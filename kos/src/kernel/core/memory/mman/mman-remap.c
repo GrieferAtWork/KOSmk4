@@ -314,11 +314,11 @@ something_changed:
 
 
 struct mappinginfo {
-	REF struct mfile           *mi_file;      /* [0..1] The file being mapped (or `NULL' for RESERVED mappings) */
-	REF struct path            *mi_fspath;    /* [0..1] Filesystem path for this mapping */
-	REF struct fdirent *mi_fsname;    /* [0..1] Filesystem name for this mapping */
-	PAGEDIR_PAGEALIGNED pos_t   mi_fpos;      /* Starting offset into `mi_file' of the first mapped byte. */
-	uintptr_t                   mi_nodeflags; /* Set of `MNODE_F_* & MREMAP_KEPT_MNODE_FLAGS' for node flags. */
+	REF struct mfile         *mi_file;      /* [0..1] The file being mapped (or `NULL' for RESERVED mappings) */
+	REF struct path          *mi_fspath;    /* [0..1] Filesystem path for this mapping */
+	REF struct fdirent       *mi_fsname;    /* [0..1] Filesystem name for this mapping */
+	PAGEDIR_PAGEALIGNED pos_t mi_fpos;      /* Starting offset into `mi_file' of the first mapped byte. */
+	uintptr_t                 mi_nodeflags; /* Set of `MNODE_F_* & MREMAP_KEPT_MNODE_FLAGS' for node flags. */
 };
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -531,7 +531,7 @@ again_lock_mman:
 			byte_t *result_maxaddr;
 			struct mnode *node;
 			struct mnode_slist movenodes;
-			uintptr_t move_disp;
+			ptrdiff_t move_disp;
 			unsigned int i;
 			result = old_address;
 			if (flags & MREMAP_FIXED)
@@ -599,6 +599,9 @@ fini_mapinfo_and_again_lock_mman:
 			 * range have been prepared. */
 			if unlikely(!pagedir_prepare_p(self->mm_pagedir_p, old_address, old_size)) {
 err_cannot_prepare:
+				mnode_merge(mman_mappings_locate(self, old_address));
+				mnode_merge(mman_mappings_locate(self, old_maxaddr));
+				mnode_merge(mman_mappings_locate(self, old_newmax));
 				mman_lock_release(self);
 				/*mappinginfo_fini(&mapinfo);*/ /* s.a. EXCEPT below! */
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
@@ -611,7 +614,7 @@ err_cannot_prepare:
 			/* With all of  the mem-node splits  done, it's time  to
 			 * shuffle around nodes the way our caller want's us to. */
 			SLIST_INIT(&movenodes);
-			move_disp = (uintptr_t)((byte_t *)result - (byte_t *)old_address);
+			move_disp = (byte_t *)result - (byte_t *)old_address;
 			if (move_disp != 0) {
 				while ((node = mman_mappings_rremove(self, old_address, old_newmax)) != NULL) {
 					node->mn_minaddr += move_disp;
@@ -772,7 +775,7 @@ again_lock_mman_phase2:
 					result = old_address;
 				} else {
 					struct mnode *node;
-					uintptr_t move_disp;
+					ptrdiff_t move_disp;
 					bool did_prepare;
 
 					/* Must create a new mapping somewhere else,
@@ -792,8 +795,31 @@ again_lock_mman_phase2:
 					if unlikely(result == MAP_FAILED)
 						goto again_lock_mman_phase2;
 
+					/* The address range being moved may not entirely overlap with
+					 * proper mnode bounds. We already  know that its entirety  is
+					 * mapped by nodes, but the lowest/greatest address may not be
+					 * at the start/end of some mnode.
+					 *
+					 * Because  we need to move the mapping elsewhere, we have to
+					 * make sure that mem-nodes are split at those two positions.
+					 * Else, we'd be moving more memory that we're supposed to! */
+					node = mman_mappings_locate(self, old_address);
+					assert(node);
+					if ((byte_t *)mnode_getminaddr(node) < (byte_t *)old_address) {
+						if (!mnode_split_or_unlock(self, node, old_address, &map))
+							goto again_lock_mman_phase2;
+					}
+					node = mman_mappings_locate(self, old_maxaddr);
+					assert(node);
+					if ((byte_t *)mnode_getmaxaddr(node) > (byte_t *)old_maxaddr) {
+						if (!mnode_split_or_unlock(self, node, (byte_t *)old_maxaddr + 1, &map))
+							goto again_lock_mman_phase2;
+					}
+
 					/* Prepare the pagedir to remove the old mapping, so we can remove it. */
 					if unlikely(!pagedir_prepare_p(self->mm_pagedir_p, old_address, old_size)) {
+						mnode_merge(mman_mappings_locate(self, old_address));
+						mnode_merge(mman_mappings_locate(self, old_maxaddr));
 						mman_lock_release(self);
 						mfile_map_release_or_reserved(&map.mmwu_map);
 						/*mappinginfo_fini(&mapinfo);*/ /* s.a. EXCEPT below! */
@@ -812,8 +838,16 @@ again_lock_mman_phase2:
 					assert(result != old_address);
 					assert(!RANGES_OVERLAP((byte_t *)result, (byte_t *)result + old_size,
 					                       (byte_t *)old_address, (byte_t *)old_address + old_size));
-					move_disp = (uintptr_t)((byte_t *)result - (byte_t *)old_address);
+					move_disp = (byte_t *)result - (byte_t *)old_address;
 					while ((node = mman_mappings_rremove(self, old_address, old_maxaddr)) != NULL) {
+						assertf((byte_t *)mnode_getminaddr(node) >= (byte_t *)old_address &&
+						        (byte_t *)mnode_getmaxaddr(node) <= (byte_t *)old_maxaddr,
+						        "Node at %p-%p exceeds move bounds %p-%p\n"
+						        "This should have been prevented by the `mnode_split_or_unlock()' above!",
+						        (byte_t *)mnode_getminaddr(node),
+						        (byte_t *)mnode_getmaxaddr(node),
+						        (byte_t *)old_address, (byte_t *)old_maxaddr);
+
 						node->mn_minaddr += move_disp;
 						node->mn_maxaddr += move_disp;
 						if (LIST_ISBOUND(node, mn_writable))

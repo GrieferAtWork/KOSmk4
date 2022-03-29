@@ -839,8 +839,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: `file(1)' appears to be broken */
 
-	/* TODO: `mremap(2)' can panic (try running tcc) */
-
 	return state;
 }
 
