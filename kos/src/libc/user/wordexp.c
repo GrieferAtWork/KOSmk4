@@ -1541,6 +1541,21 @@ got_homedir:
 }
 
 
+/* Check if `var' in `line' (which is formated as "var=value\0")
+ * starts with  `prefix_str...+=prefix_len'. If  so, return  the
+ * offset  from `line' to its containing '='. If not, return `0'
+ *
+ * NOTE: Allowed to assume that `prefix_str' does not contain '=' */
+PRIVATE ATTR_SECTION(".text.crt.wordexp") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
+NOTHROW_NCX(LIBCCALL envline_startswith)(char const *__restrict line,
+                                         char const *__restrict prefix_str,
+                                         size_t prefix_len) {
+	if (memcmp(line, prefix_str, prefix_len * sizeof(char)) != 0)
+		return 0;
+	return prefix_len + stroff(line + prefix_len, '=');
+}
+
+
 /* Parse a dollar-parameter
  * - `self->wxp_input' must point at the start of the parameter name
  * - Returns with `self->wxp_input' pointing _AFTER_ the expression (_AFTER_ the trailing '}')
@@ -1582,18 +1597,98 @@ set_value_as_argc_minus_one:
 		++self->wxp_input;
 		break;
 
-//	case '!':
-		/* TODO: "${!VARNAME}"
-		 *       Indirection
-		 *       >> FOO="Hello"
-		 *       >> VAR=FOO
-		 *       >> echo ${VAR}   # "FOO"
-		 *       >> echo ${!VAR}  # "Hello"
+	case '!': {
+		/* - "${!VARNAME}"
+		 *   Indirection
+		 *   >> FOO="Hello"
+		 *   >> VAR=FOO
+		 *   >> echo ${VAR}   # "FOO"
+		 *   >> echo ${!VAR}  # "Hello"
 		 *
-		 * TODO: "${!prefix*}", "${!prefix@}"
-		 *       Same * vs. @ expansion rules as ${#*} and ${#@},
-		 *       but  expands uses the  list of environ variables
-		 *       names that start with the given `prefix'. */
+		 * - "${!prefix*}", "${!prefix@}"
+		 *   Same * vs. @ expansion rules as ${#*} and ${#@},
+		 *   but  expands uses the  list of environ variables
+		 *   names that start with the given `prefix'. */
+		char const *envname_start;
+		size_t envname_len;
+		if unlikely(!curlyd) {
+			result = WX_SYNTAX();
+			goto done;
+		}
+		++self->wxp_input;
+		envname_start = self->wxp_input;
+		for (;; ++self->wxp_input) {
+			char ch = *self->wxp_input;
+			if (isalnum(ch))
+				continue;
+			if (ch == '_')
+				continue;
+			break;
+		}
+		envname_len = (size_t)(self->wxp_input - envname_start);
+		if (*self->wxp_input == '*' || *self->wxp_input == '@') {
+			char mode  = *self->wxp_input++;
+			char const *const *env = (char const *const *)environ;
+			if (mode == '*' || (mode == '@' && !quoted)) {
+				size_t i;
+				char const *line;
+				char *dst;
+				value_len = 0;
+				for (i = 0; (line = env[i]) != NULL; ++i) {
+					size_t len = envline_startswith(line, envname_start, envname_len);
+					if (!len)
+						continue;
+					value_len = len + 1;
+				}
+				if unlikely(!value_len)
+					value_len = 1;
+				value_freeme = (char *)malloc(value_len, sizeof(char));
+				if unlikely(!value_freeme) {
+					result = WRDE_NOSPACE;
+					goto done;
+				}
+				dst = value_freeme;
+				for (i = 0; (line = env[i]) != NULL; ++i) {
+					size_t len = envline_startswith(line, envname_start, envname_len);
+					if (!len)
+						continue;
+					dst = (char *)mempcpy(dst, line, len, sizeof(char));
+					*dst++ = ' ';
+				}
+				assert(dst == value_freeme + value_len);
+				dst[-1] = '\0';
+				value_str = value_freeme;
+			} else {
+				size_t i;
+				char const *line;
+				value_len = 0;
+				value_str = NULL;
+				for (i = 0; (line = env[i]) != NULL; ++i) {
+					size_t len = envline_startswith(line, envname_start, envname_len);
+					if (!len)
+						continue;
+					if (value_str != NULL) {
+						result = wxparser_wordappend(self, value_str, value_len);
+						if unlikely(result != 0)
+							goto done;
+						result = wxparser_newword(self);
+						if unlikely(result != 0)
+							goto done;
+					}
+					value_str = line;
+					value_len = len;
+				}
+				goto got_value_str_and_value_len;
+			}
+			result = WX_SYNTAX();
+			goto done;
+		} else {
+			value_str = getenv_fixedlength(envname_start, envname_len);
+			if (value_str != NULL)
+				value_str = getenv(value_str); /* Indirection! */
+		}
+		goto set_value_len_with_strlen;
+	}	break;
 
 	case '*':
 	case '@': {
@@ -1612,19 +1707,20 @@ set_value_as_argc_minus_one:
 			/* Use a space-separated list of all main()-arguments (except `0') as value.
 			 * >> value = " ".join(argv[1:]); */
 			value_len = 0;
-			for (i = 0; i < argc; ++i) {
+			for (i = 1; i < argc; ++i) {
 				char const *arg = argv[i];
 				if (!arg)
 					arg = "";
 				value_len = strlen(arg) + 1;
 			}
+			assert(value_len != 0);
 			value_freeme = (char *)malloc(value_len, sizeof(char));
 			if unlikely(!value_freeme) {
 				result = WRDE_NOSPACE;
 				goto done;
 			}
 			dst = value_freeme;
-			for (i = 0; i < argc; ++i) {
+			for (i = 1; i < argc; ++i) {
 				char const *arg = argv[i];
 				if (!arg)
 					arg = "";
@@ -1711,6 +1807,7 @@ set_value_len_with_strlen:
 	} /* switch (...) */
 
 	/* Inside of "${...}", we also accept extended actions, like ${HOME:-/home/me} */
+got_value_str_and_value_len:
 	if (curlyd) {
 		char const *action_start = self->wxp_input;
 		unsigned char action;
@@ -1751,43 +1848,43 @@ again_switch_curlied_action:
 			ch        = *self->wxp_input;
 			if unlikely(!strchr("-=?+", ch)) {
 				/* TODO: Support for bash-style substring:
-				 *   FOO="TestString"
-				 *   ${FOO:1}    --> "estString"
-				 *   ${FOO:1:}   --> ""
-				 *   ${FOO:1:3}  --> "est"
-				 *   ${FOO::1}   --> "T"
-				 *   ${FOO:3}    --> "tString"
-				 *   ${FOO:3:2}  --> "tS"
+				 *   >> FOO="TestString"
+				 *   >> ${FOO:1}    --> "estString"
+				 *   >> ${FOO:1:}   --> ""
+				 *   >> ${FOO:1:3}  --> "est"
+				 *   >> ${FOO::1}   --> "T"
+				 *   >> ${FOO:3}    --> "tString"
+				 *   >> ${FOO:3:2}  --> "tS"
 				 * Syntax:
-				 *   ${VARNAME:START_INDEX[:LENGTH]}  -- LENGTH=INT_MAX
-				 *   ${VARNAME::[LENGTH]}             -- START_INDEX="0"
+				 *   >> ${VARNAME:START_INDEX[:LENGTH]}  -- LENGTH=INT_MAX
+				 *   >> ${VARNAME::[LENGTH]}             -- START_INDEX="0"
 				 * Impl:
-				 *   startIndex = START_INDEX;
-				 *   if  (startIndex < 0) {
-				 *       startIndex  =   0;
-				 *       endIndex   = {value_len};
-				 *   } else {
-				 *       endIndex =  LENGTH;
-				 *       if (endIndex < 0) {
-				 *           if ((startIndex + (-endIndex)) > {value_len})
-				 *               ERROR;
-				 *           endIndex += {value_len};
-				 *           assert(endIndex  >=  0);
-				 *       } else {
-				 *           endIndex   +=   startIndex;
-				 *           if (endIndex > {value_len})
-				 *               endIndex = {value_len};
-				 *       }
-				 *   }
-				 *   if (startIndex > {value_len}) {
-				 *       startIndex = {value_len})
-				 *       endIndex   = {value_len})
-				 *   }
-				 *   // Apply substring transformation
-				 *   value_str += startIndex;
-				 *   value_len = startIndex - endIndex;
+				 *   >> startIndex = START_INDEX;
+				 *   >> if  (startIndex < 0) {
+				 *   >>     startIndex = 0;
+				 *   >>     endIndex   = {value_len};
+				 *   >> } else {
+				 *   >>     endIndex = LENGTH;
+				 *   >>     if (endIndex < 0) {
+				 *   >>         if ((startIndex + (-endIndex)) > {value_len})
+				 *   >>             ERROR;
+				 *   >>         endIndex += {value_len};
+				 *   >>         assert(endIndex >= 0);
+				 *   >>     } else {
+				 *   >>         endIndex += startIndex;
+				 *   >>         if (endIndex > {value_len})
+				 *   >>             endIndex = {value_len};
+				 *   >>     }
+				 *   >> }
+				 *   >> if (startIndex > {value_len}) {
+				 *   >>     startIndex = {value_len})
+				 *   >>     endIndex   = {value_len})
+				 *   >> }
+				 *   >> // Apply substring transformation
+				 *   >> value_str += startIndex;
+				 *   >> value_len = startIndex - endIndex;
 				 */
-				goto err_syntax;
+				goto err_syntax_in_action;
 			}
 			goto again_switch_curlied_action;
 
@@ -1813,7 +1910,7 @@ again_switch_curlied_action:
 			break;
 
 		default:
-err_syntax:
+err_syntax_in_action:
 			result = WX_SYNTAX();
 			goto done;
 		}
