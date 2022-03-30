@@ -24,6 +24,7 @@
 #include "../api.h"
 /**/
 
+#include <hybrid/overflow.h>
 #include <hybrid/wordbits.h>
 
 #include <sys/wait.h>
@@ -1319,6 +1320,15 @@ done:
 	return result;
 }
 
+PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
+NOTHROW_NCX(FCALL wxpr_evalconst)(struct wxpr_parser *__restrict self) {
+	int result = wxpr_eval_comma(self);
+	if likely(result == 0)
+		result = wxpr_makeconst(self);
+	return result;
+}
+
+
 
 /* Evaluate a mathematical expression and append its (decimal) result. */
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
@@ -1339,7 +1349,7 @@ NOTHROW_NCX(LIBCCALL wxparser_parse_expr)(struct wxparser *__restrict self,
 
 	/* Evaluate the expression */
 	wxpr_next(&wxpr);
-	result = wxpr_eval_comma(&wxpr);
+	result = wxpr_evalconst(&wxpr);
 	if unlikely(result != 0)
 		goto done;
 
@@ -1348,12 +1358,6 @@ NOTHROW_NCX(LIBCCALL wxparser_parse_expr)(struct wxparser *__restrict self,
 		result = WX_SYNTAX();
 		goto done;
 	}
-
-	/* Ensure that variables have been expanded */
-	result = wxpr_makeconst(&wxpr);
-	if unlikely(result != 0)
-		goto done;
-
 
 	/* Convert the expression result into a (decimal) string */
 	len = sprintf(buf, "%" PRIdMAX, wxpr.wxpr_val);
@@ -1847,22 +1851,28 @@ again_switch_curlied_action:
 			got_colon = true;
 			ch        = *self->wxp_input;
 			if unlikely(!strchr("-=?+", ch)) {
-				/* TODO: Support for bash-style substring:
+				/* Support for bash-style (and 100% bash-compatible) substring:
 				 *   >> FOO="TestString"
-				 *   >> ${FOO:1}    --> "estString"
-				 *   >> ${FOO:1:}   --> ""
-				 *   >> ${FOO:1:3}  --> "est"
-				 *   >> ${FOO::1}   --> "T"
-				 *   >> ${FOO:3}    --> "tString"
-				 *   >> ${FOO:3:2}  --> "tS"
+				 *   >> ${FOO:1}       --> "estString"
+				 *   >> ${FOO:1:}      -->      (nothing)
+				 *   >> "${FOO:1:}"    --> ""
+				 *   >> ${FOO:1:3}     --> "est"
+				 *   >> ${FOO::1}      --> "T"
+				 *   >> ${FOO:3}       --> "tString"
+				 *   >> ${FOO:3:2}     --> "tS"
+				 *   >> ${FOO:(-1):2}  --> "tS"
+				 *   >> ${FOO:(-10):4} --> "Test"
+				 *   >> ${FOO:(-11):4} -->      (nothing)
 				 * Syntax:
-				 *   >> ${VARNAME:START_INDEX[:LENGTH]}  -- LENGTH=INT_MAX
-				 *   >> ${VARNAME::[LENGTH]}             -- START_INDEX="0"
+				 *   >> ${VARNAME:STARTI[:LENGTH]}  -- LENGTH=INT_MAX
+				 *   >> ${VARNAME::[LENGTH]}        -- STARTI="0"
 				 * Impl:
-				 *   >> startIndex = START_INDEX;
-				 *   >> if  (startIndex < 0) {
+				 *   >> startIndex = STARTI;
+				 *   >> if (startIndex < 0)
+				 *   >>     startIndex += {value_len};
+				 *   >> if (startIndex < 0) {
 				 *   >>     startIndex = 0;
-				 *   >>     endIndex   = {value_len};
+				 *   >>     endIndex   = 0;
 				 *   >> } else {
 				 *   >>     endIndex = LENGTH;
 				 *   >>     if (endIndex < 0) {
@@ -1882,9 +1892,12 @@ again_switch_curlied_action:
 				 *   >> }
 				 *   >> // Apply substring transformation
 				 *   >> value_str += startIndex;
-				 *   >> value_len = startIndex - endIndex;
+				 *   >> value_len = endIndex - startIndex;
 				 */
-				goto err_syntax_in_action;
+				/*goto err_syntax_in_action;*/
+				action         = ':';
+				expand_pattern = true;
+				break;
 			}
 			goto again_switch_curlied_action;
 
@@ -1910,7 +1923,7 @@ again_switch_curlied_action:
 			break;
 
 		default:
-err_syntax_in_action:
+/*err_syntax_in_action:*/
 			result = WX_SYNTAX();
 			goto done;
 		}
@@ -2083,6 +2096,80 @@ err_pattern_restore:
 		/* Perform the requested action. */
 		switch (action) {
 
+		case (unsigned char)':': {
+			size_t start_index, end_index;
+			intmax_t parsed_starti = 0;
+			intmax_t parsed_length = INTMAX_MAX;
+			struct wxpr_parser wxpr;
+			DBG_memset(&wxpr, 0xcc, sizeof(wxpr));
+			wxpr.wxpr_pos  = pattern_str;
+			wxpr.wxpr_end  = pattern_str + pattern_len;
+			wxpr.wxpr_dead = false;
+			wxpr.wxpr_wpar = self;
+
+			/* Parse the `STARTI' part of the expression */
+			if (wxpr_next(&wxpr) != ':') {
+				result = wxpr_evalconst(&wxpr);
+				if unlikely(result != 0)
+					goto err_pattern_freeme;
+				parsed_starti = wxpr.wxpr_val;
+			}
+
+			/* Parse the `LENGTH' part of the expression */
+			if (wxpr.wxpr_tok == ':') {
+				parsed_length = 0;
+				if (wxpr_next(&wxpr) != '\0') {
+					result = wxpr_evalconst(&wxpr);
+					if unlikely(result != 0)
+						goto err_pattern_freeme;
+					parsed_length = wxpr.wxpr_val;
+				}
+			}
+
+			/* Ensure that everything was consumed */
+			if unlikely(wxpr.wxpr_tok != '\0') {
+				result = WX_SYNTAX();
+				goto err_pattern_freeme;
+			}
+			if (parsed_starti < 0)
+				parsed_starti += value_len;
+			if (parsed_starti < 0) {
+				start_index = 0;
+				end_index   = 0;
+			} else {
+#if __SIZEOF_INTMAX_T__ > __SIZEOF_SIZE_T__
+				if (parsed_starti > (intmax_t)SIZE_MAX)
+					parsed_starti = (intmax_t)SIZE_MAX;
+				if (parsed_length > (intmax_t)SIZE_MAX)
+					parsed_length = (intmax_t)SIZE_MAX;
+#endif /* __SIZEOF_INTMAX_T__ > __SIZEOF_SIZE_T__ */
+				start_index = (size_t)parsed_starti;
+				end_index   = (size_t)parsed_length;
+				if (parsed_length < 0) {
+					if ((start_index - end_index) > value_len) {
+						result = WX_SYNTAX();
+						goto err_pattern_freeme;
+					}
+					end_index += value_len;
+					assert(end_index <= value_len);
+				} else {
+					if (OVERFLOW_UADD(end_index, start_index, &end_index) ||
+					    end_index > value_len)
+						end_index = value_len;
+				}
+			}
+
+			/* Apply substring transformation */
+			assertf(start_index <= end_index &&
+			        end_index <= value_len,
+			        "start_index: %" PRIuSIZ "\n"
+			        "end_index:   %" PRIuSIZ "\n"
+			        "value_len:   %" PRIuSIZ "\n",
+			        start_index, end_index, value_len);
+			value_str += start_index;
+			value_len = end_index - start_index;
+		}	break;
+
 		case (unsigned char)'#':
 		case (unsigned char)'#' << 1:
 		case (unsigned char)'%':
@@ -2139,6 +2226,8 @@ err_pattern_restore:
 			}
 insert_nothing:
 			result = 0;
+err_pattern_freeme:
+			free(pattern_freeme);
 			goto done;
 
 		case (unsigned char)'-':

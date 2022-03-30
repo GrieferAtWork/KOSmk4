@@ -185,6 +185,46 @@ DEFINE_TEST(wordexp) {
 	assertf(strcmp(getenv("FOO"), "44") == 0, "%q", getenv("FOO"));
 	unsetenv("FOO");
 
+	/* Test bash-style (and 100% bash-compatible) substring expansion. */
+	setenv("FOO", "TestString", 1);
+	assert_wordexp("${FOO:1}", 1, "estString");
+	assert_wordexp("${FOO:1:}", 0);
+	assert_wordexp("\"${FOO:1:}\"", 1, "");
+	assert_wordexp("${FOO:1:3}", 1, "est");
+	assert_wordexp("${FOO::1}", 1, "T");
+	assert_wordexp("${FOO:3}", 1, "tString");
+	assert_wordexp("${FOO:3:2}", 1, "tS");
+	assert_wordexp("${FOO::-1}", 1, "TestStrin");
+	assert_wordexp("${FOO::-2}", 1, "TestStri");
+	assert_wordexp("${FOO:1:-1}", 1, "estStrin");
+	assert_wordexp("${FOO:2:-2}", 1, "stStri");
+	assert_wordexp("${FOO:(-6):-2}", 1, "Stri");
+	assert_wordexp("${FOO:(-6):-1}", 1, "Strin");
+	assert_wordexp("${FOO:(-6)}", 1, "String");
+	assert_wordexp("${FOO:(-6):1}", 1, "S");
+	assert_wordexp("${FOO:(-6):2}", 1, "St");
+	assert_wordexp("${FOO:(-7):-2}", 1, "tStri");
+	assert_wordexp("${FOO:(-7):-1}", 1, "tStrin");
+	assert_wordexp("${FOO:(-7)}", 1, "tString");
+	assert_wordexp("${FOO:(-7):1}", 1, "t");
+	assert_wordexp("${FOO:(-7):2}", 1, "tS");
+	assert_wordexp("${FOO:(-10):-2}", 1, "TestStri");
+	assert_wordexp("${FOO:(-10):-1}", 1, "TestStrin");
+	assert_wordexp("${FOO:(-10)}", 1, "TestString");
+	assert_wordexp("${FOO:(-10):1}", 1, "T");
+	assert_wordexp("${FOO:(-10):2}", 1, "Te");
+	assert_wordexp("${FOO:(-11):-2}", 0);
+	assert_wordexp("${FOO:(-11):-1}", 0);
+	assert_wordexp("${FOO:(-11)}", 0);
+	assert_wordexp("${FOO:(-11):1}", 0);
+	assert_wordexp("${FOO:(-11):2}", 0);
+	assert_wordexp("\"${FOO:(-11):-2}\"", 1, "");
+	assert_wordexp("\"${FOO:(-11):-1}\"", 1, "");
+	assert_wordexp("\"${FOO:(-11)}\"", 1, "");
+	assert_wordexp("\"${FOO:(-11):1}\"", 1, "");
+	assert_wordexp("\"${FOO:(-11):2}\"", 1, "");
+	unsetenv("FOO");
+
 	/* Assert that unquoted variable expansion works when using a custom $IFS */
 	setenv("IFS", ", \t\r\n", 1);
 	setenv("VAR", "foo, bar, baz", 1);
