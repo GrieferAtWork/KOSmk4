@@ -1443,7 +1443,7 @@ NOTHROW_NCX(LIBCCALL wxparser_parse_quoted_backslash)(struct wxparser *__restric
 PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL wxparser_parse_tilde)(struct wxparser *__restrict self,
                                            bool pretend_first_word) {
-	char const *homedir;
+	char *homedir;
 	int result;
 	char const *username_start, *username_end;
 	/* Special handling for situation where '~' should _NOT_ be expanded. */
@@ -1498,8 +1498,24 @@ done_username:
 		char *namebuf;
 		size_t namelen;
 		namelen = (size_t)(username_end - username_start);
-		/* TODO: '~+' --> '$PWD' or getpwd() */
-		/* TODO: '~-' --> '$OLDPWD' or <re-insert '~-'> */
+		if (namelen == 1) {
+			if (username_start[0] == '+') {
+				/* '~+' --> '$PWD' or getpwd() */
+				homedir = getenv("PWD");
+				if (homedir)
+					goto got_homedir;
+				homedir = getcwd(NULL, 0);
+				if unlikely(!homedir)
+					return WRDE_NOSPACE;
+				result = wxparser_wordappend(self, homedir, strlen(homedir));
+				free(homedir);
+				return result;
+			} else if (username_start[0] == '-') {
+				/* '~-' --> '$OLDPWD' or <re-insert '~-'> */
+				homedir = getenv("OLDPWD");
+				goto got_homedir;
+			}
+		}
 
 		namebuf = (char *)malloca(namelen + 1, sizeof(char));
 		if unlikely(!namebuf)
@@ -1512,9 +1528,14 @@ done_username:
 		if (pwd != NULL)
 			homedir = pwd->pw_dir;
 	}
-	if (homedir == NULL)
-		homedir = "~"; /* Fallback */
-	result = wxparser_wordappend(self, homedir, strlen(homedir));
+got_homedir:
+	if (homedir != NULL) {
+		result = wxparser_wordappend(self, homedir, strlen(homedir));
+	} else {
+		--username_start; /* Include the leading '~' */
+		result = wxparser_wordappend(self, username_start,
+		                             (size_t)(username_end - username_start));
+	}
 	self->wxp_input = username_end;
 	return result;
 }
