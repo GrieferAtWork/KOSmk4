@@ -299,19 +299,97 @@ NOTHROW_NCX(LIBCCALL libc_re_set_registers)(struct re_pattern_buffer *buffer,
 }
 /*[[[end:libc_re_set_registers]]]*/
 
+
+#define REGEX_USE_PCRE
+
+/* Until KOS implements regular expressions proper, we (try to) use libpcre */
+#ifdef REGEX_USE_PCRE
+#define PCRE_REG_ICASE     0x0001
+#define PCRE_REG_NEWLINE   0x0002
+#define PCRE_REG_NOTBOL    0x0004
+#define PCRE_REG_NOTEOL    0x0008
+#define PCRE_REG_DOTALL    0x0010
+#define PCRE_REG_NOSUB     0x0020
+#define PCRE_REG_UTF8      0x0040
+#define PCRE_REG_STARTEND  0x0080
+#define PCRE_REG_NOTEMPTY  0x0100
+#define PCRE_REG_UNGREEDY  0x0200
+#define PCRE_REG_UCP       0x0400
+typedef struct {
+	void *re_pcre;
+	size_t re_nsub;
+	size_t re_erroffset;
+} pcre_regex_t;
+
+#define PCRE_REGEX_ENCODE(self) \
+	(((pcre_regex_t *)(self))->re_nsub = (self)->re_nsub)
+#define PCRE_REGEX_DECODE(self) \
+	((self)->re_nsub = ((pcre_regex_t *)(self))->re_nsub)
+
+
+typedef int (*PREGCOMP)(pcre_regex_t *, const char *, int);
+typedef int (*PREGEXEC)(const pcre_regex_t *, const char *, size_t, regmatch_t *, int);
+typedef size_t (*PREGERROR)(int, const pcre_regex_t *, char *, size_t);
+typedef void (*PREGFREE)(pcre_regex_t *);
+
+PRIVATE ATTR_SECTION(".bss.crt.utility.regex") void *libpcre = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.utility.regex") PREGCOMP pdyn_pcre_regcomp   = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.utility.regex") PREGEXEC pdyn_pcre_regexec   = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.utility.regex") PREGERROR pdyn_pcre_regerror = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.utility.regex") PREGFREE pdyn_pcre_regfree   = NULL;
+PRIVATE ATTR_SECTION(".text.crt.utility.regex") bool LIBCCALL load_pcre(void) {
+	void *lib;
+	if (libpcre != NULL)
+		return libpcre != (void *)-1;
+	lib = dlopen("libpcreposix.so.0", RTLD_LAZY | RTLD_LOCAL);
+	if (!lib)
+		goto fail;
+	if ((*(void **)&pdyn_pcre_regcomp = dlsym(lib, "regcomp")) == NULL)
+		goto fail;
+	if ((*(void **)&pdyn_pcre_regexec = dlsym(lib, "regexec")) == NULL)
+		goto fail;
+	if ((*(void **)&pdyn_pcre_regerror = dlsym(lib, "regerror")) == NULL)
+		goto fail;
+	if ((*(void **)&pdyn_pcre_regfree = dlsym(lib, "regfree")) == NULL)
+		goto fail;
+	if (!ATOMIC_CMPXCH(libpcre, NULL, lib))
+		dlclose(lib);
+	return ATOMIC_READ(libpcre) != (void *)-1;
+fail:
+	libpcre = (void *)-1;
+	return false;
+}
+#endif /* REGEX_USE_PCRE */
+
+
 /*[[[head:libc_regcomp,hash:CRC-32=0xd2f28c93]]]*/
 INTERN ATTR_SECTION(".text.crt.utility.regex") int
 NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict preg,
                                    char const *__restrict pattern,
                                    int cflags)
 /*[[[body:libc_regcomp]]]*/
-/*AUTO*/{
+{
+#ifdef REGEX_USE_PCRE
+	if (load_pcre()) {
+		int result;
+		int new_cflags = 0;
+		if (cflags & REG_ICASE)
+			new_cflags |= PCRE_REG_ICASE;
+		if (cflags & REG_NEWLINE)
+			new_cflags |= PCRE_REG_NEWLINE;
+		if (cflags & REG_NOSUB)
+			new_cflags |= PCRE_REG_NOSUB;
+		PCRE_REGEX_ENCODE(preg);
+		result = (*pdyn_pcre_regcomp)((pcre_regex_t *)preg, pattern, new_cflags);
+		PCRE_REGEX_DECODE(preg);
+		return result;
+	}
+#endif /* REGEX_USE_PCRE */
 	(void)preg;
 	(void)pattern;
 	(void)cflags;
 	CRT_UNIMPLEMENTEDF("regcomp(%p, %q, %x)", preg, pattern, cflags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_regcomp]]]*/
 
@@ -324,6 +402,22 @@ NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict preg,
                                    int eflags)
 /*[[[body:libc_regexec]]]*/
 {
+#ifdef REGEX_USE_PCRE
+	if (load_pcre()) {
+		int result;
+		int new_eflags = 0;
+		if (eflags & REG_NOTBOL)
+			new_eflags |= PCRE_REG_NOTBOL;
+		if (eflags & REG_NOTEOL)
+			new_eflags |= PCRE_REG_NOTEOL;
+		if (eflags & REG_STARTEND)
+			new_eflags |= PCRE_REG_STARTEND;
+		PCRE_REGEX_ENCODE(preg);
+		result = (*pdyn_pcre_regexec)((pcre_regex_t *)preg, string, nmatch, pmatch, new_eflags);
+		/*PCRE_REGEX_DECODE(preg);*/
+		return result;
+	}
+#endif /* REGEX_USE_PCRE */
 	(void)preg;
 	(void)string;
 	(void)nmatch;
@@ -344,7 +438,16 @@ NOTHROW_NCX(LIBCCALL libc_regerror)(int errcode,
                                     char *__restrict errbuf,
                                     size_t errbuf_size)
 /*[[[body:libc_regerror]]]*/
-/*AUTO*/{
+{
+#ifdef REGEX_USE_PCRE
+	if (load_pcre()) {
+		size_t result;
+		PCRE_REGEX_ENCODE(preg);
+		result = (*pdyn_pcre_regerror)(errcode, (pcre_regex_t *)preg, errbuf, errbuf_size);
+		/*PCRE_REGEX_DECODE(preg);*/
+		return result;
+	}
+#endif /* REGEX_USE_PCRE */
 	(void)errcode;
 	(void)preg;
 	(void)errbuf;
@@ -359,7 +462,14 @@ NOTHROW_NCX(LIBCCALL libc_regerror)(int errcode,
 INTERN ATTR_SECTION(".text.crt.utility.regex") void
 NOTHROW_NCX(LIBCCALL libc_regfree)(regex_t *preg)
 /*[[[body:libc_regfree]]]*/
-/*AUTO*/{
+{
+#ifdef REGEX_USE_PCRE
+	if (load_pcre()) {
+		PCRE_REGEX_ENCODE(preg);
+		(*pdyn_pcre_regfree)((pcre_regex_t *)preg);
+		return;
+	}
+#endif /* REGEX_USE_PCRE */
 	(void)preg;
 	CRT_UNIMPLEMENTEDF("regfree(%p)", preg); /* TODO */
 	libc_seterrno(ENOSYS);
