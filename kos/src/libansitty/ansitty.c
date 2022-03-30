@@ -174,7 +174,14 @@ DECL_BEGIN
 #define ANSITTY_FLAG_ENABLE_APP_CURSOR 0x0040 /* FLAG: Enable application cursor keys */
 #define ANSITTY_FLAG_ENABLE_APP_KEYPAD 0x0080 /* FLAG: Enable application keypad keys */
 #define ANSITTY_FLAG_BACKSPACE_REVERSE 0x0100 /* FLAG: 0: BS=8,CTRL+BS=127; 1: BS=127,CTRL+BS=8 */
-#define ANSITTY_FLAG_RENDERMASK        (ANSITTY_FLAG_CONCEIL | ANSITTY_FLAG_CRM) /* Mask for flags that affect rendering */
+#define ANSITTY_FLAG_COLORBOLD         0x0200 /* FLAG: \e[1m (brighten foreground color) is active. (affects \e[30m ... \e[37m) */
+#define ANSITTY_FLAG_RENDERMASK        (ANSITTY_FLAG_CONCEIL | ANSITTY_FLAG_CRM | ANSITTY_FLAG_COLORBOLD) /* Mask for flags that affect rendering */
+
+#if (ANSITTY_FLAG_COLORBOLD >> 6) == ANSITTY_IFSTRONG
+#define ANSITTY_FLAG_GETCOLORSTRONG(x) (((x) & ANSITTY_FLAG_COLORBOLD) >> 6)
+#else /* (ANSITTY_FLAG_COLORBOLD >> 6) == ANSITTY_IFSTRONG */
+#define ANSITTY_FLAG_GETCOLORSTRONG(x) ((x) & ANSITTY_FLAG_COLORBOLD ? ANSITTY_IFSTRONG : 0)
+#endif /* (ANSITTY_FLAG_COLORBOLD >> 6) != ANSITTY_IFSTRONG */
 
 
 /* TTY states */
@@ -2099,10 +2106,12 @@ done_insert_ansitty_flag_hedit:
 
 			case 1: /* Brighten foreground output color */
 				setcolor(self, self->at_color | ANSITTY_IFSTRONG);
+				self->at_ttyflag |= ANSITTY_FLAG_COLORBOLD;
 				break;
 
 			case 2: /* Darken foreground output color */
 				setcolor(self, self->at_color & ~ANSITTY_IFSTRONG);
+				self->at_ttyflag &= ~ANSITTY_FLAG_COLORBOLD;
 				break;
 
 			case 3:
@@ -2172,7 +2181,7 @@ done_insert_ansitty_flag_hedit:
 				break;
 
 			case 30 ... 37:
-				setcolor(self, ANSITTY_PALETTE_INDEX(code - 30,
+				setcolor(self, ANSITTY_PALETTE_INDEX((code - 30) + ANSITTY_FLAG_GETCOLORSTRONG(self->at_ttyflag),
 				                                     ANSITTY_PALETTE_INDEX_BG(self->at_color)));
 				break;
 
@@ -2274,14 +2283,15 @@ done_insert_ansitty_flag_hedit:
 
 			case 90 ... 97:
 				setcolor(self,
-				         ANSITTY_PALETTE_INDEX(ANSITTY_IFSTRONG + (code - 90),
+				         ANSITTY_PALETTE_INDEX((code - 90) + ANSITTY_IFSTRONG -
+				                               ANSITTY_FLAG_GETCOLORSTRONG(self->at_ttyflag),
 				                               ANSITTY_PALETTE_INDEX_BG(self->at_color)));
 				break;
 
 			case 100 ... 107:
 				setcolor(self,
 				         ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_FG(self->at_color),
-				                               ANSITTY_IFSTRONG + (code - 100)));
+				                               (code - 100) + ANSITTY_IFSTRONG));
 				break;
 
 			}
