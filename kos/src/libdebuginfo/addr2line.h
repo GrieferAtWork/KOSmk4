@@ -99,7 +99,13 @@ libdi_debug_addr2line_print_filename(pformatprinter printer, void *arg,
 /* Load debug sections, given a handle to a module, as returned by dlopen()
  * >> These functions are simply light-weight wrappers around `dllocksection()',
  *    taking  the job of  locking debug information sections  into memory off of
- *    the user. */
+ *    the user.
+ * @return: DEBUG_INFO_ERROR_SUCCESS: Successfully loaded debug sections.
+ * @return: DEBUG_INFO_ERROR_NOFRAME: Either `dl_handle' is invalid, or the specified library
+ *                                    doesn't  provide any of the necessary debug information
+ *                                    sections.
+ *                                    In this case, `sections' and `dl_sections' will have both
+ *                                    been initialized to all NULL-values. */
 INTDEF NONNULL((2, 3)) unsigned int
 NOTHROW_NCX(CC libdi_debug_addr2line_sections_lock)(module_t *dl_handle,
                                                     di_addr2line_sections_t *__restrict sections,

@@ -73,7 +73,7 @@ typedef unsigned int gfp_t;
  *   - GFP_CALLOC:       Allocate from `mfile_zero' instead of `mfile_ndef'
  *   - GFP_ATOMIC:       Don't block when waiting to acquire any sort of lock.
  *   - GFP_NOMMAP:       Unconditionally throw `E_WOULDBLOCK_PREEMPTED'
- *   - GFP_VCBASE:       Allocate the mnode and mpart using `mcoreheap_alloc_locked_nx()'.
+ *   - GFP_MCHEAP:       Allocate the mnode and mpart using `mcoreheap_alloc_locked_nx()'.
  *                       This also  causes  the  `MNODE_F_COREPART'  /  `MPART_F_COREPART'
  *                       flags  to  be set  for each  resp. This  flag is  used internally
  *                       to resolve  the dependency  loop  between this  function  needing

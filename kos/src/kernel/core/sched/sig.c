@@ -98,7 +98,7 @@ NOTHROW(KCALL pertask_fix_task_connections)(struct task *__restrict self) {
 fixit:
 	FORTASK(self, this_connections) = &FORTASK(self, this_root_connections);
 	bzero(&FORTASK(self, this_root_connections), sizeof(struct task_connections));
-	FORTASK(self, this_root_connections).tcs_thread = self;
+	FORTASK(self, this_root_connections.tcs_thread) = self;
 }
 
 #if defined(__x86_64__) || defined(__i386__)

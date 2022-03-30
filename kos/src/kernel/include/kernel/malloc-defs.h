@@ -253,7 +253,7 @@ typedef unsigned int gfp_t;
                             *       remains will still produce some overflow that will be reserved
                             *       for future allocations. */
 #define GFP_NOSWAP  0x2000 /* FLAG: Don't invoke the swap machinery to free up memory. */
-#define GFP_VCBASE  0x4000 /* FLAG: Allocate page controllers using the core-base allocators. (VmCoreBASE) */
+#define GFP_MCHEAP  0x4000 /* FLAG: Allocate page controllers using the core-heap allocators. (MCoreHEAP) */
 #define GFP_NOMOVE  0x8000 /* FLAG: Only for `heap_realloc()' / `heap_realign()': use `realloc_in_place()' semantics,
                             *       returning `NULL' (even  in exception-mode) when  the re-allocation is  impossible
                             *       due to an overlap with some other memory mapping. */
@@ -261,7 +261,7 @@ typedef unsigned int gfp_t;
 /* Mask of GFP flags that are inherited by recursive allocations for control structures. */
 #define GFP_INHERIT                                      \
 	(GFP_ATOMIC | GFP_NOOVER | GFP_NOMMAP | GFP_NOTRIM | \
-	 GFP_NOSWAP | GFP_NOCLRC | GFP_VCBASE)
+	 GFP_NOSWAP | GFP_NOCLRC | GFP_MCHEAP)
 
 
 #ifdef CONFIG_TRACE_MALLOC

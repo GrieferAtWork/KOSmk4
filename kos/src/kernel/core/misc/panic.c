@@ -146,15 +146,19 @@ NOTHROW(KCALL _kernel_poison)(void) {
 	    mythread != &asyncwork &&
 	    mythread != &bootidle)
 		fixup_uninitialized_thread(mythread);
+
 	/* Poison the kernel (indicating  that the kernel has  become
-	 * inconsistent, and can no longer be trusted to sporadically
+	 * inconsistent, and can no longer be trusted not to randomly
 	 * crash and burn) */
 	COMPILER_WRITE_BARRIER();
 	ATOMIC_STORE(__kernel_poisoned, 0xff); /* Set all of the poison bits! */
 	COMPILER_WRITE_BARRIER();
-#ifdef CONFIG_HAVE_POISON_HEAP
+
 	/* Redirect heap functions to use the poison heap */
+#ifdef CONFIG_HAVE_POISON_HEAP
 	ph_install();
+#endif /* CONFIG_HAVE_POISON_HEAP */
+
 	/* TODO: Turn system_clearcache() into a no-op.
 	 *       With the poison-heap, kfree() also becomes a no-op,
 	 *       so system_clearcache() won't actually do  anything.
@@ -165,7 +169,7 @@ NOTHROW(KCALL _kernel_poison)(void) {
 	 * prevent any  unnecessary callbacks  to sub-systems  that
 	 * depend on too many other sub-systems, or contain dynamic
 	 * callbacks (both of which are the case for this function) */
-#endif /* CONFIG_HAVE_POISON_HEAP */
+
 	PREEMPTION_POP(was);
 }
 

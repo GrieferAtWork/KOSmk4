@@ -221,7 +221,7 @@ NOTHROW(KCALL system_cc_slab_prealloc)(struct ccinfo *__restrict info) {
 #define CORE_ALLOC_FLAGS                                                        \
 	(GFP_LOCKED |                                                               \
 	 GFP_PREFLT |                                                               \
-	 GFP_VCBASE | /* Instruct the heap to only consider allocating from VCbase, \
+	 GFP_MCHEAP | /* Instruct the heap to only consider allocating from VCbase, \
 	               * thus preventing an infinite loop. */                       \
 	 GFP_NOOVER   /* Don't overallocate to prevent infinite recursion! */       \
 	)

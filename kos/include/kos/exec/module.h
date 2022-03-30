@@ -20,8 +20,8 @@
 #ifndef _KOS_EXEC_MODULE_H
 #define _KOS_EXEC_MODULE_H 1
 
-/* Portable (as in: both user- and kernel-space capable) API
- * for    working    with   dynamically    loaded   objects:
+/* Portable (as in: both user- and kernel-space capable)
+ * API for  working  with  dynamically  loaded  objects:
  *   kernelspace: `struct module *'  from <kernel/mman/module.h>
  *   userspace:   `void *'           from <dlfcn.h>  (aka: struct dlmodule *)
  */

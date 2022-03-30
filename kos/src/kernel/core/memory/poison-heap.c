@@ -267,7 +267,7 @@ err:
 	void *result;
 	result = mman_map_kram_nx(NULL, num_bytes,
 	                          GFP_LOCKED | GFP_PREFLT |
-	                          GFP_VCBASE | GFP_NOCLRC |
+	                          GFP_MCHEAP | GFP_NOCLRC |
 	                          GFP_NOSWAP | flags);
 	if (result == MAP_FAILED)
 		result = NULL;
@@ -289,8 +289,8 @@ NOTHROW(KCALL phcore_unused_alloc_nx)(size_t num_bytes, gfp_t flags,
 	void *result = NULL;
 	struct ph_unused *chain, **piter, *iter;
 	/* Temporarily steal the chain.
-	 * NOTE: This must be thread-safe, but not necessarily thread-efficient,
-	 *       so it's OK if one thread can cause this fail for other threads! */
+	 * NOTE: This must be thread-safe, but not necessarily thread-efficient,  so
+	 *       it's OK if one thread can cause this to fail for all other threads! */
 	chain = ATOMIC_XCH(ph_unused_blocks, NULL);
 	for (piter = &chain; (iter = *piter) != NULL; piter = &iter->pu_next) {
 		if (iter->pu_size >= num_bytes) {
@@ -365,7 +365,7 @@ NOTHROW(KCALL phcore_core_alloc_nx)(size_t num_bytes, gfp_t flags,
 				if (unused_head >= sizeof(struct ph_unused)) {
 					real_alloc = page_bytes - unused_head;
 					/* In order to somewhat better deal with small  allocations,
-					 * allow the unused tail to be re-used in later allocations. */
+					 * allow the unused head to be re-used in later allocations. */
 					phcore_unused_append(result, unused_head);
 					result = (byte_t *)result + unused_head;
 				}

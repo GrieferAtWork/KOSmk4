@@ -56,7 +56,7 @@ DECL_BEGIN
  *   - GFP_CALLOC:       Allocate from `mfile_zero' instead of `mfile_ndef'
  *   - GFP_ATOMIC:       Don't block when waiting to acquire any sort of lock.
  *   - GFP_NOMMAP:       Unconditionally throw `E_WOULDBLOCK_PREEMPTED'
- *   - GFP_VCBASE:       Allocate the mnode and mpart using `mcoreheap_alloc_locked_nx()'.
+ *   - GFP_MCHEAP:       Allocate the mnode and mpart using `mcoreheap_alloc_locked_nx()'.
  *                       This also  causes  the  `MNODE_F_COREPART'  /  `MPART_F_COREPART'
  *                       flags  to  be set  for each  resp. This  flag is  used internally
  *                       to resolve  the dependency  loop  between this  function  needing
@@ -147,17 +147,17 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
 	 *  - GFP_LOCKED: All   components  must  be  locked,  since  we're
 	 *                allocating stuff such as mem-nodes and mem-parts!
 	 *  - GFP_PREFLT: Slightly improve through-put for locked memory
-	 *  - GFP_VCBASE: If  we end up  calling ourself recursively, don't
+	 *  - GFP_MCHEAP: If  we end up  calling ourself recursively, don't
 	 *                allocate mem-nodes/parts using kmalloc(), but use
 	 *                the  mcoreheap system instead, thus resolving the
 	 *                dependency loop between  us calling kmalloc,  and
 	 *                kmalloc calling us.
 	 *  - GFP_NOOVER: Don't  over-allocate.  This is  required so  that a
-	 *                recursive call with the `GFP_VCBASE' flag set won't
+	 *                recursive call with the `GFP_MCHEAP' flag set won't
 	 *                try  to allocate more  memory than the ceil-aligned
 	 *                size of the requested data-blob.
 	 *                This is required to  ensure that a truly  recursive
-	 *                call  with  the  `GFP_VCBASE' should  never  try to
+	 *                call  with  the  `GFP_MCHEAP' should  never  try to
 	 *                allocate  more than a single page, thus guarantying
 	 *                that we'll never be needing to make use of  further
 	 *                dynamic memory allocations during a recursive call.
@@ -172,7 +172,7 @@ NOTHROW(FCALL mman_map_kram_nx)(void *hint, size_t num_bytes,
 	num_pages = (num_bytes + PAGESIZE - 1) >> PAGESHIFT; /* CEILDIV-style */
 	num_bytes = num_pages << PAGESHIFT; /* This enforces page-alignment for `num_bytes'! */
 	inner_flags = flags;
-	inner_flags |= GFP_LOCKED | GFP_PREFLT | GFP_VCBASE | GFP_NOOVER;
+	inner_flags |= GFP_LOCKED | GFP_PREFLT | GFP_MCHEAP | GFP_NOOVER;
 	inner_flags &= ~(GFP_CALLOC | GFP_MAP_FLAGS);
 
 again_lock_mman:
@@ -266,7 +266,7 @@ again_lock_mman:
 #define LOCAL_INIT_PART(part, flags) \
 		((part)->mp_state = MPART_ST_VOID, (part)->mp_flags = (flags), (part)->mp_xflags = MPART_XF_NORMAL)
 		/* Allocate the required node/part pair. */
-		if (flags & GFP_VCBASE) {
+		if (flags & GFP_MCHEAP) {
 			if likely(!node) {
 				union mcorepart *cp;
 				cp = mcoreheap_alloc_locked_nx();

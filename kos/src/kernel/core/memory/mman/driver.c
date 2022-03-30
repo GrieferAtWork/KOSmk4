@@ -813,7 +813,7 @@ NOTHROW(FCALL driver_fromaddr)(void const *addr) {
 			/* NOTE: Any module we  find here should  _always_ be a  driver
 			 *       module, but better be save than sorry, and check  that
 			 *       this is the case, only constructing the to-be returned
-			 *       reference if that is truly the case. */
+			 *       reference if that is truly so. */
 			if (result && (!module_isdriver((struct module *)result) ||
 			               !tryincref(result)))
 				result = NULL;
