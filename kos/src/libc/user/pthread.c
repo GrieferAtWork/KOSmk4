@@ -3921,7 +3921,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict cond,
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
-		 *       we're released `mutex',  else there'd be  a race  condition! */
+		 *       we've released `mutex',  else there'd be  a race  condition! */
 		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}

@@ -59,20 +59,14 @@ DECL_BEGIN
 
 PUBLIC NONNULL((1)) void
 NOTHROW(FCALL mfile_map_fini_or_reserved)(struct mfile_map *__restrict self) {
-	struct mnode *iter, *next;
-	iter = SLIST_FIRST(&self->mfm_nodes);
-	while (iter) {
-		next = SLIST_NEXT(iter, _mn_alloc);
+	struct mnode *iter;
+	SLIST_FOREACH_SAFE (iter, &self->mfm_nodes, _mn_alloc) {
 		xdecref(iter->mn_part);
 		kfree(iter);
-		iter = next;
 	}
 	/* Free all nodes still apart of the free-list. */
-	iter = SLIST_FIRST(&self->mfm_flist);
-	while (iter) {
-		next = SLIST_NEXT(iter, _mn_alloc);
+	SLIST_FOREACH_SAFE (iter, &self->mfm_flist, _mn_alloc) {
 		kfree(iter);
-		iter = next;
 	}
 	mpart_setcore_data_fini(&self->mfm_scdat);
 	mpart_unsharecow_data_fini(&self->mfm_ucdat);
@@ -94,20 +88,14 @@ DEFINE_PUBLIC_ALIAS(mfile_map_fini, mfile_map_fini_or_reserved);
 #else /* __OPTIMIZE_SIZE__ */
 PUBLIC NONNULL((1)) void
 NOTHROW(FCALL mfile_map_fini)(struct mfile_map *__restrict self) {
-	struct mnode *iter, *next;
-	iter = SLIST_FIRST(&self->mfm_nodes);
-	while (iter) {
-		next = SLIST_NEXT(iter, _mn_alloc);
+	struct mnode *iter;
+	SLIST_FOREACH_SAFE (iter, &self->mfm_nodes, _mn_alloc) {
 		decref(iter->mn_part);
 		kfree(iter);
-		iter = next;
 	}
 	/* Free all nodes still apart of the free-list. */
-	iter = SLIST_FIRST(&self->mfm_flist);
-	while (iter) {
-		next = SLIST_NEXT(iter, _mn_alloc);
+	SLIST_FOREACH_SAFE (iter, &self->mfm_flist, _mn_alloc) {
 		kfree(iter);
-		iter = next;
 	}
 	mpart_setcore_data_fini(&self->mfm_scdat);
 	mpart_unsharecow_data_fini(&self->mfm_ucdat);
@@ -294,8 +282,8 @@ _mfile_map_init_and_acquire(struct mfile_map *__restrict self)
 	block_aligned_size = mfile_partsize_ceilalign(file, block_aligned_size);
 	mpart_setcore_data_init(&self->mfm_scdat);
 	mpart_unsharecow_data_init(&self->mfm_ucdat);
+	/*SLIST_INIT(&self->mfm_nodes);*/
 
-	SLIST_INIT(&self->mfm_nodes);
 	/* Allocate the initial node! */
 	node = SLIST_FIRST(&self->mfm_flist);
 	if (node != NULL) {

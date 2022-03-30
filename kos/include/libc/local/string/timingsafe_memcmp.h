@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95699db2 */
+/* HASH CRC-32:0x97be905d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,8 +39,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timingsafe_memcmp))(void const *__s1,
 		__b = *(__SBYTE_TYPE__ const *)__s2;
 
 		/* a_le_b:
-		 *    0  <=> a <= b
-		 *   -1  <=> a > b
+		 *    0  <=> a <= b <=> 0b0???????
+		 *   -1  <=> a >  b <=> 0b1???????
+		 *                        | >>= 7  (signed shift --> copy sign bit to all other positions)
+		 *                        +-> 0bXXXXXXXX
+		 * HINT: (signed)x >> 7 == (signed)x / 0x80 == 0xff * ((unsigned)x >> 7)
 		 *
 		 * >> a_le_b = a <= b ? 0 : -1; */
 #ifdef __ARCH_SIGNED_SHIFT_IS_SDIV
@@ -50,8 +53,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timingsafe_memcmp))(void const *__s1,
 #endif /* !__ARCH_SIGNED_SHIFT_IS_SDIV */
 
 		/* a_gr_b:
-		 *    0  <=> a >= b
-		 *   -1  <=> a < b
+		 *    0  <=> a >= b <=> 0b0???????
+		 *   -1  <=> a <  b <=> 0b1???????
+		 *                        | >>= 7  (signed shift --> copy sign bit to all other positions)
+		 *                        +-> 0bXXXXXXXX
+		 * HINT: (signed)x >> 7 == (signed)x / 0x80 == 0xff * ((unsigned)x >> 7)
 		 *
 		 * >> a_gr_b = a >= b ? 0 : -1; */
 #ifdef __ARCH_SIGNED_SHIFT_IS_SDIV
@@ -62,7 +68,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timingsafe_memcmp))(void const *__s1,
 
 		/* a <  b  <=>  [a_le_b= 0,a_gr_b=-1]   -> diff=-1
 		 * a == b  <=>  [a_le_b= 0,a_gr_b= 0]   -> diff= 0
-		 * a >  b  <=>  [a_le_b=-1,a_gr_b= 0]   -> diff=1 */
+		 * a >  b  <=>  [a_le_b=-1,a_gr_b= 0]   -> diff=+1 */
 		__diff = __a_gr_b - __a_le_b;
 
 		/* (finished == 0) <=> (~finished != 0)
@@ -72,7 +78,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timingsafe_memcmp))(void const *__s1,
 		 * >>     result = diff; */
 		__result |= __diff & ~__finished;
 
-		/* ((a_gr_b | a_le_b) != 0)  <=>  {a != b}
+		/* ((a_gr_b | a_le_b) == -1)  <=>  {a != b}
 		 *
 		 * >> if (a != b)
 		 * >>     finished = -1; */

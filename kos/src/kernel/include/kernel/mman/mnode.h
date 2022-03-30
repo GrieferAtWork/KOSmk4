@@ -506,17 +506,18 @@ mnode_split_or_unlock(struct mman *__restrict self,
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct mnode *
 NOTHROW(FCALL mnode_merge)(struct mnode *__restrict self);
 
-/* Same  as `mnode_merge()', but  the caller must  also be holding a
- * lock to `self->mn_part'  (which may be  assumed to be  non-NULL).
- * Upon return, the lock to `self->mn_part' may have been  released,
- * in which case the caller must inherit a lock to `return->mn_part' */
+/* Same as `mnode_merge()', but the  caller must also be holding  a
+ * lock to `self->mn_part' (which may  be assumed to be  non-NULL).
+ * Upon return, the lock to `self->mn_part' may have been released,
+ * because of which case the caller  must alway inherits a lock  to
+ * `return->mn_part'. */
 FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mnode *
 NOTHROW(FCALL mnode_merge_with_partlock)(struct mnode *__restrict self);
 
 
-/* Mark the given mman  as potentially containing mergeable  mem-nodes.
- * These nodes will (eventually) be merged asynchronously, but may  not
- * be merged immediately (though they may still be merged immediately).
+/* Mark the given mman as potentially containing mergeable  mem-nodes.
+ * These nodes will (eventually) be merged asynchronously, but may not
+ * be merged immediately (though they might be merged immediately).
  * NOTE: The caller isn't required to be holding a lock to `self', but
  *       if they are, this function is still going to be non-blocking,
  *       and the node-merging process  will simply happen _after_  the
@@ -529,8 +530,8 @@ NOTHROW(FCALL mman_mergenodes)(struct mman *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_mergenodes_locked)(struct mman *__restrict self);
 
-/* Helper wrapper to try to merge a node at `addr' (if such a node exists).
- * The caller must be holding a lock to `self' when calling this  function. */
+/* Helper wrapper to try to merge all nodes within the given range. The
+ * caller must be holding a lock to `self' when calling this  function. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_mergenodes_inrange)(struct mman *__restrict self,
                                        void const *minaddr,
@@ -538,13 +539,14 @@ NOTHROW(FCALL mman_mergenodes_inrange)(struct mman *__restrict self,
 
 
 
-/* Mem-node tree API. All of these functions require that the caller
- * be holding a lock to the associated mman. */
+/* Helper structure for `mnode_tree_minmaxlocate()' */
 struct mnode_tree_minmax {
 	struct mnode *mm_min; /* [0..1] Lowest branch. */
 	struct mnode *mm_max; /* [0..1] Greatest branch. */
 };
 
+/* Mem-node tree API. All of these functions require that
+ * the caller be holding a  lock to the associated  mman. */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mnode *NOTHROW(FCALL mnode_tree_locate)(/*nullable*/ struct mnode *root, void const *key);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED struct mnode *NOTHROW(FCALL mnode_tree_rlocate)(/*nullable*/ struct mnode *root, void const *minkey, void const *maxkey);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL mnode_tree_insert)(struct mnode **__restrict proot, struct mnode *__restrict node);
@@ -582,7 +584,19 @@ DATDEF ATTR_PERMMAN struct mnode thismman_kernel_reservation;
  * For more information on the data race solved by this counter, see the detailed explanation
  * of `mman_kernel_hintinit_inuse' within `mman_unmap_kram_locked()' */
 DATDEF WEAK unsigned int mman_kernel_hintinit_inuse;
-#endif /* !CONFIG_NO_SMP */
+#define mman_kernel_hintinit_inuse_inc() __hybrid_atomic_inc(mman_kernel_hintinit_inuse, __ATOMIC_ACQUIRE)
+#define mman_kernel_hintinit_inuse_dec() __hybrid_atomic_dec(mman_kernel_hintinit_inuse, __ATOMIC_RELEASE)
+#define mman_kernel_hintinit_inuse_waitfor()                    \
+	do {                                                        \
+		while (__hybrid_atomic_load(mman_kernel_hintinit_inuse, \
+		                            __ATOMIC_ACQUIRE) != 0)     \
+			task_pause();                                       \
+	}	__WHILE0
+#else /* !CONFIG_NO_SMP */
+#define mman_kernel_hintinit_inuse_inc()     (void)0
+#define mman_kernel_hintinit_inuse_dec()     (void)0
+#define mman_kernel_hintinit_inuse_waitfor() (void)0
+#endif /* CONFIG_NO_SMP */
 
 
 /* Helper macros to perform pagedir_* operations on the address range of a given `mnode' */

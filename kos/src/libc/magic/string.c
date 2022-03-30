@@ -8193,8 +8193,11 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 		b = *(__SBYTE_TYPE__ const *)s2;
 
 		/* a_le_b:
-		 *    0  <=> a <= b
-		 *   -1  <=> a > b
+		 *    0  <=> a <= b <=> 0b0???????
+		 *   -1  <=> a >  b <=> 0b1???????
+		 *                        | >>= 7  (signed shift --> copy sign bit to all other positions)
+		 *                        +-> 0bXXXXXXXX
+		 * HINT: (signed)x >> 7 == (signed)x / 0x80 == 0xff * ((unsigned)x >> 7)
 		 *
 		 * >> a_le_b = a <= b ? 0 : -1; */
 @@pp_ifdef __ARCH_SIGNED_SHIFT_IS_SDIV@@
@@ -8204,8 +8207,11 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 @@pp_endif@@
 
 		/* a_gr_b:
-		 *    0  <=> a >= b
-		 *   -1  <=> a < b
+		 *    0  <=> a >= b <=> 0b0???????
+		 *   -1  <=> a <  b <=> 0b1???????
+		 *                        | >>= 7  (signed shift --> copy sign bit to all other positions)
+		 *                        +-> 0bXXXXXXXX
+		 * HINT: (signed)x >> 7 == (signed)x / 0x80 == 0xff * ((unsigned)x >> 7)
 		 *
 		 * >> a_gr_b = a >= b ? 0 : -1; */
 @@pp_ifdef __ARCH_SIGNED_SHIFT_IS_SDIV@@
@@ -8216,7 +8222,7 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 
 		/* a <  b  <=>  [a_le_b= 0,a_gr_b=-1]   -> diff=-1
 		 * a == b  <=>  [a_le_b= 0,a_gr_b= 0]   -> diff= 0
-		 * a >  b  <=>  [a_le_b=-1,a_gr_b= 0]   -> diff=1 */
+		 * a >  b  <=>  [a_le_b=-1,a_gr_b= 0]   -> diff=+1 */
 		diff = a_gr_b - a_le_b;
 
 		/* (finished == 0) <=> (~finished != 0)
@@ -8226,7 +8232,7 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 		 * >>     result = diff; */
 		result |= diff & ~finished;
 
-		/* ((a_gr_b | a_le_b) != 0)  <=>  {a != b}
+		/* ((a_gr_b | a_le_b) == -1)  <=>  {a != b}
 		 *
 		 * >> if (a != b)
 		 * >>     finished = -1; */

@@ -383,15 +383,6 @@ rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void const
 	RETHROW();
 }
 
-#ifndef CONFIG_NO_SMP
-#define mman_kernel_hintinit_inuse_inc() OATOMIC_INC(mman_kernel_hintinit_inuse, __ATOMIC_ACQUIRE)
-#define mman_kernel_hintinit_inuse_dec() OATOMIC_DEC(mman_kernel_hintinit_inuse, __ATOMIC_RELEASE)
-#else /* !CONFIG_NO_SMP */
-#define mman_kernel_hintinit_inuse_inc() (void)0
-#define mman_kernel_hintinit_inuse_dec() (void)0
-#endif /* CONFIG_NO_SMP */
-
-
 
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_pagefault(struct icpustate *__restrict state,

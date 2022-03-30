@@ -42,7 +42,7 @@ typedef unsigned int gfp_t;
 
 
 /************************************************************************/
-/* Additional GFP_* flags for `mman_map_kram()'                   */
+/* Additional GFP_* flags for `mman_map_kram()'                         */
 /************************************************************************/
 
 #define GFP_MAP_FIXED        0x0010 /* Map new kernel ram at exactly the given address.
@@ -270,7 +270,7 @@ NOTHROW(FCALL mman_unmap_kram_locked)(PAGEDIR_PAGEALIGNED void *addr,
 
 /* Try to unmap kernel memory while the caller is holding a lock to the kernel mman.
  * NOTE: This function can be used to delete any kind of kernel-space memory  mapping,
- *       but special case must be taken when it comes to read-only, or shared copy-on-
+ *       but special care must be taken when it comes to read-only, or shared copy-on-
  *       write memory mappings (see the documentation of `struct mman_unmap_kram_job')
  * @param: locked_part: If non-NULL, a part which may be assumed as locked by the caller.
  * @return: MMAN_UNMAP_KRAM_LOCKED_EX_DONE:  Success (you must invoke the done-callback)

@@ -772,7 +772,7 @@ again_lock_mman_phase2:
 						                    map.mmwu_map.mfm_size);
 					}
 
-					result = old_address;
+					result = old_address; /* Keep the same address */
 				} else {
 					struct mnode *node;
 					ptrdiff_t move_disp;
@@ -802,7 +802,7 @@ again_lock_mman_phase2:
 					 *
 					 * Because  we need to move the mapping elsewhere, we have to
 					 * make sure that mem-nodes are split at those two positions.
-					 * Else, we'd be moving more memory that we're supposed to! */
+					 * Else, we'd be moving more memory than we're supposed to! */
 					node = mman_mappings_locate(self, old_address);
 					assert(node);
 					if ((byte_t *)mnode_getminaddr(node) < (byte_t *)old_address) {
@@ -816,7 +816,7 @@ again_lock_mman_phase2:
 							goto again_lock_mman_phase2;
 					}
 
-					/* Prepare the pagedir to remove the old mapping, so we can remove it. */
+					/* Prepare the pagedir to remove the old mapping, so we can unmap it. */
 					if unlikely(!pagedir_prepare_p(self->mm_pagedir_p, old_address, old_size)) {
 						mnode_merge(mman_mappings_locate(self, old_address));
 						mnode_merge(mman_mappings_locate(self, old_maxaddr));
@@ -1018,7 +1018,6 @@ err_bad_old_size:
 	if (OVERFLOW_UADD(used_new_size, PAGEMASK, &used_new_size))
 		goto err_bad_new_size;
 	used_new_size &= ~PAGEMASK;
-
 
 	/* When remapping to a fixed address, that address must have
 	 * the  same  in-page  alignment  as  the  original address. */

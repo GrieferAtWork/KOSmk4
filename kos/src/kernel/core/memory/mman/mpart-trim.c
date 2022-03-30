@@ -267,12 +267,11 @@ NOTHROW(FCALL mnode_load_mhint)(struct mnode *__restrict self) {
 			iter += PAGESIZE;
 		} while (iter < end);
 	}
-#ifndef CONFIG_NO_SMP
+
 	/* Make sure that any other CPU is still initializing hinted pages,
 	 * which may  overlap with  the address  range we've  just  loaded. */
-	while (ATOMIC_READ(mman_kernel_hintinit_inuse) != 0)
-		task_pause();
-#endif /* !CONFIG_NO_SMP */
+	mman_kernel_hintinit_inuse_waitfor();
+
 	ATOMIC_AND(self->mn_flags, ~MNODE_F_MHINT);
 }
 

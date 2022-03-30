@@ -732,10 +732,11 @@ NOTHROW(FCALL mnode_merge_without_part)(struct mnode *__restrict self) {
 }
 
 
-/* Same  as `mnode_merge()', but  the caller must  also be holding a
- * lock to `self->mn_part'  (which may be  assumed to be  non-NULL).
- * Upon return, the lock to `self->mn_part' may have been  released,
- * in which case the caller must inherit a lock to `return->mn_part' */
+/* Same as `mnode_merge()', but the  caller must also be holding  a
+ * lock to `self->mn_part' (which may  be assumed to be  non-NULL).
+ * Upon return, the lock to `self->mn_part' may have been released,
+ * because of which case the caller  must alway inherits a lock  to
+ * `return->mn_part'. */
 PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mnode *
 NOTHROW(FCALL mnode_merge_with_partlock)(struct mnode *__restrict self) {
 	struct mnode *merged, *neighbor;
@@ -800,9 +801,9 @@ NOTHROW(FCALL mnode_merge)(struct mnode *__restrict self) {
 }
 
 
-/* Mark the given mman  as potentially containing mergeable  mem-nodes.
- * These nodes will (eventually) be merged asynchronously, but may  not
- * be merged immediately (though they may still be merged immediately).
+/* Mark the given mman as potentially containing mergeable  mem-nodes.
+ * These nodes will (eventually) be merged asynchronously, but may not
+ * be merged immediately (though they might be merged immediately).
  * NOTE: The caller isn't required to be holding a lock to `self', but
  *       if they are, this function is still going to be non-blocking,
  *       and the node-merging process  will simply happen _after_  the
@@ -851,8 +852,8 @@ NOTHROW(FCALL mman_mergenodes_locked)(struct mman *__restrict self) {
 	}
 }
 
-/* Helper wrapper to try to merge a node at `addr' (if such a node exists).
- * The caller must be holding a lock to `self' when calling this  function. */
+/* Helper wrapper to try to merge all nodes within the given range. The
+ * caller must be holding a lock to `self' when calling this  function. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_mergenodes_inrange)(struct mman *__restrict self,
                                        void const *minaddr,
@@ -2348,10 +2349,11 @@ domerge_locked:
 
 #else /* CONFIG_HAVE_MNODE_MERGE */
 
-/* Same  as `mnode_merge()', but  the caller must  also be holding a
- * lock to `self->mn_part'  (which may be  assumed to be  non-NULL).
- * Upon return, the lock to `self->mn_part' may have been  released,
- * in which case the caller must inherit a lock to `return->mn_part' */
+/* Same as `mnode_merge()', but the  caller must also be holding  a
+ * lock to `self->mn_part' (which may  be assumed to be  non-NULL).
+ * Upon return, the lock to `self->mn_part' may have been released,
+ * because of which case the caller  must alway inherits a lock  to
+ * `return->mn_part'. */
 PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) struct mnode *
 NOTHROW(FCALL mnode_merge_with_partlock)(struct mnode *__restrict self) {
 	/* No-op */
@@ -2375,9 +2377,9 @@ NOTHROW(FCALL mnode_merge_with_partlock)(struct mnode *__restrict self) {
 DEFINE_PUBLIC_ALIAS(mnode_merge, mnode_merge_with_partlock);
 
 
-/* Mark the given mman  as potentially containing mergeable  mem-nodes.
- * These nodes will (eventually) be merged asynchronously, but may  not
- * be merged immediately (though they may still be merged immediately).
+/* Mark the given mman as potentially containing mergeable  mem-nodes.
+ * These nodes will (eventually) be merged asynchronously, but may not
+ * be merged immediately (though they might be merged immediately).
  * NOTE: The caller isn't required to be holding a lock to `self', but
  *       if they are, this function is still going to be non-blocking,
  *       and the node-merging process  will simply happen _after_  the
@@ -2395,8 +2397,8 @@ NOTHROW(FCALL mman_mergenodes)(struct mman *__restrict self) {
 DEFINE_PUBLIC_ALIAS(mman_mergenodes_locked, mman_mergenodes);
 
 
-/* Helper wrapper to try to merge a node at `addr' (if such a node exists).
- * The caller must be holding a lock to `self' when calling this  function. */
+/* Helper wrapper to try to merge all nodes within the given range. The
+ * caller must be holding a lock to `self' when calling this  function. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mman_mergenodes_inrange)(struct mman *__restrict self,
                                        void const *minaddr,

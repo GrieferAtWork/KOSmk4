@@ -233,8 +233,7 @@ NOTHROW(FCALL unmap_and_unprepare_and_sync_memory)(void *addr, size_t num_bytes)
 	 * into something that's a bit easier to narrow down:
 	 * Instead of (possibly) failing anywhere within the hinted-page-mapping
 	 * function,  fail  with  a  normal  #PF  upon  access  to  bad  memory. */
-	while (ATOMIC_READ(mman_kernel_hintinit_inuse) != 0)
-		task_pause();
+	mman_kernel_hintinit_inuse_waitfor();
 #endif /* !NDEBUG && !CONFIG_NO_SMP */
 }
 
@@ -570,12 +569,9 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 			} while (tail_minaddr < tail_endaddr);
 		}
 
-#ifndef CONFIG_NO_SMP
 		/* Make sure that any other CPU is still initializing hinted pages,
 		 * which may  overlap with  the address  range we've  just  loaded. */
-		while (ATOMIC_READ(mman_kernel_hintinit_inuse) != 0)
-			task_pause();
-#endif /* !CONFIG_NO_SMP */
+		mman_kernel_hintinit_inuse_waitfor();
 	}
 
 	if unlikely(node->mn_partoff != 0) {
@@ -1246,7 +1242,7 @@ NOTHROW(FCALL mpart_lockop_insert_or_lock)(struct mpart *__restrict self,
 
 /* Try to unmap kernel memory while the caller is holding a lock to the kernel mman.
  * NOTE: This function can be used to delete any kind of kernel-space memory  mapping,
- *       but special case must be taken when it comes to read-only, or shared copy-on-
+ *       but special care must be taken when it comes to read-only, or shared copy-on-
  *       write memory mappings (see the documentation of `struct mman_unmap_kram_job')
  * @param: locked_part: If non-NULL, a part which may be assumed as locked by the caller.
  * @return: MMAN_UNMAP_KRAM_LOCKED_EX_DONE:  Success (you must invoke the done-callback)

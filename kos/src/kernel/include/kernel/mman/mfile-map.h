@@ -40,8 +40,8 @@ SLIST_HEAD(mnode_slist, mnode);
 #endif /* !__mnode_slist_defined */
 
 struct mfile_map {
-	/* Helper data structure to allocate+lock mem-nodes used
-	 * for   mapping  files  into  a  given  memory-manager.
+	/* Helper  data  structure to  allocate+lock mem-nodes
+	 * used for mapping files into a given memory-manager.
 	 *
 	 * Usage:
 	 * >> void mman_mapat(struct mman *mm, void *addr, size_t num_bytes,
