@@ -708,6 +708,8 @@ DlModule_PeInitialize(DlModule *__restrict self) {
 		 * it, or any thread created thereafter. */
 		PIMAGE_TLS_DIRECTORY tls;
 		tls = DlModule_GetTlsDir(self);
+		if unlikely(tls->EndAddressOfRawData < tls->StartAddressOfRawData)
+			goto notls; /* Shouldn't happen? */
 
 		self->dm_tlsoff   = (ElfW(Off))-1; /* Unused for PE */
 		self->dm_tlsinit  = (byte_t *)(/*self->dm_loadaddr + */ tls->StartAddressOfRawData);
@@ -742,6 +744,7 @@ DlModule_PeInitialize(DlModule *__restrict self) {
 			}
 		}
 	}
+notls:
 
 	/* TODO: Make non-writable sections read-only. */
 

@@ -48,7 +48,7 @@ struct dlmodule_pe {
 #define DlModule_HasOptionalHeader(self, field)             \
 	((self)->dm_pe.dp_nt.FileHeader.SizeOfOptionalHeader >= \
 	 COMPILER_OFFSETAFTER(IMAGE_OPTIONAL_HEADER, field))
-#define DlModule_HasDataDirectory(self, id) DlModule_HasOptionalHeader(self, DataDirectory[id])
+#define DlModule_HasDataDirectory(self, id) (DlModule_HasOptionalHeader(self, DataDirectory[id]) && (self)->dm_pe.dp_nt.OptionalHeader.DataDirectory[id].Size > 0)
 #define DlModule_HasExports(self)           DlModule_HasDataDirectory(self, IMAGE_DIRECTORY_ENTRY_EXPORT)
 #define DlModule_GetExports(self)           (&(self)->dm_pe.dp_nt.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT])
 #define DlModule_HasImports(self)           DlModule_HasDataDirectory(self, IMAGE_DIRECTORY_ENTRY_IMPORT)
