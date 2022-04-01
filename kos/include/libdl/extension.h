@@ -147,7 +147,11 @@ typedef int (__DLFCN_CC *__dl_iterator_callback)(struct dl_phdr_info *__info,
  * NOTE: Module format extensions cannot be unloaded once loaded! */
 struct dlmodule_format {
 	/* Magic byte sequence for this module format extension. */
-	byte_t df_magic[((DL_MODULE_MAXMAGIC + (__SIZEOF_POINTER__ - 1)) & ~(__SIZEOF_POINTER__ - 1)) + (__SIZEOF_POINTER__ - 1)];
+	byte_t df_magic[((DL_MODULE_MAXMAGIC -        /* Required base size */
+	                  (__SIZEOF_POINTER__ - 1) +  /* Offset for `df_magsz' (see final addend below) */
+	                  (__SIZEOF_POINTER__ - 1)) & /* Ceil-align addend */
+	                 ~(__SIZEOF_POINTER__ - 1)) + /* Force pointer alignment */
+	                (__SIZEOF_POINTER__ - 1)];    /* Added to place `df_magsz' at end of pointer-sized word */
 	byte_t df_magsz; /* Length of this format's magic header. <= DL_MODULE_MAXMAGIC */
 
 	struct dlcore_ops       *df_core; /* [1..1] Initialized by the libdl core: A jump-table of callbacks defined by the core. */
