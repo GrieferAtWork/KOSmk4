@@ -1706,16 +1706,13 @@ extend_failed:
 						chunk_addr += skip;
 						chunk_size -= skip;
 						skip = 0;
-						if (src_bytes >= chunk_size) {
-							LOCAL_BUFFER_copy2phys(chunk_addr, src_offset, chunk_size);
-							src_bytes -= chunk_size;
-							src_offset += chunk_size;
-						} else {
+						if (src_bytes <= chunk_size) {
 							LOCAL_BUFFER_copy2phys(chunk_addr, src_offset, src_bytes);
-							chunk_addr += src_bytes;
-							chunk_size -= src_bytes;
 							break;
 						}
+						LOCAL_BUFFER_copy2phys(chunk_addr, src_offset, chunk_size);
+						src_bytes -= chunk_size;
+						src_offset += chunk_size;
 					}
 				}
 
