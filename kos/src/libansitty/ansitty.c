@@ -196,22 +196,22 @@ DECL_BEGIN
 #define STATE_SOS              6 /* Start of String reception mode. */
 #define STATE_PM               7 /* Privacy Message reception mode. */
 #define STATE_APC              8 /* Application Program Command reception mode. */
-#define STATE_OSC_ESC          9 /* `STATE_OSC', followed by ESC */
-#define STATE_DCS_ESC         10 /* `STATE_DCS', followed by ESC */
-#define STATE_SOS_ESC         11 /* `STATE_SOS', followed by ESC */
-#define STATE_PM_ESC          12 /* `STATE_PM', followed by ESC */
-#define STATE_APC_ESC         13 /* `STATE_APC', followed by ESC */
-#define STATE_LPAREN          14 /* After `ESC(' */
-#define STATE_ESC_5           15 /* After `ESC5' */
-#define STATE_ESC_6           16 /* After `ESC6' */
-#define STATE_ESC_POUND       17 /* After `ESC#' */
+#define STATE_OSC_ESC          9 /* `STATE_OSC', followed by "\e" */
+#define STATE_DCS_ESC         10 /* `STATE_DCS', followed by "\e" */
+#define STATE_SOS_ESC         11 /* `STATE_SOS', followed by "\e" */
+#define STATE_PM_ESC          12 /* `STATE_PM', followed by "\e" */
+#define STATE_APC_ESC         13 /* `STATE_APC', followed by "\e" */
+#define STATE_LPAREN          14 /* After "\e(" */
+#define STATE_ESC_5           15 /* After "\e5" */
+#define STATE_ESC_6           16 /* After "\e6" */
+#define STATE_ESC_POUND       17 /* After "\e#" */
 #define STATE_INSERT          18 /* Insertion-mode */
 #define STATE_INSERT_UTF8     19 /* Insertion-mode (in UTF-8 mode) */
 #define STATE_INSERT_UTF8_MBS 20 /* Insertion-mode (in UTF-8 mode, with pending multi-byte character) */
-#define STATE_ESC_Y1          21 /* After `ESCY' */
+#define STATE_ESC_Y1          21 /* After "\eY" */
 #define STATE_ESC_Y1_VAL(self) (*(uint8_t *)(COMPILER_ENDOF((self)->at_escape) - sizeof(uint8_t)))
-#define STATE_ESC_Y2          22 /* After `ESCY<ORD>' */
-#define STATE_LPAREN_PERCENT  23 /* After `ESC(%' */
+#define STATE_ESC_Y2          22 /* After "\eY<ORD>" */
+#define STATE_LPAREN_PERCENT  23 /* After "\e(%" */
 #define STATE_TEXT            24 /* Non-utf8 character set */
 
 #define STATE_OSC_ADD_ESC(x) ((x) + 5)

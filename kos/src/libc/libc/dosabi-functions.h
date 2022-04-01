@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f9c5786 */
+/* HASH CRC-32:0x8ed9ee39 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1727,8 +1727,8 @@ DFUN(".text.crt.dos.FILE.unlocked.write.printf", libd_vfprintf_unlocked, libc_vf
 DFUN(".text.crt.dos.FILE.unlocked.write.printf", libd_vprintf_unlocked, libc_vprintf_unlocked, TD, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.read.scanf", libd_vfscanf_unlocked, libc_vfscanf_unlocked, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.read.scanf", libd_vscanf_unlocked, libc_vscanf_unlocked, TD, 2, TP, TP)
-DFUN(".text.crt.dos.FILE.unlocked.read.scanf", libd_fgetln, libc_fgetln, TP, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.read.scanf", libd_fmtcheck, libc_fmtcheck, TP, 2, TP, TP)
+DFUN(".text.crt.dos.FILE.unlocked.read.scanf", libd_fgetln, libc_fgetln, TP, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.access", libd_funopen, libc_funopen, TP, 5, TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.utility", libd_funopen2, libc_funopen2, TP, 6, TP, TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.utility", libd_funopen64, libc_funopen64, TP, 5, TP, TP, TP, TP, TP)

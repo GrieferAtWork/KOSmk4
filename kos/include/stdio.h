@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54f44eba */
+/* HASH CRC-32:0x33f13b33 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3731,7 +3731,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(file_printer_unlocked, __FORCELOCAL __ATTR_ARTIF
 #endif /* ... */
 #endif /* __USE_KOS */
 
-#if defined(__USE_GNU) || defined(__USE_SOLARIS) || defined(__USE_NETBSD)
+#if defined(__USE_GNU) || defined(__USE_SOLARIS) || defined(__USE_BSD)
 #ifdef __CRT_HAVE_vasprintf
 /* >> asprintf(3), vasprintf(3)
  * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
@@ -3774,7 +3774,7 @@ __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __N
  * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
 #define __asprintf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asprintf))(__VA_ARGS__)
 #endif /* ... */
-#endif /* __USE_GNU || __USE_SOLARIS || __USE_NETBSD */
+#endif /* __USE_GNU || __USE_SOLARIS || __USE_BSD */
 
 
 
@@ -4615,6 +4615,38 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fparseln, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #undef __fparseln_defined
 #endif /* !... */
 #endif /* !__fparseln_defined */
+#ifndef __fmtcheck_defined
+#define __fmtcheck_defined
+#ifdef __CRT_HAVE_fmtcheck
+/* >> fmtcheck(3)
+ * Check if `user_format' may be used as a drop-in replacement for `good_format'
+ * in the context of a call to `printf(3)' (or `format_printf()'), such that all
+ * contained format qualifiers reference the  same (or compatible) underlying  C
+ * types, and in the same order.
+ * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
+ * when `user_format' isn't compatible with `good_format'), return `good_format'
+ * instead. This function is meant to  be used to validate user-provided  printf
+ * format strings before actually using them, after they've been read from  lang
+ * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_ARG(2),char const *,__NOTHROW_NCX,fmtcheck,(char const *__user_format, char const *__good_format),(__user_format,__good_format))
+#else /* __CRT_HAVE_fmtcheck */
+#include <libc/local/stdio/fmtcheck.h>
+/* >> fmtcheck(3)
+ * Check if `user_format' may be used as a drop-in replacement for `good_format'
+ * in the context of a call to `printf(3)' (or `format_printf()'), such that all
+ * contained format qualifiers reference the  same (or compatible) underlying  C
+ * types, and in the same order.
+ * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
+ * when `user_format' isn't compatible with `good_format'), return `good_format'
+ * instead. This function is meant to  be used to validate user-provided  printf
+ * format strings before actually using them, after they've been read from  lang
+ * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmtcheck, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *__NOTHROW_NCX(__LIBCCALL fmtcheck)(char const *__user_format, char const *__good_format) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmtcheck))(__user_format, __good_format); })
+#endif /* !__CRT_HAVE_fmtcheck */
+#endif /* !__fmtcheck_defined */
+#endif /* __USE_NETBSD */
+
+#ifdef __USE_BSD
 #ifndef __fpurge_defined
 #define __fpurge_defined
 #ifdef __CRT_HAVE___fpurge
@@ -4654,38 +4686,9 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__stream),(__s
  *                `stream', tough this isn't the case under KOS. */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,fgetln,(__FILE *__restrict __stream, __SIZE_TYPE__ *__restrict __lenp),(__stream,__lenp))
 #endif /* !__fgetln_defined && __CRT_HAVE_fgetln */
-#ifndef __fmtcheck_defined
-#define __fmtcheck_defined
-#ifdef __CRT_HAVE_fmtcheck
-/* >> fmtcheck(3)
- * Check if `user_format' may be used as a drop-in replacement for `good_format'
- * in the context of a call to `printf(3)' (or `format_printf()'), such that all
- * contained format qualifiers reference the  same (or compatible) underlying  C
- * types, and in the same order.
- * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
- * when `user_format' isn't compatible with `good_format'), return `good_format'
- * instead. This function is meant to  be used to validate user-provided  printf
- * format strings before actually using them, after they've been read from  lang
- * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_ARG(2),char const *,__NOTHROW_NCX,fmtcheck,(char const *__user_format, char const *__good_format),(__user_format,__good_format))
-#else /* __CRT_HAVE_fmtcheck */
-#include <libc/local/stdio/fmtcheck.h>
-/* >> fmtcheck(3)
- * Check if `user_format' may be used as a drop-in replacement for `good_format'
- * in the context of a call to `printf(3)' (or `format_printf()'), such that all
- * contained format qualifiers reference the  same (or compatible) underlying  C
- * types, and in the same order.
- * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
- * when `user_format' isn't compatible with `good_format'), return `good_format'
- * instead. This function is meant to  be used to validate user-provided  printf
- * format strings before actually using them, after they've been read from  lang
- * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fmtcheck, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *__NOTHROW_NCX(__LIBCCALL fmtcheck)(char const *__user_format, char const *__good_format) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmtcheck))(__user_format, __good_format); })
-#endif /* !__CRT_HAVE_fmtcheck */
-#endif /* !__fmtcheck_defined */
-#endif /* __USE_NETBSD */
+#endif /* __USE_BSD */
 
-#if defined(__USE_NETBSD) || defined(__USE_KOS)
+#if defined(__USE_BSD) || defined(__USE_KOS)
 #ifndef __off_t_defined
 #define __off_t_defined
 typedef __FS_TYPE(off) off_t;
@@ -4753,7 +4756,7 @@ __CDECLARE(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,funopen2_64,(void const *__cook
 __NAMESPACE_LOCAL_USING_OR_IMPL(funopen2_64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FILE *__NOTHROW_NCX(__LIBCCALL funopen2_64)(void const *__cookie, ssize_t (__LIBKCALL *__readfn)(void *__cookie, void *__buf, size_t __num_bytes), ssize_t (__LIBKCALL *__writefn)(void *__cookie, void const *__buf, size_t __num_bytes), off64_t (__LIBKCALL *__seekfn)(void *__cookie, off64_t __off, int __whence), int (__LIBKCALL *__flushfn)(void *__cookie), int (__LIBKCALL *__closefn)(void *__cookie)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(funopen2_64))(__cookie, __readfn, __writefn, __seekfn, __flushfn, __closefn); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
-#ifdef __USE_NETBSD
+#ifdef __USE_BSD
 #ifdef __funopen_defined
 #define fropen(cookie, fn) funopen(cookie, fn, __NULLPTR, __NULLPTR, __NULLPTR)
 #define fwopen(cookie, fn) funopen(cookie, __NULLPTR, fn, __NULLPTR, __NULLPTR)
@@ -4762,8 +4765,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(funopen2_64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #define fropen2(cookie, fn) funopen2(cookie, fn, __NULLPTR, __NULLPTR, __NULLPTR, __NULLPTR)
 #define fwopen2(cookie, fn) funopen2(cookie, __NULLPTR, fn, __NULLPTR, __NULLPTR, __NULLPTR)
 #endif /* __funopen2_defined */
-#endif /* __USE_NETBSD */
-#endif /* __USE_NETBSD || __USE_KOS */
+#endif /* __USE_BSD */
+#endif /* __USE_BSD || __USE_KOS */
 
 #endif /* __CC__ */
 

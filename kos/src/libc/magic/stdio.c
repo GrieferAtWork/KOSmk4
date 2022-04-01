@@ -3062,7 +3062,7 @@ $ssize_t file_printer_unlocked([[nonnull]] /*FILE*/ void *arg,
 
 
 %
-%#if defined(__USE_GNU) || defined(__USE_SOLARIS) || defined(__USE_NETBSD)
+%#if defined(__USE_GNU) || defined(__USE_SOLARIS) || defined(__USE_BSD)
 %[default:section(".text.crt{|.dos}.heap.strdup")]
 
 [[decl_include("<features.h>"), doc_alias("asprintf")]]
@@ -3109,7 +3109,7 @@ __STDC_INT_AS_SSIZE_T asprintf([[nonnull]] char **__restrict pstr,
 	%{printf("vasprintf")}
 
 %[insert:function(__asprintf = asprintf)]
-%#endif /* __USE_GNU || __USE_SOLARIS || __USE_NETBSD */
+%#endif /* __USE_GNU || __USE_SOLARIS || __USE_BSD */
 
 %{
 
@@ -3671,25 +3671,6 @@ __STDC_INT_AS_SIZE_T scanf_unlocked([[nonnull, format]] char const *__restrict f
 %
 %#ifdef __USE_NETBSD
 %[insert:extern(fparseln)]
-%[insert:guarded_function(fpurge = __fpurge)]
-
-@@>> fgetln(3)
-@@A slightly more convenient (but way less portable) alternative to `fgets(3)'
-@@This function automatically malloc's a  buffer of sufficient length for  the
-@@next line in the given `stream', and stores its length in `*lenp'
-@@NOTE: KOS adds the following extensions to this function:
-@@ - We guaranty that "return[*lenp] == '\0'" upon a non-NULL return
-@@ - You may pass `lenp == NULL', which simply ignores that argument
-@@@return: NULL: The EOF flag of `stream' is set (fix this with `clearerr(3)'),
-@@               or the underlying file has been fully read.
-@@@return: * :   Pointer to an  automatically malloc'd  buffer (to-be  freed
-@@               by  fclose(3)  once you  call  that function  on  the given
-@@               `stream'). The buffer is re-used in subsequence invocations
-@@               of this function, and documentation states that it may also
-@@               be invalidated during any  other I/O operation relating  to
-@@               `stream', tough this isn't the case under KOS.
-[[guard, wunused]] char *
-fgetln([[nonnull]] $FILE *__restrict stream, $size_t *__restrict lenp);
 
 @@>> fmtcheck(3)
 @@Check if `user_format' may be used as a drop-in replacement for `good_format'
@@ -3713,6 +3694,32 @@ char const *fmtcheck([[nullable]] char const *user_format,
 
 
 
+%
+%#ifdef __USE_BSD
+%[insert:guarded_function(fpurge = __fpurge)]
+
+@@>> fgetln(3)
+@@A slightly more convenient (but way less portable) alternative to `fgets(3)'
+@@This function automatically malloc's a  buffer of sufficient length for  the
+@@next line in the given `stream', and stores its length in `*lenp'
+@@NOTE: KOS adds the following extensions to this function:
+@@ - We guaranty that "return[*lenp] == '\0'" upon a non-NULL return
+@@ - You may pass `lenp == NULL', which simply ignores that argument
+@@@return: NULL: The EOF flag of `stream' is set (fix this with `clearerr(3)'),
+@@               or the underlying file has been fully read.
+@@@return: * :   Pointer to an  automatically malloc'd  buffer (to-be  freed
+@@               by  fclose(3)  once you  call  that function  on  the given
+@@               `stream'). The buffer is re-used in subsequence invocations
+@@               of this function, and documentation states that it may also
+@@               be invalidated during any  other I/O operation relating  to
+@@               `stream', tough this isn't the case under KOS.
+[[guard, wunused]] char *
+fgetln([[nonnull]] $FILE *__restrict stream, $size_t *__restrict lenp);
+
+%#endif /* __USE_BSD */
+
+
+
 
 /************************************************************************/
 /************************************************************************/
@@ -3720,7 +3727,7 @@ char const *fmtcheck([[nullable]] char const *user_format,
 /************************************************************************/
 /************************************************************************/
 %
-%#if defined(__USE_NETBSD) || defined(__USE_KOS)
+%#if defined(__USE_BSD) || defined(__USE_KOS)
 
 %{
 #ifndef __off_t_defined
@@ -4494,7 +4501,7 @@ $FILE *funopen2_64(void const *cookie,
 
 
 %{
-#ifdef __USE_NETBSD
+#ifdef __USE_BSD
 #ifdef __funopen_defined
 #define fropen(cookie, fn) funopen(cookie, fn, __NULLPTR, __NULLPTR, __NULLPTR)
 #define fwopen(cookie, fn) funopen(cookie, __NULLPTR, fn, __NULLPTR, __NULLPTR)
@@ -4503,9 +4510,9 @@ $FILE *funopen2_64(void const *cookie,
 #define fropen2(cookie, fn) funopen2(cookie, fn, __NULLPTR, __NULLPTR, __NULLPTR, __NULLPTR)
 #define fwopen2(cookie, fn) funopen2(cookie, __NULLPTR, fn, __NULLPTR, __NULLPTR, __NULLPTR)
 #endif /* __funopen2_defined */
-#endif /* __USE_NETBSD */
+#endif /* __USE_BSD */
 }
-%#endif /* __USE_NETBSD || __USE_KOS */
+%#endif /* __USE_BSD || __USE_KOS */
 /************************************************************************/
 /************************************************************************/
 
