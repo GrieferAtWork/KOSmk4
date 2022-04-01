@@ -70,6 +70,9 @@
  * │  1 1       1  │  void [*]_SWAP(l1, l2, [type])                           (C++-style std::swap())
  * │1     1 1      │  void [*]_SWAP(l1, l2, [type], key)                      (C++-style std::swap())
  * ├───────────────┤
+ * │  1 1       1  │  void [*]_TRANSFER(dst, src)                             (C++-style move-constructor, but leaves `src' undefined)
+ * │1     1 1      │  void [*]_TRANSFER(dst, src, key)                        (C++-style move-constructor, but leaves `src' undefined)
+ * ├───────────────┤
  * │1 1 1 1 1   1  │  void [*]_CLEAR(self)
  * ├───────────────┤
  * │    1          │  void [*]_CONCAT(dst, src)
@@ -335,6 +338,8 @@
 #define LIST_INSERT_HEAD_R_P(self, lo_elem, hi_elem, getpath)                             __HYBRID_LIST_INSERT_HEAD_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define LIST_ISBOUND(elem, key)                                                           ((elem)->key.le_prev != __NULLPTR)
 #define LIST_ISBOUND_P(elem, getpath)                                                     (getpath(elem).le_prev != __NULLPTR)
+#define LIST_TRANSFER(dst, src, key)                                                      __HYBRID_LIST_TRANSFER(dst, src, __HYBRID_Q_KEY, key)
+#define LIST_TRANSFER_P(dst, src, getpath)                                                __HYBRID_LIST_TRANSFER(dst, src, __HYBRID_Q_PTH, getpath)
 #define LIST_MOVE_P(dst, src, getpath)                                                    __HYBRID_LIST_MOVE(dst, src, __HYBRID_Q_PTH, getpath)
 #define LIST_NEXT_P(elem, getpath)                                                        getpath(elem).le_next
 #define LIST_PFIRST(self)                                                                 (&(self)->lh_first)
@@ -561,6 +566,11 @@
 	 ? (void)(X(_, (dst)->lh_first).le_prev = &(dst)->lh_first, \
 	          (src)->lh_first               = __NULLPTR)        \
 	 : (void)0)
+#define __HYBRID_LIST_TRANSFER(dst, src, X, _)                  \
+	(((dst)->lh_first = (src)->lh_first) != __NULLPTR           \
+	 ? (void)(X(_, (dst)->lh_first).le_prev = &(dst)->lh_first) \
+	 : (void)0,                                                 \
+	 __HYBRID_Q_BADPTR((src)->lh_first))
 #define __HYBRID_LIST_Q_ASSERT_NEXTLINK_(elem, X, _) \
 	__HYBRID_Q_ASSERT_(X(_, X(_, elem).le_next).le_prev == &X(_, elem).le_next)
 #define __HYBRID_LIST_Q_ASSERT_PREVLINK_(elem, X, _) \
@@ -876,6 +886,7 @@
 #define SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, key)                                 __HYBRID_SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define SLIST_ATOMIC_INSERT_R_P(self, lo_elem, hi_elem, getpath)                           __HYBRID_SLIST_ATOMIC_INSERT_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define SLIST_MOVE(dst, src)                                                               (void)((dst)->slh_first = (src)->slh_first, (src)->slh_first = __NULLPTR)
+#define SLIST_TRANSFER(dst, src)                                                           (void)((dst)->slh_first = (src)->slh_first, __HYBRID_Q_BADPTR((src)->slh_first))
 #define SLIST_CLEAR(self)                                                                  (void)((self)->slh_first = __NULLPTR)
 #define SLIST_FOREACH_FROM_P(elem, self, getpath)                                          __HYBRID_SLIST_FOREACH_FROM(elem, self, __HYBRID_Q_PTH, getpath)
 #define SLIST_FOREACH_PREVPTR_P(elem, p_elem, self, getpath)                               __HYBRID_SLIST_FOREACH_PREVPTR(elem, p_elem, self, __HYBRID_Q_PTH, getpath)
@@ -1453,6 +1464,13 @@
 	       : (void)0,                                           \
 	       (src)->stqh_first = __NULLPTR,                       \
 	       (src)->stqh_last  = &(src)->stqh_first)
+#define STAILQ_TRANSFER(dst, src)                               \
+	(void)((dst)->stqh_last = (src)->stqh_last,                 \
+	       ((dst)->stqh_first = (src)->stqh_first) == __NULLPTR \
+	       ? (void)((dst)->stqh_last = &(dst)->stqh_first)      \
+	       : (void)0,                                           \
+	       __HYBRID_Q_BADPTR((src)->stqh_first),                \
+	       __HYBRID_Q_BADPTR((src)->stqh_last))
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
 #define __HYBRID_STAILQ_REMOVE_TAIL_2(self, key)                                                                           __HYBRID_STAILQ_REMOVE_TAIL(self, __typeof__(*(self)->stqh_first), __HYBRID_Q_KEY, key)
 #define __HYBRID_STAILQ_REMOVE_TAIL_3(self, type, key)                                                                     __HYBRID_STAILQ_REMOVE_TAIL(self, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
@@ -1966,6 +1984,13 @@
 	       : (void)0,                                         \
 	       (src)->sqh_first = __NULLPTR,                      \
 	       (src)->sqh_last  = &(src)->sqh_first)
+#define SIMPLEQ_TRANSFER(dst, src)                            \
+	(void)((dst)->sqh_last = (src)->sqh_last,                 \
+	       ((dst)->sqh_first = (src)->sqh_first) == __NULLPTR \
+	       ? (void)((dst)->sqh_last = &(dst)->sqh_first)      \
+	       : (void)0,                                         \
+	       __HYBRID_Q_BADPTR((src)->sqh_first),               \
+	       __HYBRID_Q_BADPTR((src)->sqh_last))
 #if defined(__COMPILER_HAVE_TYPEOF) && defined(__HYBRID_PP_VA_OVERLOAD)
 #define __HYBRID_SIMPLEQ_REMOVE_TAIL_2(self, key)                                                                           __HYBRID_SIMPLEQ_REMOVE_TAIL(self, __typeof__(*(self)->sqh_first), __HYBRID_Q_KEY, key)
 #define __HYBRID_SIMPLEQ_REMOVE_TAIL_3(self, type, key)                                                                     __HYBRID_SIMPLEQ_REMOVE_TAIL(self, __HYBRID_Q_STRUCT type, __HYBRID_Q_KEY, key)
@@ -2492,6 +2517,8 @@
 #define TAILQ_LAST_P(self, HEAD_T)                                                           (*(((HEAD_T *)((self)->tqh_last))->tqh_last))
 #define TAILQ_MOVE(dst, src, key)                                                            __HYBRID_TAILQ_MOVE(dst, src, __HYBRID_Q_KEY, key)
 #define TAILQ_MOVE_P(dst, src, getpath)                                                      __HYBRID_TAILQ_MOVE(dst, src, __HYBRID_Q_PTH, getpath)
+#define TAILQ_TRANSFER(dst, src, key)                                                        __HYBRID_TAILQ_TRANSFER(dst, src, __HYBRID_Q_KEY, key)
+#define TAILQ_TRANSFER_P(dst, src, getpath)                                                  __HYBRID_TAILQ_TRANSFER(dst, src, __HYBRID_Q_PTH, getpath)
 #define TAILQ_NEXT_P(elem, getpath)                                                          getpath(elem).tqe_next
 #define TAILQ_REMOVE_AFTER(self, elem, key)                                                  __HYBRID_TAILQ_REMOVE_AFTER(self, elem, __HYBRID_Q_KEY, key)
 #define TAILQ_REMOVE_AFTER_P(self, elem, getpath)                                            __HYBRID_TAILQ_REMOVE_AFTER(self, elem, __HYBRID_Q_PTH, getpath)
@@ -2885,6 +2912,13 @@
 	                X(_, (dst)->tqh_first).tqe_prev = &(dst)->tqh_first)            \
 	       : (void)0,                                                               \
 	       *((src)->tqh_last = &(src)->tqh_first) = __NULLPTR)
+#define __HYBRID_TAILQ_TRANSFER(dst, src, X, _)                                     \
+	(void)((*((dst)->tqh_last = &(dst)->tqh_first) = (src)->tqh_first) != __NULLPTR \
+	       ? (void)((dst)->tqh_last                 = (src)->tqh_last,              \
+	                X(_, (dst)->tqh_first).tqe_prev = &(dst)->tqh_first)            \
+	       : (void)0,                                                               \
+	       __HYBRID_Q_BADPTR((src)->tqh_last),                                      \
+	       __HYBRID_Q_BADPTR((src)->tqh_first))
 #define __HYBRID_TAILQ_SWAP(l1, l2, T, X, _)                    \
 	/* Sorry, this one must be a statement */                   \
 	do {                                                        \
@@ -3116,6 +3150,8 @@
 #define CIRCLEQ_LOOP_PREV_P(self, elem, getpath)                                               __HYBRID_CIRCLEQ_LOOP_PREV(self, elem, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_MOVE(dst, src, key)                                                            __HYBRID_CIRCLEQ_MOVE(dst, src, __HYBRID_Q_KEY, key)
 #define CIRCLEQ_MOVE_P(dst, src, getpath)                                                      __HYBRID_CIRCLEQ_MOVE(dst, src, __HYBRID_Q_PTH, getpath)
+#define CIRCLEQ_TRANSFER(dst, src, key)                                                        __HYBRID_CIRCLEQ_TRANSFER(dst, src, __HYBRID_Q_KEY, key)
+#define CIRCLEQ_TRANSFER_P(dst, src, getpath)                                                  __HYBRID_CIRCLEQ_TRANSFER(dst, src, __HYBRID_Q_PTH, getpath)
 #define CIRCLEQ_NEXT_P(elem, getpath)                                                          getpath(elem).cqe_next
 #define CIRCLEQ_PREV_P(elem, getpath)                                                          getpath(elem).cqe_prev
 #define CIRCLEQ_REMOVE_AFTER(self, elem, key)                                                  __HYBRID_CIRCLEQ_REMOVE_AFTER(self, elem, __HYBRID_Q_PTH, getpath)
@@ -3289,6 +3325,12 @@
 	 : (void)(*(void **)&X(_, (dst)->cqh_first = (src)->cqh_first).cqe_prev = (dst), \
 	          *(void **)&X(_, (dst)->cqh_last = (src)->cqh_last).cqe_next   = (dst), \
 	          CIRCLEQ_INIT(src)))
+#define __HYBRID_CIRCLEQ_TRANSFER(dst, src, X, _)                                     \
+	(CIRCLEQ_EMPTY(src)                                                               \
+	 ? CIRCLEQ_INIT(dst)                                                              \
+	 : (void)(*(void **)&X(_, (dst)->cqh_first = (src)->cqh_first).cqe_prev = (dst),  \
+	          *(void **)&X(_, (dst)->cqh_last = (src)->cqh_last).cqe_next   = (dst)), \
+	 __HYBRID_Q_BADPTR((src)->cqh_first), __HYBRID_Q_BADPTR((src)->cqh_last))
 #define __HYBRID_CIRCLEQ_INSERT_AFTER(self, predecessor, elem, X, _) \
 	__HYBRID_CIRCLEQ_INSERT_AFTER_R(self, predecessor, elem, elem, X, _)
 #define __HYBRID_CIRCLEQ_INSERT_AFTER_R(self, predecessor, lo_elem, hi_elem, X, _) \
@@ -3718,6 +3760,7 @@
 #define DLIST_INSERT_HEAD_R(self, lo_elem, hi_elem, key)                                     __HYBRID_DLIST_INSERT_HEAD_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define DLIST_INSERT_HEAD_R_P(self, lo_elem, hi_elem, getpath)                               __HYBRID_DLIST_INSERT_HEAD_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define DLIST_MOVE(dst, src)                                                                 (void)((dst)->dlh_first = (src)->dlh_first, (src)->dlh_first = __NULLPTR)
+#define DLIST_TRANSFER(dst, src)                                                             (void)((dst)->dlh_first = (src)->dlh_first, __HYBRID_Q_BADPTR((src)->dlh_first))
 #define DLIST_NEXT(elem, key)                                                                (elem)->key.dle_next
 #define DLIST_NEXT_P(elem, getpath)                                                          getpath(elem).dle_next
 #define DLIST_PREV(elem, key)                                                                (elem)->key.dle_prev

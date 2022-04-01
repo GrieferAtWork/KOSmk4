@@ -1209,9 +1209,7 @@ blkdev_repart(struct blkdev *__restrict self)
 	/* NOEXCEPT from here on... */
 
 	/* Step #3: Clear `self->bd_rootinfo.br_parts' and unregister old partitions */
-	oldparts = self->bd_rootinfo.br_parts;
-	DBG_memset(&self->bd_rootinfo.br_parts, 0xcc,
-	           sizeof(self->bd_rootinfo.br_parts));
+	LIST_TRANSFER(&oldparts, &self->bd_rootinfo.br_parts, bd_partinfo.bp_partlink);
 
 	/* Acquire references to old parts, and unlink all that are already dead */
 	LIST_FOREACH_SAFE (dev, &oldparts, bd_partinfo.bp_partlink) {
@@ -1251,7 +1249,8 @@ blkdev_repart(struct blkdev *__restrict self)
 		}
 		devfs_log_new_device(dev);
 	}
-	self->bd_rootinfo.br_parts = newparts;
+	LIST_TRANSFER(&self->bd_rootinfo.br_parts,
+	              &newparts, bd_partinfo.bp_partlink);
 
 	/* Step #5: Release locks. */
 	_fallnodes_release();
