@@ -398,19 +398,25 @@ devfs_root_next(struct fdirent *__restrict self)
 		if (curr == NULL) {
 			struct device *next;
 			next = device_fixdeleted(me);
-			if (next == NULL)
-				goto unlock_byname_and_return_first_ramfs;
-			result = incref(&next->dv_dirent->dd_dirent);
-			devfs_byname_endread();
+			if (next != NULL) {
+				result = incref(&next->dv_dirent->dd_dirent);
+				devfs_byname_endread();
+			} else {
+				devfs_byname_endread();
+				result = devfs_root_first_ramfs_dirent();
+			}
 		} else {
 			struct device *next;
 			next = devfs_bynametree_nextnode(curr);
 			if (next != NULL) {
 				result = incref(&next->dv_dirent->dd_dirent);
-				devfs_byname_endread();
+				_devfs_byname_endread();
+				decref_unlikely(curr);
+				devfs_byname_reap();
 			} else {
-unlock_byname_and_return_first_ramfs:
-				devfs_byname_endread();
+				_devfs_byname_endread();
+				decref_unlikely(curr);
+				devfs_byname_reap();
 				result = devfs_root_first_ramfs_dirent();
 			}
 		}
