@@ -986,7 +986,8 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__rest
 		/* nopf support */                                   \
 		void *pc = (void *)kcpustate_getpc(state);           \
 		if (libc_x86_nopf_check(pc)) {                       \
-			/* XXX: Don't do this for E_EXIT_THREAD? */      \
+			/* TODO: Must send RPC to calling thread that    \
+			 * re-throws exception if it's RT-priority. */   \
 			kcpustate_setpc(state, libc_x86_nopf_retof(pc)); \
 			return state;                                    \
 		}                                                    \
