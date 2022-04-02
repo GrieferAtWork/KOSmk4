@@ -1157,7 +1157,9 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
  * been loaded by `return' will _NOT_ be visible.
  *
  * This function is primarily used as a hacky wrapper for loading PE files
- * into memory (as those  sometimes have sub-page alignment  constraints). */
+ * into memory (as those  sometimes have sub-page alignment  constraints).
+ *
+ * NOTE: The caller must ensure that `mfile_hasrawio(inner)'! */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfile *FCALL
 mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
                                 pos_t inner_fpos)

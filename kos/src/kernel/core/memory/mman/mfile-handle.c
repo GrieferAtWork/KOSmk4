@@ -34,6 +34,7 @@
 #include <kernel/fs/vfs.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/iovec.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/user.h>
@@ -48,6 +49,7 @@
 #include <asm/ioctl.h>
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
+#include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/ioctl/file.h>
 #include <linux/fs.h>
@@ -103,7 +105,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 			flags |= FS_IMMUTABLE_FL;
 		if (mfile_flags & MFILE_F_NOATIME)
 			flags |= FS_NOATIME_FL;
-		validate_writable(arg, _IOC_SIZE(cmd));
+		arg = validate_writable(arg, _IOC_SIZE(cmd));
 		if (_IOC_SIZE(cmd) == sizeof(u32)) {
 			UNALIGNED_SET32((USER CHECKED u32 *)arg, (u32)flags);
 		} else {
@@ -117,7 +119,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		uintptr_t mask, flag, inode_flags;
 		if unlikely(!IO_CANWRITE(mode))
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_SETPROPERTY, mode);
-		validate_readable(arg, _IOC_SIZE(cmd));
+		arg = (USER CHECKED void *)validate_readable(arg, _IOC_SIZE(cmd));
 		if (_IOC_SIZE(cmd) == sizeof(u32)) {
 			inode_flags = (uintptr_t)UNALIGNED_GET32((USER CHECKED u32 const *)arg);
 		} else {
@@ -140,8 +142,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		if (mfile_isnode(self)) {
 			struct fsuper *super;
 			super = mfile_asnode(self)->fn_super;
-			validate_writable(arg, FSLABEL_MAX * sizeof(char));
-			if (fsuper_getlabel(super, (USER CHECKED char *)arg))
+			if (fsuper_getlabel(super, (USER CHECKED char *)validate_writable(arg, FSLABEL_MAX * sizeof(char))))
 				return 0;
 		}
 		break;
@@ -152,8 +153,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 			USER CHECKED char const *labelname;
 			size_t labelsize;
 			super = mfile_asnode(self)->fn_super;
-			validate_readable(arg, 1);
-			labelname = (USER CHECKED char const *)arg;
+			labelname = (USER CHECKED char const *)validate_readable(arg, 1);
 			labelsize = strnlen(labelname, FSLABEL_MAX);
 			/* As per the specs, only a SYS_ADMIN can issue this command! */
 			require(CAP_SYS_ADMIN);
@@ -165,12 +165,58 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	case FILE_IOC_BLKSHIFT: {
 		USER CHECKED struct file_blkshift *info;
 		/* Query ioctl for buffer requirements of `O_DIRECT' */
-		validate_writable(arg, sizeof(struct file_blkshift));
-		info = (USER CHECKED struct file_blkshift *)arg;
+		info = (USER CHECKED struct file_blkshift *)validate_writable(arg, sizeof(struct file_blkshift));
 		COMPILER_WRITE_BARRIER();
 		info->fbs_blck = self->mf_blockshift;
 		info->fbs_ioba = self->mf_iobashift;
 		return 0;
+	}	break;
+
+	case FILE_IOC_MKUALIGN: {
+		USER CHECKED struct file_mkualign *info;
+		REF struct mfile *ma_wrapper;
+		REF struct filehandle *ma_handle;
+		struct handle hand;
+		pos_t offset;
+		info   = (USER CHECKED struct file_mkualign *)validate_readwrite(arg, sizeof(struct file_mkualign));
+		offset = (pos_t)info->fmua_offset;
+		COMPILER_READ_BARRIER();
+
+		/* Ensure that the caller has read-access for `self'.
+		 * Since the resulting wrapper will be usable for reading, we have to prevent
+		 * this ioctl from be  ing (ab-)used to gain  read-access to files that  were
+		 * previously opened as write-only. */
+		if unlikely(!IO_CANREAD(mode))
+			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
+
+		/* Ensure that the file supports "Raw I/O". `mfile_create_misaligned_wrapper()'
+		 * will assert the same thing,  but if it detects this  to not be the case,  it
+		 * will  cause kernel panic. -- Since we get called from user-space, we need to
+		 * throw an exception in this situation. */
+		if unlikely(!mfile_hasrawio(self))
+			THROW(E_ILLEGAL_OPERATION, E_ILLEGAL_OPERATION_CONTEXT_MKUALIGN_NO_RAW_IO);
+
+		/* Create the misalignment wrapper. */
+		ma_wrapper = mfile_create_misaligned_wrapper(self, offset);
+
+		/* Wrap the new mfile in a `struct filehandle'. */
+		{
+			REF struct path *fh_path;
+			REF struct fdirent *fh_dent;
+			FINALLY_DECREF_UNLIKELY(ma_wrapper);
+			fh_path = (REF struct path *)mfile_utryas(self, HANDLE_TYPE_PATH);
+			FINALLY_XDECREF_UNLIKELY(fh_path);
+			fh_dent = (REF struct fdirent *)mfile_utryas(self, HANDLE_TYPE_DIRENT);
+			FINALLY_XDECREF_UNLIKELY(fh_dent);
+			ma_handle = filehandle_new(ma_wrapper, fh_path, fh_dent);
+		}
+		FINALLY_DECREF_UNLIKELY(ma_handle);
+
+		/* Set-up and install the new object as a handle. */
+		hand.h_type = HANDLE_TYPE_FILEHANDLE;
+		hand.h_data = ma_handle;
+		hand.h_mode = IO_RDONLY;
+		return handles_install_openfd(hand, &info->fmua_resfd);
 	}	break;
 
 	case FILE_IOC_TAILREAD: {
@@ -178,8 +224,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		size_t num_bytes;
 		USER CHECKED void *buf;
 		USER CHECKED struct file_tailread *info;
-		validate_readwrite(arg, sizeof(struct file_tailread));
-		info = (USER CHECKED struct file_tailread *)arg;
+		info = (USER CHECKED struct file_tailread *)validate_readwrite(arg, sizeof(struct file_tailread));
 		/* Load arguments. */
 		buf       = info->ftr_buf;
 		num_bytes = info->ftr_siz;
@@ -220,9 +265,10 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		if (!mfile_isnode(self))
 			break; /* These ioctls are only supported for fnode-based files. */
 		super = mfile_asnode(self)->fn_super;
-		validate_writable(arg, _IOC_SIZE(cmd));
 		/* Copy attribute into user-provided buffer. */
-		memcpy(arg, (byte_t *)super + super_attrib_offsets[_IOC_NR(cmd) - USER_ATTRIB_MINID], _IOC_SIZE(cmd));
+		memcpy(validate_writable(arg, _IOC_SIZE(cmd)),
+		       (byte_t *)super + super_attrib_offsets[_IOC_NR(cmd) - USER_ATTRIB_MINID],
+		       _IOC_SIZE(cmd));
 		return 0;
 	}	break;
 
@@ -312,7 +358,6 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		if (!mfile_isnode(self))
 			break; /* These ioctls are only supported for fnode-based files. */
 		super = mfile_asnode(self)->fn_super;
-		validate_writable(arg, _IOC_SIZE(cmd));
 
 		/* Copy attribute into user-provided buffer. */
 		pvalue = (byte_t *)super + super_attrib_offsets[_IOC_NR(cmd) - USER_ATTRIB_MINID];

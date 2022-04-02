@@ -27,6 +27,8 @@
 #include <asm/ioctl.h>
 #include <linux/fs.h>
 
+#include "_openfd.h"
+
 /* Standard (linux-compatible) file I/O-control codes.
  * Commented out ioctls work, but shouldn't be used because they suck. */
 /*efine FILE_IOC_GETFLAGS   FS_IOC_GETFLAGS    * Get INode flags (set of `FS_*') */
@@ -48,12 +50,13 @@
 /* Actually KOS-specific ioctls.                                        */
 /************************************************************************/
 #define FILE_IOC_DELETED   _IOR_KOS('F', 0x00, int)                  /* Check if the file was deleted (as per `unlink(2)') */
-#define FILE_IOC_HASRAWIO  _IOR_KOS('F', 0x01, int)                  /* Check if the file supports "raw io" (s.a. `mfile_hasrawio()') */
+#define FILE_IOC_HASRAWIO  _IOR_KOS('F', 0x01, int)                  /* Check if the file supports "Raw I/O" (s.a. `mfile_hasrawio()') */
 #define FILE_IOC_DCHANGED  _IOR_KOS('F', 0x02, int)                  /* Check if data of the file has changed (s.a. `fdatasync(2)', `mfile_haschanged()') */
 #define FILE_IOC_CHANGED   _IOR_KOS('F', 0x03, int)                  /* Check if attributes or data have changed (s.a. `fsync(2)', `MFILE_F_CHANGED | MFILE_F_ATTRCHANGED') */
 #define FILE_IOC_BLKSHIFT  _IOR_KOS('F', 0x04, struct file_blkshift) /* This ioctl is meant to be used to query buffer requirements for `O_DIRECT',
                                                                       * which requires file offsets be  aligned by `1 << fbs_blck', and I/O  buffer
                                                                       * pointers to be aligned by `1 << fbs_ioba' (IOBaseAddress_SHIFT). */
+#define FILE_IOC_MKUALIGN _IOWR_KOS('F', 0x10, struct file_mkualign) /* Create an unaligned wrapper for this file (see below) */
 #define FILE_IOC_TAILREAD _IOWR_KOS('F', 0x20, struct file_tailread) /* Tail read (see below) */
 
 
@@ -83,6 +86,52 @@ struct file_blkshift {
 	__SHIFT_TYPE__ fbs_blck; /* log2(FILE_IOC_BLOCKSIZE)             (s.a. `struct mfile::mf_blockshift') */
 	__SHIFT_TYPE__ fbs_ioba; /* log2(BUFFER_ALIGNMENT_FOR_O_DIRECT)  (s.a. `struct mfile::mf_iobashift') */
 };
+
+
+
+/* Construct structure for `FILE_IOC_MKUALIGN', which can be used to
+ * create an  unaligned wrapper  for the  file. Briefly  stated:  an
+ * unaligned file wrapper behaves the same as the original file, but
+ * with the addition that:
+ *  - All references to file data have `fmua_offset' added
+ *    - This  affects `pread(2)', `read(2)' and `mmap(2)', this
+ *      last system call being the most important of these when
+ *      it comes to be uses of unaligned wrappers.
+ *  - The wrapper is read-only, but (may) contain its own  I/O
+ *    buffer that is distinct from the original file. In other
+ *    words, modifications made to the original file *may* not
+ *    be visible in the wrapper.
+ *
+ * Q: Why does this exist?
+ * A: Notice how there are no alignment requirements imposed  on
+ *    what you can pass for  `fmua_offset', as well as the  fact
+ *    that the resulting  result can still  be mmap'd. As  such,
+ *    you can use  this mechanism to  create lazily  initialized
+ *    file->to->memory mappings of arbitrary file positions then
+ *    mapped to arbitrary memory  locations (iow: this makes  it
+ *    possible to overcome `ADDR & PAGEMASK == FPOS & PAGEMASK')
+ *
+ * Restrictions (and behavior in corner-cases):
+ * - The original file must support "Raw I/O" (s.a. `FILE_IOC_HASRAWIO')
+ *   If it doesn't, `E_ILLEGAL_OPERATION_CONTEXT_MKUALIGN_NO_RAW_IO'  is
+ *   thrown when `ioctl(FILE_IOC_MKUALIGN)' is attempted.
+ * - When block-reads from the given file  behave the same as reads  from
+ *   /dev/zero, or some other file  where file offsets don't matter,  the
+ *   kernel is allowed to simply return a dup(2)'d handle of the original
+ *   file. The same is guarantied to happen when `fmua_offset == 0',  and
+ *   the kernel  ensures that  it is  impossible to  create an  unaligned
+ *   wrapper file with an offset of zero.
+ * - Creating a misalignment  wrapper of another  one causes offsets  to
+ *   cascade, and the new wrapper to be created for the underlying file.
+ * - When the actual file offset  (in the underlying file) overflows  at
+ *   file read time (and generally: any file reads that are attempted at
+ *   out-of-bounds file locations) will behave like reads from /dev/zero
+ */
+struct file_mkualign {
+	__uint64_t    fmua_offset; /* Unaligned file offset. */
+	struct openfd fmua_resfd;  /* Resulting file descriptor. */
+};
+
 
 /* Perform a tail read from a file. This ioctl behaves the same  as
  * a normal `pread(2)', with the exception that trying to read past

@@ -103,7 +103,8 @@ misaligned_mfile_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 			/* Can load everything from the file */
 			(*base->mf_ops->mo_loadblocks)(base, addr, buf, num_bytes, aio);
 		} else {
-			(*base->mf_ops->mo_loadblocks)(base, addr, buf, (size_t)io_bytes, aio);
+			if (io_bytes != 0)
+				(*base->mf_ops->mo_loadblocks)(base, addr, buf, (size_t)io_bytes, aio);
 
 			/* Must zero-initialize trailing data. */
 			bzerophyscc(buf + (size_t)io_bytes, num_bytes - (size_t)io_bytes);
@@ -121,7 +122,7 @@ misaligned_mfile_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
 	struct misaligned_mfile *me;
 	me = mfile_asmisaligned(self);
 	if (OVERFLOW_UADD(addr, me->mam_offs, &addr))
-		return 0;
+		return 0; /* TODO: Read from /dev/zero */
 	return mfile_upread(me->mam_base, dst, num_bytes, addr, mode);
 }
 
@@ -131,7 +132,7 @@ misaligned_mfile_v_preadv(struct mfile *__restrict self, struct iov_buffer *__re
 	struct misaligned_mfile *me;
 	me = mfile_asmisaligned(self);
 	if (OVERFLOW_UADD(addr, me->mam_offs, &addr))
-		return 0;
+		return 0; /* TODO: Read from /dev/zero */
 	return mfile_upreadv(me->mam_base, dst, num_bytes, addr, mode);
 }
 
@@ -204,13 +205,17 @@ PRIVATE struct mfile_ops const misaligned_mfile_ops = {
  * been loaded by `return' will _NOT_ be visible.
  *
  * This function is primarily used as a hacky wrapper for loading PE files
- * into memory (as those  sometimes have sub-page alignment  constraints). */
+ * into memory (as those  sometimes have sub-page alignment  constraints).
+ *
+ * NOTE: The caller must ensure that `mfile_hasrawio(inner)'! */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfile *FCALL
 mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
                                 pos_t inner_fpos)
 		THROWS(E_BADALLOC) {
 	REF struct misaligned_mfile *result;
 	shift_t blockshift;
+	assertf(mfile_hasrawio(inner), "The underlying file must support RAW I/O");
+
 	if unlikely(inner->mf_ops->mo_loadblocks == NULL)
 		goto return_inner; /* File offsets don't matter in this case! */
 	if unlikely(inner_fpos == 0)

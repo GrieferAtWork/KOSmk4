@@ -2042,8 +2042,7 @@ PRIVATE char const repr_IOCTLS_89e0h[] =
 "SIOCPROTOPRIVATE\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0SIOCDEVPRIVATE";
 
 #define GETBASE_KOS_IOCTLS(result, index) \
-	(((index) >= 0x4600 && (index) <= 0x4604) ? ((index) -= 0x4600, (result) = repr_KOS_IOCTLS_4600h, true) : \
-	 ((index) == 0x4620) ? ((index) = 0, (result) = repr_KOS_IOCTLS_4620h, true) : \
+	(((index) >= 0x4600 && (index) <= 0x4620) ? ((index) -= 0x4600, (result) = repr_KOS_IOCTLS_4600h, true) : \
 	 ((index) >= 0x4680 && (index) <= 0x4687) ? ((index) -= 0x4680, (result) = repr_KOS_IOCTLS_4680h, true) : \
 	 ((index) >= 0x4b00 && (index) <= 0x4b08) ? ((index) -= 0x4b00, (result) = repr_KOS_IOCTLS_4b00h, true) : \
 	 ((index) >= 0x4c01 && (index) <= 0x4c06) ? ((index) -= 0x4c01, (result) = repr_KOS_IOCTLS_4c01h, true) : \
@@ -2059,9 +2058,8 @@ PRIVATE char const repr_IOCTLS_89e0h[] =
 	 ((index) >= 0x7000 && (index) <= 0x7010) ? ((index) -= 0x7000, (result) = repr_KOS_IOCTLS_7000h, true) : false)
 PRIVATE char const repr_KOS_IOCTLS_4600h[] =
 "FILE_IOC_DELETED\0FILE_IOC_HASRAWIO\0FILE_IOC_DCHANGED\0FILE_IOC_CH"
-"ANGED\0FILE_IOC_BLKSHIFT";
-PRIVATE char const repr_KOS_IOCTLS_4620h[] =
-"FILE_IOC_TAILREAD";
+"ANGED\0FILE_IOC_BLKSHIFT\0\0\0\0\0\0\0\0\0\0\0\0FILE_IOC_MKUALIGN\0\0\0\0\0\0\0\0\0\0\0\0"
+"\0\0\0\0FILE_IOC_TAILREAD";
 PRIVATE char const repr_KOS_IOCTLS_4680h[] =
 "FILE_IOC_GETFSLINKMAX\0FILE_IOC_GETFSNAMEMAX\0FILE_IOC_GETFSSIZBIT"
 "S\0FILE_IOC_GETFSXFERINC\0FILE_IOC_GETFSXFERMAX\0FILE_IOC_GETFSXFER"
@@ -4006,7 +4004,8 @@ printStrendNDatabase("PR_", prctl);
 ]]]*/
 #define GETBASE_PR(result, index) \
 	(((index) <= 0x3a) ? ((result) = repr_PR_0h, true) : \
-	 ((index) == 0x59616d61) ? ((index) = 0, (result) = repr_PR_59616d61h, true) : false)
+	 ((index) == 0x59616d61) ? ((index) = 0, (result) = repr_PR_59616d61h, true) : \
+	 ((index) == 0x8050fff1) ? ((index) = 0, (result) = repr_PR_8050fff1h, true) : false)
 PRIVATE char const repr_PR_0h[] =
 "\0SET_PDEATHSIG\0GET_PDEATHSIG\0GET_DUMPABLE\0SET_DUMPABLE\0GET_UNALI"
 "GN\0SET_UNALIGN\0GET_KEEPCAPS\0SET_KEEPCAPS\0GET_FPEMU\0SET_FPEMU\0GET"
@@ -4022,6 +4021,8 @@ PRIVATE char const repr_PR_0h[] =
 "GGED_ADDR_CTRL\0SET_IO_FLUSHER\0GET_IO_FLUSHER";
 PRIVATE char const repr_PR_59616d61h[] =
 "SET_PTRACER";
+PRIVATE char const repr_PR_8050fff1h[] =
+"KOS_GET_AT_SECURE";
 /*[[[end]]]*/
 
 PRIVATE ATTR_CONST WUNUSED char const *CC
