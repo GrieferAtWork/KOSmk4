@@ -341,7 +341,7 @@ NOTHROW(FCALL mergenodes_lop_cb)(Toblockop(mman) *__restrict lop,
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mergenode_waitfor_mpart_postlop)(Tobpostlockop(mpart) *__restrict _lop,
                                                REF struct mpart *__restrict self) {
-	struct mman *mm;
+	REF struct mman *mm;
 	union mman_mergenodes_lop *lop;
 	mm  = (struct mman *)((byte_t *)_lop - (uintptr_t)&thismman_mergenodes_lop.mml_mp_postlop);
 	lop = &FORMMAN(mm, thismman_mergenodes_lop);
@@ -361,6 +361,9 @@ NOTHROW(FCALL mergenode_waitfor_mpart_postlop)(Tobpostlockop(mpart) *__restrict 
 
 	/* Merge nodes of the mman. */
 	mman_mergenodes(mm);
+
+	/* Drop the reference given to us by the caller. */
+	decref_unlikely(mm);
 }
 
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mpart) *
@@ -381,6 +384,11 @@ NOTHROW(FCALL async_waitfor_part_and_mergenodes)(struct mman *__restrict self,
                                                  struct mpart *__restrict blocking_part) {
 	union mman_mergenodes_lop *lop;
 	Toblockop_callback_t(mman) func;
+	/* These references are inherited by `mergenode_waitfor_mpart_lop'
+	 * (aka. `MERGENODES_LOP_FUNC_WAITFOR_MPART') */
+	incref(self);
+	incref(blocking_part);
+
 	lop = &FORMMAN(self, thismman_mergenodes_lop);
 	/* (try to) switch over into WAITFOR_MPART node. */
 	do {
@@ -389,14 +397,12 @@ NOTHROW(FCALL async_waitfor_part_and_mergenodes)(struct mman *__restrict self,
 		    func != MERGENODES_LOP_FUNC_RUNNING) {
 			/* Something that will eventually call mergenodes is already set-up!
 			 * -> So just don't interfere... */
+			decref_nokill(self);
+			decref_nokill(blocking_part);
 			return;
 		}
 	} while (!ATOMIC_CMPXCH(lop->mml_mm_lop.olo_func, func,
 	                        MERGENODES_LOP_FUNC_WAITFOR_MPART));
-
-	/* This reference is inherited by `mergenode_waitfor_mpart_lop'
-	 * (aka. `MERGENODES_LOP_FUNC_WAITFOR_MPART') */
-	incref(blocking_part);
 
 	/* Enqueue the lockop into `blocking_part' */
 	SLIST_ATOMIC_INSERT(&blocking_part->mp_lockops,
