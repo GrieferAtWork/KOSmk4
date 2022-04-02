@@ -478,6 +478,9 @@ typedef struct _IMAGE_SECTION_HEADER {
 #define IMAGE_SCN_MEM_WRITE              0x80000000
 
 #ifdef __KOS__
+#define IMAGE_SCN_ALIGN(image_scn) \
+	((__SIZE_TYPE__)1 << ((((image_scn) & IMAGE_SCN_ALIGN_MASK) >> 20) - 1))
+
 #include <asm/os/mman.h>
 
 /* Convert `IMAGE_SCN_*' into a set of `PROT_*' */

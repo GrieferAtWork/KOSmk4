@@ -1159,8 +1159,8 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
  * This function is primarily used as a hacky wrapper for loading PE files
  * into memory (as those  sometimes have sub-page alignment  constraints). */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfile *FCALL
-mfile_create_missaligned_wrapper(struct mfile *__restrict inner,
-                                 pos_t inner_fpos)
+mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
+                                pos_t inner_fpos)
 		THROWS(E_BADALLOC);
 
 

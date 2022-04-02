@@ -778,10 +778,14 @@ libpe_v_fini(DlModule *__restrict self) {
 PRIVATE NONNULL((1)) bool LIBDL_CC
 libpe_v_ismapped(DlModule *__restrict self,
                  uintptr_t module_relative_pointer) {
-	/* TODO */
-	(void)self;
-	(void)module_relative_pointer;
-	COMPILER_IMPURE();
+	size_t i;
+	for (i = 0; i < self->dm_shnum; ++i) {
+		uintptr_t minaddr, maxaddr;
+		minaddr = self->dm_pe.dp_sect[i].VirtualAddress;
+		maxaddr = minaddr + self->dm_pe.dp_sect[i].Misc.VirtualSize - 1;
+		if (module_relative_pointer >= minaddr && module_relative_pointer <= maxaddr)
+			return true;
+	}
 	return false;
 }
 
@@ -814,41 +818,85 @@ libpe_v_dladdr(DlModule *__restrict self,
 PRIVATE NONNULL((1, 2)) uintptr_t LIBDL_CC
 libpe_v_dlsectindex(DlModule *__restrict self,
                     char const *__restrict name) {
-	/* TODO */
-	(void)self;
-	(void)name;
+	uintptr_t result;
+	for (result = 0; result < self->dm_shnum; ++result) {
+		char const *sn = (char const *)self->dm_pe.dp_sect[result].Name;
+		if (strcmp(name, sn) == 0)
+			return result;
+	}
 	return (uintptr_t)-1;
 }
 
 PRIVATE NONNULL((1, 3)) int LIBDL_CC
 libpe_v_dlsectinfo(DlModule *__restrict self, uintptr_t index,
                    struct dl_sect_info *__restrict result) {
-	/* TODO */
-	(void)self;
-	(void)index;
-	(void)result;
-	return (*dl.dl_seterrorf)("Not implemented");
+	if (index >= self->dm_shnum)
+		return (*dl.dl_seterrorf)("Invalid section index %" PRIuPTR, index);
+	result->dsi_addr     = (void *)(self->dm_loadaddr + self->dm_pe.dp_sect[index].VirtualAddress);
+	result->dsi_size     = self->dm_pe.dp_sect[index].Misc.VirtualSize;
+	result->dsi_offset   = self->dm_pe.dp_sect[index].PointerToRawData;
+	result->dsi_entsize  = 0;
+	result->dsi_link     = 0;
+	result->dsi_info     = 0;
+	result->dsi_elfflags = SHF_ALLOC;
+	if (self->dm_pe.dp_sect[index].Characteristics & IMAGE_SCN_MEM_WRITE)
+		result->dsi_elfflags |= SHF_WRITE;
+	if (self->dm_pe.dp_sect[index].Characteristics & IMAGE_SCN_MEM_EXECUTE)
+		result->dsi_elfflags |= SHF_EXECINSTR;
+	return 0;
 }
 
 PRIVATE NONNULL((1)) char const *LIBDL_CC
 libpe_v_dlsectname(DlModule *__restrict self, uintptr_t index) {
-	/* TODO */
-	(void)self;
-	(void)index;
-	(*dl.dl_seterrorf)("Not implemented");
-	return NULL;
+	if (index >= self->dm_shnum)
+		return NULL;
+	/* XXX: Support for long section names? */
+	return (char const *)self->dm_pe.dp_sect[index].Name;
+}
+
+PRIVATE NONNULL((1, 2, 3)) void LIBDL_CC
+libpe_encode_phdr(DlModule *__restrict self,
+                  IMAGE_SECTION_HEADER const *__restrict section,
+                  ElfW(Phdr) *__restrict result) {
+	result->p_type   = PT_LOAD;
+	result->p_offset = section->PointerToRawData;
+	result->p_vaddr  = section->VirtualAddress + self->dm_loadaddr;
+	result->p_paddr  = result->p_vaddr;
+	result->p_filesz = section->SizeOfRawData;
+	result->p_memsz  = section->Misc.VirtualSize;
+	result->p_flags  = 0;
+	if (!(section->Characteristics & (IMAGE_SCN_LNK_REMOVE | IMAGE_SCN_LNK_INFO))) {
+		/*if (section->Characteristics & IMAGE_SCN_MEM_SHARED)
+			result->p_flags |= PROT_SHARED;*/
+		if (section->Characteristics & IMAGE_SCN_MEM_EXECUTE)
+			result->p_flags |= PF_X;
+		if (section->Characteristics & IMAGE_SCN_MEM_READ)
+			result->p_flags |= PF_R;
+		if (section->Characteristics & IMAGE_SCN_MEM_WRITE)
+			result->p_flags |= PF_W;
+	}
+	result->p_align = 1;
+	if ((section->Characteristics & IMAGE_SCN_ALIGN_MASK) != 0)
+		result->p_align = (Elf32_Word)IMAGE_SCN_ALIGN(section->Characteristics);
+}
+
+PRIVATE ATTR_RETNONNULL NONNULL((1, 2)) ElfW(Phdr) *LIBDL_CC
+libpe_encode_phdrs(DlModule *__restrict self, ElfW(Phdr) result[]) {
+	size_t i;
+	for (i = 0; i < self->dm_shnum; ++i)
+		libpe_encode_phdr(self, &self->dm_pe.dp_sect[i], &result[i]);
+	return result;
 }
 
 PRIVATE NONNULL((1, 2, 3)) int LIBDL_CC
 libpe_v_lsphdrs(DlModule *__restrict self,
                 struct dl_phdr_info *__restrict info,
                 __dl_iterator_callback callback, void *arg) {
-	/* TODO */
-	(void)self;
-	(void)info;
-	(void)callback;
-	(void)arg;
-	return 0;
+	ElfW(Phdr) *phdrs;
+	phdrs = (ElfW(Phdr) *)alloca(self->dm_shnum * sizeof(ElfW(Phdr)));
+	info->dlpi_phnum = self->dm_shnum;
+	info->dlpi_phdr  = libpe_encode_phdrs(self, phdrs);
+	return (*callback)(info, sizeof(*info), arg);
 }
 
 PRIVATE PNT_TIB CC libpe_AllocateTib(void) {

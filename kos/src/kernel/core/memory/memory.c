@@ -183,16 +183,16 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 			++num_qpages;
 	} else {
 		/* free partial pages. */
-		unsigned int missalignment, num_free;
-		missalignment = (unsigned int)(zone_relative_base & (PAGES_PER_WORD - 1));
-		if (missalignment) {
-			num_free = (PAGES_PER_WORD - missalignment);
+		unsigned int misalignment, num_free;
+		misalignment = (unsigned int)(zone_relative_base & (PAGES_PER_WORD - 1));
+		if (misalignment) {
+			num_free = (PAGES_PER_WORD - misalignment);
 			mask     = PMEMBITSET_FREEMASK;
 			if ((physpagecnt_t)num_free > num_pages) {
 				num_free = (unsigned int)num_pages;
 				mask &= (((uintptr_t)1 << (num_free * PMEMZONE_BITSPERPAGE)) - 1);
 			}
-			mask <<= missalignment * PMEMZONE_BITSPERPAGE;
+			mask <<= misalignment * PMEMZONE_BITSPERPAGE;
 			oldval = ATOMIC_FETCHOR(self->mz_free[i], mask);
 			assertf(!(oldval & mask),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n",
@@ -274,16 +274,16 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 		        (physpage_t)(self->mz_start + zone_relative_base));
 	} else {
 		/* free partial pages. */
-		unsigned int missalignment, num_free;
-		missalignment = (unsigned int)(zone_relative_base % PAGES_PER_WORD);
-		if (missalignment) {
-			num_free = (PAGES_PER_WORD - missalignment);
+		unsigned int misalignment, num_free;
+		misalignment = (unsigned int)(zone_relative_base % PAGES_PER_WORD);
+		if (misalignment) {
+			num_free = (PAGES_PER_WORD - misalignment);
 			mask     = (PMEMBITSET_FREEMASK | PMEMBITSET_UNDFMASK);
 			if ((physpagecnt_t)num_free > num_pages) {
 				num_free = (unsigned int)num_pages;
 				mask &= (((uintptr_t)1 << (num_free * PMEMZONE_BITSPERPAGE)) - 1);
 			}
-			mask <<= missalignment * PMEMZONE_BITSPERPAGE;
+			mask <<= misalignment * PMEMZONE_BITSPERPAGE;
 			ASSIGN_OLDVAL_ATOMIC_FETCHOR(self->mz_free[i], mask);
 			assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
@@ -383,16 +383,16 @@ NOTHROW(KCALL zone_cfree)(struct pmemzone *__restrict self,
 		set_cfree_word(&self->mz_free[i], mask);
 	} else {
 		/* free partial pages. */
-		unsigned int missalignment, num_free;
-		missalignment = (unsigned int)(zone_relative_base & (PAGES_PER_WORD - 1));
-		if (missalignment) {
-			num_free = (PAGES_PER_WORD - missalignment);
+		unsigned int misalignment, num_free;
+		misalignment = (unsigned int)(zone_relative_base & (PAGES_PER_WORD - 1));
+		if (misalignment) {
+			num_free = (PAGES_PER_WORD - misalignment);
 			mask     = PMEMBITSET_FREEMASK;
 			if ((physpagecnt_t)num_free > num_pages) {
 				num_free = (unsigned int)num_pages;
 				mask &= (((uintptr_t)1 << (num_free * PMEMZONE_BITSPERPAGE)) - 1);
 			}
-			mask <<= missalignment * PMEMZONE_BITSPERPAGE;
+			mask <<= misalignment * PMEMZONE_BITSPERPAGE;
 			set_cfree_word(&self->mz_free[i], mask);
 			num_pages -= num_free;
 			assert(!num_pages ||

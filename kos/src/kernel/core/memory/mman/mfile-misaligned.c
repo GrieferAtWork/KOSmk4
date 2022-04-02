@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_MISSALIGNED_C
-#define GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_MISSALIGNED_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_MISALIGNED_C
+#define GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_MISALIGNED_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -47,30 +47,38 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-struct missaligned_mfile: mfile {
+struct misaligned_mfile: mfile {
 	REF struct mfile *mam_base; /* [1..1][const] The underlying mem-file. */
 	pos_t             mam_offs; /* [const] Offset addend added to every request. */
 };
 
+#define mfile_asmisaligned(self) ((struct misaligned_mfile *)(self))
+#define mfile_ismisaligned(self) ((self)->mf_ops == &misaligned_mfile_ops)
+
+
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL missaligned_mfile_v_destroy)(struct mfile *__restrict self) {
-	struct missaligned_mfile *me;
-	me = (struct missaligned_mfile *)self;
+NOTHROW(KCALL misaligned_mfile_v_destroy)(struct mfile *__restrict self) {
+	struct misaligned_mfile *me;
+	me = mfile_asmisaligned(self);
 	decref_unlikely(me->mam_base);
 	kfree(me);
 }
 
 PRIVATE BLOCKING NONNULL((1, 5)) void KCALL
-missaligned_mfile_v_loadblocks(struct mfile *__restrict self, pos_t addr,
-                               physaddr_t buf, size_t num_bytes,
-                               struct aio_multihandle *__restrict aio) {
-	struct missaligned_mfile *me;
+misaligned_mfile_v_loadblocks(struct mfile *__restrict self, pos_t addr,
+                              physaddr_t buf, size_t num_bytes,
+                              struct aio_multihandle *__restrict aio) {
+	struct misaligned_mfile *me;
 	struct mfile *base;
-	me   = (struct missaligned_mfile *)self;
+	me   = mfile_asmisaligned(self);
 	base = me->mam_base;
 
 	/* Apply addend */
-	addr += me->mam_offs;
+	if (OVERFLOW_UADD(addr, me->mam_offs, &addr)) {
+		/* Out-of-bounds --> always read zero-bytes. */
+		bzerophyscc(buf, num_bytes);
+		return;
+	}
 
 	/* Check if direct I/O is possible. */
 	if (addr == ((addr >> base->mf_blockshift) << base->mf_blockshift)) {
@@ -108,41 +116,41 @@ missaligned_mfile_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 
 
 PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
-missaligned_mfile_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
-                          size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
-	struct missaligned_mfile *me;
-	me = (struct missaligned_mfile *)self;
+misaligned_mfile_v_pread(struct mfile *__restrict self, USER CHECKED void *dst,
+                         size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
+	struct misaligned_mfile *me;
+	me = mfile_asmisaligned(self);
 	if (OVERFLOW_UADD(addr, me->mam_offs, &addr))
 		return 0;
 	return mfile_upread(me->mam_base, dst, num_bytes, addr, mode);
 }
 
 PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL
-missaligned_mfile_v_preadv(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
-                           size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
-	struct missaligned_mfile *me;
-	me = (struct missaligned_mfile *)self;
+misaligned_mfile_v_preadv(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
+                          size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
+	struct misaligned_mfile *me;
+	me = mfile_asmisaligned(self);
 	if (OVERFLOW_UADD(addr, me->mam_offs, &addr))
 		return 0;
 	return mfile_upreadv(me->mam_base, dst, num_bytes, addr, mode);
 }
 
 PRIVATE BLOCKING WUNUSED NONNULL((1)) REF void * KCALL
-missaligned_mfile_v_tryas(struct mfile *__restrict self,
-                          uintptr_half_t wanted_type)
+misaligned_mfile_v_tryas(struct mfile *__restrict self,
+                         uintptr_half_t wanted_type)
 		THROWS(...) {
-	struct missaligned_mfile *me;
-	me = (struct missaligned_mfile *)self;
+	struct misaligned_mfile *me;
+	me = mfile_asmisaligned(self);
 	return mfile_utryas(me->mam_base, wanted_type);
 }
 
 PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) ssize_t KCALL
-missaligned_mfile_v_printlink(struct mfile *__restrict self,
-                              pformatprinter printer, void *arg)
+misaligned_mfile_v_printlink(struct mfile *__restrict self,
+                             pformatprinter printer, void *arg)
 		THROWS(E_WOULDBLOCK, ...) {
 	ssize_t temp, result;
-	struct missaligned_mfile *me;
-	me     = (struct missaligned_mfile *)self;
+	struct misaligned_mfile *me;
+	me     = mfile_asmisaligned(self);
 	result = (*printer)(arg, "[", 1);
 	if unlikely(result < 0)
 		goto done;
@@ -164,29 +172,30 @@ err:
 }
 
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
-NOTHROW(KCALL missaligned_mfile_v_cc)(struct mfile *__restrict self,
-                                      struct ccinfo *__restrict info) {
-	struct missaligned_mfile *me;
+NOTHROW(KCALL misaligned_mfile_v_cc)(struct mfile *__restrict self,
+                                     struct ccinfo *__restrict info) {
+	struct misaligned_mfile *me;
 	struct mfile_stream_ops const *inner_stream;
-	me           = (struct missaligned_mfile *)self;
+	me           = mfile_asmisaligned(self);
 	inner_stream = me->mam_base->mf_ops->mo_stream;
 	if (inner_stream->mso_cc)
 		(*inner_stream->mso_cc)(me->mam_base, info);
 }
 
-PRIVATE struct mfile_stream_ops const missaligned_mfile_v_stream_ops = {
-	.mso_pread     = &missaligned_mfile_v_pread,
-	.mso_preadv    = &missaligned_mfile_v_preadv,
-	.mso_tryas     = &missaligned_mfile_v_tryas,
-	.mso_printlink = &missaligned_mfile_v_printlink,
-	.mso_cc        = &missaligned_mfile_v_cc,
+PRIVATE struct mfile_stream_ops const misaligned_mfile_v_stream_ops = {
+	.mso_pread     = &misaligned_mfile_v_pread,
+	.mso_preadv    = &misaligned_mfile_v_preadv,
+	.mso_tryas     = &misaligned_mfile_v_tryas,
+	.mso_printlink = &misaligned_mfile_v_printlink,
+	.mso_cc        = &misaligned_mfile_v_cc,
 };
 
-PRIVATE struct mfile_ops const missaligned_mfile_ops = {
-	.mo_destroy    = &missaligned_mfile_v_destroy,
-	.mo_loadblocks = &missaligned_mfile_v_loadblocks,
-	.mo_stream     = &missaligned_mfile_v_stream_ops,
+PRIVATE struct mfile_ops const misaligned_mfile_ops = {
+	.mo_destroy    = &misaligned_mfile_v_destroy,
+	.mo_loadblocks = &misaligned_mfile_v_loadblocks,
+	.mo_stream     = &misaligned_mfile_v_stream_ops,
 };
+
 
 /* Create a wrapper file whose I/O cache is lazily populated from  `inner',
  * with the given `inner_fpos' addend added to all file offsets. Note  that
@@ -197,18 +206,26 @@ PRIVATE struct mfile_ops const missaligned_mfile_ops = {
  * This function is primarily used as a hacky wrapper for loading PE files
  * into memory (as those  sometimes have sub-page alignment  constraints). */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mfile *FCALL
-mfile_create_missaligned_wrapper(struct mfile *__restrict inner,
-                                 pos_t inner_fpos)
+mfile_create_misaligned_wrapper(struct mfile *__restrict inner,
+                                pos_t inner_fpos)
 		THROWS(E_BADALLOC) {
-	REF struct missaligned_mfile *result;
+	REF struct misaligned_mfile *result;
 	shift_t blockshift;
 	if unlikely(inner->mf_ops->mo_loadblocks == NULL)
-		return incref(inner); /* File offsets don't matter in this case! */
-	result = (REF struct missaligned_mfile *)kmalloc(sizeof(struct missaligned_mfile), GFP_NORMAL);
+		goto return_inner; /* File offsets don't matter in this case! */
+	if unlikely(inner_fpos == 0)
+		goto return_inner; /* No misalignment --> no need to create a wrapper! */
+
+	/* Allocate a new `struct misaligned_mfile' */
+	result = (REF struct misaligned_mfile *)kmalloc(sizeof(struct misaligned_mfile), GFP_NORMAL);
 	blockshift = inner->mf_blockshift;
-	if (blockshift < PAGESHIFT)
+	if (blockshift < PAGESHIFT) {
+		/* Because  it's the most efficient shift, and  because we're free to pick whatever
+		 * shift we want to pick for misaligned wrapper files, we can simply pick PAGESHIFT
+		 * as our block-shift. */
 		blockshift = PAGESHIFT;
-	_mfile_init(result, &missaligned_mfile_ops, blockshift, inner->mf_iobashift);
+	}
+	_mfile_init(result, &misaligned_mfile_ops, blockshift, inner->mf_iobashift);
 	result->mf_parts             = MFILE_PARTS_ANONYMOUS;
 	result->mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;
 	atomic64_init(&result->mf_filesize, (uint64_t)-1);
@@ -218,27 +235,44 @@ mfile_create_missaligned_wrapper(struct mfile *__restrict inner,
 	                   MFILE_F_NOMTIME | MFILE_F_FIXEDFILESIZE;
 
 	mfile_tslock_acquire(inner);
-	if (!(inner->mf_flags & MFILE_F_DELETED)) {
-		result->mf_atime = inner->mf_atime;
-		result->mf_mtime = inner->mf_mtime;
-		result->mf_ctime = inner->mf_ctime;
-		result->mf_btime = inner->mf_btime;
-	} else {
-		result->mf_atime = realtime();
-		result->mf_mtime = result->mf_atime;
-		result->mf_ctime = result->mf_atime;
-		result->mf_btime = result->mf_atime;
+	if unlikely(inner->mf_flags & MFILE_F_DELETED) {
+		mfile_tslock_release_br(inner);
+		/* Deleted file --> don't create a misalignment wrapper! */
+		goto kfree_result_and_return_inner;
 	}
+	result->mf_atime = inner->mf_atime;
+	result->mf_mtime = inner->mf_mtime;
+	result->mf_ctime = inner->mf_ctime;
+	result->mf_btime = inner->mf_btime;
 	mfile_tslock_release(inner);
 
 	/* Fill in remaining fields. */
-	result->mam_base = incref(inner);
-	result->mam_offs = inner_fpos;
+	if (mfile_ismisaligned(inner)) {
+		/* Cascade offsets to merge miss-alignments for readthru */
+		struct misaligned_mfile *inner_miss;
+		inner_miss = mfile_asmisaligned(inner);
+		if (OVERFLOW_UADD(inner_fpos, inner_miss->mam_offs, &inner_fpos)) {
+			/* Reading  from out-of-bounds addresses yields ZEROes. In a
+			 * situation where _all_ addresses are out-of-bounds, we can
+			 * simply return /dev/zero instead of creating a new file! */
+			kfree(result);
+			return incref(&mfile_zero);
+		}
+		result->mam_base = incref(inner_miss->mam_base);
+		result->mam_offs = inner_fpos;
+	} else {
+		result->mam_base = incref(inner);
+		result->mam_offs = inner_fpos;
+	}
 	return result;
+kfree_result_and_return_inner:
+	kfree(result);
+return_inner:
+	return incref(inner);
 }
 
 
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_MISSALIGNED_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_MISALIGNED_C */

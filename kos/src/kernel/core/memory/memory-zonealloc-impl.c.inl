@@ -75,7 +75,7 @@ NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
 #ifdef ALLOC_BETWEEN
 	size_t min_i;
 #endif /* ALLOC_BETWEEN */
-	unsigned int missalignment;
+	unsigned int misalignment;
 	physpage_t result;
 #ifdef ALLOC_BETWEEN
 	assert(zone_relative_max >= zone_relative_min);
@@ -84,8 +84,8 @@ NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
 #ifdef ALLOC_BETWEEN
 	min_i = (size_t)(zone_relative_min / PAGES_PER_WORD);
 #endif /* ALLOC_BETWEEN */
-	i             = (size_t)(zone_relative_max / PAGES_PER_WORD);
-	missalignment = (unsigned int)(zone_relative_max % PAGES_PER_WORD);
+	i            = (size_t)(zone_relative_max / PAGES_PER_WORD);
+	misalignment = (unsigned int)(zone_relative_max % PAGES_PER_WORD);
 #ifdef ALLOC_MINMAX
 	if (max_pages <= 1)
 #elif !defined(ALLOC_SINGLE)
@@ -97,7 +97,7 @@ NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
 			uintptr_t page_mask;
 again_word_i:
 			word      = ATOMIC_READ(self->mz_free[i]);
-			page_mask = (uintptr_t)PMEMZONE_ISFREEMASK << (missalignment * PMEMZONE_BITSPERPAGE);
+			page_mask = (uintptr_t)PMEMZONE_ISFREEMASK << (misalignment * PMEMZONE_BITSPERPAGE);
 			for (;;) {
 				if (word & page_mask) {
 					/* Got it! (allocate the remainder!) */
@@ -137,7 +137,7 @@ again_word_i:
 				goto nope;
 #endif /* !ALLOC_BETWEEN */
 			--i;
-			missalignment = PAGES_PER_WORD - 1;
+			misalignment = PAGES_PER_WORD - 1;
 		}
 	}
 #ifndef ALLOC_SINGLE
@@ -154,7 +154,7 @@ again_word_i_trans:
 			alloc_mask      = 0;
 			new_alloc_count = alloc_count;
 			word            = ATOMIC_READ(self->mz_free[i]);
-			page_mask       = (uintptr_t)PMEMZONE_ISFREEMASK << (missalignment * PMEMZONE_BITSPERPAGE);
+			page_mask       = (uintptr_t)PMEMZONE_ISFREEMASK << (misalignment * PMEMZONE_BITSPERPAGE);
 			for (;;) {
 				if (word & page_mask) {
 					alloc_mask |= page_mask;
@@ -265,7 +265,7 @@ min_max_allocate_current_alloc_mask:
 				goto nope;
 			}
 			--i;
-			missalignment = PAGES_PER_WORD - 1;
+			misalignment = PAGES_PER_WORD - 1;
 		}
 	}
 #endif /* !ALLOC_SINGLE */

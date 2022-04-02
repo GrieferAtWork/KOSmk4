@@ -230,7 +230,7 @@ peabi_exec(/*in|out*/ struct execargs *__restrict args) {
 			if (section->VirtualAddress & PAGEMASK) {
 				section->Misc.VirtualSize += section->VirtualAddress & PAGEMASK;
 				if (section->SizeOfRawData) {
-					section->PointerToRawData += section->VirtualAddress & PAGEMASK;
+					section->PointerToRawData -= section->VirtualAddress & PAGEMASK;
 					section->SizeOfRawData += section->VirtualAddress & PAGEMASK;
 				}
 				section->VirtualAddress &= ~PAGEMASK;
@@ -305,7 +305,7 @@ done_bss:
 				if (offset & PAGEMASK) {
 					/* Custom mfile to lazily load data from a miss-aligned file offset. */
 					REF struct mfile *wrapper;
-					wrapper = mfile_create_missaligned_wrapper(args->ea_xfile, offset);
+					wrapper = mfile_create_misaligned_wrapper(args->ea_xfile, offset);
 					FINALLY_DECREF_UNLIKELY(wrapper);
 					mbuilder_map(&builder, (void *)sectaddr,
 					             section->SizeOfRawData, prot,
