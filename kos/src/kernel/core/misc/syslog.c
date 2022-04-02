@@ -396,8 +396,8 @@ DBG_COMMAND_AUTO(loglevel, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 
 
 
-/* Broadcast a given system log packet for all registered sinks to handle
- * Note   that   this  function   can   be  called   from   any  context! */
+/* Broadcast a given system log packet for all registered sinks to
+ * handle  Note that this function can be called from any context! */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL syslog_packet_broadcast)(struct syslog_packet const *__restrict self,
                                        unsigned int level) {
@@ -732,6 +732,14 @@ syslog_packet_append(struct syslog_packet *__restrict self,
  *   - `\r': Clear the internal buffer for `level' (if not immediately followed by `\n')
  *   - `\n': Broadcast  the  contents of  the  internal buffer  as  a syslog
  *           packet (s.a. `syslog_packet_broadcast()') and clear the buffer.
+ *   - `\b': Backspace. -- Delete the most-recently written character from the
+ *           buffer. If the internal buffer is already empty, this is a no-op.
+ *   - `\0': Ignored. -- This character is not appended to the line buffer.
+ *   -  * :  All other iscntrl() characters are currently ignored (such  that
+ *           they will not be appended to the internal line buffer), with the
+ *           exception  of 0x01..0x04 and 0x1c..0x1f (inclusive). The control
+ *           characters currently being ignored should  not be used, as  they
+ *           may be assigned meaning in the future.
  * @except: May only throw exceptions as the result of accessing memory in `*data'
  * @return: * : Always re-returns `datalen' */
 PUBLIC ssize_t FORMATPRINTER_CC
