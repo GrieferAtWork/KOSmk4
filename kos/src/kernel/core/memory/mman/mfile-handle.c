@@ -138,30 +138,6 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		return 0;
 	}	break;
 
-	case FS_IOC_GETFSLABEL:
-		if (mfile_isnode(self)) {
-			struct fsuper *super;
-			super = mfile_asnode(self)->fn_super;
-			if (fsuper_getlabel(super, (USER CHECKED char *)validate_writable(arg, FSLABEL_MAX * sizeof(char))))
-				return 0;
-		}
-		break;
-
-	case FS_IOC_SETFSLABEL:
-		if (mfile_isnode(self)) {
-			struct fsuper *super;
-			USER CHECKED char const *labelname;
-			size_t labelsize;
-			super = mfile_asnode(self)->fn_super;
-			labelname = (USER CHECKED char const *)validate_readable(arg, 1);
-			labelsize = strnlen(labelname, FSLABEL_MAX);
-			/* As per the specs, only a SYS_ADMIN can issue this command! */
-			require(CAP_SYS_ADMIN);
-			if (fsuper_setlabel(super, labelname, labelsize))
-				return 0;
-		}
-		break;
-
 	case FILE_IOC_BLKSHIFT: {
 		USER CHECKED struct file_blkshift *info;
 		/* Query ioctl for buffer requirements of `O_DIRECT' */
@@ -383,6 +359,31 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		return ioctl_intarg_setu64(cmd, arg, value);
 	}	break;
 
+	case _IO_WITHSIZE(FS_IOC_GETFSLABEL, 0):
+		if (mfile_isnode(self)) {
+			struct fsuper *super;
+			size_t maxlen = _IOC_SIZE(cmd); /* Usually `sizeof(char[FSLABEL_MAX])' */
+			(void)maxlen;
+			super = mfile_asnode(self)->fn_super;
+			if (fsuper_getlabel(super, (USER CHECKED char *)validate_writable(arg, maxlen)))
+				return 0;
+		}
+		break;
+
+	case _IO_WITHSIZE(FS_IOC_SETFSLABEL, 0):
+		if (mfile_isnode(self)) {
+			struct fsuper *super;
+			USER CHECKED char const *labelname;
+			size_t labelsize = _IOC_SIZE(cmd); /* Usually `sizeof(char[FSLABEL_MAX])' */
+			super = mfile_asnode(self)->fn_super;
+			labelname = (USER CHECKED char const *)validate_readable(arg, 1);
+			labelsize = strnlen(labelname, labelsize / sizeof(char));
+			/* As per the specs, only a SYS_ADMIN can issue this command! */
+			require(CAP_SYS_ADMIN);
+			if (fsuper_setlabel(super, labelname, labelsize))
+				return 0;
+		}
+		break;
 
 	default:
 		break;
