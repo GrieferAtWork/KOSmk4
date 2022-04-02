@@ -1195,6 +1195,15 @@ blkdev_repart(struct blkdev *__restrict self)
 	if unlikely(!blkdev_isroot(self))
 		return;
 
+#ifndef __OPTIMIZE_SIZE__
+	/* Step #0.1: If `self' doesn't have the GLOBAL_REF bit set,  then
+	 *            we  won't be able to set that bit for its sub-parts,
+	 *            and those parts would just seize to exist once we're
+	 *            done registering them... */
+	if unlikely(!(self->mf_flags & MFILE_FN_GLOBAL_REF))
+		return;
+#endif /* !__OPTIMIZE_SIZE__ */
+
 	/* Step #1: Construct new partitions and assign device IDs and names to partitions */
 	newparts = blkdev_makeparts(self, &info);
 
@@ -1225,6 +1234,42 @@ blkdev_repart(struct blkdev *__restrict self)
 			decref_nokill(dev);
 	}
 
+	/* Ensure that the underlying block device didn't get deleted in the mean time.
+	 * If it did, then we have to delete all of the partitions which we're about to
+	 * register otherwise.
+	 *
+	 * Note that TLSLOCK is an SMP-LOCK, so we're allowed to acquire it while
+	 * already holding atomic locks! */
+	mfile_tslock_acquire(self);
+	if unlikely(ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED) {
+		/* Release locks */
+		mfile_tslock_release_br(self);
+		_fallnodes_release();
+		_devfs_byname_endwrite();
+		_ramfs_dirnode_endread(&devfs_rootdir);
+		_fsuper_nodes_endwrite(&devfs);
+		_blkdev_root_partslock_release(self);
+
+		/* Reap locks */
+		ramfs_dirnode_reap(&devfs_rootdir);
+		fallnodes_reap();
+		devfs_byname_reap();
+		fsuper_nodes_reap(&devfs);
+		blkdev_root_partslock_reap(self);
+
+		/* Destroy objects */
+		blkdev_destroy_incomplete_parts(&newparts);
+		while (!LIST_EMPTY(&oldparts)) {
+			dev = LIST_FIRST(&oldparts);
+			LIST_UNBIND(dev, bd_partinfo.bp_partlink);
+			decref(dev);
+		}
+
+		/* Return after not actually having registered new partitions. */
+		return;
+	}
+	mfile_tslock_release(self);
+
 	/* Step #4: Register all of the new partitions */
 	LIST_FOREACH (dev, &newparts, bd_partinfo.bp_partlink) {
 		if (devfs_root_nameused(dev->dv_dirent)) {
@@ -1243,10 +1288,12 @@ blkdev_repart(struct blkdev *__restrict self)
 
 		/* Setup global reference */
 		assert(!(dev->mf_flags & MFILE_FN_GLOBAL_REF));
-		if (self->mf_flags & MFILE_FN_GLOBAL_REF) {
-			dev->mf_flags |= MFILE_FN_GLOBAL_REF;
-			++dev->mf_refcnt; /* For `MFILE_FN_GLOBAL_REF' (in `fallnodes_list') */
-		}
+		dev->mf_flags |= MFILE_FN_GLOBAL_REF;
+
+		/* NOTE: Don't incref here. -- Instead, let `MFILE_FN_GLOBAL_REF' inherit
+		 *       the  initial reference returned by `blkdev_makeparts()', meaning
+		 *       that the device can go away once it gets deleted. */
+		/*++dev->mf_refcnt;*/ /* For `MFILE_FN_GLOBAL_REF' (in `fallnodes_list') */
 		devfs_log_new_device(dev);
 	}
 	LIST_TRANSFER(&self->bd_rootinfo.br_parts,
@@ -1262,7 +1309,7 @@ blkdev_repart(struct blkdev *__restrict self)
 	while (!LIST_EMPTY(&oldparts)) {
 		dev = LIST_FIRST(&oldparts);
 		LIST_UNBIND(dev, bd_partinfo.bp_partlink);
-		decref_unlikely(dev);
+		decref(dev);
 	}
 
 	/* Save updated information. */
@@ -1362,7 +1409,11 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 
 		assert(!(dev->mf_flags & MFILE_FN_GLOBAL_REF));
 		dev->mf_flags |= MFILE_FN_GLOBAL_REF;
-		++dev->mf_refcnt; /* For `MFILE_FN_GLOBAL_REF' (in `fallnodes_list') */
+
+		/* NOTE: Don't incref here. -- Instead, let `MFILE_FN_GLOBAL_REF' inherit
+		 *       the  initial reference returned by `blkdev_makeparts()', meaning
+		 *       that the device can go away once it gets deleted. */
+		/*++dev->mf_refcnt;*/ /* For `MFILE_FN_GLOBAL_REF' (in `fallnodes_list') */
 		devfs_log_new_device(dev);
 	}
 	self->bd_rootinfo.br_parts = newparts;
