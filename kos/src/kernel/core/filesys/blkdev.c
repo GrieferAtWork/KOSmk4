@@ -1077,6 +1077,27 @@ again:
 }
 
 
+/* Release  all  locks acquired  by `blkdev_repart_locks_acquire()',  but don't
+ * reap associated locks. For that, you must call `blkdev_repart_locks_reap()'! */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL _blkdev_repart_locks_release)(struct blkdev *__restrict self) {
+	_fallnodes_release();
+	_devfs_byname_endwrite();
+	_ramfs_dirnode_endread(&devfs_rootdir);
+	_fsuper_nodes_endwrite(&devfs);
+	_blkdev_root_partslock_release(self);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL blkdev_repart_locks_reap)(struct blkdev *__restrict self) {
+	ramfs_dirnode_reap(&devfs_rootdir);
+	fallnodes_reap();
+	devfs_byname_reap();
+	fsuper_nodes_reap(&devfs);
+	blkdev_root_partslock_reap(self);
+}
+
+
 /* If bound, remove `self' from the following global listings (caller must be holding locks):
  *  - devfs_byname_list
  *  - devfs.rs_sup.fs_nodes
@@ -1244,18 +1265,10 @@ blkdev_repart(struct blkdev *__restrict self)
 	if unlikely(ATOMIC_READ(self->mf_flags) & MFILE_F_DELETED) {
 		/* Release locks */
 		mfile_tslock_release_br(self);
-		_fallnodes_release();
-		_devfs_byname_endwrite();
-		_ramfs_dirnode_endread(&devfs_rootdir);
-		_fsuper_nodes_endwrite(&devfs);
-		_blkdev_root_partslock_release(self);
+		_blkdev_repart_locks_release(self);
 
 		/* Reap locks */
-		ramfs_dirnode_reap(&devfs_rootdir);
-		fallnodes_reap();
-		devfs_byname_reap();
-		fsuper_nodes_reap(&devfs);
-		blkdev_root_partslock_reap(self);
+		blkdev_repart_locks_reap(self);
 
 		/* Destroy objects */
 		blkdev_destroy_incomplete_parts(&newparts);
@@ -1320,11 +1333,7 @@ blkdev_repart(struct blkdev *__restrict self)
 	_blkdev_root_partslock_release(self);
 
 	/* Reap all of the locks released above */
-	ramfs_dirnode_reap(&devfs_rootdir);
-	fallnodes_reap();
-	devfs_byname_reap();
-	fsuper_nodes_reap(&devfs);
-	blkdev_root_partslock_reap(self);
+	blkdev_repart_locks_reap(self);
 }
 
 
@@ -1420,18 +1429,10 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 	devfs_log_new_device(self);
 
 	/* Step #5: Release locks. */
-	_fallnodes_release();
-	_devfs_byname_endwrite();
-	_ramfs_dirnode_endread(&devfs_rootdir);
-	_fsuper_nodes_endwrite(&devfs);
-	_blkdev_root_partslock_release(self);
+	_blkdev_repart_locks_release(self);
 
 	/* Reap all of the locks released above */
-	fallnodes_reap();
-	devfs_byname_reap();
-	ramfs_dirnode_reap(&devfs_rootdir);
-	fsuper_nodes_reap(&devfs);
-	blkdev_root_partslock_reap(self);
+	blkdev_repart_locks_reap(self);
 }
 
 
