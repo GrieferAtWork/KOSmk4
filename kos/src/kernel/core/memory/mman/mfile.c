@@ -161,9 +161,9 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 #ifdef CONFIG_HAVE_FS_NOTIFY
 	if (self->mf_notify != NULL) {
 		struct inotify_controller *notify;
-		struct dnotify_link_slist links;
+		struct dnotify_link_slist deadlinks;
 		COMPILER_READ_BARRIER();
-		SLIST_INIT(&links);
+		SLIST_INIT(&deadlinks);
 		notify_lock_acquire();
 		if ((notify = self->mf_notify) != NULL) {
 			assertf(LIST_EMPTY(&notify->inc_listeners),
@@ -172,6 +172,9 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 			assertf(!LIST_EMPTY(&notify->inc_dirs),
 			        "If this was also empty, then the notify "
 			        "controller should have already been freed!");
+			assertf(notify->inc_file == self,
+			        "Notify contrller of different file? (%p != %p)",
+			        notify->inc_file, self);
 
 			/* Remove the file from watched directories that contain it. */
 			do {
@@ -183,15 +186,15 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 				LIST_REMOVE(link, dnl_fillink);
 				dnotify_link_tree_removenode(&link->dnl_dir->dnc_files, link);
 				DBG_memset(&link->dnl_dir, 0xcc, sizeof(link->dnl_dir));
-				SLIST_INSERT(&links, link, _dnl_fildead);
+				SLIST_INSERT(&deadlinks, link, _dnl_fildead);
 			} while (!LIST_EMPTY(&notify->inc_dirs));
 		}
 		notify_lock_release();
-		xnotify_controller_xfree(notify);
-		while (!SLIST_EMPTY(&links)) {
+		inotify_controller_xfree(notify);
+		while (!SLIST_EMPTY(&deadlinks)) {
 			struct dnotify_link *link;
-			link = SLIST_FIRST(&links);
-			SLIST_REMOVE_HEAD(&links, _dnl_fildead);
+			link = SLIST_FIRST(&deadlinks);
+			SLIST_REMOVE_HEAD(&deadlinks, _dnl_fildead);
 			dnotify_link_destroy(link);
 		}
 	}

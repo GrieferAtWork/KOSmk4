@@ -382,6 +382,7 @@ fdirnode_mkfile(struct fdirnode *__restrict self,
 		THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	unsigned int result;
 	struct fdirnode_ops const *ops;
 	ops = fdirnode_getops(self);
 	if unlikely(!ops->dno_mkfile) {
@@ -414,7 +415,7 @@ again_lookup:
 		return FDIRNODE_MKFILE_EXISTS;
 	}
 	TRY {
-		return (*ops->dno_mkfile)(self, info);
+		result = (*ops->dno_mkfile)(self, info);
 	} EXCEPT {
 		/* If `dno_mkfile' throws `E_FSERROR_UNSUPPORTED_OPERATION', try to
 		 * fill  in the correct `E_FILESYSTEM_OPERATION_*' context based on
@@ -449,6 +450,17 @@ again_lookup:
 		}
 		RETHROW();
 	}
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	/* TODO: Must lazily bind  directory notifications  to
+	 * child files, like also done by `fdirent_opennode()'
+	 *  - info->mkf_rnode
+	 *  - info->mkf_dent
+	 *
+	 * IMPORTANT: The bind here  must be done  such that  it
+	 * is NOTHROW, since (in case  a new file was  created),
+	 * we have no way of dealing with an allocation failure. */
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+	return result;
 }
 
 /* Delete the specified file from this directory

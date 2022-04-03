@@ -152,7 +152,7 @@ DATDEF struct atomic_lock notify_lock;
 
 
 struct notify_listener {
-	struct notifyfd            *nl_notfd; /* [1..1][const] Associated notify FD */
+	struct notifyfd            *nl_notfd; /* [1..1][valid_if(nl_file)][const] Associated notify FD */
 	REF struct mfile           *nl_file;  /* [0..1][lock(!PREEMPTION && :notify_lock)] Attached notification controller. (only NULL if deleted) */
 	LIST_ENTRY(notify_listener) nl_link;  /* [0..1][valid_if(nl_file)][lock(!PREEMPTION && :notify_lock)] Link in list of listeners attached to `nl_file->mf_notify' */
 	uint32_t                    nl_mask;  /* [lock(!PREEMPTION && :notify_lock)] Mask of events to listen fork (set of `IN_ALL_EVENTS | IN_ONESHOT | IN_EXCL_UNLINK') */
@@ -172,13 +172,17 @@ struct notifyfd {
 	/* TODO: List of pending (not-yet-read) events */
 };
 
+/* Check if `fd' is being used. */
+#define notifyfd_fdused(self, fd) ((self)->nf_listenv[fd].nl_file != __NULLPTR)
+
+
 /* Destroy a given notifyfd object. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL notifyfd_destroy)(struct notifyfd *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct notifyfd, nf_refcnt, notifyfd_destroy)
 
 /* Create a new notifyfd object. */
-FUNDEF ATTR_RETNONNULL WUNUSED REF struct notifyfd *FCALL
+FUNDEF ATTR_RETNONNULL WUNUSED REF struct notifyfd *KCALL
 notifyfd_new(void) THROWS(E_BADALLOC);
 
 /* Add a new watch (listener) for `file' to `self'
@@ -188,11 +192,18 @@ notifyfd_new(void) THROWS(E_BADALLOC);
  *                - IN_MASK_CREATE: Return `-EEXIST' if `file' is already being watched.
  * @return: * :      The watch descriptor (index into `self->nf_listenv')
  * @return: -EEXIST: `IN_MASK_CREATE' was given and `file' is already being monitored. */
-FUNDEF WUNUSED NONNULL((1, 2)) int FCALL
+FUNDEF WUNUSED NONNULL((1, 2)) unsigned int KCALL
 notifyfd_addwatch(struct notifyfd *__restrict self,
                   struct mfile *__restrict file,
                   uint32_t mask)
 		THROWS(E_BADALLOC);
+
+/* Remove the watch descriptor `watchfd' (as previously returned by `notifyfd_addwatch')
+ * @return: true:  Successfully deleted `watchfd'.
+ * @return: false: The given `watchfd' was already deleted. */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
+NOTHROW(KCALL notifyfd_rmwatch)(struct notifyfd *__restrict self,
+                                unsigned int watchfd);
 
 
 
@@ -243,27 +254,60 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL dnotify_link_tree_removenode)(
 
 /* The base notification controller as pointed-to by `struct mfile::mf_notify' */
 struct inotify_controller {
+#ifdef __WANT_INOTIFY_CONTROLLER__inc_deadlnk
+	union {
+		struct notify_listener_list      inc_listeners; /* [0..n][lock(!PREEMPTION && :notify_lock)] List of attached listeners */
+		SLIST_ENTRY(inotify_controller) _inc_deadlnk;   /* Used internally during destruction */
+	};
+#else /* __WANT_INOTIFY_CONTROLLER__inc_deadlnk */
 	struct notify_listener_list inc_listeners; /* [0..n][lock(!PREEMPTION && :notify_lock)] List of attached listeners */
+#endif /* !__WANT_INOTIFY_CONTROLLER__inc_deadlnk */
 	struct dnotify_link_list    inc_dirs;      /* [0..n][lock(!PREEMPTION && :notify_lock)]
 	                                            * [*->dnl_fil == this][link(dnl_fillink)]
 	                                            * Directories containing this file/directory. */
+	struct mfile               *inc_file;      /* [1..1][lock(!PREEMPTION && :notify_lock)] Associated file */
 };
+#define inotify_controller_isdnotify(self) mfile_isdir((self)->inc_file)
+#define inotify_controller_asdnotify(self) ((struct dnotify_controller *)(self))
+
 
 /* `struct mfile::mf_notify' is actually a `struct dnotify_controller' when `mfile_isdir()' */
 struct dnotify_controller: inotify_controller {
+#ifdef __INTELLISENSE__
+	struct dnotify_link        *dnc_files; /* [0..n][lock(!PREEMPTION && :notify_lock)]
+	                                        * [*->dnl_dir == this][link(dnl_dirnode)]
+	                                        * [owned] Files in this directory. - Always
+	                                        * `NULL' when  `LIST_EMPTY(inc_listeners)'. */
+#else /* __INTELLISENSE__ */
 	LLRBTREE_ROOT(dnotify_link) dnc_files; /* [0..n][lock(!PREEMPTION && :notify_lock)]
 	                                        * [*->dnl_dir == this][link(dnl_dirnode)]
 	                                        * [owned] Files in this directory. - Always
 	                                        * `NULL' when  `LIST_EMPTY(inc_listeners)'. */
+#endif /* !__INTELLISENSE__ */
 };
 
 /* Allocate/free notification controllers. */
-#define xnotify_controller_xfree(self) kfree(self)
-#define xnotify_controller_free(self)  kfree(self)
-#define inotify_controller_alloc()    ((struct inotify_controller *)kmalloc(sizeof(struct inotify_controller), GFP_NORMAL))
-#define inotify_controller_free(self) xnotify_controller_free(self)
-#define dnotify_controller_alloc()    ((struct dnotify_controller *)kmalloc(sizeof(struct dnotify_controller), GFP_NORMAL))
-#define dnotify_controller_free(self) xnotify_controller_free(self)
+#define inotify_controller_alloc()     ((struct inotify_controller *)kmalloc(sizeof(struct inotify_controller), GFP_NORMAL))
+#define inotify_controller_xfree(self) kfree(self)
+#define inotify_controller_free(self)  kfree(self)
+#define dnotify_controller_alloc()     ((struct dnotify_controller *)kmalloc(sizeof(struct dnotify_controller), GFP_NORMAL))
+#define dnotify_controller_free(self)  xnotify_controller_free(self)
+
+
+/* If `dir->mf_notify != NULL', ensure that `child_file->mf_notify' has
+ * been allocated, and that it is linked in the dnotify child-file list
+ * of `dir'.
+ *
+ * Always inherits a reference to `child_file' that is also always re-
+ * returned.  - In case  of an allocation error,  this pointer will be
+ * decref'd! */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct fnode *KCALL
+dnotify_controller_bindchild(struct fdirnode *__restrict dir,
+                             struct fdirent *__restrict child_dent,
+                             /*inherit(always)*/ REF struct fnode *__restrict child_file)
+		THROWS(E_BADALLOC);
+
+
 
 DECL_END
 #endif /* __CC__ */

@@ -28,6 +28,34 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 
+#include <asm/os/stat.h> /* __S_IS*() macros */
+
+/* File mode test macros. */
+#if !defined(S_ISDIR) && defined(__S_ISDIR)
+#define S_ISDIR(mode)  __S_ISDIR(mode)  /* Directory. */
+#endif /* !S_ISDIR && __S_ISDIR */
+#if !defined(S_ISCHR) && defined(__S_ISCHR)
+#define S_ISCHR(mode)  __S_ISCHR(mode)  /* Character device. */
+#endif /* !S_ISCHR && __S_ISCHR */
+#if !defined(S_ISBLK) && defined(__S_ISBLK)
+#define S_ISBLK(mode)  __S_ISBLK(mode)  /* Block device. */
+#endif /* !S_ISBLK && __S_ISBLK */
+#if !defined(S_ISDEV) && defined(__S_ISDEV)
+#define S_ISDEV(mode)  __S_ISDEV(mode) /* S_ISCHR(mode) || S_ISBLK(mode) */
+#endif /* !S_ISDEV && __S_ISDEV */
+#if !defined(S_ISREG) && defined(__S_ISREG)
+#define S_ISREG(mode)  __S_ISREG(mode)  /* Regular file. */
+#endif /* !S_ISREG && __S_ISREG */
+#if !defined(S_ISFIFO) && defined(__S_ISFIFO)
+#define S_ISFIFO(mode) __S_ISFIFO(mode) /* FIFO. */
+#endif /* !S_ISFIFO && __S_ISFIFO */
+#if !defined(S_ISLNK) && defined(__S_ISLNK)
+#define S_ISLNK(mode)  __S_ISLNK(mode)  /* Symbolic link. */
+#endif /* !S_ISLNK && __S_ISLNK */
+#if !defined(S_ISSOCK) && defined(__S_ISSOCK)
+#define S_ISSOCK(mode) __S_ISSOCK(mode) /* Socket. */
+#endif /* !S_ISSOCK && __S_ISSOCK */
+
 #ifdef __CC__
 DECL_BEGIN
 

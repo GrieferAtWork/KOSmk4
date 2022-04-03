@@ -77,7 +77,22 @@ struct fdirent {
 DEFINE_REFCOUNT_FUNCTIONS(struct fdirent, fd_refcnt, fdirent_destroy)
 
 /* Open the node associated with this directory entry. */
+#ifdef CONFIG_HAVE_FS_NOTIFY
+/* TODO: Must process non-NULL return value:
+ * >> if (dir->mf_notify != NULL && return->mf_notify == NULL) {
+ * >>     ENSURE_ALLOCATED(return->mf_notify);
+ * >>     struct dnotify_link *link = dnotify_link_alloc();
+ * >>     link->dnl_dir = inotify_controller_asdnotify(dir->mf_notify);
+ * >>     link->dnl_fil = return;
+ * >>     LIST_INSERT(&return->mf_notify->inc_dirs, link, dnl_fillink);
+ * >>     link->dnl_ent = incref(self);
+ * >>     dnotify_link_tree_insert(&link->dnl_dir->dnc_files, link);
+ * >> }
+ * TODO: Use `dnotify_controller_bindchild()' for this. */
 #define fdirent_opennode(self, dir) ((*(self)->fd_ops->fdo_opennode)(self, dir))
+#else /* CONFIG_HAVE_FS_NOTIFY */
+#define fdirent_opennode(self, dir) ((*(self)->fd_ops->fdo_opennode)(self, dir))
+#endif /* !CONFIG_HAVE_FS_NOTIFY */
 
 /* Return the INode number of `self', potentially invoking the override operator. */
 #define fdirent_getino(self, dir)                                          \

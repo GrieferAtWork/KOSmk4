@@ -332,6 +332,18 @@ struct mfile_stream_ops {
 	NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 	/*NOTHROW*/ (KCALL *mso_cc)(struct mfile *__restrict self,
 	                            struct ccinfo *__restrict info);
+
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	/* TODO: New operators:
+	 * >> void *mso_notify_attach(struct mfile *__restrict self);
+	 * >> void mso_notify_detach(struct mfile *__restrict self, void *cookie);
+	 * Where `cookie' is stored in `struct inotify_controller'
+	 *  - `mso_notify_attach' is called when a `struct inotify_controller' is created
+	 *  - `mso_notify_detach' is called when a `struct inotify_controller' is destroyed
+	 * Together, these operators can be used to start/stop object-specific async jobs
+	 * for  the purpose of  polling signals and  generating file notification events. */
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+
 };
 
 /* Default ioctl(2) operator for mfiles. Implements:
