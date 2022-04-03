@@ -1845,6 +1845,7 @@ handle_part_insert_failure:
 				break; /* Already increased further! */
 		}
 		mfile_trunclock_dec_nosignal(self);
+
 		/* Always broadcast because we've just increased the file's size! */
 		sig_broadcast(&self->mf_initdone);
 

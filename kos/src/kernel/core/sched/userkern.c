@@ -221,6 +221,9 @@ PUBLIC struct mfile userkern_segment_file = {
 	.mf_part_amask = PAGEMASK,
 	.mf_blockshift = PAGESHIFT,
 	.mf_iobashift  = PAGESHIFT,
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	.mf_notify     = NULL,
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 	.mf_flags      = MFILE_F_FIXEDFILESIZE | MFILE_F_NOMTIME | MFILE_F_NOATIME,
 	.mf_trunclock  = 0,
 	.mf_filesize   = ATOMIC64_INIT(((uint64_t)KS_MAXADDR - (uint64_t)KS_MINADDR) + 1),
@@ -348,6 +351,9 @@ PUBLIC struct mfile userkern_segment_file_compat = {
 	.mf_part_amask = PAGEMASK,
 	.mf_blockshift = PAGESHIFT,
 	.mf_iobashift  = PAGESHIFT,
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	.mf_notify     = NULL,
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 	.mf_flags      = MFILE_F_FIXEDFILESIZE | MFILE_F_NOMTIME | MFILE_F_NOATIME,
 	.mf_trunclock  = 0,
 	.mf_filesize   = ATOMIC64_INIT(((uint64_t)KS_MAXADDR - (uint64_t)KS_MINADDR) + 1),

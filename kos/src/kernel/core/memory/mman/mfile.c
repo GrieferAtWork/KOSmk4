@@ -19,11 +19,14 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MFILE_C 1
+#define __WANT_DNOTIFY_LINK__dnl_fildead
 #define __WANT_FS_INIT
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/dirent.h>
+#include <kernel/fs/notify.h>
 #include <kernel/fs/null.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
@@ -131,6 +134,14 @@ NOTHROW(FCALL mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 }
 
 
+#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifndef __dnotify_link_slist_defined
+#define __dnotify_link_slist_defined
+SLIST_HEAD(dnotify_link_slist, dnotify_link);
+#endif /* !__dnotify_link_slist_defined */
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+
+
 /* Destroy a given mem-file */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
@@ -144,6 +155,48 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 	        "Any remaining part should have kept us alive!\n"
 	        "self->mf_changed.slh_first = %p\n",
 	        self->mf_changed.slh_first);
+
+	/* The file may still have a notify controller
+	 * if its containing directory is being watched. */
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	if (self->mf_notify != NULL) {
+		struct inotify_controller *notify;
+		struct dnotify_link_slist links;
+		COMPILER_READ_BARRIER();
+		SLIST_INIT(&links);
+		notify_lock_acquire();
+		if ((notify = self->mf_notify) != NULL) {
+			assertf(LIST_EMPTY(&notify->inc_listeners),
+			        "Per-file listeners should have kept us "
+			        "alive via `notify_listener::nl_file'");
+			assertf(!LIST_EMPTY(&notify->inc_dirs),
+			        "If this was also empty, then the notify "
+			        "controller should have already been freed!");
+
+			/* Remove the file from watched directories that contain it. */
+			do {
+				struct dnotify_link *link;
+				link = LIST_FIRST(&notify->inc_dirs);
+				assertf(dnotify_link_getfile(link) == notify,
+				        "%p != %p",
+				        dnotify_link_getfile(link), notify);
+				LIST_REMOVE(link, dnl_fillink);
+				dnotify_link_tree_removenode(&link->dnl_dir->dnc_files, link);
+				DBG_memset(&link->dnl_dir, 0xcc, sizeof(link->dnl_dir));
+				SLIST_INSERT(&links, link, _dnl_fildead);
+			} while (!LIST_EMPTY(&notify->inc_dirs));
+		}
+		notify_lock_release();
+		xnotify_controller_xfree(notify);
+		while (!SLIST_EMPTY(&links)) {
+			struct dnotify_link *link;
+			link = SLIST_FIRST(&links);
+			SLIST_REMOVE_HEAD(&links, _dnl_fildead);
+			dnotify_link_destroy(link);
+		}
+	}
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+
 	sig_broadcast_for_fini(&self->mf_initdone);
 	if (self->mf_ops->mo_destroy) {
 		(*self->mf_ops->mo_destroy)(self);
@@ -253,6 +306,9 @@ PUBLIC struct mfile mfile_ndef = {
 	MFILE_INIT_mf_lockops,
 	MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	MFILE_INIT_mf_notify,
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 	MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 	                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 	                    MFILE_F_FIXEDFILESIZE),
@@ -264,6 +320,12 @@ PUBLIC struct mfile mfile_ndef = {
 	MFILE_INIT_mf_btime(0, 0),
 };
 
+
+#ifdef CONFIG_HAVE_FS_NOTIFY
+#define MFILE_INIT_mf_notify_ MFILE_INIT_mf_notify,
+#else /* CONFIG_HAVE_FS_NOTIFY */
+#define MFILE_INIT_mf_notify_ /* nothing */
+#endif /* !CONFIG_HAVE_FS_NOTIFY */
 
 
 /* Fallback  files for anonymous memory. These behave the same as `mfile_zero',
@@ -282,6 +344,7 @@ PUBLIC struct mfile mfile_anon[BITSOF(void *)] = {
 		MFILE_INIT_mf_lockops,                                      \
 		MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),               \
 		MFILE_INIT_mf_blockshift(i, i),                             \
+		MFILE_INIT_mf_notify_                                       \
 		MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED | \
 		                    MFILE_F_NOATIME | MFILE_F_NOMTIME |     \
 		                    MFILE_F_FIXEDFILESIZE),                 \

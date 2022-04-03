@@ -173,7 +173,6 @@ again:
 	assert(rfdat->tfd_nlen >= me->td_ent.fd_namelen);
 
 	/* Fill in mem-file fields. */
-	__mfile_init_wrlockpc(result)
 	_mfile_init_common(result);
 	_mfile_init_blockshift(result, TBLOCKSHIFT, super->ts_super.fs_root.mf_iobashift);
 	result->mf_refcnt            = 2; /* +1: result, +1: MFILE_FN_GLOBAL_REF */

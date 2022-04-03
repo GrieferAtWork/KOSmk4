@@ -942,7 +942,7 @@ devdiskrule_vallocf(size_t sizeof_devdiskruledir,
 	LIST_ENTRY_UNBOUND_INIT(&dir->fn_allnodes);
 	DBG_memset(&dir->fn_fsdata, 0xcc, sizeof(dir->fn_fsdata));
 
-	__mfile_init_wrlockpc(dir) _mfile_init_common(dir);
+	_mfile_init_common(dir);
 	_mfile_init_blockshift(dir, PAGESHIFT, PAGESHIFT);
 	dir->mf_ops               = &devdiskruledir_ops.dno_node.no_file;
 	dir->mf_parts             = MFILE_PARTS_ANONYMOUS;

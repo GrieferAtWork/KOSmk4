@@ -692,6 +692,10 @@ SLIST_HEAD(ramfs_dirent_slist, ramfs_dirent);
 #endif /* !__ramfs_dirent_slist_defined */
 #endif /* __WANT_MFILE__mf_deadrament */
 
+#ifdef CONFIG_HAVE_FS_NOTIFY
+struct inotify_controller;
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+
 
 struct mfile {
 	WEAK refcnt_t                 mf_refcnt;     /* Reference counter. */
@@ -756,9 +760,15 @@ struct mfile {
 #define MFILE_INIT_mf_blockshift(mf_blockshift, mf_iobashift) \
 	__hybrid_max_c2(PAGESIZE, (size_t)1 << (mf_blockshift)) - 1, mf_blockshift, mf_iobashift
 #endif /* ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) == 0 */
+#ifdef CONFIG_HAVE_FS_NOTIFY
+#define MFILE_INIT_mf_notify                    __NULLPTR
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 #define MFILE_INIT_mf_flags(mf_flags)           mf_flags
 #define MFILE_INIT_mf_trunclock                 0
 #endif /* __WANT_FS_INIT */
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	struct inotify_controller    *mf_notify;     /* [0..1][owned][lock(!PREEMPTION && :notify_lock)] Notify controller. */
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 	uintptr_t                     mf_flags;      /* File flags (set of `MFILE_F_*') */
 	WEAK size_t                   mf_trunclock;  /* [lock(INC(RDLOCK(mf_lock) || mpart_lock_acquired(ANY(mf_parts))),
 	                                              *       DEC(ATOMIC))]
@@ -1022,13 +1032,19 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
 	                                        : PAGESHIFT)) -                     \
 	                         1)
 #ifdef CONFIG_MFILE_TRACE_LOCKPC
-#define __MFILE_INIT_WRLOCKPC        __NULLPTR,
 #define __mfile_init_wrlockpc(self)  (self)->_mf_wrlockpc = __NULLPTR,
 #define __mfile_cinit_wrlockpc(self) __hybrid_assert((self)->_mf_wrlockpc == __NULLPTR),
 #else /* CONFIG_MFILE_TRACE_LOCKPC */
-#define __MFILE_INIT_WRLOCKPC        /* nothing */
 #define __mfile_init_wrlockpc(self)  /* nothing */
 #define __mfile_cinit_wrlockpc(self) /* nothing */
+#endif /* !CONFIG_MFILE_TRACE_LOCKPC */
+
+#ifdef CONFIG_MFILE_TRACE_LOCKPC
+#define __mfile_init_notify(self)  (self)->mf_notify = __NULLPTR,
+#define __mfile_cinit_notify(self) __hybrid_assert((self)->mf_notify == __NULLPTR),
+#else /* CONFIG_MFILE_TRACE_LOCKPC */
+#define __mfile_init_notify(self)  /* nothing */
+#define __mfile_cinit_notify(self) /* nothing */
 #endif /* !CONFIG_MFILE_TRACE_LOCKPC */
 
 
@@ -1037,13 +1053,17 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
  *    mf_iobashift, mf_flags,  mf_filesize,  mf_atime,  mf_mtime,
  *    mf_ctime, mf_btime */
 #define _mfile_init_common(self)           \
-	((self)->mf_refcnt = 1,                \
+	(__mfile_init_wrlockpc(self)           \
+	 __mfile_init_notify(self)             \
+	 (self)->mf_refcnt = 1,                \
 	 atomic_rwlock_init(&(self)->mf_lock), \
 	 sig_init(&(self)->mf_initdone),       \
 	 SLIST_INIT(&(self)->mf_lockops),      \
 	 (self)->mf_trunclock = 0)
 #define _mfile_cinit_common(self)                       \
-	((self)->mf_refcnt = 1,                             \
+	(__mfile_cinit_wrlockpc(self)                       \
+	 __mfile_cinit_notify(self)                         \
+	 (self)->mf_refcnt = 1,                             \
 	 atomic_rwlock_cinit(&(self)->mf_lock),             \
 	 sig_cinit(&(self)->mf_initdone),                   \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->mf_lockops)), \
@@ -1054,12 +1074,10 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
 #define _mfile_init(self, ops, block_shift, iobashift) \
 	(_mfile_init_common(self),                         \
 	 (self)->mf_ops = (ops),                           \
-	 __mfile_init_wrlockpc(self)                       \
 	 _mfile_init_blockshift(self, block_shift, iobashift))
 #define _mfile_cinit(self, ops, block_shift, iobashift) \
 	(_mfile_cinit_common(self),                         \
 	 (self)->mf_ops = (ops),                            \
-	 __mfile_cinit_wrlockpc(self)                       \
 	 _mfile_cinit_blockshift(self, block_shift, iobashift))
 
 

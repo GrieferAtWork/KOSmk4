@@ -50,6 +50,7 @@
 #define __F_OFD_GETLK         36   /* [struct flock *arg] */
 #define __F_OFD_SETLK         37   /* [struct flock const *arg] */
 #define __F_OFD_SETLKW        38   /* [struct flock const *arg] */
+#define __F_LINUX_SPECIFIC_BASE 1024
 #define __F_SETLEASE          1024 /* [int arg = <One of `F_RDLCK', `F_WRLCK', `F_UNLCK'>] Set a lease. */
 #define __F_GETLEASE          1025 /* [void arg] Enquire what lease is active.
                                     * @return: * : One of `F_RDLCK', `F_WRLCK', `F_UNLCK' */

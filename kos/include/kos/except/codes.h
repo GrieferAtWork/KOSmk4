@@ -586,6 +586,9 @@
 #ifndef E_FILESYSTEM_NOT_A_DIRECTORY_IOCTL
 #define E_FILESYSTEM_NOT_A_DIRECTORY_IOCTL   7 /* The specific `ioctl(2)' command cannot be used on a non-directory. */
 #endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_IOCTL */
+#ifndef E_FILESYSTEM_NOT_A_DIRECTORY_WATCH
+#define E_FILESYSTEM_NOT_A_DIRECTORY_WATCH   8 /* `IN_ONLYDIR' was given `inotify_add_watch(2)', but specified file wasn't a directory. */
+#endif /* !E_FILESYSTEM_NOT_A_DIRECTORY_WATCH */
 
 /* SPLIT: All error codes above should be interpreted as  FILE-NOT-FOUND
  *        in situations where a list of paths is searched for a specific

@@ -78,9 +78,9 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	/* Generate offset table for attributes referenced by ioctl codes. */
 	enum {
 		USER_ATTRIB_MINID = MIN_C(_IOC_NR(FILE_IOC_GETFSLINKMAX), _IOC_NR(FILE_IOC_GETFSNAMEMAX),
-		              _IOC_NR(FILE_IOC_GETFSSIZBITS), _IOC_NR(FILE_IOC_GETFSXFERINC),
-		              _IOC_NR(FILE_IOC_GETFSXFERMAX), _IOC_NR(FILE_IOC_GETFSXFERMIN),
-		              _IOC_NR(FILE_IOC_GETFSXFERALN), _IOC_NR(FILE_IOC_GETFSSYMMAX))
+		                          _IOC_NR(FILE_IOC_GETFSSIZBITS), _IOC_NR(FILE_IOC_GETFSXFERINC),
+		                          _IOC_NR(FILE_IOC_GETFSXFERMAX), _IOC_NR(FILE_IOC_GETFSXFERMIN),
+		                          _IOC_NR(FILE_IOC_GETFSXFERALN), _IOC_NR(FILE_IOC_GETFSSYMMAX))
 	};
 	static uint16_t const super_attrib_offsets[] = {
 		[(_IOC_NR(FILE_IOC_GETFSLINKMAX) - USER_ATTRIB_MINID)] = offsetof(struct fsuper, fs_feat.sf_link_max),
@@ -229,6 +229,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	}	break;
 
 		/* All of the following ioctls are used to read attributes from the superblock. */
+#ifndef __OPTIMIZE_SIZE__
 	case _IO_WITHTYPE(FILE_IOC_GETFSLINKMAX, typeof_field(struct fsuper, fs_feat.sf_link_max)):
 	case _IO_WITHTYPE(FILE_IOC_GETFSNAMEMAX, typeof_field(struct fsuper, fs_feat.sf_name_max)):
 	case _IO_WITHTYPE(FILE_IOC_GETFSSIZBITS, typeof_field(struct fsuper, fs_feat.sf_filesizebits)):
@@ -247,6 +248,7 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		       _IOC_SIZE(cmd));
 		return 0;
 	}	break;
+#endif /* !__OPTIMIZE_SIZE__ */
 
 	default:
 		break;

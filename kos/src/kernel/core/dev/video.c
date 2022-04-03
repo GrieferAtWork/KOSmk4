@@ -1020,7 +1020,7 @@ got_active:
 	assert(result->mf_ops->mo_destroy);
 
 	/* Fill remaining fields. */
-	__mfile_init_wrlockpc(result) _mfile_init_common(result);
+	_mfile_init_common(result);
 	_mfile_init_blockshift(result, PAGESHIFT, PAGESHIFT);
 	result->mf_parts             = MFILE_PARTS_ANONYMOUS;
 	result->mf_changed.slh_first = MFILE_PARTS_ANONYMOUS;

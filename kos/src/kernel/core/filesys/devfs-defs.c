@@ -43,6 +43,12 @@ INTDEF struct fdirnode_ops const devfs_char_ops;
 INTDEF struct fdirnode_ops const devfs_cpu_ops;
 INTDEF struct fdirnode_ops const devfs_disk_ops;
 
+#ifdef CONFIG_HAVE_FS_NOTIFY
+#define MFILE_INIT_mf_notify_ MFILE_INIT_mf_notify,
+#else /* CONFIG_HAVE_FS_NOTIFY */
+#define MFILE_INIT_mf_notify_ /* nothing */
+#endif /* !CONFIG_HAVE_FS_NOTIFY */
+
 #define INIT_SPECIAL_DEVFS_SUBDIR(ops, ino)                                         \
 	{                                                                               \
 		.dn_node = {                                                                \
@@ -55,6 +61,7 @@ INTDEF struct fdirnode_ops const devfs_disk_ops;
 				MFILE_INIT_mf_lockops,                                              \
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                       \
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                     \
+				MFILE_INIT_mf_notify_                                               \
 				MFILE_INIT_mf_flags(MFILE_FN_GLOBAL_REF | MFILE_F_NOUSRMMAP |       \
 				                    MFILE_F_NOUSRIO | MFILE_F_PERSISTENT |          \
 				                    MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY), \
@@ -108,6 +115,7 @@ INTDEF struct fdirnode_ops const _devdiskruledir_default_ops;
 					MFILE_INIT_mf_lockops,                                               \
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                        \
 					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                      \
+					MFILE_INIT_mf_notify_                                                \
 					MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |            \
 					                    MFILE_F_NOATIME | MFILE_F_NOMTIME |              \
 					                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),       \
@@ -174,6 +182,7 @@ INTERN_CONST struct flnknode const devicelink_template = {
 			MFILE_INIT_mf_lockops,
 			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
+			MFILE_INIT_mf_notify_
 			MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 			                    MFILE_F_FIXEDFILESIZE | MFILE_FN_ATTRREADONLY),
 			MFILE_INIT_mf_trunclock,
@@ -244,6 +253,7 @@ PUBLIC struct ramfs_super devfs = {
 					MFILE_INIT_mf_lockops,
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
+					MFILE_INIT_mf_notify_
 					MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 					                    MFILE_FN_GLOBAL_REF | MFILE_F_NOUSRMMAP |
 					                    MFILE_F_NOUSRIO | MFILE_F_PERSISTENT |

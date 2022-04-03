@@ -152,6 +152,9 @@ again:
 	        "As per documentation, `ffso_makenode()' may only set these flags!");
 	result->mf_flags |= dir->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 	atomic_rwlock_init(&result->mf_lock);
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	result->mf_notify = NULL;
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 	sig_init(&result->mf_initdone);
 	SLIST_INIT(&result->mf_lockops);
 	SLIST_INIT(&result->mf_changed);
@@ -927,6 +930,9 @@ handle_existing:
 		node->mf_flags |= me->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 		node->mf_refcnt = 2; /* +1: MFILE_FN_GLOBAL_REF, +1: info->mkf_rnode */
 		atomic_rwlock_init(&node->mf_lock);
+#ifdef CONFIG_HAVE_FS_NOTIFY
+		node->mf_notify = NULL;
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 		sig_init(&node->mf_initdone);
 		SLIST_INIT(&node->mf_lockops);
 		SLIST_INIT(&node->mf_changed);
