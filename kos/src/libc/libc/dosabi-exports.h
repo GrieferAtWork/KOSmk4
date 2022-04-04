@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x680db700 */
+/* HASH CRC-32:0x1021c2d4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2859,9 +2859,7 @@ DEFINE_PUBLIC_ALIAS(DOS$setfsgid, libd_setfsgid);
 
 /* sys.inotify */
 DEFINE_PUBLIC_ALIAS(DOS$inotify_init1, libd_inotify_init1);
-DEFINE_PUBLIC_ALIAS(DOS$inotify_add_watch, libd_inotify_add_watch);
 DEFINE_PUBLIC_ALIAS(DOS$inotify_rm_watch, libd_inotify_rm_watch);
-DEFINE_PUBLIC_ALIAS(DOS$inotify_add_watch_at, libd_inotify_add_watch_at);
 
 /* sys.ioctl */
 DEFINE_PUBLIC_ALIAS(DOS$__ioctl, libd_ioctl);

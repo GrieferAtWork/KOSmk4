@@ -6963,6 +6963,8 @@
 #define __CRT_HAVE_KOS$getwchar_unlocked
 #define __CRT_HAVE_KOS$getwd
 #define __CRT_HAVE_KOS$gsignal
+#define __CRT_HAVE_KOS$inotify_add_watch
+#define __CRT_HAVE_KOS$inotify_add_watch_at
 #define __CRT_HAVE_KOS$is_wctype
 #define __CRT_HAVE_KOS$iswalnum
 #define __CRT_HAVE_KOS$iswalnum_l
@@ -7987,6 +7989,8 @@
 #define __CRT_HAVE_DOS$getwchar_unlocked
 #define __CRT_HAVE_DOS$getwd
 #define __CRT_HAVE_DOS$gsignal
+#define __CRT_HAVE_DOS$inotify_add_watch
+#define __CRT_HAVE_DOS$inotify_add_watch_at
 #define __CRT_HAVE_DOS$is_wctype
 #define __CRT_HAVE_DOS$iswalnum
 #define __CRT_HAVE_DOS$iswalnum_l

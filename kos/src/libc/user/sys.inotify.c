@@ -58,6 +58,24 @@ NOTHROW_NCX(LIBCCALL libc_inotify_init1)(__STDC_INT_AS_UINT_T flags)
 }
 /*[[[end:libc_inotify_init1]]]*/
 
+/*[[[head:libd_inotify_add_watch,hash:CRC-32=0xdb124805]]]*/
+/* >> inotify_add_watch(2)
+ * @param: mask: Set of `IN_ALL_EVENTS | ...' */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") __watchfd_t
+NOTHROW_NCX(LIBDCALL libd_inotify_add_watch)(fd_t notify_fd,
+                                             char const *pathname,
+                                             uint32_t mask)
+/*[[[body:libd_inotify_add_watch]]]*/
+{
+	atflag_t atflags = 0;
+	if (mask & IN_DONT_FOLLOW) {
+		atflags |= AT_SYMLINK_NOFOLLOW;
+		mask &= ~IN_DONT_FOLLOW;
+	}
+	return libd_inotify_add_watch_at(notify_fd, AT_FDCWD, pathname, atflags, mask);
+}
+/*[[[end:libd_inotify_add_watch]]]*/
+
 /*[[[head:libc_inotify_add_watch,hash:CRC-32=0x2b0f8438]]]*/
 /* >> inotify_add_watch(2)
  * @param: mask: Set of `IN_ALL_EVENTS | ...' */
@@ -96,6 +114,24 @@ NOTHROW_NCX(LIBCCALL libc_inotify_rm_watch)(fd_t notify_fd,
 }
 /*[[[end:libc_inotify_rm_watch]]]*/
 
+/*[[[head:libd_inotify_add_watch_at,hash:CRC-32=0x570da93]]]*/
+/* >> inotify_add_watch_at(2)
+ * @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH | AT_EMPTY_PATH'
+ * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") __watchfd_t
+NOTHROW_NCX(LIBDCALL libd_inotify_add_watch_at)(fd_t notify_fd,
+                                                fd_t dirfd,
+                                                char const *pathname,
+                                                atflag_t atflags,
+                                                uint32_t mask)
+/*[[[body:libd_inotify_add_watch_at]]]*/
+{
+	return libc_inotify_add_watch_at(notify_fd, dirfd, pathname,
+	                                 atflags | libd_AT_DOSPATH,
+	                                 mask);
+}
+/*[[[end:libd_inotify_add_watch_at]]]*/
+
 /*[[[head:libc_inotify_add_watch_at,hash:CRC-32=0x28a3ba58]]]*/
 /* >> inotify_add_watch_at(2)
  * @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH | AT_EMPTY_PATH'
@@ -114,11 +150,13 @@ NOTHROW_NCX(LIBCCALL libc_inotify_add_watch_at)(fd_t notify_fd,
 }
 /*[[[end:libc_inotify_add_watch_at]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x26d92fa6]]]*/
+/*[[[start:exports,hash:CRC-32=0x792fe03c]]]*/
 DEFINE_PUBLIC_ALIAS(inotify_init, libc_inotify_init);
 DEFINE_PUBLIC_ALIAS(inotify_init1, libc_inotify_init1);
+DEFINE_PUBLIC_ALIAS(DOS$inotify_add_watch, libd_inotify_add_watch);
 DEFINE_PUBLIC_ALIAS(inotify_add_watch, libc_inotify_add_watch);
 DEFINE_PUBLIC_ALIAS(inotify_rm_watch, libc_inotify_rm_watch);
+DEFINE_PUBLIC_ALIAS(DOS$inotify_add_watch_at, libd_inotify_add_watch_at);
 DEFINE_PUBLIC_ALIAS(inotify_add_watch_at, libc_inotify_add_watch_at);
 /*[[[end:exports]]]*/
 
