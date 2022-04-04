@@ -56,7 +56,8 @@
 #define HANDLE_TYPE_MODULE          0x0012 /* `struct module' */
 #define HANDLE_TYPE_DRIVER_LOADLIST 0x0013 /* `struct driver_loadlist' */
 #define HANDLE_TYPE_REFCOUNTABLE    0x0014 /* `struct refcountable' */
-#define HANDLE_TYPE_COUNT           0x0015 /* # of recognized handle types
+#define HANDLE_TYPE_NOTIFYFD        0x0015 /* `struct notifyfd' */
+#define HANDLE_TYPE_COUNT           0x0016 /* # of recognized handle types
                                             * NOTE: After changing  this value,  be sure  to
                                             * `touch kos/src/kernel/include/kernel/handle.h' */
 
@@ -77,7 +78,8 @@
 	cb(HANDLE_TYPE_SIGNALFD, struct signalfd)            \
 	cb(HANDLE_TYPE_FUTEXFD, struct mfutexfd)             \
 	cb(HANDLE_TYPE_SOCKET, struct socket)                \
-	cb(HANDLE_TYPE_REFCOUNTABLE, struct refcountable)
+	cb(HANDLE_TYPE_REFCOUNTABLE, struct refcountable)    \
+	cb(HANDLE_TYPE_NOTIFYFD, struct notifyfd)
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle  type
  * that could reasonably be used for callback registrations (such

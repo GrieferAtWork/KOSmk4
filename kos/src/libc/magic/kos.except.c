@@ -436,11 +436,19 @@ for (local name: classes.keys.sorted()) {
 		break;
 @@pp_endif@@
 
-@@pp_if defined(ERANGE)@@
 	case @E_BUFFER_TOO_SMALL@:
+@@pp_if defined(ERANGE)@@
 		result = ERANGE;
-		break;
 @@pp_endif@@
+		switch(self->@e_subclass@) {
+@@pp_if defined(EINVAL)@@
+		case @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@_E_BUFFER_TOO_SMALL_EINVAL@)):
+			result = EINVAL;
+			break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
 
 @@pp_if defined(EINVAL)@@
 	case @E_DIVIDE_BY_ZERO@:
@@ -1150,8 +1158,8 @@ char const *except_name(except_code_t code) {
 	"R_NODATA\0\1E_NOT_EXECUTABLE\0E_NOT_EXECUTABLE_NOEXEC\0E_NOT_EXECUTA"
 	"BLE_NOT_REGULAR\0E_NOT_EXECUTABLE_NOT_A_BINARY\0E_NOT_EXECUTABLE_F"
 	"AULTY\0E_NOT_EXECUTABLE_TOOLARGE\0E_NOT_EXECUTABLE_TOOSMALL\0\1E_INS"
-	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR"
-	"\0\1";
+	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0_E_BUFFER_TOO_SM"
+	"ALL_EINVAL\0\1E_UNICODE_ERROR\0\1";
 	static char const e_linear_f000h_f000h[] =
 	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1";
 	static char const e_linear_fe40h_fe40h[] =
@@ -1280,8 +1288,8 @@ non_linear_prefix:
 	"R_NODATA\0\1E_NOT_EXECUTABLE\0E_NOT_EXECUTABLE_NOEXEC\0E_NOT_EXECUTA"
 	"BLE_NOT_REGULAR\0E_NOT_EXECUTABLE_NOT_A_BINARY\0E_NOT_EXECUTABLE_F"
 	"AULTY\0E_NOT_EXECUTABLE_TOOLARGE\0E_NOT_EXECUTABLE_TOOSMALL\0\1E_INS"
-	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR"
-	"\0\1";
+	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0_E_BUFFER_TOO_SM"
+	"ALL_EINVAL\0\1E_UNICODE_ERROR\0\1";
 	static char const e_linear_f000h_f000h[] =
 	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1";
 	static char const e_linear_fe40h_fe40h[] =

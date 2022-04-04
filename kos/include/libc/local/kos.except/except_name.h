@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7522196 */
+/* HASH CRC-32:0xa35101d7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,8 +93,8 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_name))(__except_code_t __code) {
 	"R_NODATA\0\1E_NOT_EXECUTABLE\0E_NOT_EXECUTABLE_NOEXEC\0E_NOT_EXECUTA"
 	"BLE_NOT_REGULAR\0E_NOT_EXECUTABLE_NOT_A_BINARY\0E_NOT_EXECUTABLE_F"
 	"AULTY\0E_NOT_EXECUTABLE_TOOLARGE\0E_NOT_EXECUTABLE_TOOSMALL\0\1E_INS"
-	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR"
-	"\0\1";
+	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0_E_BUFFER_TOO_SM"
+	"ALL_EINVAL\0\1E_UNICODE_ERROR\0\1";
 	static char const __e_linear_f000h_f000h[] =
 	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1";
 	static char const __e_linear_fe40h_fe40h[] =
@@ -223,8 +223,8 @@ __non_linear_prefix:
 	"R_NODATA\0\1E_NOT_EXECUTABLE\0E_NOT_EXECUTABLE_NOEXEC\0E_NOT_EXECUTA"
 	"BLE_NOT_REGULAR\0E_NOT_EXECUTABLE_NOT_A_BINARY\0E_NOT_EXECUTABLE_F"
 	"AULTY\0E_NOT_EXECUTABLE_TOOLARGE\0E_NOT_EXECUTABLE_TOOSMALL\0\1E_INS"
-	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR"
-	"\0\1";
+	"UFFICIENT_RIGHTS\0\1\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0_E_BUFFER_TOO_SM"
+	"ALL_EINVAL\0\1E_UNICODE_ERROR\0\1";
 	static char const __e_linear_f000h_f000h[] =
 	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1";
 	static char const __e_linear_fe40h_fe40h[] =

@@ -894,6 +894,9 @@
                                                             * [fld(req_size:   size_t, "The required buffer size")]
                                                             * [fld(given_size: size_t, "The given buffer size")] */
 #endif /* !E_BUFFER_TOO_SMALL */
+#ifndef _E_BUFFER_TOO_SMALL_EINVAL
+#define _E_BUFFER_TOO_SMALL_EINVAL                (E_BUFFER_TOO_SMALL, 0x0001) /* [errno(EINVAL)] Needed for linux compat. */
+#endif /* !_E_BUFFER_TOO_SMALL_EINVAL */
 
 
 

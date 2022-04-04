@@ -31,8 +31,11 @@
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/notify.h>
+#include <kernel/handle-proto.h>
+#include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <sched/task.h>
 
@@ -40,6 +43,7 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/except.h>
 #include <linux/inotify.h>
@@ -561,11 +565,23 @@ PRIVATE NOPREEMPT NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL notifyfd_postfsevent_raw_impl)(struct notifyfd *__restrict self,
                                              unsigned int wd, uint16_t mask,
                                              uint16_t cookie, struct fdirent *ent) {
+	unsigned int slot_wd;
 	struct notifyfd_event *slot;
 	if (self->nf_eventc >= self->nf_eventa)
 		return false; /* Already full */
 	assert(!(wd & NOTIFYFD_EVENT_ISDIR_FLAG));
 	assert(wd < self->nf_listenc);
+	slot_wd = wd;
+	if (ent ? (ent->fd_type == DT_DIR)
+	        : mfile_isdir(self->nf_listenv[wd].nl_file))
+		slot_wd |= NOTIFYFD_EVENT_ISDIR_FLAG;
+	if (self->nf_eventc != 0) {
+		/* Special case: linux documents that consecutive, identical events are merged. */
+		slot = &self->nf_eventv[(self->nf_eventr + self->nf_eventc - 1) % self->nf_eventa];
+		if (slot->nfe_wd == slot_wd && slot->mfe_mask == mask &&
+		    slot->mfe_cookie == cookie && slot->mfe_name == ent)
+			return false; /* Auto-merge identical events. */
+	}
 
 	slot = &self->nf_eventv[(self->nf_eventr + self->nf_eventc) % self->nf_eventa];
 	++self->nf_eventc; /* Allocate one more event */
@@ -578,10 +594,7 @@ NOTHROW(FCALL notifyfd_postfsevent_raw_impl)(struct notifyfd *__restrict self,
 		slot->mfe_name   = NULL;
 	} else {
 		/* Fill in the new slot. */
-		slot->nfe_wd = wd;
-		if (ent ? (ent->fd_type == DT_DIR)
-				: mfile_isdir(self->nf_listenv[wd].nl_file))
-			slot->nfe_wd |= NOTIFYFD_EVENT_ISDIR_FLAG;
+		slot->nfe_wd     = slot_wd;
 		slot->mfe_mask   = mask;
 		slot->mfe_cookie = cookie;
 		slot->mfe_name   = xincref(ent);
@@ -913,7 +926,7 @@ NOTHROW(FCALL notifyfd_postfsevent_impl)(struct notifyfd *__restrict self,
 	 * call immediately because we're currently holding an SMP-lock */
 	if (self->nf_eventc == 1) {
 		/* Only enqueue for broadcast if the notifyfd isn't already pending
-		 * a broadcast in the context of some other thread that also just
+		 * a broadcast in the context of  some other thread that also  just
 		 * send it an fs event.
 		 * This prevents an unlikely race condition:
 		 *   thread#1: Posts FS event
@@ -1197,6 +1210,123 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_postfsevent_ex)(struct mfile *__restrict self,
                                     uint16_t fil_mask, uint16_t dir_mask) {
 	mfile_postfsevent_impl(self, fil_mask, dir_mask, 0);
+}
+
+
+
+
+/************************************************************************/
+/* HANDLE OPERATORS FOR `HANDLE_TYPE_NOTIFYFD' (struct notifyfd)        */
+/************************************************************************/
+DEFINE_HANDLE_REFCNT_FUNCTIONS(notifyfd, struct notifyfd);
+
+PRIVATE BLOCKING WUNUSED NONNULL((1)) size_t KCALL
+handle_notifyfd_read_nonblock(struct notifyfd *__restrict self,
+                              USER CHECKED void *dst,
+                              size_t num_bytes) THROWS(...) {
+	USER CHECKED struct inotify_event *uevent;
+	struct notifyfd_event ne;
+	struct notifyfd_event *slot;
+	size_t reqsize;
+	uint32_t umask;
+
+	/* Load the next-pending event. */
+again:
+	notify_lock_acquire();
+	COMPILER_READ_BARRIER();
+	if (self->nf_eventc == 0) {
+		notify_lock_release_br();
+		return 0; /* Nothing pending... */
+	}
+	slot = &self->nf_eventv[self->nf_eventr];
+	memcpy(&ne, slot, sizeof(ne));
+	xincref(ne.mfe_name);
+	notify_lock_release();
+	FINALLY_XDECREF_UNLIKELY(ne.mfe_name);
+
+	/* Calculate the required buffer size for this slot. */
+	reqsize = offsetof(struct inotify_event, ine_name);
+	if (ne.mfe_name != NULL)
+		reqsize += (ne.mfe_name->fd_namelen + 1) * sizeof(char);
+
+	/* Check if the user-provided buffer is large enough. */
+	if (reqsize > num_bytes) {
+		/* Linux documents `EINVAL' for this case, but our usual `E_BUFFER_TOO_SMALL'
+		 * translates to `ERANGE'. As such, we need to use a custom sub-class.  *ugh* */
+		THROW(_E_BUFFER_TOO_SMALL_EINVAL, reqsize, num_bytes);
+	}
+
+	/* Copy the entry to user-space. */
+	uevent = (USER CHECKED struct inotify_event *)dst;
+	umask  = ne.mfe_mask;
+	if (ne.nfe_wd & NOTIFYFD_EVENT_ISDIR_FLAG)
+		umask |= IN_ISDIR;
+	UNALIGNED_SET((uint32_t *)&uevent->ine_wd, ((uint32_t)ne.nfe_wd & ~NOTIFYFD_EVENT_ISDIR_FLAG));
+	UNALIGNED_SET(&uevent->ine_mask, umask);
+	UNALIGNED_SET(&uevent->ine_cookie, (uint32_t)ne.mfe_cookie);
+	if (ne.mfe_name) {
+		UNALIGNED_SET(&uevent->ine_len, (u32)(ne.mfe_name->fd_namelen + 1));
+		memcpy(uevent->ine_name, ne.mfe_name->fd_name,
+		       ne.mfe_name->fd_namelen + 1, sizeof(char));
+	} else {
+		UNALIGNED_SET(&uevent->ine_len, 0);
+	}
+
+	/* Consume the entry from the pending-events list. */
+	notify_lock_acquire();
+	COMPILER_READ_BARRIER();
+	slot = &self->nf_eventv[self->nf_eventr];
+	if unlikely(self->nf_eventc == 0 || memcmp(&ne, slot, sizeof(ne)) != 0) {
+		/* Race condition: event was already read by another thread. --> try again */
+		notify_lock_release_br();
+		goto again;
+	}
+	--self->nf_eventc;
+	++self->nf_eventr;
+	self->nf_eventr %= self->nf_eventa;
+	notify_lock_release();
+
+	/* Return the required buffer size back to user-space. */
+	return reqsize;
+}
+
+
+INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
+handle_notifyfd_read(struct notifyfd *__restrict self, USER CHECKED void *dst,
+                     size_t num_bytes, iomode_t mode) THROWS(...) {
+	size_t result;
+	while ((result = handle_notifyfd_read_nonblock(self, dst, num_bytes)) == 0) {
+		if (mode & IO_NONBLOCK) {
+			if (mode & IO_NODATAZERO)
+				break;
+			THROW(E_WOULDBLOCK);
+		}
+		task_connect(&self->nf_avail);
+		TRY {
+			result = handle_notifyfd_read_nonblock(self, dst, num_bytes);
+		} EXCEPT {
+			task_disconnectall();
+			RETHROW();
+		}
+		task_waitfor();
+	}
+	return result;
+}
+
+INTERN BLOCKING NONNULL((1)) void KCALL
+handle_notifyfd_pollconnect(struct notifyfd *__restrict self,
+                            poll_mode_t what) THROWS(...) {
+	if (what & POLLSELECT_READFDS)
+		task_connect_for_poll(&self->nf_avail);
+}
+
+INTERN BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL
+handle_notifyfd_polltest(struct notifyfd *__restrict self,
+                         poll_mode_t what) THROWS(...) {
+	poll_mode_t result = 0;
+	if (ATOMIC_READ(self->nf_eventc) != 0)
+		result |= POLLSELECT_READFDS;
+	return result & what;
 }
 
 

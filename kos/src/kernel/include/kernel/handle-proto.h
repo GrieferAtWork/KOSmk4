@@ -332,6 +332,7 @@ struct taskpid;
 struct module;
 struct driver_loadlist;
 struct refcountable;
+struct notifyfd;
 
 
 
@@ -934,6 +935,36 @@ INTDEF BLOCKING NONNULL((1)) void KCALL handle_refcountable_pollconnect(struct r
 INTDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL handle_refcountable_polltest(struct refcountable *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) REF void *KCALL handle_refcountable_tryas(struct refcountable *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_refcountable_printlink(struct refcountable *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
+
+/* Handle operators for `HANDLE_TYPE_NOTIFYFD' (`struct notifyfd') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_notifyfd_refcnt)(struct notifyfd const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_notifyfd_incref)(struct notifyfd *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_notifyfd_decref)(REF struct notifyfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_notifyfd_tryincref)(struct notifyfd *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_notifyfd_weakgetref)(struct notifyfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct notifyfd *NOTHROW(FCALL handle_notifyfd_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_notifyfd_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_notifyfd_read(struct notifyfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) size_t KCALL handle_notifyfd_write(struct notifyfd *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_notifyfd_pread(struct notifyfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) size_t KCALL handle_notifyfd_pwrite(struct notifyfd *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL handle_notifyfd_readv(struct notifyfd *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) size_t KCALL handle_notifyfd_writev(struct notifyfd *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL handle_notifyfd_preadv(struct notifyfd *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) size_t KCALL handle_notifyfd_pwritev(struct notifyfd *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_notifyfd_readdir(struct notifyfd *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_notifyfd_seek(struct notifyfd *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_notifyfd_ioctl(struct notifyfd *__restrict self, ioctl_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_notifyfd_truncate(struct notifyfd *__restrict self, pos_t new_size) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_notifyfd_mmap(struct notifyfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_notifyfd_allocate(struct notifyfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_notifyfd_sync(struct notifyfd *__restrict self) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_notifyfd_datasync(struct notifyfd *__restrict self) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_notifyfd_stat(struct notifyfd *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_notifyfd_pollconnect(struct notifyfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL handle_notifyfd_polltest(struct notifyfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) REF void *KCALL handle_notifyfd_tryas(struct notifyfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_notifyfd_printlink(struct notifyfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 #endif /* __CC__ */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */

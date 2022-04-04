@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ca9425b */
+/* HASH CRC-32:0x817e0338 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -197,11 +197,19 @@ for (local name: classes.keys.sorted()) {
 		break;
 #endif /* __EPIPE */
 
-#ifdef __ERANGE
 	case E_BUFFER_TOO_SMALL:
+#ifdef __ERANGE
 		__result = __ERANGE;
-		break;
 #endif /* __ERANGE */
+		switch(__self->e_subclass) {
+#ifdef __EINVAL
+		case EXCEPT_SUBCLASS(EXCEPT_CODEOF(_E_BUFFER_TOO_SMALL_EINVAL)):
+			__result = __EINVAL;
+			break;
+#endif /* __EINVAL */
+		default: break;
+		}
+		break;
 
 #ifdef __EINVAL
 	case E_DIVIDE_BY_ZERO:
