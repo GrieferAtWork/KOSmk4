@@ -1419,12 +1419,18 @@ PRIVATE fd_t KCALL sys_inotify_init_impl(syscall_ulong_t flags) {
 	iomode_t iomode = 0;
 	fd_t result;
 	REF struct notifyfd *notfd;
+#if (IN_NONBLOCK == O_NONBLOCK && \
+     IN_CLOEXEC == O_CLOEXEC &&   \
+     IN_CLOFORK == O_CLOFORK)
+	iomode = IO_FROM_OPENFLAG(flags);
+#else /* ... */
 	if (flags & IN_NONBLOCK)
 		iomode |= IO_NONBLOCK;
 	if (flags & IN_CLOEXEC)
 		iomode |= IO_CLOEXEC;
 	if (flags & IN_CLOFORK)
 		iomode |= IO_CLOFORK;
+#endif /* !... */
 	result = handles_install_begin(&install);
 	TRY {
 		unsigned int maxevents;
