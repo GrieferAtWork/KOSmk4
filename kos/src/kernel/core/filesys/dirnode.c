@@ -514,8 +514,8 @@ again_acquire_notify_lock:
 			dnot = inotify_controller_asdnotify(self->mf_notify);
 			olnk = dnotify_link_tree_locate(dnot->dnc_files, info->mkf_dent);
 			if (olnk) {
-				assert(olnk->dnl_dir == dnot);
-				assert(olnk->dnl_fil == info->mkf_rnode->mf_notify);
+				assert(dnotify_link_getdir(olnk) == dnot);
+				assert(dnotify_link_getfil(olnk) == info->mkf_rnode->mf_notify);
 			} else {
 				/* Link is missing -> create it */
 				struct mfile *rfile = info->mkf_rnode;

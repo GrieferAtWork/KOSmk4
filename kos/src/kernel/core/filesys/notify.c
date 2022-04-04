@@ -121,7 +121,7 @@ again:
 	DBG_memset(&self->dnl_dirnode, 0xcc, sizeof(self->dnl_dirnode));
 
 	/* Remove directory from the associated file (self->dnl_fil->inc_dirs) */
-	inot = self->dnl_fil;
+	inot = dnotify_link_getfil(self);
 	file = inot->inc_file;
 	assert(file);
 	assert(file->mf_notify == inot);
@@ -1068,10 +1068,11 @@ NOTHROW(FCALL inotify_controller_postfsevent_impl)(struct inotify_controller *__
 		struct dnotify_link *link;
 		LIST_FOREACH_SAFE (link, &self->inc_dirs, dnl_fillink) {
 			struct notify_listener *listener;
-			struct dnotify_controller *dir = link->dnl_dir;
+			struct dnotify_controller *dir = dnotify_link_getdir(link);
 			LIST_FOREACH_SAFE (listener, &dir->inc_listeners, nl_link) {
 				notify_listener_postfsevent_impl(listener, blist, fil_mask, cookie,
-				                                 link->dnl_ent, deadlinks, deadnotif);
+				                                 dnotify_link_getent(link),
+				                                 deadlinks, deadnotif);
 			}
 		}
 	}
