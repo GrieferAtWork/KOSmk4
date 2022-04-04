@@ -173,13 +173,13 @@ struct notify_listener {
 
 /* Flag for `struct notifyfd_event::nfe_wd'. - If set, indicates `IN_ISDIR' */
 #if __SIZEOF_INT__ == 4
-#define NOTIFYFD_EVENT_ISDIR_FLAG 0x80000000
+#define NOTIFYFD_EVENT_ISDIR_FLAG 0x80000000u
 #elif __SIZEOF_INT__ == 8
-#define NOTIFYFD_EVENT_ISDIR_FLAG 0x8000000000000000
+#define NOTIFYFD_EVENT_ISDIR_FLAG 0x8000000000000000u
 #elif __SIZEOF_INT__ == 2
-#define NOTIFYFD_EVENT_ISDIR_FLAG 0x8000
+#define NOTIFYFD_EVENT_ISDIR_FLAG 0x8000u
 #elif __SIZEOF_INT__ == 1
-#define NOTIFYFD_EVENT_ISDIR_FLAG 0x80
+#define NOTIFYFD_EVENT_ISDIR_FLAG 0x80u
 #else /* __SIZEOF_INT__ == ... */
 #error "Unsupported sizeof(int)"
 #endif /* __SIZEOF_INT__ != ... */
