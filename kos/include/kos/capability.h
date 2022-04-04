@@ -79,16 +79,38 @@ enum {
 	CAP_SETUID          = 7,                /* Allow setting user ids (`setuid(2)', `setfsuid(2)', ...) */
 	CAP_SETPCAP         = 8,                /* capset(): Inheritable caps don't necessarily have to be apart of permitted caps */
 	CAP_LINUX_IMMUTABLE = 9,                /* TODO: For now, only here as placeholder for fsuid-root transitions */
+	CAP_NET_BIND_SERVICE = 10,              /* TODO: Placeholder */
+	CAP_NET_BROADCAST   = 11,               /* TODO: Placeholder */
 	CAP_NET_ADMIN       = 12,               /* Allow exceeding `socket_default_(rcv|snd)bufmax' */
+	CAP_NET_RAW         = 13,               /* TODO: Placeholder */
+	CAP_IPC_LOCK        = 14,               /* TODO: Placeholder */
+	CAP_IPC_OWNER       = 15,               /* TODO: Placeholder */
 	CAP_SYS_MODULE      = 16,               /* Allow use of `KSYSCTL_DRIVER_INSMOD', `KSYSCTL_DRIVER_DELMOD' and `KSYSCTL_DRIVER_SET_LIBRARY_PATH' */
 	CAP_SYS_RAWIO       = 17,               /* Gain hardware I/O permissions via `ioperm(2)' and `iopl(2)' */
+	CAP_SYS_CHROOT      = 18,               /* TODO: Placeholder */
 	CAP_SYS_PTRACE      = 19,               /* Inspect data of arbitrary processes that you're not the parent of. */
+	CAP_SYS_PACCT       = 20,               /* TODO: Placeholder */
 	CAP_SYS_ADMIN       = 21,               /* A _lot_ of things */
+	CAP_SYS_BOOT        = 22,               /* TODO: Placeholder */
+	CAP_SYS_NICE        = 23,               /* TODO: Placeholder */
 	CAP_SYS_RESOURCE    = 24,               /* Override and set resource limits. */
 	CAP_SYS_TIME        = 25,               /* Change the system time. */
+	CAP_SYS_TTY_CONFIG  = 26,               /* TODO: Placeholder */
 	CAP_MKNOD           = 27,               /* TODO: For now, only here as placeholder for fsuid-root transitions */
+	CAP_LEASE           = 28,               /* TODO: Placeholder */
+	CAP_AUDIT_WRITE     = 29,               /* TODO: Placeholder */
+	CAP_AUDIT_CONTROL   = 30,               /* TODO: Placeholder */
+	CAP_SETFCAP	        = 31,               /* TODO: Placeholder */
 	CAP_MAC_OVERRIDE    = 32,               /* TODO: For now, only here as placeholder for fsuid-root transitions */
-	CAP_LAST_CAP        = CAP_MAC_OVERRIDE, /* Greatest positive capability */
+	CAP_MAC_ADMIN       = 33,               /* TODO: Placeholder */
+	CAP_SYSLOG          = 34,               /* TODO: Placeholder */
+	CAP_WAKE_ALARM      = 35,               /* TODO: Placeholder */
+	CAP_BLOCK_SUSPEND   = 36,               /* TODO: Placeholder */
+	CAP_AUDIT_READ      = 37,               /* TODO: Placeholder */
+	CAP_PERFMON         = 38,               /* TODO: Placeholder */
+	CAP_BPF             = 39,               /* TODO: Placeholder */
+	CAP_CHECKPOINT_RESTORE = 40,            /* TODO: Placeholder */
+	CAP_LAST_CAP = CAP_CHECKPOINT_RESTORE,  /* Greatest positive capability */
 	_CAP_COUNT                              /* Greatest positive capability, plus 1 */
 };
 #endif /* __CC__ */
@@ -119,15 +141,37 @@ enum {
 #define CAP_SETUID             CAP_SETUID             /* Allow setting user ids (`setuid(2)', `setfsuid(2)', ...) */
 #define CAP_SETPCAP            CAP_SETPCAP            /* capset(): Inheritable caps don't necessarily have to be apart of permitted caps */
 #define CAP_LINUX_IMMUTABLE    CAP_LINUX_IMMUTABLE    /* TODO: For now, only here as placeholder for fsuid-root transitions */
+#define CAP_NET_BIND_SERVICE   CAP_NET_BIND_SERVICE   /* TODO: Placeholder */
+#define CAP_NET_BROADCAST      CAP_NET_BROADCAST      /* TODO: Placeholder */
 #define CAP_NET_ADMIN          CAP_NET_ADMIN          /* Allow exceeding `socket_default_(rcv|snd)bufmax' */
+#define CAP_NET_RAW            CAP_NET_RAW            /* TODO: Placeholder */
+#define CAP_IPC_LOCK           CAP_IPC_LOCK           /* TODO: Placeholder */
+#define CAP_IPC_OWNER          CAP_IPC_OWNER          /* TODO: Placeholder */
 #define CAP_SYS_MODULE         CAP_SYS_MODULE         /* Allow use of `KSYSCTL_DRIVER_INSMOD', `KSYSCTL_DRIVER_DELMOD' and `KSYSCTL_DRIVER_SET_LIBRARY_PATH' */
 #define CAP_SYS_RAWIO          CAP_SYS_RAWIO          /* Gain hardware I/O permissions via `ioperm(2)' and `iopl(2)' */
+#define CAP_SYS_CHROOT         CAP_SYS_CHROOT         /* TODO: Placeholder */
 #define CAP_SYS_PTRACE         CAP_SYS_PTRACE         /* Inspect data of arbitrary processes that you're not the parent of. */
+#define CAP_SYS_PACCT          CAP_SYS_PACCT          /* TODO: Placeholder */
 #define CAP_SYS_ADMIN          CAP_SYS_ADMIN          /* A _lot_ of things */
+#define CAP_SYS_BOOT           CAP_SYS_BOOT           /* TODO: Placeholder */
+#define CAP_SYS_NICE           CAP_SYS_NICE           /* TODO: Placeholder */
 #define CAP_SYS_RESOURCE       CAP_SYS_RESOURCE       /* Override and set resource limits. */
 #define CAP_SYS_TIME           CAP_SYS_TIME           /* Change the system time. */
+#define CAP_SYS_TTY_CONFIG     CAP_SYS_TTY_CONFIG     /* TODO: Placeholder */
 #define CAP_MKNOD              CAP_MKNOD              /* TODO: For now, only here as placeholder for fsuid-root transitions */
+#define CAP_LEASE              CAP_LEASE              /* TODO: Placeholder */
+#define CAP_AUDIT_WRITE        CAP_AUDIT_WRITE        /* TODO: Placeholder */
+#define CAP_AUDIT_CONTROL      CAP_AUDIT_CONTROL      /* TODO: Placeholder */
+#define CAP_SETFCAP            CAP_SETFCAP            /* TODO: Placeholder */
 #define CAP_MAC_OVERRIDE       CAP_MAC_OVERRIDE       /* TODO: For now, only here as placeholder for fsuid-root transitions */
+#define CAP_MAC_ADMIN          CAP_MAC_ADMIN          /* TODO: Placeholder */
+#define CAP_SYSLOG             CAP_SYSLOG             /* TODO: Placeholder */
+#define CAP_WAKE_ALARM         CAP_WAKE_ALARM         /* TODO: Placeholder */
+#define CAP_BLOCK_SUSPEND      CAP_BLOCK_SUSPEND      /* TODO: Placeholder */
+#define CAP_AUDIT_READ         CAP_AUDIT_READ         /* TODO: Placeholder */
+#define CAP_PERFMON            CAP_PERFMON            /* TODO: Placeholder */
+#define CAP_BPF                CAP_BPF                /* TODO: Placeholder */
+#define CAP_CHECKPOINT_RESTORE CAP_CHECKPOINT_RESTORE /* TODO: Placeholder */
 #define CAP_LAST_CAP           CAP_LAST_CAP           /* Greatest positive capability */
 #define _CAP_COUNT             _CAP_COUNT             /* Greatest positive capability, plus 1 */
 #else /* __COMPILER_PREFERR_ENUMS */
@@ -156,17 +200,39 @@ enum {
 #define CAP_SETUID             7    /* Allow setting user ids (`setuid(2)', `setfsuid(2)', ...) */
 #define CAP_SETPCAP            8    /* capset(): Inheritable caps don't necessarily have to be apart of permitted caps */
 #define CAP_LINUX_IMMUTABLE    9    /* TODO: For now, only here as placeholder for fsuid-root transitions */
+#define CAP_NET_BIND_SERVICE   10   /* TODO: Placeholder */
+#define CAP_NET_BROADCAST      11   /* TODO: Placeholder */
 #define CAP_NET_ADMIN          12   /* Allow exceeding `socket_default_(rcv|snd)bufmax' */
+#define CAP_NET_RAW            13   /* TODO: Placeholder */
+#define CAP_IPC_LOCK           14   /* TODO: Placeholder */
+#define CAP_IPC_OWNER          15   /* TODO: Placeholder */
 #define CAP_SYS_MODULE         16   /* Allow use of `KSYSCTL_DRIVER_INSMOD', `KSYSCTL_DRIVER_DELMOD' and `KSYSCTL_DRIVER_SET_LIBRARY_PATH' */
 #define CAP_SYS_RAWIO          17   /* Gain hardware I/O permissions via `ioperm(2)' and `iopl(2)' */
+#define CAP_SYS_CHROOT         18   /* TODO: Placeholder */
 #define CAP_SYS_PTRACE         19   /* Inspect data of arbitrary processes that you're not the parent of. */
+#define CAP_SYS_PACCT          20   /* TODO: Placeholder */
 #define CAP_SYS_ADMIN          21   /* A _lot_ of things */
+#define CAP_SYS_BOOT           22   /* TODO: Placeholder */
+#define CAP_SYS_NICE           23   /* TODO: Placeholder */
 #define CAP_SYS_RESOURCE       24   /* Override and set resource limits. */
 #define CAP_SYS_TIME           25   /* Change the system time. */
+#define CAP_SYS_TTY_CONFIG     26   /* TODO: Placeholder */
 #define CAP_MKNOD              27   /* TODO: For now, only here as placeholder for fsuid-root transitions */
+#define CAP_LEASE              28   /* TODO: Placeholder */
+#define CAP_AUDIT_WRITE        29   /* TODO: Placeholder */
+#define CAP_AUDIT_CONTROL      30   /* TODO: Placeholder */
+#define CAP_SETFCAP            31   /* TODO: Placeholder */
 #define CAP_MAC_OVERRIDE       32   /* TODO: For now, only here as placeholder for fsuid-root transitions */
-#define CAP_LAST_CAP           32   /* Greatest positive capability */
-#define _CAP_COUNT             33   /* Greatest positive capability, plus 1 */
+#define CAP_MAC_ADMIN          33   /* TODO: Placeholder */
+#define CAP_SYSLOG             34   /* TODO: Placeholder */
+#define CAP_WAKE_ALARM         35   /* TODO: Placeholder */
+#define CAP_BLOCK_SUSPEND      36   /* TODO: Placeholder */
+#define CAP_AUDIT_READ         37   /* TODO: Placeholder */
+#define CAP_PERFMON            38   /* TODO: Placeholder */
+#define CAP_BPF                39   /* TODO: Placeholder */
+#define CAP_CHECKPOINT_RESTORE 40   /* TODO: Placeholder */
+#define CAP_LAST_CAP           40   /* Greatest positive capability */
+#define _CAP_COUNT             41   /* Greatest positive capability, plus 1 */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
@@ -183,7 +249,5 @@ enum {
 #define SECBIT_KEEP_CAPS_LOCKED            0x0020 /* Make `SECBIT_KEEP_CAPS' immutable (this flag cannot be unset) */
 #define SECBIT_NO_CAP_AMBIENT_RAISE        0x0040 /* Disallow `PR_CAP_AMBIENT_RAISE' */
 #define SECBIT_NO_CAP_AMBIENT_RAISE_LOCKED 0x0080 /* Make `SECBIT_NO_CAP_AMBIENT_RAISE' immutable (this flag cannot be unset) */
-
-
 
 #endif /* !_KOS_CAPABILITY_H */
