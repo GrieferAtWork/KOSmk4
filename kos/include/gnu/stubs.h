@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25a40e2d */
+/* HASH CRC-32:0x492b5fd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,6 +118,8 @@
 #define __stub_bindresvport
 #define __stub_bindresvport6
 #define __stub_canonicalize
+#define __stub_capget
+#define __stub_capset
 #define __stub_catclose
 #define __stub_catgets
 #define __stub_catopen

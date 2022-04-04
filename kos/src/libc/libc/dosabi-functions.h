@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84a7b99 */
+/* HASH CRC-32:0x41d7e2b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2298,6 +2298,10 @@ DFUN(".text.crt.dos.fs.modify", libd_acct, libc_acct, TD, 1, TP)
 
 /* sys.auxv */
 DFUN(".text.crt.dos.system.auxv", libd_getauxval, libc_getauxval, TP, 1, TP)
+
+/* sys.capability */
+DFUN(".text.crt.dos.capability", libd_capset, libc_capset, TD, 2, TP, TP)
+DFUN(".text.crt.dos.capability", libd_capget, libc_capget, TD, 2, TP, TP)
 
 /* sys.epoll */
 DFUN(".text.crt.dos.io.poll", libd_epoll_create, libc_epoll_create, TIn(__SIZEOF_FD_T__), 1, TD)

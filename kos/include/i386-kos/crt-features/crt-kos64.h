@@ -2266,6 +2266,8 @@
 #define __CRT_HAVE_canonicalize_file_name
 #define __CRT_HAVE_canonicalizef
 #define __CRT_HAVE_canonicalizel
+#define __CRT_HAVE_capget
+#define __CRT_HAVE_capset
 #define __CRT_HAVE_carg
 #define __CRT_HAVE_cargf
 #define __CRT_HAVE_cargl
@@ -7965,6 +7967,8 @@
 #define __CRT_HAVE_KOS$canonicalize_file_name
 #define __CRT_HAVE_KOS$canonicalizef
 #define __CRT_HAVE_KOS$canonicalizel
+#define __CRT_HAVE_KOS$capget
+#define __CRT_HAVE_KOS$capset
 #define __CRT_HAVE_KOS$carg
 #define __CRT_HAVE_KOS$cargf
 #define __CRT_HAVE_KOS$cargl
@@ -12419,6 +12423,8 @@
 #define __CRT_HAVE_DOS$canonicalize_file_name
 #define __CRT_HAVE_DOS$canonicalizef
 #define __CRT_HAVE_DOS$canonicalizel
+#define __CRT_HAVE_DOS$capget
+#define __CRT_HAVE_DOS$capset
 #define __CRT_HAVE_DOS$carg
 #define __CRT_HAVE_DOS$cargf
 #define __CRT_HAVE_DOS$cargl

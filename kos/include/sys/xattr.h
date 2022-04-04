@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f01164d */
+/* HASH CRC-32:0xf7a8753e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,42 +43,15 @@
 #include <sys/types.h>
 #endif /* __USE_GLIBC */
 
-__SYSDECL_BEGIN
-
-#ifndef __USE_KERNEL_XATTR_DEFS
-#if (defined(__XATTR_CREATE) || defined(__XATTR_REPLACE))
-/*[[[enum]]]*/
-#ifdef __CC__
-enum {
-#ifdef __XATTR_CREATE
-	XATTR_CREATE  = __XATTR_CREATE, /* set value, fail if attr already exists. */
-#endif /* __XATTR_CREATE */
-#ifdef __XATTR_REPLACE
-	XATTR_REPLACE = __XATTR_REPLACE /* set value, fail if attr does not exist. */
-#endif /* __XATTR_REPLACE */
-};
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __XATTR_CREATE
-#define XATTR_CREATE  XATTR_CREATE  /* set value, fail if attr already exists. */
-#endif /* __XATTR_CREATE */
-#ifdef __XATTR_REPLACE
-#define XATTR_REPLACE XATTR_REPLACE /* set value, fail if attr does not exist. */
-#endif /* __XATTR_REPLACE */
-#else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __XATTR_CREATE
+#if !defined(XATTR_CREATE) && defined(__XATTR_CREATE)
 #define XATTR_CREATE  __XATTR_CREATE  /* set value, fail if attr already exists. */
-#endif /* __XATTR_CREATE */
-#ifdef __XATTR_REPLACE
+#endif /* !XATTR_CREATE && __XATTR_CREATE */
+#if !defined(XATTR_REPLACE) && defined(__XATTR_REPLACE)
 #define XATTR_REPLACE __XATTR_REPLACE /* set value, fail if attr does not exist. */
-#endif /* __XATTR_REPLACE */
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
-#endif /* ... */
-#endif /* !__USE_KERNEL_XATTR_DEFS */
+#endif /* !XATTR_REPLACE && __XATTR_REPLACE */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined
@@ -117,8 +90,8 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,removexattr,(char const 
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,lremovexattr,(char const *__path, char const *__name),(__path,__name))
 /* >> fremovexattr(2) */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fremovexattr,(__fd_t __fd, char const *__name),(__fd,__name))
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_XATTR_H */

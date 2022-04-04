@@ -2418,6 +2418,8 @@
 #define __CRT_HAVE_canonicalize_file_name
 #define __CRT_HAVE_canonicalizef
 #define __CRT_HAVE_canonicalizel
+#define __CRT_HAVE_capget
+#define __CRT_HAVE_capset
 #define __CRT_HAVE_carg
 #define __CRT_HAVE_cargf
 #define __CRT_HAVE_cargl

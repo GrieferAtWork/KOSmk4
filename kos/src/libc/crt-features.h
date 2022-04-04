@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25ffa9df */
+/* HASH CRC-32:0xba12bff4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1117,6 +1117,8 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$canonicalizef
 #define __CRT_HAVE_DOS$canonicalizel
+#define __CRT_HAVE_DOS$capget
+#define __CRT_HAVE_DOS$capset
 #define __CRT_HAVE_DOS$carg
 #define __CRT_HAVE_DOS$cargf
 #define __CRT_HAVE_DOS$cargl
@@ -5098,6 +5100,8 @@
 #define __CRT_HAVE_canonicalize_file_name
 #define __CRT_HAVE_canonicalizef
 #define __CRT_HAVE_canonicalizel
+#define __CRT_HAVE_capget
+#define __CRT_HAVE_capset
 #define __CRT_HAVE_carg
 #define __CRT_HAVE_cargf
 #define __CRT_HAVE_cargl

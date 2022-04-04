@@ -59,13 +59,13 @@
 __DECL_BEGIN
 
 struct __user_cap_header_struct {
-	__u32 version;
-	int pid;
+	__UINT32_TYPE__ version;
+	__INT32_TYPE__ pid;
 };
 struct __user_cap_data_struct {
-	__u32 effective;
-	__u32 permitted;
-	__u32 inheritable;
+	__UINT32_TYPE__ effective;
+	__UINT32_TYPE__ permitted;
+	__UINT32_TYPE__ inheritable;
 };
 typedef struct __user_cap_header_struct *cap_user_header_t;
 typedef struct __user_cap_data_struct *cap_user_data_t;

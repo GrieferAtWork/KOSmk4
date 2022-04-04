@@ -42,42 +42,15 @@
 #include <sys/types.h>
 #endif /* __USE_GLIBC */
 
-__SYSDECL_BEGIN
-
-#ifndef __USE_KERNEL_XATTR_DEFS
-#if (defined(__XATTR_CREATE) || defined(__XATTR_REPLACE))
-/*[[[enum]]]*/
-#ifdef __CC__
-enum {
-#ifdef __XATTR_CREATE
-	XATTR_CREATE  = __XATTR_CREATE, /* set value, fail if attr already exists. */
-#endif /* __XATTR_CREATE */
-#ifdef __XATTR_REPLACE
-	XATTR_REPLACE = __XATTR_REPLACE /* set value, fail if attr does not exist. */
-#endif /* __XATTR_REPLACE */
-};
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __XATTR_CREATE
-#define XATTR_CREATE  XATTR_CREATE  /* set value, fail if attr already exists. */
-#endif /* __XATTR_CREATE */
-#ifdef __XATTR_REPLACE
-#define XATTR_REPLACE XATTR_REPLACE /* set value, fail if attr does not exist. */
-#endif /* __XATTR_REPLACE */
-#else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __XATTR_CREATE
+#if !defined(XATTR_CREATE) && defined(__XATTR_CREATE)
 #define XATTR_CREATE  __XATTR_CREATE  /* set value, fail if attr already exists. */
-#endif /* __XATTR_CREATE */
-#ifdef __XATTR_REPLACE
+#endif /* !XATTR_CREATE && __XATTR_CREATE */
+#if !defined(XATTR_REPLACE) && defined(__XATTR_REPLACE)
 #define XATTR_REPLACE __XATTR_REPLACE /* set value, fail if attr does not exist. */
-#endif /* __XATTR_REPLACE */
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
-#endif /* ... */
-#endif /* !__USE_KERNEL_XATTR_DEFS */
+#endif /* !XATTR_REPLACE && __XATTR_REPLACE */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined
@@ -175,8 +148,8 @@ int fremovexattr($fd_t fd,
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }
