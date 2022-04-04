@@ -1392,7 +1392,7 @@ sys_inotify_add_watch_impl(fd_t notify_fd, fd_t dfd,
                            atflag_t atflags, uint32_t mask) {
 	REF struct notifyfd *self;
 	REF struct mfile *file;
-	VALIDATE_FLAGSET(atflags, AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
+	VALIDATE_FLAGSET(atflags, AT_SYMLINK_NOFOLLOW | AT_DOSPATH | AT_EMPTY_PATH,
 	                 E_INVALID_ARGUMENT_CONTEXT_INOTIFY_ADD_WATCH_FLAGS);
 	VALIDATE_FLAGSET(mask,
 	                 IN_ALL_EVENTS | IN_UNMOUNT | IN_Q_OVERFLOW | IN_IGNORED |
@@ -1406,8 +1406,12 @@ sys_inotify_add_watch_impl(fd_t notify_fd, fd_t dfd,
 	}
 	self = handles_lookupnotifyfd(notify_fd);
 	FINALLY_DECREF_UNLIKELY(self);
-	atflags = fs_atflags(atflags);
-	file    = path_traversefull(dfd, pathname, atflags);
+	if ((atflags & AT_EMPTY_PATH) && *pathname == '\0') {
+		file = handles_lookupmfile(dfd);
+	} else {
+		atflags = fs_atflags(atflags);
+		file    = path_traversefull(dfd, pathname, atflags);
+	}
 	FINALLY_DECREF_UNLIKELY(file);
 	if ((mask & IN_ONLYDIR) && !mfile_isdir(file))
 		THROW(E_FSERROR_NOT_A_DIRECTORY, E_FILESYSTEM_NOT_A_DIRECTORY_WATCH);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55b26135 */
+/* HASH CRC-32:0xbf75eb83 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -713,7 +713,9 @@
  * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
 #define __NR64_ioprio_get               0xfc                           /* syscall_slong_t ioprio_get(syscall_ulong_t who, syscall_ulong_t id) */
 #define __NR64_inotify_init             0xfd                           /* fd_t inotify_init(void) */
+/* @param: mask: Set of `IN_ALL_EVENTS | ...' */
 #define __NR64_inotify_add_watch        0xfe                           /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
+/* @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
 #define __NR64_inotify_rm_watch         0xff                           /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 #define __NR64_migrate_pages            0x100                          /* errno_t migrate_pages(int TODO_PROTOTYPE) */
 /* Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -825,6 +827,7 @@
 /* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 #define __NR64_dup3                     0x124                          /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
 #define __NR64_pipe2                    0x125                          /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
+/* @param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
 #define __NR64_inotify_init1            0x126                          /* fd_t inotify_init1(syscall_ulong_t flags) */
 /* Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
@@ -986,7 +989,9 @@
 #define __NR64_fmknodat                 __UINT64_C(0xfffffffffffffefd) /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR64_fmkdirat                 __UINT64_C(0xfffffffffffffefe) /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
-#define __NR64_inotify_add_watch_at     __UINT64_C(0xffffffffffffff02) /* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+/* @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+ * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
+#define __NR64_inotify_add_watch_at     __UINT64_C(0xffffffffffffff02) /* int inotify_add_watch_at(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask) */
 #define __NR64_ksysctl                  __UINT64_C(0xffffffffffffff64) /* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)

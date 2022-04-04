@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2759c7 */
+/* HASH CRC-32:0xfeadfcaa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -630,15 +630,18 @@ __CDECLARE_SC(,__ssize_t,getxattr,(char const *__path, char const *__name, void 
 __CDECLARE_SC(,__errno_t,init_module,(void const *__module_image, __size_t __len, char const *__uargs),(__module_image,__len,__uargs))
 #endif /* __CRT_HAVE_SC(init_module) */
 #if __CRT_HAVE_SC(inotify_add_watch)
+/* @param: mask: Set of `IN_ALL_EVENTS | ...' */
 __CDECLARE_SC(,int,inotify_add_watch,(__fd_t __notify_fd, char const *__pathname, __uint32_t __mask),(__notify_fd,__pathname,__mask))
 #endif /* __CRT_HAVE_SC(inotify_add_watch) */
 #if __CRT_HAVE_SC(inotify_init)
 __CDECLARE_SC(,__fd_t,inotify_init,(void),())
 #endif /* __CRT_HAVE_SC(inotify_init) */
 #if __CRT_HAVE_SC(inotify_init1)
+/* @param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
 __CDECLARE_SC(,__fd_t,inotify_init1,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_SC(inotify_init1) */
 #if __CRT_HAVE_SC(inotify_rm_watch)
+/* @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
 __CDECLARE_SC(,__errno_t,inotify_rm_watch,(__fd_t __notify_fd, int __wd),(__notify_fd,__wd))
 #endif /* __CRT_HAVE_SC(inotify_rm_watch) */
 #if __CRT_HAVE_SC(io_cancel)
@@ -2107,15 +2110,18 @@ __CDECLARE_XSC(,__ssize_t,getxattr,(char const *__path, char const *__name, void
 __CDECLARE_XSC(,__errno_t,init_module,(void const *__module_image, __size_t __len, char const *__uargs),(__module_image,__len,__uargs))
 #endif /* __CRT_HAVE_XSC(init_module) */
 #if __CRT_HAVE_XSC(inotify_add_watch)
+/* @param: mask: Set of `IN_ALL_EVENTS | ...' */
 __CDECLARE_XSC(,int,inotify_add_watch,(__fd_t __notify_fd, char const *__pathname, __uint32_t __mask),(__notify_fd,__pathname,__mask))
 #endif /* __CRT_HAVE_XSC(inotify_add_watch) */
 #if __CRT_HAVE_XSC(inotify_init)
 __CDECLARE_XSC(,__fd_t,inotify_init,(void),())
 #endif /* __CRT_HAVE_XSC(inotify_init) */
 #if __CRT_HAVE_XSC(inotify_init1)
+/* @param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
 __CDECLARE_XSC(,__fd_t,inotify_init1,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_XSC(inotify_init1) */
 #if __CRT_HAVE_XSC(inotify_rm_watch)
+/* @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
 __CDECLARE_XSC(,__errno_t,inotify_rm_watch,(__fd_t __notify_fd, int __wd),(__notify_fd,__wd))
 #endif /* __CRT_HAVE_XSC(inotify_rm_watch) */
 #if __CRT_HAVE_XSC(io_cancel)

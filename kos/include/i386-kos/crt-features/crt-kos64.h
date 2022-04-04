@@ -3193,6 +3193,11 @@
 #define __CRT_HAVE_initstate
 #define __CRT_HAVE_initstate_r
 #define __CRT_HAVE_innetgr
+#define __CRT_HAVE_inotify_add_watch
+#define __CRT_HAVE_inotify_add_watch_at
+#define __CRT_HAVE_inotify_init
+#define __CRT_HAVE_inotify_init1
+#define __CRT_HAVE_inotify_rm_watch
 #define __CRT_HAVE_insline
 #define __CRT_HAVE_insque
 #define __CRT_HAVE_ioctl
@@ -8702,6 +8707,10 @@
 #define __CRT_HAVE_KOS$initstate
 #define __CRT_HAVE_KOS$initstate_r
 #define __CRT_HAVE_KOS$innetgr
+#define __CRT_HAVE_KOS$inotify_add_watch
+#define __CRT_HAVE_KOS$inotify_add_watch_at
+#define __CRT_HAVE_KOS$inotify_init1
+#define __CRT_HAVE_KOS$inotify_rm_watch
 #define __CRT_HAVE_KOS$insque
 #define __CRT_HAVE_KOS$ioctl
 #define __CRT_HAVE_KOS$ioperm
@@ -13152,6 +13161,10 @@
 #define __CRT_HAVE_DOS$initstate
 #define __CRT_HAVE_DOS$initstate_r
 #define __CRT_HAVE_DOS$innetgr
+#define __CRT_HAVE_DOS$inotify_add_watch
+#define __CRT_HAVE_DOS$inotify_add_watch_at
+#define __CRT_HAVE_DOS$inotify_init1
+#define __CRT_HAVE_DOS$inotify_rm_watch
 #define __CRT_HAVE_DOS$insque
 #define __CRT_HAVE_DOS$ioctl
 #define __CRT_HAVE_DOS$ioperm

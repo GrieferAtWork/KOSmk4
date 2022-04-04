@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeef38e1f */
+/* HASH CRC-32:0xf0e9191b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Windows Kits (/ucrt/corecrt_wio.h) */
+/* (#) Portability: Windows Kits (/ucrt/corecrt_wprocess.h) */
 #ifndef _CORECRT_WPROCESS_H
 #define _CORECRT_WPROCESS_H 1
 

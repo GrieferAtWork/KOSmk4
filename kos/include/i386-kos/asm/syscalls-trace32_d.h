@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48077d79 */
+/* HASH CRC-32:0x2ded36ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1008,7 +1008,7 @@
 #define __NR32AN2_fmkdirat                     mode
 #define __NR32AN3_fmkdirat                     flags
 #define __NR32AN0_inotify_add_watch_at         notify_fd
-#define __NR32AN1_inotify_add_watch_at         dfd
+#define __NR32AN1_inotify_add_watch_at         dirfd
 #define __NR32AN2_inotify_add_watch_at         pathname
 #define __NR32AN3_inotify_add_watch_at         atflags
 #define __NR32AN4_inotify_add_watch_at         mask
@@ -2699,9 +2699,9 @@
 #define __NR32ATR3_fmkdirat                     SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
 #define __NR32RTR_fmkdirat                      SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_inotify_add_watch_at         SC_REPR_FD_T                                                         /* notify_fd */ 
-#define __NR32ATR1_inotify_add_watch_at         SC_REPR_FD_T                                                         /* dfd */ 
+#define __NR32ATR1_inotify_add_watch_at         SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR2_inotify_add_watch_at         SC_REPR_STRING                                                       /* pathname */ 
-#define __NR32ATR3_inotify_add_watch_at         SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH                            /* atflags */ 
+#define __NR32ATR3_inotify_add_watch_at         SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH                /* atflags */ 
 #define __NR32ATR4_inotify_add_watch_at         SC_REPR_INOTIFY_MASK                                                 /* mask */ 
 #define __NR32RTR_inotify_add_watch_at          SC_REPR_INT                                                          /* return */
 #define __NR32ATR0_waitid64                     SC_REPR_IDTYPE_T                                                     /* idtype */ 

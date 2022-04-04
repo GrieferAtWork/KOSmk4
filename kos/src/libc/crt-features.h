@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4083848a */
+/* HASH CRC-32:0x5c55b25 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1947,6 +1947,10 @@
 #define __CRT_HAVE_DOS$initstate
 #define __CRT_HAVE_DOS$initstate_r
 #define __CRT_HAVE_DOS$innetgr
+#define __CRT_HAVE_DOS$inotify_add_watch
+#define __CRT_HAVE_DOS$inotify_add_watch_at
+#define __CRT_HAVE_DOS$inotify_init1
+#define __CRT_HAVE_DOS$inotify_rm_watch
 #define __CRT_HAVE_DOS$insque
 #define __CRT_HAVE_DOS$ioctl
 #define __CRT_HAVE_DOS$ioperm
@@ -5994,6 +5998,11 @@
 #define __CRT_HAVE_initstate
 #define __CRT_HAVE_initstate_r
 #define __CRT_HAVE_innetgr
+#define __CRT_HAVE_inotify_add_watch
+#define __CRT_HAVE_inotify_add_watch_at
+#define __CRT_HAVE_inotify_init
+#define __CRT_HAVE_inotify_init1
+#define __CRT_HAVE_inotify_rm_watch
 #define __CRT_HAVE_insline
 #define __CRT_HAVE_insque
 #define __CRT_HAVE_ioctl

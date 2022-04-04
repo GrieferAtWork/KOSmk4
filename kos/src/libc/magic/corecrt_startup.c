@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
+/* (#) Portability: MinGW        (/mingw-w64-headers/crt/corecrt_startup.h) */
 /* (#) Portability: Windows Kits (/ucrt/corecrt_startup.h) */
 }
 

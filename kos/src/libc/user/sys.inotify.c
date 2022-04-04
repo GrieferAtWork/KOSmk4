@@ -1,0 +1,127 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_USER_SYS_INOTIFY_C
+#define GUARD_LIBC_USER_SYS_INOTIFY_C 1
+
+#include "../api.h"
+/**/
+
+#include <kos/syscalls.h>
+
+#include <syscall.h>
+
+#include "sys.inotify.h"
+
+#ifndef SYS_inotify_init
+#define sys_inotify_init() sys_inotify_init1(0)
+#endif /* !SYS_inotify_init */
+
+DECL_BEGIN
+
+/*[[[head:libc_inotify_init,hash:CRC-32=0xfd63ef52]]]*/
+/* >> inotify_init(2) */
+INTERN ATTR_SECTION(".text.crt.unsorted") fd_t
+NOTHROW_NCX(LIBCCALL libc_inotify_init)(void)
+/*[[[body:libc_inotify_init]]]*/
+{
+	fd_t result = sys_inotify_init();
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_inotify_init]]]*/
+
+/*[[[head:libc_inotify_init1,hash:CRC-32=0x227ac8a3]]]*/
+/* >> inotify_init1(2)
+ * @param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
+INTERN ATTR_SECTION(".text.crt.unsorted") fd_t
+NOTHROW_NCX(LIBCCALL libc_inotify_init1)(__STDC_INT_AS_UINT_T flags)
+/*[[[body:libc_inotify_init1]]]*/
+{
+	fd_t result = sys_inotify_init1((syscall_ulong_t)(unsigned int)flags);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_inotify_init1]]]*/
+
+/*[[[head:libc_inotify_add_watch,hash:CRC-32=0x2b0f8438]]]*/
+/* >> inotify_add_watch(2)
+ * @param: mask: Set of `IN_ALL_EVENTS | ...' */
+INTERN ATTR_SECTION(".text.crt.unsorted") __watchfd_t
+NOTHROW_NCX(LIBCCALL libc_inotify_add_watch)(fd_t notify_fd,
+                                             char const *pathname,
+                                             uint32_t mask)
+/*[[[body:libc_inotify_add_watch]]]*/
+{
+#ifdef SYS_inotify_add_watch
+	watchfd_t result;
+	result = sys_inotify_add_watch(notify_fd, pathname, mask);
+	return libc_seterrno_syserr(result);
+#else /* SYS_inotify_add_watch */
+	atflag_t atflags = 0;
+	if (mask & IN_DONT_FOLLOW) {
+		atflags |= __AT_SYMLINK_NOFOLLOW;
+		mask &= ~IN_DONT_FOLLOW;
+	}
+	return libc_inotify_add_watch_at(notify_fd, __AT_FDCWD, pathname, atflags, mask);
+#endif /* !SYS_inotify_add_watch */
+}
+/*[[[end:libc_inotify_add_watch]]]*/
+
+/*[[[head:libc_inotify_rm_watch,hash:CRC-32=0xe654c470]]]*/
+/* >> inotify_rm_watch(2)
+ * @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
+INTERN ATTR_SECTION(".text.crt.unsorted") int
+NOTHROW_NCX(LIBCCALL libc_inotify_rm_watch)(fd_t notify_fd,
+                                            __watchfd_t wd)
+/*[[[body:libc_inotify_rm_watch]]]*/
+{
+	errno_t result;
+	result = sys_inotify_rm_watch(notify_fd, wd);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_inotify_rm_watch]]]*/
+
+/*[[[head:libc_inotify_add_watch_at,hash:CRC-32=0x28a3ba58]]]*/
+/* >> inotify_add_watch_at(2)
+ * @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH | AT_EMPTY_PATH'
+ * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
+INTERN ATTR_SECTION(".text.crt.unsorted") __watchfd_t
+NOTHROW_NCX(LIBCCALL libc_inotify_add_watch_at)(fd_t notify_fd,
+                                                fd_t dirfd,
+                                                char const *pathname,
+                                                atflag_t atflags,
+                                                uint32_t mask)
+/*[[[body:libc_inotify_add_watch_at]]]*/
+{
+	watchfd_t result;
+	result = sys_inotify_add_watch_at(notify_fd, dirfd, pathname, atflags, mask);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_inotify_add_watch_at]]]*/
+
+/*[[[start:exports,hash:CRC-32=0x26d92fa6]]]*/
+DEFINE_PUBLIC_ALIAS(inotify_init, libc_inotify_init);
+DEFINE_PUBLIC_ALIAS(inotify_init1, libc_inotify_init1);
+DEFINE_PUBLIC_ALIAS(inotify_add_watch, libc_inotify_add_watch);
+DEFINE_PUBLIC_ALIAS(inotify_rm_watch, libc_inotify_rm_watch);
+DEFINE_PUBLIC_ALIAS(inotify_add_watch_at, libc_inotify_add_watch_at);
+/*[[[end:exports]]]*/
+
+DECL_END
+
+#endif /* !GUARD_LIBC_USER_SYS_INOTIFY_C */

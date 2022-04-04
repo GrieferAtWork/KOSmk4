@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7b53163 */
+/* HASH CRC-32:0xf75b1a8d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -654,7 +654,9 @@
  * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
 #define __NR_ioprio_get                   0x122                  /* syscall_slong_t ioprio_get(syscall_ulong_t who, syscall_ulong_t id) */
 #define __NR_inotify_init                 0x123                  /* fd_t inotify_init(void) */
+/* @param: mask: Set of `IN_ALL_EVENTS | ...' */
 #define __NR_inotify_add_watch            0x124                  /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
+/* @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
 #define __NR_inotify_rm_watch             0x125                  /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 #define __NR_migrate_pages                0x126                  /* errno_t migrate_pages(int TODO_PROTOTYPE) */
 /* Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -753,6 +755,7 @@
 /* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 #define __NR_dup3                         0x14a                  /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
 #define __NR_pipe2                        0x14b                  /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
+/* @param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
 #define __NR_inotify_init1                0x14c                  /* fd_t inotify_init1(syscall_ulong_t flags) */
 /* Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
@@ -1129,7 +1132,9 @@
 #define __NR_fmknodat                     __UINT32_C(0xfffffed7) /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR_fmkdirat                     __UINT32_C(0xfffffed8) /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
-#define __NR_inotify_add_watch_at         __UINT32_C(0xfffffedc) /* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+/* @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+ * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
+#define __NR_inotify_add_watch_at         __UINT32_C(0xfffffedc) /* int inotify_add_watch_at(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask) */
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 #define __NR_waitid64                     __UINT32_C(0xfffffee4) /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */

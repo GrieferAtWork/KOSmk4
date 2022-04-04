@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x245e7421 */
+/* HASH CRC-32:0x9c8bad09 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2566,6 +2566,7 @@ INTERN_FUNCTION(libc_sys_inotify_init)
 END(libc_sys_inotify_init)
 DEFINE_PUBLIC_ALIAS(sys_inotify_init, libc_sys_inotify_init)
 
+/* @param: mask: Set of `IN_ALL_EVENTS | ...' */
 /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 INTERN_FUNCTION(libc_sys_inotify_add_watch)
 	movl   $(0x124), %eax
@@ -2573,6 +2574,7 @@ INTERN_FUNCTION(libc_sys_inotify_add_watch)
 END(libc_sys_inotify_add_watch)
 DEFINE_PUBLIC_ALIAS(sys_inotify_add_watch, libc_sys_inotify_add_watch)
 
+/* @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
 /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 INTERN_FUNCTION(libc_sys_inotify_rm_watch)
 	movl   $(0x125), %eax
@@ -2905,6 +2907,7 @@ INTERN_FUNCTION(libc_sys_pipe2)
 END(libc_sys_pipe2)
 DEFINE_PUBLIC_ALIAS(sys_pipe2, libc_sys_pipe2)
 
+/* @param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
 /* fd_t inotify_init1(syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_inotify_init1)
 	movl   $(0x14c), %eax
@@ -3941,7 +3944,9 @@ INTERN_FUNCTION(libc_sys_fmkdirat)
 END(libc_sys_fmkdirat)
 DEFINE_PUBLIC_ALIAS(sys_fmkdirat, libc_sys_fmkdirat)
 
-/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+/* @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+ * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask) */
 INTERN_FUNCTION(libc_sys_inotify_add_watch_at)
 	movl   $(0xfffffedc), %eax
 	jmp    libc_x86_exec_syscall5
@@ -7028,6 +7033,7 @@ INTERN_FUNCTION(libc_sys_Xinotify_init)
 END(libc_sys_Xinotify_init)
 DEFINE_PUBLIC_ALIAS(sys_Xinotify_init, libc_sys_Xinotify_init)
 
+/* @param: mask: Set of `IN_ALL_EVENTS | ...' */
 /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 INTERN_FUNCTION(libc_sys_Xinotify_add_watch)
 	movl   $(0x124), %eax
@@ -7035,6 +7041,7 @@ INTERN_FUNCTION(libc_sys_Xinotify_add_watch)
 END(libc_sys_Xinotify_add_watch)
 DEFINE_PUBLIC_ALIAS(sys_Xinotify_add_watch, libc_sys_Xinotify_add_watch)
 
+/* @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
 /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 INTERN_FUNCTION(libc_sys_Xinotify_rm_watch)
 	movl   $(0x125), %eax
@@ -7367,6 +7374,7 @@ INTERN_FUNCTION(libc_sys_Xpipe2)
 END(libc_sys_Xpipe2)
 DEFINE_PUBLIC_ALIAS(sys_Xpipe2, libc_sys_Xpipe2)
 
+/* @param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
 /* fd_t inotify_init1(syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_Xinotify_init1)
 	movl   $(0x14c), %eax
@@ -8403,7 +8411,9 @@ INTERN_FUNCTION(libc_sys_Xfmkdirat)
 END(libc_sys_Xfmkdirat)
 DEFINE_PUBLIC_ALIAS(sys_Xfmkdirat, libc_sys_Xfmkdirat)
 
-/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+/* @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+ * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask) */
 INTERN_FUNCTION(libc_sys_Xinotify_add_watch_at)
 	movl   $(0xfffffedc), %eax
 	jmp    libc_x86_exec_Xsyscall5

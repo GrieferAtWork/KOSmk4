@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79b1235c */
+/* HASH CRC-32:0x143e0067 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -847,7 +847,7 @@
 #define __NR64AN2_fmkdirat                 mode
 #define __NR64AN3_fmkdirat                 flags
 #define __NR64AN0_inotify_add_watch_at     notify_fd
-#define __NR64AN1_inotify_add_watch_at     dfd
+#define __NR64AN1_inotify_add_watch_at     dirfd
 #define __NR64AN2_inotify_add_watch_at     pathname
 #define __NR64AN3_inotify_add_watch_at     atflags
 #define __NR64AN4_inotify_add_watch_at     mask
@@ -2240,9 +2240,9 @@
 #define __NR64ATR3_fmkdirat                 SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
 #define __NR64RTR_fmkdirat                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_inotify_add_watch_at     SC_REPR_FD_T                                                         /* notify_fd */ 
-#define __NR64ATR1_inotify_add_watch_at     SC_REPR_FD_T                                                         /* dfd */ 
+#define __NR64ATR1_inotify_add_watch_at     SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR64ATR2_inotify_add_watch_at     SC_REPR_STRING                                                       /* pathname */ 
-#define __NR64ATR3_inotify_add_watch_at     SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH                            /* atflags */ 
+#define __NR64ATR3_inotify_add_watch_at     SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH                /* atflags */ 
 #define __NR64ATR4_inotify_add_watch_at     SC_REPR_INOTIFY_MASK                                                 /* mask */ 
 #define __NR64RTR_inotify_add_watch_at      SC_REPR_INT                                                          /* return */
 #define __NR64ATR0_ksysctl                  SC_REPR_KSYSCTL_COMMAND                                              /* command */ 

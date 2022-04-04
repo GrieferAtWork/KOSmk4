@@ -730,9 +730,20 @@ kcmp:(pid_t pid1, pid_t pid2, [tostr(KCMP_TYPE)] syscall_ulong_t type,
 /* Filesystem notifications                                             */
 /************************************************************************/
 inotify_init:() -> fd_t;
+
+@@@param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK'
 inotify_init1:([tostr(INOTIFY_INIT_FLAGS)] syscall_ulong_t flags) -> fd_t;
+
+@@@param: mask: Set of `IN_ALL_EVENTS | ...'
 inotify_add_watch:(fd_t notify_fd, char const *pathname, [tostr(INOTIFY_MASK)] uint32_t mask) -> int;
-inotify_add_watch_at:(fd_t notify_fd, fd_t dfd, char const *pathname, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t atflags, [tostr(INOTIFY_MASK)] uint32_t mask) -> int; /* KOS Extension! */
+
+@@@param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+@@@param: mask:    Set of `IN_ALL_EVENTS | ...'
+inotify_add_watch_at:(fd_t notify_fd, fd_t dirfd, char const *pathname,
+                      [tostr(ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t atflags,
+                      [tostr(INOTIFY_MASK)] uint32_t mask) -> int; /* KOS Extension! */
+
+@@@param: wd: Watch fd (as returned by `inotify_add_watch{_at}')
 inotify_rm_watch:(fd_t notify_fd, int wd) -> errno_t;
 
 

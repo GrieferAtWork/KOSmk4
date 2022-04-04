@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42ad16f */
+/* HASH CRC-32:0xe89335ea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1008,7 +1008,7 @@
 #define __NRAN2_fmkdirat                     mode
 #define __NRAN3_fmkdirat                     flags
 #define __NRAN0_inotify_add_watch_at         notify_fd
-#define __NRAN1_inotify_add_watch_at         dfd
+#define __NRAN1_inotify_add_watch_at         dirfd
 #define __NRAN2_inotify_add_watch_at         pathname
 #define __NRAN3_inotify_add_watch_at         atflags
 #define __NRAN4_inotify_add_watch_at         mask
@@ -2699,9 +2699,9 @@
 #define __NRATR3_fmkdirat                     SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
 #define __NRRTR_fmkdirat                      SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_inotify_add_watch_at         SC_REPR_FD_T                                                         /* notify_fd */ 
-#define __NRATR1_inotify_add_watch_at         SC_REPR_FD_T                                                         /* dfd */ 
+#define __NRATR1_inotify_add_watch_at         SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NRATR2_inotify_add_watch_at         SC_REPR_STRING                                                       /* pathname */ 
-#define __NRATR3_inotify_add_watch_at         SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH                            /* atflags */ 
+#define __NRATR3_inotify_add_watch_at         SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH                /* atflags */ 
 #define __NRATR4_inotify_add_watch_at         SC_REPR_INOTIFY_MASK                                                 /* mask */ 
 #define __NRRTR_inotify_add_watch_at          SC_REPR_INT                                                          /* return */
 #define __NRATR0_waitid64                     SC_REPR_IDTYPE_T                                                     /* idtype */ 

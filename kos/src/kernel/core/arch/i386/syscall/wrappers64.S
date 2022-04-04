@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb548a4e */
+/* HASH CRC-32:0x77135c98 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8130,6 +8130,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_init)
 	.cfi_endproc
 END(__x86_asm64_syscall_inotify_init)
 
+/* @param: mask: Set of `IN_ALL_EVENTS | ...' */
 /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 .section .text.x86.asm64_syscall.inotify_add_watch
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_add_watch)
@@ -8160,6 +8161,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_add_watch)
 	.cfi_endproc
 END(__x86_asm64_syscall_inotify_add_watch)
 
+/* @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
 /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 .section .text.x86.asm64_syscall.inotify_rm_watch
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_rm_watch)
@@ -9422,6 +9424,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pipe2)
 	.cfi_endproc
 END(__x86_asm64_syscall_pipe2)
 
+/* @param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
 /* fd_t inotify_init1(syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.inotify_init1
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_init1)
@@ -11461,7 +11464,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fmkdirat)
 	.cfi_endproc
 END(__x86_asm64_syscall_fmkdirat)
 
-/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+/* @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+ * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask) */
 .section .text.x86.asm64_syscall.inotify_add_watch_at
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_add_watch_at)
 	.cfi_startproc simple
@@ -20296,6 +20301,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init)
 	.cfi_endproc
 END(__x86_asm32_int80_inotify_init)
 
+/* @param: mask: Set of `IN_ALL_EVENTS | ...' */
 /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 .section .text.x86.asm32_syscall_int80.inotify_add_watch
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch)
@@ -20321,6 +20327,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch)
 	.cfi_endproc
 END(__x86_asm32_int80_inotify_add_watch)
 
+/* @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
 /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 .section .text.x86.asm32_syscall_int80.inotify_rm_watch
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_rm_watch)
@@ -21389,6 +21396,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pipe2)
 	.cfi_endproc
 END(__x86_asm32_int80_pipe2)
 
+/* @param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
 /* fd_t inotify_init1(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.inotify_init1
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init1)
@@ -24438,7 +24446,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 	.cfi_endproc
 END(__x86_asm32_int80_fmkdirat)
 
-/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+/* @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+ * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask) */
 .section .text.x86.asm32_syscall_int80.inotify_add_watch_at
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch_at)
 	.cfi_startproc simple
@@ -28010,9 +28020,11 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioprio_get, __x86_asm32_int80_iopr
 /* fd_t inotify_init(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_inotify_init, __x86_asm32_int80_inotify_init)
 
+/* @param: mask: Set of `IN_ALL_EVENTS | ...' */
 /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_inotify_add_watch, __x86_asm32_int80_inotify_add_watch)
 
+/* @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
 /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_inotify_rm_watch, __x86_asm32_int80_inotify_rm_watch)
 
@@ -28428,6 +28440,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_dup3, __x86_asm32_int80_dup3)
 /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pipe2, __x86_asm32_int80_pipe2)
 
+/* @param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
 /* fd_t inotify_init1(syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_inotify_init1, __x86_asm32_int80_inotify_init1)
 
@@ -29837,7 +29850,9 @@ END(__x86_asm32_sysenter_fmknodat)
 /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fmkdirat, __x86_asm32_int80_fmkdirat)
 
-/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+/* @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+ * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask) */
 .section .text.x86.asm32_syscall_sysenter.inotify_add_watch_at
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_add_watch_at)
 	.cfi_startproc simple
@@ -34096,6 +34111,7 @@ END(__x86_asm32_sysrun32_ioprio_get)
 /* fd_t inotify_init(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_inotify_init, sys32_inotify_init); */
 
+/* @param: mask: Set of `IN_ALL_EVENTS | ...' */
 /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 .section .text.x86.asm32_syscall_sysrun32.inotify_add_watch
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_add_watch)
@@ -34108,6 +34124,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_add_watch)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_inotify_add_watch)
 
+/* @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
 /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 .section .text.x86.asm32_syscall_sysrun32.inotify_rm_watch
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_rm_watch)
@@ -34650,6 +34667,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pipe2)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pipe2)
 
+/* @param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
 /* fd_t inotify_init1(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.inotify_init1
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_init1)
@@ -36229,7 +36247,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fmkdirat)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fmkdirat)
 
-/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+/* @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+ * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask) */
 .section .text.x86.asm32_syscall_sysrun32.inotify_add_watch_at
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_add_watch_at)
 	.cfi_startproc

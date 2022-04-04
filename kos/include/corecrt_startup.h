@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa93a1680 */
+/* HASH CRC-32:0x6ac3fc14 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: MinGW        (/mingw-w64-headers/crt/corecrt_startup.h) */
 /* (#) Portability: Windows Kits (/ucrt/corecrt_startup.h) */
 #ifndef _CORECRT_STARTUP_H
 #define _CORECRT_STARTUP_H 1

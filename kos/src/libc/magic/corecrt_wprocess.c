@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: Windows Kits (/ucrt/corecrt_wio.h) */
+/* (#) Portability: Windows Kits (/ucrt/corecrt_wprocess.h) */
 }
 
 %[define_replacement(fd_t = __fd_t)]

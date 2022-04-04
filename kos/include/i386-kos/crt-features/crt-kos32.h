@@ -3346,6 +3346,11 @@
 #define __CRT_HAVE_initstate
 #define __CRT_HAVE_initstate_r
 #define __CRT_HAVE_innetgr
+#define __CRT_HAVE_inotify_add_watch
+#define __CRT_HAVE_inotify_add_watch_at
+#define __CRT_HAVE_inotify_init
+#define __CRT_HAVE_inotify_init1
+#define __CRT_HAVE_inotify_rm_watch
 #define __CRT_HAVE_insline
 #define __CRT_HAVE_insque
 #define __CRT_HAVE_ioctl

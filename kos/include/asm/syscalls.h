@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa14752c0 */
+/* HASH CRC-32:0x757b10e7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,8 +87,11 @@
 #define __NR_dup                    0x17  /* fd_t dup(fd_t fd) */
 /* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 #define __NR_dup3                   0x18  /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
+/* @param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
 #define __NR_inotify_init1          0x1a  /* fd_t inotify_init1(syscall_ulong_t flags) */
+/* @param: mask: Set of `IN_ALL_EVENTS | ...' */
 #define __NR_inotify_add_watch      0x1b  /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
+/* @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
 #define __NR_inotify_rm_watch       0x1c  /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 #define __NR_ioctl                  0x1d  /* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 /* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)

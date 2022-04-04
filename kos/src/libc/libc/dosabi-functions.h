@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ed9ee39 */
+/* HASH CRC-32:0xef5f900c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2318,6 +2318,12 @@ DFUN(".text.crt.dos.unsorted", libd_flock, libc_flock, TD, 2, TIn(__SIZEOF_FD_T_
 /* sys.fsuid */
 DFUN(".text.crt.dos.sched.user", libd_setfsuid, libc_setfsuid, TD, 1, TIn(__SIZEOF_UID_T__))
 DFUN(".text.crt.dos.sched.user", libd_setfsgid, libc_setfsgid, TD, 1, TIn(__SIZEOF_GID_T__))
+
+/* sys.inotify */
+DFUN(".text.crt.dos.unsorted", libd_inotify_init1, libc_inotify_init1, TIn(__SIZEOF_FD_T__), 1, TD)
+DFUN(".text.crt.dos.unsorted", libd_inotify_add_watch, libc_inotify_add_watch, TD, 3, TIn(__SIZEOF_FD_T__), TP, TI32)
+DFUN(".text.crt.dos.unsorted", libd_inotify_rm_watch, libc_inotify_rm_watch, TD, 2, TIn(__SIZEOF_FD_T__), TD)
+DFUN(".text.crt.dos.unsorted", libd_inotify_add_watch_at, libc_inotify_add_watch_at, TD, 5, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_ATFLAG_T__), TI32)
 
 /* sys.ioctl */
 DFUN(".text.crt.dos.io.utility", libd_ioctl, libc_ioctl, TD, 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_IOCTL_T__), TP)
