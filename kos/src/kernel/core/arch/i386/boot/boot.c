@@ -839,8 +839,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: `file(1)' appears to be broken */
 
-	/* TODO: Enable `miscutils/inotifyd.c' in busybox */
-
 	/* TODO: Implement inotify -> `fdirnode_ops::dno_attach_notify' */
 
 	return state;
