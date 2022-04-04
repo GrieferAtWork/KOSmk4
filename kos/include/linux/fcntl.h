@@ -21,10 +21,12 @@
 #ifndef _LINUX_FCNTL_H
 #define _LINUX_FCNTL_H 1
 
-#include <asm/os/oflags.h>
+#include <__stdinc.h>
+
 #include <asm/os/fcntl.h>
-#include <bits/os/flock.h>
+#include <asm/os/oflags.h>
 #include <bits/os/f_owner_ex.h>
+#include <bits/os/flock.h>
 
 #if !defined(O_ACCMODE) && defined(__O_ACCMODE)
 #define O_ACCMODE __O_ACCMODE
@@ -59,9 +61,9 @@
 #if !defined(O_DSYNC) && defined(__O_DSYNC)
 #define O_DSYNC __O_DSYNC
 #endif /* !O_DSYNC && __O_DSYNC */
-#if !defined(FASYNC) && defined(__FASYNC)
-#define FASYNC __FASYNC
-#endif /* !FASYNC && __FASYNC */
+#if !defined(FASYNC) && defined(__O_ASYNC)
+#define FASYNC __O_ASYNC
+#endif /* !FASYNC && __O_ASYNC */
 #if !defined(O_DIRECT) && defined(__O_DIRECT)
 #define O_DIRECT __O_DIRECT
 #endif /* !O_DIRECT && __O_DIRECT */
@@ -92,9 +94,9 @@
 #if !defined(O_TMPFILE_MASK) && defined(__O_TMPFILE_MASK)
 #define O_TMPFILE_MASK __O_TMPFILE_MASK
 #endif /* !O_TMPFILE_MASK && __O_TMPFILE_MASK */
-#if !defined(O_NDELAY) && defined(__O_NDELAY)
-#define O_NDELAY __O_NDELAY
-#endif /* !O_NDELAY && __O_NDELAY */
+#if !defined(O_NDELAY) && defined(__O_NONBLOCK)
+#define O_NDELAY __O_NONBLOCK
+#endif /* !O_NDELAY && __O_NONBLOCK */
 
 #if !defined(F_DUPFD) && defined(__F_DUPFD)
 #define F_DUPFD __F_DUPFD
@@ -164,13 +166,13 @@
 #endif /* !F_LINUX_SPECIFIC_BASE && __F_LINUX_SPECIFIC_BASE */
 
 #if !defined(F_OWNER_TID) && defined(__F_OWNER_TID)
-#define F_OWNER_TID __F_OWNER_TID
+#define F_OWNER_TID __F_OWNER_TID /* Kernel thread. */
 #endif /* !F_OWNER_TID && __F_OWNER_TID */
 #if !defined(F_OWNER_PID) && defined(__F_OWNER_PID)
-#define F_OWNER_PID __F_OWNER_PID
+#define F_OWNER_PID __F_OWNER_PID /* Process. */
 #endif /* !F_OWNER_PID && __F_OWNER_PID */
 #if !defined(F_OWNER_PGRP) && defined(__F_OWNER_PGRP)
-#define F_OWNER_PGRP __F_OWNER_PGRP
+#define F_OWNER_PGRP __F_OWNER_PGRP /* Process group. */
 #endif /* !F_OWNER_PGRP && __F_OWNER_PGRP */
 
 #if !defined(FD_CLOEXEC) && defined(__FD_CLOEXEC)

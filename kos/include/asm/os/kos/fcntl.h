@@ -279,7 +279,6 @@
 #define __F_OWNER_TID  0 /* Kernel thread. */
 #define __F_OWNER_PID  1 /* Process. */
 #define __F_OWNER_PGRP 2 /* Process group. */
-#define __F_OWNER_GID  2 /* Alternative, obsolete name. */
 
 
 #define __POSIX_FADV_NORMAL     0 /* No further special treatment. */

@@ -57,7 +57,8 @@
 #define __O_NOATIME         0x0040000 /* Don't update last-accessed time stamps. */
 #define __O_CLOEXEC         0x0080000 /* Close the file during exec() */
 #define __O_PATH            0x0200000 /* Open a path for *at system calls. */
-#define __O_TMPFILE        (0x0400000 | __O_DIRECTORY) /* Open a temporary file */
+#define __O_TMPFILE         (0x0400000 | __O_DIRECTORY) /* Open a temporary file */
+#define __O_TMPFILE_MASK    (__O_TMPFILE | __O_CREAT)
 #ifdef __KOS__
 #define __O_CLOFORK         0x1000000 /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
 #define __O_DOSPATH         0x4000000 /* Interpret  '\\'  as  '/',  and   ignore  casing  during  path   resolution.

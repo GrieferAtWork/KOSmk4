@@ -334,14 +334,34 @@ struct mfile_stream_ops {
 	                            struct ccinfo *__restrict info);
 
 #ifdef CONFIG_HAVE_FS_NOTIFY
-	/* TODO: New operators:
-	 * >> void *mso_notify_attach(struct mfile *__restrict self);
-	 * >> void mso_notify_detach(struct mfile *__restrict self, void *cookie);
-	 * Where `cookie' is stored in `struct inotify_controller'
+	/* [0..1] Operator pair used for creating/destroying additional cookie objects
+	 *        that remain alive for as long as `mf_notify != NULL' (iow: for as long
+	 *        as fs events are being tracked for a file)
+	 *
+	 * These operators can be used to start/stop object-specific async jobs for
+	 * the purpose of polling signals and generating file notification  events:
 	 *  - `mso_notify_attach' is called when a `struct inotify_controller' is created
 	 *  - `mso_notify_detach' is called when a `struct inotify_controller' is destroyed
-	 * Together, these operators can be used to start/stop object-specific async jobs
-	 * for  the purpose of  polling signals and  generating file notification events. */
+	 *
+	 * WARNING: `wasdestroyed(self)' may be the case when `mso_notify_detach' is called,
+	 *          but  in this  case it is  guarantied that (aside  from `mf_notify'), all
+	 *          other fields of `self' remain in a valid state until after the  operator
+	 *          return (though the operator still isn't allowed to incref(self)!)
+	 *
+	 * NOTE: `mso_notify_attach' _is_ allowed to incref(self), and have `mso_notify_detach'
+	 *       be the one to eventually decref() it. HOWEVER! If you do this, the system will
+	 *       have a harder time trying  to unload unused files in  those cases where it  is
+	 *       the containing directory that is being watched (rather than the file  itself),
+	 *       because  `system_cc()' won't  be able to  identify `self' as  unused until the
+	 *       user stops watching the containing directory.
+	 *
+	 * @return: * : Cookie object to store alongside the `struct inotify_controller'.
+	 *              Whatever  is returned here (even if it's NULL) will eventually be
+	 *              passed to `mso_notify_detach' when the notify is detached. */
+	BLOCKING NONNULL((1)) void *
+	(KCALL *mso_notify_attach)(struct mfile *__restrict self) THROWS(E_BADALLOC, ...);
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (KCALL *mso_notify_detach)(struct mfile *__restrict self, void *cookie);
 #endif /* CONFIG_HAVE_FS_NOTIFY */
 
 };

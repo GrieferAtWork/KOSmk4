@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc7456bd */
+/* HASH CRC-32:0xd6bdc178 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -759,55 +759,20 @@ __SYSDECL_BEGIN
 #endif /* !DN_MULTISHOT && __DN_MULTISHOT */
 
 
-#if (defined(__F_OWNER_TID) || defined(__F_OWNER_PID) || \
-     defined(__F_OWNER_PGRP) || defined(__F_OWNER_GID))
-/*[[[enum]]]*/
-#ifdef __CC__
-enum __pid_type {
-#ifdef __F_OWNER_TID
-	F_OWNER_TID  = __F_OWNER_TID,  /* Kernel thread. */
-#endif /* __F_OWNER_TID */
-#ifdef __F_OWNER_PID
-	F_OWNER_PID  = __F_OWNER_PID,  /* Process. */
-#endif /* __F_OWNER_PID */
-#ifdef __F_OWNER_PGRP
-	F_OWNER_PGRP = __F_OWNER_PGRP, /* Process group. */
-#endif /* __F_OWNER_PGRP */
-#ifdef __F_OWNER_GID
-	F_OWNER_GID  = __F_OWNER_GID   /* Alternative, obsolete name. */
-#endif /* __F_OWNER_GID */
-};
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __F_OWNER_TID
-#define F_OWNER_TID  F_OWNER_TID  /* Kernel thread. */
-#endif /* __F_OWNER_TID */
-#ifdef __F_OWNER_PID
-#define F_OWNER_PID  F_OWNER_PID  /* Process. */
-#endif /* __F_OWNER_PID */
-#ifdef __F_OWNER_PGRP
-#define F_OWNER_PGRP F_OWNER_PGRP /* Process group. */
-#endif /* __F_OWNER_PGRP */
-#ifdef __F_OWNER_GID
-#define F_OWNER_GID  F_OWNER_GID  /* Alternative, obsolete name. */
-#endif /* __F_OWNER_GID */
-#else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __F_OWNER_TID
-#define F_OWNER_TID  __F_OWNER_TID  /* Kernel thread. */
-#endif /* __F_OWNER_TID */
-#ifdef __F_OWNER_PID
-#define F_OWNER_PID  __F_OWNER_PID  /* Process. */
-#endif /* __F_OWNER_PID */
-#ifdef __F_OWNER_PGRP
+/* PID Types. */
+#if !defined(F_OWNER_TID) && defined(__F_OWNER_TID)
+#define F_OWNER_TID __F_OWNER_TID /* Kernel thread. */
+#endif /* !F_OWNER_TID && __F_OWNER_TID */
+#if !defined(F_OWNER_PID) && defined(__F_OWNER_PID)
+#define F_OWNER_PID __F_OWNER_PID /* Process. */
+#endif /* !F_OWNER_PID && __F_OWNER_PID */
+#if !defined(F_OWNER_PGRP) && defined(__F_OWNER_PGRP)
 #define F_OWNER_PGRP __F_OWNER_PGRP /* Process group. */
-#endif /* __F_OWNER_PGRP */
-#ifdef __F_OWNER_GID
-#define F_OWNER_GID  __F_OWNER_GID  /* Alternative, obsolete name. */
-#endif /* __F_OWNER_GID */
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
-#endif /* __F_OWNER_TID || __F_OWNER_PID || __F_OWNER_PGRP || __F_OWNER_GID */
+#endif /* !F_OWNER_PGRP && __F_OWNER_PGRP */
+#if !defined(F_OWNER_GID) && defined(__F_OWNER_PGRP)
+#define F_OWNER_GID __F_OWNER_PGRP /* Alternative, obsolete name. */
+#endif /* !F_OWNER_GID && __F_OWNER_PGRP */
+
 
 /* Wait upon writeout of all pages in the range before performing the write. */
 #if !defined(SYNC_FILE_RANGE_WAIT_BEFORE) && defined(__SYNC_FILE_RANGE_WAIT_BEFORE)

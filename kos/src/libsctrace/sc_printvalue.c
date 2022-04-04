@@ -2666,7 +2666,8 @@ import * from ...misc.libgen.strendN;
 local typ = getPrefixedMacrosFromFileAsMapping("../../include/asm/os/kos/fcntl.h", "__F_",
 	filter: [](x) -> x !in {
 		"__F_RDLCK", "__F_WRLCK", "__F_UNLCK", "__F_EXLCK", "__F_SHLCK",
-		"__F_OWNER_TID", "__F_OWNER_PID", "__F_OWNER_PGRP", "__F_OWNER_GID"
+		"__F_OWNER_TID", "__F_OWNER_PID", "__F_OWNER_PGRP",
+		"__F_LINUX_SPECIFIC_BASE"
 	});
 printStrendNDatabase("FCNTL", typ);
 ]]]*/

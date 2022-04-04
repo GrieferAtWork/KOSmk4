@@ -180,9 +180,9 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 			do {
 				struct dnotify_link *link;
 				link = LIST_FIRST(&notify->inc_dirs);
-				assertf(dnotify_link_getfile(link) == notify,
+				assertf(dnotify_link_getfil(link) == notify,
 				        "%p != %p",
-				        dnotify_link_getfile(link), notify);
+				        dnotify_link_getfil(link), notify);
 				LIST_REMOVE(link, dnl_fillink);
 				dnotify_link_tree_removenode(&link->dnl_dir->dnc_files, link);
 				DBG_memset(&link->dnl_dir, 0xcc, sizeof(link->dnl_dir));
@@ -190,7 +190,14 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 			} while (!LIST_EMPTY(&notify->inc_dirs));
 		}
 		notify_lock_release();
-		inotify_controller_xfree(notify);
+		if (notify) {
+			struct mfile_stream_ops const *stream;
+			stream = self->mf_ops->mo_stream;
+			/* Detach the notify file handle (if that operator is defined) */
+			if (stream && stream->mso_notify_detach)
+				(*stream->mso_notify_detach)(self, notify->inc_fhnd);
+			inotify_controller_free(notify);
+		}
 		while (!SLIST_EMPTY(&deadlinks)) {
 			struct dnotify_link *link;
 			link = SLIST_FIRST(&deadlinks);

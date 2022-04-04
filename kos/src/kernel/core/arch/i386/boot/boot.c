@@ -839,6 +839,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: `file(1)' appears to be broken */
 
+	/* TODO: Enable `miscutils/inotifyd.c' in busybox (after adding <sys/inotify.h>) */
+
 	return state;
 }
 

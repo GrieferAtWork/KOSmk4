@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_HAVE_FS_NOTIFY
+#include <kernel/mman/mfile.h>
 #include <kernel/types.h>
 
 #include <hybrid/sequence/list.h>
@@ -116,11 +117,17 @@ DECL_BEGIN
  *
  */
 
+struct fdirnode;
+struct fdirent;
+struct fnode;
+struct mfile;
+
 struct dnotify_link;
 struct notifyfd;
 struct notify_listener;
 struct dnotify_controller;
 struct inotify_controller;
+
 LIST_HEAD(notify_listener_list, notify_listener);
 LIST_HEAD(dnotify_link_list, dnotify_link);
 
@@ -186,13 +193,15 @@ FUNDEF ATTR_RETNONNULL WUNUSED REF struct notifyfd *KCALL
 notifyfd_new(void) THROWS(E_BADALLOC);
 
 /* Add a new watch (listener) for `file' to `self'
+ * NOTE: This function is only `BLOCKING' because `file->mf_ops->mo_stream_ops->mso_notify_attach'
+ *       is  allowed  to  be `BLOCKING',  and  this function  may  need to  invoke  said operator!
  * @param: mask: Set of `IN_ALL_EVENTS', optionally or'd with:
  *                - IN_EXCL_UNLINK | IN_ONESHOT: Include as bits in `notify_listener::nl_mask'
  *                - IN_MASK_ADD:    Or valid bits from `mask' with any pre-existing watch events
  *                - IN_MASK_CREATE: Return `-EEXIST' if `file' is already being watched.
  * @return: * :      The watch descriptor (index into `self->nf_listenv')
  * @return: -EEXIST: `IN_MASK_CREATE' was given and `file' is already being monitored. */
-FUNDEF WUNUSED NONNULL((1, 2)) unsigned int KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 notifyfd_addwatch(struct notifyfd *__restrict self,
                   struct mfile *__restrict file,
                   uint32_t mask)
@@ -238,13 +247,15 @@ struct dnotify_link {
 
 /* Allocate/free a given `struct dnotify_link' */
 #define dnotify_link_alloc()       ((struct dnotify_link *)kmalloc(sizeof(struct dnotify_link), GFP_NORMAL))
+#define dnotify_link_xfree(self)   kfree(self)
 #define dnotify_link_free(self)    kfree(self)
 #define dnotify_link_fini(self)    decref((self)->dnl_ent)
 #define dnotify_link_destroy(self) (dnotify_link_fini(self), dnotify_link_free(self))
 
 /* Helpers for accessing fields of `self' */
-#define dnotify_link_getdir(self)  ((self)->dnl_dir)
-#define dnotify_link_getfile(self) ((struct inotify_controller *)((uintptr_t)(self)->dnl_fil & ~1))
+#define dnotify_link_getdir(self) ((self)->dnl_dir)
+#define dnotify_link_getfil(self) ((struct inotify_controller *)((uintptr_t)(self)->dnl_fil & ~1))
+#define dnotify_link_getent(self) ((self)->dnl_ent)
 
 /* dnotify_link tree API. (s.a. `struct dnotify_controller::dnc_files') */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED struct dnotify_link *NOTHROW(FCALL dnotify_link_tree_locate)(/*nullable*/ struct dnotify_link *root, struct fdirent const *key);
@@ -266,13 +277,21 @@ struct inotify_controller {
 	                                            * [*->dnl_fil == this][link(dnl_fillink)]
 	                                            * Directories containing this file/directory. */
 	struct mfile               *inc_file;      /* [1..1][lock(!PREEMPTION && :notify_lock)] Associated file */
+	void                       *inc_fhnd;      /* [?..?][lock(!PREEMPTION && :notify_lock)] Cookie returned by `mso_notify_attach(inc_file)' */
 };
 #define inotify_controller_isdnotify(self) mfile_isdir((self)->inc_file)
 #define inotify_controller_asdnotify(self) ((struct dnotify_controller *)(self))
 
 
-/* `struct mfile::mf_notify' is actually a `struct dnotify_controller' when `mfile_isdir()' */
-struct dnotify_controller: inotify_controller {
+/* `struct mfile::mf_notify' is actually a `struct dnotify_controller' when `mfile_isdir(inc_file)' */
+struct dnotify_controller
+#ifdef __cplusplus
+    : inotify_controller                   /* Underlying inotify controller */
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct inotify_controller   dnc_icon;  /* Underlying inotify controller */
+#endif /* !__cplusplus */
 #ifdef __INTELLISENSE__
 	struct dnotify_link        *dnc_files; /* [0..n][lock(!PREEMPTION && :notify_lock)]
 	                                        * [*->dnl_dir == this][link(dnl_dirnode)]
@@ -291,7 +310,7 @@ struct dnotify_controller: inotify_controller {
 #define inotify_controller_xfree(self) kfree(self)
 #define inotify_controller_free(self)  kfree(self)
 #define dnotify_controller_alloc()     ((struct dnotify_controller *)kmalloc(sizeof(struct dnotify_controller), GFP_NORMAL))
-#define dnotify_controller_free(self)  xnotify_controller_free(self)
+#define dnotify_controller_free(self)  inotify_controller_free(self)
 
 
 /* If `dir->mf_notify != NULL', ensure that `child_file->mf_notify' has
@@ -301,16 +320,27 @@ struct dnotify_controller: inotify_controller {
  * Always inherits a reference to `child_file' that is also always re-
  * returned.  - In case  of an allocation error,  this pointer will be
  * decref'd! */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct fnode *KCALL
-dnotify_controller_bindchild(struct fdirnode *__restrict dir,
-                             struct fdirent *__restrict child_dent,
-                             /*inherit(always)*/ REF struct fnode *__restrict child_file)
-		THROWS(E_BADALLOC);
+FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct fnode *KCALL
+dnotify_controller_bindchild_slow(struct fdirnode *__restrict dir,
+                                  struct fdirent *__restrict child_dent,
+                                  /*inherit(always)*/ REF struct fnode *__restrict child_file)
+		THROWS(E_BADALLOC, ...);
+EIDECLARE(BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)), REF struct fnode *, ,
+          KCALL, dnotify_controller_bindchild, (struct fdirnode *__restrict dir,
+                                                struct fdirent *__restrict child_dent,
+                                                /*inherit(always)*/ REF struct fnode *__restrict child_file)
+		THROWS(E_BADALLOC, ...), {
+	if likely(((struct mfile *)dir)->mf_notify == __NULLPTR)
+		return child_file; /* Directory isn't being watched --> nothing to do here! */
+	return dnotify_controller_bindchild_slow(dir, child_dent, child_file);
+});
 
 
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#else /* CONFIG_HAVE_FS_NOTIFY */
+#define dnotify_controller_bindchild(dir, child_dent, child_file) (child_file)
+#endif /* !CONFIG_HAVE_FS_NOTIFY */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_NOTIFY_H */
