@@ -31,6 +31,7 @@
 #include <kernel/fs/filehandle.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/fs.h>
+#include <kernel/fs/notify.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/super.h>
 #include <kernel/handle.h>
@@ -1470,13 +1471,13 @@ ProcFS_Sys_X86_KeepIopl_Exec_Write(USER CHECKED void const *buf, size_t bufsize)
 /* /proc/sys/fs/pipe-max-size                                           */
 /************************************************************************/
 INTERN NONNULL((1)) void KCALL
-ProcFS_Sys_Fs_PipeMaxSize_Print(pformatprinter printer, void *arg,
+procfs_sys_fs_pipemaxsize_print(pformatprinter printer, void *arg,
                                 pos_t UNUSED(offset_hint)) {
 	ProcFS_PrintSize(printer, arg, ATOMIC_READ(pipe_max_bufsize_unprivileged));
 }
 
 INTERN void KCALL
-ProcFS_Sys_Fs_PipeMaxSize_Write(USER CHECKED void const *buf,
+procfs_sys_fs_pipemaxsize_write(USER CHECKED void const *buf,
                                 size_t bufsize) {
 	size_t newsize;
 	/* Setting  it lower than the default limit  can't be done, since the default
@@ -1484,6 +1485,26 @@ ProcFS_Sys_Fs_PipeMaxSize_Write(USER CHECKED void const *buf,
 	newsize = ProcFS_ParseSize(buf, bufsize, RINGBUFFER_DEFAULT_LIMIT, (size_t)-1);
 	ATOMIC_WRITE(pipe_max_bufsize_unprivileged, newsize);
 }
+
+
+#ifdef CONFIG_HAVE_FS_NOTIFY
+/************************************************************************/
+/* /proc/sys/fs/inotify/max_queued_events                               */
+/************************************************************************/
+INTERN NONNULL((1)) void KCALL
+procfs_sys_fs_inotify_maxqueuedevents_print(pformatprinter printer, void *arg,
+                                            pos_t UNUSED(offset_hint)) {
+	ProcFS_PrintUInt(printer, arg, ATOMIC_READ(notifyfd_default_maxevents));
+}
+
+INTERN void KCALL
+procfs_sys_fs_inotify_maxqueuedevents_write(USER CHECKED void const *buf,
+                                            size_t bufsize) {
+	unsigned int new_maxevents;
+	new_maxevents = ProcFS_ParseUInt(buf, bufsize, 1, (unsigned int)0x10000);
+	ATOMIC_WRITE(notifyfd_default_maxevents, new_maxevents);
+}
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 
 
 /************************************************************************/

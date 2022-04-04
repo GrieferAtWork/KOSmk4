@@ -153,9 +153,23 @@ MKREG_RW(procfs_r_sys_x86_keepiopl_fork, 0644, ProcFS_Sys_X86_KeepIopl_Fork_Prin
 
 /* /proc/sys/fs */
 MKDIR_BEGIN(procfs_r_sys_fs, 0555)
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	MKDIR_ENT("inotify",       DT_DIR, &procfs_r_sys_fs_inotify,       /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x1864481a, 0x796669746f6e69, 0xb55b517d, 0x796669746f6e69)/*[[[end]]]*/)
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 	MKDIR_ENT("pipe-max-size", DT_REG, &procfs_r_sys_fs_pipe_max_size, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x41a4d827, 0x3b6cd6fe0b5d281d, 0x14eb9c44, 0xf3b4f3f41341e065)/*[[[end]]]*/)
 MKDIR_END
-MKREG_RW(procfs_r_sys_fs_pipe_max_size, 0644, ProcFS_Sys_Fs_PipeMaxSize_Print, ProcFS_Sys_Fs_PipeMaxSize_Write)
+MKREG_RW(procfs_r_sys_fs_pipe_max_size, 0644, procfs_sys_fs_pipemaxsize_print, procfs_sys_fs_pipemaxsize_write)
+
+
+#ifdef CONFIG_HAVE_FS_NOTIFY
+/* /proc/sys/fs/inotify */
+MKDIR_BEGIN(procfs_r_sys_fs_inotify, 0555)
+	MKDIR_ENT("max_queued_events", DT_REG, &procfs_r_sys_fs_inotify_max_queued_events, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x4534aee4, 0x3cfbba08c5715b7d, 0xa4aef668, 0x2c5e70c40fb5fc8c)/*[[[end]]]*/)
+MKDIR_END
+MKREG_RW(procfs_r_sys_fs_inotify_max_queued_events, 0644,
+         procfs_sys_fs_inotify_maxqueuedevents_print,
+         procfs_sys_fs_inotify_maxqueuedevents_write)
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 
 
 /* /proc/sys/kernel */
