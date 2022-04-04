@@ -54,6 +54,8 @@ __DECL_BEGIN
                                         *       operations, as only `a_ctrl' can safely be used when working
                                         *       with interrupts enabled. */
 #define ATA_COMMAND        __IOPORT(7) /* [WRITE] ATA Command port */
+
+/* TODO: Get rid of these macros. -- Use the `WIN_*' constants from <linux/hdreg.h> */
 #   define ATA_COMMAND_READ_SECTORS    0x20 /* CHS */
 #   define ATA_COMMAND_READ_PIO        0x20 /* 28-bit LBA */
 #   define ATA_COMMAND_READ_PIO_EXT    0x24 /* 48-bit LBA */

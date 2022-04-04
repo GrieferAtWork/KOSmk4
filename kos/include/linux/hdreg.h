@@ -22,42 +22,69 @@
 #define _LINUX_HDREG_H 1
 
 #include <__stdinc.h>
+
+#include <hybrid/typecore.h>
+
 #include <asm/ioctl.h>
 #include <compat/config.h>
-#include <hybrid/typecore.h>
 
 __DECL_BEGIN
 
 /* Taken/Derived from /usr/include/linux/hdreg.h */
 
 
-#ifdef __CC__
-struct hd_geometry {
-	__UINT8_TYPE__    heads;
-	__UINT8_TYPE__    sectors;
-	__UINT16_TYPE__   cylinders;
-	__ULONGPTR_TYPE__ start;
-};
-#ifdef __ARCH_HAVE_COMPAT
-struct hd_geometry_compat {
-	__UINT8_TYPE__             heads;
-	__UINT8_TYPE__             sectors;
-	__UINT16_TYPE__            cylinders;
-	__ARCH_COMPAT_LONGPTR_TYPE start;
-};
-#endif /* __ARCH_HAVE_COMPAT */
-#endif /* __CC__ */
+/*efine HDIO_                  _IO(0x03, 0x00)  * ... */
+#define HDIO_GETGEO            _IO(0x03, 0x01) /* [TYPE(struct hd_geometry)] Get device geometry */
+#define HDIO_GET_UNMASKINTR    _IO(0x03, 0x02) /* ??? */
+#define HDIO_GET_MULTCOUNT     _IO(0x03, 0x04) /* ??? */
+#define HDIO_GET_QDMA          _IO(0x03, 0x05) /* ??? */
+#define HDIO_SET_XFER          _IO(0x03, 0x06) /* ??? */
+#define HDIO_OBSOLETE_IDENTITY _IO(0x03, 0x07) /* ??? */
+#define HDIO_GET_KEEPSETTINGS  _IO(0x03, 0x08) /* ??? */
+#define HDIO_GET_32BIT         _IO(0x03, 0x09) /* ??? */
+#define HDIO_GET_NOWERR        _IO(0x03, 0x0a) /* ??? */
+#define HDIO_GET_DMA           _IO(0x03, 0x0b) /* [TYPE(int)] Get use-dma flag */
+#define HDIO_GET_NICE          _IO(0x03, 0x0c) /* ??? */
+#define HDIO_GET_IDENTITY      _IO(0x03, 0x0d) /* [TYPE(struct hd_driveid)] Get IDE identification info */
+#define HDIO_GET_WCACHE        _IO(0x03, 0x0e) /* [TYPE(int)] Get write cache mode on|off */
+#define HDIO_GET_ACOUSTIC      _IO(0x03, 0x0f) /* ??? */
+#define HDIO_GET_ADDRESS       _IO(0x03, 0x10) /* ??? */
+#define HDIO_GET_BUSSTATE      _IO(0x03, 0x1a) /* [TYPE(int)] get the bus state of the hwif (One of `BUSSTATE_*') */
+#define HDIO_TRISTATE_HWIF     _IO(0x03, 0x1b) /* ??? */
+#define HDIO_DRIVE_RESET       _IO(0x03, 0x1c) /* Execute a device reset */
+#define HDIO_DRIVE_TASKFILE    _IO(0x03, 0x1d) /* ??? */
+#define HDIO_DRIVE_TASK        _IO(0x03, 0x1e) /* ??? */
+#define HDIO_DRIVE_CMD_AEB     HDIO_DRIVE_TASK
+#define HDIO_DRIVE_CMD         _IO(0x03, 0x1f) /* ??? */
+/*efine HDIO_                  _IO(0x03, 0x20)  * ... */
+#define HDIO_SET_MULTCOUNT     _IO(0x03, 0x21) /* ??? */
+#define HDIO_SET_UNMASKINTR    _IO(0x03, 0x22) /* ??? */
+#define HDIO_SET_KEEPSETTINGS  _IO(0x03, 0x23) /* ??? */
+#define HDIO_SET_32BIT         _IO(0x03, 0x24) /* ??? */
+#define HDIO_SET_NOWERR        _IO(0x03, 0x25) /* ??? */
+#define HDIO_SET_DMA           _IO(0x03, 0x26) /* ??? */
+#define HDIO_SET_PIO_MODE      _IO(0x03, 0x27) /* ??? */
+#define HDIO_SCAN_HWIF         _IO(0x03, 0x28) /* ??? */
+#define HDIO_UNREGISTER_HWIF   _IO(0x03, 0x2a) /* ??? */
+#define HDIO_SET_WCACHE        _IO(0x03, 0x2b) /* [TYPE(int)] change write cache enable-disable */
+#define HDIO_SET_NICE          _IO(0x03, 0x29) /* ??? */
+#define HDIO_SET_ACOUSTIC      _IO(0x03, 0x2c) /* ??? */
+#define HDIO_SET_BUSSTATE      _IO(0x03, 0x2d) /* ??? */
+#define HDIO_SET_QDMA          _IO(0x03, 0x2e) /* ??? */
+#define HDIO_SET_ADDRESS       _IO(0x03, 0x2f) /* ??? */
+/*efine HDIO_                  _IO(0x03, 0x30)  * ... */
+/*efine HDIO_                  _IO(0x03, 0x31)  * ... */
+/*efine HDIO_                  _IO(0x03, 0x32)  * ... */
+/*efine HDIO_                  _IO(0x03, 0x33)  * ... */
+/*efine HDIO_                  _IO(0x03, 0x34)  * ... */
+/*efine HDIO_                  _IO(0x03, 0x35)  * ... */
+/*efine HDIO_                  _IO(0x03, 0x36)  * ... */
+/*efine HDIO_                  _IO(0x03, 0x37)  * ... */
+/*efine HDIO_                  _IO(0x03, 0x38)  * ... */
+/*efine HDIO_                  _IO(0x03, 0x39)  * ... */
 
-#define HDIO_GETGEO       _IO(0x03, 0x01) /* [TYPE(struct hd_geometry)] Get device geometry */
-#define HDIO_GET_DMA      _IO(0x03, 0x0b) /* [TYPE(int)] Get use-dma flag */
-#define HDIO_GET_IDENTITY _IO(0x03, 0x0d) /* [TYPE(struct hd_driveid)] Get IDE identification info */
-#define HDIO_GET_WCACHE   _IO(0x03, 0x0e) /* [TYPE(int)] Get write cache mode on|off */
-#define HDIO_DRIVE_RESET  _IO(0x03, 0x1c) /* Execute a device reset */
-#define HDIO_GET_BUSSTATE _IO(0x03, 0x1a) /* [TYPE(int)] get the bus state of the hwif (One of `BUSSTATE_*') */
-#define HDIO_SET_WCACHE   _IO(0x03, 0x2b) /* [TYPE(int)] change write cache enable-disable */
 
-
-/* bus states */
+/* Bus states (s.a. `HDIO_GET_BUSSTATE') */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
@@ -78,7 +105,275 @@ enum {
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
+
+/* ??? */
+#define HDIO_DRIVE_CMD_HDR_SIZE  4 /* ??? */
+#define HDIO_DRIVE_HOB_HDR_SIZE  8 /* ??? */
+#define HDIO_DRIVE_TASK_HDR_SIZE 8 /* ??? */
+
+/* ??? */
+#define IDE_DRIVE_TASK_NO_DATA   0    /* ??? */
+#define IDE_DRIVE_TASK_INVALID   (-1) /* ??? */
+#define IDE_DRIVE_TASK_SET_XFER  1    /* ??? */
+#define IDE_DRIVE_TASK_IN        2    /* ??? */
+#define IDE_DRIVE_TASK_OUT       3    /* ??? */
+#define IDE_DRIVE_TASK_RAW_WRITE 4    /* ??? */
+
+/* ??? */
+#define IDE_TASKFILE_STD_IN_FLAGS  0xfe /* ??? */
+#define IDE_TASKFILE_STD_OUT_FLAGS 0xfe /* ??? */
+#define IDE_HOB_STD_IN_FLAGS       0x3c /* ??? */
+#define IDE_HOB_STD_OUT_FLAGS      0x3c /* ??? */
+
+
+/* ??? */
+#define TASKFILE_NO_DATA    0x0000 /* ??? */
+#define TASKFILE_IN         0x0001 /* ??? */
+#define TASKFILE_MULTI_IN   0x0002 /* ??? */
+#define TASKFILE_OUT        0x0004 /* ??? */
+#define TASKFILE_MULTI_OUT  0x0008 /* ??? */
+#define TASKFILE_IN_OUT     0x0010 /* ??? */
+#define TASKFILE_IN_DMA     0x0020 /* ??? */
+#define TASKFILE_OUT_DMA    0x0040 /* ??? */
+#define TASKFILE_IN_DMAQ    0x0080 /* ??? */
+#define TASKFILE_OUT_DMAQ   0x0100 /* ??? */
+#define TASKFILE_P_IN       0x0200 /* ??? */
+#define TASKFILE_P_OUT      0x0400 /* ??? */
+#define TASKFILE_P_IN_DMA   0x0800 /* ??? */
+#define TASKFILE_P_OUT_DMA  0x1000 /* ??? */
+#define TASKFILE_P_IN_DMAQ  0x2000 /* ??? */
+#define TASKFILE_P_OUT_DMAQ 0x4000 /* ??? */
+#define TASKFILE_48         0x8000 /* ??? */
+#define TASKFILE_INVALID    0x7fff /* ??? */
+
+
+/* Drive commands (for `ATA_COMMAND' from <hw/disk/ata.h>) */
+#define WIN_NOP                    0x00 /* ??? */
+/*efine WIN_                       0x01  * ... */
+/*efine WIN_                       0x02  * ... */
+#define CFA_REQ_EXT_ERROR_CODE     0x03 /* ??? */
+/*efine WIN_                       0x04  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0x07  * ... */
+#define WIN_SRST                   0x08 /* ??? */
+#define WIN_DEVICE_RESET           0x08 /* ??? */
+/*efine WIN_                       0x09  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0x0f  * ... */
+#define WIN_RECAL                  0x10 /* ??? */
+#define WIN_RESTORE                WIN_RECAL
+/*efine WIN_                       0x11  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0x1f  * ... */
+#define WIN_READ                   0x20 /* ??? */
+#define WIN_READ_ONCE              0x21 /* ??? */
+#define WIN_READ_LONG              0x22 /* ??? */
+#define WIN_READ_LONG_ONCE         0x23 /* ??? */
+#define WIN_READ_EXT               0x24 /* ??? */
+#define WIN_READDMA_EXT            0x25 /* ??? */
+#define WIN_READDMA_QUEUED_EXT     0x26 /* ??? */
+#define WIN_READ_NATIVE_MAX_EXT    0x27 /* ??? */
+#define WIN_MULTREAD_EXT           0x29 /* ??? */
+/*efine WIN_                       0x2a  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0x2f  * ... */
+#define WIN_WRITE                  0x30 /* ??? */
+#define WIN_WRITE_ONCE             0x31 /* ??? */
+#define WIN_WRITE_LONG             0x32 /* ??? */
+#define WIN_WRITE_LONG_ONCE        0x33 /* ??? */
+#define WIN_WRITE_EXT              0x34 /* ??? */
+#define WIN_WRITEDMA_EXT           0x35 /* ??? */
+#define WIN_WRITEDMA_QUEUED_EXT    0x36 /* ??? */
+#define WIN_SET_MAX_EXT            0x37 /* ??? */
+#define CFA_WRITE_SECT_WO_ERASE    0x38 /* ??? */
+#define WIN_MULTWRITE_EXT          0x39 /* ??? */
+/*efine WIN_                       0x3a  * ... */
+/*efine WIN_                       0x3b  * ... */
+#define WIN_WRITE_VERIFY           0x3c /* ??? */
+/*efine WIN_                       0x3d  * ... */
+/*efine WIN_                       0x3e  * ... */
+/*efine WIN_                       0x3f  * ... */
+#define WIN_VERIFY                 0x40 /* ??? */
+#define WIN_VERIFY_ONCE            0x41 /* ??? */
+#define WIN_VERIFY_EXT             0x42 /* ??? */
+/*efine WIN_                       0x43  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0x4f  * ... */
+#define WIN_FORMAT                 0x50 /* ??? */
+/*efine WIN_                       0x51  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0x5f  * ... */
+#define WIN_INIT                   0x60 /* ??? */
+/*efine WIN_                       0x61  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0x6f  * ... */
+#define WIN_SEEK                   0x70 /* ??? */
+/*efine WIN_                       0x71  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0x86  * ... */
+#define CFA_TRANSLATE_SECTOR       0x87 /* ??? */
+/*efine WIN_                       0x88  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0x8f  * ... */
+#define WIN_DIAGNOSE               0x90 /* ??? */
+#define WIN_SPECIFY                0x91 /* ??? */
+#define WIN_DOWNLOAD_MICROCODE     0x92 /* ??? */
+#define WIN_STANDBYNOW2            0x94 /* ??? */
+#define WIN_STANDBY2               0x96 /* ??? */
+#define WIN_SETIDLE2               0x97 /* ??? */
+#define WIN_CHECKPOWERMODE2        0x98 /* ??? */
+#define WIN_SLEEPNOW2              0x99 /* ??? */
+/*efine WIN_                       0x9a  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0x9f  * ... */
+#define WIN_PACKETCMD              0xa0 /* ??? */
+#define WIN_PIDENTIFY              0xa1 /* ??? */
+#define WIN_QUEUED_SERVICE         0xa2 /* ??? */
+/*efine WIN_                       0xa3  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0xaf  * ... */
+#define WIN_SMART                  0xb0 /* ??? */
+/*efine WIN_                       0xb1  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0xbf  * ... */
+#define CFA_ERASE_SECTORS          0xc0 /* ??? */
+/*efine WIN_                       0xc1  * ... */
+/*efine WIN_                       0xc2  * ... */
+/*efine WIN_                       0xc3  * ... */
+#define WIN_MULTREAD               0xc4 /* ??? */
+#define WIN_MULTWRITE              0xc5 /* ??? */
+#define WIN_SETMULT                0xc6 /* ??? */
+#define WIN_READDMA_QUEUED         0xc7 /* ??? */
+#define WIN_READDMA                0xc8 /* ??? */
+#define WIN_READDMA_ONCE           0xc9 /* ??? */
+#define WIN_WRITEDMA               0xca /* ??? */
+#define WIN_WRITEDMA_ONCE          0xcb /* ??? */
+#define WIN_WRITEDMA_QUEUED        0xcc /* ??? */
+#define CFA_WRITE_MULTI_WO_ERASE   0xcd /* ??? */
+/*efine WIN_                       0xce  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0xd9  * ... */
+#define WIN_GETMEDIASTATUS         0xda /* ??? */
+#define WIN_ACKMEDIACHANGE         0xdb /* ??? */
+#define WIN_POSTBOOT               0xdc /* ??? */
+#define WIN_PREBOOT                0xdd /* ??? */
+#define WIN_DOORLOCK               0xde /* ??? */
+#define WIN_DOORUNLOCK             0xdf /* ??? */
+#define WIN_STANDBYNOW1            0xe0 /* ??? */
+#define WIN_IDLEIMMEDIATE          0xe1 /* ??? */
+#define WIN_STANDBY                0xe2 /* ??? */
+#define WIN_SETIDLE1               0xe3 /* ??? */
+#define WIN_READ_BUFFER            0xe4 /* ??? */
+#define WIN_CHECKPOWERMODE1        0xe5 /* ??? */
+#define WIN_SLEEPNOW1              0xe6 /* ??? */
+#define WIN_FLUSH_CACHE            0xe7 /* ??? */
+#define WIN_WRITE_BUFFER           0xe8 /* ??? */
+#define WIN_WRITE_SAME             0xe9 /* ??? */
+#define WIN_FLUSH_CACHE_EXT        0xea /* ??? */
+#define WIN_IDENTIFY               0xec /* ??? */
+#define WIN_MEDIAEJECT             0xed /* ??? */
+#define WIN_IDENTIFY_DMA           0xee /* ??? */
+#define WIN_SETFEATURES            0xef /* ??? */
+#define EXABYTE_ENABLE_NEST        0xf0 /* ??? */
+#define WIN_SECURITY_SET_PASS      0xf1 /* ??? */
+#define WIN_SECURITY_UNLOCK        0xf2 /* ??? */
+#define WIN_SECURITY_ERASE_PREPARE 0xf3 /* ??? */
+#define WIN_SECURITY_ERASE_UNIT    0xf4 /* ??? */
+#define WIN_SECURITY_FREEZE_LOCK   0xf5 /* ??? */
+#define WIN_SECURITY_DISABLE       0xf6 /* ??? */
+#define WIN_READ_NATIVE_MAX        0xf8 /* ??? */
+#define WIN_SET_MAX                0xf9 /* ??? */
+/*efine WIN_                       0xfa  * ... */
+#define DISABLE_SEAGATE            0xfb /* ??? */
+/*efine WIN_                       0xfc  * ... */
+/*efine WIN_                       ....  * ... */
+/*efine WIN_                       0xff  * ... */
+
+/* Sub-commands for `WIN_SMART' */
+#define SMART_READ_VALUES       0xd0 /* ??? */
+#define SMART_READ_THRESHOLDS   0xd1 /* ??? */
+#define SMART_AUTOSAVE          0xd2 /* ??? */
+#define SMART_SAVE              0xd3 /* ??? */
+#define SMART_IMMEDIATE_OFFLINE 0xd4 /* ??? */
+#define SMART_READ_LOG_SECTOR   0xd5 /* ??? */
+#define SMART_WRITE_LOG_SECTOR  0xd6 /* ??? */
+#define SMART_WRITE_THRESHOLDS  0xd7 /* ??? */
+#define SMART_ENABLE            0xd8 /* ??? */
+#define SMART_DISABLE           0xd9 /* ??? */
+#define SMART_STATUS            0xda /* ??? */
+#define SMART_AUTO_OFFLINE      0xdb /* ??? */
+
+/* ??? */
+#define SMART_LCYL_PASS 0x4f /* ??? */
+#define SMART_HCYL_PASS 0xc2 /* ??? */
+
+/* Sub-commands for `WIN_SETFEATURES' */
+#define SETFEATURES_EN_8BIT    0x01 /* ??? */
+#define SETFEATURES_EN_WCACHE  0x02 /* ??? */
+#define SETFEATURES_DIS_DEFECT 0x04 /* ??? */
+#define SETFEATURES_EN_APM     0x05 /* ??? */
+#define SETFEATURES_EN_SAME_R  0x22 /* ??? */
+#define SETFEATURES_DIS_MSN    0x31 /* ??? */
+#define SETFEATURES_DIS_RETRY  0x33 /* ??? */
+#define SETFEATURES_EN_AAM     0x42 /* ??? */
+#define SETFEATURES_RW_LONG    0x44 /* ??? */
+#define SETFEATURES_SET_CACHE  0x54 /* ??? */
+#define SETFEATURES_DIS_RLA    0x55 /* ??? */
+#define SETFEATURES_EN_RI      0x5d /* ??? */
+#define SETFEATURES_EN_SI      0x5e /* ??? */
+#define SETFEATURES_DIS_RPOD   0x66 /* ??? */
+#define SETFEATURES_DIS_ECC    0x77 /* ??? */
+#define SETFEATURES_DIS_8BIT   0x81 /* ??? */
+#define SETFEATURES_DIS_WCACHE 0x82 /* ??? */
+#define SETFEATURES_EN_DEFECT  0x84 /* ??? */
+#define SETFEATURES_DIS_APM    0x85 /* ??? */
+#define SETFEATURES_EN_ECC     0x88 /* ??? */
+#define SETFEATURES_EN_MSN     0x95 /* ??? */
+#define SETFEATURES_EN_RETRY   0x99 /* ??? */
+#define SETFEATURES_EN_RLA     0xaa /* ??? */
+#define SETFEATURES_PREFETCH   0xab /* ??? */
+#define SETFEATURES_EN_REST    0xac /* ??? */
+#define SETFEATURES_4B_RW_LONG 0xbb /* ??? */
+#define SETFEATURES_DIS_AAM    0xc2 /* ??? */
+#define SETFEATURES_EN_RPOD    0xcc /* ??? */
+#define SETFEATURES_DIS_RI     0xdd /* ??? */
+#define SETFEATURES_EN_SAME_M  0xdd /* ??? */
+#define SETFEATURES_DIS_SI     0xde /* ??? */
+
+/* ??? */
+#define SECURITY_SET_PASSWORD     0xba /* ??? */
+#define SECURITY_UNLOCK           0xbb /* ??? */
+#define SECURITY_ERASE_PREPARE    0xbc /* ??? */
+#define SECURITY_ERASE_UNIT       0xbd /* ??? */
+#define SECURITY_FREEZE_LOCK      0xbe /* ??? */
+#define SECURITY_DISABLE_PASSWORD 0xbf /* ??? */
+
+/* ??? */
+#define IDE_NICE_DSC_OVERLAP   0 /* ??? */
+#define IDE_NICE_ATAPI_OVERLAP 1 /* ??? */
+#define IDE_NICE_1             3 /* ??? */
+#define IDE_NICE_0             2 /* ??? */
+#define IDE_NICE_2             4 /* ??? */
+
+
+
 #ifdef __CC__
+struct hd_geometry {
+	__UINT8_TYPE__    heads;
+	__UINT8_TYPE__    sectors;
+	__UINT16_TYPE__   cylinders;
+	__ULONGPTR_TYPE__ start;
+};
+#ifdef __ARCH_HAVE_COMPAT
+struct hd_geometry_compat {
+	__UINT8_TYPE__             heads;
+	__UINT8_TYPE__             sectors;
+	__UINT16_TYPE__            cylinders;
+	__ARCH_COMPAT_LONGPTR_TYPE start;
+};
+#endif /* __ARCH_HAVE_COMPAT */
+
+#define __NEW_HD_DRIVE_ID
 struct hd_driveid {
 	__UINT16_TYPE__     config;           /* lots of obsolete bit flags */
 	__UINT16_TYPE__     cyls;             /* Obsolete, "physical" cyls */
@@ -321,6 +616,78 @@ struct hd_driveid {
 	                                       * 15:8: Checksum
 	                                       *  7:0: Signature */
 };
+
+typedef __UINT8_TYPE__ task_ioreg_t;
+typedef __ULONGPTR_TYPE__ sata_ioreg_t;
+
+typedef union ide_reg_valid_s {
+	__UINT16_TYPE__ all;
+	struct {
+		unsigned int data : 1;
+		unsigned int error_feature : 1;
+		unsigned int sector : 1;
+		unsigned int nsector : 1;
+		unsigned int lcyl : 1;
+		unsigned int hcyl : 1;
+		unsigned int select : 1;
+		unsigned int status_command : 1;
+
+		unsigned int data_hob : 1;
+		unsigned int error_feature_hob : 1;
+		unsigned int sector_hob : 1;
+		unsigned int nsector_hob : 1;
+		unsigned int lcyl_hob : 1;
+		unsigned int hcyl_hob : 1;
+		unsigned int select_hob : 1;
+		unsigned int control_hob : 1;
+	} b;
+} ide_reg_valid_t;
+
+typedef struct ide_task_request_s {
+	__UINT8_TYPE__ io_ports[8];
+	__UINT8_TYPE__ hob_ports[8];
+	ide_reg_valid_t out_flags;
+	ide_reg_valid_t in_flags;
+	__INT32_TYPE__ data_phase;
+	__INT32_TYPE__ req_cmd;
+	__ULONGPTR_TYPE__ out_size;
+	__ULONGPTR_TYPE__ in_size;
+} ide_task_request_t;
+
+typedef struct ide_ioctl_request_s {
+	ide_task_request_t *task_request;
+	__BYTE_TYPE__ *out_buffer;
+	__BYTE_TYPE__ *in_buffer;
+} ide_ioctl_request_t;
+
+struct hd_drive_cmd_hdr {
+	__UINT8_TYPE__ command;
+	__UINT8_TYPE__ sector_number;
+	__UINT8_TYPE__ feature;
+	__UINT8_TYPE__ sector_count;
+};
+
+typedef struct hd_drive_task_hdr {
+	__UINT8_TYPE__ data;
+	__UINT8_TYPE__ feature;
+	__UINT8_TYPE__ sector_count;
+	__UINT8_TYPE__ sector_number;
+	__UINT8_TYPE__ low_cylinder;
+	__UINT8_TYPE__ high_cylinder;
+	__UINT8_TYPE__ device_head;
+	__UINT8_TYPE__ command;
+} task_struct_t;
+
+typedef struct hd_drive_hob_hdr {
+	__UINT8_TYPE__ data;
+	__UINT8_TYPE__ feature;
+	__UINT8_TYPE__ sector_count;
+	__UINT8_TYPE__ sector_number;
+	__UINT8_TYPE__ low_cylinder;
+	__UINT8_TYPE__ high_cylinder;
+	__UINT8_TYPE__ device_head;
+	__UINT8_TYPE__ control;
+} hob_struct_t;
 #endif /* __CC__ */
 
 __DECL_END
