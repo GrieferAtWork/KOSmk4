@@ -56,6 +56,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -81,6 +82,17 @@
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+#undef INOTIFY_DEBUG_TRACE
+#if 1
+#define INOTIFY_DEBUG_TRACE
+#endif
+
+
+#ifdef INOTIFY_DEBUG_TRACE
+#include <kernel/printk.h>
+#endif /* INOTIFY_DEBUG_TRACE */
+
 
 DECL_BEGIN
 
@@ -181,7 +193,7 @@ NOTHROW(FCALL inotify_controller_slist_destroyall)(struct inotify_controller_sli
 	SLIST_FOREACH_SAFE (item, self, _inc_deadlnk) {
 		REF struct mfile *file                = item->inc_file;
 		struct mfile_stream_ops const *stream = file->mf_ops->mo_stream;
-		if (stream->mso_notify_detach != NULL)
+		if (stream && stream->mso_notify_detach)
 			(*stream->mso_notify_detach)(file, item->inc_fhnd);
 		decref_unlikely(file);
 		inotify_controller_free(item);
@@ -247,7 +259,7 @@ NOTHROW(FCALL notifyfd_destroy)(struct notifyfd *__restrict self) {
 	notify_lock_acquire();
 	while (self->nf_eventc) {
 		REF struct fdirent *name;
-		assert(self->nf_eventr < self->nf_eventc);
+		assert(self->nf_eventr < self->nf_eventa);
 		name = self->nf_eventv[self->nf_eventr].mfe_name;
 		DBG_memset(&self->nf_eventv[self->nf_eventr], 0xcc,
 		           sizeof(self->nf_eventv[self->nf_eventr]));
@@ -604,6 +616,47 @@ NOTHROW(FCALL notifyfd_postfsevent_raw_impl)(struct notifyfd *__restrict self,
 		slot->mfe_cookie = 0;
 		slot->mfe_name   = NULL;
 	} else {
+#ifdef INOTIFY_DEBUG_TRACE
+		printk(KERN_TRACE "[inotify] Post event ");
+		if (mask & IN_ACCESS)
+			printk(KERN_TRACE "IN_ACCESS:");
+		if (mask & IN_MODIFY)
+			printk(KERN_TRACE "IN_MODIFY:");
+		if (mask & IN_ATTRIB)
+			printk(KERN_TRACE "IN_ATTRIB:");
+		if (mask & IN_CLOSE_WRITE)
+			printk(KERN_TRACE "IN_CLOSE_WRITE:");
+		if (mask & IN_CLOSE_NOWRITE)
+			printk(KERN_TRACE "IN_CLOSE_NOWRITE:");
+		if (mask & IN_OPEN)
+			printk(KERN_TRACE "IN_OPEN:");
+		if (mask & IN_MOVED_FROM)
+			printk(KERN_TRACE "IN_MOVED_FROM:");
+		if (mask & IN_MOVED_TO)
+			printk(KERN_TRACE "IN_MOVED_TO:");
+		if (mask & IN_CREATE)
+			printk(KERN_TRACE "IN_CREATE:");
+		if (mask & IN_DELETE)
+			printk(KERN_TRACE "IN_DELETE:");
+		if (mask & IN_DELETE_SELF)
+			printk(KERN_TRACE "IN_DELETE_SELF:");
+		if (mask & IN_MOVE_SELF)
+			printk(KERN_TRACE "IN_MOVE_SELF:");
+		if (mask & IN_ISDIR)
+			printk(KERN_TRACE "IN_ISDIR:");
+		if (mask & IN_UNMOUNT)
+			printk(KERN_TRACE "IN_UNMOUNT:");
+		if (mask & IN_Q_OVERFLOW)
+			printk(KERN_TRACE "IN_Q_OVERFLOW:");
+		if (mask & IN_IGNORED)
+			printk(KERN_TRACE "IN_IGNORED:");
+		printk(KERN_TRACE "[wd:%d,mask:%#" PRIx32 ",cookie:%#" PRIx32,
+		       slot_wd & ~NOTIFYFD_EVENT_ISDIR_FLAG, mask, cookie);
+		if (ent != NULL)
+			printk(KERN_TRACE ",name:%$q", (size_t)ent->fd_namelen, ent->fd_name);
+		printk(KERN_TRACE "]\n");
+#endif /* INOTIFY_DEBUG_TRACE */
+
 		/* Fill in the new slot. */
 		slot->nfe_wd     = slot_wd;
 		slot->mfe_mask   = mask;
@@ -701,6 +754,7 @@ done_postlock:
 	/* Free deleted objects. */
 	dnotify_link_slist_destroyall(&deadlinks);
 	inotify_controller_slist_destroyall(&deadnotif);
+	xdecref_unlikely(file); /* Inherited from `ent->nl_file' */
 
 	/* Try to trim the list of listeners to a total of `watchfd' items */
 	if (trim_listener_list)
@@ -1070,7 +1124,7 @@ NOTHROW(FCALL inotify_controller_postfsevent_impl)(struct inotify_controller *__
 			struct notify_listener *listener;
 			struct dnotify_controller *dir = dnotify_link_getdir(link);
 			LIST_FOREACH_SAFE (listener, &dir->inc_listeners, nl_link) {
-				notify_listener_postfsevent_impl(listener, blist, fil_mask, cookie,
+				notify_listener_postfsevent_impl(listener, blist, dir_mask, cookie,
 				                                 dnotify_link_getent(link),
 				                                 deadlinks, deadnotif);
 			}
@@ -1124,7 +1178,6 @@ NOTHROW(FCALL mfile_inotify_ignored)(struct mfile *__restrict self) {
 	notif = self->mf_notify;
 	if (notif != NULL) {
 		struct notify_listener *listen;
-		struct dnotify_link *link;
 		assert(notif->inc_file == self);
 		LIST_FOREACH_SAFE (listen, &notif->inc_listeners, nl_link) {
 			assert(listen->nl_file == self);
@@ -1137,15 +1190,7 @@ NOTHROW(FCALL mfile_inotify_ignored)(struct mfile *__restrict self) {
 			DBG_memset(&listen->nl_notfd, 0xcc, sizeof(listen->nl_notfd));
 			DBG_memset(&listen->nl_link, 0xcc, sizeof(listen->nl_link));
 		}
-		DBG_memset(&notif->inc_listeners, 0xcc, sizeof(notif->inc_listeners));
-
-		/* Also sever all connections to containing directories. */
-		LIST_FOREACH_SAFE (link, &notif->inc_dirs, dnl_fillink) {
-			assert(dnotify_link_getfil(link) == notif);
-			dnotify_link_tree_removenode(&dnotify_link_getdir(link)->dnc_files, link);
-			DBG_memset(&link->dnl_dirnode, 0xcc, sizeof(link->dnl_dirnode));
-			SLIST_INSERT(&deadlinks, link, _dnl_fildead); /* Destroy later... */
-		}
+		LIST_INIT(&notif->inc_listeners); /* Clear list */
 
 		/* If the file itself is a directory, then we must also clear
 		 * the file->containing_directory links from all child files. */
@@ -1155,10 +1200,29 @@ NOTHROW(FCALL mfile_inotify_ignored)(struct mfile *__restrict self) {
 			dnotify_controller_clearfiles(dnotif, &deadlinks, &deadnotif);
 		}
 
-		/* Add the file's own notify controller to the free list. */
-		self->mf_notify = NULL; /* Steal (destroyed in `inotify_controller_slist_destroyall()') */
-		incref(self);           /* Inherited by `inotify_controller_slist_destroyall()' */
-		SLIST_INSERT(&deadnotif, notif, _inc_deadlnk);
+#if 0
+		/* Also sever all connections to containing directories. */
+		{
+			struct dnotify_link *link;
+			LIST_FOREACH_SAFE (link, &notif->inc_dirs, dnl_fillink) {
+				assert(dnotify_link_getfil(link) == notif);
+				dnotify_link_tree_removenode(&dnotify_link_getdir(link)->dnc_files, link);
+				DBG_memset(&link->dnl_dirnode, 0xcc, sizeof(link->dnl_dirnode));
+				SLIST_INSERT(&deadlinks, link, _dnl_fildead); /* Destroy later... */
+			}
+		}
+#else
+		/* `IN_IGNORED' shouldn't remove the file from its containing directory.
+		 * That's  the job of `IN_DELETE', and then only if `IN_EXCL_UNLINK' was
+		 * set. */
+		if (LIST_EMPTY(&notif->inc_dirs))
+#endif
+		{
+			/* Add the file's own notify controller to the free list. */
+			self->mf_notify = NULL; /* Steal (destroyed in `inotify_controller_slist_destroyall()') */
+			incref(self);           /* Inherited by `inotify_controller_slist_destroyall()' */
+			SLIST_INSERT(&deadnotif, notif, _inc_deadlnk);
+		}
 	}
 	notify_lock_release();
 
@@ -1172,12 +1236,13 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_postfsevent_impl)(struct mfile *__restrict self,
                                       uint16_t fil_mask, uint16_t dir_mask,
                                       uint16_t cookie) {
-	struct REF notifyfd_slist blist = { BLIST_EMPTY_MARKER };
+	struct REF notifyfd_slist blist;
 	struct dnotify_link_slist deadlinks;
 	struct inotify_controller_slist deadnotif;
 	COMPILER_READ_BARRIER();
 	if (self->mf_notify == NULL)
 		return;
+	blist.slh_first = BLIST_EMPTY_MARKER;
 	SLIST_INIT(&deadlinks);
 	SLIST_INIT(&deadnotif);
 	notify_lock_acquire();
@@ -1295,10 +1360,11 @@ again:
 		notify_lock_release_br();
 		goto again;
 	}
-	--self->nf_eventc;
+	--self->nf_eventc; /* Inherited reference to `slot->mfe_name' (in `ne.mfe_name') */
 	++self->nf_eventr;
 	self->nf_eventr %= self->nf_eventa;
 	notify_lock_release();
+	xdecref_nokill(ne.mfe_name); /* Inherited from `slot' */
 
 	/* Return the required buffer size back to user-space. */
 	return reqsize;
@@ -1407,7 +1473,7 @@ sys_inotify_add_watch_impl(fd_t notify_fd, fd_t dfd,
 	if unlikely((mask & IN_ALL_EVENTS) == 0) {
 		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
 		      E_INVALID_ARGUMENT_CONTEXT_INOTIFY_WATCH_MASK,
-		      mask, IN_ALL_EVENTS/*, 0*/);
+		      mask, IN_ALL_EVENTS /*, 0*/);
 	}
 	self = handles_lookupnotifyfd(notify_fd);
 	FINALLY_DECREF_UNLIKELY(self);

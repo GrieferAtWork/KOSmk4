@@ -25,6 +25,7 @@
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/fifohandle.h>
 #include <kernel/fs/fifonode.h>
+#include <kernel/fs/notify.h>
 #include <kernel/fs/path.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
@@ -143,6 +144,9 @@ NOTHROW(FCALL fifohandle_destroy)(struct fifohandle *__restrict self) {
 	if (IO_CANWRITE(self->fu_accmode)) {
 		if (ATOMIC_FETCHDEC(fifo->ff_wrcnt) == 1)
 			sig_broadcast(&fifo->ff_buffer.rb_nempty);
+		mfile_inotify_closewr(self->fu_fifo); /* Post `IN_CLOSE_WRITE' */
+	} else {
+		mfile_inotify_closero(self->fu_fifo); /* Post `IN_CLOSE_NOWRITE' */
 	}
 	decref(fifo);
 	xdecref(self->fu_dirent);
@@ -227,6 +231,7 @@ fifohandle_new(struct ffifonode *__restrict self, iomode_t iomode,
 	result->fu_accmode = iomode & IO_ACCMODE;
 	result->fu_path    = xincref(access_path);
 	result->fu_dirent  = xincref(access_dent);
+	mfile_inotify_opened(result->fu_fifo); /* Post `IN_OPEN' */
 	return result;
 }
 

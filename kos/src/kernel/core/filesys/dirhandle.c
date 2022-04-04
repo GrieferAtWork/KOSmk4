@@ -25,6 +25,7 @@
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirhandle.h>
 #include <kernel/fs/fs.h>
+#include <kernel/fs/notify.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/super.h>
 #include <kernel/handle-proto.h>
@@ -57,6 +58,7 @@ DECL_BEGIN
 /* Destroy the given dirhandle object. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL dirhandle_destroy)(struct dirhandle *__restrict self) {
+	mfile_inotify_closero(self->dh_enum.de_dir); /* Post `IN_CLOSE_NOWRITE' */
 	fdirenum_fini(&self->dh_enum);
 	xdecref_unlikely(self->dh_path);
 	xdecref_unlikely(self->dh_dirent);
@@ -106,6 +108,7 @@ dirhandle_new(struct fdirnode *__restrict self,
 	result->dh_path   = xincref(access_path);
 	result->dh_dirent = xincref(access_dent);
 	result->dh_dots   = 0;
+	mfile_inotify_opened(result->dh_enum.de_dir); /* Post `IN_OPEN' */
 	return result;
 }
 

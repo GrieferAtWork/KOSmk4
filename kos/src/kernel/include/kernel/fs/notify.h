@@ -396,7 +396,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsevent_ex)(struct mf
 #define __mfile_postfsdirevent2(self, mask, cookie)      __mfile_maybepostfsevent(self, (__mfile_postfsdirevent2)(self, mask, cookie))
 #define __mfile_postfsevent_ex(self, fil_mask, dir_mask) __mfile_maybepostfsevent(self, (__mfile_postfsevent_ex)(self, fil_mask, dir_mask))
 
-/* Helper functions (use these instead of the functions above) */
+/* Helper macros for generating inotify events (use these instead of the functions above) */
 #define mfile_inotify_accessed(self)         __mfile_postfsevent(self, IN_ACCESS)                    /* TODO */
 #define mfile_inotify_modified(self)         __mfile_postfsevent(self, IN_MODIFY)                    /* Implemented */
 #define mfile_inotify_attrib(self)           __mfile_postfsevent(self, IN_ATTRIB)                    /* Implemented */
@@ -409,6 +409,8 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsevent_ex)(struct mf
 #define mfile_inotify_created(self)          __mfile_postfsdirevent(self, IN_CREATE)                 /* Implemented */
 #define mfile_inotify_deleted(self)          __mfile_postfsevent_ex(self, IN_DELETE_SELF, IN_DELETE) /* Implemented */
 #define mfile_inotify_unmount(self)          __mfile_postfsfilevent(self, IN_UNMOUNT)                /* Implemented */
+/* TODO: `IN_DELETE' must remove inotify controllers from containing
+ *       dir iff any of dir's listeners have `IN_EXCL_UNLINK' set. */
 
 /* Special function to post `IN_IGNORED', as well as delete all watch-descriptors of `self' */
 FUNDEF NOBLOCK NONNULL((1)) void
