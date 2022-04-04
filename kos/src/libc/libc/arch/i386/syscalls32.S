@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2090f6eb */
+/* HASH CRC-32:0x245e7421 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2559,24 +2559,24 @@ INTERN_FUNCTION(libc_sys_ioprio_get)
 END(libc_sys_ioprio_get)
 DEFINE_PUBLIC_ALIAS(sys_ioprio_get, libc_sys_ioprio_get)
 
-/* errno_t inotify_init(int TODO_PROTOTYPE) */
+/* fd_t inotify_init(void) */
 INTERN_FUNCTION(libc_sys_inotify_init)
 	movl   $(0x123), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc___i386_syscall
 END(libc_sys_inotify_init)
 DEFINE_PUBLIC_ALIAS(sys_inotify_init, libc_sys_inotify_init)
 
-/* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
+/* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 INTERN_FUNCTION(libc_sys_inotify_add_watch)
 	movl   $(0x124), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall3
 END(libc_sys_inotify_add_watch)
 DEFINE_PUBLIC_ALIAS(sys_inotify_add_watch, libc_sys_inotify_add_watch)
 
-/* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+/* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 INTERN_FUNCTION(libc_sys_inotify_rm_watch)
 	movl   $(0x125), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall2
 END(libc_sys_inotify_rm_watch)
 DEFINE_PUBLIC_ALIAS(sys_inotify_rm_watch, libc_sys_inotify_rm_watch)
 
@@ -2905,7 +2905,7 @@ INTERN_FUNCTION(libc_sys_pipe2)
 END(libc_sys_pipe2)
 DEFINE_PUBLIC_ALIAS(sys_pipe2, libc_sys_pipe2)
 
-/* errno_t inotify_init1(int TODO_PROTOTYPE) */
+/* fd_t inotify_init1(syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_inotify_init1)
 	movl   $(0x14c), %eax
 	jmp    libc_x86_exec_syscall1
@@ -3940,6 +3940,13 @@ INTERN_FUNCTION(libc_sys_fmkdirat)
 	jmp    libc_x86_exec_syscall4
 END(libc_sys_fmkdirat)
 DEFINE_PUBLIC_ALIAS(sys_fmkdirat, libc_sys_fmkdirat)
+
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+INTERN_FUNCTION(libc_sys_inotify_add_watch_at)
+	movl   $(0xfffffedc), %eax
+	jmp    libc_x86_exec_syscall5
+END(libc_sys_inotify_add_watch_at)
+DEFINE_PUBLIC_ALIAS(sys_inotify_add_watch_at, libc_sys_inotify_add_watch_at)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
@@ -7014,24 +7021,24 @@ INTERN_FUNCTION(libc_sys_Xioprio_get)
 END(libc_sys_Xioprio_get)
 DEFINE_PUBLIC_ALIAS(sys_Xioprio_get, libc_sys_Xioprio_get)
 
-/* errno_t inotify_init(int TODO_PROTOTYPE) */
+/* fd_t inotify_init(void) */
 INTERN_FUNCTION(libc_sys_Xinotify_init)
 	movl   $(0x123), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc___i386_Xsyscall
 END(libc_sys_Xinotify_init)
 DEFINE_PUBLIC_ALIAS(sys_Xinotify_init, libc_sys_Xinotify_init)
 
-/* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
+/* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 INTERN_FUNCTION(libc_sys_Xinotify_add_watch)
 	movl   $(0x124), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall3
 END(libc_sys_Xinotify_add_watch)
 DEFINE_PUBLIC_ALIAS(sys_Xinotify_add_watch, libc_sys_Xinotify_add_watch)
 
-/* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+/* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 INTERN_FUNCTION(libc_sys_Xinotify_rm_watch)
 	movl   $(0x125), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xinotify_rm_watch)
 DEFINE_PUBLIC_ALIAS(sys_Xinotify_rm_watch, libc_sys_Xinotify_rm_watch)
 
@@ -7360,7 +7367,7 @@ INTERN_FUNCTION(libc_sys_Xpipe2)
 END(libc_sys_Xpipe2)
 DEFINE_PUBLIC_ALIAS(sys_Xpipe2, libc_sys_Xpipe2)
 
-/* errno_t inotify_init1(int TODO_PROTOTYPE) */
+/* fd_t inotify_init1(syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_Xinotify_init1)
 	movl   $(0x14c), %eax
 	jmp    libc_x86_exec_Xsyscall1
@@ -8395,6 +8402,13 @@ INTERN_FUNCTION(libc_sys_Xfmkdirat)
 	jmp    libc_x86_exec_Xsyscall4
 END(libc_sys_Xfmkdirat)
 DEFINE_PUBLIC_ALIAS(sys_Xfmkdirat, libc_sys_Xfmkdirat)
+
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+INTERN_FUNCTION(libc_sys_Xinotify_add_watch_at)
+	movl   $(0xfffffedc), %eax
+	jmp    libc_x86_exec_Xsyscall5
+END(libc_sys_Xinotify_add_watch_at)
+DEFINE_PUBLIC_ALIAS(sys_Xinotify_add_watch_at, libc_sys_Xinotify_add_watch_at)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */

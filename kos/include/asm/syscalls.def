@@ -727,6 +727,20 @@ kcmp:(pid_t pid1, pid_t pid2, [tostr(KCMP_TYPE)] syscall_ulong_t type,
 
 
 /************************************************************************/
+/* Filesystem notifications                                             */
+/************************************************************************/
+inotify_init:() -> fd_t;
+inotify_init1:([tostr(INOTIFY_INIT_FLAGS)] syscall_ulong_t flags) -> fd_t;
+inotify_add_watch:(fd_t notify_fd, char const *pathname, [tostr(INOTIFY_MASK)] uint32_t mask) -> int;
+inotify_add_watch_at:(fd_t notify_fd, fd_t dfd, char const *pathname, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t atflags, [tostr(INOTIFY_MASK)] uint32_t mask) -> int; /* KOS Extension! */
+inotify_rm_watch:(fd_t notify_fd, int wd) -> errno_t;
+
+
+
+
+
+
+/************************************************************************/
 /* Misc file handle functions                                           */
 /************************************************************************/
 pipe:([tostr(out:FD_VECTOR2)] fd_t pipedes[2]) -> errno_t;
@@ -2889,10 +2903,6 @@ add_key:(int TODO_PROTOTYPE) -> errno_t;
 request_key:(int TODO_PROTOTYPE) -> errno_t;
 keyctl:(int TODO_PROTOTYPE) -> errno_t;
 
-inotify_init:(int TODO_PROTOTYPE) -> errno_t;
-inotify_init1:(int TODO_PROTOTYPE) -> errno_t;
-inotify_add_watch:(int TODO_PROTOTYPE) -> errno_t;
-inotify_rm_watch:(int TODO_PROTOTYPE) -> errno_t;
 fanotify_init:(int TODO_PROTOTYPE) -> errno_t;
 fanotify_mark:(int TODO_PROTOTYPE) -> errno_t;
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7f76944 */
+/* HASH CRC-32:0xad51b383 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -325,9 +325,9 @@
 #define __NRAC_keyctl                       1
 #define __NRAC_ioprio_set                   3
 #define __NRAC_ioprio_get                   2
-#define __NRAC_inotify_init                 1
-#define __NRAC_inotify_add_watch            1
-#define __NRAC_inotify_rm_watch             1
+#define __NRAC_inotify_init                 0
+#define __NRAC_inotify_add_watch            3
+#define __NRAC_inotify_rm_watch             2
 #define __NRAC_migrate_pages                1
 #define __NRAC_openat                       4
 #define __NRAC_mkdirat                      3
@@ -476,6 +476,7 @@
 #define __NRAC_futimesat64                  3
 #define __NRAC_fmknodat                     5
 #define __NRAC_fmkdirat                     4
+#define __NRAC_inotify_add_watch_at         5
 #define __NRAC_waitid64                     5
 #define __NRAC_utimes64                     2
 #define __NRAC_kreaddirf                    5
@@ -826,8 +827,8 @@
 #define __NRRT_keyctl                       (errno_t, __errno_t)
 #define __NRRT_ioprio_set                   (errno_t, __errno_t)
 #define __NRRT_ioprio_get                   (syscall_slong_t, __syscall_slong_t)
-#define __NRRT_inotify_init                 (errno_t, __errno_t)
-#define __NRRT_inotify_add_watch            (errno_t, __errno_t)
+#define __NRRT_inotify_init                 (fd_t, __fd_t)
+#define __NRRT_inotify_add_watch            (int, int)
 #define __NRRT_inotify_rm_watch             (errno_t, __errno_t)
 #define __NRRT_migrate_pages                (errno_t, __errno_t)
 #define __NRRT_openat                       (fd_t, __fd_t)
@@ -867,7 +868,7 @@
 #define __NRRT_epoll_create1                (fd_t, __fd_t)
 #define __NRRT_dup3                         (fd_t, __fd_t)
 #define __NRRT_pipe2                        (errno_t, __errno_t)
-#define __NRRT_inotify_init1                (errno_t, __errno_t)
+#define __NRRT_inotify_init1                (fd_t, __fd_t)
 #define __NRRT_preadv                       (ssize_t, __ssize_t)
 #define __NRRT_pwritev                      (ssize_t, __ssize_t)
 #define __NRRT_rt_tgsigqueueinfo            (errno_t, __errno_t)
@@ -977,6 +978,7 @@
 #define __NRRT_futimesat64                  (errno_t, __errno_t)
 #define __NRRT_fmknodat                     (errno_t, __errno_t)
 #define __NRRT_fmkdirat                     (errno_t, __errno_t)
+#define __NRRT_inotify_add_watch_at         (int, int)
 #define __NRRT_waitid64                     (errno_t, __errno_t)
 #define __NRRT_utimes64                     (errno_t, __errno_t)
 #define __NRRT_kreaddirf                    (ssize_t, __ssize_t)
@@ -1587,9 +1589,11 @@
 #define __NRAT2_ioprio_set                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_ioprio_get                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_ioprio_get                   (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_inotify_init                 (int, int)
-#define __NRAT0_inotify_add_watch            (int, int)
-#define __NRAT0_inotify_rm_watch             (int, int)
+#define __NRAT0_inotify_add_watch            (fd_t, __fd_t)
+#define __NRAT1_inotify_add_watch            (char const *, char const *)
+#define __NRAT2_inotify_add_watch            (uint32_t, __uint32_t)
+#define __NRAT0_inotify_rm_watch             (fd_t, __fd_t)
+#define __NRAT1_inotify_rm_watch             (int, int)
 #define __NRAT0_migrate_pages                (int, int)
 #define __NRAT0_openat                       (fd_t, __fd_t)
 #define __NRAT1_openat                       (char const *, char const *)
@@ -1714,7 +1718,7 @@
 #define __NRAT2_dup3                         (oflag_t, __oflag_t)
 #define __NRAT0_pipe2                        (fd_t *, __fd_t *)
 #define __NRAT1_pipe2                        (oflag_t, __oflag_t)
-#define __NRAT0_inotify_init1                (int, int)
+#define __NRAT0_inotify_init1                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_preadv                       (fd_t, __fd_t)
 #define __NRAT1_preadv                       (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_preadv                       (size_t, __size_t)
@@ -2019,6 +2023,11 @@
 #define __NRAT1_fmkdirat                     (char const *, char const *)
 #define __NRAT2_fmkdirat                     (mode_t, __mode_t)
 #define __NRAT3_fmkdirat                     (atflag_t, __atflag_t)
+#define __NRAT0_inotify_add_watch_at         (fd_t, __fd_t)
+#define __NRAT1_inotify_add_watch_at         (fd_t, __fd_t)
+#define __NRAT2_inotify_add_watch_at         (char const *, char const *)
+#define __NRAT3_inotify_add_watch_at         (atflag_t, __atflag_t)
+#define __NRAT4_inotify_add_watch_at         (uint32_t, __uint32_t)
 #define __NRAT0_waitid64                     (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_waitid64                     (id_t, __id_t)
 #define __NRAT2_waitid64                     (struct __siginfox32_struct *, struct __siginfox32_struct *)
@@ -2467,9 +2476,9 @@
 #define __NRAM_keyctl(a, b, c, d, e, f)                       (int)a
 #define __NRAM_ioprio_set(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAM_ioprio_get(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAM_inotify_init(a, b, c, d, e, f)                 (int)a
-#define __NRAM_inotify_add_watch(a, b, c, d, e, f)            (int)a
-#define __NRAM_inotify_rm_watch(a, b, c, d, e, f)             (int)a
+#define __NRAM_inotify_init(a, b, c, d, e, f)                 /* nothing */
+#define __NRAM_inotify_add_watch(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (__uint32_t)c
+#define __NRAM_inotify_rm_watch(a, b, c, d, e, f)             (__fd_t)a, (int)b
 #define __NRAM_migrate_pages(a, b, c, d, e, f)                (int)a
 #define __NRAM_openat(a, b, c, d, e, f)                       (__fd_t)a, (char const *)b, (__oflag_t)c, (__mode_t)d
 #define __NRAM_mkdirat(a, b, c, d, e, f)                      (__fd_t)a, (char const *)b, (__mode_t)c
@@ -2508,7 +2517,7 @@
 #define __NRAM_epoll_create1(a, b, c, d, e, f)                (__syscall_ulong_t)a
 #define __NRAM_dup3(a, b, c, d, e, f)                         (__fd_t)a, (__fd_t)b, (__oflag_t)c
 #define __NRAM_pipe2(a, b, c, d, e, f)                        (__fd_t *)a, (__oflag_t)b
-#define __NRAM_inotify_init1(a, b, c, d, e, f)                (int)a
+#define __NRAM_inotify_init1(a, b, c, d, e, f)                (__syscall_ulong_t)a
 #define __NRAM_preadv(a, b, c, d, e, f)                       (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
 #define __NRAM_pwritev(a, b, c, d, e, f)                      (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
 #define __NRAM_rt_tgsigqueueinfo(a, b, c, d, e, f)            (__pid_t)a, (__pid_t)b, (__signo_t)c, (struct __siginfox32_struct const *)d
@@ -2618,6 +2627,7 @@
 #define __NRAM_futimesat64(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (struct __timevalx32_64 const *)c
 #define __NRAM_fmknodat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
 #define __NRAM_fmkdirat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
+#define __NRAM_inotify_add_watch_at(a, b, c, d, e, f)         (__fd_t)a, (__fd_t)b, (char const *)c, (__atflag_t)d, (__uint32_t)e
 #define __NRAM_waitid64(a, b, c, d, e, f)                     (__syscall_ulong_t)a, (__id_t)b, (struct __siginfox32_struct *)c, (__syscall_ulong_t)d, (struct __rusagex32_64 *)e
 #define __NRAM_utimes64(a, b, c, d, e, f)                     (char const *)a, (struct __timevalx32_64 const *)b
 #define __NRAM_kreaddirf(a, b, c, d, e, f)                    (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
@@ -2968,9 +2978,9 @@
 #define __NRAP_keyctl(a)                                      (__syscall_ulong_t)a
 #define __NRAP_ioprio_set(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_ioprio_get(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_inotify_init(a)                                (__syscall_ulong_t)a
-#define __NRAP_inotify_add_watch(a)                           (__syscall_ulong_t)a
-#define __NRAP_inotify_rm_watch(a)                            (__syscall_ulong_t)a
+#define __NRAP_inotify_init()                                 /* nothing */
+#define __NRAP_inotify_add_watch(a, b, c)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_inotify_rm_watch(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_migrate_pages(a)                               (__syscall_ulong_t)a
 #define __NRAP_openat(a, b, c, d)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_mkdirat(a, b, c)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
@@ -3119,6 +3129,7 @@
 #define __NRAP_futimesat64(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_fmknodat(a, b, c, d, e)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_fmkdirat(a, b, c, d)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_inotify_add_watch_at(a, b, c, d, e)            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_waitid64(a, b, c, d, e)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_utimes64(a, b)                                 (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_kreaddirf(a, b, c, d, e)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

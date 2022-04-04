@@ -4721,6 +4721,7 @@
 #define __CRT_HAVE_sys_Xgetxattr
 #define __CRT_HAVE_sys_Xinit_module
 #define __CRT_HAVE_sys_Xinotify_add_watch
+#define __CRT_HAVE_sys_Xinotify_add_watch_at
 #define __CRT_HAVE_sys_Xinotify_init
 #define __CRT_HAVE_sys_Xinotify_init1
 #define __CRT_HAVE_sys_Xinotify_rm_watch
@@ -5116,6 +5117,7 @@
 #define __CRT_HAVE_sys_getxattr
 #define __CRT_HAVE_sys_init_module
 #define __CRT_HAVE_sys_inotify_add_watch
+#define __CRT_HAVE_sys_inotify_add_watch_at
 #define __CRT_HAVE_sys_inotify_init
 #define __CRT_HAVE_sys_inotify_init1
 #define __CRT_HAVE_sys_inotify_rm_watch

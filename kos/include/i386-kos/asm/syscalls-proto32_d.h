@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf81d67d */
+/* HASH CRC-32:0xbfd0e64b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -325,9 +325,9 @@
 #define __NR32AC_keyctl                       1
 #define __NR32AC_ioprio_set                   3
 #define __NR32AC_ioprio_get                   2
-#define __NR32AC_inotify_init                 1
-#define __NR32AC_inotify_add_watch            1
-#define __NR32AC_inotify_rm_watch             1
+#define __NR32AC_inotify_init                 0
+#define __NR32AC_inotify_add_watch            3
+#define __NR32AC_inotify_rm_watch             2
 #define __NR32AC_migrate_pages                1
 #define __NR32AC_openat                       4
 #define __NR32AC_mkdirat                      3
@@ -476,6 +476,7 @@
 #define __NR32AC_futimesat64                  3
 #define __NR32AC_fmknodat                     5
 #define __NR32AC_fmkdirat                     4
+#define __NR32AC_inotify_add_watch_at         5
 #define __NR32AC_waitid64                     5
 #define __NR32AC_utimes64                     2
 #define __NR32AC_kreaddirf                    5
@@ -826,8 +827,8 @@
 #define __NR32RT_keyctl                       (errno_t, __errno_t)
 #define __NR32RT_ioprio_set                   (errno_t, __errno_t)
 #define __NR32RT_ioprio_get                   (syscall_slong_t, __syscall_slong_t)
-#define __NR32RT_inotify_init                 (errno_t, __errno_t)
-#define __NR32RT_inotify_add_watch            (errno_t, __errno_t)
+#define __NR32RT_inotify_init                 (fd_t, __fd_t)
+#define __NR32RT_inotify_add_watch            (int, int)
 #define __NR32RT_inotify_rm_watch             (errno_t, __errno_t)
 #define __NR32RT_migrate_pages                (errno_t, __errno_t)
 #define __NR32RT_openat                       (fd_t, __fd_t)
@@ -867,7 +868,7 @@
 #define __NR32RT_epoll_create1                (fd_t, __fd_t)
 #define __NR32RT_dup3                         (fd_t, __fd_t)
 #define __NR32RT_pipe2                        (errno_t, __errno_t)
-#define __NR32RT_inotify_init1                (errno_t, __errno_t)
+#define __NR32RT_inotify_init1                (fd_t, __fd_t)
 #define __NR32RT_preadv                       (ssize_t, __ssize_t)
 #define __NR32RT_pwritev                      (ssize_t, __ssize_t)
 #define __NR32RT_rt_tgsigqueueinfo            (errno_t, __errno_t)
@@ -977,6 +978,7 @@
 #define __NR32RT_futimesat64                  (errno_t, __errno_t)
 #define __NR32RT_fmknodat                     (errno_t, __errno_t)
 #define __NR32RT_fmkdirat                     (errno_t, __errno_t)
+#define __NR32RT_inotify_add_watch_at         (int, int)
 #define __NR32RT_waitid64                     (errno_t, __errno_t)
 #define __NR32RT_utimes64                     (errno_t, __errno_t)
 #define __NR32RT_kreaddirf                    (ssize_t, __ssize_t)
@@ -1587,9 +1589,11 @@
 #define __NR32AT2_ioprio_set                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_ioprio_get                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_ioprio_get                   (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT0_inotify_init                 (int, int)
-#define __NR32AT0_inotify_add_watch            (int, int)
-#define __NR32AT0_inotify_rm_watch             (int, int)
+#define __NR32AT0_inotify_add_watch            (fd_t, __fd_t)
+#define __NR32AT1_inotify_add_watch            (char const *, char const *)
+#define __NR32AT2_inotify_add_watch            (uint32_t, __uint32_t)
+#define __NR32AT0_inotify_rm_watch             (fd_t, __fd_t)
+#define __NR32AT1_inotify_rm_watch             (int, int)
 #define __NR32AT0_migrate_pages                (int, int)
 #define __NR32AT0_openat                       (fd_t, __fd_t)
 #define __NR32AT1_openat                       (char const *, char const *)
@@ -1714,7 +1718,7 @@
 #define __NR32AT2_dup3                         (oflag_t, __oflag_t)
 #define __NR32AT0_pipe2                        (fd_t *, __fd_t *)
 #define __NR32AT1_pipe2                        (oflag_t, __oflag_t)
-#define __NR32AT0_inotify_init1                (int, int)
+#define __NR32AT0_inotify_init1                (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_preadv                       (fd_t, __fd_t)
 #define __NR32AT1_preadv                       (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NR32AT2_preadv                       (size_t, __size_t)
@@ -2019,6 +2023,11 @@
 #define __NR32AT1_fmkdirat                     (char const *, char const *)
 #define __NR32AT2_fmkdirat                     (mode_t, __mode_t)
 #define __NR32AT3_fmkdirat                     (atflag_t, __atflag_t)
+#define __NR32AT0_inotify_add_watch_at         (fd_t, __fd_t)
+#define __NR32AT1_inotify_add_watch_at         (fd_t, __fd_t)
+#define __NR32AT2_inotify_add_watch_at         (char const *, char const *)
+#define __NR32AT3_inotify_add_watch_at         (atflag_t, __atflag_t)
+#define __NR32AT4_inotify_add_watch_at         (uint32_t, __uint32_t)
 #define __NR32AT0_waitid64                     (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_waitid64                     (id_t, __id_t)
 #define __NR32AT2_waitid64                     (struct __siginfox32_struct *, struct __siginfox32_struct *)
@@ -2467,9 +2476,9 @@
 #define __NR32AM_keyctl(a, b, c, d, e, f)                       (int)a
 #define __NR32AM_ioprio_set(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AM_ioprio_get(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AM_inotify_init(a, b, c, d, e, f)                 (int)a
-#define __NR32AM_inotify_add_watch(a, b, c, d, e, f)            (int)a
-#define __NR32AM_inotify_rm_watch(a, b, c, d, e, f)             (int)a
+#define __NR32AM_inotify_init(a, b, c, d, e, f)                 /* nothing */
+#define __NR32AM_inotify_add_watch(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (__uint32_t)c
+#define __NR32AM_inotify_rm_watch(a, b, c, d, e, f)             (__fd_t)a, (int)b
 #define __NR32AM_migrate_pages(a, b, c, d, e, f)                (int)a
 #define __NR32AM_openat(a, b, c, d, e, f)                       (__fd_t)a, (char const *)b, (__oflag_t)c, (__mode_t)d
 #define __NR32AM_mkdirat(a, b, c, d, e, f)                      (__fd_t)a, (char const *)b, (__mode_t)c
@@ -2508,7 +2517,7 @@
 #define __NR32AM_epoll_create1(a, b, c, d, e, f)                (__syscall_ulong_t)a
 #define __NR32AM_dup3(a, b, c, d, e, f)                         (__fd_t)a, (__fd_t)b, (__oflag_t)c
 #define __NR32AM_pipe2(a, b, c, d, e, f)                        (__fd_t *)a, (__oflag_t)b
-#define __NR32AM_inotify_init1(a, b, c, d, e, f)                (int)a
+#define __NR32AM_inotify_init1(a, b, c, d, e, f)                (__syscall_ulong_t)a
 #define __NR32AM_preadv(a, b, c, d, e, f)                       (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
 #define __NR32AM_pwritev(a, b, c, d, e, f)                      (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
 #define __NR32AM_rt_tgsigqueueinfo(a, b, c, d, e, f)            (__pid_t)a, (__pid_t)b, (__signo_t)c, (struct __siginfox32_struct const *)d
@@ -2618,6 +2627,7 @@
 #define __NR32AM_futimesat64(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (struct __timevalx32_64 const *)c
 #define __NR32AM_fmknodat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
 #define __NR32AM_fmkdirat(a, b, c, d, e, f)                     (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
+#define __NR32AM_inotify_add_watch_at(a, b, c, d, e, f)         (__fd_t)a, (__fd_t)b, (char const *)c, (__atflag_t)d, (__uint32_t)e
 #define __NR32AM_waitid64(a, b, c, d, e, f)                     (__syscall_ulong_t)a, (__id_t)b, (struct __siginfox32_struct *)c, (__syscall_ulong_t)d, (struct __rusagex32_64 *)e
 #define __NR32AM_utimes64(a, b, c, d, e, f)                     (char const *)a, (struct __timevalx32_64 const *)b
 #define __NR32AM_kreaddirf(a, b, c, d, e, f)                    (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
@@ -2968,9 +2978,9 @@
 #define __NR32AP_keyctl(a)                                      (__syscall_ulong_t)a
 #define __NR32AP_ioprio_set(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_ioprio_get(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_inotify_init(a)                                (__syscall_ulong_t)a
-#define __NR32AP_inotify_add_watch(a)                           (__syscall_ulong_t)a
-#define __NR32AP_inotify_rm_watch(a)                            (__syscall_ulong_t)a
+#define __NR32AP_inotify_init()                                 /* nothing */
+#define __NR32AP_inotify_add_watch(a, b, c)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NR32AP_inotify_rm_watch(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_migrate_pages(a)                               (__syscall_ulong_t)a
 #define __NR32AP_openat(a, b, c, d)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_mkdirat(a, b, c)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
@@ -3119,6 +3129,7 @@
 #define __NR32AP_futimesat64(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_fmknodat(a, b, c, d, e)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_fmkdirat(a, b, c, d)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR32AP_inotify_add_watch_at(a, b, c, d, e)            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_waitid64(a, b, c, d, e)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_utimes64(a, b)                                 (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_kreaddirf(a, b, c, d, e)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

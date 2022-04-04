@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33faa9f3 */
+/* HASH CRC-32:0xa14752c0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,9 +87,9 @@
 #define __NR_dup                    0x17  /* fd_t dup(fd_t fd) */
 /* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 #define __NR_dup3                   0x18  /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
-#define __NR_inotify_init1          0x1a  /* errno_t inotify_init1(int TODO_PROTOTYPE) */
-#define __NR_inotify_add_watch      0x1b  /* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
-#define __NR_inotify_rm_watch       0x1c  /* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+#define __NR_inotify_init1          0x1a  /* fd_t inotify_init1(syscall_ulong_t flags) */
+#define __NR_inotify_add_watch      0x1b  /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
+#define __NR_inotify_rm_watch       0x1c  /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 #define __NR_ioctl                  0x1d  /* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 /* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
  * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
@@ -755,7 +755,7 @@
  * @return: * : The newly created epoll control descriptor.
  * @return: -1: Error (s.a. `errno') */
 #define __NR_epoll_create           0x412 /* fd_t epoll_create(syscall_ulong_t size) */
-#define __NR_inotify_init           0x413 /* errno_t inotify_init(int TODO_PROTOTYPE) */
+#define __NR_inotify_init           0x413 /* fd_t inotify_init(void) */
 #define __NR_eventfd                0x414 /* fd_t eventfd(syscall_ulong_t initval) */
 /* Create a poll(2)-able file descriptor which can be used to wait for the
  * delivery of signals masked by `sigmask' to the waiting  thread/process. */
@@ -1384,8 +1384,8 @@
 #define __NRRC_dup                    1
 #define __NRRC_dup3                   3
 #define __NRRC_inotify_init1          1
-#define __NRRC_inotify_add_watch      1
-#define __NRRC_inotify_rm_watch       1
+#define __NRRC_inotify_add_watch      3
+#define __NRRC_inotify_rm_watch       2
 #define __NRRC_ioctl                  3
 #define __NRRC_ioprio_set             3
 #define __NRRC_ioprio_get             2
@@ -1633,7 +1633,7 @@
 #define __NRRC_pipe                   1
 #define __NRRC_dup2                   2
 #define __NRRC_epoll_create           1
-#define __NRRC_inotify_init           1
+#define __NRRC_inotify_init           0
 #define __NRRC_eventfd                1
 #define __NRRC_signalfd               3
 #define __NRRC_sendfile               4

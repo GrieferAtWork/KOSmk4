@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3b7400d */
+/* HASH CRC-32:0xeefe23d1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,8 +64,8 @@
 #define __NRAC_dup                    1
 #define __NRAC_dup3                   3
 #define __NRAC_inotify_init1          1
-#define __NRAC_inotify_add_watch      1
-#define __NRAC_inotify_rm_watch       1
+#define __NRAC_inotify_add_watch      3
+#define __NRAC_inotify_rm_watch       2
 #define __NRAC_ioctl                  3
 #define __NRAC_ioprio_set             3
 #define __NRAC_ioprio_get             2
@@ -313,7 +313,7 @@
 #define __NRAC_pipe                   1
 #define __NRAC_dup2                   2
 #define __NRAC_epoll_create           1
-#define __NRAC_inotify_init           1
+#define __NRAC_inotify_init           0
 #define __NRAC_eventfd                1
 #define __NRAC_signalfd               3
 #define __NRAC_sendfile               4
@@ -385,8 +385,8 @@
 #define __NRRT_epoll_pwait            (ssize_t, __ssize_t)
 #define __NRRT_dup                    (fd_t, __fd_t)
 #define __NRRT_dup3                   (fd_t, __fd_t)
-#define __NRRT_inotify_init1          (errno_t, __errno_t)
-#define __NRRT_inotify_add_watch      (errno_t, __errno_t)
+#define __NRRT_inotify_init1          (fd_t, __fd_t)
+#define __NRRT_inotify_add_watch      (int, int)
 #define __NRRT_inotify_rm_watch       (errno_t, __errno_t)
 #define __NRRT_ioctl                  (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_ioprio_set             (errno_t, __errno_t)
@@ -635,7 +635,7 @@
 #define __NRRT_pipe                   (errno_t, __errno_t)
 #define __NRRT_dup2                   (fd_t, __fd_t)
 #define __NRRT_epoll_create           (fd_t, __fd_t)
-#define __NRRT_inotify_init           (errno_t, __errno_t)
+#define __NRRT_inotify_init           (fd_t, __fd_t)
 #define __NRRT_eventfd                (fd_t, __fd_t)
 #define __NRRT_signalfd               (errno_t, __errno_t)
 #define __NRRT_sendfile               (ssize_t, __ssize_t)
@@ -749,9 +749,12 @@
 #define __NRAT0_dup3                   (fd_t, __fd_t)
 #define __NRAT1_dup3                   (fd_t, __fd_t)
 #define __NRAT2_dup3                   (oflag_t, __oflag_t)
-#define __NRAT0_inotify_init1          (int, int)
-#define __NRAT0_inotify_add_watch      (int, int)
-#define __NRAT0_inotify_rm_watch       (int, int)
+#define __NRAT0_inotify_init1          (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_inotify_add_watch      (fd_t, __fd_t)
+#define __NRAT1_inotify_add_watch      (char const *, char const *)
+#define __NRAT2_inotify_add_watch      (uint32_t, __uint32_t)
+#define __NRAT0_inotify_rm_watch       (fd_t, __fd_t)
+#define __NRAT1_inotify_rm_watch       (int, int)
 #define __NRAT0_ioctl                  (fd_t, __fd_t)
 #define __NRAT1_ioctl                  (ioctl_t, __ioctl_t)
 #define __NRAT2_ioctl                  (void *, void *)
@@ -1338,7 +1341,6 @@
 #define __NRAT0_dup2                   (fd_t, __fd_t)
 #define __NRAT1_dup2                   (fd_t, __fd_t)
 #define __NRAT0_epoll_create           (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_inotify_init           (int, int)
 #define __NRAT0_eventfd                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_signalfd               (fd_t, __fd_t)
 #define __NRAT1_signalfd               (struct __sigset_struct const *, struct __sigset_struct const *)
@@ -1455,9 +1457,9 @@
 #define __NRAM_epoll_pwait(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (__fd_t)a, (struct epoll_event *)b, (__size_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e, (__size_t)f
 #define __NRAM_dup(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                    (__fd_t)a
 #define __NRAM_dup3(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (__fd_t)a, (__fd_t)b, (__oflag_t)c
-#define __NRAM_inotify_init1(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
-#define __NRAM_inotify_add_watch(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)      (int)a
-#define __NRAM_inotify_rm_watch(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)       (int)a
+#define __NRAM_inotify_init1(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (__syscall_ulong_t)a
+#define __NRAM_inotify_add_watch(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)      (__fd_t)a, (char const *)b, (__uint32_t)c
+#define __NRAM_inotify_rm_watch(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)       (__fd_t)a, (int)b
 #define __NRAM_ioctl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (__ioctl_t)b, (void *)c
 #define __NRAM_ioprio_set(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAM_ioprio_get(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__syscall_ulong_t)a, (__syscall_ulong_t)b
@@ -1705,7 +1707,7 @@
 #define __NRAM_pipe(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (__fd_t *)a
 #define __NRAM_dup2(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (__fd_t)a, (__fd_t)b
 #define __NRAM_epoll_create(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__syscall_ulong_t)a
-#define __NRAM_inotify_init(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (int)a
+#define __NRAM_inotify_init(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           /* nothing */
 #define __NRAM_eventfd(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (__syscall_ulong_t)a
 #define __NRAM_signalfd(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (struct __sigset_struct const *)b, (__size_t)c
 #define __NRAM_sendfile(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (__fd_t)b, (__syscall_ulong_t *)c, (__size_t)d
@@ -1778,8 +1780,8 @@
 #define __NRAP_dup(a)                                                                                               (__syscall_ulong_t)a
 #define __NRAP_dup3(a, b, c)                                                                                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_inotify_init1(a)                                                                                     (__syscall_ulong_t)a
-#define __NRAP_inotify_add_watch(a)                                                                                 (__syscall_ulong_t)a
-#define __NRAP_inotify_rm_watch(a)                                                                                  (__syscall_ulong_t)a
+#define __NRAP_inotify_add_watch(a, b, c)                                                                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_inotify_rm_watch(a, b)                                                                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_ioctl(a, b, c)                                                                                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_ioprio_set(a, b, c)                                                                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_ioprio_get(a, b)                                                                                     (__syscall_ulong_t)a, (__syscall_ulong_t)b
@@ -2027,7 +2029,7 @@
 #define __NRAP_pipe(a)                                                                                              (__syscall_ulong_t)a
 #define __NRAP_dup2(a, b)                                                                                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_epoll_create(a)                                                                                      (__syscall_ulong_t)a
-#define __NRAP_inotify_init(a)                                                                                      (__syscall_ulong_t)a
+#define __NRAP_inotify_init()                                                                                       /* nothing */
 #define __NRAP_eventfd(a)                                                                                           (__syscall_ulong_t)a
 #define __NRAP_signalfd(a, b, c)                                                                                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_sendfile(a, b, c, d)                                                                                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d

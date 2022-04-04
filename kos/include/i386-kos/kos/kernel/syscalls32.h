@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccb15ed3 */
+/* HASH CRC-32:0xe1777718 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -176,6 +176,7 @@
 #define __ARCH_WANT_SYSCALL_IDLE
 #define __ARCH_WANT_SYSCALL_INIT_MODULE
 #define __ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH
+#define __ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH_AT
 #define __ARCH_WANT_SYSCALL_INOTIFY_INIT
 #define __ARCH_WANT_SYSCALL_INOTIFY_INIT1
 #define __ARCH_WANT_SYSCALL_INOTIFY_RM_WATCH

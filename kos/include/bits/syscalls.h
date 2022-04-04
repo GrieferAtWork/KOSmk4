@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8de4e5b8 */
+/* HASH CRC-32:0xa8dfd750 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,9 +90,9 @@
 #define SYS_dup                    __NR_dup                    /* fd_t dup(fd_t fd) */
 /* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 #define SYS_dup3                   __NR_dup3                   /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
-#define SYS_inotify_init1          __NR_inotify_init1          /* errno_t inotify_init1(int TODO_PROTOTYPE) */
-#define SYS_inotify_add_watch      __NR_inotify_add_watch      /* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
-#define SYS_inotify_rm_watch       __NR_inotify_rm_watch       /* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+#define SYS_inotify_init1          __NR_inotify_init1          /* fd_t inotify_init1(syscall_ulong_t flags) */
+#define SYS_inotify_add_watch      __NR_inotify_add_watch      /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
+#define SYS_inotify_rm_watch       __NR_inotify_rm_watch       /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 #define SYS_ioctl                  __NR_ioctl                  /* syscall_slong_t ioctl(fd_t fd, ioctl_t command, void *arg) */
 /* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
  * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
@@ -758,7 +758,7 @@
  * @return: * : The newly created epoll control descriptor.
  * @return: -1: Error (s.a. `errno') */
 #define SYS_epoll_create           __NR_epoll_create           /* fd_t epoll_create(syscall_ulong_t size) */
-#define SYS_inotify_init           __NR_inotify_init           /* errno_t inotify_init(int TODO_PROTOTYPE) */
+#define SYS_inotify_init           __NR_inotify_init           /* fd_t inotify_init(void) */
 #define SYS_eventfd                __NR_eventfd                /* fd_t eventfd(syscall_ulong_t initval) */
 /* Create a poll(2)-able file descriptor which can be used to wait for the
  * delivery of signals masked by `sigmask' to the waiting  thread/process. */

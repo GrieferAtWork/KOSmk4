@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46f1f8b7 */
+/* HASH CRC-32:0xf36dbde4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11002,7 +11002,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_get)
 	.cfi_endproc
 END(__x86_asm32_int80_ioprio_get)
 
-/* errno_t inotify_init(int TODO_PROTOTYPE) */
+/* fd_t inotify_init(void) */
 .section .text.x86.asm32_syscall_int80.inotify_init
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init)
 	.cfi_startproc simple
@@ -11023,10 +11023,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_inotify_init)
 	call   sys_inotify_init
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -11039,7 +11037,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init)
 	.cfi_endproc
 END(__x86_asm32_int80_inotify_init)
 
-/* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
+/* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 .section .text.x86.asm32_syscall_int80.inotify_add_watch
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch)
 	.cfi_startproc simple
@@ -11058,14 +11056,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_inotify_add_watch)
 	call   sys_inotify_add_watch
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -11076,7 +11074,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch)
 	.cfi_endproc
 END(__x86_asm32_int80_inotify_add_watch)
 
-/* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+/* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 .section .text.x86.asm32_syscall_int80.inotify_rm_watch
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_rm_watch)
 	.cfi_startproc simple
@@ -11095,14 +11093,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_rm_watch)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_inotify_rm_watch)
 	call   sys_inotify_rm_watch
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -12634,7 +12632,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pipe2)
 	.cfi_endproc
 END(__x86_asm32_int80_pipe2)
 
-/* errno_t inotify_init1(int TODO_PROTOTYPE) */
+/* fd_t inotify_init1(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.inotify_init1
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init1)
 	.cfi_startproc simple
@@ -17106,6 +17104,47 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_fmkdirat)
+
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+.section .text.x86.asm32_syscall_int80.inotify_add_watch_at
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch_at)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffedc
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edi  /* Arg #4 */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_inotify_add_watch_at)
+	call   sys_inotify_add_watch_at
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_inotify_add_watch_at)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
@@ -30500,7 +30539,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ioprio_get)
 	.cfi_endproc
 END(__x86_asm32_sysenter_ioprio_get)
 
-/* errno_t inotify_init(int TODO_PROTOTYPE) */
+/* fd_t inotify_init(void) */
 .section .text.x86.asm32_syscall_sysenter.inotify_init
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_init)
 	.cfi_startproc simple
@@ -30521,10 +30560,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_init)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_inotify_init)
 	call   sys_inotify_init
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -30537,7 +30574,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_init)
 	.cfi_endproc
 END(__x86_asm32_sysenter_inotify_init)
 
-/* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
+/* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 .section .text.x86.asm32_syscall_sysenter.inotify_add_watch
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_add_watch)
 	.cfi_startproc simple
@@ -30556,14 +30593,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_add_watch)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_inotify_add_watch)
 	call   sys_inotify_add_watch
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -30574,7 +30611,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_add_watch)
 	.cfi_endproc
 END(__x86_asm32_sysenter_inotify_add_watch)
 
-/* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+/* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 .section .text.x86.asm32_syscall_sysenter.inotify_rm_watch
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_rm_watch)
 	.cfi_startproc simple
@@ -30593,14 +30630,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_rm_watch)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_inotify_rm_watch)
 	call   sys_inotify_rm_watch
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -32146,7 +32183,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pipe2)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pipe2)
 
-/* errno_t inotify_init1(int TODO_PROTOTYPE) */
+/* fd_t inotify_init1(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.inotify_init1
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_init1)
 	.cfi_startproc simple
@@ -36666,6 +36703,49 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fmkdirat)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_fmkdirat)
+
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+.section .text.x86.asm32_syscall_sysenter.inotify_add_watch_at
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_add_watch_at)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffedc
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	cmpl   $(KERNELSPACE_BASE), %ebp
+	jae    __asm32_bad_sysenter_extension
+	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_inotify_add_watch_at)
+	call   sys_inotify_add_watch_at
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_inotify_add_watch_at)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe33548b */
+/* HASH CRC-32:0x9543e515 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -656,9 +656,9 @@
 /* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
  * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
 #define SYS_ioprio_get                   __NR_ioprio_get                   /* syscall_slong_t ioprio_get(syscall_ulong_t who, syscall_ulong_t id) */
-#define SYS_inotify_init                 __NR_inotify_init                 /* errno_t inotify_init(int TODO_PROTOTYPE) */
-#define SYS_inotify_add_watch            __NR_inotify_add_watch            /* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
-#define SYS_inotify_rm_watch             __NR_inotify_rm_watch             /* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+#define SYS_inotify_init                 __NR_inotify_init                 /* fd_t inotify_init(void) */
+#define SYS_inotify_add_watch            __NR_inotify_add_watch            /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
+#define SYS_inotify_rm_watch             __NR_inotify_rm_watch             /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 #define SYS_migrate_pages                __NR_migrate_pages                /* errno_t migrate_pages(int TODO_PROTOTYPE) */
 /* Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -756,7 +756,7 @@
 /* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 #define SYS_dup3                         __NR_dup3                         /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
 #define SYS_pipe2                        __NR_pipe2                        /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
-#define SYS_inotify_init1                __NR_inotify_init1                /* errno_t inotify_init1(int TODO_PROTOTYPE) */
+#define SYS_inotify_init1                __NR_inotify_init1                /* fd_t inotify_init1(syscall_ulong_t flags) */
 /* Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
@@ -1132,6 +1132,7 @@
 #define SYS_fmknodat                     __NR_fmknodat                     /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define SYS_fmkdirat                     __NR_fmkdirat                     /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
+#define SYS_inotify_add_watch_at         __NR_inotify_add_watch_at         /* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 #define SYS_waitid64                     __NR_waitid64                     /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */

@@ -4606,6 +4606,8 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_GID_VECTOR
 	// TODO: #define HAVE_SC_REPR_GID_VECTOR16
 	// TODO: #define HAVE_SC_REPR_GID_VECTOR32
+	// TODO: #define HAVE_SC_REPR_INOTIFY_INIT_FLAGS
+	// TODO: #define HAVE_SC_REPR_INOTIFY_MASK
 	// TODO: #define HAVE_SC_REPR_IOCTL_ARG
 	// TODO: #define HAVE_SC_REPR_IOPRIO_ID
 	// TODO: #define HAVE_SC_REPR_IOPRIO_VALUE

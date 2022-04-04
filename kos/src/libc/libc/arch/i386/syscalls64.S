@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7bfd1b4 */
+/* HASH CRC-32:0x10376d26 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2523,7 +2523,7 @@ INTERN_FUNCTION(libc_sys_ioprio_get)
 END(libc_sys_ioprio_get)
 DEFINE_PUBLIC_ALIAS(sys_ioprio_get, libc_sys_ioprio_get)
 
-/* errno_t inotify_init(int TODO_PROTOTYPE) */
+/* fd_t inotify_init(void) */
 INTERN_FUNCTION(libc_sys_inotify_init)
 	movq   $(0xfd), %rax
 	syscall
@@ -2531,7 +2531,7 @@ INTERN_FUNCTION(libc_sys_inotify_init)
 END(libc_sys_inotify_init)
 DEFINE_PUBLIC_ALIAS(sys_inotify_init, libc_sys_inotify_init)
 
-/* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
+/* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 INTERN_FUNCTION(libc_sys_inotify_add_watch)
 	movq   $(0xfe), %rax
 	syscall
@@ -2539,7 +2539,7 @@ INTERN_FUNCTION(libc_sys_inotify_add_watch)
 END(libc_sys_inotify_add_watch)
 DEFINE_PUBLIC_ALIAS(sys_inotify_add_watch, libc_sys_inotify_add_watch)
 
-/* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+/* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 INTERN_FUNCTION(libc_sys_inotify_rm_watch)
 	movq   $(0xff), %rax
 	syscall
@@ -2943,7 +2943,7 @@ INTERN_FUNCTION(libc_sys_pipe2)
 END(libc_sys_pipe2)
 DEFINE_PUBLIC_ALIAS(sys_pipe2, libc_sys_pipe2)
 
-/* errno_t inotify_init1(int TODO_PROTOTYPE) */
+/* fd_t inotify_init1(syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_inotify_init1)
 	movq   $(0x126), %rax
 	syscall
@@ -3573,6 +3573,15 @@ INTERN_FUNCTION(libc_sys_fmkdirat)
 	ret
 END(libc_sys_fmkdirat)
 DEFINE_PUBLIC_ALIAS(sys_fmkdirat, libc_sys_fmkdirat)
+
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+INTERN_FUNCTION(libc_sys_inotify_add_watch_at)
+	movq   $(0xffffffffffffff02), %rax
+	movq   %rcx, %r10
+	syscall
+	ret
+END(libc_sys_inotify_add_watch_at)
+DEFINE_PUBLIC_ALIAS(sys_inotify_add_watch_at, libc_sys_inotify_add_watch_at)
 
 /* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_ksysctl)
@@ -7248,7 +7257,7 @@ INTERN_FUNCTION(libc_sys_Xioprio_get)
 END(libc_sys_Xioprio_get)
 DEFINE_PUBLIC_ALIAS(sys_Xioprio_get, libc_sys_Xioprio_get)
 
-/* errno_t inotify_init(int TODO_PROTOTYPE) */
+/* fd_t inotify_init(void) */
 INTERN_FUNCTION(libc_sys_Xinotify_init)
 	movq   $(0xfd), %rax
 	std /* Enable exceptions */
@@ -7258,7 +7267,7 @@ INTERN_FUNCTION(libc_sys_Xinotify_init)
 END(libc_sys_Xinotify_init)
 DEFINE_PUBLIC_ALIAS(sys_Xinotify_init, libc_sys_Xinotify_init)
 
-/* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
+/* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 INTERN_FUNCTION(libc_sys_Xinotify_add_watch)
 	movq   $(0xfe), %rax
 	std /* Enable exceptions */
@@ -7268,7 +7277,7 @@ INTERN_FUNCTION(libc_sys_Xinotify_add_watch)
 END(libc_sys_Xinotify_add_watch)
 DEFINE_PUBLIC_ALIAS(sys_Xinotify_add_watch, libc_sys_Xinotify_add_watch)
 
-/* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+/* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 INTERN_FUNCTION(libc_sys_Xinotify_rm_watch)
 	movq   $(0xff), %rax
 	std /* Enable exceptions */
@@ -7750,7 +7759,7 @@ INTERN_FUNCTION(libc_sys_Xpipe2)
 END(libc_sys_Xpipe2)
 DEFINE_PUBLIC_ALIAS(sys_Xpipe2, libc_sys_Xpipe2)
 
-/* errno_t inotify_init1(int TODO_PROTOTYPE) */
+/* fd_t inotify_init1(syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_Xinotify_init1)
 	movq   $(0x126), %rax
 	std /* Enable exceptions */
@@ -8508,6 +8517,17 @@ INTERN_FUNCTION(libc_sys_Xfmkdirat)
 	ret
 END(libc_sys_Xfmkdirat)
 DEFINE_PUBLIC_ALIAS(sys_Xfmkdirat, libc_sys_Xfmkdirat)
+
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+INTERN_FUNCTION(libc_sys_Xinotify_add_watch_at)
+	movq   $(0xffffffffffffff02), %rax
+	movq   %rcx, %r10
+	std /* Enable exceptions */
+	syscall
+	cld /* Disable exceptions */
+	ret
+END(libc_sys_Xinotify_add_watch_at)
+DEFINE_PUBLIC_ALIAS(sys_Xinotify_add_watch_at, libc_sys_Xinotify_add_watch_at)
 
 /* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 INTERN_FUNCTION(libc_sys_Xksysctl)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85b8804 */
+/* HASH CRC-32:0x6de8105b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,6 +66,8 @@
 #define HAVE_SC_REPR_GID_VECTOR
 #define HAVE_SC_REPR_IDTYPE_T
 #define HAVE_SC_REPR_ID_T
+#define HAVE_SC_REPR_INOTIFY_INIT_FLAGS
+#define HAVE_SC_REPR_INOTIFY_MASK
 #define HAVE_SC_REPR_INT
 #define HAVE_SC_REPR_IOCTL_ARG
 #define HAVE_SC_REPR_IOCTL_COMMAND
@@ -223,6 +225,8 @@ __SYSCALL_REPR(SC_REPR_GID_T)
 __SYSCALL_REPR(SC_REPR_GID_VECTOR)
 __SYSCALL_REPR(SC_REPR_IDTYPE_T)
 __SYSCALL_REPR(SC_REPR_ID_T)
+__SYSCALL_REPR(SC_REPR_INOTIFY_INIT_FLAGS)
+__SYSCALL_REPR(SC_REPR_INOTIFY_MASK)
 __SYSCALL_REPR(SC_REPR_INT)
 __SYSCALL_REPR(SC_REPR_IOCTL_ARG)
 __SYSCALL_REPR(SC_REPR_IOCTL_COMMAND)

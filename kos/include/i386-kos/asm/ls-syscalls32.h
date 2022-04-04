@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x391693d9 */
+/* HASH CRC-32:0xc8fd9db2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -615,7 +615,7 @@ __TSYSCALL1(fmkdirat, 0x26, 0x26)
 __TSYSCALL1_UNUSED(0xfffffed9, 0x27, 0x27)
 __TSYSCALL1_UNUSED(0xfffffeda, 0x28, 0x28)
 __TSYSCALL1_UNUSED(0xfffffedb, 0x29, 0x29)
-__TSYSCALL1_UNUSED(0xfffffedc, 0x2a, 0x2a)
+__TSYSCALL1(inotify_add_watch_at, 0x2a, 0x2a)
 __TSYSCALL1_UNUSED(0xfffffedd, 0x2b, 0x2b)
 __TSYSCALL1_UNUSED(0xfffffede, 0x2c, 0x2c)
 __TSYSCALL1_UNUSED(0xfffffedf, 0x2d, 0x2d)

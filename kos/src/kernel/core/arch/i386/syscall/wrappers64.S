@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x238768e8 */
+/* HASH CRC-32:0xdb548a4e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8100,7 +8100,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioprio_get)
 	.cfi_endproc
 END(__x86_asm64_syscall_ioprio_get)
 
-/* errno_t inotify_init(int TODO_PROTOTYPE) */
+/* fd_t inotify_init(void) */
 .section .text.x86.asm64_syscall.inotify_init
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_init)
 	.cfi_startproc simple
@@ -8130,7 +8130,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_init)
 	.cfi_endproc
 END(__x86_asm64_syscall_inotify_init)
 
-/* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
+/* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 .section .text.x86.asm64_syscall.inotify_add_watch
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_add_watch)
 	.cfi_startproc simple
@@ -8160,7 +8160,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_add_watch)
 	.cfi_endproc
 END(__x86_asm64_syscall_inotify_add_watch)
 
-/* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+/* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 .section .text.x86.asm64_syscall.inotify_rm_watch
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_rm_watch)
 	.cfi_startproc simple
@@ -9422,7 +9422,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pipe2)
 	.cfi_endproc
 END(__x86_asm64_syscall_pipe2)
 
-/* errno_t inotify_init1(int TODO_PROTOTYPE) */
+/* fd_t inotify_init1(syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.inotify_init1
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_init1)
 	.cfi_startproc simple
@@ -11460,6 +11460,37 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fmkdirat)
 	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_fmkdirat)
+
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+.section .text.x86.asm64_syscall.inotify_add_watch_at
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_add_watch_at)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffff02
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_inotify_add_watch_at)
+	call   sys_inotify_add_watch_at
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_inotify_add_watch_at)
 
 /* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
 .section .text.x86.asm64_syscall.ksysctl
@@ -20243,7 +20274,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioprio_get)
 	.cfi_endproc
 END(__x86_asm32_int80_ioprio_get)
 
-/* errno_t inotify_init(int TODO_PROTOTYPE) */
+/* fd_t inotify_init(void) */
 .section .text.x86.asm32_syscall_int80.inotify_init
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init)
 	.cfi_startproc simple
@@ -20255,7 +20286,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_inotify_init)
 	call   sys32_inotify_init
 	popq_cfi_r %rdi
@@ -20266,7 +20296,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init)
 	.cfi_endproc
 END(__x86_asm32_int80_inotify_init)
 
-/* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
+/* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 .section .text.x86.asm32_syscall_int80.inotify_add_watch
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch)
 	.cfi_startproc simple
@@ -20279,6 +20309,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch)
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
 	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_inotify_add_watch)
 	call   sys32_inotify_add_watch
 	popq_cfi_r %rdi
@@ -20289,7 +20321,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch)
 	.cfi_endproc
 END(__x86_asm32_int80_inotify_add_watch)
 
-/* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+/* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 .section .text.x86.asm32_syscall_int80.inotify_rm_watch
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_rm_watch)
 	.cfi_startproc simple
@@ -20302,6 +20334,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_rm_watch)
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
 	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movslq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_inotify_rm_watch)
 	call   sys32_inotify_rm_watch
 	popq_cfi_r %rdi
@@ -21356,7 +21389,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pipe2)
 	.cfi_endproc
 END(__x86_asm32_int80_pipe2)
 
-/* errno_t inotify_init1(int TODO_PROTOTYPE) */
+/* fd_t inotify_init1(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.inotify_init1
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init1)
 	.cfi_startproc simple
@@ -21368,7 +21401,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init1)
 	pushq_cfi_r %rdx
 	pushq_cfi_r %rsi
 	pushq_cfi_r %rdi
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_inotify_init1)
 	call   sys32_inotify_init1
 	popq_cfi_r %rdi
@@ -24404,6 +24437,34 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fmkdirat)
+
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+.section .text.x86.asm32_syscall_int80.inotify_add_watch_at
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_add_watch_at)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffedc
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movslq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_inotify_add_watch_at)
+	call   sys32_inotify_add_watch_at
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_inotify_add_watch_at)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
@@ -27946,13 +28007,13 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioprio_set, __x86_asm32_int80_iopr
 /* syscall_slong_t ioprio_get(syscall_ulong_t who, syscall_ulong_t id) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioprio_get, __x86_asm32_int80_ioprio_get)
 
-/* errno_t inotify_init(int TODO_PROTOTYPE) */
+/* fd_t inotify_init(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_inotify_init, __x86_asm32_int80_inotify_init)
 
-/* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
+/* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_inotify_add_watch, __x86_asm32_int80_inotify_add_watch)
 
-/* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+/* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_inotify_rm_watch, __x86_asm32_int80_inotify_rm_watch)
 
 /* errno_t migrate_pages(int TODO_PROTOTYPE) */
@@ -28367,7 +28428,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_dup3, __x86_asm32_int80_dup3)
 /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pipe2, __x86_asm32_int80_pipe2)
 
-/* errno_t inotify_init1(int TODO_PROTOTYPE) */
+/* fd_t inotify_init1(syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_inotify_init1, __x86_asm32_int80_inotify_init1)
 
 /* Same as  `readv(2)', but  read data  from a  file at  a
@@ -29775,6 +29836,42 @@ END(__x86_asm32_sysenter_fmknodat)
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fmkdirat, __x86_asm32_int80_fmkdirat)
+
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+.section .text.x86.asm32_syscall_sysenter.inotify_add_watch_at
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_inotify_add_watch_at)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffedc
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movslq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_inotify_add_watch_at)
+	call   sys32_inotify_add_watch_at
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET32
+	.cfi_endproc
+END(__x86_asm32_sysenter_inotify_add_watch_at)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
@@ -33996,30 +34093,26 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioprio_get)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ioprio_get)
 
-/* errno_t inotify_init(int TODO_PROTOTYPE) */
-.section .text.x86.asm32_syscall_sysrun32.inotify_init
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_init)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_inotify_init)
-	jmp    sys32_inotify_init
-	.cfi_endproc
-END(__x86_asm32_sysrun32_inotify_init)
+/* fd_t inotify_init(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_inotify_init, sys32_inotify_init); */
 
-/* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
+/* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
 .section .text.x86.asm32_syscall_sysrun32.inotify_add_watch
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_add_watch)
 	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_inotify_add_watch)
 	jmp    sys32_inotify_add_watch
 	.cfi_endproc
 END(__x86_asm32_sysrun32_inotify_add_watch)
 
-/* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+/* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 .section .text.x86.asm32_syscall_sysrun32.inotify_rm_watch
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_rm_watch)
 	.cfi_startproc
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_inotify_rm_watch)
 	jmp    sys32_inotify_rm_watch
@@ -34557,7 +34650,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pipe2)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pipe2)
 
-/* errno_t inotify_init1(int TODO_PROTOTYPE) */
+/* fd_t inotify_init1(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.inotify_init1
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_init1)
 	.cfi_startproc
@@ -36135,6 +36228,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fmkdirat)
 	jmp    sys32_fmkdirat
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fmkdirat)
+
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+.section .text.x86.asm32_syscall_sysrun32.inotify_add_watch_at
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_add_watch_at)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_inotify_add_watch_at)
+	jmp    sys32_inotify_add_watch_at
+	.cfi_endproc
+END(__x86_asm32_sysrun32_inotify_add_watch_at)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */

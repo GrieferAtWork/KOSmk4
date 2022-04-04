@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ef46316 */
+/* HASH CRC-32:0x79b1235c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -554,9 +554,11 @@
 #define __NR64AN2_ioprio_set               ioprio
 #define __NR64AN0_ioprio_get               who
 #define __NR64AN1_ioprio_get               id
-#define __NR64AN0_inotify_init             TODO_PROTOTYPE
-#define __NR64AN0_inotify_add_watch        TODO_PROTOTYPE
-#define __NR64AN0_inotify_rm_watch         TODO_PROTOTYPE
+#define __NR64AN0_inotify_add_watch        notify_fd
+#define __NR64AN1_inotify_add_watch        pathname
+#define __NR64AN2_inotify_add_watch        mask
+#define __NR64AN0_inotify_rm_watch         notify_fd
+#define __NR64AN1_inotify_rm_watch         wd
 #define __NR64AN0_migrate_pages            TODO_PROTOTYPE
 #define __NR64AN0_openat                   dirfd
 #define __NR64AN1_openat                   filename
@@ -682,7 +684,7 @@
 #define __NR64AN2_dup3                     flags
 #define __NR64AN0_pipe2                    pipedes
 #define __NR64AN1_pipe2                    flags
-#define __NR64AN0_inotify_init1            TODO_PROTOTYPE
+#define __NR64AN0_inotify_init1            flags
 #define __NR64AN0_preadv                   fd
 #define __NR64AN1_preadv                   iovec
 #define __NR64AN2_preadv                   count
@@ -844,6 +846,11 @@
 #define __NR64AN1_fmkdirat                 pathname
 #define __NR64AN2_fmkdirat                 mode
 #define __NR64AN3_fmkdirat                 flags
+#define __NR64AN0_inotify_add_watch_at     notify_fd
+#define __NR64AN1_inotify_add_watch_at     dfd
+#define __NR64AN2_inotify_add_watch_at     pathname
+#define __NR64AN3_inotify_add_watch_at     atflags
+#define __NR64AN4_inotify_add_watch_at     mask
 #define __NR64AN0_ksysctl                  command
 #define __NR64AN1_ksysctl                  arg
 #define __NR64AN0_maplibrary               addr
@@ -1786,11 +1793,13 @@
 #define __NR64ATR1_ioprio_get               SC_REPR_IOPRIO_ID                                                    /* id */ 
 #define __NR64ATL1_ioprio_get               0                                                                    /* id -> who */ 
 #define __NR64RTR_ioprio_get                SC_REPR_IOPRIO_VALUE                                                 /* return */
-#define __NR64ATR0_inotify_init             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NR64RTR_inotify_init              SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_inotify_add_watch        SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NR64RTR_inotify_add_watch         SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_inotify_rm_watch         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR64RTR_inotify_init              SC_REPR_FD_T                                                         /* return */
+#define __NR64ATR0_inotify_add_watch        SC_REPR_FD_T                                                         /* notify_fd */ 
+#define __NR64ATR1_inotify_add_watch        SC_REPR_STRING                                                       /* pathname */ 
+#define __NR64ATR2_inotify_add_watch        SC_REPR_INOTIFY_MASK                                                 /* mask */ 
+#define __NR64RTR_inotify_add_watch         SC_REPR_INT                                                          /* return */
+#define __NR64ATR0_inotify_rm_watch         SC_REPR_FD_T                                                         /* notify_fd */ 
+#define __NR64ATR1_inotify_rm_watch         SC_REPR_INT                                                          /* wd */ 
 #define __NR64RTR_inotify_rm_watch          SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_migrate_pages            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR64RTR_migrate_pages             SC_REPR_ERRNO_T                                                      /* return */
@@ -1983,8 +1992,8 @@
 #define __NR64ATR0_pipe2                    SC_REPR_POINTER                                                      /* pipedes */ 
 #define __NR64ATR1_pipe2                    SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK__DIRECT                    /* flags */ 
 #define __NR64RTR_pipe2                     SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_inotify_init1            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NR64RTR_inotify_init1             SC_REPR_ERRNO_T                                                      /* return */
+#define __NR64ATR0_inotify_init1            SC_REPR_INOTIFY_INIT_FLAGS                                           /* flags */ 
+#define __NR64RTR_inotify_init1             SC_REPR_FD_T                                                         /* return */
 #define __NR64ATR0_preadv                   SC_REPR_FD_T                                                         /* fd */ 
 #define __NR64ATR1_preadv                   SC_REPR_STRUCT_IOVECX64                                              /* iovec */ 
 #define __NR64ATL1_preadv                   2                                                                    /* iovec -> count */ 
@@ -2230,6 +2239,12 @@
 #define __NR64ATR2_fmkdirat                 SC_REPR_MODE_T                                                       /* mode */ 
 #define __NR64ATR3_fmkdirat                 SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
 #define __NR64RTR_fmkdirat                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NR64ATR0_inotify_add_watch_at     SC_REPR_FD_T                                                         /* notify_fd */ 
+#define __NR64ATR1_inotify_add_watch_at     SC_REPR_FD_T                                                         /* dfd */ 
+#define __NR64ATR2_inotify_add_watch_at     SC_REPR_STRING                                                       /* pathname */ 
+#define __NR64ATR3_inotify_add_watch_at     SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH                            /* atflags */ 
+#define __NR64ATR4_inotify_add_watch_at     SC_REPR_INOTIFY_MASK                                                 /* mask */ 
+#define __NR64RTR_inotify_add_watch_at      SC_REPR_INT                                                          /* return */
 #define __NR64ATR0_ksysctl                  SC_REPR_KSYSCTL_COMMAND                                              /* command */ 
 #define __NR64ATR1_ksysctl                  SC_REPR_KSYSCTL_ARG                                                  /* arg */ 
 #define __NR64ATL1_ksysctl                  0                                                                    /* arg -> command */ 

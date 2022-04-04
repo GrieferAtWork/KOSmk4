@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x136a4a2c */
+/* HASH CRC-32:0x42ad16f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -573,9 +573,11 @@
 #define __NRAN2_ioprio_set                   ioprio
 #define __NRAN0_ioprio_get                   who
 #define __NRAN1_ioprio_get                   id
-#define __NRAN0_inotify_init                 TODO_PROTOTYPE
-#define __NRAN0_inotify_add_watch            TODO_PROTOTYPE
-#define __NRAN0_inotify_rm_watch             TODO_PROTOTYPE
+#define __NRAN0_inotify_add_watch            notify_fd
+#define __NRAN1_inotify_add_watch            pathname
+#define __NRAN2_inotify_add_watch            mask
+#define __NRAN0_inotify_rm_watch             notify_fd
+#define __NRAN1_inotify_rm_watch             wd
 #define __NRAN0_migrate_pages                TODO_PROTOTYPE
 #define __NRAN0_openat                       dirfd
 #define __NRAN1_openat                       filename
@@ -700,7 +702,7 @@
 #define __NRAN2_dup3                         flags
 #define __NRAN0_pipe2                        pipedes
 #define __NRAN1_pipe2                        flags
-#define __NRAN0_inotify_init1                TODO_PROTOTYPE
+#define __NRAN0_inotify_init1                flags
 #define __NRAN0_preadv                       fd
 #define __NRAN1_preadv                       iovec
 #define __NRAN2_preadv                       count
@@ -1005,6 +1007,11 @@
 #define __NRAN1_fmkdirat                     pathname
 #define __NRAN2_fmkdirat                     mode
 #define __NRAN3_fmkdirat                     flags
+#define __NRAN0_inotify_add_watch_at         notify_fd
+#define __NRAN1_inotify_add_watch_at         dfd
+#define __NRAN2_inotify_add_watch_at         pathname
+#define __NRAN3_inotify_add_watch_at         atflags
+#define __NRAN4_inotify_add_watch_at         mask
 #define __NRAN0_waitid64                     idtype
 #define __NRAN1_waitid64                     id
 #define __NRAN2_waitid64                     infop
@@ -2036,11 +2043,13 @@
 #define __NRATR1_ioprio_get                   SC_REPR_IOPRIO_ID                                                    /* id */ 
 #define __NRATL1_ioprio_get                   0                                                                    /* id -> who */ 
 #define __NRRTR_ioprio_get                    SC_REPR_IOPRIO_VALUE                                                 /* return */
-#define __NRATR0_inotify_init                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NRRTR_inotify_init                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_inotify_add_watch            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NRRTR_inotify_add_watch             SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_inotify_rm_watch             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_inotify_init                  SC_REPR_FD_T                                                         /* return */
+#define __NRATR0_inotify_add_watch            SC_REPR_FD_T                                                         /* notify_fd */ 
+#define __NRATR1_inotify_add_watch            SC_REPR_STRING                                                       /* pathname */ 
+#define __NRATR2_inotify_add_watch            SC_REPR_INOTIFY_MASK                                                 /* mask */ 
+#define __NRRTR_inotify_add_watch             SC_REPR_INT                                                          /* return */
+#define __NRATR0_inotify_rm_watch             SC_REPR_FD_T                                                         /* notify_fd */ 
+#define __NRATR1_inotify_rm_watch             SC_REPR_INT                                                          /* wd */ 
 #define __NRRTR_inotify_rm_watch              SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_migrate_pages                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_migrate_pages                 SC_REPR_ERRNO_T                                                      /* return */
@@ -2232,8 +2241,8 @@
 #define __NRATR0_pipe2                        SC_REPR_POINTER                                                      /* pipedes */ 
 #define __NRATR1_pipe2                        SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK__DIRECT                    /* flags */ 
 #define __NRRTR_pipe2                         SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_inotify_init1                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NRRTR_inotify_init1                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_inotify_init1                SC_REPR_INOTIFY_INIT_FLAGS                                           /* flags */ 
+#define __NRRTR_inotify_init1                 SC_REPR_FD_T                                                         /* return */
 #define __NRATR0_preadv                       SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_preadv                       SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
 #define __NRATL1_preadv                       2                                                                    /* iovec -> count */ 
@@ -2689,6 +2698,12 @@
 #define __NRATR2_fmkdirat                     SC_REPR_MODE_T                                                       /* mode */ 
 #define __NRATR3_fmkdirat                     SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
 #define __NRRTR_fmkdirat                      SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_inotify_add_watch_at         SC_REPR_FD_T                                                         /* notify_fd */ 
+#define __NRATR1_inotify_add_watch_at         SC_REPR_FD_T                                                         /* dfd */ 
+#define __NRATR2_inotify_add_watch_at         SC_REPR_STRING                                                       /* pathname */ 
+#define __NRATR3_inotify_add_watch_at         SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH                            /* atflags */ 
+#define __NRATR4_inotify_add_watch_at         SC_REPR_INOTIFY_MASK                                                 /* mask */ 
+#define __NRRTR_inotify_add_watch_at          SC_REPR_INT                                                          /* return */
 #define __NRATR0_waitid64                     SC_REPR_IDTYPE_T                                                     /* idtype */ 
 #define __NRATR1_waitid64                     SC_REPR_ID_T                                                         /* id */ 
 #define __NRATL1_waitid64                     0                                                                    /* id -> idtype */ 

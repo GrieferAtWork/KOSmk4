@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59db9d8a */
+/* HASH CRC-32:0xe1b7e231 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,9 +93,12 @@
 #define __NRAN0_dup3                   oldfd
 #define __NRAN1_dup3                   newfd
 #define __NRAN2_dup3                   flags
-#define __NRAN0_inotify_init1          TODO_PROTOTYPE
-#define __NRAN0_inotify_add_watch      TODO_PROTOTYPE
-#define __NRAN0_inotify_rm_watch       TODO_PROTOTYPE
+#define __NRAN0_inotify_init1          flags
+#define __NRAN0_inotify_add_watch      notify_fd
+#define __NRAN1_inotify_add_watch      pathname
+#define __NRAN2_inotify_add_watch      mask
+#define __NRAN0_inotify_rm_watch       notify_fd
+#define __NRAN1_inotify_rm_watch       wd
 #define __NRAN0_ioctl                  fd
 #define __NRAN1_ioctl                  command
 #define __NRAN2_ioctl                  arg
@@ -682,7 +685,6 @@
 #define __NRAN0_dup2                   oldfd
 #define __NRAN1_dup2                   newfd
 #define __NRAN0_epoll_create           size
-#define __NRAN0_inotify_init           TODO_PROTOTYPE
 #define __NRAN0_eventfd                initval
 #define __NRAN0_signalfd               fd
 #define __NRAN1_signalfd               sigmask
@@ -873,11 +875,14 @@
 #define __NRATR1_dup3                   SC_REPR_FD_T                                            /* newfd */ 
 #define __NRATR2_dup3                   SC_REPR_OFLAG__CLOEXEC__CLOFORK                         /* flags */ 
 #define __NRRTR_dup3                    SC_REPR_FD_T                                            /* return */
-#define __NRATR0_inotify_init1          SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
-#define __NRRTR_inotify_init1           SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_inotify_add_watch      SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
-#define __NRRTR_inotify_add_watch       SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_inotify_rm_watch       SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
+#define __NRATR0_inotify_init1          SC_REPR_INOTIFY_INIT_FLAGS                              /* flags */ 
+#define __NRRTR_inotify_init1           SC_REPR_FD_T                                            /* return */
+#define __NRATR0_inotify_add_watch      SC_REPR_FD_T                                            /* notify_fd */ 
+#define __NRATR1_inotify_add_watch      SC_REPR_STRING                                          /* pathname */ 
+#define __NRATR2_inotify_add_watch      SC_REPR_INOTIFY_MASK                                    /* mask */ 
+#define __NRRTR_inotify_add_watch       SC_REPR_INT                                             /* return */
+#define __NRATR0_inotify_rm_watch       SC_REPR_FD_T                                            /* notify_fd */ 
+#define __NRATR1_inotify_rm_watch       SC_REPR_INT                                             /* wd */ 
 #define __NRRTR_inotify_rm_watch        SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_ioctl                  SC_REPR_FD_T                                            /* fd */ 
 #define __NRATR1_ioctl                  SC_REPR_IOCTL_COMMAND                                   /* command */ 
@@ -1779,8 +1784,7 @@
 #define __NRRTR_dup2                    SC_REPR_FD_T                                            /* return */
 #define __NRATR0_epoll_create           SC_REPR_SYSCALL_ULONG_T                                 /* size */ 
 #define __NRRTR_epoll_create            SC_REPR_FD_T                                            /* return */
-#define __NRATR0_inotify_init           SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
-#define __NRRTR_inotify_init            SC_REPR_ERRNO_T                                         /* return */
+#define __NRRTR_inotify_init            SC_REPR_FD_T                                            /* return */
 #define __NRATR0_eventfd                SC_REPR_SYSCALL_ULONG_T                                 /* initval */ 
 #define __NRRTR_eventfd                 SC_REPR_FD_T                                            /* return */
 #define __NRATR0_signalfd               SC_REPR_FD_T                                            /* fd */ 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5e7bb34 */
+/* HASH CRC-32:0x48077d79 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -573,9 +573,11 @@
 #define __NR32AN2_ioprio_set                   ioprio
 #define __NR32AN0_ioprio_get                   who
 #define __NR32AN1_ioprio_get                   id
-#define __NR32AN0_inotify_init                 TODO_PROTOTYPE
-#define __NR32AN0_inotify_add_watch            TODO_PROTOTYPE
-#define __NR32AN0_inotify_rm_watch             TODO_PROTOTYPE
+#define __NR32AN0_inotify_add_watch            notify_fd
+#define __NR32AN1_inotify_add_watch            pathname
+#define __NR32AN2_inotify_add_watch            mask
+#define __NR32AN0_inotify_rm_watch             notify_fd
+#define __NR32AN1_inotify_rm_watch             wd
 #define __NR32AN0_migrate_pages                TODO_PROTOTYPE
 #define __NR32AN0_openat                       dirfd
 #define __NR32AN1_openat                       filename
@@ -700,7 +702,7 @@
 #define __NR32AN2_dup3                         flags
 #define __NR32AN0_pipe2                        pipedes
 #define __NR32AN1_pipe2                        flags
-#define __NR32AN0_inotify_init1                TODO_PROTOTYPE
+#define __NR32AN0_inotify_init1                flags
 #define __NR32AN0_preadv                       fd
 #define __NR32AN1_preadv                       iovec
 #define __NR32AN2_preadv                       count
@@ -1005,6 +1007,11 @@
 #define __NR32AN1_fmkdirat                     pathname
 #define __NR32AN2_fmkdirat                     mode
 #define __NR32AN3_fmkdirat                     flags
+#define __NR32AN0_inotify_add_watch_at         notify_fd
+#define __NR32AN1_inotify_add_watch_at         dfd
+#define __NR32AN2_inotify_add_watch_at         pathname
+#define __NR32AN3_inotify_add_watch_at         atflags
+#define __NR32AN4_inotify_add_watch_at         mask
 #define __NR32AN0_waitid64                     idtype
 #define __NR32AN1_waitid64                     id
 #define __NR32AN2_waitid64                     infop
@@ -2036,11 +2043,13 @@
 #define __NR32ATR1_ioprio_get                   SC_REPR_IOPRIO_ID                                                    /* id */ 
 #define __NR32ATL1_ioprio_get                   0                                                                    /* id -> who */ 
 #define __NR32RTR_ioprio_get                    SC_REPR_IOPRIO_VALUE                                                 /* return */
-#define __NR32ATR0_inotify_init                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NR32RTR_inotify_init                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_inotify_add_watch            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NR32RTR_inotify_add_watch             SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_inotify_rm_watch             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_inotify_init                  SC_REPR_FD_T                                                         /* return */
+#define __NR32ATR0_inotify_add_watch            SC_REPR_FD_T                                                         /* notify_fd */ 
+#define __NR32ATR1_inotify_add_watch            SC_REPR_STRING                                                       /* pathname */ 
+#define __NR32ATR2_inotify_add_watch            SC_REPR_INOTIFY_MASK                                                 /* mask */ 
+#define __NR32RTR_inotify_add_watch             SC_REPR_INT                                                          /* return */
+#define __NR32ATR0_inotify_rm_watch             SC_REPR_FD_T                                                         /* notify_fd */ 
+#define __NR32ATR1_inotify_rm_watch             SC_REPR_INT                                                          /* wd */ 
 #define __NR32RTR_inotify_rm_watch              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_migrate_pages                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_migrate_pages                 SC_REPR_ERRNO_T                                                      /* return */
@@ -2232,8 +2241,8 @@
 #define __NR32ATR0_pipe2                        SC_REPR_POINTER                                                      /* pipedes */ 
 #define __NR32ATR1_pipe2                        SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK__DIRECT                    /* flags */ 
 #define __NR32RTR_pipe2                         SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_inotify_init1                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NR32RTR_inotify_init1                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_inotify_init1                SC_REPR_INOTIFY_INIT_FLAGS                                           /* flags */ 
+#define __NR32RTR_inotify_init1                 SC_REPR_FD_T                                                         /* return */
 #define __NR32ATR0_preadv                       SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_preadv                       SC_REPR_STRUCT_IOVECX32                                              /* iovec */ 
 #define __NR32ATL1_preadv                       2                                                                    /* iovec -> count */ 
@@ -2689,6 +2698,12 @@
 #define __NR32ATR2_fmkdirat                     SC_REPR_MODE_T                                                       /* mode */ 
 #define __NR32ATR3_fmkdirat                     SC_REPR_ATFLAG__DOSPATH                                              /* flags */ 
 #define __NR32RTR_fmkdirat                      SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_inotify_add_watch_at         SC_REPR_FD_T                                                         /* notify_fd */ 
+#define __NR32ATR1_inotify_add_watch_at         SC_REPR_FD_T                                                         /* dfd */ 
+#define __NR32ATR2_inotify_add_watch_at         SC_REPR_STRING                                                       /* pathname */ 
+#define __NR32ATR3_inotify_add_watch_at         SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH                            /* atflags */ 
+#define __NR32ATR4_inotify_add_watch_at         SC_REPR_INOTIFY_MASK                                                 /* mask */ 
+#define __NR32RTR_inotify_add_watch_at          SC_REPR_INT                                                          /* return */
 #define __NR32ATR0_waitid64                     SC_REPR_IDTYPE_T                                                     /* idtype */ 
 #define __NR32ATR1_waitid64                     SC_REPR_ID_T                                                         /* id */ 
 #define __NR32ATL1_waitid64                     0                                                                    /* id -> idtype */ 

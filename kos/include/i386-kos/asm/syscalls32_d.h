@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c087029 */
+/* HASH CRC-32:0xc3f4f1b2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -653,9 +653,9 @@
 /* NOTE: Linux calls `who' `which', and `id' `who' (refactored to prevent confusion)
  * @param: who: One of `IOPRIO_WHO_PROCESS', `IOPRIO_WHO_PGRP' or `IOPRIO_WHO_USER' */
 #define __NR32_ioprio_get                   0x122                  /* syscall_slong_t ioprio_get(syscall_ulong_t who, syscall_ulong_t id) */
-#define __NR32_inotify_init                 0x123                  /* errno_t inotify_init(int TODO_PROTOTYPE) */
-#define __NR32_inotify_add_watch            0x124                  /* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
-#define __NR32_inotify_rm_watch             0x125                  /* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+#define __NR32_inotify_init                 0x123                  /* fd_t inotify_init(void) */
+#define __NR32_inotify_add_watch            0x124                  /* int inotify_add_watch(fd_t notify_fd, char const *pathname, uint32_t mask) */
+#define __NR32_inotify_rm_watch             0x125                  /* errno_t inotify_rm_watch(fd_t notify_fd, int wd) */
 #define __NR32_migrate_pages                0x126                  /* errno_t migrate_pages(int TODO_PROTOTYPE) */
 /* Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -753,7 +753,7 @@
 /* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 #define __NR32_dup3                         0x14a                  /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
 #define __NR32_pipe2                        0x14b                  /* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
-#define __NR32_inotify_init1                0x14c                  /* errno_t inotify_init1(int TODO_PROTOTYPE) */
+#define __NR32_inotify_init1                0x14c                  /* fd_t inotify_init1(syscall_ulong_t flags) */
 /* Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
@@ -1129,6 +1129,7 @@
 #define __NR32_fmknodat                     __UINT32_C(0xfffffed7) /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR32_fmkdirat                     __UINT32_C(0xfffffed8) /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
+#define __NR32_inotify_add_watch_at         __UINT32_C(0xfffffedc) /* int inotify_add_watch_at(fd_t notify_fd, fd_t dfd, char const *pathname, atflag_t atflags, uint32_t mask) */
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 #define __NR32_waitid64                     __UINT32_C(0xfffffee4) /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
@@ -2023,6 +2024,7 @@
 #define __NR32RM_futimesat64                  0
 #define __NR32RM_fmknodat                     0
 #define __NR32RM_fmkdirat                     0
+#define __NR32RM_inotify_add_watch_at         0
 #define __NR32RM_waitid64                     1
 #define __NR32RM_utimes64                     0
 #define __NR32RM_kreaddirf                    0
@@ -2554,9 +2556,9 @@
 #define __NR32RC_keyctl                       1
 #define __NR32RC_ioprio_set                   3
 #define __NR32RC_ioprio_get                   2
-#define __NR32RC_inotify_init                 1
-#define __NR32RC_inotify_add_watch            1
-#define __NR32RC_inotify_rm_watch             1
+#define __NR32RC_inotify_init                 0
+#define __NR32RC_inotify_add_watch            3
+#define __NR32RC_inotify_rm_watch             2
 #define __NR32RC_migrate_pages                1
 #define __NR32RC_openat                       4
 #define __NR32RC_mkdirat                      3
@@ -2705,6 +2707,7 @@
 #define __NR32RC_futimesat64                  3
 #define __NR32RC_fmknodat                     5
 #define __NR32RC_fmkdirat                     4
+#define __NR32RC_inotify_add_watch_at         5
 #define __NR32RC_waitid64                     5
 #define __NR32RC_utimes64                     2
 #define __NR32RC_kreaddirf                    5
