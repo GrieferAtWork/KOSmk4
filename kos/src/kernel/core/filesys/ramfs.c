@@ -829,7 +829,7 @@ again_acquire_lock_for_insert:
 				mfile_tslock_acquire(new_node);
 				++new_node->fn_nlink;
 				mfile_tslock_release(new_node);
-				mfile_postfs_attrib(new_node); /* Post `IN_ATTRIB' */
+				mfile_inotify_attrib(new_node); /* Post `IN_ATTRIB' */
 			}
 
 			/* Construct missing references for `new_dirent' */
@@ -924,7 +924,7 @@ again:
 		if (last_link_went_away)
 			last_link_went_away = fnode_delete_strt_with_tslock(file);
 		mfile_tslock_release(file);
-		mfile_postfs_attrib(file); /* Post `IN_ATTRIB' */
+		mfile_inotify_attrib(file); /* Post `IN_ATTRIB' */
 
 		/* Delete the file (make all mem-parts anonymous) */
 		if (last_link_went_away) {

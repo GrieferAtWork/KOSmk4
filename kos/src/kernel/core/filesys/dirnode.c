@@ -573,7 +573,7 @@ again_acquire_notify_lock:
 
 	/* If a new file was created, post the relevant fs event. */
 	if (result == FDIRNODE_MKFILE_SUCCESS)
-		mfile_postfs_created(info->mkf_rnode); /* Post `IN_CREATE' */
+		mfile_inotify_created(info->mkf_rnode); /* Post `IN_CREATE' */
 #endif /* CONFIG_HAVE_FS_NOTIFY */
 
 	return result;
@@ -596,7 +596,7 @@ fdirnode_unlink(struct fdirnode *__restrict self,
 		THROW(E_FSERROR_READONLY);
 	result = (*ops->dno_unlink)(self, entry, file);
 	if (result == FDIRNODE_UNLINK_SUCCESS)
-		mfile_postfs_deleted(file); /* Post `IN_DELETE' and `IN_DELETE_SELF' */
+		mfile_inotify_deleted(file); /* Post `IN_DELETE' and `IN_DELETE_SELF' */
 	return result;
 }
 

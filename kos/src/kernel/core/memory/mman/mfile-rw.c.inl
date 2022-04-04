@@ -690,7 +690,7 @@ again_read_old_filesize:
 		/* (possibly) mark file attributes as having changed. */
 		if (changes != 0) {
 			mfile_changed(self, changes);
-			mfile_postfs_modified(self); /* Post `IN_MODIFY' */
+			mfile_inotify_modified(self); /* Post `IN_MODIFY' */
 		}
 	} else
 #endif /* LOCAL_WRITING */
@@ -1867,7 +1867,7 @@ handle_part_insert_failure:
 
 		mfile_changed(self, changes);
 		result += num_bytes;
-		mfile_postfs_modified(self); /* Post `IN_MODIFY' */
+		mfile_inotify_modified(self); /* Post `IN_MODIFY' */
 
 		/* Drop the reference from `mfile_insert_and_merge_part_and_unlock()' */
 		decref_unlikely(inserted_part);

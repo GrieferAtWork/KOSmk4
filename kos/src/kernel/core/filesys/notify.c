@@ -1106,7 +1106,7 @@ NOTHROW(FCALL blist_serve)(struct REF notifyfd_slist *__restrict self) {
 
 /* Special function to post `IN_IGNORED', as well as delete all watch-descriptors of `self' */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfile_postfs_ignored)(struct mfile *__restrict self) {
+NOTHROW(FCALL mfile_inotify_ignored)(struct mfile *__restrict self) {
 	struct REF notifyfd_slist blist;
 	struct dnotify_link_slist deadlinks;
 	struct inotify_controller_slist deadnotif;

@@ -751,7 +751,7 @@ again_acquire_lock_for_insert:
 				mfile_tslock_acquire(new_node);
 				ATOMIC_INC(new_node->fn_nlink);
 				mfile_tslock_release(new_node);
-				mfile_postfs_attrib(new_node); /* Post `IN_ATTRIB' */
+				mfile_inotify_attrib(new_node); /* Post `IN_ATTRIB' */
 			}
 
 			/* Construct missing references for `new_dirent' */

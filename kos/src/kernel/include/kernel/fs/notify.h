@@ -397,23 +397,23 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsevent_ex)(struct mf
 #define __mfile_postfsevent_ex(self, fil_mask, dir_mask) __mfile_maybepostfsevent(self, (__mfile_postfsevent_ex)(self, fil_mask, dir_mask))
 
 /* Helper functions (use these instead of the functions above) */
-#define mfile_postfs_accessed(self)         __mfile_postfsevent(self, IN_ACCESS)                    /* TODO */
-#define mfile_postfs_modified(self)         __mfile_postfsevent(self, IN_MODIFY)                    /* Implemented */
-#define mfile_postfs_attrib(self)           __mfile_postfsevent(self, IN_ATTRIB)                    /* Implemented */
-#define mfile_postfs_closewr(self)          __mfile_postfsevent(self, IN_CLOSE_WRITE)               /* TODO */
-#define mfile_postfs_closero(self)          __mfile_postfsevent(self, IN_CLOSE_NOWRITE)             /* Implemented */
-#define mfile_postfs_opened(self)           __mfile_postfsevent(self, IN_OPEN)                      /* Implemented */
-#define mfile_postfs_movefrom(self, cookie) __mfile_postfsdirevent2(self, IN_MOVED_FROM, cookie)    /* TODO */
-#define mfile_postfs_moveto(self, cookie)   __mfile_postfsdirevent2(self, IN_MOVED_TO, cookie)      /* TODO */
-#define mfile_postfs_moved(self)            __mfile_postfsfilevent(self, IN_MOVE_SELF)              /* TODO */
-#define mfile_postfs_created(self)          __mfile_postfsdirevent(self, IN_CREATE)                 /* Implemented */
-#define mfile_postfs_deleted(self)          __mfile_postfsevent_ex(self, IN_DELETE_SELF, IN_DELETE) /* Implemented */
-#define mfile_postfs_unmount(self)          __mfile_postfsfilevent(self, IN_UNMOUNT)                /* Implemented */
+#define mfile_inotify_accessed(self)         __mfile_postfsevent(self, IN_ACCESS)                    /* TODO */
+#define mfile_inotify_modified(self)         __mfile_postfsevent(self, IN_MODIFY)                    /* Implemented */
+#define mfile_inotify_attrib(self)           __mfile_postfsevent(self, IN_ATTRIB)                    /* Implemented */
+#define mfile_inotify_closewr(self)          __mfile_postfsevent(self, IN_CLOSE_WRITE)               /* TODO */
+#define mfile_inotify_closero(self)          __mfile_postfsevent(self, IN_CLOSE_NOWRITE)             /* Implemented */
+#define mfile_inotify_opened(self)           __mfile_postfsevent(self, IN_OPEN)                      /* Implemented */
+#define mfile_inotify_movefrom(self, cookie) __mfile_postfsdirevent2(self, IN_MOVED_FROM, cookie)    /* TODO */
+#define mfile_inotify_moveto(self, cookie)   __mfile_postfsdirevent2(self, IN_MOVED_TO, cookie)      /* TODO */
+#define mfile_inotify_moved(self)            __mfile_postfsfilevent(self, IN_MOVE_SELF)              /* TODO */
+#define mfile_inotify_created(self)          __mfile_postfsdirevent(self, IN_CREATE)                 /* Implemented */
+#define mfile_inotify_deleted(self)          __mfile_postfsevent_ex(self, IN_DELETE_SELF, IN_DELETE) /* Implemented */
+#define mfile_inotify_unmount(self)          __mfile_postfsfilevent(self, IN_UNMOUNT)                /* Implemented */
 
 /* Special function to post `IN_IGNORED', as well as delete all watch-descriptors of `self' */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL mfile_postfs_ignored)(struct mfile *__restrict self);
-#define mfile_postfs_ignored(self) __mfile_maybepostfsevent(self, (mfile_postfs_ignored)(self)) /* Implemented */
+NOTHROW(FCALL mfile_inotify_ignored)(struct mfile *__restrict self);
+#define mfile_inotify_ignored(self) __mfile_maybepostfsevent(self, (mfile_inotify_ignored)(self)) /* Implemented */
 
 
 
@@ -424,19 +424,19 @@ DECL_END
 #define dnotify_controller_bindchild(dir, child_dent, child_file) (child_file)
 
 /* No-op file event triggers */
-#define mfile_postfs_accessed(self)         (void)0
-#define mfile_postfs_modified(self)         (void)0
-#define mfile_postfs_attrib(self)           (void)0
-#define mfile_postfs_closewr(self)          (void)0
-#define mfile_postfs_closero(self)          (void)0
-#define mfile_postfs_opened(self)           (void)0
-#define mfile_postfs_movefrom(self, cookie) (void)0
-#define mfile_postfs_moveto(self, cookie)   (void)0
-#define mfile_postfs_moved(self)            (void)0
-#define mfile_postfs_created(self)          (void)0
-#define mfile_postfs_deleted(self)          (void)0
-#define mfile_postfs_unmount(self)          (void)0
-#define mfile_postfs_ignored(self)          (void)0
+#define mfile_inotify_accessed(self)         (void)0
+#define mfile_inotify_modified(self)         (void)0
+#define mfile_inotify_attrib(self)           (void)0
+#define mfile_inotify_closewr(self)          (void)0
+#define mfile_inotify_closero(self)          (void)0
+#define mfile_inotify_opened(self)           (void)0
+#define mfile_inotify_movefrom(self, cookie) (void)0
+#define mfile_inotify_moveto(self, cookie)   (void)0
+#define mfile_inotify_moved(self)            (void)0
+#define mfile_inotify_created(self)          (void)0
+#define mfile_inotify_deleted(self)          (void)0
+#define mfile_inotify_unmount(self)          (void)0
+#define mfile_inotify_ignored(self)          (void)0
 #endif /* !CONFIG_HAVE_FS_NOTIFY */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_NOTIFY_H */

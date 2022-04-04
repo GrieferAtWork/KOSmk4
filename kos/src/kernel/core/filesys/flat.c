@@ -1038,7 +1038,7 @@ handle_existing:
 					if likely(nlink_ok) {
 						/* Indicate that attributes of `node' have changed. */
 						mfile_changed(node, MFILE_F_ATTRCHANGED);
-						mfile_postfs_attrib(node); /* Post `IN_ATTRIB' */
+						mfile_inotify_attrib(node); /* Post `IN_ATTRIB' */
 					} else {
 						RAII_FINALLY {
 							/* _Always_ remove `ent' from the `fdd_bypos' list. */
@@ -1168,7 +1168,7 @@ again_locked:
 		--file->fn_nlink;
 		deleted = file->fn_nlink == 0;
 		mfile_tslock_release(file);
-		mfile_postfs_attrib(file); /* Post `IN_ATTRIB' */
+		mfile_inotify_attrib(file); /* Post `IN_ATTRIB' */
 		if (!deleted) {
 			mfile_changed(file, MFILE_F_ATTRCHANGED);
 		} else {
@@ -1541,7 +1541,7 @@ again:
 			--info->frn_repfile->fn_nlink;
 			deleted = info->frn_repfile->fn_nlink == 0;
 			mfile_tslock_release(info->frn_repfile);
-			mfile_postfs_attrib(info->frn_repfile); /* Post `IN_ATTRIB' */
+			mfile_inotify_attrib(info->frn_repfile); /* Post `IN_ATTRIB' */
 			if (!deleted) {
 				mfile_changed(info->frn_repfile, MFILE_F_ATTRCHANGED);
 			} else {

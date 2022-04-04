@@ -662,7 +662,7 @@ again_check_permissions:
 	/* Broadcast that mode bits have changed. */
 	if (old_mode != new_mode) {
 		mfile_changed(self, MFILE_F_ATTRCHANGED);
-		mfile_postfs_attrib(self); /* Post `IN_ATTRIB' */
+		mfile_inotify_attrib(self); /* Post `IN_ATTRIB' */
 	}
 	return old_mode;
 }
@@ -800,7 +800,7 @@ again_read_old_values:
 	/* Broadcast that owner values have changed. */
 	if (changed) {
 		mfile_changed(self, MFILE_F_ATTRCHANGED);
-		mfile_postfs_attrib(self); /* Post `IN_ATTRIB' */
+		mfile_inotify_attrib(self); /* Post `IN_ATTRIB' */
 	}
 }
 
@@ -854,7 +854,7 @@ mfile_chtime(struct mfile *__restrict self,
 	/* Mark attributes of this file as having changed. */
 	if (changed) {
 		mfile_changed(self, MFILE_F_ATTRCHANGED);
-		mfile_postfs_attrib(self); /* Post `IN_ATTRIB' */
+		mfile_inotify_attrib(self); /* Post `IN_ATTRIB' */
 	}
 	return changed;
 }

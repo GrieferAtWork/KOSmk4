@@ -459,7 +459,7 @@ NOTHROW(FCALL mfile_add_changed_part)(struct mfile *__restrict self,
 				mfile_tslock_release(self);
 			}
 			mfile_changed(self, changes);
-			mfile_postfs_modified(self); /* Post `IN_MODIFY' */
+			mfile_inotify_modified(self); /* Post `IN_MODIFY' */
 		}
 	}
 }

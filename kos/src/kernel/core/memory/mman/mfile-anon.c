@@ -315,7 +315,7 @@ NOTHROW(FCALL mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(mfile) *_
 	}
 
 	/* Generate `IN_IGNORED' */
-	mfile_postfs_ignored(me);
+	mfile_inotify_ignored(me);
 
 	/* Drop the inherited reference to the original file. */
 	decref_unlikely(me);
@@ -326,7 +326,7 @@ NOTHROW(FCALL mfile_decref_postop)(Tobpostlockop(mfile) *__restrict self,
                                    struct mfile *__restrict UNUSED(_file)) {
 	REF struct mfile *me;
 	me = container_of(self, struct mfile, _mf_mfplop);
-	mfile_postfs_ignored(me); /* Generate `IN_IGNORED' */
+	mfile_inotify_ignored(me); /* Generate `IN_IGNORED' */
 	decref_unlikely(me);
 }
 

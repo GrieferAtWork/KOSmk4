@@ -359,7 +359,7 @@ struct fdirnode_ops {
 	 * >> REMOVE_DIRECTORY_ENTRY(self, entry);
 	 * >> MARK_DELETED(entry);
 	 * >> if (CHANGED(file->fn_nlink))
-	 * >>     mfile_postfs_attrib(file); */
+	 * >>     mfile_inotify_attrib(file); */
 	BLOCKING WUNUSED NONNULL((1, 2, 3)) unsigned int
 	(KCALL *dno_unlink)(struct fdirnode *__restrict self,
 	                    struct fdirent *__restrict entry,

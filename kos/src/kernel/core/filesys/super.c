@@ -539,7 +539,7 @@ again:
 	/* Mark this node as deleted */
 	DBG_memset(&tree->fn_supent, 0xcc, sizeof(tree->fn_supent));
 	ATOMIC_WRITE(tree->fn_supent.rb_rhs, FSUPER_NODES_DELETED);
-	mfile_postfs_unmount(tree); /* Post `IN_UNMOUNT' */
+	mfile_inotify_unmount(tree); /* Post `IN_UNMOUNT' */
 
 	/* Try to get a reference to this tree-node. */
 	if (tryincref(tree)) {

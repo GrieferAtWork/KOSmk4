@@ -52,7 +52,7 @@ DECL_BEGIN
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL filehandle_destroy)(struct filehandle *__restrict self) {
 	/* TODO: If the file was opened as writable, must post `IN_CLOSE_WRITE'! */
-	mfile_postfs_closero(self->fh_file); /* Post `IN_CLOSE_NOWRITE' */
+	mfile_inotify_closero(self->fh_file); /* Post `IN_CLOSE_NOWRITE' */
 	decref_unlikely(self->fh_file);
 	xdecref_unlikely(self->fh_path);
 	xdecref_unlikely(self->fh_dirent);
@@ -78,7 +78,7 @@ filehandle_new(struct mfile *__restrict self,
 	result->fh_path   = xincref(access_path);
 	result->fh_dirent = xincref(access_dent);
 	atomic64_init(&result->fh_offset, 0);
-	mfile_postfs_opened(self); /* Post `IN_OPEN' */
+	mfile_inotify_opened(self); /* Post `IN_OPEN' */
 	return result;
 }
 
