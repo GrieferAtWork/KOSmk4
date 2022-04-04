@@ -41,14 +41,14 @@ struct inotify_event {
 	__u32 ine_len;     /* Length of `ine_name', including a trailing `NUL' character.
 	                    * When `ine_wd' isn't a directory, or the event itself refers
 	                    * to the directory itself, this is set to `0'. */
-	COMPILER_FLEXIBLE_ARRAY(char, ine_name); /* [len] Filename (only present when `len != 0') */
+	__COMPILER_FLEXIBLE_ARRAY(char, ine_name); /* [len] Filename (only present when `len != 0') */
 #elif defined(__USE_KOS_KERNEL)
 	union { __s32 ine_wd;     __s32 wd;     };
 	union { __u32 ine_mask;   __u32 mask;   };
 	union { __u32 ine_cookie; __u32 cookie; };
 	union {
-		struct { __u32 ine_len; COMPILER_FLEXIBLE_ARRAY(char, ine_name); };
-		struct { __u32 len;     COMPILER_FLEXIBLE_ARRAY(char, name); };
+		struct { __u32 ine_len; __COMPILER_FLEXIBLE_ARRAY(char, ine_name); };
+		struct { __u32 len;     __COMPILER_FLEXIBLE_ARRAY(char, name); };
 	};
 #else /* ... */
 	__s32 wd;      /* Watch token (return value of `inotify_add_watch(2)') */
@@ -59,7 +59,7 @@ struct inotify_event {
 	__u32 len;     /* Length of `name', including a trailing `NUL' character.
 	                * When `wd' isn't a directory, or the event itself refers
 	                * to the directory itself, this is set to `0'. */
-	COMPILER_FLEXIBLE_ARRAY(char, name); /* [len] Filename (only present when `len != 0') */
+	__COMPILER_FLEXIBLE_ARRAY(char, name); /* [len] Filename (only present when `len != 0') */
 #endif /* !... */
 };
 
