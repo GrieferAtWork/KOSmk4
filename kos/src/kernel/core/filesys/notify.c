@@ -41,6 +41,7 @@
 #include <kernel/mman/mfile.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
+#include <kernel/user.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -1392,6 +1393,7 @@ sys_inotify_add_watch_impl(fd_t notify_fd, fd_t dfd,
                            atflag_t atflags, uint32_t mask) {
 	REF struct notifyfd *self;
 	REF struct mfile *file;
+	validate_readableaddr(pathname);
 	VALIDATE_FLAGSET(atflags, AT_SYMLINK_NOFOLLOW | AT_DOSPATH | AT_EMPTY_PATH,
 	                 E_INVALID_ARGUMENT_CONTEXT_INOTIFY_ADD_WATCH_FLAGS);
 	VALIDATE_FLAGSET(mask,
