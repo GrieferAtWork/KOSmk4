@@ -1244,6 +1244,9 @@ NOTHROW(FCALL mfile_delete)(struct mfile *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_delete_impl)(/*inherit(always)*/ REF struct mfile *__restrict self);
 
+/* Check if a given file has been marked as deleted. */
+#define mfile_wasdeleted(self) (__hybrid_atomic_load((self)->mf_flags, __ATOMIC_ACQUIRE) & MFILE_F_DELETED)
+
 
 /* Change  the size of the given file. If the new size is smaller than
  * the old size, mem-parts outside the new file's size-bounds are made

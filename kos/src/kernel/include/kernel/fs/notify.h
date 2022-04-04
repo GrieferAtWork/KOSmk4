@@ -25,6 +25,7 @@
 #ifdef CONFIG_HAVE_FS_NOTIFY
 #include <kernel/mman/mfile.h>
 #include <kernel/types.h>
+#include <sched/sig.h>
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
@@ -169,14 +170,43 @@ struct notify_listener {
 };
 
 
+
+/* Flag for `struct notifyfd_event::nfe_wd'. - If set, indicates `IN_ISDIR' */
+#if __SIZEOF_INT__ == 4
+#define NOTIFYFD_EVENT_ISDIR_FLAG 0x80000000
+#elif __SIZEOF_INT__ == 8
+#define NOTIFYFD_EVENT_ISDIR_FLAG 0x8000000000000000
+#elif __SIZEOF_INT__ == 2
+#define NOTIFYFD_EVENT_ISDIR_FLAG 0x8000
+#elif __SIZEOF_INT__ == 1
+#define NOTIFYFD_EVENT_ISDIR_FLAG 0x80
+#else /* __SIZEOF_INT__ == ... */
+#error "Unsupported sizeof(int)"
+#endif /* __SIZEOF_INT__ != ... */
+
+struct notifyfd_event {
+	unsigned int        nfe_wd;     /* [const] Descriptor number. (most significant bit represents `IN_ISDIR') */
+	uint16_t            mfe_mask;   /* [const] Event mask. */
+	uint16_t            mfe_cookie; /* [const] Event cookie */
+	REF struct fdirent *mfe_name;   /* [0..1][const] Name of associated file (or NULL if not a child-in-directory-event) */
+};
+
 /* The main NOTIFYFD object (as also exposed via `HANDLE_TYPE_NOTIFYFD') */
 struct notifyfd {
 	refcnt_t                nf_refcnt;  /* Reference counter. */
+	SLIST_ENTRY(notifyfd)  _nf_blist;   /* [lock(SET_NON_NULL(!PREEMPTION && :notify_lock),
+	                                     *       SET_NULL(DID_SET_NON_NULL && ATOMIC))]
+	                                     * Used internally. */
 	struct notify_listener *nf_listenv; /* [0..nf_listenc][owned][lock(!PREEMPTION && :notify_lock)]
 	                                     * List  of listeners. (Index is "watch descriptor"; deleted
 	                                     * entries are identified by `nl_file == NULL'). */
 	unsigned int            nf_listenc; /* [lock(!PREEMPTION && :notify_lock)] # of allocated entries in `nf_listenv'. */
-	/* TODO: List of pending (not-yet-read) events */
+	unsigned int            nf_eventr;  /* [lock(!PREEMPTION && :notify_lock)][< nf_eventa] Index of next unread event */
+	unsigned int            nf_eventc;  /* [lock(!PREEMPTION && :notify_lock)][<= nf_eventa] Number of pending unread events */
+	unsigned int            nf_eventa;  /* [const] Total number of allocated events (including the failsafe overflow-event) */
+	struct sig              nf_avail;   /* Signal broadcast when `nf_eventc' becomes non-zero. */
+	COMPILER_FLEXIBLE_ARRAY(struct notifyfd_event,
+	                        nf_eventv); /* [nf_eventa] Vector of pending events. */
 };
 
 /* Check if `fd' is being used. */
@@ -188,24 +218,26 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL notifyfd_destroy)(struct notifyfd *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct notifyfd, nf_refcnt, notifyfd_destroy)
 
-/* Create a new notifyfd object. */
+/* Create a new notifyfd object.
+ * @param: num_events: The max number of unread pending events (excluding the failsafe overflow-event) */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct notifyfd *KCALL
-notifyfd_new(void) THROWS(E_BADALLOC);
+notifyfd_new(unsigned int num_events) THROWS(E_BADALLOC);
 
 /* Add a new watch (listener) for `file' to `self'
  * NOTE: This function is only `BLOCKING' because `file->mf_ops->mo_stream_ops->mso_notify_attach'
  *       is  allowed  to  be `BLOCKING',  and  this function  may  need to  invoke  said operator!
- * @param: mask: Set of `IN_ALL_EVENTS', optionally or'd with:
- *                - IN_EXCL_UNLINK | IN_ONESHOT: Include as bits in `notify_listener::nl_mask'
- *                - IN_MASK_ADD:    Or valid bits from `mask' with any pre-existing watch events
- *                - IN_MASK_CREATE: Return `-EEXIST' if `file' is already being watched.
+ * @param: mask_and_flags: Set of `IN_ALL_EVENTS', optionally or'd with:
+ *          - IN_EXCL_UNLINK | IN_ONESHOT: Include as bits in `notify_listener::nl_mask'
+ *          - IN_MASK_ADD:    Or valid bits from `mask' with any pre-existing watch events
+ *          - IN_MASK_CREATE: Return `-EEXIST' if `file' is already being watched.
  * @return: * :      The watch descriptor (index into `self->nf_listenv')
  * @return: -EEXIST: `IN_MASK_CREATE' was given and `file' is already being monitored. */
 FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 notifyfd_addwatch(struct notifyfd *__restrict self,
                   struct mfile *__restrict file,
-                  uint32_t mask)
+                  uint32_t mask_and_flags)
 		THROWS(E_BADALLOC);
+
 
 /* Remove the watch descriptor `watchfd' (as previously returned by `notifyfd_addwatch')
  * @return: true:  Successfully deleted `watchfd'.
@@ -282,7 +314,6 @@ struct inotify_controller {
 #define inotify_controller_isdnotify(self) mfile_isdir((self)->inc_file)
 #define inotify_controller_asdnotify(self) ((struct dnotify_controller *)(self))
 
-
 /* `struct mfile::mf_notify' is actually a `struct dnotify_controller' when `mfile_isdir(inc_file)' */
 struct dnotify_controller
 #ifdef __cplusplus
@@ -334,6 +365,51 @@ EIDECLARE(BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)), REF struct fnode 
 		return child_file; /* Directory isn't being watched --> nothing to do here! */
 	return dnotify_controller_bindchild_slow(dir, child_dent, child_file);
 });
+
+
+
+/* Post filesystem events to the notify controller of `self'
+ * Don't call this function directly -- use the macros below.
+ * @param: mask: One of `(IN_ALL_EVENTS | IN_UNMOUNT | IN_IGNORED) & ~(...)' */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsevent)(struct mfile *__restrict self, uint16_t mask) ASMNAME("mfile_postfsevent");
+/* Same as `__mfile_postfsevent()', but only post to `inc_listeners' */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsfilevent)(struct mfile *__restrict self, uint16_t mask) ASMNAME("mfile_postfsfilevent");
+/* Same as `__mfile_postfsevent()', but only post to `inc_dirs' */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsdirevent)(struct mfile *__restrict self, uint16_t mask) ASMNAME("mfile_postfsdirevent");
+/* Same as `__mfile_postfsdirevent()', but has an explicit `cookie' */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsdirevent2)(struct mfile *__restrict self, uint16_t mask, uint16_t cookie) ASMNAME("mfile_postfsdirevent2");
+/* Same as `__mfile_postfsevent()', but use different masks for `inc_listeners' and `inc_dirs' */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsevent_ex)(struct mfile *__restrict self, uint16_t fil_mask, uint16_t dir_mask) ASMNAME("mfile_postfsevent_ex");
+#define __mfile_canpostfsevents(self) (__hybrid_atomic_load((self)->mf_notify, __ATOMIC_ACQUIRE) != __NULLPTR)
+#ifdef __OPTIMIZE_SIZE__
+#define __mfile_maybepostfsevent(self, expr_) expr_
+#else /* __OPTIMIZE_SIZE__ */
+#define __mfile_maybepostfsevent(self, expr_) (void)(__mfile_canpostfsevents(self) && (expr_, 1))
+#endif /* !__OPTIMIZE_SIZE__ */
+#define __mfile_postfsevent(self, mask)                  __mfile_maybepostfsevent(self, (__mfile_postfsevent)(self, mask))
+#define __mfile_postfsfilevent(self, mask)               __mfile_maybepostfsevent(self, (__mfile_postfsfilevent)(self, mask))
+#define __mfile_postfsdirevent(self, mask)               __mfile_maybepostfsevent(self, (__mfile_postfsdirevent)(self, mask))
+#define __mfile_postfsdirevent2(self, mask, cookie)      __mfile_maybepostfsevent(self, (__mfile_postfsdirevent2)(self, mask, cookie))
+#define __mfile_postfsevent_ex(self, fil_mask, dir_mask) __mfile_maybepostfsevent(self, (__mfile_postfsevent_ex)(self, fil_mask, dir_mask))
+
+/* Helper functions (use these instead of the functions above) */
+#define mfile_postfs_accessed(self)         __mfile_postfsevent(self, IN_ACCESS)
+#define mfile_postfs_modified(self)         __mfile_postfsevent(self, IN_MODIFY)
+#define mfile_postfs_attrib(self)           __mfile_postfsevent(self, IN_ATTRIB)
+#define mfile_postfs_closewr(self)          __mfile_postfsevent(self, IN_CLOSE_WRITE)
+#define mfile_postfs_closero(self)          __mfile_postfsevent(self, IN_CLOSE_NOWRITE)
+#define mfile_postfs_opened(self)           __mfile_postfsevent(self, IN_OPEN)
+#define mfile_postfs_movefrom(self, cookie) __mfile_postfsdirevent2(self, IN_MOVED_FROM, cookie)
+#define mfile_postfs_moveto(self, cookie)   __mfile_postfsdirevent2(self, IN_MOVED_TO, cookie)
+#define mfile_postfs_moved(self)            __mfile_postfsfilevent(self, IN_MOVE_SELF)
+#define mfile_postfs_created(self)          __mfile_postfsdirevent(self, IN_CREATE)
+#define mfile_postfs_deleted(self)          __mfile_postfsevent_ex(self, IN_DELETE_SELF, IN_DELETE)
+#define mfile_postfs_unmount(self)          __mfile_postfsfilevent(self, IN_UNMOUNT)
+
+/* Special function to post `IN_IGNORED', as well as delete all watch-descriptors of `self' */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_postfs_ignored)(struct mfile *__restrict self);
+#define mfile_postfs_ignored(self) __mfile_maybepostfsevent(self, (mfile_postfs_ignored)(self))
 
 
 

@@ -36,6 +36,7 @@
 #include <kernel/types.h>
 #include <sched/task.h>
 
+#include <hybrid/atomic.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
@@ -45,6 +46,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -226,24 +228,51 @@ NOTHROW(FCALL notifyfd_destroy)(struct notifyfd *__restrict self) {
 		xdecref_unlikely(file); /* Inherited from `ent->nl_file' */
 	}
 
+	/* Clear all remaining unread events. */
+	notify_lock_acquire();
+	while (self->nf_eventc) {
+		REF struct fdirent *name;
+		assert(self->nf_eventr < self->nf_eventc);
+		name = self->nf_eventv[self->nf_eventr].mfe_name;
+		DBG_memset(&self->nf_eventv[self->nf_eventr], 0xcc,
+		           sizeof(self->nf_eventv[self->nf_eventr]));
+		--self->nf_eventc;
+		++self->nf_eventr;
+		self->nf_eventr %= self->nf_eventa;
+		if (name) {
+			notify_lock_release_br();
+			decref(name);
+			notify_lock_acquire_br();
+		}
+	}
+	notify_lock_release();
+
 	/* Free deleted objects. */
+	sig_broadcast_for_fini(&self->nf_avail);
 	dnotify_link_slist_destroyall(&deadlinks);
 	inotify_controller_slist_destroyall(&deadnotif);
 	kfree(self->nf_listenv);
 	kfree(self);
 }
 
-/* Create a new notifyfd object. */
+/* Create a new notifyfd object.
+ * @param: num_events: The max number of unread pending events (excluding the failsafe overflow-event) */
 PUBLIC ATTR_RETNONNULL WUNUSED REF struct notifyfd *KCALL
-notifyfd_new(void) THROWS(E_BADALLOC) {
+notifyfd_new(unsigned int num_events) THROWS(E_BADALLOC) {
 	REF struct notifyfd *result;
-	result = (REF struct notifyfd *)kmalloc(sizeof(struct notifyfd), GFP_NORMAL);
+	result = (REF struct notifyfd *)kmalloc(offsetof(struct notifyfd, nf_eventv) +
+	                                        ((num_events + 1) * sizeof(struct notifyfd_event)),
+	                                        GFP_NORMAL);
 
 	/* Initialize the new object. */
-	result->nf_refcnt  = 1;
-	result->nf_listenv = NULL;
-	result->nf_listenc = 0;
-
+	result->nf_refcnt          = 1;
+	result->_nf_blist.sle_next = NULL;
+	result->nf_listenv         = NULL;
+	result->nf_listenc         = 0;
+	sig_init(&result->nf_avail);
+	result->nf_eventr = 0;
+	result->nf_eventc = 0;
+	result->nf_eventa = num_events + 1;
 	return result;
 }
 
@@ -273,16 +302,18 @@ NOTHROW(FCALL notify_listener_relocate)(struct notify_listener *__restrict oldli
 /* Add a new watch (listener) for `file' to `self'
  * NOTE: This function is only `BLOCKING' because `file->mf_ops->mo_stream_ops->mso_notify_attach'
  *       is  allowed  to  be `BLOCKING',  and  this function  may  need to  invoke  said operator!
- * @param: mask: Set of `IN_ALL_EVENTS', optionally or'd with:
- *                - IN_EXCL_UNLINK | IN_ONESHOT: Include as bits in `notify_listener::nl_mask'
- *                - IN_MASK_ADD:    Or valid bits from `mask' with any pre-existing watch events
- *                - IN_MASK_CREATE: Return `-EEXIST' if `file' is already being watched.
+ * NOTE: When `!mfile_canwatch(file)', the file's FD is immediately deleted and an `IN_IGNORED'
+ *       event  is  generated,  though  the  returned  watch  descriptor  becomes  meaningless.
+ * @param: mask_and_flags: Set of `IN_ALL_EVENTS', optionally or'd with:
+ *          - IN_EXCL_UNLINK | IN_ONESHOT: Include as bits in `notify_listener::nl_mask'
+ *          - IN_MASK_ADD:    Or valid bits from `mask' with any pre-existing watch events
+ *          - IN_MASK_CREATE: Return `-EEXIST' if `file' is already being watched.
  * @return: * :      The watch descriptor (index into `self->nf_listenv')
  * @return: -EEXIST: `IN_MASK_CREATE' was given and `file' is already being monitored. */
 PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 notifyfd_addwatch(struct notifyfd *__restrict self,
                   struct mfile *__restrict file,
-                  uint32_t mask)
+                  uint32_t mask_and_flags)
 		THROWS(E_BADALLOC) {
 	struct notify_listener *ent;
 	struct inotify_controller *ctrl = NULL;
@@ -309,12 +340,12 @@ again:
 			if (ent->nl_file == file) {
 				/* File is already being monitored. */
 				result = (unsigned int)-EEXIST;
-				if (!(mask & IN_MASK_CREATE)) {
+				if (!(mask_and_flags & IN_MASK_CREATE)) {
 					result = i;
 					/* Update watch mask */
-					if (mask & IN_MASK_ADD)
-						mask |= ent->nl_mask;
-					ent->nl_mask = mask & (IN_ALL_EVENTS | IN_ONESHOT | IN_EXCL_UNLINK);
+					if (mask_and_flags & IN_MASK_ADD)
+						mask_and_flags |= ent->nl_mask;
+					goto set_ent_mask_and_done_release;
 				}
 				goto done_release;
 			} else if (ent->nl_file == NULL) {
@@ -322,6 +353,21 @@ again:
 					result = i;
 			}
 		}
+
+		/* Never allow slots that don't fit into a signed integer! */
+#if __SIZEOF_SIZE_T__ > __SIZEOF_INT__
+		if unlikely(result > (unsigned int)INT_MAX) {
+			notify_lock_release_br();
+			/* Yes: in theory there might be enough heap memory, but we
+			 *      simply  fake that there  isn't enough, thus meaning
+			 *      that  we don't have to add a new exception just for
+			 *      this super-unlikely and special case. */
+			THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY,
+			      (result + 1) * sizeof(struct notify_listener));
+		}
+#endif /* __SIZEOF_SIZE_T__ > __SIZEOF_INT__ */
+
+		/* Check if more slots must be allocated. */
 		if (result >= self->nf_listenc) {
 			struct notify_listener *newlist;
 			struct notify_listener *oldlist;
@@ -418,7 +464,10 @@ again:
 		LIST_INSERT_HEAD(&file->mf_notify->inc_listeners, ent, nl_link);
 		ent->nl_notfd = self;
 		ent->nl_file  = incref(file);
-		ent->nl_mask  = mask & (IN_ALL_EVENTS | IN_ONESHOT | IN_EXCL_UNLINK);
+set_ent_mask_and_done_release:
+		ent->nl_mask = mask_and_flags & (IN_ALL_EVENTS | IN_ONESHOT | IN_EXCL_UNLINK);
+		/* These events cannot be ignored */
+		ent->nl_mask |= IN_UNMOUNT | IN_Q_OVERFLOW | IN_IGNORED;
 done_release:
 		notify_lock_release();
 /*done:*/
@@ -508,6 +557,39 @@ NOTHROW(KCALL notifyfd_trytrim)(struct notifyfd *__restrict self,
 }
 
 
+PRIVATE NOPREEMPT NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL notifyfd_postfsevent_raw_impl)(struct notifyfd *__restrict self,
+                                             unsigned int wd, uint16_t mask,
+                                             uint16_t cookie, struct fdirent *ent) {
+	struct notifyfd_event *slot;
+	if (self->nf_eventc >= self->nf_eventa)
+		return false; /* Already full */
+	assert(!(wd & NOTIFYFD_EVENT_ISDIR_FLAG));
+	assert(wd < self->nf_listenc);
+
+	slot = &self->nf_eventv[(self->nf_eventr + self->nf_eventc) % self->nf_eventa];
+	++self->nf_eventc; /* Allocate one more event */
+	if (self->nf_eventc >= self->nf_eventa) {
+		/* Last slot allocated -> must fill with `IN_Q_OVERFLOW' */
+		STATIC_ASSERT(!((unsigned int)INT_MAX & NOTIFYFD_EVENT_ISDIR_FLAG));
+		slot->nfe_wd     = (unsigned int)INT_MAX; /* Don't set most significant bit! */
+		slot->mfe_mask   = IN_Q_OVERFLOW;
+		slot->mfe_cookie = 0;
+		slot->mfe_name   = NULL;
+	} else {
+		/* Fill in the new slot. */
+		slot->nfe_wd = wd;
+		if (ent ? (ent->fd_type == DT_DIR)
+				: mfile_isdir(self->nf_listenv[wd].nl_file))
+			slot->nfe_wd |= NOTIFYFD_EVENT_ISDIR_FLAG;
+		slot->mfe_mask   = mask;
+		slot->mfe_cookie = cookie;
+		slot->mfe_name   = xincref(ent);
+	}
+	return true;
+}
+
+
 /* Remove the watch descriptor `watchfd' (as previously returned by `notifyfd_addwatch')
  * @return: true:  Successfully deleted `watchfd'.
  * @return: false: The given `watchfd' was already deleted. */
@@ -515,6 +597,7 @@ PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL notifyfd_rmwatch)(struct notifyfd *__restrict self,
                                 unsigned int watchfd) {
 	bool trim_listener_list = false;
+	bool should_broadcast   = false;
 	struct dnotify_link_slist deadlinks;
 	struct inotify_controller_slist deadnotif;
 	struct notify_listener *ent;
@@ -529,6 +612,12 @@ NOTHROW(KCALL notifyfd_rmwatch)(struct notifyfd *__restrict self,
 	file = ent->nl_file;
 	if unlikely(file == NULL)
 		goto done; /* Fd was already deleted */
+
+	/* Notify watchfd deletion. */
+	if (notifyfd_postfsevent_raw_impl(self, watchfd, IN_IGNORED, 0, NULL))
+		should_broadcast = self->nf_eventc == 1;
+
+	/* Actually delete the slot. */
 	ent->nl_file = NULL; /* Inherited by `file' // indicate deleted slot */
 	assert(ent->nl_notfd == self);
 	DBG_memset(&ent->nl_notfd, 0xcc, sizeof(ent->nl_notfd));
@@ -592,6 +681,8 @@ done_postlock:
 	/* Try to trim the list of listeners to a total of `watchfd' items */
 	if (trim_listener_list)
 		notifyfd_trytrim(self, watchfd);
+	if (should_broadcast)
+		sig_broadcast(&self->nf_avail);
 
 	/* Return indicative of a file watch having been removed. */
 	return file != NULL;
@@ -794,6 +885,321 @@ done:
 	/* Always just re-return `child_file' */
 	return child_file;
 }
+
+
+#ifndef __notifyfd_slist_defined
+#define __notifyfd_slist_defined
+SLIST_HEAD(notifyfd_slist, notifyfd);
+#endif /* !__notifyfd_slist_defined */
+
+
+/* Enqueue a filesystem event into `self'.
+ * NOTE: The caller must be holding `notify_lock_acquire()'
+ * @param: wd:     s.a. `struct inotify_event::ine_wd'
+ * @param: mask:   s.a. `struct inotify_event::ine_mask'
+ * @param: cookie: s.a. `struct inotify_event::ine_cookie'
+ * @param: ent:    s.a. `struct inotify_event::ine_(len|name)' */
+PRIVATE NOPREEMPT NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL notifyfd_postfsevent_impl)(struct notifyfd *__restrict self,
+                                         struct REF notifyfd_slist *__restrict blist,
+                                         unsigned int wd, uint16_t mask,
+                                         uint16_t cookie, struct fdirent *ent) {
+	/* Post the event. */
+	if (!notifyfd_postfsevent_raw_impl(self, wd, mask, cookie, ent))
+		return;
+
+	/* If we just posted the first  event to the notifyfd, then  we
+	 * must enqueue a call to  `sig_broadcast()'. We can't do  that
+	 * call immediately because we're currently holding an SMP-lock */
+	if (self->nf_eventc == 1) {
+		/* Only enqueue for broadcast if the notifyfd isn't already pending
+		 * a broadcast in the context of some other thread that also just
+		 * send it an fs event.
+		 * This prevents an unlikely race condition:
+		 *   thread#1: Posts FS event
+		 *   thread#1: Adds notifyfd to pending-broadcast list
+		 *   thread#1: notify_lock_release();
+		 *   thread#2: read(notifyfd) --> reads just-posted event
+		 *   thread#3: Posts FS event
+		 *   thread#3: -- We get here, but `self->_nf_blist.sle_next != NULL' because of thread#1
+		 *   thread#3: ...
+		 *   thread#3: notify_lock_release();
+		 *             ...
+		 *   thread#1: ATOMIC_WRITE(notifyfd->_nf_blist.sle_next, NULL);
+		 *   thread#1: sig_broadcast(notifyfd)
+		 *   thread#1: decref(notifyfd)
+		 */
+		if likely(self->_nf_blist.sle_next == NULL) {
+			/* It  is possible to encounter already-destroyed notifyfd objects
+			 * when posting events.  - That's OK  since the destroy  functions
+			 * for these objects will wait for the global `notify_lock', prior
+			 * to actually finalizing anything (other than the refcnt).
+			 *
+			 * And once the destroy function gets the lock, it will remove the
+			 * notifyfd from all attached files,  meaning we wouldn't be  able
+			 * to see it in its partially-destroyed form.
+			 *
+			 * However, since we want to enqueue the notifyfd for being woken
+			 * due to having events be added,  this has to happen _after_  we
+			 * released  our lock to `notify_lock', at which point we have to
+			 * ensure that the object hasn't been destroyed yet.
+			 *
+			 * As such, we try to acquire a reference here and only broadcast
+			 * the notifyfd object if it  wasn't already dead at this  point! */
+			if (tryincref(self)) {
+				self->_nf_blist.sle_next = blist->slh_first; /* Never `NULL'! */
+				blist->slh_first         = self;
+			}
+		}
+	}
+}
+
+
+PRIVATE NOPREEMPT NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL notify_listener_postfsevent_raw_impl)(struct notify_listener *__restrict self,
+                                                    struct REF notifyfd_slist *__restrict blist,
+                                                    uint16_t mask, uint16_t cookie, struct fdirent *ent) {
+	struct notifyfd *notfd = self->nl_notfd;
+	notifyfd_postfsevent_impl(notfd, blist,
+	                          (unsigned int)(self - notfd->nf_listenv),
+	                          mask, cookie, ent);
+}
+
+PRIVATE NOPREEMPT NOBLOCK NONNULL((1, 2, 6, 7)) void
+NOTHROW(FCALL notify_listener_postfsevent_impl)(struct notify_listener *__restrict self,
+                                                struct REF notifyfd_slist *__restrict blist,
+                                                uint16_t mask, uint16_t cookie, struct fdirent *ent,
+                                                struct dnotify_link_slist *__restrict deadlinks,
+                                                struct inotify_controller_slist *__restrict deadnotif) {
+	struct notifyfd *notfd;
+	unsigned int wd;
+
+	/* Check if the event is even being listened for. */
+	if ((mask & self->nl_mask) == 0)
+		return; /* Ignore event */
+	notfd = self->nl_notfd;
+	wd    = (unsigned int)(self - notfd->nf_listenv);
+	notifyfd_postfsevent_impl(notfd, blist, wd, mask, cookie, ent);
+
+	/* Handle IN_ONESHOT descriptors */
+	if (self->nl_mask & IN_ONESHOT) {
+		struct mfile *file = self->nl_file;
+		struct inotify_controller *inot;
+		notifyfd_postfsevent_impl(notfd, blist, wd, IN_IGNORED, 0, NULL);
+
+		/* Actually delete the slot. */
+		self->nl_file = NULL; /* Inherited by `file' // indicate deleted slot */
+		DBG_memset(&self->nl_notfd, 0xcc, sizeof(self->nl_notfd));
+		inot = file->mf_notify;
+		assertf(inot, "Must be non-NULL because the listener "
+		               "we're about to remove still exists");
+		assertf(!LIST_EMPTY(&inot->inc_listeners),
+		        "Can't be empty because we're about to remove an element");
+		assertf(inot->inc_file == file, "Wrong file? (%p != %p)", inot->inc_file, file);
+		LIST_REMOVE(self, nl_link);
+
+		if (LIST_EMPTY(&inot->inc_listeners)) {
+			/* If the file being monitored  is a directory, and  the
+			 * listener we just removed was the last one to go, then
+			 * we  have to clear the file->parent_directory links of
+			 * all files currently loaded within that directory. */
+			if (mfile_isdir(file)) {
+				struct dnotify_controller *dnotif;
+				dnotif = inotify_controller_asdnotify(inot);
+				dnotify_controller_clearfiles(dnotif, deadlinks, deadnotif);
+			}
+
+			/* If the controller doesn't have any remaining listeners,
+			 * both in terms  of per-file and  per-directory, then  we
+			 * can safely delete it! */
+			if (LIST_EMPTY(&inot->inc_dirs)) {
+				file->mf_notify = NULL; /* Remove link from file->notify_controller */
+				incref(file);           /* Inherited by `inotify_controller_slist_destroyall()' */
+				SLIST_INSERT(deadnotif, inot, _inc_deadlnk);
+			}
+		}
+	}
+}
+
+
+PRIVATE NOPREEMPT NOBLOCK NONNULL((1, 2, 6, 7)) void
+NOTHROW(FCALL inotify_controller_postfsevent_impl)(struct inotify_controller *__restrict self,
+                                                   struct REF notifyfd_slist *__restrict blist,
+                                                   uint16_t fil_mask, uint16_t dir_mask, uint16_t cookie,
+                                                   struct dnotify_link_slist *__restrict deadlinks,
+                                                   struct inotify_controller_slist *__restrict deadnotif) {
+	/* Post file events. */
+	if (fil_mask != 0) {
+		struct notify_listener *listener;
+		LIST_FOREACH_SAFE (listener, &self->inc_listeners, nl_link) {
+			notify_listener_postfsevent_impl(listener, blist, fil_mask, cookie,
+			                                 NULL, deadlinks, deadnotif);
+		}
+	}
+
+	/* Post directory events. */
+	if (dir_mask != 0) {
+		struct dnotify_link *link;
+		LIST_FOREACH_SAFE (link, &self->inc_dirs, dnl_fillink) {
+			struct notify_listener *listener;
+			struct dnotify_controller *dir = link->dnl_dir;
+			LIST_FOREACH_SAFE (listener, &dir->inc_listeners, nl_link) {
+				notify_listener_postfsevent_impl(listener, blist, fil_mask, cookie,
+				                                 link->dnl_ent, deadlinks, deadnotif);
+			}
+		}
+	}
+}
+
+
+
+/* Empty-marker for a BLIST (NOTE: The "b" stands for "broadcast") */
+#define BLIST_EMPTY_MARKER ((REF struct notifyfd *)-1) /* Must be non-NULL! */
+
+/* Broadcast the avail-signals of all elements from `self' */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL blist_serve)(struct REF notifyfd_slist *__restrict self) {
+	while (self->slh_first != BLIST_EMPTY_MARKER) {
+		REF struct notifyfd *nfd;
+		nfd             = self->slh_first;
+		self->slh_first = nfd->_nf_blist.sle_next;
+		COMPILER_READ_BARRIER();
+
+		/* Allow other threads to enqueue further broadcasts for this notifyfd */
+		ATOMIC_WRITE(nfd->_nf_blist.sle_next, NULL);
+
+		/* Perform the broadcast we are meant to perform. */
+		sig_broadcast(&nfd->nf_avail);
+
+		/* Drop the reference we were given to do the broadcast. */
+		decref_unlikely(nfd);
+	}
+}
+
+
+
+/* Special function to post `IN_IGNORED', as well as delete all watch-descriptors of `self' */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_postfs_ignored)(struct mfile *__restrict self) {
+	struct REF notifyfd_slist blist;
+	struct dnotify_link_slist deadlinks;
+	struct inotify_controller_slist deadnotif;
+	struct inotify_controller *notif;
+	assert(!wasdestroyed(self));
+	COMPILER_READ_BARRIER();
+	if (self->mf_notify == NULL)
+		return;
+	SLIST_INIT(&deadlinks);
+	SLIST_INIT(&deadnotif);
+	blist.slh_first = BLIST_EMPTY_MARKER;
+	notify_lock_acquire();
+	COMPILER_READ_BARRIER();
+	notif = self->mf_notify;
+	if (notif != NULL) {
+		struct notify_listener *listen;
+		struct dnotify_link *link;
+		assert(notif->inc_file == self);
+		LIST_FOREACH_SAFE (listen, &notif->inc_listeners, nl_link) {
+			assert(listen->nl_file == self);
+			notify_listener_postfsevent_raw_impl(listen, &blist, IN_IGNORED, 0, NULL);
+			listen->nl_file = NULL; /* Mark as deleted. */
+			decref_nokill(self);    /* Reference stolen from `listen->nl_file' */
+			/* XXX: Somehow try to truncate the watch-fd vector of `listen->nl_notfd'?
+			 *      We can't just  do so unconditionally  because not even  GFP_ATOMIC
+			 *      realloc is smp-lock-safe (and we're currently holding an SMP-lock) */
+			DBG_memset(&listen->nl_notfd, 0xcc, sizeof(listen->nl_notfd));
+			DBG_memset(&listen->nl_link, 0xcc, sizeof(listen->nl_link));
+		}
+		DBG_memset(&notif->inc_listeners, 0xcc, sizeof(notif->inc_listeners));
+
+		/* Also sever all connections to containing directories. */
+		LIST_FOREACH_SAFE (link, &notif->inc_dirs, dnl_fillink) {
+			assert(dnotify_link_getfil(link) == notif);
+			dnotify_link_tree_removenode(&dnotify_link_getdir(link)->dnc_files, link);
+			DBG_memset(&link->dnl_dirnode, 0xcc, sizeof(link->dnl_dirnode));
+			SLIST_INSERT(&deadlinks, link, _dnl_fildead); /* Destroy later... */
+		}
+
+		/* If the file itself is a directory, then we must also clear
+		 * the file->containing_directory links from all child files. */
+		if (mfile_isdir(self)) {
+			struct dnotify_controller *dnotif;
+			dnotif = inotify_controller_asdnotify(notif);
+			dnotify_controller_clearfiles(dnotif, &deadlinks, &deadnotif);
+		}
+
+		/* Add the file's own notify controller to the free list. */
+		self->mf_notify = NULL; /* Steal (destroyed in `inotify_controller_slist_destroyall()') */
+		incref(self);           /* Inherited by `inotify_controller_slist_destroyall()' */
+		SLIST_INSERT(&deadnotif, notif, _inc_deadlnk);
+	}
+	notify_lock_release();
+
+	/* Free deleted objects. */
+	dnotify_link_slist_destroyall(&deadlinks);
+	inotify_controller_slist_destroyall(&deadnotif);
+	blist_serve(&blist);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_postfsevent_impl)(struct mfile *__restrict self,
+                                      uint16_t fil_mask, uint16_t dir_mask,
+                                      uint16_t cookie) {
+	struct REF notifyfd_slist blist = { BLIST_EMPTY_MARKER };
+	struct dnotify_link_slist deadlinks;
+	struct inotify_controller_slist deadnotif;
+	COMPILER_READ_BARRIER();
+	if (self->mf_notify == NULL)
+		return;
+	SLIST_INIT(&deadlinks);
+	SLIST_INIT(&deadnotif);
+	notify_lock_acquire();
+	COMPILER_READ_BARRIER();
+	if (self->mf_notify != NULL) {
+		inotify_controller_postfsevent_impl(self->mf_notify, &blist,
+		                                    fil_mask, dir_mask, cookie,
+		                                    &deadlinks, &deadnotif);
+	}
+	notify_lock_release();
+
+	/* Free deleted objects. */
+	dnotify_link_slist_destroyall(&deadlinks);
+	inotify_controller_slist_destroyall(&deadnotif);
+	blist_serve(&blist);
+}
+
+/* Like the functions above, but operator on a given `struct mfile *self' */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_postfsevent)(struct mfile *__restrict self,
+                                 uint16_t mask) {
+	mfile_postfsevent_impl(self, mask, mask, 0);
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_postfsfilevent)(struct mfile *__restrict self,
+                                    uint16_t mask) {
+	mfile_postfsevent_impl(self, mask, 0, 0);
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_postfsdirevent)(struct mfile *__restrict self,
+                                    uint16_t mask) {
+	mfile_postfsevent_impl(self, 0, mask, 0);
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_postfsdirevent2)(struct mfile *__restrict self,
+                                     uint16_t mask, uint16_t cookie) {
+	mfile_postfsevent_impl(self, 0, mask, cookie);
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mfile_postfsevent_ex)(struct mfile *__restrict self,
+                                    uint16_t fil_mask, uint16_t dir_mask) {
+	mfile_postfsevent_impl(self, fil_mask, dir_mask, 0);
+}
+
+
 
 
 
