@@ -34,6 +34,7 @@
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/notify.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <sched/cred.h>
@@ -659,8 +660,10 @@ again_check_permissions:
 	mfile_tslock_release(self);
 
 	/* Broadcast that mode bits have changed. */
-	if (old_mode != new_mode)
+	if (old_mode != new_mode) {
 		mfile_changed(self, MFILE_F_ATTRCHANGED);
+		mfile_postfs_attrib(self); /* Post `IN_ATTRIB' */
+	}
 	return old_mode;
 }
 
@@ -795,8 +798,10 @@ again_read_old_values:
 	mfile_tslock_release(self);
 
 	/* Broadcast that owner values have changed. */
-	if (changed)
+	if (changed) {
 		mfile_changed(self, MFILE_F_ATTRCHANGED);
+		mfile_postfs_attrib(self); /* Post `IN_ATTRIB' */
+	}
 }
 
 
@@ -847,7 +852,10 @@ mfile_chtime(struct mfile *__restrict self,
 	mfile_tslock_release(self);
 
 	/* Mark attributes of this file as having changed. */
-	mfile_changed(self, MFILE_F_ATTRCHANGED);
+	if (changed) {
+		mfile_changed(self, MFILE_F_ATTRCHANGED);
+		mfile_postfs_attrib(self); /* Post `IN_ATTRIB' */
+	}
 	return changed;
 }
 

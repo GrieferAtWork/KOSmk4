@@ -41,6 +41,7 @@
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/fs.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/notify.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
@@ -750,6 +751,7 @@ again_acquire_lock_for_insert:
 				mfile_tslock_acquire(new_node);
 				ATOMIC_INC(new_node->fn_nlink);
 				mfile_tslock_release(new_node);
+				mfile_postfs_attrib(new_node); /* Post `IN_ATTRIB' */
 			}
 
 			/* Construct missing references for `new_dirent' */

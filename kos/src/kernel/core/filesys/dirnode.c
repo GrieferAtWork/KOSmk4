@@ -30,6 +30,7 @@
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/node.h>
 #include <kernel/handle.h>
+#include <sched/task.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
@@ -382,16 +383,43 @@ fdirnode_mkfile(struct fdirnode *__restrict self,
 		THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	struct inotify_controller *newfile_notcon;
+	struct dnotify_link *newfile_link;
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 	unsigned int result;
 	struct fdirnode_ops const *ops;
 	ops = fdirnode_getops(self);
-	if unlikely(!ops->dno_mkfile) {
+#ifndef CONFIG_HAVE_FS_NOTIFY
+	if unlikely(!ops->dno_mkfile)
+#endif /* !CONFIG_HAVE_FS_NOTIFY */
+	{
 		/* Check for an already-existing file. */
 		REF struct fdirent *ent;
-		REF struct fnode *node;
 again_lookup:
 		ent = fdirnode_lookup(self, &info->mkf_lookup_info);
-		if (!ent) {
+		if (ent) {
+			REF struct fnode *node;
+			TRY {
+				node = fdirent_opennode(ent, self);
+			} EXCEPT {
+				decref_unlikely(ent);
+				RETHROW();
+			}
+			if unlikely(!node) {
+				/* Race condition: file was deleted after we did the lookup above. */
+				decref_unlikely(ent);
+				goto again_lookup;
+			}
+			info->mkf_dent  = ent;  /* Inherit reference */
+			info->mkf_rnode = node; /* Inherit reference */
+			return FDIRNODE_MKFILE_EXISTS;
+		}
+
+#ifdef CONFIG_HAVE_FS_NOTIFY
+		if unlikely(!ops->dno_mkfile)
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+		{
 			/* If we don't have permissions to change files,
 			 * then don't throw READONLY, but ACCESS_DENIED. */
 			fnode_access(self, W_OK);
@@ -399,24 +427,40 @@ again_lookup:
 			/* If we have permissions, then throw READONLY. */
 			THROW(E_FSERROR_READONLY);
 		}
-		TRY {
-			node = fdirent_opennode(ent, self);
-		} EXCEPT {
-			decref_unlikely(ent);
-			RETHROW();
-		}
-		if unlikely(!node) {
-			/* Race condition: file was deleted after we did the lookup above. */
-			decref_unlikely(ent);
-			goto again_lookup;
-		}
-		info->mkf_dent  = ent;  /* Inherit reference */
-		info->mkf_rnode = node; /* Inherit reference */
-		return FDIRNODE_MKFILE_EXISTS;
 	}
+
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	/* Because we have no way of knowing if the containing directory will  be
+	 * traced by the time the new file  has been created, we have to  prepare
+	 * for the case where it is, in which case we have to ensure that the new
+	 * file will be traced, too.
+	 *
+	 * Because of this, we have to allocate memory that will be needed to
+	 * link the newly  created file to  it's parent's notify  controller. */
+	if (S_ISDIR(info->mkf_fmode) ||
+	    (info->mkf_fmode == 0 && fnode_isdir(info->mkf_hrdlnk.hl_node))) {
+		newfile_notcon = dnotify_controller_alloc();
+		inotify_controller_asdnotify(newfile_notcon)->dnc_files = NULL;
+	} else {
+		newfile_notcon = inotify_controller_alloc();
+	}
+	newfile_notcon->inc_file = NULL;
+	TRY {
+		newfile_link = dnotify_link_alloc();
+	} EXCEPT {
+		inotify_controller_free(newfile_notcon);
+		RETHROW();
+	}
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+
 	TRY {
 		result = (*ops->dno_mkfile)(self, info);
 	} EXCEPT {
+#ifdef CONFIG_HAVE_FS_NOTIFY
+		dnotify_link_free(newfile_link);
+		inotify_controller_free(newfile_notcon);
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+
 		/* If `dno_mkfile' throws `E_FSERROR_UNSUPPORTED_OPERATION', try to
 		 * fill  in the correct `E_FILESYSTEM_OPERATION_*' context based on
 		 * `info->mkf_fmode'. */
@@ -450,23 +494,92 @@ again_lookup:
 		}
 		RETHROW();
 	}
+
 #ifdef CONFIG_HAVE_FS_NOTIFY
-	/* TODO: Must lazily bind  directory notifications  to
-	 * child files, like also done by `fdirent_opennode()'
+	/* Must lazily bind directory notifications to child
+	 * files,  like  also done  by `fdirent_opennode()':
 	 *  - info->mkf_rnode
 	 *  - info->mkf_dent
 	 *
 	 * IMPORTANT: The bind here  must be done  such that  it
 	 * is NOTHROW, since (in case  a new file was  created),
 	 * we have no way of dealing with an allocation failure. */
+	if (self->mf_notify != NULL) {
+again_acquire_notify_lock:
+		notify_lock_acquire();
+		COMPILER_READ_BARRIER();
+		if (self->mf_notify != NULL) {
+			struct dnotify_link *olnk;
+			struct dnotify_controller *dnot;
+			dnot = inotify_controller_asdnotify(self->mf_notify);
+			olnk = dnotify_link_tree_locate(dnot->dnc_files, info->mkf_dent);
+			if (olnk) {
+				assert(olnk->dnl_dir == dnot);
+				assert(olnk->dnl_fil == info->mkf_rnode->mf_notify);
+			} else {
+				/* Link is missing -> create it */
+				struct mfile *rfile = info->mkf_rnode;
+				assert(newfile_notcon->inc_file == NULL ||
+				       newfile_notcon->inc_file == rfile);
+				if (rfile->mf_notify == NULL) {
+					if (newfile_notcon->inc_file == NULL) {
+						struct mfile_stream_ops const *stream;
+						newfile_notcon->inc_file = rfile;
+						newfile_notcon->inc_fhnd = NULL;
+						/* Allocate a notify file handle. */
+						stream = rfile->mf_ops->mo_stream;
+						if (stream && stream->mso_notify_attach) {
+							notify_lock_release_br();
+							/* If this throws in this context, there is literally nothing we can do. */
+							TRY {
+								newfile_notcon->inc_fhnd = (*stream->mso_notify_attach)(info->mkf_rnode);
+							} EXCEPT {
+								inotify_controller_free(newfile_notcon);
+								dnotify_link_free(newfile_link);
+								RETHROW();
+							}
+							goto again_acquire_notify_lock;
+						}
+					}
+					/* Assign a notify controller. */
+					LIST_INIT(&newfile_notcon->inc_listeners);
+					LIST_INIT(&newfile_notcon->inc_dirs);
+					rfile->mf_notify = newfile_notcon;
+					newfile_notcon   = NULL; /* Steal */
+				}
+				/* Create the link */
+				newfile_link->dnl_dir = dnot;
+				newfile_link->dnl_fil = rfile->mf_notify;
+				newfile_link->dnl_ent = incref(info->mkf_dent);
+				LIST_INSERT_HEAD(&newfile_link->dnl_fil->inc_dirs, newfile_link, dnl_fillink);
+				dnotify_link_tree_insert(&dnot->dnc_files, newfile_link);
+				newfile_link = NULL; /* Steal */
+			}
+		}
+		notify_lock_release();
+	}
+	dnotify_link_xfree(newfile_link);
+	if (newfile_notcon) {
+		if (newfile_notcon->inc_file) {
+			struct mfile_stream_ops const *stream;
+			assert(newfile_notcon->inc_file == info->mkf_rnode);
+			/* Detach notify handle. */
+			stream = info->mkf_rnode->mf_ops->mo_stream;
+			if (stream && stream->mso_notify_detach)
+				(*stream->mso_notify_detach)(info->mkf_rnode, newfile_notcon->inc_fhnd);
+		}
+		inotify_controller_free(newfile_notcon);
+	}
+
+	/* If a new file was created, post the relevant fs event. */
+	if (result == FDIRNODE_MKFILE_SUCCESS)
+		mfile_postfs_created(info->mkf_rnode); /* Post `IN_CREATE' */
 #endif /* CONFIG_HAVE_FS_NOTIFY */
+
 	return result;
 }
 
 /* Delete the specified file from this directory
- * @throw: E_FSERROR_FILE_NOT_FOUND:      The file had  already been deleted,  or
- *                                        renamed (it no longer exists as `entry'
- *                                        within `self').
  * @throw: E_FSERROR_DIRECTORY_NOT_EMPTY: `file' is a non-empty directory.
  * @throw: E_FSERROR_READONLY:            Read-only filesystem (or unsupported operation)
  * @return: * : One of `FDIRNODE_UNLINK_*' */
@@ -474,13 +587,17 @@ PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fdirnode_unlink(struct fdirnode *__restrict self,
                 struct fdirent *__restrict entry,
                 struct fnode *__restrict file)
-		THROWS(E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DIRECTORY_NOT_EMPTY,
+		THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
 		       E_FSERROR_READONLY, E_IOERROR, ...) {
+	unsigned int result;
 	struct fdirnode_ops const *ops;
 	ops = fdirnode_getops(self);
 	if unlikely(!ops->dno_unlink)
 		THROW(E_FSERROR_READONLY);
-	return (*ops->dno_unlink)(self, entry, file);
+	result = (*ops->dno_unlink)(self, entry, file);
+	if (result == FDIRNODE_UNLINK_SUCCESS)
+		mfile_postfs_deleted(file); /* Post `IN_DELETE' and `IN_DELETE_SELF' */
+	return result;
 }
 
 /* Rename/move the specified file from one location to another

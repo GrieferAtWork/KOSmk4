@@ -357,7 +357,9 @@ struct fdirnode_ops {
 	 * >>     return FDIRNODE_UNLINK_DELETED;
 	 * >> assert(entry->FILE == file);
 	 * >> REMOVE_DIRECTORY_ENTRY(self, entry);
-	 * >> MARK_DELETED(entry); */
+	 * >> MARK_DELETED(entry);
+	 * >> if (CHANGED(file->fn_nlink))
+	 * >>     mfile_postfs_attrib(file); */
 	BLOCKING WUNUSED NONNULL((1, 2, 3)) unsigned int
 	(KCALL *dno_unlink)(struct fdirnode *__restrict self,
 	                    struct fdirent *__restrict entry,
@@ -600,9 +602,6 @@ fdirnode_mkfile(struct fdirnode *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 
 /* Delete the specified file from this directory
- * @throw: E_FSERROR_FILE_NOT_FOUND:      The file had  already been deleted,  or
- *                                        renamed (it no longer exists as `entry'
- *                                        within `self').
  * @throw: E_FSERROR_DIRECTORY_NOT_EMPTY: `file' is a non-empty directory.
  * @throw: E_FSERROR_READONLY:            Read-only filesystem (or unsupported operation)
  * @return: * : One of `FDIRNODE_UNLINK_*' */
@@ -610,7 +609,7 @@ FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) unsigned int KCALL
 fdirnode_unlink(struct fdirnode *__restrict self,
                 struct fdirent *__restrict entry,
                 struct fnode *__restrict file)
-		THROWS(E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DIRECTORY_NOT_EMPTY,
+		THROWS(E_FSERROR_DIRECTORY_NOT_EMPTY,
 		       E_FSERROR_READONLY, E_IOERROR, ...);
 
 /* Rename/move the specified file from one location to another

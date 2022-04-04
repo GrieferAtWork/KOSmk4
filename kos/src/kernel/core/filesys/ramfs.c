@@ -827,8 +827,9 @@ again_acquire_lock_for_insert:
 			} else {
 				/* Hard link -> increment the nlink counter */
 				mfile_tslock_acquire(new_node);
-				ATOMIC_INC(new_node->fn_nlink);
+				++new_node->fn_nlink;
 				mfile_tslock_release(new_node);
+				mfile_postfs_attrib(new_node); /* Post `IN_ATTRIB' */
 			}
 
 			/* Construct missing references for `new_dirent' */
@@ -918,11 +919,12 @@ again:
 		/* For non-directory files, must decrement the NLINK counter. */
 		mfile_tslock_acquire(file);
 		assert(file->fn_nlink >= 1);
-		ATOMIC_DEC(file->fn_nlink);
+		--file->fn_nlink;
 		last_link_went_away = file->fn_nlink == 0;
 		if (last_link_went_away)
 			last_link_went_away = fnode_delete_strt_with_tslock(file);
 		mfile_tslock_release(file);
+		mfile_postfs_attrib(file); /* Post `IN_ATTRIB' */
 
 		/* Delete the file (make all mem-parts anonymous) */
 		if (last_link_went_away) {

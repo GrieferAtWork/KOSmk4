@@ -355,15 +355,15 @@ struct dnotify_controller
  * Always inherits a reference to `child_file' that is also always re-
  * returned.  - In case  of an allocation error,  this pointer will be
  * decref'd! */
-FUNDEF BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct fnode *KCALL
+FUNDEF BLOCKING WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 dnotify_controller_bindchild_slow(struct fdirnode *__restrict dir,
                                   struct fdirent *__restrict child_dent,
-                                  /*inherit(always)*/ REF struct fnode *__restrict child_file)
+                                  /*inherit(always)*/ REF struct fnode *child_file)
 		THROWS(E_BADALLOC, ...);
-EIDECLARE(BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)), REF struct fnode *, ,
-          KCALL, dnotify_controller_bindchild, (struct fdirnode *__restrict dir,
-                                                struct fdirent *__restrict child_dent,
-                                                /*inherit(always)*/ REF struct fnode *__restrict child_file)
+EIDECLARE(BLOCKING WUNUSED NONNULL((1, 2)), REF struct fnode *, , KCALL,
+          dnotify_controller_bindchild, (struct fdirnode *__restrict dir,
+                                         struct fdirent *__restrict child_dent,
+                                         /*inherit(always)*/ REF struct fnode *child_file)
 		THROWS(E_BADALLOC, ...), {
 	if likely(((struct mfile *)dir)->mf_notify == __NULLPTR)
 		return child_file; /* Directory isn't being watched --> nothing to do here! */
@@ -397,30 +397,46 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsevent_ex)(struct mf
 #define __mfile_postfsevent_ex(self, fil_mask, dir_mask) __mfile_maybepostfsevent(self, (__mfile_postfsevent_ex)(self, fil_mask, dir_mask))
 
 /* Helper functions (use these instead of the functions above) */
-#define mfile_postfs_accessed(self)         __mfile_postfsevent(self, IN_ACCESS)
-#define mfile_postfs_modified(self)         __mfile_postfsevent(self, IN_MODIFY)
-#define mfile_postfs_attrib(self)           __mfile_postfsevent(self, IN_ATTRIB)
-#define mfile_postfs_closewr(self)          __mfile_postfsevent(self, IN_CLOSE_WRITE)
-#define mfile_postfs_closero(self)          __mfile_postfsevent(self, IN_CLOSE_NOWRITE)
-#define mfile_postfs_opened(self)           __mfile_postfsevent(self, IN_OPEN)
-#define mfile_postfs_movefrom(self, cookie) __mfile_postfsdirevent2(self, IN_MOVED_FROM, cookie)
-#define mfile_postfs_moveto(self, cookie)   __mfile_postfsdirevent2(self, IN_MOVED_TO, cookie)
-#define mfile_postfs_moved(self)            __mfile_postfsfilevent(self, IN_MOVE_SELF)
-#define mfile_postfs_created(self)          __mfile_postfsdirevent(self, IN_CREATE)
-#define mfile_postfs_deleted(self)          __mfile_postfsevent_ex(self, IN_DELETE_SELF, IN_DELETE)
-#define mfile_postfs_unmount(self)          __mfile_postfsfilevent(self, IN_UNMOUNT)
+#define mfile_postfs_accessed(self)         __mfile_postfsevent(self, IN_ACCESS)                    /* TODO */
+#define mfile_postfs_modified(self)         __mfile_postfsevent(self, IN_MODIFY)                    /* Implemented */
+#define mfile_postfs_attrib(self)           __mfile_postfsevent(self, IN_ATTRIB)                    /* Implemented */
+#define mfile_postfs_closewr(self)          __mfile_postfsevent(self, IN_CLOSE_WRITE)               /* TODO */
+#define mfile_postfs_closero(self)          __mfile_postfsevent(self, IN_CLOSE_NOWRITE)             /* Implemented */
+#define mfile_postfs_opened(self)           __mfile_postfsevent(self, IN_OPEN)                      /* Implemented */
+#define mfile_postfs_movefrom(self, cookie) __mfile_postfsdirevent2(self, IN_MOVED_FROM, cookie)    /* TODO */
+#define mfile_postfs_moveto(self, cookie)   __mfile_postfsdirevent2(self, IN_MOVED_TO, cookie)      /* TODO */
+#define mfile_postfs_moved(self)            __mfile_postfsfilevent(self, IN_MOVE_SELF)              /* TODO */
+#define mfile_postfs_created(self)          __mfile_postfsdirevent(self, IN_CREATE)                 /* Implemented */
+#define mfile_postfs_deleted(self)          __mfile_postfsevent_ex(self, IN_DELETE_SELF, IN_DELETE) /* Implemented */
+#define mfile_postfs_unmount(self)          __mfile_postfsfilevent(self, IN_UNMOUNT)                /* Implemented */
 
 /* Special function to post `IN_IGNORED', as well as delete all watch-descriptors of `self' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_postfs_ignored)(struct mfile *__restrict self);
-#define mfile_postfs_ignored(self) __mfile_maybepostfsevent(self, (mfile_postfs_ignored)(self))
+#define mfile_postfs_ignored(self) __mfile_maybepostfsevent(self, (mfile_postfs_ignored)(self)) /* Implemented */
 
 
 
 DECL_END
 #endif /* __CC__ */
 #else /* CONFIG_HAVE_FS_NOTIFY */
+/* No-op directory-child-bind */
 #define dnotify_controller_bindchild(dir, child_dent, child_file) (child_file)
+
+/* No-op file event triggers */
+#define mfile_postfs_accessed(self)         (void)0
+#define mfile_postfs_modified(self)         (void)0
+#define mfile_postfs_attrib(self)           (void)0
+#define mfile_postfs_closewr(self)          (void)0
+#define mfile_postfs_closero(self)          (void)0
+#define mfile_postfs_opened(self)           (void)0
+#define mfile_postfs_movefrom(self, cookie) (void)0
+#define mfile_postfs_moveto(self, cookie)   (void)0
+#define mfile_postfs_moved(self)            (void)0
+#define mfile_postfs_created(self)          (void)0
+#define mfile_postfs_deleted(self)          (void)0
+#define mfile_postfs_unmount(self)          (void)0
+#define mfile_postfs_ignored(self)          (void)0
 #endif /* !CONFIG_HAVE_FS_NOTIFY */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_NOTIFY_H */

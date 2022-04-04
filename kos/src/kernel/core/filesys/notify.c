@@ -721,22 +721,24 @@ done_postlock:
  * Always inherits a reference to `child_file' that is also always re-
  * returned.  - In case  of an allocation error,  this pointer will be
  * decref'd! */
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct fnode *KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 dnotify_controller_bindchild(struct fdirnode *__restrict dir,
                              struct fdirent *__restrict child_dent,
-                             /*inherit(always)*/ REF struct fnode *__restrict child_file)
+                             /*inherit(always)*/ REF struct fnode *child_file)
 		THROWS(E_BADALLOC, ...) {
 	if likely(dir->mf_notify == NULL)
 		return child_file; /* Nothing to do in this case! */
 	return dnotify_controller_bindchild_slow(dir, child_dent, child_file);
 }
-PUBLIC BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct fnode *KCALL
+PUBLIC BLOCKING WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 dnotify_controller_bindchild_slow(struct fdirnode *__restrict dir,
                                   struct fdirent *__restrict child_dent,
-                                  /*inherit(always)*/ REF struct fnode *__restrict child_file)
+                                  /*inherit(always)*/ REF struct fnode *child_file)
 		THROWS(E_BADALLOC, ...) {
-	assert(!!mfile_isdir(child_file) == (child_dent->fd_type == DT_DIR));
 	struct dnotify_link *link = NULL;
+	if (child_file == NULL)
+		return child_file;
+	assert(!!mfile_isdir(child_file) == (child_dent->fd_type == DT_DIR));
 	/*if unlikely(dir->mf_notify == NULL)
 		return child_file;*/
 	RAII_FINALLY { dnotify_link_xfree(link); };

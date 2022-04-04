@@ -31,6 +31,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/notify.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <sched/sig-completion.h>
@@ -313,7 +314,8 @@ NOTHROW(FCALL mfile_decref_and_destroy_deadparts_postop)(Tobpostlockop(mfile) *_
 		mpart_destroy(part);
 	}
 
-	/* TODO: Generate `IN_IGNORED' */
+	/* Generate `IN_IGNORED' */
+	mfile_postfs_ignored(me);
 
 	/* Drop the inherited reference to the original file. */
 	decref_unlikely(me);
@@ -324,7 +326,7 @@ NOTHROW(FCALL mfile_decref_postop)(Tobpostlockop(mfile) *__restrict self,
                                    struct mfile *__restrict UNUSED(_file)) {
 	REF struct mfile *me;
 	me = container_of(self, struct mfile, _mf_mfplop);
-	/* TODO: Generate `IN_IGNORED' */
+	mfile_postfs_ignored(me); /* Generate `IN_IGNORED' */
 	decref_unlikely(me);
 }
 
