@@ -954,6 +954,7 @@ handles_lookuptask(fd_t fd)
 #define handles_lookupsocket(fd)   ((REF struct socket *)handles_lookupobj(fd, HANDLE_TYPE_SOCKET))
 #define handles_lookupepoll(fd)    ((REF struct epoll_controller *)handles_lookupobj(fd, HANDLE_TYPE_EPOLL))
 #define handles_lookupsignalfd(fd) ((REF struct signalfd *)handles_lookupobj(fd, HANDLE_TYPE_SIGNALFD))
+#define handles_lookupnotifyfd(fd) ((REF struct notifyfd *)handles_lookupobj(fd, HANDLE_TYPE_NOTIFYFD))
 
 /* Same as `handman_install_into()',  but also  accept
  * symbolic handles, and use `THIS_HANDMAN' otherwise. */

@@ -137,6 +137,12 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP,                 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `op' argument passed to `epoll_ctl(2)' isn't one of `EPOLL_CTL_*' from `<sys/epoll.h>' */
 	E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS,    /* E_INVALID_ARGUMENT_BAD_VALUE: The `maxevents' argument passed to `epoll_wait(2)' is `<= 0' */
 
+	/* System calls: inotify. */
+	E_INVALID_ARGUMENT_CONTEXT_INOTIFY_INIT1_FLAGS = 0x0370, /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `inotify_init1(2)' cannot be masked by `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
+	E_INVALID_ARGUMENT_CONTEXT_INOTIFY_WATCH_MASK,           /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown bits set in `mask', as passed to `inotify_add_watch(2)' (NOTE: `inotify_add_watch_at' doesn't accept `IN_DONT_FOLLOW'!)
+	                                                          * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Failed to pass at least one of `IN_ALL_EVENTS' in `mask' */
+	E_INVALID_ARGUMENT_CONTEXT_INOTIFY_ADD_WATCH_FLAGS,      /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Illegal `AT_*' flag passed to `inotify_add_watch_at()' (accepted are `AT_SYMLINK_NOFOLLOW|AT_DOSPATH'). */
+
 	/* System calls: scheduling */
 	E_INVALID_ARGUMENT_CONTEXT_CLONE_THREAD_WITH_NEWPID = 0x0380, /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_THREAD` and 'CLONE_NEWPID' were given. */
 	E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM,            /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_VFORK` was given without 'CLONE_VM'. */
@@ -419,6 +425,11 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS              E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS              /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `epoll_create1(2)' cannot be masked by `EPOLL_CLOEXEC | EPOLL_CLOFORK' */
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP                     E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP                     /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `op' argument passed to `epoll_ctl(2)' isn't one of `EPOLL_CTL_*' from `<sys/epoll.h>' */
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS        E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS        /* E_INVALID_ARGUMENT_BAD_VALUE: The `maxevents' argument passed to `epoll_wait(2)' is `<= 0' */
+/* System calls: inotify. */
+#define E_INVALID_ARGUMENT_CONTEXT_INOTIFY_INIT1_FLAGS              E_INVALID_ARGUMENT_CONTEXT_INOTIFY_INIT1_FLAGS              /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `inotify_init1(2)' cannot be masked by `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
+#define E_INVALID_ARGUMENT_CONTEXT_INOTIFY_WATCH_MASK               E_INVALID_ARGUMENT_CONTEXT_INOTIFY_WATCH_MASK               /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown bits set in `mask', as passed to `inotify_add_watch(2)' (NOTE: `inotify_add_watch_at' doesn't accept `IN_DONT_FOLLOW'!)
+                                                                                                                                 * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Failed to pass at least one of `IN_ALL_EVENTS' in `mask' */
+#define E_INVALID_ARGUMENT_CONTEXT_INOTIFY_ADD_WATCH_FLAGS          E_INVALID_ARGUMENT_CONTEXT_INOTIFY_ADD_WATCH_FLAGS          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Illegal `AT_*' flag passed to `inotify_add_watch_at()' (accepted are `AT_SYMLINK_NOFOLLOW|AT_DOSPATH'). */
 /* System calls: scheduling */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_THREAD_WITH_NEWPID         E_INVALID_ARGUMENT_CONTEXT_CLONE_THREAD_WITH_NEWPID         /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_THREAD` and 'CLONE_NEWPID' were given. */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM           E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM           /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_VFORK` was given without 'CLONE_VM'. */
@@ -675,6 +686,11 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS              832  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `epoll_create1(2)' cannot be masked by `EPOLL_CLOEXEC | EPOLL_CLOFORK' */
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP                     833  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `op' argument passed to `epoll_ctl(2)' isn't one of `EPOLL_CTL_*' from `<sys/epoll.h>' */
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS        834  /* E_INVALID_ARGUMENT_BAD_VALUE: The `maxevents' argument passed to `epoll_wait(2)' is `<= 0' */
+/* System calls: inotify. */
+#define E_INVALID_ARGUMENT_CONTEXT_INOTIFY_INIT1_FLAGS              880  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `inotify_init1(2)' cannot be masked by `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK' */
+#define E_INVALID_ARGUMENT_CONTEXT_INOTIFY_WATCH_MASK               881  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown bits set in `mask', as passed to `inotify_add_watch(2)' (NOTE: `inotify_add_watch_at' doesn't accept `IN_DONT_FOLLOW'!)
+                                                                          * E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Failed to pass at least one of `IN_ALL_EVENTS' in `mask' */
+#define E_INVALID_ARGUMENT_CONTEXT_INOTIFY_ADD_WATCH_FLAGS          882  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Illegal `AT_*' flag passed to `inotify_add_watch_at()' (accepted are `AT_SYMLINK_NOFOLLOW|AT_DOSPATH'). */
 /* System calls: scheduling */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_THREAD_WITH_NEWPID         896  /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: Both `CLONE_THREAD` and 'CLONE_NEWPID' were given. */
 #define E_INVALID_ARGUMENT_CONTEXT_CLONE_VFORK_WITHOUT_VM           897  /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: `CLONE_VFORK` was given without 'CLONE_VM'. */

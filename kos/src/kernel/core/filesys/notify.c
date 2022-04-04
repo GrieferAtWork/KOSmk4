@@ -27,12 +27,16 @@
 #include <kernel/compiler.h>
 
 #ifdef CONFIG_HAVE_FS_NOTIFY
+#include <kernel/except.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
+#include <kernel/fs/fs.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/notify.h>
+#include <kernel/fs/path.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
+#include <kernel/handman.h>
 #include <kernel/malloc.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/syscall.h>
@@ -46,6 +50,7 @@
 #include <hybrid/unaligned.h>
 
 #include <kos/except.h>
+#include <kos/except/reason/inval.h>
 #include <linux/inotify.h>
 
 #include <assert.h>
@@ -77,6 +82,11 @@
 #endif /* NDEBUG || NDEBUG_FINI */
 
 DECL_BEGIN
+
+/* >> /proc/sys/fs/inotify/max_queued_events
+ * Default # of max pending events in newly created `struct notifyfd' */
+PUBLIC unsigned int notifyfd_default_maxevents = 64;
+
 
 /* SMP-lock  for filesystem event notify. -- We use a global lock for this because
  * the alternative would be to set-up many smaller locks, each of which would also
@@ -1332,6 +1342,112 @@ handle_notifyfd_polltest(struct notifyfd *__restrict self,
 
 
 
+#if (defined(__ARCH_WANT_SYSCALL_INOTIFY_INIT) || \
+     defined(__ARCH_WANT_SYSCALL_INOTIFY_INIT1))
+PRIVATE fd_t KCALL sys_inotify_init_impl(syscall_ulong_t flags) {
+	struct handle_install_data install;
+	iomode_t iomode = 0;
+	fd_t result;
+	REF struct notifyfd *notfd;
+	if (flags & IN_NONBLOCK)
+		iomode |= IO_NONBLOCK;
+	if (flags & IN_CLOEXEC)
+		iomode |= IO_CLOEXEC;
+	if (flags & IN_CLOFORK)
+		iomode |= IO_CLOFORK;
+	result = handles_install_begin(&install);
+	TRY {
+		unsigned int maxevents;
+		maxevents = ATOMIC_READ(notifyfd_default_maxevents);
+		notfd     = notifyfd_new(maxevents);
+	} EXCEPT {
+		handles_install_abort(&install);
+		RETHROW();
+	}
+	handles_install_commit_inherit(&install, notfd, iomode);
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_INOTIFY_INIT{1} */
+
+#ifdef __ARCH_WANT_SYSCALL_INOTIFY_INIT
+DEFINE_SYSCALL0(fd_t, inotify_init) {
+	return sys_inotify_init_impl(0);
+}
+#endif /* __ARCH_WANT_SYSCALL_INOTIFY_INIT */
+
+#ifdef __ARCH_WANT_SYSCALL_INOTIFY_INIT1
+DEFINE_SYSCALL1(fd_t, inotify_init1, syscall_ulong_t, flags) {
+	VALIDATE_FLAGSET(flags, IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK,
+	                 E_INVALID_ARGUMENT_CONTEXT_INOTIFY_INIT1_FLAGS);
+	return sys_inotify_init_impl(flags);
+}
+#endif /* __ARCH_WANT_SYSCALL_INOTIFY_INIT1 */
+
+
+#if (defined(__ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH) || \
+     defined(__ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH_AT))
+PRIVATE int KCALL
+sys_inotify_add_watch_impl(fd_t notify_fd, fd_t dfd,
+                           USER UNCHECKED char const *pathname,
+                           atflag_t atflags, uint32_t mask) {
+	REF struct notifyfd *self;
+	REF struct mfile *file;
+	VALIDATE_FLAGSET(atflags, AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
+	                 E_INVALID_ARGUMENT_CONTEXT_INOTIFY_ADD_WATCH_FLAGS);
+	VALIDATE_FLAGSET(mask,
+	                 IN_ALL_EVENTS | IN_UNMOUNT | IN_Q_OVERFLOW | IN_IGNORED |
+	                 IN_ONLYDIR | IN_EXCL_UNLINK | IN_MASK_CREATE | IN_MASK_ADD |
+	                 IN_ISDIR | IN_ONESHOT,
+	                 E_INVALID_ARGUMENT_CONTEXT_INOTIFY_ADD_WATCH_FLAGS);
+	if unlikely((mask & IN_ALL_EVENTS) == 0) {
+		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+		      E_INVALID_ARGUMENT_CONTEXT_INOTIFY_WATCH_MASK,
+		      mask, IN_ALL_EVENTS/*, 0*/);
+	}
+	self = handles_lookupnotifyfd(notify_fd);
+	FINALLY_DECREF_UNLIKELY(self);
+	atflags = fs_atflags(atflags);
+	file    = path_traversefull(dfd, pathname, atflags);
+	FINALLY_DECREF_UNLIKELY(file);
+	if ((mask & IN_ONLYDIR) && !mfile_isdir(file))
+		THROW(E_FSERROR_NOT_A_DIRECTORY, E_FILESYSTEM_NOT_A_DIRECTORY_WATCH);
+	return (int)notifyfd_addwatch(self, file, mask);
+}
+#endif /* __ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH{_AT} */
+
+#ifdef __ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH
+DEFINE_SYSCALL3(int, inotify_add_watch, fd_t, notify_fd,
+                USER UNCHECKED char const *, pathname,
+                uint32_t, mask) {
+	atflag_t atflags = 0;
+	if (mask & IN_DONT_FOLLOW) {
+		atflags |= AT_SYMLINK_NOFOLLOW;
+		mask &= ~IN_DONT_FOLLOW;
+	}
+	return sys_inotify_add_watch_impl(notify_fd, AT_FDCWD,
+	                                  pathname, atflags, mask);
+}
+#endif /* __ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH */
+
+#ifdef __ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH_AT
+DEFINE_SYSCALL5(int, inotify_add_watch_at, fd_t, notify_fd,
+                fd_t, dfd, USER UNCHECKED char const *, pathname,
+                atflag_t, atflags, uint32_t, mask) {
+	return sys_inotify_add_watch_impl(notify_fd, dfd, pathname, atflags, mask);
+}
+#endif /* __ARCH_WANT_SYSCALL_INOTIFY_ADD_WATCH_AT */
+
+#ifdef __ARCH_WANT_SYSCALL_INOTIFY_RM_WATCH
+DEFINE_SYSCALL2(errno_t, inotify_rm_watch, fd_t, notify_fd, int, wd) {
+	errno_t result = -EOK;
+	REF struct notifyfd *self;
+	self = handles_lookupnotifyfd(notify_fd);
+	FINALLY_DECREF_UNLIKELY(self);
+	if (!notifyfd_rmwatch(self, (unsigned int)wd))
+		result = -EINVAL;
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_INOTIFY_RM_WATCH */
 
 
 DECL_END

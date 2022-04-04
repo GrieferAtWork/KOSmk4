@@ -218,6 +218,10 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL notifyfd_destroy)(struct notifyfd *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct notifyfd, nf_refcnt, notifyfd_destroy)
 
+/* >> /proc/sys/fs/inotify/max_queued_events
+ * Default # of max pending events in newly created `struct notifyfd' */
+DATDEF unsigned int notifyfd_default_maxevents;
+
 /* Create a new notifyfd object.
  * @param: num_events: The max number of unread pending events (excluding the failsafe overflow-event) */
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct notifyfd *KCALL
@@ -368,7 +372,7 @@ EIDECLARE(BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)), REF struct fnode 
 
 
 
-/* Post filesystem events to the notify controller of `self'
+/* Post filesystem events to the notify controller of  `self'
  * Don't call this function directly -- use the macros below.
  * @param: mask: One of `(IN_ALL_EVENTS | IN_UNMOUNT | IN_IGNORED) & ~(...)' */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsevent)(struct mfile *__restrict self, uint16_t mask) ASMNAME("mfile_postfsevent");
