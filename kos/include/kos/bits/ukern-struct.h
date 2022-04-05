@@ -25,37 +25,37 @@
 #include <bits/types.h>
 #include <kos/kernel/cpu-state.h>
 
-#define OFFSET_USERKERN_BASE   0
-#define OFFSET_USERKERN_TID    __SIZEOF_POINTER__
-#define OFFSET_USERKERN_PID   (__SIZEOF_POINTER__*2)
-#define OFFSET_USERKERN_PPID  (__SIZEOF_POINTER__*3)
-#define OFFSET_USERKERN_PGID  (__SIZEOF_POINTER__*4)
-#define OFFSET_USERKERN_SID   (__SIZEOF_POINTER__*5)
-#define OFFSET_USERKERN_UID   (__SIZEOF_POINTER__*6)
-#define OFFSET_USERKERN_GID   (__SIZEOF_POINTER__*7)
-#define OFFSET_USERKERN_EUID  (__SIZEOF_POINTER__*8)
-#define OFFSET_USERKERN_EGID  (__SIZEOF_POINTER__*9)
-#define OFFSET_USERKERN_SUID  (__SIZEOF_POINTER__*10)
-#define OFFSET_USERKERN_SGID  (__SIZEOF_POINTER__*11)
-#define OFFSET_USERKERN_REGS  (__SIZEOF_POINTER__*12)
-#define SIZEOF_USERKERN       (__SIZEOF_POINTER__*12+SIZEOF_UCPUSTATE)
+#define OFFSET_USERKERN_BASE 0
+#define OFFSET_USERKERN_TID  __SIZEOF_POINTER__
+#define OFFSET_USERKERN_PID  (__SIZEOF_POINTER__ * 2)
+#define OFFSET_USERKERN_PPID (__SIZEOF_POINTER__ * 3)
+#define OFFSET_USERKERN_PGID (__SIZEOF_POINTER__ * 4)
+#define OFFSET_USERKERN_SID  (__SIZEOF_POINTER__ * 5)
+#define OFFSET_USERKERN_UID  (__SIZEOF_POINTER__ * 6)
+#define OFFSET_USERKERN_GID  (__SIZEOF_POINTER__ * 7)
+#define OFFSET_USERKERN_EUID (__SIZEOF_POINTER__ * 8)
+#define OFFSET_USERKERN_EGID (__SIZEOF_POINTER__ * 9)
+#define OFFSET_USERKERN_SUID (__SIZEOF_POINTER__ * 10)
+#define OFFSET_USERKERN_SGID (__SIZEOF_POINTER__ * 11)
+#define OFFSET_USERKERN_REGS (__SIZEOF_POINTER__ * 12)
+#define SIZEOF_USERKERN      (__SIZEOF_POINTER__ * 12 + SIZEOF_UCPUSTATE)
 
 #ifdef __CC__
 #if __SIZEOF_PID_T__ < __SIZEOF_POINTER__
 #define __USERKERN_PAD_PID(name)  __byte_t name[__SIZEOF_POINTER__ - __SIZEOF_PID_T__];
-#else
+#else /* __SIZEOF_PID_T__ < __SIZEOF_POINTER__ */
 #define __USERKERN_PAD_PID(name)  /* nothing */
-#endif
+#endif /* __SIZEOF_PID_T__ >= __SIZEOF_POINTER__ */
 #if __SIZEOF_UID_T__ < __SIZEOF_POINTER__
 #define __USERKERN_PAD_UID(name)  __byte_t name[__SIZEOF_POINTER__ - __SIZEOF_UID_T__];
-#else
+#else /* __SIZEOF_UID_T__ < __SIZEOF_POINTER__ */
 #define __USERKERN_PAD_UID(name)  /* nothing */
-#endif
+#endif /* __SIZEOF_UID_T__ >= __SIZEOF_POINTER__ */
 #if __SIZEOF_GID_T__ < __SIZEOF_POINTER__
 #define __USERKERN_PAD_GID(name)  __byte_t name[__SIZEOF_POINTER__ - __SIZEOF_GID_T__];
-#else
+#else /* __SIZEOF_GID_T__ < __SIZEOF_POINTER__ */
 #define __USERKERN_PAD_GID(name)  /* nothing */
-#endif
+#endif /* __SIZEOF_GID_T__ >= __SIZEOF_POINTER__ */
 
 
 struct userkern /*[PREFIX(uk_)]*/ {

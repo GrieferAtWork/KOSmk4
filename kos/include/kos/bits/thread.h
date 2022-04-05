@@ -22,7 +22,7 @@
 
 #include <__stdinc.h>
 
-/* #define RD_TLS_BASE_REGISTER()   [arch-specific] */
+/* #define RD_TLS_BASE_REGISTER(r)  [arch-specific] */
 /* #define WR_TLS_BASE_REGISTER(v)  [arch-specific] */
 
 #endif /* !_KOS_BITS_THREAD_H */

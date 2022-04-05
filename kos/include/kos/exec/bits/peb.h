@@ -24,26 +24,27 @@
 
 #include <hybrid/typecore.h>
 
-__DECL_BEGIN
-
 #define OFFSET_PROCESS_PEB_ARGC 0
 #define OFFSET_PROCESS_PEB_ARGV (__SIZEOF_POINTER__)
 #define OFFSET_PROCESS_PEB_ENVC (2 * __SIZEOF_POINTER__)
 #define OFFSET_PROCESS_PEB_ENVP (3 * __SIZEOF_POINTER__)
+
 #ifdef __CC__
+__DECL_BEGIN
+
 struct process_peb /*[PREFIX(pp_)]*/ {
-	__SIZE_TYPE__  pp_argc;  /* Number of arguments passed to the program. */
-	char         **pp_argv;  /* [1..pp_argc] Vector of argument strings (NOTE: pp_argv[pp_argc] == NULL). */
-	__SIZE_TYPE__  pp_envc;  /* Number of environment strings passed to the program. */
-	char         **pp_envp;  /* [1..pp_envc] Vector of environment strings (NOTE: pp_envv[pp_envc] == NULL). */
-	/* ... Possibly additional (maybe arch-specific) data goes here. */
-//	char          *pp_argv_vector[pp_argc]; /* [pp_argc + 1] Vector of pointers to argument strings */
-//	char          *pp_envp_vector[pp_argp]; /* [pp_envc + 1] Vector of pointers to environment strings */
-//	char           pp_argv_strings[];       /* Buffer containing argument strings */
-//	char           pp_envp_strings[];       /* Buffer containing environment strings */
+	__SIZE_TYPE__ pp_argc;  /* Number of arguments passed to the program. */
+	char        **pp_argv;  /* [1..pp_argc] Vector of argument strings (NOTE: pp_argv[pp_argc] == NULL). */
+	__SIZE_TYPE__ pp_envc;  /* Number of environment strings passed to the program. */
+	char        **pp_envp;  /* [1..pp_envc] Vector of environment strings (NOTE: pp_envv[pp_envc] == NULL). */
+	/* ... Additional (possibly arch-specific) data goes here. */
+//	char         *pp_argv_vector[pp_argc]; /* [pp_argc + 1] Vector of pointers to argument strings */
+//	char         *pp_envp_vector[pp_argp]; /* [pp_envc + 1] Vector of pointers to environment strings */
+//	char          pp_argv_strings[];       /* Buffer containing argument strings */
+//	char          pp_envp_strings[];       /* Buffer containing environment strings */
 };
-#endif /* __CC__ */
 
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_KOS_EXEC_BITS_PEB_H */

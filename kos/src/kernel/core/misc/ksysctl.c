@@ -213,7 +213,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 
 	case KSYSCTL_DRIVER_LSMOD: {
 		struct handle temp;
-		require(CAP_DRIVER_QUERY);
+		require(CAP_SYS_MODULE);
 		temp.h_type = HANDLE_TYPE_DRIVER_LOADLIST;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = get_driver_loadlist();
@@ -374,7 +374,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		case KSYSCTL_DRIVER_FORMAT_BLOB: {
 			void *addr = data->gm_addr;
 			COMPILER_READ_BARRIER();
-			require(CAP_DRIVER_QUERY);
+			require(CAP_SYS_MODULE);
 			drv = driver_fromaddr(addr);
 		}	break;
 
@@ -384,7 +384,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			COMPILER_READ_BARRIER();
 			file = handles_lookupmfile(fileno);
 			FINALLY_DECREF_UNLIKELY(file);
-			require(CAP_DRIVER_QUERY);
+			require(CAP_SYS_MODULE);
 			drv = driver_fromfile(file);
 		}	break;
 
@@ -393,7 +393,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			name = data->gm_name;
 			COMPILER_READ_BARRIER();
 			validate_readable(name, 1);
-			require(CAP_DRIVER_QUERY);
+			require(CAP_SYS_MODULE);
 			drv = driver_fromname(name);
 		}	break;
 
@@ -425,7 +425,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(struct ksysctl_driver_get_library_path))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_get_library_path), struct_size);
-		require(CAP_DRIVER_QUERY);
+		require(CAP_SYS_MODULE);
 
 		/* Read the user-space buffer address/size. */
 		buffer  = data->glp_buf;
@@ -527,7 +527,7 @@ again_get_oldpath:
 
 	case KSYSCTL_OPEN_KERNEL_DRIVER: {
 		struct handle temp;
-		require(CAP_DRIVER_QUERY);
+		require(CAP_SYS_MODULE);
 		temp.h_type = HANDLE_TYPE_MODULE;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &kernel_driver;
@@ -536,7 +536,7 @@ again_get_oldpath:
 
 	case KSYSCTL_OPEN_BOOT_TASK: {
 		struct handle temp;
-		require(CAP_KERNEL_QUERY);
+		require(CAP_SYS_ADMIN);
 		temp.h_type = HANDLE_TYPE_PIDFD;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = FORTASK(&boottask, this_taskpid);

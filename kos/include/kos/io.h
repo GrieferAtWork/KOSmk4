@@ -547,7 +547,6 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define IFF_STATUS      0x0040  /* Mask for status flags. */
 #define IFF_CONST       0xfc00  /* [const] Mask for constant (feature) flags. */
 
-
 __DECL_END
 
 #endif /* !_KOS_IO_H */

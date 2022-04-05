@@ -892,7 +892,7 @@ again_TIOCNOTTY:
 	case _IO_WITHSIZE(TTYIO_IPEND_SETLIMIT, 0): {
 		size_t value;
 		struct linebuffer *lnbuf;
-		require(CAP_SET_TTY_BUFFER_SIZES);
+		require(CAP_SYS_RESOURCE);
 		value = ioctl_intarg_getsize(cmd, arg);
 		switch (_IOC_NR(cmd)) {
 

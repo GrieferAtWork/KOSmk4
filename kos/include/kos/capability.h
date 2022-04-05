@@ -29,27 +29,11 @@
  * encode KOS-specific kernel capability codes. */
 
 /* Capability aliases */
-#define CAP_ALLOW_OPEN_BY_HANDLE_AT          CAP_DAC_READ_SEARCH /* Allow use of `open_by_handle_at(2)' */
-#define CAP_ALLOW_LINK_FD                    CAP_DAC_READ_SEARCH /* Allow use of `linkat(AT_EMPTY_PATH)' */
-#define CAP_IGNORE_STICKY_ON_DELETE          CAP_FOWNER          /* Ignore directory `S_ISVTX' during file deletion */
-#define CAP_ALLOW_O_NOATIME                  CAP_FOWNER          /* Allow use of `O_NOATIME' with any file. */
-#define CAP_ALLOW_PR_CAPBSET_DROP            CAP_SETPCAP         /* Allow use of `prctl(PR_CAPBSET_DROP)'. */
-#define CAP_ALLOW_PR_SET_SECUREBITS          CAP_SETPCAP         /* Allow use of `prctl(PR_SET_SECUREBITS)'. */
-#define CAP_MOUNT                            CAP_SYS_ADMIN       /* Modify mounted file systems. */
-#define CAP_MOUNT_DRIVES                     CAP_SYS_ADMIN       /* Re-bind `AT_FDDRIVE_ROOT(<letter>)' file handles. */
-#define CAP_EXCEED_PIPE_MAX_SIZE             CAP_SYS_RESOURCE    /* Exceed and modify the pipe-buffer-size limit from `/proc/sys/fs/pipe-max-size' */
-#define CAP_ALLOW_CTTY_STEALING              CAP_SYS_ADMIN       /* Allow stealing of controlling terminals (s.a. `TIOCSCTTY') */
-#define CAP_SET_TTY_BUFFER_SIZES             CAP_SYS_RESOURCE    /* Allow use of `TTYIO_IBUF_SETLIMIT', `TTYIO_CANON_SETLIMIT', `TTYIO_OPEND_SETLIMIT', `TTYIO_IPEND_SETLIMIT' */
-#define CAP_DRIVER_QUERY                     CAP_SYS_MODULE      /* Allow use of  `KSYSCTL_DRIVER_LSMOD', `KSYSCTL_DRIVER_GETMOD',  `KSYSCTL_DRIVER_GET_LIBRARY_PATH',
-                                                                  * as well as `HOP_DRIVER_LOADLIST_GET_DRIVER', `HOP_DRIVER_OPEN_FILE', `HOP_DRIVER_OPEN_DEPENDENCY',
-                                                                  * as well as `KSYSCTL_OPEN_KERNEL_DRIVER' */
-#define CAP_DRIVER_CONTROL                   CAP_SYS_MODULE      /* Allow use of `HOP_DRIVER_INITIALIZE', `HOP_DRIVER_FINALIZE' */
-#define CAP_KERNEL_QUERY                     CAP_SYS_ADMIN       /* Allow use of `KSYSCTL_OPEN_KERNEL_VFS' `KSYSCTL_OPEN_KERNEL_FS', `KSYSCTL_OPEN_KERNEL_MMAN',
-                                                                  *              `KSYSCTL_OPEN_ROOT_PIDNS', `KSYSCTL_OPEN_BOOT_TASK' */
-#define CAP_DATABLOCK_DEANONYMIZE            CAP_SYS_RESOURCE    /* Allow use of `HOP_DATABLOCK_DEANONYMIZE' */
-#define CAP_DATABLOCK_OPEN_PART              CAP_SYS_RESOURCE    /* Allow use of `HOP_DATABLOCK_OPEN_PART' and `HOP_DATABLOCK_OPEN_PART_EXACT' */
-#define CAP_AT_CHANGE_BTIME                  CAP_SYS_TIME        /* Allow use of `AT_CHANGE_BTIME' */
-
+#define CAP_ALLOW_OPEN_BY_HANDLE_AT CAP_DAC_READ_SEARCH /* TODO: Allow use of `open_by_handle_at(2)' */
+#define CAP_IGNORE_STICKY_ON_DELETE CAP_FOWNER          /* TODO: Ignore directory `S_ISVTX' during file deletion */
+#define CAP_MOUNT                   CAP_SYS_ADMIN       /* Modify mounted file systems. */
+#define CAP_MOUNT_DRIVES            CAP_SYS_ADMIN       /* Re-bind `AT_FDDRIVE_ROOT(<letter>)' file handles. */
+#define CAP_AT_CHANGE_BTIME         CAP_SYS_TIME        /* Allow use of `AT_CHANGE_BTIME' */
 
 /*[[[enum]]]*/
 #ifdef __CC__

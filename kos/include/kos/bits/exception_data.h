@@ -604,8 +604,10 @@ struct __ATTR_PACKED exception_data /*[PREFIX(e_)]*/ {
 	_ed_code
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 	;
+
 	/* Exception-specific arguments */
 	union exception_data_pointers e_args;
+
 	/* The address of the instruction that caused the fault.
 	 * Unlike  the  program counter  stored within  the `except_register_state_t'
 	 * structure which can  be accessed  through `except_register_state()',  this
@@ -635,7 +637,6 @@ struct __ATTR_PACKED exception_data /*[PREFIX(e_)]*/ {
 #define e_class    _ed_class_subclass.e_class
 #define e_subclass _ed_class_subclass.e_subclass
 #endif /* ... */
-
 
 __SYSDECL_END
 #endif /* !__CC__ */

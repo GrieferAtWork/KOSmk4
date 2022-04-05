@@ -41,7 +41,7 @@
  * >>     // Export a public symbol "program_pid" from this library that
  * >>     // is a data-object and will lazily invoke this function if used
  * >>     DEFINE_PUBLIC_IDATA(program_pid, resolve_program_pid);
- * >>     static pid_t program_pid = 0;  // The library address of `program_pid'
+ * >>     static pid_t program_pid  = 0; // The library address of `program_pid'
  * >>     static int program_loaded = 0; // init-once barrier
  * >> again:
  * >>     if (program_loaded != 2) {

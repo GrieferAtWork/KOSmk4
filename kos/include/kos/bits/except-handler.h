@@ -54,10 +54,7 @@ typedef /*__ATTR_NORETURN*/ void
 (__EXCEPT_HANDLER_CC *__except_handler_t)(except_register_state_t *__restrict state,
                                           struct exception_data *__restrict error);
 
-
 __SYSDECL_END
 #endif /* !__CC__ */
-
-
 
 #endif /* !_KOS_BITS_EXCEPT_HANDLER_H */

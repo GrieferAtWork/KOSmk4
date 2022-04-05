@@ -1479,11 +1479,15 @@ procfs_sys_fs_pipemaxsize_print(pformatprinter printer, void *arg,
 INTERN void KCALL
 procfs_sys_fs_pipemaxsize_write(USER CHECKED void const *buf,
                                 size_t bufsize) {
-	size_t newsize;
+	size_t oldsize, newsize;
 	/* Setting  it lower than the default limit  can't be done, since the default
 	 * limit is set regardless of what `pipe_max_bufsize_unprivileged' is set to. */
 	newsize = ProcFS_ParseSize(buf, bufsize, RINGBUFFER_DEFAULT_LIMIT, (size_t)-1);
-	ATOMIC_WRITE(pipe_max_bufsize_unprivileged, newsize);
+	do {
+		oldsize = ATOMIC_READ(pipe_max_bufsize_unprivileged);
+		if (newsize > oldsize)
+			require(CAP_SYS_RESOURCE);
+	} while (!ATOMIC_CMPXCH_WEAK(pipe_max_bufsize_unprivileged, oldsize, newsize));
 }
 
 

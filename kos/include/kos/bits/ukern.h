@@ -23,6 +23,6 @@
 #include <__stdinc.h>
 
 #define userkern_self()  ((struct userkern *)0)
-#define userkern_valid()   0
+#define userkern_valid() 0
 
 #endif /* !_KOS_BITS_UKERN_H */

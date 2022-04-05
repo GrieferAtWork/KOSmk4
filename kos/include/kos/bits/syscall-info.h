@@ -33,10 +33,10 @@
 __DECL_BEGIN
 
 struct rpc_syscall_info /*[PREFIX(rsi_)]*/ {
-	__UINTPTR_TYPE__  rsi_flags;   /* System call invocation flags (Set of `RPC_SYSCALL_INFO_F*') */
-	__UINTPTR_TYPE__  rsi_sysno;   /* The system call vector that got invoked. */
-	__UINTPTR_TYPE__  rsi_regs[6]; /* Arguments passed to the system call.
-	                                * NOTE: You may validate any argument by testing for `RPC_SYSCALL_INFO_FREGVALID(i)' */
+	__UINTPTR_TYPE__ rsi_flags;   /* System call invocation flags (Set of `RPC_SYSCALL_INFO_F*') */
+	__UINTPTR_TYPE__ rsi_sysno;   /* The system call vector that got invoked. */
+	__UINTPTR_TYPE__ rsi_regs[6]; /* Arguments passed to the system call.
+	                               * NOTE: You may validate any argument by testing for `RPC_SYSCALL_INFO_FREGVALID(i)' */
 };
 
 __DECL_END

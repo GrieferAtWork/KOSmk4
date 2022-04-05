@@ -23,8 +23,8 @@
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
 
-/* KOS futex operations (for use with the `lfutex(2)'  system
- * call, though can't be used with the futex() system call!). */
+/* KOS futex operations (for use with the `lfutex(2)' system
+ * call, iow: can't be used with the futex(2) system call!). */
 #define LFUTEX_WAKE                __UINT32_C(0x00000000) /* >> result = 0; while (val && sig_send(uaddr)) ++result; return result; */
 #define LFUTEX_EXPREND             __UINT32_C(0x00000000) /* Expression list terminator for `lfutexexpr(2)' */
 #define LFUTEX_NOP                 __UINT32_C(0x00000001) /* >> return 0; // Only valid in `lfutexexpr(2)' */

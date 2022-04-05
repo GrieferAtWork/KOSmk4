@@ -103,6 +103,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 			      E_INVALID_ARGUMENT_CONTEXT_PRCTL_SET_KEEPCAPS_BADBOOL,
 			      arg2);
 		}
+		require(CAP_SETPCAP); /* "The CAP_SETPCAP capability is required to modify the flags" */
 		cred_write(mycred);
 		if (mycred->c_securebits & SECBIT_KEEP_CAPS_LOCKED) {
 			cred_endwrite(mycred);
@@ -207,7 +208,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 			      E_INVALID_ARGUMENT_CONTEXT_PRCTL_SET_SECUREBITS_BADBITS,
 			      arg2, ~SECBITS_ALL);
 		}
-
+		require(CAP_SETPCAP); /* "The CAP_SETPCAP capability is required to modify the flags" */
 		cred_write(mycred);
 		/* Don't allow locks to be released. (they can only be added) */
 		if ((mycred->c_securebits & ~arg2 & SECBITS_LOCKS) != 0) {

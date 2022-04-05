@@ -593,6 +593,7 @@ sys_linkat_impl(fd_t olddirfd, USER UNCHECKED char const *oldpath,
 		mkinfo.mkf_hash  = FLOOKUP_INFO_HASH_UNSET;
 		mkinfo.mkf_fmode = 0;
 		if ((mkinfo.mkf_flags & AT_EMPTY_PATH) && !*oldpath) {
+			require(CAP_DAC_READ_SEARCH); /* Linux says the caller needs this perm... */
 			mkinfo.mkf_hrdlnk.hl_node = handles_lookupfnode(olddirfd);
 		} else {
 			mkinfo.mkf_flags |= AT_SYMLINK_NOFOLLOW;

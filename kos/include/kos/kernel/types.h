@@ -26,13 +26,13 @@
 #include <kos/types.h>
 
 #if __SIZEOF_POINTER__ == 4
-#define BITS_PER_POINTER  32
+#define BITS_PER_POINTER 32
 #elif __SIZEOF_POINTER__ == 8
-#define BITS_PER_POINTER  64
+#define BITS_PER_POINTER 64
 #elif __SIZEOF_POINTER__ == 2
-#define BITS_PER_POINTER  16
+#define BITS_PER_POINTER 16
 #elif __SIZEOF_POINTER__ == 1
-#define BITS_PER_POINTER  8
+#define BITS_PER_POINTER 8
 #else /* __SIZEOF_POINTER__ == ... */
 #error "Invalid `__SIZEOF_POINTER__'"
 #endif /* __SIZEOF_POINTER__ != ... */

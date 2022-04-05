@@ -78,11 +78,11 @@
 #endif /* !ELFW */
 
 
-
 #ifdef __CC__
 #ifndef __elfexec_info_defined
 #define __elfexec_info_defined
 __DECL_BEGIN
+
 struct elfexec_info /*[PREFIX(ei_)]*/ {
 	ElfW(Addr)  ei_rtldaddr;    /* Load address of the RTLD itself. */
 	ElfW(Half)  ei_pnum;        /* Amount of ELF program headers. */
@@ -96,6 +96,7 @@ struct elfexec_info /*[PREFIX(ei_)]*/ {
 //	byte_t      ei_entry_sp[];  /* Entry stack address (set the address of this field as
 //	                             * stack-pointer when handing control to the hosted application) */
 };
+
 __DECL_END
 #endif /* !__elfexec_info_defined */
 

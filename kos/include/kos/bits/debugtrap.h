@@ -26,8 +26,6 @@
 
 #include <bits/types.h>
 
-__DECL_BEGIN
-
 #define __OFFSET_DEBUGTRAP_REASON_SIGNO  0
 #define __OFFSET_DEBUGTRAP_REASON_REASON 4
 #define __OFFSET_DEBUGTRAP_REASON_INTARG 8
@@ -36,6 +34,8 @@ __DECL_BEGIN
 #define __SIZEOF_DEBUGTRAP_REASON (8 + __SIZEOF_POINTER__)
 
 #ifdef __CC__
+__DECL_BEGIN
+
 struct debugtrap_reason /*[PREFIX(dtr_)]*/ {
 	__uint32_t dtr_signo;  /* Trap signal number (one of `SIG*' from <signal.h>) */
 	__uint32_t dtr_reason; /* Trap reason (one of `DEBUGTRAP_REASON_*') */
@@ -45,8 +45,8 @@ struct debugtrap_reason /*[PREFIX(dtr_)]*/ {
 		void       *dtr_ptrarg; /* Pointer argument. */
 	};
 };
-#endif /* __CC__ */
 
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_KOS_BITS_DEBUGTRAP_H */

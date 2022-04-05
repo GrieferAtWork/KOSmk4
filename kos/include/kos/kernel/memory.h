@@ -25,12 +25,11 @@
 #include <asm/pagesize.h>
 #include <bits/types.h>
 
-__DECL_BEGIN
-
 /* Type  declarations  and  helper  macros   for
  * working with physical memory addresses/pages. */
 
 #ifdef __CC__
+__DECL_BEGIN
 
 #ifndef __physaddr_t_defined
 #define __physaddr_t_defined
@@ -78,9 +77,7 @@ __UINT32_TYPE__ (physpage2addr32)(physpage_t __pageptr_);
 #endif /* !__INTELLISENSE__ || !__CC__ || !__cplusplus */
 #endif /* __ARCH_PAGESIZE */
 
-#endif /* __CC__ */
-
 __DECL_END
-
+#endif /* __CC__ */
 
 #endif /* !_KOS_KERNEL_MEMORY_H */

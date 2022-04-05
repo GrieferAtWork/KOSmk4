@@ -42,7 +42,7 @@ struct coredump_assert {
  * via the `exception' argument. Depending on `unwind_error', this can be a
  * number of things relating to what caused  the error, and can be used  to
  * affect  the behavior of how the kernel will handle the fault, as well as
- * how/if the system call returns. (because normally it won't) */
+ * how/if the system call returns (because normally it doesn't). */
 union coredump_info {
 	struct exception_data   ci_except;     /* [unwind_error = *]                   Exception data. */
 	struct __siginfo_struct ci_signal;     /* [unwind_error = UNWIND_SUCCESS]      Signal information. */

@@ -27,7 +27,6 @@
 
 #include <bits/os/sigset.h>
 
-
 #define __OFFSET_USERPROCMASK_MYTID   0
 #define __OFFSET_USERPROCMASK_SIGSIZE 8
 #define __OFFSET_USERPROCMASK_SIGMASK 16
@@ -35,13 +34,13 @@
 #define __OFFSET_USERPROCMASK_PENDING 32
 #define __SIZEOF_USERPROCMASK         (32 + __SIZEOF_SIGSET_T__)
 
+/* Bits for `userprocmask::pm_flags' */
+#define USERPROCMASK_FLAG_NORMAL     0x0000 /* Normal flags. */
+#define USERPROCMASK_FLAG_HASPENDING 0x0001 /* FLAG: `pm_pending' may contain  non-zero entries.  Set
+                                             * by the kernel and expected to be cleared by userspace. */
+
 #ifdef __CC__
 __DECL_BEGIN
-
-#define USERPROCMASK_FLAG_NORMAL     0x0000 /* Normal flags. */
-#define USERPROCMASK_FLAG_HASPENDING 0x0001 /* FLAG: `pm_pending'   may    contain   non-zero    entries.
-                                             * Set by the kernel and expected to be cleared by userspace. */
-
 
 /* User-space sigprocmask() control structure (this structure should be
  * placed in TLS memory, and its  contents are shared with the  kernel)
@@ -82,9 +81,6 @@ struct userprocmask /*[PREFIX(pm_)]*/ {
 #define USERPROCMASK_INIT(mytid, sigsize, sigmask, flags, pending) \
 	{ mytid, 0, sigsize, 0, sigmask, 0, flags, 0, pending }
 #endif /* !__x86_64__ */
-
-
-
 
 __DECL_END
 #endif /* __CC__ */

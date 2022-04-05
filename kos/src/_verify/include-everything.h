@@ -641,6 +641,8 @@ incdir("");
 #include <kos/bits/nopf.h>
 #include <kos/bits/rtm.h>
 #include <kos/bits/shared-lock.h>
+#include <kos/bits/shared-recursive-lock.h>
+#include <kos/bits/shared-recursive-rwlock.h>
 #include <kos/bits/shared-rwlock.h>
 #include <kos/bits/syscall-info.h>
 #include <kos/bits/thread.h>
@@ -718,6 +720,8 @@ incdir("");
 #include <kos/rpc.h>
 #include <kos/rtm.h>
 #include <kos/sched/shared-lock.h>
+#include <kos/sched/shared-recursive-lock.h>
+#include <kos/sched/shared-recursive-rwlock.h>
 #include <kos/sched/shared-rwlock.h>
 #include <kos/sys/epoll.h>
 #include <kos/sys/ioctl.h>
@@ -979,7 +983,9 @@ incdir("");
 #include <link.h>
 #include <linux/agpgart.h>
 #include <linux/bits/posix_types.h>
+#include <linux/capability.h>
 #include <linux/close_range.h>
+#include <linux/fcntl.h>
 #include <linux/fd.h>
 #include <linux/fs.h>
 #include <linux/futex.h>
@@ -987,6 +993,7 @@ incdir("");
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
 #include <linux/if_fddi.h>
+#include <linux/inotify.h>
 #include <linux/ioctl.h>
 #include <linux/kcmp.h>
 #include <linux/kd.h>
@@ -1007,6 +1014,7 @@ incdir("");
 #include <linux/types.h>
 #include <linux/unistd.h>
 #include <linux/vt.h>
+#include <linux/xattr.h>
 #include <locale.h>
 #include <machine/_default_types.h>
 #include <machine/_endian.h>
@@ -1193,6 +1201,7 @@ incdir("");
 #include <sys/bsdtypes.h>
 #include <sys/bswap.h>
 #include <sys/byteorder.h>
+#include <sys/capability.h>
 #include <sys/cdefs.h>
 #include <sys/common_ansi.h>
 #include <sys/common_int_const.h>
@@ -1223,6 +1232,7 @@ incdir("");
 #include <sys/file.h>
 #include <sys/filio.h>
 #include <sys/fsuid.h>
+#include <sys/inotify.h>
 #include <sys/int_const.h>
 #include <sys/int_fmtio.h>
 #include <sys/int_limits.h>

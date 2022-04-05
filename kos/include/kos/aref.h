@@ -1908,13 +1908,25 @@
 
 /* Static initializers */
 #ifdef __ARCH_HAVE_AR_NOSMP
+#ifdef __INTELLISENSE_GCC__
+#define ARREF_INIT(ptr) { .arr_obj = ptr }
+#define AXREF_INIT(ptr) { .axr_obj = ptr }
+#define AWREF_INIT(ptr) { .awr_obj = ptr }
+#else /* __INTELLISENSE_GCC__ */
 #define ARREF_INIT(ptr) { ptr }
 #define AXREF_INIT(ptr) { ptr }
 #define AWREF_INIT(ptr) { ptr }
+#endif /* !__INTELLISENSE_GCC__ */
 #else /* __ARCH_HAVE_AR_NOSMP */
+#ifdef __INTELLISENSE_GCC__
+#define ARREF_INIT(ptr) { .arr_obj = ptr, .arr_cnt = 0 }
+#define AXREF_INIT(ptr) { .axr_obj = ptr, .axr_cnt = 0 }
+#define AWREF_INIT(ptr) { .awr_obj = ptr, .awr_cnt = 0 }
+#else /* __INTELLISENSE_GCC__ */
 #define ARREF_INIT(ptr) { ptr, 0 }
 #define AXREF_INIT(ptr) { ptr, 0 }
 #define AWREF_INIT(ptr) { ptr, 0 }
+#endif /* !__INTELLISENSE_GCC__ */
 #endif /* !__ARCH_HAVE_AR_NOSMP */
 
 /* >> arref_init(ARREF(T) *self, [[nonnull]] REF T *ptr); */
@@ -1926,7 +1938,8 @@
 	(void)((self)->arr_obj = (ptr) __PRIVATE_arref_cinit_smp(self))
 
 #ifdef __HYBRID_PP_VA_OVERLOAD
-/* >> arref_fini(ARREF(T) *self, [void decref(T *)]); */
+/* >> arref_fini(ARREF(T) *self);
+ * >> arref_fini(ARREF(T) *self, void decref(T *)); */
 #define arref_fini(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_fini_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* __HYBRID_PP_VA_OVERLOAD */
 /* >> arref_fini(ARREF(T) *self, void decref(T *)); */
@@ -1942,7 +1955,8 @@
 	(void)((self)->axr_obj = (ptr) __PRIVATE_axref_cinit_smp(self))
 
 #ifdef __HYBRID_PP_VA_OVERLOAD
-/* >> arref_fini(AxREF(T) *self, [void decref(T *)]); */
+/* >> arref_fini(AxREF(T) *self);
+ * >> arref_fini(AxREF(T) *self, void decref(T *)); */
 #define axref_fini(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_fini_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* __HYBRID_PP_VA_OVERLOAD */
 /* >> arref_fini(AxREF(T) *self, void decref(T *)); */
@@ -1957,12 +1971,6 @@
 #define awref_cinit(self, /*inherit(always)*/ ptr) \
 	(void)((self)->awr_obj = (ptr) __PRIVATE_awref_cinit_smp(self))
 
-
-
-
-
-
 #endif /* __CC__ */
-
 
 #endif /* !_KOS_ATOMIC_REF_H */
