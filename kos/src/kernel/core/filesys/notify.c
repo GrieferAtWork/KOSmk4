@@ -872,6 +872,7 @@ allocate_missing_child_file_notify:
 		        (size_t)child_dent->fd_namelen, child_dent->fd_name);
 		dnotify_link_tree_insert(&link->dnl_dir->dnc_files, link);
 		child_file->mf_notify = ctrl;
+		link = NULL; /* Steal (and don't free) */
 		notify_lock_release();
 
 		/* And with that, everything has been  */
