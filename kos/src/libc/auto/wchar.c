@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe87cc112 */
+/* HASH CRC-32:0xa69ef8a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4586,7 +4586,6 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncasecmp)(char32_t const *s1,
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wildwcscmp)(char16_t const *pattern,
                                       char16_t const *string) {
-	char16_t card_post;
 	for (;;) {
 		if (!*string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
@@ -4597,6 +4596,7 @@ NOTHROW_NCX(LIBDCALL libd_wildwcscmp)(char16_t const *pattern,
 		if (!*pattern)
 			return (int)(char16_t)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
+			char16_t card_post;
 			/* Skip stars */
 			do {
 				++pattern;
@@ -4630,7 +4630,6 @@ next:
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wildwcscmp)(char32_t const *pattern,
                                       char32_t const *string) {
-	char32_t card_post;
 	for (;;) {
 		if (!*string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
@@ -4641,6 +4640,7 @@ NOTHROW_NCX(LIBKCALL libc_wildwcscmp)(char32_t const *pattern,
 		if (!*pattern)
 			return (int)(char32_t)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
+			char32_t card_post;
 			/* Skip stars */
 			do {
 				++pattern;
@@ -4674,16 +4674,18 @@ next:
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp)(char16_t const *pattern,
                                           char16_t const *string) {
-	char16_t card_post, pattern_ch, wcsing_ch;
+	char16_t pattern_ch, wcsing_ch;
 	for (;;) {
 		if (!*string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
-			while (*pattern == '*') ++pattern;
+			while (*pattern == '*')
+				++pattern;
 			return -(int)*pattern;
 		}
 		if (!*pattern)
 			return (int)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
+			char16_t card_post;
 			/* Skip stars */
 			do {
 				++pattern;
@@ -4705,7 +4707,7 @@ NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp)(char16_t const *pattern,
 			}
 		}
 		pattern_ch = *pattern;
-		wcsing_ch = *string;
+		wcsing_ch  = *string;
 		if (pattern_ch == wcsing_ch || pattern_ch == '?' ||
 		    (pattern_ch = (char16_t)libd_towlower((char16_t)pattern_ch),
 		     wcsing_ch  = (char16_t)libd_towlower((char16_t)wcsing_ch),
@@ -4723,16 +4725,18 @@ next:
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp)(char32_t const *pattern,
                                           char32_t const *string) {
-	char32_t card_post, pattern_ch, wcsing_ch;
+	char32_t pattern_ch, wcsing_ch;
 	for (;;) {
 		if (!*string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
-			while (*pattern == '*') ++pattern;
+			while (*pattern == '*')
+				++pattern;
 			return -(int)*pattern;
 		}
 		if (!*pattern)
 			return (int)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
+			char32_t card_post;
 			/* Skip stars */
 			do {
 				++pattern;
@@ -4754,7 +4758,7 @@ NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp)(char32_t const *pattern,
 			}
 		}
 		pattern_ch = *pattern;
-		wcsing_ch = *string;
+		wcsing_ch  = *string;
 		if (pattern_ch == wcsing_ch || pattern_ch == '?' ||
 		    (pattern_ch = (char32_t)libc_towlower((char32_t)pattern_ch),
 		     wcsing_ch  = (char32_t)libc_towlower((char32_t)wcsing_ch),
@@ -5193,16 +5197,18 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memor
 NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp_l)(char16_t const *pattern,
                                             char16_t const *string,
                                             locale_t locale) {
-	char16_t card_post, pattern_ch, wcsing_ch;
+	char16_t pattern_ch, wcsing_ch;
 	for (;;) {
 		if (!*string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
-			while (*pattern == '*') ++pattern;
+			while (*pattern == '*')
+				++pattern;
 			return -(int)*pattern;
 		}
 		if (!*pattern)
 			return (int)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
+			char16_t card_post;
 			/* Skip stars */
 			do {
 				++pattern;
@@ -5224,10 +5230,10 @@ NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp_l)(char16_t const *pattern,
 			}
 		}
 		pattern_ch = *pattern;
-		wcsing_ch = *string;
+		wcsing_ch  = *string;
 		if (pattern_ch == wcsing_ch || pattern_ch == '?' ||
 		    (pattern_ch = (char16_t)libd_towlower_l((char16_t)pattern_ch, locale),
-		     wcsing_ch = (char16_t)libd_towlower_l((char16_t)wcsing_ch, locale),
+		     wcsing_ch  = (char16_t)libd_towlower_l((char16_t)wcsing_ch, locale),
 		     pattern_ch == wcsing_ch)) {
 next:
 			++string;
@@ -5243,16 +5249,18 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED N
 NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp_l)(char32_t const *pattern,
                                             char32_t const *string,
                                             locale_t locale) {
-	char32_t card_post, pattern_ch, wcsing_ch;
+	char32_t pattern_ch, wcsing_ch;
 	for (;;) {
 		if (!*string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
-			while (*pattern == '*') ++pattern;
+			while (*pattern == '*')
+				++pattern;
 			return -(int)*pattern;
 		}
 		if (!*pattern)
 			return (int)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
+			char32_t card_post;
 			/* Skip stars */
 			do {
 				++pattern;
@@ -5274,10 +5282,10 @@ NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp_l)(char32_t const *pattern,
 			}
 		}
 		pattern_ch = *pattern;
-		wcsing_ch = *string;
+		wcsing_ch  = *string;
 		if (pattern_ch == wcsing_ch || pattern_ch == '?' ||
 		    (pattern_ch = (char32_t)libc_towlower_l((char32_t)pattern_ch, locale),
-		     wcsing_ch = (char32_t)libc_towlower_l((char32_t)wcsing_ch, locale),
+		     wcsing_ch  = (char32_t)libc_towlower_l((char32_t)wcsing_ch, locale),
 		     pattern_ch == wcsing_ch)) {
 next:
 			++string;

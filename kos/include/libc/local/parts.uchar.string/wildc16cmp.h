@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cb0cab5 */
+/* HASH CRC-32:0xdc71e26d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wildc16cmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(wildc16cmp))(__CHAR16_TYPE__ const *__pattern, __CHAR16_TYPE__ const *__string) {
-	__CHAR16_TYPE__ __card_post;
 	for (;;) {
 		if (!*__string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
@@ -35,6 +34,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(wildc16cmp))(__CHAR16_TYPE__ const *_
 		if (!*__pattern)
 			return (int)(__CHAR16_TYPE__)*__string; /* Pattern end doesn't match */
 		if (*__pattern == '*') {
+			__CHAR16_TYPE__ __card_post;
 			/* Skip stars */
 			do {
 				++__pattern;

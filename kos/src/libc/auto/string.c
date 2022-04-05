@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b1e05ec */
+/* HASH CRC-32:0xb48ba1d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4555,7 +4555,6 @@ NOTHROW_NCX(VLIBCCALL libc_strdupf)(char const *__restrict format,
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_wildstrcmp)(char const *pattern,
                                       char const *string) {
-	char card_post;
 	for (;;) {
 		if (!*string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
@@ -4566,6 +4565,7 @@ NOTHROW_NCX(LIBCCALL libc_wildstrcmp)(char const *pattern,
 		if (!*pattern)
 			return (int)(unsigned char)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
+			char card_post;
 			/* Skip stars */
 			do {
 				++pattern;
@@ -4599,16 +4599,18 @@ next:
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp)(char const *pattern,
                                           char const *string) {
-	char card_post, pattern_ch, string_ch;
+	char pattern_ch, string_ch;
 	for (;;) {
 		if (!*string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
-			while (*pattern == '*') ++pattern;
+			while (*pattern == '*')
+				++pattern;
 			return -(int)*pattern;
 		}
 		if (!*pattern)
 			return (int)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
+			char card_post;
 			/* Skip stars */
 			do {
 				++pattern;
@@ -4630,7 +4632,7 @@ NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp)(char const *pattern,
 			}
 		}
 		pattern_ch = *pattern;
-		string_ch = *string;
+		string_ch  = *string;
 		if (pattern_ch == string_ch || pattern_ch == '?' ||
 		    (pattern_ch = (char)libc_tolower((unsigned char)pattern_ch),
 		     string_ch  = (char)libc_tolower((unsigned char)string_ch),
@@ -4813,16 +4815,18 @@ INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL
 NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp_l)(char const *pattern,
                                             char const *string,
                                             locale_t locale) {
-	char card_post, pattern_ch, string_ch;
+	char pattern_ch, string_ch;
 	for (;;) {
 		if (!*string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
-			while (*pattern == '*') ++pattern;
+			while (*pattern == '*')
+				++pattern;
 			return -(int)*pattern;
 		}
 		if (!*pattern)
 			return (int)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
+			char card_post;
 			/* Skip stars */
 			do {
 				++pattern;
@@ -4844,10 +4848,10 @@ NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp_l)(char const *pattern,
 			}
 		}
 		pattern_ch = *pattern;
-		string_ch = *string;
+		string_ch  = *string;
 		if (pattern_ch == string_ch || pattern_ch == '?' ||
 		    (pattern_ch = (char)libc_tolower_l((unsigned char)pattern_ch, locale),
-		     string_ch = (char)libc_tolower_l((unsigned char)string_ch, locale),
+		     string_ch  = (char)libc_tolower_l((unsigned char)string_ch, locale),
 		     pattern_ch == string_ch)) {
 next:
 			++string;

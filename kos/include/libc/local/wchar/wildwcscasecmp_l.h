@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c6c665e */
+/* HASH CRC-32:0xb306d87d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,16 +91,18 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_wcscasecmp_l_defined */
 __LOCAL_LIBC(wildwcscasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscasecmp_l))(__WCHAR_TYPE__ const *__pattern, __WCHAR_TYPE__ const *__string, __locale_t __locale) {
-	__WCHAR_TYPE__ __card_post, __pattern_ch, __wcsing_ch;
+	__WCHAR_TYPE__ __pattern_ch, __wcsing_ch;
 	for (;;) {
 		if (!*__string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
-			while (*__pattern == '*') ++__pattern;
+			while (*__pattern == '*')
+				++__pattern;
 			return -(int)*__pattern;
 		}
 		if (!*__pattern)
 			return (int)*__string; /* Pattern end doesn't match */
 		if (*__pattern == '*') {
+			__WCHAR_TYPE__ __card_post;
 			/* Skip stars */
 			do {
 				++__pattern;
@@ -122,10 +124,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscasecmp_l))(__WCHAR_TYPE__ con
 			}
 		}
 		__pattern_ch = *__pattern;
-		__wcsing_ch = *__string;
+		__wcsing_ch  = *__string;
 		if (__pattern_ch == __wcsing_ch || __pattern_ch == '?' ||
 		    (__pattern_ch = (__WCHAR_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_towlower_l)((__WCHAR_TYPE__)__pattern_ch, __locale),
-		     __wcsing_ch = (__WCHAR_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_towlower_l)((__WCHAR_TYPE__)__wcsing_ch, __locale),
+		     __wcsing_ch  = (__WCHAR_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_towlower_l)((__WCHAR_TYPE__)__wcsing_ch, __locale),
 		     __pattern_ch == __wcsing_ch)) {
 __next:
 			++__string;

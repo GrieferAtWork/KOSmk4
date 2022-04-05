@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88fc529e */
+/* HASH CRC-32:0x1be66eec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,16 +44,18 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_tolower_defined */
 __LOCAL_LIBC(wildstrcasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcasecmp))(char const *__pattern, char const *__string) {
-	char __card_post, __pattern_ch, __string_ch;
+	char __pattern_ch, __string_ch;
 	for (;;) {
 		if (!*__string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
-			while (*__pattern == '*') ++__pattern;
+			while (*__pattern == '*')
+				++__pattern;
 			return -(int)*__pattern;
 		}
 		if (!*__pattern)
 			return (int)*__string; /* Pattern end doesn't match */
 		if (*__pattern == '*') {
+			char __card_post;
 			/* Skip stars */
 			do {
 				++__pattern;
@@ -75,7 +77,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcasecmp))(char const *__patter
 			}
 		}
 		__pattern_ch = *__pattern;
-		__string_ch = *__string;
+		__string_ch  = *__string;
 		if (__pattern_ch == __string_ch || __pattern_ch == '?' ||
 		    (__pattern_ch = (char)(__NAMESPACE_LOCAL_SYM __localdep_tolower)((unsigned char)__pattern_ch),
 		     __string_ch  = (char)(__NAMESPACE_LOCAL_SYM __localdep_tolower)((unsigned char)__string_ch),

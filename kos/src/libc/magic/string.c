@@ -6448,7 +6448,6 @@ __NOTHROW_NCX(__mstrndupa_init)(void *__buf, char const *__restrict __string, __
 [[pure, wunused]]
 int wildstrcmp([[nonnull]] char const *pattern,
                [[nonnull]] char const *string) {
-	char card_post;
 	for (;;) {
 		if (!*string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
@@ -6459,6 +6458,7 @@ int wildstrcmp([[nonnull]] char const *pattern,
 		if (!*pattern)
 			return (int)(unsigned char)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
+			char card_post;
 			/* Skip stars */
 			do {
 				++pattern;
@@ -6493,16 +6493,18 @@ next:
 [[pure, wunused, section(".text.crt{|.dos}.unicode.static.memory")]]
 int wildstrcasecmp([[nonnull]] char const *pattern,
                    [[nonnull]] char const *string) {
-	char card_post, pattern_ch, string_ch;
+	char pattern_ch, string_ch;
 	for (;;) {
 		if (!*string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
-			while (*pattern == '*') ++pattern;
+			while (*pattern == '*')
+				++pattern;
 			return -(int)*pattern;
 		}
 		if (!*pattern)
 			return (int)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
+			char card_post;
 			/* Skip stars */
 			do {
 				++pattern;
@@ -6524,7 +6526,7 @@ int wildstrcasecmp([[nonnull]] char const *pattern,
 			}
 		}
 		pattern_ch = *pattern;
-		string_ch = *string;
+		string_ch  = *string;
 		if (pattern_ch == string_ch || pattern_ch == '?' ||
 		    (pattern_ch = (char)tolower((unsigned char)pattern_ch),
 		     string_ch  = (char)tolower((unsigned char)string_ch),
@@ -6717,16 +6719,18 @@ $size_t fuzzy_strncasecmp_l([[nonnull]] char const *s1, $size_t s1_maxlen,
 [[pure, wunused, section(".text.crt{|.dos}.unicode.locale.memory")]]
 int wildstrcasecmp_l([[nonnull]] char const *pattern,
                      [[nonnull]] char const *string, $locale_t locale) {
-	char card_post, pattern_ch, string_ch;
+	char pattern_ch, string_ch;
 	for (;;) {
 		if (!*string) {
 			/* End of string (if the patter is empty, or only contains '*', we have a match) */
-			while (*pattern == '*') ++pattern;
+			while (*pattern == '*')
+				++pattern;
 			return -(int)*pattern;
 		}
 		if (!*pattern)
 			return (int)*string; /* Pattern end doesn't match */
 		if (*pattern == '*') {
+			char card_post;
 			/* Skip stars */
 			do {
 				++pattern;
@@ -6748,10 +6752,10 @@ int wildstrcasecmp_l([[nonnull]] char const *pattern,
 			}
 		}
 		pattern_ch = *pattern;
-		string_ch = *string;
+		string_ch  = *string;
 		if (pattern_ch == string_ch || pattern_ch == '?' ||
 		    (pattern_ch = (char)tolower_l((unsigned char)pattern_ch, locale),
-		     string_ch = (char)tolower_l((unsigned char)string_ch, locale),
+		     string_ch  = (char)tolower_l((unsigned char)string_ch, locale),
 		     pattern_ch == string_ch)) {
 next:
 			++string;
