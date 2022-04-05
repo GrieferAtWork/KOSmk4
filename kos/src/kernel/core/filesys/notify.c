@@ -504,26 +504,15 @@ done_release:
 	}*/
 
 	if (must_attach_directory) {
+		struct fdirnode_ops const *ops;
+		struct fdirnode *dir;
+
+		/* Attach `file->mf_notify' to currently-loaded files in the directory */
 		assert(mfile_isdir(file));
-		/* Attach `file->mf_notify' to currently-loaded files in the directory:
-		 * >> struct dnotify_controller *dnotify;
-		 * >> dnotify = inotify_controller_asdnotify(file->mf_notify);
-		 * >> FOREACH (struct fdirent *child_dirent,
-		 * >>          struct fnode   *child_inode:
-		 * >>          ENUMATE_LOADED_CHILD_INODES(mfile_asdir(file))) {
-		 * >>     struct dnotify_link *link;
-		 * >>     if (dnotify_link_tree_locate(dnotify->dnc_files, child_dirent) != NULL)
-		 * >>         continue;
-		 * >>     ENSURE_ALLOCATED(child_inode->mf_notify);
-		 * >>     link = dnotify_link_alloc();
-		 * >>     link->dnl_dir = dnotify;
-		 * >>     link->dnl_fil = child_inode;
-		 * >>     LIST_INSERT(&child_inode->mf_notify->inc_dirs, link, dnl_fillink);
-		 * >>     link->dnl_ent = incref(child_dirent);
-		 * >>     dnotify_link_tree_insert(&dnotify->dnc_files, link);
-		 * >> }
-		 * NOTE: Locking of `notify_lock' is omitted from the above pseudo-code! */
-		/* TODO: fdirnode_ops::dno_attach_notify(mfile_asdir(file)) */
+		dir = mfile_asdir(file);
+		ops = fdirnode_getops(dir);
+		if (ops->dno_attach_notify)
+			(*ops->dno_attach_notify)(dir);
 	}
 	return result;
 }

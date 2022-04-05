@@ -499,6 +499,9 @@ PUBLIC_CONST struct fdirnode_ops const ramfs_dirnode_ops = {
 	.dno_mkfile = &ramfs_dirnode_v_mkfile,
 	.dno_unlink = &ramfs_dirnode_v_unlink,
 	.dno_rename = &ramfs_dirnode_v_rename,
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	.dno_attach_notify = &ramfs_dirnode_v_attach_notify,
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 };
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) struct ramfs_dirent *KCALL
@@ -1100,6 +1103,91 @@ again_acquire_locks:
 }
 
 
+#ifdef CONFIG_HAVE_FS_NOTIFY
+/* Return values for `ramfs_dirnode_dirent_traced()' */
+#define RAMFS_DIRNODE_DIRENT_TRACED_NO    0 /* Not traced */
+#define RAMFS_DIRNODE_DIRENT_TRACED_YES   1 /* Is traced */
+#define RAMFS_DIRNODE_DIRENT_TRACED_NOCON 2 /* Directory doesn't have a notify controller. */
+
+/* Check if `ent' is traced by `self's notify controller
+ * @return: * : One of `RAMFS_DIRNODE_DIRENT_TRACED_*' */
+PRIVATE NOBLOCK NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL ramfs_dirnode_dirent_traced)(struct ramfs_dirnode const *__restrict self,
+                                           struct ramfs_dirent const *__restrict ent) {
+	struct dnotify_controller *dnot;
+	struct dnotify_link *link;
+	notify_lock_acquire();
+	if unlikely(self->mf_notify == NULL) {
+		notify_lock_release_br();
+		return RAMFS_DIRNODE_DIRENT_TRACED_NOCON; /* Controller was deleted :( */
+	}
+	dnot = inotify_controller_asdnotify(self->mf_notify);
+	link = dnotify_link_tree_locate(dnot->dnc_files, &ent->rde_ent);
+	notify_lock_release();
+	return link ? RAMFS_DIRNODE_DIRENT_TRACED_YES
+	            : RAMFS_DIRNODE_DIRENT_TRACED_NO;
+}
+
+PRIVATE BLOCKING NONNULL((1, 2)) bool KCALL
+ramfs_dirnode_v_attach_notify_impl(struct ramfs_dirnode *__restrict self,
+                                   struct ramfs_dirent *__restrict iter) {
+	unsigned int state;
+again:
+
+	/* Check the tracing-state of this entry. */
+	state = ramfs_dirnode_dirent_traced(self, iter);
+	if (state == RAMFS_DIRNODE_DIRENT_TRACED_YES) {
+		/* Already being tracked; nothing to do here! */
+	} else {
+		REF struct fnode *node;
+		if (state == RAMFS_DIRNODE_DIRENT_TRACED_NOCON)
+			return false; /* No controller --> no need to search for more files! */
+		/* Bind the node. Note that we don't have to release `ramfs_dirnode_endread(self)'
+		 * for this because `ramfs_dirnode_endread(self)' references a shared lock  (which
+		 * is less restrictive  than atomic locks  and can be  held while doing  something
+		 * like `kmalloc()') */
+		node = mfile_asnode(incref(iter->rde_node));
+		TRY {
+			node = dnotify_controller_bindchild(self, &iter->rde_ent, node);
+		} EXCEPT {
+			ramfs_dirnode_endread(self);
+			/*decref_nokill(node);*/ /* Inherited by `dnotify_controller_bindchild()' on error */
+			RETHROW();
+		}
+		assert(node == iter->rde_node);
+		decref_nokill(node);
+	}
+
+	/* Recursively scan the entire tree. */
+	if (iter->rde_treenode.rb_lhs) {
+		if (iter->rde_treenode.rb_rhs) {
+			if (!ramfs_dirnode_v_attach_notify_impl(self, iter->rde_treenode.rb_rhs))
+				return false;
+		}
+		iter = iter->rde_treenode.rb_lhs;
+		goto again;
+	}
+	if (iter->rde_treenode.rb_rhs) {
+		iter = iter->rde_treenode.rb_rhs;
+		goto again;
+	}
+	return true;
+}
+
+PUBLIC BLOCKING NONNULL((1)) void KCALL
+ramfs_dirnode_v_attach_notify(struct fdirnode *__restrict self)
+		THROWS(E_BADALLOC, ...) {
+	struct ramfs_dirnode *me = (struct ramfs_dirnode *)self;
+	ramfs_dirnode_read(me);
+	/* Enumerate loaded directory entries. */
+	if (me->rdn_dat.rdd_tree != NULL)
+		ramfs_dirnode_v_attach_notify_impl(me, me->rdn_dat.rdd_tree);
+	ramfs_dirnode_endread(me);
+}
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+
+
+
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_super_v_destroy)(struct mfile *__restrict self) {
 	struct ramfs_super *me = (struct ramfs_super *)mfile_assuper(self);
@@ -1317,6 +1405,9 @@ PUBLIC_CONST struct fsuper_ops const ramfs_super_ops = {
 		.dno_mkfile = &ramfs_super_v_mkfile,
 		.dno_unlink = &ramfs_super_v_unlink,
 		.dno_rename = &ramfs_super_v_rename,
+#ifdef CONFIG_HAVE_FS_NOTIFY
+		.dno_attach_notify = &ramfs_super_v_attach_notify,
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 	},
 };
 

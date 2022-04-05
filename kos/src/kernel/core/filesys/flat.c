@@ -26,6 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/flat.h>
+#include <kernel/fs/notify.h>
 #include <kernel/fs/path.h>
 #include <kernel/malloc.h>
 #include <sched/task.h>
@@ -1625,6 +1626,85 @@ err_exists_fill_in_repnode:
 	}
 	return FDIRNODE_RENAME_EXISTS;
 }
+
+
+#ifdef CONFIG_HAVE_FS_NOTIFY
+
+/* Return values for `flatdirnode_dirent_traced()' */
+#define FLATDIRNODE_DIRENT_TRACED_NO    0 /* Not traced */
+#define FLATDIRNODE_DIRENT_TRACED_YES   1 /* Is traced */
+#define FLATDIRNODE_DIRENT_TRACED_NOCON 2 /* Directory doesn't have a notify controller. */
+
+/* Check if `ent' is traced by `self's notify controller
+ * @return: * : One of `FLATDIRNODE_DIRENT_TRACED_*' */
+PRIVATE NOBLOCK NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL flatdirnode_dirent_traced)(struct flatdirnode const *__restrict self,
+                                         struct flatdirent const *__restrict ent) {
+	struct dnotify_controller *dnot;
+	struct dnotify_link *link;
+	notify_lock_acquire();
+	if unlikely(self->mf_notify == NULL) {
+		notify_lock_release_br();
+		return FLATDIRNODE_DIRENT_TRACED_NOCON; /* Controller was deleted :( */
+	}
+	dnot = inotify_controller_asdnotify(self->mf_notify);
+	link = dnotify_link_tree_locate(dnot->dnc_files, &ent->fde_ent);
+	notify_lock_release();
+	return link ? FLATDIRNODE_DIRENT_TRACED_YES
+	            : FLATDIRNODE_DIRENT_TRACED_NO;
+}
+
+PUBLIC BLOCKING NONNULL((1)) void KCALL
+flatdirnode_v_attach_notify(struct fdirnode *__restrict self)
+		THROWS(E_BADALLOC, ...) {
+	struct flatdirent *iter;
+	struct flatdirnode *me  = fdirnode_asflat(self);
+	struct flatsuper *super = fsuper_asflat(me->fn_super);
+again:
+	flatdirnode_read(me);
+
+	/* Enumerate loaded directory entries. */
+	TAILQ_FOREACH (iter, &me->fdn_data.fdd_bypos, fde_bypos) {
+		unsigned int state;
+		REF struct fnode *node;
+
+		/* Check the tracing-state of this entry. */
+		state = flatdirnode_dirent_traced(me, iter);
+		if (state == FLATDIRNODE_DIRENT_TRACED_YES)
+			continue; /* Already being tracked; nothing to do here! */
+		if (state == FLATDIRNODE_DIRENT_TRACED_NOCON)
+			break; /* No controller --> no need to search for more files! */
+
+		/* Got a (seemingly) untraced entry.
+		 * --> Check if the associated node has already been loaded. */
+		if (!fsuper_nodes_tryread(&super->ffs_super)) {
+			flatdirnode_endread(me);
+			fsuper_nodes_waitread(&super->ffs_super);
+			goto again;
+		}
+		node = fsuper_nodes_locate(&super->ffs_super, iter->fde_ent.fd_ino);
+		if (node && !tryincref(node))
+			node = NULL;
+		fsuper_nodes_endread(&super->ffs_super);
+		if (node) {
+			/* Bind the node. Note that we don't have to release `flatdirnode_endread(me)'
+			 * for this because `flatdirnode_endread(me)' references a shared lock  (which
+			 * is less restrictive than atomic locks and can be held while doing something
+			 * like `kmalloc()') */
+			TRY {
+				node = dnotify_controller_bindchild(me, &iter->fde_ent, node);
+			} EXCEPT {
+				flatdirnode_endread(me);
+				/*decref_unlikely(node);*/ /* Inherited by `dnotify_controller_bindchild()' on error */
+				RETHROW();
+			}
+			decref_unlikely(node);
+		}
+	}
+	flatdirnode_endread(me);
+}
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+
 
 
 

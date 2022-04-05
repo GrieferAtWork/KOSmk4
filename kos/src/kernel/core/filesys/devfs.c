@@ -530,6 +530,7 @@ devfs_dirnode_v_rename(struct fdirnode *__restrict self,
 }
 
 
+
 PUBLIC_CONST struct fdirnode_ops const devfs_dirnode_ops = {
 	.dno_node = {
 		.no_file = {
@@ -545,6 +546,9 @@ PUBLIC_CONST struct fdirnode_ops const devfs_dirnode_ops = {
 	.dno_mkfile = &ramfs_dirnode_v_mkfile,
 	.dno_unlink = &ramfs_dirnode_v_unlink,
 	.dno_rename = &devfs_dirnode_v_rename,
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	.dno_attach_notify = &ramfs_dirnode_v_attach_notify,
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 };
 
 
@@ -1138,6 +1142,88 @@ again_acquire_locks:
 }
 
 
+
+#ifdef CONFIG_HAVE_FS_NOTIFY
+/* Return values for `devfs_super_dirent_traced()' */
+#define DEVFS_SUPER_DIRENT_TRACED_NO    0 /* Not traced */
+#define DEVFS_SUPER_DIRENT_TRACED_YES   1 /* Is traced */
+#define DEVFS_SUPER_DIRENT_TRACED_NOCON 2 /* Directory doesn't have a notify controller. */
+
+/* Check if `ent' is traced by `self's notify controller
+ * @return: * : One of `DEVFS_SUPER_DIRENT_TRACED_*' */
+PRIVATE NOBLOCK NONNULL((1)) unsigned int
+NOTHROW(FCALL devfs_device_traced)(struct device const *__restrict dev) {
+	struct dnotify_controller *dnot;
+	struct dnotify_link *link;
+	notify_lock_acquire();
+	if unlikely(devfs.fs_root.mf_notify == NULL) {
+		notify_lock_release_br();
+		return DEVFS_SUPER_DIRENT_TRACED_NOCON; /* Controller was deleted :( */
+	}
+	dnot = inotify_controller_asdnotify(devfs.fs_root.mf_notify);
+	link = dnotify_link_tree_locate(dnot->dnc_files, &dev->dv_dirent->dd_dirent);
+	notify_lock_release();
+	return link ? DEVFS_SUPER_DIRENT_TRACED_YES
+	            : DEVFS_SUPER_DIRENT_TRACED_NO;
+}
+
+PRIVATE BLOCKING NONNULL((1)) bool KCALL
+devfs_super_v_attach_notify_impl(struct device *__restrict iter) {
+	unsigned int state;
+again:
+
+	/* Check the tracing-state of this entry. */
+	state = devfs_device_traced(iter);
+	if (state == DEVFS_SUPER_DIRENT_TRACED_YES) {
+		/* Already being tracked; nothing to do here! */
+	} else {
+		if (state == DEVFS_SUPER_DIRENT_TRACED_NOCON)
+			return false; /* No controller --> no need to search for more files! */
+		incref(iter);
+		TRY {
+			iter = (struct device *)dnotify_controller_bindchild(&devfs.fs_root,
+			                                                     &iter->dv_dirent->dd_dirent,
+			                                                     iter);
+		} EXCEPT {
+			devfs_byname_endread();
+			/*decref_nokill(iter);*/ /* Inherited by `dnotify_controller_bindchild()' on error */
+			RETHROW();
+		}
+		decref_nokill(iter);
+	}
+
+	/* Recursively scan the entire tree. */
+	if (iter->dv_byname_node.rb_lhs) {
+		if (iter->dv_byname_node.rb_rhs) {
+			if (!devfs_super_v_attach_notify_impl(iter->dv_byname_node.rb_rhs))
+				return false;
+		}
+		iter = iter->dv_byname_node.rb_lhs;
+		goto again;
+	}
+	if (iter->dv_byname_node.rb_rhs) {
+		iter = iter->dv_byname_node.rb_rhs;
+		goto again;
+	}
+	return true;
+}
+
+PRIVATE BLOCKING NONNULL((1)) void KCALL
+devfs_super_v_attach_notify(struct fdirnode *__restrict self)
+		THROWS(E_BADALLOC, ...) {
+	assert(self == &devfs.fs_root);
+	/* Load files from the ramfs portion */
+	ramfs_dirnode_v_attach_notify(self);
+
+	/* Load actual device files. */
+	devfs_byname_read();
+	if (devfs_byname_tree != NULL)
+		devfs_super_v_attach_notify_impl(devfs_byname_tree);
+	devfs_byname_endread();
+}
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+
+
 #define devfs_super_v_changed    ramfs_super_v_changed
 #define devfs_super_v_open       ramfs_super_v_open
 #define devfs_super_v_wrattr     ramfs_super_v_wrattr
@@ -1178,6 +1264,9 @@ INTERN_CONST struct fsuper_ops const devfs_super_ops = {
 		.dno_mkfile = &devfs_super_v_mkfile,
 		.dno_unlink = &devfs_super_v_unlink,
 		.dno_rename = &devfs_super_v_rename,
+#ifdef CONFIG_HAVE_FS_NOTIFY
+		.dno_attach_notify = &devfs_super_v_attach_notify,
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 	},
 };
 

@@ -2453,6 +2453,9 @@ PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 		.dno_mkfile = &flatdirnode_v_mkfile,
 		.dno_unlink = &flatdirnode_v_unlink,
 		.dno_rename = &flatdirnode_v_rename,
+#ifdef CONFIG_HAVE_FS_NOTIFY
+		.dno_attach_notify = &flatdirnode_v_attach_notify,
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 	},
 	.fdno_flat = {
 		.fdnx_readdir       = &fatdir_v_readdir,
@@ -3001,6 +3004,9 @@ PRIVATE struct flatsuper_ops const Fat16_SuperOps = {
 			.dno_mkfile = &flatdirnode_v_mkfile,
 			.dno_unlink = &flatdirnode_v_unlink,
 			.dno_rename = &flatdirnode_v_rename,
+#ifdef CONFIG_HAVE_FS_NOTIFY
+			.dno_attach_notify = &flatdirnode_v_attach_notify,
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 		},
 	},
 	.ffso_flat = {
@@ -3043,6 +3049,9 @@ PRIVATE struct flatsuper_ops const Fat32_SuperOps = {
 			.dno_mkfile = &flatdirnode_v_mkfile,
 			.dno_unlink = &flatdirnode_v_unlink,
 			.dno_rename = &flatdirnode_v_rename,
+#ifdef CONFIG_HAVE_FS_NOTIFY
+			.dno_attach_notify = &flatdirnode_v_attach_notify,
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 		},
 	},
 	.ffso_flat = {

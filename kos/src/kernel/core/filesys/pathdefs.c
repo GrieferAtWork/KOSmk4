@@ -64,6 +64,9 @@ PRIVATE struct fsuper_ops const fsuper_unmounted_ops = {
 		.dno_mkfile = &ramfs_super_v_mkfile,
 		.dno_unlink = &ramfs_super_v_unlink,
 		.dno_rename = &ramfs_super_v_rename,
+#ifdef CONFIG_HAVE_FS_NOTIFY
+		.dno_attach_notify = &ramfs_super_v_attach_notify,
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 	},
 };
 

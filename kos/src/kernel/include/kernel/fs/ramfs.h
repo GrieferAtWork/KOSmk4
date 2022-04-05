@@ -333,6 +333,12 @@ FUNDEF BLOCKING NONNULL((1, 2)) unsigned int KCALL
 ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
                        struct frename_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, ...);
+#ifdef CONFIG_HAVE_FS_NOTIFY
+FUNDEF BLOCKING NONNULL((1)) void KCALL
+ramfs_dirnode_v_attach_notify(struct fdirnode *__restrict self)
+		THROWS(E_BADALLOC, ...);
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+
 
 
 /* Construct a new fully initialized, but not globally visible, as in:
@@ -381,13 +387,16 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_super_v_destroy)(struct mfile *__restrict self);
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL ramfs_super_v_delete)(REF struct fsuper *__restrict self);
-#define ramfs_super_v_wrattr ramfs_dirnode_v_wrattr
-#define ramfs_super_v_lookup ramfs_dirnode_v_lookup
-#define ramfs_super_v_enumsz ramfs_dirnode_v_enumsz
-#define ramfs_super_v_enum   ramfs_dirnode_v_enum
-#define ramfs_super_v_mkfile ramfs_dirnode_v_mkfile
-#define ramfs_super_v_unlink ramfs_dirnode_v_unlink
-#define ramfs_super_v_rename ramfs_dirnode_v_rename
+#define ramfs_super_v_wrattr        ramfs_dirnode_v_wrattr
+#define ramfs_super_v_lookup        ramfs_dirnode_v_lookup
+#define ramfs_super_v_enumsz        ramfs_dirnode_v_enumsz
+#define ramfs_super_v_enum          ramfs_dirnode_v_enum
+#define ramfs_super_v_mkfile        ramfs_dirnode_v_mkfile
+#define ramfs_super_v_unlink        ramfs_dirnode_v_unlink
+#define ramfs_super_v_rename        ramfs_dirnode_v_rename
+#ifdef CONFIG_HAVE_FS_NOTIFY
+#define ramfs_super_v_attach_notify ramfs_dirnode_v_attach_notify
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 
 /* Top-level ram filesystem descriptor. */
 DATDEF struct ffilesys ramfs_filesys;

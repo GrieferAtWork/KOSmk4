@@ -455,6 +455,11 @@ flatdirnode_v_rename(struct fdirnode *__restrict self,
                      struct frename_info *__restrict info)
 		THROWS(E_BADALLOC, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_IOERROR, ...);
+#ifdef CONFIG_HAVE_FS_NOTIFY
+FUNDEF BLOCKING NONNULL((1)) void KCALL
+flatdirnode_v_attach_notify(struct fdirnode *__restrict self)
+		THROWS(E_BADALLOC, ...);
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 
 
 struct flatdir_bucket {

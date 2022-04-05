@@ -426,6 +426,32 @@ struct fdirnode_ops {
 	                    struct frename_info *__restrict info)
 			THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 			       E_FSERROR_READONLY, E_IOERROR, ...);
+
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	/* [0..1]
+	 * Attach the notify-controller of `self' to the controllers
+	 * all currently-loaded (i.e. cached) child-files of `self':
+	 * >> struct dnotify_controller *dnotify;
+	 * >> dnotify = inotify_controller_asdnotify(self->mf_notify);
+	 * >> FOREACH (struct fdirent *child_dirent,
+	 * >>          struct fnode   *child_inode:
+	 * >>          ENUMATE_LOADED_CHILD_INODES(mfile_asdir(self))) {
+	 * >>     struct dnotify_link *link;
+	 * >>     if (dnotify_link_tree_locate(dnotify->dnc_files, child_dirent) != NULL)
+	 * >>         continue;
+	 * >>     ENSURE_ALLOCATED(child_inode->mf_notify);
+	 * >>     link = dnotify_link_alloc();
+	 * >>     link->dnl_dir = dnotify;
+	 * >>     link->dnl_fil = child_inode;
+	 * >>     LIST_INSERT(&child_inode->mf_notify->inc_dirs, link, dnl_fillink);
+	 * >>     link->dnl_ent = incref(child_dirent);
+	 * >>     dnotify_link_tree_insert(&dnotify->dnc_files, link);
+	 * >> } */
+	BLOCKING NONNULL((1)) void
+	(KCALL *dno_attach_notify)(struct fdirnode *__restrict self)
+			THROWS(E_BADALLOC, ...);
+#endif /* CONFIG_HAVE_FS_NOTIFY */
+
 };
 
 struct fdirnode
