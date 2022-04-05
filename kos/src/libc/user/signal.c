@@ -186,7 +186,7 @@ NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
 {
 	char const **result = libc_sys_siglist;
 	if (!result[1]) { /* Signal `0' is undefined */
-		unsigned int i = NSIG;
+		unsigned int i = NSIG - 1;
 		/* Lazily initialize */
 		for (;;) {
 			result[i] = libc_sigdescr_np(i);
@@ -240,7 +240,7 @@ ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *
 NOTHROW(LIBCCALL libc___p_sys_sigabbrev)(void) {
 	char const **result = libc_sys_sigabbrev;
 	if (!result[1]) { /* Signal `0' is undefined */
-		unsigned int i = NSIG;
+		unsigned int i = NSIG - 1;
 		/* Lazily initialize */
 		for (;;) {
 			result[i] = libc_sigabbrev_np(i);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4909617d */
+/* HASH CRC-32:0xe34718ae */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1803,6 +1803,13 @@ __CREDIRECT(,int,__NOTHROW_NCX,sigprocmask,(__STDC_INT_AS_UINT_T __how, sigset_t
 __CREDIRECT(,int,__NOTHROW_NCX,sigprocmask,(__STDC_INT_AS_UINT_T __how, sigset_t const *__set, sigset_t *__oset),thr_sigsetmask,(__how,__set,__oset))
 #endif /* ... */
 #ifdef __USE_KOS
+
+#ifdef __NSIG
+/* >> sigvalid(3)
+ * Verify that `signo' is a valid signal number. */
+#define sigvalid(signo) ((signo) > 0 && (signo) < __NSIG)
+#endif /* __NSIG */
+
 /* >> getsigmaskptr(3)
  * Return   the   current  signal   mask  pointer.
  * See the documentation of `setsigmaskptr(3)' for

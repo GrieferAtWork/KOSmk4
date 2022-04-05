@@ -73,11 +73,10 @@ task_raisesignalthread(struct task *__restrict target,
                        siginfo_t const *__restrict info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
 	struct pending_rpc *rpc;
-	if unlikely(info->si_signo <= 0 || info->si_signo >= NSIG) {
-		signo_t signo = info->si_signo;
+	if unlikely(!sigvalid(info->si_signo)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
-		      signo);
+		      info->si_signo);
 	}
 
 #ifndef __OPTIMIZE_SIZE__
@@ -116,11 +115,10 @@ task_raisesignalprocess(struct taskpid *__restrict proc,
                         siginfo_t const *__restrict info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE) {
 	struct pending_rpc *rpc;
-	if unlikely(info->si_signo <= 0 || info->si_signo >= NSIG) {
-		signo_t signo = info->si_signo;
+	if unlikely(!sigvalid(info->si_signo)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
-		      signo);
+		      info->si_signo);
 	}
 
 #ifndef __OPTIMIZE_SIZE__
@@ -165,11 +163,10 @@ task_raisesignalprocessgroup(struct procgrp *__restrict group,
 	size_t rpcs_count = 0; /* # of elements in `rpcs' */
 	size_t proc_count;
 	size_t multiplier = 1;
-	if unlikely(info->si_signo <= 0 || info->si_signo >= NSIG) {
-		signo_t signo = info->si_signo;
+	if unlikely(!sigvalid(info->si_signo)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
-		      signo);
+		      info->si_signo);
 	}
 
 	SLIST_INIT(&rpcs);
@@ -341,10 +338,11 @@ DEFINE_SYSCALL3(errno_t, tgkill,
                 pid_t, pid, pid_t, tid,
                 signo_t, signo) {
 	REF struct task *target;
-	if unlikely(signo < 0 || signo >= NSIG)
+	if unlikely(!sigvalid(signo)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      signo);
+	}
 	target = pidns_lookuptask_srch(THIS_PIDNS, tid);
 	FINALLY_DECREF_UNLIKELY(target);
 
@@ -379,9 +377,11 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 #ifdef __ARCH_WANT_SYSCALL_TKILL
 DEFINE_SYSCALL2(errno_t, tkill, pid_t, tid, signo_t, signo) {
 	REF struct task *target;
-	if unlikely(signo < 0 || signo >= NSIG)
+	if unlikely(!sigvalid(signo)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO, signo);
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
+		      signo);
+	}
 	target = pidns_lookuptask_srch(THIS_PIDNS, tid);
 	FINALLY_DECREF_UNLIKELY(target);
 
@@ -413,7 +413,7 @@ DEFINE_SYSCALL2(errno_t, tkill, pid_t, tid, signo_t, signo) {
 INTERN NONNULL((1)) void KCALL
 siginfo_from_user(siginfo_t *__restrict info, signo_t usigno,
                   USER UNCHECKED siginfo_t const *uinfo) {
-	if unlikely(usigno < 0 || usigno >= NSIG) {
+	if unlikely(!sigvalid(usigno)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      usigno);
@@ -442,7 +442,7 @@ siginfo_from_user(siginfo_t *__restrict info, signo_t usigno,
 INTERN NONNULL((1)) void KCALL
 siginfo_from_compat_user(siginfo_t *__restrict info, signo_t usigno,
                          USER UNCHECKED compat_siginfo_t const *uinfo) {
-	if unlikely(usigno < 0 || usigno >= NSIG) {
+	if unlikely(!sigvalid(usigno)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      usigno);

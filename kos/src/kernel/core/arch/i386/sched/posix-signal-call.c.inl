@@ -142,7 +142,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	USER CHECKED LOCAL_struct_fpustate *user_fpustate;
 	USER CHECKED LOCAL_struct_rpc_syscall_info *user_sc_info;
 	USER CHECKED LOCAL_uintptr_t user_rstor;
-	assert(!(siginfo->si_signo <= 0 || siginfo->si_signo >= NSIG));
+	assert(sigvalid(siginfo->si_signo));
 
 	/* Figure out how, and if we need to mask signals. */
 	must_restore_sigmask = false;

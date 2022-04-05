@@ -249,7 +249,7 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 		mode |= RPC_SIGNO(SIGRPC);
 	} else {
 		signo_t signo = _RPC_GETSIGNO(mode);
-		if unlikely(signo <= 0 || signo >= NSIG) {
+		if unlikely(!sigvalid(signo)) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 			      signo);

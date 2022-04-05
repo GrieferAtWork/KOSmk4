@@ -294,8 +294,7 @@ userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
 
 	/* Raise a POSIX signal */
 again_gethand:
-	assert(siginfo.si_signo != 0);
-	assert(siginfo.si_signo < NSIG);
+	assert(sigvalid(siginfo.si_signo));
 	sighand_getaction(siginfo.si_signo, &action);
 
 	/* Check for special signal handlers. */
@@ -482,8 +481,7 @@ NOTHROW(FCALL userexcept_exec_user_rpc)(/*in|out*/ struct rpc_context *__restric
 		 * SIG_STOP, which introduce  custom control routing  which
 		 * could otherwise interfere with normal RPC handling. */
 		struct kernel_sigaction action;
-		assert(rpc->pr_psig.si_signo != 0);
-		assert(rpc->pr_psig.si_signo < NSIG);
+		assert(sigvalid(rpc->pr_psig.si_signo));
 again_load_threadsig_action:
 		sighand_getaction(rpc->pr_psig.si_signo, &action);
 
@@ -676,8 +674,7 @@ NOTHROW(FCALL userexcept_exec_user_signo_rpc)(/*in|out*/ struct rpc_context *__r
 	 * SIG_STOP, which introduce  custom control routing  which
 	 * could otherwise interfere with normal RPC handling. */
 	struct kernel_sigaction action;
-	assert(signo != 0);
-	assert(signo < NSIG);
+	assert(sigvalid(signo));
 again_load_threadsig_action:
 	sighand_getaction(signo, &action);
 

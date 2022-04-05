@@ -355,7 +355,7 @@ PUBLIC NONNULL((2)) void FCALL
 sighand_getaction(signo_t signo, struct kernel_sigaction *__restrict action)
 		THROWS(E_WOULDBLOCK) {
 	struct sighand_ptr *ptr;
-	assert(signo >= 1 && signo < NSIG);
+	assert(sigvalid(signo));
 	ptr = THIS_SIGHAND_PTR;
 	if (!ptr) {
 default_sighand:
@@ -379,7 +379,7 @@ sighand_gethandler(signo_t signo)
 	sighandler_t result = SIG_DFL;
 	struct sighand_ptr *ptr;
 	struct sighand *hand;
-	assert(signo >= 1 && signo <= NSIG);
+	assert(sigvalid(signo));
 	ptr = THIS_SIGHAND_PTR;
 	if (ptr == NULL)
 		goto done;
@@ -406,8 +406,7 @@ sighand_reset_handler(signo_t signo,
                       struct kernel_sigaction const *__restrict current_action)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct sighand *hand;
-	assert(signo != 0);
-	assert(signo < NSIG);
+	assert(sigvalid(signo));
 	if unlikely(!THIS_SIGHAND_PTR)
 		return false;
 	hand = sighand_ptr_lockwrite();
@@ -430,8 +429,8 @@ sighand_reset_handler(signo_t signo,
  * SIG_IGN that wouldn't be set as such by default. */
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL sighand_has_nondefault_sig_ign)(struct sighand const *__restrict self) {
-	signo_t i;
-	for (i = 0; i < NSIG - 1; ++i) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->sh_actions); ++i) {
 		/* Check if the handler's action is SIG_IGN */
 		if (self->sh_actions[i].sa_handler != SIG_IGN)
 			continue; /* Something other than SIG_IGN */
@@ -495,7 +494,7 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 		 * or any other handlers for that matter.
 		 * Especially of note is that we also don't copy signal masks,
 		 * since  those wouldn't actually matter for SIG_IGN handlers. */
-		for (i = 0; i < NSIG - 1; ++i) {
+		for (i = 0; i < COMPILER_LENOF(hand->sh_actions); ++i) {
 			if (hand->sh_actions[i].sa_handler == SIG_IGN)
 				newhand->sh_actions[i].sa_handler = SIG_IGN;
 		}
@@ -576,7 +575,7 @@ sys_sigaction_impl(signo_t signo,
 		overflow   = sigsetsize - sizeof(sigset_t);
 		sigsetsize = sizeof(sigset_t);
 	}
-	if unlikely(signo <= 0 || signo >= NSIG) {
+	if unlikely(!sigvalid(signo)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 		      signo);

@@ -125,10 +125,11 @@ sys_debugtrap64_impl(struct icpustate *__restrict return_state,
 		    reason.dtr_reason != DEBUGTRAP_REASON_PEXITED) {
 			/* Verify a valid signal number.
 			 * NOTE: The (T|P)EXITED reason use the SIGNO field as the exit status. */
-			if (reason.dtr_signo <= 0 || reason.dtr_signo >= NSIG)
+			if (!sigvalid(reason.dtr_signo)) {
 				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 				      E_INVALID_ARGUMENT_CONTEXT_DEBUG_TRAPNO,
 				      reason.dtr_signo);
+			}
 		}
 	} else {
 		reason.dtr_signo  = SIGTRAP;

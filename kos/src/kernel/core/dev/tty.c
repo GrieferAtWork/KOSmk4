@@ -848,7 +848,7 @@ again_TIOCNOTTY:
 	/*case _IO_WITHSIZE(TIOCSIG, 0) | _IOC_IN:*/ {
 		signo_t signo;
 		signo = ioctl_intarg_getsigno(cmd, arg);
-		if unlikely(signo <= 0 || signo >= NSIG) {
+		if unlikely(!sigvalid(signo)) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 			      signo);

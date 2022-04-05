@@ -1780,6 +1780,15 @@ int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 
 %#ifdef __USE_KOS
+
+%
+%#ifdef __NSIG
+%/* >> sigvalid(3)
+% * Verify that `signo' is a valid signal number. */
+%#define sigvalid(signo) ((signo) > 0 && (signo) < __NSIG)
+%#endif /* __NSIG */
+%
+
 @@>> getsigmaskptr(3)
 @@Return   the   current  signal   mask  pointer.
 @@See the documentation of `setsigmaskptr(3)' for

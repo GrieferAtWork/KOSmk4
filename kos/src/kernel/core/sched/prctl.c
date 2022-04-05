@@ -75,7 +75,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 	switch (command) {
 
 	case PR_SET_PDEATHSIG:
-		if unlikely(arg2 == 0 || arg2 >= NSIG) {
+		if unlikely(!sigvalid(arg2)) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 			      arg2);

@@ -1710,7 +1710,7 @@ follow_jmp:
 		if unlikely(!CANPOP(1))
 			goto err_stack_underflow;
 		signo = (signo_t)TOP;
-		if unlikely(signo <= 0 || signo >= NSIG) {
+		if unlikely(!sigvalid(signo)) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
 			      signo);
