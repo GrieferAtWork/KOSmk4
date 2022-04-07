@@ -37,6 +37,10 @@
  * so we can't actually turn on this functionality here, either... */
 #elif defined(__KERNEL__)
 /* EFLAGS.AC is always ignored in kernel-space */
+#elif !defined(__KOS__)
+/* I give up -- On KOS I can say for certain that you're able  to
+ * enable AC, but for now we disable this on _all_ other systems:
+ * https://sourceware.org/bugzilla/show_bug.cgi?id=11357 */
 #elif defined(__x86_64__)
 #ifdef _MSC_VER
 __NAMESPACE_INT_BEGIN
