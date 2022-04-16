@@ -900,6 +900,11 @@ mfile_extract_name(struct mfile const *self,
 				goto badobj;
 		}
 	}
+#ifdef CONFIG_HAVE_FS_NOTIFY
+	/* TODO: If a dnotify_controller is attached to the inotify_controller of `self',
+	 *       then we can determine (at least 1) name of `self' in some directory. But
+	 *       in this case we still can't determine where that directory is... */
+#endif /* CONFIG_HAVE_FS_NOTIFY */
 	return true;
 badobj:
 	return false;
