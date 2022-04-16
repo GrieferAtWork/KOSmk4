@@ -2558,7 +2558,7 @@ again:
 	}
 
 	/* Try to do the init ourselves. */
-	error = pthread_key_create(key, destr_function);
+	error = pthread_key_create(&kv, destr_function);
 	if unlikely(error != 0)
 		return error; /* Error... */
 
@@ -2579,6 +2579,8 @@ again:
 @@pp_endif@@
 		goto again;
 	}
+
+	/* Success: key has been created */
 	return 0;
 }
 %#endif /* __USE_SOLARIS */

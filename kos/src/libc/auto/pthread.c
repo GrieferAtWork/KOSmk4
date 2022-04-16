@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31c1beb1 */
+/* HASH CRC-32:0xbdc3408b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -211,7 +211,7 @@ again:
 	}
 
 	/* Try to do the init ourselves. */
-	error = libc_pthread_key_create(key, destr_function);
+	error = libc_pthread_key_create(&kv, destr_function);
 	if unlikely(error != 0)
 		return error; /* Error... */
 
@@ -232,6 +232,8 @@ again:
 
 		goto again;
 	}
+
+	/* Success: key has been created */
 	return 0;
 }
 #include <bits/os/cpu_set.h>

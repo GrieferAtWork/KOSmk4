@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x706601cc */
+/* HASH CRC-32:0x8df50d6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __again:
 	}
 
 	/* Try to do the init ourselves. */
-	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_key_create)(__key, __destr_function);
+	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_key_create)(&__kv, __destr_function);
 	if __unlikely(__error != 0)
 		return __error; /* Error... */
 
@@ -85,6 +85,8 @@ __again:
 #endif /* __CRT_HAVE_pthread_key_delete || __CRT_HAVE_tss_delete */
 		goto __again;
 	}
+
+	/* Success: key has been created */
 	return 0;
 }
 __NAMESPACE_LOCAL_END
