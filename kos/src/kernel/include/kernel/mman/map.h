@@ -89,8 +89,8 @@
 #endif /* !PROT_FORCEWRITE */
 
 
-/* Kernel-only flag: disallow use mprotect(2) to gain write access. Trying to do
- * so  will  throw `E_INVALID_HANDLE_OPERATION:E_INVALID_HANDLE_OPERATION_MMAP'. */
+/* Kernel-only flag: disallow use of mprotect(2) to gain write access. Trying  to
+ * do so will throw `E_INVALID_HANDLE_OPERATION:E_INVALID_HANDLE_OPERATION_MMAP'. */
 #ifndef PROT_DENYWRITE
 #define PROT_DENYWRITE 0x10
 #endif /* !PROT_DENYWRITE */

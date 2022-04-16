@@ -43,7 +43,7 @@ DECL_BEGIN
  *   >> struct inotify_controller *mf_notify; // [0..1][owned][lock(!PREEMPTION && :notify_lock)]
  *
  * - Files not currently loaded are  not monitored, and no  attempt is made to  load
- *   more files  from disk)  The case  where the  directory may  contain other  hard
+ *   more files  from disk.  The case  where the  directory may  contain other  hard
  *   references to already opened files for which we simply don't know that they are
  *   also apart of the directory now being monitored is ignored:
  *   $ echo Content > /opt/subdir/testfile
