@@ -211,13 +211,13 @@ NOTHROW(LIBCCALL libc___p___libc_enable_secure)(void) {
 
 
 
-/*[[[head:libc_getauxval,hash:CRC-32=0x5db66f12]]]*/
+/*[[[head:libc_getauxval,hash:CRC-32=0xed3d3098]]]*/
 /* >> getauxval(3)
  * Return the value associated with  a named `type' from  the
  * auxiliary information vector passed to the calling program
  * by the kernel.
  * @param: type: One of `AT_*' from <elf.h> */
-INTERN ATTR_SECTION(".text.crt.system.auxv") ulongptr_t
+INTERN ATTR_SECTION(".text.crt.system.auxv") ATTR_PURE WUNUSED ulongptr_t
 NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 /*[[[body:libc_getauxval]]]*/
 {

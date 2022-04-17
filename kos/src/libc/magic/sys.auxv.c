@@ -41,7 +41,7 @@ __SYSDECL_BEGIN
 @@auxiliary information vector passed to the calling program
 @@by the kernel.
 @@@param: type: One of `AT_*' from <elf.h>
-[[export_alias("__getauxval")]]
+[[libc, wunused, pure, export_alias("__getauxval")]]
 $ulongptr_t getauxval($ulongptr_t type);
 
 %{

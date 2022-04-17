@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x703c6420 */
+/* HASH CRC-32:0x77c2d5e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1257,6 +1257,14 @@ NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd) {
 
 
 }
+#include <libc/template/__libc_enable_secure.h>
+/* >> issetugid(3)
+ * Check if the calling program is running under setuid-mode
+ * Hint: simply returns the value of `__libc_enable_secure(3)'. */
+INTERN ATTR_SECTION(".text.crt.sched.user") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_issetugid)(void) {
+	return __LOCAL___libc_enable_secure;
+}
 #include <asm/os/fcntl.h>
 /* >> fchroot(2)
  * Change the root directory to  `fd'. If `fd' was opened  before a prior call to  `chroot()',
@@ -1409,6 +1417,7 @@ DEFINE_PUBLIC_ALIAS(getpassfd, libc_getpassfd);
 DEFINE_PUBLIC_ALIAS(getpass_r, libc_getpass_r);
 DEFINE_PUBLIC_ALIAS(getpeereid, libc_getpeereid);
 DEFINE_PUBLIC_ALIAS(closefrom, libc_closefrom);
+DEFINE_PUBLIC_ALIAS(issetugid, libc_issetugid);
 DEFINE_PUBLIC_ALIAS(fchroot, libc_fchroot);
 DEFINE_PUBLIC_ALIAS(DOS$resolvepath, libd_resolvepath);
 DEFINE_PUBLIC_ALIAS(resolvepath, libc_resolvepath);

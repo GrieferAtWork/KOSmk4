@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6933ac5 */
+/* HASH CRC-32:0xc0672e57 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
  * auxiliary information vector passed to the calling program
  * by the kernel.
  * @param: type: One of `AT_*' from <elf.h> */
-INTDEF ulongptr_t NOTHROW_NCX(LIBDCALL libd_getauxval)(ulongptr_t type);
+INTDEF ATTR_PURE WUNUSED ulongptr_t NOTHROW_NCX(LIBDCALL libd_getauxval)(ulongptr_t type);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

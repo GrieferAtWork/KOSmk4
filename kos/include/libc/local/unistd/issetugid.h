@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe55bc22e */
+/* HASH CRC-32:0x6cb17a5d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,43 +18,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: FreeBSD       (/sys/sys/auxv.h) */
-/* (#) Portability: GNU C Library (/misc/sys/auxv.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/auxv.h) */
-/* (#) Portability: diet libc     (/include/sys/auxv.h) */
-/* (#) Portability: musl libc     (/include/sys/auxv.h) */
-#ifndef _SYS_AUXV_H
-#define _SYS_AUXV_H 1
-
-#include <__stdinc.h>
+#ifndef __local_issetugid_defined
+#define __local_issetugid_defined
 #include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
-#include <elf.h>
-
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-#ifdef __CRT_HAVE_getauxval
-/* >> getauxval(3)
- * Return the value associated with  a named `type' from  the
- * auxiliary information vector passed to the calling program
- * by the kernel.
- * @param: type: One of `AT_*' from <elf.h> */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),(__type))
-#elif defined(__CRT_HAVE___getauxval)
-/* >> getauxval(3)
- * Return the value associated with  a named `type' from  the
- * auxiliary information vector passed to the calling program
- * by the kernel.
- * @param: type: One of `AT_*' from <elf.h> */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),__getauxval,(__type))
-#endif /* ... */
-
-__SYSDECL_END
-#endif /* __CC__ */
-
-#endif /* !_SYS_AUXV_H */
+#include <libc/template/__libc_enable_secure.h>
+#ifdef __LOCAL___libc_enable_secure
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(issetugid) __ATTR_PURE __ATTR_WUNUSED int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(issetugid))(void) {
+	return __LOCAL___libc_enable_secure;
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_issetugid_defined
+#define __local___localdep_issetugid_defined
+#define __localdep_issetugid __LIBC_LOCAL_NAME(issetugid)
+#endif /* !__local___localdep_issetugid_defined */
+#else /* __LOCAL___libc_enable_secure */
+#undef __local_issetugid_defined
+#endif /* !__LOCAL___libc_enable_secure */
+#endif /* !__local_issetugid_defined */

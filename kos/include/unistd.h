@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89afeb4 */
+/* HASH CRC-32:0x27edc731 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3709,6 +3709,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void _
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE(,int,__NOTHROW_NCX,close_range,(unsigned int __minfd, unsigned int __maxfd, unsigned int __flags),(__minfd,__maxfd,__flags))
 #endif /* !__close_range_defined && __CRT_HAVE_close_range */
+#ifndef __issetugid_defined
+#define __issetugid_defined
+#ifdef __CRT_HAVE_issetugid
+/* >> issetugid(3)
+ * Check if the calling program is running under setuid-mode
+ * Hint: simply returns the value of `__libc_enable_secure(3)'. */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,issetugid,(void),())
+#else /* __CRT_HAVE_issetugid */
+#include <libc/template/__libc_enable_secure.h>
+#ifdef __LOCAL___libc_enable_secure
+#include <libc/local/unistd/issetugid.h>
+/* >> issetugid(3)
+ * Check if the calling program is running under setuid-mode
+ * Hint: simply returns the value of `__libc_enable_secure(3)'. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(issetugid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL issetugid)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issetugid))(); })
+#else /* __LOCAL___libc_enable_secure */
+#undef __issetugid_defined
+#endif /* !__LOCAL___libc_enable_secure */
+#endif /* !__CRT_HAVE_issetugid */
+#endif /* !__issetugid_defined */
 #endif /* __USE_BSD */
 
 #if defined(__USE_SOLARIS) || defined(__USE_NETBSD)

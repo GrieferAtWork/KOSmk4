@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe55bc22e */
+/* HASH CRC-32:0x9c76350 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,43 +18,40 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: FreeBSD       (/sys/sys/auxv.h) */
-/* (#) Portability: GNU C Library (/misc/sys/auxv.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/auxv.h) */
-/* (#) Portability: diet libc     (/include/sys/auxv.h) */
-/* (#) Portability: musl libc     (/include/sys/auxv.h) */
-#ifndef _SYS_AUXV_H
-#define _SYS_AUXV_H 1
+#ifndef _LIBC_CORE_SYS_AUXV_H
+#define _LIBC_CORE_SYS_AUXV_H 1
 
 #include <__stdinc.h>
-#include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
-#include <elf.h>
 
 #ifdef __CC__
+#include <__crt.h>
+#include <hybrid/typecore.h>
+
 __SYSDECL_BEGIN
 
+#ifndef ____libc_core_getauxval_defined
+#define ____libc_core_getauxval_defined
 #ifdef __CRT_HAVE_getauxval
 /* >> getauxval(3)
  * Return the value associated with  a named `type' from  the
  * auxiliary information vector passed to the calling program
  * by the kernel.
  * @param: type: One of `AT_*' from <elf.h> */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),(__type))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__ULONGPTR_TYPE__,__NOTHROW_NCX,__libc_core_getauxval,(__ULONGPTR_TYPE__ __type),getauxval,(__type))
 #elif defined(__CRT_HAVE___getauxval)
 /* >> getauxval(3)
  * Return the value associated with  a named `type' from  the
  * auxiliary information vector passed to the calling program
  * by the kernel.
  * @param: type: One of `AT_*' from <elf.h> */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),__getauxval,(__type))
-#endif /* ... */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__ULONGPTR_TYPE__,__NOTHROW_NCX,__libc_core_getauxval,(__ULONGPTR_TYPE__ __type),__getauxval,(__type))
+#else /* ... */
+#undef ____libc_core_getauxval_defined
+#endif /* !... */
+#endif /* !____libc_core_getauxval_defined */
 
 __SYSDECL_END
+
 #endif /* __CC__ */
 
-#endif /* !_SYS_AUXV_H */
+#endif /* !_LIBC_CORE_SYS_AUXV_H */

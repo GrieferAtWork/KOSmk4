@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e95cc3 */
+/* HASH CRC-32:0xfefa8f6f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,15 +49,25 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_s
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),__secure_getenv,(__varname))
 #elif defined(__CRT_HAVE___libc_secure_getenv)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),__libc_secure_getenv,(__varname))
-#elif defined(__CRT_HAVE_getenv)
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/template/__libc_enable_secure.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_getenv) && !defined(__LOCAL___libc_enable_secure)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),getenv,(__varname))
-#elif defined(__LOCAL_environ)
+#elif defined(__LOCAL_environ) && !defined(__LOCAL___libc_enable_secure)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/getenv.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_secure_getenv __LIBC_LOCAL_NAME(getenv)
+#elif defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
+__NAMESPACE_LOCAL_END
+#include <libc/local/stdlib/secure_getenv.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_secure_getenv __LIBC_LOCAL_NAME(secure_getenv)
 #else /* ... */
 #undef __local___localdep_secure_getenv_defined
+#endif /* !... */
 #endif /* !... */
 #endif /* !__local___localdep_secure_getenv_defined */
 #ifndef __local___localdep_strrchrnul_defined

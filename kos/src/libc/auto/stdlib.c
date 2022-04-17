@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e03b828 */
+/* HASH CRC-32:0xc166dbc6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2051,6 +2051,30 @@ NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr,
 	return libc_strtold(nptr, endptr);
 }
 #endif /* __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
+#include <libc/template/__libc_enable_secure.h>
+/* >> secure_getenv(3)
+ * Same as `getenv(3)', but always  return `NULL' if the  caller
+ * is running in set-ugid mode (s.a. `__libc_enable_secure(3)'). */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char const *varname) {
+#ifdef __LOCAL___libc_enable_secure
+	if (__LOCAL___libc_enable_secure)
+		return NULL; /* Unconditionally return `NULL' for setuid() programs */
+#endif /* __LOCAL___libc_enable_secure */
+	return libd_getenv(varname);
+}
+#include <libc/template/__libc_enable_secure.h>
+/* >> secure_getenv(3)
+ * Same as `getenv(3)', but always  return `NULL' if the  caller
+ * is running in set-ugid mode (s.a. `__libc_enable_secure(3)'). */
+INTERN ATTR_SECTION(".text.crt.fs.environ") WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname) {
+#ifdef __LOCAL___libc_enable_secure
+	if (__LOCAL___libc_enable_secure)
+		return NULL; /* Unconditionally return `NULL' for setuid() programs */
+#endif /* __LOCAL___libc_enable_secure */
+	return libc_getenv(varname);
+}
 #include <asm/os/oflags.h>
 #include <asm/crt/stdio.h>
 #include <bits/os/timeval.h>
@@ -4398,6 +4422,12 @@ DEFINE_PUBLIC_ALIAS(_strtold_l, libc_strtold_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(strtold_l, libc_strtold_l);
+DEFINE_PUBLIC_ALIAS(DOS$__secure_getenv, libd_secure_getenv);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_secure_getenv, libd_secure_getenv);
+DEFINE_PUBLIC_ALIAS(DOS$secure_getenv, libd_secure_getenv);
+DEFINE_PUBLIC_ALIAS(__secure_getenv, libc_secure_getenv);
+DEFINE_PUBLIC_ALIAS(__libc_secure_getenv, libc_secure_getenv);
+DEFINE_PUBLIC_ALIAS(secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(shexec, libc_shexec);
 DEFINE_PUBLIC_ALIAS(DOS$getexecname, libd_getexecname);
 DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);

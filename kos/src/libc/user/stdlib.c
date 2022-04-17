@@ -696,17 +696,6 @@ do_fill_environ:
 }
 /*[[[end:libc_putenv]]]*/
 
-/*[[[head:libc_secure_getenv,hash:CRC-32=0x43530c7b]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.environ") WUNUSED NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname)
-/*[[[body:libc_secure_getenv]]]*/
-{
-	if (__libc_enable_secure)
-		return NULL; /* Unconditionally return `NULL' for setuid() programs */
-	return libc_getenv(varname);
-}
-/*[[[end:libc_secure_getenv]]]*/
-
 
 
 
@@ -1530,17 +1519,6 @@ NOTHROW_NCX(LIBDCALL libd_putenv)(char *string)
 	return result;
 }
 /*[[[end:libd_putenv]]]*/
-
-/*[[[head:libd_secure_getenv,hash:CRC-32=0xf26829ff]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
-NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char const *varname)
-/*[[[body:libd_secure_getenv]]]*/
-{
-	if (__libc_enable_secure)
-		return NULL; /* Unconditionally return `NULL' for setuid() programs */
-	return libd_getenv(varname);
-}
-/*[[[end:libd_secure_getenv]]]*/
 
 /*[[[head:libd__wputenv,hash:CRC-32=0xe7d19ea2]]]*/
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) int
@@ -3230,7 +3208,7 @@ NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x30bbf189]]]*/
+/*[[[start:exports,hash:CRC-32=0x43d05f70]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getenv, libd_getenv);
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
@@ -3302,12 +3280,6 @@ DEFINE_PUBLIC_ALIAS(grantpt, libc_grantpt);
 DEFINE_PUBLIC_ALIAS(posix_openpt, libc_posix_openpt);
 DEFINE_PUBLIC_ALIAS(DOS$ptsname_r, libd_ptsname_r);
 DEFINE_PUBLIC_ALIAS(ptsname_r, libc_ptsname_r);
-DEFINE_PUBLIC_ALIAS(DOS$__secure_getenv, libd_secure_getenv);
-DEFINE_PUBLIC_ALIAS(DOS$__libc_secure_getenv, libd_secure_getenv);
-DEFINE_PUBLIC_ALIAS(DOS$secure_getenv, libd_secure_getenv);
-DEFINE_PUBLIC_ALIAS(__secure_getenv, libc_secure_getenv);
-DEFINE_PUBLIC_ALIAS(__libc_secure_getenv, libc_secure_getenv);
-DEFINE_PUBLIC_ALIAS(secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(getpt, libc_getpt);
 DEFINE_PUBLIC_ALIAS(DOS$canonicalize_file_name, libd_canonicalize_file_name);
 DEFINE_PUBLIC_ALIAS(canonicalize_file_name, libc_canonicalize_file_name);

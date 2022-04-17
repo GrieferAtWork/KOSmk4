@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41d0cae0 */
+/* HASH CRC-32:0xd6928170 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3223,17 +3223,41 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtold_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 #ifdef __CRT_HAVE_secure_getenv
+/* >> secure_getenv(3)
+ * Same as `getenv(3)', but always  return `NULL' if the  caller
+ * is running in set-ugid mode (s.a. `__libc_enable_secure(3)'). */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,secure_getenv,(char const *__varname),(__varname))
 #elif defined(__CRT_HAVE___secure_getenv)
+/* >> secure_getenv(3)
+ * Same as `getenv(3)', but always  return `NULL' if the  caller
+ * is running in set-ugid mode (s.a. `__libc_enable_secure(3)'). */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,secure_getenv,(char const *__varname),__secure_getenv,(__varname))
 #elif defined(__CRT_HAVE___libc_secure_getenv)
+/* >> secure_getenv(3)
+ * Same as `getenv(3)', but always  return `NULL' if the  caller
+ * is running in set-ugid mode (s.a. `__libc_enable_secure(3)'). */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,secure_getenv,(char const *__varname),__libc_secure_getenv,(__varname))
-#elif defined(__CRT_HAVE_getenv)
+#else /* ... */
+#include <libc/template/__libc_enable_secure.h>
+#if defined(__CRT_HAVE_getenv) && !defined(__LOCAL___libc_enable_secure)
+/* >> secure_getenv(3)
+ * Same as `getenv(3)', but always  return `NULL' if the  caller
+ * is running in set-ugid mode (s.a. `__libc_enable_secure(3)'). */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,secure_getenv,(char const *__varname),getenv,(__varname))
-#elif defined(__LOCAL_environ)
+#elif defined(__LOCAL_environ) && !defined(__LOCAL___libc_enable_secure)
 #include <libc/local/stdlib/getenv.h>
+/* >> secure_getenv(3)
+ * Same as `getenv(3)', but always  return `NULL' if the  caller
+ * is running in set-ugid mode (s.a. `__libc_enable_secure(3)'). */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL secure_getenv)(char const *__varname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getenv))(__varname); }
+#elif defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
+#include <libc/local/stdlib/secure_getenv.h>
+/* >> secure_getenv(3)
+ * Same as `getenv(3)', but always  return `NULL' if the  caller
+ * is running in set-ugid mode (s.a. `__libc_enable_secure(3)'). */
+__NAMESPACE_LOCAL_USING_OR_IMPL(secure_getenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL secure_getenv)(char const *__varname) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(secure_getenv))(__varname); })
 #endif /* ... */
+#endif /* !... */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,getpt,(void),())
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
  * Upon error, `NULL' is returned instead */

@@ -2966,10 +2966,23 @@ __LONGDOUBLE strtold_l([[nonnull]] char const *__restrict nptr,
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 
+@@>> secure_getenv(3)
+@@Same as `getenv(3)', but always  return `NULL' if the  caller
+@@is running in set-ugid mode (s.a. `__libc_enable_secure(3)').
 [[crt_dos_variant, wunused, section(".text.crt{|.dos}.fs.environ")]]
-[[export_alias("__secure_getenv", "__libc_secure_getenv"), alias("getenv")]]
-[[if($extended_include_prefix("<libc/template/environ.h>")defined(__LOCAL_environ)), bind_local_function(getenv)]]
-char *secure_getenv([[nonnull]] char const *varname);
+[[export_alias("__secure_getenv", "__libc_secure_getenv")]]
+[[if($extended_include_prefix("<libc/template/__libc_enable_secure.h>")
+     !defined(__LOCAL___libc_enable_secure)), alias("getenv")]]
+[[if($extended_include_prefix("<libc/template/environ.h>", "<libc/template/__libc_enable_secure.h>")
+     defined(__LOCAL_environ) && !defined(__LOCAL___libc_enable_secure)), bind_local_function(getenv)]]
+[[impl_include("<libc/template/__libc_enable_secure.h>"), requires_function(getenv)]]
+char *secure_getenv([[nonnull]] char const *varname) {
+@@pp_ifdef __LOCAL___libc_enable_secure@@
+	if (__LOCAL___libc_enable_secure)
+		return NULL; /* Unconditionally return `NULL' for setuid() programs */
+@@pp_endif@@
+	return getenv(varname);
+}
 
 [[cp, section(".text.crt{|.dos}.io.tty")]]
 int getpt();

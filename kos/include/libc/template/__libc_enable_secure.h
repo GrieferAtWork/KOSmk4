@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xe55bc22e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,43 +17,48 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: FreeBSD       (/sys/sys/auxv.h) */
-/* (#) Portability: GNU C Library (/misc/sys/auxv.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/auxv.h) */
-/* (#) Portability: diet libc     (/include/sys/auxv.h) */
-/* (#) Portability: musl libc     (/include/sys/auxv.h) */
-#ifndef _SYS_AUXV_H
-#define _SYS_AUXV_H 1
-
-#include <__stdinc.h>
+#ifndef __LOCAL___libc_enable_secure
 #include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
-#include <elf.h>
-
+#ifndef __LOCAL___libc_enable_secure
+#ifdef __libc_enable_secure
+#define __LOCAL___libc_enable_secure __libc_enable_secure
+#elif defined(__CRT_HAVE___libc_enable_secure)
+#ifndef __NO_ASMNAME
+#define __LOCAL___libc_enable_secure __LOCAL___libc_enable_secure
 #ifdef __CC__
-__SYSDECL_BEGIN
-
-#ifdef __CRT_HAVE_getauxval
-/* >> getauxval(3)
- * Return the value associated with  a named `type' from  the
- * auxiliary information vector passed to the calling program
- * by the kernel.
- * @param: type: One of `AT_*' from <elf.h> */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),(__type))
-#elif defined(__CRT_HAVE___getauxval)
-/* >> getauxval(3)
- * Return the value associated with  a named `type' from  the
- * auxiliary information vector passed to the calling program
- * by the kernel.
- * @param: type: One of `AT_*' from <elf.h> */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),__getauxval,(__type))
-#endif /* ... */
-
-__SYSDECL_END
+__DECL_BEGIN
+__LIBC int __LOCAL___libc_enable_secure __CASMNAME("__libc_enable_secure");
+__DECL_END
 #endif /* __CC__ */
-
-#endif /* !_SYS_AUXV_H */
+#else /* !__NO_ASMNAME */
+#define __LOCAL___libc_enable_secure __libc_enable_secure
+#define __libc_enable_secure         __libc_enable_secure
+#ifdef __CC__
+__DECL_BEGIN
+__LIBC int __libc_enable_secure;
+__DECL_END
+#endif /* __CC__ */
+#endif /* __NO_ASMNAME */
+#elif defined(__CRT_HAVE_issetugid)
+#ifndef __issetugid_defined
+#define __issetugid_defined
+#ifdef __CC__
+__DECL_BEGIN
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,issetugid,(void),())
+__DECL_END
+#endif /* __CC__ */
+#endif /* !__issetugid_defined */
+#define __LOCAL___libc_enable_secure issetugid()
+#else /* ... */
+#include <libc/sys.auxv.h>
+#ifdef ____libc_getauxval_defined
+#include <elf.h>
+#ifdef AT_SECURE
+#ifndef __LOCAL___libc_enable_secure
+#define __LOCAL___libc_enable_secure __libc_getauxval(AT_SECURE)
+#endif /* !__LOCAL___libc_enable_secure */
+#endif /* AT_SECURE */
+#endif /* ____libc_getauxval_defined */
+#endif /* !... */
+#endif /* !__LOCAL___libc_enable_secure */
+#endif /* !__LOCAL___libc_enable_secure */

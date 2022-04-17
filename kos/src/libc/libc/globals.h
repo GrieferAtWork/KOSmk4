@@ -264,8 +264,10 @@ INTDEF unsigned int libd___mb_cur_max;
 
 /* Misc... */
 #undef __libc_enable_secure
+#undef __LOCAL___libc_enable_secure
 DECLARE_NOREL_GLOBAL_META(int, __libc_enable_secure);
-#define __libc_enable_secure GET_NOREL_GLOBAL(__libc_enable_secure)
+#define __libc_enable_secure         GET_NOREL_GLOBAL(__libc_enable_secure)
+#define __LOCAL___libc_enable_secure GET_NOREL_GLOBAL(__libc_enable_secure)
 
 DECL_END
 #endif /* !__KERNEL__ */

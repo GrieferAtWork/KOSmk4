@@ -3237,6 +3237,7 @@
 #define __CRT_HAVE_isprint_l
 #define __CRT_HAVE_ispunct
 #define __CRT_HAVE_ispunct_l
+#define __CRT_HAVE_issetugid
 #define __CRT_HAVE_issignaling
 #define __CRT_HAVE_issignalingf
 #define __CRT_HAVE_issignalingl

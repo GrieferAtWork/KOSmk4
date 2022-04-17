@@ -3268,6 +3268,18 @@ void closefrom($fd_t lowfd) {
 [[guard, section(".text.crt{|.dos}.bsd.io.access")]]
 int close_range(unsigned int minfd, unsigned int maxfd, unsigned int flags);
 
+@@>> issetugid(3)
+@@Check if the calling program is running under setuid-mode
+@@Hint: simply returns the value of `__libc_enable_secure(3)'.
+[[guard, wunused, pure, section(".text.crt{|.dos}.sched.user")]]
+[[requires_include("<libc/template/__libc_enable_secure.h>")]]
+[[requires(defined(__LOCAL___libc_enable_secure))]]
+[[impl_include("<libc/template/__libc_enable_secure.h>")]]
+int issetugid(void) {
+	return __LOCAL___libc_enable_secure;
+}
+
+
 %{
 #endif /* __USE_BSD */
 
@@ -3290,8 +3302,6 @@ int fchroot($fd_t fd) {
 }
 
 %[insert:extern(rresvport_af)]
-
-// TODO: int issetugid(void);
 
 %{
 #endif /* __USE_SOLARIS || __USE_NETBSD */

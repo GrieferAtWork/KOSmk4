@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef7e0abd */
+/* HASH CRC-32:0xf0540cb0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -826,6 +826,14 @@ INTDEF NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_strtold_l)(char const
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr, char **endptr, locale_t locale);
+/* >> secure_getenv(3)
+ * Same as `getenv(3)', but always  return `NULL' if the  caller
+ * is running in set-ugid mode (s.a. `__libc_enable_secure(3)'). */
+INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char const *varname);
+/* >> secure_getenv(3)
+ * Same as `getenv(3)', but always  return `NULL' if the  caller
+ * is running in set-ugid mode (s.a. `__libc_enable_secure(3)'). */
+INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname);
 /* Internal implementation for creating temporary files.
  * @param: what: Select what kind of temporary object to create.
  *                  `0': Create a temporary file. (The handle of that file will be returned)
