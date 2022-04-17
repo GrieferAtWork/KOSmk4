@@ -827,8 +827,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       s.a. explaination in `userexcept_sysret_inject_safe()' (NOTE: threads also
 	 *       need to check for pending RPCs in this scenario) */
 
-	/* TODO: Add futex support to pthread_once() (via an alternate [[userimpl]]) */
-
 	/* TODO: Add support for preadv2(2) and pwritev2(2)
 	 * XXX:  On  that note, maybe also get rid of preadvf(2) / pwritevf(2),
 	 *       since  these  2  system  calls  kind-of  do  the  same  thing?

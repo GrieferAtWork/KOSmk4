@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdc3408b */
+/* HASH CRC-32:0x49d9817e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <kos/types.h>
 #include "../user/pthread.h"
 #include "../user/kos.except.h"
+#include "../user/kos.futex.h"
 #include "../user/sched.h"
 #include "../user/unistd.h"
 
@@ -45,6 +46,7 @@ NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1,
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
 #include <asm/os/errno.h>
+#include <kos/asm/futex.h>
 /* >> pthread_once(3)
  * Guarantee that the initialization function `init_routine' will be called
  * only  once,  even if  pthread_once is  executed  several times  with the
@@ -54,6 +56,25 @@ NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1,
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
 (LIBCCALL libc_pthread_once)(pthread_once_t *once_control,
                              void (LIBCCALL *init_routine)(void)) THROWS(...) {
+#undef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
+
+#if __SIZEOF_PTHREAD_ONCE_T == __SIZEOF_POINTER__
+#define __PRIVATE_PTHREAD_ONCE_USES_FUTEX
+#elif defined(LFUTEX_WAIT_WHILE_EX)
+#define __PRIVATE_PTHREAD_ONCE_USES_FUTEX
+#endif /* ... */
+
+
+	/*
+	 * Internal state values for pthread_once():
+	 *  - __PTHREAD_ONCE_INIT + 0: Not yet called
+	 *  - __PTHREAD_ONCE_INIT + 1: Currently being called
+	 *  - __PTHREAD_ONCE_INIT + 2: Was called
+	 * #ifdef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
+	 *  - __PTHREAD_ONCE_INIT + 3: Currently being called, and other threads are waiting
+	 * #endif
+	 *
+	 */
 	pthread_once_t status;
 again:
 	status = __hybrid_atomic_cmpxch_val(*once_control,
@@ -62,16 +83,22 @@ again:
 	                                    __ATOMIC_SEQ_CST,
 	                                    __ATOMIC_SEQ_CST);
 	if (status == __PTHREAD_ONCE_INIT) {
-		/* To  comply with POSIX, we must be able to roll-back once
+		/* To comply with POSIX, we  must be able to roll-back  our
 		 * initialization when `init_routine' "cancels" our thread. */
 #ifdef __cplusplus
 		try {
 			(*init_routine)();
 		} catch (...) {
 			/* roll-back... */
+#ifdef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
+			if (__hybrid_atomic_xch(*once_control, __PTHREAD_ONCE_INIT,
+			                        __ATOMIC_RELEASE) == __PTHREAD_ONCE_INIT + 3)
+				libc_futex_wakeall((lfutex_t *)once_control);
+#else /* __PRIVATE_PTHREAD_ONCE_USES_FUTEX */
 			__hybrid_atomic_store(*once_control,
 			                      __PTHREAD_ONCE_INIT,
 			                      __ATOMIC_RELEASE);
+#endif /* !__PRIVATE_PTHREAD_ONCE_USES_FUTEX */
 
 			libc_except_rethrow();
 
@@ -81,11 +108,25 @@ again:
 #else /* __cplusplus */
 		(*init_routine)();
 #endif /* !__cplusplus */
+
+		/* Remember that the function was called. */
+#ifdef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
+		if (__hybrid_atomic_xch(*once_control, __PTHREAD_ONCE_INIT + 2,
+		                        __ATOMIC_RELEASE) == __PTHREAD_ONCE_INIT + 3)
+			libc_futex_wakeall((lfutex_t *)once_control);
+#else /* __PRIVATE_PTHREAD_ONCE_USES_FUTEX */
 		__hybrid_atomic_store(*once_control,
 		                      __PTHREAD_ONCE_INIT + 2,
 		                      __ATOMIC_RELEASE);
+#endif /* !__PRIVATE_PTHREAD_ONCE_USES_FUTEX */
 	} else if (status != __PTHREAD_ONCE_INIT + 2) {
-		if unlikely(status != __PTHREAD_ONCE_INIT + 1) {
+#ifdef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
+		if unlikely(status != __PTHREAD_ONCE_INIT + 1 &&
+		            status != __PTHREAD_ONCE_INIT + 3)
+#else /* __PRIVATE_PTHREAD_ONCE_USES_FUTEX */
+		if unlikely(status != __PTHREAD_ONCE_INIT + 1)
+#endif /* !__PRIVATE_PTHREAD_ONCE_USES_FUTEX */
+		{
 			/* Quote(https://man7.org/linux/man-pages/man3/pthread_once.3p.html):
 			 * """
 			 * If  an implementation  detects that  the value  specified by the
@@ -103,10 +144,34 @@ again:
 		}
 
 		/* Wait for some other thread to finish init_routine() */
+#ifdef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
+		if (status == __PTHREAD_ONCE_INIT + 1) {
+			/* Request a futex-wake call once initialization
+			 * completes  in  whatever thread  is  doing it. */
+			if (!__hybrid_atomic_cmpxch(*once_control,
+			                            __PTHREAD_ONCE_INIT + 1,
+			                            __PTHREAD_ONCE_INIT + 3,
+			                            __ATOMIC_SEQ_CST,
+			                            __ATOMIC_SEQ_CST))
+				goto again;
+		}
+#if __SIZEOF_PTHREAD_ONCE_T == __SIZEOF_POINTER__
+		libc_futex_waitwhile((lfutex_t *)once_control, __PTHREAD_ONCE_INIT + 3);
+#else /* __SIZEOF_PTHREAD_ONCE_T == __SIZEOF_POINTER__ */
+		{
+			static pthread_once_t const _init_marker = __PTHREAD_ONCE_INIT + 3;
+			libc_lfutex64((lfutex_t *)once_control, LFUTEX_WAIT_WHILE_EX,
+			         (lfutex_t)&_init_marker, (struct timespec64 const *)NULL,
+			         sizeof(pthread_once_t));
+		}
+#endif /* __SIZEOF_PTHREAD_ONCE_T != __SIZEOF_POINTER__ */
+#else /* __PRIVATE_PTHREAD_ONCE_USES_FUTEX */
 		do {
 			__hybrid_yield();
 		} while (__hybrid_atomic_load(*once_control, __ATOMIC_ACQUIRE) ==
 		         __PTHREAD_ONCE_INIT + 1);
+#endif /* !__PRIVATE_PTHREAD_ONCE_USES_FUTEX */
+
 		/* Must re-check the once-status, since another thread may have
 		 * rolled back completion  in case its  call to  `init_routine'
 		 * resulted in an exception being called. (or to speak in terms
@@ -114,6 +179,7 @@ again:
 		goto again;
 	}
 	return 0;
+#undef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
 }
 /* Function called to call the cleanup handler. As an extern inline
  * function the compiler is free to decide inlining the change when
