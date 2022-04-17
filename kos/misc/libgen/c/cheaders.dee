@@ -1785,10 +1785,10 @@ class LocalFunction {
 				 *       these cases, we have to use a local typedef in order
 				 *       to declare a symbol we can use for the cast.
 				 * TODO: If someone later in the current file does a `using'
-				 *       for our namespace'd symbol, they have to check for
+				 *       for our namespace'd symbol, they have to check  for
 				 *       the case where we did the cast-trick, in which case
 				 *       they either have to do nothing, or namespace-using-
-				 *       import the custom type symbol we created as alias
+				 *       import the custom type  symbol we created as  alias
 				 *       for the function's return type. */
 				usedPrototype.returnType.cprint(fp, escapeMode);
 				fp << "(" << callToLocalName << "(__VA_ARGS__))\n";

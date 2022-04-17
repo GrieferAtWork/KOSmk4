@@ -337,7 +337,7 @@ make_inactive:
 #endif /* !LOCAL_IS_SYSRET */
 					continue;
 				}
-	
+
 				/* Do everything necessary to handle the USER-rpc. */
 				if (!userexcept_exec_user_signo_rpc(&ctx, &error, signo))
 					repeat_bitset |= signo_mask;

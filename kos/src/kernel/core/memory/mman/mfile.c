@@ -156,7 +156,7 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 	        "self->mf_changed.slh_first = %p\n",
 	        self->mf_changed.slh_first);
 
-	/* The file may still have a notify controller
+	/* The  file may still  have a notify controller
 	 * if its containing directory is being watched. */
 #ifdef CONFIG_HAVE_FS_NOTIFY
 	if (self->mf_notify != NULL) {

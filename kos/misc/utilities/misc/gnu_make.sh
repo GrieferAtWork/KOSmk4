@@ -1654,7 +1654,7 @@ $1=$2"
 				if ! test -z "$PACKAGE_CXXFLAGS"; then export CXXFLAGS="$CXXFLAGS $PACKAGE_CXXFLAGS"; fi
 				if ! test -z "$PACKAGE_CCFLAGS"; then
 					export CFLAGS="$CFLAGS $PACKAGE_CCFLAGS";
-					export CXXFLAGS="$CXXFLAGS $PACKAGE_CCFLAGS"; 
+					export CXXFLAGS="$CXXFLAGS $PACKAGE_CCFLAGS";
 				fi
 				export CPP="${CROSS_PREFIX}cpp"
 				export CXXCPP="${CROSS_PREFIX}cpp"

@@ -1402,7 +1402,7 @@ DECL_END
 
 DECL_BEGIN
 
-/* Weakly alias the TRACED-versions of heap functions.
+/* Weakly  alias  the  TRACED-versions  of  heap  functions.
  * When `trace-malloc.c' is enabled, it will override these. */
 DEFINE_PUBLIC_WEAK_ALIAS(heap_alloc, heap_alloc_untraced);
 DEFINE_PUBLIC_WEAK_ALIAS(heap_align, heap_align_untraced);

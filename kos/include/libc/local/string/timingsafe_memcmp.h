@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97be905d */
+/* HASH CRC-32:0xf9a65b3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timingsafe_memcmp))(void const *__s1,
 		/* a_le_b:
 		 *    0  <=> a <= b <=> 0b0???????
 		 *   -1  <=> a >  b <=> 0b1???????
-		 *                        | >>= 7  (signed shift --> copy sign bit to all other positions)
+		 *                        | >>= 7 (signed shift --> copy sign bit to all other positions)
 		 *                        +-> 0bXXXXXXXX
 		 * HINT: (signed)x >> 7 == (signed)x / 0x80 == 0xff * ((unsigned)x >> 7)
 		 *
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timingsafe_memcmp))(void const *__s1,
 		/* a_gr_b:
 		 *    0  <=> a >= b <=> 0b0???????
 		 *   -1  <=> a <  b <=> 0b1???????
-		 *                        | >>= 7  (signed shift --> copy sign bit to all other positions)
+		 *                        | >>= 7 (signed shift --> copy sign bit to all other positions)
 		 *                        +-> 0bXXXXXXXX
 		 * HINT: (signed)x >> 7 == (signed)x / 0x80 == 0xff * ((unsigned)x >> 7)
 		 *

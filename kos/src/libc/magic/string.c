@@ -8199,7 +8199,7 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 		/* a_le_b:
 		 *    0  <=> a <= b <=> 0b0???????
 		 *   -1  <=> a >  b <=> 0b1???????
-		 *                        | >>= 7  (signed shift --> copy sign bit to all other positions)
+		 *                        | >>= 7 (signed shift --> copy sign bit to all other positions)
 		 *                        +-> 0bXXXXXXXX
 		 * HINT: (signed)x >> 7 == (signed)x / 0x80 == 0xff * ((unsigned)x >> 7)
 		 *
@@ -8213,7 +8213,7 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 		/* a_gr_b:
 		 *    0  <=> a >= b <=> 0b0???????
 		 *   -1  <=> a <  b <=> 0b1???????
-		 *                        | >>= 7  (signed shift --> copy sign bit to all other positions)
+		 *                        | >>= 7 (signed shift --> copy sign bit to all other positions)
 		 *                        +-> 0bXXXXXXXX
 		 * HINT: (signed)x >> 7 == (signed)x / 0x80 == 0xff * ((unsigned)x >> 7)
 		 *

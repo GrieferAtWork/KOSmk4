@@ -410,7 +410,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsevent_ex)(struct mf
 #define mfile_inotify_deleted(self)          __mfile_postfsevent_ex(self, IN_DELETE_SELF, IN_DELETE) /* Implemented */
 #define mfile_inotify_unmount(self)          __mfile_postfsfilevent(self, IN_UNMOUNT)                /* Implemented */
 /* TODO: `IN_DELETE' must remove inotify controllers from containing
- *       dir iff any of dir's listeners have `IN_EXCL_UNLINK' set. */
+ *       dir iff any of  dir's listeners have `IN_EXCL_UNLINK'  set. */
 
 /* Special function to post `IN_IGNORED', as well as delete all watch-descriptors of `self' */
 FUNDEF NOBLOCK NONNULL((1)) void

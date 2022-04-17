@@ -20,7 +20,7 @@
 #ifdef __INTELLISENSE__
 #include "rpc.c"
 #define    DEFINE_task_serve_with_icpustate
-//#define DEFINE_task_serve_with_icpustate_nx
+//#define          DEFINE_task_serve_with_icpustate_nx
 //#define DEFINE_task_serve_with_icpustate_and_sigmask
 #endif /* __INTELLISENSE__ */
 

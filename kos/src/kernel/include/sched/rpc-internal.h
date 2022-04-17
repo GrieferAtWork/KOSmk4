@@ -149,7 +149,7 @@ DATDEF ATTR_PERTASK struct pending_rpc_slist this_rpcs;
 
 /* [lock(SET(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
  * Bitset of pending info-less POSIX signals (1-31). Bit#0 becomes set
- * by the thread itself to indicate `THIS_RPCS_TERMINATED'. Once this
+ * by the thread itself to indicate `THIS_RPCS_TERMINATED'. Once  this
  * bit is set, all other bits become meaningless.
  *
  * To send one of these signals to a thread, do:

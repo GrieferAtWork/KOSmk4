@@ -80,9 +80,9 @@
 #include "compiler/other.h"
 #else /* !__CC__ */
 #define __COMPILER_LENOF(arr)  (sizeof(arr) / sizeof(*(arr)))
-#define __COMPILER_ENDOF(arr)  ((arr) + (sizeof(arr) / sizeof(*(arr))))
+#define __COMPILER_ENDOF(arr)  ((arr) + sizeof(arr) / sizeof(*(arr)))
 #define __COMPILER_STRLEN(str) (sizeof(str) / sizeof(char) - 1)
-#define __COMPILER_STREND(str) ((str) + (sizeof(str) / sizeof(char) - 1))
+#define __COMPILER_STREND(str) ((str) + sizeof(str) / sizeof(char) - 1)
 #if defined(__clang__)
 #include "compiler/clang.h"
 #elif defined(__GNUC__)
