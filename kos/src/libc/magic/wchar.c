@@ -581,7 +581,7 @@ wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
 	size_t srclen = wcsnlen(src, buflen);
 	wchar_t *dst = wcsend(buf);
 	wmemcpy(dst, src, srclen);
-	dst[srclen] = '\0';
+	dst[srclen] = (wchar_t)'\0';
 	return buf;
 }
 
@@ -593,7 +593,7 @@ wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
                              $size_t buflen) {
 	size_t srclen = wcsnlen(src, buflen);
 	wmemcpy(buf, src, srclen);
-	wmemset(buf+srclen, '\0', buflen - srclen);
+	wmemset(buf + srclen, (wchar_t)'\0', buflen - srclen);
 	return buf;
 }
 
@@ -679,25 +679,25 @@ wchar_t *fgetws([[outp(bufsize)]] wchar_t *__restrict buf,
 				return NULL;
 			break;
 		}
-		if (ch == '\r') {
+		if (ch == (wchar_t)'\r') {
 			/* Special handling to convert both `\r' and `\r\n' into `\n' */
-			buf[n++] = '\n';
+			buf[n++] = (wchar_t)'\n';
 			ch = fgetwc(stream);
 			if (ch == WEOF) {
 				if (n == 0 || ferror(stream))
 					return NULL;
 				break;
 			}
-			if (ch == '\r')
+			if (ch == (wchar_t)'\r')
 				continue;
 			ungetwc(ch, stream);
 			break;
 		}
 		buf[n] = (wchar_t)ch;
-		if (ch == '\n')
+		if (ch == (wchar_t)'\n')
 			break;
 	}
-	buf[n] = '\0';
+	buf[n] = (wchar_t)'\0';
 	return buf;
 }
 
@@ -1105,7 +1105,7 @@ wcsxfrm_l(*) %{generate(str2wcs("strxfrm_l"))}
                              $size_t buflen) {
 	$size_t srclen = wcsnlen(src, buflen);
 	wmemcpy(buf, src, srclen);
-	wmemset(buf + srclen, '\0', ($size_t)(buflen - srclen));
+	wmemset(buf + srclen, (wchar_t)'\0', ($size_t)(buflen - srclen));
 	return buf + srclen;
 }
 
@@ -1186,7 +1186,7 @@ $size_t wcsnrtombs([[outp_opt(dstlen)]] char *dst,
 		dstlen -= error;
 		++src;
 		--nwc;
-		if (ch == '\0') {
+		if (ch == (wchar_t)'\0') {
 			src = NULL; /* NUL-character reached */
 			break;
 		}
@@ -1424,25 +1424,25 @@ wchar_t *fgetws_unlocked([[outp(bufsize)]] wchar_t *__restrict buf, __STDC_INT_A
 				return NULL;
 			break;
 		}
-		if (ch == '\r') {
+		if (ch == (wchar_t)'\r') {
 			/* Special handling to convert both `\r' and `\r\n' into `\n' */
-			buf[n++] = '\n';
+			buf[n++] = (wchar_t)'\n';
 			ch = fgetwc_unlocked(stream);
 			if (ch == WEOF) {
 				if (n == 0 || ferror_unlocked(stream))
 					return NULL;
 				break;
 			}
-			if (ch == '\r')
+			if (ch == (wchar_t)'\r')
 				continue;
 			ungetwc_unlocked(ch, stream);
 			break;
 		}
 		buf[n] = (wchar_t)ch;
-		if (ch == '\n')
+		if (ch == (wchar_t)'\n')
 			break;
 	}
-	buf[n] = '\0';
+	buf[n] = (wchar_t)'\0';
 	return buf;
 }
 
@@ -1846,7 +1846,7 @@ wchar_t *wcscasestr([[nonnull]] wchar_t const *haystack, wchar_t const *needle)
                               [[nonnull]] wchar_t const *__restrict src, $size_t buflen) {
 	$size_t srclen = wcsnlen(src, buflen);
 	wmemcpy(buf, src, srclen);
-	return wmempset(buf + srclen, '\0', buflen - srclen);
+	return wmempset(buf + srclen, (wchar_t)'\0', buflen - srclen);
 }
 
 %[define_wchar_replacement(wmempset = "(char16_t *)mempsetw", "(char32_t *)mempsetl")]
@@ -2210,10 +2210,10 @@ __SYSDECL_END
 #endif /* __USE_UTF */
 
 #ifdef __USE_DOS
-#include <corecrt_wprocess.h>
 #include <corecrt_wconio.h>
 #include <corecrt_wdirect.h>
 #include <corecrt_wio.h>
+#include <corecrt_wprocess.h>
 #include <corecrt_wstdio.h>
 #include <corecrt_wstdlib.h>
 #include <corecrt_wstring.h>

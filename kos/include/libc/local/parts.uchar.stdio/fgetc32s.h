@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13a262a9 */
+/* HASH CRC-32:0x7726829a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,25 +93,25 @@ __LOCAL_LIBC(fgetc32s) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __CHAR32_TYPE__ *
 				return __NULLPTR;
 			break;
 		}
-		if (__ch == '\r') {
+		if (__ch == (__CHAR32_TYPE__)'\r') {
 			/* Special handling to convert both `\r' and `\r\n' into `\n' */
-			__buf[__n++] = '\n';
+			__buf[__n++] = (__CHAR32_TYPE__)'\n';
 			__ch = (__NAMESPACE_LOCAL_SYM __localdep_fgetc32)(__stream);
 			if (__ch == __WEOF32) {
 				if (__n == 0 || (__NAMESPACE_LOCAL_SYM __localdep_ferror)(__stream))
 					return __NULLPTR;
 				break;
 			}
-			if (__ch == '\r')
+			if (__ch == (__CHAR32_TYPE__)'\r')
 				continue;
 			(__NAMESPACE_LOCAL_SYM __localdep_ungetc32)(__ch, __stream);
 			break;
 		}
 		__buf[__n] = (__CHAR32_TYPE__)__ch;
-		if (__ch == '\n')
+		if (__ch == (__CHAR32_TYPE__)'\n')
 			break;
 	}
-	__buf[__n] = '\0';
+	__buf[__n] = (__CHAR32_TYPE__)'\0';
 	return __buf;
 }
 __NAMESPACE_LOCAL_END

@@ -522,11 +522,14 @@
 #endif /* !... */
 
 /* format-printer attributes. */
-#if __has_attribute(__format__)
-#define __ATTR_FORMAT_PRINTF(fmt, args) __attribute__((__format__(__printf__, fmt, args)))
-#else /* ... */
+#if !__has_attribute(__format__)
 #define __NO_ATTR_FORMAT_PRINTF
 #define __ATTR_FORMAT_PRINTF(fmt, args) /* Nothing */
+#elif __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 7)
+/* underscore-guarded variants weren't available in this version of gcc... */
+#define __ATTR_FORMAT_PRINTF(fmt, args) __attribute__((format(printf, fmt, args)))
+#else /* ... */
+#define __ATTR_FORMAT_PRINTF(fmt, args) __attribute__((__format__(__printf__, fmt, args)))
 #endif /* !... */
 
 #if !defined(__NO_ATTR_FORMAT_PRINTF) /* TODO: There were added later. - But when exactly? */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4418db55 */
+/* HASH CRC-32:0xd9b5190b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnrtombs))(char *__dst, __WCHAR_TYP
 		__dstlen -= __error;
 		++__src;
 		--__nwc;
-		if (__ch == '\0') {
+		if (__ch == (__WCHAR_TYPE__)'\0') {
 			__src = __NULLPTR; /* NUL-character reached */
 			break;
 		}
