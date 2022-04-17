@@ -5500,6 +5500,7 @@
 #define __CRT_HAVE_sys_nerr
 #define __CRT_HAVE_sys_nfsservctl
 #define __CRT_HAVE_sys_nice
+#define __CRT_HAVE_sys_nsig
 #define __CRT_HAVE_sys_oldfstat
 #define __CRT_HAVE_sys_oldlstat
 #define __CRT_HAVE_sys_oldolduname
@@ -5660,6 +5661,7 @@
 #define __CRT_HAVE_sys_signal
 #define __CRT_HAVE_sys_signalfd
 #define __CRT_HAVE_sys_signalfd4
+#define __CRT_HAVE_sys_signame
 #define __CRT_HAVE_sys_sigpending
 #define __CRT_HAVE_sys_sigprocmask
 #define __CRT_HAVE_sys_sigreturn

@@ -1589,11 +1589,19 @@ char const *const *__p_sys_siglist();
 #endif /* ____p_sys_siglist_defined */
 #ifndef _sys_siglist
 #ifdef __CRT_HAVE_sys_siglist
+#ifdef _NSIG
 __LIBC char const *const sys_siglist[_NSIG];
+#else /* _NSIG */
+__LIBC char const *const sys_siglist[];
+#endif /* !_NSIG */
 #define sys_siglist  sys_siglist
 #define _sys_siglist sys_siglist
 #elif defined(__CRT_HAVE__sys_siglist)
+#ifdef _NSIG
 __LIBC char const *const _sys_siglist[_NSIG];
+#else /* _NSIG */
+__LIBC char const *const _sys_siglist[];
+#endif /* !_NSIG */
 #define sys_siglist  _sys_siglist
 #define _sys_siglist _sys_siglist
 #endif /* sys_siglist... */
@@ -1614,6 +1622,50 @@ __LIBC char const *const _sys_siglist[_NSIG];
 void sigreturn(struct sigcontext const *scp);
 
 %#endif /* __USE_MISC */
+
+%
+%#ifdef __USE_BSD
+%{
+#ifndef sys_signame
+#ifdef sys_sigabbrev
+#define sys_signame sys_sigabbrev
+#elif defined(__CRT_HAVE_sys_signame)
+#ifdef _NSIG
+__LIBC char const *const sys_signame[_NSIG];
+#else /* _NSIG */
+__LIBC char const *const sys_signame[];
+#endif /* !_NSIG */
+#define sys_signame sys_signame
+#elif defined(__CRT_HAVE_sys_sigabbrev)
+#ifdef __NO_ASMNAME
+#ifdef _NSIG
+__LIBC char const *const sys_signame[_NSIG] __CASMNAME("sys_sigabbrev");
+#else /* _NSIG */
+__LIBC char const *const sys_signame[] __CASMNAME("sys_sigabbrev");
+#endif /* !_NSIG */
+#define sys_signame sys_signame
+#else /* __NO_ASMNAME */
+#ifdef _NSIG
+__LIBC char const *const sys_sigabbrev[_NSIG];
+#else /* _NSIG */
+__LIBC char const *const sys_sigabbrev[];
+#endif /* !_NSIG */
+#define sys_sigabbrev sys_sigabbrev
+#define sys_signame   sys_sigabbrev
+#endif /* !__NO_ASMNAME */
+#endif /* ... */
+#endif /* !sys_signame */
+
+#ifndef sys_nsig
+#ifdef __CRT_HAVE_sys_nsig
+__LIBC int const sys_nsig;
+#define sys_nsig sys_nsig
+#endif /* __CRT_HAVE_sys_nsig */
+#endif /* !sys_nsig */
+}
+%#endif /* __USE_BSD */
+
+
 %
 %#ifdef __USE_XOPEN
 

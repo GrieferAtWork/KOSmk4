@@ -210,7 +210,32 @@ NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
  * >> printf("%s\n", sys_sigabbrev[SIGINT]); // "INT\n" */
 #undef sys_sigabbrev
 PRIVATE ATTR_SECTION(".bss.crt.errno.sys_siglist") char const *libc_sys_sigabbrev[NSIG] = { NULL };
-DEFINE_PUBLIC_IDATA_G(sys_sigabbrev, libc___p_sys_sigabbrev, NSIG * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(sys_sigabbrev, libc___p_sys_sigabbrev, NSIG * __SIZEOF_POINTER__); /* GLibc symbol (not defined in headers) */
+DEFINE_PUBLIC_IDATA_G(sys_signame, libc___p_sys_sigabbrev, NSIG * __SIZEOF_POINTER__);   /* FreeBSD symbol */
+
+INTERN ATTR_SECTION(".text.crt.errno.sys_siglist")
+ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *
+NOTHROW(LIBCCALL libc___p_sys_sigabbrev)(void) {
+	char const **result = libc_sys_sigabbrev;
+	if (!result[1]) { /* Signal `0' is undefined */
+		unsigned int i = NSIG - 1;
+		/* Lazily initialize */
+		for (;;) {
+			result[i] = libc_sigabbrev_np(i);
+			COMPILER_WRITE_BARRIER();
+			if (i == 1)
+				break;
+			--i;
+		}
+	}
+	return result;
+}
+
+/* FreeBSD symbol */
+INTDEF int const libc_sys_nsig;
+INTERN_CONST ATTR_SECTION(".rodata.crt.errno.sys_siglist") int const libc_sys_nsig = NSIG;
+DEFINE_PUBLIC_ALIAS(sys_nsig, libc_sys_nsig);
+
 
 
 /* Weird function exported by  gLibc that's a (kind-of)  wrapper
@@ -231,26 +256,6 @@ NOTHROW_NCX(LIBCCALL libc___gai_sigqueue)(signo_t signo,
 	/* Do the system call. */
 	error = sys_rt_sigqueueinfo(target_pid, signo, &info);
 	return libc_seterrno_syserr(error);
-}
-
-
-
-INTERN ATTR_SECTION(".text.crt.errno.sys_siglist")
-ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *
-NOTHROW(LIBCCALL libc___p_sys_sigabbrev)(void) {
-	char const **result = libc_sys_sigabbrev;
-	if (!result[1]) { /* Signal `0' is undefined */
-		unsigned int i = NSIG - 1;
-		/* Lazily initialize */
-		for (;;) {
-			result[i] = libc_sigabbrev_np(i);
-			COMPILER_WRITE_BARRIER();
-			if (i == 1)
-				break;
-			--i;
-		}
-	}
-	return result;
 }
 
 

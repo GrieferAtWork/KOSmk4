@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe34718ae */
+/* HASH CRC-32:0x21f42278 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1506,11 +1506,19 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *const *,__N
 #endif /* ____p_sys_siglist_defined */
 #ifndef _sys_siglist
 #ifdef __CRT_HAVE_sys_siglist
+#ifdef _NSIG
 __LIBC char const *const sys_siglist[_NSIG];
+#else /* _NSIG */
+__LIBC char const *const sys_siglist[];
+#endif /* !_NSIG */
 #define sys_siglist  sys_siglist
 #define _sys_siglist sys_siglist
 #elif defined(__CRT_HAVE__sys_siglist)
+#ifdef _NSIG
 __LIBC char const *const _sys_siglist[_NSIG];
+#else /* _NSIG */
+__LIBC char const *const _sys_siglist[];
+#endif /* !_NSIG */
 #define sys_siglist  _sys_siglist
 #define _sys_siglist _sys_siglist
 #endif /* sys_siglist... */
@@ -1526,6 +1534,45 @@ struct sigcontext;
  * execution when returning from a signal handler. */
 __CDECLARE_VOID_OPT(__ATTR_NORETURN,__NOTHROW_NCX,sigreturn,(struct sigcontext const *__scp),(__scp))
 #endif /* __USE_MISC */
+
+#ifdef __USE_BSD
+#ifndef sys_signame
+#ifdef sys_sigabbrev
+#define sys_signame sys_sigabbrev
+#elif defined(__CRT_HAVE_sys_signame)
+#ifdef _NSIG
+__LIBC char const *const sys_signame[_NSIG];
+#else /* _NSIG */
+__LIBC char const *const sys_signame[];
+#endif /* !_NSIG */
+#define sys_signame sys_signame
+#elif defined(__CRT_HAVE_sys_sigabbrev)
+#ifdef __NO_ASMNAME
+#ifdef _NSIG
+__LIBC char const *const sys_signame[_NSIG] __CASMNAME("sys_sigabbrev");
+#else /* _NSIG */
+__LIBC char const *const sys_signame[] __CASMNAME("sys_sigabbrev");
+#endif /* !_NSIG */
+#define sys_signame sys_signame
+#else /* __NO_ASMNAME */
+#ifdef _NSIG
+__LIBC char const *const sys_sigabbrev[_NSIG];
+#else /* _NSIG */
+__LIBC char const *const sys_sigabbrev[];
+#endif /* !_NSIG */
+#define sys_sigabbrev sys_sigabbrev
+#define sys_signame   sys_sigabbrev
+#endif /* !__NO_ASMNAME */
+#endif /* ... */
+#endif /* !sys_signame */
+
+#ifndef sys_nsig
+#ifdef __CRT_HAVE_sys_nsig
+__LIBC int const sys_nsig;
+#define sys_nsig sys_nsig
+#endif /* __CRT_HAVE_sys_nsig */
+#endif /* !sys_nsig */
+#endif /* __USE_BSD */
 
 #ifdef __USE_XOPEN
 #ifdef __CRT_HAVE_bsd_signal

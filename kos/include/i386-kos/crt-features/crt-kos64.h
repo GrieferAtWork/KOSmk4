@@ -5211,6 +5211,7 @@
 #define __CRT_HAVE_sys_nerr
 #define __CRT_HAVE_sys_newfstatat
 #define __CRT_HAVE_sys_nfsservctl
+#define __CRT_HAVE_sys_nsig
 #define __CRT_HAVE_sys_open
 #define __CRT_HAVE_sys_open_by_handle_at
 #define __CRT_HAVE_sys_open_tree
@@ -5344,6 +5345,7 @@
 #define __CRT_HAVE_sys_siglist
 #define __CRT_HAVE_sys_signalfd
 #define __CRT_HAVE_sys_signalfd4
+#define __CRT_HAVE_sys_signame
 #define __CRT_HAVE_sys_socket
 #define __CRT_HAVE_sys_socketpair
 #define __CRT_HAVE_sys_splice
