@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd80adbf8 */
+/* HASH CRC-32:0xb21254a2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,51 +24,27 @@
 #include <bits/crt/mbstate.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_uchar_mbrtoc16_defined
-#define __local___localdep_uchar_mbrtoc16_defined
-#if defined(__CRT_HAVE_mbrtowc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, struct __mbstate *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
-#elif defined(__CRT_HAVE_DOS$mbrtowc)
-__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, struct __mbstate *__mbs),mbrtowc,(__pwc,__str,__maxlen,__mbs))
-#elif defined(__CRT_HAVE___mbrtowc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, struct __mbstate *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
-#elif defined(__CRT_HAVE_DOS$__mbrtowc)
-__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, struct __mbstate *__mbs),__mbrtowc,(__pwc,__str,__maxlen,__mbs))
-#elif defined(__CRT_HAVE_mbrtoc16) && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, struct __mbstate *__mbs),mbrtoc16,(__pwc,__str,__maxlen,__mbs))
-#elif defined(__CRT_HAVE_DOS$mbrtoc16)
-__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, struct __mbstate *__mbs),mbrtoc16,(__pwc,__str,__maxlen,__mbs))
+#ifndef __local___localdep_mbsnrtoc16_defined
+#define __local___localdep_mbsnrtoc16_defined
+#if defined(__CRT_HAVE_mbsnrtowcs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsnrtoc16,(__CHAR16_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __nmc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),mbsnrtowcs,(__dst,__psrc,__nmc,__dstlen,__mbs))
+#elif defined(__CRT_HAVE_DOS$mbsnrtowcs)
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsnrtoc16,(__CHAR16_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __nmc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),mbsnrtowcs,(__dst,__psrc,__nmc,__dstlen,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
-#include <libc/local/wchar/mbrtowc.h>
+#include <libc/local/wchar/mbsnrtowcs.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_uchar_mbrtoc16 __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ *,char const *__restrict,__SIZE_TYPE__,struct __mbstate *),__SIZE_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ *,char const *__restrict,__SIZE_TYPE__,struct __mbstate *),mbrtowc)
+#define __localdep_mbsnrtoc16 __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ *__restrict,char const **__restrict,__SIZE_TYPE__,__SIZE_TYPE__,struct __mbstate *),__SIZE_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ *__restrict,char const **__restrict,__SIZE_TYPE__,__SIZE_TYPE__,struct __mbstate *),mbsnrtowcs)
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/uchar/uchar_mbrtoc16.h>
+#include <libc/local/parts.uchar.wchar/mbsnrtoc16.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_uchar_mbrtoc16 __LIBC_LOCAL_NAME(uchar_mbrtoc16)
+#define __localdep_mbsnrtoc16 __LIBC_LOCAL_NAME(mbsnrtoc16)
 #endif /* !... */
-#endif /* !__local___localdep_uchar_mbrtoc16_defined */
+#endif /* !__local___localdep_mbsnrtoc16_defined */
 __LOCAL_LIBC(mbsrtoc16) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(mbsrtoc16))(__CHAR16_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs) {
-	__SIZE_TYPE__ __result = 0;
-	char const *__src = *__psrc;
-	while (__dstlen) {
-		__SIZE_TYPE__ __error;
-		__CHAR16_TYPE__ __wc;
-		__error = (__NAMESPACE_LOCAL_SYM __localdep_uchar_mbrtoc16)(&__wc, __src, (__SIZE_TYPE__)-1, __mbs);
-		if (!__error)
-			break;
-		if (__error == (__SIZE_TYPE__)-1)
-			return (__SIZE_TYPE__)-1; /* EILSEQ */
-		*__dst++ = __wc;
-		__src += __error;
-		--__dstlen;
-		++__result;
-	}
-	*__psrc = __src;
-	return __result;
+	return (__NAMESPACE_LOCAL_SYM __localdep_mbsnrtoc16)(__dst, __psrc, (__SIZE_TYPE__)-1, __dstlen, __mbs);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mbsrtoc16_defined

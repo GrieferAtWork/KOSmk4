@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99e07c15 */
+/* HASH CRC-32:0x6df7e766 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,55 +24,20 @@
 #include <bits/crt/mbstate.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_mempcpy_defined
-#define __local___localdep_mempcpy_defined
-#ifdef __CRT_HAVE_mempcpy
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
-#elif defined(__CRT_HAVE___mempcpy)
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
-#else /* ... */
+#ifndef __local___localdep_wcsnrtombs_defined
+#define __local___localdep_wcsnrtombs_defined
+#ifdef __CRT_HAVE_wcsnrtombs
+__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnrtombs,(char *__dst, __WCHAR_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __nwc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),wcsnrtombs,(__dst,__psrc,__nwc,__dstlen,__mbs))
+#else /* __CRT_HAVE_wcsnrtombs */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/mempcpy.h>
+#include <libc/local/wchar/wcsnrtombs.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
-#endif /* !... */
-#endif /* !__local___localdep_mempcpy_defined */
-#ifndef __local___localdep_wcrtomb_defined
-#define __local___localdep_wcrtomb_defined
-#ifdef __CRT_HAVE_wcrtomb
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, struct __mbstate *__mbs),wcrtomb,(__str,__wc,__mbs))
-#elif defined(__CRT_HAVE_c16rtomb) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, struct __mbstate *__mbs),c16rtomb,(__str,__wc,__mbs))
-#elif defined(__CRT_HAVE_c32rtomb) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, struct __mbstate *__mbs),c32rtomb,(__str,__wc,__mbs))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/wchar/wcrtomb.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_wcrtomb __LIBC_LOCAL_NAME(wcrtomb)
-#endif /* !... */
-#endif /* !__local___localdep_wcrtomb_defined */
+#define __localdep_wcsnrtombs __LIBC_LOCAL_NAME(wcsnrtombs)
+#endif /* !__CRT_HAVE_wcsnrtombs */
+#endif /* !__local___localdep_wcsnrtombs_defined */
 __LOCAL_LIBC(wcsrtombs) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsrtombs))(char *__dst, __WCHAR_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs) {
-	__SIZE_TYPE__ __result = 0;
-	__WCHAR_TYPE__ const *__src = *__psrc;
-	while (__dstlen) {
-		__SIZE_TYPE__ __error;
-		char __buf[7];
-		__error = (__NAMESPACE_LOCAL_SYM __localdep_wcrtomb)(__buf, *__src, __mbs);
-		if (!__error)
-			break;
-		if (__error == (__SIZE_TYPE__)-1)
-			return (__SIZE_TYPE__)-1; /* EILSEQ */
-		if (__error > __dstlen)
-			break;
-		__dst = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpy)(__dst, __buf, __error);
-		__result += __error;
-		__dstlen -= __error;
-		++__src;
-	}
-	*__psrc = __src;
-	return __result;
+	return (__NAMESPACE_LOCAL_SYM __localdep_wcsnrtombs)(__dst, __psrc, (__SIZE_TYPE__)-1, __dstlen, __mbs);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsrtombs_defined

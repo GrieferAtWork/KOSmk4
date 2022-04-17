@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6e6aa0c */
+/* HASH CRC-32:0x162ca9c2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -285,6 +285,14 @@ INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char32_t *NOTHROW_NCX(LIBKCALL libc_wcpcp
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_wcpncpy)(char16_t *__restrict buf, char16_t const *__restrict src, size_t buflen);
 /* >> wcpncpy(3) */
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char32_t *NOTHROW_NCX(LIBKCALL libc_wcpncpy)(char32_t *__restrict buf, char32_t const *__restrict src, size_t buflen);
+/* >> mbsnrtowcs(3) */
+INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *__restrict dst, char const **__restrict psrc, size_t nmc, size_t dstlen, mbstate_t *mbs);
+/* >> mbsnrtowcs(3) */
+INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBKCALL libc_mbsnrtowcs)(char32_t *__restrict dst, char const **__restrict psrc, size_t nmc, size_t dstlen, mbstate_t *mbs);
+/* >> wcsnrtombs(3) */
+INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_wcsnrtombs)(char *dst, char16_t const **__restrict psrc, size_t nwc, size_t dstlen, mbstate_t *mbs);
+/* >> wcsnrtombs(3) */
+INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBKCALL libc_wcsnrtombs)(char *dst, char32_t const **__restrict psrc, size_t nwc, size_t dstlen, mbstate_t *mbs);
 /* >> wcsnlen(3) */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBDCALL libd_wcsnlen)(char16_t const *__restrict str, size_t maxlen);
 /* >> wcsnlen(3) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbabd5c65 */
+/* HASH CRC-32:0xb8a4164f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2173,10 +2173,22 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),wchar_t *,__NOTHROW_NCX,wcpn
 /* >> wcpncpy(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcpncpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) wchar_t *__NOTHROW_NCX(__LIBCCALL wcpncpy)(wchar_t *__restrict __buf, wchar_t const *__restrict __src, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcpncpy))(__buf, __src, __buflen); })
 #endif /* !__CRT_HAVE_wcpncpy */
+#ifdef __CRT_HAVE_mbsnrtowcs
 /* >> mbsnrtowcs(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,mbsnrtowcs,(wchar_t *__dst, char const **__restrict __psrc, __SIZE_TYPE__ __nmc, __SIZE_TYPE__ __len, struct __mbstate *__mbs),(__dst,__psrc,__nmc,__len,__mbs))
+__CDECLARE(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,mbsnrtowcs,(wchar_t *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __nmc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),(__dst,__psrc,__nmc,__dstlen,__mbs))
+#else /* __CRT_HAVE_mbsnrtowcs */
+#include <libc/local/wchar/mbsnrtowcs.h>
+/* >> mbsnrtowcs(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mbsnrtowcs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL mbsnrtowcs)(wchar_t *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __nmc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbsnrtowcs))(__dst, __psrc, __nmc, __dstlen, __mbs); })
+#endif /* !__CRT_HAVE_mbsnrtowcs */
+#ifdef __CRT_HAVE_wcsnrtombs
 /* >> wcsnrtombs(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,wcsnrtombs,(char *__dst, wchar_t const **__restrict __psrc, __SIZE_TYPE__ __nwc, __SIZE_TYPE__ __len, struct __mbstate *__mbs),(__dst,__psrc,__nwc,__len,__mbs))
+__CDECLARE(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,wcsnrtombs,(char *__dst, wchar_t const **__restrict __psrc, __SIZE_TYPE__ __nwc, size_t __dstlen, mbstate_t *__mbs),(__dst,__psrc,__nwc,__dstlen,__mbs))
+#else /* __CRT_HAVE_wcsnrtombs */
+#include <libc/local/wchar/wcsnrtombs.h>
+/* >> wcsnrtombs(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcsnrtombs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL wcsnrtombs)(char *__dst, wchar_t const **__restrict __psrc, __SIZE_TYPE__ __nwc, size_t __dstlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnrtombs))(__dst, __psrc, __nwc, __dstlen, __mbs); })
+#endif /* !__CRT_HAVE_wcsnrtombs */
 /* >> open_wmemstream(3) */
 __CDECLARE_OPT(,__FILE *,__NOTHROW_NCX,open_wmemstream,(wchar_t **__bufloc, __SIZE_TYPE__ *__sizeloc),(__bufloc,__sizeloc))
 #endif /* __USE_XOPEN2K8 */

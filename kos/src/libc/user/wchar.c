@@ -635,108 +635,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.
 }
 /*[[[end:libd_file_wprinter_unlocked]]]*/
 
-/*[[[head:libd_wcsnrtombs,hash:CRC-32=0x45186d50]]]*/
-/* >> wcsnrtombs(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) size_t
-NOTHROW_NCX(LIBDCALL libd_wcsnrtombs)(char *dst,
-                                      char16_t const **__restrict psrc,
-                                      size_t nwc,
-                                      size_t len,
-                                      mbstate_t *mbs)
-/*[[[body:libd_wcsnrtombs]]]*/
-/*AUTO*/{
-	(void)dst;
-	(void)psrc;
-	(void)nwc;
-	(void)len;
-	(void)mbs;
-	CRT_UNIMPLEMENTEDF("DOS$wcsnrtombs(%q, %p, %Ix, %Ix, %p)", dst, psrc, nwc, len, mbs); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libd_wcsnrtombs]]]*/
-
-/*[[[head:libc_wcsnrtombs,hash:CRC-32=0x63ea54c8]]]*/
-/* >> wcsnrtombs(3) */
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((2)) size_t
-NOTHROW_NCX(LIBKCALL libc_wcsnrtombs)(char *dst,
-                                      char32_t const **__restrict psrc,
-                                      size_t nwc,
-                                      size_t len,
-                                      mbstate_t *mbs)
-/*[[[body:libc_wcsnrtombs]]]*/
-/*AUTO*/{
-	(void)dst;
-	(void)psrc;
-	(void)nwc;
-	(void)len;
-	(void)mbs;
-	CRT_UNIMPLEMENTEDF("wcsnrtombs(%q, %p, %Ix, %Ix, %p)", dst, psrc, nwc, len, mbs); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_wcsnrtombs]]]*/
-
-/*[[[head:libc_mbsnrtowcs,hash:CRC-32=0x244f802]]]*/
-/* >> mbsnrtowcs(3) */
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((2)) size_t
-NOTHROW_NCX(LIBKCALL libc_mbsnrtowcs)(char32_t *dst,
-                                      char const **__restrict psrc,
-                                      size_t nmc,
-                                      size_t len,
-                                      mbstate_t *mbs)
-/*[[[body:libc_mbsnrtowcs]]]*/
-/*AUTO*/{
-	(void)dst;
-	(void)psrc;
-	(void)nmc;
-	(void)len;
-	(void)mbs;
-	CRT_UNIMPLEMENTEDF("mbsnrtowcs(%p, %p, %Ix, %Ix, %p)", dst, psrc, nmc, len, mbs); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_mbsnrtowcs]]]*/
-
-/*[[[head:libd_mbsnrtowcs,hash:CRC-32=0x98c1c250]]]*/
-/* >> mbsnrtowcs(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) size_t
-NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *dst,
-                                      char const **__restrict psrc,
-                                      size_t nmc,
-                                      size_t len,
-                                      mbstate_t *mbs)
-/*[[[body:libd_mbsnrtowcs]]]*/
-/*AUTO*/{
-	(void)dst;
-	(void)psrc;
-	(void)nmc;
-	(void)len;
-	(void)mbs;
-	CRT_UNIMPLEMENTEDF("DOS$mbsnrtowcs(%p, %p, %Ix, %Ix, %p)", dst, psrc, nmc, len, mbs); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libd_mbsnrtowcs]]]*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*[[[start:exports,hash:CRC-32=0xe8d41d68]]]*/
+/*[[[start:exports,hash:CRC-32=0x9b27426b]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(getwc, libc_fgetwc);
@@ -749,10 +648,6 @@ DEFINE_PUBLIC_ALIAS(DOS$ungetwc, libd_ungetwc);
 DEFINE_PUBLIC_ALIAS(ungetwc, libc_ungetwc);
 DEFINE_PUBLIC_ALIAS(DOS$vfwscanf, libd_vfwscanf);
 DEFINE_PUBLIC_ALIAS(vfwscanf, libc_vfwscanf);
-DEFINE_PUBLIC_ALIAS(DOS$mbsnrtowcs, libd_mbsnrtowcs);
-DEFINE_PUBLIC_ALIAS(mbsnrtowcs, libc_mbsnrtowcs);
-DEFINE_PUBLIC_ALIAS(DOS$wcsnrtombs, libd_wcsnrtombs);
-DEFINE_PUBLIC_ALIAS(wcsnrtombs, libc_wcsnrtombs);
 DEFINE_PUBLIC_ALIAS(DOS$open_wmemstream, libd_open_wmemstream);
 DEFINE_PUBLIC_ALIAS(open_wmemstream, libc_open_wmemstream);
 DEFINE_PUBLIC_ALIAS(DOS$getwc_unlocked, libd_fgetwc_unlocked);

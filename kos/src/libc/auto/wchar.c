@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa69ef8a3 */
+/* HASH CRC-32:0xd31dd6e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -328,23 +328,7 @@ NOTHROW_NCX(LIBDCALL libd_mbsrtowcs)(char16_t *__restrict dst,
                                      char const **__restrict psrc,
                                      size_t dstlen,
                                      mbstate_t *mbs) {
-	size_t result = 0;
-	char const *src = *psrc;
-	while (dstlen) {
-		size_t error;
-		char16_t wc;
-		error = libd_mbrtowc(&wc, src, (size_t)-1, mbs);
-		if (!error)
-			break;
-		if (error == (size_t)-1)
-			return (size_t)-1; /* EILSEQ */
-		*dst++ = wc;
-		src += error;
-		--dstlen;
-		++result;
-	}
-	*psrc = src;
-	return result;
+	return libd_mbsnrtowcs(dst, psrc, (size_t)-1, dstlen, mbs);
 }
 /* >> mbsrtowcs(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
@@ -352,23 +336,7 @@ NOTHROW_NCX(LIBKCALL libc_mbsrtowcs)(char32_t *__restrict dst,
                                      char const **__restrict psrc,
                                      size_t dstlen,
                                      mbstate_t *mbs) {
-	size_t result = 0;
-	char const *src = *psrc;
-	while (dstlen) {
-		size_t error;
-		char32_t wc;
-		error = libc_mbrtowc(&wc, src, (size_t)-1, mbs);
-		if (!error)
-			break;
-		if (error == (size_t)-1)
-			return (size_t)-1; /* EILSEQ */
-		*dst++ = wc;
-		src += error;
-		--dstlen;
-		++result;
-	}
-	*psrc = src;
-	return result;
+	return libc_mbsnrtowcs(dst, psrc, (size_t)-1, dstlen, mbs);
 }
 /* >> wcsrtombs(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
@@ -376,25 +344,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsrtombs)(char *dst,
                                      char16_t const **__restrict psrc,
                                      size_t dstlen,
                                      mbstate_t *mbs) {
-	size_t result = 0;
-	char16_t const *src = *psrc;
-	while (dstlen) {
-		size_t error;
-		char buf[7];
-		error = libd_wcrtomb(buf, *src, mbs);
-		if (!error)
-			break;
-		if (error == (size_t)-1)
-			return (size_t)-1; /* EILSEQ */
-		if (error > dstlen)
-			break;
-		dst = (char *)libc_mempcpy(dst, buf, error);
-		result += error;
-		dstlen -= error;
-		++src;
-	}
-	*psrc = src;
-	return result;
+	return libd_wcsnrtombs(dst, psrc, (size_t)-1, dstlen, mbs);
 }
 /* >> wcsrtombs(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
@@ -402,25 +352,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsrtombs)(char *dst,
                                      char32_t const **__restrict psrc,
                                      size_t dstlen,
                                      mbstate_t *mbs) {
-	size_t result = 0;
-	char32_t const *src = *psrc;
-	while (dstlen) {
-		size_t error;
-		char buf[7];
-		error = libc_wcrtomb(buf, *src, mbs);
-		if (!error)
-			break;
-		if (error == (size_t)-1)
-			return (size_t)-1; /* EILSEQ */
-		if (error > dstlen)
-			break;
-		dst = (char *)libc_mempcpy(dst, buf, error);
-		result += error;
-		dstlen -= error;
-		++src;
-	}
-	*psrc = src;
-	return result;
+	return libc_wcsnrtombs(dst, psrc, (size_t)-1, dstlen, mbs);
 }
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == 4
@@ -2089,6 +2021,178 @@ NOTHROW_NCX(LIBKCALL libc_wcpncpy)(char32_t *__restrict buf,
 	(char32_t *)libc_memcpyl(buf, src, srclen);
 	(char32_t *)libc_memsetl(buf + srclen, '\0', (size_t)(buflen - srclen));
 	return buf + srclen;
+}
+/* >> mbsnrtowcs(3) */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) size_t
+NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *__restrict dst,
+                                      char const **__restrict psrc,
+                                      size_t nmc,
+                                      size_t dstlen,
+                                      mbstate_t *mbs) {
+	size_t result = 0;
+	char const *src = *psrc;
+	if (nmc) {
+		while (dstlen) {
+			size_t error;
+			char16_t wc;
+			if (nmc >= 7) {
+				error = libd_mbrtowc(&wc, src, (size_t)-1, mbs);
+			} else {
+				char temp[7];
+				libc_bzero(libc_mempcpy(temp, src, nmc), 7 - nmc);
+				error = libd_mbrtowc(&wc, temp, (size_t)-1, mbs);
+			}
+			if (!error) {
+				src = NULL; /* NUL-character reached */
+				break;
+			}
+			if (error == (size_t)-1) {
+				result = (size_t)-1; /* EILSEQ */
+				break;
+			}
+			if (dst != NULL)
+				*dst++ = wc;
+			--dstlen;
+			++result;
+			if (error >= nmc) {
+				src = NULL; /* (implicit) NUL-character reached */
+				break;
+			}
+			src += error;
+			nmc -= error;
+		}
+	} else {
+		src = NULL; /* (implicit) NUL-character reached */
+	}
+	if (dst != NULL)
+		*psrc = src; /* Only update source if destination was given */
+	return result;
+}
+/* >> mbsnrtowcs(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((2)) size_t
+NOTHROW_NCX(LIBKCALL libc_mbsnrtowcs)(char32_t *__restrict dst,
+                                      char const **__restrict psrc,
+                                      size_t nmc,
+                                      size_t dstlen,
+                                      mbstate_t *mbs) {
+	size_t result = 0;
+	char const *src = *psrc;
+	if (nmc) {
+		while (dstlen) {
+			size_t error;
+			char32_t wc;
+			if (nmc >= 7) {
+				error = libc_mbrtowc(&wc, src, (size_t)-1, mbs);
+			} else {
+				char temp[7];
+				libc_bzero(libc_mempcpy(temp, src, nmc), 7 - nmc);
+				error = libc_mbrtowc(&wc, temp, (size_t)-1, mbs);
+			}
+			if (!error) {
+				src = NULL; /* NUL-character reached */
+				break;
+			}
+			if (error == (size_t)-1) {
+				result = (size_t)-1; /* EILSEQ */
+				break;
+			}
+			if (dst != NULL)
+				*dst++ = wc;
+			--dstlen;
+			++result;
+			if (error >= nmc) {
+				src = NULL; /* (implicit) NUL-character reached */
+				break;
+			}
+			src += error;
+			nmc -= error;
+		}
+	} else {
+		src = NULL; /* (implicit) NUL-character reached */
+	}
+	if (dst != NULL)
+		*psrc = src; /* Only update source if destination was given */
+	return result;
+}
+/* >> wcsnrtombs(3) */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((2)) size_t
+NOTHROW_NCX(LIBDCALL libd_wcsnrtombs)(char *dst,
+                                      char16_t const **__restrict psrc,
+                                      size_t nwc,
+                                      size_t dstlen,
+                                      mbstate_t *mbs) {
+	size_t result = 0;
+	char16_t const *src = *psrc;
+	while (dstlen) {
+		size_t error;
+		char buf[7];
+		char16_t ch;
+		if (!nwc) {
+			src = NULL; /* (implicit) NUL-character reached */
+			break;
+		}
+		ch = *src;
+		error = libd_wcrtomb(buf, ch, mbs);
+		if (error == (size_t)-1) {
+			result = (size_t)-1; /* EILSEQ */
+			break;
+		}
+		if (error > dstlen)
+			break;
+		if (dst != NULL)
+			dst = (char *)libc_mempcpy(dst, buf, error);
+		result += error;
+		dstlen -= error;
+		++src;
+		--nwc;
+		if (ch == '\0') {
+			src = NULL; /* NUL-character reached */
+			break;
+		}
+	}
+	if (dst != NULL)
+		*psrc = src; /* Only update source if destination was given */
+	return result;
+}
+/* >> wcsnrtombs(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((2)) size_t
+NOTHROW_NCX(LIBKCALL libc_wcsnrtombs)(char *dst,
+                                      char32_t const **__restrict psrc,
+                                      size_t nwc,
+                                      size_t dstlen,
+                                      mbstate_t *mbs) {
+	size_t result = 0;
+	char32_t const *src = *psrc;
+	while (dstlen) {
+		size_t error;
+		char buf[7];
+		char32_t ch;
+		if (!nwc) {
+			src = NULL; /* (implicit) NUL-character reached */
+			break;
+		}
+		ch = *src;
+		error = libc_wcrtomb(buf, ch, mbs);
+		if (error == (size_t)-1) {
+			result = (size_t)-1; /* EILSEQ */
+			break;
+		}
+		if (error > dstlen)
+			break;
+		if (dst != NULL)
+			dst = (char *)libc_mempcpy(dst, buf, error);
+		result += error;
+		dstlen -= error;
+		++src;
+		--nwc;
+		if (ch == '\0') {
+			src = NULL; /* NUL-character reached */
+			break;
+		}
+	}
+	if (dst != NULL)
+		*psrc = src; /* Only update source if destination was given */
+	return result;
 }
 #ifndef LIBC_ARCH_HAVE_C16SNLEN
 /* >> wcsnlen(3) */
@@ -5619,6 +5723,10 @@ DEFINE_PUBLIC_ALIAS(DOS$wcpcpy, libd_wcpcpy);
 DEFINE_PUBLIC_ALIAS(wcpcpy, libc_wcpcpy);
 DEFINE_PUBLIC_ALIAS(DOS$wcpncpy, libd_wcpncpy);
 DEFINE_PUBLIC_ALIAS(wcpncpy, libc_wcpncpy);
+DEFINE_PUBLIC_ALIAS(DOS$mbsnrtowcs, libd_mbsnrtowcs);
+DEFINE_PUBLIC_ALIAS(mbsnrtowcs, libc_mbsnrtowcs);
+DEFINE_PUBLIC_ALIAS(DOS$wcsnrtombs, libd_wcsnrtombs);
+DEFINE_PUBLIC_ALIAS(wcsnrtombs, libc_wcsnrtombs);
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16SNLEN)
 DEFINE_PUBLIC_ALIAS(DOS$__wcsncnt, libd_wcsnlen);

@@ -420,55 +420,21 @@ $size_t mbrlen([[inp_opt(maxlen)]] char const *__restrict str, $size_t maxlen,
 }
 
 @@>> mbsrtowcs(3)
-[[std, wchar]]
+[[std, wchar, requires_function(mbsnrtowcs)]]
 [[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 size_t mbsrtowcs([[outp(dstlen)]] wchar_t *__restrict dst,
                  [[nonnull]] char const **__restrict psrc, size_t dstlen,
                  [[nullable]] mbstate_t *mbs) {
-	size_t result = 0;
-	char const *src = *psrc;
-	while (dstlen) {
-		size_t error;
-		wchar_t wc;
-		error = mbrtowc(&wc, src, (size_t)-1, mbs);
-		if (!error)
-			break;
-		if (error == (size_t)-1)
-			return (size_t)-1; /* EILSEQ */
-		*dst++ = wc;
-		src += error;
-		--dstlen;
-		++result;
-	}
-	*psrc = src;
-	return result;
+	return mbsnrtowcs(dst, psrc, (size_t)-1, dstlen, mbs);
 }
 
 @@>> wcsrtombs(3)
-[[std, wchar]]
+[[std, wchar, requires_function(wcsnrtombs)]]
 [[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 size_t wcsrtombs([[outp(dstlen)]] char *dst,
                  [[nonnull]] wchar_t const **__restrict psrc, size_t dstlen,
                  [[nullable]] mbstate_t *mbs) {
-	size_t result = 0;
-	wchar_t const *src = *psrc;
-	while (dstlen) {
-		size_t error;
-		char buf[UNICODE_UTF8_CURLEN];
-		error = wcrtomb(buf, *src, mbs);
-		if (!error)
-			break;
-		if (error == (size_t)-1)
-			return (size_t)-1; /* EILSEQ */
-		if (error > dstlen)
-			break;
-		dst = (char *)mempcpy(dst, buf, error);
-		result += error;
-		dstlen -= error;
-		++src;
-	}
-	*psrc = src;
-	return result;
+	return wcsnrtombs(dst, psrc, (size_t)-1, dstlen, mbs);
 }
 
 @@>> wcstol(3)
@@ -1146,16 +1112,89 @@ wcsxfrm_l(*) %{generate(str2wcs("strxfrm_l"))}
 @@>> mbsnrtowcs(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/mbstate.h>")]]
-$size_t mbsnrtowcs([[nullable]] wchar_t *dst,
-                   [[nonnull]] char const **__restrict psrc, $size_t nmc, $size_t len,
-                   [[nullable]] $mbstate_t *mbs); /* TODO: Implement here */
+$size_t mbsnrtowcs([[outp_opt(dstlen)]] wchar_t *__restrict dst,
+                   [[nonnull]] char const **__restrict psrc, $size_t nmc, $size_t dstlen,
+                   [[nullable]] $mbstate_t *mbs) {
+	size_t result = 0;
+	char const *src = *psrc;
+	if (nmc) {
+		while (dstlen) {
+			size_t error;
+			wchar_t wc;
+			if (nmc >= UNICODE_UTF8_CURLEN) {
+				error = mbrtowc(&wc, src, (size_t)-1, mbs);
+			} else {
+				char temp[UNICODE_UTF8_CURLEN];
+				bzero(mempcpy(temp, src, nmc), UNICODE_UTF8_CURLEN - nmc);
+				error = mbrtowc(&wc, temp, (size_t)-1, mbs);
+			}
+			if (!error) {
+				src = NULL; /* NUL-character reached */
+				break;
+			}
+			if (error == (size_t)-1) {
+				result = (size_t)-1; /* EILSEQ */
+				break;
+			}
+			if (dst != NULL)
+				*dst++ = wc;
+			--dstlen;
+			++result;
+			if (error >= nmc) {
+				src = NULL; /* (implicit) NUL-character reached */
+				break;
+			}
+			src += error;
+			nmc -= error;
+		}
+	} else {
+		src = NULL; /* (implicit) NUL-character reached */
+	}
+	if (dst != NULL)
+		*psrc = src; /* Only update source if destination was given */
+	return result;
+}
+
 
 @@>> wcsnrtombs(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/mbstate.h>")]]
-$size_t wcsnrtombs([[nullable]] char *dst,
-                   [[nonnull]] wchar_t const **__restrict psrc, $size_t nwc, $size_t len,
-                   [[nullable]] $mbstate_t *mbs); /* TODO: Implement here */
+$size_t wcsnrtombs([[outp_opt(dstlen)]] char *dst,
+                   [[nonnull]] wchar_t const **__restrict psrc, $size_t nwc, size_t dstlen,
+                   [[nullable]] mbstate_t *mbs) {
+	size_t result = 0;
+	wchar_t const *src = *psrc;
+	while (dstlen) {
+		size_t error;
+		char buf[UNICODE_UTF8_CURLEN];
+		wchar_t ch;
+		if (!nwc) {
+			src = NULL; /* (implicit) NUL-character reached */
+			break;
+		}
+		ch = *src;
+		error = wcrtomb(buf, ch, mbs);
+		if (error == (size_t)-1) {
+			result = (size_t)-1; /* EILSEQ */
+			break;
+		}
+		if (error > dstlen)
+			break;
+		if (dst != NULL)
+			dst = (char *)mempcpy(dst, buf, error);
+		result += error;
+		dstlen -= error;
+		++src;
+		--nwc;
+		if (ch == '\0') {
+			src = NULL; /* NUL-character reached */
+			break;
+		}
+	}
+	if (dst != NULL)
+		*psrc = src; /* Only update source if destination was given */
+	return result;
+}
 
 @@>> open_wmemstream(3)
 [[decl_include("<hybrid/typecore.h>")]]

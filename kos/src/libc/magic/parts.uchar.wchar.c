@@ -132,6 +132,15 @@ c32lcpy(*) %{uchar32("wcslcpy")}
 %#endif /* __USE_BSD */
 
 
+%
+%#ifdef __USE_XOPEN2K8
+mbsnrtoc16(*) %{uchar16("mbsnrtowcs")}
+mbsnrtoc32(*) %{uchar32("mbsnrtowcs")}
+c16nrtombs(*) %{uchar16("wcsnrtombs")}
+c32nrtombs(*) %{uchar32("wcsnrtombs")}
+%#endif /* __USE_XOPEN2K8 */
+
+
 %{
 
 __SYSDECL_END
