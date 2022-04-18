@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/wchar.h) */
 /* (#) Portability: DJGPP         (/include/wchar.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/wchar.h) */
 /* (#) Portability: FreeBSD       (/include/wchar.h) */
 /* (#) Portability: GNU C Library (/wcsmbs/wchar.h) */
 /* (#) Portability: MSVC          (/include/wchar.h) */
@@ -34,6 +35,7 @@
 /* (#) Portability: diet libc     (/include/wchar.h) */
 /* (#) Portability: libbsd        (/include/bsd/wchar.h) */
 /* (#) Portability: libc6         (/include/wchar.h) */
+/* (#) Portability: mintlib       (/include/wchar.h) */
 /* (#) Portability: musl libc     (/include/wchar.h) */
 /* (#) Portability: uClibc        (/include/wchar.h) */
 }

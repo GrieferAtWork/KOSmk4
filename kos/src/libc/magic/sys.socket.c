@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/socket.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/socket.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/socket.h) */
 /* (#) Portability: GNU C Library (/socket/sys/socket.h) */
 /* (#) Portability: NetBSD        (/sys/sys/socket.h) */
@@ -27,6 +28,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/socket.h) */
 /* (#) Portability: diet libc     (/include/sys/socket.h) */
 /* (#) Portability: libc4/5       (/include/sys/socket.h) */
+/* (#) Portability: mintlib       (/include/sys/socket.h) */
 /* (#) Portability: musl libc     (/include/sys/socket.h) */
 /* (#) Portability: uClibc        (/include/sys/socket.h) */
 }

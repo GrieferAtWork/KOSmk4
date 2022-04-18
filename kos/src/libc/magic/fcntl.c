@@ -21,15 +21,18 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/fcntl.h) */
 /* (#) Portability: DJGPP         (/include/fcntl.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/fcntl.h) */
 /* (#) Portability: GNU C Library (/io/fcntl.h) */
 /* (#) Portability: MSVC          (/include/fcntl.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/fcntl.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/fcntl.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/fcntl.h) */
 /* (#) Portability: Windows Kits  (/ucrt/fcntl.h) */
+/* (#) Portability: avr-libc      (/include/fcntl.h) */
 /* (#) Portability: diet libc     (/include/fcntl.h) */
 /* (#) Portability: libc4/5       (/include/fcntl.h) */
 /* (#) Portability: libc6         (/include/fcntl.h) */
+/* (#) Portability: mintlib       (/include/fcntl.h) */
 /* (#) Portability: musl libc     (/include/fcntl.h) */
 /* (#) Portability: uClibc        (/include/fcntl.h) */
 }

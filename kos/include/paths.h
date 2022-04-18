@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/paths.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/paths.h) */
 /* (#) Portability: FreeBSD       (/include/paths.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/paths.h) */
 /* (#) Portability: NetBSD        (/include/paths.h) */
@@ -26,6 +27,7 @@
 /* (#) Portability: diet libc     (/include/paths.h) */
 /* (#) Portability: libc4/5       (/include/paths.h) */
 /* (#) Portability: libc6         (/include/paths.h) */
+/* (#) Portability: mintlib       (/include/paths.h) */
 /* (#) Portability: musl libc     (/include/paths.h) */
 /* (#) Portability: uClibc        (/include/paths.h) */
 #ifndef _PATHS_H

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5be44ae */
+/* HASH CRC-32:0xd55aaf19 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/math.h) */
 /* (#) Portability: DJGPP         (/include/math.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/math.h) */
 /* (#) Portability: GNU C Library (/math/math.h) */
 /* (#) Portability: MSVC          (/include/math.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/math.h) */
@@ -30,6 +31,7 @@
 /* (#) Portability: OpenBSD       (/include/math.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/lib/libbc/inc/include/math.h) */
 /* (#) Portability: Windows Kits  (/ucrt/math.h) */
+/* (#) Portability: avr-libc      (/include/math.h) */
 /* (#) Portability: diet libc     (/include/math.h) */
 /* (#) Portability: libc4/5       (/include/math.h) */
 /* (#) Portability: libc6         (/include/math.h) */

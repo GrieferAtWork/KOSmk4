@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/wctype.h) */
 /* (#) Portability: DJGPP         (/include/wctype.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/wctype.h) */
 /* (#) Portability: FreeBSD       (/include/wctype.h) */
 /* (#) Portability: GNU C Library (/wctype/wctype.h) */
 /* (#) Portability: MSVC          (/include/wctype.h) */
@@ -30,9 +31,11 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/wctype.h) */
 /* (#) Portability: OpenBSD       (/include/wctype.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/wctype.h) */
+/* (#) Portability: PDCLib        (/include/wctype.h) */
 /* (#) Portability: Windows Kits  (/ucrt/wctype.h) */
 /* (#) Portability: diet libc     (/include/wctype.h) */
 /* (#) Portability: libc6         (/include/wctype.h) */
+/* (#) Portability: mintlib       (/include/wctype.h) */
 /* (#) Portability: musl libc     (/include/wctype.h) */
 /* (#) Portability: uClibc        (/include/wctype.h) */
 }

@@ -17,10 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin  (/newlib/libc/include/sys/_types.h) */
-/* (#) Portability: FreeBSD (/sys/sys/_types.h) */
-/* (#) Portability: Newlib  (/newlib/libc/include/sys/_types.h) */
-/* (#) Portability: OpenBSD (/sys/sys/_types.h) */
+/* (#) Portability: Cygwin    (/newlib/libc/include/sys/_types.h) */
+/* (#) Portability: EMX kLIBC (/libc/include/sys/_types.h) */
+/* (#) Portability: FreeBSD   (/sys/sys/_types.h) */
+/* (#) Portability: Newlib    (/newlib/libc/include/sys/_types.h) */
+/* (#) Portability: OpenBSD   (/sys/sys/_types.h) */
 #ifndef _SYS__TYPES_H
 #define _SYS__TYPES_H 1
 

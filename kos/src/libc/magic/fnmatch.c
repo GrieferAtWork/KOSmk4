@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/fnmatch.h) */
 /* (#) Portability: DJGPP         (/include/fnmatch.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/fnmatch.h) */
 /* (#) Portability: FreeBSD       (/include/fnmatch.h) */
 /* (#) Portability: GNU C Library (/posix/fnmatch.h) */
 /* (#) Portability: NetBSD        (/include/fnmatch.h) */
@@ -30,6 +31,7 @@
 /* (#) Portability: diet libc     (/include/fnmatch.h) */
 /* (#) Portability: libc4/5       (/include/fnmatch.h) */
 /* (#) Portability: libc6         (/include/fnmatch.h) */
+/* (#) Portability: mintlib       (/include/fnmatch.h) */
 /* (#) Portability: musl libc     (/include/fnmatch.h) */
 /* (#) Portability: uClibc        (/include/fnmatch.h) */
 }

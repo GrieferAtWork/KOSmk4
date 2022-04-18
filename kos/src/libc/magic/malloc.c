@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/malloc.h) */
 /* (#) Portability: DJGPP         (/include/malloc.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/malloc.h) */
 /* (#) Portability: FreeBSD       (/include/malloc.h) */
 /* (#) Portability: GNU C Library (/malloc/malloc.h) */
 /* (#) Portability: MSVC          (/include/malloc.h) */
@@ -31,6 +32,7 @@
 /* (#) Portability: diet libc     (/include/malloc.h) */
 /* (#) Portability: libc4/5       (/include/malloc.h) */
 /* (#) Portability: libc6         (/include/malloc.h) */
+/* (#) Portability: mintlib       (/include/malloc.h) */
 /* (#) Portability: musl libc     (/include/malloc.h) */
 /* (#) Portability: uClibc        (/include/malloc.h) */
 }

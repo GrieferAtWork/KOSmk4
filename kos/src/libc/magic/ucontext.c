@@ -25,6 +25,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/ucontext.h) */
 /* (#) Portability: diet libc     (/include/ucontext.h) */
 /* (#) Portability: libc6         (/include/ucontext.h) */
+/* (#) Portability: mintlib       (/include/ucontext.h) */
 /* (#) Portability: musl libc     (/include/ucontext.h) */
 /* (#) Portability: uClibc        (/include/ucontext.h) */
 }

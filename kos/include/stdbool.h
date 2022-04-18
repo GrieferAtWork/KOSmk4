@@ -24,6 +24,7 @@
 /* (#) Portability: MSVC        (/include/stdbool.h) */
 /* (#) Portability: OpenBSD     (/include/stdbool.h) */
 /* (#) Portability: OpenSolaris (/usr/src/head/stdbool.h) */
+/* (#) Portability: PDCLib      (/include/stdbool.h) */
 /* (#) Portability: diet libc   (/include/stdbool.h) */
 /* (#) Portability: musl libc   (/include/stdbool.h) */
 #ifndef _STDBOOL_H

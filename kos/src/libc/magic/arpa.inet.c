@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/arpa/inet.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/arpa/inet.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/inet.h) */
 /* (#) Portability: GNU C Library (/inet/arpa/inet.h) */
 /* (#) Portability: NetBSD        (/include/arpa/inet.h) */
@@ -28,6 +29,7 @@
 /* (#) Portability: diet libc     (/include/arpa/inet.h) */
 /* (#) Portability: libc4/5       (/include/arpa/inet.h) */
 /* (#) Portability: libc6         (/include/arpa/inet.h) */
+/* (#) Portability: mintlib       (/include/arpa/inet.h) */
 /* (#) Portability: musl libc     (/include/arpa/inet.h) */
 /* (#) Portability: uClibc        (/include/arpa/inet.h) */
 }

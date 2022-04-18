@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: DJGPP        (/include/conio.h) */
+/* (#) Portability: EMX kLIBC    (/libc/include/conio.h) */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/conio.h) */
 /* (#) Portability: Windows Kits (/ucrt/conio.h) */
 }

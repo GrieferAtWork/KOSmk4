@@ -18,12 +18,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/ptrace.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/ptrace.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/ptrace.h) */
 /* (#) Portability: NetBSD        (/sys/sys/ptrace.h) */
 /* (#) Portability: OpenBSD       (/sys/sys/ptrace.h) */
 /* (#) Portability: diet libc     (/include/sys/ptrace.h) */
 /* (#) Portability: libc4/5       (/include/sys/ptrace.h) */
+/* (#) Portability: mintlib       (/include/sys/ptrace.h) */
 /* (#) Portability: musl libc     (/include/sys/ptrace.h) */
 }
 

@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/in_systm.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/netinet/in_systm.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/in_systm.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/in_systm.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/in_systm.h) */
@@ -26,6 +27,7 @@
 /* (#) Portability: diet libc     (/include/netinet/in_systm.h) */
 /* (#) Portability: libc4/5       (/include/netinet/in_systm.h) */
 /* (#) Portability: libc6         (/include/netinet/in_systm.h) */
+/* (#) Portability: mintlib       (/include/netinet/in_systm.h) */
 /* (#) Portability: musl libc     (/include/netinet/in_systm.h) */
 /* (#) Portability: uClibc        (/include/netinet/in_systm.h) */
 #ifndef _NETINET_IN_SYSTM_H

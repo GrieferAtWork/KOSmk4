@@ -17,8 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin (/newlib/libc/include/machine/_types.h) */
-/* (#) Portability: Newlib (/newlib/libc/include/machine/_types.h) */
+/* (#) Portability: Cygwin    (/newlib/libc/include/machine/_types.h) */
+/* (#) Portability: EMX kLIBC (/libc/include/machine/_types.h) */
+/* (#) Portability: Newlib    (/newlib/libc/include/machine/_types.h) */
 #ifndef _MACHINE__TYPES_H
 #define _MACHINE__TYPES_H 1
 

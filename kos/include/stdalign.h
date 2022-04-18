@@ -20,6 +20,7 @@
 /* (>) Standard: ISO C11 (ISO/IEC 9899:2011) */
 /* (#) Portability: FreeBSD   (/include/stdalign.h) */
 /* (#) Portability: NetBSD    (/include/stdalign.h) */
+/* (#) Portability: PDCLib    (/include/stdalign.h) */
 /* (#) Portability: musl libc (/include/stdalign.h) */
 #ifndef _STDALIGN_H
 #define _STDALIGN_H 1

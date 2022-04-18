@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb505ba56 */
+/* HASH CRC-32:0x64edb2c4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/getopt.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/getopt.h) */
 /* (#) Portability: FreeBSD       (/include/getopt.h) */
 /* (#) Portability: GNU C Library (/posix/getopt.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/getopt.h) */
@@ -30,6 +31,8 @@
 /* (#) Portability: libbsd        (/include/bsd/getopt.h) */
 /* (#) Portability: libc4/5       (/include/getopt.h) */
 /* (#) Portability: libc6         (/include/getopt.h) */
+/* (#) Portability: libcmini      (/include/getopt.h) */
+/* (#) Portability: mintlib       (/include/getopt.h) */
 /* (#) Portability: musl libc     (/include/getopt.h) */
 /* (#) Portability: uClibc        (/include/getopt.h) */
 #ifndef _GETOPT_H

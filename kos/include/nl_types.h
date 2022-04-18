@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c878758 */
+/* HASH CRC-32:0x6de47ca6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/nl_types.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/nl_types.h) */
 /* (#) Portability: FreeBSD       (/include/nl_types.h) */
 /* (#) Portability: GNU C Library (/catgets/nl_types.h) */
 /* (#) Portability: NetBSD        (/include/nl_types.h) */

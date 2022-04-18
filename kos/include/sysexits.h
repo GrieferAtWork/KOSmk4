@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/newlib/libc/posix/sysexits.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sysexits.h) */
 /* (#) Portability: FreeBSD       (/include/sysexits.h) */
 /* (#) Portability: GNU C Library (/misc/sysexits.h) */
 /* (#) Portability: NetBSD        (/include/sysexits.h) */
@@ -27,6 +28,7 @@
 /* (#) Portability: diet libc     (/include/sysexits.h) */
 /* (#) Portability: libc4/5       (/include/sysexits.h) */
 /* (#) Portability: libc6         (/include/sysexits.h) */
+/* (#) Portability: mintlib       (/include/sysexits.h) */
 /* (#) Portability: musl libc     (/include/sysexits.h) */
 /* (#) Portability: uClibc        (/include/sysexits.h) */
 #ifndef _SYSEXITS_H

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13c73ab3 */
+/* HASH CRC-32:0x94e19845 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/poll.h) */
 /* (#) Portability: diet libc     (/include/sys/poll.h) */
 /* (#) Portability: libbsd        (/include/bsd/sys/poll.h) */
+/* (#) Portability: mintlib       (/include/sys/poll.h) */
 /* (#) Portability: musl libc     (/include/sys/poll.h) */
 /* (#) Portability: uClibc        (/include/sys/poll.h) */
 #ifndef _SYS_POLL_H

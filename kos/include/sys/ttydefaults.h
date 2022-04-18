@@ -21,6 +21,7 @@
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/ttydefaults.h) */
 /* (#) Portability: NetBSD        (/sys/sys/ttydefaults.h) */
 /* (#) Portability: OpenBSD       (/sys/sys/ttydefaults.h) */
+/* (#) Portability: mintlib       (/include/sys/ttydefaults.h) */
 /* (#) Portability: musl libc     (/include/sys/ttydefaults.h) */
 /* (#) Portability: uClibc        (/include/sys/ttydefaults.h) */
 #ifndef _SYS_TTYDEFAULTS_H

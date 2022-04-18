@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/assert.h) */
 /* (#) Portability: DJGPP         (/include/assert.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/assert.h) */
 /* (#) Portability: FreeBSD       (/include/assert.h) */
 /* (#) Portability: GNU C Library (/assert/assert.h) */
 /* (#) Portability: MSVC          (/include/assert.h) */
@@ -29,10 +30,14 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/assert.h) */
 /* (#) Portability: OpenBSD       (/include/assert.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/assert.h) */
+/* (#) Portability: PDCLib        (/include/assert.h) */
 /* (#) Portability: Windows Kits  (/ucrt/assert.h) */
+/* (#) Portability: avr-libc      (/include/assert.h) */
 /* (#) Portability: diet libc     (/include/assert.h) */
 /* (#) Portability: libc4/5       (/include/assert.h) */
 /* (#) Portability: libc6         (/include/assert.h) */
+/* (#) Portability: libcmini      (/include/assert.h) */
+/* (#) Portability: mintlib       (/include/assert.h) */
 /* (#) Portability: musl libc     (/include/assert.h) */
 /* (#) Portability: uClibc        (/include/assert.h) */
 /**/

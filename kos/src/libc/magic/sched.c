@@ -28,6 +28,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/sched.h) */
 /* (#) Portability: diet libc     (/include/sched.h) */
 /* (#) Portability: libc6         (/include/sched.h) */
+/* (#) Portability: mintlib       (/include/sched.h) */
 /* (#) Portability: musl libc     (/include/sched.h) */
 /* (#) Portability: uClibc        (/include/sched.h) */
 }

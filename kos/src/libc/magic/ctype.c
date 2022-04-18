@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/ctype.h) */
 /* (#) Portability: DJGPP         (/include/ctype.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/ctype.h) */
 /* (#) Portability: FreeBSD       (/include/ctype.h) */
 /* (#) Portability: GNU C Library (/ctype/ctype.h) */
 /* (#) Portability: MSVC          (/include/ctype.h) */
@@ -30,10 +31,14 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/ctype.h) */
 /* (#) Portability: OpenBSD       (/include/ctype.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ctype.h) */
+/* (#) Portability: PDCLib        (/include/ctype.h) */
 /* (#) Portability: Windows Kits  (/ucrt/ctype.h) */
+/* (#) Portability: avr-libc      (/include/ctype.h) */
 /* (#) Portability: diet libc     (/include/ctype.h) */
 /* (#) Portability: libc4/5       (/include/ctype.h) */
 /* (#) Portability: libc6         (/include/ctype.h) */
+/* (#) Portability: libcmini      (/include/ctype.h) */
+/* (#) Portability: mintlib       (/include/ctype.h) */
 /* (#) Portability: musl libc     (/include/ctype.h) */
 /* (#) Portability: uClibc        (/include/ctype.h) */
 }

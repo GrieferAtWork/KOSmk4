@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/udp.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/netinet/udp.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/udp.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/udp.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/udp.h) */
@@ -26,6 +27,7 @@
 /* (#) Portability: diet libc     (/include/netinet/udp.h) */
 /* (#) Portability: libc4/5       (/include/netinet/udp.h) */
 /* (#) Portability: libc6         (/include/netinet/udp.h) */
+/* (#) Portability: mintlib       (/include/netinet/udp.h) */
 /* (#) Portability: musl libc     (/include/netinet/udp.h) */
 /* (#) Portability: uClibc        (/include/netinet/udp.h) */
 #ifndef __NETINET_UDP_H

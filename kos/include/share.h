@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: DJGPP        (/include/share.h) */
+/* (#) Portability: EMX kLIBC    (/libc/include/share.h) */
 /* (#) Portability: MSVC         (/include/share.h) */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/share.h) */
 /* (#) Portability: Windows Kits (/ucrt/share.h) */

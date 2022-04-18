@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fb82db8 */
+/* HASH CRC-32:0x4502805a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/dirent.h) */
 /* (#) Portability: DJGPP         (/include/dirent.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/dirent.h) */
 /* (#) Portability: FreeBSD       (/include/dirent.h) */
 /* (#) Portability: GNU C Library (/dirent/dirent.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/dirent.h) */
@@ -31,6 +32,8 @@
 /* (#) Portability: diet libc     (/include/dirent.h) */
 /* (#) Portability: libc4/5       (/include/dirent.h) */
 /* (#) Portability: libc6         (/include/dirent.h) */
+/* (#) Portability: libcmini      (/include/dirent.h) */
+/* (#) Portability: mintlib       (/include/dirent.h) */
 /* (#) Portability: musl libc     (/include/dirent.h) */
 /* (#) Portability: uClibc        (/include/dirent.h) */
 #ifndef _DIRENT_H

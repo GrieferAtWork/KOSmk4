@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/resource.h) */
 /* (#) Portability: DJGPP         (/include/sys/resource.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/resource.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/resource.h) */
 /* (#) Portability: GNU C Library (/resource/sys/resource.h) */
 /* (#) Portability: NetBSD        (/sys/sys/resource.h) */
@@ -29,6 +30,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/resource.h) */
 /* (#) Portability: diet libc     (/include/sys/resource.h) */
 /* (#) Portability: libc4/5       (/include/sys/resource.h) */
+/* (#) Portability: mintlib       (/include/sys/resource.h) */
 /* (#) Portability: musl libc     (/include/sys/resource.h) */
 /* (#) Portability: uClibc        (/include/sys/resource.h) */
 }

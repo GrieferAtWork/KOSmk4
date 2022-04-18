@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38b1e493 */
+/* HASH CRC-32:0xd096227b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/fts.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/fts.h) */
 /* (#) Portability: FreeBSD       (/include/fts.h) */
 /* (#) Portability: GNU C Library (/io/fts.h) */
 /* (#) Portability: NetBSD        (/include/fts.h) */

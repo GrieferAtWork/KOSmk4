@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bce153b */
+/* HASH CRC-32:0x7402e02c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/in.h) */
 /* (#) Portability: DJGPP         (/include/netinet/in.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/netinet/in.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/in.h) */
 /* (#) Portability: GNU C Library (/inet/netinet/in.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/in.h) */
@@ -29,6 +30,7 @@
 /* (#) Portability: diet libc     (/include/netinet/in.h) */
 /* (#) Portability: libc4/5       (/include/netinet/in.h) */
 /* (#) Portability: libc6         (/include/netinet/in.h) */
+/* (#) Portability: mintlib       (/include/netinet/in.h) */
 /* (#) Portability: musl libc     (/include/netinet/in.h) */
 /* (#) Portability: uClibc        (/include/netinet/in.h) */
 #ifndef _NETINET_IN_H

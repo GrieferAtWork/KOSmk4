@@ -18,12 +18,15 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/alloca.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/alloca.h) */
 /* (#) Portability: GNU C Library (/stdlib/alloca.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/alloca.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/alloca.h) */
+/* (#) Portability: avr-libc      (/include/alloca.h) */
 /* (#) Portability: diet libc     (/include/alloca.h) */
 /* (#) Portability: libc4/5       (/include/alloca.h) */
 /* (#) Portability: libc6         (/include/alloca.h) */
+/* (#) Portability: mintlib       (/include/alloca.h) */
 /* (#) Portability: musl libc     (/include/alloca.h) */
 /* (#) Portability: uClibc        (/include/alloca.h) */
 #ifndef _ALLOCA_H

@@ -24,6 +24,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/syscall.h) */
 /* (#) Portability: diet libc     (/include/sys/syscall.h) */
 /* (#) Portability: libc4/5       (/include/sys/syscall.h) */
+/* (#) Portability: mintlib       (/include/sys/syscall.h) */
 /* (#) Portability: musl libc     (/include/sys/syscall.h) */
 /* (#) Portability: uClibc        (/include/sys/syscall.h) */
 #ifndef _SYS_SYSCALL_H

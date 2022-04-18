@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/setjmp.h) */
 /* (#) Portability: DJGPP         (/include/setjmp.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/setjmp.h) */
 /* (#) Portability: FreeBSD       (/include/setjmp.h) */
 /* (#) Portability: GNU C Library (/setjmp/setjmp.h) */
 /* (#) Portability: MSVC          (/include/setjmp.h) */
@@ -29,9 +30,12 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/setjmp.h) */
 /* (#) Portability: OpenBSD       (/include/setjmp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/setjmp.h) */
+/* (#) Portability: avr-libc      (/include/setjmp.h) */
 /* (#) Portability: diet libc     (/include/setjmp.h) */
 /* (#) Portability: libc4/5       (/include/setjmp.h) */
 /* (#) Portability: libc6         (/include/setjmp.h) */
+/* (#) Portability: libcmini      (/include/setjmp.h) */
+/* (#) Portability: mintlib       (/include/setjmp.h) */
 /* (#) Portability: musl libc     (/include/setjmp.h) */
 /* (#) Portability: uClibc        (/include/setjmp.h) */
 #ifndef _SETJMP_H

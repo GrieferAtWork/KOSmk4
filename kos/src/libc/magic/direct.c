@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: DJGPP        (/include/direct.h) */
+/* (#) Portability: EMX kLIBC    (/libc/include/direct.h) */
 /* (#) Portability: MSVC         (/include/direct.h) */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/direct.h) */
 /* (#) Portability: Windows Kits (/ucrt/direct.h) */

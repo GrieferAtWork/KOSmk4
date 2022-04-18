@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: GNU C Library (/bits/posix_opt.h) */
+/* (#) Portability: mintlib       (/include/bits/posix_opt.h) */
 #ifndef _BITS_POSIX_OPT_H
 #define _BITS_POSIX_OPT_H 1
 

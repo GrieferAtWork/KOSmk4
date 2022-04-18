@@ -19,6 +19,7 @@
  */
 /* (#) Portability: Cygwin      (/newlib/libc/include/ieeefp.h) */
 /* (#) Portability: DJGPP       (/include/ieeefp.h) */
+/* (#) Portability: EMX kLIBC   (/libc/include/ieeefp.h) */
 /* (#) Portability: FreeBSD     (/include/ieeefp.h) */
 /* (#) Portability: MinGW       (/mingw-w64-headers/crt/ieeefp.h) */
 /* (#) Portability: NetBSD      (/include/ieeefp.h) */

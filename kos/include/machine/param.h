@@ -17,8 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin (/newlib/libc/include/machine/param.h) */
-/* (#) Portability: Newlib (/newlib/libc/include/machine/param.h) */
+/* (#) Portability: Cygwin    (/newlib/libc/include/machine/param.h) */
+/* (#) Portability: EMX kLIBC (/libc/include/machine/param.h) */
+/* (#) Portability: Newlib    (/newlib/libc/include/machine/param.h) */
 #ifndef _MACHINE_PARAM_H
 #define _MACHINE_PARAM_H 1
 

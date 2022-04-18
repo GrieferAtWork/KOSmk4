@@ -18,10 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
+/* (#) Portability: EMX kLIBC     (/libc/include/sgtty.h) */
 /* (#) Portability: GNU C Library (/misc/sgtty.h) */
 /* (#) Portability: NetBSD        (/include/sgtty.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/sgtty.h) */
 /* (#) Portability: libc6         (/include/sgtty.h) */
+/* (#) Portability: mintlib       (/include/sgtty.h) */
 /* (#) Portability: uClibc        (/include/sgtty.h) */
 }
 

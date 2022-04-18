@@ -23,6 +23,7 @@
 /* (#) Portability: NetBSD        (/sys/sys/ucontext.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/[...]/sys/ucontext.h) */
 /* (#) Portability: diet libc     (/include/sys/ucontext.h) */
+/* (#) Portability: mintlib       (/include/sys/ucontext.h) */
 /* (#) Portability: musl libc     (/include/sys/ucontext.h) */
 #ifndef _SYS_UCONTEXT_H
 #define _SYS_UCONTEXT_H 1

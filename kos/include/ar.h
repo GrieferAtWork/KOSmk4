@@ -19,6 +19,7 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/ar.h) */
 /* (#) Portability: DJGPP         (/include/ar.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/ar.h) */
 /* (#) Portability: FreeBSD       (/include/ar.h) */
 /* (#) Portability: GNU C Library (/misc/ar.h) */
 /* (#) Portability: NetBSD        (/include/ar.h) */
@@ -28,6 +29,7 @@
 /* (#) Portability: diet libc     (/include/ar.h) */
 /* (#) Portability: libc4/5       (/include/ar.h) */
 /* (#) Portability: libc6         (/include/ar.h) */
+/* (#) Portability: mintlib       (/include/ar.h) */
 /* (#) Portability: musl libc     (/include/ar.h) */
 /* (#) Portability: uClibc        (/include/ar.h) */
 #ifndef _AR_H

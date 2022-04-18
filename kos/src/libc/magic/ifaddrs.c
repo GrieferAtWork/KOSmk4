@@ -24,6 +24,7 @@
 /* (#) Portability: NetBSD        (/include/ifaddrs.h) */
 /* (#) Portability: OpenBSD       (/include/ifaddrs.h) */
 /* (#) Portability: libc6         (/include/ifaddrs.h) */
+/* (#) Portability: mintlib       (/include/ifaddrs.h) */
 /* (#) Portability: musl libc     (/include/ifaddrs.h) */
 /* (#) Portability: uClibc        (/include/ifaddrs.h) */
 }

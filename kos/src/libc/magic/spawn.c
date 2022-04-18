@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/spawn.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/spawn.h) */
 /* (#) Portability: FreeBSD       (/include/spawn.h) */
 /* (#) Portability: GNU C Library (/posix/spawn.h) */
 /* (#) Portability: NetBSD        (/include/spawn.h) */

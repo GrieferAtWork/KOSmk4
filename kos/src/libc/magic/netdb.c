@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netdb.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/netdb.h) */
 /* (#) Portability: FreeBSD       (/include/netdb.h) */
 /* (#) Portability: GNU C Library (/resolv/netdb.h) */
 /* (#) Portability: NetBSD        (/include/netdb.h) */
@@ -28,6 +29,7 @@
 /* (#) Portability: diet libc     (/include/netdb.h) */
 /* (#) Portability: libc4/5       (/include/netdb.h) */
 /* (#) Portability: libc6         (/include/netdb.h) */
+/* (#) Portability: mintlib       (/include/netdb.h) */
 /* (#) Portability: musl libc     (/include/netdb.h) */
 /* (#) Portability: uClibc        (/include/netdb.h) */
 }

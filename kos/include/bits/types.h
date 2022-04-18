@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: GNU C Library (/posix/bits/types.h) */
+/* (#) Portability: mintlib       (/include/bits/types.h) */
 #ifndef _BITS_TYPES_H
 #define _BITS_TYPES_H 1
 

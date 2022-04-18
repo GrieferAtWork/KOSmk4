@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/bitypes.h) */
 /* (#) Portability: GNU C Library (/resolv/sys/bitypes.h) */
 /* (#) Portability: libc4/5       (/include/sys/bitypes.h) */
 /* (#) Portability: uClibc        (/include/sys/bitypes.h) */

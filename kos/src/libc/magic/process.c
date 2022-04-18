@@ -20,9 +20,11 @@
 %(c_prefix){
 /* (#) Portability: Cygwin       (/winsup/cygwin/include/process.h) */
 /* (#) Portability: DJGPP        (/include/process.h) */
+/* (#) Portability: EMX kLIBC    (/libc/include/process.h) */
 /* (#) Portability: MSVC         (/include/process.h) */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/process.h) */
 /* (#) Portability: Windows Kits (/ucrt/process.h) */
+/* (#) Portability: mintlib      (/include/process.h) */
 }
 
 %[define_replacement(fd_t = __fd_t)]

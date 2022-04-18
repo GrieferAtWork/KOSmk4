@@ -19,11 +19,13 @@
  */
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/syslog.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/syslog.h) */
 /* (#) Portability: GNU C Library (/misc/syslog.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/syslog.h) */
 /* (#) Portability: diet libc     (/include/syslog.h) */
 /* (#) Portability: libc4/5       (/include/syslog.h) */
 /* (#) Portability: libc6         (/include/syslog.h) */
+/* (#) Portability: mintlib       (/include/syslog.h) */
 /* (#) Portability: musl libc     (/include/syslog.h) */
 /* (#) Portability: uClibc        (/include/syslog.h) */
 #ifndef _SYSLOG_H

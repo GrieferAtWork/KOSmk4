@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/regex.h) */
 /* (#) Portability: DJGPP         (/include/regex.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/regex.h) */
 /* (#) Portability: FreeBSD       (/include/regex.h) */
 /* (#) Portability: GNU C Library (/posix/regex.h) */
 /* (#) Portability: NetBSD        (/include/regex.h) */
@@ -30,6 +31,7 @@
 /* (#) Portability: diet libc     (/include/regex.h) */
 /* (#) Portability: libc4/5       (/include/regex.h) */
 /* (#) Portability: libc6         (/include/regex.h) */
+/* (#) Portability: mintlib       (/include/regex.h) */
 /* (#) Portability: musl libc     (/include/regex.h) */
 /* (#) Portability: uClibc        (/include/regex.h) */
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ad82d37 */
+/* HASH CRC-32:0x71c7fe7a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/langinfo.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/langinfo.h) */
 /* (#) Portability: FreeBSD       (/include/langinfo.h) */
 /* (#) Portability: GNU C Library (/locale/langinfo.h) */
 /* (#) Portability: NetBSD        (/include/langinfo.h) */

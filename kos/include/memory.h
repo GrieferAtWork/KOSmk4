@@ -19,6 +19,7 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/memory.h) */
 /* (#) Portability: DJGPP         (/include/memory.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/memory.h) */
 /* (#) Portability: FreeBSD       (/include/memory.h) */
 /* (#) Portability: GNU C Library (/string/memory.h) */
 /* (#) Portability: MSVC          (/include/memory.h) */
@@ -31,6 +32,7 @@
 /* (#) Portability: diet libc     (/include/memory.h) */
 /* (#) Portability: libc4/5       (/include/memory.h) */
 /* (#) Portability: libc6         (/include/memory.h) */
+/* (#) Portability: mintlib       (/include/memory.h) */
 /* (#) Portability: musl libc     (/include/memory.h) */
 /* (#) Portability: uClibc        (/include/memory.h) */
 #ifndef _MEMORY_H

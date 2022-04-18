@@ -28,6 +28,7 @@
 /* (#) Portability: diet libc     (/include/tar.h) */
 /* (#) Portability: libc4/5       (/include/tar.h) */
 /* (#) Portability: libc6         (/include/tar.h) */
+/* (#) Portability: mintlib       (/include/tar.h) */
 /* (#) Portability: musl libc     (/include/tar.h) */
 /* (#) Portability: uClibc        (/include/tar.h) */
 #ifndef _TAR_H

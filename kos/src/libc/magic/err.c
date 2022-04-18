@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/err.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/err.h) */
 /* (#) Portability: FreeBSD       (/include/err.h) */
 /* (#) Portability: GNU C Library (/misc/err.h) */
 /* (#) Portability: NetBSD        (/include/err.h) */
@@ -27,6 +28,7 @@
 /* (#) Portability: diet libc     (/include/err.h) */
 /* (#) Portability: libbsd        (/include/bsd/err.h) */
 /* (#) Portability: libc6         (/include/err.h) */
+/* (#) Portability: mintlib       (/include/err.h) */
 /* (#) Portability: musl libc     (/include/err.h) */
 /* (#) Portability: uClibc        (/include/err.h) */
 }

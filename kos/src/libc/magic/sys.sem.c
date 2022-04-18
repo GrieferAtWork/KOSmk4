@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/sem.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/sem.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/sem.h) */
 /* (#) Portability: GNU C Library (/sysvipc/sys/sem.h) */
 /* (#) Portability: NetBSD        (/sys/sys/sem.h) */
@@ -27,6 +28,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sem.h) */
 /* (#) Portability: diet libc     (/include/sys/sem.h) */
 /* (#) Portability: libc4/5       (/include/sys/sem.h) */
+/* (#) Portability: mintlib       (/include/sys/sem.h) */
 /* (#) Portability: musl libc     (/include/sys/sem.h) */
 /* (#) Portability: uClibc        (/include/sys/sem.h) */
 }

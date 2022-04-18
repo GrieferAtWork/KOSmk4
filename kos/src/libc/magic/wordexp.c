@@ -25,6 +25,7 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/wordexp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/wordexp.h) */
 /* (#) Portability: libc6         (/include/wordexp.h) */
+/* (#) Portability: mintlib       (/include/wordexp.h) */
 /* (#) Portability: musl libc     (/include/wordexp.h) */
 /* (#) Portability: uClibc        (/include/wordexp.h) */
 }

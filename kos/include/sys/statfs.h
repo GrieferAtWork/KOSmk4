@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb94cabd */
+/* HASH CRC-32:0xb0f24e10 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,9 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/statfs.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/statfs.h) */
 /* (#) Portability: GNU C Library (/io/sys/statfs.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/statfs.h) */
 /* (#) Portability: diet libc     (/include/sys/statfs.h) */
+/* (#) Portability: mintlib       (/include/sys/statfs.h) */
 /* (#) Portability: musl libc     (/include/sys/statfs.h) */
 /* (#) Portability: uClibc        (/include/sys/statfs.h) */
 #ifndef _SYS_STATFS_H

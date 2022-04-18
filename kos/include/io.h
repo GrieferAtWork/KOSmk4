@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x762cf61e */
+/* HASH CRC-32:0xff93ea25 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: Cygwin       (/winsup/cygwin/include/io.h) */
 /* (#) Portability: DJGPP        (/include/io.h) */
+/* (#) Portability: EMX kLIBC    (/libc/include/io.h) */
 /* (#) Portability: MSVC         (/include/io.h) */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/io.h) */
 /* (#) Portability: NetBSD       (/sys/arch/[...]/include/io.h) */

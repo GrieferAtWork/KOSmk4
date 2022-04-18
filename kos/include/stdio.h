@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33f13b33 */
+/* HASH CRC-32:0x97dc102f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/stdio.h) */
 /* (#) Portability: DJGPP         (/include/stdio.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/stdio.h) */
 /* (#) Portability: FreeBSD       (/include/stdio.h) */
 /* (#) Portability: GNU C Library (/libio/stdio.h) */
 /* (#) Portability: MSVC          (/include/stdio.h) */
@@ -30,11 +31,15 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/stdio.h) */
 /* (#) Portability: OpenBSD       (/include/stdio.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/stdio.h) */
+/* (#) Portability: PDCLib        (/include/stdio.h) */
 /* (#) Portability: Windows Kits  (/ucrt/stdio.h) */
+/* (#) Portability: avr-libc      (/include/stdio.h) */
 /* (#) Portability: diet libc     (/include/stdio.h) */
 /* (#) Portability: libbsd        (/include/bsd/stdio.h) */
 /* (#) Portability: libc4/5       (/include/stdio.h) */
 /* (#) Portability: libc6         (/include/stdio.h) */
+/* (#) Portability: libcmini      (/include/stdio.h) */
+/* (#) Portability: mintlib       (/include/stdio.h) */
 /* (#) Portability: musl libc     (/include/stdio.h) */
 /* (#) Portability: uClibc        (/include/stdio.h) */
 #ifndef _STDIO_H

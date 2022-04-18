@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d9d734b */
+/* HASH CRC-32:0xedb8fefd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/search.h) */
 /* (#) Portability: DJGPP         (/include/search.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/search.h) */
 /* (#) Portability: FreeBSD       (/include/search.h) */
 /* (#) Portability: GNU C Library (/misc/search.h) */
 /* (#) Portability: MSVC          (/include/search.h) */
@@ -33,6 +34,7 @@
 /* (#) Portability: diet libc     (/include/search.h) */
 /* (#) Portability: libc4/5       (/include/search.h) */
 /* (#) Portability: libc6         (/include/search.h) */
+/* (#) Portability: mintlib       (/include/search.h) */
 /* (#) Portability: musl libc     (/include/search.h) */
 /* (#) Portability: uClibc        (/include/search.h) */
 #ifndef _SEARCH_H

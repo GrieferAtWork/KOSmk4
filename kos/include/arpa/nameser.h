@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb917616 */
+/* HASH CRC-32:0x6fabb73c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/arpa/nameser.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/arpa/nameser.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/nameser.h) */
 /* (#) Portability: GNU C Library (/resolv/arpa/nameser.h) */
 /* (#) Portability: NetBSD        (/include/arpa/nameser.h) */
@@ -27,6 +28,7 @@
 /* (#) Portability: diet libc     (/include/arpa/nameser.h) */
 /* (#) Portability: libc4/5       (/include/arpa/nameser.h) */
 /* (#) Portability: libc6         (/include/arpa/nameser.h) */
+/* (#) Portability: mintlib       (/include/arpa/nameser.h) */
 /* (#) Portability: musl libc     (/include/arpa/nameser.h) */
 /* (#) Portability: uClibc        (/include/arpa/nameser.h) */
 #ifndef _ARPA_NAMESER_H

@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/string.h) */
 /* (#) Portability: DJGPP         (/include/string.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/string.h) */
 /* (#) Portability: FreeBSD       (/include/string.h) */
 /* (#) Portability: GNU C Library (/string/string.h) */
 /* (#) Portability: MSVC          (/include/string.h) */
@@ -30,11 +31,15 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/string.h) */
 /* (#) Portability: OpenBSD       (/include/string.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/string.h) */
+/* (#) Portability: PDCLib        (/include/string.h) */
 /* (#) Portability: Windows Kits  (/ucrt/string.h) */
+/* (#) Portability: avr-libc      (/include/string.h) */
 /* (#) Portability: diet libc     (/include/string.h) */
 /* (#) Portability: libbsd        (/include/bsd/string.h) */
 /* (#) Portability: libc4/5       (/include/string.h) */
 /* (#) Portability: libc6         (/include/string.h) */
+/* (#) Portability: libcmini      (/include/string.h) */
+/* (#) Portability: mintlib       (/include/string.h) */
 /* (#) Portability: musl libc     (/include/string.h) */
 /* (#) Portability: uClibc        (/include/string.h) */
 }

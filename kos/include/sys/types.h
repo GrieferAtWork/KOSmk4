@@ -20,6 +20,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/types.h) */
 /* (#) Portability: DJGPP         (/include/sys/types.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/types.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/types.h) */
 /* (#) Portability: GNU C Library (/posix/sys/types.h) */
 /* (#) Portability: MSVC          (/include/sys/types.h) */
@@ -29,8 +30,11 @@
 /* (#) Portability: OpenBSD       (/sys/sys/types.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/types.h) */
 /* (#) Portability: Windows Kits  (/ucrt/sys/types.h) */
+/* (#) Portability: avr-libc      (/include/sys/types.h) */
 /* (#) Portability: diet libc     (/include/sys/types.h) */
 /* (#) Portability: libc4/5       (/include/sys/types.h) */
+/* (#) Portability: libcmini      (/include/sys/types.h) */
+/* (#) Portability: mintlib       (/include/sys/types.h) */
 /* (#) Portability: musl libc     (/include/sys/types.h) */
 /* (#) Portability: uClibc        (/include/sys/types.h) */
 #ifndef _SYS_TYPES_H

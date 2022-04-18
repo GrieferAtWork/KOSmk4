@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: EMX kLIBC     (/libc/include/netinet/igmp.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/igmp.h) */
 /* (#) Portability: GNU C Library (/inet/netinet/igmp.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/igmp.h) */

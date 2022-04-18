@@ -19,9 +19,11 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/statfs.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/statfs.h) */
 /* (#) Portability: GNU C Library (/io/sys/statfs.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/statfs.h) */
 /* (#) Portability: diet libc     (/include/sys/statfs.h) */
+/* (#) Portability: mintlib       (/include/sys/statfs.h) */
 /* (#) Portability: musl libc     (/include/sys/statfs.h) */
 /* (#) Portability: uClibc        (/include/sys/statfs.h) */
 }

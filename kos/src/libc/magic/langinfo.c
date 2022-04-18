@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/langinfo.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/langinfo.h) */
 /* (#) Portability: FreeBSD       (/include/langinfo.h) */
 /* (#) Portability: GNU C Library (/locale/langinfo.h) */
 /* (#) Portability: NetBSD        (/include/langinfo.h) */

@@ -17,9 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin  (/newlib/libc/include/sys/_sigset.h) */
-/* (#) Portability: FreeBSD (/sys/sys/_sigset.h) */
-/* (#) Portability: Newlib  (/newlib/libc/include/sys/_sigset.h) */
+/* (#) Portability: Cygwin    (/newlib/libc/include/sys/_sigset.h) */
+/* (#) Portability: EMX kLIBC (/libc/include/sys/_sigset.h) */
+/* (#) Portability: FreeBSD   (/sys/sys/_sigset.h) */
+/* (#) Portability: Newlib    (/newlib/libc/include/sys/_sigset.h) */
 #ifndef _SYS__SIGSET_H
 #define _SYS__SIGSET_H 1
 

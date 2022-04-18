@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/systeminfo.h) */
+/* (#) Portability: mintlib     (/include/sys/systeminfo.h) */
 }
 
 %[define_replacement(fd_t = __fd_t)]

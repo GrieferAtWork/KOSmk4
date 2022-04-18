@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21f42278 */
+/* HASH CRC-32:0xb55fc6a8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/signal.h) */
 /* (#) Portability: DJGPP         (/include/signal.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/signal.h) */
 /* (#) Portability: FreeBSD       (/include/signal.h) */
 /* (#) Portability: GNU C Library (/signal/signal.h) */
 /* (#) Portability: MSVC          (/include/signal.h) */
@@ -31,9 +32,11 @@
 /* (#) Portability: OpenBSD       (/include/signal.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/signal.h) */
 /* (#) Portability: Windows Kits  (/ucrt/signal.h) */
+/* (#) Portability: avr-libc      (/include/signal.h) */
 /* (#) Portability: diet libc     (/include/signal.h) */
 /* (#) Portability: libc4/5       (/include/signal.h) */
 /* (#) Portability: libc6         (/include/signal.h) */
+/* (#) Portability: mintlib       (/include/signal.h) */
 /* (#) Portability: musl libc     (/include/signal.h) */
 /* (#) Portability: uClibc        (/include/signal.h) */
 #ifndef _SIGNAL_H

@@ -19,6 +19,7 @@
  */
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/tcp.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/netinet/tcp.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/tcp.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/tcp.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/tcp.h) */
@@ -27,6 +28,7 @@
 /* (#) Portability: diet libc     (/include/netinet/tcp.h) */
 /* (#) Portability: libc4/5       (/include/netinet/tcp.h) */
 /* (#) Portability: libc6         (/include/netinet/tcp.h) */
+/* (#) Portability: mintlib       (/include/netinet/tcp.h) */
 /* (#) Portability: musl libc     (/include/netinet/tcp.h) */
 /* (#) Portability: uClibc        (/include/netinet/tcp.h) */
 #ifndef _NETINET_TCP_H

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27edc731 */
+/* HASH CRC-32:0x6870b4b9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/unistd.h) */
 /* (#) Portability: DJGPP         (/include/unistd.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/unistd.h) */
 /* (#) Portability: FreeBSD       (/include/unistd.h) */
 /* (#) Portability: GNU C Library (/posix/unistd.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/unistd.h) */
@@ -28,10 +29,13 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/unistd.h) */
 /* (#) Portability: OpenBSD       (/include/unistd.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/unistd.h) */
+/* (#) Portability: avr-libc      (/include/unistd.h) */
 /* (#) Portability: diet libc     (/include/unistd.h) */
 /* (#) Portability: libbsd        (/include/bsd/unistd.h) */
 /* (#) Portability: libc4/5       (/include/unistd.h) */
 /* (#) Portability: libc6         (/include/unistd.h) */
+/* (#) Portability: libcmini      (/include/unistd.h) */
+/* (#) Portability: mintlib       (/include/unistd.h) */
 /* (#) Portability: musl libc     (/include/unistd.h) */
 /* (#) Portability: uClibc        (/include/unistd.h) */
 #ifndef _UNISTD_H

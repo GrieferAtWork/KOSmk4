@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: EMX kLIBC   (/libc/include/sys/filio.h) */
 /* (#) Portability: FreeBSD     (/sys/sys/filio.h) */
 /* (#) Portability: NetBSD      (/sys/sys/filio.h) */
 /* (#) Portability: OpenBSD     (/sys/sys/filio.h) */

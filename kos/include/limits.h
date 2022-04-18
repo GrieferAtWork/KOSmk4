@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/limits.h) */
 /* (#) Portability: DJGPP         (/include/limits.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/limits.h) */
 /* (#) Portability: FreeBSD       (/include/limits.h) */
 /* (#) Portability: GNU C Library (/include/limits.h) */
 /* (#) Portability: MSVC          (/include/limits.h) */
@@ -29,9 +30,12 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/limits.h) */
 /* (#) Portability: OpenBSD       (/include/limits.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/limits.h) */
+/* (#) Portability: PDCLib        (/include/limits.h) */
 /* (#) Portability: diet libc     (/include/limits.h) */
 /* (#) Portability: libc4/5       (/include/limits.h) */
 /* (#) Portability: libc6         (/include/limits.h) */
+/* (#) Portability: libcmini      (/include/limits.h) */
+/* (#) Portability: mintlib       (/include/limits.h) */
 /* (#) Portability: musl libc     (/include/limits.h) */
 /* (#) Portability: uClibc        (/include/limits.h) */
 #ifndef _LIMITS_H

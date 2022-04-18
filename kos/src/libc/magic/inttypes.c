@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/inttypes.h) */
 /* (#) Portability: DJGPP         (/include/inttypes.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/inttypes.h) */
 /* (#) Portability: FreeBSD       (/include/inttypes.h) */
 /* (#) Portability: GNU C Library (/stdlib/inttypes.h) */
 /* (#) Portability: MSVC          (/include/inttypes.h) */
@@ -30,10 +31,13 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/inttypes.h) */
 /* (#) Portability: OpenBSD       (/include/inttypes.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/inttypes.h) */
+/* (#) Portability: PDCLib        (/include/inttypes.h) */
 /* (#) Portability: Windows Kits  (/ucrt/inttypes.h) */
+/* (#) Portability: avr-libc      (/include/inttypes.h) */
 /* (#) Portability: diet libc     (/include/inttypes.h) */
 /* (#) Portability: libbsd        (/include/bsd/inttypes.h) */
 /* (#) Portability: libc6         (/include/inttypes.h) */
+/* (#) Portability: mintlib       (/include/inttypes.h) */
 /* (#) Portability: musl libc     (/include/inttypes.h) */
 /* (#) Portability: uClibc        (/include/inttypes.h) */
 }

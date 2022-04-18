@@ -21,6 +21,7 @@
 /* (#) Portability: NetBSD        (/include/re_comp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/re_comp.h) */
 /* (#) Portability: libc6         (/include/re_comp.h) */
+/* (#) Portability: mintlib       (/include/re_comp.h) */
 #ifndef _RE_COMP_H
 #define _RE_COMP_H 1
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x740c6808 */
+/* HASH CRC-32:0x56417e47 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/wordexp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/wordexp.h) */
 /* (#) Portability: libc6         (/include/wordexp.h) */
+/* (#) Portability: mintlib       (/include/wordexp.h) */
 /* (#) Portability: musl libc     (/include/wordexp.h) */
 /* (#) Portability: uClibc        (/include/wordexp.h) */
 #ifndef _WORDEXP_H

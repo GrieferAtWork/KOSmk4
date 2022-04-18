@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/glob.h) */
 /* (#) Portability: DJGPP         (/include/glob.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/glob.h) */
 /* (#) Portability: FreeBSD       (/include/glob.h) */
 /* (#) Portability: GNU C Library (/posix/glob.h) */
 /* (#) Portability: MinGW         (/include/glob.h) */
@@ -31,6 +32,7 @@
 /* (#) Portability: diet libc     (/include/glob.h) */
 /* (#) Portability: libc4/5       (/include/glob.h) */
 /* (#) Portability: libc6         (/include/glob.h) */
+/* (#) Portability: mintlib       (/include/glob.h) */
 /* (#) Portability: musl libc     (/include/glob.h) */
 /* (#) Portability: uClibc        (/include/glob.h) */
 }

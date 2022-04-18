@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa6ceff */
+/* HASH CRC-32:0x5a052f0a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/libgen.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/libgen.h) */
 /* (#) Portability: FreeBSD       (/include/libgen.h) */
 /* (#) Portability: GNU C Library (/misc/libgen.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/libgen.h) */
@@ -29,6 +30,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/head/libgen.h) */
 /* (#) Portability: diet libc     (/include/libgen.h) */
 /* (#) Portability: libc6         (/include/libgen.h) */
+/* (#) Portability: mintlib       (/include/libgen.h) */
 /* (#) Portability: musl libc     (/include/libgen.h) */
 /* (#) Portability: uClibc        (/include/libgen.h) */
 #ifndef _LIBGEN_H

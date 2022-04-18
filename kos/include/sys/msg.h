@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0d85caa */
+/* HASH CRC-32:0x7a14dafb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/msg.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/msg.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/msg.h) */
 /* (#) Portability: GNU C Library (/sysvipc/sys/msg.h) */
 /* (#) Portability: NetBSD        (/sys/sys/msg.h) */
@@ -27,6 +28,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/msg.h) */
 /* (#) Portability: diet libc     (/include/sys/msg.h) */
 /* (#) Portability: libc4/5       (/include/sys/msg.h) */
+/* (#) Portability: mintlib       (/include/sys/msg.h) */
 /* (#) Portability: musl libc     (/include/sys/msg.h) */
 /* (#) Portability: uClibc        (/include/sys/msg.h) */
 #ifndef _SYS_MSG_H

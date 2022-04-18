@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/locale.h) */
 /* (#) Portability: DJGPP         (/include/locale.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/locale.h) */
 /* (#) Portability: FreeBSD       (/include/locale.h) */
 /* (#) Portability: GNU C Library (/locale/locale.h) */
 /* (#) Portability: MSVC          (/include/locale.h) */
@@ -30,10 +31,13 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/locale.h) */
 /* (#) Portability: OpenBSD       (/include/locale.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/locale.h) */
+/* (#) Portability: PDCLib        (/include/locale.h) */
 /* (#) Portability: Windows Kits  (/ucrt/locale.h) */
+/* (#) Portability: avr-libc      (/include/locale.h) */
 /* (#) Portability: diet libc     (/include/locale.h) */
 /* (#) Portability: libc4/5       (/include/locale.h) */
 /* (#) Portability: libc6         (/include/locale.h) */
+/* (#) Portability: mintlib       (/include/locale.h) */
 /* (#) Portability: musl libc     (/include/locale.h) */
 /* (#) Portability: uClibc        (/include/locale.h) */
 }

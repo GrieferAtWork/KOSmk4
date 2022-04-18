@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d46f403 */
+/* HASH CRC-32:0x2b6b4e87 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/malloc.h) */
 /* (#) Portability: DJGPP         (/include/malloc.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/malloc.h) */
 /* (#) Portability: FreeBSD       (/include/malloc.h) */
 /* (#) Portability: GNU C Library (/malloc/malloc.h) */
 /* (#) Portability: MSVC          (/include/malloc.h) */
@@ -31,6 +32,7 @@
 /* (#) Portability: diet libc     (/include/malloc.h) */
 /* (#) Portability: libc4/5       (/include/malloc.h) */
 /* (#) Portability: libc6         (/include/malloc.h) */
+/* (#) Portability: mintlib       (/include/malloc.h) */
 /* (#) Portability: musl libc     (/include/malloc.h) */
 /* (#) Portability: uClibc        (/include/malloc.h) */
 #ifndef _MALLOC_H

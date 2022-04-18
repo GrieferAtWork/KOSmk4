@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/strings.h) */
 /* (#) Portability: DJGPP         (/include/strings.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/strings.h) */
 /* (#) Portability: FreeBSD       (/include/strings.h) */
 /* (#) Portability: GNU C Library (/string/strings.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/strings.h) */
@@ -31,6 +32,7 @@
 /* (#) Portability: diet libc     (/include/strings.h) */
 /* (#) Portability: libc4/5       (/include/strings.h) */
 /* (#) Portability: libc6         (/include/strings.h) */
+/* (#) Portability: mintlib       (/include/strings.h) */
 /* (#) Portability: musl libc     (/include/strings.h) */
 /* (#) Portability: uClibc        (/include/strings.h) */
 }

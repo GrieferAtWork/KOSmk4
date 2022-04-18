@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/errno.h) */
 /* (#) Portability: DJGPP         (/include/errno.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/errno.h) */
 /* (#) Portability: GNU C Library (/stdlib/errno.h) */
 /* (#) Portability: MSVC          (/include/errno.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/errno.h) */
@@ -29,10 +30,14 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/errno.h) */
 /* (#) Portability: OpenBSD       (/include/errno.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/errno.h) */
+/* (#) Portability: PDCLib        (/include/errno.h) */
 /* (#) Portability: Windows Kits  (/ucrt/errno.h) */
+/* (#) Portability: avr-libc      (/include/errno.h) */
 /* (#) Portability: diet libc     (/include/errno.h) */
 /* (#) Portability: libc4/5       (/include/errno.h) */
 /* (#) Portability: libc6         (/include/errno.h) */
+/* (#) Portability: libcmini      (/include/errno.h) */
+/* (#) Portability: mintlib       (/include/errno.h) */
 /* (#) Portability: musl libc     (/include/errno.h) */
 /* (#) Portability: uClibc        (/include/errno.h) */
 }

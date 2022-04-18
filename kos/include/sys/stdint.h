@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: EMX kLIBC   (/libc/include/sys/stdint.h) */
 /* (#) Portability: FreeBSD     (/sys/sys/stdint.h) */
 /* (#) Portability: NetBSD      (/sys/sys/stdint.h) */
 /* (#) Portability: OpenBSD     (/sys/sys/stdint.h) */

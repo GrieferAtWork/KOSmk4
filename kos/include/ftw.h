@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x858c1f25 */
+/* HASH CRC-32:0x2c621dd0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/ftw.h) */
 /* (#) Portability: DJGPP         (/include/ftw.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/ftw.h) */
 /* (#) Portability: FreeBSD       (/include/ftw.h) */
 /* (#) Portability: GNU C Library (/io/ftw.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/ftw.h) */
@@ -30,6 +31,7 @@
 /* (#) Portability: diet libc     (/include/ftw.h) */
 /* (#) Portability: libc4/5       (/include/ftw.h) */
 /* (#) Portability: libc6         (/include/ftw.h) */
+/* (#) Portability: mintlib       (/include/ftw.h) */
 /* (#) Portability: musl libc     (/include/ftw.h) */
 /* (#) Portability: uClibc        (/include/ftw.h) */
 #ifndef _FTW_H

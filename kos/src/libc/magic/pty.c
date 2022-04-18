@@ -22,6 +22,7 @@
 /* (#) Portability: GNU C Library (/login/pty.h) */
 /* (#) Portability: diet libc     (/include/pty.h) */
 /* (#) Portability: libc6         (/include/pty.h) */
+/* (#) Portability: mintlib       (/include/pty.h) */
 /* (#) Portability: musl libc     (/include/pty.h) */
 /* (#) Portability: uClibc        (/include/pty.h) */
 }

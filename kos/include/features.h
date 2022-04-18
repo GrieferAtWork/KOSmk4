@@ -18,10 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/features.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/features.h) */
 /* (#) Portability: GNU C Library (/include/features.h) */
 /* (#) Portability: diet libc     (/include/features.h) */
 /* (#) Portability: libc4/5       (/include/features.h) */
 /* (#) Portability: libc6         (/include/features.h) */
+/* (#) Portability: libcmini      (/include/features.h) */
 /* (#) Portability: musl libc     (/include/features.h) */
 /* (#) Portability: uClibc        (/include/features.h) */
 #ifndef _FEATURES_H

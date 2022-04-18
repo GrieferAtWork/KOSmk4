@@ -18,9 +18,10 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: FreeBSD (/include/stringlist.h) */
-/* (#) Portability: NetBSD  (/include/stringlist.h) */
-/* (#) Portability: libbsd  (/include/bsd/stringlist.h) */
+/* (#) Portability: EMX kLIBC (/libc/include/stringlist.h) */
+/* (#) Portability: FreeBSD   (/include/stringlist.h) */
+/* (#) Portability: NetBSD    (/include/stringlist.h) */
+/* (#) Portability: libbsd    (/include/bsd/stringlist.h) */
 }
 
 %[define_replacement(pid_t = __pid_t)]

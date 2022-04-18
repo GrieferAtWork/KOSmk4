@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin      (/winsup/cygwin/include/sys/termio.h) */
+/* (#) Portability: EMX kLIBC   (/libc/include/sys/termio.h) */
 /* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/termio.h) */
 /* (#) Portability: libc4/5     (/include/sys/termio.h) */
 #ifndef _SYS_TERMIO_H

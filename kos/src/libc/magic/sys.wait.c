@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/wait.h) */
 /* (#) Portability: DJGPP         (/include/sys/wait.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/wait.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/wait.h) */
 /* (#) Portability: GNU C Library (/posix/sys/wait.h) */
 /* (#) Portability: NetBSD        (/sys/sys/wait.h) */
@@ -29,6 +30,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/wait.h) */
 /* (#) Portability: diet libc     (/include/sys/wait.h) */
 /* (#) Portability: libc4/5       (/include/sys/wait.h) */
+/* (#) Portability: mintlib       (/include/sys/wait.h) */
 /* (#) Portability: musl libc     (/include/sys/wait.h) */
 /* (#) Portability: uClibc        (/include/sys/wait.h) */
 }

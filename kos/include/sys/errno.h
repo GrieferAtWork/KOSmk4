@@ -19,6 +19,7 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/errno.h) */
 /* (#) Portability: DJGPP         (/include/sys/errno.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/errno.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/errno.h) */
 /* (#) Portability: GNU C Library (/stdlib/sys/errno.h) */
 /* (#) Portability: NetBSD        (/sys/sys/errno.h) */
@@ -26,6 +27,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/errno.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/errno.h) */
 /* (#) Portability: libc4/5       (/include/sys/errno.h) */
+/* (#) Portability: mintlib       (/include/sys/errno.h) */
 /* (#) Portability: musl libc     (/include/sys/errno.h) */
 /* (#) Portability: uClibc        (/include/sys/errno.h) */
 #ifndef _SYS_ERRNO_H

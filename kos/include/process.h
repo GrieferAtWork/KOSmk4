@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafbf166f */
+/* HASH CRC-32:0xf0320e0c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,9 +20,11 @@
  */
 /* (#) Portability: Cygwin       (/winsup/cygwin/include/process.h) */
 /* (#) Portability: DJGPP        (/include/process.h) */
+/* (#) Portability: EMX kLIBC    (/libc/include/process.h) */
 /* (#) Portability: MSVC         (/include/process.h) */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/process.h) */
 /* (#) Portability: Windows Kits (/ucrt/process.h) */
+/* (#) Portability: mintlib      (/include/process.h) */
 #ifndef _PROCESS_H
 #define _PROCESS_H 1
 

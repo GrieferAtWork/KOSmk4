@@ -23,6 +23,7 @@
 /* (#) Portability: diet libc     (/include/shadow.h) */
 /* (#) Portability: libc4/5       (/include/shadow.h) */
 /* (#) Portability: libc6         (/include/shadow.h) */
+/* (#) Portability: mintlib       (/include/shadow.h) */
 /* (#) Portability: musl libc     (/include/shadow.h) */
 /* (#) Portability: uClibc        (/include/shadow.h) */
 }

@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/resolv.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/resolv.h) */
 /* (#) Portability: FreeBSD       (/include/resolv.h) */
 /* (#) Portability: GNU C Library (/resolv/resolv.h) */
 /* (#) Portability: NetBSD        (/include/resolv.h) */
@@ -27,6 +28,7 @@
 /* (#) Portability: diet libc     (/include/resolv.h) */
 /* (#) Portability: libc4/5       (/include/resolv.h) */
 /* (#) Portability: libc6         (/include/resolv.h) */
+/* (#) Portability: mintlib       (/include/resolv.h) */
 /* (#) Portability: musl libc     (/include/resolv.h) */
 /* (#) Portability: uClibc        (/include/resolv.h) */
 }

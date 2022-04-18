@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7193ae5 */
+/* HASH CRC-32:0xd4871f23 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: DJGPP        (/include/conio.h) */
+/* (#) Portability: EMX kLIBC    (/libc/include/conio.h) */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/conio.h) */
 /* (#) Portability: Windows Kits (/ucrt/conio.h) */
 #ifndef _CONIO_H

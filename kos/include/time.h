@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25f1fb9d */
+/* HASH CRC-32:0x746bb694 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/time.h) */
 /* (#) Portability: DJGPP         (/include/time.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/time.h) */
 /* (#) Portability: FreeBSD       (/include/time.h) */
 /* (#) Portability: GNU C Library (/time/time.h) */
 /* (#) Portability: MSVC          (/include/time.h) */
@@ -30,10 +31,14 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/time.h) */
 /* (#) Portability: OpenBSD       (/include/time.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/time.h) */
+/* (#) Portability: PDCLib        (/include/time.h) */
 /* (#) Portability: Windows Kits  (/ucrt/time.h) */
+/* (#) Portability: avr-libc      (/include/time.h) */
 /* (#) Portability: diet libc     (/include/time.h) */
 /* (#) Portability: libc4/5       (/include/time.h) */
 /* (#) Portability: libc6         (/include/time.h) */
+/* (#) Portability: libcmini      (/include/time.h) */
+/* (#) Portability: mintlib       (/include/time.h) */
 /* (#) Portability: musl libc     (/include/time.h) */
 /* (#) Portability: uClibc        (/include/time.h) */
 #ifndef _TIME_H

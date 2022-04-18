@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a8d32d */
+/* HASH CRC-32:0x3cc71c61 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/wctype.h) */
 /* (#) Portability: DJGPP         (/include/wctype.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/wctype.h) */
 /* (#) Portability: FreeBSD       (/include/wctype.h) */
 /* (#) Portability: GNU C Library (/wctype/wctype.h) */
 /* (#) Portability: MSVC          (/include/wctype.h) */
@@ -30,9 +31,11 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/wctype.h) */
 /* (#) Portability: OpenBSD       (/include/wctype.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/wctype.h) */
+/* (#) Portability: PDCLib        (/include/wctype.h) */
 /* (#) Portability: Windows Kits  (/ucrt/wctype.h) */
 /* (#) Portability: diet libc     (/include/wctype.h) */
 /* (#) Portability: libc6         (/include/wctype.h) */
+/* (#) Portability: mintlib       (/include/wctype.h) */
 /* (#) Portability: musl libc     (/include/wctype.h) */
 /* (#) Portability: uClibc        (/include/wctype.h) */
 #ifndef _WCTYPE_H

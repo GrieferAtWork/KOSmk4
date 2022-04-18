@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: EMX kLIBC     (/libc/include/fpu_control.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/fpu_control.h) */
 /* (#) Portability: libc4/5       (/include/fpu_control.h) */
 #ifndef _I386_KOS_FPU_CONTROL_H

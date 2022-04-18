@@ -17,7 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: libc4/5 (/include/ansidecl.h) */
+/* (#) Portability: EMX kLIBC (/libc/include/ansidecl.h) */
+/* (#) Portability: libc4/5   (/include/ansidecl.h) */
 #ifndef _ANSIDECL_H
 #define _ANSIDECL_H 1
 

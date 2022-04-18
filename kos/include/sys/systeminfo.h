@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57e52214 */
+/* HASH CRC-32:0xead01403 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/systeminfo.h) */
+/* (#) Portability: mintlib     (/include/sys/systeminfo.h) */
 #ifndef _SYS_SYSTEMINFO_H
 #define _SYS_SYSTEMINFO_H 1
 

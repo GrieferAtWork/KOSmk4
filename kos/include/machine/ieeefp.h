@@ -17,8 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin (/newlib/libc/include/machine/ieeefp.h) */
-/* (#) Portability: Newlib (/newlib/libc/include/machine/ieeefp.h) */
+/* (#) Portability: Cygwin    (/newlib/libc/include/machine/ieeefp.h) */
+/* (#) Portability: EMX kLIBC (/libc/include/machine/ieeefp.h) */
+/* (#) Portability: Newlib    (/newlib/libc/include/machine/ieeefp.h) */
 #ifndef _MACHINE_IEEEFP_H
 #define _MACHINE_IEEEFP_H 1
 

@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/complex.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/complex.h) */
 /* (#) Portability: FreeBSD       (/include/complex.h) */
 /* (#) Portability: GNU C Library (/math/complex.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/complex.h) */

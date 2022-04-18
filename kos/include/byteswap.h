@@ -21,6 +21,7 @@
 /* (#) Portability: GNU C Library (/string/byteswap.h) */
 /* (#) Portability: diet libc     (/include/byteswap.h) */
 /* (#) Portability: libc6         (/include/byteswap.h) */
+/* (#) Portability: mintlib       (/include/byteswap.h) */
 /* (#) Portability: musl libc     (/include/byteswap.h) */
 /* (#) Portability: uClibc        (/include/byteswap.h) */
 #ifndef _BYTESWAP_H

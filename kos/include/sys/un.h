@@ -19,6 +19,7 @@
  */
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/un.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/un.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/un.h) */
 /* (#) Portability: GNU C Library (/socket/sys/un.h) */
 /* (#) Portability: NetBSD        (/sys/sys/un.h) */
@@ -26,6 +27,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/un.h) */
 /* (#) Portability: diet libc     (/include/sys/un.h) */
 /* (#) Portability: libc4/5       (/include/sys/un.h) */
+/* (#) Portability: mintlib       (/include/sys/un.h) */
 /* (#) Portability: musl libc     (/include/sys/un.h) */
 /* (#) Portability: uClibc        (/include/sys/un.h) */
 #ifndef _SYS_UN_H

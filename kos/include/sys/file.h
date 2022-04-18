@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58ee9844 */
+/* HASH CRC-32:0x4e49ad7a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/file.h) */
 /* (#) Portability: DJGPP         (/include/sys/file.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/file.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/file.h) */
 /* (#) Portability: GNU C Library (/misc/sys/file.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/file.h) */
@@ -29,6 +30,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/file.h) */
 /* (#) Portability: diet libc     (/include/sys/file.h) */
 /* (#) Portability: libc4/5       (/include/sys/file.h) */
+/* (#) Portability: mintlib       (/include/sys/file.h) */
 /* (#) Portability: musl libc     (/include/sys/file.h) */
 /* (#) Portability: uClibc        (/include/sys/file.h) */
 #ifndef _SYS_FILE_H

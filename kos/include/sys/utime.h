@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin       (/newlib/libc/include/sys/utime.h) */
+/* (#) Portability: EMX kLIBC    (/libc/include/sys/utime.h) */
 /* (#) Portability: MSVC         (/include/sys/utime.h) */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/sys/utime.h) */
 /* (#) Portability: Newlib       (/newlib/libc/include/sys/utime.h) */

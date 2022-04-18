@@ -24,6 +24,7 @@
 /* (#) Portability: OpenBSD       (/sys/sys/reboot.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/reboot.h) */
 /* (#) Portability: diet libc     (/include/sys/reboot.h) */
+/* (#) Portability: mintlib       (/include/sys/reboot.h) */
 /* (#) Portability: musl libc     (/include/sys/reboot.h) */
 /* (#) Portability: uClibc        (/include/sys/reboot.h) */
 }

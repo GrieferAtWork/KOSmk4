@@ -24,6 +24,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sysmacros.h) */
 /* (#) Portability: diet libc     (/include/sys/sysmacros.h) */
 /* (#) Portability: libc4/5       (/include/sys/sysmacros.h) */
+/* (#) Portability: mintlib       (/include/sys/sysmacros.h) */
 /* (#) Portability: musl libc     (/include/sys/sysmacros.h) */
 /* (#) Portability: uClibc        (/include/sys/sysmacros.h) */
 }

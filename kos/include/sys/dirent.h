@@ -17,19 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/termio.h) */
-/* (#) Portability: EMX kLIBC     (/libc/include/termio.h) */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/termio.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/termio.h) */
-/* (#) Portability: diet libc     (/include/termio.h) */
-/* (#) Portability: libc4/5       (/include/termio.h) */
-/* (#) Portability: libc6         (/include/termio.h) */
-/* (#) Portability: mintlib       (/include/termio.h) */
-/* (#) Portability: uClibc        (/include/termio.h) */
-#ifndef _TERMIO_H
-#define _TERMIO_H 1
+/* (#) Portability: Cygwin      (/newlib/libc/include/sys/dirent.h) */
+/* (#) Portability: EMX kLIBC   (/libc/include/sys/dirent.h) */
+/* (#) Portability: FreeBSD     (/sys/sys/dirent.h) */
+/* (#) Portability: NetBSD      (/sys/sys/dirent.h) */
+/* (#) Portability: Newlib      (/newlib/libc/include/sys/dirent.h) */
+/* (#) Portability: OpenBSD     (/sys/sys/dirent.h) */
+/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/dirent.h) */
+/* (#) Portability: libc4/5     (/include/sys/dirent.h) */
+/* (#) Portability: libcmini    (/include/sys/dirent.h) */
+/* (#) Portability: mintlib     (/include/sys/dirent.h) */
+#ifndef _SYS_DIRENT_H
+#define _SYS_DIRENT_H 1
 
-#include <termios.h>
-#include <sys/ioctl.h>
+#include <dirent.h>
 
-#endif /* !_TERMIO_H */
+#endif /* !_SYS_DIRENT_H */

@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/syslog.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/syslog.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/syslog.h) */
 /* (#) Portability: GNU C Library (/misc/sys/syslog.h) */
 /* (#) Portability: NetBSD        (/sys/sys/syslog.h) */
@@ -26,6 +27,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/syslog.h) */
 /* (#) Portability: diet libc     (/include/sys/syslog.h) */
 /* (#) Portability: libc4/5       (/include/sys/syslog.h) */
+/* (#) Portability: mintlib       (/include/sys/syslog.h) */
 /* (#) Portability: musl libc     (/include/sys/syslog.h) */
 /* (#) Portability: uClibc        (/include/sys/syslog.h) */
 }

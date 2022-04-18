@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7f8ca55 */
+/* HASH CRC-32:0xb9a48719 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/wait.h) */
 /* (#) Portability: DJGPP         (/include/sys/wait.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/wait.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/wait.h) */
 /* (#) Portability: GNU C Library (/posix/sys/wait.h) */
 /* (#) Portability: NetBSD        (/sys/sys/wait.h) */
@@ -29,6 +30,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/wait.h) */
 /* (#) Portability: diet libc     (/include/sys/wait.h) */
 /* (#) Portability: libc4/5       (/include/sys/wait.h) */
+/* (#) Portability: mintlib       (/include/sys/wait.h) */
 /* (#) Portability: musl libc     (/include/sys/wait.h) */
 /* (#) Portability: uClibc        (/include/sys/wait.h) */
 #ifndef _SYS_WAIT_H

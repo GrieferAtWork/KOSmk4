@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfc3594c */
+/* HASH CRC-32:0x35bd03b3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ipc.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/ipc.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/ipc.h) */
 /* (#) Portability: GNU C Library (/sysvipc/sys/ipc.h) */
 /* (#) Portability: NetBSD        (/sys/sys/ipc.h) */
@@ -27,6 +28,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ipc.h) */
 /* (#) Portability: diet libc     (/include/sys/ipc.h) */
 /* (#) Portability: libc4/5       (/include/sys/ipc.h) */
+/* (#) Portability: mintlib       (/include/sys/ipc.h) */
 /* (#) Portability: musl libc     (/include/sys/ipc.h) */
 /* (#) Portability: uClibc        (/include/sys/ipc.h) */
 #ifndef _SYS_IPC_H

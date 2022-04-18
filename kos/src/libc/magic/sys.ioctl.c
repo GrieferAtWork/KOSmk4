@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ioctl.h) */
 /* (#) Portability: DJGPP         (/include/sys/ioctl.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/ioctl.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/ioctl.h) */
 /* (#) Portability: GNU C Library (/misc/sys/ioctl.h) */
 /* (#) Portability: NetBSD        (/sys/sys/ioctl.h) */
@@ -27,6 +28,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/ioctl.h) */
 /* (#) Portability: diet libc     (/include/sys/ioctl.h) */
 /* (#) Portability: libc4/5       (/include/sys/ioctl.h) */
+/* (#) Portability: mintlib       (/include/sys/ioctl.h) */
 /* (#) Portability: musl libc     (/include/sys/ioctl.h) */
 /* (#) Portability: uClibc        (/include/sys/ioctl.h) */
 }

@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: Cygwin       (/winsup/cygwin/include/io.h) */
 /* (#) Portability: DJGPP        (/include/io.h) */
+/* (#) Portability: EMX kLIBC    (/libc/include/io.h) */
 /* (#) Portability: MSVC         (/include/io.h) */
 /* (#) Portability: MinGW        (/mingw-w64-headers/crt/io.h) */
 /* (#) Portability: NetBSD       (/sys/arch/[...]/include/io.h) */

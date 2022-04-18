@@ -20,6 +20,7 @@
 /* (#) Portability: GNU C Library (/misc/syscall.h) */
 /* (#) Portability: libc4/5       (/include/syscall.h) */
 /* (#) Portability: libc6         (/include/syscall.h) */
+/* (#) Portability: mintlib       (/include/syscall.h) */
 /* (#) Portability: musl libc     (/include/syscall.h) */
 /* (#) Portability: uClibc        (/include/syscall.h) */
 #ifndef _SYSCALL_H

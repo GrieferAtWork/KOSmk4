@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/grp.h) */
 /* (#) Portability: DJGPP         (/include/grp.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/grp.h) */
 /* (#) Portability: FreeBSD       (/include/grp.h) */
 /* (#) Portability: GNU C Library (/grp/grp.h) */
 /* (#) Portability: NetBSD        (/include/grp.h) */
@@ -31,6 +32,7 @@
 /* (#) Portability: libbsd        (/include/bsd/grp.h) */
 /* (#) Portability: libc4/5       (/include/grp.h) */
 /* (#) Portability: libc6         (/include/grp.h) */
+/* (#) Portability: mintlib       (/include/grp.h) */
 /* (#) Portability: musl libc     (/include/grp.h) */
 /* (#) Portability: uClibc        (/include/grp.h) */
 }

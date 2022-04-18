@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
+/* (#) Portability: EMX kLIBC     (/libc/include/libintl.h) */
 /* (#) Portability: GNU C Library (/intl/libintl.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/libintl.h) */
 /* (#) Portability: diet libc     (/include/libintl.h) */

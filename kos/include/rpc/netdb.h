@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4db14c4c */
+/* HASH CRC-32:0xcf2ed9fd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (#) Portability: GNU C Library (/inet/rpc/netdb.h) */
 /* (#) Portability: diet libc     (/include/rpc/netdb.h) */
 /* (#) Portability: libc6         (/include/rpc/netdb.h) */
+/* (#) Portability: mintlib       (/include/rpc/netdb.h) */
 /* (#) Portability: uClibc        (/include/rpc/netdb.h) */
 #ifndef _RPC_NETDB_H
 #define _RPC_NETDB_H 1

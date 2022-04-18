@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7340c551 */
+/* HASH CRC-32:0x163d5a5f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/ctype.h) */
 /* (#) Portability: DJGPP         (/include/ctype.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/ctype.h) */
 /* (#) Portability: FreeBSD       (/include/ctype.h) */
 /* (#) Portability: GNU C Library (/ctype/ctype.h) */
 /* (#) Portability: MSVC          (/include/ctype.h) */
@@ -30,10 +31,14 @@
 /* (#) Portability: Newlib        (/newlib/libc/include/ctype.h) */
 /* (#) Portability: OpenBSD       (/include/ctype.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ctype.h) */
+/* (#) Portability: PDCLib        (/include/ctype.h) */
 /* (#) Portability: Windows Kits  (/ucrt/ctype.h) */
+/* (#) Portability: avr-libc      (/include/ctype.h) */
 /* (#) Portability: diet libc     (/include/ctype.h) */
 /* (#) Portability: libc4/5       (/include/ctype.h) */
 /* (#) Portability: libc6         (/include/ctype.h) */
+/* (#) Portability: libcmini      (/include/ctype.h) */
+/* (#) Portability: mintlib       (/include/ctype.h) */
 /* (#) Portability: musl libc     (/include/ctype.h) */
 /* (#) Portability: uClibc        (/include/ctype.h) */
 #ifndef _CTYPE_H

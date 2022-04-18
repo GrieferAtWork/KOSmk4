@@ -26,6 +26,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/poll.h) */
 /* (#) Portability: diet libc     (/include/sys/poll.h) */
 /* (#) Portability: libbsd        (/include/bsd/sys/poll.h) */
+/* (#) Portability: mintlib       (/include/sys/poll.h) */
 /* (#) Portability: musl libc     (/include/sys/poll.h) */
 /* (#) Portability: uClibc        (/include/sys/poll.h) */
 }

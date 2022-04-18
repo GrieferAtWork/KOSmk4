@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/utmp.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/utmp.h) */
 /* (#) Portability: GNU C Library (/login/utmp.h) */
 /* (#) Portability: NetBSD        (/include/utmp.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/utmp.h) */
@@ -27,6 +28,7 @@
 /* (#) Portability: diet libc     (/include/utmp.h) */
 /* (#) Portability: libc4/5       (/include/utmp.h) */
 /* (#) Portability: libc6         (/include/utmp.h) */
+/* (#) Portability: mintlib       (/include/utmp.h) */
 /* (#) Portability: musl libc     (/include/utmp.h) */
 /* (#) Portability: uClibc        (/include/utmp.h) */
 }

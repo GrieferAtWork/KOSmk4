@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/mount.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/mount.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/mount.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/mount.h) */
 /* (#) Portability: NetBSD        (/sys/sys/mount.h) */
@@ -26,6 +27,7 @@
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/mount.h) */
 /* (#) Portability: diet libc     (/include/sys/mount.h) */
 /* (#) Portability: libc4/5       (/include/sys/mount.h) */
+/* (#) Portability: mintlib       (/include/sys/mount.h) */
 /* (#) Portability: musl libc     (/include/sys/mount.h) */
 /* (#) Portability: uClibc        (/include/sys/mount.h) */
 }

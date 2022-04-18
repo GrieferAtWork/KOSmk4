@@ -21,13 +21,17 @@
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/stdint.h) */
 /* (#) Portability: DJGPP         (/include/stdint.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/stdint.h) */
 /* (#) Portability: GNU C Library (/stdlib/stdint.h) */
 /* (#) Portability: MSVC          (/include/stdint.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/stdint.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/stdint.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/stdint.h) */
+/* (#) Portability: PDCLib        (/include/stdint.h) */
+/* (#) Portability: avr-libc      (/include/stdint.h) */
 /* (#) Portability: diet libc     (/include/stdint.h) */
 /* (#) Portability: libc6         (/include/stdint.h) */
+/* (#) Portability: mintlib       (/include/stdint.h) */
 /* (#) Portability: musl libc     (/include/stdint.h) */
 /* (#) Portability: uClibc        (/include/stdint.h) */
 #ifndef _STDINT_H
