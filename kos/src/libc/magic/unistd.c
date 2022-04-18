@@ -1246,7 +1246,8 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("pread64", "__pread64")]]
 [[section(".text.crt{|.dos}.io.read"), requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pread64) || ($has_function(lseek) && $has_function(read) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
-ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET offset) {
+ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf,
+              size_t bufsize, __PIO_OFFSET offset) {
 @@pp_if $has_function(pread64)@@
 	return pread64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
 @@pp_else@@
@@ -1272,7 +1273,8 @@ ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSE
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("pwrite64", "__pwrite64")]]
 [[section(".text.crt{|.dos}.io.write"), requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pwrite64) || ($has_function(lseek) && $has_function(write) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
-ssize_t pwrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO_OFFSET offset) {
+ssize_t pwrite($fd_t fd, [[inp(bufsize)]] void const *buf,
+               size_t bufsize, __PIO_OFFSET offset) {
 @@pp_if $has_function(pwrite64)@@
 	return pwrite64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
 @@pp_else@@
@@ -1338,7 +1340,8 @@ ssize_t pwrite32($fd_t fd, [[inp(bufsize)]] void const *buf,
 [[section(".text.crt{|.dos}.io.large.read"), export_alias("__pread64")]]
 [[requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pread32) || ($has_function(lseek) && $has_function(read) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
-ssize_t pread64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET64 offset) {
+ssize_t pread64($fd_t fd, [[outp(bufsize)]] void *buf,
+                size_t bufsize, __PIO_OFFSET64 offset) {
 @@pp_if $has_function(pread32)@@
 	return pread32(fd, buf, bufsize, (pos32_t)offset);
 @@pp_elif $has_function(lseek64)@@
@@ -1373,7 +1376,8 @@ ssize_t pread64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFF
 [[section(".text.crt{|.dos}.io.large.write"), export_alias("__pwrite64")]]
 [[requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pwrite32) || ($has_function(lseek) && $has_function(write) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
-ssize_t pwrite64($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO_OFFSET64 offset) {
+ssize_t pwrite64($fd_t fd, [[inp(bufsize)]] void const *buf,
+                 size_t bufsize, __PIO_OFFSET64 offset) {
 @@pp_if $has_function(pwrite32)@@
 	return pwrite32(fd, buf, bufsize, (pos32_t)offset);
 @@pp_elif $has_function(lseek64)@@
@@ -1434,7 +1438,8 @@ ssize_t preadall64($fd_t fd, [[inp(bufsize)]] void *buf,
 [[cp, preferred_off64_variant_of(pwriteall), doc_alias("pwriteall")]]
 [[section(".text.crt{|.dos}.io.large.write")]]
 [[userimpl, requires_function(pwrite64), decl_include("<bits/types.h>")]]
-ssize_t pwriteall64($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO_OFFSET64 offset) {
+ssize_t pwriteall64($fd_t fd, [[inp(bufsize)]] void const *buf,
+                    size_t bufsize, __PIO_OFFSET64 offset) {
 	ssize_t result, temp;
 	result = pwrite64(fd, buf, bufsize, offset);
 	if (result > 0 && (size_t)result < bufsize) {
@@ -2364,10 +2369,17 @@ void swab([[nonnull]] void const *__restrict from,
 @@a writable  data location  that contains  that same  string.
 [[guard, section(".text.crt{|.dos}.io.tty")]]
 [[nonnull]] char *ctermid([[nullable]] char *s) {
+@@pp_ifdef _WIN32@@
+	static char buf[4];
+	if (s == NULL)
+		s = buf;
+	return strcpy(s, "CON");
+@@pp_else@@
 	static char buf[9];
 	if (s == NULL)
 		s = buf;
 	return strcpy(s, "/dev/tty");
+@@pp_endif@@
 }
 
 @@>> cuserid(3)
@@ -2535,12 +2547,12 @@ char *getpassfd([[nullable]] char const *prompt,
                 [[nullable]] $fd_t fds[3],
                 __STDC_INT_AS_UINT_T flags,
                 int timeout_in_seconds) {
-#ifndef __STDIN_FILENO
+@@pp_ifndef __STDIN_FILENO@@
 #define __STDIN_FILENO 0
-#endif /* !__STDIN_FILENO */
-#ifndef __STDERR_FILENO
+@@pp_endif@@
+@@pp_ifndef __STDERR_FILENO@@
 #define __STDERR_FILENO 2
-#endif /* !__STDERR_FILENO */
+@@pp_endif@@
 
 @@pp_if $has_function(malloc)@@
 	bool heap_buf;
@@ -2586,31 +2598,33 @@ char *getpassfd([[nullable]] char const *prompt,
 	if (!fds) {
 		fds = default_fds;
 @@pp_if $has_function(open)@@
-#ifdef __O_CLOEXEC
+@@pp_ifdef __O_CLOEXEC@@
 #define __PRIVATE_GETPASSFD_O_CLOEXEC __O_CLOEXEC
-#else /* __O_CLOEXEC */
+@@pp_else@@
 #define __PRIVATE_GETPASSFD_O_CLOEXEC 0
-#endif /* !__O_CLOEXEC */
-#ifdef __O_CLOFORK
+@@pp_endif@@
+@@pp_ifdef __O_CLOFORK@@
 #define __PRIVATE_GETPASSFD_O_CLOFORK __O_CLOFORK
-#else /* __O_CLOFORK */
+@@pp_else@@
 #define __PRIVATE_GETPASSFD_O_CLOFORK 0
-#endif /* !__O_CLOFORK */
-#ifdef __O_RDWR
+@@pp_endif@@
+@@pp_ifdef __O_RDWR@@
 #define __PRIVATE_GETPASSFD_O_RDWR __O_RDWR
-#else /* __O_RDWR */
+@@pp_else@@
 #define __PRIVATE_GETPASSFD_O_RDWR 0
-#endif /* !__O_RDWR */
+@@pp_endif@@
 @@pp_if defined(__O_NONBLOCK) && $has_function(poll)@@
 #define __PRIVATE_GETPASSFD_O_NONBLOCK __O_NONBLOCK
 @@pp_else@@
 #define __PRIVATE_GETPASSFD_O_NONBLOCK 0
 @@pp_endif@@
-#ifdef _PATH_TTY
+@@pp_ifdef _PATH_TTY@@
 #define __PRIVATE_GETPASSFD_PATH_TTY _PATH_TTY
-#else /* _PATH_TTY */
+@@pp_elif defined(_WIN32)@@
+#define __PRIVATE_GETPASSFD_PATH_TTY "CON"
+@@pp_else@@
 #define __PRIVATE_GETPASSFD_PATH_TTY "/dev/tty"
-#endif /* !_PATH_TTY */
+@@pp_endif@@
 #if __PRIVATE_GETPASSFD_O_NONBLOCK != 0
 		default_fds[2] = open(__PRIVATE_GETPASSFD_PATH_TTY,
 		                      __PRIVATE_GETPASSFD_O_CLOEXEC |

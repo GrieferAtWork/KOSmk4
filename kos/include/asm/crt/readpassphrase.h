@@ -22,6 +22,7 @@
 
 #include <__crt.h>
 
+/* Flags for OpenBSD's `readpassphrase(3)' function */
 #define __RPP_ECHO_OFF    0x00 /* Disable echo. */
 #define __RPP_ECHO_ON     0x01 /* Don't disable echo (but leave it on). */
 #define __RPP_REQUIRE_TTY 0x02 /* Error out if `!isatty()' */

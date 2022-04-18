@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6184e455 */
+/* HASH CRC-32:0x3575e9c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -454,9 +454,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 #endif /* !__O_NONBLOCK || (!__CRT_HAVE_poll && !__CRT_HAVE___poll) */
 #ifdef _PATH_TTY
 #define __PRIVATE_GETPASSFD_PATH_TTY _PATH_TTY
-#else /* _PATH_TTY */
+#elif defined(_WIN32)
+#define __PRIVATE_GETPASSFD_PATH_TTY "CON"
+#else /* ... */
 #define __PRIVATE_GETPASSFD_PATH_TTY "/dev/tty"
-#endif /* !_PATH_TTY */
+#endif /* !... */
 #if __PRIVATE_GETPASSFD_O_NONBLOCK != 0
 		__default_fds[2] = (__NAMESPACE_LOCAL_SYM __localdep_open)(__PRIVATE_GETPASSFD_PATH_TTY,
 		                      __PRIVATE_GETPASSFD_O_CLOEXEC |

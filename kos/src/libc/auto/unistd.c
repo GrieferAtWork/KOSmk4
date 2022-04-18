@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77c2d5e */
+/* HASH CRC-32:0x329001cb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -573,10 +573,17 @@ NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
  * a writable  data location  that contains  that same  string. */
 INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_RETNONNULL char *
 NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s) {
+
+
+
+
+
+
 	static char buf[9];
 	if (s == NULL)
 		s = buf;
 	return libc_strcpy(s, "/dev/tty");
+
 }
 #include <asm/crt/stdio.h>
 /* >> cuserid(3)
@@ -659,12 +666,12 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
                                      fd_t fds[3],
                                      __STDC_INT_AS_UINT_T flags,
                                      int timeout_in_seconds) {
-#ifndef __STDIN_FILENO
-#define __STDIN_FILENO 0
-#endif /* !__STDIN_FILENO */
-#ifndef __STDERR_FILENO
-#define __STDERR_FILENO 2
-#endif /* !__STDERR_FILENO */
+
+
+
+
+
+
 
 
 	bool heap_buf;
@@ -710,21 +717,21 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 	if (!fds) {
 		fds = default_fds;
 
-#ifdef __O_CLOEXEC
+
 #define __PRIVATE_GETPASSFD_O_CLOEXEC __O_CLOEXEC
-#else /* __O_CLOEXEC */
-#define __PRIVATE_GETPASSFD_O_CLOEXEC 0
-#endif /* !__O_CLOEXEC */
-#ifdef __O_CLOFORK
+
+
+
+
 #define __PRIVATE_GETPASSFD_O_CLOFORK __O_CLOFORK
-#else /* __O_CLOFORK */
-#define __PRIVATE_GETPASSFD_O_CLOFORK 0
-#endif /* !__O_CLOFORK */
-#ifdef __O_RDWR
+
+
+
+
 #define __PRIVATE_GETPASSFD_O_RDWR __O_RDWR
-#else /* __O_RDWR */
-#define __PRIVATE_GETPASSFD_O_RDWR 0
-#endif /* !__O_RDWR */
+
+
+
 
 #define __PRIVATE_GETPASSFD_O_NONBLOCK __O_NONBLOCK
 
@@ -732,6 +739,8 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 
 #ifdef _PATH_TTY
 #define __PRIVATE_GETPASSFD_PATH_TTY _PATH_TTY
+
+
 #else /* _PATH_TTY */
 #define __PRIVATE_GETPASSFD_PATH_TTY "/dev/tty"
 #endif /* !_PATH_TTY */

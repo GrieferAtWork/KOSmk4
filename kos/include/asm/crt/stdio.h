@@ -59,7 +59,11 @@
 
 /* - Max # of characters in the string returned by `ctermid()'
  * - Buffer size that must be passed to `ctermid_r()' */
-#define __L_ctermid 9
+#ifdef _WIN32
+#define __L_ctermid 4 /* "CON\0" */
+#else /* _WIN32 */
+#define __L_ctermid 9 /* "/dev/tty\0" */
+#endif /* !_WIN32 */
 
 /* Max # of characters in the string returned by `cuserid()' */
 #define __L_cuserid 9
