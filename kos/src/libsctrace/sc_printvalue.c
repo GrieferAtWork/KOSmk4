@@ -1945,7 +1945,7 @@ printStrendNDatabase("KOS_IOCTLS", kos_ioctls);
 	 ((index) >= 0x204 && (index) <= 0x217) ? ((index) -= 0x204, (result) = repr_IOCTLS_204h, true) : \
 	 ((index) >= 0x241 && (index) <= 0x25a) ? ((index) -= 0x241, (result) = repr_IOCTLS_241h, true) : \
 	 ((index) == 0x290) ? ((index) = 0, (result) = repr_IOCTLS_290h, true) : \
-	 ((index) >= 0x301 && (index) <= 0x32b) ? ((index) -= 0x301, (result) = repr_IOCTLS_301h, true) : \
+	 ((index) >= 0x301 && (index) <= 0x32f) ? ((index) -= 0x301, (result) = repr_IOCTLS_301h, true) : \
 	 ((index) >= 0x125d && (index) <= 0x127f) ? ((index) -= 0x125d, (result) = repr_IOCTLS_125dh, true) : \
 	 ((index) >= 0x4b2f && (index) <= 0x4b72) ? ((index) -= 0x4b2f, (result) = repr_IOCTLS_4b2fh, true) : \
 	 ((index) >= 0x4bfa && (index) <= 0x4bfb) ? ((index) -= 0x4bfa, (result) = repr_IOCTLS_4bfah, true) : \
@@ -1953,6 +1953,7 @@ printStrendNDatabase("KOS_IOCTLS", kos_ioctls);
 	 ((index) >= 0x5401 && (index) <= 0x5460) ? ((index) -= 0x5401, (result) = repr_IOCTLS_5401h, true) : \
 	 ((index) >= 0x5600 && (index) <= 0x560f) ? ((index) -= 0x5600, (result) = repr_IOCTLS_5600h, true) : \
 	 ((index) >= 0x5877 && (index) <= 0x5879) ? ((index) -= 0x5877, (result) = repr_IOCTLS_5877h, true) : \
+	 ((index) == 0x667a) ? ((index) = 0, (result) = repr_IOCTLS_667ah, true) : \
 	 ((index) >= 0x7201 && (index) <= 0x7213) ? ((index) -= 0x7201, (result) = repr_IOCTLS_7201h, true) : \
 	 ((index) >= 0x8901 && (index) <= 0x89b1) ? ((index) -= 0x8901, (result) = repr_IOCTLS_8901h, true) : \
 	 ((index) >= 0x89e0 && (index) <= 0x89f0) ? ((index) -= 0x89e0, (result) = repr_IOCTLS_89e0h, true) : false)
@@ -1968,9 +1969,16 @@ PRIVATE char const repr_IOCTLS_241h[] =
 PRIVATE char const repr_IOCTLS_290h[] =
 "FDSETDRVPRM";
 PRIVATE char const repr_IOCTLS_301h[] =
-"HDIO_GETGEO\0\0\0\0\0\0\0\0\0\0HDIO_GET_DMA\0\0HDIO_GET_IDENTITY\0HDIO_GET_WC"
-"ACHE\0\0\0\0\0\0\0\0\0\0\0\0HDIO_GET_BUSSTATE\0\0HDIO_DRIVE_RESET\0\0\0\0\0\0\0\0\0\0\0\0\0"
-"\0\0HDIO_SET_WCACHE";
+"HDIO_GETGEO\0HDIO_GET_UNMASKINTR\0\0HDIO_GET_MULTCOUNT\0HDIO_GET_QDM"
+"A\0HDIO_SET_XFER\0HDIO_OBSOLETE_IDENTITY\0HDIO_GET_KEEPSETTINGS\0HDI"
+"O_GET_32BIT\0HDIO_GET_NOWERR\0HDIO_GET_DMA\0HDIO_GET_NICE\0HDIO_GET_"
+"IDENTITY\0HDIO_GET_WCACHE\0HDIO_GET_ACOUSTIC\0HDIO_GET_ADDRESS\0\0\0\0\0"
+"\0\0\0\0\0HDIO_GET_BUSSTATE\0HDIO_TRISTATE_HWIF\0HDIO_DRIVE_RESET\0HDIO_"
+"DRIVE_TASKFILE\0HDIO_DRIVE_TASK\0HDIO_DRIVE_CMD\0\0HDIO_SET_MULTCOUN"
+"T\0HDIO_SET_UNMASKINTR\0HDIO_SET_KEEPSETTINGS\0HDIO_SET_32BIT\0HDIO_"
+"SET_NOWERR\0HDIO_SET_DMA\0HDIO_SET_PIO_MODE\0HDIO_SCAN_HWIF\0HDIO_SE"
+"T_NICE\0HDIO_UNREGISTER_HWIF\0HDIO_SET_WCACHE\0HDIO_SET_ACOUSTIC\0HD"
+"IO_SET_BUSSTATE\0HDIO_SET_QDMA\0HDIO_SET_ADDRESS";
 PRIVATE char const repr_IOCTLS_125dh[] =
 "BLKROSET\0BLKROGET\0BLKRRPART\0BLKGETSIZE\0BLKFLSBUF\0BLKRASET\0BLKRAG"
 "ET\0BLKFRASET\0BLKFRAGET\0BLKSECTSET\0BLKSECTGET\0BLKSSZGET\0\0\0\0\0\0\0\0BL"
@@ -2015,6 +2023,8 @@ PRIVATE char const repr_IOCTLS_5600h[] =
 "SETACTIVATE";
 PRIVATE char const repr_IOCTLS_5877h[] =
 "FIFREEZE\0FITHAW\0FITRIM";
+PRIVATE char const repr_IOCTLS_667ah[] =
+"FIODTYPE";
 PRIVATE char const repr_IOCTLS_7201h[] =
 "VFAT_IOCTL_READDIR_BOTH\0VFAT_IOCTL_READDIR_SHORT\0\0\0\0\0\0\0\0\0\0\0\0\0\0FA"
 "T_IOCTL_GET_ATTRIBUTES\0FAT_IOCTL_SET_ATTRIBUTES\0\0FAT_IOCTL_GET_V"

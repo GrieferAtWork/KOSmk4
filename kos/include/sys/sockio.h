@@ -22,8 +22,8 @@
 /* (#) Portability: NetBSD      (/sys/sys/sockio.h) */
 /* (#) Portability: OpenBSD     (/sys/sys/sockio.h) */
 /* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/sockio.h) */
-#ifndef _SYS_SIGNAL_H
-#define _SYS_SIGNAL_H 1
+#ifndef _SYS_SOCKIO_H
+#define _SYS_SOCKIO_H 1
 
 #include <__stdinc.h>
 
@@ -184,4 +184,4 @@
 #define SIOCGNIT      __SIOCGNIT /* [struct nit_ioc *arg] ... */
 #endif /* !SIOCGNIT && __SIOCGNIT */
 
-#endif /* !_SYS_SIGNAL_H */
+#endif /* !_SYS_SOCKIO_H */

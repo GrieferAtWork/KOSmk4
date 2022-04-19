@@ -153,7 +153,7 @@
 /* Inode flags (FS_IOC_GETFLAGS / FS_IOC_SETFLAGS)
  * These  flags are no  necessarily persistent; once  the associate mfile is
  * unloaded due to no-one holding any more references, the next time another
- * access is made, these flags set set based on superblock mount flags! */
+ * access is made, these flags are set based on superblock mount flags! */
 #define FS_SECRM_FL           0x00000001 /* 's': Ignored. */
 #define FS_UNRM_FL            0x00000002 /* 'u': Ignored. */
 #define FS_COMPR_FL           0x00000004 /* 'c': [KOS:Unsupported] Store on-disk in compressed format (if supported by FS) */

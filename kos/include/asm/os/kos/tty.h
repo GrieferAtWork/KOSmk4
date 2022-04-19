@@ -122,4 +122,19 @@
 #define __TIOCM_RNG 0x080 /* ??? */
 #define __TIOCM_DSR 0x100 /* ??? */
 
+
+/************************************************************************/
+/* Additional stuff normally only found on BSD                          */
+/************************************************************************/
+#ifdef __KOS__
+
+/* Possible values for `FIODTYPE' */
+#define __D_TAPE 0x0001 /* *unused* */
+#define __D_DISK 0x0002 /* /dev/hda */
+#define __D_TTY  0x0004 /* isatty() */
+#define __D_MEM  0x0008 /* /dev/mem and /dev/kmem */
+
+#define __FIODTYPE _IOR('f', 122, int) /* Returns set of `__D_*' */
+#endif /* __KOS__ */
+
 #endif /* !_ASM_OS_KOS_TTY_H */

@@ -29,5 +29,11 @@
 /* (#) Portability: uClibc        (/include/sys/vfs.h) */
 #ifndef _SYS_VFS_H
 #define _SYS_VFS_H 1
+
 #include <sys/statfs.h>
+
+/* From EMX kLIBC: */
+#include <sys/types.h>
+#include <sys/mount.h>
+
 #endif /* !_SYS_VFS_H */

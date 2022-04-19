@@ -47,6 +47,10 @@
 #define SYS_NMLN _UTSNAME_LENGTH
 #endif /* __USE_MISC */
 
+#ifndef _UN_LEN
+#define _UN_LEN _UTSNAME_LENGTH /* From EMX kLIBC */
+#endif /* !_UN_LEN */
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 

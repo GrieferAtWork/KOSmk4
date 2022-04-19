@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <dev/tty.h>
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/devnode.h>
 #include <kernel/fs/filehandle.h>
@@ -53,6 +54,7 @@
 #include <kos/except/reason/inval.h>
 #include <kos/ioctl/file.h>
 #include <linux/fs.h>
+#include <sys/filio.h>
 #include <sys/stat.h>
 
 #include <assert.h>
@@ -386,6 +388,15 @@ mfile_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 				return 0;
 		}
 		break;
+
+	case _IO_WITHSIZE(FIODTYPE, 0): {
+		unsigned int type = 0;
+		if (mfile_isblkdev(self))
+			type |= D_DISK;
+		if (mfile_istty(self))
+			type |= D_TTY;
+		return ioctl_intarg_setuint(cmd, arg, type);
+	}	break;
 
 	default:
 		break;

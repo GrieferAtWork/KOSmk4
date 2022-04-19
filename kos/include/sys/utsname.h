@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccc7e73b */
+/* HASH CRC-32:0x293bde59 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,6 +49,10 @@
 #ifdef __USE_MISC
 #define SYS_NMLN _UTSNAME_LENGTH
 #endif /* __USE_MISC */
+
+#ifndef _UN_LEN
+#define _UN_LEN _UTSNAME_LENGTH /* From EMX kLIBC */
+#endif /* !_UN_LEN */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

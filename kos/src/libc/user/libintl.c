@@ -198,7 +198,7 @@ struct mo_file_header {
 	 */
 #define MO_FILE_MAGIC 0x950412de /* Actually could also be the BSWAP32 of this, in which
                                   * case  other fields also  use the reversed byteorder.
-                                  * Note that KOS only supports same-endian mo files! */
+                                  * Note  that KOS only supports native-endian mo files! */
 	u32 mo_magic;    /* .mo file magic (== MO_FILE_MAGIC) */
 	u32 mo_revision; /* .mo file revision (ignored; we only use features from the initial revision!) */
 	u32 mo_strcount; /* # of strings */
@@ -841,7 +841,7 @@ NOTHROW_NCX(FCALL mo_extract_plural_from_metadata)(char const *__restrict header
 	 *
 	 * The expression parser treats these characters as EOF:
 	 *     - ';',        (just a semicolon)
-	 *     - 0 ... 31    (all control characters, but excluding `isspace(3)' ones)
+	 *     - 0 ... 31    (all control characters, but excluding `isspace(3)' ones, but including \n and \r)
 	 *     - ')'         (only if unmatched by a preceding ')')
 	 */
 	header_end = header + header_len;

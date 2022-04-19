@@ -62,4 +62,28 @@
 #define FIOGETOWN  __FIOGETOWN  /* ... */
 #endif /* !FIOGETOWN && __FIOGETOWN */
 
+
+
+/************************************************************************/
+/* Additional stuff normally only found on BSD                          */
+/************************************************************************/
+
+/* Possible values for `FIODTYPE' */
+#if !defined(D_TAPE) && defined(__D_TAPE)
+#define D_TAPE __D_TAPE /* *unused* */
+#endif /* !D_TAPE && __D_TAPE */
+#if !defined(D_DISK) && defined(__D_DISK)
+#define D_DISK __D_DISK /* /dev/hda */
+#endif /* !D_DISK && __D_DISK */
+#if !defined(D_TTY) && defined(__D_TTY)
+#define D_TTY  __D_TTY  /* isatty() */
+#endif /* !D_TTY && __D_TTY */
+#if !defined(D_MEM) && defined(__D_MEM)
+#define D_MEM  __D_MEM  /* /dev/mem and /dev/kmem */
+#endif /* !D_MEM && __D_MEM */
+
+#if !defined(FIODTYPE) && defined(__FIODTYPE)
+#define FIODTYPE __FIODTYPE /* Returns set of `__D_*' */
+#endif /* !FIODTYPE && __FIODTYPE */
+
 #endif /* !_SYS_FILIO_H */

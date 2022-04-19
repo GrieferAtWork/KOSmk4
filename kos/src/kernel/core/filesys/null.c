@@ -36,12 +36,14 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
 #include <kernel/syslog.h>
+#include <kernel/user.h>
 #include <sched/group.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
 #include <kos/dev.h>
+#include <sys/filio.h>
 #include <sys/io.h>
 #include <sys/param.h> /* NBBY */
 #include <sys/stat.h>
@@ -163,13 +165,30 @@ done:
 	return (size_t)result;
 }
 
+PRIVATE BLOCKING NONNULL((1)) syscall_slong_t KCALL
+devmem_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
+               USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...) {
+	switch (_IO_WITHSIZE(cmd, 0)) {
+
+	case _IO_WITHSIZE(FIODTYPE, 0):
+		return ioctl_intarg_setuint(cmd, arg, D_MEM);
+
+	default: break;
+	}
+	return chrdev_v_ioctl(self, cmd, arg, mode);
+}
+
+
+
+
 PRIVATE struct mfile_stream_ops const devmem_stream_ops = {
 	.mso_pread   = &devmem_v_pread,
 	.mso_preadv  = &devmem_v_preadv,
 	.mso_pwrite  = &devmem_v_pwrite,
 	.mso_pwritev = &devmem_v_pwritev,
 	.mso_stat    = &nullfile_v_stat,
-	.mso_ioctl   = &chrdev_v_ioctl,
+	.mso_ioctl   = &devmem_v_ioctl,
 };
 
 
@@ -441,6 +460,8 @@ done:
 	return (size_t)result;
 }
 
+#define devkmem_v_ioctl devmem_v_ioctl
+
 PRIVATE struct mfile_stream_ops const devkmem_stream_ops = {
 	.mso_open    = &mfile_v_open,
 	.mso_pread   = &devkmem_v_pread,
@@ -448,7 +469,7 @@ PRIVATE struct mfile_stream_ops const devkmem_stream_ops = {
 	.mso_pwrite  = &devkmem_v_pwrite,
 	.mso_pwritev = &devkmem_v_pwritev,
 	.mso_stat    = &nullfile_v_stat,
-	.mso_ioctl   = &chrdev_v_ioctl,
+	.mso_ioctl   = &devkmem_v_ioctl,
 };
 
 #ifdef LIBVIO_CONFIG_ENABLED
