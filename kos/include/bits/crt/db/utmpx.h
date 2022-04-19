@@ -48,8 +48,12 @@
 
 #ifdef __USE_GNU
 #include <paths.h>
-#define _PATH_UTMPX    _PATH_UTMP
-#define _PATH_WTMPX    _PATH_WTMP
+#if !defined(_PATH_UTMPX) && defined(_PATH_UTMP)
+#define _PATH_UTMPX _PATH_UTMP
+#endif /* !_PATH_UTMPX && _PATH_UTMP */
+#if !defined(_PATH_WTMPX) && defined(_PATH_WTMP)
+#define _PATH_WTMPX _PATH_WTMP
+#endif /* !_PATH_WTMPX && _PATH_WTMP */
 #endif /* __USE_GNU */
 
 #define __UT_LINESIZE  32

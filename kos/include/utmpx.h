@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62480258 */
+/* HASH CRC-32:0xa8f82f43 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,10 +48,18 @@
 
 #ifdef __USE_GNU
 /* Compatibility names for the strings of the canonical file names.  */
+#if !defined(UTMPX_FILE) && defined(_PATH_UTMPX)
 #define UTMPX_FILE     _PATH_UTMPX
+#endif /* !UTMPX_FILE && _PATH_UTMPX */
+#if !defined(UTMPX_FILENAME) && defined(_PATH_UTMPX)
 #define UTMPX_FILENAME _PATH_UTMPX
+#endif /* !UTMPX_FILENAME && _PATH_UTMPX */
+#if !defined(WTMPX_FILE) && defined(_PATH_WTMPX)
 #define WTMPX_FILE     _PATH_WTMPX
+#endif /* !WTMPX_FILE && _PATH_WTMPX */
+#if !defined(WTMPX_FILENAME) && defined(_PATH_WTMPX)
 #define WTMPX_FILENAME _PATH_WTMPX
+#endif /* !WTMPX_FILENAME && _PATH_WTMPX */
 #endif /* __USE_GNU */
 
 #ifdef __CC__
