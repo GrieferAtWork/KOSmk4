@@ -51,11 +51,6 @@
 #include <libservice/bits/com.h>
 #include <libservice/types.h>
 
-#ifndef atomic_lock_release_nopr
-#define atomic_lock_acquire_nopr(self) atomic_lock_acquire(self)
-#define atomic_lock_release_nopr(self) atomic_lock_release(self)
-#endif /* !atomic_lock_release_nopr */
-
 DECL_BEGIN
 
 /* This  string (without a  trailing NUL) is send  alongside the initial SHM

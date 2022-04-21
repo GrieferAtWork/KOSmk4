@@ -172,6 +172,7 @@ typedef struct { int __hpf_flag; } __hybrid_preemption_flag_t;
 #ifndef __hybrid_preemption_tryyield
 #include "__yield.h"
 #define __hybrid_preemption_tryyield() (void)__hybrid_yield_nx()
+#define __HYBRID_PREEMPTION_TRYYIELD_IS_HYBRID_YIELD
 #endif /* !__hybrid_preemption_tryyield */
 
 /* Same as `__hybrid_preemption_tryyield()', but optimized
