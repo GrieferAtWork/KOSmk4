@@ -28,32 +28,32 @@ __DECL_BEGIN
 #elif defined(__daylight)
 #define __LOCAL_daylight __daylight
 #elif defined(__CRT_HAVE_daylight)
-#ifdef __NO_ASMNAME
-__LIBC int daylight;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,int,daylight)
 #define daylight         daylight
 #define __LOCAL_daylight daylight
-#else /* __NO_ASMNAME */
-__LIBC int __LOCAL_daylight __CASMNAME("daylight");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,int,__LOCAL_daylight,daylight)
 #define __LOCAL_daylight __LOCAL_daylight
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE__daylight)
-#ifdef __NO_ASMNAME
-__LIBC int _daylight;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,int,_daylight)
 #define _daylight        _daylight
 #define __LOCAL_daylight _daylight
-#else /* __NO_ASMNAME */
-__LIBC int __LOCAL_daylight __CASMNAME("_daylight");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,int,__LOCAL_daylight,_daylight)
 #define __LOCAL_daylight __LOCAL_daylight
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___daylight)
-#ifdef __NO_ASMNAME
-__LIBC int __daylight;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,int,__daylight)
 #define __daylight       __daylight
 #define __LOCAL_daylight __daylight
-#else /* __NO_ASMNAME */
-__LIBC int __LOCAL_daylight __CASMNAME("__daylight");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,int,__LOCAL_daylight,__daylight)
 #define __LOCAL_daylight __LOCAL_daylight
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(____p__daylight_defined)
 #define __LOCAL_daylight (*__p__daylight())
 #elif defined(__CRT_HAVE___p__daylight)

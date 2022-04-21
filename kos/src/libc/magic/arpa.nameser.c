@@ -129,9 +129,10 @@ struct _ns_flagdata {
 	int shift;
 };
 }%[pop_macro]%{
-#ifdef __CRT_HAVE__ns_flagdata
-__LIBC struct _ns_flagdata const _ns_flagdata[];
-#endif /* !__CRT_HAVE__ns_flagdata */
+#if !defined(_ns_flagdata) && defined(__CRT_HAVE__ns_flagdata)
+__CSDECLARE2(,struct _ns_flagdata const _ns_flagdata[],_ns_flagdata)
+#define _ns_flagdata _ns_flagdata
+#endif /* !_ns_flagdata && __CRT_HAVE__ns_flagdata */
 #endif /* __CC__ */
 
 /* ??? */

@@ -45,7 +45,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,___mb_cur_max_func,(void),(
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__p___mb_cur_max,(void),())
 #define __LOCAL_MB_CUR_MAX ((__SIZE_TYPE__)*__p___mb_cur_max())
 #elif defined(__CRT_HAVE___mb_cur_max)
-__LIBC int __mb_cur_max __CASMNAME_SAME("__mb_cur_max");
+__CSDECLARE(,int,__mb_cur_max)
 #define __mb_cur_max       __mb_cur_max
 #define __LOCAL_MB_CUR_MAX ((__SIZE_TYPE__)__mb_cur_max)
 #else /* __CRT_HAVE___ctype_get_mb_cur_max */

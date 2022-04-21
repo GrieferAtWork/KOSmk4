@@ -24,14 +24,14 @@
 #define __LOCAL__mbcasemap _mbcasemap
 #elif defined(__CRT_HAVE__mbcasemap)
 __DECL_BEGIN
-#ifdef __NO_ASMNAME
-__LIBC unsigned char _mbcasemap[];
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE2(,unsigned char _mbcasemap[],_mbcasemap)
 #define _mbcasemap         _mbcasemap
 #define __LOCAL__mbcasemap _mbcasemap
-#else /* __NO_ASMNAME */
-__LIBC unsigned char __LOCAL__mbcasemap[] __CASMNAME("_mbcasemap");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT2(,unsigned char __LOCAL__mbcasemap[],__LOCAL__mbcasemap,_mbcasemap)
 #define __LOCAL__mbcasemap __LOCAL__mbcasemap
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 __DECL_END
 #elif defined(____p__mbcasemap_defined)
 #define __LOCAL__mbcasemap __p__mbcasemap()

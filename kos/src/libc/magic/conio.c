@@ -61,12 +61,10 @@ typedef __errno_t errno_t; /* Errno code (one of `E*' from <errno.h>) */
 #endif /* !__errno_t_defined */
 
 /* KOS-extension: standard file stream for `/dev/tty' */
-#if defined(__USE_KOS) && !defined(stdtty)
-#ifdef __CRT_HAVE_stdtty
-__LIBC FILE *stdtty;
+#if defined(__USE_KOS) && !defined(stdtty) && defined(__CRT_HAVE_stdtty)
+__CSDECLARE(,FILE *,stdtty)
 #define stdtty stdtty
-#endif /* __CRT_HAVE_stdtty */
-#endif /* __USE_KOS && !stdtty */
+#endif /* __USE_KOS && !stdtty && __CRT_HAVE_stdtty */
 
 }
 

@@ -34,38 +34,38 @@ __SYSDECL_BEGIN
 #define __LOCAL_program_invocation_name   __progname_full
 #define __LOCAL_program_invocation_name_p __progname_full
 #elif defined(__CRT_HAVE_program_invocation_name)
-#ifndef __NO_ASMNAME
-__LIBC char *__LOCAL_program_invocation_name __ASMNAME("program_invocation_name");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,char *,__LOCAL_program_invocation_name,program_invocation_name)
 #define __LOCAL_program_invocation_name   __LOCAL_program_invocation_name
 #define __LOCAL_program_invocation_name_p __LOCAL_program_invocation_name
-#else /* !__NO_ASMNAME */
-__LIBC char *program_invocation_name;
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,char *,program_invocation_name)
 #define program_invocation_name           program_invocation_name
 #define __LOCAL_program_invocation_name   program_invocation_name
 #define __LOCAL_program_invocation_name_p program_invocation_name
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE__pgmptr)
-#ifndef __NO_ASMNAME
-__LIBC char *__LOCAL_program_invocation_name __ASMNAME("_pgmptr");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,char *,__LOCAL_program_invocation_name,_pgmptr)
 #define __LOCAL_program_invocation_name   __LOCAL_program_invocation_name
 #define __LOCAL_program_invocation_name_p __LOCAL_program_invocation_name
-#else /* !__NO_ASMNAME */
-__LIBC char *_pgmptr;
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,char *,_pgmptr)
 #define _pgmptr                           _pgmptr
 #define __LOCAL_program_invocation_name   _pgmptr
 #define __LOCAL_program_invocation_name_p _pgmptr
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___progname_full)
-#ifndef __NO_ASMNAME
-__LIBC char *__LOCAL_program_invocation_name __ASMNAME("__progname_full");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,char *,__LOCAL_program_invocation_name,__progname_full)
 #define __LOCAL_program_invocation_name   __LOCAL_program_invocation_name
 #define __LOCAL_program_invocation_name_p __LOCAL_program_invocation_name_p
-#else /* !__NO_ASMNAME */
-__LIBC char *__progname_full;
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,char *,__progname_full)
 #define __progname_full                   __progname_full
 #define __LOCAL_program_invocation_name   __progname_full
 #define __LOCAL_program_invocation_name_p __LOCAL_program_invocation_name_p
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE_getexecname)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char /*const*/ *,__NOTHROW_NCX,__LOCAL_getexecname,(void),getexecname,())
 #define __LOCAL_program_invocation_name __LOCAL_getexecname()
@@ -94,27 +94,27 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,
 #define __LOCAL_program_invocation_short_name   __progname
 #define __LOCAL_program_invocation_short_name_p __progname
 #elif defined(__CRT_HAVE_program_invocation_short_name)
-#ifndef __NO_ASMNAME
-__LIBC char *__LOCAL_program_invocation_short_name __ASMNAME("program_invocation_short_name");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,char *,__LOCAL_program_invocation_short_name,program_invocation_short_name)
 #define __LOCAL_program_invocation_short_name   __LOCAL_program_invocation_short_name
 #define __LOCAL_program_invocation_short_name_p __LOCAL_program_invocation_short_name
-#else /* !__NO_ASMNAME */
-__LIBC char *program_invocation_short_name;
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,char *,program_invocation_short_name)
 #define program_invocation_short_name           program_invocation_short_name
 #define __LOCAL_program_invocation_short_name   program_invocation_short_name
 #define __LOCAL_program_invocation_short_name_p program_invocation_short_name
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___progname)
-#ifndef __NO_ASMNAME
-__LIBC char *__LOCAL_program_invocation_short_name __ASMNAME("__progname");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,char *,__LOCAL_program_invocation_short_name,__progname)
 #define __LOCAL_program_invocation_short_name   __LOCAL_program_invocation_short_name
 #define __LOCAL_program_invocation_short_name_p __LOCAL_program_invocation_short_name
-#else /* !__NO_ASMNAME */
-__LIBC char *__progname;
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,char *,__progname)
 #define __progname                              __progname
 #define __LOCAL_program_invocation_short_name   __progname
 #define __LOCAL_program_invocation_short_name_p __progname
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___p_program_invocation_short_name)
 #ifndef ____p_program_invocation_short_name_defined
 #define ____p_program_invocation_short_name_defined

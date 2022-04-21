@@ -373,14 +373,16 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 	__pragma(comment(linker, "/alternatename:" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #x "=" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #y))             \
 	__pragma(comment(linker, "/alternatename:__imp_" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #x "=__imp_" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #y)) \
 	__pragma(comment(linker, "/alternatename:__imp__" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #x "=__imp__" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #y))
-#define __COMPILER_REDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, args)                                          decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name, asmname)
-#define __COMPILER_REDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, args)                                              decl attr void nothrow(cc name) param; __REDIRECT_ASSEMBLY(name, asmname)
-#define __COMPILER_VREDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, args, before_va_start, varcount, vartypes)    decl attr Treturn nothrow(cc name) (____PRIVATE_VREDIRECT_UNPACK param, ...); __REDIRECT_ASSEMBLY(name, asmname)
-#define __COMPILER_VREDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, args, before_va_start, varcount, vartypes)        decl attr void nothrow(cc name) (____PRIVATE_VREDIRECT_UNPACK param, ...); __REDIRECT_ASSEMBLY(name, asmname)
-#define __COMPILER_VFREDIRECT(decl, attr, Treturn, nothrow, cc, name, paramf, asmnamef, vparamf, vasmnamef, args, before_va_start) decl attr Treturn nothrow(cc name) paramf; __REDIRECT_ASSEMBLY(name, asmnamef)
-#define __COMPILER_VFREDIRECT_VOID(decl, attr, nothrow, cc, name, paramf, asmnamef, vparamf, vasmnamef, args, before_va_start)     decl attr void nothrow(cc name) paramf; __REDIRECT_ASSEMBLY(name, asmnamef)
-#define __COMPILER_XREDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, code)                                         decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name, asmname)
-#define __COMPILER_XREDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, code)                                             decl attr void nothrow(cc name) param; __REDIRECT_ASSEMBLY(name, asmname)
+#define __COMPILER_SREDIRECT(decl,attr,T,name,asmname)                                                                  decl attr T name; __REDIRECT_ASSEMBLY(name,asmname)
+#define __COMPILER_SREDIRECT2(decl,attr,Tdecl,name,asmname)                                                             decl attr Tdecl; __REDIRECT_ASSEMBLY(name,asmname)
+#define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
+#define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          decl attr void nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
+#define __COMPILER_VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    decl attr Treturn nothrow(cc name) (____PRIVATE_VREDIRECT_UNPACK param,...); __REDIRECT_ASSEMBLY(name,asmname)
+#define __COMPILER_VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       decl attr void nothrow(cc name) (____PRIVATE_VREDIRECT_UNPACK param,...); __REDIRECT_ASSEMBLY(name,asmname)
+#define __COMPILER_VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) decl attr Treturn nothrow(cc name) paramf; __REDIRECT_ASSEMBLY(name,asmnamef)
+#define __COMPILER_VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    decl attr void nothrow(cc name) paramf; __REDIRECT_ASSEMBLY(name,asmnamef)
+#define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
+#define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         decl attr void nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
 #endif /* !__INTELLISENSE__ */
 
 

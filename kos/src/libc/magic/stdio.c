@@ -356,7 +356,7 @@ __NAMESPACE_STD_USING(FILE)
 #elif !defined(___iob_defined) && defined(__CRT_HAVE__iob)
 #include <bits/crt/io-file.h>
 #define ___iob_defined
-__LIBC __FILE _iob[];
+__CSDECLARE2(,__FILE _iob[],_iob)
 #ifndef ____iob_func_defined
 #define ____iob_func_defined
 #define __iob_func() (_iob)
@@ -381,7 +381,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__FILE *,__NOTHROW,__io
 #ifdef __LOCAL_stdin
 #define stdin __LOCAL_stdin
 #elif defined(__CRT_HAVE_stdin)
-__LIBC __FILE *stdin;
+__CSDECLARE(,__FILE *,stdin)
 #define stdin stdin
 #elif defined(__CYG_REENT)
 #define stdin (__CYG_REENT->__cyg_stdin)
@@ -389,14 +389,14 @@ __LIBC __FILE *stdin;
 #define stdin (__iob_func() + 0)
 #elif defined(__CRT_HAVE__IO_stdin_)
 #ifndef _IO_stdin_
+__CSDECLARE(,__FILE,_IO_stdin_)
 #define _IO_stdin_ _IO_stdin_
-__LIBC __FILE _IO_stdin_;
 #endif /* !_IO_stdin_ */
 #define stdin (&_IO_stdin_)
 #elif defined(__CRT_HAVE__IO_2_1_stdin_)
 #ifndef _IO_2_1_stdin_
+__CSDECLARE(,__FILE,_IO_2_1_stdin_)
 #define _IO_2_1_stdin_ _IO_2_1_stdin_
-__LIBC __FILE _IO_2_1_stdin_;
 #endif /* !_IO_2_1_stdin_ */
 #define stdin (&_IO_2_1_stdin_)
 #endif /* ... */
@@ -408,7 +408,7 @@ __LIBC __FILE _IO_2_1_stdin_;
 #ifdef __LOCAL_stdout
 #define stdout __LOCAL_stdout
 #elif defined(__CRT_HAVE_stdout)
-__LIBC __FILE *stdout;
+__CSDECLARE(,__FILE *,stdout)
 #define stdout stdout
 #elif defined(__CYG_REENT)
 #define stdout (__CYG_REENT->__cyg_stdout)
@@ -416,14 +416,14 @@ __LIBC __FILE *stdout;
 #define stdout (__iob_func() + 1)
 #elif defined(__CRT_HAVE__IO_stdout_)
 #ifndef _IO_stdout_
+__CSDECLARE(,__FILE,_IO_stdout_)
 #define _IO_stdout_ _IO_stdout_
-__LIBC __FILE _IO_stdout_;
 #endif /* !_IO_stdout_ */
 #define stdout (&_IO_stdout_)
 #elif defined(__CRT_HAVE__IO_2_1_stdout_)
 #ifndef _IO_2_1_stdout_
+__CSDECLARE(,__FILE,_IO_2_1_stdout_)
 #define _IO_2_1_stdout_ _IO_2_1_stdout_
-__LIBC __FILE _IO_2_1_stdout_;
 #endif /* !_IO_2_1_stdout_ */
 #define stdout (&_IO_2_1_stdout_)
 #endif /* ... */
@@ -435,7 +435,7 @@ __LIBC __FILE _IO_2_1_stdout_;
 #ifdef __LOCAL_stderr
 #define stderr __LOCAL_stderr
 #elif defined(__CRT_HAVE_stderr)
-__LIBC __FILE *stderr;
+__CSDECLARE(,__FILE *,stderr)
 #define stderr stderr
 #elif defined(__CYG_REENT)
 #define stderr (__CYG_REENT->__cyg_stderr)
@@ -443,14 +443,14 @@ __LIBC __FILE *stderr;
 #define stderr (__iob_func() + 2)
 #elif defined(__CRT_HAVE__IO_stderr_)
 #ifndef _IO_stderr_
+__CSDECLARE(,__FILE,_IO_stderr_)
 #define _IO_stderr_ _IO_stderr_
-__LIBC __FILE _IO_stderr_;
 #endif /* !_IO_stderr_ */
 #define stderr (&_IO_stderr_)
 #elif defined(__CRT_HAVE__IO_2_1_stderr_)
 #ifndef _IO_2_1_stderr_
+__CSDECLARE(,__FILE,_IO_2_1_stderr_)
 #define _IO_2_1_stderr_ _IO_2_1_stderr_
-__LIBC __FILE _IO_2_1_stderr_;
 #endif /* !_IO_2_1_stderr_ */
 #define stderr (&_IO_2_1_stderr_)
 #endif /* ... */
@@ -458,12 +458,10 @@ __LIBC __FILE _IO_2_1_stderr_;
 
 
 /* KOS-extension: standard file stream for `/dev/tty' */
-#if defined(__USE_KOS) && !defined(stdtty)
-#ifdef __CRT_HAVE_stdtty
-__LIBC FILE *stdtty;
+#if defined(__USE_KOS) && !defined(stdtty) && defined(__CRT_HAVE_stdtty)
+__CSDECLARE(,__FILE *,stdtty)
 #define stdtty stdtty
-#endif /* __CRT_HAVE_stdtty */
-#endif /* __USE_KOS && !stdtty */
+#endif /* __USE_KOS && !stdtty && __CRT_HAVE_stdtty */
 
 }
 

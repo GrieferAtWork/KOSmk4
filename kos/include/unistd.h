@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6870b4b9 */
+/* HASH CRC-32:0xe6921615 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,6 +78,7 @@
 #endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_POSIX) */
 
 #ifdef __USE_NETBSD
+#include <asm/os/signal.h> /* __NSIG */
 #include <asm/crt/getpassfd.h> /* __GETPASS_* */
 #endif /* __USE_NETBSD */
 
@@ -274,25 +275,25 @@ typedef __socklen_t socklen_t;
 #elif defined(__LOCAL_environ)
 #define __environ __LOCAL_environ
 #elif defined(__CRT_HAVE_environ)
-#ifdef __NO_ASMNAME
-__LIBC char **environ;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,char **,environ)
 #define environ   environ
 #define __environ environ
-#else /* __NO_ASMNAME */
-__LIBC char **__environ __CASMNAME("environ");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,char **,__environ,environ)
 #define __environ __environ
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE__environ)
-#ifdef __NO_ASMNAME
-__LIBC char **_environ;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,char **,_environ)
 #define _environ  _environ
 #define __environ _environ
-#else /* __NO_ASMNAME */
-__LIBC char **__environ __CASMNAME("_environ");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,char **,__environ,_environ)
 #define __environ __environ
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___environ)
-__LIBC char **__environ;
+__CSDECLARE(,char **,__environ)
 #define __environ __environ
 #elif defined(____p__environ_defined)
 #define __environ (*__p__environ())
@@ -2034,7 +2035,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pipe2, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #ifdef __USE_GNU
 #ifndef environ
 #ifdef __CRT_HAVE_environ
-__LIBC char **environ;
+__CSDECLARE(,char **,environ)
 #define environ environ
 #elif defined(_environ)
 #define environ _environ
@@ -2043,23 +2044,23 @@ __LIBC char **environ;
 #elif defined(__LOCAL_environ)
 #define environ __LOCAL_environ
 #elif defined(__CRT_HAVE__environ)
-#ifdef __NO_ASMNAME
-__LIBC char **_environ;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,char **,_environ)
 #define _environ _environ
 #define environ  _environ
-#else /* __NO_ASMNAME */
-__LIBC char **environ __CASMNAME("_environ");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,char **,environ,_environ)
 #define environ environ
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___environ)
-#ifdef __NO_ASMNAME
-__LIBC char **__environ;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,char **,__environ)
 #define __environ _environ
 #define environ   __environ
-#else /* __NO_ASMNAME */
-__LIBC char **environ __CASMNAME("__environ");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,char **,environ,__environ)
 #define environ environ
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(____p__environ_defined)
 #define environ (*__p__environ())
 #elif defined(__CRT_HAVE___p__environ)
@@ -2500,35 +2501,22 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),exit,(__
  * @return: 1 :    Empty configuration string.
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
 __CDECLARE_OPT(,size_t,__NOTHROW_NCX,confstr,(__STDC_INT_AS_UINT_T __name, char *__buf, size_t __buflen),(__name,__buf,__buflen))
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("optarg")
-#pragma push_macro("optind")
-#pragma push_macro("opterr")
-#pragma push_macro("optopt")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef optarg
-#undef optind
-#undef opterr
-#undef optopt
-#ifdef __CRT_HAVE_optarg
-__LIBC char *optarg;
-#endif /* __CRT_HAVE_optarg */
-#ifdef __CRT_HAVE_optind
-__LIBC int optind;
-#endif /* __CRT_HAVE_optind */
-#ifdef __CRT_HAVE_opterr
-__LIBC int opterr;
-#endif /* __CRT_HAVE_opterr */
-#ifdef __CRT_HAVE_optopt
-__LIBC int optopt;
-#endif /* __CRT_HAVE_optopt */
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("optopt")
-#pragma pop_macro("opterr")
-#pragma pop_macro("optind")
-#pragma pop_macro("optarg")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#if !defined(optarg) && defined(__CRT_HAVE_optarg)
+__CSDECLARE(,char *,optarg)
+#define optarg optarg
+#endif /* !optarg && __CRT_HAVE_optarg */
+#if !defined(optind) && defined(__CRT_HAVE_optind)
+__CSDECLARE(,int,optind)
+#define optind optind
+#endif /* !optind && __CRT_HAVE_optind */
+#if !defined(opterr) && defined(__CRT_HAVE_opterr)
+__CSDECLARE(,int,opterr)
+#define opterr opterr
+#endif /* !opterr && __CRT_HAVE_opterr */
+#if !defined(optopt) && defined(__CRT_HAVE_optopt)
+__CSDECLARE(,int,optopt)
+#define optopt optopt
+#endif /* !optopt && __CRT_HAVE_optopt */
 
 #ifndef __getopt_defined
 #define __getopt_defined
@@ -3189,11 +3177,19 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *const *,__N
 #endif /* ____p_sys_siglist_defined */
 #ifndef _sys_siglist
 #ifdef __CRT_HAVE_sys_siglist
-__LIBC char const *const sys_siglist[_NSIG];
+#ifdef __NSIG
+__CSDECLARE2(,char const *const sys_siglist[__NSIG],sys_siglist)
+#else /* __NSIG */
+__CSDECLARE2(,char const *const sys_siglist[],sys_siglist)
+#endif /* !__NSIG */
 #define sys_siglist  sys_siglist
 #define _sys_siglist sys_siglist
 #elif defined(__CRT_HAVE__sys_siglist)
-__LIBC char const *const _sys_siglist[_NSIG];
+#ifdef __NSIG
+__CSDECLARE2(,char const *const _sys_siglist[__NSIG],_sys_siglist)
+#else /* __NSIG */
+__CSDECLARE2(,char const *const _sys_siglist[],_sys_siglist)
+#endif /* !__NSIG */
 #define sys_siglist  _sys_siglist
 #define _sys_siglist _sys_siglist
 #endif /* sys_siglist... */

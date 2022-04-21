@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x107674cc */
+/* HASH CRC-32:0xeba5138c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,17 +47,17 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *const *,__N
 #endif /* ____sys_errlist_defined */
 #ifndef _sys_errlist
 #if defined(__CRT_HAVE__sys_errlist)
-__LIBC char const *const _sys_errlist[];
+__CSDECLARE2(,char const *const _sys_errlist[],_sys_errlist)
 #define _sys_errlist     _sys_errlist
 #elif defined(__CRT_HAVE_sys_errlist)
-#ifndef __NO_ASMNAME
-__LIBC char const *const _sys_errlist[] __ASMNAME("sys_errlist");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT2(,char const *const _sys_errlist[],_sys_errlist,sys_errlist)
 #define _sys_errlist     _sys_errlist
-#else /* !__NO_ASMNAME */
-__LIBC char const *const sys_errlist[];
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE2(,char const *const sys_errlist[],sys_errlist)
 #define sys_errlist      sys_errlist
 #define _sys_errlist     sys_errlist
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #endif /* ... */
 #endif /* !_sys_errlist */
 #endif /* !sys_errlist */
@@ -76,17 +76,17 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__sys_n
 #endif /* ____sys_nerr_defined */
 #ifndef _sys_nerr
 #if defined(__CRT_HAVE__sys_nerr)
-__LIBC int _sys_nerr;
+__CSDECLARE(,int,_sys_nerr)
 #define _sys_nerr _sys_nerr
 #elif defined(__CRT_HAVE_sys_nerr)
-#ifndef __NO_ASMNAME
-__LIBC int _sys_nerr __ASMNAME("sys_nerr");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,int,_sys_nerr,sys_nerr)
 #define _sys_nerr _sys_nerr
-#else /* !__NO_ASMNAME */
-__LIBC int sys_nerr;
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,int,sys_nerr)
 #define sys_nerr sys_nerr
 #define _sys_nerr sys_nerr
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #endif /* ... */
 #endif /* !_sys_nerr */
 #endif /* !sys_nerr */
@@ -107,16 +107,16 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *const *,__N
 #endif /* ____sys_errlist_defined */
 #ifndef sys_errlist
 #if defined(__CRT_HAVE__sys_errlist)
-#ifndef __NO_ASMNAME
-__LIBC char const *const sys_errlist[] __ASMNAME("_sys_errlist");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT2(,char const *const sys_errlist[],sys_errlist,_sys_errlist)
 #define sys_errlist      sys_errlist
-#else /* !__NO_ASMNAME */
-__LIBC char const *const _sys_errlist[];
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE2(,char const *const _sys_errlist[],_sys_errlist)
 #define _sys_errlist     _sys_errlist
 #define sys_errlist      _sys_errlist
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE_sys_errlist)
-__LIBC char const *const sys_errlist[];
+__CSDECLARE2(,char const *const sys_errlist[],sys_errlist)
 #define sys_errlist      sys_errlist
 #endif /* ... */
 #endif /* !sys_errlist */
@@ -136,16 +136,16 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__sys_n
 #endif /* ____sys_nerr_defined */
 #ifndef sys_nerr
 #if defined(__CRT_HAVE__sys_nerr)
-#ifndef __NO_ASMNAME
-__LIBC int sys_nerr __ASMNAME("_sys_nerr");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,int,sys_nerr,_sys_nerr)
 #define sys_nerr sys_nerr
-#else /* !__NO_ASMNAME */
-__LIBC int _sys_nerr;
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,int,_sys_nerr)
 #define sys_nerr  _sys_nerr
 #define _sys_nerr _sys_nerr
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE_sys_nerr)
-__LIBC int sys_nerr;
+__CSDECLARE(,int,sys_nerr)
 #define sys_nerr sys_nerr
 #endif /* ... */
 #endif /* !sys_nerr */

@@ -104,7 +104,7 @@ __SYSDECL_BEGIN
 #ifndef __unicode_utf8seqlen_defined
 #define __unicode_utf8seqlen_defined
 #ifdef __CRT_HAVE_unicode_utf8seqlen
-__LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seqlen");
+__CSDECLARE2(,__UINT8_TYPE__ const unicode_utf8seqlen[256],unicode_utf8seqlen)
 #else /* __CRT_HAVE_unicode_utf8seqlen */
 #include <libc/template/unicode_utf8seqlen.h>
 #define unicode_utf8seqlen __LOCAL_unicode_utf8seqlen

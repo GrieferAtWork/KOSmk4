@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4871f23 */
+/* HASH CRC-32:0x6dfb6c01 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,12 +57,10 @@ typedef __errno_t errno_t; /* Errno code (one of `E*' from <errno.h>) */
 #endif /* !__errno_t_defined */
 
 /* KOS-extension: standard file stream for `/dev/tty' */
-#if defined(__USE_KOS) && !defined(stdtty)
-#ifdef __CRT_HAVE_stdtty
-__LIBC FILE *stdtty;
+#if defined(__USE_KOS) && !defined(stdtty) && defined(__CRT_HAVE_stdtty)
+__CSDECLARE(,FILE *,stdtty)
 #define stdtty stdtty
-#endif /* __CRT_HAVE_stdtty */
-#endif /* __USE_KOS && !stdtty */
+#endif /* __USE_KOS && !stdtty && __CRT_HAVE_stdtty */
 
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_kbhit,(void),())
 #if defined(__CRT_HAVE__getch_nolock) && defined(__USE_STDIO_UNLOCKED)

@@ -24,14 +24,14 @@
 #define __LOCAL__mbctype _mbctype
 #elif defined(__CRT_HAVE__mbctype)
 __DECL_BEGIN
-#ifdef __NO_ASMNAME
-__LIBC unsigned char _mbctype[];
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE2(,unsigned char _mbctype[],_mbctype)
 #define _mbctype         _mbctype
 #define __LOCAL__mbctype _mbctype
-#else /* __NO_ASMNAME */
-__LIBC unsigned char __LOCAL__mbctype[] __CASMNAME("_mbctype");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT2(,unsigned char __LOCAL__mbctype[],__LOCAL__mbctype,_mbctype)
 #define __LOCAL__mbctype __LOCAL__mbctype
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 __DECL_END
 #elif defined(____p__mbctype_defined)
 #define __LOCAL__mbctype __p__mbctype()

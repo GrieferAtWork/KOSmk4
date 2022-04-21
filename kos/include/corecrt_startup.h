@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ac3fc14 */
+/* HASH CRC-32:0xbc7afa74 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -158,7 +158,7 @@ __CREDIRECT_DOS(,__WCHAR16_TYPE__ **,__NOTHROW_NCX,__p__wcmdln,(void),__p__wcmdl
 #endif /* ... */
 #ifndef ___acmdln
 #ifdef __CRT_HAVE__acmdln
-__LIBC char *_acmdln;
+__CSDECLARE(,char *,_acmdln)
 #define _acmdln _acmdln
 #elif defined(__CRT_HAVE___p__acmdln)
 #define _acmdln (*__p__acmdln())
@@ -166,19 +166,19 @@ __LIBC char *_acmdln;
 #endif /* !___acmdln */
 #ifndef ___wcmdln
 #if defined(__CRT_HAVE__wcmdln) && defined(__PE__)
-__LIBC __WCHAR16_TYPE__ *_wcmdln;
+__CSDECLARE(,__WCHAR16_TYPE__ *,_wcmdln)
 #define _wcmdln _wcmdln
 #elif defined(DOS$_wcmdln)
 #define _wcmdln DOS$_wcmdln
 #elif defined(__CRT_HAVE_DOS$_wcmdln)
-#ifndef __NO_ASMNAME
-__LIBC __WCHAR16_TYPE__ *_wcmdln __ASMNAME("DOS$_wcmdln");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,__WCHAR16_TYPE__ *,_wcmdln,DOS$_wcmdln)
 #define _wcmdln _wcmdln
-#else /* !__NO_ASMNAME */
-__LIBC __WCHAR16_TYPE__ *DOS$_wcmdln;
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,__WCHAR16_TYPE__ *,DOS$_wcmdln)
 #define DOS$_wcmdln DOS$_wcmdln
 #define _wcmdln     DOS$_wcmdln
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif (defined(__CRT_HAVE___p__wcmdln) && defined(__PE__)) || defined(__CRT_HAVE_DOS$__p__wcmdln)
 #define _wcmdln (*__p__wcmdln())
 #endif /* ... */

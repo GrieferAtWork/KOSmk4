@@ -33,7 +33,7 @@ __DECL_BEGIN
 
 #if defined(__CRT_HAVE___sincosl_table) && (!defined(__CRT_KOS) || !defined(__BUILDING_LIBC))
 /* Included during normal program compilation */
-__LIBC __IEEE854_LONG_DOUBLE_TYPE__ const __sincosl_table[];
+__CSDECLARE2(,__IEEE854_LONG_DOUBLE_TYPE__ const __sincosl_table[],__sincosl_table)
 #elif defined(__CRT_KOS) && defined(__BUILDING_LIBC) && !defined(GUARD_LIBC_AUTO_MATH_C)
 /* Included during build of libc.so from a file other than "auto/math.c" */
 __INTDEF __IEEE854_LONG_DOUBLE_TYPE__ const libc___sincosl_table[];

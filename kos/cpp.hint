@@ -646,6 +646,8 @@
 
 #define __KOS_FIXED_CONST const
 
+#define __COMPILER_SREDIRECT(decl,attr,T,name,asmname) extern T name;
+#define __COMPILER_SREDIRECT2(decl,attr,Tdecl,name,asmname) extern Tdecl;
 #define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                        Treturn name param;
 #define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                              void name param;
 #define __COMPILER_VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)     Treturn name param;
@@ -783,6 +785,10 @@
 #define __CASMNAME_DOS(x)
 #define __CASMNAME_KOS_SAME(x)
 #define __CASMNAME_DOS_SAME(x)
+#define __CSDECLARE(attr,T,name)               extern T name;
+#define __CSREDIRECT(attr,T,name,asmname)      extern T name;
+#define __CSDECLARE2(attr,Tdecl,name)          extern Tdecl;
+#define __CSREDIRECT2(attr,Tdecl,name,asmname) extern Tdecl;
 #define __CDECLARE(attr,Treturn,nothrow,name,param,args)                                                    Treturn name param;
 #define __CDECLARE_OPT(attr,Treturn,nothrow,name,param,args)                                                Treturn name param;
 #define __CDECLARE_VOID(attr,nothrow,name,param,args)                                                       void name param;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9396399b */
+/* HASH CRC-32:0xb3bfe1f1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -815,14 +815,20 @@ NOTHROW(LIBDCALL libd_strerrordesc_np)(errno_t errnum) {
 #define ___local_sys_errlist_defined
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
 #ifndef _sys_errlist
-__LIBC char const *const _sys_errlist[];
+#ifdef __NSIG
+__CSDECLARE2(,char const *const _sys_siglist[__NSIG],_sys_siglist)
+#else /* __NSIG */
+__CSDECLARE2(,char const *const _sys_siglist[],_sys_siglist)
+#endif /* !__NSIG */
+#define _sys_errlist _sys_errlist
 #endif /* !_sys_errlist */
 #ifndef _sys_nerr
-__LIBC int _sys_nerr;
+__CSDECLARE(,int,_sys_nerr)
+#define _sys_nerr _sys_nerr
 #endif /* !_sys_nerr */
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)
-__LIBC __ATTR_WUNUSED __ATTR_CONST char const *const *(__LIBCCALL __sys_errlist)(void);
-__LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL __sys_nerr)(void);
+__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,char const *const *,__sys_errlist,(void),())
+__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int *,__sys_nerr,(void),())
 #else /* ... */
 #undef ___local_sys_errlist_defined
 #endif /* !... */

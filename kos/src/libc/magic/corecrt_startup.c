@@ -177,7 +177,7 @@ __WCHAR16_TYPE__ **__p__wcmdln(void);
 
 %[insert:pp_if(!defined(_acmdln))]
 %[insert:pp_if(defined(__CRT_HAVE__acmdln))]
-%__LIBC char *_acmdln;
+%__CSDECLARE(,char *,_acmdln)
 %#define _acmdln _acmdln
 %[insert:pp_elif($has_function(__p__acmdln))]
 %#define _acmdln (*__p__acmdln())
@@ -186,16 +186,16 @@ __WCHAR16_TYPE__ **__p__wcmdln(void);
 
 %[insert:pp_if(!defined(_wcmdln))]
 %[insert:pp_if(defined(__CRT_HAVE__wcmdln) && defined(__PE__))]
-%__LIBC __WCHAR16_TYPE__ *_wcmdln;
+%__CSDECLARE(,__WCHAR16_TYPE__ *,_wcmdln)
 %#define _wcmdln _wcmdln
 %[insert:pp_elif(defined(@DOS$_wcmdln@))]
 %#define _wcmdln DOS$_wcmdln
 %[insert:pp_elif(defined(__CRT_HAVE_DOS$_wcmdln))]
-%[insert:pp_if(!defined(__NO_ASMNAME))]
-%__LIBC __WCHAR16_TYPE__ *_wcmdln __ASMNAME("DOS$_wcmdln");
+%[insert:pp_if(!defined(__NO_COMPILER_SREDIRECT))]
+%__CSREDIRECT(,__WCHAR16_TYPE__ *,_wcmdln,DOS$_wcmdln)
 %#define _wcmdln _wcmdln
 %[insert:pp_else]
-%__LIBC __WCHAR16_TYPE__ *DOS$_wcmdln;
+%__CSDECLARE(,__WCHAR16_TYPE__ *,DOS$_wcmdln)
 %#define DOS$_wcmdln DOS$_wcmdln
 %#define _wcmdln     DOS$_wcmdln
 %[insert:pp_endif]

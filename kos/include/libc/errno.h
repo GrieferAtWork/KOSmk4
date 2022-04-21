@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf75a0972 */
+/* HASH CRC-32:0x317e7473 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,13 +41,13 @@
 #define __libc_errno (*__libc___errno_location())
 #elif defined(__CRT_HAVE_errno) && 0
 __DECL_BEGIN
-__LIBC __ATTR_THREAD __errno_t errno;
+__CSDECLARE(__ATTR_THREAD,__errno_t,errno)
 __DECL_END
 #define errno        errno
 #define __libc_errno errno
 #elif defined(__CRT_HAVE_errno)
 __DECL_BEGIN
-__LIBC __errno_t errno;
+__CSDECLARE(,__errno_t,errno)
 __DECL_END
 #define errno        errno
 #define __libc_errno errno

@@ -63,15 +63,15 @@ __SYSDECL_BEGIN
 
 %[define(DEFINE_LOCAL_error_print_progname =
 @@pp_ifndef __LOCAL_error_print_progname@@
-@@pp_ifdef          error_print_progname@@
-#define __LOCAL_error_print_progname error_print_progname
+@@pp_if defined(@error_print_progname@)@@
+#define __LOCAL_error_print_progname @error_print_progname@
 @@pp_elif defined(__CRT_HAVE_error_print_progname)@@
-@@pp_ifdef __NO_ASMNAME@@
-__LIBC void (__LIBKCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
+@@pp_ifdef __NO_COMPILER_SREDIRECT@@
+__CSREDIRECT2(,void (__LIBKCALL *__LOCAL_error_print_progname)(void),__LOCAL_error_print_progname,@error_print_progname@)
 @@pp_else@@
-__LIBC void (__LIBKCALL *error_print_progname)(void);
-#define error_print_progname         error_print_progname
-#define __LOCAL_error_print_progname error_print_progname
+__CSDECLARE2(,void (__LIBKCALL *@error_print_progname@)(void),@error_print_progname@)
+#define @error_print_progname@       @error_print_progname@
+#define __LOCAL_error_print_progname @error_print_progname@
 @@pp_endif@@
 @@pp_endif@@
 @@pp_endif@@
@@ -79,15 +79,15 @@ __LIBC void (__LIBKCALL *error_print_progname)(void);
 
 %[define(DEFINE_LOCAL_error_message_count =
 @@pp_ifndef __LOCAL_error_message_count@@
-@@pp_ifdef          error_message_count@@
-#define __LOCAL_error_message_count error_message_count
+@@pp_if defined(@error_message_count@)@@
+#define __LOCAL_error_message_count @error_message_count@
 @@pp_elif defined(__CRT_HAVE_error_message_count)@@
-@@pp_ifdef __NO_ASMNAME@@
-__LIBC unsigned int __LOCAL_error_message_count __ASMNAME("error_message_count");
+@@pp_ifdef __NO_COMPILER_SREDIRECT@@
+__CSREDIRECT(,unsigned int,__LOCAL_error_message_count,@error_message_count@)
 @@pp_else@@
-__LIBC unsigned int error_message_count;
-#define error_message_count         error_message_count
-#define __LOCAL_error_message_count error_message_count
+__CSDECLARE(,unsigned int,@error_message_count@)
+#define @error_message_count@       @error_message_count@
+#define __LOCAL_error_message_count @error_message_count@
 @@pp_endif@@
 @@pp_endif@@
 @@pp_endif@@
@@ -95,15 +95,15 @@ __LIBC unsigned int error_message_count;
 
 %[define(DEFINE_LOCAL_error_one_per_line =
 @@pp_ifndef __LOCAL_error_one_per_line@@
-@@pp_ifdef          error_one_per_line@@
-#define __LOCAL_error_one_per_line error_one_per_line
+@@pp_if defined(@error_one_per_line@)@@
+#define __LOCAL_error_one_per_line @error_one_per_line@
 @@pp_elif defined(__CRT_HAVE_error_one_per_line)@@
-@@pp_ifdef __NO_ASMNAME@@
-__LIBC int __LOCAL_error_one_per_line __ASMNAME("error_one_per_line");
+@@pp_ifdef __NO_COMPILER_SREDIRECT@@
+__CSREDIRECT(,int,__LOCAL_error_one_per_line,@error_one_per_line@)
 @@pp_else@@
-__LIBC int error_one_per_line;
-#define error_one_per_line         error_one_per_line
-#define __LOCAL_error_one_per_line error_one_per_line
+__CSDECLARE(,int,@error_one_per_line@)
+#define @error_one_per_line@       @error_one_per_line@
+#define __LOCAL_error_one_per_line @error_one_per_line@
 @@pp_endif@@
 @@pp_endif@@
 @@pp_endif@@
@@ -250,7 +250,7 @@ void error_at_line(int status, $errno_t errnum, char const *filename,
  * When non-NULL,  this  function  should:
  *  - fflush(stdout);
  *  - fprintf(stderr, "%s:", basename(argv[0])); */
-__LIBC void (__LIBKCALL *error_print_progname)(void);
+__CSDECLARE2(,void (__LIBKCALL *error_print_progname)(void),error_print_progname)
 #define error_print_progname error_print_progname
 #endif /* ... */
 #endif /* !error_print_progname */
@@ -260,7 +260,7 @@ __LIBC void (__LIBKCALL *error_print_progname)(void);
 #define error_message_count __LOCAL_error_message_count
 #elif defined(__CRT_HAVE_error_message_count)
 /* Incremented by one each time `error()' or `error_at_line()' is called. */
-__LIBC unsigned int error_message_count;
+__CSDECLARE(,unsigned int,error_message_count)
 #define error_message_count error_message_count
 #endif /* ... */
 #endif /* !error_message_count */
@@ -273,7 +273,7 @@ __LIBC unsigned int error_message_count;
  * When non-zero, consecutive calls to `error_at_line()' that pass the same
  * values for `filename'  and `line'  will not produce  the error  message.
  * The default value is ZERO(0) */
-__LIBC int error_one_per_line;
+__CSDECLARE(,int,error_one_per_line)
 #define error_one_per_line error_one_per_line
 #endif /* ... */
 #endif /* !error_one_per_line */

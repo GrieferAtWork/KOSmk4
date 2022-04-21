@@ -204,8 +204,8 @@ typedef __FILE FILE;
 // TODO: #define __loc1 (*____loc1())
 // TODO: #define __i_size (*___i_size())
 // TODO: #else
-// TODO: __LIBC char *__loc1;
-// TODO: __LIBC int __i_size;
+// TODO: __CSDECLARE(,char *,__loc1)
+// TODO: __CSDECLARE(,int,__i_size)
 // TODO: #endif
 
 // TODO: [[ATTR_SENTINEL]] char *regcmp(char const *s1, ...);

@@ -24,14 +24,14 @@ __DECL_BEGIN
 #ifdef stdtty
 #define __LOCAL_stdtty stdtty
 #elif defined(__CRT_HAVE_stdtty)
-#ifdef __NO_ASMNAME
-__LIBC __FILE *stdtty;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,__FILE *,stdtty)
 #define stdtty         stdtty
 #define __LOCAL_stdtty stdtty
-#else /* __NO_ASMNAME */
-__LIBC __FILE *__LOCAL_stdtty __CASMNAME("stdtty");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,__FILE *,__LOCAL_stdtty,stdtty)
 #define __LOCAL_stdtty __LOCAL_stdtty
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #endif /* ... */
 __DECL_END
 #endif /* !__LOCAL_stdtty */

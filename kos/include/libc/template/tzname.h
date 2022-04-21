@@ -28,32 +28,32 @@ __DECL_BEGIN
 #elif defined(__tzname)
 #define __LOCAL_tzname __tzname
 #elif defined(__CRT_HAVE_tzname)
-#ifdef __NO_ASMNAME
-__LIBC char *tzname[2];
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE2(,char *tzname[2],tzname)
 #define tzname         tzname
 #define __LOCAL_tzname tzname
-#else /* __NO_ASMNAME */
-__LIBC char *__LOCAL_tzname[2] __CASMNAME("tzname");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT2(,char *__LOCAL_tzname[2],__LOCAL_tzname,tzname)
 #define __LOCAL_tzname __LOCAL_tzname
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE__tzname)
-#ifdef __NO_ASMNAME
-__LIBC char *_tzname[2];
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE2(,char *_tzname[2],_tzname)
 #define _tzname        _tzname
 #define __LOCAL_tzname _tzname
-#else /* __NO_ASMNAME */
-__LIBC char *__LOCAL_tzname[2] __CASMNAME("_tzname");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT2(,char *__LOCAL_tzname[2],__LOCAL_tzname,_tzname)
 #define __LOCAL_tzname __LOCAL_tzname
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___tzname)
-#ifdef __NO_ASMNAME
-__LIBC char *__tzname[2];
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE2(,char *__tzname[2],__tzname)
 #define __tzname       __tzname
 #define __LOCAL_tzname __tzname
-#else /* __NO_ASMNAME */
-__LIBC char *__LOCAL_tzname[2] __CASMNAME("__tzname");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT2(,char *__LOCAL_tzname[2],__LOCAL_tzname,__tzname)
 #define __LOCAL_tzname __LOCAL_tzname
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(____p__tzname_defined)
 #define __LOCAL_tzname __p__tzname()
 #elif defined(__CRT_HAVE___p__tzname)

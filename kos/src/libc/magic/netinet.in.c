@@ -156,14 +156,14 @@ struct in6_addr {
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 };
 
-#ifdef __CRT_HAVE_in6addr_any
-#undef in6addr_any
-__LIBC struct in6_addr const in6addr_any; /* :: */
-#endif /* __CRT_HAVE_in6addr_any */
-#ifdef __CRT_HAVE_in6addr_loopback
-#undef in6addr_loopback
-__LIBC struct in6_addr const in6addr_loopback; /* ::1 */
-#endif /* __CRT_HAVE_in6addr_loopback */
+#if !defined(in6addr_any) && defined(__CRT_HAVE_in6addr_any)
+__CSDECLARE(,struct in6_addr const,in6addr_any) /* :: */
+#define in6addr_any in6addr_any
+#endif /* !in6addr_any && __CRT_HAVE_in6addr_any */
+#if !defined(in6addr_loopback) && defined(__CRT_HAVE_in6addr_loopback)
+__CSDECLARE(,struct in6_addr const,in6addr_loopback) /* ::1 */
+#define in6addr_loopback in6addr_loopback
+#endif /* !in6addr_loopback && __CRT_HAVE_in6addr_loopback */
 
 #define IN6ADDR_ANY_INIT      { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } } }
 #define IN6ADDR_LOOPBACK_INIT { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } } }

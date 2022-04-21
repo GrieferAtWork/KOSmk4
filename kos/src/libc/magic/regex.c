@@ -119,7 +119,7 @@ typedef __ULONGPTR_TYPE__ reg_syntax_t; /* Set of `RE_*' (see below) */
 
 #ifdef __CRT_HAVE_re_syntax_options
 /* Regex syntax used by certain interfaces. */
-__LIBC reg_syntax_t re_syntax_options;
+__CSDECLARE(,reg_syntax_t,re_syntax_options)
 #endif /* __CRT_HAVE_re_syntax_options */
 
 #ifdef __USE_GNU
@@ -150,25 +150,23 @@ __LIBC reg_syntax_t re_syntax_options;
 #endif /* !RE_DUP_MAX */
 #endif /* __USE_GNU */
 
-}
-%/* Flags for `regcomp:cflags'.
-% * NOTE: REG_EXTENDED does the following:
-% *  - Enable support for [:class:] (as opposed to being the
-% *    equivalent of "[:clas]", aka regular set-matching)
-% *  - . matches \n  (as opposed to it not doing so)
-% *  - . doesn't match \0  (as opposed to it doing so)
-% *  - f{0-3} interval matching (as opposed to the equivalent of "f\{0-3\}")
-% *  - [z-a] is invalid  (as opposed to never matched)
-% *  - ^ and $ are always matched as operators (as opposed to only
-% *    at the start or end of a pattern, and in "abc(^foo$|^bar$)def"
-% *  - *, + and ? are always special (as opposed to only as a suffix;
-% *    aka. in non-suffix places using these becomes an error)
-% *  - (foo|bar) groups and |-alternatives are supported (as
-% *    opposed to being the equivalent of "\(foo\|bar\)")
-% *     - An unmatched ) is still allowed to be parsed as \), without causing an error
-% *  - {, +, * or ? cannot appear at the start of a pattern, or after ( or |, as
-% *    opposed to being processed like regular match-characters in these locations. */
-%{
+/* Flags for `regcomp(3)'s `cflags' argument.
+ * NOTE: REG_EXTENDED does the following:
+ *  - Enable support for [:class:] (as opposed to being the
+ *    equivalent of "[:clas]", aka regular set-matching)
+ *  - . matches \n  (as opposed to it not doing so)
+ *  - . doesn't match \0  (as opposed to it doing so)
+ *  - f{0-3} interval matching (as opposed to the equivalent of "f\{0-3\}")
+ *  - [z-a] is invalid  (as opposed to never matched)
+ *  - ^ and $ are always matched as operators (as opposed to only
+ *    at the start or end of a pattern, and in "abc(^foo$|^bar$)def"
+ *  - *, + and ? are always special (as opposed to only as a suffix;
+ *    aka. in non-suffix places using these becomes an error)
+ *  - (foo|bar) groups and |-alternatives are supported (as
+ *    opposed to being the equivalent of "\(foo\|bar\)")
+ *     - An unmatched ) is still allowed to be parsed as \), without causing an error
+ *  - {, +, * or ? cannot appear at the start of a pattern, or after ( or |, as
+ *    opposed to being processed like regular match-characters in these locations. */
 #define REG_EXTENDED 0x0001 /* Use `RE_SYNTAX_POSIX_MINIMAL_BASIC' instead of `RE_SYNTAX_POSIX_BASIC' */
 #define REG_ICASE    0x0002 /* == REGEX_FLAG_NOCASE
                              * Ignore casing during matching */
@@ -178,7 +176,7 @@ __LIBC reg_syntax_t re_syntax_options;
 #define REG_NOSUB    0x0008 /* If set:   Only return success/failure in regexec.
                              * If clear: Return success/failure/error in regexec. */
 
-/* Flags for `regexec:eflags'). */
+/* Flags for `regexec(3)'s `eflags' argument. */
 #define REG_NOTBOL   0x0001 /* == REGEX_FLAG_NOT_BEGIN_OF_LINE
                              * ^ doesn't match the start of input data (but only at an actual begin-of-line) */
 #define REG_NOTEOL   0x0002 /* == REGEX_FLAG_NOT_END_OF_LINE

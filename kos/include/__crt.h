@@ -496,6 +496,10 @@ struct __locale_struct;
 #define __CASMNAME_SAME(x)                                                                              /* nothing */
 #define __CASMNAME_DOS_SAME(x)                                                                          /* nothing */
 #define __CASMNAME_KOS_SAME(x)                                                                          /* nothing */
+#define __CSDECLARE(attr,T,name)                                                                        /* nothing */
+#define __CSREDIRECT(attr,T,name,asmname)                                                               /* nothing */
+#define __CSDECLARE2(attr,Tdecl,name)                                                                   /* nothing */
+#define __CSREDIRECT2(attr,Tdecl,name,asmname)                                                          /* nothing */
 #define __CDECLARE(attr,Treturn,nothrow,name,param,args)                                                /* nothing */
 #define __CDECLARE_VOID(attr,nothrow,name,param,args)                                                   /* nothing */
 #define __CREDIRECT(attr,Treturn,nothrow,name,param,asmname,args)                                       /* nothing */
@@ -551,6 +555,10 @@ struct __locale_struct;
 #define __CASMNAME_SAME(x)                                                                              /* nothing */
 #define __CASMNAME_DOS_SAME(x)                                                                          /* nothing */
 #define __CASMNAME_KOS_SAME(x)                                                                          /* nothing */
+#define __CSDECLARE(attr,T,name)                                                                        extern attr T name;
+#define __CSREDIRECT(attr,T,name,asmname)                                                               extern attr T name;
+#define __CSDECLARE2(attr,Tdecl,name)                                                                   extern attr Tdecl;
+#define __CSREDIRECT2(attr,Tdecl,name,asmname)                                                          extern attr Tdecl;
 #define __CDECLARE(attr,Treturn,nothrow,name,param,args)                                                attr Treturn nothrow(__LIBCCALL name) param;
 #define __CDECLARE_VOID(attr,nothrow,name,param,args)                                                   attr void nothrow(__LIBCCALL name) param;
 #define __CREDIRECT(attr,Treturn,nothrow,name,param,asmname,args)                                       attr Treturn nothrow(__LIBCCALL name) param;
@@ -590,6 +598,10 @@ struct __locale_struct;
 #define __CASMNAME_SAME(x)                                                                              __ASMNAME("libc_" x)
 #define __CASMNAME_DOS_SAME(x)                                                                          __ASMNAME("libd_" x)
 #define __CASMNAME_KOS_SAME(x)                                                                          __ASMNAME("libc_" x)
+#define __CSDECLARE(attr,T,name)                                                                        __INTDEF attr T name __ASMNAME("libc_" #name);
+#define __CSREDIRECT(attr,T,name,asmname)                                                               __INTDEF attr T name __ASMNAME("libc_" #asmname);
+#define __CSDECLARE2(attr,Tdecl,name)                                                                   __INTDEF attr Tdecl __ASMNAME("libc_" #name);
+#define __CSREDIRECT2(attr,Tdecl,name,asmname)                                                          __INTDEF attr Tdecl __ASMNAME("libc_" #asmname);
 #define __CDECLARE(attr,Treturn,nothrow,name,param,args)                                                __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name);
 #define __CDECLARE_VOID(attr,nothrow,name,param,args)                                                   __INTDEF attr void nothrow(__LIBCCALL name) param __ASMNAME("libc_" #name);
 #define __CREDIRECT(attr,Treturn,nothrow,name,param,asmname,args)                                       __INTDEF attr Treturn nothrow(__LIBCCALL name) param __ASMNAME("libc_" #asmname);
@@ -653,6 +665,10 @@ struct __locale_struct;
 #else /* __BUILDING_LIBC... */
 #define __CASMNAME                                                                                      __ASMNAME
 #define __CASMNAME_SAME(x)                                                                              /* nothing */
+#define __CSDECLARE(attr,T,name)                                                                        __LIBC attr T name;
+#define __CSREDIRECT(attr,T,name,asmname)                                                               __COMPILER_SREDIRECT(__LIBC,attr,T,name,asmname)
+#define __CSDECLARE2(attr,Tdecl,name)                                                                   __LIBC attr Tdecl;
+#define __CSREDIRECT2(attr,Tdecl,name,asmname)                                                          __COMPILER_SREDIRECT2(__LIBC,attr,Tdecl,name,asmname)
 #define __CDECLARE(attr,Treturn,nothrow,name,param,args)                                                __LIBC attr Treturn nothrow(__LIBCCALL name) param;
 #define __CDECLARE_VOID(attr,nothrow,name,param,args)                                                   __LIBC attr void nothrow(__LIBCCALL name) param;
 #define __CREDIRECT(attr,Treturn,nothrow,name,param,asmname,args)                                       __COMPILER_REDIRECT(__LIBC,attr,Treturn,nothrow,__LIBCCALL,name,param,asmname,args)

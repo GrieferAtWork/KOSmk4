@@ -33,7 +33,7 @@ __SYSDECL_BEGIN
 #elif !defined(___iob_defined) && defined(__CRT_HAVE__iob)
 #include <bits/crt/io-file.h>
 #define ___iob_defined
-__LIBC __FILE _iob[];
+__CSDECLARE2(,__FILE _iob[],_iob)
 #ifndef ____iob_func_defined
 #define ____iob_func_defined
 #define __iob_func() (_iob)
@@ -58,7 +58,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__FILE *,__NOTHROW,__io
 #ifdef stdin
 #define __LOCAL_stdin stdin
 #elif defined(__CRT_HAVE_stdin)
-__LIBC __FILE *stdin;
+__CSDECLARE(,__FILE *,stdin)
 #define stdin         stdin
 #define __LOCAL_stdin stdin
 #elif defined(__CYG_REENT)
@@ -67,14 +67,14 @@ __LIBC __FILE *stdin;
 #define __LOCAL_stdin (__iob_func() + 0)
 #elif defined(__CRT_HAVE__IO_stdin_)
 #ifndef _IO_stdin_
+__CSDECLARE(,__FILE,_IO_stdin_)
 #define _IO_stdin_ _IO_stdin_
-__LIBC __FILE _IO_stdin_;
 #endif /* !_IO_stdin_ */
 #define __LOCAL_stdin (&_IO_stdin_)
 #elif defined(__CRT_HAVE__IO_2_1_stdin_)
 #ifndef _IO_2_1_stdin_
+__CSDECLARE(,__FILE,_IO_2_1_stdin_)
 #define _IO_2_1_stdin_ _IO_2_1_stdin_
-__LIBC __FILE _IO_2_1_stdin_;
 #endif /* !_IO_2_1_stdin_ */
 #define __LOCAL_stdin (&_IO_2_1_stdin_)
 #endif /* ... */
@@ -86,7 +86,7 @@ __LIBC __FILE _IO_2_1_stdin_;
 #ifdef stdout
 #define __LOCAL_stdout stdout
 #elif defined(__CRT_HAVE_stdout)
-__LIBC __FILE *stdout;
+__CSDECLARE(,__FILE *,stdout)
 #define stdout         stdout
 #define __LOCAL_stdout stdout
 #elif defined(__CYG_REENT)
@@ -95,14 +95,14 @@ __LIBC __FILE *stdout;
 #define __LOCAL_stdout (__iob_func() + 1)
 #elif defined(__CRT_HAVE__IO_stdout_)
 #ifndef _IO_stdout_
+__CSDECLARE(,__FILE,_IO_stdout_)
 #define _IO_stdout_ _IO_stdout_
-__LIBC __FILE _IO_stdout_;
 #endif /* !_IO_stdout_ */
 #define __LOCAL_stdout (&_IO_stdout_)
 #elif defined(__CRT_HAVE__IO_2_1_stdout_)
 #ifndef _IO_2_1_stdout_
+__CSDECLARE(,__FILE,_IO_2_1_stdout_)
 #define _IO_2_1_stdout_ _IO_2_1_stdout_
-__LIBC __FILE _IO_2_1_stdout_;
 #endif /* !_IO_2_1_stdout_ */
 #define __LOCAL_stdout (&_IO_2_1_stdout_)
 #endif /* ... */
@@ -114,7 +114,7 @@ __LIBC __FILE _IO_2_1_stdout_;
 #ifdef stderr
 #define __LOCAL_stderr stderr
 #elif defined(__CRT_HAVE_stderr)
-__LIBC __FILE *stderr;
+__CSDECLARE(,__FILE *,stderr)
 #define stderr         stderr
 #define __LOCAL_stderr stderr
 #elif defined(__CYG_REENT)
@@ -123,14 +123,14 @@ __LIBC __FILE *stderr;
 #define __LOCAL_stderr (__iob_func() + 2)
 #elif defined(__CRT_HAVE__IO_stderr_)
 #ifndef _IO_stderr_
+__CSDECLARE(,__FILE,_IO_stderr_)
 #define _IO_stderr_ _IO_stderr_
-__LIBC __FILE _IO_stderr_;
 #endif /* !_IO_stderr_ */
 #define __LOCAL_stderr (&_IO_stderr_)
 #elif defined(__CRT_HAVE__IO_2_1_stderr_)
 #ifndef _IO_2_1_stderr_
+__CSDECLARE(,__FILE,_IO_2_1_stderr_)
 #define _IO_2_1_stderr_ _IO_2_1_stderr_
-__LIBC __FILE _IO_2_1_stderr_;
 #endif /* !_IO_2_1_stderr_ */
 #define __LOCAL_stderr (&_IO_2_1_stderr_)
 #endif /* ... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x407d0d7a */
+/* HASH CRC-32:0x946c9126 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,26 +42,26 @@ DECL_BEGIN
 #ifdef error_print_progname
 #define __LOCAL_error_print_progname error_print_progname
 #elif defined(__CRT_HAVE_error_print_progname)
-#ifdef __NO_ASMNAME
-__LIBC void (__LIBKCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
-#else /* __NO_ASMNAME */
-__LIBC void (__LIBKCALL *error_print_progname)(void);
-#define error_print_progname         error_print_progname
+#ifdef __NO_COMPILER_SREDIRECT
+__CSREDIRECT2(,void (__LIBKCALL *__LOCAL_error_print_progname)(void),__LOCAL_error_print_progname,error_print_progname)
+#else /* __NO_COMPILER_SREDIRECT */
+__CSDECLARE2(,void (__LIBKCALL *error_print_progname)(void),error_print_progname)
+#define error_print_progname       error_print_progname
 #define __LOCAL_error_print_progname error_print_progname
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #endif /* ... */
 #endif /* !__LOCAL_error_print_progname */
 #ifndef __LOCAL_error_message_count
 #ifdef error_message_count
 #define __LOCAL_error_message_count error_message_count
 #elif defined(__CRT_HAVE_error_message_count)
-#ifdef __NO_ASMNAME
-__LIBC unsigned int __LOCAL_error_message_count __ASMNAME("error_message_count");
-#else /* __NO_ASMNAME */
-__LIBC unsigned int error_message_count;
-#define error_message_count         error_message_count
+#ifdef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,unsigned int,__LOCAL_error_message_count,error_message_count)
+#else /* __NO_COMPILER_SREDIRECT */
+__CSDECLARE(,unsigned int,error_message_count)
+#define error_message_count       error_message_count
 #define __LOCAL_error_message_count error_message_count
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #endif /* ... */
 #endif /* !__LOCAL_error_message_count */
 #include <libc/template/stdstreams.h>
@@ -99,39 +99,39 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(3, 0) void
 #ifdef error_print_progname
 #define __LOCAL_error_print_progname error_print_progname
 #elif defined(__CRT_HAVE_error_print_progname)
-#ifdef __NO_ASMNAME
-__LIBC void (__LIBKCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
-#else /* __NO_ASMNAME */
-__LIBC void (__LIBKCALL *error_print_progname)(void);
-#define error_print_progname         error_print_progname
+#ifdef __NO_COMPILER_SREDIRECT
+__CSREDIRECT2(,void (__LIBKCALL *__LOCAL_error_print_progname)(void),__LOCAL_error_print_progname,error_print_progname)
+#else /* __NO_COMPILER_SREDIRECT */
+__CSDECLARE2(,void (__LIBKCALL *error_print_progname)(void),error_print_progname)
+#define error_print_progname       error_print_progname
 #define __LOCAL_error_print_progname error_print_progname
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #endif /* ... */
 #endif /* !__LOCAL_error_print_progname */
 #ifndef __LOCAL_error_one_per_line
 #ifdef error_one_per_line
 #define __LOCAL_error_one_per_line error_one_per_line
 #elif defined(__CRT_HAVE_error_one_per_line)
-#ifdef __NO_ASMNAME
-__LIBC int __LOCAL_error_one_per_line __ASMNAME("error_one_per_line");
-#else /* __NO_ASMNAME */
-__LIBC int error_one_per_line;
-#define error_one_per_line         error_one_per_line
+#ifdef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,int,__LOCAL_error_one_per_line,error_one_per_line)
+#else /* __NO_COMPILER_SREDIRECT */
+__CSDECLARE(,int,error_one_per_line)
+#define error_one_per_line       error_one_per_line
 #define __LOCAL_error_one_per_line error_one_per_line
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #endif /* ... */
 #endif /* !__LOCAL_error_one_per_line */
 #ifndef __LOCAL_error_message_count
 #ifdef error_message_count
 #define __LOCAL_error_message_count error_message_count
 #elif defined(__CRT_HAVE_error_message_count)
-#ifdef __NO_ASMNAME
-__LIBC unsigned int __LOCAL_error_message_count __ASMNAME("error_message_count");
-#else /* __NO_ASMNAME */
-__LIBC unsigned int error_message_count;
-#define error_message_count         error_message_count
+#ifdef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,unsigned int,__LOCAL_error_message_count,error_message_count)
+#else /* __NO_COMPILER_SREDIRECT */
+__CSDECLARE(,unsigned int,error_message_count)
+#define error_message_count       error_message_count
 #define __LOCAL_error_message_count error_message_count
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #endif /* ... */
 #endif /* !__LOCAL_error_message_count */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(5, 0) void

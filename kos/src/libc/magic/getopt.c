@@ -93,18 +93,17 @@ enum {
 
 #ifdef __CC__
 
-}%[push_macro @undef { optarg optind opterr optopt option name has_arg flag val }]%{
-
-#ifdef __CRT_HAVE_optarg
+#if !defined(optarg) && defined(__CRT_HAVE_optarg)
 /* For   communication  from  `getopt'  to  the  caller.
  * When `getopt' finds an option that takes an argument,
  * the argument value is returned here.
  * Also,  when  `ordering'  is   RETURN_IN_ORDER,
  * each non-option argv-element is returned here. */
-__LIBC char *optarg;
-#endif /* __CRT_HAVE_optarg */
+__CSDECLARE(,char *,optarg)
+#define optarg optarg
+#endif /* !defined(optarg) && __CRT_HAVE_optarg */
 
-#ifdef __CRT_HAVE_optind
+#if !defined(optind) && defined(__CRT_HAVE_optind)
 /* Index in `argv' of the next element to be scanned.
  * - This  is  used for  communication  to and  from  the caller
  *   and for communication between successive calls to `getopt'.
@@ -113,30 +112,24 @@ __LIBC char *optarg;
  *   the non-option elements that the caller should itself scan.
  * - Otherwise, `optind'  communicates from  one call  to
  *   the next how much of `argv' has been scanned so far. */
-__LIBC __INT32_TYPE__ optind;
-#endif /* __CRT_HAVE_optind */
+__CSDECLARE(,int,optind)
+#define optind optind
+#endif /* !defined(optind) && __CRT_HAVE_optind */
 
-#ifdef __CRT_HAVE_opterr
+#if !defined(opterr) && defined(__CRT_HAVE_opterr)
 /* Callers store zero here to inhibit the error message
  * `getopt'   prints    for    unrecognized    options. */
-__LIBC __INT32_TYPE__ opterr;
-#endif /* __CRT_HAVE_opterr */
+__CSDECLARE(,int,opterr)
+#define opterr opterr
+#endif /* !defined(opterr) && __CRT_HAVE_opterr */
 
-#ifdef __CRT_HAVE_optopt
+#if !defined(optopt) && defined(__CRT_HAVE_optopt)
 /* Set to an option character which was unrecognized. */
-__LIBC __INT32_TYPE__ optopt;
-#endif /* __CRT_HAVE_optopt */
+__CSDECLARE(,int,optopt)
+#define optopt optopt
+#endif /* !defined(optopt) && __CRT_HAVE_optopt */
 
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("name")
-#pragma push_macro("has_arg")
-#pragma push_macro("flag")
-#pragma push_macro("val")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef name
-#undef has_arg
-#undef flag
-#undef val
+}%[push_macro @undef { option name has_arg flag val }]%{
 
 /* Describe the long-named options requested by the application.
  *
@@ -163,14 +156,9 @@ struct option {
 	__INT32_TYPE__   val;
 };
 
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("val")
-#pragma pop_macro("flag")
-#pragma pop_macro("has_arg")
-#pragma pop_macro("name")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-
 }
+%[pop_macro]
+
 
 @@Return the option  character from  OPTS just read.  Return -1  when
 @@there  are no  more options.  For unrecognized  options, or options
@@ -203,8 +191,7 @@ int getopt_long_only(int argc, char *const argv[],
                      int *longind);
 
 
-%
-%[pop_macro]%{
+%{
 
 #endif /* __CC__ */
 

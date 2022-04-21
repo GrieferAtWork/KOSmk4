@@ -259,7 +259,7 @@ typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 %#ifndef _M_CEE_PURE
 
 %#ifdef __CRT_HAVE__crtAssertBusy
-%__LIBC __LONG32_TYPE__ _crtAssertBusy;
+%__CSDECLARE(,__LONG32_TYPE__,_crtAssertBusy)
 %#else /* __CRT_HAVE__crtAssertBusy */
 [[crt_dos_only, guard, decl_include("<hybrid/typecore.h>")]]
 __LONG32_TYPE__ *__p__crtAssertBusy();
@@ -269,7 +269,7 @@ __LONG32_TYPE__ *__p__crtAssertBusy();
 %#endif /* !__CRT_HAVE__crtAssertBusy */
 
 %#ifdef __CRT_HAVE__crtBreakAlloc
-%__LIBC __LONG32_TYPE__ _crtBreakAlloc;
+%__CSDECLARE(,__LONG32_TYPE__,_crtBreakAlloc)
 %#else /* __CRT_HAVE__crtBreakAlloc */
 [[crt_dos_only, guard, decl_include("<hybrid/typecore.h>")]]
 __LONG32_TYPE__ *__p__crtBreakAlloc();
@@ -279,7 +279,7 @@ __LONG32_TYPE__ *__p__crtBreakAlloc();
 %#endif /* !__CRT_HAVE__crtBreakAlloc */
 
 %#ifdef __CRT_HAVE__crtDbgFlag
-%__LIBC int _crtDbgFlag;
+%__CSDECLARE(,int,_crtDbgFlag)
 %#else /* __CRT_HAVE__crtDbgFlag */
 [[crt_dos_only, guard]]
 int *__p__crtDbgFlag();

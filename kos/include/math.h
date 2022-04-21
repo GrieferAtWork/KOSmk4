@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd55aaf19 */
+/* HASH CRC-32:0x34ceed64 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -13631,7 +13631,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(canonicalizel, __FORCELOCAL __ATTR_ARTIFICIAL in
 /* This variable is used by `gamma(3)' and `lgamma(3)'. */
 #ifndef signgam
 #ifdef __CRT_HAVE_signgam
-__LIBC int signgam __CASMNAME_SAME("signgam");
+__CSDECLARE(,int,signgam)
 #define signgam signgam
 #elif defined(__LOCAL_signgam)
 #define signgam __LOCAL_signgam
@@ -14274,7 +14274,7 @@ typedef enum {
 /* One of `_LIB_VERSION_TYPE': The current math error behavior */
 #ifndef _LIB_VERSION
 #ifdef __CRT_HAVE__LIB_VERSION
-__LIBC _LIB_VERSION_TYPE _LIB_VERSION;
+__CSDECLARE(,_LIB_VERSION_TYPE,_LIB_VERSION)
 #define _LIB_VERSION _LIB_VERSION
 #endif /* __CRT_HAVE__LIB_VERSION */
 #endif /* !_LIB_VERSION */

@@ -23,22 +23,22 @@
 #ifdef signgam
 #define __LOCAL_signgam signgam
 #elif defined(__CRT_HAVE_signgam)
-#ifndef __NO_ASMNAME
+#ifndef __NO_COMPILER_SREDIRECT
 #define __LOCAL_signgam __LOCAL_signgam
 #ifdef __CC__
 __DECL_BEGIN
-__LIBC int *__LOCAL_signgam __CASMNAME("signgam");
+__CSREDIRECT(,int *,__LOCAL_signgam,signgam)
 __DECL_END
 #endif /* __CC__ */
-#else /* !__NO_ASMNAME */
+#else /* !__NO_COMPILER_SREDIRECT */
 #define __LOCAL_signgam signgam
 #define signgam         signgam
 #ifdef __CC__
 __DECL_BEGIN
-__LIBC int *signgam;
+__CSDECLARE(,int *,signgam)
 __DECL_END
 #endif /* __CC__ */
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___signgam)
 #ifdef __CC__
 __DECL_BEGIN

@@ -273,7 +273,7 @@
 #endif /* !__COMPILER_HAVE_GCC_ASM */
 #endif /* !__DEFINE_PUBLIC_ALIAS */
 
-#if !defined(__CC__)
+#ifndef __CC__
 #define __IMPDEF                               /* Nothing */
 #define __IMPDAT                               /* Nothing */
 #define __EXPDEF                               /* Nothing */
@@ -468,6 +468,8 @@
 #ifndef __COMPILER_REDIRECT
 #if defined(__INTELLISENSE__) || defined(__LCLINT__)
 /* Only declare the functions for intellisense to minimize IDE lag. */
+#define __COMPILER_SREDIRECT(decl,attr,T,name,asmname)                                                                  decl attr T name;
+#define __COMPILER_SREDIRECT2(decl,attr,Tdecl,name,asmname)                                                             decl attr Tdecl;
 #define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       decl attr Treturn nothrow(cc name) param;
 #define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          decl attr void nothrow(cc name) param;
 #ifdef ____PRIVATE_VREDIRECT_UNPACK
@@ -489,6 +491,8 @@
 #define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,inline_impl)                                   extern attr Treturn nothrow(cc name) param;
 #endif /* !... */
 #elif !defined(__CC__)
+#define __COMPILER_SREDIRECT(decl,attr,T,name,asmname)                                                                  /* nothing */
+#define __COMPILER_SREDIRECT2(decl,attr,Tdecl,name,asmname)                                                             /* nothing */
 #define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       /* nothing */
 #define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          /* nothing */
 #define __COMPILER_VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    /* nothing */
@@ -510,6 +514,8 @@
 #elif !defined(__NO_ASMNAME)
 /* Use GCC family's assembly name extension. */
 #ifdef __COMPILER_ASMNAME_ON_SECOND_DECL
+#define __COMPILER_SREDIRECT(decl,attr,T,name,asmname)                                                                  decl attr T name; decl attr T name __ASMNAME(__PP_PRIVATE_STR(asmname));
+#define __COMPILER_SREDIRECT2(decl,attr,Tdecl,name,asmname)                                                             decl attr Tdecl; decl attr Tdecl __ASMNAME(__PP_PRIVATE_STR(asmname));
 #define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       decl attr Treturn nothrow(cc name) param; decl attr Treturn nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
 #define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          decl attr void nothrow(cc name) param; decl attr void nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
 #define __COMPILER_VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) decl attr Treturn nothrow(cc name) paramf; decl attr Treturn nothrow(cc name) paramf __ASMNAME(__PP_PRIVATE_STR(asmnamef));
@@ -517,6 +523,8 @@
 #define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      decl attr Treturn nothrow(cc name) param; decl attr Treturn nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
 #define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         decl attr void nothrow(cc name) param; decl attr void nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
 #else /* __COMPILER_ASMNAME_ON_SECOND_DECL */
+#define __COMPILER_SREDIRECT(decl,attr,T,name,asmname)                                                                  decl attr T name __ASMNAME(__PP_PRIVATE_STR(asmname));
+#define __COMPILER_SREDIRECT2(decl,attr,Tdecl,name,asmname)                                                             decl attr Tdecl __ASMNAME(__PP_PRIVATE_STR(asmname));
 #define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       decl attr Treturn nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
 #define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          decl attr void nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
 #define __COMPILER_VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) decl attr Treturn nothrow(cc name) paramf __ASMNAME(__PP_PRIVATE_STR(asmnamef));
@@ -572,6 +580,8 @@
 #endif /* !... */
 #elif defined(__PRAGMA_REDEFINE_EXTNAME)
 /* Use _Pragma("redefine_extname " #name " " #asmname). */
+#define __COMPILER_SREDIRECT(decl,attr,T,name,asmname)                                                                  __pragma(redefine_extname name asmname) decl attr T name;
+#define __COMPILER_SREDIRECT2(decl,attr,Tdecl,name,asmname)                                                             __pragma(redefine_extname name asmname) decl attr Tdecl;
 #define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       __pragma(redefine_extname name asmname) decl attr Treturn nothrow(cc name) param;
 #define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          __pragma(redefine_extname name asmname) decl attr void nothrow(cc name) param;
 #ifdef ____PRIVATE_VREDIRECT_UNPACK
@@ -651,6 +661,12 @@
 #endif /* !__LOCAL_REDIRECT */
 #define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)  __LOCAL_REDIRECT attr Treturn nothrow(cc name) param code
 #define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)     __LOCAL_REDIRECT attr void nothrow(cc name) param code
+
+#define __NO_COMPILER_SREDIRECT
+#define __COMPILER_SREDIRECT(decl,attr,T,name,asmname) \
+	decl attr __ATTR_DEPRECATED("symbol '" #name "' could not be redirected to '" #asmname "'") T name;
+#define __COMPILER_SREDIRECT2(decl,attr,Tdecl,name,asmname) \
+	decl attr __ATTR_DEPRECATED("symbol '" #name "' could not be redirected to '" #asmname "'") Tdecl;
 
 #ifdef __cplusplus
 /* In C++, we can use use namespaces to prevent collisions with incompatible prototypes. */

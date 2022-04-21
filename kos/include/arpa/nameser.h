@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fabb73c */
+/* HASH CRC-32:0x302d3ad4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -138,9 +138,10 @@ struct _ns_flagdata {
 #pragma pop_macro("shift")
 #pragma pop_macro("mask")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#ifdef __CRT_HAVE__ns_flagdata
-__LIBC struct _ns_flagdata const _ns_flagdata[];
-#endif /* !__CRT_HAVE__ns_flagdata */
+#if !defined(_ns_flagdata) && defined(__CRT_HAVE__ns_flagdata)
+__CSDECLARE2(,struct _ns_flagdata const _ns_flagdata[],_ns_flagdata)
+#define _ns_flagdata _ns_flagdata
+#endif /* !_ns_flagdata && __CRT_HAVE__ns_flagdata */
 #endif /* __CC__ */
 
 /* ??? */

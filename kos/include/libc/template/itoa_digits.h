@@ -36,14 +36,14 @@
 #ifdef _itoa_digits
 #define __LOCAL_itoa_digits _itoa_digits
 #elif defined(__CRT_HAVE__itoa_digits)
-#ifndef __NO_ASMNAME
-__LIBC char const __LOCAL_itoa_digits[101] __CASMNAME("_itoa_digits");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT2(,char const __LOCAL_itoa_digits[101],__LOCAL_itoa_digits,_itoa_digits)
 #define __LOCAL_itoa_digits __LOCAL_itoa_digits
-#else /* !__NO_ASMNAME */
-__LIBC char const _itoa_digits[101] __CASMNAME_SAME("_itoa_digits");
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE2(,char const _itoa_digits[101],_itoa_digits)
 #define _itoa_digits        _itoa_digits
 #define __LOCAL_itoa_digits _itoa_digits
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif defined(__cplusplus)
 #define __LOCAL_itoa_digits __LOCAL_itoa_digits_fp()
 __ATTR_FORCEINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
@@ -69,14 +69,14 @@ __LOCAL_LIBC_CONST_DATA(_itoa_digits) char const _itoa_digits[101] =
 #ifdef _itoa_lower_digits
 #define __LOCAL_itoa_lower_digits _itoa_lower_digits
 #elif defined(__CRT_HAVE__itoa_lower_digits)
-#ifndef __NO_ASMNAME
-__LIBC char const __LOCAL_itoa_lower_digits[37] __CASMNAME("_itoa_lower_digits");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT2(,char const __LOCAL_itoa_lower_digits[37],__LOCAL_itoa_lower_digits,_itoa_lower_digits)
 #define __LOCAL_itoa_lower_digits __LOCAL_itoa_lower_digits
-#else /* !__NO_ASMNAME */
-__LIBC char const _itoa_lower_digits[37] __CASMNAME_SAME("_itoa_lower_digits");
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE2(,char const _itoa_lower_digits[37],_itoa_lower_digits)
 #define _itoa_lower_digits        _itoa_lower_digits
 #define __LOCAL_itoa_lower_digits _itoa_lower_digits
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #else /* ... */
 #define __LOCAL_itoa_lower_digits (__LOCAL_itoa_digits + 0)
 #endif /* !... */
@@ -87,14 +87,14 @@ __LIBC char const _itoa_lower_digits[37] __CASMNAME_SAME("_itoa_lower_digits");
 #ifdef _itoa_upper_digits
 #define __LOCAL_itoa_upper_digits _itoa_upper_digits
 #elif defined(__CRT_HAVE__itoa_upper_digits)
-#ifndef __NO_ASMNAME
-__LIBC char const __LOCAL_itoa_upper_digits[37] __CASMNAME("_itoa_upper_digits");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT2(,char const __LOCAL_itoa_upper_digits[37],__LOCAL_itoa_upper_digits,_itoa_upper_digits)
 #define __LOCAL_itoa_upper_digits __LOCAL_itoa_upper_digits
-#else /* !__NO_ASMNAME */
-__LIBC char const _itoa_upper_digits[37] __CASMNAME_SAME("_itoa_upper_digits");
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE2(,char const _itoa_upper_digits[37],_itoa_upper_digits)
 #define _itoa_upper_digits        _itoa_upper_digits
 #define __LOCAL_itoa_upper_digits _itoa_upper_digits
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #else /* ... */
 #define __LOCAL_itoa_upper_digits (__LOCAL_itoa_digits + 64)
 #endif /* !... */

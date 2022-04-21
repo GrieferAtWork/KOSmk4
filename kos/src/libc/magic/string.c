@@ -1386,15 +1386,21 @@ int strncasecmp_l([[nonnull]] char const *s1,
 @@pp_ifndef ___local_sys_errlist_defined@@
 #define ___local_sys_errlist_defined
 @@pp_if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)@@
-#ifndef @_sys_errlist@
-__LIBC char const *const @_sys_errlist@[];
-#endif /* !_sys_errlist */
-#ifndef @_sys_nerr@
-__LIBC int @_sys_nerr@;
-#endif /* !_sys_nerr */
+@@pp_if !defined(@_sys_errlist@)@@
+@@pp_ifdef __NSIG@@
+__CSDECLARE2(,char const *const @_sys_siglist@[__NSIG],@_sys_siglist@)
+@@pp_else@@
+__CSDECLARE2(,char const *const @_sys_siglist@[],@_sys_siglist@)
+@@pp_endif@@
+#define @_sys_errlist@ @_sys_errlist@
+@@pp_endif@@
+@@pp_if !defined(@_sys_nerr@)@@
+__CSDECLARE(,int,@_sys_nerr@)
+#define @_sys_nerr@ @_sys_nerr@
+@@pp_endif@@
 @@pp_elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)@@
-__LIBC __ATTR_WUNUSED __ATTR_CONST char const *const *(__LIBCCALL @__sys_errlist@)(void);
-__LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL @__sys_nerr@)(void);
+__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,char const *const *,@__sys_errlist@,(void),())
+__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int *,@__sys_nerr@,(void),())
 @@pp_else@@
 #undef ___local_sys_errlist_defined
 @@pp_endif@@
@@ -2908,26 +2914,26 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__N
 #define @sys_siglist@  @__p_sys_siglist@()
 #endif /* !sys_siglist */
 #elif defined(__CRT_HAVE_sys_siglist)
-#if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
-__LIBC char const *const @_sys_siglist@[__NSIG] __ASMNAME("sys_siglist");
-#else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
+#if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_COMPILER_SREDIRECT)
+__CSREDIRECT2(,char const *const @_sys_siglist@[__NSIG],@_sys_siglist@,sys_siglist)
+#else /* __CRT_HAVE__sys_siglist || !__NO_COMPILER_SREDIRECT */
 #ifndef @_sys_siglist@
 #define @_sys_siglist@ @sys_siglist@
 #endif /* !_sys_siglist */
-#endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
+#endif /* !__CRT_HAVE__sys_siglist && __NO_COMPILER_SREDIRECT */
 #ifndef @sys_siglist@
-__LIBC char const *const @sys_siglist@[__NSIG];
+__CSDECLARE2(,char const *const @sys_siglist@[__NSIG],@sys_siglist@)
 #endif /* !sys_siglist */
 #elif defined(__CRT_HAVE__sys_siglist)
 #ifndef @sys_siglist@
-#ifndef __NO_ASMNAME
-__LIBC char const *const @sys_siglist@[__NSIG] __ASMNAME("_sys_siglist");
-#else /* !__NO_ASMNAME */
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT2(,char const *const @sys_siglist@[__NSIG],@sys_siglist@,_sys_siglist)
+#else /* !__NO_COMPILER_SREDIRECT */
 #define @sys_siglist@ @_sys_siglist@
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #endif /* !sys_siglist */
 #ifndef @_sys_siglist@
-__LIBC char const *const @_sys_siglist@[__NSIG];
+__CSDECLARE2(,char const *const @_sys_siglist@[__NSIG],@_sys_siglist@)
 #endif /* !_sys_siglist */
 #endif /* sys_siglist... */
 #endif /* !___local_sys_siglist_defined */

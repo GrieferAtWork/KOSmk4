@@ -2020,7 +2020,7 @@ DEFINE_PUBLIC_ALIAS(_itoa_upper_digits, libc__itoa_upper_digits);
 #ifdef __LOCAL_itoa_digits
 #define _itoa_digits __LOCAL_itoa_digits
 #elif defined(__CRT_HAVE__itoa_digits)
-__LIBC char const _itoa_digits[101] __CASMNAME_SAME("_itoa_digits");
+__CSDECLARE2(,char const _itoa_digits[101],_itoa_digits)
 #define _itoa_digits _itoa_digits
 #elif defined(__cplusplus)
 #define _itoa_digits __LOCAL_itoa_digits_fp()
@@ -2047,7 +2047,7 @@ __LOCAL_LIBC_CONST_DATA(_itoa_digits) char const _itoa_digits[101] =
 #elif defined(__CRT_HAVE__itoa_digits)
 #define _itoa_lower_digits (_itoa_digits + 0)
 #elif defined(__CRT_HAVE__itoa_lower_digits)
-__LIBC char const _itoa_lower_digits[37] __CASMNAME_SAME("_itoa_lower_digits");
+__CSDECLARE2(,char const _itoa_lower_digits[37],_itoa_lower_digits)
 #define _itoa_lower_digits _itoa_lower_digits
 #else /* ... */
 #define _itoa_lower_digits (_itoa_digits + 0)
@@ -2061,7 +2061,7 @@ __LIBC char const _itoa_lower_digits[37] __CASMNAME_SAME("_itoa_lower_digits");
 #elif defined(__CRT_HAVE__itoa_digits)
 #define _itoa_upper_digits (_itoa_digits + 64)
 #elif defined(__CRT_HAVE__itoa_upper_digits)
-__LIBC char const _itoa_upper_digits[37] __CASMNAME_SAME("_itoa_upper_digits");
+__CSDECLARE2(,char const _itoa_upper_digits[37],_itoa_upper_digits)
 #define _itoa_upper_digits _itoa_upper_digits
 #else /* ... */
 #define _itoa_upper_digits (_itoa_digits + 64)
@@ -2487,7 +2487,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,___mb_cur_max_func,(void),(
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__p___mb_cur_max,(void),())
 #define MB_CUR_MAX ((__SIZE_TYPE__)*__p___mb_cur_max())
 #elif defined(__CRT_HAVE___mb_cur_max)
-__LIBC int __mb_cur_max __CASMNAME_SAME("__mb_cur_max");
+__CSDECLARE(,int,__mb_cur_max)
 #define __mb_cur_max __mb_cur_max
 #define MB_CUR_MAX   ((__SIZE_TYPE__)__mb_cur_max)
 #else /* __CRT_HAVE___ctype_get_mb_cur_max */
@@ -4090,26 +4090,26 @@ errno_t _set_doserrno($u32 err);
 #elif defined(__LOCAL_environ)
 #define _environ __LOCAL_environ
 #elif defined(__CRT_HAVE_environ)
-#ifdef __NO_ASMNAME
-__LIBC char **environ;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,char **,environ)
 #define environ  environ
 #define _environ environ
-#else /* __NO_ASMNAME */
-__LIBC char **_environ __CASMNAME("environ");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,char **,_environ,environ)
 #define _environ _environ
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE__environ)
-__LIBC char **_environ;
+__CSDECLARE(,char **,_environ)
 #define _environ _environ
 #elif defined(__CRT_HAVE___environ)
-#ifdef __NO_ASMNAME
-__LIBC char **__environ;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,char **,__environ)
 #define __environ __environ
 #define _environ  __environ
-#else /* __NO_ASMNAME */
-__LIBC char **_environ __CASMNAME("__environ");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,char **,_environ,__environ)
 #define _environ _environ
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(____p__environ_defined)
 #define _environ (*__p__environ())
 #elif defined(__CRT_HAVE___p__environ)
@@ -4141,7 +4141,7 @@ __NOTHROW(__LIBCCALL ___get_environ_wrapper)(void) {
 %{
 #ifndef __argc
 #ifdef __CRT_HAVE___argc
-__LIBC int __argc;
+__CSDECLARE(,int,__argc)
 #define __argc __argc
 #else /* __CRT_HAVE___argc */
 }
@@ -4157,7 +4157,7 @@ int *__p___argc();
 
 #ifndef __argv
 #ifdef __CRT_HAVE___argv
-__LIBC char **__argv;
+__CSDECLARE(,char **,__argv)
 #else /* __CRT_HAVE___argv */
 }
 [[guard, const, wunused]]
@@ -4172,7 +4172,7 @@ char ***__p___argv();
 
 #ifndef __wargv
 #ifdef __CRT_HAVE___wargv
-__LIBC wchar_t **__wargv;
+__CSDECLARE(,wchar_t **,__wargv)
 #define __wargv __wargv
 #else /* __CRT_HAVE___wargv */
 }
@@ -4188,7 +4188,7 @@ wchar_t ***__p___wargv();
 
 #ifndef _wenviron
 #ifdef __CRT_HAVE__wenviron
-__LIBC wchar_t **_wenviron;
+__CSDECLARE(,wchar_t **,_wenviron)
 #define _wenviron _wenviron
 #else /* __CRT_HAVE__wenviron */
 }
@@ -4204,7 +4204,7 @@ wchar_t ***__p__wenviron();
 
 #ifndef _wpgmptr
 #ifdef __CRT_HAVE__wpgmptr
-__LIBC wchar_t *_wpgmptr;
+__CSDECLARE(,wchar_t *,_wpgmptr)
 #define _wpgmptr _wpgmptr
 #else /* __CRT_HAVE__wpgmptr */
 }
@@ -4222,30 +4222,30 @@ wchar_t **__p__wpgmptr();
  * HINT: The GNU equivalent of this is `program_invocation_name' */
 #ifndef _pgmptr
 #ifdef program_invocation_name
-#define _pgmptr   program_invocation_name
+#define _pgmptr program_invocation_name
 #elif defined(__progname_full)
-#define _pgmptr   __progname_full
+#define _pgmptr __progname_full
 #elif defined(__CRT_HAVE_program_invocation_name)
-#ifndef __NO_ASMNAME
-__LIBC char *_pgmptr __ASMNAME("program_invocation_name");
-#define _pgmptr   _pgmptr
-#else /* !__NO_ASMNAME */
-__LIBC char *program_invocation_name;
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,char *,_pgmptr,program_invocation_name)
+#define _pgmptr _pgmptr
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,char *,program_invocation_name)
 #define program_invocation_name program_invocation_name
 #define _pgmptr                 program_invocation_name
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE__pgmptr)
-__LIBC char *_pgmptr;
-#define _pgmptr   _pgmptr
+__CSDECLARE(,char *,_pgmptr)
+#define _pgmptr _pgmptr
 #elif defined(__CRT_HAVE___progname_full)
-#ifndef __NO_ASMNAME
-__LIBC char *_pgmptr __ASMNAME("__progname_full");
-#define _pgmptr   _pgmptr
-#else /* !__NO_ASMNAME */
-__LIBC char *__progname_full;
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,char *,_pgmptr,__progname_full)
+#define _pgmptr _pgmptr
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,char *,__progname_full)
 #define __progname_full __progname_full
 #define _pgmptr         __progname_full
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #else /* ... */
 }
 
@@ -4262,7 +4262,7 @@ char **__p__pgmptr() {
 
 %{
 #ifdef ____p__pgmptr_defined
-#define _pgmptr   (*__p__pgmptr())
+#define _pgmptr (*__p__pgmptr())
 #endif /* ____p__pgmptr_defined */
 #endif /* !... */
 #endif /* !_pgmptr */
@@ -4273,7 +4273,8 @@ char **__p__pgmptr() {
 %{
 #ifndef __initenv
 #ifdef __CRT_HAVE___initenv
-__LIBC char **__initenv;
+__CSDECLARE(,char **,__initenv)
+#define __initenv __initenv
 #else /* __CRT_HAVE___initenv */
 }
 @@Access to the initial environment block
@@ -4288,7 +4289,8 @@ __LIBC char **__initenv;
 #endif /* !__initenv */
 #ifndef __winitenv
 #ifdef __CRT_HAVE___winitenv
-__LIBC wchar_t **__winitenv;
+__CSDECLARE(,wchar_t **,__winitenv)
+#define __winitenv __winitenv
 #else /* __CRT_HAVE___winitenv */
 }
 @@Access to the initial environment block
@@ -4392,7 +4394,7 @@ errno_t _get_wpgmptr(wchar_t **pvalue) {
 }
 
 %#ifdef __CRT_HAVE__fmode
-%__LIBC int _fmode;
+%__CSDECLARE(,int,_fmode)
 %#else /* ... */
 [[guard, const, wunused]]
 [[nonnull, section(".text.crt.dos.FILE.utility")]]
@@ -5535,7 +5537,7 @@ void _sleep($uint32_t milli) {
 %{
 #ifndef environ
 #ifdef __CRT_HAVE_environ
-__LIBC char **environ;
+__CSDECLARE(,char **,environ)
 #define environ environ
 #elif defined(_environ)
 #define environ _environ
@@ -5544,23 +5546,23 @@ __LIBC char **environ;
 #elif defined(__LOCAL_environ)
 #define environ __LOCAL_environ
 #elif defined(__CRT_HAVE__environ)
-#ifdef __NO_ASMNAME
-__LIBC char **_environ;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,char **,_environ)
 #define _environ _environ
 #define environ  _environ
-#else /* __NO_ASMNAME */
-__LIBC char **environ __CASMNAME("_environ");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,char **,environ,_environ)
 #define environ environ
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___environ)
-#ifdef __NO_ASMNAME
-__LIBC char **__environ;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,char **,__environ)
 #define __environ _environ
 #define environ   __environ
-#else /* __NO_ASMNAME */
-__LIBC char **environ __CASMNAME("__environ");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,char **,environ,__environ)
 #define environ environ
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(____p__environ_defined)
 #define environ (*__p__environ())
 #elif defined(__CRT_HAVE___p__environ)

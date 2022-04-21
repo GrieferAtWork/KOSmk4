@@ -28,32 +28,32 @@ __DECL_BEGIN
 #elif defined(__timezone)
 #define __LOCAL_timezone __timezone
 #elif defined(__CRT_HAVE_timezone)
-#ifdef __NO_ASMNAME
-__LIBC long timezone;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,long,timezone)
 #define timezone         timezone
 #define __LOCAL_timezone timezone
-#else /* __NO_ASMNAME */
-__LIBC long __LOCAL_timezone __CASMNAME("timezone");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,long,__LOCAL_timezone,timezone)
 #define __LOCAL_timezone __LOCAL_timezone
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE__timezone)
-#ifdef __NO_ASMNAME
-__LIBC long _timezone;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,long,_timezone)
 #define _timezone        _timezone
 #define __LOCAL_timezone _timezone
-#else /* __NO_ASMNAME */
-__LIBC long __LOCAL_timezone __CASMNAME("_timezone");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,long,__LOCAL_timezone,_timezone)
 #define __LOCAL_timezone __LOCAL_timezone
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___timezone)
-#ifdef __NO_ASMNAME
-__LIBC long __timezone;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,long,__timezone)
 #define __timezone       __timezone
 #define __LOCAL_timezone __timezone
-#else /* __NO_ASMNAME */
-__LIBC long __LOCAL_timezone __CASMNAME("__timezone");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,long,__LOCAL_timezone,__timezone)
 #define __LOCAL_timezone __LOCAL_timezone
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(____p__timezone_defined)
 #define __LOCAL_timezone (*__p__timezone())
 #elif defined(__CRT_HAVE___p__timezone)

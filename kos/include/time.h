@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x746bb694 */
+/* HASH CRC-32:0x24a672bf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -891,25 +891,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(localtime64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #elif defined(__LOCAL_tzname)
 #define __tzname __LOCAL_tzname
 #elif defined(__CRT_HAVE_tzname)
-#ifdef __NO_ASMNAME
-__LIBC char *tzname[2];
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE2(,char *tzname[2],tzname)
 #define tzname   tzname
 #define __tzname tzname
-#else /* __NO_ASMNAME */
-__LIBC char *__tzname[2] __CASMNAME("tzname");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT2(,char *__tzname[2],__tzname,tzname)
 #define __tzname __tzname
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE__tzname)
-#ifdef __NO_ASMNAME
-__LIBC char *_tzname[2];
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE2(,char *_tzname[2],_tzname)
 #define _tzname  _tzname
 #define __tzname _tzname
-#else /* __NO_ASMNAME */
-__LIBC char *__tzname[2] __CASMNAME("_tzname");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT2(,char *__tzname[2],__tzname,_tzname)
 #define __tzname __tzname
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___tzname) && !defined(__CRT_DOS)
-__LIBC char *__tzname[2];
+__CSDECLARE2(,char *__tzname[2],__tzname)
 #define __tzname __tzname
 #elif defined(__CRT_HAVE___tzname) && defined(__CRT_DOS)
 #ifndef ____dos_tzname_defined
@@ -929,25 +929,25 @@ __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,char **,__NOTHROW_
 #elif defined(__LOCAL_daylight)
 #define __daylight __LOCAL_daylight
 #elif defined(__CRT_HAVE_daylight)
-#ifdef __NO_ASMNAME
-__LIBC int daylight;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,int,daylight)
 #define daylight   daylight
 #define __daylight daylight
-#else /* __NO_ASMNAME */
-__LIBC int __daylight __CASMNAME("daylight");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,int,__daylight,daylight)
 #define __daylight __daylight
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE__daylight)
-#ifdef __NO_ASMNAME
-__LIBC int _daylight;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,int,_daylight)
 #define _daylight  _daylight
 #define __daylight _daylight
-#else /* __NO_ASMNAME */
-__LIBC int __daylight __CASMNAME("_daylight");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,int,__daylight,_daylight)
 #define __daylight __daylight
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___daylight) && !defined(__CRT_DOS)
-__LIBC int __daylight;
+__CSDECLARE(,int,__daylight)
 #define __daylight __daylight
 #elif defined(__CRT_HAVE___daylight) && defined(__CRT_DOS)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,int *,__NOTHROW_NCX,__dos_daylight,(void),__daylight,())
@@ -964,25 +964,25 @@ __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,int *,__NOTHROW_NC
 #elif defined(__LOCAL_timezone)
 #define __timezone __LOCAL_timezone
 #elif defined(__CRT_HAVE_timezone)
-#ifdef __NO_ASMNAME
-__LIBC long timezone;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,long,timezone)
 #define timezone   timezone
 #define __timezone timezone
-#else /* __NO_ASMNAME */
-__LIBC long __timezone __CASMNAME("timezone");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,long,__timezone,timezone)
 #define __timezone __timezone
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE__timezone)
-#ifdef __NO_ASMNAME
-__LIBC long _timezone;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,long,_timezone)
 #define _timezone  _timezone
 #define __timezone _timezone
-#else /* __NO_ASMNAME */
-__LIBC long __timezone __CASMNAME("_timezone");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,long,__timezone,_timezone)
 #define __timezone __timezone
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___timezone) && !defined(__CRT_DOS)
-__LIBC long __timezone;
+__CSDECLARE(,long,__timezone)
 #define __timezone __timezone
 #elif defined(__CRT_HAVE___daylight) && defined(__CRT_DOS)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,long *,__NOTHROW_NCX,__dos_timezone,(void),__timezone,())
@@ -1000,17 +1000,17 @@ __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,long *,__NOTHROW_N
 #elif defined(__LOCAL_tzname)
 #define tzname __LOCAL_tzname
 #elif defined(__CRT_HAVE_tzname)
-__LIBC char *tzname[2];
+__CSDECLARE2(,char *tzname[2],tzname)
 #define tzname tzname
 #elif defined(__CRT_HAVE___tzname) && !defined(__CRT_DOS)
-#ifdef __NO_ASMNAME
-__LIBC char *__tzname[2];
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE2(,char *__tzname[2],__tzname)
 #define __tzname __tzname
 #define tzname   __tzname
-#else /* __NO_ASMNAME */
-__LIBC char *tzname[2] __CASMNAME("__tzname");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT2(,char *tzname[2],tzname,__tzname)
 #define tzname tzname
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___tzname) && defined(__CRT_DOS)
 #ifndef ____dos_tzname_defined
 #define ____dos_tzname_defined
@@ -1041,7 +1041,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,tzset,(void),_tzset,())
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifndef daylight
 #ifdef __CRT_HAVE_daylight
-__LIBC int daylight;
+__CSDECLARE(,int,daylight)
 #define daylight daylight
 #elif defined(__daylight)
 #define daylight __daylight
@@ -1050,11 +1050,11 @@ __LIBC int daylight;
 
 #ifndef timezone
 #ifdef __CRT_HAVE_timezone
-__LIBC long timezone;
-#elif defined(__CRT_HAVE__timezone) && !defined(__NO_ASMNAME)
-__LIBC long timezone __CASMNAME("_timezone");
-#elif defined(__CRT_HAVE___timezone) && !defined(__NO_ASMNAME) && !defined(__CRT_DOS)
-__LIBC long timezone __CASMNAME("__timezone");
+__CSDECLARE(,long,timezone)
+#elif defined(__CRT_HAVE__timezone) && !defined(__NO_COMPILER_SREDIRECT)
+__CSREDIRECT(,long,timezone,_timezone)
+#elif defined(__CRT_HAVE___timezone) && !defined(__NO_COMPILER_SREDIRECT) && !defined(__CRT_DOS)
+__CSREDIRECT(,long,timezone,__timezone)
 #elif defined(__timezone)
 #define timezone __timezone
 #ifdef __struct_timezone_defined
@@ -1577,7 +1577,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timespec_get, __FORCELOCAL __ATTR_ARTIFICIAL __A
         specified that can not be represented in a time_t (representing
         the time in seconds since 00:00:00 UTC, January 1, 1970) */
 #ifdef __CRT_HAVE_getdate_err
-__LIBC int getdate_err;
+__CSDECLARE(,int,getdate_err)
+#define getdate_err getdate_err
 #endif /* __CRT_HAVE_getdate_err */
 /* >> getdate(3)
  * Parse the given string as a date specification and return a value
@@ -1853,7 +1854,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__dstbias, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifdef __LOCAL_dstbias
 #define _dstbias __LOCAL_dstbias
 #elif defined(__CRT_HAVE__dstbias)
-__LIBC __LONG32_TYPE__ _dstbias;
+__CSDECLARE(,__LONG32_TYPE__,_dstbias)
 #define _dstbias _dstbias
 #include <libc/template/dstbias.h>
 #elif (defined(__CRT_HAVE___dstbias) && defined(__CRT_DOS)) || defined(__CRT_HAVE_DOS$__dstbias) || defined(__CRT_HAVE___p__dstbias)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x747b6a25 */
+/* HASH CRC-32:0x5d07cd2e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -125,7 +125,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_ARTIFICIAL __
  * When non-NULL,  this  function  should:
  *  - fflush(stdout);
  *  - fprintf(stderr, "%s:", basename(argv[0])); */
-__LIBC void (__LIBKCALL *error_print_progname)(void);
+__CSDECLARE2(,void (__LIBKCALL *error_print_progname)(void),error_print_progname)
 #define error_print_progname error_print_progname
 #endif /* ... */
 #endif /* !error_print_progname */
@@ -135,7 +135,7 @@ __LIBC void (__LIBKCALL *error_print_progname)(void);
 #define error_message_count __LOCAL_error_message_count
 #elif defined(__CRT_HAVE_error_message_count)
 /* Incremented by one each time `error()' or `error_at_line()' is called. */
-__LIBC unsigned int error_message_count;
+__CSDECLARE(,unsigned int,error_message_count)
 #define error_message_count error_message_count
 #endif /* ... */
 #endif /* !error_message_count */
@@ -148,7 +148,7 @@ __LIBC unsigned int error_message_count;
  * When non-zero, consecutive calls to `error_at_line()' that pass the same
  * values for `filename'  and `line'  will not produce  the error  message.
  * The default value is ZERO(0) */
-__LIBC int error_one_per_line;
+__CSDECLARE(,int,error_one_per_line)
 #define error_one_per_line error_one_per_line
 #endif /* ... */
 #endif /* !error_one_per_line */

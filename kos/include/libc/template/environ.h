@@ -28,32 +28,32 @@ __DECL_BEGIN
 #elif defined(__environ)
 #define __LOCAL_environ __environ
 #elif defined(__CRT_HAVE_environ)
-#ifdef __NO_ASMNAME
-__LIBC char **environ;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,char **,environ)
 #define environ         environ
 #define __LOCAL_environ environ
-#else /* __NO_ASMNAME */
-__LIBC char **__LOCAL_environ __CASMNAME("environ");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,char **,__LOCAL_environ,environ)
 #define __LOCAL_environ __LOCAL_environ
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE__environ)
-#ifdef __NO_ASMNAME
-__LIBC char **_environ;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,char **,_environ)
 #define _environ        _environ
 #define __LOCAL_environ _environ
-#else /* __NO_ASMNAME */
-__LIBC char **__LOCAL_environ __CASMNAME("_environ");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,char **,__LOCAL_environ,_environ)
 #define __LOCAL_environ __LOCAL_environ
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___environ)
-#ifdef __NO_ASMNAME
-__LIBC char **__environ;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,char **,__environ)
 #define __environ       __environ
 #define __LOCAL_environ __environ
-#else /* __NO_ASMNAME */
-__LIBC char **__LOCAL_environ __CASMNAME("__environ");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,char **,__LOCAL_environ,__environ)
 #define __LOCAL_environ __LOCAL_environ
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(____p__environ_defined)
 #define __LOCAL_environ (*__p__environ())
 #elif defined(__CRT_HAVE___p__environ)

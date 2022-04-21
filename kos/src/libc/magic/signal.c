@@ -1318,9 +1318,9 @@ typedef __sighandler_t sighandler_t;
 #endif /* __USE_GNU */
 
 #ifdef __USE_MISC
-#ifndef NSIG
-#define NSIG _NSIG
-#endif /* !NSIG */
+#if !defined(NSIG) && defined(__NSIG)
+#define NSIG __NSIG
+#endif /* !NSIG && __NSIG */
 #ifndef __sig_t_defined
 #define __sig_t_defined
 typedef __sighandler_t sig_t;
@@ -1592,19 +1592,19 @@ char const *const *__p_sys_siglist();
 #endif /* ____p_sys_siglist_defined */
 #ifndef _sys_siglist
 #ifdef __CRT_HAVE_sys_siglist
-#ifdef _NSIG
-__LIBC char const *const sys_siglist[_NSIG];
-#else /* _NSIG */
-__LIBC char const *const sys_siglist[];
-#endif /* !_NSIG */
+#ifdef __NSIG
+__CSDECLARE2(,char const *const sys_siglist[__NSIG],sys_siglist)
+#else /* __NSIG */
+__CSDECLARE2(,char const *const sys_siglist[],sys_siglist)
+#endif /* !__NSIG */
 #define sys_siglist  sys_siglist
 #define _sys_siglist sys_siglist
 #elif defined(__CRT_HAVE__sys_siglist)
-#ifdef _NSIG
-__LIBC char const *const _sys_siglist[_NSIG];
-#else /* _NSIG */
-__LIBC char const *const _sys_siglist[];
-#endif /* !_NSIG */
+#ifdef __NSIG
+__CSDECLARE2(,char const *const _sys_siglist[__NSIG],_sys_siglist)
+#else /* __NSIG */
+__CSDECLARE2(,char const *const _sys_siglist[],_sys_siglist)
+#endif /* !__NSIG */
 #define sys_siglist  _sys_siglist
 #define _sys_siglist _sys_siglist
 #endif /* sys_siglist... */
@@ -1633,35 +1633,35 @@ void sigreturn(struct sigcontext const *scp);
 #ifdef sys_sigabbrev
 #define sys_signame sys_sigabbrev
 #elif defined(__CRT_HAVE_sys_signame)
-#ifdef _NSIG
-__LIBC char const *const sys_signame[_NSIG];
-#else /* _NSIG */
-__LIBC char const *const sys_signame[];
-#endif /* !_NSIG */
+#ifdef __NSIG
+__CSDECLARE2(,char const *const sys_signame[__NSIG],sys_signame)
+#else /* __NSIG */
+__CSDECLARE2(,char const *const sys_signame[],sys_signame)
+#endif /* !__NSIG */
 #define sys_signame sys_signame
 #elif defined(__CRT_HAVE_sys_sigabbrev)
-#ifdef __NO_ASMNAME
-#ifdef _NSIG
-__LIBC char const *const sys_signame[_NSIG] __CASMNAME("sys_sigabbrev");
-#else /* _NSIG */
-__LIBC char const *const sys_signame[] __CASMNAME("sys_sigabbrev");
-#endif /* !_NSIG */
+#ifdef __NO_COMPILER_SREDIRECT
+#ifdef __NSIG
+__CSREDIRECT2(,char const *const sys_signame[__NSIG],sys_signame,sys_sigabbrev)
+#else /* __NSIG */
+__CSREDIRECT2(,char const *const sys_signame[],sys_signame,sys_sigabbrev)
+#endif /* !__NSIG */
 #define sys_signame sys_signame
-#else /* __NO_ASMNAME */
-#ifdef _NSIG
-__LIBC char const *const sys_sigabbrev[_NSIG];
-#else /* _NSIG */
-__LIBC char const *const sys_sigabbrev[];
-#endif /* !_NSIG */
+#else /* __NO_COMPILER_SREDIRECT */
+#ifdef __NSIG
+__CSDECLARE2(,char const *const sys_sigabbrev[__NSIG],sys_sigabbrev)
+#else /* __NSIG */
+__CSDECLARE2(,char const *const sys_sigabbrev[],sys_sigabbrev)
+#endif /* !__NSIG */
 #define sys_sigabbrev sys_sigabbrev
 #define sys_signame   sys_sigabbrev
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #endif /* ... */
 #endif /* !sys_signame */
 
 #ifndef sys_nsig
 #ifdef __CRT_HAVE_sys_nsig
-__LIBC int const sys_nsig;
+__CSDECLARE(,int const,sys_nsig)
 #define sys_nsig sys_nsig
 #endif /* __CRT_HAVE_sys_nsig */
 #endif /* !sys_nsig */

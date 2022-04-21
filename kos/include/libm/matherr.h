@@ -300,14 +300,14 @@ __LIBM_LOCAL_FUNC(kernel_standard_l) __LONGDOUBLE
 #define __LIBM_LIB_VERSION _LIB_VERSION
 #elif defined(__CRT_HAVE__LIB_VERSION)
 /* Use libc configuration */
-#ifdef __NO_ASMNAME
-__LIBC __LIBM_LIB_VERSION_TYPE _LIB_VERSION;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,__LIBM_LIB_VERSION_TYPE,_LIB_VERSION)
 #define _LIB_VERSION       _LIB_VERSION
 #define __LIBM_LIB_VERSION _LIB_VERSION
-#else /* __NO_ASMNAME */
-__LIBC __LIBM_LIB_VERSION_TYPE __LIBM_LIB_VERSION __CASMNAME("_LIB_VERSION");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,__LIBM_LIB_VERSION_TYPE,__LIBM_LIB_VERSION,_LIB_VERSION)
 #define __LIBM_LIB_VERSION __LIBM_LIB_VERSION
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #else /* __CRT_HAVE__LIB_VERSION */
 /* Fallback: select most appropriate for caller's system. */
 #if defined(__unix__)

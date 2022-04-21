@@ -23,22 +23,22 @@
 #ifdef __libc_enable_secure
 #define __LOCAL___libc_enable_secure __libc_enable_secure
 #elif defined(__CRT_HAVE___libc_enable_secure)
-#ifndef __NO_ASMNAME
+#ifndef __NO_COMPILER_SREDIRECT
 #define __LOCAL___libc_enable_secure __LOCAL___libc_enable_secure
 #ifdef __CC__
 __DECL_BEGIN
-__LIBC int __LOCAL___libc_enable_secure __CASMNAME("__libc_enable_secure");
+__CSREDIRECT(,int,__LOCAL___libc_enable_secure,__libc_enable_secure)
 __DECL_END
 #endif /* __CC__ */
-#else /* !__NO_ASMNAME */
+#else /* !__NO_COMPILER_SREDIRECT */
 #define __LOCAL___libc_enable_secure __libc_enable_secure
 #define __libc_enable_secure         __libc_enable_secure
 #ifdef __CC__
 __DECL_BEGIN
-__LIBC int __libc_enable_secure;
+__CSDECLARE(,int,__libc_enable_secure)
 __DECL_END
 #endif /* __CC__ */
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE_issetugid)
 #ifndef __issetugid_defined
 #define __issetugid_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f490c41 */
+/* HASH CRC-32:0x5b83b261 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -598,11 +598,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_
 #ifdef ____errno_location_defined
 #define errno (*__errno_location())
 #elif defined(__CRT_HAVE_errno) && 0
-__LIBC __ATTR_THREAD __errno_t errno;
-#define errno  errno
+__CSDECLARE(__ATTR_THREAD,__errno_t,errno)
+#define errno errno
 #elif defined(__CRT_HAVE_errno)
-__LIBC __errno_t errno;
-#define errno  errno
+__CSDECLARE(,__errno_t,errno)
+#define errno errno
 #endif /* ... */
 #endif /* !__libc_errno */
 #endif /* !errno */
@@ -616,26 +616,26 @@ __LIBC __errno_t errno;
 #elif defined(_pgmptr)
 #define program_invocation_name __progname_full
 #elif defined(__CRT_HAVE_program_invocation_name)
-__LIBC char *program_invocation_name;
+__CSDECLARE(,char *,program_invocation_name)
 #define program_invocation_name program_invocation_name
 #elif defined(__CRT_HAVE__pgmptr)
-#ifndef __NO_ASMNAME
-__LIBC char *program_invocation_name __ASMNAME("_pgmptr");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,char *,program_invocation_name,_pgmptr)
 #define program_invocation_name  program_invocation_name
-#else /* !__NO_ASMNAME */
-__LIBC char *_pgmptr;
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,char *,_pgmptr)
 #define _pgmptr                 _pgmptr
 #define program_invocation_name _pgmptr
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___progname_full)
-#ifndef __NO_ASMNAME
-__LIBC char *program_invocation_name __ASMNAME("__progname_full");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,char *,program_invocation_name,__progname_full)
 #define program_invocation_name  program_invocation_name
-#else /* !__NO_ASMNAME */
-__LIBC char *__progname_full;
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,char *,__progname_full)
 #define __progname_full         __progname_full
 #define program_invocation_name __progname_full
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #else /* ... */
 #ifndef ____p__pgmptr_defined
 #define ____p__pgmptr_defined
@@ -667,17 +667,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__p__pgmptr, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #ifdef __progname
 #define program_invocation_short_name __progname
 #elif defined(__CRT_HAVE_program_invocation_short_name)
-__LIBC char *program_invocation_short_name;
+__CSDECLARE(,char *,program_invocation_short_name)
 #define program_invocation_short_name program_invocation_short_name
 #elif defined(__CRT_HAVE___progname)
-#ifndef __NO_ASMNAME
-__LIBC char *program_invocation_short_name __ASMNAME("__progname");
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,char *,program_invocation_short_name,__progname)
 #define program_invocation_short_name  program_invocation_short_name
-#else /* !__NO_ASMNAME */
-__LIBC char *__progname;
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,char *,__progname)
 #define __progname                    __progname
 #define program_invocation_short_name __progname
-#endif /* __NO_ASMNAME */
+#endif /* __NO_COMPILER_SREDIRECT */
 #else /* ... */
 #ifndef ____p_program_invocation_short_name_defined
 #define ____p_program_invocation_short_name_defined

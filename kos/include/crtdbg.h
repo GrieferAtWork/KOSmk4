@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1a3393a */
+/* HASH CRC-32:0xb711d28f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -251,7 +251,7 @@ typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 
 #ifndef _M_CEE_PURE
 #ifdef __CRT_HAVE__crtAssertBusy
-__LIBC __LONG32_TYPE__ _crtAssertBusy;
+__CSDECLARE(,__LONG32_TYPE__,_crtAssertBusy)
 #else /* __CRT_HAVE__crtAssertBusy */
 #if !defined(____p__crtAssertBusy_defined) && defined(__CRT_HAVE___p__crtAssertBusy)
 #define ____p__crtAssertBusy_defined
@@ -262,7 +262,7 @@ __LIBC __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __p__crtAssertBusy)(void) __CAS
 #endif /* ____p__crtAssertBusy_defined */
 #endif /* !__CRT_HAVE__crtAssertBusy */
 #ifdef __CRT_HAVE__crtBreakAlloc
-__LIBC __LONG32_TYPE__ _crtBreakAlloc;
+__CSDECLARE(,__LONG32_TYPE__,_crtBreakAlloc)
 #else /* __CRT_HAVE__crtBreakAlloc */
 #if !defined(____p__crtBreakAlloc_defined) && defined(__CRT_HAVE___p__crtBreakAlloc)
 #define ____p__crtBreakAlloc_defined
@@ -273,7 +273,7 @@ __LIBC __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __p__crtBreakAlloc)(void) __CAS
 #endif /* ____p__crtBreakAlloc_defined */
 #endif /* !__CRT_HAVE__crtBreakAlloc */
 #ifdef __CRT_HAVE__crtDbgFlag
-__LIBC int _crtDbgFlag;
+__CSDECLARE(,int,_crtDbgFlag)
 #else /* __CRT_HAVE__crtDbgFlag */
 #if !defined(____p__crtDbgFlag_defined) && defined(__CRT_HAVE___p__crtDbgFlag)
 #define ____p__crtDbgFlag_defined

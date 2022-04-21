@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64edb2c4 */
+/* HASH CRC-32:0xa30cc947 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,37 +92,17 @@ enum {
 
 #ifdef __CC__
 
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("optarg")
-#pragma push_macro("optind")
-#pragma push_macro("opterr")
-#pragma push_macro("optopt")
-#pragma push_macro("option")
-#pragma push_macro("name")
-#pragma push_macro("has_arg")
-#pragma push_macro("flag")
-#pragma push_macro("val")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef optarg
-#undef optind
-#undef opterr
-#undef optopt
-#undef option
-#undef name
-#undef has_arg
-#undef flag
-#undef val
-
-#ifdef __CRT_HAVE_optarg
+#if !defined(optarg) && defined(__CRT_HAVE_optarg)
 /* For   communication  from  `getopt'  to  the  caller.
  * When `getopt' finds an option that takes an argument,
  * the argument value is returned here.
  * Also,  when  `ordering'  is   RETURN_IN_ORDER,
  * each non-option argv-element is returned here. */
-__LIBC char *optarg;
-#endif /* __CRT_HAVE_optarg */
+__CSDECLARE(,char *,optarg)
+#define optarg optarg
+#endif /* !defined(optarg) && __CRT_HAVE_optarg */
 
-#ifdef __CRT_HAVE_optind
+#if !defined(optind) && defined(__CRT_HAVE_optind)
 /* Index in `argv' of the next element to be scanned.
  * - This  is  used for  communication  to and  from  the caller
  *   and for communication between successive calls to `getopt'.
@@ -131,26 +111,31 @@ __LIBC char *optarg;
  *   the non-option elements that the caller should itself scan.
  * - Otherwise, `optind'  communicates from  one call  to
  *   the next how much of `argv' has been scanned so far. */
-__LIBC __INT32_TYPE__ optind;
-#endif /* __CRT_HAVE_optind */
+__CSDECLARE(,int,optind)
+#define optind optind
+#endif /* !defined(optind) && __CRT_HAVE_optind */
 
-#ifdef __CRT_HAVE_opterr
+#if !defined(opterr) && defined(__CRT_HAVE_opterr)
 /* Callers store zero here to inhibit the error message
  * `getopt'   prints    for    unrecognized    options. */
-__LIBC __INT32_TYPE__ opterr;
-#endif /* __CRT_HAVE_opterr */
+__CSDECLARE(,int,opterr)
+#define opterr opterr
+#endif /* !defined(opterr) && __CRT_HAVE_opterr */
 
-#ifdef __CRT_HAVE_optopt
+#if !defined(optopt) && defined(__CRT_HAVE_optopt)
 /* Set to an option character which was unrecognized. */
-__LIBC __INT32_TYPE__ optopt;
-#endif /* __CRT_HAVE_optopt */
+__CSDECLARE(,int,optopt)
+#define optopt optopt
+#endif /* !defined(optopt) && __CRT_HAVE_optopt */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("option")
 #pragma push_macro("name")
 #pragma push_macro("has_arg")
 #pragma push_macro("flag")
 #pragma push_macro("val")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef option
 #undef name
 #undef has_arg
 #undef flag
@@ -186,8 +171,8 @@ struct option {
 #pragma pop_macro("flag")
 #pragma pop_macro("has_arg")
 #pragma pop_macro("name")
+#pragma pop_macro("option")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-
 #if !defined(__getopt_defined) && defined(__CRT_HAVE_getopt)
 #define __getopt_defined
 /* Return the option  character from  OPTS just read.  Return -1  when
@@ -239,18 +224,6 @@ __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long,(int ___argc, char *
  *   arguments to the option '\0'. This behavior is specific to the GNU
  *   `getopt' */
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long_only,(int ___argc, char *const ___argv[], char const *__shortopts, struct option const *__longopts, int *__longind),(___argc,___argv,__shortopts,__longopts,__longind))
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("val")
-#pragma pop_macro("flag")
-#pragma pop_macro("has_arg")
-#pragma pop_macro("name")
-#pragma pop_macro("option")
-#pragma pop_macro("optopt")
-#pragma pop_macro("opterr")
-#pragma pop_macro("optind")
-#pragma pop_macro("optarg")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 #endif /* __CC__ */
 

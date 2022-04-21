@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6632b15 */
+/* HASH CRC-32:0x3ff4cd77 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,7 +116,7 @@ typedef __ULONGPTR_TYPE__ reg_syntax_t; /* Set of `RE_*' (see below) */
 
 #ifdef __CRT_HAVE_re_syntax_options
 /* Regex syntax used by certain interfaces. */
-__LIBC reg_syntax_t re_syntax_options;
+__CSDECLARE(,reg_syntax_t,re_syntax_options)
 #endif /* __CRT_HAVE_re_syntax_options */
 
 #ifdef __USE_GNU
@@ -147,7 +147,7 @@ __LIBC reg_syntax_t re_syntax_options;
 #endif /* !RE_DUP_MAX */
 #endif /* __USE_GNU */
 
-/* Flags for `regcomp:cflags'.
+/* Flags for `regcomp(3)'s `cflags' argument.
  * NOTE: REG_EXTENDED does the following:
  *  - Enable support for [:class:] (as opposed to being the
  *    equivalent of "[:clas]", aka regular set-matching)
@@ -173,7 +173,7 @@ __LIBC reg_syntax_t re_syntax_options;
 #define REG_NOSUB    0x0008 /* If set:   Only return success/failure in regexec.
                              * If clear: Return success/failure/error in regexec. */
 
-/* Flags for `regexec:eflags'). */
+/* Flags for `regexec(3)'s `eflags' argument. */
 #define REG_NOTBOL   0x0001 /* == REGEX_FLAG_NOT_BEGIN_OF_LINE
                              * ^ doesn't match the start of input data (but only at an actual begin-of-line) */
 #define REG_NOTEOL   0x0002 /* == REGEX_FLAG_NOT_END_OF_LINE

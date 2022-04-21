@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5161aa63 */
+/* HASH CRC-32:0xf66c7473 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,29 +155,29 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_vfprintf_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __LOCAL_error_print_progname
-#ifdef __error_print_progname
-#define __LOCAL_error_print_progname __error_print_progname
+#ifdef error_print_progname
+#define __LOCAL_error_print_progname error_print_progname
 #elif defined(__CRT_HAVE_error_print_progname)
-#ifdef __NO_ASMNAME
-__LIBC void (__LIBKCALL *__LOCAL_error_print_progname)(void) __ASMNAME("error_print_progname");
-#else /* __NO_ASMNAME */
-__LIBC void (__LIBKCALL *__error_print_progname)(void);
-#define __error_print_progname         __error_print_progname
-#define __LOCAL_error_print_progname __error_print_progname
-#endif /* !__NO_ASMNAME */
+#ifdef __NO_COMPILER_SREDIRECT
+__CSREDIRECT2(,void (__LIBKCALL *__LOCAL_error_print_progname)(void),__LOCAL_error_print_progname,error_print_progname)
+#else /* __NO_COMPILER_SREDIRECT */
+__CSDECLARE2(,void (__LIBKCALL *error_print_progname)(void),error_print_progname)
+#define error_print_progname       error_print_progname
+#define __LOCAL_error_print_progname error_print_progname
+#endif /* !__NO_COMPILER_SREDIRECT */
 #endif /* ... */
 #endif /* !__LOCAL_error_print_progname */
 #ifndef __LOCAL_error_message_count
-#ifdef __error_message_count
-#define __LOCAL_error_message_count __error_message_count
+#ifdef error_message_count
+#define __LOCAL_error_message_count error_message_count
 #elif defined(__CRT_HAVE_error_message_count)
-#ifdef __NO_ASMNAME
-__LIBC unsigned int __LOCAL_error_message_count __ASMNAME("error_message_count");
-#else /* __NO_ASMNAME */
-__LIBC unsigned int __error_message_count;
-#define __error_message_count         __error_message_count
-#define __LOCAL_error_message_count __error_message_count
-#endif /* !__NO_ASMNAME */
+#ifdef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,unsigned int,__LOCAL_error_message_count,error_message_count)
+#else /* __NO_COMPILER_SREDIRECT */
+__CSDECLARE(,unsigned int,error_message_count)
+#define error_message_count       error_message_count
+#define __LOCAL_error_message_count error_message_count
+#endif /* !__NO_COMPILER_SREDIRECT */
 #endif /* ... */
 #endif /* !__LOCAL_error_message_count */
 __NAMESPACE_LOCAL_BEGIN

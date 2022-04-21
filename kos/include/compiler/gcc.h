@@ -93,17 +93,17 @@
 #define __GCC_HAS_ATTRIBUTE___transparent_union__
 #endif
 #if __GCC_VERSION_NUM >= 20300
-#define __GCC_HAS_ATTRIBUTE___format__
+#define __GCC_HAS_ATTRIBUTE___format__ /* 20400 */
 #endif
 #if __GCC_VERSION_NUM >= 20500
-#define __GCC_HAS_ATTRIBUTE___noreturn__
-#define __GCC_HAS_ATTRIBUTE___const__
+#define __GCC_HAS_ATTRIBUTE___noreturn__ /* 20800 */
+#define __GCC_HAS_ATTRIBUTE___const__ /* 20400 */
 #endif
 #if __GCC_VERSION_NUM >= 20700
-#define __GCC_HAS_ATTRIBUTE___unused__
+#define __GCC_HAS_ATTRIBUTE___unused__ /* 20400 */
 #endif
 #if __GCC_VERSION_NUM >= 20800
-#define __GCC_HAS_ATTRIBUTE___format_arg__
+#define __GCC_HAS_ATTRIBUTE___format_arg__ /* 20400 */
 #endif
 #if __GCC_VERSION_NUM >= 29600
 #define __GCC_HAS_ATTRIBUTE___pure__
@@ -112,8 +112,8 @@
 #define __GCC_HAS_ATTRIBUTE___malloc__
 #endif
 #if __GCC_VERSION_NUM >= 30100
-#define __GCC_HAS_ATTRIBUTE___no_instrument_function__
-#define __GCC_HAS_ATTRIBUTE___noinline__
+#define __GCC_HAS_ATTRIBUTE___no_instrument_function__ /* 20400 */
+#define __GCC_HAS_ATTRIBUTE___noinline__ /* 29600 */
 #define __GCC_HAS_ATTRIBUTE___used__
 #define __GCC_HAS_ATTRIBUTE___deprecated__ /*  - __GCC_VERSION_NUM >= 30100
                                             *  - __GCC_VERSION_NUM >= 30200
@@ -124,9 +124,13 @@
 #define __GCC_HAS_ATTRIBUTE___nothrow__
 #define __GCC_HAS_ATTRIBUTE___nonnull__
 #define __GCC_HAS_ATTRIBUTE___warn_unused_result__ /* __GCC_VERSION_NUM >= 30300 / __GCC_VERSION_NUM >= 30400 */
+#define __GCC_HAS_ATTRIBUTE_may_alias
+#endif
+#if __GCC_VERSION_NUM >= 30400
+#define __GCC_HAS_ATTRIBUTE_warn_unused_result
 #endif
 #if __GCC_VERSION_NUM >= 30500
-#define __GCC_HAS_ATTRIBUTE___sentinel__
+#define __GCC_HAS_ATTRIBUTE___sentinel__ /* 40000 */
 #endif
 #if __GCC_VERSION_NUM >= 40300
 #define __GCC_HAS_ATTRIBUTE___alloc_size__
@@ -148,6 +152,9 @@
 #endif
 #if __GCC_VERSION_NUM >= 70000
 #define __GCC_HAS_ATTRIBUTE___fallthrough__
+#endif
+#if __GCC_VERSION_NUM >= 60000
+#define __GCC_HAS_ATTRIBUTE_fallthrough
 #endif
 #if defined(__GNUC_GNU_INLINE__) || defined(__GNUC_STDC_INLINE__)
 #define __GCC_HAS_ATTRIBUTE___gnu_inline__
@@ -315,8 +322,10 @@
 
 #if defined(__cplusplus) && __has_cpp_attribute(fallthrough)
 #define __ATTR_FALLTHROUGH [[fallthrough]];
-#elif __has_attribute(fallthrough)
+#elif __has_attribute(__fallthrough__)
 #define __ATTR_FALLTHROUGH __attribute__((__fallthrough__));
+#elif __has_attribute(fallthrough)
+#define __ATTR_FALLTHROUGH __attribute__((fallthrough));
 #else /* ... */
 #define __NO_ATTR_FALLTHROUGH
 #define __ATTR_FALLTHROUGH /* Nothing */
@@ -574,6 +583,8 @@
 
 #if __has_attribute(__warn_unused_result__)
 #define __ATTR_WUNUSED __attribute__((__warn_unused_result__))
+#elif __has_attribute(warn_unused_result)
+#define __ATTR_WUNUSED __attribute__((warn_unused_result))
 #else /* ... */
 #define __NO_ATTR_WUNUSED
 #define __ATTR_WUNUSED /* Nothing */

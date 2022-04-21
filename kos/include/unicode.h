@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4fefd32 */
+/* HASH CRC-32:0xbe760d95 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __SYSDECL_BEGIN
 #ifndef __unicode_utf8seqlen_defined
 #define __unicode_utf8seqlen_defined
 #ifdef __CRT_HAVE_unicode_utf8seqlen
-__LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seqlen");
+__CSDECLARE2(,__UINT8_TYPE__ const unicode_utf8seqlen[256],unicode_utf8seqlen)
 #else /* __CRT_HAVE_unicode_utf8seqlen */
 #include <libc/template/unicode_utf8seqlen.h>
 #define unicode_utf8seqlen __LOCAL_unicode_utf8seqlen

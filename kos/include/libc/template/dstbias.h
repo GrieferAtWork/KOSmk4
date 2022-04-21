@@ -27,23 +27,23 @@ __DECL_BEGIN
 #elif defined(__dstbias)
 #define __LOCAL_dstbias __dstbias
 #elif defined(__CRT_HAVE__dstbias)
-#ifdef __NO_ASMNAME
-__LIBC __LONG32_TYPE__ _dstbias;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,__LONG32_TYPE__,_dstbias)
 #define _dstbias        _dstbias
 #define __LOCAL_dstbias _dstbias
-#else /* __NO_ASMNAME */
-__LIBC __LONG32_TYPE__ __LOCAL_dstbias __CASMNAME("_dstbias");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,__LONG32_TYPE__,__LOCAL_dstbias,_dstbias)
 #define __LOCAL_dstbias __LOCAL_dstbias
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(__CRT_HAVE___dstbias)
-#ifdef __NO_ASMNAME
-__LIBC __LONG32_TYPE__ __dstbias;
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,__LONG32_TYPE__,__dstbias)
 #define __dstbias       __dstbias
 #define __LOCAL_dstbias __dstbias
-#else /* __NO_ASMNAME */
-__LIBC __LONG32_TYPE__ __LOCAL_dstbias __CASMNAME("__dstbias");
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,__LONG32_TYPE__,__LOCAL_dstbias,__dstbias)
 #define __LOCAL_dstbias __LOCAL_dstbias
-#endif /* !__NO_ASMNAME */
+#endif /* !__NO_COMPILER_SREDIRECT */
 #elif defined(____p__dstbias_defined)
 #define __LOCAL_dstbias (*__p__dstbias())
 #elif defined(__CRT_HAVE___p__dstbias)
