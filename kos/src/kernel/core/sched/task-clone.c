@@ -52,6 +52,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/except.h>
@@ -368,8 +369,10 @@ again_lock_myptr:
 LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL x86_ioperm_bitmap_unset_write_access)(struct task *__restrict caller,
                                                     struct ioperm_bitmap *__restrict self) {
-	pflag_t was       = PREEMPTION_PUSHOFF();
-	struct cpu *mycpu = caller->t_cpu;
+	preemption_flag_t was;
+	struct cpu *mycpu;
+	preemption_pushoff(&was);
+	mycpu = caller->t_cpu;
 	if (FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == self) {
 		/* Re-map, and only include read permissions. */
 		pagedir_map(FORCPU(mycpu, thiscpu_x86_iob),
@@ -377,7 +380,7 @@ NOTHROW(KCALL x86_ioperm_bitmap_unset_write_access)(struct task *__restrict call
 		            self->ib_pages,
 		            PAGEDIR_PROT_READ);
 	}
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 #endif /* __i386__ || __x86_64__ */
 

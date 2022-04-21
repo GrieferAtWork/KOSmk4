@@ -35,6 +35,7 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <asm/cpu-cpuid.h>
 #include <asm/cpu-flags.h>
@@ -133,10 +134,10 @@ PUBLIC WUNUSED bool NOTHROW(KCALL fpustate_init_nx)(void) {
  * This functions are no-ops if the calling thread wasn't the
  * last one to use the FPU, or has never used the FPU at all. */
 PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_save)(void) {
-	pflag_t was;
+	preemption_flag_t was;
 	if (PERCPU(thiscpu_fputhread) != THIS_TASK)
 		return;
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	COMPILER_READ_BARRIER();
 	if (PERCPU(thiscpu_fputhread) == THIS_TASK) {
 		__clts();
@@ -146,7 +147,7 @@ PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_save)(void) {
 		__wrcr0(__rdcr0() | CR0_TS);
 		PERCPU(thiscpu_fputhread) = NULL;
 	}
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 /* Similar to `fpustate_save()', but save the state of whichever thread is
@@ -159,9 +160,9 @@ PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_save)(void) {
  * the associated CPU, after which the debugger can read/write FPU information
  * for any thread by simply looking at `FORTASK(thread, this_fpustate)' */
 PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_savecpu)(void) {
-	pflag_t was;
+	preemption_flag_t was;
 	struct task *holder;
-	was    = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	holder = PERCPU(thiscpu_fputhread);
 	if (holder) {
 		assert(!wasdestroyed(holder));
@@ -180,7 +181,7 @@ PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_savecpu)(void) {
 		__wrcr0(__rdcr0() | CR0_TS);
 		PERCPU(thiscpu_fputhread) = NULL;
 	}
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 
@@ -207,14 +208,14 @@ fpustate_loadfrom(USER CHECKED struct fpustate const *state)
 	struct fpustate *mystate;
 	mystate = PERTASK_GET(this_fpustate);
 	if (mystate) {
-		pflag_t was;
-		was = PREEMPTION_PUSHOFF();
+		preemption_flag_t was;
+		preemption_pushoff(&was);
 		/* Make sure that the calling thread isn't the current FPU user. */
 		if (PERCPU(thiscpu_fputhread) == THIS_TASK) {
 			PERCPU(thiscpu_fputhread) = NULL;
 			__wrcr0(__rdcr0() | CR0_TS);
 		}
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		/* Copy the given state to set it as the new FPU state. */
 		memcpy(mystate, state, SIZEOF_FPUSTATE);
 	} else {

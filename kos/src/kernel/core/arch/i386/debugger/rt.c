@@ -54,6 +54,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
+#include <hybrid/sched/preemption.h>
 
 #include <asm/farptr.h>
 #include <asm/intrin.h>
@@ -435,7 +436,8 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
                                                          unsigned int flags,
                                                          struct cpu *calling_cpu) {
 	unsigned int i, result = 0;
-	pflag_t was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 	for (i = 0; i < cpu_count; ++i) {
 		struct cpu *target;
 		struct task *thread;
@@ -468,7 +470,7 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 		if (cpu_sendipi(target, func, args, flags))
 			++result;
 	}
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return result;
 }
 #endif /* !CONFIG_NO_SMP */
@@ -986,10 +988,10 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	 * handler, which may actually be  the IPI-handler if the  debug-cpu
 	 * isn't the boot cpu! */
 	{
-		pflag_t was;
-		was = PREEMPTION_PUSHOFF();
+		preemption_flag_t was;
+		preemption_pushoff(&was);
 		cpu_ipi_service_nopr();
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	}
 
 }

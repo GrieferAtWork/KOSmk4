@@ -624,7 +624,7 @@ NOTHROW(FCALL sig_intern_broadcast)(struct sig *self,
                                     struct task *destroy_later,
                                     struct sig_cleanup_callback *cleanup,
                                     uintptr_t phase_one_state,
-                                    pflag_t was) {
+                                    preemption_flag_t was) {
 	uintptr_t ctl;
 	struct sig_post_completion *phase2 = NULL;
 	struct sig_completion_context context;
@@ -663,7 +663,7 @@ no_cons:
 		sig_unlock_pending(sc_pending);
 		if (cleanup)
 			(*cleanup->scc_cb)(cleanup);
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		destroy_tasks(destroy_later);
 		sig_run_phase_2(phase2, &context);
 		return result;
@@ -766,7 +766,7 @@ NOTHROW(FCALL sig_intern_send)(struct sig *self,
                                struct sig_completion *sc_pending,
                                struct task *destroy_later,
                                struct sig_cleanup_callback *cleanup,
-                               pflag_t was) {
+                               preemption_flag_t was) {
 	bool result;
 	uintptr_t ctl;
 	struct sig_post_completion *phase2 = NULL;
@@ -968,7 +968,7 @@ done:
 	sig_unlock_pending(sc_pending);
 	if (cleanup)
 		(*cleanup->scc_cb)(cleanup);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	destroy_tasks(destroy_later);
 	sig_run_phase_2(phase2, &context);
 	return result;
@@ -981,7 +981,7 @@ NOTHROW(FCALL sig_completion_runsingle)(struct sig *self,
                                         struct task *__restrict caller,
                                         struct sig *sender,
                                         struct sig_cleanup_callback *cleanup,
-                                        pflag_t was) {
+                                        preemption_flag_t was) {
 	struct sig_post_completion *phase2 = NULL;
 	struct sig_completion_context context;
 	context.scc_sender = sender;
@@ -995,7 +995,7 @@ NOTHROW(FCALL sig_completion_runsingle)(struct sig *self,
 	sig_smplock_release_nopr(self);
 	if (cleanup)
 		(*cleanup->scc_cb)(cleanup);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 
 	/* Run phase #2 callback. */
 	sig_run_phase_2(phase2, &context);
@@ -1008,7 +1008,7 @@ NOTHROW(FCALL sig_completion_runsingle)(struct sig *self,
 PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2)) bool
 NOTHROW(FCALL sig_sendone_for_forwarding_and_unlock)(struct sig *self,
                                                      struct sig *sender,
-                                                     pflag_t was) {
+                                                     preemption_flag_t was) {
 	bool result = false;
 	bool is_broadcasting_poll = false;
 	uintptr_t ctl;
@@ -1034,7 +1034,7 @@ no_cons:
 			goto again;
 #endif /* SIG_CONTROL_SMPLOCK != 0 */
 		result = false;
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		goto done;
 	}
 
@@ -1145,7 +1145,7 @@ no_cons:
 		thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
 		ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_SENT);
 		sig_smplock_release_nopr(self);
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		if likely(thread) {
 			task_wake(thread);
 			assert(thread->t_refcnt >= 1);
@@ -1162,7 +1162,7 @@ done:
 	 * NOTE: During this, the completion callback will clear the
 	 *       SMP  lock  bit  of its  own  completion controller. */
 	sig_unlock_pending(sc_pending);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 
 	/* Invoke phase-2 callbacks. */
 	sig_run_phase_2(phase2, &context);
@@ -1194,7 +1194,7 @@ NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
 	struct sig *signal = self->tc_sig;
 
 	/* At this point, we're allowed to assume all of the following: */
-	assert(!PREEMPTION_ENABLED());
+	assert(!preemption_ison());
 #ifndef CONFIG_NO_SMP
 	assert(signal->s_ctl & SIG_CONTROL_SMPLOCK);
 	assert(self->tc_stat & TASK_CONNECTION_STAT_FLOCK);
@@ -1275,16 +1275,16 @@ NOTHROW(FCALL task_disconnect_connection)(struct task_connection *__restrict sel
                                           bool forward_sent_signals) {
 	struct sig *signal;
 	struct task_connection *signal_cons;
-	pflag_t was;
+	preemption_flag_t was;
 	uintptr_t status;
 	signal = self->tc_sig;
 
 	/* Acquire a lock to the connection. */
 #ifdef CONFIG_NO_SMP
-	was    = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	status = ATOMIC_READ(self->tc_stat);
 	if (TASK_CONNECTION_STAT_ISDEAD(status)) {
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		goto done; /* Dead connection */
 	}
 	signal_cons = ATOMIC_READ(signal->s_con);
@@ -1297,10 +1297,10 @@ again:
 		task_pause();
 		goto again;
 	}
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	if (!ATOMIC_CMPXCH_WEAK(self->tc_stat, status,
 	                        status | TASK_CONNECTION_STAT_FLOCK)) {
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		goto again;
 	}
 
@@ -1309,7 +1309,7 @@ again_signal_cons:
 	signal_cons = ATOMIC_READ(signal->s_con);
 	if unlikely(sig_smplock_tst(signal_cons)) {
 		ATOMIC_AND(self->tc_stat, ~TASK_CONNECTION_STAT_FLOCK);
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		task_pause();
 		goto again;
 	}
@@ -1324,7 +1324,7 @@ again_signal_cons:
 	if likely(status != TASK_CONNECTION_STAT_SENT || !forward_sent_signals) {
 		/* Unlink our connection, and unlock the signal. */
 		task_connection_unlink_from_sig_and_unlock(signal, self);
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	} else {
 		/* Unlink our connection. */
 		task_connection_unlink_from_sig(signal, self);
@@ -1355,16 +1355,16 @@ PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL sig_completion_disconnect)(struct sig_completion *__restrict self) {
 	struct sig *signal;
 	struct task_connection *signal_cons;
-	pflag_t was;
+	preemption_flag_t was;
 	uintptr_t status;
 	signal = self->tc_sig;
 
 	/* Acquire a lock to the connection. */
 #ifdef CONFIG_NO_SMP
-	was    = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	status = ATOMIC_READ(self->tc_stat);
 	if (TASK_CONNECTION_STAT_ISDONE(status)) {
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		return false; /* Dead connection */
 	}
 	assert(status == TASK_CONNECTION_STAT_COMPLETION ||
@@ -1381,10 +1381,10 @@ again:
 	}
 	assert(status == TASK_CONNECTION_STAT_COMPLETION ||
 	       status == TASK_CONNECTION_STAT_COMPLETION_FOR_POLL);
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	if (!ATOMIC_CMPXCH_WEAK(self->tc_stat, status,
 	                        status | TASK_CONNECTION_STAT_FLOCK)) {
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		goto again;
 	}
 
@@ -1393,7 +1393,7 @@ again_signal_cons:
 	signal_cons = ATOMIC_READ(signal->s_con);
 	if unlikely(sig_smplock_tst(signal_cons)) {
 		ATOMIC_AND(self->tc_stat, ~TASK_CONNECTION_STAT_FLOCK);
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		task_pause();
 		goto again;
 	}
@@ -1406,7 +1406,7 @@ again_signal_cons:
 	 * to `self' and `signal'. With that in mind, remove `self' from
 	 * the connection queue of `signal' */
 	task_connection_unlink_from_sig_and_unlock(signal, self);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	DBG_memset(&self->tc_sig, 0xcc, sizeof(self->tc_sig));
 	DBG_memset(&self->tc_connext, 0xcc, sizeof(self->tc_connext));
 	DBG_memset(&self->tc_signext, 0xcc, sizeof(self->tc_signext));
@@ -1848,7 +1848,7 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 		struct sig_completion *route;
 		struct task_connection *signext;
 		struct sig *signal;
-		pflag_t was;
+		preemption_flag_t was;
 		route  = sig_multicompletion_alloc(completion, cb);
 		signal = con->tc_sig;
 
@@ -1876,7 +1876,7 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 		 * that signal (~ala `sig_broadcast_for_fini()') */
 
 		/* Step #1 */
-		was = PREEMPTION_PUSHOFF();
+		preemption_pushoff(&was);
 
 		/* Step #2 */
 #ifndef CONFIG_NO_SMP
@@ -1897,7 +1897,7 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 				 * delivered-connection field is non-NULL (since  that
 				 * field may not have been set yet by whoever had sent
 				 * the signal) */
-				PREEMPTION_POP(was);
+				preemption_pop(&was);
 
 				/* Mark  `route'  as  unused  (since  it  was  never  fully connected)
 				 * This  must be  done to ensure  that `self' remains  in a consistent
@@ -1922,9 +1922,9 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 			if unlikely(status & TASK_CONNECTION_STAT_FLOCK) {
 				/* Pausing w/ preemption may  do better than pausing  w/o
 				 * As such, try to re-enable preemption while we do this. */
-				PREEMPTION_POP(was);
+				preemption_pop(&was);
 				task_tryyield_or_pause();
-				was = PREEMPTION_PUSHOFF();
+				preemption_pushoff(&was);
 				continue;
 			}
 
@@ -1950,7 +1950,7 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 #endif /* !CONFIG_NO_SMP */
 
 		/* Step #5 */
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	}
 }
 
@@ -2062,7 +2062,7 @@ NOTHROW(FCALL sig_send_select_as)(struct sig *__restrict self,
                                   struct task *__restrict caller,
                                   struct sig_cleanup_callback *cleanup,
                                   bool run_cleanup_when_notarget) {
-	pflag_t was;
+	preemption_flag_t was;
 	struct sig *sender;
 	struct task_connection *sig_con;
 	struct task_connection *receiver;
@@ -2073,7 +2073,7 @@ NOTHROW(FCALL sig_send_select_as)(struct sig *__restrict self,
 	context.ssc_flag      = SIG_SELECT_FLAG_NORMAL;
 	context.ssc_wakeflags = TASK_WAKE_FNORMAL;
 	context.ssc_caller    = caller;
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 #ifdef CONFIG_NO_SMP
 	sig_con = ATOMIC_READ(self->s_con);
 	if (!sig_con)
@@ -2084,9 +2084,9 @@ NOTHROW(FCALL sig_send_select_as)(struct sig *__restrict self,
 		if (!sig_con)
 			goto done;
 		if unlikely((uintptr_t)sig_con & SIG_CONTROL_SMPLOCK) {
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			task_tryyield_or_pause();
-			was = PREEMPTION_PUSHOFF();
+			preemption_pushoff(&was);
 			continue;
 		}
 		if (ATOMIC_CMPXCH_WEAK(self->s_con, sig_con,
@@ -2195,7 +2195,7 @@ unlock_receiver_and_return_already:
 						ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
 						if (cleanup)
 							(*cleanup->scc_cb)(cleanup);
-						PREEMPTION_POP(was);
+						preemption_pop(&was);
 						return SIG_SEND_SELECT_ALREADY;
 					}
 					sig_smplock_release_nopr(self);
@@ -2206,7 +2206,7 @@ unlock_receiver_and_return_already:
 				}
 				if (cleanup)
 					(*cleanup->scc_cb)(cleanup);
-				PREEMPTION_POP(was);
+				preemption_pop(&was);
 
 				/* Wake-up the thread. */
 				if likely(thread) {
@@ -2232,7 +2232,7 @@ unlock_receiver_and_return_already:
 done:
 	if (cleanup && run_cleanup_when_notarget)
 		(*cleanup->scc_cb)(cleanup);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return SIG_SEND_SELECT_NOTARGET;
 }
 

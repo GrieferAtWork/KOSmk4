@@ -35,10 +35,11 @@
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/swap.h>
-#include <sched/task.h>
+#include <sched/task.h> /* _TASK_FDBGHEAPDMEM */
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -244,19 +245,19 @@ NOTHROW(FCALL mnode_load_mhint)(struct mnode *__restrict self) {
 	assert(iter < end);
 #ifdef CONFIG_DEBUG_HEAP
 	if (self->mn_part->mp_file == &mfile_dbgheap) {
-		pflag_t was;
+		preemption_flag_t was;
 		/* Super-ugly, hacky work-around because the heap system can't
 		 * be made compatible  with lockops without  a full  re-write.
 		 *
 		 * s.a.: `heap_unmap_kram()' */
 		heap_validate_all();
-		was = PREEMPTION_PUSHOFF();
+		preemption_pushoff(&was);
 		ATOMIC_OR(THIS_TASK->t_flags, _TASK_FDBGHEAPDMEM);
 		do {
 			__asm__ __volatile__("" : : "r" (*iter));
 			iter += PAGESIZE;
 		} while (iter < end);
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		ATOMIC_AND(THIS_TASK->t_flags, ~_TASK_FDBGHEAPDMEM);
 		heap_validate_all();
 	} else

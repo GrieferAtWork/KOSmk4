@@ -37,6 +37,7 @@
 #include <sched/x86/smp.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -223,7 +224,7 @@ PUBLIC unsigned int task_start_default_flags = TASK_START_FNORMAL;
  * @param: flags: Set of `TASK_START_F*' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
-	pflag_t was;
+	preemption_flag_t was;
 	struct cpu *me;
 #ifndef CONFIG_NO_SMP
 	struct cpu *target_cpu;
@@ -271,7 +272,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 		                                    TASK_FRUNNING)))
 			break;
 	}
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	me  = THIS_CPU;
 	printk(KERN_TRACE "[sched:cpu#%u] Starting thread %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 	       (unsigned int)thread->t_cpu->c_id, thread,
@@ -292,7 +293,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 		caller = THIS_TASK;
 		thread = sched_intern_localadd(me, caller, thread,
 		                               (flags & TASK_START_FHIGHPRIO) != 0 &&
-		                               PREEMPTION_WASENABLED(was));
+		                               preemption_wason(&was));
 		if (thread != caller) {
 			/* Directly switch execution to the new thread,
 			 * immediately allowing it to start  executing. */
@@ -300,7 +301,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 			cpu_run_current_and_remember_nopr(caller);
 		}
 	}
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 DECL_END

@@ -92,11 +92,11 @@ opt.append("-Os");
 #include <sched/cpu.h>
 #include <sched/group.h>
 #include <sched/rpc.h>
-#include <sched/task.h>
 #include <sched/userkern.h>
 #include <sched/x86/iobm.h>
 
 #include <hybrid/overflow.h>
+#include <hybrid/sched/preemption.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/registers.h>
@@ -804,16 +804,16 @@ PRIVATE ATTR_PURE WUNUSED u32 NOTHROW(KCALL emulate_rdpid)(void) {
 PRIVATE WUNUSED NONNULL((1)) u64
 NOTHROW(KCALL emulate_rdtscp)(u32 *__restrict p_tsc_aux) {
 	u64 tsc;
-	pflag_t was;
+	preemption_flag_t was;
 	/* To guaranty that the hosting CPU doesn't change  during
 	 * execution here, temporarily disable preemption, so that
 	 * the TSC and CPU-ID are consistent with each other! */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	COMPILER_BARRIER();
 	*p_tsc_aux = EMU86_EMULATE_RDPID();
 	tsc        = EMU86_EMULATE_RDTSC_INDIRECT();
 	COMPILER_BARRIER();
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return tsc;
 }
 
@@ -1241,7 +1241,7 @@ i386_getsegment_base(struct icpustate32 *__restrict state,
 		THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
 	u32 result;
 	u16 segment_index;
-	pflag_t was;
+	preemption_flag_t was;
 	struct segment *seg;
 	struct desctab dt;
 
@@ -1304,13 +1304,13 @@ err_privileged_segment:
 		break;
 	}
 
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	__sgdt(&dt);
 	if (segment_index & 4) {
 		/* LDT index. */
 		u16 ldt = __sldt() & ~7;
 		if unlikely(!ldt || ldt > dt.dt_limit) {
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			/* Deal with an invalid / disabled LDT by throwing an error indicating an invalid LDT. */
 			THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 			      0,                                    /* opcode */
@@ -1326,7 +1326,7 @@ err_privileged_segment:
 	}
 	segment_index &= ~7;
 	if (!segment_index || segment_index > dt.dt_limit) {
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 		      0,                                       /* opcode */
 		      0,                                       /* op_flags */
@@ -1338,11 +1338,11 @@ err_privileged_segment:
 	seg = (struct segment *)((byte_t *)dt.dt_base + segment_index);
 	if (seg->s_descriptor.d_dpl != 3 && icpustate_isuser(state)) {
 		/* User-space can't read the base address of a privileged segment! */
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		goto err_privileged_segment;
 	}
 	result = segment_rdbaseX(seg);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return result;
 }
 #endif /* !__x86_64__ */
@@ -1768,7 +1768,7 @@ throw_illegal_op:
 
 PRIVATE NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct segment *KCALL
 x86_lookup_segment_nopr(struct icpustate *__restrict state,
-                        uint16_t segment_value, pflag_t was,
+                        uint16_t segment_value, preemption_flag_t was,
                         uintptr_t segment_regno)
 		THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
 	uintptr_t segment_index;
@@ -1780,7 +1780,7 @@ x86_lookup_segment_nopr(struct icpustate *__restrict state,
 		/* LDT index. */
 		u16 ldt = __sldt() & ~7;
 		if unlikely(!ldt || ldt > dt.dt_limit) {
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			/* Deal with an invalid / disabled LDT by throwing an error indicating an invalid LDT. */
 			THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 			      /* opcode:   */ 0,
@@ -1796,7 +1796,7 @@ x86_lookup_segment_nopr(struct icpustate *__restrict state,
 	}
 	segment_index &= ~7;
 	if (!segment_index || segment_index > dt.dt_limit) {
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 		      /* opcode:   */ 0,
 		      /* op_flags: */ 0,
@@ -1808,7 +1808,7 @@ x86_lookup_segment_nopr(struct icpustate *__restrict state,
 	seg = (struct segment *)((byte_t *)dt.dt_base + segment_index);
 	if (!((segment_value & 3) <= seg->s_descriptor.d_dpl)) {
 		/* Invariant violated: RPL <= DPL */
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 		      /* opcode:   */ 0,
 		      /* op_flags: */ 0,
@@ -1819,7 +1819,7 @@ x86_lookup_segment_nopr(struct icpustate *__restrict state,
 	}
 	if (!((icpustate_getcs(state) & 3) <= seg->s_descriptor.d_dpl)) {
 		/* Invariant violated: CPL <= DPL */
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 		      /* opcode:   */ 0,
 		      /* op_flags: */ 0,
@@ -1835,12 +1835,12 @@ PRIVATE NONNULL((1)) void KCALL
 x86_validate_ipcs(struct icpustate *__restrict state,
                   uintptr_t ip, uint16_t cs)
 		THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
-	pflag_t was;
+	preemption_flag_t was;
 	struct segment *seg;
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	seg = x86_lookup_segment_nopr(state, cs, was, X86_REGISTER_SEGMENT_CS);
 	if (seg->s_descriptor.d_type != SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD) {
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		/* Not a code segment! */
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 		      /* opcode:   */ 0,
@@ -1852,7 +1852,7 @@ x86_validate_ipcs(struct icpustate *__restrict state,
 	}
 	/* Verify that `ip' belongs to `seg' */
 	if ((seg->s_descriptor.d_dpl == 0) != ADDR_ISKERN(ip)) {
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		if (ADDR_ISKERN(ip)) {
 			/* Tried to execute kernel with user CS */
 			THROW(E_SEGFAULT_NOTEXECUTABLE, ip,
@@ -1868,14 +1868,14 @@ x86_validate_ipcs(struct icpustate *__restrict state,
 		      /* offset:   */ 0,
 		      /* regval:   */ cs);
 	}
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 PRIVATE NONNULL((1)) void KCALL
 x86_validate_datseg(struct icpustate *__restrict state,
                     uint16_t segment_value, uintptr_t segment_regno)
 		THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
-	pflag_t was;
+	preemption_flag_t was;
 	struct segment *seg;
 #ifdef __x86_64__
 	/* Special case: In 64-bit mode, one is allowed
@@ -1883,10 +1883,10 @@ x86_validate_datseg(struct icpustate *__restrict state,
 	if (segment_value == 0 && icpustate_is64bit(state))
 		return;
 #endif /* __x86_64__ */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	seg = x86_lookup_segment_nopr(state, segment_value, was, segment_regno);
 	if (seg->s_descriptor.d_type != SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR) {
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		/* Not a data segment! */
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 		      0,                                    /* opcode */
@@ -1896,7 +1896,7 @@ x86_validate_datseg(struct icpustate *__restrict state,
 		      0,                                    /* offset */
 		      segment_value);                       /* regval */
 	}
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 

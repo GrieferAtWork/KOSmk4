@@ -277,14 +277,14 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
 #define LOCAL_sender self
 #endif /* !HAVE_SENDER */
 #ifdef HAVE_NOPREEMPT
-	assert(!PREEMPTION_ENABLED());
-#define LOCAL_PREEMPTION_PUSHOFF() (void)0
-#define LOCAL_PREEMPTION_POP()     (void)0
-#define LOCAL_was       PREEMPTION_DISABLED_VALUE
+	assert(!preemption_ison());
+#define LOCAL_preemption_pushoff() (void)0
+#define LOCAL_preemption_pop()     (void)0
+#define LOCAL_was                  PREEMPTION_DISABLED_VALUE
 #else /* HAVE_NOPREEMPT */
-	pflag_t was;
-#define LOCAL_PREEMPTION_PUSHOFF() was = PREEMPTION_PUSHOFF()
-#define LOCAL_PREEMPTION_POP()     PREEMPTION_POP(was)
+	preemption_flag_t was;
+#define LOCAL_preemption_pushoff() preemption_pushoff(&was)
+#define LOCAL_preemption_pop()     preemption_pop(&was)
 #define LOCAL_was                  was
 #endif /* !HAVE_NOPREEMPT */
 #ifdef HAVE_SENDER_THREAD
@@ -307,7 +307,7 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
 #define LOCAL_TASK_CONNECTION_STAT_FFINI 0
 #endif /* !HAVE_FOR_FINI */
 again_disable_preemption:
-	LOCAL_PREEMPTION_PUSHOFF();
+	LOCAL_preemption_pushoff();
 #ifdef CONFIG_NO_SMP
 again:
 #endif /* CONFIG_NO_SMP */
@@ -317,7 +317,7 @@ again:
 done_exec_cleanup:
 #endif /* !CONFIG_NO_SMP || HAVE_TARGET_THREAD */
 		LOCAL_exec_cleanup();
-		LOCAL_PREEMPTION_POP();
+		LOCAL_preemption_pop();
 #ifdef HAVE_BROADCAST
 		return result;
 #else /* HAVE_BROADCAST */
@@ -328,7 +328,7 @@ done_exec_cleanup:
 #ifndef CONFIG_NO_SMP
 	/* Wait if the SMP lock isn't available at the moment. */
 	if unlikely((uintptr_t)con & SIG_CONTROL_SMPLOCK) {
-		LOCAL_PREEMPTION_POP();
+		LOCAL_preemption_pop();
 		task_tryyield_or_pause();
 		goto again_disable_preemption;
 	}
@@ -455,7 +455,7 @@ again_read_target_cons:
 				 * to scheduling if preemption is enabled (since in that case, it  can
 				 * do direct context switches, possibly even over to `thread'  itself) */
 				LOCAL_exec_cleanup();
-				LOCAL_PREEMPTION_POP();
+				LOCAL_preemption_pop();
 				LOCAL_task_wake(thread);
 				decref_unlikely(thread);
 				return result;
@@ -666,7 +666,7 @@ again_read_target_cons:
 		ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_SENT);
 #endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 		LOCAL_exec_cleanup();
-		LOCAL_PREEMPTION_POP();
+		LOCAL_preemption_pop();
 
 		/* Wake-up the thread. */
 		if likely(thread) {
@@ -680,8 +680,8 @@ again_read_target_cons:
 #undef LOCAL_exec_cleanup
 #undef LOCAL_cleanup
 #undef LOCAL_was
-#undef LOCAL_PREEMPTION_PUSHOFF
-#undef LOCAL_PREEMPTION_POP
+#undef LOCAL_preemption_pushoff
+#undef LOCAL_preemption_pop
 #undef LOCAL_caller
 #undef LOCAL_task_wake
 #undef LOCAL_decref_task

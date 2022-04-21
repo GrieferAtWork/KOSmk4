@@ -41,12 +41,12 @@
 #include <kernel/printk.h>
 #include <kernel/x86/cpuid.h>
 #include <sched/cpu.h>
-#include <sched/task.h>
 #include <sched/userkern.h>
 #include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/cpu-cpuid.h>
@@ -252,7 +252,7 @@ NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
                                 PHYS struct p64_pdir *phys_self) {
 #define NOT_SWITCHED ((PHYS pagedir_t *)-1)
 	unsigned int vec4;
-	pflag_t was = 0;
+	preemption_flag_t was;
 	PHYS pagedir_t *old_pagedir = NOT_SWITCHED;
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)phys_self, PAGESIZE));
@@ -273,7 +273,7 @@ NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
 			/* Switch to the target page directory so we can  make
 			 * use of its identity mapping in order to destroy it. */
 			if (old_pagedir == NOT_SWITCHED) {
-				was         = PREEMPTION_PUSHOFF();
+				preemption_pushoff(&was);
 				old_pagedir = pagedir_get();
 				pagedir_set((PHYS pagedir_t *)phys_self);
 			}
@@ -301,7 +301,7 @@ NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
 	}
 	if (old_pagedir != NOT_SWITCHED) {
 		pagedir_set(old_pagedir);
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	}
 #undef NOT_SWITCHED
 }
@@ -337,39 +337,39 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 
 #define X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ(was)                    \
 	do {                                                              \
-		was = PREEMPTION_PUSHOFF();                                   \
+		preemption_pushoff(&was);                                     \
 		if likely(atomic_rwlock_tryread(&x86_pagedir_prepare_lock)) { \
 			ATOMIC_INC(x86_pagedir_prepare_version);                  \
 			break;                                                    \
 		}                                                             \
-		PREEMPTION_POP(was);                                          \
-		task_tryyield_or_pause();                                     \
+		preemption_pop(&was);                                         \
+		preemption_tryyield();                                        \
 	}	__WHILE1
 #define X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ_NOVER(was)            \
 	do {                                                            \
-		was = PREEMPTION_PUSHOFF();                                 \
+		preemption_pushoff(&was);                                   \
 		if likely(atomic_rwlock_tryread(&x86_pagedir_prepare_lock)) \
 			break;                                                  \
-		PREEMPTION_POP(was);                                        \
-		task_tryyield_or_pause();                                   \
+		preemption_pop(&was);                                       \
+		preemption_tryyield();                                      \
 	}	__WHILE1
 #define X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_WRITE(was)                  \
 	do {                                                             \
-		was = PREEMPTION_PUSHOFF();                                  \
+		preemption_pushoff(&was);                                    \
 		if likely(atomic_rwlock_trywrite(&x86_pagedir_prepare_lock)) \
 			break;                                                   \
-		PREEMPTION_POP(was);                                         \
-		task_tryyield_or_pause();                                    \
+		preemption_pop(&was);                                        \
+		preemption_tryyield();                                       \
 	}	__WHILE1
 #define X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was)        \
 	do {                                                  \
 		atomic_rwlock_endread(&x86_pagedir_prepare_lock); \
-		PREEMPTION_POP(was);                              \
+		preemption_pop(&was);                              \
 	}	__WHILE0
 #define X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was)        \
 	do {                                                   \
 		atomic_rwlock_endwrite(&x86_pagedir_prepare_lock); \
-		PREEMPTION_POP(was);                               \
+		preemption_pop(&was);                               \
 	}	__WHILE0
 
 
@@ -530,7 +530,7 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen)(unsigned int vec4,
 	union p64_pdir_e4 e4;
 	union p64_pdir_e3 e3;
 	union p64_pdir_e2 e2;
-	pflag_t was = 0;
+	preemption_flag_t was;
 	assert(vec4 < 512);
 	assert(vec3 < 512);
 	assert(vec2 < 512);
@@ -1171,7 +1171,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten)(unsigned int vec4,
 	                           vec1_unprepare_start,
 	                           vec1_unprepare_size);
 	if unlikely(can_flatten) {
-		pflag_t was;
+		preemption_flag_t was;
 		bool must_restart;
 		u64 new_e3_word;
 		union p64_pdir_e3 *e3_p, e3;

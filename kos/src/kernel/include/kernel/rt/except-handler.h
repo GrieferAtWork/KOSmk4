@@ -316,9 +316,10 @@ NOTHROW(FCALL userexcept_sysret_injected)(void);
 
 
 /* Arch-specific function: Behaves identical to:
- * >> pflag_t was = PREEMPTION_PUSHOFF();
+ * >> preemption_flag_t was;
+ * >> preemption_pushoff(&was);
  * >> userexcept_sysret_inject_nopr(THIS_TASK);
- * >> PREEMPTION_POP(was);
+ * >> preemption_pop(&was);
  * This function can be used to force checks for RPCs (including  posix
  * signals) to be performed _after_ a  system has completed (even in  a
  * scenario where the system call completes successfully). This kind of

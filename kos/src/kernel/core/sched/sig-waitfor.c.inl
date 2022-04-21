@@ -92,7 +92,7 @@ got_result:
 		assert(result = self->tcs_dlvr);
 		self->tcs_dlvr = NULL;
 	} else {
-		if unlikely_untraced(!PREEMPTION_ENABLED()) {
+		if unlikely_untraced(!preemption_ison()) {
 #ifdef LOCAL_NOEXCEPT
 			goto do_return_with_disconnect;
 #define NEED_do_return_with_disconnect

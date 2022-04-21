@@ -166,7 +166,7 @@ __asm__(".pushsection .text.cold\n\t"
 
 /* @return: true:  Success
  * @return: false: Must try again (preemption had to be enabled) */
-PRIVATE NONNULL((1)) bool FCALL
+PRIVATE NOPREEMPT NONNULL((1)) bool FCALL
 handle_iob_access(struct cpu *__restrict me,
                   bool is_writing,
                   bool allow_preemption) {

@@ -33,9 +33,9 @@
 #include <kernel/types.h>
 #include <kernel/x86/emulock.h>
 #include <sched/cpu.h>
-#include <sched/task.h>
 
 #include <hybrid/align.h>
+#include <hybrid/sched/preemption.h>
 
 #include <asm/cacheline.h>
 #include <asm/intrin.h>
@@ -54,17 +54,17 @@ DECL_BEGIN
 
 /* atomics _CAN_ be emulated:
  *  >> u32 emu_cmpxchl(u32 *p, u32 o, u32 n) {
- *  >>     pflag_t was;
+ *  >>     preemption_flag_t was;
  *  >>     struct cpu *me = THIS_CPU;
  *  >>     u32 result;
- *  >>     was = PREEMPTION_PUSHOFF();
+ *  >>     preemption_pushoff(&was);
  *  >>     ENSURE_PAGE_LOADED_INTO_MEMORY(p);
  *  >>     ACQUIRE_BUS_LOCK();
  *  >>     result = *p;
  *  >>     if (result == o)
  *  >>         *p = n;
  *  >>     RELEASE_BUS_LOCK();
- *  >>     PREEMPTION_POP(was);
+ *  >>     preemption_pop(&was);
  *  >>     return result;
  *  >> }
  * The BUS_LOCK can be implemented using this:
@@ -188,11 +188,11 @@ x86_emulock_cmpxch(struct icpustate **__restrict pstate,
                    void *poldval,
                    void *pnewval,
                    size_t num_bytes) {
-	pflag_t was;
+	preemption_flag_t was;
 	size_t error;
 	byte_t real_oldval[EMULOCK_MAXBYTES];
 again:
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	/* TODO: In SMP, we must send a  (preferably NMI) IPI to all  other
 	 *       CPUs, and tell them to temporarily halt what they're doing
 	 *       until we're done here.
@@ -208,12 +208,12 @@ again:
 			goto handle_vio_or_not_faulted;
 	}
 	bus_releaselock();
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	memcpy(preal_oldval, real_oldval, num_bytes);
 	return;
 handle_vio_or_not_faulted:
 	bus_releaselock();
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	{
 		/* Check if this is a VIO segment (or maybe not mapped at all) */
 		struct mman *effective_mman;

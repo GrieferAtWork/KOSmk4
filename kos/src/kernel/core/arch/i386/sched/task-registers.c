@@ -25,10 +25,11 @@
 
 #include <kernel/paging.h>
 #include <kernel/types.h>
-#include <sched/task.h>
+#include <sched/arch/task.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
+#include <hybrid/sched/preemption.h>
 
 #include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state-compat.h>
@@ -146,8 +147,8 @@ NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t valu
 /* set: `self->ir_cs' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value) {
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 	COMPILER_READ_BARRIER();
 	if unlikely(self->ir_Pip == (uintptr_t)&x86_userexcept_sysret) {
 		PERTASK_SET(this_x86_sysret_iret.ir_cs, value);
@@ -155,14 +156,14 @@ NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value) {
 		self->ir_cs = value;
 	}
 	COMPILER_WRITE_BARRIER();
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 /* set: `self->ir_Pflags' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrflags)(struct irregs_kernel *__restrict self, uintptr_t value) {
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 	COMPILER_READ_BARRIER();
 	if unlikely(self->ir_Pip == (uintptr_t)&x86_userexcept_sysret) {
 		PERTASK_SET(this_x86_sysret_iret.ir_Pflags, value);
@@ -170,15 +171,15 @@ NOTHROW(FCALL irregs_wrflags)(struct irregs_kernel *__restrict self, uintptr_t v
 		self->ir_Pflags = value;
 	}
 	COMPILER_WRITE_BARRIER();
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 /* set: `self->ir_Pflags = (self->ir_Pflags & mask) | flags' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self,
                                uintptr_t mask, uintptr_t flags) {
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 	COMPILER_READ_BARRIER();
 	if unlikely(self->ir_Pip == (uintptr_t)&x86_userexcept_sysret) {
 		uintptr_t newval;
@@ -189,7 +190,7 @@ NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self,
 		self->ir_Pflags |= flags;
 	}
 	COMPILER_WRITE_BARRIER();
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 
@@ -228,8 +229,8 @@ NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self) {
 /* set: `self->ir_rsp' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrsp)(struct irregs *__restrict self, uintptr_t value) {
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 	COMPILER_READ_BARRIER();
 	if unlikely(self->ir_rip == (u64)&x86_userexcept_sysret) {
 		PERTASK_SET(this_x86_sysret_iret.ir_rsp, value);
@@ -237,14 +238,14 @@ NOTHROW(FCALL irregs_wrsp)(struct irregs *__restrict self, uintptr_t value) {
 		self->ir_rsp = value;
 	}
 	COMPILER_WRITE_BARRIER();
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 /* set: `self->ir_ss' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value) {
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 	COMPILER_READ_BARRIER();
 	if unlikely(self->ir_rip == (u64)&x86_userexcept_sysret) {
 		PERTASK_SET(this_x86_sysret_iret.ir_ss, (u64)value);
@@ -252,7 +253,7 @@ NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value) {
 		self->ir_ss = (u64)value;
 	}
 	COMPILER_WRITE_BARRIER();
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 #else /* __x86_64__ */

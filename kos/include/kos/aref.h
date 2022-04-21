@@ -222,7 +222,7 @@
 #define __PRIVATE_AR_INTR_PUSHOFF()             \
 	do {                                        \
 		__hybrid_preemption_flagvar(__aip_was); \
-		__hybrid_preemption_push(&__aip_was)
+		__hybrid_preemption_pushoff(&__aip_was)
 #define __PRIVATE_AR_INTR_BREAK()        __hybrid_preemption_pop(&__aip_was)
 #define __PRIVATE_AR_INTR_POP()          __hybrid_preemption_pop(&__aip_was); } __WHILE0
 #define __PRIVATE_AR_INTR_END()          } __WHILE0
@@ -400,17 +400,17 @@
 #define __PRIVATE_arref_cinit_smp(self) , __hybrid_assert((self)->arr_cnt == 0)
 #define __PRIVATE_arref_inccnt(self)    __hybrid_atomic_inc((self)->arr_cnt, __ATOMIC_ACQUIRE);
 #define __PRIVATE_arref_deccnt(self)    __hybrid_atomic_dec((self)->arr_cnt, __ATOMIC_RELEASE);
-#define __PRIVATE_arref_waitfor(self)   while (__hybrid_atomic_load((self)->arr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_yield_nopr();
+#define __PRIVATE_arref_waitfor(self)   while (__hybrid_atomic_load((self)->arr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_tryyield_nopr();
 #define __PRIVATE_axref_init_smp(self)  , (self)->axr_cnt = 0
 #define __PRIVATE_axref_cinit_smp(self) , __hybrid_assert((self)->axr_cnt == 0)
 #define __PRIVATE_axref_inccnt(self)    __hybrid_atomic_inc((self)->axr_cnt, __ATOMIC_ACQUIRE);
 #define __PRIVATE_axref_deccnt(self)    __hybrid_atomic_dec((self)->axr_cnt, __ATOMIC_RELEASE);
-#define __PRIVATE_axref_waitfor(self)   while (__hybrid_atomic_load((self)->axr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_yield_nopr();
+#define __PRIVATE_axref_waitfor(self)   while (__hybrid_atomic_load((self)->axr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_tryyield_nopr();
 #define __PRIVATE_awref_init_smp(self)  , (self)->awr_cnt = 0
 #define __PRIVATE_awref_cinit_smp(self) , __hybrid_assert((self)->awr_cnt == 0)
 #define __PRIVATE_awref_inccnt(self)    __hybrid_atomic_inc((self)->awr_cnt, __ATOMIC_ACQUIRE);
 #define __PRIVATE_awref_deccnt(self)    __hybrid_atomic_dec((self)->awr_cnt, __ATOMIC_RELEASE);
-#define __PRIVATE_awref_waitfor(self)   while (__hybrid_atomic_load((self)->awr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_yield_nopr();
+#define __PRIVATE_awref_waitfor(self)   while (__hybrid_atomic_load((self)->awr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_tryyield_nopr();
 #endif /* !__HYBRID_NO_PREEMPTION_SMP */
 
 /************************************************************************/

@@ -23,6 +23,8 @@
 //#define DEFINE_task_wake_as
 #endif /* __INTELLISENSE__ */
 
+#include <hybrid/sched/preemption.h>
+
 #if (defined(DEFINE_task_wake) + defined(DEFINE_task_wake_as)) != 1
 #error "Invalid configuration (must define exactly one of these macros)"
 #endif /* ... */
@@ -67,7 +69,7 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
                             unsigned int flags)
 #endif /* ... */
 {
-	pflag_t was;
+	preemption_flag_t was;
 	struct cpu *me;
 #ifndef CONFIG_NO_SMP
 	struct cpu *target;
@@ -85,7 +87,7 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 	 *       while  the task  was already  dying, which  can only happen
 	 *       when the  thread was  already in  a state  where it  wasn't
 	 *       guarantied to be responsive to wakeup commands. */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 #ifdef DEFINE_task_wake_as
 	me = caller->t_cpu;
 #else /* DEFINE_task_wake_as */
@@ -107,7 +109,7 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 		while (!cpu_sendipi(target, &task_wake_ipi, args,
 		                    CPU_IPI_FWAKEUP | (flags & TASK_WAKE_FWAITFOR)))
 			task_pause();
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	} else
 #endif /* !CONFIG_NO_SMP */
 	{
@@ -134,7 +136,7 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 #endif /* !DEFINE_task_wake_as */
 			thread = sched_intern_localwake(me, caller, thread,
 			                                (flags & TASK_WAKE_FHIGHPRIO) != 0 &&
-			                                PREEMPTION_WASENABLED(was));
+			                                preemption_wason(&was));
 			if (thread != caller) {
 				/* Directly switch execution to the thread in question,
 				 * immediately   allowing   it  to   resume  executing. */
@@ -145,7 +147,7 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 				return true;
 			}
 		}
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	}
 	return true;
 }

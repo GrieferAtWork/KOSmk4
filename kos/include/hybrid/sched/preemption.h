@@ -28,11 +28,19 @@
  * - typedef ... preemption_flag_t;
  *   - Data type for the preemption state flag
  *
- * - void preemption_yield();
+ * - void preemption_tryyield();
  *   - Special  function for safe `sched_yield()', both with preemption
  *     enabled and disabled. Use as loop-hint when acquiring SMP locks.
+ *   SEMANTICS:
+ *   >> preemption_tryyield() {
+ *   >>     if (preemption_ison()) {
+ *   >>         sched_yield();   // or pthread_yield(), thrd_yield(), etc...
+ *   >>     } else {
+ *   >>         preemption_tryyield_nopr();
+ *   >>     }
+ *   >> }
  *
- * - void preemption_push(preemption_flag_t *p_flag);
+ * - void preemption_pushoff(preemption_flag_t *p_flag);
  *   - Store the current preemption state in `*p_flag' and disable preemption
  *
  * - void preemption_pop(preemption_flag_t const *p_flag);
@@ -41,21 +49,39 @@
  *     elements during restore, and don't restore in an incorrect order.
  *
  * - #define __NO_PREEMPTION_SMP
- *   - Defined  if `__hybrid_preemption_push()' results in the calling thread
+ *   - Defined  if `__hybrid_preemption_pushoff()' results in the calling thread
  *     to become the only thread that's still running in the caller's address
  *     space.  (Iow: anything that's  done at this point  will appear to have
  *     happened atomically to other threads)
  *
  * - #define __NO_PREEMPTION_CONTROL
  *   - Defined if preemption cannot be controlled (in this case, all of the other macros are simply no-ops).
+ *
+ *
+ * Function mappings for the KOS kernel:
+ * - preemption_flag_t           <--->  pflag_t
+ * - preemption_pushoff()        <--->  PREEMPTION_PUSHOFF()
+ * - preemption_pop()            <--->  PREEMPTION_POP()
+ * - preemption_ison()           <--->  PREEMPTION_ENABLED()
+ * - preemption_wason()          <--->  PREEMPTION_WASENABLED()
+ * - preemption_tryyield()       <--->  task_tryyield_or_pause()
+ * - preemption_tryyield_f()     <--->  PREEMPTION_POP() + task_tryyield_or_pause() + PREEMPTION_PUSHOFF()
+ * - preemption_tryyield_nopr()  <--->  task_pause()
+ *
  */
 
+#ifdef __INTELLISENSE__
+typedef __hybrid_preemption_flag_t preemption_flag_t;
+#else /* __INTELLISENSE__ */
 #define preemption_flag_t        __hybrid_preemption_flag_t
-#define preemption_yield         __hybrid_preemption_yield
-#define preemption_yield_nopr    __hybrid_preemption_yield_nopr
-#define preemption_yield_f       __hybrid_preemption_yield_f
-#define preemption_push          __hybrid_preemption_push
+#endif /* !__INTELLISENSE__ */
+#define preemption_tryyield      __hybrid_preemption_tryyield
+#define preemption_tryyield_nopr __hybrid_preemption_tryyield_nopr
+#define preemption_tryyield_f    __hybrid_preemption_tryyield_f
+#define preemption_pushoff       __hybrid_preemption_pushoff
 #define preemption_pop           __hybrid_preemption_pop
+#define preemption_ison          __hybrid_preemption_ison
+#define preemption_wason         __hybrid_preemption_wason
 #define preemption_flagvar       __hybrid_preemption_flagvar
 #define preemption_acquire_smp_r __hybrid_preemption_acquire_smp_r
 #define preemption_release_smp_r __hybrid_preemption_release_smp_r

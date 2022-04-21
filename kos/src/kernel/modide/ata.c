@@ -39,11 +39,11 @@
 #include <kernel/mman/map.h>
 #include <kernel/printk.h>
 #include <sched/cpu.h>
-#include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
+#include <hybrid/sched/preemption.h>
 
 #include <hw/bus/pci.h>
 #include <kos/dev.h>
@@ -129,7 +129,7 @@ NOTHROW(FCALL AtaBus_HW_WaitForBusy_P)(port_t ctrlio, ktime_t timeout_BSY) {
 			return ATA_HW_GetErrorFromStatusRegister(status);
 		if unlikely(ktime() >= abs_timeout)
 			return ATA_ERROR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_DCR_BSY);
-		task_tryyield_or_pause();
+		preemption_tryyield();
 		io_delay();
 	}
 	return ATA_ERROR_OK;
@@ -154,7 +154,7 @@ NOTHROW(FCALL AtaBus_HW_WaitForDrq)(AtaBus *__restrict self) {
 				return ATA_HW_GetErrorFromStatusRegister(status);
 			if unlikely(ktime() >= abs_timeout)
 				return ATA_ERROR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_DCR_BSY);
-			task_tryyield_or_pause();
+			preemption_tryyield();
 			io_delay();
 		}
 	}
@@ -165,7 +165,7 @@ NOTHROW(FCALL AtaBus_HW_WaitForDrq)(AtaBus *__restrict self) {
 	abs_timeout = ktime();
 	abs_timeout += self->ab_timeout_DRQ;
 	for (;;) {
-		task_tryyield_or_pause();
+		preemption_tryyield();
 		io_delay();
 		status = inb(self->ab_ctrlio);
 		if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF))
@@ -374,7 +374,7 @@ again:
 	}
 #ifndef CONFIG_NO_SMP
 	if (!removed) {
-		task_pause();
+		preemption_tryyield_nopr();
 		goto again;
 	}
 #else /* !CONFIG_NO_SMP */
@@ -387,12 +387,12 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL AtaDrive_DmaAioHandle_Cancel)(struct aio_handle *__restrict self) {
 	AtaAIOHandleData *data;
 	PHYS u32 bufaddr;
-	pflag_t was;
+	preemption_flag_t was;
 	AtaBus *bus;
 	data = (AtaAIOHandleData *)self->ah_data;
 	bus  = data->hd_drive->ad_bus;
 	/* Try to clear the command descriptor. (for which we use the PRD buffer pointer) */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	bufaddr = ATOMIC_XCH(data->hd_bufaddr, NULL);
 	if (bufaddr != 0) { /* Canceled before started */
 		/* Remove  the entry from  pending AIO. Having successfully
@@ -423,11 +423,11 @@ NOTHROW(KCALL AtaDrive_DmaAioHandle_Cancel)(struct aio_handle *__restrict self) 
 	}
 
 	/* And we're finished! */
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return;
 do_cancel:
 	aio_handle_complete_nopr(self, AIO_COMPLETION_CANCEL);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 /* Return the # of bytes that have already been transferred as part
@@ -737,10 +737,10 @@ again:
 #define WANT_no_handles
 #endif /* !__OPTIMIZE_SIZE__ */
 	{
-		pflag_t was;
-		was    = PREEMPTION_PUSHOFF();
+		preemption_flag_t was;
+		preemption_pushoff(&was);
 		handle = AtaBus_ActivateAioHandle_NoPR(self, &bufaddr);
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	}
 
 	if unlikely(!handle) {
@@ -761,7 +761,7 @@ no_handles:
 		                             ATA_BUS_STATE_READY));
 #endif /* ATA_BUS_STATE_READY != 0 */
 		if (ATOMIC_READ(self->ab_aio_pending) != NULL) {
-			task_tryyield_or_pause();
+			preemption_tryyield();
 			if (ATOMIC_READ(self->ab_aio_pending) != NULL) {
 				for (;;) {
 					/* Try once again to start a DMA operation. */

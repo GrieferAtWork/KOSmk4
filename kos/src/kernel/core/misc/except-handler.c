@@ -48,6 +48,7 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <asm/intrin.h>
 #include <kos/bits/except.h>
@@ -880,11 +881,11 @@ NOTHROW(FCALL ipi_userexcept_sysret_inject_safe)(struct icpustate *__restrict st
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL userexcept_sysret_inject_safe)(struct task *__restrict thread,
                                              syscall_ulong_t rpc_flags) {
-	pflag_t was;
+	preemption_flag_t was;
 #ifndef CONFIG_NO_SMP
 	struct cpu *mycpu;
 	struct cpu *target_cpu;
-	was        = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	mycpu      = THIS_CPU;
 	target_cpu = ATOMIC_READ(thread->t_cpu);
 	if (mycpu != target_cpu) {
@@ -906,31 +907,31 @@ NOTHROW(FCALL userexcept_sysret_inject_safe)(struct task *__restrict thread,
 		while (!cpu_sendipi(target_cpu, &ipi_userexcept_sysret_inject_safe,
 		                    args, CPU_IPI_FWAKEUP | CPU_IPI_FWAITFOR))
 			task_pause();
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	} else
 #endif /* !CONFIG_NO_SMP */
 	{
 		struct task *caller = THIS_TASK;
 #ifdef CONFIG_NO_SMP
-		was = PREEMPTION_PUSHOFF();
+		preemption_pushoff(&was);
 #endif /* CONFIG_NO_SMP */
 		/* check if the thread has already terminated */
 		if (thread->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED)) {
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			return;
 		}
 		userexcept_sysret_inject_nopr(thread);
 		if (caller != thread) {
 			thread = sched_intern_localwake(mycpu, caller, thread,
 			                                (rpc_flags & RPC_PRIORITY_F_HIGH) != 0 &&
-			                                PREEMPTION_WASENABLED(was));
+			                                preemption_wason(&was));
 			if (thread != caller) {
 				/* Immediately switch to the next thread. */
 				FORCPU(mycpu, thiscpu_sched_current) = thread;
 				cpu_run_current_and_remember_nopr(caller);
 			}
 		}
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	}
 }
 
@@ -1021,11 +1022,11 @@ NOTHROW(FCALL ipi_userexcept_sysret_inject_and_marksignal_safe)(struct icpustate
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restrict thread,
                                                             syscall_ulong_t rpc_flags) {
-	pflag_t was;
+	preemption_flag_t was;
 #ifndef CONFIG_NO_SMP
 	struct cpu *mycpu;
 	struct cpu *target_cpu;
-	was        = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	mycpu      = THIS_CPU;
 	target_cpu = ATOMIC_READ(thread->t_cpu);
 	if (mycpu != target_cpu) {
@@ -1045,31 +1046,31 @@ NOTHROW(FCALL userexcept_sysret_inject_and_marksignal_safe)(struct task *__restr
 		while (!cpu_sendipi(target_cpu, &ipi_userexcept_sysret_inject_and_marksignal_safe,
 		                    args, CPU_IPI_FWAKEUP | CPU_IPI_FWAITFOR))
 			task_pause();
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	} else
 #endif /* !CONFIG_NO_SMP */
 	{
 		struct task *caller = THIS_TASK;
 #ifdef CONFIG_NO_SMP
-		was = PREEMPTION_PUSHOFF();
+		preemption_pushoff(&was);
 #endif /* CONFIG_NO_SMP */
 		/* check if the thread has already terminated */
 		if (thread->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED)) {
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			return;
 		}
 		userexcept_sysret_inject_and_marksignal_nopr(thread, _RPC_GETSIGNO(rpc_flags));
 		if (caller != thread) {
 			thread = sched_intern_localwake(mycpu, caller, thread,
 			                                (rpc_flags & RPC_PRIORITY_F_HIGH) != 0 &&
-			                                PREEMPTION_WASENABLED(was));
+			                                preemption_wason(&was));
 			if (thread != caller) {
 				/* Immediately switch to the next thread. */
 				FORCPU(mycpu, thiscpu_sched_current) = thread;
 				cpu_run_current_and_remember_nopr(caller);
 			}
 		}
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	}
 }
 

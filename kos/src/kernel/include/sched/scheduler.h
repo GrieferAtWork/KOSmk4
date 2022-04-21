@@ -23,7 +23,6 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <sched/arch/task.h> /* pflag_t */
 #include <hybrid/sequence/list.h>
 #include <sched/pertask.h>
 #include <sched/tsc.h>

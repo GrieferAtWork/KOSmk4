@@ -26,6 +26,7 @@
 /**/
 
 #include <hybrid/align.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/except.h>
@@ -541,14 +542,14 @@ INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(CC libservice_buffer_free)(struct service *__restrict self,
                                    void *ptr) {
 	struct service_shm_handle *shm;
-	pflag_t was;
+	preemption_flag_t was;
 	if (!ptr)
 		return;
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	shm = libservice_shm_handle_ataddr_nopr(self, ptr);
 	assertf(shm, "service_buffer_free(%p): Invalid pointer", ptr);
 	libservice_shmbuf_free_nopr(self, shm, ptr);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 

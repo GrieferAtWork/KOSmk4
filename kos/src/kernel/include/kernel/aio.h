@@ -25,10 +25,10 @@
 #include <kernel/except.h>
 #include <kernel/types.h>
 #include <sched/sig.h>
-#include <sched/task.h>
 
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
+#include <hybrid/sched/__preemption.h>
 #include <hybrid/typecore.h>
 
 #ifndef CONFIG_NO_SMP
@@ -114,7 +114,7 @@ DECL_BEGIN
  * [ 0] >> for (;;) {                                                                              │ │ │
  * [ 1] >>     struct aio_handle *aio;                                                             │ │ │
  * [ 2] >>     [COMMAND_DESCRIPTOR] *cmd;   <──────────────────────────────────────────┬───────────┤ │ │
- * [ 3] >>     was = PREEMPTION_PUSHOFF();                                             │           │ │ │
+ * [ 3] >>     preemption_pushoff(&was);                                             │           │ │ │
  * [ 4] >>     // Take an AIO handle with a present command-descriptor                 │           │ │ │
  * [ 5] >>     // The command-descriptor is cleared during AIO-cancel!                 │   ┌───────│─┘ │
  * [ 6] >>     aio = device->d_aio_pending.TAKEONE([](ent) {                           │   │       │   │
@@ -123,7 +123,7 @@ DECL_BEGIN
  * [ 9] >>         return cmd != NULL;   <─────────────────────────────────────────────┤   │ │     │
  * [10] >>     });                                                                     │   │ │     │
  * [11] >>     ATOMIC_WRITE(device->d_aio_current, aio);                               │   │ │     │
- * [12] >>     PREEMPTION_POP(was);                                                    │   │ │     │
+ * [12] >>     preemption_pop(&was);                                                    │   │ │     │
  * [13] >>     if (!aio) break;                                                        │   │ │     │
  * [14] >>     FINALLY_DECREF_LIKELY(cmd);   <─────────────────────────────────────────┤   │ │     │
  * [15] >>     // Allow cancelation between command-steps by testing `d_aio_current'   │   │ │     │
@@ -134,21 +134,21 @@ DECL_BEGIN
  * [20] >>         }                                                                       │ │     │
  * [21] >>     } EXCEPT {                                                                  │ │     │
  * [22] >>         // Indicate AIO failure                                                 │ │     │
- * [23] >>         was = PREEMPTION_PUSHOFF();                                             │ │     │
+ * [23] >>         preemption_pushoff(&was);                                             │ │     │
  * [24] >>         aio = ATOMIC_XCH(device->d_aio_current, NULL);                          │ │     │
  * [25] >>         if (aio) aio_handle_complete(aio, AIO_COMPLETION_FAILURE);              │ │     │
- * [26] >>         PREEMPTION_POP(was);                                                    │ │     │
+ * [26] >>         preemption_pop(&was);                                                    │ │     │
  * [27] >>         continue;                                                               │ │     │
  * [28] >>     }                                                                           │ │     │
  * [29] >>     // Indicate AIO success                                                     │ │     │
- * [30] >>     was = PREEMPTION_PUSHOFF();                                                 │ │     │
+ * [30] >>     preemption_pushoff(&was);                                                 │ │     │
  * [31] >>     aio = ATOMIC_XCH(device->d_aio_current, NULL);                              │ │     │
  * [32] >>     if (aio) aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);                  │ │     │
  * [33] >>     else {                                                                      │ │     │
  * [34] >>         // Wait for [HWIO_CANCEL_CURRENT_OPERATION] in aio_cancel() to finish   │ │     │
  * [35] >>         [HWIO_WAIT_FOR_CANCEL_COMPLETION](device);                              │ │     │
  * [36] >>     }                                                                           │ │     │
- * [37] >>     PREEMPTION_POP(was);                                                        │ │     │
+ * [37] >>     preemption_pop(&was);                                                        │ │     │
  * [38] >> }                                                                               │ │     │
  *                                                                                         │ │     │
  *  ┌──────────────────────────────────────────────────────────────────────────────────────┘ │     │
@@ -162,7 +162,7 @@ DECL_BEGIN
  * >> };                                 │ └─> [aio_cancel(aio)]                             │     │
  *                                       │     [ 0] >> device = aio->ah_data[0];   <─────────┘     │
  * ┌─────────────────────────────────────┘     [ 1] >> [COMMAND_DESCRIPTOR] *cmd;   <──────────────┤
- * │                                           [ 2] >> was = PREEMPTION_PUSHOFF();                 │
+ * │                                           [ 2] >> preemption_pushoff(&was);                 │
  * │                                           [ 3] >> cmd = ATOMIC_XCH(aio->ah_data[1], NULL);  <─┘
  * v                                           [ 4] >> if (cmd) {
  * [aio_progress(aio)]                         [ 5] >>     // Canceled before started
@@ -171,7 +171,7 @@ DECL_BEGIN
  * by keeping track of how many steps have     [ 8] >>     // cleared the command-pointer, we know that `async_work()'
  * already been completed, and how many        [ 9] >>     // hasn't gotten around to this AIO handle, yet.
  * are still left within the device itself,    [10] >>     d_aio_pending.REMOVE(ent);
- * alongside checking if `aio' matches the     [11] >>     PREEMPTION_POP(was);
+ * alongside checking if `aio' matches the     [11] >>     preemption_pop(&was);
  * device's `d_aio_current' field.             [12] >>     goto do_cancel;
  *                                             [13] >> }
  *                                             [14] >> // If the cmd-pointer was already cleared, then the AIO operation is
@@ -184,10 +184,10 @@ DECL_BEGIN
  *                                             [21] >>     // is currently inside of `[COMMAND_DESCRIPTOR_DO_NEXT_STEP]', and
  *                                             [22] >>     // will/has fall/en into `[HWIO_WAIT_FOR_CANCEL_COMPLETION]' shortly.
  *                                             [23] >>     [HWIO_CANCEL_CURRENT_OPERATION](device);
- *                                             [24] >>     PREEMPTION_POP(was);
+ *                                             [24] >>     preemption_pop(&was);
  *                                             [25] >>     goto do_cancel;
  *                                             [26] >> }
- *                                             [27] >> PREEMPTION_POP(was);
+ *                                             [27] >> preemption_pop(&was);
  *                                             [28] >> return;
  *                                             [29] >>do_cancel:
  *                                             [30] >> aio_handle_complete(aio, AIO_COMPLETION_CANCEL);
@@ -399,7 +399,7 @@ NOTHROW(KCALL aio_handle_fini)(struct aio_handle *__restrict self) {
 #ifndef CONFIG_NO_SMP
 	/* Make sure that no other thread is still inside of `ah_func' */
 	while (__hybrid_atomic_load(self->ah_next, __ATOMIC_ACQUIRE) != AIO_HANDLE_NEXT_COMPLETED)
-		task_tryyield_or_pause();
+		__hybrid_preemption_tryyield();
 #endif /* !CONFIG_NO_SMP */
 	(*self->ah_type->ht_fini)(self);
 }
@@ -437,7 +437,7 @@ NOTHROW(KCALL aio_handle_cancel)(struct aio_handle *__restrict self) {
 LOCAL NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(KCALL aio_handle_complete_nopr)(/*inherit(always)*/ struct aio_handle *__restrict self,
                                         unsigned int status) {
-	__hybrid_assert(!PREEMPTION_ENABLED());
+	__hybrid_assert(!__hybrid_preemption_ison());
 	__hybrid_assert(!aio_handle_completed(self));
 	/* Invoke the completion callback */
 	(*self->ah_func)(self, status);
@@ -446,16 +446,16 @@ NOTHROW(KCALL aio_handle_complete_nopr)(/*inherit(always)*/ struct aio_handle *_
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_handle_complete)(/*inherit(always)*/ struct aio_handle *__restrict self,
                                    unsigned int status) {
-	pflag_t was;
+	__hybrid_preemption_flag_t was;
 	/* Ensure that the call to the completion function, as well as the
 	 * sub-sequent write of `AIO_HANDLE_NEXT_COMPLETED' to  `ah_next'.
 	 * This must be done to guaranty SMP-ATOMIC NONBLOCK-semantics  in
 	 * `aio_handle_fini()' */
-	was = PREEMPTION_PUSHOFF();
+	__hybrid_preemption_pushoff(&was);
 	__hybrid_assert(!aio_handle_completed(self));
 	/* Invoke the completion callback */
 	(*self->ah_func)(self, status);
-	PREEMPTION_POP(was);
+	__hybrid_preemption_pop(&was);
 }
 
 

@@ -26,6 +26,7 @@
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
+#include <hybrid/sched/__preemption.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 
@@ -590,7 +591,7 @@ DATDEF WEAK unsigned int mman_kernel_hintinit_inuse;
 	do {                                                        \
 		while (__hybrid_atomic_load(mman_kernel_hintinit_inuse, \
 		                            __ATOMIC_ACQUIRE) != 0)     \
-			task_pause();                                       \
+			__hybrid_preemption_tryyield_nopr();                \
 	}	__WHILE0
 #else /* !CONFIG_NO_SMP */
 #define mman_kernel_hintinit_inuse_inc()     (void)0

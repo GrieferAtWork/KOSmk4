@@ -33,12 +33,12 @@
 #include <kernel/x86/pit.h>
 #include <sched/cpu.h>
 #include <sched/pertask.h>
-#include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/preemption.h>
 
 #include <sys/io.h>
 
@@ -431,7 +431,7 @@ again_with_timer:
 	/* Update the current register to what it's value will be down below. */
 	if (OVERFLOW_USUB(current_reg, delay, &old_current_reg)) {
 		/* Special case: Roll-over will (probably) happen during our calculations. */
-		task_pause();
+		preemption_tryyield_nopr();
 		/* In case there was a (really long) SMM interrupt,
 		 * we need  to  be  able to  deal  with  that,  too */
 		delay >>= 1;
@@ -525,7 +525,7 @@ again_with_timer:
 	/* Update the current register to what it's value will be down below. */
 	if (OVERFLOW_USUB(current_reg, delay, &old_current_reg)) {
 		/* Special case: Roll-over will (probably) happen during our calculations. */
-		task_pause();
+		preemption_tryyield_nopr();
 
 		/* In case there was a (really long) SMM interrupt,
 		 * we  need  to be  able  to deal  with  that, too. */
@@ -553,7 +553,7 @@ again_with_timer:
 
 	/* Check if the deadline will end up being passed when accounting for delay. */
 	if unlikely(tsc_current >= deadline) {
-		task_pause();
+		preemption_tryyield_nopr();
 		goto again;
 	}
 
@@ -568,7 +568,7 @@ again_with_timer:
 		 * case  the entire  machine will lock  up because it'll  just keep on
 		 * triggering  interrupt  after interrupt,  without leaving  us enough
 		 * time to actually handle everything! */
-		task_pause();
+		preemption_tryyield_nopr();
 		goto again;
 	}
 
@@ -705,11 +705,11 @@ NOTHROW(FCALL x86_tsc_calibrate_hz_cali)(void) {
 		outb(PIT_COMMAND, PIT_COMMAND_SELECT_F1 | PIT_COMMAND_ACCESS_FHI |
 		                  PIT_COMMAND_MODE_FONESHOT | PIT_COMMAND_FBINARY);
 		while (inb(PIT_DATA1))
-			/*task_pause()*/;
+			/*preemption_tryyield_nopr()*/;
 		outb(PIT_COMMAND, PIT_COMMAND_SELECT_F1 | PIT_COMMAND_ACCESS_FLO |
 		                  PIT_COMMAND_MODE_FONESHOT | PIT_COMMAND_FBINARY);
 		while (inb(PIT_DATA1))
-			/*task_pause()*/;
+			/*preemption_tryyield_nopr()*/;
 		COMPILER_BARRIER();
 		end = __rdtsc();
 		COMPILER_BARRIER();
@@ -735,11 +735,11 @@ again_calibrate:
 	outb(PIT_COMMAND, PIT_COMMAND_SELECT_F1 | PIT_COMMAND_ACCESS_FHI |
 	                  PIT_COMMAND_MODE_FONESHOT | PIT_COMMAND_FBINARY);
 	while (inb(PIT_DATA1))
-		/*task_pause()*/;
+		/*preemption_tryyield_nopr()*/;
 	outb(PIT_COMMAND, PIT_COMMAND_SELECT_F1 | PIT_COMMAND_ACCESS_FLO |
 	                  PIT_COMMAND_MODE_FONESHOT | PIT_COMMAND_FBINARY);
 	while (inb(PIT_DATA1))
-		/*task_pause()*/;
+		/*preemption_tryyield_nopr()*/;
 
 	COMPILER_BARRIER();
 	remaining = lapic_read(APIC_TIMER_CURRENT); /* Check where we're at now. */
@@ -1000,15 +1000,15 @@ DBG_COMMAND(clockinfo,
 	dbg_pprint(0, dbg_screen_height - 1, DBGSTR("Press ESC to exit"));
 	dbg_setcolor(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_BLACK);
 	for (;;) {
-		pflag_t was;
+		preemption_flag_t was;
 		tsc_t now_tsc;
 		ktime_t now_ktime;
 		struct timespec now_timespec;
 		struct tm now_tm;
-		was = PREEMPTION_PUSHOFF();
+		preemption_pushoff(&was);
 		now_tsc   = tsc_get(me);
 		now_ktime = tsc_now_to_ktime(me, now_tsc);
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		now_timespec = ktime_to_timespec(now_ktime);
 		localtime_r(&now_timespec.tv_sec, &now_tm);
 		dbg_beginupdate();

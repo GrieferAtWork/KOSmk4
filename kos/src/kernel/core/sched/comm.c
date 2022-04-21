@@ -30,9 +30,9 @@
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/sig.h>
-#include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <kos/except.h>
 
@@ -63,7 +63,7 @@ again:
 	 * proper UTF-8 as defined by the standard) */
 	for (i = 0; i < TASK_COMM_LEN; ++i) {
 		if (buf[i] == (char)0xff) {
-			task_tryyield_or_pause();
+			preemption_tryyield();
 			goto again;
 		}
 	}
@@ -166,7 +166,7 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 	return status == TASK_SETCOMM_RPC_ST_DONE;
 force_wait_for:
 	while (ATOMIC_READ(rpc->tscr_state) == TASK_SETCOMM_RPC_ST_WORKING)
-		task_tryyield_or_pause();
+		preemption_tryyield();
 	return true;
 }
 
@@ -174,7 +174,7 @@ force_wait_for:
 /* Same as `task_setcomm_of()', but set for the calling thread. */
 FUNDEF NONNULL((1)) void
 NOTHROW(FCALL task_setcomm)(char const *__restrict name) {
-	pflag_t was;
+	preemption_flag_t was;
 	size_t len;
 	char *nameptr = PERTASK(this_comm);
 	char used_newname[TASK_COMM_LEN];
@@ -202,13 +202,13 @@ NOTHROW(FCALL task_setcomm)(char const *__restrict name) {
 	 * thread  is able to  read the name  of another thread, also
 	 * without blocking (since waiting for another CPU in SMP can
 	 * be considered as non-blocking) */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	COMPILER_BARRIER();
 	memset(nameptr, 0xff, TASK_COMM_LEN, sizeof(char));
 	COMPILER_BARRIER();
 	memcpy(nameptr, used_newname, TASK_COMM_LEN, sizeof(char));
 	COMPILER_BARRIER();
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 
 }
 

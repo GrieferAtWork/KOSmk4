@@ -100,14 +100,15 @@ LOCAL NOBLOCK WUNUSED NONNULL((1)) void KCALL
 NOTHROW(KCALL hisr_clear)(struct hisr *__restrict self) {
 	/* Clear the `hi_obj' pointer of `self' */
 #ifdef CONFIG_NO_SMP
-	pflag_t was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 #endif /* CONFIG_NO_SMP */
 	ATOMIC_STORE(self->hi_obj, NULL);
 #ifndef CONFIG_NO_SMP
 	while (ATOMIC_READ(self->hi_inuse))
 		task_tryyield_or_pause();
 #else /* !CONFIG_NO_SMP */
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 #endif /* CONFIG_NO_SMP */
 }
 

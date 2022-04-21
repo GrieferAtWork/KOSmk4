@@ -30,11 +30,11 @@
 #include <sched/atomic64.h>
 #include <sched/cpu.h>
 #include <sched/scheduler.h>
-#include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/preemption.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
@@ -662,15 +662,15 @@ NOTHROW(FCALL tsc_offset_to_ktime)(struct cpu const *__restrict me,
  *       while having preemption disabled. */
 PUBLIC NOBLOCK WUNUSED ktime_t
 NOTHROW(KCALL ktime)(void) {
+	preemption_flag_t was;
 	ktime_t result;
-	pflag_t was;
 	struct cpu *me;
 	tsc_t now;
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	me     = THIS_CPU;
 	now    = tsc_get(me);
 	result = tsc_now_to_ktime(me, now);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return result;
 }
 

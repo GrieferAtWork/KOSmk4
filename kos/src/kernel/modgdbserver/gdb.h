@@ -419,7 +419,8 @@ INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL GDBRemote_HasPendingBytes)(void);
  * NOTE: May only be called  while preemption is disabled,  and
  *       only from the designated CPU for interrupts concerning
  *       incoming remote data! */
-INTDEF NOBLOCK void NOTHROW(FCALL GDBRemote_PostByte)(byte_t b);
+INTDEF NOBLOCK NOPREEMPT void
+NOTHROW(FCALL GDBRemote_PostByte)(byte_t b);
 
 /* Read a byte from the remote data input queue.
  * NOTE: These functions may only be called by the GDB host thread!

@@ -30,6 +30,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
@@ -371,18 +372,20 @@ NOTHROW(FCALL service_shm_handle_free_nopr)(struct service_shm_handle *__restric
 
 INTERN NOBLOCK ATTR_RETNONNULL WUNUSED struct service_shm_handle *FCALL
 service_shm_handle_alloc(void) THROWS(E_BADALLOC) {
-	pflag_t was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
 	struct service_shm_handle *result;
-	RAII_FINALLY { PREEMPTION_POP(was); };
+	preemption_pushoff(&was);
+	RAII_FINALLY { preemption_pop(&was); };
 	result = service_shm_handle_alloc_nopr();
 	return result;
 }
 
 INTDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL service_shm_handle_free)(struct service_shm_handle *__restrict self) {
-	pflag_t was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 	service_shm_handle_free_nopr(self);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 
@@ -409,22 +412,22 @@ NOTHROW(LOCKOP_CC service_shm_handle_destroy_lop)(Toblockop(service) *__restrict
  * HINT: This function uses lockops to remove `self' from `self->ssh_service->s_shm_tree'! */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL service_shm_handle_destroy)(struct service_shm_handle *__restrict self) {
-	pflag_t was;
+	preemption_flag_t was;
 	struct service *svc;
 	svc = self->ssh_service;
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	if (libservice_shmlock_tryacquire_nopr(svc)) {
 		sshtree_removenode(&svc->s_shm_tree, self);
 		libservice_shmlock_release_nopr(svc);
 		service_shm_handle_free_nopr(self);
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		return;
 	}
 	/* Enqueue a lockop to remove `self' from `svc->s_shm_tree' */
 	self->ssh_lop.olo_func = &service_shm_handle_destroy_lop;
 	oblockop_enqueue(&svc->s_shm_lops, &self->ssh_lop);
 	libservice_shmlock_reap_nopr(svc);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 

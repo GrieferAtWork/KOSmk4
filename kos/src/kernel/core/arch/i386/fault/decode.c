@@ -30,7 +30,8 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/x86/gdt.h>
-#include <sched/task.h>
+
+#include <hybrid/sched/preemption.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
@@ -143,13 +144,13 @@ PRIVATE uintptr_t FCALL get_segment_base(u16 segid) {
 	struct desctab gdt;
 	uintptr_t result;
 	struct segment *seg;
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 	__sgdt(&gdt);
 	if (segid & 4) {
 		u16 ldt = __sldt() & ~7;
 		if unlikely(!ldt || ldt > (gdt.dt_limit & ~7)) {
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			/* Deal with an invalid / disabled LDT by throwing an error indicating an invalid LDT. */
 			THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 			      /* opcode:   */ 0,
@@ -168,10 +169,10 @@ PRIVATE uintptr_t FCALL get_segment_base(u16 segid) {
 		goto fail;
 	seg = &((struct segment *)gdt.dt_base)[SEGMENT_INDEX(segid)];
 	result = segment_rdbaseX(seg);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return result;
 fail:
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return 0;
 }
 #endif /* !__x86_64__ */

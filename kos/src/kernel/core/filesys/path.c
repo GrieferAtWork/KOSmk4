@@ -74,22 +74,22 @@ PUBLIC NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL path_isdescendantof)(struct path *child,
                                    struct path const *root) {
 #ifdef CONFIG_NO_SMP
-	pflag_t was;
+	preemption_flag_t was;
 	if (root == child)
 		return true;
 	if (path_isroot(child))
 		return false;
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	for (;;) {
 		child = child->p_parent;
 		if (root == child) {
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			return true;
 		}
 		if (path_isroot(child))
 			break;
 	}
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 #else /* CONFIG_NO_SMP */
 	REF struct path *iter;
 	if (root == child)
@@ -118,12 +118,12 @@ PUBLIC NOBLOCK WUNUSED NONNULL((1)) struct vfs *
 NOTHROW(FCALL _path_getvfs)(struct path *__restrict self) {
 	if (!path_isroot(self)) {
 #ifdef CONFIG_NO_SMP
-		pflag_t was;
-		was = PREEMPTION_PUSHOFF();
+		preemption_flag_t was;
+		preemption_pushoff(&was);
 		do {
 			self = path_parent(self);
 		} while (!path_isroot(self));
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 #else /* CONFIG_NO_SMP */
 		struct vfs *result;
 		self = path_getparent(self);

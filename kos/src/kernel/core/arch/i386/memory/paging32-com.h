@@ -25,9 +25,9 @@
 #include <kernel/arch/paging32.h>
 #include <kernel/types.h>
 #include <kernel/x86/cpuid.h>
-#include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/cpu-cpuid.h>
@@ -97,39 +97,39 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 
 #define X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ(was)                    \
 	do {                                                              \
-		was = PREEMPTION_PUSHOFF();                                   \
+		preemption_pushoff(&(was));                                   \
 		if likely(atomic_rwlock_tryread(&x86_pagedir_prepare_lock)) { \
 			ATOMIC_INC(x86_pagedir_prepare_version);                  \
 			break;                                                    \
 		}                                                             \
-		PREEMPTION_POP(was);                                          \
-		task_tryyield_or_pause();                                     \
+		preemption_pop(&(was));                                       \
+		preemption_tryyield();                                        \
 	}	__WHILE1
 #define X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ_NOVER(was)            \
 	do {                                                            \
-		was = PREEMPTION_PUSHOFF();                                 \
+		preemption_pushoff(&(was));                                 \
 		if likely(atomic_rwlock_tryread(&x86_pagedir_prepare_lock)) \
 			break;                                                  \
-		PREEMPTION_POP(was);                                        \
-		task_tryyield_or_pause();                                   \
+		preemption_pop(&(was));                                     \
+		preemption_tryyield();                                      \
 	}	__WHILE1
 #define X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_WRITE(was)                  \
 	do {                                                             \
-		was = PREEMPTION_PUSHOFF();                                  \
+		preemption_pushoff(&(was));                                  \
 		if likely(atomic_rwlock_trywrite(&x86_pagedir_prepare_lock)) \
 			break;                                                   \
-		PREEMPTION_POP(was);                                         \
-		task_tryyield_or_pause();                                    \
+		preemption_pop(&(was));                                      \
+		preemption_tryyield();                                       \
 	}	__WHILE1
 #define X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was)        \
 	do {                                                  \
 		atomic_rwlock_endread(&x86_pagedir_prepare_lock); \
-		PREEMPTION_POP(was);                              \
+		preemption_pop(&(was));                           \
 	}	__WHILE0
 #define X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was)        \
 	do {                                                   \
 		atomic_rwlock_endwrite(&x86_pagedir_prepare_lock); \
-		PREEMPTION_POP(was);                               \
+		preemption_pop(&(was));                            \
 	}	__WHILE0
 
 

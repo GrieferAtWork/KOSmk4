@@ -74,26 +74,26 @@ NOTHROW(FCALL lockfor)(atomic64_t const *__restrict self) {
 #ifdef CONFIG_NO_SMP
 #define _LOCK_EX(...) \
 	do {              \
-		pflag_t _was; \
-		_was = PREEMPTION_PUSHOFF()
+		preemption_flag_t _was; \
+		preemption_pushoff(&_was)
 #define _UNLOCK_EX(...)       \
-		PREEMPTION_POP(_was); \
+		preemption_pop(&_was); \
 	}	__WHILE0
 #else /* CONFIG_NO_SMP */
 #define _LOCK_EX(self, tryacquire)                   \
 	do {                                             \
 		struct atomic_rwlock *_lock = lockfor(self); \
-		pflag_t _was;                                \
+		preemption_flag_t _was;                      \
 		for (;;) {                                   \
-			_was = PREEMPTION_PUSHOFF();             \
+			preemption_pushoff(&_was);               \
 			if likely_untraced (tryacquire(_lock))   \
 				break;                               \
-			PREEMPTION_POP(_was);                    \
+			preemption_pop(&_was);                   \
 			task_tryyield_or_pause();                \
 		}
 #define _UNLOCK_EX(release)   \
 		release(_lock);       \
-		PREEMPTION_POP(_was); \
+		preemption_pop(&_was); \
 	}	__WHILE0
 #endif /* !CONFIG_NO_SMP */
 

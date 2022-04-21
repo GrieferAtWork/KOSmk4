@@ -31,12 +31,12 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/sig.h>
-#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/bit.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/except.h>
@@ -144,10 +144,10 @@ entropy_connect(size_t num_bits)
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL entropy_take)(void *buf, size_t num_bits) {
 	bool result;
-	pflag_t was;
-	was    = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 	result = entropy_take_nopr(buf, num_bits);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return result;
 }
 
@@ -176,10 +176,10 @@ NOTHROW(FCALL entropy_take_nopr)(void *buf, size_t num_bits) {
  *       may otherwise be reverse-engineered by a malicious entity! */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL entropy_give)(void const *buf, size_t num_bits) {
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 	entropy_give_nopr(buf, num_bits);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 

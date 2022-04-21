@@ -37,6 +37,7 @@
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <kos/debugtrap.h>
 
@@ -290,9 +291,10 @@ do_normal_stop:
 PRIVATE NONNULL((1)) void
 NOTHROW(PRPC_EXEC_CALLBACK_CC GDBThread_StopRPC)(struct rpc_context *__restrict ctx,
                                                  void *cookie) {
-	pflag_t was   = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 	ctx->rc_state = GDBThread_StopRPCImpl((uintptr_t)cookie, ctx->rc_state);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) struct icpustate *
@@ -306,27 +308,27 @@ PRIVATE struct task *GDBThread_StopAll_Host_Old_override = NULL;
 PRIVATE uintptr_t GDBThread_StopAll_Host_Old_flags = 0;
 
 PRIVATE void NOTHROW(FCALL GDBThread_DisablePreemptionForHostCPU)(void) {
-	pflag_t was;
+	preemption_flag_t was;
 	/* TODO: Don't directly access `thiscpu_sched_override'! */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	/* Ensure that the GDB host thread doesn't move to a different core. */
 	GDBThread_StopAll_Host_Old_flags = ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FKEEPCORE);
 	/* Set the GDB Host thread as the scheduling override */
 	GDBThread_StopAll_Host_Old_override = FORCPU(GDBServer_Host->t_cpu, thiscpu_sched_override);
 	FORCPU(GDBServer_Host->t_cpu, thiscpu_sched_override) = GDBServer_Host;
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 PRIVATE void NOTHROW(FCALL GDBThread_ReenablePreemptionForHostCPU)(void) {
-	pflag_t was;
+	preemption_flag_t was;
 	/* TODO: Don't directly access `thiscpu_sched_override'! */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	/* Restore the old scheduling override */
 	FORCPU(GDBServer_Host->t_cpu, thiscpu_sched_override) = GDBThread_StopAll_Host_Old_override;
 	/* Restore the old KEEPCORE flag. */
 	if (!(GDBThread_StopAll_Host_Old_flags & TASK_FKEEPCORE))
 		ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FKEEPCORE);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 
@@ -500,13 +502,13 @@ NOTHROW(PRPC_EXEC_CALLBACK_CC GDBThread_StopWithAsyncNotificationRPC)(struct rpc
                                                                       void *cookie) {
 	/* Restore the old CPU override. */
 	struct cpu *me;
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 	me  = THIS_CPU;
 	/* TODO: Don't directly access `thiscpu_sched_override'! */
 	FORCPU(me, thiscpu_sched_override) = (REF struct task *)cookie;
 	ctx->rc_state = GDBThread_StopRPCImpl(GDBTHREAD_STOPRPCIMPL_F_SETREASON, ctx->rc_state);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 

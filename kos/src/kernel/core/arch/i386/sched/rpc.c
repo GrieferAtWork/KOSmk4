@@ -29,6 +29,8 @@
 #include <sched/rpc-internal.h>
 #include <sched/task.h>
 
+#include <hybrid/sched/preemption.h>
+
 #include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
@@ -283,22 +285,23 @@ NOTHROW(FCALL userexcept_sysret_inject_nopr)(struct task *__restrict thread) {
 
 
 /* Arch-specific function: Behaves identical to:
- * >> pflag_t was = PREEMPTION_PUSHOFF();
+ * >> preemption_flag_t was;
+ * >> preemption_pushoff(&was);
  * >> userexcept_sysret_inject_nopr(THIS_TASK);
- * >> PREEMPTION_POP(was);
+ * >> preemption_pop(&was);
  * This function can be used to force checks for RPCs (including  posix
  * signals) to be performed _after_ a  system has completed (even in  a
  * scenario where the system call completes successfully). This kind of
  * functionality is required for some POSIX-signal-related system calls */
 PUBLIC NOBLOCK void NOTHROW(FCALL userexcept_sysret_inject_self)(void) {
-	pflag_t was;
+	preemption_flag_t was;
 	struct task *thread = THIS_TASK;
 #ifdef __x86_64__
 	struct irregs_user *thread_iret;
 	struct irregs_user *thread_save;
 	assert(!(thread->t_flags & TASK_FKERNTHREAD));
 	thread_iret = x86_get_irregs(thread);
-	was         = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	if (thread_iret->ir_rip != (uintptr_t)&x86_userexcept_sysret) {
 		/* Save the original IRET tail. */
 		thread_save = &FORTASK(thread, this_x86_sysret_iret);
@@ -323,13 +326,13 @@ PUBLIC NOBLOCK void NOTHROW(FCALL userexcept_sysret_inject_self)(void) {
 		thread_iret->ir_rsp = (u64)(thread_iret + 1);
 		COMPILER_WRITE_BARRIER();
 	}
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 #else /* __x86_64__ */
 	struct irregs_user *thread_iret;
 	assert(thread->t_cpu == THIS_CPU);
 	assert(!(thread->t_flags & TASK_FKERNTHREAD));
 	thread_iret = x86_get_irregs(thread);
-	was         = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	if (thread_iret->ir_eip != (uintptr_t)&x86_userexcept_sysret) {
 		FORTASK(thread, this_x86_sysret_iret).ir_eip    = thread_iret->ir_eip;
 		FORTASK(thread, this_x86_sysret_iret).ir_cs     = thread_iret->ir_cs;
@@ -346,7 +349,7 @@ PUBLIC NOBLOCK void NOTHROW(FCALL userexcept_sysret_inject_self)(void) {
 		thread_iret->ir_eflags = 0;
 		COMPILER_WRITE_BARRIER();
 	}
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 #endif /* !__x86_64__ */
 }
 

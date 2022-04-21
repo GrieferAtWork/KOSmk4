@@ -3586,7 +3586,7 @@ NOTHROW(FCALL comgen_handle_errno_problems)(struct com_generator *__restrict sel
  * >>     leaP   service_comdesc::scd_com(%R_service_com), %Pdx
  * >>     movP   LOC_shm(%Psp),                            %Pax
  * >>     subP   service_shm_handle::ssh_shm(%Pax),        %Pdx # %Pdx = shm_offsetof_elem_com
- * >> // PREEMPTION_PUSHOFF();
+ * >> // preemption_pushoff();
  * >>     movP   LOC_upm(%Psp), %Pax
  * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption (movabs via %Pdi on x86_64)
  * >> // atomic_lock_acquire(&s_shm_lock);

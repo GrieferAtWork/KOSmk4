@@ -28,10 +28,11 @@
 #include <kernel/malloc.h>
 #include <kernel/mman/cc.h>
 #include <kernel/user.h>
-#include <sched/task.h>
+#include <sched/task.h> /* get_stack_avail() */
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sync/atomic-rwlock.h>
@@ -1665,7 +1666,7 @@ again_findrange:
 			break; /*  */
 	}
 	if (has_preemption < 0)
-		has_preemption = PREEMPTION_ENABLED();
+		has_preemption = preemption_ison();
 
 	/* If `handman_write(self)' might throw, don't release the lock. */
 	if (has_preemption)

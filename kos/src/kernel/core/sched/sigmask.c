@@ -42,6 +42,7 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/typecore.h>
 #include <hybrid/unaligned.h>
 
@@ -584,11 +585,12 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 			 * try  to gain  insight into  their user-space  memory state by
 			 * disabling preemption, temporarily switching page directories,
 			 * and finally using memcpy_nopf() to access memory. */
-			pflag_t was = PREEMPTION_PUSHOFF();
+			preemption_flag_t was;
+			preemption_pushoff(&was);
 			/* Check again, now that our CPU won't change. */
 			if likely(ATOMIC_READ(self->t_cpu) == THIS_CPU)
 				result = sigmask_ismasked_in_userprocmask_nopf(self, signo);
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 		}
 		return result;
 #endif /* CONFIG_HAVE_USERPROCMASK */

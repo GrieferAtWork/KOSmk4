@@ -38,6 +38,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -233,7 +234,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		goto atomic_set_new_e2_word_or_free_new_e1_vector;
 	} else {
 		/* Already a fully allocated vector (nothing to do here) */
-		pflag_t was;
+		preemption_flag_t was;
 		assert(P32_PDIR_E2_ISVEC1(e2.p_word));
 		e1_p = P32_PDIR_E1_IDENTITY[vec2];
 
@@ -437,7 +438,7 @@ NOTHROW(FCALL p32_pagedir_unprepare_impl_flatten)(unsigned int vec2,
 	p32_pagedir_unset_prepared(&e1_p[vec1_unprepare_start], vec2, vec1_unprepare_start,
 	                           vec1_unprepare_start, vec1_unprepare_size);
 	if unlikely(can_flatten) {
-		pflag_t was;
+		preemption_flag_t was;
 		bool must_restart;
 again_try_exchange_e2_word:
 		must_restart = false;

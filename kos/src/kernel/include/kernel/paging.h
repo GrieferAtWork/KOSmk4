@@ -25,6 +25,7 @@
 #include <kernel/arch/paging.h>
 #include <kernel/types.h>
 
+#include <hybrid/sched/__preemption.h>
 #include <hybrid/typecore.h>
 
 #include <asm/pagesize.h>
@@ -269,17 +270,18 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(pagedir_phys
 #define PAGEDIR_P_BEGINUSE(self)                              \
 	do {                                                      \
 		pagedir_phys_t _old_pdir;                             \
-		pflag_t _p_was = PREEMPTION_PUSHOFF();                \
+		__hybrid_preemption_flag_t _p_was;                    \
+		__hybrid_preemption_pushoff(&_p_was);                 \
 		assert(IS_ALIGNED((uintptr_t)(self), PAGEDIR_ALIGN)); \
 		_old_pdir = pagedir_get();                            \
 		if (_old_pdir != (self))                              \
 			pagedir_set(self);                                \
 		do
-#define PAGEDIR_P_ENDUSE(self)      \
-		__WHILE0;                   \
-		if (_old_pdir != (self))    \
-			pagedir_set(_old_pdir); \
-		PREEMPTION_POP(_p_was);     \
+#define PAGEDIR_P_ENDUSE(self)            \
+		__WHILE0;                         \
+		if (_old_pdir != (self))          \
+			pagedir_set(_old_pdir);       \
+		__hybrid_preemption_pop(&_p_was); \
 	}	__WHILE0
 #define PAGEDIR_P_BEGINUSE_KEEP_PR(self)                      \
 	do {                                                      \

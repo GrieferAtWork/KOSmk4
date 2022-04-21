@@ -32,13 +32,13 @@
 #include <kernel/mman/mpart-blkst.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/phys.h>
-#include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/preemption.h>
 
 #include <kos/except.h>
 
@@ -923,7 +923,7 @@ NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
 
 	/* Some hinted-node-related assertions that we can make
 	 * without  the need of knowing the accessing mem-node. */
-	assert(!PREEMPTION_ENABLED());
+	assert(!preemption_ison());
 	assert(self->mp_file != NULL);
 	assert(ADDR_ISKERN(self->mp_file));
 	assert(self->mp_file->mf_blockshift == PAGESHIFT);
@@ -952,7 +952,7 @@ again_read_st:
 		 * proceed. */
 		if (st == MPART_BLOCK_ST_INIT) {
 			/* Another CPU is currently doing the INIT */
-			task_pause();
+			preemption_tryyield_nopr();
 			goto again_read_st;
 		}
 

@@ -200,7 +200,7 @@ use_boottask_as_parent:
 
 	TRY {
 #ifdef LOCAL_IS_THRD
-		pflag_t preemption_was;
+		preemption_flag_t was;
 #endif /* LOCAL_IS_THRD */
 #ifdef LOCAL_IS_PROC
 		REF struct procgrp *result_grp;
@@ -314,15 +314,15 @@ again_determine_group:
 
 #ifdef LOCAL_IS_THRD
 		/* Lock the current process's thread list. */
-		preemption_was = PREEMPTION_PUSHOFF();
+		preemption_pushoff(&was);
 #ifndef CONFIG_NO_SMP
 		if (!procctl_thrds_tryacquire_nopr(caller_ctl)) {
-			task_pause();
+			preemption_tryyield_nopr();
 			if (!procctl_thrds_tryacquire_nopr(caller_ctl)) {
-				PREEMPTION_POP(preemption_was);
+				preemption_pop(&was);
 				pidns_endwriteall(result_pid->tp_ns);
 				while (!procctl_thrds_available(caller_ctl))
-					task_tryyield_or_pause();
+					preemption_tryyield();
 				goto again_lock_ns;
 			}
 		}
@@ -339,7 +339,7 @@ again_determine_group:
 #else /* LOCAL_IS_PROC */
 #define LOCAL_RELEASE_ALL_LOCKS()                \
 		(procctl_thrds_release_nopr(caller_ctl), \
-		 PREEMPTION_POP(preemption_was),         \
+		 preemption_pop(&was),                   \
 		 pidns_endwriteall(result_pid->tp_ns))
 #endif /* !LOCAL_IS_PROC */
 

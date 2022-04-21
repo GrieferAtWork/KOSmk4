@@ -34,6 +34,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -55,7 +56,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct cpf_rtdata, cpf_refcnt, kfree)
 #define CPF_IPI_FUNC   1
 #define CPF_IPI_THREAD 2
 
-PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL cpf_ipi)(struct icpustate *__restrict state,
                        void *args[CPU_IPI_ARGCOUNT]) {
 	struct cpf_rtdata *rt;
@@ -70,7 +71,7 @@ NOTHROW(FCALL cpf_ipi)(struct icpustate *__restrict state,
 	target_cpu = ATOMIC_READ(thread->t_cpu);
 	if unlikely(target_cpu != THIS_CPU) {
 		while (!cpu_sendipi(target_cpu, &cpf_ipi, args, CPU_IPI_FWAKEUP))
-			task_pause();
+			preemption_tryyield_nopr();
 	} else {
 		/* Invoke the accessor function */
 		(*func)(rt->cpf_data, thread);
@@ -123,20 +124,20 @@ cpu_private_function_callbuf_ex(struct task *__restrict thread,
                                 cpu_private_function_t func, void *stack_buf,
                                 size_t bufsize, size_t bufalign)
 		THROWS(E_BADALLOC, E_INTERRUPT) {
-	pflag_t was;
+	preemption_flag_t was;
 #ifndef CONFIG_NO_SMP
 	struct cpu *thread_cpu;
 #endif /* !CONFIG_NO_SMP */
 	(void)bufsize;
 	(void)bufalign;
 	assert(IS_ALIGNED((uintptr_t)stack_buf, bufalign));
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 #ifndef CONFIG_NO_SMP
 	thread_cpu = ATOMIC_READ(thread->t_cpu);
 	if (thread_cpu != THIS_CPU) {
 		struct cpf_rtdata *rt;
 		void *args[CPU_IPI_ARGCOUNT];
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		if (bufalign < alignof(struct cpf_rtdata))
 			bufalign = alignof(struct cpf_rtdata);
 		rt = (struct cpf_rtdata *)kmemalign_offset(bufalign,
@@ -151,7 +152,7 @@ cpu_private_function_callbuf_ex(struct task *__restrict thread,
 		args[CPF_IPI_FUNC]   = (void *)func;
 		args[CPF_IPI_THREAD] = thread;
 		/* Re-acquire the preemption lock and check that `thread's cpu hasn't changed. */
-		was = PREEMPTION_PUSHOFF();
+		preemption_pushoff(&was);
 		thread_cpu = ATOMIC_READ(thread->t_cpu);
 		if unlikely(thread_cpu == THIS_CPU) {
 			kfree(rt);
@@ -159,8 +160,8 @@ cpu_private_function_callbuf_ex(struct task *__restrict thread,
 		}
 		while (!cpu_sendipi(thread_cpu, &cpf_ipi, args,
 		                    CPU_IPI_FWAKEUP | CPU_IPI_FWAITFOR))
-			task_pause();
-		PREEMPTION_POP(was);
+			preemption_tryyield_nopr();
+		preemption_pop(&was);
 		TRY {
 			/* Now wait for the function to be serviced. */
 			while (!ATOMIC_READ(rt->cpf_finish)) {
@@ -183,7 +184,7 @@ do_service_directly:
 #endif /* !CONFIG_NO_SMP */
 	/* Service directly. */
 	(*func)(stack_buf, thread);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return stack_buf;
 }
 

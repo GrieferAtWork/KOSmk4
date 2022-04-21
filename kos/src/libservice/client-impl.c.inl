@@ -49,20 +49,20 @@ libservice_buffer_malloc(struct service *__restrict self, size_t num_bytes)
 #endif /* !LOCAL_DEFINE_NOEXCEPT */
 {
 	service_buf_t buf;
-	pflag_t was;
+	preemption_flag_t was;
 	num_bytes += SERVICE_SHM_ALLOC_ALIGN - 1;
 	num_bytes &= ~(SERVICE_SHM_ALLOC_ALIGN - 1);
 	num_bytes += SERVICE_SHM_ALLOC_EXTRA;
 	if (num_bytes < SERVICE_SHM_ALLOC_MINSIZE)
 		num_bytes = SERVICE_SHM_ALLOC_MINSIZE;
 	/* Allocate a new blob. */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 #ifdef LOCAL_DEFINE_NOEXCEPT
 	buf = libservice_shmbuf_alloc_nopr_nx(self, num_bytes);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 #else /* LOCAL_DEFINE_NOEXCEPT */
 	{
-		RAII_FINALLY { PREEMPTION_POP(was); };
+		RAII_FINALLY { preemption_pop(&was); };
 		buf = libservice_shmbuf_alloc_nopr(self, num_bytes);
 	}
 #endif /* !LOCAL_DEFINE_NOEXCEPT */
@@ -126,19 +126,19 @@ libservice_buffer_realloc(struct service *__restrict self, void *ptr, size_t num
 		num_free = oldsize - num_bytes;
 		if (num_free >= SERVICE_SHM_ALLOC_MINSIZE) {
 			struct service_shm_handle *shm;
-			pflag_t was;
-			was = PREEMPTION_PUSHOFF();
+			preemption_flag_t was;
+			preemption_pushoff(&was);
 			shm = libservice_shm_handle_ataddr_nopr(self, ptr);
 			assertf(shm, "service_buffer_realloc(%p): Invalid pointer", ptr);
 			libservice_shmbuf_free_nopr(self, shm, ptr);
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			libservice_shmbuf_set_total_size(ptr, num_bytes);
 		}
 	} else if (oldsize < num_bytes) {
 		struct service_shm_handle *shm;
-		pflag_t was;
+		preemption_flag_t was;
 		size_t extra;
-		was = PREEMPTION_PUSHOFF();
+		preemption_pushoff(&was);
 		shm = libservice_shm_handle_ataddr_nopr(self, ptr);
 		assertf(shm, "service_buffer_realloc(%p): Invalid pointer", ptr);
 		extra = num_bytes - oldsize;
@@ -147,21 +147,21 @@ libservice_buffer_realloc(struct service *__restrict self, void *ptr, size_t num
 			assert(extra >= (num_bytes - oldsize));
 			oldsize += extra;
 			libservice_shmbuf_set_total_size(ptr, oldsize);
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 		} else {
 			service_buf_t buf;
 			/* Allocate a new blob. */
 #ifdef LOCAL_DEFINE_NOEXCEPT
 			buf = libservice_shmbuf_alloc_nopr_nx(self, num_bytes);
 #else /* LOCAL_DEFINE_NOEXCEPT */
-			RAII_FINALLY { PREEMPTION_POP(was); };
+			RAII_FINALLY { preemption_pop(&was); };
 			buf = libservice_shmbuf_alloc_nopr(self, num_bytes);
 #endif /* !LOCAL_DEFINE_NOEXCEPT */
 			assert(libservice_shmbuf_get_total_size(service_buf_getptr(buf)) >= num_bytes);
 			memcpy(service_buf_getptr(buf), ptr, oldsize);
 			libservice_shmbuf_freeat_nopr(self, shm, libservice_shmbuf_get_base_addr(ptr), oldsize);
 #ifdef LOCAL_DEFINE_NOEXCEPT
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 #endif /* LOCAL_DEFINE_NOEXCEPT */
 			return service_buf_getptr(buf);
 		}

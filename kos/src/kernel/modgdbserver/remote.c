@@ -71,7 +71,8 @@ NOTHROW(FCALL GDBRemote_HasPendingBytes)(void) {
  * NOTE: May only be called  while preemption is disabled,  and
  *       only from the designated CPU for interrupts concerning
  *       incoming remote data! */
-INTERN NOBLOCK void NOTHROW(FCALL GDBRemote_PostByte)(byte_t b) {
+INTERN NOBLOCK NOPREEMPT void
+NOTHROW(FCALL GDBRemote_PostByte)(byte_t b) {
 	BufferState state, newstate;
 	assert(!PREEMPTION_ENABLED());
 	for (;;) {

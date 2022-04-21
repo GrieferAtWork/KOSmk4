@@ -82,7 +82,7 @@ opt.append("-Os");
 #ifdef __KERNEL__
 #include <kernel/printk.h>
 #include <kernel/user.h>
-#include <sched/task.h>
+#include <hybrid/sched/preemption.h>
 #endif /* __KERNEL__ */
 
 #ifdef __KERNEL__
@@ -1553,7 +1553,7 @@ i386_getsegment_base(struct icpustate32 *__restrict state,
                      u8 segment_regno) {
 	u32 result;
 	u16 segment_index;
-	pflag_t was;
+	preemption_flag_t was;
 	struct segment *seg;
 	struct desctab dt;
 
@@ -1605,13 +1605,13 @@ i386_getsegment_base(struct icpustate32 *__restrict state,
 		break;
 	}
 
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	__sgdt(&dt);
 	if (segment_index & 4) {
 		/* LDT index. */
 		u16 ldt = __sldt() & ~7;
 		if unlikely(!ldt || ldt > dt.dt_limit) {
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			/* Deal with an invalid / disabled LDT by throwing an error indicating an invalid LDT. */
 			THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 			      0,                                    /* opcode */
@@ -1627,7 +1627,7 @@ i386_getsegment_base(struct icpustate32 *__restrict state,
 	}
 	segment_index &= ~7;
 	if (!segment_index || segment_index > dt.dt_limit) {
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER,
 		      0,                                       /* opcode */
 		      0,                                       /* op_flags */
@@ -1638,7 +1638,7 @@ i386_getsegment_base(struct icpustate32 *__restrict state,
 	}
 	seg = (struct segment *)((byte_t *)dt.dt_base + segment_index);
 	result = segment_rdbaseX(seg);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return result;
 }
 

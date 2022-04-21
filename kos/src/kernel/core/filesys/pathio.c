@@ -34,9 +34,9 @@
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
 #include <kernel/mman/driver.h>
-#include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
@@ -903,23 +903,23 @@ PRIVATE NOBLOCK WUNUSED NONNULL((1, 2, 3)) bool
 NOTHROW(FCALL check_move_to_child)(struct path *__restrict oldpath,
                                    struct path *__restrict newpath,
                                    struct fdirnode *__restrict movedir) {
-	pflag_t was;
+	preemption_flag_t was;
 	struct path *mount;
 	unsigned int result;
 #ifndef CONFIG_NO_SMP
 again:
 #endif /* !CONFIG_NO_SMP */
-	was   = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	mount = findmount_and_plock_tree_nopr(newpath, movedir);
 	if (mount == FINDMOUNT_AND_PLOCK_TREE_NOPR_MOVE2CHILD) {
 		/* Yes: this is a move-to-child scenario. */
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		return true;
 	}
 #ifndef CONFIG_NO_SMP
 	if (!mount) {
-		PREEMPTION_POP(was);
-		task_tryyield_or_pause();
+		preemption_pop(&was);
+		preemption_tryyield();
 		goto again;
 	}
 #endif /* !CONFIG_NO_SMP */
@@ -930,11 +930,11 @@ again:
 	 * between `oldpath/movedir' and `newpath' */
 	result = is_part_of_different_mount_nopr(oldpath, newpath, mount);
 	findmount_and_punlock_tree_nopr(newpath);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 #ifndef CONFIG_NO_SMP
 	if (result == IS_PART_OF_DIFFERENT_MOUNT_NOPR_RETRY) {
 		/* Wait for a blocking lock to (hopefully) go away. */
-		task_tryyield_or_pause();
+		preemption_tryyield();
 		goto again;
 	}
 #endif /* !CONFIG_NO_SMP */

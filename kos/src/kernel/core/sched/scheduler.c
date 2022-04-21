@@ -32,6 +32,7 @@
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/preemption.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -1721,9 +1722,9 @@ PUBLIC NOBLOCK ATTR_RETNONNULL struct cpu *
 NOTHROW(FCALL sched_override_start)(void) {
 	struct task *caller;
 	struct cpu *me;
-	pflag_t was;
+	preemption_flag_t was;
 	caller = THIS_TASK;
-	was    = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	COMPILER_READ_BARRIER();
 	me = caller->t_cpu;
 	assert(!sched_override);
@@ -1733,7 +1734,7 @@ NOTHROW(FCALL sched_override_start)(void) {
 
 	/* Disable any previously set deadline. */
 	tsc_nodeadline(me);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return me;
 }
 
@@ -1742,11 +1743,11 @@ NOTHROW(FCALL sched_override_end)(void) {
 	struct task *caller, *next;
 	struct cpu *me;
 	tsc_t tsc_now;
-	pflag_t was;
+	preemption_flag_t was;
 	caller = THIS_TASK;
 	me     = caller->t_cpu;
 	assert(sched_override == caller);
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	ATOMIC_WRITE(sched_override, NULL);
 	tsc_now = tsc_get(me);
 
@@ -1754,9 +1755,9 @@ NOTHROW(FCALL sched_override_end)(void) {
 	 * the additional time  it spent being  an active scheduler  override. */
 	next = sched_intern_reload_deadline(me, caller, sched_stoptime(caller),
 	                                    0, tsc_now_to_ktime(me, tsc_now),
-	                                    tsc_now, !PREEMPTION_WASENABLED(was));
+	                                    tsc_now, !preemption_wason(&was));
 	if (next != caller) {
-		assert(PREEMPTION_WASENABLED(was));
+		assert(preemption_wason(&was));
 
 		/* Directly resume execution in `next' */
 		FORCPU(me, thiscpu_sched_current) = next;
@@ -1765,7 +1766,7 @@ NOTHROW(FCALL sched_override_end)(void) {
 		/* Switch over to the next thread. */
 		cpu_run_current_and_remember_nopr(caller);
 	}
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 /* While the caller is holding a scheduler override, pass over that

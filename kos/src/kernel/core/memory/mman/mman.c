@@ -41,6 +41,7 @@
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
@@ -340,32 +341,32 @@ PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *
 NOTHROW(FCALL task_xchmman_inherit)(/*inherit(always)*/ REF struct mman *__restrict newmman) {
 	REF struct mman *oldmman;
 	struct task *me = THIS_TASK;
-	pflag_t was;
+	preemption_flag_t was;
 #ifndef CONFIG_NO_SMP
 again:
 #endif /* CONFIG_NO_SMP */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	oldmman = me->t_mman; /* Inherit reference */
 #ifndef CONFIG_NO_SMP
 	if unlikely(oldmman == newmman) {
 		/* No-op (but must  check explicitly  to prevent  dead-
 		 * lock from acquiring `newmman->mm_threadslock' twice) */
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		return newmman;
 	}
 
 	/* Acquire all of the necessary locks. */
 	if (!atomic_lock_tryacquire(task_mman_change_lock(me))) {
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		while (!atomic_lock_available(task_mman_change_lock(me)))
-			task_tryyield_or_pause();
+			preemption_tryyield();
 		goto again;
 	}
 	if unlikely(!mman_threadslock_tryacquire_nopr(newmman)) {
 		atomic_lock_release(task_mman_change_lock(me));
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		while (!mman_threadslock_available(newmman))
-			task_tryyield_or_pause();
+			preemption_tryyield();
 		goto again;
 	}
 	if unlikely(!mman_threadslock_tryacquire_nopr(oldmman)) {
@@ -376,9 +377,9 @@ again:
 		 * but is actually something that's allowed to be done. */
 		incref(oldmman);
 		atomic_lock_release(task_mman_change_lock(me));
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		while (!mman_threadslock_available(oldmman))
-			task_tryyield_or_pause();
+			preemption_tryyield();
 		decref(oldmman);
 		goto again;
 	}
@@ -406,7 +407,7 @@ again:
 	{
 		cpu_setmman_ex(me->t_cpu, newmman);
 	}
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 
 	/* Return a reference to the old mman. */
 	return oldmman;

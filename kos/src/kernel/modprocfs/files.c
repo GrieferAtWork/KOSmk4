@@ -53,13 +53,14 @@
 #include <sched/cred.h>
 #include <sched/group.h>
 #include <sched/scheduler.h>
-#include <sched/task.h>
+#include <sched/task.h> /* task_start_default_flags */
 #include <sched/tsc.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/except.h>
@@ -329,8 +330,8 @@ procfs_uptime_printer(pformatprinter printer, void *arg,
 		ci_active = ATOMIC_READ(FORTASK(ci, this_activetime));
 #else /* __SIZEOF_POINTER__ >= __SIZEOF_KTIME_T__ */
 		{
-			pflag_t was;
-			was = PREEMPTION_PUSHOFF();
+			preemption_flag_t was;
+			preemption_pushoff(&was);
 			if (c == THIS_CPU) {
 				ci_active = FORTASK(ci, this_activetime);
 			} else {
@@ -342,10 +343,10 @@ procfs_uptime_printer(pformatprinter printer, void *arg,
 					if unlikely(ci_active <= now)
 						break; /* Makes sense... */
 					/* Maybe the other CPU is changing the variable right now? */
-					task_pause();
+					preemption_tryyield_nopr();
 				}
 			}
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 		}
 #endif /* __SIZEOF_POINTER__ < __SIZEOF_KTIME_T__ */
 		idle += ci_active;

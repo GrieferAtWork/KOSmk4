@@ -33,6 +33,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/preemption.h>
 
 #include <kos/except/reason/inval.h>
 #include <sys/stat.h>
@@ -50,7 +51,7 @@ PUBLIC NOBLOCK NOPREEMPT bool
 NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mousebuf *__restrict self,
                                            mouse_packet_t packet) {
 	union mousebuf_state oldstate, newstate;
-	assert(!PREEMPTION_ENABLED());
+	assert(!preemption_ison());
 	assert(packet.mp_type != MOUSE_PACKET_TYPE_NONE);
 	for (;;) {
 		size_t index;
@@ -90,7 +91,7 @@ NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mousebuf *__restrict self,
 	union mousebuf_state oldstate, newstate;
 	assert(packetc != 0);
 	assert(packetc <= MOUSE_PACKET_SEQMAX);
-	assert(!PREEMPTION_ENABLED());
+	assert(!preemption_ison());
 	assert(packetv[0].mp_type != MOUSE_PACKET_TYPE_NONE);
 	for (;;) {
 		size_t i, index;
@@ -815,7 +816,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 
 	case MOUSEIO_SETABSRECT: {
 		struct mouse_rect new_rect;
-		pflag_t was;
+		preemption_flag_t was;
 		bool was_clamped = false;
 		validate_writable(arg, sizeof(struct mouse_rect));
 		COMPILER_READ_BARRIER();
@@ -834,10 +835,10 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 			      new_rect.mr_maxx, new_rect.mr_maxy);
 		}
 		for (;;) {
-			was = PREEMPTION_PUSHOFF();
+			preemption_pushoff(&was);
 			if (mousedev_smplock_tryacquire(me))
 				break;
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			task_yield();
 		}
 		memcpy(&me->md_rect, &new_rect, sizeof(struct mouse_rect));
@@ -862,7 +863,7 @@ mousedev_v_ioctl(struct mfile *__restrict self,
 		if (was_clamped && (ATOMIC_READ(me->md_flags) & MOUSE_DEVICE_FLAG_GENABS))
 			mouse_device_do_motion_nopr_locked(me, 0, 0);
 		mousedev_smplock_release_nopr(me);
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	}	break;
 
 	case MOUSEIO_PUTMOTION: {

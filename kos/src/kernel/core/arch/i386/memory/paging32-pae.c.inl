@@ -40,6 +40,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <asm/cpu-cpuid.h>
 
@@ -242,11 +243,11 @@ INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
                                 PHYS struct pae_pdir *phys_self) {
 	unsigned int vec3;
-	pflag_t was;
+	preemption_flag_t was;
 	PHYS pagedir_t *old_pagedir;
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)phys_self, PAGESIZE));
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	old_pagedir = pagedir_get();
 
 	/* Temporarily  switch  to  the  page-directory  to-be  freed,  so  we
@@ -270,7 +271,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 		}
 	}
 	pagedir_set(old_pagedir);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 
 	/* Free the always-allocated E2-vectors */
 	for (vec3 = 0; vec3 < 4; ++vec3) {
@@ -417,7 +418,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		goto atomic_set_new_e2_word_or_free_new_e1_vector;
 	} else {
 		/* Already a fully allocated vector (nothing to do here) */
-		pflag_t was;
+		preemption_flag_t was;
 		assert(PAE_PDIR_E2_ISVEC1(e2.p_word));
 		e1_p = &PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1_prepare_start];
 
@@ -630,7 +631,7 @@ NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten)(unsigned int vec3,
 	pae_pagedir_unset_prepared(&e1_p[vec1_unprepare_start], vec3, vec2, vec1_unprepare_start,
 	                           vec1_unprepare_start, vec1_unprepare_size);
 	if unlikely(can_flatten) {
-		pflag_t was;
+		preemption_flag_t was;
 		bool must_restart;
 again_try_exchange_e2_word:
 		must_restart = false;

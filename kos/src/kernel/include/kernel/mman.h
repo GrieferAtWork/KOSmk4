@@ -192,7 +192,7 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #define mman_threadslock_tryacquire_nopr(self) 1
 #define mman_threadslock_acquire_nopr(self)    (void)0
 #define mman_threadslock_release_nopr(self)    (void)0
-#define mman_threadslock_acquired(self)        (!PREEMPTION_ENABLED())
+#define mman_threadslock_acquired(self)        (!__hybrid_preemption_ison())
 #define mman_threadslock_available(self)       1
 #endif /* CONFIG_NO_SMP */
 #define mman_threadslock_acquire(self)   atomic_lock_acquire_smp(&(self)->mm_threadslock)

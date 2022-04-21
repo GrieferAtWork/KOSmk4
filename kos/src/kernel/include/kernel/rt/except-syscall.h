@@ -90,7 +90,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * call (`sys_rpc_serve_sysret(2)') is required.
  *
  * Purpose:
- *    - A lot of kernel-space code makes use of `PREEMPTION_PUSHOFF()' / `PREEMPTION_POP()'
+ *    - A lot of kernel-space code makes use of `preemption_pushoff()' / `preemption_pop()'
  *      in order to ensure reentrancy for small sections of code. The equivalent user-space
  *      API for this is `sigprocmask()', however that function is anything but efficient in
  *      what  it  does, having  to  unconditionally employ  a  system call  when  used, and
@@ -201,9 +201,9 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * Example code:
  * >> sigset_t os, ns;
  * >> sigfillset(&ns);
- * >> sigprocmask(SIG_SETMASK, &ns, &os);   // PREEMPTION_PUSHOFF()
+ * >> sigprocmask(SIG_SETMASK, &ns, &os);   // preemption_pushoff()
  * >> ...
- * >> sigprocmask(SIG_SETMASK, &os, NULL);  // PREEMPTION_POP()
+ * >> sigprocmask(SIG_SETMASK, &os, NULL);  // preemption_pop()
  *
  *
  * Implementation of libc's `sigprocmask()':
@@ -356,12 +356,12 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>     // However, this also assumes that `my_function_that_mustnt_get_interrupted()'
  * >>     // doesn't include a call to `sys_sigprocmask(2)' (i.e. _NOT_ the library
  * >>     // variant), since such a call would also try to write to `fullmask'
- * >>     oldset = setsigmaskptr((sigset_t *)&fullmask); // PREEMPTION_PUSHOFF()
+ * >>     oldset = setsigmaskptr((sigset_t *)&fullmask); // preemption_pushoff()
  * >>
  * >>     my_function_that_mustnt_get_interrupted();
  * >>
  * >>     // Restore the old signal mask
- * >>     setsigmaskptr(oldset);                         // PREEMPTION_POP()
+ * >>     setsigmaskptr(oldset);                         // preemption_pop()
  * >> }
  */
 #ifdef CONFIG_HAVE_USERPROCMASK

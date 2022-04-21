@@ -31,8 +31,10 @@
 #include <kernel/refcountable.h>
 #include <kernel/types.h>
 #include <sched/sig.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -211,7 +213,7 @@ NOTHROW(KCALL aio_multihandle_fini)(struct aio_multihandle *__restrict self) {
 #ifndef CONFIG_NO_SMP
 	/* Make sure that no other thread is still inside of `am_func' */
 	while (!(ATOMIC_READ(self->am_status) & AIO_MULTIHANDLE_STATUS_RELEASED))
-		task_tryyield_or_pause();
+		preemption_tryyield();
 #endif /* !CONFIG_NO_SMP */
 
 	DBG_memset(&self->am_func, 0xcc, sizeof(self->am_func));
@@ -368,11 +370,11 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self) {
 	/* Check if all AIO handles have already completed. */
 	if ((old_status & AIO_MULTIHANDLE_STATUS_RUNMASK) == 0) {
 		unsigned int status;
-		pflag_t was;
+		preemption_flag_t was;
 
 		/* Completion functions must  be called  with preemption  disabled,
 		 * so satisfy that requirement by disabling preemption temporarily. */
-		was = PREEMPTION_PUSHOFF();
+		preemption_pushoff(&was);
 
 		/* All handles have already completed. */
 		status = (old_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) >> AIO_MULTIHANDLE_STATUS_STATUSSHFT;
@@ -389,7 +391,7 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self) {
 			/* Invoke the completion callback. */
 			(*self->am_func)(self, status);
 		}
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	}
 }
 
@@ -400,7 +402,7 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self) {
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_multihandle_fail)(struct aio_multihandle *__restrict self) {
 	uintptr_t old_status;
-	pflag_t was;
+	preemption_flag_t was;
 	do {
 		old_status = ATOMIC_READ(self->am_status);
 		if (old_status & AIO_MULTIHANDLE_STATUS_FAILED)
@@ -420,9 +422,9 @@ NOTHROW(KCALL aio_multihandle_fail)(struct aio_multihandle *__restrict self) {
 		memcpy(&self->am_error, &THIS_EXCEPTION_DATA, sizeof(self->am_error));
 	/* Invoke the completion function. */
 	memcpy(&THIS_EXCEPTION_DATA, &self->am_error, sizeof(self->am_error));
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	(*self->am_func)(self, AIO_COMPLETION_FAILURE);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 

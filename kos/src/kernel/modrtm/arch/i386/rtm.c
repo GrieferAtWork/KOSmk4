@@ -41,7 +41,8 @@
 #include <kernel/x86/gdt.h>
 #include <sched/cpu.h>
 #include <sched/rpc.h>
-#include <sched/task.h>
+
+#include <hybrid/sched/preemption.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
@@ -321,7 +322,7 @@ NOTHROW(KCALL i386_getsegment_base)(struct icpustate32 const *__restrict state,
                                     u8 segment_regno) {
 	u32 result;
 	u16 segment_index;
-	pflag_t was;
+	preemption_flag_t was;
 	struct segment *seg;
 	struct desctab dt;
 
@@ -377,13 +378,13 @@ err_complex:
 		break;
 	}
 
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	__sgdt(&dt);
 	if (segment_index & 4) {
 		/* LDT index. */
 		u16 ldt = __sldt() & ~7;
 		if unlikely(!ldt || ldt > dt.dt_limit) {
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			goto err_complex;
 		}
 		seg = (struct segment *)((byte_t *)dt.dt_base + ldt);
@@ -392,17 +393,17 @@ err_complex:
 	}
 	segment_index &= ~7;
 	if (!segment_index || segment_index > dt.dt_limit) {
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		goto err_complex;
 	}
 	seg = (struct segment *)((byte_t *)dt.dt_base + segment_index);
 	if (seg->s_descriptor.d_dpl != 3 && icpustate_isuser(state)) {
 		/* User-space can't read the base address of a privileged segment! */
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		goto err_complex;
 	}
 	result = segment_rdbaseX(seg);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return result;
 }
 #endif /* !__x86_64__ */
@@ -886,16 +887,16 @@ PRIVATE ATTR_PURE WUNUSED u32 KCALL emulate_rdpid(void) {
 LOCAL WUNUSED NONNULL((1)) u64 KCALL
 emulate_rdtscp(u32 *__restrict p_tsc_aux) {
 	u64 tsc;
-	pflag_t was;
+	preemption_flag_t was;
 	/* To guaranty that the hosting CPU doesn't change  during
 	 * execution here, temporarily disable preemption, so that
 	 * the TSC and CPU-ID are consistent with each other! */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	COMPILER_BARRIER();
 	*p_tsc_aux = EMU86_EMULATE_RDPID();
 	tsc        = EMU86_EMULATE_RDTSC_INDIRECT();
 	COMPILER_BARRIER();
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return tsc;
 }
 

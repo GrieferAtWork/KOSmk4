@@ -60,6 +60,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
+#include <hybrid/sched/preemption.h>
 
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-helpers.h>
@@ -129,7 +130,8 @@ NOTHROW(KCALL _kernel_poison)(void) {
 	 * from within an assertion handler, which in turn is able
 	 * to cause other assertions) */
 	struct task *mythread;
-	pflag_t was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 
 	/* Try  to repair  a broken  TLS state,  since we'll need
 	 * a (somewhat) working one in order to even do anything! */
@@ -170,7 +172,7 @@ NOTHROW(KCALL _kernel_poison)(void) {
 	 * depend on too many other sub-systems, or contain dynamic
 	 * callbacks (both of which are the case for this function) */
 
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 

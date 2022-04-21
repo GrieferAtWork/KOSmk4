@@ -44,6 +44,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
+#include <hybrid/sched/preemption.h>
 
 #include <kos/except.h>
 #include <kos/lockop.h>
@@ -541,19 +542,19 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 
 #ifdef CONFIG_DEBUG_HEAP
 		if (node->mn_part->mp_file == &mfile_dbgheap) {
-			pflag_t was;
+			preemption_flag_t was;
 			/* Super-ugly, hacky work-around because the heap system can't
 			 * be made compatible  with lockops without  a full  re-write.
 			 *
 			 * s.a.: `heap_unmap_kram()' */
 			heap_validate_all();
-			was = PREEMPTION_PUSHOFF();
+			preemption_pushoff(&was);
 			ATOMIC_OR(THIS_TASK->t_flags, _TASK_FDBGHEAPDMEM);
 			do {
 				__asm__ __volatile__("" : : "r" (*tail_minaddr));
 				tail_minaddr += PAGESIZE;
 			} while (tail_minaddr < tail_endaddr);
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			ATOMIC_AND(THIS_TASK->t_flags, ~_TASK_FDBGHEAPDMEM);
 			heap_validate_all();
 		} else

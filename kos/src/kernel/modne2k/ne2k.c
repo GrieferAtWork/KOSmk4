@@ -34,6 +34,7 @@
 #include <kernel/x86/pic.h> /* X86_INTERRUPT_PIC1_BASE (TODO: Non-portable) */
 #include <sched/async.h>
 #include <sched/cpu.h>
+#include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>

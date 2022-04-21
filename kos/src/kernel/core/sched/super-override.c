@@ -28,9 +28,9 @@
 #include <sched/cpu.h>
 #include <sched/scheduler.h>
 #include <sched/sig.h>
-#include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -139,11 +139,11 @@ sched_super_override_start_impl(bool force)
 
 	/* Start by acquiring the regular scheduler override. */
 	{
-		pflag_t was;
-		was = PREEMPTION_PUSHOFF();
+		preemption_flag_t was;
+		preemption_pushoff(&was);
 		me  = THIS_CPU;
 		was_already_override = FORCPU(me, thiscpu_sched_override) != NULL;
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 	}
 	if (!was_already_override)
 		me = sched_override_start();
@@ -181,7 +181,7 @@ again:
 		sig_broadcast(&super_override_release);
 		/* Wait for another thread to finish releasing the SUPER-lock. */
 		do {
-			task_tryyield_or_pause();
+			preemption_tryyield();
 		} while (ATOMIC_READ(super_override_unlocking));
 		goto again;
 	}
@@ -200,7 +200,7 @@ again:
 		                                 CPU_IPI_FWAKEUP | CPU_IPI_FWAITFOR);
 		/* Wait until all other CPUs have acknowledged the request. */
 		while (ATOMIC_READ(super_override_ack) < count)
-			task_pause();
+			preemption_tryyield();
 	}
 
 	/* We've successfully acquired the super-lock! */
@@ -302,7 +302,7 @@ NOTHROW(FCALL sched_super_override_end)(bool release_sched_override) {
 
 	/* Wait for all CPUs to acknowledge resuming execution. */
 	while (ATOMIC_READ(super_override_ack) != 0)
-		task_tryyield_or_pause();
+		preemption_tryyield();
 
 	/* Clear the override-unlocking flag.
 	 * This  flag  is needed  to prevent  `super_override_ack' from

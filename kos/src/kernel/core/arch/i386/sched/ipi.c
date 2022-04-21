@@ -37,6 +37,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/cpu-flags.h>
@@ -76,7 +77,7 @@ NOTHROW(KCALL apic_send_init)(u8 procid) {
 	            APIC_ICR0_FASSERT |
 	            APIC_ICR0_TARGET_FICR1);
 	while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
-		task_pause();
+		preemption_tryyield();
 }
 
 INTERN NOBLOCK void
@@ -88,17 +89,17 @@ NOTHROW(KCALL apic_send_startup)(u8 procid, u8 pageno) {
 	                       APIC_ICR0_FASSERT |
 	                       APIC_ICR0_TARGET_FICR1);
 	while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
-		task_pause();
+		preemption_tryyield();
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
-	pflag_t was;
+	preemption_flag_t was;
 	assert(target != THIS_CPU);
 	/* Make sure that our outgoing interrupt line isn't
 	 * still  pending  due to  another,  unrelated IPI. */
 	while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
-		task_pause();
+		preemption_tryyield();
 
 	/* Send an INIT IPI to the target CPU. */
 	apic_send_init(FORCPU(target, thiscpu_x86_lapicid));
@@ -122,7 +123,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 		outb(PIT_PCSPEAKER, temp | PIT_PCSPEAKER_OUT);
 	}
 	while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT)
-		task_pause();
+		preemption_tryyield_nopr();
 	x86_pit_lock_release_smp();
 
 	/* Send the startup IPI */
@@ -140,13 +141,11 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 #endif
 
 	/* Explicitly wait for 1 millisecond. */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	while (!x86_pit_lock_tryacquire()) {
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
-		PREEMPTION_POP(was);
-		task_tryyield_or_pause();
-		was = PREEMPTION_PUSHOFF();
+		preemption_tryyield_f(&was);
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
 	}
@@ -171,15 +170,15 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 done_ppop_endwrite:
 			x86_pit_lock_release_nopr();
 done_ppop:
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 			return;
 		}
-		task_pause();
+		preemption_tryyield_nopr();
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop_endwrite;
 	}
 	x86_pit_lock_release_nopr();
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 		return;
 
@@ -187,13 +186,11 @@ done_ppop:
 	apic_send_startup(FORCPU(target, thiscpu_x86_lapicid), x86_smp_entry_page);
 
 	/* Wait for up to 1 second. */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	while (!x86_pit_lock_tryacquire()) {
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
-		PREEMPTION_POP(was);
-		task_tryyield_or_pause();
-		was = PREEMPTION_PUSHOFF();
+		preemption_tryyield_f(&was);
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
 	}
@@ -217,12 +214,12 @@ done_ppop:
 	while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT) {
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop_endwrite;
-		task_pause();
+		preemption_tryyield_nopr();
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop_endwrite;
 	}
 	x86_pit_lock_release_nopr();
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 		return;
 	kernel_panic("Failed to re-initialize previously functional CPU #%u (hardware failure?)",
@@ -336,16 +333,16 @@ NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
 PRIVATE NONNULL((1)) void
 NOTHROW(PRPC_EXEC_CALLBACK_CC task_rpc_serve_ipi)(struct rpc_context *__restrict ctx,
                                                   void *UNUSED(cookie)) {
-	pflag_t was;
+	preemption_flag_t was;
 	struct cpu *mycpu;
 	/* Disable  preemption  to prevent  CPU switches  and to
 	 * comply with `x86_serve_ipi()'s NOPREEMPT requirement. */
-	was   = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	mycpu = THIS_CPU;
 
 	/* Serve IPIs */
 	ctx->rc_state = x86_serve_ipi(mycpu, ctx->rc_state);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 }
 
 
@@ -381,7 +378,7 @@ NOTHROW(KCALL cpu_sendipi)(struct cpu *__restrict target,
                            unsigned int flags) {
 	unsigned int i, attempt = 0;
 	unsigned int slot;
-	pflag_t was;
+	preemption_flag_t was;
 	IPI_DEBUG("cpu_sendipi:%p,%p\n", target, func);
 #ifndef NDEBUG
 	/* Make it easier for race conditions  related to IPI races to  surface
@@ -392,14 +389,14 @@ NOTHROW(KCALL cpu_sendipi)(struct cpu *__restrict target,
 		task_pause();
 	}
 #endif /* !NDEBUG */
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	if (target == THIS_CPU) {
 		/* Special case: The current CPU is being targeted. */
 		if (flags & CPU_IPI_FNOINTR) {
 			x86_execute_direct_ipi_nopr(func, args);
 			goto done_success;
 		}
-		if (PREEMPTION_WASENABLED(was)) {
+		if (preemption_wason(&was)) {
 			x86_execute_direct_ipi(func, args);
 			assert(PREEMPTION_ENABLED());
 			goto done_success;
@@ -450,7 +447,7 @@ do_send_ipi:
 
 				/* Make sure that no other IPI is still pending to be delivered by our LAPIC */
 				while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
-					task_pause();
+					preemption_tryyield_nopr();
 
 				/* There were no other IPIs already, meaning it's our job to send the first! */
 				lapic_write(APIC_ICR1, APIC_ICR1_MKDEST(FORCPU(target, thiscpu_x86_lapicid)));
@@ -462,7 +459,7 @@ do_send_ipi:
 				            APIC_ICR0_TARGET_FICR1);
 				if (flags & CPU_IPI_FWAITFOR) {
 					while (lapic_read(APIC_ICR0) & APIC_ICR0_FPENDING)
-						task_pause();
+						preemption_tryyield_nopr();
 				}
 			} else if (flags & CPU_IPI_FWAKEUP) {
 				/* Indicate that the IPI is now ready for handling by the core. */
@@ -492,7 +489,7 @@ do_wake_target:
 			}
 		}
 done_success:
-		PREEMPTION_POP(was);
+		preemption_pop(&was);
 		return true;
 	}
 
@@ -500,7 +497,7 @@ done_success:
 	if (++attempt < 64)
 		goto again;
 done_failure:
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return false;
 }
 

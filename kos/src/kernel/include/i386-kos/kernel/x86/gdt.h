@@ -34,7 +34,9 @@
 #include <asm/cpu-flags.h>
 #include <asm/cpu-msr.h>
 #include <asm/intrin.h>
-#endif /* __x86_64__ */
+#else /* __x86_64__ */
+#include <hybrid/sched/__preemption.h>
+#endif /* !__x86_64__ */
 
 DECL_BEGIN
 
@@ -92,18 +94,17 @@ DATDEF ATTR_PERTASK uintptr_t this_x86_user_gsbase;
 	}	__WHILE0
 #define x86_set_user_fsbase(v)                                                            \
 	do {                                                                                  \
-		pflag_t _xsufnr_was;                                                              \
+		__hybrid_preemption_flag_t _xsufnr_was;                                           \
 		PERTASK_SET(this_x86_user_fsbase, v);                                             \
-		_xsufnr_was = PREEMPTION_PUSHOFF();                                               \
+		__hybrid_preemption_pushoff(&_xsufnr_was);                                        \
 		segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]), v); \
-		PREEMPTION_POP(_xsufnr_was);                                                      \
+		__hybrid_preemption_pop(&_xsufnr_was);                                            \
 		/* NOTE: No need to reload the %fs register here, since it'll                     \
 		 *       be reloaded anyways once we return to user-space; at                     \
 		 *       the moment's it's `SEGMENT_KERNEL_FSBASE' anyways! */                    \
 	}	__WHILE0
 #define x86_set_user_gsbase_nopr(v)                                                       \
 	do {                                                                                  \
-		pflag_t _xsugnr_was;                                                              \
 		PERTASK_SET(this_x86_user_gsbase, v);                                             \
 		segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]), v); \
 		/* Reload the GS register, which likely wouldn't be done without this. */         \
@@ -115,12 +116,12 @@ DATDEF ATTR_PERTASK uintptr_t this_x86_user_gsbase;
 	}	__WHILE0
 #define x86_set_user_gsbase(v)                                                            \
 	do {                                                                                  \
-		pflag_t _xsugnr_was;                                                              \
+		__hybrid_preemption_flag_t _xsugnr_was;                                           \
 		__register uintptr_t _xsugnr_temp;                                                \
 		PERTASK_SET(this_x86_user_gsbase, v);                                             \
-		_xsugnr_was = PREEMPTION_PUSHOFF();                                               \
+		__hybrid_preemption_pushoff(&_xsugnr_was);                                        \
 		segment_wrbaseX(&PERCPU(thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]), v); \
-		PREEMPTION_POP(_xsugnr_was);                                                      \
+		__hybrid_preemption_pop(&_xsugnr_was);                                            \
 		/* Reload the GS register, which likely wouldn't be done without this. */         \
 		__asm__ __volatile__("movw %%gs, %w0\n\t"                                         \
 		                     "movw %w0, %%gs"                                             \

@@ -32,10 +32,10 @@
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/user.h>
-#include <sched/task.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <kos/except/reason/inval.h>
 #include <kos/ioctl/kbd.h>
@@ -57,12 +57,12 @@ DECL_BEGIN
 #ifdef CONFIG_HAVE_DEBUGGER
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL kbddev_putkey)(struct kbddev *__restrict self, u16 key) {
-	pflag_t was;
+	preemption_flag_t was;
 	bool result;
 	assert(key != KEY_NONE);
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	result = kbddev_putkey_nopr(self, key);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return result;
 }
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool
@@ -91,19 +91,19 @@ again_read_flags:
  * @return: false: The buffer is already full and the key was not added. */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL kbdbuf_putkey)(struct kbdbuf *__restrict self, u16 key) {
-	pflag_t was;
+	preemption_flag_t was;
 	bool result;
 	assert(key != KEY_NONE);
-	was = PREEMPTION_PUSHOFF();
+	preemption_pushoff(&was);
 	result = kbdbuf_putkey_nopr(self, key);
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 	return result;
 }
 
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool
 NOTHROW(FCALL kbdbuf_putkey_nopr)(struct kbdbuf *__restrict self, u16 key) {
 	union kbdbuf_state oldstate, newstate;
-	assert(!PREEMPTION_ENABLED());
+	assert(!preemption_ison());
 	assert(key != KEY_NONE);
 	for (;;) {
 		size_t index;

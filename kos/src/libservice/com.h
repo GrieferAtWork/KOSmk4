@@ -51,6 +51,11 @@
 #include <libservice/bits/com.h>
 #include <libservice/types.h>
 
+#ifndef atomic_lock_release_nopr
+#define atomic_lock_acquire_nopr(self) atomic_lock_acquire(self)
+#define atomic_lock_release_nopr(self) atomic_lock_release(self)
+#endif /* !atomic_lock_release_nopr */
+
 DECL_BEGIN
 
 /* This  string (without a  trailing NUL) is send  alongside the initial SHM
@@ -59,39 +64,6 @@ DECL_BEGIN
  * message differs from this string, or no (or more than 1) file handles are
  * passed, then the connection will be terminated. */
 #define LIBSERVICE_COM_HANDSHAKE_MESSAGE "libservice.400"
-
-
-#ifndef __sigset_t_defined
-#define __sigset_t_defined
-typedef struct __sigset_struct sigset_t;
-#endif /* !__sigset_t_defined */
-
-/* Helpers for preemption (iow: signal masking) control.
- * These may be used the same way that the kernel macros
- * of the same name are used.
- *
- * NOTE: For userspace, the term "preemption" is kind-of
- *       missleading: userspace can't turn preemption off
- *       in a literal sense, however in kernel-space, the
- *       act  of disabling preemption  also has the side-
- *       effect  of disabling all other interrupts, which
- *       allows code to run uninterrupted.
- *
- * For user-space, terminology somewhat differs, in that
- * instead of calling  them interrupts, they're  calling
- * signals. And using  these macros,  you actually  just
- * set the current thread's signal mask to full, or will
- * restore the previously set mask.
- *
- * Thanks to  userprocmask, this  can be  done entirely  in
- * user-space (no syscalls needed  on the most common  code
- * path; the only syscall possibly invoke is during restore
- * when  the kernel signaled  that signals became available
- * in the mean time) */
-typedef sigset_t *pflag_t;
-#define PREEMPTION_PUSHOFF()           __libc_setsigmaskfullptr()
-#define PREEMPTION_POP(was)            __libc_setsigmaskptr(was)
-#define atomic_lock_acquire_nopr(self) atomic_lock_acquire(self)
 
 /*
  * Command execution mockup:
@@ -545,7 +517,7 @@ struct service {
 	 * >>     uintptr_t next = elem->scd_active_link;
 	 * >>     if (ATOMIC_CMPXCH(s_active_list, shm_offsetof_elem_com, next))
 	 * >>         return;
-	 * >>     PREEMPTION_PUSHOFF();
+	 * >>     preemption_pushoff();
 	 * >>     // This acquire also waits for `ABORT_ALL_COMMANDS_ON_HOP()' to finish
 	 * >>     atomic_lock_acquire(&s_shm_lock);
 	 * >>     COMPILER_BARRIER();
@@ -573,12 +545,12 @@ struct service {
 	 * >>         }
 	 * >>     }
 	 * >>     atomic_lock_release(&s_shm_lock);
-	 * >>     PREEMPTION_POP();
+	 * >>     preemption_pop();
 	 * >> }
 	 * >>
 	 * >> ABORT_ALL_COMMANDS_ON_HOP(void) {
 	 * >>     uintptr_t chain;
-	 * >>     PREEMPTION_PUSHOFF();
+	 * >>     preemption_pushoff();
 	 * >>     atomic_lock_acquire(&s_shm_lock);
 	 * >>     chain = ATOMIC_XCH(s_active_list, SERVICE_ACTIVE_LIST_SHUTDOWN);
 	 * >>     while (chain) {
@@ -650,18 +622,6 @@ struct service {
 #define libservice_shmlock_acquire_nopr(self)    atomic_lock_acquire_nopr(&(self)->s_shm_lock)
 #define _libservice_shmlock_release_nopr(self)   atomic_lock_release(&(self)->s_shm_lock)
 #define libservice_shmlock_release_nopr(self)    (_libservice_shmlock_release_nopr(self), libservice_shmlock_reap_nopr(self))
-
-/* Helpers to automatically  disable preemption before  acquire,
- * and re-enable after release. Note that the disable here works
- * recursively! */
-#define libservice_shmlock_acquire(self)     \
-	do {                                     \
-		pflag_t _was = PREEMPTION_PUSHOFF(); \
-		libservice_shmlock_acquire_nopr(self)
-#define libservice_shmlock_release(self)       \
-		libservice_shmlock_release_nopr(self); \
-		PREEMPTION_POP(_was);                  \
-	}	__WHILE0
 
 
 

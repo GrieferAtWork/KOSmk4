@@ -64,6 +64,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-lock.h>
 
@@ -311,20 +312,20 @@ DECL_BEGIN
 PRIVATE ATTR_MALL_UNTRACKED struct atomic_lock tm_smplock = ATOMIC_LOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(tm_smplock);
 #endif /* !CONFIG_NO_SMP */
-#define smplock_acquire_smp_r(p_flag) atomic_lock_acquire_smp_r(&tm_smplock, p_flag)
-#define smplock_release_smp_r(p_flag) atomic_lock_release_smp_r(&tm_smplock, p_flag)
+#define tm_smplock_acquire_smp_r(p_flag) atomic_lock_acquire_smp_r(&tm_smplock, p_flag)
+#define tm_smplock_release_smp_r(p_flag) atomic_lock_release_smp_r(&tm_smplock, p_flag)
 
-#define LOCK_PARAMS pflag_t _l_was
+#define LOCK_PARAMS preemption_flag_t _l_was
 #define LOCK_ARGS   _l_was
 
-#define lock_acquire()  \
-	do {                \
-		pflag_t _l_was; \
-		smplock_acquire_smp_r(&_l_was)
-#define lock_break()  smplock_release_smp_r(&_l_was)
-#define lock_regain() smplock_acquire_smp_r(&_l_was)
+#define lock_acquire()            \
+	do {                          \
+		preemption_flag_t _l_was; \
+		tm_smplock_acquire_smp_r(&_l_was)
+#define lock_break()  tm_smplock_release_smp_r(&_l_was)
+#define lock_regain() tm_smplock_acquire_smp_r(&_l_was)
 #define lock_release()                  \
-		smplock_release_smp_r(&_l_was); \
+		tm_smplock_release_smp_r(&_l_was); \
 	}	__WHILE0
 
 

@@ -935,7 +935,7 @@ STATIC_ASSERT(IS_ALIGNED(offsetof(struct service_com, sc_generic.g_data), 4));
  * >>     leaP   service_comdesc::scd_com(%R_service_com), %Pdx
  * >>     movP   LOC_shm(%Psp),                            %Pax
  * >>     subP   service_shm_handle::ssh_shm(%Pax),        %Pdx # %Pdx = shm_offsetof_elem_com
- * >> // PREEMPTION_PUSHOFF();
+ * >> // preemption_pushoff();
  * >>     movP   LOC_upm(%Psp), %Pax
  * >>     movP   $full_sigset,  userprocmask::pm_sigmask(%Pax) # re-disable preemption (movabs via %Pdi on x86_64)
  * >> // atomic_lock_acquire(&s_shm_lock);

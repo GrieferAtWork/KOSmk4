@@ -28,6 +28,7 @@
 #include <kernel/printk.h>
 
 #include <hybrid/host.h>
+#include <hybrid/sched/preemption.h>
 
 #include <hw/bus/serial.h>
 #include <sys/io.h>
@@ -136,12 +137,12 @@ INTERN void FCALL GDBSerial_Init(char *args) {
 		outb(SERIAL_IOADDR_IER(GDBSerial_IO_PortBase), SERIAL_EIR_RDA);
 		if (avail & SERIAL_LSR_DA) {
 			u8 data = inb(SERIAL_IOADDR_RBR(GDBSerial_IO_PortBase));
-			pflag_t was;
+			preemption_flag_t was;
 			printk(KERN_INFO "[gdb] Processing initial byte %#.2" PRIx8 "\n", data);
 			/* Calls to `GDBRemote_PostByte()' require that preemption be turned off. */
-			was = PREEMPTION_PUSHOFF();
+			preemption_pushoff(&was);
 			GDBRemote_PostByte(data);
-			PREEMPTION_POP(was);
+			preemption_pop(&was);
 		}
 	}
 }

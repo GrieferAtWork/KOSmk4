@@ -68,14 +68,15 @@ LOCAL NOBLOCK bool
 NOTHROW(FCALL sct_entry_clearobj)(struct sct_entry *__restrict self) {
 	void *old_value;
 #ifdef CONFIG_NO_SMP
-	pflag_t was = PREEMPTION_PUSHOFF();
+	preemption_flag_t was;
+	preemption_pushoff(&was);
 #endif /* CONFIG_NO_SMP */
 	old_value = ATOMIC_XCH(self->te_object, NULL);
 #ifndef CONFIG_NO_SMP
 	while (ATOMIC_READ(self->te_inuse))
 		task_tryyield_or_pause();
 #else /* !CONFIG_NO_SMP */
-	PREEMPTION_POP(was);
+	preemption_pop(&was);
 #endif /* CONFIG_NO_SMP */
 	return old_value != NULL;
 }
