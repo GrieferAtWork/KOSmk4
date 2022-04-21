@@ -598,7 +598,9 @@ incdir("");
 #include <hybrid/pp/__va_nargs.h>
 #include <hybrid/pp/bubble.h>
 #include <hybrid/sched/__gettid.h>
+#include <hybrid/sched/__preemption.h>
 #include <hybrid/sched/__yield.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/sched/yield.h>
 #include <hybrid/sequence/bitset.h>
 #include <hybrid/sequence/bsearch.h>
@@ -756,6 +758,7 @@ incdir("");
 #include <libc/core/stdlib.h>
 #include <libc/core/string.h>
 #include <libc/core/strings.h>
+#include <libc/core/sys.auxv.h>
 #include <libc/core/unicode.h>
 #include <libc/core/unistd.h>
 #include <libc/ctype.h>
@@ -770,6 +773,7 @@ incdir("");
 #include <libc/stdlib.h>
 #include <libc/string.h>
 #include <libc/strings.h>
+#include <libc/sys.auxv.h>
 #include <libc/unicode.h>
 #include <libc/unistd.h>
 #include <libcmdline/api.h>
@@ -1213,6 +1217,7 @@ incdir("");
 #include <sys/common_wchar_limits.h>
 #include <sys/config.h>
 #include <sys/dir.h>
+#include <sys/dirent.h>
 #include <sys/elf.h>
 #include <sys/elf_386.h>
 #include <sys/elf_SPARC.h>
