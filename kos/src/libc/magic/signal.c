@@ -1958,7 +1958,7 @@ int sigwait([[nonnull]] sigset_t const *__restrict set,
 @@Check if the given signal set is empty
 @@@return: != 0: Yes, it is empty
 @@@return: == 0: No, at least 1 signal is contained
-[[kernel, pure, wunused, decl_include("<bits/os/sigset.h>")]]
+[[kernel, libc, pure, wunused, decl_include("<bits/os/sigset.h>")]]
 int sigisemptyset([[nonnull]] $sigset_t const *__restrict set) {
 	size_t i;
 	for (i = 0; i < COMPILER_LENOF(set->__val); ++i) {

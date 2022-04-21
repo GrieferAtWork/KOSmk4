@@ -100,7 +100,9 @@
  * - __hybrid_preemption_tryyield_nopr()  <--->  task_pause()
  *
  */
-#ifdef __INTELLISENSE__
+#ifndef __CC__
+/* ... */
+#elif defined(__INTELLISENSE__)
 #ifndef __NOPREEMPT
 #define __NOPREEMPT /* Annotation for functions that may only be called with preemption disabled. */
 #endif /* !__NOPREEMPT */
@@ -215,6 +217,9 @@ __DECL_END
 #endif /* CONFIG_NO_SMP */
 #else  /* ... */
 
+/* KOS system headers expose all functions we need in an escaped namespace,
+ * meaning  we  don't have  to include  <signal.h>  and clobber  the global
+ * namespace. */
 #ifdef __KOS_SYSTEM_HEADERS__
 #include <libc/signal.h>
 #if defined(__libc_setsigmaskfullptr) && defined(__libc_setsigmaskptr)
@@ -244,28 +249,88 @@ __DECL_END
 #endif /* ... */
 #endif /* __KOS_SYSTEM_HEADERS__ */
 
+
+/* Fallback implementation for a generic UNIX target */
 #ifndef __hybrid_preemption_flag_t
 #include <hybrid/host.h>
 #if defined(__unix__) || defined(HAVE_SIGNAL_H) || __has_include(<signal.h>)
 #include <signal.h>
 #endif /* <signal.h>... */
+
 #ifdef SIG_SETMASK
+#if defined(HAVE_SIGFILLSET) || (defined(__USE_POSIX) && !defined(NO_SIGFILLSET))
+#define __hybrid_sigfillset sigfillset
+#else /* HAVE_SIGFILLSET || (__USE_POSIX && !NO_SIGFILLSET) */
+#include <string.h>
+#define __hybrid_sigfillset(set) memset(set, 0xff, sizeof(sigset_t))
+#endif /* !HAVE_SIGFILLSET && (!__USE_POSIX || NO_SIGFILLSET) */
+
+#if defined(HAVE_SIGISEMPTYSET) || (defined(__USE_GNU) && !defined(NO_SIGISEMPTYSET))
+#define __hybrid_sigisemptyset(set) sigisemptyset(set)
+#else /* HAVE_SIGISEMPTYSET || (__USE_GNU && !NO_SIGISEMPTYSET) */
+#include <hybrid/typecore.h>
+#define __hybrid_sigisemptyset (__NAMESPACE_INT_SYM __hybrid_private_sigisemptyset)
+__DECL_BEGIN
+__NAMESPACE_INT_BEGIN
+__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(__hybrid_private_sigisemptyset)(sigset_t const *__restrict __set) {
+	__STATIC_IF ((sizeof(sigset_t) % __SIZEOF_POINTER__) == 0) {
+		__SIZE_TYPE__ __i;
+		for (__i = 0; __i < sizeof(sigset_t) / __SIZEOF_POINTER__; ++__i) {
+			if (((__UINTPTR_TYPE__ *)__set)[__i] != 0)
+				return 0;
+		}
+	} __STATIC_ELSE ((sizeof(sigset_t) % __SIZEOF_POINTER__) == 0) {
+		__SIZE_TYPE__ __i;
+		for (__i = 0; __i < sizeof(sigset_t); ++__i) {
+			if (((__BYTE_TYPE__ *)__set)[__i] != 0)
+				return 0;
+		}
+	}
+	return 1;
+}
+__NAMESPACE_INT_END
+__DECL_END
+#endif /* !HAVE_SIGISEMPTYSET && (!__USE_GNU || NO_SIGISEMPTYSET) */
+
 #define __hybrid_preemption_flag_t sigset_t
+#ifdef __NO_XBLOCK
+#define __hybrid_preemption_pushoff (__NAMESPACE_INT_SYM __hybrid_private_preemption_pushoff)
+#define __hybrid_preemption_ison    (__NAMESPACE_INT_SYM __hybrid_private_preemption_ison)
+__DECL_BEGIN
+__NAMESPACE_INT_BEGIN
+__LOCAL __ATTR_NONNULL((1)) void
+__NOTHROW(__hybrid_private_preemption_pushoff)(sigset_t *__restrict __p_flag) {
+	sigset_t __hpp_nss;
+	__hybrid_sigfillset(&__hpp_nss);
+	sigprocmask(SIG_SETMASK, __p_flag, &__hpp_nss);
+}
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __BOOL
+__NOTHROW(__hybrid_private_preemption_ison)(void) {
+	sigset_t __hpp_nss;
+	__hybrid_sigfillset(&__hpp_nss);
+	sigprocmask(SIG_SETMASK, __NULLPTR, &__hpp_nss);
+	return !__hybrid_sigisemptyset(&__hpp_nss)
+}
+__NAMESPACE_INT_END
+__DECL_END
+#else /* __NO_XBLOCK */
 #define __hybrid_preemption_pushoff(p_flag)           \
 	__XBLOCK({                                        \
 		sigset_t __hpp_nss;                           \
-		sigfillset(&__hpp_nss);                       \
+		__hybrid_sigfillset(&__hpp_nss);              \
 		sigprocmask(SIG_SETMASK, p_flag, &__hpp_nss); \
 	})
-#define __hybrid_preemption_pop(p_flag) \
-	(void)sigprocmask(SIG_SETMASK, p_flag, __NULLPTR)
 #define __hybrid_preemption_ison()                       \
 	__XBLOCK({                                           \
 		struct __sigset_struct __hpp_nss;                \
 		sigprocmask(SIG_SETMASK, __NULLPTR, &__hpp_nss); \
-		__XRETURN !sigisemptyset(&__hpp_nss);            \
+		__XRETURN !__hybrid_sigisemptyset(&__hpp_nss);   \
 	})
-#define __hybrid_preemption_wason(p_flag) (!sigisemptyset(p_flag))
+#endif /* !__NO_XBLOCK */
+
+#define __hybrid_preemption_pop(p_flag)   (void)sigprocmask(SIG_SETMASK, p_flag, __NULLPTR)
+#define __hybrid_preemption_wason(p_flag) (!__hybrid_sigisemptyset(p_flag))
 #endif /* SIG_SETMASK */
 #endif /* !__hybrid_preemption_flag_t */
 
