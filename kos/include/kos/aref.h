@@ -54,7 +54,7 @@
  * >>         return false;
  * >>     }
  * >>     while (arr_cnt != 0)
- * >>         sched_yield();
+ * >>         preemption_tryyield();
  * >>     __PRIVATE_AR_INTR_POP();
  * >>     decref(old);
  * >>     return true;
@@ -232,7 +232,7 @@
 #define __PRIVATE_AR_INTR_END_NOPR()     } __WHILE0
 
 
-#ifdef __HYBRID_NO_PREEMPTION_SMP
+#ifdef __HYBRID_PREEMPTION_NO_SMP
 #ifdef __cplusplus
 #define __PRIVATE_ARREF_1(type)                              \
 	struct {                                                 \
@@ -284,7 +284,7 @@
 		struct type *awr_obj; /* [0..1] Referenced object. */ \
 	}
 #endif /* !__cplusplus */
-#else  /* __HYBRID_NO_PREEMPTION_SMP */
+#else  /* __HYBRID_PREEMPTION_NO_SMP */
 #ifdef __cplusplus
 #define __PRIVATE_ARREF_1(type)                                                             \
 	struct {                                                                                \
@@ -356,7 +356,7 @@
 		                           * or `*awr_obj' is valid) */                            \
 	}
 #endif /* !__cplusplus */
-#endif /* !__HYBRID_NO_PREEMPTION_SMP */
+#endif /* !__HYBRID_PREEMPTION_NO_SMP */
 
 
 #ifdef __HYBRID_PP_VA_OVERLOAD
@@ -379,7 +379,7 @@
 #define __PRIVATE_arref_fini_2(self, decref) decref((self)->arr_obj)
 #define __PRIVATE_axref_fini_1(self)         __PRIVATE_axref_fini_2(self, decref)
 #define __PRIVATE_axref_fini_2(self, decref) ((self)->axr_obj ? decref((self)->axr_obj) : (void)0)
-#ifdef __HYBRID_NO_PREEMPTION_SMP
+#ifdef __HYBRID_PREEMPTION_NO_SMP
 #define __PRIVATE_arref_init_smp(self)  /* nothing */
 #define __PRIVATE_arref_cinit_smp(self) /* nothing */
 #define __PRIVATE_arref_inccnt(self)    /* nothing */
@@ -395,7 +395,7 @@
 #define __PRIVATE_awref_inccnt(self)    /* nothing */
 #define __PRIVATE_awref_deccnt(self)    /* nothing */
 #define __PRIVATE_awref_waitfor(self)   /* nothing */
-#else /* __HYBRID_NO_PREEMPTION_SMP */
+#else /* __HYBRID_PREEMPTION_NO_SMP */
 #define __PRIVATE_arref_init_smp(self)  , (self)->arr_cnt = 0
 #define __PRIVATE_arref_cinit_smp(self) , __hybrid_assert((self)->arr_cnt == 0)
 #define __PRIVATE_arref_inccnt(self)    __hybrid_atomic_inc((self)->arr_cnt, __ATOMIC_ACQUIRE);
@@ -411,7 +411,7 @@
 #define __PRIVATE_awref_inccnt(self)    __hybrid_atomic_inc((self)->awr_cnt, __ATOMIC_ACQUIRE);
 #define __PRIVATE_awref_deccnt(self)    __hybrid_atomic_dec((self)->awr_cnt, __ATOMIC_RELEASE);
 #define __PRIVATE_awref_waitfor(self)   while (__hybrid_atomic_load((self)->awr_cnt, __ATOMIC_ACQUIRE) != 0) __hybrid_preemption_tryyield_nopr();
-#endif /* !__HYBRID_NO_PREEMPTION_SMP */
+#endif /* !__HYBRID_PREEMPTION_NO_SMP */
 
 /************************************************************************/
 /* ARREF Api                                                            */
@@ -693,7 +693,7 @@
 
 /* ========== arref_cmpxch_inherit ==========
  * NOTE: References are only inherited on success! */
-#ifdef __HYBRID_NO_PREEMPTION_SMP
+#ifdef __HYBRID_PREEMPTION_NO_SMP
 #define __PRIVATE_arref_cmpxch_inherit_4(self, oldobj, newobj, p_ok)      \
 	__PRIVATE_AR_INTR_PUSHOFF();                                          \
 	*(p_ok) = __hybrid_atomic_cmpxch((self)->arr_obj, oldobj, newobj,     \
@@ -704,7 +704,7 @@
 	*(p_ok) = __hybrid_atomic_cmpxch((self)->arr_obj, oldobj, newobj,      \
 	                                 __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST);  \
 	__PRIVATE_AR_INTR_POP_NOPR()
-#else /* __HYBRID_NO_PREEMPTION_SMP */
+#else /* __HYBRID_PREEMPTION_NO_SMP */
 #define __PRIVATE_arref_cmpxch_inherit_4(self, oldobj, newobj, p_ok)                   \
 	__PRIVATE_AR_INTR_PUSHOFF();                                                       \
 	if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->arr_obj, oldobj, newobj,             \
@@ -719,7 +719,7 @@
 		__PRIVATE_arref_waitfor(self)                                                  \
 	}                                                                                  \
 	__PRIVATE_AR_INTR_POP_NOPR()
-#endif /* !__HYBRID_NO_PREEMPTION_SMP */
+#endif /* !__HYBRID_PREEMPTION_NO_SMP */
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define __PRIVATE_arref_cmpxch_inherit_3(self, oldobj, newobj)               \
 	__XBLOCK({                                                               \
@@ -1307,7 +1307,7 @@
 
 /* ========== axref_cmpxch_inherit ==========
  * NOTE: References are only inherited on success! */
-#ifdef __HYBRID_NO_PREEMPTION_SMP
+#ifdef __HYBRID_PREEMPTION_NO_SMP
 #define __PRIVATE_axref_cmpxch_inherit_4(self, oldobj, newobj, p_ok)      \
 	__PRIVATE_AR_INTR_PUSHOFF();                                          \
 	*(p_ok) = __hybrid_atomic_cmpxch((self)->axr_obj, oldobj, newobj,     \
@@ -1318,7 +1318,7 @@
 	*(p_ok) = __hybrid_atomic_cmpxch((self)->axr_obj, oldobj, newobj,     \
 	                                 __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); \
 	__PRIVATE_AR_INTR_POP_NOPR()
-#else /* __HYBRID_NO_PREEMPTION_SMP */
+#else /* __HYBRID_PREEMPTION_NO_SMP */
 #define __PRIVATE_axref_cmpxch_inherit_4(self, oldobj, newobj, p_ok)                   \
 	__PRIVATE_AR_INTR_PUSHOFF();                                                       \
 	if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->axr_obj, oldobj, newobj,             \
@@ -1333,7 +1333,7 @@
 		__PRIVATE_axref_waitfor(self)                                                  \
 	}                                                                                  \
 	__PRIVATE_AR_INTR_POP_NOPR()
-#endif /* !__HYBRID_NO_PREEMPTION_SMP */
+#endif /* !__HYBRID_PREEMPTION_NO_SMP */
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define __PRIVATE_axref_cmpxch_inherit_3(self, oldobj, newobj)               \
 	__XBLOCK({                                                               \
@@ -1842,7 +1842,7 @@
 /************************************************************************/
 
 /* Static initializers */
-#ifdef __HYBRID_NO_PREEMPTION_SMP
+#ifdef __HYBRID_PREEMPTION_NO_SMP
 #ifdef __INTELLISENSE_GCC__
 #define ARREF_INIT(ptr) { .arr_obj = ptr }
 #define AXREF_INIT(ptr) { .axr_obj = ptr }
@@ -1852,7 +1852,7 @@
 #define AXREF_INIT(ptr) { ptr }
 #define AWREF_INIT(ptr) { ptr }
 #endif /* !__INTELLISENSE_GCC__ */
-#else /* __HYBRID_NO_PREEMPTION_SMP */
+#else /* __HYBRID_PREEMPTION_NO_SMP */
 #ifdef __INTELLISENSE_GCC__
 #define ARREF_INIT(ptr) { .arr_obj = ptr, .arr_cnt = 0 }
 #define AXREF_INIT(ptr) { .axr_obj = ptr, .axr_cnt = 0 }
@@ -1862,7 +1862,7 @@
 #define AXREF_INIT(ptr) { ptr, 0 }
 #define AWREF_INIT(ptr) { ptr, 0 }
 #endif /* !__INTELLISENSE_GCC__ */
-#endif /* !__HYBRID_NO_PREEMPTION_SMP */
+#endif /* !__HYBRID_PREEMPTION_NO_SMP */
 
 /* >> arref_init(ARREF(T) *self, [[nonnull]] REF T *ptr); */
 #define arref_init(self, /*inherit(always)*/ ptr) \

@@ -22,11 +22,31 @@
 
 #include <__stdinc.h>
 
-/* Preemption control:
- * - Guaranty non-reentrancy by disabling interrupts/signals
+/* ===========================================================================
+ * ==== Preemption control ===================================================
+ * ===========================================================================
+ *
+ * ---------------------------------------------------------------------------
+ * Guaranty non-reentrancy by disabling interrupts/signals
+ * ---------------------------------------------------------------------------
  *
  * - typedef ... __hybrid_preemption_flag_t;
  *   - Data type for the preemption state flag
+ *
+ * - void __hybrid_preemption_pushoff(__hybrid_preemption_flag_t *p_flag);
+ *   - Store the current preemption state in `*p_flag' and disable preemption
+ *
+ * - void __hybrid_preemption_pop(__hybrid_preemption_flag_t *p_flag);
+ *   - Restore the current preemption state from `*p_flag'
+ *   - Be careful  to nest  these two  functions correctly;  don't  skip
+ *     elements during restore, and don't restore in an incorrect order.
+ *
+ * - bool __hybrid_preemption_ison(void);
+ *   - Check if preemption is currently enabled
+ *
+ * - bool __hybrid_preemption_wason(__hybrid_preemption_flag_t const *p_flag);
+ *   - Check if preemption was currently enabled before `p_flag' was
+ *     initialized by  a  call  to  `__hybrid_preemption_pushoff()'.
  *
  * - void __hybrid_preemption_tryyield();
  *   - Special  function for safe `sched_yield()', both with preemption
@@ -40,22 +60,33 @@
  *   >>     }
  *   >> }
  *
- * - void __hybrid_preemption_pushoff(__hybrid_preemption_flag_t *p_flag);
- *   - Store the current preemption state in `*p_flag' and disable preemption
+ * - void __hybrid_preemption_tryyield_f(__hybrid_preemption_flag_t *p_flag);
+ *   - If  doing so grants  improved performance (iow: `__hybrid_preemption_tryyield()'
+ *     and `__hybrid_preemption_tryyield_nopr()' are different functions), then briefly
+ *     restore the  preemption behavior  of `p_flag',  follow this  up with  a call  to
+ *     `__hybrid_preemption_tryyield()',  before finally disabling preemption one again
+ *     with a call to `__hybrid_preemption_pushoff()'.
+ *     When `__hybrid_preemption_tryyield()' and `__hybrid_preemption_tryyield_nopr()'
+ *     are the same function, `p_flag' is ignored and `__hybrid_preemption_tryyield()'
+ *     is called as-is.
  *
- * - void __hybrid_preemption_pop(__hybrid_preemption_flag_t const *p_flag);
- *   - Restore the current preemption state from `*p_flag'
- *   - Be careful  to nest  these two  functions correctly;  don't  skip
- *     elements during restore, and don't restore in an incorrect order.
+ * - void __hybrid_preemption_tryyield_nopr(void);
+ *   - A specialized variant of `__hybrid_preemption_tryyield()' that expects preemption
+ *     to be disabled at  the moment. This function  will not re-enable preemption,  but
+ *     will  instead try to yield execution to another CPU (if doing so is possible), or
+ *     to  another thread (in case every thread behaves like it is hosted by a dedicated
+ *     CPU, as is the case in user-space).
  *
- * - #define __HYBRID_NO_PREEMPTION_SMP
- *   - Defined  if `__hybrid_preemption_pushoff()' results in the calling thread
- *     to become the only thread that's still running in the caller's address
- *     space.  (Iow: anything that's  done at this point  will appear to have
+ * - #define __HYBRID_PREEMPTION_NO_SMP
+ *   - Defined if `__hybrid_preemption_pushoff()' results in the calling thread
+ *     to become the only thread that's  still running in the caller's  address
+ *     space. (Iow: anything  that's done  at this  point will  appear to  have
  *     happened atomically to other threads)
  *
- * - #define __HYBRID_NO_PREEMPTION_CONTROL
- *   - Defined if preemption cannot be controlled (in this case, all of the other macros are simply no-ops).
+ * - #define __HYBRID_PREEMPTION_NO_CONTROL
+ *   - Defined if preemption cannot be controlled (in this case, all of the
+ *     other  macros are simply no-ops, except for the yield functions, all
+ *     of which simply map to `__hybrid_yield(3H)').
  *
  *
  * Function mappings for the KOS kernel:
@@ -70,13 +101,96 @@
  *
  */
 #ifdef __INTELLISENSE__
+#ifndef __NOPREEMPT
+#define __NOPREEMPT /* Annotation for functions that may only be called with preemption disabled. */
+#endif /* !__NOPREEMPT */
+__DECL_BEGIN
+
+/* >> preemption_flag_t(3H)
+ * Opaque data type to represent a saved preemption state. */
 typedef struct { int __hpf_flag; } __hybrid_preemption_flag_t;
-#define __hybrid_preemption_flag_t          __hybrid_preemption_flag_t
-#define __hybrid_preemption_tryyield()      (void)0
-#define __hybrid_preemption_ison()          1
-#define __hybrid_preemption_wason(p_flag)   1
-#define __hybrid_preemption_pushoff(p_flag) (void)((p_flag)->__hpf_flag = 0)
-#define __hybrid_preemption_pop(p_flag)     (void)((p_flag)->__hpf_flag)
+#define __hybrid_preemption_flag_t __hybrid_preemption_flag_t
+
+/* >> preemption_ison(3H)
+ * Check if preemption is currently enabled:
+ * - kernelspace: EFLAGS.IF  (x86)
+ * - userspace:   at least 1 signal from `sigprocmask(3)' is unmasked */
+__ATTR_WUNUSED __BOOL __hybrid_preemption_ison(void);
+#define __hybrid_preemption_ison __hybrid_preemption_ison
+
+/* Check if preemption was enabled when `preemption_pushoff(3H)'
+ * was called (s.a. `preemption_ison(3H)'). */
+__ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__hybrid_preemption_wason(__hybrid_preemption_flag_t const *__restrict __p_flag);
+#define __hybrid_preemption_wason __hybrid_preemption_wason
+
+/* >> preemption_pushoff(3H)
+ * Save the current preemption context in `*p_flag' and disable preemption.
+ * NOTE: The saved state can later be restored with `preemption_pop(3H)'
+ * - kernelspace: `pushfP; cli;'  (x86)
+ * - userspace:   setsigmaskfullptr(3) */
+__ATTR_NONNULL((1)) void
+__hybrid_preemption_pushoff(__hybrid_preemption_flag_t *__restrict __p_flag);
+#define __hybrid_preemption_pushoff __hybrid_preemption_pushoff
+
+/* >> preemption_pop(3H)
+ * Restore the saved preemption context from `*p_flag'. After a call to this
+ * function, the contents of `*p_flag'  become undefined and must either  be
+ * discarded, or re-initialized by `preemption_pushoff(3H)'.
+ * - kernelspace: `popfP;'  (x86)
+ * - userspace:   setsigmaskptr(3) */
+__ATTR_NONNULL((1)) void
+__hybrid_preemption_pop(__hybrid_preemption_flag_t *__restrict __p_flag);
+#define __hybrid_preemption_pop __hybrid_preemption_pop
+
+/* >> preemption_tryyield(3H)
+ * Safely try to yield execution to another thread if doing is allowed by the
+ * current  preemption-state  (s.a.  `preemption_ison(3H)'). If  doing  so is
+ * allowed,  yield to the next thread like  normal. Else, try to instruct the
+ * CPU  to let another  core consume additional processing  power for a while
+ * (if possible, as is the case with multi-threading), or simply do  nothing.
+ *
+ * - kernelspace: task_tryyield_or_pause()
+ *                >> if (EFLAGS.IF) {     (x86)
+ *                >>     task_yield();
+ *                >> } else {
+ *                >>     task_pause(); // "pause"
+ *                >> }
+ * - userspace:   sched_yield(3) */
+void __hybrid_preemption_tryyield(void);
+#define __hybrid_preemption_tryyield __hybrid_preemption_tryyield
+
+/* >> preemption_tryyield_f(3H)
+ * If `preemption_tryyield(3H)' requires preemption to be enabled in order to do
+ * more than instruct the CPU with a loop-hint (x86: "pause"), then restore  the
+ * preemption  state saved in  `*p_flag', and call `task_tryyield_or_pause(3H)'.
+ * Once that function returns, disable preemption once again (possibly modifying
+ * the state of `*p_flag' to differ from prior to the call).
+ * When `preemption_tryyield(3H)' doesn't care about the preemption state, simply
+ * do the same as `__hybrid_preemption_tryyield(3H)'.
+ *
+ * - kernelspace: PREEMPTION_POP([p_flag])
+ *                task_tryyield_or_pause()
+ *                PREEMPTION_DISABLE()
+ * - userspace:   sched_yield(3) */
+__ATTR_NONNULL((1)) void
+__hybrid_preemption_tryyield_f(__hybrid_preemption_flag_t *__restrict __p_flag);
+#define __hybrid_preemption_tryyield_f __hybrid_preemption_tryyield_f
+
+/* >> preemption_tryyield_nopr(3H)
+ * If task yielding is possible without preemption needing to be enabled,  then
+ * do a normal task yield. Otherwise, only instruct the current CPU with a loop
+ * hint (x86: "pause"), or do nothing of this isn't supported.
+ *
+ * For the sake of consistency, try not to call this function when preemption
+ * isn't guarantied to be disabled.
+ *
+ * - kernelspace: task_pause()
+ * - userspace:   sched_yield(3) */
+__NOPREEMPT void __hybrid_preemption_tryyield_nopr(void);
+#define __hybrid_preemption_tryyield_nopr __hybrid_preemption_tryyield_nopr
+
+__DECL_END
 #elif defined(__KOS__) && defined(__KERNEL__)
 /* KOS Kernel version */
 #include <sched/task.h>
@@ -91,9 +205,13 @@ typedef struct { int __hpf_flag; } __hybrid_preemption_flag_t;
 	(__hybrid_preemption_pop(p_flag),          \
 	 __hybrid_preemption_tryyield(),           \
 	 PREEMPTION_DISABLE())
-#undef __HYBRID_NO_PREEMPTION_SMP
+
+/* If configured for single-core use, disabling preemption means that nothing
+ * will be able to interrupt the calling thread, also meaning that  disabling
+ * preemption results in execution continuing in a single-threaded mode. */
+#undef __HYBRID_PREEMPTION_NO_SMP
 #ifdef CONFIG_NO_SMP
-#define __HYBRID_NO_PREEMPTION_SMP
+#define __HYBRID_PREEMPTION_NO_SMP
 #endif /* CONFIG_NO_SMP */
 #else  /* ... */
 
@@ -153,7 +271,7 @@ typedef struct { int __hpf_flag; } __hybrid_preemption_flag_t;
 
 #if 0 /* Technically correct, but only if `-pthread' is used correctly and passes `-D_REENTRANT' */
 #ifndef _REENTRANT
-#define __HYBRID_NO_PREEMPTION_SMP
+#define __HYBRID_PREEMPTION_NO_SMP
 #endif /* !_REENTRANT */
 #endif
 
@@ -161,7 +279,7 @@ typedef struct { int __hpf_flag; } __hybrid_preemption_flag_t;
 
 /* Fallback definition */
 #ifndef __hybrid_preemption_flag_t
-#define __HYBRID_NO_PREEMPTION_CONTROL
+#define __HYBRID_PREEMPTION_NO_CONTROL
 #define __hybrid_preemption_flag_t          int
 #define __hybrid_preemption_pushoff(p_flag) (void)0
 #define __hybrid_preemption_pop(p_flag)     (void)0
@@ -176,29 +294,36 @@ typedef struct { int __hpf_flag; } __hybrid_preemption_flag_t;
 #endif /* !__hybrid_preemption_tryyield */
 
 /* Same as `__hybrid_preemption_tryyield()', but optimized
- * for  the  case where  preemption has  been disabled. */
+ * for  the  case  where  preemption  has  been  disabled. */
 #ifndef __hybrid_preemption_tryyield_nopr
 #define __hybrid_preemption_tryyield_nopr() __hybrid_preemption_tryyield()
 #endif /* !__hybrid_preemption_tryyield_nopr */
 
 /* Same as `__hybrid_preemption_tryyield()', but allowed to temporarily
- * restore `p_flag' if doing so  can make the yield perform  better. */
+ * restore `p_flag'  if doing  so can  make the  yield perform  better. */
 #ifndef __hybrid_preemption_tryyield_f
+#ifdef __HYBRID_PREEMPTION_TRYYIELD_IS_HYBRID_YIELD
 #define __hybrid_preemption_tryyield_f(p_flag) __hybrid_preemption_tryyield()
+#else /* __HYBRID_PREEMPTION_TRYYIELD_IS_HYBRID_YIELD */
+#define __hybrid_preemption_tryyield_f(p_flag) \
+	(__hybrid_preemption_pop(p_flag),          \
+	 __hybrid_preemption_tryyield(),           \
+	 __hybrid_preemption_pushoff(p_flag))
+#endif /* !__HYBRID_PREEMPTION_TRYYIELD_IS_HYBRID_YIELD */
 #endif /* !__hybrid_preemption_tryyield_f */
 
 
 
 /* Helper macro to declare preemption flag variables. */
-#ifdef __HYBRID_NO_PREEMPTION_CONTROL
+#ifdef __HYBRID_PREEMPTION_NO_CONTROL
 #define __hybrid_preemption_flagvar(name) /* nothing */
-#else /* __HYBRID_NO_PREEMPTION_CONTROL */
+#else /* __HYBRID_PREEMPTION_NO_CONTROL */
 #define __hybrid_preemption_flagvar(name) __hybrid_preemption_flag_t name
-#endif /* !__HYBRID_NO_PREEMPTION_CONTROL */
+#endif /* !__HYBRID_PREEMPTION_NO_CONTROL */
 
 
 /* Helper macros to acquire/release locks whilst simultaneously disabling preemption */
-#ifdef __HYBRID_NO_PREEMPTION_CONTROL
+#ifdef __HYBRID_PREEMPTION_NO_CONTROL
 #include "__yield.h"
 /* No preemption control -> must implement regular acquire/release semantics */
 #define __hybrid_preemption_acquire_smp_r(_tryacquire, p_flag) \
@@ -209,7 +334,7 @@ typedef struct { int __hpf_flag; } __hybrid_preemption_flag_t;
 	})
 #define __hybrid_preemption_release_smp_r(_release, p_flag) \
 	(_release)
-#elif defined(__HYBRID_NO_PREEMPTION_SMP)
+#elif defined(__HYBRID_PREEMPTION_NO_SMP)
 /* Preemption control causes us to enter single-threaded mode -> no need to touch external locks. */
 #define __hybrid_preemption_acquire_smp_r(_tryacquire, p_flag) \
 	__hybrid_preemption_pushoff(p_flag)
