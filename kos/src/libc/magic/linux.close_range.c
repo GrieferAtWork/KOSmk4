@@ -48,7 +48,7 @@ __SYSDECL_BEGIN
  *
  * For some reason, glib expects (in "glib/gspawn.c") that both `CLOSE_RANGE_CLOEXEC' and `close_range'
  * be declared, even though it never bothered to actually include any relevant headers (i.e. this one).
- * The only thing that even comes close is <unistd.h>, and the fact that is defines _GNU_SOURCE. So  we
+ * The only thing that even comes close is <unistd.h>, and the fact that it defines _GNU_SOURCE. So  we
  * use that combination to include <linux/close_range.h> from <unistd.h> and expose everything it might
  * need in regards to close_range(2)!
  */

@@ -319,9 +319,10 @@ again_determine_group:
 		if (!procctl_thrds_tryacquire_nopr(caller_ctl)) {
 			task_pause();
 			if (!procctl_thrds_tryacquire_nopr(caller_ctl)) {
+				PREEMPTION_POP(preemption_was);
 				pidns_endwriteall(result_pid->tp_ns);
 				while (!procctl_thrds_available(caller_ctl))
-					task_pause();
+					task_tryyield_or_pause();
 				goto again_lock_ns;
 			}
 		}

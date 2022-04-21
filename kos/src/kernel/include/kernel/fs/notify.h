@@ -138,24 +138,11 @@ LIST_HEAD(dnotify_link_list, dnotify_link);
  * faster since filesystem event notification is usually a brief process. */
 #ifndef CONFIG_NO_SMP
 DATDEF struct atomic_lock notify_lock;
-#define notify_lock_tryacquire()   atomic_lock_tryacquire(&notify_lock)
-#define notify_lock_acquire_nopr() atomic_lock_acquire_nopr(&notify_lock)
-#define notify_lock_release_nopr() atomic_lock_release_nopr(&notify_lock)
-#else /* !CONFIG_NO_SMP */
-#define notify_lock_tryacquire()   1
-#define notify_lock_acquire_nopr() (void)0
-#define notify_lock_release_nopr() (void)0
-#endif /* CONFIG_NO_SMP */
-#define notify_lock_acquire()                    \
-	do {                                         \
-		pflag_t _nla_was = PREEMPTION_PUSHOFF(); \
-		notify_lock_acquire_nopr()
-#define notify_lock_acquire_br() (_nla_was = PREEMPTION_PUSHOFF(), notify_lock_acquire_nopr())
-#define notify_lock_release_br() (notify_lock_release_nopr(), PREEMPTION_POP(_nla_was))
-#define notify_lock_release()       \
-		notify_lock_release_nopr(); \
-		PREEMPTION_POP(_nla_was);   \
-	}	__WHILE0
+#endif /* !CONFIG_NO_SMP */
+#define notify_lock_acquire()    atomic_lock_acquire_smp(&notify_lock)
+#define notify_lock_release()    atomic_lock_release_smp(&notify_lock)
+#define notify_lock_acquire_br() atomic_lock_acquire_smp_b(&notify_lock)
+#define notify_lock_release_br() atomic_lock_release_smp_b(&notify_lock)
 
 
 

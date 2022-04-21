@@ -1959,22 +1959,10 @@ nosym_no_elf_ht:
  *
  * Note that this is an SMP-lock! */
 PRIVATE struct atomic_lock driver_isym_lock = ATOMIC_LOCK_INIT;
-#define driver_isym_acquire_nopr() atomic_lock_acquire_nopr(&driver_isym_lock)
-#define driver_isym_release_nopr() atomic_lock_release(&driver_isym_lock)
-#else /* !CONFIG_NO_SMP */
-#define driver_isym_acquire_nopr() (void)0
-#define driver_isym_release_nopr() (void)0
-#endif /* CONFIG_NO_SMP */
-#define driver_isym_acquire()                    \
-	do {                                         \
-		pflag_t _dis_was = PREEMPTION_PUSHOFF(); \
-		driver_isym_acquire_nopr()
-#define driver_isym_break()          \
-		(driver_isym_release_nopr(), \
-		 PREEMPTION_POP(_dis_was))
-#define driver_isym_release() \
-		driver_isym_break();  \
-	}	__WHILE0
+#endif /* !CONFIG_NO_SMP */
+#define driver_isym_acquire() atomic_lock_acquire_smp(&driver_isym_lock)
+#define driver_isym_release() atomic_lock_release_smp(&driver_isym_lock)
+#define driver_isym_break()   atomic_lock_release_smp_b(&driver_isym_lock)
 
 
 /* Copy data to physical memory located at the virtual

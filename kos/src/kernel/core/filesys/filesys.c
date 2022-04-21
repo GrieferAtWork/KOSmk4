@@ -94,22 +94,11 @@ PRIVATE REF struct mfile **mount_in_progress_list  = NULL;     /* [1..1][0..moun
 PRIVATE struct sig /*   */ mount_in_progress_rmsig = SIG_INIT; /* Broadcast when a file is removed from `mount_in_progress_list' */
 #ifndef CONFIG_NO_SMP
 PRIVATE struct atomic_lock mount_in_progress_lock = ATOMIC_LOCK_INIT; /* SMP-lock for `mount_in_progress_list' */
-#define mount_in_progress_lock_acquire_nopr() atomic_lock_acquire_nopr(&mount_in_progress_lock)
-#define mount_in_progress_lock_release_nopr() atomic_lock_release(&mount_in_progress_lock)
-#else /* !CONFIG_NO_SMP */
-#define mount_in_progress_lock_acquire_nopr() (void)0
-#define mount_in_progress_lock_release_nopr() (void)0
-#endif /* CONFIG_NO_SMP */
-#define mount_in_progress_lock_acquire_br() (_was = PREEMPTION_PUSHOFF(), mount_in_progress_lock_acquire_nopr())
-#define mount_in_progress_lock_release_br() (mount_in_progress_lock_release_nopr(), PREEMPTION_POP(_was))
-#define mount_in_progress_lock_acquire()     \
-	do {                                     \
-		pflag_t _was = PREEMPTION_PUSHOFF(); \
-		mount_in_progress_lock_acquire_nopr()
-#define mount_in_progress_lock_release()       \
-		mount_in_progress_lock_release_nopr(); \
-		PREEMPTION_POP(_was);                  \
-	}	__WHILE0
+#endif /* !CONFIG_NO_SMP */
+#define mount_in_progress_lock_acquire_br() atomic_lock_acquire_smp_b(&mount_in_progress_lock)
+#define mount_in_progress_lock_release_br() atomic_lock_release_smp_b(&mount_in_progress_lock)
+#define mount_in_progress_lock_acquire()    atomic_lock_acquire_smp(&mount_in_progress_lock)
+#define mount_in_progress_lock_release()    atomic_lock_release_smp(&mount_in_progress_lock)
 
 /* Check if  `mount_in_progress_list'  contains  `dev'.  The
  * caller must be holding a lock to `mount_in_progress_lock' */

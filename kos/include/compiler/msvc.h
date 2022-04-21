@@ -120,8 +120,14 @@
 #define __ASMNAME(x) /* Nothing */
 #define __extension__ /* Nothing */
 #define __ATTR_NOINLINE __declspec(noinline)
+
+#if _MSC_VER >= 1200
 #define __ATTR_NORETURN_IS_DECLSPEC_NORETURN
 #define __ATTR_NORETURN __declspec(noreturn)
+#else /* _MSC_VER >= 1200 */
+#define __NO_ATTR_NORETURN
+#define __ATTR_NORETURN /* Nothing */
+#endif /* _MSC_VER < 1200 */
 #define __NO_ATTR_FALLTHROUGH
 #define __ATTR_FALLTHROUGH /* Nothing */
 #if !defined(__midl) && (defined(_X86_) || defined(_M_IX86))

@@ -224,20 +224,9 @@ require(syscall_slong_t capno)
 /* Lock for accessing any remote thread's this_cred field */
 #ifndef CONFIG_NO_SMP
 PRIVATE struct atomic_lock cred_change_lock = ATOMIC_LOCK_INIT;
-#define cred_change_lock_acquire_nopr() atomic_lock_acquire_nopr(&cred_change_lock)
-#define cred_change_lock_release_nopr() atomic_lock_release(&cred_change_lock)
-#else /* !CONFIG_NO_SMP */
-#define cred_change_lock_acquire_nopr() (void)0
-#define cred_change_lock_release_nopr() (void)0
-#endif /* CONFIG_NO_SMP */
-#define cred_change_lock_acquire()           \
-	do {                                     \
-		pflag_t _was = PREEMPTION_PUSHOFF(); \
-		cred_change_lock_acquire_nopr()
-#define cred_change_lock_release()       \
-		cred_change_lock_release_nopr(); \
-		PREEMPTION_POP(_was);            \
-	}	__WHILE0
+#endif /* !CONFIG_NO_SMP */
+#define cred_change_lock_acquire() atomic_lock_acquire_smp(&cred_change_lock)
+#define cred_change_lock_release() atomic_lock_release_smp(&cred_change_lock)
 
 /* Return the credentials controller of the given thread. */
 PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *

@@ -755,7 +755,7 @@ INTERN void NOTHROW(KCALL x86_initialize_pic)(void)
 extern byte_t x86_arch_cpu_hwipi_pending_nopr[] ASMNAME("arch_cpu_hwipi_pending_nopr");
 
 #ifndef CONFIG_NO_SMP
-INTERN ATTR_FREETEXT void KCALL pit_delay_hz(u16 hz) {
+INTERN NOPREEMPT ATTR_FREETEXT void KCALL pit_delay_hz(u16 hz) {
 	x86_pit_lock_acquire_nopr();
 	outb(PIT_COMMAND,
 	     PIT_COMMAND_SELECT_F1 |

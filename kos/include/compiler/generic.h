@@ -261,13 +261,14 @@
 #define __ATTR_NOINLINE /* Nothing */
 #endif /* !... */
 
-#if __has_attribute(__noreturn__) || defined(__TINYC__)
+#if (__has_attribute(__noreturn__) || defined(__TINYC__) || \
+     (defined(__SUNPRO_C) && __SUNPRO_C >= 0x5110))
 #define __ATTR_NORETURN __attribute__((__noreturn__))
+#elif defined(__SUNPRO_C) && __SUNPRO_C >= 0x590
+#define __ATTR_NORETURN __attribute__((noreturn))
 #elif __has_declspec_attribute(noreturn)
 #define __ATTR_NORETURN __declspec(noreturn)
-#elif (defined(__SUNPRO_C) && (__SUNPRO_C >= 0x590))
-#define __ATTR_NORETURN __attribute__((noreturn))
-#elif defined(_Noreturn) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112)
+#elif defined(_Noreturn) || (!defined(__cplusplus) && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112)
 #define __ATTR_NORETURN_IS__NORETURN
 #define __ATTR_NORETURN _Noreturn
 #elif __has_cpp_attribute(noreturn)

@@ -355,7 +355,12 @@ again:
 	}
 
 	/* Acquire all of the necessary locks. */
-	atomic_lock_acquire_nopr(task_mman_change_lock(me));
+	if (!atomic_lock_tryacquire(task_mman_change_lock(me))) {
+		PREEMPTION_POP(was);
+		while (!atomic_lock_available(task_mman_change_lock(me)))
+			task_tryyield_or_pause();
+		goto again;
+	}
 	if unlikely(!mman_threadslock_tryacquire_nopr(newmman)) {
 		atomic_lock_release(task_mman_change_lock(me));
 		PREEMPTION_POP(was);
@@ -413,16 +418,9 @@ again:
 PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *
 NOTHROW(FCALL task_getmman)(struct task *__restrict thread) {
 	REF struct mman *result;
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
-#ifndef CONFIG_NO_SMP
-	atomic_lock_acquire_nopr(task_mman_change_lock(thread));
-#endif /* !CONFIG_NO_SMP */
+	atomic_lock_acquire_smp(task_mman_change_lock(thread));
 	result = incref(thread->t_mman);
-#ifndef CONFIG_NO_SMP
-	atomic_lock_release(task_mman_change_lock(thread));
-#endif /* !CONFIG_NO_SMP */
-	PREEMPTION_POP(was);
+	atomic_lock_release_smp(task_mman_change_lock(thread));
 	return result;
 }
 

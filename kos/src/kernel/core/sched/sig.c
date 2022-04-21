@@ -38,6 +38,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -271,6 +272,10 @@ NOTHROW(FCALL task_connection_free)(struct task_connections *__restrict self,
 #define sig_smplock_acquire_nopr(self)    (void)0
 #define sig_smplock_release_nopr(self)    (void)0
 #endif /* SIG_CONTROL_SMPLOCK == 0 */
+
+#define sig_smplock_acquire(self) preemption_acquire_smp(sig_smplock_tryacquire_nopr(self))
+#define sig_smplock_release(self) preemption_release_smp(sig_smplock_release_nopr(self))
+
 
 #ifdef TASK_CONNECTION_STAT_FLOCK
 #define TASK_CONNECTION_STAT_FLOCK_OPT TASK_CONNECTION_STAT_FLOCK
@@ -1572,8 +1577,7 @@ NOTHROW(FCALL sig_iswaiting)(struct sig *__restrict self) {
 	if (cons) {
 		/* Acquire the SMP-lock for `self', so we can inspect
 		 * the chain of established connections more closely. */
-		pflag_t was = PREEMPTION_PUSHOFF();
-		sig_smplock_acquire_nopr(self);
+		sig_smplock_acquire(self);
 		for (cons = sig_smplock_clr(ATOMIC_READ(self->s_con));
 		     cons; cons = cons->tc_signext) {
 			uintptr_t status = ATOMIC_READ(cons->tc_stat);
@@ -1583,8 +1587,7 @@ NOTHROW(FCALL sig_iswaiting)(struct sig *__restrict self) {
 				break;
 			}
 		}
-		sig_smplock_release_nopr(self);
-		PREEMPTION_POP(was);
+		sig_smplock_release(self);
 	}
 	return result;
 }
@@ -1601,8 +1604,7 @@ NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self) {
 	if (cons) {
 		/* Acquire the SMP-lock for `self', so we can inspect
 		 * the chain of established connections more closely. */
-		pflag_t was = PREEMPTION_PUSHOFF();
-		sig_smplock_acquire_nopr(self);
+		sig_smplock_acquire(self);
 		for (cons = sig_smplock_clr(ATOMIC_READ(self->s_con));
 		     cons; cons = cons->tc_signext) {
 			uintptr_t status;
@@ -1610,8 +1612,7 @@ NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self) {
 			if (!TASK_CONNECTION_STAT_ISDONE(status))
 				++result; /* Found an alive, normal connection! */
 		}
-		sig_smplock_release_nopr(self);
-		PREEMPTION_POP(was);
+		sig_smplock_release(self);
 	}
 	return result;
 }
@@ -1911,7 +1912,7 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 				 * delivered-signal field may not have become non-NULL, yet.
 				 * In this case, simply pause until that happens. */
 				while (ATOMIC_READ(cons->tcs_dlvr) == NULL)
-					task_pause();
+					task_tryyield_or_pause();
 #endif /* !CONFIG_NO_SMP */
 				return;
 			}
@@ -1922,7 +1923,7 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 				/* Pausing w/ preemption may  do better than pausing  w/o
 				 * As such, try to re-enable preemption while we do this. */
 				PREEMPTION_POP(was);
-				task_pause();
+				task_tryyield_or_pause();
 				was = PREEMPTION_PUSHOFF();
 				continue;
 			}
@@ -2084,7 +2085,7 @@ NOTHROW(FCALL sig_send_select_as)(struct sig *__restrict self,
 			goto done;
 		if unlikely((uintptr_t)sig_con & SIG_CONTROL_SMPLOCK) {
 			PREEMPTION_POP(was);
-			task_pause();
+			task_tryyield_or_pause();
 			was = PREEMPTION_PUSHOFF();
 			continue;
 		}

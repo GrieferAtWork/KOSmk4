@@ -90,20 +90,9 @@ NOTHROW(KCALL fini_this_fs)(struct task *__restrict self) {
 /* Lock for accessing any remote thread's this_fs field */
 #ifndef CONFIG_NO_SMP
 PRIVATE struct atomic_lock this_fs_smplock = ATOMIC_LOCK_INIT;
-#define this_fs_smplock_acquire_nopr() atomic_lock_acquire_nopr(&this_fs_smplock)
-#define this_fs_smplock_release_nopr() atomic_lock_release(&this_fs_smplock)
-#else /* !CONFIG_NO_SMP */
-#define this_fs_smplock_acquire_nopr() (void)0
-#define this_fs_smplock_release_nopr() (void)0
-#endif /* CONFIG_NO_SMP */
-#define this_fs_smplock_acquire()            \
-	do {                                     \
-		pflag_t _was = PREEMPTION_PUSHOFF(); \
-		this_fs_smplock_acquire_nopr()
-#define this_fs_smplock_release()       \
-		this_fs_smplock_release_nopr(); \
-		PREEMPTION_POP(_was);           \
-	}	__WHILE0
+#endif /* !CONFIG_NO_SMP */
+#define this_fs_smplock_acquire() atomic_lock_acquire_smp(&this_fs_smplock)
+#define this_fs_smplock_release() atomic_lock_release_smp(&this_fs_smplock)
 
 
 

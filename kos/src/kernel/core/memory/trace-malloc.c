@@ -310,29 +310,21 @@ DECL_BEGIN
 #ifndef CONFIG_NO_SMP
 PRIVATE ATTR_MALL_UNTRACKED struct atomic_lock tm_smplock = ATOMIC_LOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(tm_smplock);
-#define smplock_acquire_nopr() atomic_lock_acquire_nopr(&tm_smplock)
-#define smplock_release_nopr() atomic_lock_release(&tm_smplock)
-#else /* !CONFIG_NO_SMP */
-#define smplock_acquire_nopr() (void)0
-#define smplock_release_nopr() (void)0
-#endif /* CONFIG_NO_SMP */
+#endif /* !CONFIG_NO_SMP */
+#define smplock_acquire_smp_r(p_flag) atomic_lock_acquire_smp_r(&tm_smplock, p_flag)
+#define smplock_release_smp_r(p_flag) atomic_lock_release_smp_r(&tm_smplock, p_flag)
 
 #define LOCK_PARAMS pflag_t _l_was
 #define LOCK_ARGS   _l_was
 
-#define lock_acquire()                         \
-	do {                                       \
-		pflag_t _l_was = PREEMPTION_PUSHOFF(); \
-		smplock_acquire_nopr()
-#define lock_break()             \
-		(smplock_release_nopr(), \
-		 PREEMPTION_POP(_l_was))
-#define lock_regain()                   \
-		(_l_was = PREEMPTION_PUSHOFF(), \
-		 smplock_acquire_nopr())
-#define lock_release()           \
-		 smplock_release_nopr(); \
-		 PREEMPTION_POP(_l_was); \
+#define lock_acquire()  \
+	do {                \
+		pflag_t _l_was; \
+		smplock_acquire_smp_r(&_l_was)
+#define lock_break()  smplock_release_smp_r(&_l_was)
+#define lock_regain() smplock_acquire_smp_r(&_l_was)
+#define lock_release()                  \
+		smplock_release_smp_r(&_l_was); \
 	}	__WHILE0
 
 

@@ -245,31 +245,9 @@ struct devruleenum: fdirenum {
 	REF struct fnode  *dre_nextfil; /* [0..1][lock(SMP(dre_lock))] Next file to enumerate. */
 	uintptr_t          dre_nextvar; /* [lock(SMP(dre_lock))] Next variant to enumerate. */
 };
-
-#ifndef CONFIG_NO_SMP
-#define devruleenum_tryacquire_nopr(self) atomic_lock_tryacquire(&(self)->dre_lock)
-#define devruleenum_acquire_nopr(self)    atomic_lock_acquire_nopr(&(self)->dre_lock)
-#define devruleenum_release_nopr(self)    atomic_lock_release(&(self)->dre_lock)
-#define devruleenum_acquired(self)        atomic_lock_acquired(&(self)->dre_lock)
-#define devruleenum_available(self)       atomic_lock_available(&(self)->dre_lock)
-#else /* !CONFIG_NO_SMP */
-#define devruleenum_tryacquire_nopr(self) 1
-#define devruleenum_acquire_nopr(self)    (void)0
-#define devruleenum_release_nopr(self)    (void)0
-#define devruleenum_acquired(self)        (!PREEMPTION_ENABLED())
-#define devruleenum_available(self)       1
-#endif /* CONFIG_NO_SMP */
-#define devruleenum_acquire(self)                 \
-	do {                                          \
-		pflag_t __dre_was = PREEMPTION_PUSHOFF(); \
-		devruleenum_acquire_nopr(self)
-#define devruleenum_break(self)          \
-		(devruleenum_release_nopr(self), \
-		 PREEMPTION_POP(__dre_was))
-#define devruleenum_release(self)       \
-		devruleenum_release_nopr(self); \
-		PREEMPTION_POP(__dre_was);      \
-	}	__WHILE0
+#define devruleenum_break(self)   atomic_lock_release_smp_b(&(self)->dre_lock)
+#define devruleenum_acquire(self) atomic_lock_acquire_smp(&(self)->dre_lock)
+#define devruleenum_release(self) atomic_lock_release_smp(&(self)->dre_lock)
 
 
 struct devdiskruledir_readdata {

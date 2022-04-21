@@ -304,7 +304,6 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct task *thread, *caller;
 	struct pending_rpc **p_rpc_desc;
-	pflag_t was;
 
 	/* Make sure that there are enough RPC descriptors
 	 * in order to kill  all threads using this  mman.
@@ -315,8 +314,7 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 	caller     = THIS_TASK;
 	p_rpc_desc = SLIST_PFIRST(&self->mb_killrpc);
 
-	was = PREEMPTION_PUSHOFF();
-	mman_threadslock_acquire_nopr(target);
+	mman_threadslock_acquire(target);
 
 	/* Allocate missing descriptors */
 	LIST_FOREACH (thread, &target->mm_threads, t_mman_tasks) {
@@ -329,8 +327,7 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 			/* Try to allocate another RPC descriptor w/o blocking. */
 			rpc = pending_rpc_alloc_kern_nx(GFP_ATOMIC);
 			if unlikely(!rpc) {
-				mman_threadslock_release_nopr(target);
-				PREEMPTION_POP(was);
+				mman_threadslock_release_b(target);
 				mbuilder_partlocks_release(self);
 				mman_lock_release(target);
 				unlockinfo_xunlock(unlock);
@@ -371,8 +368,7 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 	}
 
 	/* And with that, all target threads have been killed. */
-	mman_threadslock_release_nopr(target);
-	PREEMPTION_POP(was);
+	mman_threadslock_release(target);
 	return true;
 }
 

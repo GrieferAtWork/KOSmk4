@@ -525,7 +525,7 @@
 #if !__has_attribute(__format__)
 #define __NO_ATTR_FORMAT_PRINTF
 #define __ATTR_FORMAT_PRINTF(fmt, args) /* Nothing */
-#elif __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 7)
+#elif __GCC_VERSION_NUM < 20700
 /* underscore-guarded variants weren't available in this version of gcc... */
 #define __ATTR_FORMAT_PRINTF(fmt, args) __attribute__((format(printf, fmt, args)))
 #else /* ... */

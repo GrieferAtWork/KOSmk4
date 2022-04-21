@@ -1088,39 +1088,30 @@ NOTHROW(KCALL fini_this_handman)(struct task *__restrict self) {
 #ifndef CONFIG_NO_SMP
 /* Lock for accessing any remote thread's this_handman field */
 PRIVATE struct atomic_lock handman_change_lock = ATOMIC_RWLOCK_INIT;
-#define handman_change_lock_acquire_nopr() atomic_lock_acquire_nopr(&handman_change_lock)
-#define handman_change_lock_release_nopr() atomic_lock_release_nopr(&handman_change_lock)
-#else /* !CONFIG_NO_SMP */
-#define handman_change_lock_acquire_nopr() (void)0
-#define handman_change_lock_release_nopr() (void)0
-#endif /* CONFIG_NO_SMP */
+#endif /* !CONFIG_NO_SMP */
+#define handman_change_lock_acquire() atomic_lock_acquire_smp(&handman_change_lock)
+#define handman_change_lock_release() atomic_lock_release_smp(&handman_change_lock)
 
 
 
 /* Return the handle manager of the given thread. */
 PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handman *
 NOTHROW(FCALL task_gethandman)(struct task *__restrict thread) {
-	pflag_t was;
 	REF struct handman *result;
-	was = PREEMPTION_PUSHOFF();
-	handman_change_lock_acquire_nopr();
+	handman_change_lock_acquire();
 	result = incref(FORTASK(thread, this_handman));
-	handman_change_lock_release_nopr();
-	PREEMPTION_POP(was);
+	handman_change_lock_release();
 	return result;
 }
 
 /* Exchange the handle manager of the calling thread (and return the old one). */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handman *
 NOTHROW(FCALL task_sethandman_inherit)(/*inherit(always)*/ REF struct handman *__restrict newman) {
-	pflag_t was;
 	REF struct handman *result;
-	was = PREEMPTION_PUSHOFF();
-	handman_change_lock_acquire_nopr();
+	handman_change_lock_acquire();
 	result = PERTASK_GET(this_handman);
 	PERTASK_SET(this_handman, newman);
-	handman_change_lock_release_nopr();
-	PREEMPTION_POP(was);
+	handman_change_lock_release();
 	return result;
 }
 

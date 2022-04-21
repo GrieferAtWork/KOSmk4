@@ -27,6 +27,7 @@
 #endif /* !__INTELLISENSE__ */
 #include <kernel/types.h>
 
+#include <hybrid/sched/__preemption.h>
 #include <hybrid/sequence/list.h>
 
 #include <asm/os/fcntl.h>
@@ -224,26 +225,11 @@ NOTHROW(path_plock_acquire_nopr)(struct path *__restrict self) {
 }
 #else /* !CONFIG_NO_SMP */
 #define path_plock_tryacquire_nopr(self) 1
-#define path_plock_release_nopr(self)    (void)0
 #define path_plock_acquire_nopr(self)    (void)0
+#define path_plock_release_nopr(self)    (void)0
 #endif /* CONFIG_NO_SMP */
-#ifdef __INTELLISENSE__
-#define path_plock_acquire(self) \
-	do {                         \
-		path_plock_acquire_nopr(self)
-#define path_plock_release(self)       \
-		path_plock_release_nopr(self); \
-	}	__WHILE0
-#else /* __INTELLISENSE__ */
-#define path_plock_acquire(self)                 \
-	do {                                         \
-		pflag_t _ppl_was = PREEMPTION_PUSHOFF(); \
-		path_plock_acquire_nopr(self)
-#define path_plock_release(self)       \
-		path_plock_release_nopr(self); \
-		PREEMPTION_POP(_ppl_was);      \
-	}	__WHILE0
-#endif /* !__INTELLISENSE__ */
+#define path_plock_acquire(self) __hybrid_preemption_acquire_smp(path_plock_tryacquire_nopr(self))
+#define path_plock_release(self) __hybrid_preemption_release_smp(path_plock_release_nopr(self))
 
 #ifdef __INTELLISENSE__
 NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fdirent *

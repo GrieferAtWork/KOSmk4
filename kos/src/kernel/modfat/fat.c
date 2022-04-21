@@ -2917,18 +2917,11 @@ fatsuper_v_getlabel(struct fsuper *__restrict self,
 	STATIC_ASSERT(FSLABEL_MAX >= 12);
 	FatSuperblock *me = fsuper_asfat(self);
 	char label[12];
-	pflag_t was;
 
 	/* Load current label */
-	was = PREEMPTION_PUSHOFF();
-#ifndef CONFIG_NO_SMP
-	atomic_lock_acquire(&me->fs_stringslock);
-#endif /* !CONFIG_NO_SMP */
+	atomic_lock_acquire_smp(&me->fs_stringslock);
 	memcpy(label, me->ft_label, 12);
-#ifndef CONFIG_NO_SMP
-	atomic_lock_release(&me->fs_stringslock);
-#endif /* !CONFIG_NO_SMP */
-	PREEMPTION_POP(was);
+	atomic_lock_release_smp(&me->fs_stringslock);
 
 	/* Copy label to user-space.  */
 	strcpy(buf, label);
@@ -2944,7 +2937,6 @@ fatsuper_v_setlabel(struct fsuper *__restrict self,
 	char newlabel[12];
 	FatSuperblock *me = fsuper_asfat(self);
 	pos_t diskaddr;
-	pflag_t was;
 	if unlikely(namelen >= 12)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE, E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG, namelen);
 	*(char *)mempcpy(newlabel, name, namelen) = '\0';
@@ -2960,15 +2952,9 @@ fatsuper_v_setlabel(struct fsuper *__restrict self,
 	mfile_sync(me->ft_super.ffs_super.fs_dev);
 
 	/* Save the new label */
-	was = PREEMPTION_PUSHOFF();
-#ifndef CONFIG_NO_SMP
-	atomic_lock_acquire_nopr(&me->fs_stringslock);
-#endif /* !CONFIG_NO_SMP */
+	atomic_lock_acquire_smp(&me->fs_stringslock);
 	memcpy(me->ft_label, newlabel, 12);
-#ifndef CONFIG_NO_SMP
-	atomic_lock_release(&me->fs_stringslock);
-#endif /* !CONFIG_NO_SMP */
-	PREEMPTION_POP(was);
+	atomic_lock_release_smp(&me->fs_stringslock);
 
 	return true;
 }

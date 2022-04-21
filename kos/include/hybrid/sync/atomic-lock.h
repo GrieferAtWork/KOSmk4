@@ -21,9 +21,10 @@
 #define __GUARD_HYBRID_SYNC_ATOMIC_LOCK_H 1
 
 #include "../../__stdinc.h"
-#include "../typecore.h"
-#include "../__atomic.h"
 #include "../__assert.h"
+#include "../__atomic.h"
+#include "../sched/__preemption.h"
+#include "../typecore.h"
 #ifndef __INTELLISENSE__
 #include "../sched/__yield.h"
 #endif /* !__INTELLISENSE__ */
@@ -74,6 +75,16 @@ __LOCAL __NOPREEMPT __ATTR_NONNULL((1)) void __NOTHROW(atomic_lock_acquire_nopr)
 __LOCAL __NOPREEMPT __ATTR_NONNULL((1)) void __NOTHROW(atomic_lock_waitfor_nopr)(struct atomic_lock *__restrict __self);
 #define atomic_lock_release_nopr atomic_lock_release
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
+
+/* Acquire/release a given atomic_lock as an smp-lock
+ * @param: __hybrid_preemption_flag_t *p_flag: preemption control flag. */
+#define atomic_lock_acquire_smp_r(self, p_flag) __hybrid_preemption_acquire_smp_r(atomic_lock_tryacquire(self), p_flag)
+#define atomic_lock_release_smp_r(self, p_flag) __hybrid_preemption_release_smp_r(atomic_lock_release(self), p_flag)
+#define atomic_lock_acquire_smp_b(self)         __hybrid_preemption_acquire_smp_b(atomic_lock_tryacquire(self))
+#define atomic_lock_release_smp_b(self)         __hybrid_preemption_release_smp_b(atomic_lock_release(self))
+#define atomic_lock_acquire_smp(self)           __hybrid_preemption_acquire_smp(atomic_lock_tryacquire(self))
+#define atomic_lock_release_smp(self)           __hybrid_preemption_release_smp(atomic_lock_release(self))
+
 
 #if !defined(__INTELLISENSE__) && !defined(__NO_builtin_expect)
 #undef atomic_lock_tryacquire

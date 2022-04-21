@@ -285,7 +285,7 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
 	pflag_t was;
 #define LOCAL_PREEMPTION_PUSHOFF() was = PREEMPTION_PUSHOFF()
 #define LOCAL_PREEMPTION_POP()     PREEMPTION_POP(was)
-#define LOCAL_was       was
+#define LOCAL_was                  was
 #endif /* !HAVE_NOPREEMPT */
 #ifdef HAVE_SENDER_THREAD
 #define LOCAL_caller            caller
@@ -329,7 +329,7 @@ done_exec_cleanup:
 	/* Wait if the SMP lock isn't available at the moment. */
 	if unlikely((uintptr_t)con & SIG_CONTROL_SMPLOCK) {
 		LOCAL_PREEMPTION_POP();
-		task_pause();
+		task_tryyield_or_pause();
 		goto again_disable_preemption;
 	}
 	/* Acquire the SMP-lock and validate that `con' is still correct. */

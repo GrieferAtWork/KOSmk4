@@ -31,6 +31,7 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 #include <hybrid/sync/atomic-lock.h>
 
 #include <sys/io.h>
@@ -61,22 +62,10 @@ INTERN port_t x86_syslog_port = (port_t)0x80;
 
 
 #ifndef CONFIG_NO_SMP
-PRIVATE unsigned int x86_syslog_smplock = 0;
-#define x86_syslog_smplock_acquire(was)                \
-	do {                                               \
-		(was) = PREEMPTION_PUSHOFF();                  \
-		while (ATOMIC_XCH(x86_syslog_smplock, 1) != 0) \
-			task_pause();                              \
-	}	__WHILE0
-#define x86_syslog_smplock_release(was)   \
-	(ATOMIC_STORE(x86_syslog_smplock, 0), \
-	 PREEMPTION_POP(was))
-#else /* !CONFIG_NO_SMP */
-#define x86_syslog_smplock_acquire(was) \
-	((was) = PREEMPTION_PUSHOFF())
-#define x86_syslog_smplock_release(was)   \
-	PREEMPTION_POP(was)
-#endif /* CONFIG_NO_SMP */
+PRIVATE struct atomic_lock x86_syslog_smplock = ATOMIC_LOCK_INIT;
+#endif /* !CONFIG_NO_SMP */
+#define x86_syslog_smplock_acquire(p_flag) atomic_lock_acquire_smp_r(&x86_syslog_smplock, p_flag)
+#define x86_syslog_smplock_release(p_flag) atomic_lock_release_smp_r(&x86_syslog_smplock, p_flag)
 
 
 /* Raw, low-level write the given data to the default x86 system log.
@@ -85,10 +74,10 @@ PRIVATE unsigned int x86_syslog_smplock = 0;
 PUBLIC NOBLOCK NONNULL((1)) void FCALL
 x86_syslog_write(char const *__restrict data,
                  size_t datalen) {
-	pflag_t was;
-	x86_syslog_smplock_acquire(was);
+	preemption_flag_t was;
+	x86_syslog_smplock_acquire(&was);
 	outsb(x86_syslog_port, data, datalen);
-	x86_syslog_smplock_release(was);
+	x86_syslog_smplock_release(&was);
 }
 
 /* Same as `x86_syslog_write()', but is format-printer compatible. */
@@ -175,7 +164,7 @@ PRIVATE NOBLOCK void
 NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
                                     struct syslog_packet const *__restrict packet,
                                     unsigned int level) {
-	pflag_t was;
+	preemption_flag_t was;
 	/* Write to a debug port. */
 	if (level < COMPILER_LENOF(level_prefix)) {
 		/* Note that the max values here may not make perfect sense in
@@ -212,13 +201,13 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 		              (pid_t)packet->sp_tid);
 		if (packet->sp_msg[0] == '[')
 			--len;
-		x86_syslog_smplock_acquire(was);
+		x86_syslog_smplock_acquire(&was);
 		outsb(x86_syslog_port, buf, len);
 	} else {
-		x86_syslog_smplock_acquire(was);
+		x86_syslog_smplock_acquire(&was);
 	}
 	outsb(x86_syslog_port, packet->sp_msg, packet->sp_len);
-	x86_syslog_smplock_release(was);
+	x86_syslog_smplock_release(&was);
 }
 
 /* The x86 hook for the arch-specific, default system log sink */

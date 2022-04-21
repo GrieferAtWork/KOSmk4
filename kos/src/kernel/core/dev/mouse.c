@@ -502,53 +502,19 @@ mousebuf_getpacket(struct mousebuf *__restrict self) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-#ifndef CONFIG_NO_SMP
-#define MD_LOCK_WRITE(self, was)                         \
-	do {                                                 \
-		for (;;) {                                       \
-			was = PREEMPTION_PUSHOFF();                  \
-			if likely(mousedev_smplock_tryacquire(self)) \
-				break;                                   \
-			PREEMPTION_POP(was);                         \
-			task_yield();                                \
-		}                                                \
-	}	__WHILE0
-#define MD_LOCK_WRITE_NOPR(self)             \
-	do {                                     \
-		assert(!PREEMPTION_ENABLED());       \
-		mousedev_smplock_acquire_nopr(self); \
-	}	__WHILE0
-#define MD_LOCK_ENDWRITE(self, was)          \
-	do {                                     \
-		mousedev_smplock_release_nopr(self); \
-		PREEMPTION_POP(was);                 \
-	}	__WHILE0
-#define MD_LOCK_ENDWRITE_NOPR(self)          \
-	do {                                     \
-		assert(!PREEMPTION_ENABLED());       \
-		mousedev_smplock_release_nopr(self); \
-	}	__WHILE0
-#else /* !CONFIG_NO_SMP */
-#define MD_LOCK_WRITE(self, was)    ((was) = PREEMPTION_PUSHOFF())
-#define MD_LOCK_WRITE_NOPR(self)    (assert(!PREEMPTION_ENABLED()))
-#define MD_LOCK_ENDWRITE(self, was) (PREEMPTION_POP(was))
-#define MD_LOCK_ENDWRITE_NOPR(self) (assert(!PREEMPTION_ENABLED()))
-#endif /* CONFIG_NO_SMP */
-
 
 /* Generate mouse input packets
  * Note  that when generating event packets, the motion
  * packets should always be created before other events */
 PUBLIC NONNULL((1)) bool KCALL
 mousedev_motion(struct mousedev *__restrict self,
-                    s32 relx, s32 rely) {
+                s32 relx, s32 rely) {
 	bool result;
-	pflag_t was;
 	if (!relx && !rely)
 		return true;
-	MD_LOCK_WRITE(self, was);
+	mousedev_smplock_acquire(self);
 	result = mouse_device_do_motion_nopr_locked(self, relx, rely);
-	MD_LOCK_ENDWRITE(self, was);
+	mousedev_smplock_release(self);
 	return result;
 }
 
@@ -556,15 +522,14 @@ PUBLIC NONNULL((1)) bool KCALL
 mousedev_moveto(struct mousedev *__restrict self,
                     s32 absx, s32 absy) {
 	bool result;
-	pflag_t was;
-	MD_LOCK_WRITE(self, was);
+	mousedev_smplock_acquire(self);
 	if (self->md_state.ms_abs_x == absx &&
 	    self->md_state.ms_abs_y == absy) {
 		result = true;
 	} else {
 		result = mouse_device_do_moveto_nopr_locked(self, absx, absy);
 	}
-	MD_LOCK_ENDWRITE(self, was);
+	mousedev_smplock_release(self);
 	return result;
 }
 
@@ -572,16 +537,15 @@ PUBLIC NONNULL((1)) bool KCALL
 mousedev_button(struct mousedev *__restrict self,
                     u32 mask, u32 flag) {
 	bool result;
-	pflag_t was;
 	u32 new_buttons;
-	MD_LOCK_WRITE(self, was);
+	mousedev_smplock_acquire(self);
 	new_buttons = (self->md_state.ms_buttons & mask) | flag;
 	if (self->md_state.ms_buttons == new_buttons) {
 		result = true;
 	} else {
 		result = mouse_device_do_button_nopr_locked(self, new_buttons);
 	}
-	MD_LOCK_ENDWRITE(self, was);
+	mousedev_smplock_release(self);
 	return result;
 }
 
@@ -591,10 +555,9 @@ mousedev_button_ex(struct mousedev *__restrict self,
                        u32 *__restrict pold_buttons,
                        u32 *__restrict pnew_buttons) {
 	bool result;
-	pflag_t was;
 	u32 old_buttons;
 	u32 new_buttons;
-	MD_LOCK_WRITE(self, was);
+	mousedev_smplock_acquire(self);
 	old_buttons = self->md_state.ms_buttons;
 	new_buttons = ((old_buttons & mask) | flag) ^ xflg;
 	if (old_buttons == new_buttons) {
@@ -602,7 +565,7 @@ mousedev_button_ex(struct mousedev *__restrict self,
 	} else {
 		result = mouse_device_do_button_nopr_locked(self, new_buttons);
 	}
-	MD_LOCK_ENDWRITE(self, was);
+	mousedev_smplock_release(self);
 	*pold_buttons = old_buttons;
 	*pnew_buttons = new_buttons;
 	return result;
@@ -611,28 +574,26 @@ mousedev_button_ex(struct mousedev *__restrict self,
 PUBLIC NONNULL((1)) bool KCALL
 mousedev_vwheel(struct mousedev *__restrict self, s32 lines) {
 	bool result;
-	pflag_t was;
 	if unlikely(!lines)
 		return true;
-	MD_LOCK_WRITE(self, was);
+	mousedev_smplock_acquire(self);
 	result = mouse_device_do_wheel_nopr_locked(self,
 	                                           MOUSE_PACKET_TYPE_VSCROLL,
 	                                           lines);
-	MD_LOCK_ENDWRITE(self, was);
+	mousedev_smplock_release(self);
 	return result;
 }
 
 PUBLIC NONNULL((1)) bool KCALL
 mousedev_hwheel(struct mousedev *__restrict self, s32 rows) {
 	bool result;
-	pflag_t was;
 	if unlikely(!rows)
 		return true;
-	MD_LOCK_WRITE(self, was);
+	mousedev_smplock_acquire(self);
 	result = mouse_device_do_wheel_nopr_locked(self,
 	                                           MOUSE_PACKET_TYPE_HSCROLL,
 	                                           rows);
-	MD_LOCK_ENDWRITE(self, was);
+	mousedev_smplock_release(self);
 	return result;
 }
 
@@ -642,9 +603,9 @@ NOTHROW(KCALL mousedev_motion_nopr)(struct mousedev *__restrict self,
 	bool result;
 	if (!relx && !rely)
 		return true;
-	MD_LOCK_WRITE_NOPR(self);
+	mousedev_smplock_acquire_nopr(self);
 	result = mouse_device_do_motion_nopr_locked(self, relx, rely);
-	MD_LOCK_ENDWRITE_NOPR(self);
+	mousedev_smplock_release_nopr(self);
 	return result;
 }
 
@@ -652,14 +613,14 @@ PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL mousedev_moveto_nopr)(struct mousedev *__restrict self,
                                         s32 absx, s32 absy) {
 	bool result;
-	MD_LOCK_WRITE_NOPR(self);
+	mousedev_smplock_acquire_nopr(self);
 	if (self->md_state.ms_abs_x == absx &&
 	    self->md_state.ms_abs_y == absy) {
 		result = true;
 	} else {
 		result = mouse_device_do_moveto_nopr_locked(self, absx, absy);
 	}
-	MD_LOCK_ENDWRITE_NOPR(self);
+	mousedev_smplock_release_nopr(self);
 	return result;
 }
 
@@ -668,14 +629,14 @@ NOTHROW(KCALL mousedev_button_nopr)(struct mousedev *__restrict self,
                                         u32 mask, u32 flag) {
 	bool result;
 	u32 new_buttons;
-	MD_LOCK_WRITE_NOPR(self);
+	mousedev_smplock_acquire_nopr(self);
 	new_buttons = (self->md_state.ms_buttons & mask) | flag;
 	if (self->md_state.ms_buttons == new_buttons) {
 		result = true;
 	} else {
 		result = mouse_device_do_button_nopr_locked(self, new_buttons);
 	}
-	MD_LOCK_ENDWRITE_NOPR(self);
+	mousedev_smplock_release_nopr(self);
 	return result;
 }
 
@@ -687,7 +648,7 @@ NOTHROW(KCALL mousedev_button_ex_nopr)(struct mousedev *__restrict self,
 	bool result;
 	u32 old_buttons;
 	u32 new_buttons;
-	MD_LOCK_WRITE_NOPR(self);
+	mousedev_smplock_acquire_nopr(self);
 	old_buttons = self->md_state.ms_buttons;
 	new_buttons = ((old_buttons & mask) | flag) ^ xflg;
 	if (old_buttons == new_buttons) {
@@ -695,7 +656,7 @@ NOTHROW(KCALL mousedev_button_ex_nopr)(struct mousedev *__restrict self,
 	} else {
 		result = mouse_device_do_button_nopr_locked(self, new_buttons);
 	}
-	MD_LOCK_ENDWRITE_NOPR(self);
+	mousedev_smplock_release_nopr(self);
 	*pold_buttons = old_buttons;
 	*pnew_buttons = new_buttons;
 	return result;
@@ -707,11 +668,11 @@ NOTHROW(KCALL mousedev_vwheel_nopr)(struct mousedev *__restrict self,
 	bool result;
 	if unlikely(!lines)
 		return true;
-	MD_LOCK_WRITE_NOPR(self);
+	mousedev_smplock_acquire_nopr(self);
 	result = mouse_device_do_wheel_nopr_locked(self,
 	                                           MOUSE_PACKET_TYPE_VSCROLL,
 	                                           lines);
-	MD_LOCK_ENDWRITE_NOPR(self);
+	mousedev_smplock_release_nopr(self);
 	return result;
 }
 
@@ -721,11 +682,11 @@ NOTHROW(KCALL mousedev_hwheel_nopr)(struct mousedev *__restrict self,
 	bool result;
 	if unlikely(!rows)
 		return true;
-	MD_LOCK_WRITE_NOPR(self);
+	mousedev_smplock_acquire_nopr(self);
 	result = mouse_device_do_wheel_nopr_locked(self,
 	                                           MOUSE_PACKET_TYPE_HSCROLL,
 	                                           rows);
-	MD_LOCK_ENDWRITE_NOPR(self);
+	mousedev_smplock_release_nopr(self);
 	return result;
 }
 

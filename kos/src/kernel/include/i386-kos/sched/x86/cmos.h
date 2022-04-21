@@ -56,21 +56,14 @@ DATDEF struct x86_cmos_struct x86_cmos;
 
 #ifndef CONFIG_NO_SMP
 #define x86_cmos_lock_acquire_nopr() atomic_lock_acquire_nopr(&x86_cmos.cr_lock)
-#define x86_cmos_lock_release_nopr() atomic_lock_release(&x86_cmos.cr_lock)
+#define x86_cmos_lock_release_nopr() atomic_lock_release_nopr(&x86_cmos.cr_lock)
 #else /* !CONFIG_NO_SMP */
 #define x86_cmos_lock_acquire_nopr() (void)0
 #define x86_cmos_lock_release_nopr() (void)0
 #endif /* CONFIG_NO_SMP */
-#define x86_cmos_lock_acquire()                 \
-	do {                                        \
-		pflag_t _cl_was = PREEMPTION_PUSHOFF(); \
-		x86_cmos_lock_acquire_nopr()
-#define x86_cmos_lock_break()          \
-		(x86_cmos_lock_release_nopr(), \
-		 PREEMPTION_POP(_cl_was))
-#define x86_cmos_lock_release() \
-		x86_cmos_lock_break();  \
-	}	__WHILE0
+#define x86_cmos_lock_acquire() atomic_lock_acquire_smp(&x86_cmos.cr_lock)
+#define x86_cmos_lock_release() atomic_lock_release_smp(&x86_cmos.cr_lock)
+#define x86_cmos_lock_break()   atomic_lock_release_smp_b(&x86_cmos.cr_lock)
 
 /* Read CMOS control register `reg' */
 #define cmos_rd(reg)                           \
@@ -107,11 +100,14 @@ NOTHROW(KCALL x86_set_nmi_enabled_nopr)(__BOOL enabled) {
 }
 LOCAL NOBLOCK NOPREEMPT __BOOL
 NOTHROW(KCALL x86_set_nmi_enabled)(__BOOL enabled) {
-	__BOOL result;
-	pflag_t was = PREEMPTION_PUSHOFF();
-	result = x86_set_nmi_enabled_nopr(enabled);
-	PREEMPTION_POP(was);
-	return result;
+	u8 old_nmi, new_nmi;
+	new_nmi = enabled ? 0 : CMOS_ADDR_NONMI;
+	x86_cmos_lock_acquire();
+	old_nmi = __hybrid_atomic_xch(x86_cmos.cr_nmi, new_nmi, __ATOMIC_SEQ_CST);
+	if (old_nmi != new_nmi)
+		outb(CMOS_ADDR, new_nmi); /* Update hardware */
+	x86_cmos_lock_release();
+	return (old_nmi & CMOS_ADDR_NONMI) == 0;
 }
 
 

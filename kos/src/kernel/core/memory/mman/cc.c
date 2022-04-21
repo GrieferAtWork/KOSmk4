@@ -1378,8 +1378,6 @@ NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 	DOCC(system_cc_slab_prealloc(info));
 	DOCC(system_cc_heaps(info));
 
-	/* TODO: Clear unused memory from handle managers (once handle managers have been re-written) */
-
 	/* TODO: Clear unused memory from pid namespace (once pid namespace have been re-written) */
 
 	/* TODO: Trim unmapped sub-regions of mem-parts, similar to `mpart_trim()', only that we should

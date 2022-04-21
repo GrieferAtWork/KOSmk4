@@ -80,12 +80,17 @@ NOTHROW(FCALL lockfor)(atomic64_t const *__restrict self) {
 		PREEMPTION_POP(_was); \
 	}	__WHILE0
 #else /* CONFIG_NO_SMP */
-#define _LOCK_EX(self, tryacquire)                          \
-	do {                                                    \
-		pflag_t _was                = PREEMPTION_PUSHOFF(); \
-		struct atomic_rwlock *_lock = lockfor(self);        \
-		while unlikely_untraced(!tryacquire(_lock))         \
-			task_pause()
+#define _LOCK_EX(self, tryacquire)                   \
+	do {                                             \
+		struct atomic_rwlock *_lock = lockfor(self); \
+		pflag_t _was;                                \
+		for (;;) {                                   \
+			_was = PREEMPTION_PUSHOFF();             \
+			if likely_untraced (tryacquire(_lock))   \
+				break;                               \
+			PREEMPTION_POP(_was);                    \
+			task_tryyield_or_pause();                \
+		}
 #define _UNLOCK_EX(release)   \
 		release(_lock);       \
 		PREEMPTION_POP(_was); \
@@ -127,7 +132,7 @@ DECL NOBLOCK ATTR_LEAF NONNULL((1)) bool
 NOTHROW(FCALL FUNC(atomic64_cmpxch))(atomic64_t *__restrict self,
                                      u64 oldval, u64 newval) {
 	bool result;
-	LOCK_RD(self);
+	LOCK_WR(self);
 	result = __atomic64_val(*self) == oldval;
 	if (result)
 		__atomic64_val(*self) = newval;
@@ -139,7 +144,7 @@ DECL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL FUNC(atomic64_cmpxch_val))(atomic64_t *__restrict self,
                                          u64 oldval, u64 newval) {
 	u64 result;
-	LOCK_RD(self);
+	LOCK_WR(self);
 	result = __atomic64_val(*self);
 	if (result == oldval)
 		__atomic64_val(*self) = newval;
@@ -151,7 +156,7 @@ DECL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL FUNC(atomic64_xch))(atomic64_t *__restrict self,
                                   u64 value) {
 	u64 result;
-	LOCK_RD(self);
+	LOCK_WR(self);
 	result        = __atomic64_val(*self);
 	__atomic64_val(*self) = value;
 	UNLOCK_WR();
@@ -162,7 +167,7 @@ DECL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL FUNC(atomic64_fetchadd))(atomic64_t *__restrict self,
                                        u64 value) {
 	u64 result;
-	LOCK_RD(self);
+	LOCK_WR(self);
 	result        = __atomic64_val(*self);
 	__atomic64_val(*self) = result + value;
 	UNLOCK_WR();
@@ -173,7 +178,7 @@ DECL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL FUNC(atomic64_fetchand))(atomic64_t *__restrict self,
                                        u64 value) {
 	u64 result;
-	LOCK_RD(self);
+	LOCK_WR(self);
 	result        = __atomic64_val(*self);
 	__atomic64_val(*self) = result & value;
 	UNLOCK_WR();
@@ -184,7 +189,7 @@ DECL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL FUNC(atomic64_fetchor))(atomic64_t *__restrict self,
                                       u64 value) {
 	u64 result;
-	LOCK_RD(self);
+	LOCK_WR(self);
 	result        = __atomic64_val(*self);
 	__atomic64_val(*self) = result | value;
 	UNLOCK_WR();
@@ -195,7 +200,7 @@ DECL NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL FUNC(atomic64_fetchxor))(atomic64_t *__restrict self,
                                        u64 value) {
 	u64 result;
-	LOCK_RD(self);
+	LOCK_WR(self);
 	result        = __atomic64_val(*self);
 	__atomic64_val(*self) = result ^ value;
 	UNLOCK_WR();

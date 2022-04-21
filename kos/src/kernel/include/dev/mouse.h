@@ -157,6 +157,10 @@ mousedev_v_polltest(struct mfile *__restrict self,
 #define __mousedev_cinit_md_lock_(self)     /* nothing */
 #endif /* CONFIG_NO_SMP */
 
+#define mousedev_smplock_acquire(self) atomic_lock_acquire_smp(&(self)->md_lock)
+#define mousedev_smplock_release(self) atomic_lock_release_smp(&(self)->md_lock)
+
+
 /* Initialize common+basic fields. The caller must still initialize:
  *  - self->_mousedev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_flags |= MFILE_FN_GLOBAL_REF;  # s.a. `device_registerf()'
  *  - self->_mousedev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ fn_allnodes;  # s.a. `device_registerf()'

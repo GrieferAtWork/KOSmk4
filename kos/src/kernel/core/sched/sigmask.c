@@ -584,9 +584,8 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 			 * try  to gain  insight into  their user-space  memory state by
 			 * disabling preemption, temporarily switching page directories,
 			 * and finally using memcpy_nopf() to access memory. */
-			pflag_t was;
-			was = PREEMPTION_PUSHOFF();
-			/* Check again, how that our CPU won't change. */
+			pflag_t was = PREEMPTION_PUSHOFF();
+			/* Check again, now that our CPU won't change. */
 			if likely(ATOMIC_READ(self->t_cpu) == THIS_CPU)
 				result = sigmask_ismasked_in_userprocmask_nopf(self, signo);
 			PREEMPTION_POP(was);

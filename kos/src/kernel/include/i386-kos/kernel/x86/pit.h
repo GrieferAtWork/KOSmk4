@@ -48,6 +48,10 @@ DATDEF struct atomic_lock x86_pit_lock;
 #define x86_pit_lock_release_nopr() (void)0
 #endif /* CONFIG_NO_SMP */
 
+#define x86_pit_lock_acquire_smp() atomic_lock_acquire_smp(&x86_pit_lock)
+#define x86_pit_lock_release_smp() atomic_lock_release_smp(&x86_pit_lock)
+
+
 DECL_END
 #endif /* __CC__ */
 

@@ -374,18 +374,11 @@ struct flatdirenum
 #define flatdirenum_lock_release_nopr(self) (void)0
 #else /* CONFIG_NO_SMP */
 #define flatdirenum_lock_acquire_nopr(self) atomic_lock_acquire_nopr(&(self)->ffde_lock)
-#define flatdirenum_lock_release_nopr(self) atomic_lock_release(&(self)->ffde_lock)
+#define flatdirenum_lock_release_nopr(self) atomic_lock_release_nopr(&(self)->ffde_lock)
 #endif /* !CONFIG_NO_SMP */
-#define flatdirenum_lock_acquire(self)      \
-	do {                                     \
-		pflag_t _was = PREEMPTION_PUSHOFF(); \
-		flatdirenum_lock_acquire_nopr(self)
-#define flatdirenum_lock_release_br(self)     \
-		(flatdirenum_lock_release_nopr(self), \
-		 PREEMPTION_POP(_was))
-#define flatdirenum_lock_release(self)     \
-		flatdirenum_lock_release_br(self); \
-	}	__WHILE0
+#define flatdirenum_lock_acquire(self)    atomic_lock_acquire_smp(&(self)->ffde_lock)
+#define flatdirenum_lock_release(self)    atomic_lock_release_smp(&(self)->ffde_lock)
+#define flatdirenum_lock_release_br(self) atomic_lock_release_smp_b(&(self)->ffde_lock)
 
 /* Directory enumeration operators for `struct flatdirenum' */
 DATDEF struct fdirenum_ops const flatdirenum_ops;

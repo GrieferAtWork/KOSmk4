@@ -104,8 +104,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 	apic_send_init(FORCPU(target, thiscpu_x86_lapicid));
 
 	/* Wait for 10 milliseconds. */
-	was = PREEMPTION_PUSHOFF();
-	x86_pit_lock_acquire_nopr();
+	x86_pit_lock_acquire_smp();
 	outb(PIT_PCSPEAKER,
 	     (inb(PIT_PCSPEAKER) &
 	      ~(PIT_PCSPEAKER_FSYNCPIT | PIT_PCSPEAKER_FINOUT)) |
@@ -124,8 +123,7 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 	}
 	while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT)
 		task_pause();
-	x86_pit_lock_release_nopr();
-	PREEMPTION_POP(was);
+	x86_pit_lock_release_smp();
 
 	/* Send the startup IPI */
 	apic_send_startup(FORCPU(target, thiscpu_x86_lapicid), x86_smp_entry_page);
@@ -146,7 +144,9 @@ NOTHROW(KCALL send_init_ipi)(struct cpu *__restrict target) {
 	while (!x86_pit_lock_tryacquire()) {
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
-		task_pause();
+		PREEMPTION_POP(was);
+		task_tryyield_or_pause();
+		was = PREEMPTION_PUSHOFF();
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
 	}
@@ -191,7 +191,9 @@ done_ppop:
 	while (!x86_pit_lock_tryacquire()) {
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
-		task_pause();
+		PREEMPTION_POP(was);
+		task_tryyield_or_pause();
+		was = PREEMPTION_PUSHOFF();
 		if (ATOMIC_READ(target->c_state) != CPU_STATE_GETTING_UP)
 			goto done_ppop;
 	}

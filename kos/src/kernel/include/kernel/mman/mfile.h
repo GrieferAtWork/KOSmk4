@@ -28,6 +28,7 @@
 #include <sched/atomic64.h>
 #include <sched/sig.h>
 
+#include <hybrid/sched/__preemption.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-rwlock.h>
@@ -1022,25 +1023,14 @@ struct mfile {
 #define mfile_tslock_release_nopr(self) \
 	__hybrid_atomic_and((self)->mf_flags, ~_MFILE_F_SMP_TSLOCK, __ATOMIC_RELEASE)
 #endif /* !CONFIG_NO_SMP */
-#define mfile_tslock_acquire(self)                \
-	do {                                          \
-		pflag_t _mtsl_was = PREEMPTION_PUSHOFF(); \
-		mfile_tslock_acquire_nopr(self)
-#define mfile_tslock_release_br(self) \
-		(mfile_tslock_release_nopr(self), PREEMPTION_POP(_mtsl_was))
-#define mfile_tslock_release_pronly_br(self) \
-		(PREEMPTION_POP(_mtsl_was))
-#define mfile_tslock_acquire_br(self)     \
-	do {                                  \
-		_mtsl_was = PREEMPTION_PUSHOFF(); \
-		mfile_tslock_acquire_nopr(self);  \
-	}	__WHILE0
-#define mfile_tslock_release(self)     \
-		mfile_tslock_release_br(self); \
-	}	__WHILE0
-#define mfile_tslock_release_pronly(self)     \
-		mfile_tslock_release_pronly_br(self); \
-	}	__WHILE0
+
+/* Helper macros for working with the TSLOCK of `self' */
+#define mfile_tslock_acquire(self)           __hybrid_preemption_acquire_smp(mfile_tslock_tryacquire(self))
+#define mfile_tslock_release(self)           __hybrid_preemption_release_smp(mfile_tslock_release_nopr(self))
+#define mfile_tslock_acquire_br(self)        __hybrid_preemption_acquire_smp_b(mfile_tslock_tryacquire(self))
+#define mfile_tslock_release_br(self)        __hybrid_preemption_release_smp_b(mfile_tslock_release_nopr(self))
+#define mfile_tslock_release_pronly_br(self) __hybrid_preemption_release_smp_b((void)0)
+#define mfile_tslock_release_pronly(self)    __hybrid_preemption_release_smp((void)0)
 
 
 /* Mark `what' as having changed for `self'

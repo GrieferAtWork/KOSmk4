@@ -433,7 +433,7 @@ struct procctl {
 #ifndef CONFIG_NO_SMP
 #define procctl_thrds_tryacquire_nopr(self) atomic_lock_tryacquire(&(self)->pc_thrds_lock)
 #define procctl_thrds_acquire_nopr(self)    atomic_lock_acquire_nopr(&(self)->pc_thrds_lock)
-#define procctl_thrds_release_nopr(self)    atomic_lock_release(&(self)->pc_thrds_lock)
+#define procctl_thrds_release_nopr(self)    atomic_lock_release_nopr(&(self)->pc_thrds_lock)
 #define procctl_thrds_acquired(self)        atomic_lock_acquired(&(self)->pc_thrds_lock)
 #define procctl_thrds_available(self)       atomic_lock_available(&(self)->pc_thrds_lock)
 #else /* !CONFIG_NO_SMP */
@@ -443,16 +443,10 @@ struct procctl {
 #define procctl_thrds_acquired(self)        (!PREEMPTION_ENABLED())
 #define procctl_thrds_available(self)       1
 #endif /* CONFIG_NO_SMP */
-#define procctl_thrds_reacquire(self) (__pclthr_was = PREEMPTION_PUSHOFF(), procctl_thrds_acquire_nopr(self))
-#define procctl_thrds_break(self)     (procctl_thrds_release_nopr(self), PREEMPTION_POP(__pclthr_was))
-#define procctl_thrds_acquire(self)                  \
-	do {                                             \
-		pflag_t __pclthr_was = PREEMPTION_PUSHOFF(); \
-		procctl_thrds_acquire_nopr(self)
-#define procctl_thrds_release(self)       \
-		procctl_thrds_release_nopr(self); \
-		PREEMPTION_POP(__pclthr_was);     \
-	}	__WHILE0
+#define procctl_thrds_acquire(self)   atomic_lock_acquire_smp(&(self)->pc_thrds_lock)
+#define procctl_thrds_release(self)   atomic_lock_release_smp(&(self)->pc_thrds_lock)
+#define procctl_thrds_reacquire(self) atomic_lock_acquire_smp_b(&(self)->pc_thrds_lock)
+#define procctl_thrds_break(self)     atomic_lock_release_smp_b(&(self)->pc_thrds_lock)
 
 
 /* Helper macros for adding/removing elements from `struct procctl::pc_thrds_list'

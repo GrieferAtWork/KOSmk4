@@ -195,15 +195,10 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #define mman_threadslock_acquired(self)        (!PREEMPTION_ENABLED())
 #define mman_threadslock_available(self)       1
 #endif /* CONFIG_NO_SMP */
-#define mman_threadslock_acquire(self)             \
-	do {                                           \
-		pflag_t __mtla_was = PREEMPTION_PUSHOFF(); \
-		mman_threadslock_acquire_nopr(self)
-#define mman_threadslock_release(self)       \
-		mman_threadslock_release_nopr(self); \
-		PREEMPTION_POP(__mtla_was);          \
-	}	__WHILE0
-
+#define mman_threadslock_acquire(self)   atomic_lock_acquire_smp(&(self)->mm_threadslock)
+#define mman_threadslock_release(self)   atomic_lock_release_smp(&(self)->mm_threadslock)
+#define mman_threadslock_acquire_b(self) atomic_lock_acquire_smp_b(&(self)->mm_threadslock)
+#define mman_threadslock_release_b(self) atomic_lock_release_smp_b(&(self)->mm_threadslock)
 
 
 #ifdef CONFIG_MMAN_TRACE_LOCKPC

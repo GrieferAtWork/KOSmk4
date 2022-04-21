@@ -74,39 +74,30 @@ NOTHROW(KCALL fini_this_sighand_ptr)(struct task *__restrict thread) {
 /* Lock for accessing any remote thread's this_sighand_ptr field */
 #ifndef CONFIG_NO_SMP
 PRIVATE struct atomic_lock sighand_ptr_change_lock = ATOMIC_LOCK_INIT;
-#define sighand_ptr_change_lock_acquire_nopr() atomic_lock_acquire_nopr(&sighand_ptr_change_lock)
-#define sighand_ptr_change_lock_release_nopr() atomic_lock_release(&sighand_ptr_change_lock)
-#else /* !CONFIG_NO_SMP */
-#define sighand_ptr_change_lock_acquire_nopr() (void)0
-#define sighand_ptr_change_lock_release_nopr() (void)0
-#endif /* CONFIG_NO_SMP */
+#endif /* !CONFIG_NO_SMP */
+#define sighand_ptr_change_lock_acquire() atomic_lock_acquire_smp(&sighand_ptr_change_lock)
+#define sighand_ptr_change_lock_release() atomic_lock_release_smp(&sighand_ptr_change_lock)
 
 /* Return the sighand pointer of the given thread. */
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct sighand_ptr *
 NOTHROW(FCALL task_getsighand_ptr)(struct task *__restrict thread) {
-	pflag_t was;
 	REF struct sighand_ptr *result;
-	was = PREEMPTION_PUSHOFF();
-	sighand_ptr_change_lock_acquire_nopr();
+	sighand_ptr_change_lock_acquire();
 	assert(FORTASK(thread, this_sighand_ptr));
 	result = xincref(FORTASK(thread, this_sighand_ptr));
-	sighand_ptr_change_lock_release_nopr();
-	PREEMPTION_POP(was);
+	sighand_ptr_change_lock_release();
 	return result;
 }
 
 /* Exchange the sighand pointer of the calling thread. */
 PUBLIC WUNUSED REF struct sighand_ptr *
 NOTHROW(FCALL task_setsighand_ptr)(struct sighand_ptr *newsighand_ptr) {
-	pflag_t was;
 	REF struct sighand_ptr *result;
-	was = PREEMPTION_PUSHOFF();
-	sighand_ptr_change_lock_acquire_nopr();
+	sighand_ptr_change_lock_acquire();
 	result = PERTASK_GET(this_sighand_ptr);
 	xincref(newsighand_ptr);
 	PERTASK_SET(this_sighand_ptr, newsighand_ptr);
-	sighand_ptr_change_lock_release_nopr();
-	PREEMPTION_POP(was);
+	sighand_ptr_change_lock_release();
 	return result;
 }
 
