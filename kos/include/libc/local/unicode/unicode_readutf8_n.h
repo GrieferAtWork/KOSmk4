@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cb9dd42 */
+/* HASH CRC-32:0xd4c8447 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_unicode_readutf8_n_defined
 #define __local_unicode_readutf8_n_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 #include <libc/template/unicode_utf8seqlen.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(unicode_readutf8_n) __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__

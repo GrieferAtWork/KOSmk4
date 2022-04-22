@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda0e517a */
+/* HASH CRC-32:0xfd828cc0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,6 +41,20 @@
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
 #define __libc_unicode_readutf8_rev_n __libc_core_unicode_readutf8_rev_n
+/* >> unicode_readutf16(3)
+ * Read a single Unicode character from a given UTF-16 string */
+#define __libc_unicode_readutf16 __libc_core_unicode_readutf16
+/* >> unicode_readutf16_n(3)
+ * Same as `unicode_readutf16()', but don't read past `text_end' */
+#define __libc_unicode_readutf16_n __libc_core_unicode_readutf16_n
+/* >> unicode_readutf16_rev(3)
+ * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
+ * being updated to point to the start of the character that was read */
+#define __libc_unicode_readutf16_rev __libc_core_unicode_readutf16_rev
+/* >> unicode_readutf16_rev_n(3)
+ * Same as `unicode_readutf16_rev()', but don't read ahead of `text_start' */
+#define __libc_unicode_readutf16_rev_n __libc_core_unicode_readutf16_rev_n
 /* >> unicode_writeutf8(3)
  * Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
  * location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */

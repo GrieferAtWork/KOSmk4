@@ -103,8 +103,6 @@
 #ifndef __pformatprinter_defined
 #define __pformatprinter_defined
 typedef __pformatprinter pformatprinter;
-typedef __pformatgetc pformatgetc;
-typedef __pformatungetc pformatungetc;
 #endif /* !__pformatprinter_defined */
 }
 

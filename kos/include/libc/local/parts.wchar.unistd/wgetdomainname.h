@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8139f595 */
+/* HASH CRC-32:0xcd01f032 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_format_8tow
 __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_8tow,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_8tow */

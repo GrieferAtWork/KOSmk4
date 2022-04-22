@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d76e260 */
+/* HASH CRC-32:0xe1a4d23e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_unicode_8to16_defined
 #define __local_unicode_8to16_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_readutf8_n_defined
 #define __local___localdep_unicode_readutf8_n_defined

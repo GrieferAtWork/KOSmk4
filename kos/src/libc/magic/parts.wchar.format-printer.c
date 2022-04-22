@@ -194,6 +194,31 @@ $ssize_t format_vwprintf([[nonnull]] pwformatprinter printer, void *arg,
 format_wprintf(*) %{printf("format_vwprintf")}
 
 
+
+[[throws, wchar, doc_alias("format_vscanf")]]
+[[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<libc/string.h>", "<libc/unicode.h>")]]
+[[impl_include("<parts/printf-config.h>")]]
+[[impl_include("<bits/math-constants.h>")]]
+$ssize_t format_vwscanf([[nonnull]] pformatgetc pgetc,
+                        [[nonnull]] pformatungetc pungetc, void *arg,
+                        [[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
+#ifndef __INTELLISENSE__
+#define __CHAR_TYPE      wchar_t
+#define __CHAR_SIZE      __SIZEOF_WCHAR_T__
+#define __FORMAT_PGETC   pgetc
+#define __FORMAT_PUNGETC pungetc
+#define __FORMAT_ARG     arg
+#define __FORMAT_FORMAT  format
+#define __FORMAT_ARGS    args
+@#include <libc/template/format-scanf.h>@
+#endif /* !__INTELLISENSE__ */
+}
+
+[[wchar, doc_alias("format_vwscanf")]]
+format_wscanf(*) %{printf("format_vwscanf")}
+
+
 %
 %
 %

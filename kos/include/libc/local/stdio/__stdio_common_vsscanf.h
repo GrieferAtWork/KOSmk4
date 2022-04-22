@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1998ca1e */
+/* HASH CRC-32:0xd70e946c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,19 +103,22 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 struct __vsnscanf_data {
-	char const *__ptr;
-	char const *__end;
+	unsigned char const *__ptr;
+	unsigned char const *__end;
 };
-__LOCAL_LIBC(vsnscanf_getc) __SSIZE_TYPE__
+__LOCAL_LIBC(vsnscanf_getc) __format_word_t
 (__FORMATPRINTER_CC __vsnscanf_getc)(void *__arg) {
-	__CHAR32_TYPE__ __result;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_n)(&((struct __vsnscanf_data *)__arg)->__ptr,
-	                              ((struct __vsnscanf_data *)__arg)->__end);
-	return __result ? (__SSIZE_TYPE__)__result : (__SSIZE_TYPE__)__EOF;
+	struct __vsnscanf_data *__cookie;
+	__cookie = (struct __vsnscanf_data *)__arg;
+	if (__cookie->__ptr >= __cookie->__end)
+		return __EOF;
+	return (__format_word_t)*__cookie->__ptr++;
 }
 __LOCAL_LIBC(vsnscanf_ungetc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	(__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_rev)(&((struct __vsnscanf_data *)__arg)->__ptr);
+(__FORMATPRINTER_CC __vsnscanf_ungetc)(void *__arg, __format_word_t __UNUSED(__word)) {
+	struct __vsnscanf_data *__cookie;
+	__cookie = (struct __vsnscanf_data *)__arg;
+	--__cookie->__ptr;
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -127,8 +130,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__stdio_common_vsscanf))(__UINT64_TYP
 	(void)__locale;
 	if (__inputsize == (__SIZE_TYPE__)-1)
 		return (__NAMESPACE_LOCAL_SYM __localdep_vsscanf)(__input, __format, __args);
-	__data.__ptr = __input;
-	__data.__end = __input + __inputsize;
+	__data.__ptr = (unsigned char const *)__input;
+	__data.__end = (unsigned char const *)__input + __inputsize;
 	return (__NAMESPACE_LOCAL_SYM __localdep_format_vscanf)(&__NAMESPACE_LOCAL_SYM __vsnscanf_getc,
 	                     &__NAMESPACE_LOCAL_SYM __vsnscanf_ungetc,
 	                     (void *)&__data, __format, __args);

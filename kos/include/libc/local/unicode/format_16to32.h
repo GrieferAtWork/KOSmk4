@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb726b38 */
+/* HASH CRC-32:0x54439503 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_format_16to32_defined
 #include <__crt.h>
 #include <bits/crt/uformat-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_16to32) __SSIZE_TYPE__
 __NOTHROW_NCX(__C16FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_16to32))(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {

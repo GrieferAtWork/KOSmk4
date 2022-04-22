@@ -282,16 +282,16 @@ __STDC_INT_AS_SSIZE_T __conio_common_vcprintf_p($uint64_t options, [[nonnull, fo
 }
 
 [[decl_include("<features.h>", "<hybrid/typecore.h>"), wunused]]
-[[requires_dependent_function(_getwche, _ungetwch)]]
+[[requires_dependent_function(_getche, _ungetch)]]
 [[impl_prefix(
 @@push_namespace(local)@@
-__LOCAL_LIBC(__conio_common_vcscanf_getc) ssize_t
+__LOCAL_LIBC(__conio_common_vcscanf_getc) __format_word_t
 (__FORMATPRINTER_CC __conio_common_vcscanf_getc)(void *__UNUSED(arg)) {
-	return (ssize_t)_getwche();
+	return (__format_word_t)_getche();
 }
 __LOCAL_LIBC(__conio_common_vcscanf_ungetc) ssize_t
-(__FORMATPRINTER_CC __conio_common_vcscanf_ungetc)(void *__UNUSED(arg), char32_t ch) {
-	return _ungetwch((int)(unsigned int)ch);
+(__FORMATPRINTER_CC __conio_common_vcscanf_ungetc)(void *__UNUSED(arg), __format_word_t word) {
+	return _ungetch((int)(unsigned char)(unsigned int)word);
 }
 @@pop_namespace@@
 )]]

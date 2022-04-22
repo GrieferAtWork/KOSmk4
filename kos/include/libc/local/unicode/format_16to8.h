@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63671618 */
+/* HASH CRC-32:0x21c74f44 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_format_16to8_defined
 #include <__crt.h>
 #include <bits/crt/uformat-printer.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_writeutf8_defined
 #define __local___localdep_unicode_writeutf8_defined

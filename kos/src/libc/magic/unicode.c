@@ -36,8 +36,6 @@
 #ifndef __pformatprinter_defined
 #define __pformatprinter_defined
 typedef __pformatprinter pformatprinter;
-typedef __pformatgetc pformatgetc;
-typedef __pformatungetc pformatungetc;
 #endif /* !__pformatprinter_defined */
 #ifndef __pc16formatprinter_defined
 #define __pc16formatprinter_defined
@@ -193,6 +191,7 @@ typedef __CHAR32_TYPE__ char32_t;
 @@>> unicode_readutf8(3)
 @@Read a single Unicode character from a given UTF-8 string
 [[libc, kernel, impl_include("<libc/template/unicode_utf8seqlen.h>")]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf8([[nonnull]] /*utf-8*/ char const **__restrict ptext)
 	[([[nonnull]] /*utf-8*/ char const **__restrict ptext): char32_t]
 	[([[nonnull]] /*utf-8*/ char **__restrict ptext): char32_t]
@@ -280,7 +279,7 @@ char32_t unicode_readutf8([[nonnull]] /*utf-8*/ char const **__restrict ptext)
 @@Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
 @@starting out as a pointer after  the character to be read,  before
 @@being updated to point to the start of the character that was read
-[[libc, kernel]]
+[[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf8_rev([[nonnull]] /*utf-8*/ char const **__restrict ptext)
 	[([[nonnull]] /*utf-8*/ char const **__restrict ptext): char32_t]
 	[([[nonnull]] /*utf-8*/ char **__restrict ptext): char32_t]
@@ -367,7 +366,8 @@ char32_t unicode_readutf8_rev([[nonnull]] /*utf-8*/ char const **__restrict ptex
 
 @@>> unicode_readutf8_n(3)
 @@Same as `unicode_readutf8()', but don't read past `text_end'
-[[libc, kernel, impl_include("<libc/template/unicode_utf8seqlen.h>")]]
+[[kernel, libc, impl_include("<libc/template/unicode_utf8seqlen.h>")]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf8_n([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end)
 	[([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end): char32_t]
 	[([[nonnull]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_end): char32_t]
@@ -459,7 +459,7 @@ char32_t unicode_readutf8_n([[nonnull]] /*utf-8*/ char const **__restrict ptext,
 
 @@>> unicode_readutf8_rev_n(3)
 @@Same as `unicode_readutf8_rev()', but don't read ahead of `text_start'
-[[libc, kernel]]
+[[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf8_rev_n([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_start)
 	[([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_start): char32_t]
 	[([[nonnull]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_start): char32_t]
@@ -550,7 +550,7 @@ char32_t unicode_readutf8_rev_n([[nonnull]] /*utf-8*/ char const **__restrict pt
 
 @@>> unicode_readutf16(3)
 @@Read a single Unicode character from a given UTF-16 string
-[[kernel]]
+[[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf16([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext)
 	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext): char32_t]
 	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext): char32_t]
@@ -571,7 +571,7 @@ char32_t unicode_readutf16([[nonnull]] /*utf-16*/ char16_t const **__restrict pt
 
 @@>> unicode_readutf16_n(3)
 @@Same as `unicode_readutf16()', but don't read past `text_end'
-[[kernel]]
+[[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf16_n([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end)
 	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
 	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
@@ -597,6 +597,7 @@ char32_t unicode_readutf16_n([[nonnull]] /*utf-16*/ char16_t const **__restrict 
 @@>> unicode_readutf16_swap(3)
 @@Same as `unicode_readutf16()', but read in reverse endian as that of the host CPU
 [[kernel, impl_include("<hybrid/__byteswap.h>")]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf16_swap([[nonnull]] /*utf-16-swap*/ char16_t const **__restrict ptext)
 	[([[nonnull]] /*utf-16-swap*/ char16_t const **__restrict ptext): char32_t]
 	[([[nonnull]] /*utf-16-swap*/ char16_t **__restrict ptext): char32_t]
@@ -620,6 +621,7 @@ char32_t unicode_readutf16_swap([[nonnull]] /*utf-16-swap*/ char16_t const **__r
 @@>> unicode_readutf16_swap_n(3)
 @@Same as `unicode_readutf16_n()', but read in reverse endian as that of the host CPU
 [[kernel, impl_include("<hybrid/__byteswap.h>")]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf16_swap_n([[nonnull]] /*utf-16-swap*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end)
 	[([[nonnull]] /*utf-16-swap*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
 	[([[nonnull]] /*utf-16-swap*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
@@ -647,7 +649,7 @@ char32_t unicode_readutf16_swap_n([[nonnull]] /*utf-16-swap*/ char16_t const **_
 @@Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
 @@starting out as a pointer after  the character to be read,  before
 @@being updated to point to the start of the character that was read
-[[kernel]]
+[[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf16_rev([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext)
 	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext): char32_t]
 	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext): char32_t]
@@ -669,7 +671,8 @@ char32_t unicode_readutf16_rev([[nonnull]] /*utf-16*/ char16_t const **__restric
 
 @@>> unicode_readutf16_swap_rev(3)
 @@Same as `unicode_readutf16_rev()', but read in reverse endian as that of the host CPU
-[[kernel]]
+[[kernel, impl_include("<hybrid/__byteswap.h>")]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf16_swap_rev([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext)
 	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext): char32_t]
 	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext): char32_t]
@@ -692,7 +695,7 @@ char32_t unicode_readutf16_swap_rev([[nonnull]] /*utf-16*/ char16_t const **__re
 
 @@>> unicode_readutf16_rev_n(3)
 @@Same as `unicode_readutf16_rev()', but don't read ahead of `text_start'
-[[kernel]]
+[[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf16_rev_n([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start)
 	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
 	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
@@ -716,7 +719,8 @@ char32_t unicode_readutf16_rev_n([[nonnull]] /*utf-16*/ char16_t const **__restr
 
 @@>> unicode_readutf16_swap_rev_n(3)
 @@Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU
-[[kernel]]
+[[kernel, impl_include("<hybrid/__byteswap.h>")]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t unicode_readutf16_swap_rev_n([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start)
 	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
 	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
@@ -753,6 +757,7 @@ char32_t unicode_readutf16_swap_rev_n([[nonnull]] /*utf-16*/ char16_t const **__
 @@Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
 @@location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst'
 [[kernel, libc, nonnull]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, char32_t ch) {
 	if likely(ch <= UTF8_1BYTE_MAX) {
 		*dst++ = (char)(unsigned char)ch;
@@ -797,6 +802,7 @@ char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, char32_t ch)
 @@Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
 @@location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst'
 [[kernel, libc, nonnull]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ char16_t *__restrict dst, char32_t ch) {
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
 		*dst++ = (char16_t)ch;
@@ -811,6 +817,7 @@ char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ char16_t *__restrict dst, ch
 @@>> unicode_writeutf16_chk(3)
 @@Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false
 [[kernel, wunused]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char16_t *unicode_writeutf16_chk([[nonnull]] /*utf-16*/ char16_t *__restrict dst, char32_t ch) {
 	if unlikely(ch > UNICODE_MAXCHAR)
 		return NULL;
@@ -1064,6 +1071,7 @@ __LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char32_t *
 @@@param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
 @@@return: * : A pointer after the last written UTF-16 character
 [[kernel, nonnull]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char16_t *unicode_8to16([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
                          [[inp(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
                          $size_t utf8_characters) {
@@ -1085,6 +1093,7 @@ char16_t *unicode_8to16([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
 @@@return: * : A pointer after the last written UTF-16 character.
 @@@return: NULL: Attempted to write an invalid character
 [[wunused]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char16_t *unicode_8to16_chk([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
                              [[inp(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
                              $size_t utf8_characters) {
@@ -1106,6 +1115,7 @@ char16_t *unicode_8to16_chk([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_ds
 @@@param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
 @@@return: * : A pointer after the last written UTF-32 character.
 [[kernel, nonnull]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t *unicode_8to32([[nonnull]] /*utf-32*/ char32_t *__restrict utf32_dst,
                          [[inp(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
                          $size_t utf8_characters) {
@@ -1123,6 +1133,7 @@ char32_t *unicode_8to32([[nonnull]] /*utf-32*/ char32_t *__restrict utf32_dst,
 @@@param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
 @@@return: * : A pointer after the last written UTF-8 character
 [[kernel, nonnull]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char *unicode_16to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
                     [[inp(utf16_characters)]] /*utf-16*/ char16_t const *__restrict utf16_text,
                     $size_t utf16_characters) {
@@ -1151,6 +1162,7 @@ char *unicode_16to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
 @@@param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
 @@@return: * : A pointer after the last written UTF-32 character
 [[kernel, nonnull]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char32_t *unicode_16to32([[nonnull]] /*utf-32*/ char32_t *__restrict utf32_dst,
                           [[inp(utf16_characters)]] /*utf-16*/ char16_t const *__restrict utf16_text,
                           $size_t utf16_characters) {
@@ -1167,6 +1179,7 @@ char32_t *unicode_16to32([[nonnull]] /*utf-32*/ char32_t *__restrict utf32_dst,
 @@@param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
 @@@return: * : A pointer after the last written UTF-8 character
 [[kernel, nonnull]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char *unicode_32to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
                     [[inp(utf32_characters)]] /*utf-32*/ char32_t const *__restrict utf32_text,
                     $size_t utf32_characters) {
@@ -1183,6 +1196,7 @@ char *unicode_32to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
 @@@param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
 @@@return: * : A pointer after the last written UTF-16 character
 [[kernel, nonnull]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char16_t *unicode_32to16([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
                           [[inp(utf32_characters)]] /*utf-32*/ char32_t const *__restrict utf32_text,
                           $size_t utf32_characters) {
@@ -1206,6 +1220,7 @@ char16_t *unicode_32to16([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
 @@                     (`s...+=n', together with `mbs' doesn't for
 @@                     a full  character, but  `mbs' was  updated)
 [[decl_include("<bits/crt/mbstate.h>")]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 $size_t unicode_c8toc16([[nonnull]] char16_t *__restrict pc16,
                         [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
                         [[nonnull]] mbstate_t *__restrict mbs) {
@@ -1345,6 +1360,7 @@ done:
 @@                     (`s...+=n', together with `mbs' doesn't for
 @@                     a full  character, but  `mbs' was  updated)
 [[decl_include("<bits/crt/mbstate.h>")]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 $size_t unicode_c8toc32([[nonnull]] char32_t *__restrict pc32,
                         [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
                         [[nonnull]] mbstate_t *__restrict mbs) {
@@ -1465,6 +1481,7 @@ done:
 @@@return: (size_t)-1: Unicode error (the given input string
 @@                     isn't  a   valid  unicode   sequence)
 [[decl_include("<bits/crt/mbstate.h>")]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 $size_t unicode_c16toc8([[nonnull]] char pc8[3], char16_t c16,
                         [[nonnull]] mbstate_t *__restrict mbs) {
 	char32_t ch32;
@@ -1512,6 +1529,7 @@ $size_t unicode_c16toc8([[nonnull]] char pc8[3], char16_t c16,
 @@converting UTF-8 unicode input data into a UTF-16/32 output
 [[wchar, hidden, decl_include("<bits/crt/format-printer.h>"), cc(__FORMATPRINTER_CC)]]
 [[impl_include("<bits/crt/mbstate.h>", "<bits/crt/wformat-printer.h>")]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 $ssize_t format_8tow(/*struct format_8tow_data **/ void *arg,
                      /*utf-8*/ char const *data, $size_t datalen) {
 	struct __local_format_8tow_data {
@@ -1570,6 +1588,7 @@ struct format_8to16_data {
 @@Format printer (compatible with `__pformatprinter')  for
 @@converting UTF-8 unicode input data into a UTF-16 output
 [[decl_include("<bits/crt/format-printer.h>"), cc(__FORMATPRINTER_CC)]]
+[[decl_include("<hybrid/typecore.h>")]]
 $ssize_t format_8to16(/*struct format_8to16_data **/ void *arg,
                       /*utf-8*/ char const *data, $size_t datalen)
 	%{uchar16("format_8tow")}
@@ -1587,6 +1606,7 @@ struct format_8to32_data {
 @@Format printer (compatible with `__pformatprinter')  for
 @@converting UTF-8 unicode input data into a UTF-32 output
 [[decl_include("<bits/crt/format-printer.h>"), cc(__FORMATPRINTER_CC)]]
+[[decl_include("<hybrid/typecore.h>")]]
 $ssize_t format_8to32(/*struct format_8to32_data **/ void *arg,
                       /*utf-8*/ char const *data, $size_t datalen)
 	%{uchar32("format_8tow")}
@@ -1605,6 +1625,7 @@ $ssize_t format_8to32(/*struct format_8to32_data **/ void *arg,
 @@converting wide-character unicode input data into a UTF-8 output
 [[wchar, hidden, decl_include("<bits/crt/wformat-printer.h>"), cc(__WFORMATPRINTER_CC)]]
 [[impl_include("<bits/crt/format-printer.h>")]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 $ssize_t format_wto8(/*struct format_wto8_data **/ void *arg,
                      $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
@@ -1697,6 +1718,7 @@ struct format_16to8_data {
 @@Format printer (compatible with `pc16formatprinter') for
 @@converting UTF-16 unicode input data into a UTF-8 output
 [[decl_include("<bits/crt/uformat-printer.h>"), cc(__C16FORMATPRINTER_CC)]]
+[[decl_include("<hybrid/typecore.h>")]]
 $ssize_t format_16to8(/*struct format_16to8_data **/ void *arg,
                       char16_t const *data, $size_t datalen)
 	%{uchar16("format_wto8")}
@@ -1714,6 +1736,7 @@ struct format_32to8_data {
 @@Format printer (compatible with `pc32formatprinter') for
 @@converting UTF-32 unicode input data into a UTF-8 output
 [[decl_include("<bits/crt/uformat-printer.h>"), cc(__C32FORMATPRINTER_CC)]]
+[[decl_include("<hybrid/typecore.h>")]]
 $ssize_t format_32to8(/*struct format_32to8_data **/ void *arg,
                       char32_t const *data, $size_t datalen)
 	%{uchar32("format_wto8")}
@@ -1733,6 +1756,7 @@ $ssize_t format_32to8(/*struct format_32to8_data **/ void *arg,
 @@converting wide-character unicode input data into a UTF-32 output
 [[hidden, impl_include("<bits/crt/uformat-printer.h>"), wchar]]
 [[decl_include("<bits/crt/wformat-printer.h>"), cc(__WFORMATPRINTER_CC)]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 $ssize_t format_wto32(/*struct format_wto32_data **/ void *arg,
                       $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
@@ -1810,6 +1834,7 @@ struct format_16to32_data {
 @@Format printer (compatible with `pc16formatprinter')  for
 @@converting UTF-16 unicode input data into a UTF-32 output
 [[decl_include("<bits/crt/uformat-printer.h>"), cc(__C16FORMATPRINTER_CC)]]
+[[decl_include("<hybrid/typecore.h>")]]
 $ssize_t format_16to32(/*struct format_16to32_data **/ void *arg,
                        char16_t const *data, $size_t datalen)
 	%{uchar16("format_wto32")}
@@ -1823,8 +1848,9 @@ $ssize_t format_16to32(/*struct format_16to32_data **/ void *arg,
 @@>> format_wto16(3)
 @@Format   printer   (compatible   with   `pwformatprinter')    for
 @@converting wide-character unicode input data into a UTF-16 output
-[[decl_include("<bits/crt/wformat-printer.h>"), cc(__WFORMATPRINTER_CC)]]
-[[hidden, wchar, impl_include("<bits/crt/format-printer.h>", "<bits/crt/uformat-printer.h>")]]
+[[hidden, wchar, decl_include("<bits/crt/wformat-printer.h>"), cc(__WFORMATPRINTER_CC)]]
+[[impl_include("<bits/crt/format-printer.h>", "<bits/crt/uformat-printer.h>")]]
+[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 $ssize_t format_wto16(/*struct format_wto16_data **/ void *arg,
                       $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 4@@
@@ -1874,6 +1900,7 @@ struct format_32to16_data {
 @@Format printer (compatible with `__pc32formatprinter') for
 @@converting UTF-32 unicode input data into a UTF-16  output
 [[decl_include("<bits/crt/uformat-printer.h>"), cc(__C32FORMATPRINTER_CC)]]
+[[decl_include("<hybrid/typecore.h>")]]
 $ssize_t format_32to16(/*struct format_32to16_data **/ void *arg,
                        char32_t const *data, $size_t datalen)
 	%{uchar32("format_wto16")}
@@ -1888,8 +1915,8 @@ $ssize_t format_32to16(/*struct format_32to16_data **/ void *arg,
 @@and are aware that your code might break should this API ever be
 @@changed)
 @@Also note that this function never returns `NULL'!
-[[decl_include("<bits/crt/unicode.h>")]]
 [[guard, libc, const, nonnull, nothrow]]
+[[decl_include("<bits/crt/unicode.h>", "<hybrid/typecore.h>")]]
 struct __unitraits const *__unicode_descriptor(char32_t ch);
 
 @@>> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
@@ -1897,11 +1924,13 @@ struct __unitraits const *__unicode_descriptor(char32_t ch);
 @@Returns `0' if the given index is invalid
 @@@param: digit_idx: As read from `__unitraits::__ut_digit_idx'
 [[guard, libc, const, wunused, nothrow]]
+[[decl_include("<hybrid/typecore.h>")]]
 $uint8_t __unicode_descriptor_digit($uint8_t digit_idx);
 
 %#ifdef __UINT64_TYPE__
 [[guard, libc, const, wunused, nothrow]]
 [[doc_alias("__unicode_descriptor_digit")]]
+[[decl_include("<hybrid/typecore.h>")]]
 $uint64_t __unicode_descriptor_digit64($uint8_t digit_idx);
 %#endif /* __UINT64_TYPE__ */
 
@@ -1911,11 +1940,13 @@ $uint64_t __unicode_descriptor_digit64($uint8_t digit_idx);
 @@Returns `0.0' if the given index is invalid
 @@@param: digit_idx: As read from `__unitraits::__ut_digit_idx'
 [[guard, libc, const, wunused, nothrow]]
+[[decl_include("<hybrid/typecore.h>")]]
 double __unicode_descriptor_digitd($uint8_t digit_idx);
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[guard, libc, const, wunused, nothrow]]
 [[doc_alias("__unicode_descriptor_digitd")]]
+[[decl_include("<hybrid/typecore.h>")]]
 __LONGDOUBLE __unicode_descriptor_digitld($uint8_t digit_idx);
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
@@ -1931,6 +1962,7 @@ __LONGDOUBLE __unicode_descriptor_digitld($uint8_t digit_idx);
 @@>> unicode_fold(3)
 @@Fold the given unicode character `ch'
 [[libc, inline, no_extern_inline, nonnull, userimpl]]
+[[decl_include("<hybrid/typecore.h>")]]
 char32_t *unicode_fold(char32_t ch, [[nonnull]] char32_t buf[3]) {
 	buf[0] = ch;
 	return buf + 1;

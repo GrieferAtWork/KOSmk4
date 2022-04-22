@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c22961d */
+/* HASH CRC-32:0x7b976c51 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/conio.h"
-#include "../user/corecrt_wconio.h"
 #include "format-printer.h"
 #include "../user/stdio.h"
 #include "../user/stdio_ext.h"
@@ -209,13 +208,13 @@ NOTHROW_NCX(LIBCCALL libc___conio_common_vcprintf_s)(uint64_t options,
 }
 DEFINE_INTERN_ALIAS(libc___conio_common_vcprintf_p, libc___conio_common_vcprintf);
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__conio_common_vcscanf_getc) ssize_t
+__LOCAL_LIBC(__conio_common_vcscanf_getc) __format_word_t
 (__FORMATPRINTER_CC __conio_common_vcscanf_getc)(void *__UNUSED(arg)) {
-	return (ssize_t)libc__getwche();
+	return (__format_word_t)libc__getche();
 }
 __LOCAL_LIBC(__conio_common_vcscanf_ungetc) ssize_t
-(__FORMATPRINTER_CC __conio_common_vcscanf_ungetc)(void *__UNUSED(arg), char32_t ch) {
-	return libc__ungetwch((int)(unsigned int)ch);
+(__FORMATPRINTER_CC __conio_common_vcscanf_ungetc)(void *__UNUSED(arg), __format_word_t word) {
+	return libc__ungetch((int)(unsigned char)(unsigned int)word);
 }
 __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.dos.conio") WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T

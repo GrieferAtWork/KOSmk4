@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c7f362 */
+/* HASH CRC-32:0x5155ab6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vsc32scanf_defined
 #define __local___localdep_vsc32scanf_defined
 #if defined(__CRT_HAVE_vswscanf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc32scanf,(__CHAR32_TYPE__ const *__restrict __src, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc32scanf,(__CHAR32_TYPE__ const *__restrict __input, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__input,__format,__args))
 #elif defined(__CRT_HAVE_KOS$vswscanf)
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc32scanf,(__CHAR32_TYPE__ const *__restrict __src, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc32scanf,(__CHAR32_TYPE__ const *__restrict __input, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__input,__format,__args))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/vswscanf.h>

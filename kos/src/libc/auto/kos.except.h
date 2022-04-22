@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15f001af */
+/* HASH CRC-32:0x3c58db33 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,8 +57,6 @@ DECL_BEGIN
 #ifndef __pformatprinter_defined
 #define __pformatprinter_defined
 typedef __pformatprinter pformatprinter;
-typedef __pformatgetc pformatgetc;
-typedef __pformatungetc pformatungetc;
 #endif /* !__pformatprinter_defined */
 /* >> except_as_errno(3)
  * Transform the  given exception  into  a posix  errno  value.

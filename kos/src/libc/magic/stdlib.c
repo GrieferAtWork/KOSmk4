@@ -949,11 +949,11 @@ double atof([[nonnull]] char const *__restrict nptr) {
 [[impl_include("<asm/crt/stdio.h>")]]
 [[impl_prefix(
 @@pp_if __SIZEOF_CHAR__ == 1@@
-DEFINE_VSSCANF_HELPERS_C8
+DEFINE_VSSCANF_HELPERS
 @@pp_elif __SIZEOF_CHAR__ == 2@@
-DEFINE_VSSCANF_HELPERS_C16
+DEFINE_VSC16SCANF_HELPERS
 @@pp_else@@
-DEFINE_VSSCANF_HELPERS_C32
+DEFINE_VSC32SCANF_HELPERS
 @@pp_endif@@
 )]]
 [[dependency(unicode_readutf8, unicode_readutf8_rev)]]
@@ -990,11 +990,11 @@ double strtod([[nonnull]] char const *__restrict nptr,
 [[impl_include("<asm/crt/stdio.h>")]]
 [[impl_prefix(
 @@pp_if __SIZEOF_CHAR__ == 1@@
-DEFINE_VSSCANF_HELPERS_C8
+DEFINE_VSSCANF_HELPERS
 @@pp_elif __SIZEOF_CHAR__ == 2@@
-DEFINE_VSSCANF_HELPERS_C16
+DEFINE_VSC16SCANF_HELPERS
 @@pp_else@@
-DEFINE_VSSCANF_HELPERS_C32
+DEFINE_VSC32SCANF_HELPERS
 @@pp_endif@@
 )]]
 [[dependency(unicode_readutf8, unicode_readutf8_rev)]]
@@ -1029,11 +1029,11 @@ float strtof([[nonnull]] char const *__restrict nptr,
 [[impl_include("<asm/crt/stdio.h>")]]
 [[impl_prefix(
 @@pp_if __SIZEOF_CHAR__ == 1@@
-DEFINE_VSSCANF_HELPERS_C8
+DEFINE_VSSCANF_HELPERS
 @@pp_elif __SIZEOF_CHAR__ == 2@@
-DEFINE_VSSCANF_HELPERS_C16
+DEFINE_VSC16SCANF_HELPERS
 @@pp_else@@
-DEFINE_VSSCANF_HELPERS_C32
+DEFINE_VSC32SCANF_HELPERS
 @@pp_endif@@
 )]]
 [[dependency(unicode_readutf8, unicode_readutf8_rev)]]

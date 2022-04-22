@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22372284 */
+/* HASH CRC-32:0x918f4b4b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,52 @@
 #define __local_vswscanf_defined
 #include <__crt.h>
 #include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_format_vwscanf_defined
+#define __local___localdep_format_vwscanf_defined
+#ifdef __CRT_HAVE_format_vwscanf
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vswscanf) __ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vswscanf))(__WCHAR_TYPE__ const *__restrict __src, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args) {
-	/* TODO: format_wscanf() */
-	(void)__src;
-	(void)__format;
-	(void)__args;
-	__COMPILER_IMPURE();
+__CREDIRECT(__ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__localdep_format_vwscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwscanf,(__pgetc,__pungetc,__arg,__format,__args))
+#else /* __CRT_HAVE_format_vwscanf */
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.wchar.format-printer/format_vwscanf.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_format_vwscanf __LIBC_LOCAL_NAME(format_vwscanf)
+#endif /* !__CRT_HAVE_format_vwscanf */
+#endif /* !__local___localdep_format_vwscanf_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+#include <bits/crt/format-printer.h>
+#include <asm/crt/stdio.h>
+#ifndef ____vswscanf_getc_defined
+#define ____vswscanf_getc_defined
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vswscanf_getc) __format_word_t
+(__FORMATPRINTER_CC __vswscanf_getc)(void *__arg) {
+	__WCHAR_TYPE__ const *__reader = *(__WCHAR_TYPE__ const **)__arg;
+	__WCHAR_TYPE__ __result        = *__reader++;
+	if (!__result)
+		return __EOF;
+	*(__WCHAR_TYPE__ const **)__arg = __reader;
+	return (__format_word_t)__result;
+}
+__LOCAL_LIBC(vswscanf_ungetc) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vswscanf_ungetc)(void *__arg, __format_word_t __UNUSED(__word)) {
+	--(*(__WCHAR_TYPE__ const **)__arg);
 	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vswscanf_getc_defined */
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vswscanf) __ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vswscanf))(__WCHAR_TYPE__ const *__restrict __input, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args) {
+	return (__NAMESPACE_LOCAL_SYM __localdep_format_vwscanf)(&__NAMESPACE_LOCAL_SYM __vswscanf_getc,
+	                      &__NAMESPACE_LOCAL_SYM __vswscanf_ungetc,
+	                      (void *)&__input, __format, __args);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vswscanf_defined

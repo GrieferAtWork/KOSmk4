@@ -1007,12 +1007,89 @@ wcstoull(*) %{generate(str2wcs("strtoull"))}
 
 %[default:section(".text.crt{|.dos}.wchar.FILE.locked.read.scanf")]
 
-@@>> vfwscanf(3)
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[cp_stdio, std, guard, wchar, wunused]]
+%[define_wchar_replacement(__LIBCCALL_IS_FORMATPRINTER_CC = __LIBDCALL_IS_FORMATPRINTER_CC, __LIBKCALL_IS_FORMATPRINTER_CC)]
+%[define_wchar_replacement(vfwscanf_getc = vfc16scanf_getc, vfc32scanf_getc)]
+%[define_wchar_replacement(vfwscanf_ungetc = vfc16scanf_ungetc, vfc32scanf_ungetc)]
+%[define_wchar_replacement(____vfwscanf_getc_defined = ____vfc16scanf_getc_defined, ____vfc32scanf_getc_defined)]
+%[define_wchar_replacement(DEFINE_VFWSCANF_HELPERS = DEFINE_VFC16SCANF_HELPERS, DEFINE_VFC32SCANF_HELPERS)]
+
+%[define(DEFINE_VFWSCANF_HELPERS =
+@@pp_ifndef ____vfwscanf_getc_defined@@
+#define ____vfwscanf_getc_defined
+@@push_namespace(local)@@
+@@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
+__LOCAL_LIBC(@vfwscanf_getc@) __format_word_t
+(__FORMATPRINTER_CC vfwscanf_getc)(void *arg) {
+	return (__format_word_t)fgetwc((FILE *)arg);
+}
+@@pp_endif@@
+__LOCAL_LIBC(@vfwscanf_ungetc@) ssize_t
+(__FORMATPRINTER_CC vfwscanf_ungetc)(void *arg, __format_word_t word) {
+	return ungetwc((wint_t)word, (FILE *)arg);
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_VFC16SCANF_HELPERS =
+@@pp_ifndef ____vfc16scanf_getc_defined@@
+#define ____vfc16scanf_getc_defined
+@@push_namespace(local)@@
+@@pp_if !defined(__LIBDCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
+__LOCAL_LIBC(@vfc16scanf_getc@) __format_word_t
+(__FORMATPRINTER_CC vfc16scanf_getc)(void *arg) {
+	return (__format_word_t)fgetc16((FILE *)arg);
+}
+@@pp_endif@@
+__LOCAL_LIBC(@vfc16scanf_ungetc@) ssize_t
+(__FORMATPRINTER_CC vfc16scanf_ungetc)(void *arg, __format_word_t word) {
+	return ungetc16((wint16_t)word, (FILE *)arg);
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_VFC32SCANF_HELPERS =
+@@pp_ifndef ____vfc32scanf_getc_defined@@
+#define ____vfc32scanf_getc_defined
+@@push_namespace(local)@@
+@@pp_if !defined(__LIBKCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
+__LOCAL_LIBC(@vfc32scanf_getc@) __format_word_t
+(__FORMATPRINTER_CC vfc32scanf_getc)(void *arg) {
+	return (__format_word_t)fgetc32((FILE *)arg);
+}
+@@pp_endif@@
+__LOCAL_LIBC(@vfc32scanf_ungetc@) ssize_t
+(__FORMATPRINTER_CC vfc32scanf_ungetc)(void *arg, __format_word_t word) {
+	return ungetc32((wint32_t)word, (FILE *)arg);
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+
+[[std, cp_stdio, guard, wchar, wunused, doc_alias("fwscanf")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("vfwscanf_unlocked")]]
+[[requires_dependent_function(fgetwc, ungetwc), alias("vfwscanf_unlocked")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+[[impl_prefix(DEFINE_VFWSCANF_HELPERS)]]
 __STDC_INT_AS_SIZE_T vfwscanf([[nonnull]] FILE *__restrict stream,
-                              [[nonnull, format]] wchar_t const *__restrict format, $va_list args);
-/* TODO: format_scanf() implementation for `vfwscanf'! */
+                              [[nonnull, format]] wchar_t const *__restrict format,
+                              $va_list args) {
+@@pp_if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__@@
+	return format_vwscanf((pformatgetc)(void *)&fgetwc,
+	                      &__NAMESPACE_LOCAL_SYM vfwscanf_ungetc,
+	                      (void *)stream,
+	                      format, args);
+@@pp_else@@
+	return format_vwscanf(&__NAMESPACE_LOCAL_SYM vfwscanf_getc,
+	                      &__NAMESPACE_LOCAL_SYM vfwscanf_ungetc,
+	                      (void *)stream,
+	                      format, args);
+@@pp_endif@@
+}
+
+
 
 @@>> vwscanf(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
@@ -1026,17 +1103,87 @@ __STDC_INT_AS_SIZE_T vwscanf([[nonnull, format]] wchar_t const *__restrict forma
 
 %[default:section(".text.crt{|.dos}.wchar.unicode.static.format.scanf")]
 
-@@>> vswscanf(3)
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[std, guard, wchar, wunused]]
-__STDC_INT_AS_SIZE_T vswscanf([[nonnull]] wchar_t const *__restrict src,
-                              [[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
-	/* TODO: format_wscanf() */
-	(void)src;
-	(void)format;
-	(void)args;
-	COMPILER_IMPURE();
+%[define_wchar_replacement(vswscanf_getc = vsc16scanf_getc, vsc32scanf_getc)]
+%[define_wchar_replacement(vswscanf_ungetc = vsc16scanf_ungetc, vsc16scanf_ungetc)]
+%[define_wchar_replacement(____vswscanf_getc_defined = ____vsc16scanf_getc_defined, ____vsc32scanf_getc_defined)]
+%[define_wchar_replacement(DEFINE_VSWSCANF_HELPERS = DEFINE_VSC16SCANF_HELPERS, DEFINE_VSC32SCANF_HELPERS)]
+
+%[define(DEFINE_VSWSCANF_HELPERS =
+@@pp_ifndef ____vswscanf_getc_defined@@
+#define ____vswscanf_getc_defined
+@@push_namespace(local)@@
+__LOCAL_LIBC(@vswscanf_getc@) __format_word_t
+(FORMATPRINTER_CC vswscanf_getc)(void *arg) {
+	wchar_t const *reader = *(wchar_t const **)arg;
+	wchar_t result        = *reader++;
+	if (!result)
+		return __EOF;
+	*(wchar_t const **)arg = reader;
+	return (__format_word_t)result;
+}
+__LOCAL_LIBC(@vswscanf_ungetc@) ssize_t
+(FORMATPRINTER_CC vswscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+	--(*(wchar_t const **)arg);
 	return 0;
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_VSC16SCANF_HELPERS =
+@@pp_ifndef ____vsc16scanf_getc_defined@@
+#define ____vsc16scanf_getc_defined
+@@push_namespace(local)@@
+__LOCAL_LIBC(@vsc16scanf_getc@) __format_word_t
+(FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
+	char16_t const *reader = *(char16_t const **)arg;
+	char16_t result        = *reader++;
+	if (!result)
+		return __EOF;
+	*(char16_t const **)arg = reader;
+	return (__format_word_t)result;
+}
+__LOCAL_LIBC(@vsc16scanf_ungetc@) ssize_t
+(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+	--(*(char16_t const **)arg);
+	return 0;
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_VSC32SCANF_HELPERS =
+@@pp_ifndef ____vsc32scanf_getc_defined@@
+#define ____vsc32scanf_getc_defined
+@@push_namespace(local)@@
+__LOCAL_LIBC(@vsc32scanf_getc@) __format_word_t
+(FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
+	char32_t const *reader = *(char32_t const **)arg;
+	char32_t result        = *reader++;
+	if (!result)
+		return __EOF;
+	*(char32_t const **)arg = reader;
+	return (__format_word_t)result;
+}
+__LOCAL_LIBC(@vsc32scanf_ungetc@) ssize_t
+(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+	--(*(char32_t const **)arg);
+	return 0;
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+
+
+[[std, guard, wchar, wunused, decl_include("<features.h>"), doc_alias("swscanf")]]
+[[impl_include("<hybrid/typecore.h>", "<bits/crt/format-printer.h>", "<asm/crt/stdio.h>")]]
+[[impl_prefix(DEFINE_VSWSCANF_HELPERS)]]
+__STDC_INT_AS_SIZE_T vswscanf([[nonnull]] wchar_t const *__restrict input,
+                              [[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
+	return format_vwscanf(&__NAMESPACE_LOCAL_SYM vswscanf_getc,
+	                      &__NAMESPACE_LOCAL_SYM vswscanf_ungetc,
+	                      (void *)&input, format, args);
 }
 
 %(std)#endif /* __USE_ISOC99 */

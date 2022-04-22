@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5601f306 */
+/* HASH CRC-32:0xb3decc72 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,10 +43,6 @@ INTDEF NONNULL((2)) wint32_t (LIBKCALL libc_fputwc)(char32_t wc, FILE *stream) T
 INTDEF NONNULL((2)) wint16_t NOTHROW_NCX(LIBDCALL libd_ungetwc)(wint16_t wc, FILE *stream);
 /* >> ungetwc(3) */
 INTDEF NONNULL((2)) wint32_t NOTHROW_NCX(LIBKCALL libc_ungetwc)(wint32_t wc, FILE *stream);
-/* >> vfwscanf(3) */
-INTDEF WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwscanf)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) THROWS(...);
-/* >> vfwscanf(3) */
-INTDEF WUNUSED ATTR_LIBC_C32SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBKCALL libc_vfwscanf)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) THROWS(...);
 /* >> open_wmemstream(3) */
 INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc, size_t *sizeloc);
 /* >> open_wmemstream(3) */

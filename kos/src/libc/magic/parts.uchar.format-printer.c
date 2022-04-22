@@ -92,6 +92,11 @@ format_vc32printf(*) %{uchar32("format_vwprintf")}
 format_c16printf(*) %{uchar16("format_wprintf")}
 format_c32printf(*) %{uchar32("format_wprintf")}
 
+format_vc16scanf(*) %{uchar16("format_vwscanf")}
+format_vc32scanf(*) %{uchar32("format_vwscanf")}
+format_c16scanf(*) %{uchar16("format_wscanf")}
+format_c32scanf(*) %{uchar32("format_wscanf")}
+
 %
 %
 %

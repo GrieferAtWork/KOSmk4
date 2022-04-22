@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c56b711 */
+/* HASH CRC-32:0x60fc9814 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1546,6 +1546,7 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$format_vwprintf
+#define __CRT_HAVE_DOS$format_vwscanf
 #define __CRT_HAVE_DOS$format_waprintf_alloc
 #define __CRT_HAVE_DOS$format_waprintf_pack
 #define __CRT_HAVE_DOS$format_waprintf_printer
@@ -1553,6 +1554,7 @@
 #define __CRT_HAVE_DOS$format_whexdump
 #define __CRT_HAVE_DOS$format_wprintf
 #define __CRT_HAVE_DOS$format_wrepeat
+#define __CRT_HAVE_DOS$format_wscanf
 #define __CRT_HAVE_DOS$format_wsnprintf_printer
 #define __CRT_HAVE_DOS$format_wsprintf_printer
 #define __CRT_HAVE_DOS$format_wto16
@@ -5552,6 +5554,7 @@
 #define __CRT_HAVE_format_vscanf
 #ifndef __KERNEL__
 #define __CRT_HAVE_format_vwprintf
+#define __CRT_HAVE_format_vwscanf
 #define __CRT_HAVE_format_waprintf_alloc
 #define __CRT_HAVE_format_waprintf_pack
 #define __CRT_HAVE_format_waprintf_printer
@@ -5562,6 +5565,7 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_format_wprintf
 #define __CRT_HAVE_format_wrepeat
+#define __CRT_HAVE_format_wscanf
 #define __CRT_HAVE_format_wsnprintf_printer
 #define __CRT_HAVE_format_wsprintf_printer
 #define __CRT_HAVE_format_wto16

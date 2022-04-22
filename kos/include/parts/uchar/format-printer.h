@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf48d8211 */
+/* HASH CRC-32:0x58d432a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -608,6 +608,442 @@ __LIBC __ATTR_LIBC_C32PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBK
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_c32printf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_C32PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBKCALL format_c32printf)(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32printf))(__printer, __arg, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define format_c32printf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32printf))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
+#endif /* !... */
+#if defined(__CRT_HAVE_format_vwscanf) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__CREDIRECT(__ATTR_LIBC_C16SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,format_vc16scanf,(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char16_t const *__restrict __format, __builtin_va_list __args),format_vwscanf,(__pgetc,__pungetc,__arg,__format,__args))
+#elif defined(__CRT_HAVE_DOS$format_vwscanf)
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__CREDIRECT_DOS(__ATTR_LIBC_C16SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,format_vc16scanf,(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char16_t const *__restrict __format, __builtin_va_list __args),format_vwscanf,(__pgetc,__pungetc,__arg,__format,__args))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/parts.wchar.format-printer/format_vwscanf.h>
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_C16SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBDCALL format_vc16scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char16_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwscanf))(__pgetc, __pungetc, __arg, (__WCHAR_TYPE__ const *)__format, __args); }
+#else /* ... */
+#include <libc/local/parts.uchar.format-printer/format_vc16scanf.h>
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_vc16scanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_C16SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBDCALL format_vc16scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char16_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vc16scanf))(__pgetc, __pungetc, __arg, __format, __args); })
+#endif /* !... */
+#if defined(__CRT_HAVE_format_vwscanf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__CREDIRECT(__ATTR_LIBC_C32SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,format_vc32scanf,(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char32_t const *__restrict __format, __builtin_va_list __args),format_vwscanf,(__pgetc,__pungetc,__arg,__format,__args))
+#elif defined(__CRT_HAVE_KOS$format_vwscanf)
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__CREDIRECT_KOS(__ATTR_LIBC_C32SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,format_vc32scanf,(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char32_t const *__restrict __format, __builtin_va_list __args),format_vwscanf,(__pgetc,__pungetc,__arg,__format,__args))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/parts.wchar.format-printer/format_vwscanf.h>
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_C32SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBKCALL format_vc32scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char32_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwscanf))(__pgetc, __pungetc, __arg, (__WCHAR_TYPE__ const *)__format, __args); }
+#else /* ... */
+#include <libc/local/parts.uchar.format-printer/format_vc32scanf.h>
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_vc32scanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_C32SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBKCALL format_vc32scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char32_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vc32scanf))(__pgetc, __pungetc, __arg, __format, __args); })
+#endif /* !... */
+#if defined(__CRT_HAVE_format_wscanf) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__LIBC __ATTR_LIBC_C16SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBCCALL format_c16scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char16_t const *__restrict __format, ...) __THROWS(...) __CASMNAME("format_wscanf");
+#elif defined(__CRT_HAVE_DOS$format_wscanf)
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__LIBC __ATTR_LIBC_C16SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBDCALL format_c16scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char16_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_DOS("format_wscanf");
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/parts.wchar.format-printer/format_wscanf.h>
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+#define format_c16scanf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wscanf))(__VA_ARGS__)
+#else /* ... */
+#include <libc/local/parts.uchar.format-printer/format_c16scanf.h>
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_c16scanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_C16SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBDCALL format_c16scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char16_t const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16scanf))(__pgetc, __pungetc, __arg, __format, __builtin_va_arg_pack()); })
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define format_c16scanf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16scanf))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
+#endif /* !... */
+#if defined(__CRT_HAVE_format_wscanf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__LIBC __ATTR_LIBC_C32SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBCCALL format_c32scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char32_t const *__restrict __format, ...) __THROWS(...) __CASMNAME("format_wscanf");
+#elif defined(__CRT_HAVE_KOS$format_wscanf)
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__LIBC __ATTR_LIBC_C32SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBKCALL format_c32scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char32_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_KOS("format_wscanf");
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/parts.wchar.format-printer/format_wscanf.h>
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+#define format_c32scanf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wscanf))(__VA_ARGS__)
+#else /* ... */
+#include <libc/local/parts.uchar.format-printer/format_c32scanf.h>
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_c32scanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_C32SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBKCALL format_c32scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char32_t const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32scanf))(__pgetc, __pungetc, __arg, __format, __builtin_va_arg_pack()); })
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define format_c32scanf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32scanf))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* !... */
 

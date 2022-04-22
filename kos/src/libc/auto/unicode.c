@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b29e7d9 */
+/* HASH CRC-32:0x87a6647b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 DECL_BEGIN
 
 #include <libc/template/unicode_utf8seqlen.h>
+#include <hybrid/typecore.h>
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1)) char32_t

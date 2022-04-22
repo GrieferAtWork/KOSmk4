@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb5d7b67 */
+/* HASH CRC-32:0xe9cb0303 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_unicode_readutf16_swap_n_defined
 #define __local_unicode_readutf16_swap_n_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(unicode_readutf16_swap_n) __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__

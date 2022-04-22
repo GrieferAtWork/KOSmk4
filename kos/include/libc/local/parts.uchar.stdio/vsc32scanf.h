@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb7dd887 */
+/* HASH CRC-32:0x992f1b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,64 @@
 #define __local_vsc32scanf_defined
 #include <__crt.h>
 #include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_format_vc32scanf_defined
+#define __local___localdep_format_vc32scanf_defined
+#if defined(__CRT_HAVE_format_vwscanf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc32scanf) __ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(vsc32scanf))(__CHAR32_TYPE__ const *__restrict __src, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args) {
-	/* TODO: format_wscanf() */
-	(void)__src;
-	(void)__format;
-	(void)__args;
-	__COMPILER_IMPURE();
+__CREDIRECT(__ATTR_LIBC_C32SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__localdep_format_vc32scanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwscanf,(__pgetc,__pungetc,__arg,__format,__args))
+#elif defined(__CRT_HAVE_KOS$format_vwscanf)
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+#include <bits/crt/format-printer.h>
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_KOS(__ATTR_LIBC_C32SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__localdep_format_vc32scanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwscanf,(__pgetc,__pungetc,__arg,__format,__args))
+#elif __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.wchar.format-printer/format_vwscanf.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_format_vc32scanf __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__LIBKCALL*)(__pformatgetc,__pformatungetc,void *,__CHAR32_TYPE__ const *__restrict,__builtin_va_list),__SSIZE_TYPE__(__LIBKCALL&)(__pformatgetc,__pformatungetc,void *,__CHAR32_TYPE__ const *__restrict,__builtin_va_list),format_vwscanf)
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.uchar.format-printer/format_vc32scanf.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_format_vc32scanf __LIBC_LOCAL_NAME(format_vc32scanf)
+#endif /* !... */
+#endif /* !__local___localdep_format_vc32scanf_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+#include <bits/crt/format-printer.h>
+#include <asm/crt/stdio.h>
+#ifndef ____vsc32scanf_getc_defined
+#define ____vsc32scanf_getc_defined
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsc32scanf_getc) __format_word_t
+(__FORMATPRINTER_CC __vsc32scanf_getc)(void *__arg) {
+	__CHAR32_TYPE__ const *__reader = *(__CHAR32_TYPE__ const **)__arg;
+	__CHAR32_TYPE__ __result        = *__reader++;
+	if (!__result)
+		return __EOF;
+	*(__CHAR32_TYPE__ const **)__arg = __reader;
+	return (__format_word_t)__result;
+}
+__LOCAL_LIBC(vsc32scanf_ungetc) __SSIZE_TYPE__
+(__FORMATPRINTER_CC __vsc32scanf_ungetc)(void *__arg, __format_word_t __UNUSED(__word)) {
+	--(*(__CHAR32_TYPE__ const **)__arg);
 	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____vsc32scanf_getc_defined */
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(vsc32scanf) __ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(vsc32scanf))(__CHAR32_TYPE__ const *__restrict __input, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args) {
+	return (__NAMESPACE_LOCAL_SYM __localdep_format_vc32scanf)(&__NAMESPACE_LOCAL_SYM __vsc32scanf_getc,
+	                      &__NAMESPACE_LOCAL_SYM __vsc16scanf_ungetc,
+	                      (void *)&__input, __format, __args);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vsc32scanf_defined

@@ -508,39 +508,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.s
 }
 /*[[[end:libd_vfwscanf_unlocked]]]*/
 
-/*[[[head:libc_vfwscanf,hash:CRC-32=0xb71140c5]]]*/
-/* >> vfwscanf(3) */
-INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_C32SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-(LIBKCALL libc_vfwscanf)(FILE *__restrict stream,
-                         char32_t const *__restrict format,
-                         va_list args) THROWS(...)
-/*[[[body:libc_vfwscanf]]]*/
-/*AUTO*/{
-	(void)stream;
-	(void)format;
-	(void)args;
-	CRT_UNIMPLEMENTEDF("vfwscanf(%p, %p, %p)", stream, format, args); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_vfwscanf]]]*/
 
-/*[[[head:libd_vfwscanf,hash:CRC-32=0xae52962c]]]*/
-/* >> vfwscanf(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-(LIBDCALL libd_vfwscanf)(FILE *__restrict stream,
-                         char16_t const *__restrict format,
-                         va_list args) THROWS(...)
-/*[[[body:libd_vfwscanf]]]*/
-/*AUTO*/{
-	(void)stream;
-	(void)format;
-	(void)args;
-	CRT_UNIMPLEMENTEDF("DOS$vfwscanf(%p, %p, %p)", stream, format, args); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libd_vfwscanf]]]*/
 
 
 /*[[[head:libc_file_wprinter,hash:CRC-32=0xa52798dc]]]*/
@@ -635,7 +603,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.
 }
 /*[[[end:libd_file_wprinter_unlocked]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x9b27426b]]]*/
+/*[[[start:exports,hash:CRC-32=0xfbc31211]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(getwc, libc_fgetwc);
@@ -646,8 +614,6 @@ DEFINE_PUBLIC_ALIAS(putwc, libc_fputwc);
 DEFINE_PUBLIC_ALIAS(fputwc, libc_fputwc);
 DEFINE_PUBLIC_ALIAS(DOS$ungetwc, libd_ungetwc);
 DEFINE_PUBLIC_ALIAS(ungetwc, libc_ungetwc);
-DEFINE_PUBLIC_ALIAS(DOS$vfwscanf, libd_vfwscanf);
-DEFINE_PUBLIC_ALIAS(vfwscanf, libc_vfwscanf);
 DEFINE_PUBLIC_ALIAS(DOS$open_wmemstream, libd_open_wmemstream);
 DEFINE_PUBLIC_ALIAS(open_wmemstream, libc_open_wmemstream);
 DEFINE_PUBLIC_ALIAS(DOS$getwc_unlocked, libd_fgetwc_unlocked);

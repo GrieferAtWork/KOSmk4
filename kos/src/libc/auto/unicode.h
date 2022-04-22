@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33456f9b */
+/* HASH CRC-32:0x786db663 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,8 +32,6 @@ DECL_BEGIN
 #ifndef __pformatprinter_defined
 #define __pformatprinter_defined
 typedef __pformatprinter pformatprinter;
-typedef __pformatgetc pformatgetc;
-typedef __pformatungetc pformatungetc;
 #endif /* !__pformatprinter_defined */
 #ifndef __pc16formatprinter_defined
 #define __pc16formatprinter_defined

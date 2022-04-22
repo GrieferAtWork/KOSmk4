@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc166dbc6 */
+/* HASH CRC-32:0xd35c7dd5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -467,18 +467,18 @@ DEFINE_INTERN_ALIAS(libc_strtod, libc_strtod);
 #ifndef ____vsscanf_getc_defined
 #define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsscanf_getc) ssize_t
+__LOCAL_LIBC(vsscanf_getc) __format_word_t
 (FORMATPRINTER_CC vsscanf_getc)(void *arg) {
-	char const *reader = *(char const **)arg;
-	char32_t result = libc_unicode_readutf8(&reader);
+	unsigned char const *reader = *(unsigned char const **)arg;
+	unsigned char result        = *reader++;
 	if (!result)
 		return __EOF;
-	*(char const **)arg = reader;
-	return result;
+	*(unsigned char const **)arg = reader;
+	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
-	libc_unicode_readutf8_rev((char const **)arg);
+(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+	--(*(unsigned char const **)arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -488,18 +488,18 @@ __NAMESPACE_LOCAL_END
 #ifndef ____vsc16scanf_getc_defined
 #define ____vsc16scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc16scanf_getc) ssize_t
+__LOCAL_LIBC(vsc16scanf_getc) __format_word_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
 	char16_t const *reader = *(char16_t const **)arg;
-	char32_t result = unicode_readutf16(&reader);
+	char16_t result        = *reader++;
 	if (!result)
 		return __EOF;
 	*(char16_t const **)arg = reader;
-	return result;
+	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsc16scanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
-	unicode_readutf16_rev((char16_t const **)arg);
+(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+	--(*(char16_t const **)arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -509,18 +509,18 @@ __NAMESPACE_LOCAL_END
 #ifndef ____vsc32scanf_getc_defined
 #define ____vsc32scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc32scanf_getc) ssize_t
+__LOCAL_LIBC(vsc32scanf_getc) __format_word_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
 	char32_t const *reader = *(char32_t const **)arg;
-	char32_t result = *reader++;
+	char32_t result        = *reader++;
 	if (!result)
 		return __EOF;
 	*(char32_t const **)arg = reader;
-	return result;
+	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
-	--*(char32_t const **)arg;
+(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+	--(*(char32_t const **)arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -558,18 +558,18 @@ NOTHROW_NCX(LIBCCALL libc_strtod)(char const *__restrict nptr,
 #ifndef ____vsscanf_getc_defined
 #define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsscanf_getc) ssize_t
+__LOCAL_LIBC(vsscanf_getc) __format_word_t
 (FORMATPRINTER_CC vsscanf_getc)(void *arg) {
-	char const *reader = *(char const **)arg;
-	char32_t result = libc_unicode_readutf8(&reader);
+	unsigned char const *reader = *(unsigned char const **)arg;
+	unsigned char result        = *reader++;
 	if (!result)
 		return __EOF;
-	*(char const **)arg = reader;
-	return result;
+	*(unsigned char const **)arg = reader;
+	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
-	libc_unicode_readutf8_rev((char const **)arg);
+(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+	--(*(unsigned char const **)arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -579,18 +579,18 @@ __NAMESPACE_LOCAL_END
 #ifndef ____vsc16scanf_getc_defined
 #define ____vsc16scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc16scanf_getc) ssize_t
+__LOCAL_LIBC(vsc16scanf_getc) __format_word_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
 	char16_t const *reader = *(char16_t const **)arg;
-	char32_t result = unicode_readutf16(&reader);
+	char16_t result        = *reader++;
 	if (!result)
 		return __EOF;
 	*(char16_t const **)arg = reader;
-	return result;
+	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsc16scanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
-	unicode_readutf16_rev((char16_t const **)arg);
+(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+	--(*(char16_t const **)arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -600,18 +600,18 @@ __NAMESPACE_LOCAL_END
 #ifndef ____vsc32scanf_getc_defined
 #define ____vsc32scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc32scanf_getc) ssize_t
+__LOCAL_LIBC(vsc32scanf_getc) __format_word_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
 	char32_t const *reader = *(char32_t const **)arg;
-	char32_t result = *reader++;
+	char32_t result        = *reader++;
 	if (!result)
 		return __EOF;
 	*(char32_t const **)arg = reader;
-	return result;
+	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
-	--*(char32_t const **)arg;
+(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+	--(*(char32_t const **)arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -651,18 +651,18 @@ DEFINE_INTERN_ALIAS(libc_strtold, libc_strtod);
 #ifndef ____vsscanf_getc_defined
 #define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsscanf_getc) ssize_t
+__LOCAL_LIBC(vsscanf_getc) __format_word_t
 (FORMATPRINTER_CC vsscanf_getc)(void *arg) {
-	char const *reader = *(char const **)arg;
-	char32_t result = libc_unicode_readutf8(&reader);
+	unsigned char const *reader = *(unsigned char const **)arg;
+	unsigned char result        = *reader++;
 	if (!result)
 		return __EOF;
-	*(char const **)arg = reader;
-	return result;
+	*(unsigned char const **)arg = reader;
+	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
-	libc_unicode_readutf8_rev((char const **)arg);
+(FORMATPRINTER_CC vsscanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+	--(*(unsigned char const **)arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -672,18 +672,18 @@ __NAMESPACE_LOCAL_END
 #ifndef ____vsc16scanf_getc_defined
 #define ____vsc16scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc16scanf_getc) ssize_t
+__LOCAL_LIBC(vsc16scanf_getc) __format_word_t
 (FORMATPRINTER_CC vsc16scanf_getc)(void *arg) {
 	char16_t const *reader = *(char16_t const **)arg;
-	char32_t result = unicode_readutf16(&reader);
+	char16_t result        = *reader++;
 	if (!result)
 		return __EOF;
 	*(char16_t const **)arg = reader;
-	return result;
+	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsc16scanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
-	unicode_readutf16_rev((char16_t const **)arg);
+(FORMATPRINTER_CC vsc16scanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+	--(*(char16_t const **)arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -693,18 +693,18 @@ __NAMESPACE_LOCAL_END
 #ifndef ____vsc32scanf_getc_defined
 #define ____vsc32scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc32scanf_getc) ssize_t
+__LOCAL_LIBC(vsc32scanf_getc) __format_word_t
 (FORMATPRINTER_CC vsc32scanf_getc)(void *arg) {
 	char32_t const *reader = *(char32_t const **)arg;
-	char32_t result = *reader++;
+	char32_t result        = *reader++;
 	if (!result)
 		return __EOF;
 	*(char32_t const **)arg = reader;
-	return result;
+	return (__format_word_t)result;
 }
 __LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
-(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, char32_t UNUSED(ch)) {
-	--*(char32_t const **)arg;
+(FORMATPRINTER_CC vsc32scanf_ungetc)(void *arg, __format_word_t UNUSED(word)) {
+	--(*(char32_t const **)arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END

@@ -289,14 +289,19 @@ __SYSDECL_BEGIN
  *                  returned by the calling function upon success, also meaning that the
  *                  usual return value used to indicate success is `datalen'. */
 typedef __pformatprinter pformatprinter;
+#endif /* !__pformatprinter_defined */
 
-/* Read and return one character.
+#ifndef __pformatgetc_defined
+#define __pformatgetc_defined
+/* Read or unread 1 byte/word/dword of input data
+ * @param: arg:    The user-defined closure parameter passed alongside this function pointer.
  * @return: >= 0:  The character that was read.
  * @return: EOF:   The input stream has ended.
  * @return: < EOF: An error occurred (Return the same value to the caller) */
 typedef __pformatgetc pformatgetc;
 typedef __pformatungetc pformatungetc;
-#endif /* !__pformatprinter_defined */
+typedef __format_word_t format_word_t;
+#endif /* !__pformatgetc_defined */
 
 }
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9abda17 */
+/* HASH CRC-32:0x54296afc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,6 +41,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_readutf8_defined
 #define __local___localdep_unicode_readutf8_defined
 #ifdef __CRT_HAVE_unicode_readutf8
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8 */
 __NAMESPACE_LOCAL_END
@@ -52,6 +55,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_readutf8_rev_defined
 #define __local___localdep_unicode_readutf8_rev_defined
 #ifdef __CRT_HAVE_unicode_readutf8_rev
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_rev,(char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8_rev */
 __NAMESPACE_LOCAL_END
@@ -66,18 +72,18 @@ __NAMESPACE_LOCAL_END
 #ifndef ____vsscanf_getc_defined
 #define ____vsscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__
+__LOCAL_LIBC(vsscanf_getc) __format_word_t
 (__FORMATPRINTER_CC __vsscanf_getc)(void *__arg) {
-	char const *__reader = *(char const **)__arg;
-	__CHAR32_TYPE__ __result = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8)(&__reader);
+	unsigned char const *__reader = *(unsigned char const **)__arg;
+	unsigned char __result        = *__reader++;
 	if (!__result)
 		return __EOF;
-	*(char const **)__arg = __reader;
-	return __result;
+	*(unsigned char const **)__arg = __reader;
+	return (__format_word_t)__result;
 }
 __LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	(__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_rev)((char const **)__arg);
+(__FORMATPRINTER_CC __vsscanf_ungetc)(void *__arg, __format_word_t __UNUSED(__word)) {
+	--(*(unsigned char const **)__arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -87,18 +93,18 @@ __NAMESPACE_LOCAL_END
 #ifndef ____vsc16scanf_getc_defined
 #define ____vsc16scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc16scanf_getc) __SSIZE_TYPE__
+__LOCAL_LIBC(vsc16scanf_getc) __format_word_t
 (__FORMATPRINTER_CC __vsc16scanf_getc)(void *__arg) {
 	__CHAR16_TYPE__ const *__reader = *(__CHAR16_TYPE__ const **)__arg;
-	__CHAR32_TYPE__ __result = __unicode_readutf16(&__reader);
+	__CHAR16_TYPE__ __result        = *__reader++;
 	if (!__result)
 		return __EOF;
 	*(__CHAR16_TYPE__ const **)__arg = __reader;
-	return __result;
+	return (__format_word_t)__result;
 }
 __LOCAL_LIBC(vsc16scanf_ungetc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsc16scanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	__unicode_readutf16_rev((__CHAR16_TYPE__ const **)__arg);
+(__FORMATPRINTER_CC __vsc16scanf_ungetc)(void *__arg, __format_word_t __UNUSED(__word)) {
+	--(*(__CHAR16_TYPE__ const **)__arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -108,18 +114,18 @@ __NAMESPACE_LOCAL_END
 #ifndef ____vsc32scanf_getc_defined
 #define ____vsc32scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsc32scanf_getc) __SSIZE_TYPE__
+__LOCAL_LIBC(vsc32scanf_getc) __format_word_t
 (__FORMATPRINTER_CC __vsc32scanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ const *__reader = *(__CHAR32_TYPE__ const **)__arg;
-	__CHAR32_TYPE__ __result = *__reader++;
+	__CHAR32_TYPE__ __result        = *__reader++;
 	if (!__result)
 		return __EOF;
 	*(__CHAR32_TYPE__ const **)__arg = __reader;
-	return __result;
+	return (__format_word_t)__result;
 }
 __LOCAL_LIBC(vsc32scanf_ungetc) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vsc32scanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	--*(__CHAR32_TYPE__ const **)__arg;
+(__FORMATPRINTER_CC __vsc32scanf_ungetc)(void *__arg, __format_word_t __UNUSED(__word)) {
+	--(*(__CHAR32_TYPE__ const **)__arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END

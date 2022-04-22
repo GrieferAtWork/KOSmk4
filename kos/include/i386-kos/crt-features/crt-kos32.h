@@ -2870,6 +2870,7 @@
 #define __CRT_HAVE_format_vprintf
 #define __CRT_HAVE_format_vscanf
 #define __CRT_HAVE_format_vwprintf
+#define __CRT_HAVE_format_vwscanf
 #define __CRT_HAVE_format_waprintf_alloc
 #define __CRT_HAVE_format_waprintf_pack
 #define __CRT_HAVE_format_waprintf_printer
@@ -2878,6 +2879,7 @@
 #define __CRT_HAVE_format_width
 #define __CRT_HAVE_format_wprintf
 #define __CRT_HAVE_format_wrepeat
+#define __CRT_HAVE_format_wscanf
 #define __CRT_HAVE_format_wsnprintf_printer
 #define __CRT_HAVE_format_wsprintf_printer
 #define __CRT_HAVE_format_wto16
@@ -6908,6 +6910,7 @@
 #define __CRT_HAVE_KOS$fopendirat
 #define __CRT_HAVE_KOS$format_8tow
 #define __CRT_HAVE_KOS$format_vwprintf
+#define __CRT_HAVE_KOS$format_vwscanf
 #define __CRT_HAVE_KOS$format_waprintf_alloc
 #define __CRT_HAVE_KOS$format_waprintf_pack
 #define __CRT_HAVE_KOS$format_waprintf_printer
@@ -6915,6 +6918,7 @@
 #define __CRT_HAVE_KOS$format_whexdump
 #define __CRT_HAVE_KOS$format_wprintf
 #define __CRT_HAVE_KOS$format_wrepeat
+#define __CRT_HAVE_KOS$format_wscanf
 #define __CRT_HAVE_KOS$format_wsnprintf_printer
 #define __CRT_HAVE_KOS$format_wsprintf_printer
 #define __CRT_HAVE_KOS$format_wto16
@@ -7934,6 +7938,7 @@
 #define __CRT_HAVE_DOS$fopendirat
 #define __CRT_HAVE_DOS$format_8tow
 #define __CRT_HAVE_DOS$format_vwprintf
+#define __CRT_HAVE_DOS$format_vwscanf
 #define __CRT_HAVE_DOS$format_waprintf_alloc
 #define __CRT_HAVE_DOS$format_waprintf_pack
 #define __CRT_HAVE_DOS$format_waprintf_printer
@@ -7941,6 +7946,7 @@
 #define __CRT_HAVE_DOS$format_whexdump
 #define __CRT_HAVE_DOS$format_wprintf
 #define __CRT_HAVE_DOS$format_wrepeat
+#define __CRT_HAVE_DOS$format_wscanf
 #define __CRT_HAVE_DOS$format_wsnprintf_printer
 #define __CRT_HAVE_DOS$format_wsprintf_printer
 #define __CRT_HAVE_DOS$format_wto16

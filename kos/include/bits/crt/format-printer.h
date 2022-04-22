@@ -25,6 +25,12 @@
 
 #include <hybrid/typecore.h>
 
+#if defined(__KOS_VERSION__) && __KOS_VERSION__ < 400
+#error "Unsupported version of KOS"
+#endif /* __KOS_VERSION__ < 400 */
+
+#define __SIZEOF_FORMAT_WORD_T__ 4
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -51,15 +57,23 @@ __DECL_BEGIN
  *                  Usually,  the return value is added to a sum of values which is then
  *                  returned by the calling function upon success, also meaning that the
  *                  usual return value used to indicate success is `datalen'. */
-#if __KOS_VERSION__ >= 400
 typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatprinter)(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen);
-typedef /*utf-32*/ __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatgetc)(void *__arg);
-typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatungetc)(void *__arg, /*utf-32*/ __CHAR32_TYPE__ __ch);
-#else /* __KOS_VERSION__ >= 400 */
-typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatprinter)(/*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen, void *__arg);
-typedef /*utf-32*/ __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatgetc)(void *__arg);
-typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatungetc)(/*utf-32*/ __CHAR32_TYPE__ __ch, void *__arg);
-#endif /* __KOS_VERSION__ < 400 */
+
+
+/* The type of the word passed to/from getc/ungetc function pointers. */
+#if __SIZEOF_SIZE_T__ >= 4
+#define __format_word_t __SSIZE_TYPE__
+#else /* __SIZEOF_SIZE_T__ >= 4 */
+#define __format_word_t __INT32_TYPE__
+#endif /* __SIZEOF_SIZE_T__ < 4 */
+
+/* Read or unread 1 byte/word/dword of input data
+ * @param: arg:    The user-defined closure parameter passed alongside this function pointer.
+ * @return: >= 0:  The character that was read.
+ * @return: EOF:   The input stream has ended.
+ * @return: < EOF: An error occurred (Return the same value to the caller) */
+typedef __format_word_t (__FORMATPRINTER_CC *__pformatgetc)(void *__arg);
+typedef __SSIZE_TYPE__ (__FORMATPRINTER_CC *__pformatungetc)(void *__arg, __format_word_t __word);
 
 __DECL_END
 #endif /* __CC__ */

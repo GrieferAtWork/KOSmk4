@@ -60,14 +60,23 @@ format_vscanf(__pformatgetc __FORMAT_PGETC,
               __builtin_va_list __FORMAT_ARGS)
 #endif /* __INTELLISENSE__ */
 {
+#if __CHAR_SIZE == __SIZEOF_CHAR__
+#define __PRIVATE_FORMAT_SCANF_READUNI(p_iter, end) __libc_unicode_readutf8_n((char const **)(p_iter), end)
+#elif __CHAR_SIZE == 2
+#define __PRIVATE_FORMAT_SCANF_READUNI(p_iter, end) __libc_unicode_readutf16_n((__CHAR16_TYPE__ const **)(p_iter), end)
+#else /* __CHAR_SIZE == ... */
+#define __PRIVATE_FORMAT_SCANF_READUNI(p_iter, end) (*(p_iter) >= (end) ? 0 : *((*(p_iter))++))
+#endif /* __CHAR_SIZE != ... */
 	__SIZE_TYPE__ __read_count = 0;
 	__SSIZE_TYPE__ __result = 0;
-	__SSIZE_TYPE__ __temp = 0; /* XXX: Unused init! */
+	__format_word_t __temp = 0; /* XXX: Unused init! */
 	__BOOL __has_temp = 0;
 	__CHAR_TYPE __ch;
-	/* TODO: Support for positional arguments? */
 __next:
 	__ch = *__FORMAT_FORMAT++;
+
+	/* TODO: Re-work this function to deal with the fact that `__FORMAT_PGETC()'
+	 *       returns BYTE/WORD/DWORD, rather than unicode characters! */
 	switch (__ch) {
 
 	case '\0':
@@ -559,12 +568,12 @@ __done_string_terminate_eof:
 						if (!__width)
 							break;
 						for (__iter = __pattern_start; __iter < __FORMAT_FORMAT;) {
-							__pat_ch = __libc_unicode_readutf8_n((char const **)&__iter, __FORMAT_FORMAT);
+							__pat_ch = __PRIVATE_FORMAT_SCANF_READUNI(&__iter, __FORMAT_FORMAT);
 							if ((__CHAR32_TYPE__)__temp == __pat_ch)
 								goto __pattern_skip_has_char;
 							if (*__iter == '-') {
 								++__iter;
-								__pat_ch2 = __libc_unicode_readutf8_n((char const **)&__iter, __FORMAT_FORMAT);
+								__pat_ch2 = __PRIVATE_FORMAT_SCANF_READUNI(&__iter, __FORMAT_FORMAT);
 								if ((__CHAR32_TYPE__)__temp >= __pat_ch && (__CHAR32_TYPE__)__temp <= __pat_ch2)
 									goto __pattern_skip_has_char;
 							}
@@ -605,12 +614,12 @@ __done_pattern_terminate_eof:
 						if (!__width)
 							break;
 						for (__iter = __pattern_start; __iter < __FORMAT_FORMAT;) {
-							__pat_ch = __libc_unicode_readutf8_n((char const **)&__iter, __FORMAT_FORMAT);
+							__pat_ch = __PRIVATE_FORMAT_SCANF_READUNI(&__iter, __FORMAT_FORMAT);
 							if ((__CHAR32_TYPE__)__temp == __pat_ch)
 								goto __pattern_has_char;
 							if (*__iter == '-') {
 								++__iter;
-								__pat_ch2 = __libc_unicode_readutf8_n((char const **)&__iter, __FORMAT_FORMAT);
+								__pat_ch2 = __PRIVATE_FORMAT_SCANF_READUNI(&__iter, __FORMAT_FORMAT);
 								if ((__CHAR32_TYPE__)__temp >= __pat_ch && (__CHAR32_TYPE__)__temp <= __pat_ch2)
 									goto __pattern_has_char;
 							}
@@ -1066,6 +1075,7 @@ __err_or_eof:
 		goto __end;
 __err:
 	return __temp;
+#undef __PRIVATE_FORMAT_SCANF_READUNI
 }
 
 

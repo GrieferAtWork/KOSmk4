@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b23050 */
+/* HASH CRC-32:0x44b9d500 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -209,6 +209,118 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_wprintf, __FORCELOCAL __ATTR_ARTIFICIAL _
 #define format_wprintf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* !__CRT_HAVE_format_wprintf */
+#ifdef __CRT_HAVE_format_vwscanf
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__CDECLARE(__ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,format_vwscanf,(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args),(__pgetc,__pungetc,__arg,__format,__args))
+#else /* __CRT_HAVE_format_vwscanf */
+#include <libc/local/parts.wchar.format-printer/format_vwscanf.h>
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_vwscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBCCALL format_vwscanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwscanf))(__pgetc, __pungetc, __arg, __format, __args); })
+#endif /* !__CRT_HAVE_format_vwscanf */
+#ifdef __CRT_HAVE_format_wscanf
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+__LIBC __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBCCALL format_wscanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("format_wscanf");
+#else /* __CRT_HAVE_format_wscanf */
+#include <libc/local/parts.wchar.format-printer/format_wscanf.h>
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic     scanf     implementation
+ * Taking a regular scanf-style format string and argument, these
+ * functions will  call  the  given  `pgetc'  function  which  in
+ * return should successively  yield a character  at a time  from
+ * some kind of input source.
+ *  - If  `pgetc'  returns  `< 0', scanning  aborts  and that  value  is returned.
+ *    Otherwise, the function returns the amount of successfully parsed arguments.
+ *  - The user may  use `pgetc' to  track the last  read character to  get
+ *    additional information about what character caused the scan to fail.
+ *  - The given `pgetc' should also indicate EOF by returning `NUL'
+ *  - This implementation supports the following extensions:
+ *    - `%[A-Z]'   -- Character ranges in scan patterns
+ *    - `%[^abc]'  -- Inversion of a scan pattern
+ *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
+ *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
+ *                    This modifier  reads a  `size_t'  from the  argument  list,
+ *                    that specifies  the size  of the  following string  buffer:
+ *                 >> char buffer[64];
+ *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
+ * format -> %[*|?][width][length]specifier
+ * @return: 0 :  No data could be scanned.
+ * @return: * :  The total number of successfully scanned arguments.
+ * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBCCALL format_wscanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wscanf))(__pgetc, __pungetc, __arg, __format, __builtin_va_arg_pack()); })
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define format_wscanf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wscanf))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
+#endif /* !__CRT_HAVE_format_wscanf */
 
 
 

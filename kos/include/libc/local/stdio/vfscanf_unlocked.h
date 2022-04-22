@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1cb3e7a */
+/* HASH CRC-32:0x655ea981 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,14 +82,14 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(in
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__
-__LOCAL_LIBC(vfscanf_getc_unlocked) __SSIZE_TYPE__
+__LOCAL_LIBC(vfscanf_getc_unlocked) __format_word_t
 (__FORMATPRINTER_CC __vfscanf_getc_unlocked)(void *__arg) {
-	return (__SSIZE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked)((__FILE *)__arg);
+	return (__format_word_t)(__NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked)((__FILE *)__arg);
 }
 #endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc_unlocked) __SSIZE_TYPE__
-(__FORMATPRINTER_CC __vfscanf_ungetc_unlocked)(void *__arg, __CHAR32_TYPE__ __ch) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_ungetc_unlocked)((int)(unsigned int)__ch, (__FILE *)__arg);
+(__FORMATPRINTER_CC __vfscanf_ungetc_unlocked)(void *__arg, __format_word_t __word) {
+	return (__NAMESPACE_LOCAL_SYM __localdep_ungetc_unlocked)((int)(unsigned char)(unsigned int)__word, (__FILE *)__arg);
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN

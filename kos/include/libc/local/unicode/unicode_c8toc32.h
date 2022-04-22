@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1a4cce7 */
+/* HASH CRC-32:0x90c4ddae */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_unicode_c8toc32_defined
 #include <__crt.h>
 #include <bits/crt/mbstate.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(unicode_c8toc32) __ATTR_NONNULL((1, 2, 4)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c8toc32))(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs) {
