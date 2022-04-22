@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60fc9814 */
+/* HASH CRC-32:0x5ba63694 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1763,6 +1763,8 @@
 #define __CRT_HAVE_DOS$getexecname
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$getfsfile
+#define __CRT_HAVE_DOS$getfsspec
 #define __CRT_HAVE_DOS$getgrent_r
 #define __CRT_HAVE_DOS$getgrgid
 #define __CRT_HAVE_DOS$getgrgid_r
@@ -5308,6 +5310,7 @@
 #define __CRT_HAVE_encrypt
 #define __CRT_HAVE_encrypt_r
 #define __CRT_HAVE_endaliasent
+#define __CRT_HAVE_endfsent
 #define __CRT_HAVE_endgrent
 #define __CRT_HAVE_endhostent
 #define __CRT_HAVE_endmntent
@@ -5791,6 +5794,9 @@
 #define __CRT_HAVE_getenv_s
 #define __CRT_HAVE_geteuid
 #define __CRT_HAVE_getexecname
+#define __CRT_HAVE_getfsent
+#define __CRT_HAVE_getfsfile
+#define __CRT_HAVE_getfsspec
 #define __CRT_HAVE_getgid
 #define __CRT_HAVE_getgrent
 #define __CRT_HAVE_getgrent_r
@@ -7016,6 +7022,7 @@
 #define __CRT_HAVE_setegid
 #define __CRT_HAVE_setenv
 #define __CRT_HAVE_seteuid
+#define __CRT_HAVE_setfsent
 #define __CRT_HAVE_setfsgid
 #define __CRT_HAVE_setfsuid
 #define __CRT_HAVE_setgid

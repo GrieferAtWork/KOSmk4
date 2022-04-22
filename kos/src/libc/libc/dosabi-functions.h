@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41d7e2b */
+/* HASH CRC-32:0xd18c8312 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -483,6 +483,10 @@ DFUN(".text.crt.dos.string.format", libd_format_vprintf, libc_format_vprintf, TI
 DFUN(".text.crt.dos.string.format", libd_format_vscanf, libc_format_vscanf, TI, 5, TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.string.format", libd_format_aprintf_pack, libc_format_aprintf_pack, TP, 2, TP, TP)
 DFUN(".text.crt.dos.string.format", libd_format_aprintf_alloc, libc_format_aprintf_alloc, TP, 2, TP, TI)
+
+/* fstab */
+DFUN(".text.crt.dos.database.fstab", libd_getfsspec, libc_getfsspec, TP, 1, TP)
+DFUN(".text.crt.dos.database.fstab", libd_getfsfile, libc_getfsfile, TP, 1, TP)
 
 /* fts */
 DFUN(".text.crt.dos.fs.fts", libd_fts_children, libc_fts_children, TP, 2, TP, TD)

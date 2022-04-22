@@ -39,9 +39,10 @@
 #include <paths.h>
 )]%[insert:prefix(
 #include <kos/anno.h>
+)]%[insert:prefix(
+#include <bits/crt/db/mntent.h>
 )]%{
 
-#include <bits/crt/db/mntent.h>
 
 /* Filename for the mounting-point table (/etc/fstab) */
 #define MNTTAB _PATH_MNTTAB /* Deprecated alias. */

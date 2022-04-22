@@ -189,6 +189,7 @@
 	.database.pwd
 	.database.aliases
 	.database.mntent
+	.database.fstab
 	.database.utmp
 	.database.utmpx
 
@@ -325,6 +326,7 @@
 	CB(PREFIX.crt.database.pwd) \
 	CB(PREFIX.crt.database.aliases) \
 	CB(PREFIX.crt.database.mntent) \
+	CB(PREFIX.crt.database.fstab) \
 	CB(PREFIX.crt.database.utmp) \
 	CB(PREFIX.crt.database.utmpx) \
 	CB(PREFIX.crt.io.stropts) \
@@ -498,6 +500,7 @@
 	CB(PREFIX.crt.dos.database.pwd) \
 	CB(PREFIX.crt.dos.database.aliases) \
 	CB(PREFIX.crt.dos.database.mntent) \
+	CB(PREFIX.crt.dos.database.fstab) \
 	CB(PREFIX.crt.dos.database.utmp) \
 	CB(PREFIX.crt.dos.database.utmpx) \
 	CB(PREFIX.crt.dos.io.stropts) \

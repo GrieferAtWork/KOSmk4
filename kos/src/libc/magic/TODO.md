@@ -132,7 +132,6 @@
 - `<corecrt_share.h>`       (DOS)
 - `<corecrt_terminate.h>`   (DOS)
 - `<fmtmsg.h>`              (GLibc!)
-- `<fstab.h>`               (GLibc!)
 - `<gshadow.h>`             (GLibc!)
 - `<mcheck.h>`              (GLibc!)
 - `<obstack.h>`             (GLibc!)

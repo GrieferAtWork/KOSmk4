@@ -243,6 +243,7 @@ incdir("");
 #include <bits/crt/crypt_data.h>
 #include <bits/crt/ctype.h>
 #include <bits/crt/db/aliases.h>
+#include <bits/crt/db/fstab.h>
 #include <bits/crt/db/group.h>
 #include <bits/crt/db/mntent.h>
 #include <bits/crt/db/netdb.h>
@@ -529,13 +530,16 @@ incdir("");
 #include <fnmatch.h>
 #include <format-printer.h>
 #include <fpu_control.h>
+#include <fstab.h>
 #include <fts.h>
 #include <ftw.h>
 #include <getopt.h>
 #include <getpagesize.h>
 #include <glob.h>
 #include <gnu/lib-names.h>
+#include <gnu/libc-version.h>
 #include <gnu/stubs.h>
+#include <gnu-versions.h>
 #include <gppconio.h>
 #include <grp.h>
 #include <huge_val.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f6c1aba */
+/* HASH CRC-32:0xafd58423 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -443,6 +443,10 @@ DEFINE_PUBLIC_ALIAS(DOS$format_vprintf, libd_format_vprintf);
 DEFINE_PUBLIC_ALIAS(DOS$format_vscanf, libd_format_vscanf);
 DEFINE_PUBLIC_ALIAS(DOS$format_aprintf_pack, libd_format_aprintf_pack);
 DEFINE_PUBLIC_ALIAS(DOS$format_aprintf_alloc, libd_format_aprintf_alloc);
+
+/* fstab */
+DEFINE_PUBLIC_ALIAS(DOS$getfsspec, libd_getfsspec);
+DEFINE_PUBLIC_ALIAS(DOS$getfsfile, libd_getfsfile);
 
 /* fts */
 DEFINE_PUBLIC_ALIAS(DOS$fts_children, libd_fts_children);

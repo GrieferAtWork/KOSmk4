@@ -2458,6 +2458,7 @@
 #define __CRT_HAVE_encrypt
 #define __CRT_HAVE_encrypt_r
 #define __CRT_HAVE_endaliasent
+#define __CRT_HAVE_endfsent
 #define __CRT_HAVE_endgrent
 #define __CRT_HAVE_endhostent
 #define __CRT_HAVE_endmntent
@@ -2970,6 +2971,9 @@
 #define __CRT_HAVE_getenv_s
 #define __CRT_HAVE_geteuid
 #define __CRT_HAVE_getexecname
+#define __CRT_HAVE_getfsent
+#define __CRT_HAVE_getfsfile
+#define __CRT_HAVE_getfsspec
 #define __CRT_HAVE_getgid
 #define __CRT_HAVE_getgrent
 #define __CRT_HAVE_getgrent_r
@@ -4221,6 +4225,7 @@
 #define __CRT_HAVE_setegid
 #define __CRT_HAVE_setenv
 #define __CRT_HAVE_seteuid
+#define __CRT_HAVE_setfsent
 #define __CRT_HAVE_setfsgid
 #define __CRT_HAVE_setfsuid
 #define __CRT_HAVE_setgid
@@ -8534,6 +8539,8 @@
 #define __CRT_HAVE_KOS$getenv
 #define __CRT_HAVE_KOS$getenv_s
 #define __CRT_HAVE_KOS$getexecname
+#define __CRT_HAVE_KOS$getfsfile
+#define __CRT_HAVE_KOS$getfsspec
 #define __CRT_HAVE_KOS$getgrent_r
 #define __CRT_HAVE_KOS$getgrgid
 #define __CRT_HAVE_KOS$getgrgid_r
@@ -12992,6 +12999,8 @@
 #define __CRT_HAVE_DOS$getenv
 #define __CRT_HAVE_DOS$getenv_s
 #define __CRT_HAVE_DOS$getexecname
+#define __CRT_HAVE_DOS$getfsfile
+#define __CRT_HAVE_DOS$getfsspec
 #define __CRT_HAVE_DOS$getgrent_r
 #define __CRT_HAVE_DOS$getgrgid
 #define __CRT_HAVE_DOS$getgrgid_r
