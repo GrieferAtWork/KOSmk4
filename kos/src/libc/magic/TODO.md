@@ -133,8 +133,6 @@
 - `<corecrt_terminate.h>`   (DOS)
 - `<fmtmsg.h>`              (GLibc!)
 - `<fstab.h>`               (GLibc!)
-- `<gnu-versions.h>`        (GLibc!)
-- `<gnu/libc-version.h>`    (GLibc!)
 - `<gshadow.h>`             (GLibc!)
 - `<mcheck.h>`              (GLibc!)
 - `<obstack.h>`             (GLibc!)
