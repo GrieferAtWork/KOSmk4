@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea9e2500 */
+/* HASH CRC-32:0xb62c60c7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,6 @@
 #define __stub__W_Gettnames
 #define __stub__Wcsftime
 #define __stub____lc_locale_name_func
-#define __stub___conio_common_vcwscanf
 #define __stub___control87_2
 #define __stub___fpecode
 #define __stub___h_errno_location
@@ -595,7 +594,6 @@
 #define __stub_DOS$_W_Gettnames
 #define __stub_DOS$_Wcsftime
 #define __stub_DOS$___lc_locale_name_func
-#define __stub_DOS$__conio_common_vcwscanf
 #define __stub_DOS$__wcserror
 #define __stub_DOS$__wcserror_s
 #define __stub_DOS$_wcreate_locale

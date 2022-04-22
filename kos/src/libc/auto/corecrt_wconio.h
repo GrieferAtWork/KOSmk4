@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64866d98 */
+/* HASH CRC-32:0xa150f1c1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,6 +58,8 @@ INTDEF ATTR_LIBC_C16PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(
 INTDEF ATTR_LIBC_C32PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc___conio_common_vcwprintf_s)(uint64_t options, char32_t const *format, locale_t locale, va_list args);
 INTDEF ATTR_LIBC_C16PRINTF_P(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___conio_common_vcwprintf_p)(uint64_t options, char16_t const *format, locale_t locale, va_list args);
 INTDEF ATTR_LIBC_C32PRINTF_P(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc___conio_common_vcwprintf_p)(uint64_t options, char32_t const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___conio_common_vcwscanf)(uint64_t options, char16_t const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_LIBC_C32SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc___conio_common_vcwscanf)(uint64_t options, char32_t const *format, locale_t locale, va_list args);
 INTDEF ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vcwprintf_l)(char16_t const *format, locale_t locale, va_list args);
 INTDEF ATTR_LIBC_C32PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc__vcwprintf_l)(char32_t const *format, locale_t locale, va_list args);
 INTDEF ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vcwprintf_s_l)(char16_t const *format, locale_t locale, va_list args);

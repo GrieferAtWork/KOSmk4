@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0536b6c */
+/* HASH CRC-32:0xa6ea18 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,8 +24,9 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "../user/corecrt_wconio.h"
+#include "corecrt_wconio.h"
 #include "../user/corecrt_wstdio.h"
+#include "parts.wchar.format-printer.h"
 #include "../user/stdio.h"
 #include "../user/string.h"
 #include "termios.h"
@@ -345,6 +346,48 @@ NOTHROW_NCX(LIBKCALL libc___conio_common_vcwprintf_s)(uint64_t options,
 }
 DEFINE_INTERN_ALIAS(libd___conio_common_vcwprintf_p, libd___conio_common_vcwprintf);
 DEFINE_INTERN_ALIAS(libc___conio_common_vcwprintf_p, libc___conio_common_vcwprintf);
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(conio_common_vcc16scanf_getc) __format_word_t
+(__FORMATPRINTER_CC conio_common_vcc16scanf_getc)(void *__UNUSED(arg)) {
+	return (__format_word_t)libd__getwche();
+}
+__LOCAL_LIBC(conio_common_vcc16scanf_ungetc) ssize_t
+(__FORMATPRINTER_CC conio_common_vcc16scanf_ungetc)(void *__UNUSED(arg), __format_word_t word) {
+	return libd__ungetwch((wint16_t)word);
+}
+__NAMESPACE_LOCAL_END
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd___conio_common_vcwscanf)(uint64_t options,
+                                                   char16_t const *format,
+                                                   locale_t locale,
+                                                   va_list args) {
+	(void)options;
+	(void)locale;
+	return libd_format_vwscanf(&__NAMESPACE_LOCAL_SYM conio_common_vcc16scanf_getc,
+	                      &__NAMESPACE_LOCAL_SYM conio_common_vcc16scanf_ungetc,
+	                      NULL, format, args);
+}
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(conio_common_vcc32scanf_getc) __format_word_t
+(__FORMATPRINTER_CC conio_common_vcc32scanf_getc)(void *__UNUSED(arg)) {
+	return (__format_word_t)libc__getwche();
+}
+__LOCAL_LIBC(conio_common_vcc32scanf_ungetc) ssize_t
+(__FORMATPRINTER_CC conio_common_vcc32scanf_ungetc)(void *__UNUSED(arg), __format_word_t word) {
+	return libc__ungetwch((wint32_t)word);
+}
+__NAMESPACE_LOCAL_END
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C32SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBKCALL libc___conio_common_vcwscanf)(uint64_t options,
+                                                   char32_t const *format,
+                                                   locale_t locale,
+                                                   va_list args) {
+	(void)options;
+	(void)locale;
+	return libc_format_vwscanf(&__NAMESPACE_LOCAL_SYM conio_common_vcc32scanf_getc,
+	                      &__NAMESPACE_LOCAL_SYM conio_common_vcc32scanf_ungetc,
+	                      NULL, format, args);
+}
 #include <corecrt_stdio_config.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vcwprintf_l)(char16_t const *format,
@@ -654,6 +697,8 @@ DEFINE_PUBLIC_ALIAS(DOS$__conio_common_vcwprintf_s, libd___conio_common_vcwprint
 DEFINE_PUBLIC_ALIAS(__conio_common_vcwprintf_s, libc___conio_common_vcwprintf_s);
 DEFINE_PUBLIC_ALIAS(DOS$__conio_common_vcwprintf_p, libd___conio_common_vcwprintf_p);
 DEFINE_PUBLIC_ALIAS(__conio_common_vcwprintf_p, libc___conio_common_vcwprintf_p);
+DEFINE_PUBLIC_ALIAS(DOS$__conio_common_vcwscanf, libd___conio_common_vcwscanf);
+DEFINE_PUBLIC_ALIAS(__conio_common_vcwscanf, libc___conio_common_vcwscanf);
 DEFINE_PUBLIC_ALIAS(DOS$_vcwprintf_l, libd__vcwprintf_l);
 DEFINE_PUBLIC_ALIAS(_vcwprintf_l, libc__vcwprintf_l);
 DEFINE_PUBLIC_ALIAS(DOS$_vcwprintf_s_l, libd__vcwprintf_s_l);

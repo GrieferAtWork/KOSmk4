@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b976c51 */
+/* HASH CRC-32:0x326ccf0e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,12 +208,12 @@ NOTHROW_NCX(LIBCCALL libc___conio_common_vcprintf_s)(uint64_t options,
 }
 DEFINE_INTERN_ALIAS(libc___conio_common_vcprintf_p, libc___conio_common_vcprintf);
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__conio_common_vcscanf_getc) __format_word_t
-(__FORMATPRINTER_CC __conio_common_vcscanf_getc)(void *__UNUSED(arg)) {
+__LOCAL_LIBC(conio_common_vcscanf_getc) __format_word_t
+(__FORMATPRINTER_CC conio_common_vcscanf_getc)(void *__UNUSED(arg)) {
 	return (__format_word_t)libc__getche();
 }
-__LOCAL_LIBC(__conio_common_vcscanf_ungetc) ssize_t
-(__FORMATPRINTER_CC __conio_common_vcscanf_ungetc)(void *__UNUSED(arg), __format_word_t word) {
+__LOCAL_LIBC(conio_common_vcscanf_ungetc) ssize_t
+(__FORMATPRINTER_CC conio_common_vcscanf_ungetc)(void *__UNUSED(arg), __format_word_t word) {
 	return libc__ungetch((int)(unsigned char)(unsigned int)word);
 }
 __NAMESPACE_LOCAL_END
@@ -224,8 +224,8 @@ NOTHROW_NCX(LIBCCALL libc___conio_common_vcscanf)(uint64_t options,
                                                   va_list args) {
 	(void)options;
 	(void)locale;
-	return libc_format_vscanf(&__NAMESPACE_LOCAL_SYM __conio_common_vcscanf_getc,
-	                     &__NAMESPACE_LOCAL_SYM __conio_common_vcscanf_ungetc,
+	return libc_format_vscanf(&__NAMESPACE_LOCAL_SYM conio_common_vcscanf_getc,
+	                     &__NAMESPACE_LOCAL_SYM conio_common_vcscanf_ungetc,
 	                     NULL, format, args);
 }
 #include <corecrt_stdio_config.h>

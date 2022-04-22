@@ -285,12 +285,12 @@ __STDC_INT_AS_SSIZE_T __conio_common_vcprintf_p($uint64_t options, [[nonnull, fo
 [[requires_dependent_function(_getche, _ungetch)]]
 [[impl_prefix(
 @@push_namespace(local)@@
-__LOCAL_LIBC(__conio_common_vcscanf_getc) __format_word_t
-(__FORMATPRINTER_CC __conio_common_vcscanf_getc)(void *__UNUSED(arg)) {
+__LOCAL_LIBC(conio_common_vcscanf_getc) __format_word_t
+(__FORMATPRINTER_CC conio_common_vcscanf_getc)(void *__UNUSED(arg)) {
 	return (__format_word_t)_getche();
 }
-__LOCAL_LIBC(__conio_common_vcscanf_ungetc) ssize_t
-(__FORMATPRINTER_CC __conio_common_vcscanf_ungetc)(void *__UNUSED(arg), __format_word_t word) {
+__LOCAL_LIBC(conio_common_vcscanf_ungetc) ssize_t
+(__FORMATPRINTER_CC conio_common_vcscanf_ungetc)(void *__UNUSED(arg), __format_word_t word) {
 	return _ungetch((int)(unsigned char)(unsigned int)word);
 }
 @@pop_namespace@@
@@ -299,8 +299,8 @@ __STDC_INT_AS_SSIZE_T __conio_common_vcscanf($uint64_t options, [[nonnull, forma
                                              $locale_t locale, $va_list args) {
 	(void)options;
 	(void)locale;
-	return format_vscanf(&__NAMESPACE_LOCAL_SYM __conio_common_vcscanf_getc,
-	                     &__NAMESPACE_LOCAL_SYM __conio_common_vcscanf_ungetc,
+	return format_vscanf(&__NAMESPACE_LOCAL_SYM conio_common_vcscanf_getc,
+	                     &__NAMESPACE_LOCAL_SYM conio_common_vcscanf_ungetc,
 	                     NULL, format, args);
 }
 

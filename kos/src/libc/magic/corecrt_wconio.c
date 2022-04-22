@@ -252,9 +252,31 @@ __STDC_INT_AS_SSIZE_T __conio_common_vcwprintf_p($uint64_t options, [[nonnull, f
 	return __stdio_common_vfwprintf_p(options, stdtty, format, locale, args);
 }
 
-[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), wunused]]
+
+%[define_wchar_replacement(conio_common_vcwscanf_getc = conio_common_vcc16scanf_getc, conio_common_vcc32scanf_getc)]
+%[define_wchar_replacement(conio_common_vcwscanf_ungetc = conio_common_vcc16scanf_ungetc, conio_common_vcc32scanf_ungetc)]
+
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[wunused, requires_dependent_function(_getwche, _ungetwch), impl_prefix(
+@@push_namespace(local)@@
+__LOCAL_LIBC(conio_common_vcwscanf_getc) __format_word_t
+(__FORMATPRINTER_CC conio_common_vcwscanf_getc)(void *__UNUSED(arg)) {
+	return (__format_word_t)_getwche();
+}
+__LOCAL_LIBC(conio_common_vcwscanf_ungetc) ssize_t
+(__FORMATPRINTER_CC conio_common_vcwscanf_ungetc)(void *__UNUSED(arg), __format_word_t word) {
+	return _ungetwch((wint_t)word);
+}
+@@pop_namespace@@
+)]]
 __STDC_INT_AS_SSIZE_T __conio_common_vcwscanf($uint64_t options, [[nonnull, format]] wchar_t const *format,
-                                              $locale_t locale, $va_list args); /* TODO: format_wscanf() */
+                                              $locale_t locale, $va_list args) {
+	(void)options;
+	(void)locale;
+	return format_vwscanf(&__NAMESPACE_LOCAL_SYM conio_common_vcwscanf_getc,
+	                      &__NAMESPACE_LOCAL_SYM conio_common_vcwscanf_ungetc,
+	                      NULL, format, args);
+}
 
 
 
