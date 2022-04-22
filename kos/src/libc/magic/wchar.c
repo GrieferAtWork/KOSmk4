@@ -1737,13 +1737,87 @@ __STDC_INT_AS_SIZE_T vwprintf_unlocked([[nonnull, format]] wchar_t const *__rest
 
 %[default:section(".text.crt{|.dos}.wchar.FILE.unlocked.read.scanf")]
 
-@@>> vfwscanf_unlocked(3)
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[cp_stdio, wunused, wchar, alias("vfwscanf")]]
+%[define_wchar_replacement(vfwscanf_unlocked_getc = vfc16scanf_unlocked_getc, vfc32scanf_unlocked_getc)]
+%[define_wchar_replacement(vfwscanf_unlocked_ungetc = vfc16scanf_unlocked_ungetc, vfc32scanf_unlocked_ungetc)]
+%[define_wchar_replacement(____vfwscanf_unlocked_getc_defined = ____vfc16scanf_unlocked_getc_defined, ____vfc32scanf_unlocked_getc_defined)]
+%[define_wchar_replacement(DEFINE_VFWSCANF_UNLOCKED_HELPERS = DEFINE_VFC16SCANF_UNLOCKED_HELPERS, DEFINE_VFC32SCANF_UNLOCKED_HELPERS)]
+
+%[define(DEFINE_VFWSCANF_UNLOCKED_HELPERS =
+@@pp_ifndef ____vfwscanf_unlocked_getc_defined@@
+#define ____vfwscanf_unlocked_getc_defined
+@@push_namespace(local)@@
+@@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
+__LOCAL_LIBC(@vfwscanf_unlocked_getc@) __format_word_t
+(__FORMATPRINTER_CC vfwscanf_unlocked_getc)(void *arg) {
+	return (__format_word_t)fgetwc_unlocked((FILE *)arg);
+}
+@@pp_endif@@
+__LOCAL_LIBC(@vfwscanf_unlocked_ungetc@) ssize_t
+(__FORMATPRINTER_CC vfwscanf_unlocked_ungetc)(void *arg, __format_word_t word) {
+	return ungetwc_unlocked((wint_t)word, (FILE *)arg);
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_VFC16SCANF_UNLOCKED_HELPERS =
+@@pp_ifndef ____vfc16scanf_unlocked_getc_defined@@
+#define ____vfc16scanf_unlocked_getc_defined
+@@push_namespace(local)@@
+@@pp_if !defined(__LIBDCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
+__LOCAL_LIBC(@vfc16scanf_unlocked_getc@) __format_word_t
+(__FORMATPRINTER_CC vfc16scanf_unlocked_getc)(void *arg) {
+	return (__format_word_t)fgetc16_unlocked((FILE *)arg);
+}
+@@pp_endif@@
+__LOCAL_LIBC(@vfc16scanf_unlocked_ungetc@) ssize_t
+(__FORMATPRINTER_CC vfc16scanf_unlocked_ungetc)(void *arg, __format_word_t word) {
+	return ungetc16_unlocked((wint16_t)word, (FILE *)arg);
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_VFC32SCANF_UNLOCKED_HELPERS =
+@@pp_ifndef ____vfc32scanf_unlocked_getc_defined@@
+#define ____vfc32scanf_unlocked_getc_defined
+@@push_namespace(local)@@
+@@pp_if !defined(__LIBKCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
+__LOCAL_LIBC(@vfc32scanf_unlocked_getc@) __format_word_t
+(__FORMATPRINTER_CC vfc32scanf_unlocked_getc)(void *arg) {
+	return (__format_word_t)fgetc32_unlocked((FILE *)arg);
+}
+@@pp_endif@@
+__LOCAL_LIBC(@vfc32scanf_unlocked_ungetc@) ssize_t
+(__FORMATPRINTER_CC vfc32scanf_unlocked_ungetc)(void *arg, __format_word_t word) {
+	return ungetc32_unlocked((wint32_t)word, (FILE *)arg);
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+
+[[cp_stdio, wunused, wchar, doc_alias("vfwscanf"), alias("vfwscanf")]]
+[[requires_dependent_function(fgetwc_unlocked, ungetwc_unlocked)]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+[[impl_prefix(DEFINE_VFWSCANF_UNLOCKED_HELPERS)]]
 __STDC_INT_AS_SIZE_T vfwscanf_unlocked([[nonnull]] $FILE *__restrict stream,
                                        [[nonnull, format]] wchar_t const *__restrict format,
-                                       $va_list args);
-/* TODO: Inline implementation for `vfwscanf_unlocked()' */
+                                       $va_list args) {
+@@pp_if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__@@
+	return format_vwscanf((pformatgetc)(void *)&fgetwc_unlocked,
+	                      &__NAMESPACE_LOCAL_SYM vfwscanf_unlocked_ungetc,
+	                      (void *)stream,
+	                      format, args);
+@@pp_else@@
+	return format_vwscanf(&__NAMESPACE_LOCAL_SYM vfwscanf_unlocked_getc,
+	                      &__NAMESPACE_LOCAL_SYM vfwscanf_unlocked_ungetc,
+	                      (void *)stream,
+	                      format, args);
+@@pp_endif@@
+}
+
+
 
 @@>> vwscanf_unlocked(3)
 [[impl_include("<libc/template/stdstreams.h>")]]
@@ -1751,7 +1825,8 @@ __STDC_INT_AS_SIZE_T vfwscanf_unlocked([[nonnull]] $FILE *__restrict stream,
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdin) && $has_function(vfwscanf_unlocked))]]
-__STDC_INT_AS_SIZE_T vwscanf_unlocked([[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
+__STDC_INT_AS_SIZE_T vwscanf_unlocked([[nonnull, format]] wchar_t const *__restrict format,
+                                      $va_list args) {
 	return vfwscanf_unlocked(stdin, format, args);
 }
 

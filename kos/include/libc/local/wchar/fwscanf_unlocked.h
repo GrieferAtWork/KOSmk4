@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2aa9e22 */
+/* HASH CRC-32:0xde1823a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_fwscanf_unlocked_defined
 #define __local_fwscanf_unlocked_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)
+#if defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf) || ((defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE__getwc_nolock) || defined(__CRT_HAVE__fgetwc_nolock)) && (defined(__CRT_HAVE_ungetwc_unlocked) || defined(__CRT_HAVE__ungetwc_nolock) || defined(__CRT_HAVE_ungetwc)))
 #include <kos/anno.h>
 #include <features.h>
 #include <hybrid/typecore.h>
@@ -32,6 +32,11 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfwscanf)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
+#elif (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE__getwc_nolock) || defined(__CRT_HAVE__fgetwc_nolock)) && (defined(__CRT_HAVE_ungetwc_unlocked) || defined(__CRT_HAVE__ungetwc_nolock) || defined(__CRT_HAVE_ungetwc))
+__NAMESPACE_LOCAL_END
+#include <libc/local/wchar/vfwscanf_unlocked.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_vfwscanf_unlocked __LIBC_LOCAL_NAME(vfwscanf_unlocked)
 #else /* ... */
 #undef __local___localdep_vfwscanf_unlocked_defined
 #endif /* !... */
@@ -50,7 +55,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_fwscanf_unlocked_defined
 #define __localdep_fwscanf_unlocked __LIBC_LOCAL_NAME(fwscanf_unlocked)
 #endif /* !__local___localdep_fwscanf_unlocked_defined */
-#else /* __CRT_HAVE_vfwscanf_unlocked || __CRT_HAVE_vfwscanf */
+#else /* __CRT_HAVE_vfwscanf_unlocked || __CRT_HAVE_vfwscanf || ((__CRT_HAVE_fgetwc_unlocked || __CRT_HAVE_getwc_unlocked || __CRT_HAVE__getwc_nolock || __CRT_HAVE__fgetwc_nolock) && (__CRT_HAVE_ungetwc_unlocked || __CRT_HAVE__ungetwc_nolock || __CRT_HAVE_ungetwc)) */
 #undef __local_fwscanf_unlocked_defined
-#endif /* !__CRT_HAVE_vfwscanf_unlocked && !__CRT_HAVE_vfwscanf */
+#endif /* !__CRT_HAVE_vfwscanf_unlocked && !__CRT_HAVE_vfwscanf && ((!__CRT_HAVE_fgetwc_unlocked && !__CRT_HAVE_getwc_unlocked && !__CRT_HAVE__getwc_nolock && !__CRT_HAVE__fgetwc_nolock) || (!__CRT_HAVE_ungetwc_unlocked && !__CRT_HAVE__ungetwc_nolock && !__CRT_HAVE_ungetwc)) */
 #endif /* !__local_fwscanf_unlocked_defined */

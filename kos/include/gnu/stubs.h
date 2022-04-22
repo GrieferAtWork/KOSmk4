@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb62c60c7 */
+/* HASH CRC-32:0x6de55a4f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -584,7 +584,6 @@
 #define __stub_uselocale
 #define __stub_utmpname
 #define __stub_utmpxname
-#define __stub_vfwscanf_unlocked
 #define __stub___vhangup
 #define __stub___libc_vhangup
 #define __stub_vhangup
@@ -629,7 +628,6 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$tmpnam
-#define __stub_DOS$vfwscanf_unlocked
 #define __stub_DOS$wfreadlinkat
 #define __stub_DOS$wttyname_r
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3decc72 */
+/* HASH CRC-32:0xb2efefe4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,10 +71,6 @@ INTDEF NONNULL((1, 2)) ssize_t (LIBKCALL libc_file_wprinter_unlocked)(void *arg,
 INTDEF NONNULL((2)) wint16_t NOTHROW_NCX(LIBDCALL libd_ungetwc_unlocked)(wint16_t ch, FILE *__restrict stream);
 /* >> ungetwc_unlocked(3) */
 INTDEF NONNULL((2)) wint32_t NOTHROW_NCX(LIBKCALL libc_ungetwc_unlocked)(wint32_t ch, FILE *__restrict stream);
-/* >> vfwscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) THROWS(...);
-/* >> vfwscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_LIBC_C32SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBKCALL libc_vfwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) THROWS(...);
 /* >> fgetwln(3) */
 INTDEF WUNUSED NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict fp, size_t *__restrict lenp);
 /* >> fgetwln(3) */

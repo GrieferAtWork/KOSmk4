@@ -444,22 +444,6 @@ NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc,
 
 
 
-/*[[[head:libc_vfwscanf_unlocked,hash:CRC-32=0x56fae7ed]]]*/
-/* >> vfwscanf_unlocked(3) */
-INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_C32SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-(LIBKCALL libc_vfwscanf_unlocked)(FILE *__restrict stream,
-                                  char32_t const *__restrict format,
-                                  va_list args) THROWS(...)
-/*[[[body:libc_vfwscanf_unlocked]]]*/
-/*AUTO*/{
-	(void)stream;
-	(void)format;
-	(void)args;
-	CRT_UNIMPLEMENTEDF("vfwscanf_unlocked(%p, %p, %p)", stream, format, args); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_vfwscanf_unlocked]]]*/
 
 /*[[[head:libd_fgetwln,hash:CRC-32=0x8121879c]]]*/
 /* >> fgetwln(3) */
@@ -491,22 +475,6 @@ NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict fp,
 }
 /*[[[end:libc_fgetwln]]]*/
 
-/*[[[head:libd_vfwscanf_unlocked,hash:CRC-32=0x6d7a0836]]]*/
-/* >> vfwscanf_unlocked(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
-(LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream,
-                                  char16_t const *__restrict format,
-                                  va_list args) THROWS(...)
-/*[[[body:libd_vfwscanf_unlocked]]]*/
-/*AUTO*/{
-	(void)stream;
-	(void)format;
-	(void)args;
-	CRT_UNIMPLEMENTEDF("DOS$vfwscanf_unlocked(%p, %p, %p)", stream, format, args); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libd_vfwscanf_unlocked]]]*/
 
 
 
@@ -603,7 +571,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.
 }
 /*[[[end:libd_file_wprinter_unlocked]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xfbc31211]]]*/
+/*[[[start:exports,hash:CRC-32=0xc66a9a01]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwc, libd_fgetwc);
 DEFINE_PUBLIC_ALIAS(getwc, libc_fgetwc);
@@ -635,8 +603,6 @@ DEFINE_PUBLIC_ALIAS(file_wprinter_unlocked, libc_file_wprinter_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$_ungetwc_nolock, libd_ungetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$ungetwc_unlocked, libd_ungetwc_unlocked);
 DEFINE_PUBLIC_ALIAS(ungetwc_unlocked, libc_ungetwc_unlocked);
-DEFINE_PUBLIC_ALIAS(DOS$vfwscanf_unlocked, libd_vfwscanf_unlocked);
-DEFINE_PUBLIC_ALIAS(vfwscanf_unlocked, libc_vfwscanf_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$fgetwln, libd_fgetwln);
 DEFINE_PUBLIC_ALIAS(fgetwln, libc_fgetwln);
 /*[[[end:exports]]]*/
