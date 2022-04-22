@@ -84,6 +84,11 @@ task_raisesignalprocessgroup(struct procgrp *__restrict group,
 FUNDEF NONNULL((1)) size_t FCALL
 _task_raisesignoprocessgroup(struct procgrp *__restrict group, signo_t signo)
 		THROWS(E_WOULDBLOCK);
+
+/* Same as `_task_raisesignoprocessgroup()', but the caller must be holding `procgrp_memb_read(group)' */
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL _task_raisesignoprocessgroup_locked)(struct procgrp *__restrict group, signo_t signo);
+
 /* Like `_task_raisesignoprocessgroup()' is to `task_raisesignalprocessgroup()',
  * but for a single process. This is in fact the same as  `proc_sig_schedule()'. */
 FUNDEF NOBLOCK NONNULL((1)) __BOOL

@@ -579,7 +579,7 @@ INTERN_FUNCTION(libc_x86_setcontext_Pbp)
 	 * `%Pax' right now)
 	 *
 	 * FIXME: %Pax may point into read-only memory, because of which
-	 *        we may only many any  writes if the pointed-to  signal
+	 *        we may only make any  writes if the pointed-to  signal
 	 *        sets  actually differ. Trying  to write otherwise must
 	 *        not be done! */
 	movP   %Pax, %Pdi

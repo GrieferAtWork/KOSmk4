@@ -376,7 +376,7 @@ again_determine_group:
 		 * which  in the case of process-wide RPCs might get set asynchronously,
 		 * in which case there can be a process-directed RPC pending right  now,
 		 * which is also meant to kill,  even though our `TASK_FRPC' flag  isn't
-		 * set right now.
+		 * set yet.
 		 *
 		 * Because of this, we need a custom way of checking for signal, which
 		 * we facilitate by checking for TASK_FRPC, and even if that one's not

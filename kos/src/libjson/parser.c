@@ -350,10 +350,10 @@ again:
  *       of the given input, as  specified by the Json  specs, meaning you don't  have
  *       to concern yourself with the details on how to supply input to this function.
  * @param: start: Pointer to the start of json input data (usually points to a c-string)
- * @param: end:   Pointer to the first byte past the end of json input data (usually equal
- *                to `strend(start)', though note that the input string doesn't need to be
- *                NUL-terminated. - Only bytes `x' with `x >= start && x < end' will  ever
- *                be accessed) */
+ * @param: end:   Pointer to the first byte past the last piece of json input data (usually
+ *                equal  to `strend(start)', though note that the input string doesn't need
+ *                to be NUL-terminated. - Only bytes `x' with `x >= start && x < end'  will
+ *                ever be accessed) */
 INTERN NONNULL((1, 2, 3)) void
 NOTHROW_NCX(CC libjson_parser_init)(struct json_parser *__restrict self,
                                     void const *start, void const *end) {

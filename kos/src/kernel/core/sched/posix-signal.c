@@ -286,6 +286,21 @@ _task_raisesignoprocessgroup(struct procgrp *__restrict group, signo_t signo)
 	return proc_count;
 }
 
+/* Same as `_task_raisesignoprocessgroup()', but the caller must be holding `procgrp_memb_read(group)' */
+PUBLIC NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL _task_raisesignoprocessgroup_locked)(struct procgrp *__restrict group, signo_t signo) {
+	struct taskpid *member;
+	size_t proc_count = 0;
+	assert(signo >= 1 && signo <= 31);
+	/* Send a signal to every process within the group. */
+	FOREACH_procgrp_memb(member, group) {
+		if (proc_sig_schedule(member, signo))
+			++proc_count;
+	}
+	return proc_count;
+}
+
+
 
 
 

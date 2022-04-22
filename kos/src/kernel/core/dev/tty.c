@@ -159,25 +159,30 @@ do_throw_E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN:
 		goto again;
 	}
 	if (!procgrp_orphaned(mygrp)) {
-		/* XXX: The `procgrp_orphaned()'  check must  be made  interlocked with  sending
-		 *      the `SIGTTOU' to the process group. -- If the group stops being orphaned
-		 *      before  we're able to send the signal,  it would violate posix; iow: the
-		 *      special handling  for orphaned  process groups  must happen  interlocked
-		 *      with the sending of a signal to a non-orphaned one. */
+		/* NOTE: The `procgrp_orphaned()'  check must  be made  interlocked with  sending
+		 *       the `SIGTTOU' to the process group. -- If the group stops being orphaned
+		 *       before  we're able to send the signal,  it would violate posix; iow: the
+		 *       special handling  for orphaned  process groups  must happen  interlocked
+		 *       with the sending of a signal to a non-orphaned one. */
+		_task_raisesignoprocessgroup_locked(mygrp, signo);
 		procgrp_memb_endread(mygrp);
-		_task_raisesignoprocessgroup(mygrp, signo);
 		task_serve();
-		/* FIXME: We might get here if the calling process changed groups.
-		 *        This race condition  must be fixed  by keeping the  lock
-		 *        to `procgrp_memb_endread()' until  after we've send  the
-		 *        signal to all of the group members (which is  guarantied
-		 *        to include the calling process).
-		 * The only case  where we ~truely~  want to get  here is when  the
-		 * caller uses a userprocmask that changed `signo' to masked before
-		 * we  were able to send it the  signal. When that happens, we want
-		 * to fall through to the throwing the exception below. */
+		/* NOTE: We won't get here if the calling process changed groups.
+		 *       This race condition is prevented by keeping the lock  to
+		 *       `procgrp_memb_endread()'  until  after  we've  send  the
+		 *       signal to all of the group members (which is  guarantied
+		 *       to include the calling process).
+		 * The only case where we can actually get here is when the caller
+		 * uses a userprocmask  that changed `signo'  to masked before  we
+		 * were able to send it the signal. When that happens, we want  to
+		 * fall through to throwing the exception below. */
+
+#if 0 /* Guarantied to have happend in `_task_raisesignoprocessgroup_locked()'.
+       * If we did it  again here, the  signal may appear  twice if it's  being
+       * handled by another thread in the caller's process at the moment! */
 		_task_raisesignoprocess(mypid, signo);
 		task_serve();
+#endif
 	} else {
 		procgrp_memb_endread(mygrp);
 	}

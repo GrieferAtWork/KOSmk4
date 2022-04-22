@@ -665,8 +665,8 @@ do_split_many_chunks_after_lo_pages:
 			 *  #6:  Write the data read into the temporary physical
 			 *       memory page to the new swap-page
 			 *  #7:  Free the temporary physical memory page
-			 *  #8:  Acquire   a   new   lock   to   lo-part
-			 *  #9:  Check  that  nothing's changed  in the  mean time
+			 *  #8:  Acquire a new lock to lo-part
+			 *  #9:  Check that nothing's changed in the mean time
 			 *  #10: Use the now-initialized swap-page for the hi-part
 			 *
 			 * ooof...

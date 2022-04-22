@@ -26,6 +26,7 @@
 #include <__stdinc.h>
 
 #if 0 /* To-be overwritten by arch-specific headers */
+#include <__crt.h>
 #ifdef __CC__
 __SYSDECL_BEGIN
 
@@ -37,9 +38,10 @@ typedef NATIVE_FPU_CONTROL_WORD_TYPE fpu_control_t;
 
 /* >> __fpu_control(3)
  * Control word set during startup of old linux applications. */
-#ifdef __CRT_HAVE___fpu_control
-__LIBC fpu_control_t __fpu_control;
-#endif /* __CRT_HAVE___fpu_control */
+#if !defined(__fpu_control) && defined(__CRT_HAVE___fpu_control)
+__CSDECLARE(,fpu_control_t,__fpu_control)
+#define __fpu_control __fpu_control
+#endif /* !__fpu_control && __CRT_HAVE___fpu_control */
 
 /* >> __setfpucw(3)
  * Function called by old linux applications to set `__fpu_control()'. */

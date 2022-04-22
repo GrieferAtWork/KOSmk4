@@ -145,31 +145,43 @@ __DECL_END
 #ifdef __CRT_HAVE_sched_yield
 #undef sched_yield
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
-__LIBC int (__LIBCCALL sched_yield)(void);
+__CDECLARE(,int,__NOTHROW,sched_yield,(void),())
 __NAMESPACE_INT_END __DECL_END
 #define __hybrid_yield (__NAMESPACE_INT_SYM sched_yield)
 #elif defined(__CRT_HAVE___sched_yield)
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
-__LIBC int (__LIBCCALL __sched_yield)(void);
+__CDECLARE(,int,__NOTHROW,__sched_yield,(void),())
 __NAMESPACE_INT_END __DECL_END
 #define __hybrid_yield (__NAMESPACE_INT_SYM __sched_yield)
 #elif defined(__CRT_HAVE_pthread_yield)
 #undef pthread_yield
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
-__LIBC int (__LIBCCALL pthread_yield)(void);
+__CDECLARE(,int,__NOTHROW,pthread_yield,(void),())
 __NAMESPACE_INT_END __DECL_END
 #define __hybrid_yield (__NAMESPACE_INT_SYM pthread_yield)
 #elif defined(__CRT_HAVE___pthread_yield)
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
-__LIBC int (__LIBCCALL __pthread_yield)(void);
+__CDECLARE(,int,__NOTHROW,__pthread_yield,(void),())
 __NAMESPACE_INT_END __DECL_END
 #define __hybrid_yield (__NAMESPACE_INT_SYM __pthread_yield)
 #elif defined(__CRT_HAVE_yield)
 #undef yield
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
-__LIBC int (__LIBCCALL yield)(void);
+__CDECLARE(,int,__NOTHROW,yield,(void),())
 __NAMESPACE_INT_END __DECL_END
 #define __hybrid_yield (__NAMESPACE_INT_SYM yield)
+#elif defined(__CRT_HAVE_thrd_yield)
+#undef yield
+__DECL_BEGIN __NAMESPACE_INT_BEGIN
+__CDECLARE_VOID(,__NOTHROW,thrd_yield,(void),())
+__NAMESPACE_INT_END __DECL_END
+#define __hybrid_yield (__NAMESPACE_INT_SYM thrd_yield)
+#elif defined(__CRT_HAVE_thr_yield)
+#undef yield
+__DECL_BEGIN __NAMESPACE_INT_BEGIN
+__CDECLARE_VOID(,__NOTHROW,thr_yield,(void),())
+__NAMESPACE_INT_END __DECL_END
+#define __hybrid_yield (__NAMESPACE_INT_SYM thr_yield)
 #elif defined(__NO_has_include) || __has_include(<kos/syscalls.h>)
 #include <kos/syscalls.h>
 #if __CRT_HAVE_SC(sched_yield)

@@ -28,7 +28,8 @@
 #include <bits/crt/format-printer.h>
 #include <bits/types.h>
 
-/* Json  writer  example  usage:
+/* Json writer example usage:
+ *
  * >> struct json_writer writer;
  * >> json_writer_init(&writer, printer, arg, format);
  * >> json_writer_beginobject(&writer);
@@ -41,8 +42,10 @@
  * >>     json_writer_addfield(&writer, "bar", 3);
  * >>     json_writer_putnull(&writer);
  * >> json_writer_endobject(&writer);
+ *
  * Output (format == JSON_WRITER_FORMAT_COMPACT):
  * >> {"foo":[10,20,30],"bar":null}
+ *
  * Output (format == JSON_WRITER_FORMAT_PRETTY):
  * >> {
  * >> 	"foo": [
