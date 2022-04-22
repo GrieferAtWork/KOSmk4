@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe803cb6b */
+/* HASH CRC-32:0x8294d501 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__putwch_nolock_defined
 #define __local__putwch_nolock_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked) || defined(__CRT_HAVE__putwc_nolock) || defined(__CRT_HAVE__fputwc_nolock))
+#if defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked) || defined(__CRT_HAVE__putwc_nolock) || defined(__CRT_HAVE__fputwc_nolock) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputwc_unlocked_defined
 #define __local___localdep_fputwc_unlocked_defined
@@ -49,6 +49,18 @@ __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+#elif defined(__CRT_HAVE_putwc)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),putwc,(__wc,__stream))
+#elif defined(__CRT_HAVE_fputwc)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),fputwc,(__wc,__stream))
 #else /* ... */
 #undef __local___localdep_fputwc_unlocked_defined
 #endif /* !... */
@@ -65,7 +77,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__putwch_nolock_defined
 #define __localdep__putwch_nolock __LIBC_LOCAL_NAME(_putwch_nolock)
 #endif /* !__local___localdep__putwch_nolock_defined */
-#else /* __CRT_HAVE_stdtty && (__CRT_HAVE_fputwc_unlocked || __CRT_HAVE_putwc_unlocked || __CRT_HAVE__putwc_nolock || __CRT_HAVE__fputwc_nolock) */
+#else /* __CRT_HAVE_stdtty && (__CRT_HAVE_fputwc_unlocked || __CRT_HAVE_putwc_unlocked || __CRT_HAVE__putwc_nolock || __CRT_HAVE__fputwc_nolock || __CRT_HAVE_putwc || __CRT_HAVE_fputwc) */
 #undef __local__putwch_nolock_defined
-#endif /* !__CRT_HAVE_stdtty || (!__CRT_HAVE_fputwc_unlocked && !__CRT_HAVE_putwc_unlocked && !__CRT_HAVE__putwc_nolock && !__CRT_HAVE__fputwc_nolock) */
+#endif /* !__CRT_HAVE_stdtty || (!__CRT_HAVE_fputwc_unlocked && !__CRT_HAVE_putwc_unlocked && !__CRT_HAVE__putwc_nolock && !__CRT_HAVE__fputwc_nolock && !__CRT_HAVE_putwc && !__CRT_HAVE_fputwc) */
 #endif /* !__local__putwch_nolock_defined */
