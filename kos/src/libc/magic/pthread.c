@@ -747,6 +747,7 @@ $errno_t pthread_detach(pthread_t pthread);
 @@Obtain the identifier of the current thread
 @@@return: * : Handle for the calling thread
 [[const, wunused, nothrow, export_alias("thrd_current", "thr_self")]]
+[[decl_include("<bits/crt/pthreadtypes.h>")]]
 pthread_t pthread_self();
 
 @@>> pthread_equal(3)

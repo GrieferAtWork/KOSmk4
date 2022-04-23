@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71e6076f */
+/* HASH CRC-32:0xd5a05090 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,10 +48,19 @@ __CVREDIRECT(,int,__NOTHROW_NCX,__localdep_prctl,(__STDC_INT_AS_UINT_T __command
 #ifndef __local___localdep_pthread_self_defined
 #define __local___localdep_pthread_self_defined
 #ifdef __CRT_HAVE_pthread_self
+__NAMESPACE_LOCAL_END
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pthread_t,__NOTHROW,__localdep_pthread_self,(void),pthread_self,())
 #elif defined(__CRT_HAVE_thrd_current)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pthread_t,__NOTHROW,__localdep_pthread_self,(void),thrd_current,())
 #elif defined(__CRT_HAVE_thr_self)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/pthreadtypes.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pthread_t,__NOTHROW,__localdep_pthread_self,(void),thr_self,())
 #else /* ... */
 #undef __local___localdep_pthread_self_defined
