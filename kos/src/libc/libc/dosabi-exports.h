@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf488a28e */
+/* HASH CRC-32:0x88bb8764 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3456,6 +3456,12 @@ DEFINE_PUBLIC_ALIAS(DOS$_strtime_s, libd__strtime_s);
 DEFINE_PUBLIC_ALIAS(DOS$_strdate_s, libd__strdate_s);
 DEFINE_PUBLIC_ALIAS(DOS$_getsystime, libd__getsystime);
 DEFINE_PUBLIC_ALIAS(DOS$_setsystime, libd__setsystime);
+
+/* timeval-utils */
+DEFINE_PUBLIC_ALIAS(DOS$timeval_add, libd_timeval_add);
+DEFINE_PUBLIC_ALIAS(DOS$timeval_sub, libd_timeval_sub);
+DEFINE_PUBLIC_ALIAS(DOS$timeval_add64, libd_timeval_add64);
+DEFINE_PUBLIC_ALIAS(DOS$timeval_sub64, libd_timeval_sub64);
 
 /* ttyent */
 DEFINE_PUBLIC_ALIAS(DOS$getttynam, libd_getttynam);

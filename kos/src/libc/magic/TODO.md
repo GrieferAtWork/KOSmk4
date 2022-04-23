@@ -165,7 +165,6 @@
 	- `<libiberty/safe-ctype.h>`
 	- `<libiberty/sort.h>`
 	- `<libiberty/splay-tree.h>`
-	- `<libiberty/timeval-utils.h>`
 
 
 

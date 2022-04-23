@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9a57b8d */
+/* HASH CRC-32:0xc947edd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2777,6 +2777,12 @@ DFUN(".text.crt.dos.time", libd__strtime_s, libc__strtime_s, TIn(__SIZEOF_ERRNO_
 DFUN(".text.crt.dos.time", libd__strdate_s, libc__strdate_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TI)
 DFUN(".text.crt.dos.time", libd__getsystime, libc__getsystime, TD, 1, TP)
 DFUN(".text.crt.dos.time", libd__setsystime, libc__setsystime, TD, 2, TP, TD)
+
+/* timeval-utils */
+DFUN(".text.crt.dos.libiberty", libd_timeval_add, libc_timeval_add, TV, 3, TP, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_timeval_sub, libc_timeval_sub, TV, 3, TP, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_timeval_add64, libc_timeval_add64, TV, 3, TP, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_timeval_sub64, libc_timeval_sub64, TV, 3, TP, TP, TP)
 
 /* ttyent */
 DFUN(".text.crt.dos.database.utmpx", libd_getttynam, libc_getttynam, TP, 1, TP)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f075d02 */
+/* HASH CRC-32:0x8c01d879 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3442,6 +3442,10 @@
 #define __CRT_HAVE_DOS$times
 #define __CRT_HAVE_DOS$timespec_get
 #define __CRT_HAVE_DOS$timespec_get64
+#define __CRT_HAVE_DOS$timeval_add
+#define __CRT_HAVE_DOS$timeval_add64
+#define __CRT_HAVE_DOS$timeval_sub
+#define __CRT_HAVE_DOS$timeval_sub64
 #define __CRT_HAVE_DOS$timingsafe_memcmp
 #define __CRT_HAVE_DOS$tmpfile_s
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -7702,6 +7706,10 @@
 #define __CRT_HAVE_times
 #define __CRT_HAVE_timespec_get
 #define __CRT_HAVE_timespec_get64
+#define __CRT_HAVE_timeval_add
+#define __CRT_HAVE_timeval_add64
+#define __CRT_HAVE_timeval_sub
+#define __CRT_HAVE_timeval_sub64
 #define __CRT_HAVE_timingsafe_memcmp
 #define __CRT_HAVE_tmpfile
 #define __CRT_HAVE_tmpfile64
