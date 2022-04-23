@@ -1238,9 +1238,7 @@ char *basename([[nonnull]] char const *filename)
 	char *result, *iter = (char *)filename;
 @@pp_ifdef _WIN32@@
 	/* Skip drive letter. */
-	if (((iter[0] >= 'A' && iter[0] <= 'Z') ||
-	     (iter[0] >= 'a' && iter[0] <= 'z')) &&
-	    iter[1] == ':')
+	if (isalpha(iter[0]) && iter[1] == ':')
 		iter += 2;
 @@pp_endif@@
 	result = iter;

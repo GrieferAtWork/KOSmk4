@@ -107,19 +107,6 @@ NOTHROW_NCX(LIBCCALL libc_expandargv)(int *p_argc,
 }
 /*[[[end:libc_expandargv]]]*/
 
-/*[[[head:libc_writeargv,hash:CRC-32=0x25e9e974]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") int
-NOTHROW_NCX(LIBCCALL libc_writeargv)(char *const *argv,
-                                     FILE *fp)
-/*[[[body:libc_writeargv]]]*/
-/*AUTO*/{
-	(void)argv;
-	(void)fp;
-	CRT_UNIMPLEMENTEDF("writeargv(%p, %p)", argv, fp); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_writeargv]]]*/
 
 /*[[[head:libd_concat_copy2,hash:CRC-32=0x957c2430]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
@@ -240,55 +227,9 @@ NOTHROW_NCX(LIBCCALL libc_make_temp_file_with_prefix)(const char *a,
 }
 /*[[[end:libc_make_temp_file_with_prefix]]]*/
 
-/*[[[head:libc_unlink_if_ordinary,hash:CRC-32=0xddd3a563]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") int
-NOTHROW_NCX(LIBCCALL libc_unlink_if_ordinary)(char const *a)
-/*[[[body:libc_unlink_if_ordinary]]]*/
-/*AUTO*/{
-	(void)a;
-	CRT_UNIMPLEMENTEDF("unlink_if_ordinary(%q)", a); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_unlink_if_ordinary]]]*/
 
-/*[[[head:libc_physmem_total,hash:CRC-32=0x9f48ae5c]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_physmem_total)(void)
-/*[[[body:libc_physmem_total]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("physmem_total"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_physmem_total]]]*/
 
-/*[[[head:libc_physmem_available,hash:CRC-32=0x9311214a]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_physmem_available)(void)
-/*[[[body:libc_physmem_available]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("physmem_available"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_physmem_available]]]*/
 
-/*[[[head:libc_xcrc32,hash:CRC-32=0x5bdf587a]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") unsigned int
-NOTHROW_NCX(LIBCCALL libc_xcrc32)(unsigned char const *a,
-                                  int b,
-                                  unsigned int c)
-/*[[[body:libc_xcrc32]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	(void)c;
-	CRT_UNIMPLEMENTEDF("xcrc32(%p, %x, %x)", a, b, c); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_xcrc32]]]*/
 
 /*[[[head:libc_hex_init,hash:CRC-32=0xd35a74f8]]]*/
 INTERN ATTR_SECTION(".text.crt.libiberty") void
@@ -533,13 +474,12 @@ NOTHROW_NCX(LIBCCALL libc_pwait)(int a,
 }
 /*[[[end:libc_pwait]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xe92c7205]]]*/
+/*[[[start:exports,hash:CRC-32=0x363436a8]]]*/
 DEFINE_PUBLIC_ALIAS(xmalloc_set_program_name, libc_xmalloc_set_program_name);
 DEFINE_PUBLIC_ALIAS(xmalloc_failed, libc_xmalloc_failed);
 DEFINE_PUBLIC_ALIAS(fdmatch, libc_fdmatch);
 DEFINE_PUBLIC_ALIAS(buildargv, libc_buildargv);
 DEFINE_PUBLIC_ALIAS(expandargv, libc_expandargv);
-DEFINE_PUBLIC_ALIAS(writeargv, libc_writeargv);
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$concat_copy2, libd_concat_copy2);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
@@ -551,10 +491,6 @@ DEFINE_PUBLIC_ALIAS(choose_tmpdir, libc_choose_tmpdir);
 DEFINE_PUBLIC_ALIAS(choose_temp_base, libc_choose_temp_base);
 DEFINE_PUBLIC_ALIAS(make_temp_file, libc_make_temp_file);
 DEFINE_PUBLIC_ALIAS(make_temp_file_with_prefix, libc_make_temp_file_with_prefix);
-DEFINE_PUBLIC_ALIAS(unlink_if_ordinary, libc_unlink_if_ordinary);
-DEFINE_PUBLIC_ALIAS(physmem_total, libc_physmem_total);
-DEFINE_PUBLIC_ALIAS(physmem_available, libc_physmem_available);
-DEFINE_PUBLIC_ALIAS(xcrc32, libc_xcrc32);
 DEFINE_PUBLIC_ALIAS(hex_init, libc_hex_init);
 DEFINE_PUBLIC_ALIAS(pex_run, libc_pex_run);
 DEFINE_PUBLIC_ALIAS(pex_run_in_environment, libc_pex_run_in_environment);

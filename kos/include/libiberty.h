@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0ba5477 */
+/* HASH CRC-32:0xae2174b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1137,7 +1137,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fdmatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #endif /* !__CRT_HAVE_fdmatch */
 __CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char **,__NOTHROW_NCX,buildargv,(char const *__a),(__a))
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,expandargv,(int *__p_argc, char ***__p_argv),(__p_argc,__p_argv))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,writeargv,(char *const *___argv, FILE *__fp),(___argv,__fp))
+#ifdef __CRT_HAVE_writeargv
+/* @return: 0 : Success
+ * @return: 1 : Error */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,writeargv,(char *const *___argv, FILE *__fp),(___argv,__fp))
+#elif defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
+#include <libc/local/libiberty/writeargv.h>
+/* @return: 0 : Success
+ * @return: 1 : Error */
+__NAMESPACE_LOCAL_USING_OR_IMPL(writeargv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL writeargv)(char *const *___argv, FILE *__fp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(writeargv))(___argv, __fp); })
+#endif /* ... */
 #ifdef __CRT_HAVE_concat
 __LIBC __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_SENTINEL __ATTR_WUNUSED char *__NOTHROW_NCX(__VLIBCCALL concat)(char const *__first, ...) __CASMNAME_SAME("concat");
 #elif defined(__CRT_HAVE_xmalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))
@@ -1200,15 +1209,59 @@ __CDECLARE_OPT(__ATTR_RETNONNULL __ATTR_WUNUSED,const char *,__NOTHROW_NCX,choos
 __CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,choose_temp_base,(void),())
 __CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,make_temp_file,(char const *__a),(__a))
 __CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,make_temp_file_with_prefix,(const char *__a, const char *__b),(__a,__b))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,unlink_if_ordinary,(char const *__a),(__a))
-__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,physmem_total,(void),())
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED,double,__NOTHROW_NCX,physmem_available,(void),())
-__CDECLARE_OPT(,unsigned int,__NOTHROW_NCX,xcrc32,(unsigned char const *__a, int __b, unsigned int __c),(__a,__b,__c))
+#ifdef __CRT_HAVE_unlink_if_ordinary
+/* >> unlink_if_ordinary(3)
+ * Delete a file, but only if it's S_ISREG or S_ISLNK
+ * @return:  0: File was deleted
+ * @return:  1: File doesn't exist, isn't accessible, or not a "regular" file.
+ * @return: -1: Unlink failed (s.a. `errno') */
+__CDECLARE(,int,__NOTHROW_NCX,unlink_if_ordinary,(char const *__filename),(__filename))
+#else /* __CRT_HAVE_unlink_if_ordinary */
+#include <bits/os/stat.h>
+#include <asm/os/fcntl.h>
+#if ((defined(__CRT_HAVE_klstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_klstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_lstat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_lstat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))) && (defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || defined(__CRT_HAVE___unlink) || defined(__CRT_HAVE___libc_unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)))
+#include <libc/local/libiberty/unlink_if_ordinary.h>
+/* >> unlink_if_ordinary(3)
+ * Delete a file, but only if it's S_ISREG or S_ISLNK
+ * @return:  0: File was deleted
+ * @return:  1: File doesn't exist, isn't accessible, or not a "regular" file.
+ * @return: -1: Unlink failed (s.a. `errno') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(unlink_if_ordinary, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL unlink_if_ordinary)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink_if_ordinary))(__filename); })
+#endif /* ((__CRT_HAVE_klstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_klstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_lstat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_lstat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64))) && (__CRT_HAVE_unlink || __CRT_HAVE__unlink || __CRT_HAVE___unlink || __CRT_HAVE___libc_unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat)) */
+#endif /* !__CRT_HAVE_unlink_if_ordinary */
+#ifdef __CRT_HAVE_physmem_total
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,physmem_total,(void),())
+#else /* __CRT_HAVE_physmem_total */
+#include <asm/crt/confname.h>
+#include <asm/pagesize.h>
+#if (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE)) && (defined(__CRT_HAVE_sysconf) || defined(__CRT_HAVE___sysconf)) && defined(_SC_PHYS_PAGES)
+#include <libc/local/libiberty/physmem_total.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(physmem_total, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL physmem_total)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(physmem_total))(); })
+#endif /* (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) && (__CRT_HAVE_sysconf || __CRT_HAVE___sysconf) && _SC_PHYS_PAGES */
+#endif /* !__CRT_HAVE_physmem_total */
+#ifdef __CRT_HAVE_physmem_available
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,double,__NOTHROW_NCX,physmem_available,(void),())
+#else /* __CRT_HAVE_physmem_available */
+#include <asm/crt/confname.h>
+#include <asm/pagesize.h>
+#if (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE)) && (defined(__CRT_HAVE_sysconf) || defined(__CRT_HAVE___sysconf)) && defined(_SC_AVPHYS_PAGES)
+#include <libc/local/libiberty/physmem_available.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(physmem_available, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL physmem_available)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(physmem_available))(); })
+#endif /* (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) && (__CRT_HAVE_sysconf || __CRT_HAVE___sysconf) && _SC_AVPHYS_PAGES */
+#endif /* !__CRT_HAVE_physmem_available */
+#ifdef __CRT_HAVE_xcrc32
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,xcrc32,(__BYTE_TYPE__ const *__buf, __STDC_INT_AS_SIZE_T __len, __UINT32_TYPE__ __crc),(__buf,__len,__crc))
+#else /* __CRT_HAVE_xcrc32 */
+#include <libc/local/libiberty/xcrc32.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(xcrc32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL xcrc32)(__BYTE_TYPE__ const *__buf, __STDC_INT_AS_SIZE_T __len, __UINT32_TYPE__ __crc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(xcrc32))(__buf, __len, __crc); })
+#endif /* !__CRT_HAVE_xcrc32 */
 #define _hex_array_size 256
 #define _hex_bad        99
 extern unsigned char const _hex_value[_hex_array_size];
 #define hex_value(c) ((unsigned int)_hex_value[(unsigned char)(c)])
 #define hex_p(c)     (hex_value(c) != _hex_bad)
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,hex_init,(void),())
+
 
 #define PEX_RECORD_TIMES 0x1
 #define PEX_USE_PIPES    0x2
@@ -1237,7 +1290,6 @@ struct pex_time {
 	unsigned long system_microseconds;
 };
 
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,hex_init,(void),())
 __CDECLARE_OPT(,const char *,__NOTHROW_NCX,pex_run,(struct pex_obj *__obj, int __flags, const char *__executable, char *const *___argv, const char *__outname, const char *__errname, int *__err),(__obj,__flags,__executable,___argv,__outname,__errname,__err))
 __CDECLARE_OPT(,const char *,__NOTHROW_NCX,pex_run_in_environment,(struct pex_obj *__obj, int __flags, const char *__executable, char *const *___argv, char *const *__env, const char *__outname, const char *__errname, int *__err),(__obj,__flags,__executable,___argv,__env,__outname,__errname,__err))
 __CDECLARE_OPT(,FILE *,__NOTHROW_NCX,pex_input_file,(struct pex_obj *__obj, int __flags, const char *__in_name),(__obj,__flags,__in_name))

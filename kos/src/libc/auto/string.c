@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf5256a2 */
+/* HASH CRC-32:0x6c455747 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -672,8 +672,6 @@ NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename) {
 	/* >> char *slash = strrchr(filename, '/');
 	 * >> return slash ? slash + 1 : (char *)filename; */
 	char *result, *iter = (char *)filename;
-
-
 
 
 

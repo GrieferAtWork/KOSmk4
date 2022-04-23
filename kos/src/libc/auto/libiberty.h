@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc715db19 */
+/* HASH CRC-32:0xa1477d02 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -169,9 +169,14 @@ INTDEF ATTR_PURE WUNUSED __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_countarg
 INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_fdmatch)(fd_t fd1, fd_t fd2);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char **NOTHROW_NCX(LIBDCALL libd_buildargv)(char const *a);
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBDCALL libd_expandargv)(int *p_argc, char ***p_argv);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_writeargv)(char *const *argv, FILE *fp);
+/* @return: 0 : Success
+ * @return: 1 : Error */
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_writeargv)(char *const *argv, FILE *fp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* @return: 0 : Success
+ * @return: 1 : Error */
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_writeargv)(char *const *argv, FILE *fp);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBCCALL libc_vconcat)(char const *first, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -203,8 +208,30 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBDCALL 
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBDCALL libd_make_relative_prefix_ignore_links)(const char *a, const char *b, const char *c);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBDCALL libd_make_temp_file)(char const *a);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBDCALL libd_make_temp_file_with_prefix)(const char *a, const char *b);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_unlink_if_ordinary)(char const *a);
-INTDEF unsigned int NOTHROW_NCX(LIBDCALL libd_xcrc32)(unsigned char const *a, int b, unsigned int c);
+/* >> unlink_if_ordinary(3)
+ * Delete a file, but only if it's S_ISREG or S_ISLNK
+ * @return:  0: File was deleted
+ * @return:  1: File doesn't exist, isn't accessible, or not a "regular" file.
+ * @return: -1: Unlink failed (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_unlink_if_ordinary)(char const *filename);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> unlink_if_ordinary(3)
+ * Delete a file, but only if it's S_ISREG or S_ISLNK
+ * @return:  0: File was deleted
+ * @return:  1: File doesn't exist, isn't accessible, or not a "regular" file.
+ * @return: -1: Unlink failed (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_unlink_if_ordinary)(char const *filename);
+INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_physmem_total)(void);
+INTDEF ATTR_PURE WUNUSED double NOTHROW_NCX(LIBCCALL libc_physmem_available)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_PURE WUNUSED __UINT32_TYPE__ NOTHROW_NCX(LIBDCALL libd_xcrc32)(__BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UINT32_TYPE__ crc);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_PURE WUNUSED __UINT32_TYPE__ NOTHROW_NCX(LIBCCALL libc_xcrc32)(__BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UINT32_TYPE__ crc);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF const char *NOTHROW_NCX(LIBDCALL libd_pex_run)(struct pex_obj *obj, int flags, const char *executable, char *const *argv, const char *outname, const char *errname, int *err);
 INTDEF const char *NOTHROW_NCX(LIBDCALL libd_pex_run_in_environment)(struct pex_obj *obj, int flags, const char *executable, char *const *argv, char *const *env, const char *outname, const char *errname, int *err);
 INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_pex_input_file)(struct pex_obj *obj, int flags, const char *in_name);

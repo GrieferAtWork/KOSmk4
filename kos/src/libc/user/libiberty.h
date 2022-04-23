@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82e4ad */
+/* HASH CRC-32:0x4ca5c372 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,6 @@ INTDEF ATTR_NORETURN void (LIBCCALL libc_xmalloc_failed)(size_t num_bytes) THROW
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_fdmatch)(fd_t fd1, fd_t fd2);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char **NOTHROW_NCX(LIBCCALL libc_buildargv)(char const *a);
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBCCALL libc_expandargv)(int *p_argc, char ***p_argv);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_writeargv)(char *const *argv, FILE *fp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF char *NOTHROW_NCX(VLIBDCALL libd_concat_copy2)(char const *first, ...);
@@ -50,10 +49,6 @@ INTDEF ATTR_RETNONNULL WUNUSED const char *NOTHROW_NCX(LIBCCALL libc_choose_tmpd
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_choose_temp_base)(void);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_temp_file)(char const *a);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_temp_file_with_prefix)(const char *a, const char *b);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_unlink_if_ordinary)(char const *a);
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_physmem_total)(void);
-INTDEF ATTR_PURE WUNUSED double NOTHROW_NCX(LIBCCALL libc_physmem_available)(void);
-INTDEF unsigned int NOTHROW_NCX(LIBCCALL libc_xcrc32)(unsigned char const *a, int b, unsigned int c);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_hex_init)(void);
 INTDEF const char *NOTHROW_NCX(LIBCCALL libc_pex_run)(struct pex_obj *obj, int flags, const char *executable, char *const *argv, const char *outname, const char *errname, int *err);
 INTDEF const char *NOTHROW_NCX(LIBCCALL libc_pex_run_in_environment)(struct pex_obj *obj, int flags, const char *executable, char *const *argv, char *const *env, const char *outname, const char *errname, int *err);

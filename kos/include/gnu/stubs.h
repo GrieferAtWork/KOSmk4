@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bb1838 */
+/* HASH CRC-32:0x2ee7d4c2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -446,8 +446,6 @@
 #define __stub_pex_run
 #define __stub_pex_run_in_environment
 #define __stub_pexecute
-#define __stub_physmem_available
-#define __stub_physmem_total
 #define __stub_posix_fadvise64
 #define __stub_posix_fallocate64
 #define __stub_posix_openpt
@@ -603,7 +601,6 @@
 #define __stub_ufromfpx
 #define __stub___ulckpwdf
 #define __stub_ulckpwdf
-#define __stub_unlink_if_ordinary
 #define __stub_updwtmp
 #define __stub_updwtmpx
 #define __stub___uselocale
@@ -614,9 +611,7 @@
 #define __stub___libc_vhangup
 #define __stub_vhangup
 #define __stub_wfreadlinkat
-#define __stub_writeargv
 #define __stub_wttyname_r
-#define __stub_xcrc32
 #define __stub_xmalloc_failed
 #define __stub_xmalloc_set_program_name
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL

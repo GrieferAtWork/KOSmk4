@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xace3c244 */
+/* HASH CRC-32:0x94f26dd7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,26 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_basename __LIBC_LOCAL_NAME(basename)
 #endif /* !... */
 #endif /* !__local___localdep_basename_defined */
+#ifndef __local___localdep_isalpha_defined
+#define __local___localdep_isalpha_defined
+__NAMESPACE_LOCAL_END
+#include <bits/crt/ctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_isalpha) && defined(__CRT_HAVE_isalpha)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isalpha,(int __ch),isalpha,{ return __crt_isalpha(__ch); })
+#elif defined(__crt_isalpha)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isalpha)(int __ch) { return __crt_isalpha(__ch); }
+#elif __has_builtin(__builtin_isalpha) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isalpha)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isalpha,(int __ch),isalpha,{ return __builtin_isalpha(__ch); })
+#elif defined(__CRT_HAVE_isalpha)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isalpha,(int __ch),isalpha,(__ch))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/ctype/isalpha.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_isalpha __LIBC_LOCAL_NAME(isalpha)
+#endif /* !... */
+#endif /* !__local___localdep_isalpha_defined */
 __LOCAL_LIBC(dos_lbasename) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED const char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_lbasename))(const char *__filename) {
 #ifdef _WIN32
@@ -46,9 +66,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_lbasename))(const char *__filenam
 	 * >> return slash ? slash + 1 : (char *)filename; */
 	char *__result, *__iter = (char *)__filename;
 	/* Skip drive letter. */
-	if (((__iter[0] >= 'A' && __iter[0] <= 'Z') ||
-	     (__iter[0] >= 'a' && __iter[0] <= 'z')) &&
-	    __iter[1] == ':')
+	if ((__NAMESPACE_LOCAL_SYM __localdep_isalpha)(__iter[0]) && __iter[1] == ':')
 		__iter += 2;
 	__result = __iter;
 	for (;;) {
