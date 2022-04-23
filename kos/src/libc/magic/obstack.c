@@ -130,13 +130,13 @@ INTERN ATTR_SECTION(".data.crt.heap.obstack")
 int libc_obstack_exit_failure = EXIT_FAILURE;
 
 /* Default allocation failure handler. */
-INTERN ATTR_SECTION(".bss.crt.heap.obstack")
+PRIVATE ATTR_SECTION(".bss.crt.heap.obstack")
 void (__LIBKCALL *libc_obstack_alloc_failed_handler)(void) = NULL;
-INTERN ATTR_SECTION(".rodata.crt.heap.obstack")
-char libc_obstack_alloc_failed_message[] = "memory exhausted";
-INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.heap.obstack")
+PRIVATE ATTR_SECTION(".rodata.crt.heap.obstack")
+char const libc_obstack_alloc_failed_message[] = "memory exhausted";
+PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.heap.obstack")
 void libc_obstack_alloc_failed_default(void) {
-	fprintf(stderr, "%s\n", gettext("memory exhausted"));
+	fprintf(stderr, "%s\n", gettext(libc_obstack_alloc_failed_message));
 	exit(obstack_exit_failure);
 }
 
