@@ -77,7 +77,7 @@ struct obstack {
 	} freefun;
 	void                    *extra_arg;              /* [?..?][valid_if(use_extra_arg)] Extra argument */
 	unsigned int             use_extra_arg : 1;      /* Pass an additional cookie-argument to alloc/free */
-	unsigned int             maybe_empty_object : 1; /* The current object may be empty */
+	unsigned int             maybe_empty_object : 1; /* The current chunk may contain empty objects */
 	unsigned int             alloc_failed : 1;       /* [const] Always `0' */
 };
 

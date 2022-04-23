@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x605468f4 */
+/* HASH CRC-32:0x56f8e379 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -164,14 +164,14 @@ void obstack_chunk_free(void *ptr);
 	_obstack_begin(self, min_chunk_size, 0,                               \
 	               _OBSTACK_CAST(void *(*)(size_t), obstack_chunk_alloc), \
 	               _OBSTACK_CAST(void (*)(void *), obstack_chunk_free))
-#define obstack_specify_allocation(self, min_chunk_size, alignment, chunkfun, freefun) \
-	_obstack_begin(self, min_chunk_size, alignment,                                    \
-	               _OBSTACK_CAST(void *(*)(size_t), chunkfun),                         \
-	               _OBSTACK_CAST(void (*)(void *), freefun))
-#define obstack_specify_allocation_with_arg(self, min_chunk_size, alignment, chunkfun, freefun, arg) \
-	_obstack_begin_1(self, min_chunk_size, alignment,                                                \
-	                 _OBSTACK_CAST(void *(*)(void *, size_t), chunkfun),                             \
-	                 _OBSTACK_CAST(void (*)(void *, void *), freefun), arg)
+#define obstack_specify_allocation(self, min_chunk_size, min_object_alignment, ob_malloc, ob_free) \
+	_obstack_begin(self, min_chunk_size, min_object_alignment,                                     \
+	               _OBSTACK_CAST(void *(*)(size_t), ob_malloc),                                    \
+	               _OBSTACK_CAST(void (*)(void *), ob_free))
+#define obstack_specify_allocation_with_arg(self, min_chunk_size, min_object_alignment, ob_malloc, ob_free, arg) \
+	_obstack_begin_1(self, min_chunk_size, min_object_alignment,                                                 \
+	                 _OBSTACK_CAST(void *(*)(void *, size_t), ob_malloc),                                        \
+	                 _OBSTACK_CAST(void (*)(void *, void *), ob_free), arg)
 
 /* >> obstack_memory_used(3)
  * Return the total size of all chunks allocated by `self' */
@@ -184,8 +184,8 @@ void obstack_chunk_free(void *ptr);
 #define obstack_alignment_mask(self) (self)->alignment_mask
 
 /* Override the chunk alloc/free functions used by `self'. */
-#define obstack_chunkfun(self, new_chunkfun) (void)((self)->chunkfun.extra = (void *(*)(void *, size_t))(new_chunkfun))
-#define obstack_freefun(self, new_freefun)   (void)((self)->freefun.extra = (void *(*)(void *, void *))(new_freefun))
+#define obstack_chunkfun(self, new_ob_malloc) (void)((self)->chunkfun.extra = (void *(*)(void *, size_t))(new_ob_malloc))
+#define obstack_freefun(self, new_ob_free)    (void)((self)->freefun.extra = (void *(*)(void *, void *))(new_ob_free))
 
 /* Return the num_bytes of the current object. */
 #define obstack_object_size(self) (_OBSTACK_SIZE_T)((self)->next_free - (self)->object_base)
@@ -284,7 +284,7 @@ void obstack_chunk_free(void *ptr);
 /* Finalize the current object and return its base address. */
 #ifdef __NO_XBLOCK
 #define obstack_finish(self)                                  \
-	((self)->next_free == (self)->object_base                 \
+	((void *)(self)->next_free == (void *)(self)->object_base \
 	 ? (void)((self)->maybe_empty_object = 1)                 \
 	 : (void)0,                                               \
 	 (self)->next_free = __PTR_ALIGN((self)->object_base,     \
@@ -300,9 +300,9 @@ void obstack_chunk_free(void *ptr);
 #define obstack_finish(self)                                     \
 	__XBLOCK({                                                   \
 		void *__of_res = (void *)(self)->object_base;            \
-		if ((self)->next_free == __of_res)                       \
+		if ((void *)(self)->next_free == __of_res)               \
 			(self)->maybe_empty_object = 1;                      \
-		(self)->next_free = __PTR_ALIGN((self)->object_base,     \
+		(self)->next_free = __PTR_ALIGN((char *)__of_res,        \
 		                                (self)->next_free,       \
 		                                (self)->alignment_mask); \
 		if ((self)->next_free > (self)->chunk_limit)             \
@@ -313,8 +313,10 @@ void obstack_chunk_free(void *ptr);
 #endif /* !__NO_XBLOCK */
 
 /* >> obstack_free(3)
- * Unwind  the  object-stack by  freeing  everything allocated  after  (and including)
- * `obj', where `obj' *should* be a pointer previously returned by `obstack_finish()'. */
+ * Unwind the  object-stack by  freeing everything  allocated after  (and  including)
+ * `obj', where `obj' *should* be a pointer previously returned by `obstack_finish()'
+ * When `obj' is `NULL',  simply free everything allocated  by `self', in which  case
+ * `self' must be re-initialized (via `_obstack_begin(3)') upon return. */
 #if defined(__NO_XBLOCK) || defined(__OPTIMIZE_SIZE__)
 #define obstack_free(self, obj) (__obstack_free)(self, obj)
 #else /* __NO_XBLOCK || __OPTIMIZE_SIZE__ */
