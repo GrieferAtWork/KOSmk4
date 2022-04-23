@@ -222,6 +222,7 @@
 	.mbstring.* .mbstring             # <mbstring.h>, <mbctype.h>
 	.conio.* .conio                   # <conio.h>, `stdtty'
 	.capability                       # <sys/capability.h>
+	.libiberty                        # <libiberty.h>
 	.unsorted                         # Everything else...
 
 	# Compatibility stuff
@@ -355,6 +356,7 @@
 	CB(PREFIX.crt.bsd.io.access PREFIX.crt.bsd.strstat PREFIX.crt.bsd) \
 	CB(PREFIX.crt.solaris) \
 	CB(PREFIX.crt.capability) \
+	CB(PREFIX.crt.libiberty) \
 	CB(PREFIX.crt.unsorted) \
 	CB(PREFIX.crt.compat.dos.msabi64.msabi64_RRRR PREFIX.crt.compat.dos.msabi64.msabi64_RRRRR PREFIX.crt.compat.dos.msabi64.msabi64_RRRRRRn) \
 	CB(PREFIX.crt.compat.linux.__register_frame PREFIX.crt.compat.linux.dirent PREFIX.crt.compat.linux.except PREFIX.crt.compat.linux.heap PREFIX.crt.compat.linux.init PREFIX.crt.compat.linux.misc PREFIX.crt.compat.linux.signal PREFIX.crt.compat.linux.stdio PREFIX.crt.compat.linux) \
@@ -529,6 +531,7 @@
 	CB(PREFIX.crt.dos.mbstring) \
 	CB(PREFIX.crt.dos.conio) \
 	CB(PREFIX.crt.dos.capability) \
+	CB(PREFIX.crt.dos.libiberty) \
 	CB(PREFIX.crt.dos.unsorted) \
 	CB(PREFIX.crt.dos.compat.cyg.errno PREFIX.crt.dos.compat.cyg.fs.stat) \
 	CB(PREFIX.crt.dos.compat.dos.errno PREFIX.crt.dos.compat.dos.except PREFIX.crt.dos.compat.dos.fs.stat PREFIX.crt.dos.compat.dos.msabi64 PREFIX.crt.dos.compat.dos) \

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd40aceea */
+/* HASH CRC-32:0xdae747c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #define __CRT_HAVE_Accept
 #define __CRT_HAVE_Accept4
 #define __CRT_HAVE_Bind
+#define __CRT_HAVE_C_alloca
 #define __CRT_HAVE_Calloc
 #define __CRT_HAVE_ChRoot
 #define __CRT_HAVE_Chdir
@@ -33,6 +34,7 @@
 #define __CRT_HAVE_Creat64
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$C_alloca
 #define __CRT_HAVE_DOS$RpcExec
 #define __CRT_HAVE_DOS$RpcInterrupt
 #define __CRT_HAVE_DOS$RpcSchedule
@@ -1099,6 +1101,7 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$bufsplit
+#define __CRT_HAVE_DOS$buildargv
 #define __CRT_HAVE_DOS$bzero
 #define __CRT_HAVE_DOS$bzeroc
 #define __CRT_HAVE_DOS$bzerol
@@ -1206,6 +1209,10 @@
 #define __CRT_HAVE_DOS$cnd_timedwait
 #define __CRT_HAVE_DOS$cnd_timedwait64
 #define __CRT_HAVE_DOS$cnd_wait
+#define __CRT_HAVE_DOS$concat
+#define __CRT_HAVE_DOS$concat_copy
+#define __CRT_HAVE_DOS$concat_copy2
+#define __CRT_HAVE_DOS$concat_length
 #define __CRT_HAVE_DOS$confstr
 #define __CRT_HAVE_DOS$conj
 #define __CRT_HAVE_DOS$conjf
@@ -1238,6 +1245,7 @@
 #define __CRT_HAVE_DOS$coshf
 #define __CRT_HAVE_DOS$coshl
 #define __CRT_HAVE_DOS$cosl
+#define __CRT_HAVE_DOS$countargv
 #define __CRT_HAVE_DOS$cpow
 #define __CRT_HAVE_DOS$cpowf
 #define __CRT_HAVE_DOS$cpowl
@@ -1297,6 +1305,11 @@
 #define __CRT_HAVE_DOS$dn_expand
 #define __CRT_HAVE_DOS$dn_skipname
 #define __CRT_HAVE_DOS$dngettext
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(_WIN32)
+#define __CRT_HAVE_DOS$dos_lbasename
+#endif /* !__LIBCCALL_IS_LIBDCALL && !_WIN32 */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$dosfs_setenabled
 #define __CRT_HAVE_DOS$dprintf
 #define __CRT_HAVE_DOS$drand48_r
@@ -1307,6 +1320,7 @@
 #define __CRT_HAVE_DOS$dup3
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$dupargv
 #define __CRT_HAVE_DOS$duplocale
 #define __CRT_HAVE_DOS$dysize
 #define __CRT_HAVE_DOS$ecvt
@@ -1376,6 +1390,7 @@
 #define __CRT_HAVE_DOS$exp2
 #define __CRT_HAVE_DOS$exp2f
 #define __CRT_HAVE_DOS$exp2l
+#define __CRT_HAVE_DOS$expandargv
 #define __CRT_HAVE_DOS$expf
 #define __CRT_HAVE_DOS$expl
 #define __CRT_HAVE_DOS$expm1
@@ -1416,7 +1431,9 @@
 #define __CRT_HAVE_DOS$fdim
 #define __CRT_HAVE_DOS$fdimf
 #define __CRT_HAVE_DOS$fdiml
+#define __CRT_HAVE_DOS$fdmatch
 #define __CRT_HAVE_DOS$fdopen
+#define __CRT_HAVE_DOS$fdopen_unlocked
 #define __CRT_HAVE_DOS$fdopendir
 #define __CRT_HAVE_DOS$fdreopen
 #define __CRT_HAVE_DOS$fdreopen_unlocked
@@ -1527,6 +1544,7 @@
 #define __CRT_HAVE_DOS$fopen_s
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$fopen_unlocked
 #define __CRT_HAVE_DOS$fopencookie
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -1601,6 +1619,7 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$free
 #define __CRT_HAVE_DOS$freeaddrinfo
+#define __CRT_HAVE_DOS$freeargv
 #define __CRT_HAVE_DOS$freeifaddrs
 #define __CRT_HAVE_DOS$freelocale
 #define __CRT_HAVE_DOS$freezero
@@ -2131,6 +2150,7 @@
 #define __CRT_HAVE_DOS$logout
 #define __CRT_HAVE_DOS$logwtmp
 #define __CRT_HAVE_DOS$lrand48_r
+#define __CRT_HAVE_DOS$lrealpath
 #define __CRT_HAVE_DOS$lremovexattr
 #define __CRT_HAVE_DOS$lrint
 #define __CRT_HAVE_DOS$lrintf
@@ -2152,6 +2172,10 @@
 #define __CRT_HAVE_DOS$lutimes
 #define __CRT_HAVE_DOS$lutimes64
 #define __CRT_HAVE_DOS$madvise
+#define __CRT_HAVE_DOS$make_relative_prefix
+#define __CRT_HAVE_DOS$make_relative_prefix_ignore_links
+#define __CRT_HAVE_DOS$make_temp_file
+#define __CRT_HAVE_DOS$make_temp_file_with_prefix
 #define __CRT_HAVE_DOS$malloc
 #define __CRT_HAVE_DOS$malloc_trim
 #define __CRT_HAVE_DOS$malloc_usable_size
@@ -2477,6 +2501,18 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$pclose
 #define __CRT_HAVE_DOS$perror
+#define __CRT_HAVE_DOS$pex_free
+#define __CRT_HAVE_DOS$pex_get_status
+#define __CRT_HAVE_DOS$pex_get_times
+#define __CRT_HAVE_DOS$pex_init
+#define __CRT_HAVE_DOS$pex_input_file
+#define __CRT_HAVE_DOS$pex_input_pipe
+#define __CRT_HAVE_DOS$pex_one
+#define __CRT_HAVE_DOS$pex_read_err
+#define __CRT_HAVE_DOS$pex_read_output
+#define __CRT_HAVE_DOS$pex_run
+#define __CRT_HAVE_DOS$pex_run_in_environment
+#define __CRT_HAVE_DOS$pexecute
 #define __CRT_HAVE_DOS$pipe
 #define __CRT_HAVE_DOS$pipe2
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -2722,6 +2758,7 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$pvalloc
+#define __CRT_HAVE_DOS$pwait
 #define __CRT_HAVE_DOS$pwrite
 #define __CRT_HAVE_DOS$pwrite64
 #define __CRT_HAVE_DOS$pwriteall
@@ -2820,6 +2857,7 @@
 #define __CRT_HAVE_DOS$recalloc
 #define __CRT_HAVE_DOS$recallocarray
 #define __CRT_HAVE_DOS$recallocv
+#define __CRT_HAVE_DOS$reconcat
 #define __CRT_HAVE_DOS$recv
 #define __CRT_HAVE_DOS$recvfrom
 #define __CRT_HAVE_DOS$recvmmsg
@@ -3098,6 +3136,11 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$sopen
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$spaces
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$spawnl
 #define __CRT_HAVE_DOS$spawnle
 #define __CRT_HAVE_DOS$spawnlp
@@ -3126,6 +3169,11 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$ssignal
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$stack_limit_increase
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$stat
 #define __CRT_HAVE_DOS$stat64
 #endif /* !__KERNEL__ */
@@ -3250,6 +3298,7 @@
 #define __CRT_HAVE_DOS$strto64_r
 #define __CRT_HAVE_DOS$strtod
 #define __CRT_HAVE_DOS$strtod_l
+#define __CRT_HAVE_DOS$strtoerrno
 #define __CRT_HAVE_DOS$strtof
 #define __CRT_HAVE_DOS$strtof_l
 #define __CRT_HAVE_DOS$strtoi
@@ -3485,11 +3534,20 @@
 #define __CRT_HAVE_DOS$unicode_writeutf16_chk
 #define __CRT_HAVE_DOS$unicode_writeutf8
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && defined(_WIN32)
+#define __CRT_HAVE_DOS$unix_lbasename
+#endif /* !__LIBCCALL_IS_LIBDCALL && _WIN32 */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$unlink
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$unlink_if_ordinary
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$unlinkat
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$unlock_stream
 #define __CRT_HAVE_DOS$unlockpt
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -3797,6 +3855,7 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$write
 #define __CRT_HAVE_DOS$writeall
+#define __CRT_HAVE_DOS$writeargv
 #define __CRT_HAVE_DOS$writev
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -3833,6 +3892,17 @@
 #define __CRT_HAVE_DOS$wutimensat64
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$xasprintf
+#define __CRT_HAVE_DOS$xcalloc
+#define __CRT_HAVE_DOS$xcrc32
+#define __CRT_HAVE_DOS$xmalloc
+#define __CRT_HAVE_DOS$xmalloc_failed
+#define __CRT_HAVE_DOS$xmalloc_set_program_name
+#define __CRT_HAVE_DOS$xmemdup
+#define __CRT_HAVE_DOS$xrealloc
+#define __CRT_HAVE_DOS$xstrdup
+#define __CRT_HAVE_DOS$xstrndup
+#define __CRT_HAVE_DOS$xvasprintf
 #define __CRT_HAVE_DOS$y0
 #define __CRT_HAVE_DOS$y0f
 #define __CRT_HAVE_DOS$y0l
@@ -5094,6 +5164,7 @@
 #define __CRT_HAVE_bsearch_s
 #define __CRT_HAVE_btowc
 #define __CRT_HAVE_bufsplit
+#define __CRT_HAVE_buildargv
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_bzero
 #define __CRT_HAVE_bzeroc
@@ -5167,6 +5238,8 @@
 #endif /* !__KERNEL__ && __LIBC_CONFIG_HAVE_USERPROCMASK */
 #ifndef __KERNEL__
 #define __CRT_HAVE_chmod
+#define __CRT_HAVE_choose_temp_base
+#define __CRT_HAVE_choose_tmpdir
 #define __CRT_HAVE_chown
 #define __CRT_HAVE_chroot
 #define __CRT_HAVE_cimag
@@ -5205,6 +5278,10 @@
 #define __CRT_HAVE_cnd_timedwait
 #define __CRT_HAVE_cnd_timedwait64
 #define __CRT_HAVE_cnd_wait
+#define __CRT_HAVE_concat
+#define __CRT_HAVE_concat_copy
+#define __CRT_HAVE_concat_copy2
+#define __CRT_HAVE_concat_length
 #define __CRT_HAVE_confstr
 #define __CRT_HAVE_conj
 #define __CRT_HAVE_conjf
@@ -5233,6 +5310,7 @@
 #define __CRT_HAVE_coshf
 #define __CRT_HAVE_coshl
 #define __CRT_HAVE_cosl
+#define __CRT_HAVE_countargv
 #define __CRT_HAVE_cpow
 #define __CRT_HAVE_cpowf
 #define __CRT_HAVE_cpowl
@@ -5307,6 +5385,11 @@
 #define __CRT_HAVE_dn_expand
 #define __CRT_HAVE_dn_skipname
 #define __CRT_HAVE_dngettext
+#endif /* !__KERNEL__ */
+#ifndef _WIN32
+#define __CRT_HAVE_dos_lbasename
+#endif /* !_WIN32 */
+#ifndef __KERNEL__
 #define __CRT_HAVE_dosfs_getenabled
 #define __CRT_HAVE_dosfs_setenabled
 #define __CRT_HAVE_dprintf
@@ -5315,6 +5398,7 @@
 #define __CRT_HAVE_dup
 #define __CRT_HAVE_dup2
 #define __CRT_HAVE_dup3
+#define __CRT_HAVE_dupargv
 #define __CRT_HAVE_duplocale
 #define __CRT_HAVE_dysize
 #define __CRT_HAVE_ecvt
@@ -5360,6 +5444,7 @@
 #define __CRT_HAVE_erfl
 #define __CRT_HAVE_err
 #define __CRT_HAVE_errc
+#define __CRT_HAVE_errno_max
 #define __CRT_HAVE_error
 #define __CRT_HAVE_error_at_line
 #define __CRT_HAVE_errx
@@ -5417,6 +5502,7 @@
 #define __CRT_HAVE_exp2
 #define __CRT_HAVE_exp2f
 #define __CRT_HAVE_exp2l
+#define __CRT_HAVE_expandargv
 #define __CRT_HAVE_expf
 #define __CRT_HAVE_expl
 #define __CRT_HAVE_expm1
@@ -5447,7 +5533,9 @@
 #define __CRT_HAVE_fdim
 #define __CRT_HAVE_fdimf
 #define __CRT_HAVE_fdiml
+#define __CRT_HAVE_fdmatch
 #define __CRT_HAVE_fdopen
+#define __CRT_HAVE_fdopen_unlocked
 #define __CRT_HAVE_fdopendir
 #define __CRT_HAVE_fdreopen
 #define __CRT_HAVE_fdreopen_unlocked
@@ -5548,6 +5636,7 @@
 #define __CRT_HAVE_fopen
 #define __CRT_HAVE_fopen64
 #define __CRT_HAVE_fopen_s
+#define __CRT_HAVE_fopen_unlocked
 #define __CRT_HAVE_fopencookie
 #define __CRT_HAVE_fopendirat
 #define __CRT_HAVE_fork
@@ -5612,6 +5701,7 @@
 #define __CRT_HAVE_frealpathat
 #define __CRT_HAVE_free
 #define __CRT_HAVE_freeaddrinfo
+#define __CRT_HAVE_freeargv
 #define __CRT_HAVE_freeifaddrs
 #define __CRT_HAVE_freelocale
 #define __CRT_HAVE_freezero
@@ -5780,6 +5870,7 @@
 #define __CRT_HAVE_get_nprocs
 #define __CRT_HAVE_get_nprocs_conf
 #define __CRT_HAVE_get_phys_pages
+#define __CRT_HAVE_get_run_time
 #define __CRT_HAVE_getaddrinfo
 #define __CRT_HAVE_getaddrinfo_a
 #define __CRT_HAVE_getaliasbyname
@@ -5874,6 +5965,7 @@
 #define __CRT_HAVE_getprotoent_r
 #define __CRT_HAVE_getpt
 #define __CRT_HAVE_getpw
+#define __CRT_HAVE_getpwd
 #define __CRT_HAVE_getpwent
 #define __CRT_HAVE_getpwent_r
 #define __CRT_HAVE_getpwnam
@@ -5968,6 +6060,7 @@
 #define __CRT_HAVE_hdestroy_r
 #define __CRT_HAVE_heapsort
 #define __CRT_HAVE_herror
+#define __CRT_HAVE_hex_init
 #define __CRT_HAVE_highvideo
 #define __CRT_HAVE_hostalias
 #define __CRT_HAVE_hsearch
@@ -6211,6 +6304,7 @@
 #define __CRT_HAVE_lowvideo
 #define __CRT_HAVE_lrand48
 #define __CRT_HAVE_lrand48_r
+#define __CRT_HAVE_lrealpath
 #define __CRT_HAVE_lremovexattr
 #define __CRT_HAVE_lrint
 #define __CRT_HAVE_lrintf
@@ -6228,6 +6322,10 @@
 #define __CRT_HAVE_lutimes
 #define __CRT_HAVE_lutimes64
 #define __CRT_HAVE_madvise
+#define __CRT_HAVE_make_relative_prefix
+#define __CRT_HAVE_make_relative_prefix_ignore_links
+#define __CRT_HAVE_make_temp_file
+#define __CRT_HAVE_make_temp_file_with_prefix
 #define __CRT_HAVE_makecontext
 #define __CRT_HAVE_malloc
 #define __CRT_HAVE_malloc_trim
@@ -6566,6 +6664,20 @@
 #define __CRT_HAVE_pause
 #define __CRT_HAVE_pclose
 #define __CRT_HAVE_perror
+#define __CRT_HAVE_pex_free
+#define __CRT_HAVE_pex_get_status
+#define __CRT_HAVE_pex_get_times
+#define __CRT_HAVE_pex_init
+#define __CRT_HAVE_pex_input_file
+#define __CRT_HAVE_pex_input_pipe
+#define __CRT_HAVE_pex_one
+#define __CRT_HAVE_pex_read_err
+#define __CRT_HAVE_pex_read_output
+#define __CRT_HAVE_pex_run
+#define __CRT_HAVE_pex_run_in_environment
+#define __CRT_HAVE_pexecute
+#define __CRT_HAVE_physmem_available
+#define __CRT_HAVE_physmem_total
 #define __CRT_HAVE_pipe
 #define __CRT_HAVE_pipe2
 #endif /* !__KERNEL__ */
@@ -6806,6 +6918,7 @@
 #define __CRT_HAVE_putwchar
 #define __CRT_HAVE_putwchar_unlocked
 #define __CRT_HAVE_pvalloc
+#define __CRT_HAVE_pwait
 #define __CRT_HAVE_pwrite
 #define __CRT_HAVE_pwrite64
 #define __CRT_HAVE_pwriteall
@@ -6894,6 +7007,7 @@
 #define __CRT_HAVE_recalloc
 #define __CRT_HAVE_recallocarray
 #define __CRT_HAVE_recallocv
+#define __CRT_HAVE_reconcat
 #define __CRT_HAVE_recv
 #define __CRT_HAVE_recvfrom
 #define __CRT_HAVE_recvmmsg
@@ -7245,6 +7359,7 @@
 #define __CRT_HAVE_significand
 #define __CRT_HAVE_significandf
 #define __CRT_HAVE_significandl
+#define __CRT_HAVE_signo_max
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_sigorset
 #ifndef __KERNEL__
@@ -7285,6 +7400,7 @@
 #define __CRT_HAVE_socket
 #define __CRT_HAVE_socketpair
 #define __CRT_HAVE_sopen
+#define __CRT_HAVE_spaces
 #define __CRT_HAVE_spawnl
 #define __CRT_HAVE_spawnle
 #define __CRT_HAVE_spawnlp
@@ -7311,6 +7427,7 @@
 #define __CRT_HAVE_sscanf
 #define __CRT_HAVE_sscanf_s
 #define __CRT_HAVE_ssignal
+#define __CRT_HAVE_stack_limit_increase
 #define __CRT_HAVE_stat
 #define __CRT_HAVE_stat64
 #define __CRT_HAVE_statfs
@@ -7441,6 +7558,7 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_strtod
 #define __CRT_HAVE_strtod_l
+#define __CRT_HAVE_strtoerrno
 #define __CRT_HAVE_strtof
 #define __CRT_HAVE_strtof_l
 #define __CRT_HAVE_strtoi
@@ -7662,9 +7780,15 @@
 #define __CRT_HAVE_unicode_writeutf16
 #define __CRT_HAVE_unicode_writeutf16_chk
 #define __CRT_HAVE_unicode_writeutf8
+#ifdef _WIN32
+#define __CRT_HAVE_unix_lbasename
+#endif /* _WIN32 */
 #ifndef __KERNEL__
 #define __CRT_HAVE_unlink
+#define __CRT_HAVE_unlink_if_ordinary
 #define __CRT_HAVE_unlinkat
+#define __CRT_HAVE_unlock_std_streams
+#define __CRT_HAVE_unlock_stream
 #define __CRT_HAVE_unlockpt
 #define __CRT_HAVE_unsetenv
 #define __CRT_HAVE_unshare
@@ -7685,6 +7809,7 @@
 #define __CRT_HAVE_uucopystr
 #define __CRT_HAVE_valloc
 #define __CRT_HAVE_vasprintf
+#define __CRT_HAVE_vconcat
 #define __CRT_HAVE_vdprintf
 #define __CRT_HAVE_verr
 #define __CRT_HAVE_verrc
@@ -7949,6 +8074,7 @@
 #endif /* !__KERNEL__ && (!__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__) */
 #ifndef __KERNEL__
 #define __CRT_HAVE_writeall
+#define __CRT_HAVE_writeargv
 #define __CRT_HAVE_writev
 #define __CRT_HAVE_wrmdir
 #define __CRT_HAVE_wscanf
@@ -7981,6 +8107,17 @@
 #define __CRT_HAVE_wutime64
 #define __CRT_HAVE_wutimensat
 #define __CRT_HAVE_wutimensat64
+#define __CRT_HAVE_xasprintf
+#define __CRT_HAVE_xcalloc
+#define __CRT_HAVE_xcrc32
+#define __CRT_HAVE_xmalloc
+#define __CRT_HAVE_xmalloc_failed
+#define __CRT_HAVE_xmalloc_set_program_name
+#define __CRT_HAVE_xmemdup
+#define __CRT_HAVE_xrealloc
+#define __CRT_HAVE_xstrdup
+#define __CRT_HAVE_xstrndup
+#define __CRT_HAVE_xvasprintf
 #define __CRT_HAVE_y0
 #define __CRT_HAVE_y0f
 #define __CRT_HAVE_y0l

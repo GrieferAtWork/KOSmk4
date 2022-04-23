@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f9df06 */
+/* HASH CRC-32:0xf11d59c2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -579,6 +579,57 @@ DFUN(".text.crt.dos.solaris", libd_strecpy, libc_strecpy, TP, 3, TP, TP, TP)
 DFUN(".text.crt.dos.solaris", libd_strfind, libc_strfind, TD, 2, TP, TP)
 DFUN(".text.crt.dos.solaris", libd_strrspn, libc_strrspn, TP, 2, TP, TP)
 DFUN(".text.crt.dos.solaris", libd_strtrns, libc_strtrns, TP, 4, TP, TP, TP, TP)
+
+/* libiberty */
+DFUN(".text.crt.dos.libiberty", libd_C_alloca, libc_C_alloca, TP, 1, TI)
+DFUN(".text.crt.dos.libiberty", libd_stack_limit_increase, libc_stack_limit_increase, TV, 1, TP)
+#ifndef _WIN32
+DFUN(".text.crt.dos.libiberty", libd_dos_lbasename, libc_dos_lbasename, TP, 1, TP)
+#endif /* !_WIN32 */
+#ifdef _WIN32
+DFUN(".text.crt.dos.libiberty", libd_unix_lbasename, libc_unix_lbasename, TP, 1, TP)
+#endif /* _WIN32 */
+DFUN(".text.crt.dos.libiberty", libd_lrealpath, libc_lrealpath, TP, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_strtoerrno, libc_strtoerrno, TIn(__SIZEOF_ERRNO_T__), 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_unlock_stream, libc_unlock_stream, TV, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_fopen_unlocked, libc_fopen_unlocked, TP, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_fdopen_unlocked, libc_fdopen_unlocked, TP, 2, TIn(__SIZEOF_FD_T__), TP)
+DFUN(".text.crt.dos.libiberty", libd_spaces, libc_spaces, TP, 1, TD)
+DFUN(".text.crt.dos.libiberty", libd_xmalloc_set_program_name, libc_xmalloc_set_program_name, TV, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_xmalloc_failed, libc_xmalloc_failed, TV, 1, TI)
+DFUN(".text.crt.dos.libiberty", libd_xmalloc, libc_xmalloc, TP, 1, TI)
+DFUN(".text.crt.dos.libiberty", libd_xrealloc, libc_xrealloc, TP, 2, TP, TI)
+DFUN(".text.crt.dos.libiberty", libd_xcalloc, libc_xcalloc, TP, 2, TI, TI)
+DFUN(".text.crt.dos.libiberty", libd_xstrdup, libc_xstrdup, TP, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_xstrndup, libc_xstrndup, TP, 2, TP, TI)
+DFUN(".text.crt.dos.libiberty", libd_xmemdup, libc_xmemdup, TP, 3, TP, TI, TI)
+DFUN(".text.crt.dos.libiberty", libd_xvasprintf, libc_xvasprintf, TP, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_dupargv, libc_dupargv, TP, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_freeargv, libc_freeargv, TV, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_countargv, libc_countargv, TD, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_fdmatch, libc_fdmatch, TD, 2, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.libiberty", libd_buildargv, libc_buildargv, TP, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_expandargv, libc_expandargv, TV, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_writeargv, libc_writeargv, TD, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_make_relative_prefix, libc_make_relative_prefix, TP, 3, TP, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_make_relative_prefix_ignore_links, libc_make_relative_prefix_ignore_links, TP, 3, TP, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_make_temp_file, libc_make_temp_file, TP, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_make_temp_file_with_prefix, libc_make_temp_file_with_prefix, TP, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_unlink_if_ordinary, libc_unlink_if_ordinary, TD, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_xcrc32, libc_xcrc32, TD, 3, TP, TD, TD)
+DFUN(".text.crt.dos.libiberty", libd_pex_run, libc_pex_run, TP, 7, TP, TD, TP, TP, TP, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_pex_run_in_environment, libc_pex_run_in_environment, TP, 8, TP, TD, TP, TP, TP, TP, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_pex_input_file, libc_pex_input_file, TP, 3, TP, TD, TP)
+DFUN(".text.crt.dos.libiberty", libd_pex_input_pipe, libc_pex_input_pipe, TP, 2, TP, TD)
+DFUN(".text.crt.dos.libiberty", libd_pex_read_output, libc_pex_read_output, TP, 2, TP, TD)
+DFUN(".text.crt.dos.libiberty", libd_pex_read_err, libc_pex_read_err, TP, 2, TP, TD)
+DFUN(".text.crt.dos.libiberty", libd_pex_get_status, libc_pex_get_status, TD, 3, TP, TD, TP)
+DFUN(".text.crt.dos.libiberty", libd_pex_init, libc_pex_init, TP, 3, TD, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_pex_get_times, libc_pex_get_times, TD, 3, TP, TD, TP)
+DFUN(".text.crt.dos.libiberty", libd_pex_free, libc_pex_free, TV, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_pex_one, libc_pex_one, TP, 8, TD, TP, TP, TP, TP, TP, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_pexecute, libc_pexecute, TD, 7, TP, TP, TP, TP, TP, TP, TD)
+DFUN(".text.crt.dos.libiberty", libd_pwait, libc_pwait, TD, 3, TD, TP, TD)
 
 /* libintl */
 DFUN(".text.crt.dos.i18n", libd_dcgettext, libc_dcgettext, TP, 3, TP, TP, TD)

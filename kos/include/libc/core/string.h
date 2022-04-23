@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93ea6c7 */
+/* HASH CRC-32:0x31ccd3d7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,6 +152,32 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 /* >> strcmp(3)
  * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __libc_core_strcmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcmp)
+#endif /* !... */
+#if __has_builtin(__builtin_strcpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcpy)
+/* >> strcpy(3)
+ * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
+ * The exact # of characters copied is `strlen(src) + 1' (+1 because
+ * the trailing NUL-character is also copied) */
+__CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__libc_core_strcpy,(char *__restrict __dst, char const *__restrict __src),strcpy,{ return __builtin_strcpy(__dst, __src); })
+#elif defined(__CRT_HAVE_strcpy)
+/* >> strcpy(3)
+ * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
+ * The exact # of characters copied is `strlen(src) + 1' (+1 because
+ * the trailing NUL-character is also copied) */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__libc_core_strcpy,(char *__restrict __dst, char const *__restrict __src),strcpy,(__dst,__src))
+#elif defined(__CRT_HAVE__mbscpy)
+/* >> strcpy(3)
+ * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
+ * The exact # of characters copied is `strlen(src) + 1' (+1 because
+ * the trailing NUL-character is also copied) */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__libc_core_strcpy,(char *__restrict __dst, char const *__restrict __src),_mbscpy,(__dst,__src))
+#else /* ... */
+#include <libc/local/string/strcpy.h>
+/* >> strcpy(3)
+ * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
+ * The exact # of characters copied is `strlen(src) + 1' (+1 because
+ * the trailing NUL-character is also copied) */
+#define __libc_core_strcpy __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcpy)
 #endif /* !... */
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
 #include <hybrid/typecore.h>

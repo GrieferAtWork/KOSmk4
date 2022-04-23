@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21541554 */
+/* HASH CRC-32:0xae5d95f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -733,7 +733,7 @@ INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL
  * >> basename("..");              // Returns ".."
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_basename)(char const *filename);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_basename)(char const *filename);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> basename(3)
@@ -758,7 +758,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_basename)(
  * >> basename("..");              // Returns ".."
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strverscmp(3) */

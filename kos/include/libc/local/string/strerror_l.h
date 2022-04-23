@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ea9ecf5 */
+/* HASH CRC-32:0x85ed6f63 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,12 +29,17 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_strerror,(__errno_t __errnum),strerror,(__errnum))
-#else /* __CRT_HAVE_strerror */
+#elif defined(__CRT_HAVE_xstrerror)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_strerror,(__errno_t __errnum),xstrerror,(__errnum))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strerror.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strerror __LIBC_LOCAL_NAME(strerror)
-#endif /* !__CRT_HAVE_strerror */
+#endif /* !... */
 #endif /* !__local___localdep_strerror_defined */
 __LOCAL_LIBC(strerror_l) __ATTR_COLD __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror_l))(int __errnum, __locale_t __locale) {

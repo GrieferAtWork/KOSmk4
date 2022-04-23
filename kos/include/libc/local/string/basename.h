@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1682762f */
+/* HASH CRC-32:0x1f26aec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,19 @@
 #define __local_basename_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(basename) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(basename) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(basename))(char const *__filename) {
-	/* char  *slash   =   strrchr(filename,   '/');
-	 * return slash ? slash + 1 : (char *)filename; */
-	char *__result = (char *)__filename;
-	char *__iter   = (char *)__filename;
+	/* >> char *slash = strrchr(filename, '/');
+	 * >> return slash ? slash + 1 : (char *)filename; */
+	char *__result, *__iter = (char *)__filename;
+#ifdef _WIN32
+	/* Skip drive letter. */
+	if (((__iter[0] >= 'A' && __iter[0] <= 'Z') ||
+	     (__iter[0] >= 'a' && __iter[0] <= 'z')) &&
+	    __iter[1] == ':')
+		__iter += 2;
+#endif /* _WIN32 */
+	__result = __iter;
 	for (;;) {
 		char __ch = *__iter++;
 #ifdef _WIN32

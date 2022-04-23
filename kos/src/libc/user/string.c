@@ -239,10 +239,12 @@ NOTHROW(LIBCCALL libc_sigdescr_np)(signo_t signum)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa60227ea]]]*/
+/*[[[start:exports,hash:CRC-32=0x806b2d11]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$signalname, libd_sigabbrev_np);
+DEFINE_PUBLIC_ALIAS(DOS$strsigno, libd_sigabbrev_np);
 DEFINE_PUBLIC_ALIAS(DOS$sigabbrev_np, libd_sigabbrev_np);
 DEFINE_PUBLIC_ALIAS(signalname, libc_sigabbrev_np);
+DEFINE_PUBLIC_ALIAS(strsigno, libc_sigabbrev_np);
 DEFINE_PUBLIC_ALIAS(sigabbrev_np, libc_sigabbrev_np);
 DEFINE_PUBLIC_ALIAS(DOS$sigdescr_np, libd_sigdescr_np);
 DEFINE_PUBLIC_ALIAS(sigdescr_np, libc_sigdescr_np);

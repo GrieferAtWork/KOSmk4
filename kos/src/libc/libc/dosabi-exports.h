@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b598ccf */
+/* HASH CRC-32:0x2d014683 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -548,6 +548,57 @@ DEFINE_PUBLIC_ALIAS(DOS$strecpy, libd_strecpy);
 DEFINE_PUBLIC_ALIAS(DOS$strfind, libd_strfind);
 DEFINE_PUBLIC_ALIAS(DOS$strrspn, libd_strrspn);
 DEFINE_PUBLIC_ALIAS(DOS$strtrns, libd_strtrns);
+
+/* libiberty */
+DEFINE_PUBLIC_ALIAS(DOS$C_alloca, libd_C_alloca);
+DEFINE_PUBLIC_ALIAS(DOS$stack_limit_increase, libd_stack_limit_increase);
+#ifndef _WIN32
+DEFINE_PUBLIC_ALIAS(DOS$dos_lbasename, libd_dos_lbasename);
+#endif /* !_WIN32 */
+#ifdef _WIN32
+DEFINE_PUBLIC_ALIAS(DOS$unix_lbasename, libd_unix_lbasename);
+#endif /* _WIN32 */
+DEFINE_PUBLIC_ALIAS(DOS$lrealpath, libd_lrealpath);
+DEFINE_PUBLIC_ALIAS(DOS$strtoerrno, libd_strtoerrno);
+DEFINE_PUBLIC_ALIAS(DOS$unlock_stream, libd_unlock_stream);
+DEFINE_PUBLIC_ALIAS(DOS$fopen_unlocked, libd_fopen_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$fdopen_unlocked, libd_fdopen_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$spaces, libd_spaces);
+DEFINE_PUBLIC_ALIAS(DOS$xmalloc_set_program_name, libd_xmalloc_set_program_name);
+DEFINE_PUBLIC_ALIAS(DOS$xmalloc_failed, libd_xmalloc_failed);
+DEFINE_PUBLIC_ALIAS(DOS$xmalloc, libd_xmalloc);
+DEFINE_PUBLIC_ALIAS(DOS$xrealloc, libd_xrealloc);
+DEFINE_PUBLIC_ALIAS(DOS$xcalloc, libd_xcalloc);
+DEFINE_PUBLIC_ALIAS(DOS$xstrdup, libd_xstrdup);
+DEFINE_PUBLIC_ALIAS(DOS$xstrndup, libd_xstrndup);
+DEFINE_PUBLIC_ALIAS(DOS$xmemdup, libd_xmemdup);
+DEFINE_PUBLIC_ALIAS(DOS$xvasprintf, libd_xvasprintf);
+DEFINE_PUBLIC_ALIAS(DOS$dupargv, libd_dupargv);
+DEFINE_PUBLIC_ALIAS(DOS$freeargv, libd_freeargv);
+DEFINE_PUBLIC_ALIAS(DOS$countargv, libd_countargv);
+DEFINE_PUBLIC_ALIAS(DOS$fdmatch, libd_fdmatch);
+DEFINE_PUBLIC_ALIAS(DOS$buildargv, libd_buildargv);
+DEFINE_PUBLIC_ALIAS(DOS$expandargv, libd_expandargv);
+DEFINE_PUBLIC_ALIAS(DOS$writeargv, libd_writeargv);
+DEFINE_PUBLIC_ALIAS(DOS$make_relative_prefix, libd_make_relative_prefix);
+DEFINE_PUBLIC_ALIAS(DOS$make_relative_prefix_ignore_links, libd_make_relative_prefix_ignore_links);
+DEFINE_PUBLIC_ALIAS(DOS$make_temp_file, libd_make_temp_file);
+DEFINE_PUBLIC_ALIAS(DOS$make_temp_file_with_prefix, libd_make_temp_file_with_prefix);
+DEFINE_PUBLIC_ALIAS(DOS$unlink_if_ordinary, libd_unlink_if_ordinary);
+DEFINE_PUBLIC_ALIAS(DOS$xcrc32, libd_xcrc32);
+DEFINE_PUBLIC_ALIAS(DOS$pex_run, libd_pex_run);
+DEFINE_PUBLIC_ALIAS(DOS$pex_run_in_environment, libd_pex_run_in_environment);
+DEFINE_PUBLIC_ALIAS(DOS$pex_input_file, libd_pex_input_file);
+DEFINE_PUBLIC_ALIAS(DOS$pex_input_pipe, libd_pex_input_pipe);
+DEFINE_PUBLIC_ALIAS(DOS$pex_read_output, libd_pex_read_output);
+DEFINE_PUBLIC_ALIAS(DOS$pex_read_err, libd_pex_read_err);
+DEFINE_PUBLIC_ALIAS(DOS$pex_get_status, libd_pex_get_status);
+DEFINE_PUBLIC_ALIAS(DOS$pex_init, libd_pex_init);
+DEFINE_PUBLIC_ALIAS(DOS$pex_get_times, libd_pex_get_times);
+DEFINE_PUBLIC_ALIAS(DOS$pex_free, libd_pex_free);
+DEFINE_PUBLIC_ALIAS(DOS$pex_one, libd_pex_one);
+DEFINE_PUBLIC_ALIAS(DOS$pexecute, libd_pexecute);
+DEFINE_PUBLIC_ALIAS(DOS$pwait, libd_pwait);
 
 /* libintl */
 DEFINE_PUBLIC_ALIAS(DOS$__dcgettext, libd_dcgettext);
@@ -2260,8 +2311,10 @@ DEFINE_PUBLIC_ALIAS(DOS$div, libd_div);
 DEFINE_PUBLIC_ALIAS(DOS$mblen, libd_mblen);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_system, libd_system);
 DEFINE_PUBLIC_ALIAS(DOS$system, libd_system);
+DEFINE_PUBLIC_ALIAS(DOS$xexit, libd_exit);
 DEFINE_PUBLIC_ALIAS(DOS$exit, libd_exit);
 DEFINE_PUBLIC_ALIAS(DOS$_crt_atexit, libd_atexit);
+DEFINE_PUBLIC_ALIAS(DOS$xatexit, libd_atexit);
 DEFINE_PUBLIC_ALIAS(DOS$atexit, libd_atexit);
 DEFINE_PUBLIC_ALIAS(DOS$quick_exit, libd_quick_exit);
 DEFINE_PUBLIC_ALIAS(DOS$_crt_at_quick_exit, libd_at_quick_exit);
@@ -2526,6 +2579,13 @@ DEFINE_PUBLIC_ALIAS(DOS$strcasestr, libd_strcasestr);
 DEFINE_PUBLIC_ALIAS(DOS$strchrnul, libd_strchrnul);
 DEFINE_PUBLIC_ALIAS(DOS$rawmemchr, libd_rawmemchr);
 DEFINE_PUBLIC_ALIAS(DOS$__basename, libd_basename);
+DEFINE_PUBLIC_ALIAS(DOS$lbasename, libd_basename);
+#ifdef _WIN32
+DEFINE_PUBLIC_ALIAS(DOS$dos_lbasename, libd_basename);
+#endif /* _WIN32 */
+#ifndef _WIN32
+DEFINE_PUBLIC_ALIAS(DOS$unix_lbasename, libd_basename);
+#endif /* !_WIN32 */
 DEFINE_PUBLIC_ALIAS(DOS$basename, libd_basename);
 DEFINE_PUBLIC_ALIAS(DOS$__strverscmp, libd_strverscmp);
 DEFINE_PUBLIC_ALIAS(DOS$strverscmp, libd_strverscmp);

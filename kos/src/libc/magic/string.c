@@ -749,7 +749,7 @@ miss:
 @@Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
 @@The exact # of characters copied is `strlen(src) + 1' (+1 because
 @@the trailing NUL-character is also copied)
-[[std, crtbuiltin, leaf, dos_only_export_alias("_mbscpy")]]
+[[std, crtbuiltin, leaf, dos_only_export_alias("_mbscpy"), libc]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCPY))]]
 [[nonnull]] char *strcpy([[nonnull]] char *__restrict dst,
                          [[nonnull]] char const *__restrict src) {
@@ -881,6 +881,7 @@ size_t strxfrm(char *dst, [[nonnull]] char const *__restrict src, size_t maxlen)
 [[std, wunused, cold, crt_dos_variant]]
 [[nonnull, section(".text.crt{|.dos}.errno")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
+[[export_alias("xstrerror")]]
 char *strerror($errno_t errnum) {
 	static char strerror_buf[64];
 	char *result;
@@ -936,7 +937,7 @@ __NAMESPACE_STD_END
 %#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 @@>> strnlen(3)
 @@Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´)
-[[decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<hybrid/typecore.h>"), guard]]
 [[libc, kernel, wunused, crtbuiltin, pure, alias("__strncnt")]]
 [[if(!defined(__KERNEL__)), dos_only_export_as("__strncnt")]] /* DOS-specific name */
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRNLEN))]]
@@ -1225,15 +1226,24 @@ void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n
 @@>> basename("..");              // Returns ".."
 @@>> basename("");                // Returns ""
 @@>> basename(NULL);              // <Undefined behavior>
-[[guard, pure, wunused, export_alias("__basename")]]
+[[guard, pure, wunused, export_alias("__basename", "lbasename"), nonnull]]
+[[if(defined(_WIN32)), export_as("dos_lbasename")]]
+[[if(!defined(_WIN32)), export_as("unix_lbasename")]]
 char *basename([[nonnull]] char const *filename)
 	[([[nonnull]] char *filename): char *]
 	[([[nonnull]] char const *filename): char const *]
 {
-	/* char  *slash   =   strrchr(filename,   '/');
-	 * return slash ? slash + 1 : (char *)filename; */
-	char *result = (char *)filename;
-	char *iter   = (char *)filename;
+	/* >> char *slash = strrchr(filename, '/');
+	 * >> return slash ? slash + 1 : (char *)filename; */
+	char *result, *iter = (char *)filename;
+@@pp_ifdef _WIN32@@
+	/* Skip drive letter. */
+	if (((iter[0] >= 'A' && iter[0] <= 'Z') ||
+	     (iter[0] >= 'a' && iter[0] <= 'z')) &&
+	    iter[1] == ':')
+		iter += 2;
+@@pp_endif@@
+	result = iter;
 	for (;;) {
 		char ch = *iter++;
 @@pp_ifdef _WIN32@@
@@ -1252,7 +1262,7 @@ char *basename([[nonnull]] char const *filename)
 
 
 @@>> strverscmp(3)
-[[pure, wunused, export_alias("__strverscmp")]]
+[[pure, wunused, export_alias("__strverscmp"), guard]]
 int strverscmp([[nonnull]] char const *s1,
                [[nonnull]] char const *s2) {
 	char const *s1_start = s1;
@@ -1884,7 +1894,7 @@ impl: {
 	errnum = libd_errno_dos2kos(errnum);
 	return libc_strerrorname_np(errnum);
 }
-})]]
+}), export_alias("strerrno")]]
 char const *strerrorname_np($errno_t errnum) {
 /*[[[deemon
 import * from deemon;
@@ -2655,6 +2665,7 @@ print("	};");
 [[decl_include("<bits/types.h>"), export_alias("signalname")]]
 [[const, wunused, nothrow, section(".text.crt{|.dos}.errno")]]
 [[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>")]]
+[[export_alias("strsigno")]]
 char const *sigabbrev_np($signo_t signum) {
 	char const *result;
 	switch (signum) {
@@ -8270,7 +8281,7 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 @@e.g.: `strtosigno("SIGINT") == SIGINT'
 @@When `name' isn't recognized, return `0' instead.
 [[pure, wunused, impl_include("<asm/os/signal.h>")]]
-[[requires_function(signalnumber, isupper)]]
+[[guard, requires_function(signalnumber, isupper)]]
 $signo_t strtosigno([[nonnull]] const char *name) {
 	size_t i;
 	if (name[0] != 'S' || name[1] != 'I' || name[2] != 'G')

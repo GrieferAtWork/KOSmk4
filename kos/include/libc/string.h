@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1caab0a */
+/* HASH CRC-32:0x1269ef98 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,6 +102,11 @@
 /* >> strcmp(3)
  * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __libc_strcmp __libc_core_strcmp
+/* >> strcpy(3)
+ * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
+ * The exact # of characters copied is `strlen(src) + 1' (+1 because
+ * the trailing NUL-character is also copied) */
+#define __libc_strcpy __libc_core_strcpy
 /* >> strnlen(3)
  * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 #define __libc_strnlen __libc_core_strnlen

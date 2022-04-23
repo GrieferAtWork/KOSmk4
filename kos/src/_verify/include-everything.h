@@ -269,6 +269,7 @@ incdir("");
 #include <bits/crt/mathdef.h>
 #include <bits/crt/mbstate.h>
 #include <bits/crt/ntptimeval.h>
+#include <bits/crt/obstack.h>
 #include <bits/crt/posix_spawn.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/pthreadtypesizes.h>
@@ -815,6 +816,7 @@ incdir("");
 #include <libgen86/api.h>
 #include <libgen86/gen.h>
 #include <libgen86/register.h>
+#include <libiberty.h>
 #include <libiconv/api.h>
 #include <libiconv/codec.h>
 #include <libiconv/iconv.h>
@@ -1103,6 +1105,7 @@ incdir("");
 #include <nt/types.h>
 #include <nt/wincon.h>
 #include <nt/winnls.h>
+#include <obstack.h>
 #include <optimized/error.h>
 #include <optimized/fenv.h>
 #include <optimized/ssp.string.h>

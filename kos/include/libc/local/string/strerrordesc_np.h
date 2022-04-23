@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd099668 */
+/* HASH CRC-32:0xa00f0c3c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,12 +38,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_strerrorname_np_defined
 #ifdef __CRT_HAVE_strerrorname_np
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerrorname_np,(__errno_t __errnum),strerrorname_np,(__errnum))
-#else /* __CRT_HAVE_strerrorname_np */
+#elif defined(__CRT_HAVE_strerrno)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerrorname_np,(__errno_t __errnum),strerrno,(__errnum))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strerrorname_np.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strerrorname_np __LIBC_LOCAL_NAME(strerrorname_np)
-#endif /* !__CRT_HAVE_strerrorname_np */
+#endif /* !... */
 #endif /* !__local___localdep_strerrorname_np_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __BUILDING_LIBC

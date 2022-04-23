@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3bfe1f1 */
+/* HASH CRC-32:0xdf5256a2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -667,12 +667,19 @@ NOTHROW_NCX(LIBCCALL libc_rawmemchr)(void const *__restrict haystack,
  * >> basename("..");              // Returns ".."
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename) {
-	/* char  *slash   =   strrchr(filename,   '/');
-	 * return slash ? slash + 1 : (char *)filename; */
-	char *result = (char *)filename;
-	char *iter   = (char *)filename;
+	/* >> char *slash = strrchr(filename, '/');
+	 * >> return slash ? slash + 1 : (char *)filename; */
+	char *result, *iter = (char *)filename;
+
+
+
+
+
+
+
+	result = iter;
 	for (;;) {
 		char ch = *iter++;
 
@@ -6176,7 +6183,9 @@ DEFINE_PUBLIC_ALIAS(strcoll, libc_strcoll);
 DEFINE_PUBLIC_ALIAS(strxfrm, libc_strxfrm);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRXFRM */
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$xstrerror, libd_strerror);
 DEFINE_PUBLIC_ALIAS(DOS$strerror, libd_strerror);
+DEFINE_PUBLIC_ALIAS(xstrerror, libc_strerror);
 DEFINE_PUBLIC_ALIAS(strerror, libc_strerror);
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_STRNLEN
@@ -6240,6 +6249,8 @@ DEFINE_PUBLIC_ALIAS(rawmemchr, libc_rawmemchr);
 #endif /* !LIBC_ARCH_HAVE_RAWMEMCHR */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__basename, libc_basename);
+DEFINE_PUBLIC_ALIAS(lbasename, libc_basename);
+DEFINE_PUBLIC_ALIAS(unix_lbasename, libc_basename);
 DEFINE_PUBLIC_ALIAS(basename, libc_basename);
 DEFINE_PUBLIC_ALIAS(__strverscmp, libc_strverscmp);
 DEFINE_PUBLIC_ALIAS(strverscmp, libc_strverscmp);
@@ -6268,8 +6279,10 @@ DEFINE_PUBLIC_ALIAS(DOS$strerrordesc_np, libd_strerrordesc_np);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strerrordesc_np, libc_strerrordesc_np);
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$strerrno, libd_strerrorname_np);
 DEFINE_PUBLIC_ALIAS(DOS$strerrorname_np, libd_strerrorname_np);
 #endif /* !__KERNEL__ */
+DEFINE_PUBLIC_ALIAS(strerrno, libc_strerrorname_np);
 DEFINE_PUBLIC_ALIAS(strerrorname_np, libc_strerrorname_np);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$__strerror_r, libd_strerror_r);

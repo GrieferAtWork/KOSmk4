@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7787452 */
+/* HASH CRC-32:0x864d0131 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -263,9 +263,9 @@ enum __rlimit_resource {
 #endif /* ... */
 
 
-#define RLIM_INFINITY   (__CCAST(__FS_TYPE(rlim))-1) /* Unlimited */
+#define RLIM_INFINITY   __RLIM_INFINITY   /* Unlimited */
 #ifdef __USE_LARGEFILE64
-#define RLIM64_INFINITY (__CCAST(__rlim64_t)-1)      /* Unlimited */
+#define RLIM64_INFINITY __RLIM64_INFINITY /* Unlimited */
 #endif /* __USE_LARGEFILE64 */
 
 #ifndef RLIM_SAVED_MAX

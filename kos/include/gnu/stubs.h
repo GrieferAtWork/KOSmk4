@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc70d1c3 */
+/* HASH CRC-32:0x9bb1838 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,18 +116,22 @@
 #define __stub_b64_pton
 #define __stub_bindresvport
 #define __stub_bindresvport6
+#define __stub_buildargv
 #define __stub_canonicalize
 #define __stub_capget
 #define __stub_capset
 #define __stub_catclose
 #define __stub_catgets
 #define __stub_catopen
+#define __stub_choose_temp_base
+#define __stub_choose_tmpdir
 #define __stub_clock
 #define __stub_clock_adjtime
 #define __stub_clock_adjtime64
 #define __stub___clock_getcpuclockid
 #define __stub_clock_getcpuclockid
 #define __stub_closelog
+#define __stub_concat_copy2
 #define __stub_crypt
 #define __stub_crypt_r
 #define __stub_dehumanize_number
@@ -158,6 +162,7 @@
 #define __stub_erand48_r
 #define __stub_ether_hostton
 #define __stub_ether_ntohost
+#define __stub_expandargv
 #define __stub_fattach
 #define __stub_fdetach
 #define __stub_fegetmode
@@ -205,6 +210,7 @@
 #define __stub_gai_suspend64
 #define __stub_get_nprocs
 #define __stub_get_nprocs_conf
+#define __stub_get_run_time
 #define __stub_getaddrinfo
 #define __stub_getaddrinfo_a
 #define __stub_getaliasbyname
@@ -288,6 +294,7 @@
 #define __stub_grantpt
 #define __stub_gtty
 #define __stub_herror
+#define __stub_hex_init
 #define __stub___hostalias
 #define __stub_hostalias
 #define __stub_hstrerror
@@ -347,6 +354,10 @@
 #define __stub_logwtmp
 #define __stub_lrand48
 #define __stub_lrand48_r
+#define __stub_make_relative_prefix
+#define __stub_make_relative_prefix_ignore_links
+#define __stub_make_temp_file
+#define __stub_make_temp_file_with_prefix
 #define __stub_mrand48
 #define __stub_mrand48_r
 #define __stub_msgctl
@@ -423,6 +434,20 @@
 #define __stub_p_time
 #define __stub___p_type
 #define __stub_p_type
+#define __stub_pex_free
+#define __stub_pex_get_status
+#define __stub_pex_get_times
+#define __stub_pex_init
+#define __stub_pex_input_file
+#define __stub_pex_input_pipe
+#define __stub_pex_one
+#define __stub_pex_read_err
+#define __stub_pex_read_output
+#define __stub_pex_run
+#define __stub_pex_run_in_environment
+#define __stub_pexecute
+#define __stub_physmem_available
+#define __stub_physmem_total
 #define __stub_posix_fadvise64
 #define __stub_posix_fallocate64
 #define __stub_posix_openpt
@@ -445,6 +470,7 @@
 #define __stub__pututline
 #define __stub_pututline
 #define __stub_pututxline
+#define __stub_pwait
 #define __stub_radixsort
 #define __stub_random_r
 #define __stub_rcmd
@@ -577,6 +603,7 @@
 #define __stub_ufromfpx
 #define __stub___ulckpwdf
 #define __stub_ulckpwdf
+#define __stub_unlink_if_ordinary
 #define __stub_updwtmp
 #define __stub_updwtmpx
 #define __stub___uselocale
@@ -587,7 +614,11 @@
 #define __stub___libc_vhangup
 #define __stub_vhangup
 #define __stub_wfreadlinkat
+#define __stub_writeargv
 #define __stub_wttyname_r
+#define __stub_xcrc32
+#define __stub_xmalloc_failed
+#define __stub_xmalloc_set_program_name
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$_W_Gettnames
 #define __stub_DOS$_Wcsftime
@@ -609,6 +640,7 @@
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$__clone
 #define __stub_DOS$clone
+#define __stub_DOS$concat_copy2
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL

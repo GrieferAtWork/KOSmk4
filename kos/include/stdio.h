@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3895894c */
+/* HASH CRC-32:0xf9e1a50c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3255,12 +3255,12 @@ struct obstack;
 __CDECLARE(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,obstack_vprintf,(struct obstack *__restrict __self, char const *__restrict __format, __builtin_va_list __args),(__self,__format,__args))
 #else /* __CRT_HAVE_obstack_vprintf */
 #include <bits/crt/obstack.h>
-#if defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#if defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)
 #include <libc/local/stdio/obstack_vprintf.h>
 /* >> obstack_printf(3), obstack_vprintf(3)
  * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(obstack_vprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL obstack_vprintf)(struct obstack *__restrict __self, char const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(obstack_vprintf))(__self, __format, __args); })
-#endif /* __CRT_HAVE_obstack_printer || __CRT_HAVE__obstack_newchunk || __LOCAL_obstack_alloc_failed_handler || __CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit */
+#endif /* __CRT_HAVE_obstack_printer || __CRT_HAVE__obstack_newchunk || __LOCAL_obstack_alloc_failed_handler || __CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit || __CRT_HAVE_xexit */
 #endif /* !__CRT_HAVE_obstack_vprintf */
 #ifdef __CRT_HAVE_obstack_printf
 /* >> obstack_printf(3), obstack_vprintf(3)
@@ -3268,7 +3268,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(obstack_vprintf, __FORCELOCAL __ATTR_ARTIFICIAL 
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL obstack_printf)(struct obstack *__restrict __self, char const *__restrict __format, ...) __CASMNAME_SAME("obstack_printf");
 #else /* __CRT_HAVE_obstack_printf */
 #include <bits/crt/obstack.h>
-#if defined(__CRT_HAVE_obstack_vprintf) || defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#if defined(__CRT_HAVE_obstack_vprintf) || defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)
 #include <libc/local/stdio/obstack_printf.h>
 /* >> obstack_printf(3), obstack_vprintf(3)
  * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
@@ -3277,7 +3277,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(obstack_printf, __FORCELOCAL __ATTR_ARTIFICIAL _
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define obstack_printf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(obstack_printf))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
-#endif /* __CRT_HAVE_obstack_vprintf || __CRT_HAVE_obstack_printer || __CRT_HAVE__obstack_newchunk || __LOCAL_obstack_alloc_failed_handler || __CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit */
+#endif /* __CRT_HAVE_obstack_vprintf || __CRT_HAVE_obstack_printer || __CRT_HAVE__obstack_newchunk || __LOCAL_obstack_alloc_failed_handler || __CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit || __CRT_HAVE_xexit */
 #endif /* !__CRT_HAVE_obstack_printf */
 #endif /* __USE_GNU */
 #if defined(__USE_LARGEFILE) || defined(__USE_XOPEN2K)
@@ -3754,6 +3754,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(file_printer_unlocked, __FORCELOCAL __ATTR_ARTIF
 #endif /* __USE_KOS */
 
 #if defined(__USE_GNU) || defined(__USE_SOLARIS) || defined(__USE_BSD)
+#ifndef __vasprintf_defined
+#define __vasprintf_defined
 #ifdef __CRT_HAVE_vasprintf
 /* >> asprintf(3), vasprintf(3)
  * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
@@ -3763,7 +3765,12 @@ __CDECLARE(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T
 /* >> asprintf(3), vasprintf(3)
  * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(vasprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL vasprintf)(char **__restrict __pstr, char const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vasprintf))(__pstr, __format, __args); })
-#endif /* ... */
+#else /* ... */
+#undef __vasprintf_defined
+#endif /* !... */
+#endif /* !__vasprintf_defined */
+#ifndef __asprintf_defined
+#define __asprintf_defined
 #ifdef __CRT_HAVE_asprintf
 /* >> asprintf(3), vasprintf(3)
  * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
@@ -3781,7 +3788,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define asprintf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asprintf))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
-#endif /* ... */
+#else /* ... */
+#undef __asprintf_defined
+#endif /* !... */
+#endif /* !__asprintf_defined */
 #ifdef __CRT_HAVE_asprintf
 /* >> asprintf(3), vasprintf(3)
  * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
@@ -3820,6 +3830,8 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),__FILE *,__NOTHROW_RPC,fdreopen_unlocked,(__fd
  * Re-open the given `stream' as a file-stream for accessing `fd' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__FILE *,__NOTHROW_RPC,fdreopen_unlocked,(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream),fdreopen,(__fd,__modes,__stream))
 #endif /* ... */
+#ifndef __freopen_unlocked_defined
+#define __freopen_unlocked_defined
 #if defined(__CRT_HAVE_freopen_unlocked) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
@@ -3836,7 +3848,10 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(c
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64,(__filename,__modes,__stream))
-#endif /* ... */
+#else /* ... */
+#undef __freopen_unlocked_defined
+#endif /* !... */
+#endif /* !__freopen_unlocked_defined */
 #if defined(__CRT_HAVE_freopen_unlocked) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */

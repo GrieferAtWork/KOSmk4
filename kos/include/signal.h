@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b621b50 */
+/* HASH CRC-32:0x4463d9fe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2619,6 +2619,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,signalname,(__sig
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
  * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,signalname,(__signo_t __signum),(__signum))
+#elif defined(__CRT_HAVE_strsigno)
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, _without_ the leading `SIG*' prefix.
+ * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,signalname,(__signo_t __signum),strsigno,(__signum))
 #else /* ... */
 #include <libc/local/string/sigabbrev_np.h>
 /* >> sigabbrev_np(3)

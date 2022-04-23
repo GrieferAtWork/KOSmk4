@@ -725,11 +725,13 @@ void abort() {
 [[std, guard, crtbuiltin, noreturn, throws]]
 [[section(".text.crt{|.dos}.application.exit")]]
 [[alias("quick_exit", "_exit", "_Exit")]]
+[[export_alias("xexit")]]
 void exit(int status);
 
 [[dos_only_export_alias("_crt_atexit")]]
 [[std, alias("at_quick_exit", "_crt_at_quick_exit")]]
 [[section(".text.crt{|.dos}.sched.process")]]
+[[export_alias("xatexit")]]
 int atexit([[nonnull]] void (LIBCCALL *func)(void));
 
 
@@ -855,7 +857,7 @@ __LONGLONG atoll([[nonnull]] char const *__restrict nptr) {
 %#endif /* __LONGLONG && __USE_ISOC99 */
 
 
-[[std, leaf]]
+[[std, leaf, guard]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoul...)]]
@@ -873,7 +875,7 @@ unsigned long strtoul([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[std, leaf]]
+[[std, leaf, guard]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtol...)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
@@ -895,7 +897,7 @@ long strtol([[nonnull]] char const *__restrict nptr,
 
 %(std)#ifdef __LONGLONG
 %(std)#ifdef __USE_ISOC99
-[[std, guard, leaf]]
+[[std, leaf, guard]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoull...)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
@@ -915,7 +917,7 @@ __ULONGLONG strtoull([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[std, guard, leaf]]
+[[std, leaf, guard]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoll...)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]

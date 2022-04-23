@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd76d679e */
+/* HASH CRC-32:0x7c1f6ea2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_obstack_printf_defined
 #include <__crt.h>
 #include <bits/crt/obstack.h>
-#if defined(__CRT_HAVE_obstack_vprintf) || defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#if defined(__CRT_HAVE_obstack_vprintf) || defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)
 #include <features.h>
 struct obstack;
 __NAMESPACE_LOCAL_BEGIN
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_obstack_vprintf_defined
 #ifdef __CRT_HAVE_obstack_vprintf
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_obstack_vprintf,(struct obstack *__restrict __self, char const *__restrict __format, __builtin_va_list __args),obstack_vprintf,(__self,__format,__args))
-#elif defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#elif defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/obstack_vprintf.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_obstack_printf_defined
 #define __localdep_obstack_printf __LIBC_LOCAL_NAME(obstack_printf)
 #endif /* !__local___localdep_obstack_printf_defined */
-#else /* __CRT_HAVE_obstack_vprintf || __CRT_HAVE_obstack_printer || __CRT_HAVE__obstack_newchunk || __LOCAL_obstack_alloc_failed_handler || __CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit */
+#else /* __CRT_HAVE_obstack_vprintf || __CRT_HAVE_obstack_printer || __CRT_HAVE__obstack_newchunk || __LOCAL_obstack_alloc_failed_handler || __CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit || __CRT_HAVE_xexit */
 #undef __local_obstack_printf_defined
-#endif /* !__CRT_HAVE_obstack_vprintf && !__CRT_HAVE_obstack_printer && !__CRT_HAVE__obstack_newchunk && !__LOCAL_obstack_alloc_failed_handler && !__CRT_HAVE_exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE__exit && !__CRT_HAVE__Exit */
+#endif /* !__CRT_HAVE_obstack_vprintf && !__CRT_HAVE_obstack_printer && !__CRT_HAVE__obstack_newchunk && !__LOCAL_obstack_alloc_failed_handler && !__CRT_HAVE_exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE__exit && !__CRT_HAVE__Exit && !__CRT_HAVE_xexit */
 #endif /* !__local_obstack_printf_defined */

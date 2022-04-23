@@ -266,9 +266,9 @@ enum __rlimit_resource {
 #endif /* ... */
 
 
-#define RLIM_INFINITY   (__CCAST(__FS_TYPE(rlim))-1) /* Unlimited */
+#define RLIM_INFINITY   __RLIM_INFINITY   /* Unlimited */
 #ifdef __USE_LARGEFILE64
-#define RLIM64_INFINITY (__CCAST(__rlim64_t)-1)      /* Unlimited */
+#define RLIM64_INFINITY __RLIM64_INFINITY /* Unlimited */
 #endif /* __USE_LARGEFILE64 */
 
 #ifndef RLIM_SAVED_MAX

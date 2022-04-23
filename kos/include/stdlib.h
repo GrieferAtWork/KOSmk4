@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6fc95b2 */
+/* HASH CRC-32:0x464b7860 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,9 +107,9 @@ __NAMESPACE_STD_USING(abort)
 #define __exit_defined
 __NAMESPACE_STD_USING(exit)
 #endif /* !__exit_defined && __std_exit_defined */
-#if defined(__CRT_HAVE_atexit) || defined(__CRT_HAVE__crt_atexit) || defined(__CRT_HAVE_at_quick_exit) || defined(__CRT_HAVE__crt_at_quick_exit)
+#if defined(__CRT_HAVE_atexit) || defined(__CRT_HAVE__crt_atexit) || defined(__CRT_HAVE_at_quick_exit) || defined(__CRT_HAVE__crt_at_quick_exit) || defined(__CRT_HAVE_xatexit)
 __NAMESPACE_STD_USING(atexit)
-#endif /* __CRT_HAVE_atexit || __CRT_HAVE__crt_atexit || __CRT_HAVE_at_quick_exit || __CRT_HAVE__crt_at_quick_exit */
+#endif /* __CRT_HAVE_atexit || __CRT_HAVE__crt_atexit || __CRT_HAVE_at_quick_exit || __CRT_HAVE__crt_at_quick_exit || __CRT_HAVE_xatexit */
 #if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 #if defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 __NAMESPACE_STD_USING(quick_exit)
@@ -144,8 +144,14 @@ __NAMESPACE_STD_USING(rand)
 __NAMESPACE_STD_USING(atoi)
 __NAMESPACE_STD_USING(atol)
 __NAMESPACE_STD_USING(atoll)
+#if !defined(__strtoul_defined) && defined(__std_strtoul_defined)
+#define __strtoul_defined
 __NAMESPACE_STD_USING(strtoul)
+#endif /* !__strtoul_defined && __std_strtoul_defined */
+#if !defined(__strtol_defined) && defined(__std_strtol_defined)
+#define __strtol_defined
 __NAMESPACE_STD_USING(strtol)
+#endif /* !__strtol_defined && __std_strtol_defined */
 #if !defined(__strtoull_defined) && defined(__std_strtoull_defined)
 #define __strtoull_defined
 __NAMESPACE_STD_USING(strtoull)
@@ -824,6 +830,8 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),quick_exi
 __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),_exit,(__status))
 #elif defined(__CRT_HAVE__Exit)
 __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),_Exit,(__status))
+#elif defined(__CRT_HAVE_xexit)
+__CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),xexit,(__status))
 #else /* ... */
 #undef __std_exit_defined
 #endif /* !... */
@@ -836,6 +844,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(void (__LIBCCALL *__fu
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(void (__LIBCCALL *__func)(void)),at_quick_exit,(__func))
 #elif defined(__CRT_HAVE__crt_at_quick_exit)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(void (__LIBCCALL *__func)(void)),_crt_at_quick_exit,(__func))
+#elif defined(__CRT_HAVE_xatexit)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(void (__LIBCCALL *__func)(void)),xatexit,(__func))
 #endif /* ... */
 #if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 #ifdef __CRT_HAVE_quick_exit
@@ -996,7 +1006,11 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(atoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL atoll)(char const *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atoll))(__nptr); })
 #endif /* !... */
-#ifdef __CRT_HAVE_strtoul
+#ifndef __std_strtoul_defined
+#define __std_strtoul_defined
+#ifdef __strtoul_defined
+__NAMESPACE_GLB_USING_OR_IMPL(strtoul, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL strtoul)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return :: strtoul(__nptr, __endptr, __base); })
+#elif defined(__CRT_HAVE_strtoul)
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,strtoul,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtou32) && __SIZEOF_LONG__ == 4
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,strtoul,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtou32,(__nptr,__endptr,__base))
@@ -1018,7 +1032,12 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtoul, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL strtoul)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoul))(__nptr, __endptr, __base); })
 #endif /* !... */
-#ifdef __CRT_HAVE_strtol
+#endif /* !__std_strtoul_defined */
+#ifndef __std_strtol_defined
+#define __std_strtol_defined
+#ifdef __strtol_defined
+__NAMESPACE_GLB_USING_OR_IMPL(strtol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return :: strtol(__nptr, __endptr, __base); })
+#elif defined(__CRT_HAVE_strtol)
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,strtol,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strto32) && __SIZEOF_LONG__ == 4
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,strtol,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strto32,(__nptr,__endptr,__base))
@@ -1050,6 +1069,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL strtol)(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtol))(__nptr, __endptr, __base); })
 #endif /* !... */
+#endif /* !__std_strtol_defined */
 #ifdef __LONGLONG
 #ifdef __USE_ISOC99
 #ifndef __std_strtoull_defined
@@ -1257,9 +1277,9 @@ __NAMESPACE_STD_USING(abort)
 #define __exit_defined
 __NAMESPACE_STD_USING(exit)
 #endif /* !__exit_defined && __std_exit_defined */
-#if defined(__CRT_HAVE_atexit) || defined(__CRT_HAVE__crt_atexit) || defined(__CRT_HAVE_at_quick_exit) || defined(__CRT_HAVE__crt_at_quick_exit)
+#if defined(__CRT_HAVE_atexit) || defined(__CRT_HAVE__crt_atexit) || defined(__CRT_HAVE_at_quick_exit) || defined(__CRT_HAVE__crt_at_quick_exit) || defined(__CRT_HAVE_xatexit)
 __NAMESPACE_STD_USING(atexit)
-#endif /* __CRT_HAVE_atexit || __CRT_HAVE__crt_atexit || __CRT_HAVE_at_quick_exit || __CRT_HAVE__crt_at_quick_exit */
+#endif /* __CRT_HAVE_atexit || __CRT_HAVE__crt_atexit || __CRT_HAVE_at_quick_exit || __CRT_HAVE__crt_at_quick_exit || __CRT_HAVE_xatexit */
 #endif /* !__CXX_SYSTEM_HEADER */
 #if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 #ifndef __CXX_SYSTEM_HEADER
@@ -1306,8 +1326,14 @@ __NAMESPACE_STD_USING(atoll)
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __LONGLONG && __USE_ISOC99 */
 #ifndef __CXX_SYSTEM_HEADER
+#if !defined(__strtoul_defined) && defined(__std_strtoul_defined)
+#define __strtoul_defined
 __NAMESPACE_STD_USING(strtoul)
+#endif /* !__strtoul_defined && __std_strtoul_defined */
+#if !defined(__strtol_defined) && defined(__std_strtol_defined)
+#define __strtol_defined
 __NAMESPACE_STD_USING(strtol)
+#endif /* !__strtol_defined && __std_strtol_defined */
 #if !defined(__strtoull_defined) && defined(__std_strtoull_defined)
 #define __strtoull_defined
 __NAMESPACE_STD_USING(strtoull)
@@ -4073,14 +4099,14 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__LONGLONG,__NOTHROW_NCX,strsuf
 #else /* __CRT_HAVE_strsuftoll */
 #include <libc/template/stdstreams.h>
 #include <libc/template/program_invocation_name.h>
-#if defined(__CRT_HAVE_errx) || defined(__CRT_HAVE_verrx) || ((defined(__CRT_HAVE_vwarnx) || (defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)))
+#if defined(__CRT_HAVE_errx) || defined(__CRT_HAVE_verrx) || ((defined(__CRT_HAVE_vwarnx) || (defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)))
 #include <libc/local/stdlib/strsuftoll.h>
 /* >> strsuftoll(3)
  * Same as `strsuftollx(3)', but if an error happens, make
  * use of `errx(3)' to terminate the program, rather  than
  * return to the caller. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strsuftoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __LONGLONG __NOTHROW_NCX(__LIBCCALL strsuftoll)(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsuftoll))(__desc, __val, __lo, __hi); })
-#endif /* __CRT_HAVE_errx || __CRT_HAVE_verrx || ((__CRT_HAVE_vwarnx || (__LOCAL_stderr && __LOCAL_program_invocation_short_name && (__CRT_HAVE_putc || __CRT_HAVE_fputc || __CRT_HAVE__IO_putc || __CRT_HAVE_putc_unlocked || __CRT_HAVE_fputc_unlocked || __CRT_HAVE__putc_nolock || __CRT_HAVE__fputc_nolock || (__CRT_DOS && (__CRT_HAVE__flsbuf || __CRT_HAVE___swbuf)) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock))) && (__CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit)) */
+#endif /* __CRT_HAVE_errx || __CRT_HAVE_verrx || ((__CRT_HAVE_vwarnx || (__LOCAL_stderr && __LOCAL_program_invocation_short_name && (__CRT_HAVE_putc || __CRT_HAVE_fputc || __CRT_HAVE__IO_putc || __CRT_HAVE_putc_unlocked || __CRT_HAVE_fputc_unlocked || __CRT_HAVE__putc_nolock || __CRT_HAVE__fputc_nolock || (__CRT_DOS && (__CRT_HAVE__flsbuf || __CRT_HAVE___swbuf)) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock))) && (__CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit || __CRT_HAVE_xexit)) */
 #endif /* !__CRT_HAVE_strsuftoll */
 #ifdef __CRT_HAVE_strsuftollx
 /* >> strsuftollx(3) */

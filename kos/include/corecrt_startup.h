@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc7afa74 */
+/* HASH CRC-32:0x2b3f51f5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -221,6 +221,8 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_crt_atexit,(void (__LIBCCALL *
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_crt_atexit,(void (__LIBCCALL *__func)(void)),at_quick_exit,(__func))
 #elif defined(__CRT_HAVE__crt_at_quick_exit)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_crt_atexit,(void (__LIBCCALL *__func)(void)),_crt_at_quick_exit,(__func))
+#elif defined(__CRT_HAVE_xatexit)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_crt_atexit,(void (__LIBCCALL *__func)(void)),xatexit,(__func))
 #endif /* ... */
 #ifdef __CRT_HAVE_at_quick_exit
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_crt_at_quick_exit,(void (__LIBCCALL *__func)(void)),at_quick_exit,(__func))

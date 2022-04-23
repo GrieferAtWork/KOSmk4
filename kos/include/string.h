@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed58c82c */
+/* HASH CRC-32:0x4d023616 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -895,12 +895,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strxfrm, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #endif /* !__CRT_HAVE_strxfrm */
 #ifdef __CRT_HAVE_strerror
 __CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,strerror,(__errno_t __errnum),(__errnum))
-#else /* __CRT_HAVE_strerror */
+#elif defined(__CRT_HAVE_xstrerror)
+__CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,strerror,(__errno_t __errnum),xstrerror,(__errnum))
+#else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/string/strerror.h>
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(strerror, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strerror)(__errno_t __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror))(__errnum); })
-#endif /* !__CRT_HAVE_strerror */
+#endif /* !... */
 #if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
 extern "C++" {
 #if defined(__fast_memcpyc_defined) && defined(__CRT_HAVE_memcpyc)
@@ -995,6 +997,8 @@ __NAMESPACE_STD_END
 #endif /* _MSC_VER */
 
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
+#ifndef __strnlen_defined
+#define __strnlen_defined
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
 /* >> strnlen(3)
  * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
@@ -1013,6 +1017,7 @@ __CREDIRECT_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,
  * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strnlen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strnlen)(char const *__restrict __str, __SIZE_TYPE__ __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnlen))(__str, __maxlen); })
 #endif /* !... */
+#endif /* !__strnlen_defined */
 #endif /* __USE_XOPEN2K8 || __USE_DOS */
 #ifdef __USE_XOPEN2K8
 #if __has_builtin(__builtin_stpcpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_stpcpy)
@@ -1464,7 +1469,7 @@ extern "C++" {
  * >> basename("..");              // Returns ".."
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char *__filename),basename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char *__filename),basename,(__filename))
 /* >> basename(3)
  * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
@@ -1487,7 +1492,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,
  * >> basename("..");              // Returns ".."
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,basename,(char const *__filename),basename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,basename,(char const *__filename),basename,(__filename))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 /* >> basename(3)
@@ -1512,7 +1517,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHRO
  * >> basename("..");              // Returns ".."
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char const *__filename),(__filename))
+__CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char const *__filename),(__filename))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #elif defined(__CRT_HAVE___basename)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
@@ -1539,7 +1544,7 @@ extern "C++" {
  * >> basename("..");              // Returns ".."
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char *__filename),__basename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char *__filename),__basename,(__filename))
 /* >> basename(3)
  * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
@@ -1562,7 +1567,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,
  * >> basename("..");              // Returns ".."
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,basename,(char const *__filename),__basename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,basename,(char const *__filename),__basename,(__filename))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 /* >> basename(3)
@@ -1587,7 +1592,82 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHRO
  * >> basename("..");              // Returns ".."
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char const *__filename),__basename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char const *__filename),__basename,(__filename))
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
+#elif defined(__CRT_HAVE_lbasename)
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
+extern "C++" {
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char *__filename),lbasename,(__filename))
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,basename,(char const *__filename),lbasename,(__filename))
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
+/* >> basename(3)
+ * Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char const *__filename),lbasename,(__filename))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #else /* ... */
 #include <libc/local/string/basename.h>
@@ -1615,7 +1695,7 @@ extern "C++" {
  * >> basename("..");              // Returns ".."
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); }
 /* >> basename(3)
  * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
@@ -1638,7 +1718,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ch
  * >> basename("..");              // Returns ".."
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL basename)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL basename)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 /* >> basename(3)
@@ -1663,10 +1743,12 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ch
  * >> basename("..");              // Returns ".."
  * >> basename("");                // Returns ""
  * >> basename(NULL);              // <Undefined behavior> */
-__NAMESPACE_LOCAL_USING_OR_IMPL(basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL basename)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL basename)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #endif /* !... */
 #endif /* !__basename_defined */
+#ifndef __strverscmp_defined
+#define __strverscmp_defined
 #ifdef __CRT_HAVE_strverscmp
 /* >> strverscmp(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strverscmp,(char const *__s1, char const *__s2),(__s1,__s2))
@@ -1678,6 +1760,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 /* >> strverscmp(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strverscmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strverscmp)(char const *__s1, char const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strverscmp))(__s1, __s2); })
 #endif /* !... */
+#endif /* !__strverscmp_defined */
 #if defined(__fast_mempcpy_defined) && defined(__CRT_HAVE_mempcpy)
 /* >> mempcpy(3)
  * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
@@ -1813,10 +1896,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strerrordesc_np, __FORCELOCAL __ATTR_ARTIFICIAL 
 #endif /* !__CRT_HAVE_strerrordesc_np */
 #ifdef __CRT_HAVE_strerrorname_np
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strerrorname_np,(__errno_t __errnum),(__errnum))
-#else /* __CRT_HAVE_strerrorname_np */
+#elif defined(__CRT_HAVE_strerrno)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strerrorname_np,(__errno_t __errnum),strerrno,(__errnum))
+#else /* ... */
 #include <libc/local/string/strerrorname_np.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strerrorname_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL strerrorname_np)(__errno_t __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerrorname_np))(__errnum); })
-#endif /* !__CRT_HAVE_strerrorname_np */
+#endif /* !... */
 #ifdef __CRT_HAVE_sigabbrev_np
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
@@ -1827,6 +1912,11 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__si
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
  * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__signo_t __signum),signalname,(__signum))
+#elif defined(__CRT_HAVE_strsigno)
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, _without_ the leading `SIG*' prefix.
+ * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__signo_t __signum),strsigno,(__signum))
 #else /* ... */
 #include <libc/local/string/sigabbrev_np.h>
 /* >> sigabbrev_np(3)
@@ -8493,6 +8583,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timingsafe_memcmp, __FORCELOCAL __ATTR_ARTIFICIA
 #endif /* __USE_BSD */
 
 #ifdef __USE_CYGWIN
+#ifndef __strtosigno_defined
+#define __strtosigno_defined
 #ifdef __CRT_HAVE_strtosigno
 /* >> strtosigno(3)
  * Return the signal number for a given name.
@@ -8507,6 +8599,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__signo_t,__NOTHROW_NC
  * When `name' isn't recognized, return `0' instead. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtosigno, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __signo_t __NOTHROW_NCX(__LIBCCALL strtosigno)(const char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtosigno))(__name); })
 #endif /* !__CRT_HAVE_strtosigno */
+#endif /* !__strtosigno_defined */
 #endif /* __USE_CYGWIN */
 
 #ifdef __USE_NETBSD

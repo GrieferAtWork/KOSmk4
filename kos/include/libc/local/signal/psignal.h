@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd192fcd0 */
+/* HASH CRC-32:0x4e6db79d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,6 +73,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signum),sigabbrev_np,(__signum))
 #elif defined(__CRT_HAVE_signalname)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signum),signalname,(__signum))
+#elif defined(__CRT_HAVE_strsigno)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signum),strsigno,(__signum))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/sigabbrev_np.h>

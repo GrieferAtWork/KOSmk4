@@ -3027,7 +3027,7 @@ $ssize_t file_printer_unlocked([[nonnull]] /*FILE*/ void *arg,
 %#if defined(__USE_GNU) || defined(__USE_SOLARIS) || defined(__USE_BSD)
 %[default:section(".text.crt{|.dos}.heap.strdup")]
 
-[[decl_include("<features.h>"), doc_alias("asprintf")]]
+[[decl_include("<features.h>"), doc_alias("asprintf"), guard]]
 [[impl_include("<hybrid/typecore.h>", "<hybrid/__assert.h>")]]
 [[requires_function(format_aprintf_pack, format_aprintf_printer, free)]]
 [[impl_prefix(
@@ -3065,7 +3065,7 @@ __STDC_INT_AS_SSIZE_T vasprintf([[nonnull]] char **__restrict pstr,
 
 @@>> asprintf(3), vasprintf(3)
 @@Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr'
-[[decl_include("<features.h>"), export_alias("__asprintf")]]
+[[decl_include("<features.h>"), export_alias("__asprintf"), guard]]
 __STDC_INT_AS_SSIZE_T asprintf([[nonnull]] char **__restrict pstr,
                                [[nonnull, format]] char const *__restrict format, ...)
 	%{printf("vasprintf")}
@@ -3097,7 +3097,7 @@ $FILE *fdreopen($fd_t fd, [[nonnull]] char const *__restrict modes,
 $FILE *fdreopen_unlocked($fd_t fd, [[nonnull]] char const *__restrict modes,
                          [[nonnull]] $FILE *__restrict stream);
 
-[[crt_dos_variant, cp, doc_alias("freopen"), no_crt_self_import]]
+[[crt_dos_variant, cp, doc_alias("freopen"), no_crt_self_import, guard]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("freopen_unlocked")]]
 [[                                                                                                                                                     alias("freopen64_unlocked")]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("freopen")]]
