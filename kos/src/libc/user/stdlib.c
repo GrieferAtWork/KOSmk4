@@ -3105,33 +3105,7 @@ NOTHROW_NCX(LIBCCALL libc_dehumanize_number)(char const *str,
 }
 /*[[[end:libc_dehumanize_number]]]*/
 
-/*[[[head:libd_setproctitle,hash:CRC-32=0xf7549bc0]]]*/
-#ifndef __LIBCCALL_IS_LIBDCALL
-/* >> setproctitle(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.bsd") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void
-NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format,
-                                         ...)
-/*[[[body:libd_setproctitle]]]*/
-/*AUTO*/{
-	(void)format;
-	CRT_UNIMPLEMENTEDF("setproctitle(%q, ...)", format); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-#endif /* MAGIC:impl_if */
-/*[[[end:libd_setproctitle]]]*/
 
-/*[[[head:libc_setproctitle,hash:CRC-32=0x1a4c9c15]]]*/
-/* >> setproctitle(3) */
-INTERN ATTR_SECTION(".text.crt.bsd") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void
-NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
-                                         ...)
-/*[[[body:libc_setproctitle]]]*/
-/*AUTO*/{
-	(void)format;
-	CRT_UNIMPLEMENTEDF("setproctitle(%q, ...)", format); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_setproctitle]]]*/
 
 
 /************************************************************************/
@@ -3208,7 +3182,7 @@ NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x68724b47]]]*/
+/*[[[start:exports,hash:CRC-32=0x6ba4a7df]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getenv, libd_getenv);
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(xexit, libc_exit);
@@ -3291,10 +3265,6 @@ DEFINE_PUBLIC_ALIAS(sradixsort, libc_sradixsort);
 DEFINE_PUBLIC_ALIAS(devname_r, libc_devname_r);
 DEFINE_PUBLIC_ALIAS(humanize_number, libc_humanize_number);
 DEFINE_PUBLIC_ALIAS(dehumanize_number, libc_dehumanize_number);
-#ifndef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(DOS$setproctitle, libd_setproctitle);
-#endif /* !__LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(setproctitle, libc_setproctitle);
 DEFINE_PUBLIC_ALIAS(DOS$_get_errno, libd__get_errno);
 DEFINE_PUBLIC_ALIAS(_get_errno, libc__get_errno);
 DEFINE_PUBLIC_ALIAS(DOS$_set_errno, libd__set_errno);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd35c7dd5 */
+/* HASH CRC-32:0xbc79babe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,9 +32,11 @@
 #include "format-printer.h"
 #include "inttypes.h"
 #include "../user/malloc.h"
+#include "../user/pthread.h"
 #include "../user/stdio.h"
 #include "../user/string.h"
 #include "../user/sys.ioctl.h"
+#include "../user/sys.prctl.h"
 #include "../user/sys.stat.h"
 #include "../user/sys.time.h"
 #include "../user/sys.wait.h"
@@ -2769,6 +2771,63 @@ NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev,
 	static char buf[64];
 	return libc_devname_r(dev, type, buf, sizeof(buf)) ? NULL : buf;
 }
+#include <linux/prctl.h>
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc_vsetproctitle)(char const *format,
+                                         va_list args) {
+	/* Load+fill a buffer for the fully qualified program name. */
+#ifdef __TASK_COMM_LEN
+	char namebuf[__TASK_COMM_LEN];
+	libc_vsnprintf(namebuf, __TASK_COMM_LEN - 1, format, args);
+	namebuf[__TASK_COMM_LEN - 1] = '\0';
+#else /* __TASK_COMM_LEN */
+	char *namebuf = libc_vstrdupf(format, args);
+	if unlikely(!namebuf)
+		return;
+#endif /* !__TASK_COMM_LEN */
+
+	/* Tell the kernel about our new program name. */
+#ifdef PR_SET_NAME
+	libc_prctl(PR_SET_NAME, namebuf);
+#else /* PR_SET_NAME */
+	libc_pthread_setname_np(libc_pthread_self(), namebuf);
+#endif /* !PR_SET_NAME */
+
+	/* Free the name buffer if it was allocated dynamically. */
+#ifndef __TASK_COMM_LEN
+	libc_free(namebuf);
+#endif /* !__TASK_COMM_LEN */
+}
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> setproctitle(3)
+ * Set the program comm name. S.a.:
+ *  - pthread_setname_np(3)
+ *  - prctl(PR_SET_NAME)
+ *  - "/proc/self/comm" */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.bsd") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void
+NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format,
+                                         ...) {
+	va_list args;
+	va_start(args, format);
+	libc_vsetproctitle(format, args);
+	va_end(args);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> setproctitle(3)
+ * Set the program comm name. S.a.:
+ *  - pthread_setname_np(3)
+ *  - prctl(PR_SET_NAME)
+ *  - "/proc/self/comm" */
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void
+NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
+                                         ...) {
+	va_list args;
+	va_start(args, format);
+	libc_vsetproctitle(format, args);
+	va_end(args);
+}
 #include <asm/os/stdlib.h>
 /* >> strsuftoll(3)
  * Same as `strsuftollx(3)', but if an error happens, make
@@ -4463,6 +4522,12 @@ DEFINE_PUBLIC_ALIAS(mkostemps, libc_mkostemps);
 DEFINE_PUBLIC_ALIAS(mkostemp64, libc_mkostemp64);
 DEFINE_PUBLIC_ALIAS(mkostemps64, libc_mkostemps64);
 DEFINE_PUBLIC_ALIAS(devname, libc_devname);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$setproctitle, libd_setproctitle);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(setproctitle, libc_setproctitle);
 DEFINE_PUBLIC_ALIAS(strsuftoll, libc_strsuftoll);
 DEFINE_PUBLIC_ALIAS(strsuftollx, libc_strsuftollx);
 DEFINE_PUBLIC_ALIAS(__p_program_invocation_name, libc___p__pgmptr);

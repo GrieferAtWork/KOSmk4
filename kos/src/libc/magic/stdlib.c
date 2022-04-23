@@ -3912,9 +3912,46 @@ int humanize_number(char *buf, $size_t len, $int64_t bytes,
 int dehumanize_number(char const *str, $int64_t *size); /* TODO: Implement here */
 
 
+[[static]]
+[[requires_include("<linux/prctl.h>")]]
+[[requires((($has_function(prctl) && defined(@PR_SET_NAME@)) ||
+            ($has_function(pthread_self, pthread_setname_np))) &&
+            (defined(__TASK_COMM_LEN) || $has_function(vstrdupf)))]]
+[[impl_include("<linux/prctl.h>")]]
+void vsetproctitle([[nonnull, format("printf")]] char const *format,
+                   va_list args) {
+	/* Load+fill a buffer for the fully qualified program name. */
+@@pp_ifdef __TASK_COMM_LEN@@
+	char namebuf[__TASK_COMM_LEN];
+	vsnprintf(namebuf, __TASK_COMM_LEN - 1, format, args);
+	namebuf[__TASK_COMM_LEN - 1] = '\0';
+@@pp_else@@
+	char *namebuf = vstrdupf(format, args);
+	if unlikely(!namebuf)
+		return;
+@@pp_endif@@
+
+	/* Tell the kernel about our new program name. */
+@@pp_if $has_function(prctl) && defined(@PR_SET_NAME@)@@
+	prctl(@PR_SET_NAME@, namebuf);
+@@pp_else@@
+	pthread_setname_np(pthread_self(), namebuf);
+@@pp_endif@@
+
+	/* Free the name buffer if it was allocated dynamically. */
+@@pp_if !defined(__TASK_COMM_LEN) && $has_function(free)@@
+	free(namebuf);
+@@pp_endif@@
+}
+
 @@>> setproctitle(3)
+@@Set the program comm name. S.a.:
+@@ - pthread_setname_np(3)
+@@ - prctl(PR_SET_NAME)
+@@ - "/proc/self/comm"
 [[guard]]
-void setproctitle([[nonnull, format("printf")]] char const *format, ...);
+void setproctitle([[nonnull, format("printf")]] char const *format, ...)
+	%{printf("vsetproctitle")}
 
 
 %[insert:function(reallocarr = reallocarray)]

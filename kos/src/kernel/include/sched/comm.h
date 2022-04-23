@@ -34,7 +34,13 @@
 
 /* The max length of the task command name (including the trailing NUL) */
 #ifndef TASK_COMM_LEN
-#define TASK_COMM_LEN 16
+#include <linux/prctl.h> /* __TASK_COMM_LEN */
+#ifndef TASK_COMM_LEN
+#ifndef __TASK_COMM_LEN
+#error "This should have been defined in `<linux/prctl.h>'"
+#endif /* !__TASK_COMM_LEN */
+#define TASK_COMM_LEN __TASK_COMM_LEN
+#endif /* !TASK_COMM_LEN */
 #endif /* !TASK_COMM_LEN */
 
 #ifdef __CC__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ee7d4c2 */
+/* HASH CRC-32:0xb3d1fdf3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -555,7 +555,6 @@
 #define __stub_setmode
 #define __stub_setnetent
 #define __stub_setnetgrent
-#define __stub_setproctitle
 #define __stub_setprotoent
 #define __stub_setrpcent
 #define __stub_setservent
@@ -646,7 +645,6 @@
 #ifndef __LIBCCALL_IS_LIBDCALL
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$semctl
-#define __stub_DOS$setproctitle
 #define __stub_DOS$strfmon
 #define __stub_DOS$__strfmon_l
 #define __stub_DOS$strfmon_l

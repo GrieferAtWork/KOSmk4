@@ -39,6 +39,7 @@
 #include <linux/futex.h>
 #include <linux/prctl.h> /* TASK_COMM_LEN */
 #include <sys/mman.h>
+#include <sys/prctl.h>
 #include <sys/resource.h>
 
 #include <assert.h>
@@ -1637,22 +1638,32 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread,
 	tid = ATOMIC_READ(target_thread->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
-	/* Just like under linux,  KOS's /proc/[pid]/comm file always  re-returns
-	 * the given `num_bytes' argument, rather than return the # of bytes that
-	 * were actually written to the thread's comm name.
-	 *
-	 * Because of this (and because we mustn't modify the thread's actual
-	 * name in case the caller-given name is too long), we have to  check
-	 * the length of `name' before even passing it along to the kernel! */
-	namelen = strlen(name);
-	if unlikely(namelen > (TASK_COMM_LEN - 1))
-		return ERANGE;
-	sprintf(pathname, "/proc/%u/comm", tid);
-	commfd = sys_open(pathname, O_WRONLY, 0);
-	if unlikely(E_ISERR(commfd))
-		return -commfd;
-	result = sys_write(commfd, name, namelen * sizeof(char));
-	sys_close(commfd);
+#ifndef __OPTIMIZE_SIZE__
+	if (target_thread == &current) {
+		/* Simple case: can use a dedicated prctl code to set the name. */
+		result = sys_prctl(PR_SET_NAME, (syscall_ulong_t)(uintptr_t)name, 0, 0, 0);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		/* Just like under linux,  KOS's /proc/[pid]/comm file always  re-returns
+		 * the given `num_bytes' argument, rather than return the # of bytes that
+		 * were actually written to the thread's comm name.
+		 *
+		 * Because of this (and because we mustn't modify the thread's actual
+		 * name in case the caller-given name is too long), we have to  check
+		 * the length of `name' before even passing it along to the kernel! */
+		namelen = strlen(name);
+#ifdef TASK_COMM_LEN
+		if unlikely(namelen > (TASK_COMM_LEN - 1))
+			return ERANGE;
+#endif /* TASK_COMM_LEN */
+		sprintf(pathname, "/proc/%u/comm", tid);
+		commfd = sys_open(pathname, O_WRONLY, 0);
+		if unlikely(E_ISERR(commfd))
+			return -commfd;
+		result = sys_write(commfd, name, namelen * sizeof(char));
+		sys_close(commfd);
+	}
 	if (E_ISERR(result))
 		return -result;
 	return EOK;

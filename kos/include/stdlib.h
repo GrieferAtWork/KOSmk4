@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa960ca76 */
+/* HASH CRC-32:0x5395a508 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4076,11 +4076,34 @@ __CDECLARE(,int,__NOTHROW_NCX,humanize_number,(char *__buf, __SIZE_TYPE__ __len,
  * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
 __CDECLARE(,int,__NOTHROW_NCX,dehumanize_number,(char const *__str, __INT64_TYPE__ *__size),(__str,__size))
 #endif /* !__dehumanize_number_defined && __CRT_HAVE_dehumanize_number */
-#if !defined(__setproctitle_defined) && defined(__CRT_HAVE_setproctitle)
+#ifndef __setproctitle_defined
 #define __setproctitle_defined
-/* >> setproctitle(3) */
+#ifdef __CRT_HAVE_setproctitle
+/* >> setproctitle(3)
+ * Set the program comm name. S.a.:
+ *  - pthread_setname_np(3)
+ *  - prctl(PR_SET_NAME)
+ *  - "/proc/self/comm" */
 __LIBC __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) void __NOTHROW_NCX(__VLIBCCALL setproctitle)(char const *__format, ...) __CASMNAME_SAME("setproctitle");
-#endif /* !__setproctitle_defined && __CRT_HAVE_setproctitle */
+#else /* __CRT_HAVE_setproctitle */
+#include <linux/prctl.h>
+#if ((defined(__CRT_HAVE_prctl) && defined(PR_SET_NAME)) || ((defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self)) && (defined(__CRT_HAVE_pthread_setname_np) || defined(__CRT_HAVE_pthread_set_name_np)))) && (defined(__TASK_COMM_LEN) || defined(__CRT_HAVE_vstrdupf) || defined(__CRT_HAVE_vasprintf) || ((defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free))))
+#include <libc/local/stdlib/setproctitle.h>
+/* >> setproctitle(3)
+ * Set the program comm name. S.a.:
+ *  - pthread_setname_np(3)
+ *  - prctl(PR_SET_NAME)
+ *  - "/proc/self/comm" */
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
+__NAMESPACE_LOCAL_USING_OR_IMPL(setproctitle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) void __NOTHROW_NCX(__VLIBCCALL setproctitle)(char const *__format, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setproctitle))(__format, __builtin_va_arg_pack()); })
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define setproctitle(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setproctitle))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
+#else /* ((__CRT_HAVE_prctl && PR_SET_NAME) || ((__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current || __CRT_HAVE_thr_self) && (__CRT_HAVE_pthread_setname_np || __CRT_HAVE_pthread_set_name_np))) && (__TASK_COMM_LEN || __CRT_HAVE_vstrdupf || __CRT_HAVE_vasprintf || ((__CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free))) */
+#undef __setproctitle_defined
+#endif /* ((!__CRT_HAVE_prctl || !PR_SET_NAME) && ((!__CRT_HAVE_pthread_self && !__CRT_HAVE_thrd_current && !__CRT_HAVE_thr_self) || (!__CRT_HAVE_pthread_setname_np && !__CRT_HAVE_pthread_set_name_np))) || (!__TASK_COMM_LEN && !__CRT_HAVE_vstrdupf && !__CRT_HAVE_vasprintf && ((!__CRT_HAVE_format_aprintf_printer && !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) || (!__CRT_HAVE_free && !__CRT_HAVE_cfree && !__CRT_HAVE___libc_free))) */
+#endif /* !__CRT_HAVE_setproctitle */
+#endif /* !__setproctitle_defined */
 #ifdef __CRT_HAVE_reallocarray
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarr,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarray,(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_reallocarr)

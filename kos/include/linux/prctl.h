@@ -29,6 +29,10 @@
 
 #include <bits/types.h>
 
+#if defined(__KOS__) || defined(__linux__)
+#define __TASK_COMM_LEN 16 /* The max length of the task command name (including the trailing NUL) */
+#endif /* __KOS__ || __linux__ */
+
 /* IMPORTANT:
  *  - Macros "#define PR_foo" will appear in libsctrace
  *  - Macros "#   define PR_bar" will NOT appear in libsctrace
@@ -96,9 +100,9 @@
 #define PR_SET_NAME            15 /* [char const *arg] `write(open("/proc/thread-self/comm"))' */
 #define PR_GET_NAME            16 /* [char arg[TASK_COMM_LEN]] `read(open("/proc/thread-self/comm"))' */
 #ifdef __USE_KOS
-#ifndef TASK_COMM_LEN
-#define TASK_COMM_LEN          16 /* The max length of the task command name (including the trailing NUL) */
-#endif /* !TASK_COMM_LEN */
+#if !defined(TASK_COMM_LEN) && defined(__TASK_COMM_LEN)
+#define TASK_COMM_LEN __TASK_COMM_LEN /* The max length of the task command name (including the trailing NUL) */
+#endif /* !TASK_COMM_LEN && __TASK_COMM_LEN */
 #endif /* __USE_KOS */
 
 /* Process endian */

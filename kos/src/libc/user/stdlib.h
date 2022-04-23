@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19821666 */
+/* HASH CRC-32:0x5089ae1a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -170,14 +170,6 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_humanize_number)(char *buf, size_t len, int
  * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
  * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_dehumanize_number)(char const *str, int64_t *size);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> setproctitle(3) */
-INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format, ...);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-/* >> setproctitle(3) */
-INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format, ...);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_errno)(errno_t *perr);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_errno)(errno_t *perr);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__set_errno)(errno_t err);

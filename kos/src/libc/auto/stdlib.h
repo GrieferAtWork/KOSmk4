@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0540cb0 */
+/* HASH CRC-32:0xc89cc24 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1097,6 +1097,27 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_humanize_number)(char *buf, size_t len, int
  * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
  * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_dehumanize_number)(char const *str, int64_t *size);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_vsetproctitle)(char const *format, va_list args);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> setproctitle(3)
+ * Set the program comm name. S.a.:
+ *  - pthread_setname_np(3)
+ *  - prctl(PR_SET_NAME)
+ *  - "/proc/self/comm" */
+INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> setproctitle(3)
+ * Set the program comm name. S.a.:
+ *  - pthread_setname_np(3)
+ *  - prctl(PR_SET_NAME)
+ *  - "/proc/self/comm" */
+INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format, ...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strsuftoll(3)
  * Same as `strsuftollx(3)', but if an error happens, make
  * use of `errx(3)' to terminate the program, rather  than
