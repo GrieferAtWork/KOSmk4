@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bbd1838 */
+/* HASH CRC-32:0x87fb2621 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,7 +106,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_obstack_newchunk))(struct obstack *_
 	(__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__curobj, __self->object_base, __osize);
 
 	/* If the old object was the only one of the old chunk, and if the
-	 * old chunk couldn't possibly have contained an "empty" object,
+	 * old chunk couldn't possibly  have contained an "empty"  object,
 	 * then we can free the old chunk. */
 	if (!__self->maybe_empty_object &&
 	    __self->object_base == __PTR_ALIGN((char *)__ochunk, __ochunk->contents,

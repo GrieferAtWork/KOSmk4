@@ -36,6 +36,8 @@
 )]%[insert:prefix(
 #include <bits/crt/obstack.h>
 )]%[insert:prefix(
+#include <bits/crt/format-printer.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
 )]%[insert:prefix(
 #include <libc/string.h>
@@ -166,7 +168,7 @@ int _obstack_begin([[nonnull]] struct obstack *self,
 		min_object_alignment = __ALIGNOF_MAX_ALIGN_T__;
 	if (min_chunk_size == 0) {
 		/* This is what the source material does in this case.
-		 * We don't want to break the ABI, so we do the same. */
+		 * We don't want to break the ABI, so we do the  same. */
 		size_t extra = ((((12 + sizeof(__MAX_ALIGN_TYPE__) - 1) &
 		                  ~(sizeof(__MAX_ALIGN_TYPE__) - 1)) +
 		                 4 + sizeof(__MAX_ALIGN_TYPE__) - 1) &
@@ -216,7 +218,7 @@ int _obstack_begin_1([[nonnull]] struct obstack *self,
 		min_object_alignment = __ALIGNOF_MAX_ALIGN_T__;
 	if (min_chunk_size == 0) {
 		/* This is what the source material does in this case.
-		 * We don't want to break the ABI, so we do the same. */
+		 * We don't want to break the ABI, so we do the  same. */
 		size_t extra = ((((12 + sizeof(__MAX_ALIGN_TYPE__) - 1) &
 		                  ~(sizeof(__MAX_ALIGN_TYPE__) - 1)) +
 		                 4 + sizeof(__MAX_ALIGN_TYPE__) - 1) &
@@ -296,7 +298,7 @@ void _obstack_newchunk([[nonnull]] struct obstack *self, _OBSTACK_SIZE_T num_byt
 	memcpy(curobj, self->@object_base@, osize);
 
 	/* If the old object was the only one of the old chunk, and if the
-	 * old chunk couldn't possibly have contained an "empty" object,
+	 * old chunk couldn't possibly  have contained an "empty"  object,
 	 * then we can free the old chunk. */
 	if (!self->@maybe_empty_object@ &&
 	    self->@object_base@ == __PTR_ALIGN((char *)ochunk, ochunk->@contents@,
@@ -575,6 +577,33 @@ void obstack_chunk_free(void *ptr);
 /* Combination of `obstack_grow0()' + `obstack_finish()' */
 #define obstack_copy0(self, src, num_bytes) \
 	(obstack_grow0(self, src, num_bytes), obstack_finish(self))
+
+
+}
+%#ifdef __USE_KOS
+
+@@>> obstack_printer(3)
+@@A pformatprinter-compatible printer  sink that appends  data to  the
+@@object currently being constructed by a given `struct obstack *arg'.
+@@Note that obstacks don't have out-of-memory errors (you have to use
+@@longjmp from a custom `obstack_alloc_failed_handler'), so in turn,
+@@this function doesn't have an error return-value!
+@@HINT: Ths function does the same as `obstack_grow(3)'!
+@@@return: datalen: Success.
+[[wunused, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
+[[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<bits/crt/obstack.h>"), requires_function(_obstack_newchunk)]]
+$ssize_t obstack_printer([[nonnull]] /*struct obstack **/ void *arg,
+                         [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
+	struct obstack *me = (struct obstack *)arg;
+	if ((size_t)(me->@chunk_limit@ - me->@next_free@) < datalen)
+		_obstack_newchunk(me, datalen);
+	me->@next_free@ = (char *)mempcpy(me->@next_free@, data, datalen);
+	return (ssize_t)datalen;
+}
+
+%#endif /* __USE_KOS */
+%{
 
 
 __SYSDECL_END

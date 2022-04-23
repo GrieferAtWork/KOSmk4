@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c574766 */
+/* HASH CRC-32:0x519fd32 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,7 +94,7 @@ NOTHROW_NCX(LIBCCALL libc__obstack_begin)(struct obstack *self,
 		min_object_alignment = __ALIGNOF_MAX_ALIGN_T__;
 	if (min_chunk_size == 0) {
 		/* This is what the source material does in this case.
-		 * We don't want to break the ABI, so we do the same. */
+		 * We don't want to break the ABI, so we do the  same. */
 		size_t extra = ((((12 + sizeof(__MAX_ALIGN_TYPE__) - 1) &
 		                  ~(sizeof(__MAX_ALIGN_TYPE__) - 1)) +
 		                 4 + sizeof(__MAX_ALIGN_TYPE__) - 1) &
@@ -142,7 +142,7 @@ NOTHROW_NCX(LIBCCALL libc__obstack_begin_1)(struct obstack *self,
 		min_object_alignment = __ALIGNOF_MAX_ALIGN_T__;
 	if (min_chunk_size == 0) {
 		/* This is what the source material does in this case.
-		 * We don't want to break the ABI, so we do the same. */
+		 * We don't want to break the ABI, so we do the  same. */
 		size_t extra = ((((12 + sizeof(__MAX_ALIGN_TYPE__) - 1) &
 		                  ~(sizeof(__MAX_ALIGN_TYPE__) - 1)) +
 		                 4 + sizeof(__MAX_ALIGN_TYPE__) - 1) &
@@ -220,7 +220,7 @@ NOTHROW_NCX(LIBCCALL libc__obstack_newchunk)(struct obstack *self,
 	libc_memcpy(curobj, self->object_base, osize);
 
 	/* If the old object was the only one of the old chunk, and if the
-	 * old chunk couldn't possibly have contained an "empty" object,
+	 * old chunk couldn't possibly  have contained an "empty"  object,
 	 * then we can free the old chunk. */
 	if (!self->maybe_empty_object &&
 	    self->object_base == __PTR_ALIGN((char *)ochunk, ochunk->contents,
@@ -293,6 +293,25 @@ NOTHROW_NCX(LIBCCALL libc__obstack_allocated_p)(struct obstack const *self,
 	}
 	return 0;
 }
+#include <bits/crt/obstack.h>
+/* >> obstack_printer(3)
+ * A pformatprinter-compatible printer  sink that appends  data to  the
+ * object currently being constructed by a given `struct obstack *arg'.
+ * Note that obstacks don't have out-of-memory errors (you have to use
+ * longjmp from a custom `obstack_alloc_failed_handler'), so in turn,
+ * this function doesn't have an error return-value!
+ * HINT: Ths function does the same as `obstack_grow(3)'!
+ * @return: datalen: Success. */
+INTERN ATTR_SECTION(".text.crt.heap.obstack") WUNUSED NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(__FORMATPRINTER_CC libc_obstack_printer)(void *arg,
+                                                     char const *__restrict data,
+                                                     size_t datalen) {
+	struct obstack *me = (struct obstack *)arg;
+	if ((size_t)(me->chunk_limit - me->next_free) < datalen)
+		libc__obstack_newchunk(me, datalen);
+	me->next_free = (char *)libc_mempcpy(me->next_free, data, datalen);
+	return (ssize_t)datalen;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -305,6 +324,7 @@ DEFINE_PUBLIC_ALIAS(_obstack_free, libc_obstack_free);
 DEFINE_PUBLIC_ALIAS(obstack_free, libc_obstack_free);
 DEFINE_PUBLIC_ALIAS(_obstack_memory_used, libc__obstack_memory_used);
 DEFINE_PUBLIC_ALIAS(_obstack_allocated_p, libc__obstack_allocated_p);
+DEFINE_PUBLIC_ALIAS(obstack_printer, libc_obstack_printer);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_OBSTACK_C */

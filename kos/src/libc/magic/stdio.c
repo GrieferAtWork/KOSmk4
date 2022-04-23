@@ -2755,11 +2755,20 @@ __STDC_INT_AS_SIZE_T fputs_unlocked([[nonnull]] char const *__restrict string,
 %
 %struct obstack;
 
-%[default:section(".text.crt{|.dos}.obstack")]
-int obstack_vprintf([[nonnull]] struct obstack *__restrict obstack_,
-                    [[nonnull, format]] char const *__restrict format, $va_list args);
-int obstack_printf([[nonnull]] struct obstack *__restrict obstack_,
-                   [[nonnull, format]] char const *__restrict format, ...)
+%[default:section(".text.crt{|.dos}.heap.obstack")]
+
+@@>> obstack_printf(3), obstack_vprintf(3)
+@@Append formated strings to a given obstack. s.a. `obstack_printer(3)'
+[[decl_include("<features.h>"), decl_prefix(struct obstack;), requires_function(obstack_printer)]]
+__STDC_INT_AS_SIZE_T obstack_vprintf([[nonnull]] struct obstack *__restrict self,
+                                     [[nonnull, format]] char const *__restrict format,
+                                     $va_list args) {
+	return (__STDC_INT_AS_SIZE_T)format_vprintf(&obstack_printer, self, format, args);
+}
+
+[[decl_include("<features.h>"), decl_prefix(struct obstack;), doc_alias("obstack_vprintf")]]
+__STDC_INT_AS_SIZE_T obstack_printf([[nonnull]] struct obstack *__restrict self,
+                                    [[nonnull, format]] char const *__restrict format, ...)
 	%{printf("obstack_vprintf")}
 %#endif /* __USE_GNU */
 

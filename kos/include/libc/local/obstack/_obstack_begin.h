@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x355a0ddd */
+/* HASH CRC-32:0x29d5b01d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_obstack_begin))(struct obstack *__se
 		__min_object_alignment = __ALIGNOF_MAX_ALIGN_T__;
 	if (__min_chunk_size == 0) {
 		/* This is what the source material does in this case.
-		 * We don't want to break the ABI, so we do the same. */
+		 * We don't want to break the ABI, so we do the  same. */
 		__SIZE_TYPE__ __extra = ((((12 + sizeof(__MAX_ALIGN_TYPE__) - 1) &
 		                  ~(sizeof(__MAX_ALIGN_TYPE__) - 1)) +
 		                 4 + sizeof(__MAX_ALIGN_TYPE__) - 1) &

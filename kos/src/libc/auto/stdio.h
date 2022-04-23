@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f040253 */
+/* HASH CRC-32:0x8e924782 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -551,11 +551,24 @@ INTDEF NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_fputs_unlocked)(char 
 INTDEF NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_fputs_unlocked)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_obstack_vprintf)(struct obstack *__restrict obstack_, char const *__restrict format, va_list args);
-INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(VLIBDCALL libd_obstack_printf)(struct obstack *__restrict obstack_, char const *__restrict format, ...);
+/* >> obstack_printf(3), obstack_vprintf(3)
+ * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
+INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_obstack_vprintf)(struct obstack *__restrict self, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict obstack_, char const *__restrict format, ...);
+/* >> obstack_printf(3), obstack_vprintf(3)
+ * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
+INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict self, char const *__restrict format, va_list args);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> obstack_printf(3), obstack_vprintf(3)
+ * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
+INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_obstack_printf)(struct obstack *__restrict self, char const *__restrict format, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> obstack_printf(3), obstack_vprintf(3)
+ * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
+INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict self, char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fseeko(3), fseeko64(3)

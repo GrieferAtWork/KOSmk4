@@ -3856,6 +3856,7 @@
 #define __CRT_HAVE_obstack_alloc_failed_handler
 #define __CRT_HAVE_obstack_exit_failure
 #define __CRT_HAVE_obstack_free
+#define __CRT_HAVE_obstack_printer
 #define __CRT_HAVE_obstack_printf
 #define __CRT_HAVE_obstack_vprintf
 #define __CRT_HAVE_on_exit

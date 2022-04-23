@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdef9ba7 */
+/* HASH CRC-32:0xd40aceea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6533,6 +6533,7 @@
 #define __CRT_HAVE_obstack_alloc_failed_handler
 #define __CRT_HAVE_obstack_exit_failure
 #define __CRT_HAVE_obstack_free
+#define __CRT_HAVE_obstack_printer
 #define __CRT_HAVE_obstack_printf
 #define __CRT_HAVE_obstack_vprintf
 #define __CRT_HAVE_on_exit

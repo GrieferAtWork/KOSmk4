@@ -3743,24 +3743,6 @@ NOTHROW_RPC(LIBCCALL libc__rmtmp)(void)
 }
 /*[[[end:libc__rmtmp]]]*/
 
-
-
-/*[[[head:libc_obstack_vprintf,hash:CRC-32=0xe6d2cbda]]]*/
-INTERN ATTR_SECTION(".text.crt.obstack") ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) int
-NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict obstack_,
-                                           char const *__restrict format,
-                                           va_list args)
-/*[[[body:libc_obstack_vprintf]]]*/
-/*AUTO*/{
-	(void)obstack_;
-	(void)format;
-	(void)args;
-	CRT_UNIMPLEMENTEDF("obstack_vprintf(%p, %q, %p)", obstack_, format, args); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_obstack_vprintf]]]*/
-
 /*[[[head:libc__get_output_format,hash:CRC-32=0x399b2fa1]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") WUNUSED uint32_t
 NOTHROW_NCX(LIBCCALL libc__get_output_format)(void)
@@ -4039,7 +4021,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x9858264a]]]*/
+/*[[[start:exports,hash:CRC-32=0x74d024b]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
@@ -4156,7 +4138,6 @@ DEFINE_PUBLIC_ALIAS(pclose, libc_pclose);
 DEFINE_PUBLIC_ALIAS(popenve, libc_popenve);
 DEFINE_PUBLIC_ALIAS(_fcloseall, libc_fcloseall);
 DEFINE_PUBLIC_ALIAS(fcloseall, libc_fcloseall);
-DEFINE_PUBLIC_ALIAS(obstack_vprintf, libc_obstack_vprintf);
 DEFINE_PUBLIC_ALIAS(fseeko, libc_fseeko);
 DEFINE_PUBLIC_ALIAS(ftello, libc_ftello);
 DEFINE_PUBLIC_ALIAS(tmpfile64, libc_tmpfile64);

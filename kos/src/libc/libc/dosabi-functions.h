@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52b83668 */
+/* HASH CRC-32:0x4f9df06 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1684,7 +1684,7 @@ DFUN(".text.crt.dos.FILE.locked.write.putc", libd_putw, libc_putw, TD, 2, TD, TP
 DFUN(".text.crt.dos.FILE.locked.access", libd_fopencookie, libc_fopencookie, TP, 3, TP, TP, TS(__SIZEOF_COOKIE_IO_FUNCTIONS_T))
 DFUN(".text.crt.dos.FILE.unlocked.read.read", libd_fgets_unlocked, libc_fgets_unlocked, TP, 3, TP, TD, TP)
 DFUN(".text.crt.dos.FILE.unlocked.write.write", libd_fputs_unlocked, libc_fputs_unlocked, TD, 2, TP, TP)
-DFUN(".text.crt.dos.obstack", libd_obstack_vprintf, libc_obstack_vprintf, TD, 3, TP, TP, TP)
+DFUN(".text.crt.dos.heap.obstack", libd_obstack_vprintf, libc_obstack_vprintf, TD, 3, TP, TP, TP)
 #include <features.h>
 #include <bits/types.h>
 #if __FS_SIZEOF(OFF) == __SIZEOF_LONG__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x720b8d55 */
+/* HASH CRC-32:0xe9510fdc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3249,13 +3249,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fputs_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* ... */
 
 struct obstack;
-__CDECLARE_OPT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,obstack_vprintf,(struct obstack *__restrict __obstack_, char const *__restrict __format, __builtin_va_list __args),(__obstack_,__format,__args))
+#ifdef __CRT_HAVE_obstack_vprintf
+/* >> obstack_printf(3), obstack_vprintf(3)
+ * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
+__CDECLARE(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,obstack_vprintf,(struct obstack *__restrict __self, char const *__restrict __format, __builtin_va_list __args),(__self,__format,__args))
+#elif defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#include <libc/local/stdio/obstack_vprintf.h>
+/* >> obstack_printf(3), obstack_vprintf(3)
+ * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(obstack_vprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL obstack_vprintf)(struct obstack *__restrict __self, char const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(obstack_vprintf))(__self, __format, __args); })
+#endif /* ... */
 #ifdef __CRT_HAVE_obstack_printf
-__LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__VLIBCCALL obstack_printf)(struct obstack *__restrict __obstack_, char const *__restrict __format, ...) __CASMNAME_SAME("obstack_printf");
-#elif defined(__CRT_HAVE_obstack_vprintf)
+/* >> obstack_printf(3), obstack_vprintf(3)
+ * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
+__LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL obstack_printf)(struct obstack *__restrict __self, char const *__restrict __format, ...) __CASMNAME_SAME("obstack_printf");
+#elif defined(__CRT_HAVE_obstack_vprintf) || defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 #include <libc/local/stdio/obstack_printf.h>
+/* >> obstack_printf(3), obstack_vprintf(3)
+ * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(obstack_printf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__VLIBCCALL obstack_printf)(struct obstack *__restrict __obstack_, char const *__restrict __format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(obstack_printf))(__obstack_, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(obstack_printf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL obstack_printf)(struct obstack *__restrict __self, char const *__restrict __format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(obstack_printf))(__self, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define obstack_printf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(obstack_printf))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */

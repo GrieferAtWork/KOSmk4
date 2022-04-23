@@ -197,7 +197,6 @@
 	.io.stropts                       # stream operations
 	.io.sgtty                         # gtty / stty
 	.string.memory.strsignal          # strsignal()
-	.obstack                          # obstack
 	.system.auxv                      # <sys/auxv.h>
 	.utility.* .utility               # Misc. utility functions
 	.i18n.* .i18n                     # <libintl.h>
@@ -333,7 +332,6 @@
 	CB(PREFIX.crt.database.utmpx) \
 	CB(PREFIX.crt.io.stropts) \
 	CB(PREFIX.crt.string.memory.strsignal) \
-	CB(PREFIX.crt.obstack) \
 	CB(PREFIX.crt.system.auxv) \
 	CB(PREFIX.crt.utility.aio PREFIX.crt.utility.glob PREFIX.crt.utility.klog PREFIX.crt.utility.locale PREFIX.crt.utility.monetary PREFIX.crt.utility.mqueue PREFIX.crt.utility.regex PREFIX.crt.utility.search PREFIX.crt.utility.setjmp PREFIX.crt.utility.shm PREFIX.crt.utility.stdlib PREFIX.crt.utility) \
 	CB(PREFIX.crt.i18n) \
@@ -508,7 +506,6 @@
 	CB(PREFIX.crt.dos.database.utmpx) \
 	CB(PREFIX.crt.dos.io.stropts) \
 	CB(PREFIX.crt.dos.string.memory.strsignal) \
-	CB(PREFIX.crt.dos.obstack) \
 	CB(PREFIX.crt.dos.system.auxv) \
 	CB(PREFIX.crt.dos.utility.aio PREFIX.crt.dos.utility.klog PREFIX.crt.dos.utility.locale PREFIX.crt.dos.utility.monetary PREFIX.crt.dos.utility.mqueue PREFIX.crt.dos.utility.regex PREFIX.crt.dos.utility.search PREFIX.crt.dos.utility.shm PREFIX.crt.dos.utility.stdlib PREFIX.crt.dos.utility) \
 	CB(PREFIX.crt.dos.i18n) \

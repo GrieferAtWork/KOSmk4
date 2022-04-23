@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d186a2c */
+/* HASH CRC-32:0xcb5d2d6e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,7 @@
 #include "../user/stdio.h"
 #include "format-printer.h"
 #include "../user/malloc.h"
+#include "obstack.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
 #include "../user/sys.resource.h"
@@ -1566,29 +1567,41 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") NONNULL((1, 2)) __STD
 	                         stream);
 	return result;
 }
+/* >> obstack_printf(3), obstack_vprintf(3)
+ * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
+INTERN ATTR_SECTION(".text.crt.heap.obstack") ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict self,
+                                           char const *__restrict format,
+                                           va_list args) {
+	return (__STDC_INT_AS_SIZE_T)libc_format_vprintf(&libc_obstack_printer, self, format, args);
+}
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.obstack") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) int
-NOTHROW_NCX(VLIBDCALL libd_obstack_printf)(struct obstack *__restrict obstack_,
+/* >> obstack_printf(3), obstack_vprintf(3)
+ * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.obstack") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBDCALL libd_obstack_printf)(struct obstack *__restrict self,
                                            char const *__restrict format,
                                            ...) {
-	int result;
+	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = libc_obstack_vprintf(obstack_, format, args);
+	result = libc_obstack_vprintf(self, format, args);
 	va_end(args);
 	return result;
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.obstack") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) int
-NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict obstack_,
+/* >> obstack_printf(3), obstack_vprintf(3)
+ * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
+INTERN ATTR_SECTION(".text.crt.heap.obstack") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict self,
                                            char const *__restrict format,
                                            ...) {
-	int result;
+	__STDC_INT_AS_SIZE_T result;
 	va_list args;
 	va_start(args, format);
-	result = libc_obstack_vprintf(obstack_, format, args);
+	result = libc_obstack_vprintf(self, format, args);
 	va_end(args);
 	return result;
 }
@@ -4115,6 +4128,7 @@ DEFINE_PUBLIC_ALIAS(putw, libc_putw);
 DEFINE_PUBLIC_ALIAS(fopencookie, libc_fopencookie);
 DEFINE_PUBLIC_ALIAS(fgets_unlocked, libc_fgets_unlocked);
 DEFINE_PUBLIC_ALIAS(fputs_unlocked, libc_fputs_unlocked);
+DEFINE_PUBLIC_ALIAS(obstack_vprintf, libc_obstack_vprintf);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(DOS$obstack_printf, libd_obstack_printf);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2c88f5e */
+/* HASH CRC-32:0x9cbe52e5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,7 @@
 #include <features.h>
 #include <bits/types.h>
 #include <bits/crt/obstack.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 #include <libc/string.h>
 
@@ -342,6 +343,32 @@ void obstack_chunk_free(void *ptr);
 /* Combination of `obstack_grow0()' + `obstack_finish()' */
 #define obstack_copy0(self, src, num_bytes) \
 	(obstack_grow0(self, src, num_bytes), obstack_finish(self))
+
+
+#ifdef __USE_KOS
+#ifdef __CRT_HAVE_obstack_printer
+/* >> obstack_printer(3)
+ * A pformatprinter-compatible printer  sink that appends  data to  the
+ * object currently being constructed by a given `struct obstack *arg'.
+ * Note that obstacks don't have out-of-memory errors (you have to use
+ * longjmp from a custom `obstack_alloc_failed_handler'), so in turn,
+ * this function doesn't have an error return-value!
+ * HINT: Ths function does the same as `obstack_grow(3)'!
+ * @return: datalen: Success. */
+__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC obstack_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("obstack_printer");
+#elif defined(__CRT_HAVE__obstack_newchunk) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#include <libc/local/obstack/obstack_printer.h>
+/* >> obstack_printer(3)
+ * A pformatprinter-compatible printer  sink that appends  data to  the
+ * object currently being constructed by a given `struct obstack *arg'.
+ * Note that obstacks don't have out-of-memory errors (you have to use
+ * longjmp from a custom `obstack_alloc_failed_handler'), so in turn,
+ * this function doesn't have an error return-value!
+ * HINT: Ths function does the same as `obstack_grow(3)'!
+ * @return: datalen: Success. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(obstack_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC obstack_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(obstack_printer))(__arg, __data, __datalen); })
+#endif /* ... */
+#endif /* __USE_KOS */
 
 
 __SYSDECL_END

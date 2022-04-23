@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a5f4ac6 */
+/* HASH CRC-32:0xd5dcbcd9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -182,7 +182,6 @@ INTDEF WUNUSED NONNULL((1, 2, 3, 4)) FILE *NOTHROW_RPC(LIBCCALL libc_popenve)(ch
 /* >> fcloseall(3)
  * Close all opened files */
 INTDEF int (LIBCCALL libc_fcloseall)(void) THROWS(...);
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict obstack_, char const *__restrict format, va_list args);
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
 INTDEF NONNULL((1)) int (LIBCCALL libc_fseeko)(FILE *__restrict stream, off_t off, int whence) THROWS(...);

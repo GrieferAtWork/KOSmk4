@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x829fd570 */
+/* HASH CRC-32:0xfbaa2678 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,6 +90,15 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd__obstack_all
 /* >> _obstack_allocated_p(3)
  * Returns non-zero if `obj' was allocated by `self' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc__obstack_allocated_p)(struct obstack const *self, void const *obj);
+/* >> obstack_printer(3)
+ * A pformatprinter-compatible printer  sink that appends  data to  the
+ * object currently being constructed by a given `struct obstack *arg'.
+ * Note that obstacks don't have out-of-memory errors (you have to use
+ * longjmp from a custom `obstack_alloc_failed_handler'), so in turn,
+ * this function doesn't have an error return-value!
+ * HINT: Ths function does the same as `obstack_grow(3)'!
+ * @return: datalen: Success. */
+INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_obstack_printer)(void *arg, char const *__restrict data, size_t datalen);
 #endif /* !__KERNEL__ */
 
 DECL_END
