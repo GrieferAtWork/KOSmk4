@@ -1885,6 +1885,13 @@
 #define __CRT_HAVE__nl_default_dirname
 #define __CRT_HAVE__nl_domain_bindings
 #define __CRT_HAVE__nl_msg_cat_cntr
+#define __CRT_HAVE__obstack
+#define __CRT_HAVE__obstack_allocated_p
+#define __CRT_HAVE__obstack_begin
+#define __CRT_HAVE__obstack_begin_1
+#define __CRT_HAVE__obstack_free
+#define __CRT_HAVE__obstack_memory_used
+#define __CRT_HAVE__obstack_newchunk
 #define __CRT_HAVE__onexit
 #define __CRT_HAVE__open_osfhandle
 #define __CRT_HAVE__pclose
@@ -3846,6 +3853,9 @@
 #define __CRT_HAVE_oblockop_reap_ex
 #define __CRT_HAVE_oblockop_reap_shared_lock
 #define __CRT_HAVE_oblockop_reap_shared_rwlock
+#define __CRT_HAVE_obstack_alloc_failed_handler
+#define __CRT_HAVE_obstack_exit_failure
+#define __CRT_HAVE_obstack_free
 #define __CRT_HAVE_obstack_printf
 #define __CRT_HAVE_obstack_vprintf
 #define __CRT_HAVE_on_exit

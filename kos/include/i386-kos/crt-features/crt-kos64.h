@@ -1797,6 +1797,13 @@
 #define __CRT_HAVE__nl_default_dirname
 #define __CRT_HAVE__nl_domain_bindings
 #define __CRT_HAVE__nl_msg_cat_cntr
+#define __CRT_HAVE__obstack
+#define __CRT_HAVE__obstack_allocated_p
+#define __CRT_HAVE__obstack_begin
+#define __CRT_HAVE__obstack_begin_1
+#define __CRT_HAVE__obstack_free
+#define __CRT_HAVE__obstack_memory_used
+#define __CRT_HAVE__obstack_newchunk
 #define __CRT_HAVE__open_osfhandle
 #define __CRT_HAVE__pgmptr
 #define __CRT_HAVE__pipe
@@ -3692,6 +3699,9 @@
 #define __CRT_HAVE_oblockop_reap_ex
 #define __CRT_HAVE_oblockop_reap_shared_lock
 #define __CRT_HAVE_oblockop_reap_shared_rwlock
+#define __CRT_HAVE_obstack_alloc_failed_handler
+#define __CRT_HAVE_obstack_exit_failure
+#define __CRT_HAVE_obstack_free
 #define __CRT_HAVE_obstack_printf
 #define __CRT_HAVE_obstack_vprintf
 #define __CRT_HAVE_on_exit
@@ -7560,6 +7570,12 @@
 #define __CRT_HAVE_KOS$_mkdir
 #define __CRT_HAVE_KOS$_mktemp_s
 #define __CRT_HAVE_KOS$_msize
+#define __CRT_HAVE_KOS$_obstack_allocated_p
+#define __CRT_HAVE_KOS$_obstack_begin
+#define __CRT_HAVE_KOS$_obstack_begin_1
+#define __CRT_HAVE_KOS$_obstack_free
+#define __CRT_HAVE_KOS$_obstack_memory_used
+#define __CRT_HAVE_KOS$_obstack_newchunk
 #define __CRT_HAVE_KOS$_open_osfhandle
 #define __CRT_HAVE_KOS$_pgmptr
 #define __CRT_HAVE_KOS$_pipe
@@ -9173,6 +9189,7 @@
 #define __CRT_HAVE_KOS$ntp_adjtime64
 #define __CRT_HAVE_KOS$ntp_gettimex
 #define __CRT_HAVE_KOS$ntp_gettimex64
+#define __CRT_HAVE_KOS$obstack_free
 #define __CRT_HAVE_KOS$obstack_printf
 #define __CRT_HAVE_KOS$obstack_vprintf
 #define __CRT_HAVE_KOS$on_exit
@@ -11863,6 +11880,12 @@
 #define __CRT_HAVE_DOS$_msize_debug
 #define __CRT_HAVE_DOS$_nextafter
 #define __CRT_HAVE_DOS$_nextafterf
+#define __CRT_HAVE_DOS$_obstack_allocated_p
+#define __CRT_HAVE_DOS$_obstack_begin
+#define __CRT_HAVE_DOS$_obstack_begin_1
+#define __CRT_HAVE_DOS$_obstack_free
+#define __CRT_HAVE_DOS$_obstack_memory_used
+#define __CRT_HAVE_DOS$_obstack_newchunk
 #define __CRT_HAVE_DOS$_onexit
 #define __CRT_HAVE_DOS$_open
 #define __CRT_HAVE_DOS$_open_osfhandle
@@ -13633,6 +13656,7 @@
 #define __CRT_HAVE_DOS$ntp_adjtime64
 #define __CRT_HAVE_DOS$ntp_gettimex
 #define __CRT_HAVE_DOS$ntp_gettimex64
+#define __CRT_HAVE_DOS$obstack_free
 #define __CRT_HAVE_DOS$obstack_printf
 #define __CRT_HAVE_DOS$obstack_vprintf
 #define __CRT_HAVE_DOS$on_exit

@@ -141,6 +141,12 @@ DEFINE_NOREL_GLOBAL_META(sigset_t, _sigintr, ".crt.sched.signal");
 DEFINE_NOREL_GLOBAL_META(unsigned char, _mbctype, ".crt.dos.mbstring");
 DEFINE_NOREL_GLOBAL_META(unsigned char, _mbcasemap, ".crt.dos.mbstring");
 
+/* <obstack.h> */
+#undef obstack_alloc_failed_handler
+#undef obstack_exit_failure
+DEFINE_NOREL_GLOBAL_META(POBSTACK_ALLOC_FAILED_HANDLER, obstack_alloc_failed_handler, ".crt.heap.obstack");
+DEFINE_NOREL_GLOBAL_META(int, obstack_exit_failure, ".crt.heap.obstack");
+
 /* Misc... */
 #undef __libc_enable_secure
 DEFINE_NOREL_GLOBAL_META(int, __libc_enable_secure, ".crt.compat.glibc");

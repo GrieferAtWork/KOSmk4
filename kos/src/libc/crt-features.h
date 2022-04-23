@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ba63694 */
+/* HASH CRC-32:0xbdef9ba7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -670,6 +670,11 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_mktemp_s
+#define __CRT_HAVE_DOS$_obstack_allocated_p
+#define __CRT_HAVE_DOS$_obstack_begin
+#define __CRT_HAVE_DOS$_obstack_begin_1
+#define __CRT_HAVE_DOS$_obstack_memory_used
+#define __CRT_HAVE_DOS$_obstack_newchunk
 #define __CRT_HAVE_DOS$_open_osfhandle
 #define __CRT_HAVE_DOS$_pipe
 #define __CRT_HAVE_DOS$_printf_l
@@ -2420,6 +2425,7 @@
 #define __CRT_HAVE_DOS$ntp_adjtime64
 #define __CRT_HAVE_DOS$ntp_gettimex
 #define __CRT_HAVE_DOS$ntp_gettimex64
+#define __CRT_HAVE_DOS$obstack_free
 #define __CRT_HAVE_DOS$obstack_printf
 #define __CRT_HAVE_DOS$obstack_vprintf
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -4682,6 +4688,12 @@
 #define __CRT_HAVE__mkdir
 #define __CRT_HAVE__mktemp_s
 #define __CRT_HAVE__msize_dbg
+#define __CRT_HAVE__obstack
+#define __CRT_HAVE__obstack_allocated_p
+#define __CRT_HAVE__obstack_begin
+#define __CRT_HAVE__obstack_begin_1
+#define __CRT_HAVE__obstack_memory_used
+#define __CRT_HAVE__obstack_newchunk
 #define __CRT_HAVE__open_osfhandle
 #define __CRT_HAVE__pgmptr
 #define __CRT_HAVE__pipe
@@ -6518,6 +6530,9 @@
 #define __CRT_HAVE_oblockop_reap_shared_lock
 #define __CRT_HAVE_oblockop_reap_shared_rwlock
 #ifndef __KERNEL__
+#define __CRT_HAVE_obstack_alloc_failed_handler
+#define __CRT_HAVE_obstack_exit_failure
+#define __CRT_HAVE_obstack_free
 #define __CRT_HAVE_obstack_printf
 #define __CRT_HAVE_obstack_vprintf
 #define __CRT_HAVE_on_exit

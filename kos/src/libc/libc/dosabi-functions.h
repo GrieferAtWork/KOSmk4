@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd18c8312 */
+/* HASH CRC-32:0x52b83668 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1196,6 +1196,14 @@ DFUN(".text.crt.dos.net.inet.6.source_filter", libd_setsourcefilter, libc_setsou
 DFUN(".text.crt.dos.heap.malloc", libd_catopen, libc_catopen, TP, 2, TP, TD)
 DFUN(".text.crt.dos.heap.malloc", libd_catgets, libc_catgets, TP, 4, TP, TD, TD, TP)
 DFUN(".text.crt.dos.heap.malloc", libd_catclose, libc_catclose, TD, 1, TP)
+
+/* obstack */
+DFUN(".text.crt.dos.heap.obstack", libd__obstack_begin, libc__obstack_begin, TD, 5, TP, TI, TI, TP, TP)
+DFUN(".text.crt.dos.heap.obstack", libd__obstack_begin_1, libc__obstack_begin_1, TD, 6, TP, TI, TI, TP, TP, TP)
+DFUN(".text.crt.dos.heap.obstack", libd__obstack_newchunk, libc__obstack_newchunk, TV, 2, TP, TI)
+DFUN(".text.crt.dos.heap.obstack", libd_obstack_free, libc_obstack_free, TV, 2, TP, TP)
+DFUN(".text.crt.dos.heap.obstack", libd__obstack_memory_used, libc__obstack_memory_used, TI, 1, TP)
+DFUN(".text.crt.dos.heap.obstack", libd__obstack_allocated_p, libc__obstack_allocated_p, TD, 2, TP, TP)
 
 /* process */
 DFUN(".text.crt.dos.sched.thread", libd__beginthread, libc__beginthread, TP, 3, TP, TI32, TP)

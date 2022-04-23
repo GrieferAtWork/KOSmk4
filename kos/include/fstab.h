@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6dbb870 */
+/* HASH CRC-32:0x5350b556 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,16 +18,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/fstab.h) */
-/* (#) Portability: DJGPP         (/include/fstab.h) */
+/* (#) Portability: FreeBSD       (/include/fstab.h) */
 /* (#) Portability: GNU C Library (/misc/fstab.h) */
+/* (#) Portability: NetBSD        (/include/fstab.h) */
+/* (#) Portability: OpenBSD       (/include/fstab.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/lib/libbc/inc/include/fstab.h) */
-/* (#) Portability: diet libc     (/include/fstab.h) */
-/* (#) Portability: libc4/5       (/include/fstab.h) */
 /* (#) Portability: libc6         (/include/fstab.h) */
-/* (#) Portability: mintlib       (/include/fstab.h) */
-/* (#) Portability: musl libc     (/include/fstab.h) */
-/* (#) Portability: uClibc        (/include/fstab.h) */
 #ifndef _FSTAB_H
 #define _FSTAB_H 1
 

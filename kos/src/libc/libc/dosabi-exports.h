@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafd58423 */
+/* HASH CRC-32:0x4b598ccf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1461,6 +1461,15 @@ DEFINE_PUBLIC_ALIAS(DOS$setsourcefilter, libd_setsourcefilter);
 DEFINE_PUBLIC_ALIAS(DOS$catopen, libd_catopen);
 DEFINE_PUBLIC_ALIAS(DOS$catgets, libd_catgets);
 DEFINE_PUBLIC_ALIAS(DOS$catclose, libd_catclose);
+
+/* obstack */
+DEFINE_PUBLIC_ALIAS(DOS$_obstack_begin, libd__obstack_begin);
+DEFINE_PUBLIC_ALIAS(DOS$_obstack_begin_1, libd__obstack_begin_1);
+DEFINE_PUBLIC_ALIAS(DOS$_obstack_newchunk, libd__obstack_newchunk);
+DEFINE_PUBLIC_ALIAS(DOS$_obstack_free, libd_obstack_free);
+DEFINE_PUBLIC_ALIAS(DOS$obstack_free, libd_obstack_free);
+DEFINE_PUBLIC_ALIAS(DOS$_obstack_memory_used, libd__obstack_memory_used);
+DEFINE_PUBLIC_ALIAS(DOS$_obstack_allocated_p, libd__obstack_allocated_p);
 
 /* process */
 DEFINE_PUBLIC_ALIAS(DOS$_beginthread, libd__beginthread);

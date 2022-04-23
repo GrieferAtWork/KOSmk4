@@ -69,7 +69,7 @@ public: /* Helper functions */
 	__REF __T *incref() const __CXX_NOEXCEPT {
 		__REF __T *__res = __m_ptr;
 		if (__res)
-			__refctrl::incref(__res);
+			__refctrl::__PRIVATE_REFCNT_NAME(incref)(__res);
 		return __res;
 	}
 
@@ -84,25 +84,25 @@ public: /* Helper functions */
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __NULLPTR;
 		if (__optr)
-			__refctrl::decref(__optr);
+			__refctrl::__PRIVATE_REFCNT_NAME(decref)(__optr);
 	}
 
 	__CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL void clear_likely() __CXX_NOEXCEPT {
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __NULLPTR;
 		if (__optr)
-			__refctrl::decref_likely(__optr);
+			__refctrl::__PRIVATE_REFCNT_NAME(decref_likely)(__optr);
 	}
 
 	__CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL void clear_unlikely() __CXX_NOEXCEPT {
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __NULLPTR;
 		if (__optr)
-			__refctrl::decref_unlikely(__optr);
+			__refctrl::__PRIVATE_REFCNT_NAME(decref_unlikely)(__optr);
 	}
 
 public: /* conversion */
-	__CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL operator __T*() const __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL operator __T *() const __CXX_NOEXCEPT {
 		return __m_ptr;
 	}
 public: /* Deref */
@@ -119,7 +119,7 @@ public: /* Assignment */
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __other.__m_ptr;
 		if (__optr)
-			__refctrl::decref(__optr);
+			__refctrl::__PRIVATE_REFCNT_NAME(decref)(__optr);
 		return *this;
 	}
 	template<class __SCT> __CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL
@@ -128,14 +128,14 @@ public: /* Assignment */
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __other;
 		if (__optr)
-			__refctrl::decref(__optr);
+			__refctrl::__PRIVATE_REFCNT_NAME(decref)(__optr);
 		return *this;
 	}
 	__CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL refptr &operator = (refptr const &__other) __CXX_NOEXCEPT {
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __other.incref();
 		if (__optr)
-			__refctrl::decref(__optr);
+			__refctrl::__PRIVATE_REFCNT_NAME(decref)(__optr);
 		return *this;
 	}
 	template<class __SCT> __CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL
@@ -144,7 +144,7 @@ public: /* Assignment */
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __other.incref();
 		if (__optr)
-			__refctrl::decref(__optr);
+			__refctrl::__PRIVATE_REFCNT_NAME(decref)(__optr);
 		return *this;
 	}
 #ifdef __COMPILER_HAVE_CXX_RVALUE_REFERENCE
@@ -153,7 +153,7 @@ public: /* Assignment */
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __other.release();
 		if (__optr)
-			__refctrl::decref(__optr);
+			__refctrl::__PRIVATE_REFCNT_NAME(decref)(__optr);
 		return *this;
 	}
 	template<class __SCT> __CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL
@@ -162,7 +162,7 @@ public: /* Assignment */
 		__REF __T *__optr = __m_ptr;
 		__m_ptr = __other.release();
 		if (__optr)
-			__refctrl::decref(__optr);
+			__refctrl::__PRIVATE_REFCNT_NAME(decref)(__optr);
 		return *this;
 	}
 #endif /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
@@ -170,7 +170,7 @@ public: /* Constructor / Destructor */
 	__CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL
 	~refptr() __CXX_NOEXCEPT {
 		if (__m_ptr)
-			__refctrl::decref(__m_ptr);
+			__refctrl::__PRIVATE_REFCNT_NAME(decref)(__m_ptr);
 	}
 
 	__CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL
@@ -189,7 +189,7 @@ public: /* Constructor / Destructor */
 	refptr(__SCT *__other, typename std::enable_if<std::is_base_of<__T, __SCT>::value, void>::type * = 0) __CXX_NOEXCEPT
 	    : __m_ptr(__other) {
 		if (__other)
-			__refctrl::incref(__other);
+			__refctrl::__PRIVATE_REFCNT_NAME(incref)(__other);
 	}
 
 	template<class __SCT> __CXX_CLASSMEMBER __NOBLOCK __ATTR_ARTIFICIAL

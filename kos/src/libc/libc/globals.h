@@ -262,6 +262,20 @@ INTDEF unsigned int libd___mb_cur_max;
 #define __LOCAL_MB_CUR_MAX ((size_t)libd___mb_cur_max)
 
 
+/* <obstack.h> */
+#undef obstack_alloc_failed_handler
+#undef obstack_exit_failure
+#undef __LOCAL_obstack_alloc_failed_handler
+#undef __LOCAL_obstack_exit_failure
+typedef void (__LIBKCALL *POBSTACK_ALLOC_FAILED_HANDLER)(void);
+DECLARE_NOREL_GLOBAL_META(POBSTACK_ALLOC_FAILED_HANDLER, obstack_alloc_failed_handler);
+DECLARE_NOREL_GLOBAL_META(int, obstack_exit_failure);
+#define obstack_alloc_failed_handler         GET_NOREL_GLOBAL(obstack_alloc_failed_handler)
+#define obstack_exit_failure                 GET_NOREL_GLOBAL(obstack_exit_failure)
+#define __LOCAL_obstack_alloc_failed_handler GET_NOREL_GLOBAL(obstack_alloc_failed_handler)
+#define __LOCAL_obstack_exit_failure         GET_NOREL_GLOBAL(obstack_exit_failure)
+
+
 /* Misc... */
 #undef __libc_enable_secure
 #undef __LOCAL___libc_enable_secure

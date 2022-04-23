@@ -83,6 +83,7 @@
 	.heap.strdup
 	.heap.rare_helpers
 	.heap.utility
+	.heap.obstack
 	.heap.*
 	.heap
 
@@ -257,6 +258,7 @@
 	CB(PREFIX.crt.heap.strdup) \
 	CB(PREFIX.crt.heap.rare_helpers) \
 	CB(PREFIX.crt.heap.utility) \
+	CB(PREFIX.crt.heap.obstack) \
 	CB(PREFIX.crt.io.read PREFIX.crt.io.large.read PREFIX.crt.io.write PREFIX.crt.io.large.write) \
 	CB(PREFIX.crt.io.access) \
 	CB(PREFIX.crt.FILE.core.read) \
@@ -436,6 +438,7 @@
 	CB(PREFIX.crt.dos.heap.strdup) \
 	CB(PREFIX.crt.dos.heap.rare_helpers) \
 	CB(PREFIX.crt.dos.heap.utility) \
+	CB(PREFIX.crt.dos.heap.obstack) \
 	CB(PREFIX.crt.dos.heap.debug_malloc) \
 	CB(PREFIX.crt.dos.heap) \
 	CB(PREFIX.crt.dos.io.read PREFIX.crt.dos.io.large.read PREFIX.crt.dos.io.write PREFIX.crt.dos.io.large.write) \

@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xb2fee632 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,24 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/include/gnu-versions.h) */
-/* (#) Portability: libc6         (/include/gnu-versions.h) */
-/* (#) Portability: uClibc        (/include/gnu-versions.h) */
-#ifndef _GNU_VERSIONS_H
-#define _GNU_VERSIONS_H 1
-
+#ifndef __local__obstack_memory_used_defined
+#define __local__obstack_memory_used_defined
 #include <__crt.h>
-
-#ifdef __CRT_GLC_PRIMARY
-#define _GNU_OBSTACK_INTERFACE_VERSION 1
-#define _GNU_REGEX_INTERFACE_VERSION   1
-#define _GNU_GLOB_INTERFACE_VERSION    2
-#define _GNU_GETOPT_INTERFACE_VERSION  2
-#elif defined(__CRT_KOS_PRIMARY)
-#define _GNU_OBSTACK_INTERFACE_VERSION 2
-#define _GNU_REGEX_INTERFACE_VERSION   1
-#define _GNU_GLOB_INTERFACE_VERSION    2 /* Unimplemented as of right now */
-#define _GNU_GETOPT_INTERFACE_VERSION  2
-#endif /* ... */
-
-#endif /* !_GNU_VERSIONS_H */
+#include <features.h>
+#include <bits/crt/obstack.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(_obstack_memory_used) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_obstack_memory_used))(struct obstack __KOS_FIXED_CONST *__self) {
+	__SIZE_TYPE__ __result = 0;
+	struct _obstack_chunk *__iter;
+	for (__iter = __self->chunk; __iter; __iter = __iter->prev)
+		__result += (__SIZE_TYPE__)(__iter->limit - (char *)__iter);
+	return __result;
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep__obstack_memory_used_defined
+#define __local___localdep__obstack_memory_used_defined
+#define __localdep__obstack_memory_used __LIBC_LOCAL_NAME(_obstack_memory_used)
+#endif /* !__local___localdep__obstack_memory_used_defined */
+#endif /* !__local__obstack_memory_used_defined */

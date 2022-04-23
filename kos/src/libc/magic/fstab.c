@@ -18,16 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/fstab.h) */
-/* (#) Portability: DJGPP         (/include/fstab.h) */
+/* (#) Portability: FreeBSD       (/include/fstab.h) */
 /* (#) Portability: GNU C Library (/misc/fstab.h) */
+/* (#) Portability: NetBSD        (/include/fstab.h) */
+/* (#) Portability: OpenBSD       (/include/fstab.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/lib/libbc/inc/include/fstab.h) */
-/* (#) Portability: diet libc     (/include/fstab.h) */
-/* (#) Portability: libc4/5       (/include/fstab.h) */
 /* (#) Portability: libc6         (/include/fstab.h) */
-/* (#) Portability: mintlib       (/include/fstab.h) */
-/* (#) Portability: musl libc     (/include/fstab.h) */
-/* (#) Portability: uClibc        (/include/fstab.h) */
 }
 
 %[define_replacement(fd_t = __fd_t)]
