@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70f1df3c */
+/* HASH CRC-32:0xef2cf657 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,8 +23,8 @@
 #include <__crt.h>
 #include <libc/template/stdstreams.h>
 #if defined(__LOCAL_stdin) && (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE__getwc_nolock) || defined(__CRT_HAVE__fgetwc_nolock) || defined(__CRT_HAVE_getwc) || defined(__CRT_HAVE_fgetwc))
-#include <hybrid/typecore.h>
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetwc_unlocked_defined
 #define __local___localdep_fgetwc_unlocked_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b1a6582 */
+/* HASH CRC-32:0x4850e4ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local__cputws_defined
 #include <__crt.h>
 #include <features.h>
-#if (defined(__CRT_HAVE__putwch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putwch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#if (defined(__CRT_HAVE__putwch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putwch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__putwch_defined
 #define __local___localdep__putwch_defined
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__WINT_TYPE__,__NOTHROW_NCX,__localdep__putwch,(__WCHAR_TYPE__ __ch),_putwch_nolock,(__ch))
 #elif defined(__CRT_HAVE__putwch)
 __CREDIRECT(,__WINT_TYPE__,__NOTHROW_NCX,__localdep__putwch,(__WCHAR_TYPE__ __ch),_putwch,(__ch))
-#elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))
+#elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wconio/_putwch.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -43,23 +43,23 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_file_wprinter_defined
 #if defined(__CRT_HAVE_file_wprinter_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter)
 __NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter_unlocked)
 __NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_wprinter,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)
+#elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/file_wprinter.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -87,11 +87,11 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_cputws) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_cputws))(__WCHAR_TYPE__ const *__restrict __str) {
-#if defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))
+#if defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))
 	__SIZE_TYPE__ __len = (__NAMESPACE_LOCAL_SYM __localdep_wcslen)(__str);
 	__SIZE_TYPE__ __ok  = (__NAMESPACE_LOCAL_SYM __localdep_file_wprinter)(__LOCAL_stdtty, __str, __len);
 	return __ok >= __len ? 0 : -1;
-#else /* __CRT_HAVE_stdtty && (__CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputwc || __CRT_HAVE_putwc) */
+#else /* __CRT_HAVE_stdtty && (__CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputwc || __CRT_HAVE_putwc || __CRT_HAVE_fputwc_unlocked || __CRT_HAVE_putwc_unlocked) */
 	for (;;) {
 		__WCHAR_TYPE__ __ch = *__str++;
 		if (!__ch)
@@ -100,14 +100,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_cputws))(__WCHAR_TYPE__ const *__res
 			return -1;
 	}
 	return 0;
-#endif /* !__CRT_HAVE_stdtty || (!__CRT_HAVE_file_wprinter && !__CRT_HAVE_file_wprinter_unlocked && !__CRT_HAVE_fputwc && !__CRT_HAVE_putwc) */
+#endif /* !__CRT_HAVE_stdtty || (!__CRT_HAVE_file_wprinter && !__CRT_HAVE_file_wprinter_unlocked && !__CRT_HAVE_fputwc && !__CRT_HAVE_putwc && !__CRT_HAVE_fputwc_unlocked && !__CRT_HAVE_putwc_unlocked) */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__cputws_defined
 #define __local___localdep__cputws_defined
 #define __localdep__cputws __LIBC_LOCAL_NAME(_cputws)
 #endif /* !__local___localdep__cputws_defined */
-#else /* (__CRT_HAVE__putwch_nolock && __USE_STDIO_UNLOCKED) || __CRT_HAVE__putwch || (__CRT_HAVE_stdtty && (__CRT_HAVE_fputwc || __CRT_HAVE_putwc)) || (__CRT_HAVE_stdtty && (__CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputwc || __CRT_HAVE_putwc)) */
+#else /* (__CRT_HAVE__putwch_nolock && __USE_STDIO_UNLOCKED) || __CRT_HAVE__putwch || (__CRT_HAVE_stdtty && (__CRT_HAVE_fputwc || __CRT_HAVE_putwc || __CRT_HAVE_fputwc_unlocked || __CRT_HAVE_putwc_unlocked)) || (__CRT_HAVE_stdtty && (__CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputwc || __CRT_HAVE_putwc || __CRT_HAVE_fputwc_unlocked || __CRT_HAVE_putwc_unlocked)) */
 #undef __local__cputws_defined
-#endif /* (!__CRT_HAVE__putwch_nolock || !__USE_STDIO_UNLOCKED) && !__CRT_HAVE__putwch && (!__CRT_HAVE_stdtty || (!__CRT_HAVE_fputwc && !__CRT_HAVE_putwc)) && (!__CRT_HAVE_stdtty || (!__CRT_HAVE_file_wprinter && !__CRT_HAVE_file_wprinter_unlocked && !__CRT_HAVE_fputwc && !__CRT_HAVE_putwc)) */
+#endif /* (!__CRT_HAVE__putwch_nolock || !__USE_STDIO_UNLOCKED) && !__CRT_HAVE__putwch && (!__CRT_HAVE_stdtty || (!__CRT_HAVE_fputwc && !__CRT_HAVE_putwc && !__CRT_HAVE_fputwc_unlocked && !__CRT_HAVE_putwc_unlocked)) && (!__CRT_HAVE_stdtty || (!__CRT_HAVE_file_wprinter && !__CRT_HAVE_file_wprinter_unlocked && !__CRT_HAVE_fputwc && !__CRT_HAVE_putwc && !__CRT_HAVE_fputwc_unlocked && !__CRT_HAVE_putwc_unlocked)) */
 #endif /* !__local__cputws_defined */

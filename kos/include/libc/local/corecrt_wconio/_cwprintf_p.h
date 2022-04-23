@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6709048e */
+/* HASH CRC-32:0xd846c01a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,13 @@
 #define __local__cwprintf_p_defined
 #include <__crt.h>
 #include <features.h>
-#if defined(__CRT_HAVE__vcwprintf_p) || defined(__CRT_HAVE__vcwprintf_p_l) || defined(__CRT_HAVE___conio_common_vcwprintf_p) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#if defined(__CRT_HAVE__vcwprintf_p) || defined(__CRT_HAVE__vcwprintf_p_l) || defined(__CRT_HAVE___conio_common_vcwprintf_p) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vcwprintf_p_defined
 #define __local___localdep__vcwprintf_p_defined
 #ifdef __CRT_HAVE__vcwprintf_p
 __CREDIRECT(__ATTR_LIBC_WPRINTF_P(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vcwprintf_p,(const __WCHAR_TYPE__ *__format, __builtin_va_list __args),_vcwprintf_p,(__format,__args))
-#elif defined(__CRT_HAVE__vcwprintf_p_l) || defined(__CRT_HAVE___conio_common_vcwprintf_p) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE__vcwprintf_p_l) || defined(__CRT_HAVE___conio_common_vcwprintf_p) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wconio/_vcwprintf_p.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__cwprintf_p_defined
 #define __localdep__cwprintf_p __LIBC_LOCAL_NAME(_cwprintf_p)
 #endif /* !__local___localdep__cwprintf_p_defined */
-#else /* __CRT_HAVE__vcwprintf_p || __CRT_HAVE__vcwprintf_p_l || __CRT_HAVE___conio_common_vcwprintf_p || (__CRT_HAVE_stdtty && (__CRT_HAVE___stdio_common_vfwprintf_p || __CRT_HAVE_vfwprintf || __CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputwc || __CRT_HAVE_putwc)) */
+#else /* __CRT_HAVE__vcwprintf_p || __CRT_HAVE__vcwprintf_p_l || __CRT_HAVE___conio_common_vcwprintf_p || (__CRT_HAVE_stdtty && (__CRT_HAVE___stdio_common_vfwprintf_p || __CRT_HAVE_vfwprintf || __CRT_HAVE_vfwprintf_unlocked || __CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputwc || __CRT_HAVE_putwc || __CRT_HAVE_fputwc_unlocked || __CRT_HAVE_putwc_unlocked)) */
 #undef __local__cwprintf_p_defined
-#endif /* !__CRT_HAVE__vcwprintf_p && !__CRT_HAVE__vcwprintf_p_l && !__CRT_HAVE___conio_common_vcwprintf_p && (!__CRT_HAVE_stdtty || (!__CRT_HAVE___stdio_common_vfwprintf_p && !__CRT_HAVE_vfwprintf && !__CRT_HAVE_file_wprinter && !__CRT_HAVE_file_wprinter_unlocked && !__CRT_HAVE_fputwc && !__CRT_HAVE_putwc)) */
+#endif /* !__CRT_HAVE__vcwprintf_p && !__CRT_HAVE__vcwprintf_p_l && !__CRT_HAVE___conio_common_vcwprintf_p && (!__CRT_HAVE_stdtty || (!__CRT_HAVE___stdio_common_vfwprintf_p && !__CRT_HAVE_vfwprintf && !__CRT_HAVE_vfwprintf_unlocked && !__CRT_HAVE_file_wprinter && !__CRT_HAVE_file_wprinter_unlocked && !__CRT_HAVE_fputwc && !__CRT_HAVE_putwc && !__CRT_HAVE_fputwc_unlocked && !__CRT_HAVE_putwc_unlocked)) */
 #endif /* !__local__cwprintf_p_defined */

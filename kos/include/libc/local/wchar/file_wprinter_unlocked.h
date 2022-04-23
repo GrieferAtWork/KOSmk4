@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd62cab4c */
+/* HASH CRC-32:0x256d95bf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,8 +22,8 @@
 #define __local_file_wprinter_unlocked_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked) || defined(__CRT_HAVE__putwc_nolock) || defined(__CRT_HAVE__fputwc_nolock) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc)
-#include <hybrid/typecore.h>
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputwc_unlocked_defined
 #define __local___localdep_fputwc_unlocked_defined

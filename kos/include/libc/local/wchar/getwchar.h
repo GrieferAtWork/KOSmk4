@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2563b949 */
+/* HASH CRC-32:0xa7808c29 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,25 @@
 #define __local_getwchar_defined
 #include <__crt.h>
 #include <libc/template/stdstreams.h>
-#if defined(__LOCAL_stdin) && (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc))
+#include <features.h>
+#if defined(__LOCAL_stdin) && (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc) || defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked))
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetwc_defined
 #define __local___localdep_fgetwc_defined
-#ifdef __CRT_HAVE_fgetwc
+#if defined(__CRT_HAVE_fgetwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_getwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_fgetwc)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc,(__stream))
+#elif defined(__CRT_HAVE_fgetwc_unlocked)
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_getwc_unlocked)
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_fgetwc_defined
 #endif /* !... */
@@ -45,7 +54,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_getwchar_defined
 #define __localdep_getwchar __LIBC_LOCAL_NAME(getwchar)
 #endif /* !__local___localdep_getwchar_defined */
-#else /* __LOCAL_stdin && (__CRT_HAVE_fgetwc || __CRT_HAVE_getwc) */
+#else /* __LOCAL_stdin && (__CRT_HAVE_fgetwc || __CRT_HAVE_getwc || __CRT_HAVE_fgetwc_unlocked || __CRT_HAVE_getwc_unlocked) */
 #undef __local_getwchar_defined
-#endif /* !__LOCAL_stdin || (!__CRT_HAVE_fgetwc && !__CRT_HAVE_getwc) */
+#endif /* !__LOCAL_stdin || (!__CRT_HAVE_fgetwc && !__CRT_HAVE_getwc && !__CRT_HAVE_fgetwc_unlocked && !__CRT_HAVE_getwc_unlocked) */
 #endif /* !__local_getwchar_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8166187 */
+/* HASH CRC-32:0x32469d6d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,7 +103,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_getwche_nolock, __FORCELOCAL __ATTR_ARTIFICIAL 
 __CREDIRECT(,wint_t,__NOTHROW_NCX,_putwch,(wchar_t __ch),_putwch_nolock,(__ch))
 #elif defined(__CRT_HAVE__putwch)
 __CDECLARE(,wint_t,__NOTHROW_NCX,_putwch,(wchar_t __ch),(__ch))
-#elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))
+#elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))
 #include <libc/local/corecrt_wconio/_putwch.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_putwch, __FORCELOCAL __ATTR_ARTIFICIAL wint_t __NOTHROW_NCX(__LIBCCALL _putwch)(wchar_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_putwch))(__ch); })
 #endif /* ... */
@@ -149,25 +149,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_cgetws_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__CRT_HAVE__cgetws_s */
 #ifdef __CRT_HAVE__cputws
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_cputws,(wchar_t const *__restrict __str),(__str))
-#elif (defined(__CRT_HAVE__putwch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putwch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif (defined(__CRT_HAVE__putwch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putwch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_cputws.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_cputws, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _cputws)(wchar_t const *__restrict __str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_cputws))(__str); })
 #endif /* ... */
 #ifdef __CRT_HAVE___conio_common_vcwprintf
 __CDECLARE(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__conio_common_vcwprintf,(__UINT64_TYPE__ __options, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__options,__format,__locale,__args))
-#elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))
+#elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))
 #include <libc/local/corecrt_wconio/__conio_common_vcwprintf.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__conio_common_vcwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL __conio_common_vcwprintf)(__UINT64_TYPE__ __options, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__conio_common_vcwprintf))(__options, __format, __locale, __args); })
 #endif /* ... */
 #ifdef __CRT_HAVE___conio_common_vcwprintf_s
 __CDECLARE(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__conio_common_vcwprintf_s,(__UINT64_TYPE__ __options, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__options,__format,__locale,__args))
-#elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_s) || defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))
+#elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_s) || defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))
 #include <libc/local/corecrt_wconio/__conio_common_vcwprintf_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__conio_common_vcwprintf_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL __conio_common_vcwprintf_s)(__UINT64_TYPE__ __options, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__conio_common_vcwprintf_s))(__options, __format, __locale, __args); })
 #endif /* ... */
 #ifdef __CRT_HAVE___conio_common_vcwprintf_p
 __CDECLARE(__ATTR_LIBC_WPRINTF_P(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__conio_common_vcwprintf_p,(__UINT64_TYPE__ __options, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__options,__format,__locale,__args))
-#elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))
+#elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))
 #include <libc/local/corecrt_wconio/__conio_common_vcwprintf_p.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__conio_common_vcwprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF_P(2, 0) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL __conio_common_vcwprintf_p)(__UINT64_TYPE__ __options, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__conio_common_vcwprintf_p))(__options, __format, __locale, __args); })
 #endif /* ... */
@@ -183,19 +183,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__conio_common_vcwscanf, __FORCELOCAL __ATTR_ART
 #endif /* !__CRT_HAVE___conio_common_vcwscanf */
 #ifdef __CRT_HAVE__vcwprintf_l
 __CDECLARE(__ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vcwprintf_l,(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args))
-#elif defined(__CRT_HAVE___conio_common_vcwprintf) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE___conio_common_vcwprintf) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_vcwprintf_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vcwprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vcwprintf_l)(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vcwprintf_l))(__format, __locale, __args); })
 #endif /* ... */
 #ifdef __CRT_HAVE__vcwprintf_s_l
 __CDECLARE(__ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vcwprintf_s_l,(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args))
-#elif defined(__CRT_HAVE___conio_common_vcwprintf_s) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_s) || defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE___conio_common_vcwprintf_s) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_s) || defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_vcwprintf_s_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vcwprintf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vcwprintf_s_l)(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vcwprintf_s_l))(__format, __locale, __args); })
 #endif /* ... */
 #ifdef __CRT_HAVE__vcwprintf_p_l
 __CDECLARE(__ATTR_LIBC_WPRINTF_P(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vcwprintf_p_l,(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args))
-#elif defined(__CRT_HAVE___conio_common_vcwprintf_p) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE___conio_common_vcwprintf_p) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_vcwprintf_p_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vcwprintf_p_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF_P(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vcwprintf_p_l)(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vcwprintf_p_l))(__format, __locale, __args); })
 #endif /* ... */
@@ -221,19 +221,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vcwscanf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE__vcwscanf_s_l */
 #ifdef __CRT_HAVE__vcwprintf
 __CDECLARE(__ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vcwprintf,(wchar_t const *__format, __builtin_va_list __args),(__format,__args))
-#elif defined(__CRT_HAVE__vcwprintf_l) || defined(__CRT_HAVE___conio_common_vcwprintf) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE__vcwprintf_l) || defined(__CRT_HAVE___conio_common_vcwprintf) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_vcwprintf.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vcwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vcwprintf)(wchar_t const *__format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vcwprintf))(__format, __args); })
 #endif /* ... */
 #ifdef __CRT_HAVE__vcwprintf_s
 __CDECLARE(__ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vcwprintf_s,(wchar_t const *__format, __builtin_va_list __args),(__format,__args))
-#elif defined(__CRT_HAVE__vcwprintf_s_l) || defined(__CRT_HAVE___conio_common_vcwprintf_s) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_s) || defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE__vcwprintf_s_l) || defined(__CRT_HAVE___conio_common_vcwprintf_s) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_s) || defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_vcwprintf_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vcwprintf_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vcwprintf_s)(wchar_t const *__format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vcwprintf_s))(__format, __args); })
 #endif /* ... */
 #ifdef __CRT_HAVE__vcwprintf_p
 __CDECLARE(__ATTR_LIBC_WPRINTF_P(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vcwprintf_p,(const wchar_t *__format, __builtin_va_list __args),(__format,__args))
-#elif defined(__CRT_HAVE__vcwprintf_p_l) || defined(__CRT_HAVE___conio_common_vcwprintf_p) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE__vcwprintf_p_l) || defined(__CRT_HAVE___conio_common_vcwprintf_p) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_vcwprintf_p.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vcwprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF_P(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vcwprintf_p)(const wchar_t *__format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vcwprintf_p))(__format, __args); })
 #endif /* ... */
@@ -259,7 +259,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_vcwscanf_s, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !__CRT_HAVE__vcwscanf_s */
 #ifdef __CRT_HAVE__cwprintf
 __LIBC __ATTR_LIBC_WPRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _cwprintf)(wchar_t const *__format, ...) __CASMNAME_SAME("_cwprintf");
-#elif defined(__CRT_HAVE__vcwprintf) || defined(__CRT_HAVE__vcwprintf_l) || defined(__CRT_HAVE___conio_common_vcwprintf) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE__vcwprintf) || defined(__CRT_HAVE__vcwprintf_l) || defined(__CRT_HAVE___conio_common_vcwprintf) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_cwprintf.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(_cwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _cwprintf)(wchar_t const *__format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_cwprintf))(__format, __builtin_va_arg_pack()); })
@@ -269,7 +269,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_cwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* ... */
 #ifdef __CRT_HAVE__cwprintf_l
 __LIBC __ATTR_LIBC_WPRINTF(1, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _cwprintf_l)(wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_cwprintf_l");
-#elif defined(__CRT_HAVE__vcwprintf_l) || defined(__CRT_HAVE___conio_common_vcwprintf) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE__vcwprintf_l) || defined(__CRT_HAVE___conio_common_vcwprintf) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_cwprintf_l.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(_cwprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(1, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _cwprintf_l)(wchar_t const *__format, __locale_t __locale, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_cwprintf_l))(__format, __locale, __builtin_va_arg_pack()); })
@@ -279,7 +279,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_cwprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* ... */
 #ifdef __CRT_HAVE__cwprintf_s
 __LIBC __ATTR_LIBC_WPRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _cwprintf_s)(wchar_t const *__format, ...) __CASMNAME_SAME("_cwprintf_s");
-#elif defined(__CRT_HAVE__vcwprintf_s) || defined(__CRT_HAVE__vcwprintf_s_l) || defined(__CRT_HAVE___conio_common_vcwprintf_s) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_s) || defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE__vcwprintf_s) || defined(__CRT_HAVE__vcwprintf_s_l) || defined(__CRT_HAVE___conio_common_vcwprintf_s) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_s) || defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_cwprintf_s.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(_cwprintf_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _cwprintf_s)(wchar_t const *__format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_cwprintf_s))(__format, __builtin_va_arg_pack()); })
@@ -289,7 +289,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_cwprintf_s, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* ... */
 #ifdef __CRT_HAVE__cwprintf_s_l
 __LIBC __ATTR_LIBC_WPRINTF(1, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _cwprintf_s_l)(wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_cwprintf_s_l");
-#elif defined(__CRT_HAVE__vcwprintf_s_l) || defined(__CRT_HAVE___conio_common_vcwprintf_s) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_s) || defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE__vcwprintf_s_l) || defined(__CRT_HAVE___conio_common_vcwprintf_s) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_s) || defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_cwprintf_s_l.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(_cwprintf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(1, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _cwprintf_s_l)(wchar_t const *__format, __locale_t __locale, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_cwprintf_s_l))(__format, __locale, __builtin_va_arg_pack()); })
@@ -299,7 +299,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_cwprintf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* ... */
 #ifdef __CRT_HAVE__cwprintf_p
 __LIBC __ATTR_LIBC_WPRINTF_P(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _cwprintf_p)(wchar_t const *__format, ...) __CASMNAME_SAME("_cwprintf_p");
-#elif defined(__CRT_HAVE__vcwprintf_p) || defined(__CRT_HAVE__vcwprintf_p_l) || defined(__CRT_HAVE___conio_common_vcwprintf_p) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE__vcwprintf_p) || defined(__CRT_HAVE__vcwprintf_p_l) || defined(__CRT_HAVE___conio_common_vcwprintf_p) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_cwprintf_p.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(_cwprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF_P(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _cwprintf_p)(wchar_t const *__format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_cwprintf_p))(__format, __builtin_va_arg_pack()); })
@@ -309,7 +309,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_cwprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* ... */
 #ifdef __CRT_HAVE__cwprintf_p_l
 __LIBC __ATTR_LIBC_WPRINTF_P(1, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _cwprintf_p_l)(wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_cwprintf_p_l");
-#elif defined(__CRT_HAVE__vcwprintf_p_l) || defined(__CRT_HAVE___conio_common_vcwprintf_p) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)))
+#elif defined(__CRT_HAVE__vcwprintf_p_l) || defined(__CRT_HAVE___conio_common_vcwprintf_p) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)))
 #include <libc/local/corecrt_wconio/_cwprintf_p_l.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(_cwprintf_p_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF_P(1, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _cwprintf_p_l)(wchar_t const *__format, __locale_t __locale, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_cwprintf_p_l))(__format, __locale, __builtin_va_arg_pack()); })

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d653918 */
+/* HASH CRC-32:0xcca408eb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,24 @@
 #ifndef __local__putwch_defined
 #define __local__putwch_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc))
+#include <features.h>
+#if defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputwc_defined
 #define __local___localdep_fputwc_defined
-#ifdef __CRT_HAVE_fputwc
+#if defined(__CRT_HAVE_fputwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
+#elif defined(__CRT_HAVE_putwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
+#elif defined(__CRT_HAVE_fputwc)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
@@ -37,6 +50,18 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc,(__wc,__stream))
+#elif defined(__CRT_HAVE_fputwc_unlocked)
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),fputwc_unlocked,(__wc,__stream))
+#elif defined(__CRT_HAVE_putwc_unlocked)
+__NAMESPACE_LOCAL_END
+#include <kos/anno.h>
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc,(__WCHAR_TYPE__ __wc, __FILE *__stream),putwc_unlocked,(__wc,__stream))
 #else /* ... */
 #undef __local___localdep_fputwc_defined
 #endif /* !... */
@@ -53,7 +78,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__putwch_defined
 #define __localdep__putwch __LIBC_LOCAL_NAME(_putwch)
 #endif /* !__local___localdep__putwch_defined */
-#else /* __CRT_HAVE_stdtty && (__CRT_HAVE_fputwc || __CRT_HAVE_putwc) */
+#else /* __CRT_HAVE_stdtty && (__CRT_HAVE_fputwc || __CRT_HAVE_putwc || __CRT_HAVE_fputwc_unlocked || __CRT_HAVE_putwc_unlocked) */
 #undef __local__putwch_defined
-#endif /* !__CRT_HAVE_stdtty || (!__CRT_HAVE_fputwc && !__CRT_HAVE_putwc) */
+#endif /* !__CRT_HAVE_stdtty || (!__CRT_HAVE_fputwc && !__CRT_HAVE_putwc && !__CRT_HAVE_fputwc_unlocked && !__CRT_HAVE_putwc_unlocked) */
 #endif /* !__local__putwch_defined */

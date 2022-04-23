@@ -907,12 +907,12 @@ int getchar() {
 
 @@>> putc(3), fputc(3)
 @@Write a single character `ch' to `stream'
-[[std, cp_stdio, crtbuiltin]]
-[[no_crt_self_import, no_crt_self_export, export_as(CNL_fputc...)]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), alias(CNL_fputc_unlocked...)]]
+[[std, cp_stdio, no_crt_self_import, no_crt_self_export, export_as(CNL_fputc...)]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), crtbuiltin(fputc_unlocked)]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias(CNL_fputc_unlocked...)]]
 [[                                                                           alias(CNL_fputc...)]]
 [[                                                                           alias(CNL_fputc_unlocked...)]]
-[[userimpl, requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite))]]
+[[crtbuiltin, userimpl, requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite))]]
 [[impl_include("<bits/crt/io-file.h>", "<features.h>")]]
 int fputc(int ch, [[nonnull]] FILE *__restrict stream) {
 @@pp_if defined(__CRT_DOS) && $has_function(_flsbuf) && (defined(__USE_STDIO_UNLOCKED) || !$has_function(crt_fwrite))@@
@@ -929,9 +929,9 @@ int fputc(int ch, [[nonnull]] FILE *__restrict stream) {
 
 @@>> putchar(3)
 @@Alias for `fputc(ch, stdout)'
-[[std, cp_stdio, crtbuiltin]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), crtbuiltin(putchar_unlocked)]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("putchar_unlocked")]]
-[[dos_only_export_alias("_fputchar"), alias("putchar_unlocked")]]
+[[std, cp_stdio, crtbuiltin, dos_only_export_alias("_fputchar"), alias("putchar_unlocked")]]
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(fputc))]]
@@ -995,9 +995,10 @@ char *fgets([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
 @@>> fputs(3)
 @@Print a given string `string' to `stream'. This is identical to:
 @@>> fwrite(string, sizeof(char), strlen(string), stream);
-[[std, cp_stdio, crtbuiltin, decl_include("<features.h>")]]
+[[std, cp_stdio, decl_include("<features.h>")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), crtbuiltin(fputs_unlocked)]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fputs_unlocked")]]
-[[export_alias("_IO_fputs"), alias("fputs_unlocked")]]
+[[crtbuiltin, export_alias("_IO_fputs"), alias("fputs_unlocked")]]
 [[requires($has_function(fwrite))]]
 __STDC_INT_AS_SSIZE_T fputs([[nonnull]] char const *__restrict string,
                             [[nonnull]] FILE *__restrict stream) {
@@ -1014,9 +1015,10 @@ __STDC_INT_AS_SSIZE_T fputs([[nonnull]] char const *__restrict string,
 @@>> fputs(string, stdout);
 @@>> putchar('\n');
 @@Return the number of written characters, or `EOF' on error
-[[std, cp_stdio, crtbuiltin, decl_include("<features.h>")]]
+[[std, cp_stdio, decl_include("<features.h>")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), crtbuiltin(puts_unlocked)]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("puts_unlocked")]]
-[[export_alias("_IO_puts"), alias("puts_unlocked")]]
+[[crtbuiltin, export_alias("_IO_puts"), alias("puts_unlocked")]]
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(fputs) && $has_function(fputc))]]
@@ -1071,12 +1073,12 @@ done:
 
 @@>> fwrite(3)
 @@Write up to `elemsize * elemcount' bytes of data from `buf' into `stream'
-[[std, cp_stdio, crtbuiltin, decl_include("<hybrid/typecore.h>")]]
+[[std, cp_stdio, decl_include("<hybrid/typecore.h>")]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_fwrite...)]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), alias(CNL_fwrite_unlocked...)]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias(CNL_fwrite_unlocked...)]]
 [[                                                                           alias(CNL_fwrite...)]]
 [[                                                                           alias(CNL_fwrite_unlocked...)]]
-[[section(".text.crt{|.dos}.FILE.locked.write.write")]]
+[[crtbuiltin, section(".text.crt{|.dos}.FILE.locked.write.write")]]
 [[userimpl, requires_function(fputc)]]
 size_t fwrite([[inp(min(elemsize * return, elemsize * elemcount))]] void const *__restrict buf,
               size_t elemsize, size_t elemcount, [[nonnull]] FILE *__restrict stream) {
@@ -1341,11 +1343,11 @@ int fsetpos([[nonnull]] FILE *__restrict stream,
 
 %[default:section(".text.crt{|.dos}.FILE.locked.write.printf")]
 
-[[std, cp_stdio, crtbuiltin, decl_include("<features.h>"), doc_alias("fprintf")]]
+[[std, cp_stdio, decl_include("<features.h>"), doc_alias("fprintf")]]
 [[section(".text.crt{|.dos}.FILE.locked.write.printf")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("vfprintf_unlocked")]]
-[[requires_dependent_function(file_printer), alias("vfprintf_s")]]
-[[export_alias("_IO_vfprintf"), alias("vfprintf_unlocked")]]
+[[crtbuiltin, export_alias("_IO_vfprintf"), alias("vfprintf_s", "vfprintf_unlocked")]]
+[[requires_dependent_function(file_printer)]]
 __STDC_INT_AS_SSIZE_T vfprintf([[nonnull]] FILE *__restrict stream,
                                [[nonnull, format]] char const *__restrict format, $va_list args) {
 	return (__STDC_INT_AS_SSIZE_T)format_vprintf(&file_printer, stream, format, args);
@@ -1354,18 +1356,19 @@ __STDC_INT_AS_SSIZE_T vfprintf([[nonnull]] FILE *__restrict stream,
 @@>> fprintf(3), vfprintf(3)
 @@Print  data  to  `stream',  following  `format'
 @@Return the number of successfully printed bytes
-[[std, cp_stdio, export_alias("_IO_fprintf"), decl_include("<features.h>")]]
-[[section(".text.crt{|.dos}.FILE.locked.write.printf"), crtbuiltin]]
+[[std, cp_stdio, decl_include("<features.h>")]]
+[[section(".text.crt{|.dos}.FILE.locked.write.printf")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), crtbuiltin(fprintf_unlocked)]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fprintf_unlocked")]]
-[[alias("fprintf_s", "fprintf_unlocked")]]
+[[crtbuiltin, export_alias("_IO_fprintf"), alias("fprintf_s", "fprintf_unlocked")]]
 __STDC_INT_AS_SSIZE_T fprintf([[nonnull]] FILE *__restrict stream,
                               [[nonnull, format]] char const *__restrict format, ...)
 	%{printf("vfprintf")}
 
 
-[[std, cp_stdio, crtbuiltin, decl_include("<features.h>"), doc_alias("printf")]]
+[[std, cp_stdio, decl_include("<features.h>"), doc_alias("printf")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("vprintf_unlocked")]]
-[[alias("vprintf_s", "vprintf_unlocked")]]
+[[crtbuiltin, alias("vprintf_s", "vprintf_unlocked")]]
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(vfprintf))]]
@@ -1377,9 +1380,11 @@ __STDC_INT_AS_SSIZE_T vprintf([[nonnull, format]] char const *__restrict format,
 @@>> printf(3), vprintf(3)
 @@Print  data  to  `stdout',  following  `format'
 @@Return the number of successfully printed bytes
-[[std, cp_stdio, crtbuiltin, decl_include("<features.h>"), export_alias("_IO_printf", "printf_s")]]
+[[std, cp_stdio, decl_include("<features.h>")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), crtbuiltin(printf_unlocked)]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("printf_unlocked")]]
-[[section(".text.crt{|.dos}.FILE.locked.write.printf"), alias("printf_unlocked")]]
+[[crtbuiltin, export_alias("_IO_printf", "printf_s"), alias("printf_unlocked")]]
+[[section(".text.crt{|.dos}.FILE.locked.write.printf")]]
 __STDC_INT_AS_SSIZE_T printf([[nonnull, format]] char const *__restrict format, ...)
 	%{printf("vprintf")}
 
@@ -1407,13 +1412,12 @@ __LOCAL_LIBC(@vfscanf_ungetc@) ssize_t
 )]
 
 [[std, cp_stdio, guard, wunused, doc_alias("fscanf")]]
-[[alias("_vfscanf", "_vfscanf_s"), export_alias("_IO_vfscanf")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("vfscanf_unlocked")]]
-[[requires_dependent_function(fgetc, ungetc)]]
+[[crtbuiltin, export_alias("_IO_vfscanf", "__vfscanf"), alias("_vfscanf", "_vfscanf_s")]]
 [[section(".text.crt{|.dos}.FILE.locked.read.scanf"), alias("vfscanf_unlocked")]]
 [[decl_include("<features.h>"), impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_VFSCANF_HELPERS)]]
-[[crtbuiltin, export_alias("__vfscanf")]]
+[[requires_dependent_function(fgetc, ungetc)]]
 __STDC_INT_AS_SIZE_T vfscanf([[nonnull]] FILE *__restrict stream,
                              [[nonnull, format]] char const *__restrict format,
                              $va_list args) {
@@ -1430,13 +1434,13 @@ __STDC_INT_AS_SIZE_T vfscanf([[nonnull]] FILE *__restrict stream,
 @@pp_endif@@
 }
 
-[[decl_include("<features.h>"), doc_alias("scanf")]]
-[[std, cp_stdio, guard, crtbuiltin, wunused]]
-[[alias("_vscanf", "vscanf_unlocked")]]
+[[std, cp_stdio, guard, wunused, decl_include("<features.h>"), doc_alias("scanf")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("vscanf_unlocked")]]
+[[crtbuiltin, alias("_vscanf", "vscanf_unlocked")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdin) && $has_function(vfscanf))]]
-[[impl_include("<libc/template/stdstreams.h>"), section(".text.crt{|.dos}.FILE.locked.read.scanf")]]
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[section(".text.crt{|.dos}.FILE.locked.read.scanf")]]
 __STDC_INT_AS_SIZE_T vscanf([[nonnull, format]] char const *__restrict format, $va_list args) {
 	return vfscanf(stdin, format, args);
 }
@@ -1447,10 +1451,10 @@ __STDC_INT_AS_SIZE_T vscanf([[nonnull, format]] char const *__restrict format, $
 @@>> fscanf(3), vfscanf(3)
 @@Scan  data   from   `stream',   following   `format'
 @@Return the number of successfully scanned data items
-[[decl_include("<features.h>")]]
-[[std, cp_stdio, crtbuiltin, wunused]]
+[[std, cp_stdio, wunused, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fscanf_unlocked")]]
-[[export_alias("_IO_fscanf"), alias("fscanf_unlocked"), section(".text.crt{|.dos}.FILE.locked.read.scanf")]]
+[[crtbuiltin, export_alias("_IO_fscanf"), alias("fscanf_unlocked")]]
+[[section(".text.crt{|.dos}.FILE.locked.read.scanf")]]
 __STDC_INT_AS_SIZE_T fscanf([[nonnull]] FILE *__restrict stream,
                             [[nonnull, format]] char const *__restrict format, ...)
 	%{printf("vfscanf")}
@@ -1458,9 +1462,10 @@ __STDC_INT_AS_SIZE_T fscanf([[nonnull]] FILE *__restrict stream,
 @@>> scanf(3), vscanf(3)
 @@Scan data from `stdin', following `format'
 @@Return the number of successfully scanned data items
-[[std, cp_stdio, crtbuiltin, wunused, decl_include("<features.h>")]]
+[[std, cp_stdio, wunused, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("scanf_unlocked")]]
-[[section(".text.crt{|.dos}.FILE.locked.read.scanf"), export_alias("_IO_scanf"), alias("scanf_unlocked")]]
+[[crtbuiltin, export_alias("_IO_scanf"), alias("scanf_unlocked")]]
+[[section(".text.crt{|.dos}.FILE.locked.read.scanf")]]
 __STDC_INT_AS_SIZE_T scanf([[nonnull, format]] char const *__restrict format, ...)
 	%{printf("vscanf")}
 
@@ -1505,10 +1510,11 @@ __LOCAL_LIBC(@vsscanf_ungetc@) ssize_t
 @@pp_endif@@
 )]
 
-[[std, guard, crtbuiltin, wunused, decl_include("<features.h>"), doc_alias("sscanf")]]
+[[std, guard, wunused, decl_include("<features.h>"), doc_alias("sscanf")]]
 [[impl_include("<hybrid/typecore.h>", "<bits/crt/format-printer.h>", "<asm/crt/stdio.h>")]]
-[[impl_prefix(DEFINE_VSSCANF_HELPERS), alias("_vsscanf", "_vsscanf_s")]]
-[[section(".text.crt{|.dos}.unicode.static.format.scanf"), export_alias("__vsscanf", "_IO_vsscanf")]]
+[[crtbuiltin, export_alias("__vsscanf", "_IO_vsscanf"), alias("_vsscanf", "_vsscanf_s")]]
+[[section(".text.crt{|.dos}.unicode.static.format.scanf")]]
+[[impl_prefix(DEFINE_VSSCANF_HELPERS)]]
 __STDC_INT_AS_SIZE_T vsscanf([[nonnull]] char const *__restrict input,
                              [[nonnull, format]] char const *__restrict format, $va_list args) {
 	return format_vscanf(&__NAMESPACE_LOCAL_SYM vsscanf_getc,
@@ -1521,17 +1527,19 @@ __STDC_INT_AS_SIZE_T vsscanf([[nonnull]] char const *__restrict input,
 @@>> sscanf(3), vsscanf(3)
 @@Scan data from a given `input' string, following `format'
 @@Return  the  number  of successfully  scanned  data items
-[[std, crtbuiltin, export_alias("_IO_sscanf"), decl_include("<features.h>")]]
+[[std, decl_include("<features.h>")]]
+[[crtbuiltin, export_alias("_IO_sscanf")]]
 [[section(".text.crt{|.dos}.unicode.static.format.scanf")]]
 __STDC_INT_AS_SIZE_T sscanf([[nonnull]] char const *__restrict input,
                             [[nonnull, format]] char const *__restrict format, ...)
 	%{printf("vsscanf")}
 
 
-[[decl_include("<features.h>"), doc_alias("sprintf")]]
-[[std, kernel, crtbuiltin, alias("_IO_vsprintf")]]
+[[std, kernel, decl_include("<features.h>"), doc_alias("sprintf")]]
+[[crtbuiltin, alias("_IO_vsprintf")]]
 [[if(!defined(__KERNEL__)), export_as("_IO_vsprintf")]]
-[[section(".text.crt{|.dos}.unicode.static.format.printf"), dependency(format_sprintf_printer)]]
+[[section(".text.crt{|.dos}.unicode.static.format.printf")]]
+[[dependency(format_sprintf_printer)]]
 __STDC_INT_AS_SSIZE_T vsprintf([[nonnull]] char *__restrict dest,
                                [[nonnull, format]] char const *__restrict format, $va_list args) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -1547,7 +1555,8 @@ __STDC_INT_AS_SSIZE_T vsprintf([[nonnull]] char *__restrict dest,
 @@>> sprintf(3), vsprintf(3)
 @@Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
 @@Return the number of written characters, excluding a trailing NUL-character
-[[std, kernel, crtbuiltin, alias("_IO_sprintf"), decl_include("<features.h>")]]
+[[std, kernel, decl_include("<features.h>")]]
+[[crtbuiltin, alias("_IO_sprintf")]]
 [[if(!defined(__KERNEL__)), export_as("_IO_sprintf")]]
 [[section(".text.crt{|.dos}.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T sprintf([[nonnull]] char *__restrict buf,
@@ -1568,8 +1577,9 @@ struct __format_snprintf_data {
 	__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */
 };
 #endif /* !____format_snprintf_data_defined */
-), crtbuiltin, dependency(format_snprintf_printer)]]
-[[section(".text.crt{|.dos}.unicode.static.format.printf"), alias("__vsnprintf")]]
+), crtbuiltin, alias("__vsnprintf")]]
+[[dependency(format_snprintf_printer)]]
+[[section(".text.crt{|.dos}.unicode.static.format.printf")]]
 [[if(!defined(__KERNEL__)), export_as("__vsnprintf")]]
 __STDC_INT_AS_SIZE_T vsnprintf([[outp_opt(min(return, buflen))]] char *__restrict buf, size_t buflen,
                                [[nonnull, format]] char const *__restrict format, $va_list args) {
@@ -1625,9 +1635,8 @@ __STDC_INT_AS_SIZE_T vsnprintf([[outp_opt(min(return, buflen))]] char *__restric
 @@Print  a formatted string to a given in-member string buffer `buf'
 @@Always return the REQUIRED buffer size (excluding a trailing  NUL-
 @@character), and never write more than `buflen' characters to `buf'
-[[std, kernel, guard, crtbuiltin]]
-[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[section(".text.crt{|.dos}.unicode.static.format.printf")]]
+[[std, kernel, guard, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[crtbuiltin, section(".text.crt{|.dos}.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T snprintf([[outp_opt(min(return, buflen))]] char *__restrict buf, size_t buflen,
                               [[nonnull, format]] char const *__restrict format, ...)
 	%{printf("vsnprintf")}
@@ -1841,9 +1850,10 @@ int fgetc_unlocked([[nonnull]] $FILE *__restrict stream) {
 
 @@>> fputc_unlocked(3)
 @@Same as `fputc()', but performs I/O without acquiring a lock to `stream'
-[[cp_stdio, no_crt_self_import, no_crt_self_export, export_alias(CNL_fputc_unlocked...)]]
+[[cp_stdio, no_crt_self_import, no_crt_self_export]]
+[[crtbuiltin, export_alias(CNL_fputc_unlocked...)]]
 [[if(!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf)), alias(CNL_fputc...)]]
-[[crtbuiltin, userimpl, requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite_unlocked))]]
+[[userimpl, requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite_unlocked))]]
 int fputc_unlocked(int ch, [[nonnull]] $FILE *__restrict stream) {
 @@pp_if defined(__CRT_DOS) && $has_function(_flsbuf)@@
 	return --stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)(*stream->__f_ptr++ = (char)ch)) : _flsbuf(ch, stream);
@@ -2740,7 +2750,8 @@ char *fgets_unlocked([[outp(min(strlen(return), bufsize))]] char *__restrict buf
 
 @@>> fputs_unlocked(3)
 @@Same as `fputs()', but performs I/O without acquiring a lock to `stream'
-[[cp_stdio, alias("fputs"), crtbuiltin, decl_include("<features.h>")]]
+[[cp_stdio, decl_include("<features.h>")]]
+[[crtbuiltin, alias("fputs")]]
 [[requires_function(fwrite_unlocked)]]
 __STDC_INT_AS_SIZE_T fputs_unlocked([[nonnull]] char const *__restrict string,
                                     [[nonnull]] $FILE *__restrict stream) {
@@ -3386,10 +3397,12 @@ int fftruncate_unlocked([[nonnull]] $FILE *__restrict stream, __PIO_OFFSET lengt
 }
 
 
-[[cp_stdio, crtbuiltin, alias("puts"), decl_include("<features.h>")]]
-[[section(".text.crt{|.dos}.FILE.unlocked.write.write"), impl_include("<libc/template/stdstreams.h>")]]
+[[cp_stdio, decl_include("<features.h>")]]
+[[crtbuiltin, alias("puts")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stdout) && $has_function(fputs_unlocked))]]
+[[impl_include("<libc/template/stdstreams.h>")]]
+[[section(".text.crt{|.dos}.FILE.unlocked.write.write")]]
 __STDC_INT_AS_SSIZE_T puts_unlocked([[nonnull]] char const *__restrict string) {
 	__STDC_INT_AS_SSIZE_T result, temp;
 	result = fputs_unlocked(string, stdout);
@@ -3522,8 +3535,8 @@ __STDC_INT_AS_SSIZE_T vfprintf_unlocked([[nonnull]] $FILE *__restrict stream,
 }
 
 @@>> fprintf_unlocked(3), vfprintf_unlocked(3)
-[[decl_include("<features.h>")]]
-[[cp_stdio, crtbuiltin, dos_only_export_alias("fprintf_s")]]
+[[cp_stdio, decl_include("<features.h>")]]
+[[crtbuiltin, dos_only_export_alias("fprintf_s")]]
 __STDC_INT_AS_SSIZE_T fprintf_unlocked([[nonnull]] $FILE *__restrict stream,
                                        [[nonnull, format]] char const *__restrict format, ...)
 	%{printf("vfprintf_unlocked")}
@@ -3539,8 +3552,8 @@ __STDC_INT_AS_SSIZE_T vprintf_unlocked([[nonnull, format]] char const *__restric
 }
 
 @@>> printf_unlocked(3), vprintf_unlocked(3)
-[[decl_include("<features.h>")]]
-[[cp_stdio, crtbuiltin, dos_only_export_alias("printf_s")]]
+[[cp_stdio, decl_include("<features.h>")]]
+[[crtbuiltin, dos_only_export_alias("printf_s")]]
 __STDC_INT_AS_SSIZE_T printf_unlocked([[nonnull, format]] char const *__restrict format, ...)
 	%{printf("vprintf_unlocked")}
 

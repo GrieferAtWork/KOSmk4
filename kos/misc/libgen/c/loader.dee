@@ -4216,6 +4216,8 @@ again_parse_annotations:
 				case "crtbuiltin": {
 					/* >> [[crtbuiltin]] size_t strlen(char const *__restrict str);
 					 * Same as:
+					 * >> [[crtbuiltin(strlen)]] size_t strlen(char const *__restrict str);
+					 * Same as:
 					 * >> [[if(__has_builtin(__builtin_strlen) && defined(__LIBC_BIND_CRTBUILTINS)),
 					 * >>   preferred_extern_inline(strlen, { return __builtin_strlen(str); })
 					 * >> ]] strlen(char const *__restrict str);
@@ -4229,6 +4231,7 @@ again_parse_annotations:
 					local builtinStart: int = self.tokStart;
 					local asmnameOverride: string | none = none;
 					if (self.next() == "(") {
+						self.next();
 						asmnameOverride = self.parseCStringOrKeyword();
 						self.skip(")");
 					}

@@ -20,6 +20,7 @@
 #ifndef GUARD_APPS_PLAYGROUND_MAIN_C
 #define GUARD_APPS_PLAYGROUND_MAIN_C 1
 #define _EVERY_SOURCE 1
+#define _NO_THREADING 1 /* ... so it's used at least once */
 
 /* This  program isn't actually meant to do anything.  It is however meant to be used
  * for quickly testing out new features, or checking the behavior of system functions

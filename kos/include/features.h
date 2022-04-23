@@ -553,7 +553,38 @@
 #ifdef __CRT_CYG
 #define __USE_REENTRANT 1
 #endif /* __CRT_CYG */
+#elif (defined(__GNUC__) && defined(__KOS__) && \
+       !defined(__PIC__) && !defined(__pic__) && 0)
+/* Can't safely do this: a program might use a library which internally  uses
+ * additional threads. In this  case, the main program  might be able to  use
+ * unlocked stdio, but if it does, there might be problems syncing stuff with
+ * those internal threads of the library it uses... */
+#undef _NO_THREADING
+#define _NO_THREADING
 #endif /* ... */
+
+/* Test a couple of macros that can be used to explicitly disable thread-safety checks.
+ *
+ * Ways to enable:
+ * - #define __SINGLE_THREAD__
+ * - #define _NO_THREADING
+ * - #define _NO_REENTRANT
+ * - #define _REENTRANT 0   // only if defined to "0"; not recognized if defined as empty
+ */
+#if (defined(__SINGLE_THREAD__) || defined(_NO_REENTRANT) || \
+     (defined(_REENTRANT) && ((-_REENTRANT - 1) == -1)))
+#undef _REENTRANT
+#ifndef _NO_THREADING
+#define _NO_THREADING
+#endif /* !_NO_THREADING */
+#endif /* ... */
+
+/* When multi-threading is explicitly disabled (by one of these macros), then
+ * we can safely override normal stdio functions with their unlocked variants. */
+#if defined(_NO_THREADING) || defined(_USE_UNLOCKED_STDIO)
+#undef __USE_STDIO_UNLOCKED
+#define __USE_STDIO_UNLOCKED 1
+#endif /* _NO_THREADING || _USE_UNLOCKED_STDIO */
 
 /* Enable additional utf16/32 functions in system headers. */
 #ifdef _UTF_SOURCE
