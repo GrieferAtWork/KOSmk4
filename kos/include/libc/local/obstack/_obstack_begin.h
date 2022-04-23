@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29d5b01d */
+/* HASH CRC-32:0x72ac8b00 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,8 @@
 #ifndef __local__obstack_begin_defined
 #define __local__obstack_begin_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 #include <bits/crt/obstack.h>
+#if defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_exit_defined
 #define __local___localdep_exit_defined
@@ -104,7 +104,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__obstack_begin_defined
 #define __localdep__obstack_begin __LIBC_LOCAL_NAME(_obstack_begin)
 #endif /* !__local___localdep__obstack_begin_defined */
-#else /* __CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit */
+#else /* __LOCAL_obstack_alloc_failed_handler || __CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit */
 #undef __local__obstack_begin_defined
-#endif /* !__CRT_HAVE_exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE__exit && !__CRT_HAVE__Exit */
+#endif /* !__LOCAL_obstack_alloc_failed_handler && !__CRT_HAVE_exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE__exit && !__CRT_HAVE__Exit */
 #endif /* !__local__obstack_begin_defined */

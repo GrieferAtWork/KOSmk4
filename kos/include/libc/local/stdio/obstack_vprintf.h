@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x372963c5 */
+/* HASH CRC-32:0x9416cc8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_obstack_vprintf_defined
 #define __local_obstack_vprintf_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#include <bits/crt/obstack.h>
+#if defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 #include <features.h>
 struct obstack;
 __NAMESPACE_LOCAL_BEGIN
@@ -49,7 +50,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_obstack_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),obstack_printer,(__arg,__data,__datalen))
-#elif defined(__CRT_HAVE__obstack_newchunk) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#elif defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 __NAMESPACE_LOCAL_END
 #include <libc/local/obstack/obstack_printer.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -67,7 +68,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_obstack_vprintf_defined
 #define __localdep_obstack_vprintf __LIBC_LOCAL_NAME(obstack_vprintf)
 #endif /* !__local___localdep_obstack_vprintf_defined */
-#else /* __CRT_HAVE_obstack_printer || __CRT_HAVE__obstack_newchunk || __CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit */
+#else /* __CRT_HAVE_obstack_printer || __CRT_HAVE__obstack_newchunk || __LOCAL_obstack_alloc_failed_handler || __CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit */
 #undef __local_obstack_vprintf_defined
-#endif /* !__CRT_HAVE_obstack_printer && !__CRT_HAVE__obstack_newchunk && !__CRT_HAVE_exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE__exit && !__CRT_HAVE__Exit */
+#endif /* !__CRT_HAVE_obstack_printer && !__CRT_HAVE__obstack_newchunk && !__LOCAL_obstack_alloc_failed_handler && !__CRT_HAVE_exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE__exit && !__CRT_HAVE__Exit */
 #endif /* !__local_obstack_vprintf_defined */

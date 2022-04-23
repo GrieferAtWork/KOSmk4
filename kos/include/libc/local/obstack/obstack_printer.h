@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc452a95 */
+/* HASH CRC-32:0x596c3a8e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,18 +21,16 @@
 #ifndef __local_obstack_printer_defined
 #define __local_obstack_printer_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE__obstack_newchunk) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#include <bits/crt/obstack.h>
+#if defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__obstack_newchunk_defined
 #define __local___localdep__obstack_newchunk_defined
 #ifdef __CRT_HAVE__obstack_newchunk
-__NAMESPACE_LOCAL_END
-#include <bits/crt/obstack.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep__obstack_newchunk,(struct obstack *__self, __SIZE_TYPE__ __num_bytes),_obstack_newchunk,(__self,__num_bytes))
-#elif defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#elif defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 __NAMESPACE_LOCAL_END
 #include <libc/local/obstack/_obstack_newchunk.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -54,9 +52,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
-__NAMESPACE_LOCAL_END
-#include <bits/crt/obstack.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(obstack_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(obstack_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	struct obstack *__me = (struct obstack *)__arg;
@@ -70,7 +65,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_obstack_printer_defined
 #define __localdep_obstack_printer __LIBC_LOCAL_NAME(obstack_printer)
 #endif /* !__local___localdep_obstack_printer_defined */
-#else /* __CRT_HAVE__obstack_newchunk || __CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit */
+#else /* __CRT_HAVE__obstack_newchunk || __LOCAL_obstack_alloc_failed_handler || __CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit */
 #undef __local_obstack_printer_defined
-#endif /* !__CRT_HAVE__obstack_newchunk && !__CRT_HAVE_exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE__exit && !__CRT_HAVE__Exit */
+#endif /* !__CRT_HAVE__obstack_newchunk && !__LOCAL_obstack_alloc_failed_handler && !__CRT_HAVE_exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE__exit && !__CRT_HAVE__Exit */
 #endif /* !__local_obstack_printer_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cbe52e5 */
+/* HASH CRC-32:0x605468f4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,13 +87,13 @@ __CSDECLARE(,int,obstack_exit_failure)
 
 #ifdef __CRT_HAVE__obstack_begin
 __CDECLARE(__ATTR_NONNULL((1, 4, 5)),int,__NOTHROW_NCX,_obstack_begin,(struct obstack *__self, _OBSTACK_SIZE_T __min_chunk_size, _OBSTACK_SIZE_T __min_object_alignment, void *(__LIBCCALL *__ob_malloc)(size_t __num_bytes), void (__LIBCCALL *__ob_free)(void *__ptr)),(__self,__min_chunk_size,__min_object_alignment,__ob_malloc,__ob_free))
-#elif defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#elif defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 #include <libc/local/obstack/_obstack_begin.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_obstack_begin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4, 5)) int __NOTHROW_NCX(__LIBCCALL _obstack_begin)(struct obstack *__self, _OBSTACK_SIZE_T __min_chunk_size, _OBSTACK_SIZE_T __min_object_alignment, void *(__LIBCCALL *__ob_malloc)(size_t __num_bytes), void (__LIBCCALL *__ob_free)(void *__ptr)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_obstack_begin))(__self, __min_chunk_size, __min_object_alignment, __ob_malloc, __ob_free); })
 #endif /* ... */
 #ifdef __CRT_HAVE__obstack_begin_1
 __CDECLARE(__ATTR_NONNULL((1, 4, 5)),int,__NOTHROW_NCX,_obstack_begin_1,(struct obstack *__self, _OBSTACK_SIZE_T __min_chunk_size, _OBSTACK_SIZE_T __min_object_alignment, void *(*__ob_malloc)(void *__arg, size_t __num_bytes), void (*__ob_free)(void *__arg, void *__ptr), void *__arg),(__self,__min_chunk_size,__min_object_alignment,__ob_malloc,__ob_free,__arg))
-#elif defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#elif defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 #include <libc/local/obstack/_obstack_begin_1.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_obstack_begin_1, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4, 5)) int __NOTHROW_NCX(__LIBCCALL _obstack_begin_1)(struct obstack *__self, _OBSTACK_SIZE_T __min_chunk_size, _OBSTACK_SIZE_T __min_object_alignment, void *(*__ob_malloc)(void *__arg, size_t __num_bytes), void (*__ob_free)(void *__arg, void *__ptr), void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_obstack_begin_1))(__self, __min_chunk_size, __min_object_alignment, __ob_malloc, __ob_free, __arg); })
 #endif /* ... */
@@ -103,7 +103,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_obstack_begin_1, __FORCELOCAL __ATTR_ARTIFICIAL
  * enough additional space for the object currently being constructed,
  * and move it to the start of the new chunk. */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_obstack_newchunk,(struct obstack *__self, _OBSTACK_SIZE_T __num_bytes),(__self,__num_bytes))
-#elif defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#elif defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 #include <libc/local/obstack/_obstack_newchunk.h>
 /* >> _obstack_newchunk(3)
  * Allocate  a new chunk of at least `num_bytes' bytes. Also: allocate
@@ -356,7 +356,7 @@ void obstack_chunk_free(void *ptr);
  * HINT: Ths function does the same as `obstack_grow(3)'!
  * @return: datalen: Success. */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC obstack_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("obstack_printer");
-#elif defined(__CRT_HAVE__obstack_newchunk) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
+#elif defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)
 #include <libc/local/obstack/obstack_printer.h>
 /* >> obstack_printer(3)
  * A pformatprinter-compatible printer  sink that appends  data to  the

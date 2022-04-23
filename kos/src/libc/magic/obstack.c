@@ -157,7 +157,8 @@ NOTHROW(LIBCCALL libc_obstack_alloc_failed_handler_resolve)(void) {
 [[decl_include("<bits/crt/obstack.h>")]]
 [[impl_include("<bits/crt/obstack.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
-[[requires_function(exit)]]
+[[requires_include("<bits/crt/obstack.h>")]]
+[[requires(defined(__LOCAL_obstack_alloc_failed_handler) || $has_function(exit))]]
 int _obstack_begin([[nonnull]] struct obstack *self,
                    _OBSTACK_SIZE_T min_chunk_size,
                    _OBSTACK_SIZE_T min_object_alignment,
@@ -206,7 +207,8 @@ int _obstack_begin([[nonnull]] struct obstack *self,
 [[decl_include("<bits/crt/obstack.h>")]]
 [[impl_include("<bits/crt/obstack.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
-[[requires_function(exit)]]
+[[requires_include("<bits/crt/obstack.h>")]]
+[[requires(defined(__LOCAL_obstack_alloc_failed_handler) || $has_function(exit))]]
 int _obstack_begin_1([[nonnull]] struct obstack *self,
                      _OBSTACK_SIZE_T min_chunk_size,
                      _OBSTACK_SIZE_T min_object_alignment,
@@ -261,7 +263,8 @@ int _obstack_begin_1([[nonnull]] struct obstack *self,
 @@and move it to the start of the new chunk.
 [[decl_include("<bits/crt/obstack.h>")]]
 [[impl_include("<bits/crt/obstack.h>")]]
-[[requires_function(exit)]]
+[[requires_include("<bits/crt/obstack.h>")]]
+[[requires(defined(__LOCAL_obstack_alloc_failed_handler) || $has_function(exit))]]
 void _obstack_newchunk([[nonnull]] struct obstack *self, _OBSTACK_SIZE_T num_bytes) {
 	void *curobj;
 	struct _obstack_chunk *ochunk;
