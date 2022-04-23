@@ -72,6 +72,7 @@ No affiliation exists between KOS and the following projects. This is merely the
 - [`libc4/5`](http://archive.debian.org/debian/dists/Debian-0.93R6/source/devel/libc-4.6.27-6.tar.gz) (Seems mostly wiped off of the Internet at this point, but it you look long enough, you'll can still find it)
 - [`libc6`](https://pkgs.org/download/libc6)
 - [`libcmini`](https://github.com/freemint/libcmini/)
+- `libiberty` (As shipped with [gcc](https://ftp.gnu.org/gnu/gcc/))
 - [`mintlib`](https://github.com/freemint/mintlib)
 - [`musl libc`](https://git.musl-libc.org/cgit/musl)
 - [`uClibc`](https://git.uclibc.org/uClibc/)

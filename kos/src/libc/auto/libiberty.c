@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x942ba2ec */
+/* HASH CRC-32:0x95dee1d1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ DEFINE_PUBLIC_ALIAS(libiberty_len, libc_libiberty_len);
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #include <hybrid/host.h>
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED void *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *
 NOTHROW_NCX(LIBCCALL libc_C_alloca)(size_t num_bytes) {
 
 	struct C_alloca_header {

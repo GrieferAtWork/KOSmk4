@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdae747c9 */
+/* HASH CRC-32:0x3f075d02 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -672,6 +672,7 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_mktemp_s
+#define __CRT_HAVE_DOS$_objalloc_alloc
 #define __CRT_HAVE_DOS$_obstack_allocated_p
 #define __CRT_HAVE_DOS$_obstack_begin
 #define __CRT_HAVE_DOS$_obstack_begin_1
@@ -2449,6 +2450,8 @@
 #define __CRT_HAVE_DOS$ntp_adjtime64
 #define __CRT_HAVE_DOS$ntp_gettimex
 #define __CRT_HAVE_DOS$ntp_gettimex64
+#define __CRT_HAVE_DOS$objalloc_free
+#define __CRT_HAVE_DOS$objalloc_free_block
 #define __CRT_HAVE_DOS$obstack_free
 #define __CRT_HAVE_DOS$obstack_printf
 #define __CRT_HAVE_DOS$obstack_vprintf
@@ -4758,6 +4761,7 @@
 #define __CRT_HAVE__mkdir
 #define __CRT_HAVE__mktemp_s
 #define __CRT_HAVE__msize_dbg
+#define __CRT_HAVE__objalloc_alloc
 #define __CRT_HAVE__obstack
 #define __CRT_HAVE__obstack_allocated_p
 #define __CRT_HAVE__obstack_begin
@@ -6621,6 +6625,9 @@
 #define __CRT_HAVE_ntp_adjtime64
 #define __CRT_HAVE_ntp_gettimex
 #define __CRT_HAVE_ntp_gettimex64
+#define __CRT_HAVE_objalloc_create
+#define __CRT_HAVE_objalloc_free
+#define __CRT_HAVE_objalloc_free_block
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_oblockop_reap_atomic_lock
 #define __CRT_HAVE_oblockop_reap_atomic_rwlock

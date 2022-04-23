@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb1dab5f */
+/* HASH CRC-32:0xf9a57b8d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1247,6 +1247,11 @@ DFUN(".text.crt.dos.net.inet.6.source_filter", libd_setsourcefilter, libc_setsou
 DFUN(".text.crt.dos.heap.malloc", libd_catopen, libc_catopen, TP, 2, TP, TD)
 DFUN(".text.crt.dos.heap.malloc", libd_catgets, libc_catgets, TP, 4, TP, TD, TD, TP)
 DFUN(".text.crt.dos.heap.malloc", libd_catclose, libc_catclose, TD, 1, TP)
+
+/* objalloc */
+DFUN(".text.crt.dos.libiberty", libd__objalloc_alloc, libc__objalloc_alloc, TP, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_objalloc_free, libc_objalloc_free, TV, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_objalloc_free_block, libc_objalloc_free_block, TV, 2, TP, TP)
 
 /* obstack */
 DFUN(".text.crt.dos.heap.obstack", libd__obstack_begin, libc__obstack_begin, TD, 5, TP, TI, TI, TP, TP)

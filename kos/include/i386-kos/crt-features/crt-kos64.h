@@ -1798,6 +1798,7 @@
 #define __CRT_HAVE__nl_default_dirname
 #define __CRT_HAVE__nl_domain_bindings
 #define __CRT_HAVE__nl_msg_cat_cntr
+#define __CRT_HAVE__objalloc_alloc
 #define __CRT_HAVE__obstack
 #define __CRT_HAVE__obstack_allocated_p
 #define __CRT_HAVE__obstack_begin
@@ -3723,6 +3724,9 @@
 #define __CRT_HAVE_ntp_adjtime64
 #define __CRT_HAVE_ntp_gettimex
 #define __CRT_HAVE_ntp_gettimex64
+#define __CRT_HAVE_objalloc_create
+#define __CRT_HAVE_objalloc_free
+#define __CRT_HAVE_objalloc_free_block
 #define __CRT_HAVE_oblockop_reap_atomic_lock
 #define __CRT_HAVE_oblockop_reap_atomic_rwlock
 #define __CRT_HAVE_oblockop_reap_ex
@@ -7642,6 +7646,7 @@
 #define __CRT_HAVE_KOS$_mkdir
 #define __CRT_HAVE_KOS$_mktemp_s
 #define __CRT_HAVE_KOS$_msize
+#define __CRT_HAVE_KOS$_objalloc_alloc
 #define __CRT_HAVE_KOS$_obstack_allocated_p
 #define __CRT_HAVE_KOS$_obstack_begin
 #define __CRT_HAVE_KOS$_obstack_begin_1
@@ -9280,6 +9285,8 @@
 #define __CRT_HAVE_KOS$ntp_adjtime64
 #define __CRT_HAVE_KOS$ntp_gettimex
 #define __CRT_HAVE_KOS$ntp_gettimex64
+#define __CRT_HAVE_KOS$objalloc_free
+#define __CRT_HAVE_KOS$objalloc_free_block
 #define __CRT_HAVE_KOS$obstack_free
 #define __CRT_HAVE_KOS$obstack_printf
 #define __CRT_HAVE_KOS$obstack_vprintf
@@ -12009,6 +12016,7 @@
 #define __CRT_HAVE_DOS$_msize_debug
 #define __CRT_HAVE_DOS$_nextafter
 #define __CRT_HAVE_DOS$_nextafterf
+#define __CRT_HAVE_DOS$_objalloc_alloc
 #define __CRT_HAVE_DOS$_obstack_allocated_p
 #define __CRT_HAVE_DOS$_obstack_begin
 #define __CRT_HAVE_DOS$_obstack_begin_1
@@ -13804,6 +13812,8 @@
 #define __CRT_HAVE_DOS$ntp_adjtime64
 #define __CRT_HAVE_DOS$ntp_gettimex
 #define __CRT_HAVE_DOS$ntp_gettimex64
+#define __CRT_HAVE_DOS$objalloc_free
+#define __CRT_HAVE_DOS$objalloc_free_block
 #define __CRT_HAVE_DOS$obstack_free
 #define __CRT_HAVE_DOS$obstack_printf
 #define __CRT_HAVE_DOS$obstack_vprintf

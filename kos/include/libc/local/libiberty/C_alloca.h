@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10a9d7a3 */
+/* HASH CRC-32:0x4634449f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(C_alloca) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED void *
+__LOCAL_LIBC(C_alloca) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(C_alloca))(__SIZE_TYPE__ __num_bytes) {
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	struct C_alloca_header {

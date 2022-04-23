@@ -140,7 +140,6 @@
 - `<sys/fanotify.h>`        (linux)
 - `<sys/gmon.h>`            (linux)
 - `<sys/gmon_out.h>`        (linux: Only some macros, and structs)
-- `<sys/inotify.h>`         (linux)
 - `<sys/kdaemon.h>`         (uClibc)
 - `<sys/machine.h>`         (AIX???)
 - `<sys/mtio.h>`            (linux: Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
@@ -157,6 +156,17 @@
 - `<tchar.h>`               (DOS)
 - `<timeconv.h>`            (libbsd)
 - `<thread_db.h>`           (GLibc!)
+- libiberty:
+	- `<libiberty/dyn-string.h>`
+	- `<libiberty/fibheap.h>`
+	- `<libiberty/floatformat.h>`
+	- `<libiberty/hashtab.h>`
+	- `<libiberty/partition.h>`
+	- `<libiberty/safe-ctype.h>`
+	- `<libiberty/sort.h>`
+	- `<libiberty/splay-tree.h>`
+	- `<libiberty/timeval-utils.h>`
+
 
 
 ### Referenced, but origin unknown
@@ -167,6 +177,7 @@
 
 ### Unlikely to ever be added
 
+- `<libiberty/demangle.h>`
 - `<nlist.h>`              (libbsd)
 - `<bsd/nlist.h>`          (libbsd)
 - `<_G_config.h>`          (GLibc!)

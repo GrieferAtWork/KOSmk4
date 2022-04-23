@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d014683 */
+/* HASH CRC-32:0xf488a28e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1512,6 +1512,11 @@ DEFINE_PUBLIC_ALIAS(DOS$setsourcefilter, libd_setsourcefilter);
 DEFINE_PUBLIC_ALIAS(DOS$catopen, libd_catopen);
 DEFINE_PUBLIC_ALIAS(DOS$catgets, libd_catgets);
 DEFINE_PUBLIC_ALIAS(DOS$catclose, libd_catclose);
+
+/* objalloc */
+DEFINE_PUBLIC_ALIAS(DOS$_objalloc_alloc, libd__objalloc_alloc);
+DEFINE_PUBLIC_ALIAS(DOS$objalloc_free, libd_objalloc_free);
+DEFINE_PUBLIC_ALIAS(DOS$objalloc_free_block, libd_objalloc_free_block);
 
 /* obstack */
 DEFINE_PUBLIC_ALIAS(DOS$_obstack_begin, libd__obstack_begin);

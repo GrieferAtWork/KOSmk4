@@ -18,13 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: EMX kLIBC     (/libc/include/libintl.h) */
-/* (#) Portability: GNU C Library (/intl/libintl.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/libintl.h) */
-/* (#) Portability: diet libc     (/include/libintl.h) */
-/* (#) Portability: libc6         (/include/libintl.h) */
-/* (#) Portability: musl libc     (/include/libintl.h) */
-/* (#) Portability: uClibc        (/include/libintl.h) */
+/* (#) Portability: EMX kLIBC (/libc/include/libiberty.h) */
+/* (#) Portability: libiberty (/include/libiberty.h) */
 }
 
 %[define_replacement(fd_t = __fd_t)]
@@ -82,7 +77,7 @@ DEFINE_PUBLIC_ALIAS(libiberty_len, libc_libiberty_len);
 }
 
 
-[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
+[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1))]]
 [[requires_function(xmalloc), impl_include("<hybrid/host.h>")]]
 void *C_alloca(size_t num_bytes) {
 @@pp_if $has_function(free)@@
@@ -415,7 +410,7 @@ void xmalloc_set_program_name(char const *progname);
 [[noreturn, throws]]
 void xmalloc_failed(size_t num_bytes);
 
-[[ATTR_ALLOC_SIZE((1)), wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
+[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1))]]
 [[nonnull, requires_function(malloc, xmalloc_failed)]]
 [[impl_include("<asm/crt/malloc.h>")]]
 void *xmalloc(size_t num_bytes) {

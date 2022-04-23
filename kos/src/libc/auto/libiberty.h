@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1477d02 */
+/* HASH CRC-32:0xfe9358f6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,10 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED void *NOTHROW_NCX(LIBDCALL libd_C_alloca)(size_t num_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBDCALL libd_C_alloca)(size_t num_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED void *NOTHROW_NCX(LIBCCALL libc_C_alloca)(size_t num_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_C_alloca)(size_t num_bytes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF void NOTHROW_NCX(LIBDCALL libd_stack_limit_increase)(ulongptr_t newlim);

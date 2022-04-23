@@ -19,6 +19,7 @@
  */
 /* (#) Portability: EMX kLIBC (/libc/include/ansidecl.h) */
 /* (#) Portability: libc4/5   (/include/ansidecl.h) */
+/* (#) Portability: libiberty (/include/ansidecl.h) */
 #ifndef _ANSIDECL_H
 #define _ANSIDECL_H 1
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae2174b */
+/* HASH CRC-32:0xcc87584 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: EMX kLIBC     (/libc/include/libintl.h) */
-/* (#) Portability: GNU C Library (/intl/libintl.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/libintl.h) */
-/* (#) Portability: diet libc     (/include/libintl.h) */
-/* (#) Portability: libc6         (/include/libintl.h) */
-/* (#) Portability: musl libc     (/include/libintl.h) */
-/* (#) Portability: uClibc        (/include/libintl.h) */
+/* (#) Portability: EMX kLIBC (/libc/include/libiberty.h) */
+/* (#) Portability: libiberty (/include/libiberty.h) */
 #ifndef _LIBIBERTY_H
 #define _LIBIBERTY_H 1
 
@@ -65,10 +60,10 @@ typedef __FILE FILE;
 #define MAX_ALLOCA_SIZE 4032
 
 #ifdef __CRT_HAVE_C_alloca
-__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,void *,__NOTHROW_NCX,C_alloca,(size_t __num_bytes),(__num_bytes))
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,C_alloca,(size_t __num_bytes),(__num_bytes))
 #elif defined(__CRT_HAVE_xmalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))
 #include <libc/local/libiberty/C_alloca.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(C_alloca, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED void *__NOTHROW_NCX(__LIBCCALL C_alloca)(size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(C_alloca))(__num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(C_alloca, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL C_alloca)(size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(C_alloca))(__num_bytes); })
 #endif /* ... */
 #undef C_ALLOCA
 #if defined(__hybrid_alloca) && !defined(__USE_C_ALLOCA)
