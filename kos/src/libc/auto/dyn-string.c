@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x577d23f9 */
+/* HASH CRC-32:0xa1d95650 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include "../user/libiberty.h"
 #include "../user/malloc.h"
 #include "../user/stdlib.h"
-#include "../user/string.h"
+#include "string.h"
 
 DECL_BEGIN
 

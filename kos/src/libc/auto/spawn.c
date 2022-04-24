@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3fbb924 */
+/* HASH CRC-32:0x19b7b747 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 #include "../user/signal.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
-#include "../user/string.h"
+#include "string.h"
 #include "../user/sys.wait.h"
 #include "../user/unistd.h"
 

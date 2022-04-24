@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce221732 */
+/* HASH CRC-32:0x68ec11c1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 #include "../user/parts.wchar.unistd.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
-#include "../user/string.h"
+#include "string.h"
 #include "../user/unistd.h"
 #include "../user/wchar.h"
 

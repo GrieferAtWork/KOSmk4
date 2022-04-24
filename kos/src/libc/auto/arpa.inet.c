@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bfdd07c */
+/* HASH CRC-32:0xa8c541d4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <kos/types.h>
 #include "../user/arpa.inet.h"
 #include "../user/stdio.h"
-#include "../user/string.h"
+#include "string.h"
 
 DECL_BEGIN
 

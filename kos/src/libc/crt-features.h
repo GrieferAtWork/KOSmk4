@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bfeb57e */
+/* HASH CRC-32:0x80abdae */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -226,7 +226,11 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$__xpg_basename
 #define __CRT_HAVE_DOS$__xpg_sigpause
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$__xpg_strerror_r
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_abs64
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -3240,11 +3244,7 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$strerror
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$strerror_l
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$strerror_r
 #define __CRT_HAVE_DOS$strerrordesc_np
 #define __CRT_HAVE_DOS$strerrorname_np

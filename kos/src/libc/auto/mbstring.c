@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d417d0c */
+/* HASH CRC-32:0x81148b23 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include "../user/mbstring.h"
 #include "../user/ctype.h"
 #include "../user/mbctype.h"
-#include "../user/string.h"
+#include "string.h"
 
 DECL_BEGIN
 

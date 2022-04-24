@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcd1b625 */
+/* HASH CRC-32:0x94133c9e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include "../user/arpa.nameser.h"
 #include "error.h"
 #include "../user/stdio.h"
-#include "../user/string.h"
+#include "string.h"
 
 DECL_BEGIN
 

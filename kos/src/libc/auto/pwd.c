@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x528162de */
+/* HASH CRC-32:0xfe60bed6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include "../user/pwd.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
-#include "../user/string.h"
+#include "string.h"
 #include "../user/sys.syslog.h"
 #include "../user/util.h"
 

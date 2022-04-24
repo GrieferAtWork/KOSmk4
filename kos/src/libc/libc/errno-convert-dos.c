@@ -24,6 +24,8 @@
 #include "../api.h"
 /**/
 
+#include <signal.h>
+
 #include "compat.h"
 #include "errno.h"
 
@@ -457,14 +459,16 @@ NOBLOCK ATTR_CONST /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2nt)(/*kos*/ er
 DEFINE_PUBLIC_ALIAS(errno_nt2dos, libd_errno_nt2dos);
 DEFINE_INTERN_ALIAS(libd__dosmaperr, libd_errno_nt2dos);
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
-NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_nt2dos)(/*nt*/ errno_t value) {
+NOBLOCK ATTR_CONST /*dos*/ errno_t
+NOTHROW(LIBDCALL libd_errno_nt2dos)(/*nt*/ errno_t value) {
 	/* TODO */
 	return value;
 }
 
 DEFINE_PUBLIC_ALIAS(errno_dos2nt, libd_errno_dos2nt);
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
-NOBLOCK ATTR_CONST /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2nt)(/*kos*/ errno_t value) {
+NOBLOCK ATTR_CONST /*nt*/ errno_t
+NOTHROW(LIBDCALL libd_errno_dos2nt)(/*kos*/ errno_t value) {
 	/* TODO */
 	return value;
 }
@@ -472,7 +476,8 @@ NOBLOCK ATTR_CONST /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2nt)(/*kos*/ er
 
 DEFINE_PUBLIC_ALIAS(errno_kos2dos, libd_errno_dos2kos);
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
-NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ errno_t value) {
+NOBLOCK ATTR_CONST /*dos*/ errno_t
+NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ errno_t value) {
 	errno_t result;
 	if ((unsigned int)value > EMAX)
 		result = DOS_EOTHER;
@@ -484,7 +489,8 @@ NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ 
 
 DEFINE_PUBLIC_ALIAS(errno_dos2kos, libd_errno_dos2kos);
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
-NOBLOCK ATTR_CONST /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2kos)(/*dos*/ errno_t value) {
+NOBLOCK ATTR_CONST /*kos*/ errno_t
+NOTHROW(LIBDCALL libd_errno_dos2kos)(/*dos*/ errno_t value) {
 	errno_t result;
 	if ((unsigned int)value > DOS_EMAX)
 		result = EPERM;
@@ -493,6 +499,25 @@ NOBLOCK ATTR_CONST /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2kos)(/*dos*/ 
 	}
 	return result;
 }
+
+DEFINE_PUBLIC_ALIAS(signo_dos2kos, libd_signo_dos2kos);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
+NOBLOCK ATTR_CONST /*kos*/ signo_t
+NOTHROW(LIBDCALL libd_signo_dos2kos)(/*dos*/ signo_t value) {
+	if (value == DOS_SIGABRT)
+		return SIGABRT;
+	return value;
+}
+
+DEFINE_PUBLIC_ALIAS(signo_kos2dos, libd_signo_kos2dos);
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
+NOBLOCK ATTR_CONST /*dos*/ signo_t
+NOTHROW(LIBDCALL libd_signo_kos2dos)(/*kos*/ signo_t value) {
+	if (value == SIGABRT)
+		return DOS_SIGABRT;
+	return value;
+}
+
 
 DECL_END
 

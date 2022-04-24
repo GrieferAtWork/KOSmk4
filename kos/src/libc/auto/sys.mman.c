@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bab789b */
+/* HASH CRC-32:0x8a9004c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <kos/types.h>
 #include "../user/sys.mman.h"
 #include "../user/fcntl.h"
-#include "../user/string.h"
+#include "string.h"
 #include "../user/sys.stat.h"
 #include "../user/unistd.h"
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e1d170c */
+/* HASH CRC-32:0x70a1f043 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include "../user/ctype.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
-#include "../user/string.h"
+#include "string.h"
 
 DECL_BEGIN
 

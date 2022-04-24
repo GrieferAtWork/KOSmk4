@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d023616 */
+/* HASH CRC-32:0x1b534e10 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1105,10 +1105,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,strxfrm_l,(char *__d
 __NAMESPACE_LOCAL_USING_OR_IMPL(strxfrm_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strxfrm_l)(char *__dst, char const *__restrict __src, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strxfrm_l))(__dst, __src, __maxlen, __locale); })
 #endif /* !... */
 #ifdef __CRT_HAVE_strerror_l
-__CDECLARE(__ATTR_COLD __ATTR_WUNUSED,char *,__NOTHROW_NCX,strerror_l,(int __errnum, __locale_t __locale),(__errnum,__locale))
+__CDECLARE(__ATTR_COLD __ATTR_WUNUSED,char *,__NOTHROW_NCX,strerror_l,(__errno_t __errnum, __locale_t __locale),(__errnum,__locale))
 #else /* __CRT_HAVE_strerror_l */
 #include <libc/local/string/strerror_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strerror_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strerror_l)(int __errnum, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_l))(__errnum, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strerror_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_COLD __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strerror_l)(__errno_t __errnum, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_l))(__errnum, __locale); })
 #endif /* !__CRT_HAVE_strerror_l */
 #ifndef __strsignal_defined
 #define __strsignal_defined
@@ -1905,36 +1905,36 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strerrorname_np, __FORCELOCAL __ATTR_ARTIFICIAL 
 #ifdef __CRT_HAVE_sigabbrev_np
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
- * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__signo_t __signum),(__signum))
+ * When the given `signo' isn't  recognized, `NULL' is returned  instead. */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__signo_t __signo),(__signo))
 #elif defined(__CRT_HAVE_signalname)
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
- * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__signo_t __signum),signalname,(__signum))
+ * When the given `signo' isn't  recognized, `NULL' is returned  instead. */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__signo_t __signo),signalname,(__signo))
 #elif defined(__CRT_HAVE_strsigno)
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
- * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__signo_t __signum),strsigno,(__signum))
+ * When the given `signo' isn't  recognized, `NULL' is returned  instead. */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__signo_t __signo),strsigno,(__signo))
 #else /* ... */
 #include <libc/local/string/sigabbrev_np.h>
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
- * When the given `signum' isn't  recognized, `NULL' is returned  instead. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigabbrev_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL sigabbrev_np)(__signo_t __signum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigabbrev_np))(__signum); })
+ * When the given `signo' isn't  recognized, `NULL' is returned  instead. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigabbrev_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL sigabbrev_np)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigabbrev_np))(__signo); })
 #endif /* !... */
 #ifdef __CRT_HAVE_sigdescr_np
 /* >> sigdescr_np(3)
  * Return a description for the given signal.
- * If the given `signum' isn't recognized, return `NULL' instead. */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigdescr_np,(__signo_t __signum),(__signum))
+ * If the given `signo' isn't recognized, return `NULL' instead. */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigdescr_np,(__signo_t __signo),(__signo))
 #else /* __CRT_HAVE_sigdescr_np */
 #include <libc/local/string/sigdescr_np.h>
 /* >> sigdescr_np(3)
  * Return a description for the given signal.
- * If the given `signum' isn't recognized, return `NULL' instead. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigdescr_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL sigdescr_np)(__signo_t __signum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigdescr_np))(__signum); })
+ * If the given `signo' isn't recognized, return `NULL' instead. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigdescr_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL sigdescr_np)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigdescr_np))(__signo); })
 #endif /* !__CRT_HAVE_sigdescr_np */
 #endif /* __USE_GNU */
 

@@ -68,35 +68,35 @@
 #define __SIGINT    2         /* Interrupt (ANSI). */
 #define __SIGQUIT   3         /* Quit (POSIX). */
 #define __SIGILL    4         /* Illegal instruction (ANSI). */
-#define __SIGTRAP   5         /* Trace trap (POSIX). */
-#define __SIGABRT   6         /* Abort (ANSI). */
+#define __SIGTRAP   5         /* Trace/breakpoint trap (POSIX). */
+#define __SIGABRT   6         /* Aborted (ANSI). */
 #define __SIGIOT    __SIGABRT /* IOT trap (4.2 BSD). */
-#define __SIGBUS    7         /* BUS error (4.2 BSD). */
-#define __SIGFPE    8         /* Floating-point exception (ANSI). */
-#define __SIGKILL   9         /* Kill, unblockable (POSIX). */
-#define __SIGUSR1   10        /* User-defined signal 1 (POSIX). */
+#define __SIGBUS    7         /* Bus error (4.2 BSD). */
+#define __SIGFPE    8         /* Floating point exception (ANSI). */
+#define __SIGKILL   9         /* Killed -- Kill, unblockable (POSIX). */
+#define __SIGUSR1   10        /* User defined signal 1 (POSIX). */
 #define __SIGSEGV   11        /* Segmentation violation (ANSI). */
-#define __SIGUSR2   12        /* User-defined signal 2 (POSIX). */
+#define __SIGUSR2   12        /* User defined signal 2 (POSIX). */
 #define __SIGPIPE   13        /* Broken pipe (POSIX). */
 #define __SIGALRM   14        /* Alarm clock (POSIX). */
-#define __SIGTERM   15        /* Termination (ANSI). */
+#define __SIGTERM   15        /* Terminated (ANSI). */
 #define __SIGSTKFLT 16        /* Stack fault. */
-#define __SIGCHLD   17        /* Child status has changed (POSIX). */
-#define __SIGCLD    __SIGCHLD /* Same as SIGCHLD (System V). */
-#define __SIGCONT   18        /* Continue (POSIX). */
-#define __SIGSTOP   19        /* Stop, unblockable (POSIX). */
-#define __SIGTSTP   20        /* Keyboard stop (POSIX). */
-#define __SIGTTIN   21        /* Background read from tty (POSIX). */
-#define __SIGTTOU   22        /* Background write to tty (POSIX). */
-#define __SIGURG    23        /* Urgent condition on socket (4.2 BSD). */
-#define __SIGXCPU   24        /* CPU limit exceeded (4.2 BSD). */
+#define __SIGCHLD   17        /* Child exited (POSIX). */
+#define __SIGCLD    __SIGCHLD /* Child exited (System V). */
+#define __SIGCONT   18        /* Continued (POSIX). */
+#define __SIGSTOP   19        /* Stopped (signal) -- Stop, unblockable (POSIX). */
+#define __SIGTSTP   20        /* Stopped -- Keyboard stop (POSIX). */
+#define __SIGTTIN   21        /* Stopped (tty input) -- Background read from tty (POSIX). */
+#define __SIGTTOU   22        /* Stopped (tty output) -- Background write to tty (POSIX). */
+#define __SIGURG    23        /* Urgent I/O condition (4.2 BSD). */
+#define __SIGXCPU   24        /* CPU time limit exceeded (4.2 BSD). */
 #define __SIGXFSZ   25        /* File size limit exceeded (4.2 BSD). */
-#define __SIGVTALRM 26        /* Virtual alarm clock (4.2 BSD). */
-#define __SIGPROF   27        /* Profiling alarm clock (4.2 BSD). */
-#define __SIGWINCH  28        /* Window size change (4.3 BSD, Sun). */
-#define __SIGIO     29        /* I/O now possible (4.2 BSD). */
+#define __SIGVTALRM 26        /* Virtual timer expired (4.2 BSD). */
+#define __SIGPROF   27        /* Profiling timer expired (4.2 BSD). */
+#define __SIGWINCH  28        /* Window changed (4.3 BSD, Sun). */
+#define __SIGIO     29        /* I/O possible (4.2 BSD). */
 #define __SIGPOLL   __SIGIO   /* Pollable event occurred (System V). */
-#define __SIGPWR    30        /* Power failure restart (System V). */
+#define __SIGPWR    30        /* Power failure (System V). */
 #define __SIGSYS    31        /* Bad system call. */
 #define __NSIG      65        /* Biggest signal number + 1 (including real-time signals). */
 #ifdef __KOS__

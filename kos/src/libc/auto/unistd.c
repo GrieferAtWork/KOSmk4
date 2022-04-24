@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x329001cb */
+/* HASH CRC-32:0x434d1038 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 #include "readpassphrase.h"
 #include "../user/signal.h"
 #include "../user/stdlib.h"
-#include "../user/string.h"
+#include "string.h"
 #include "../user/sys.ioctl.h"
 #include "../user/sys.poll.h"
 #include "../user/sys.socket.h"

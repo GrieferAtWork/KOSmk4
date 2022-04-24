@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2839335 */
+/* HASH CRC-32:0x1bc18e8f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2596,7 +2596,6 @@ DEFINE_PUBLIC_ALIAS(DOS$strcoll_l, libd_strcoll_l);
 DEFINE_PUBLIC_ALIAS(DOS$_strxfrm_l, libd_strxfrm_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strxfrm_l, libd_strxfrm_l);
 DEFINE_PUBLIC_ALIAS(DOS$strxfrm_l, libd_strxfrm_l);
-DEFINE_PUBLIC_ALIAS(DOS$strerror_l, libd_strerror_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strndup, libd_strndup);
 DEFINE_PUBLIC_ALIAS(DOS$strndup, libd_strndup);
 DEFINE_PUBLIC_ALIAS(DOS$_strdup, libd_strdup);
@@ -2633,7 +2632,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_strnicmp_l, libd_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(DOS$_strncmpi_l, libd_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strncasecmp_l, libd_strncasecmp_l);
 DEFINE_PUBLIC_ALIAS(DOS$strncasecmp_l, libd_strncasecmp_l);
-DEFINE_PUBLIC_ALIAS(DOS$__xpg_strerror_r, libd___xpg_strerror_r);
 DEFINE_PUBLIC_ALIAS(DOS$strsep, libd_strsep);
 DEFINE_PUBLIC_ALIAS(DOS$bcopy, libd_bcopy);
 DEFINE_PUBLIC_ALIAS(DOS$__bzero, libd_bzero);

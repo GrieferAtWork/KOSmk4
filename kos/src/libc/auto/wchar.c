@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x561fe39a */
+/* HASH CRC-32:0xad11e1f1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,16 +26,16 @@
 #include <kos/types.h>
 #include "../user/wchar.h"
 #if !defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2
-#include "../user/string.h"
+#include "string.h"
 #endif /* !LIBC_ARCH_HAVE_C16MEMCMP && __SIZEOF_INT__ > 2 */
 #if !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
-#include "../user/string.h"
+#include "string.h"
 #endif /* !LIBC_ARCH_HAVE_C32MEMCMP && __SIZEOF_INT__ > 4 */
 #include "format-printer.h"
 #include "parts.wchar.format-printer.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
-#include "../user/string.h"
+#include "string.h"
 #include "../user/unicode.h"
 #include "wctype.h"
 
@@ -849,7 +849,6 @@ NOTHROW_NCX(LIBKCALL libc_wcsspn)(char32_t const *haystack,
 		++iter;
 	return (size_t)(iter - haystack);
 }
-#include <hybrid/typecore.h>
 /* >> wcscspn(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcscspn)(char16_t const *haystack,
@@ -859,7 +858,6 @@ NOTHROW_NCX(LIBDCALL libd_wcscspn)(char16_t const *haystack,
 		++iter;
 	return (size_t)(iter - haystack);
 }
-#include <hybrid/typecore.h>
 /* >> wcscspn(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcscspn)(char32_t const *haystack,

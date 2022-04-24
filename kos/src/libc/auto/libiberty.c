@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95dee1d1 */
+/* HASH CRC-32:0x772d95a1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #include "../user/stdio.h"
 #include "../user/stdio_ext.h"
 #include "../user/stdlib.h"
-#include "../user/string.h"
+#include "string.h"
 #include "../user/sys.resource.h"
 #include "../user/unistd.h"
 

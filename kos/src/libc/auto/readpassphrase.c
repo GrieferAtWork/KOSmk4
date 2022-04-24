@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3869faa8 */
+/* HASH CRC-32:0xeb3eaed8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include "../user/ctype.h"
 #include "../user/fcntl.h"
 #include "../user/signal.h"
-#include "../user/string.h"
+#include "string.h"
 #include "termios.h"
 #include "../user/unistd.h"
 

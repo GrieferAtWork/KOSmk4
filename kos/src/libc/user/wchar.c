@@ -36,7 +36,6 @@
 #include "stdio-api.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "string.h"
 #include "unicode.h"
 #include "wchar.h"
 

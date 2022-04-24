@@ -24,14 +24,6 @@
 /**/
 
 #include "crtdbg.h"
-#include "direct.h"
-#include "malloc.h"
-#include "parts.wchar.unistd.h"
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
-#include "unistd.h"
-#include "wchar.h"
 
 #if __has_include(<intrin.h>)
 #include <intrin.h>

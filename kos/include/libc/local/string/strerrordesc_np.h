@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa00f0c3c */
+/* HASH CRC-32:0x5ec80009 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,11 +53,7 @@ __NAMESPACE_LOCAL_END
 #define ___local_sys_errlist_defined
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
 #ifndef _sys_errlist
-#ifdef __NSIG
-__CSDECLARE2(,char const *const _sys_siglist[__NSIG],_sys_siglist)
-#else /* __NSIG */
-__CSDECLARE2(,char const *const _sys_siglist[],_sys_siglist)
-#endif /* !__NSIG */
+__CSDECLARE2(,char const *const _sys_errlist[],_sys_errlist)
 #define _sys_errlist _sys_errlist
 #endif /* !_sys_errlist */
 #ifndef _sys_nerr

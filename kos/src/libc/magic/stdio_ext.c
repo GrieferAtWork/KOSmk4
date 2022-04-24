@@ -39,6 +39,8 @@
 #include <kos/anno.h>
 )]%[insert:prefix(
 #include <asm/crt/stdio_ext.h>
+)]%[insert:prefix(
+#include <bits/types.h>
 )]%{
 
 /************************************************************************/
@@ -66,13 +68,18 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef __size_t_defined
+#define __size_t_defined
+typedef __size_t size_t;
+#endif /* !__size_t_defined */
+
 }
 
 @@>> __fbufsize(3)
 @@Returns the used buffer size of the given `stream' (s.a. `setvbuf(3)')
 @@@return: * : Used buffer size of `stream'
-[[pure, wunused, decl_include("<features.h>")]]
-$size_t __fbufsize([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
+[[pure, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+size_t __fbufsize([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> __freading(3)
 @@Returns  non-zero if the `stream' is read-only, or "the last operation
@@ -112,7 +119,7 @@ int __fwritable([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
 @@referring to a TTY. If this is the case, this function will  make
 @@the appropriate call to `isatty(3)' and set the internal is-line-
 @@buffered flag accordingly, before returning its state.
-[[pure, wunused, decl_include("<features.h>")]]
+[[pure, wunused]]
 int __flbf([[nonnull]] $FILE *stream);
 
 @@>> __fpurge(3)

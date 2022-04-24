@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60a5ad87 */
+/* HASH CRC-32:0x9135d13e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@
 #include "../user/malloc.h"
 #include "../user/pthread.h"
 #include "../user/stdio.h"
-#include "../user/string.h"
+#include "string.h"
 #include "../user/sys.ioctl.h"
 #include "../user/sys.prctl.h"
 #include "../user/sys.stat.h"

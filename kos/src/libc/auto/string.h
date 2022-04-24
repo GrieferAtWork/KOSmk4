@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae5d95f */
+/* HASH CRC-32:0x5c57ddc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -623,12 +623,8 @@ INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_strxfrm_l)(char *dst, char 
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBCCALL libc_strxfrm_l)(char *dst, char const *__restrict src, size_t maxlen, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_COLD WUNUSED char *NOTHROW_NCX(LIBDCALL libd_strerror_l)(int errnum, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_COLD WUNUSED char *NOTHROW_NCX(LIBCCALL libc_strerror_l)(int errnum, locale_t locale);
+INTDEF ATTR_COLD WUNUSED char *NOTHROW_NCX(LIBDCALL libd_strerror_l)(errno_t errnum, locale_t locale);
+INTDEF ATTR_COLD WUNUSED char *NOTHROW_NCX(LIBCCALL libc_strerror_l)(errno_t errnum, locale_t locale);
 INTDEF ATTR_COLD ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBDCALL libd_strsignal)(signo_t signo);
 INTDEF ATTR_COLD ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBCCALL libc_strsignal)(signo_t signo);
 #endif /* !__KERNEL__ */
@@ -815,13 +811,25 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerrorname_np)(err
 #endif /* !__KERNEL__ */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrorname_np)(errno_t errnum);
 #ifndef __KERNEL__
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, _without_ the leading `SIG*' prefix.
+ * When the given `signo' isn't  recognized, `NULL' is returned  instead. */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_sigabbrev_np)(signo_t signo);
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, _without_ the leading `SIG*' prefix.
+ * When the given `signo' isn't  recognized, `NULL' is returned  instead. */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_sigabbrev_np)(signo_t signo);
+/* >> sigdescr_np(3)
+ * Return a description for the given signal.
+ * If the given `signo' isn't recognized, return `NULL' instead. */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_sigdescr_np)(signo_t signo);
+/* >> sigdescr_np(3)
+ * Return a description for the given signal.
+ * If the given `signo' isn't recognized, return `NULL' instead. */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_sigdescr_np)(signo_t signo);
 INTDEF ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_strerror_r)(errno_t errnum, char *buf, size_t buflen);
 INTDEF ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_strerror_r)(errno_t errnum, char *buf, size_t buflen);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_COLD NONNULL((2)) errno_t NOTHROW_NCX(LIBDCALL libd___xpg_strerror_r)(errno_t errnum, char *buf, size_t buflen);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_COLD NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc___xpg_strerror_r)(errno_t errnum, char *buf, size_t buflen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

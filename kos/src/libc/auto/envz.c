@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c60ae36 */
+/* HASH CRC-32:0xbcc04aae */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include "envz.h"
 #include "argz.h"
 #include "../user/stdlib.h"
-#include "../user/string.h"
+#include "string.h"
 
 DECL_BEGIN
 

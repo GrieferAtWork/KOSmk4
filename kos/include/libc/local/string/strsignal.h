@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x363d8a9f */
+/* HASH CRC-32:0x9aafa506 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigdescr_np_defined
 #define __local___localdep_sigdescr_np_defined
 #ifdef __CRT_HAVE_sigdescr_np
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigdescr_np,(__signo_t __signum),sigdescr_np,(__signum))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigdescr_np,(__signo_t __signo),sigdescr_np,(__signo))
 #else /* __CRT_HAVE_sigdescr_np */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/sigdescr_np.h>

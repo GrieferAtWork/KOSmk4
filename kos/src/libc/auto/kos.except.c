@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe301b25b */
+/* HASH CRC-32:0xed6f4d47 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <kos/types.h>
 #include "../user/kos.except.h"
 #include "format-printer.h"
-#include "../user/string.h"
+#include "string.h"
 
 DECL_BEGIN
 

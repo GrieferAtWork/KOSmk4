@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4103269 */
+/* HASH CRC-32:0x8615457 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,7 @@
 #include <stdio.h>
 #include <kos/anno.h>
 #include <asm/crt/stdio_ext.h>
+#include <bits/types.h>
 
 /************************************************************************/
 /* Possible values for `__fsetlocking(3)'                               */
@@ -66,10 +67,15 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef __size_t_defined
+#define __size_t_defined
+typedef __size_t size_t;
+#endif /* !__size_t_defined */
+
 /* >> __fbufsize(3)
  * Returns the used buffer size of the given `stream' (s.a. `setvbuf(3)')
  * @return: * : Used buffer size of `stream' */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__fbufsize,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
+__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,__fbufsize,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
 /* >> __freading(3)
  * Returns  non-zero if the `stream' is read-only, or "the last operation
  * performed on `stream' was a read-operation". On KOS, this last part is

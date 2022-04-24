@@ -37,20 +37,13 @@
 #include <syscall.h>
 #include <unistd.h>
 
+#include "../auto/string.h"
 #include "../libc/compat.h"
 #include "../libc/globals.h"
 #include "../libc/tls.h"
 #include "signal.h"
-#include "string.h"
 
 DECL_BEGIN
-
-LOCAL signo_t LIBCCALL
-libc_signo_dos2kos(signo_t dos_signo) {
-	if (dos_signo == DOS_SIGABRT)
-		return SIGABRT;
-	return dos_signo;
-}
 
 LOCAL int LIBCCALL
 libc_sigms_dos2kos(int dos_sigms) {
@@ -95,7 +88,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.signal") int
 NOTHROW_NCX(LIBDCALL libd_raise)(signo_t signo)
 /*[[[body:libd_raise]]]*/
 {
-	return libc_raise(libc_signo_dos2kos(signo));
+	return libc_raise(libd_signo_dos2kos(signo));
 }
 /*[[[end:libd_raise]]]*/
 
@@ -134,7 +127,7 @@ NOTHROW_NCX(LIBDCALL libd_sysv_signal)(signo_t signo,
                                        sighandler_t handler)
 /*[[[body:libd_sysv_signal]]]*/
 {
-	return libc_sysv_signal(libc_signo_dos2kos(signo), handler);
+	return libc_sysv_signal(libd_signo_dos2kos(signo), handler);
 }
 /*[[[end:libd_sysv_signal]]]*/
 
@@ -347,7 +340,7 @@ NOTHROW_NCX(LIBDCALL libd_bsd_signal)(signo_t signo,
                                       sighandler_t handler)
 /*[[[body:libd_bsd_signal]]]*/
 {
-	return libc_bsd_signal(libc_signo_dos2kos(signo), handler);
+	return libc_bsd_signal(libd_signo_dos2kos(signo), handler);
 }
 /*[[[end:libd_bsd_signal]]]*/
 

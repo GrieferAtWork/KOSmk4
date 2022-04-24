@@ -53,7 +53,6 @@
 #include "stdio-api.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "string.h"
 
 #ifndef OFF_MAX
 #define OFF_MAX __PRIVATE_MAX_S(__SIZEOF_OFF_T__)

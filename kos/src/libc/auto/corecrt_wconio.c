@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6ea18 */
+/* HASH CRC-32:0x2075e4ea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include "../user/corecrt_wstdio.h"
 #include "parts.wchar.format-printer.h"
 #include "../user/stdio.h"
-#include "../user/string.h"
+#include "string.h"
 #include "termios.h"
 #include "../user/wchar.h"
 

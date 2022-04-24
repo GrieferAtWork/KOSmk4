@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38fbda2b */
+/* HASH CRC-32:0x7b84b417 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include "../user/corecrt_startup.h"
 #include "../user/malloc.h"
 #include "../user/stdlib.h"
-#include "../user/string.h"
+#include "string.h"
 #include "../user/sys.syslog.h"
 
 DECL_BEGIN

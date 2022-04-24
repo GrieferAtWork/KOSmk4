@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5eff8cce */
+/* HASH CRC-32:0x26418b74 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #include "../user/kos.fcntl.h"
 #include "../user/kos.sys.stat.h"
 #include "../user/kos.unistd.h"
-#include "../user/string.h"
+#include "string.h"
 
 DECL_BEGIN
 

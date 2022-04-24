@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde1b425e */
+/* HASH CRC-32:0x9732ca91 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "ssp.string.h"
-#include "../user/string.h"
+#include "string.h"
 
 DECL_BEGIN
 

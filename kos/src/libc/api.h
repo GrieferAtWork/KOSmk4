@@ -302,7 +302,11 @@ INTDEF NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(/*kos*/ errno_t va
 INTDEF NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_seterrno)(/*dos*/ errno_t value);
 /* Same as `libc_seterrno(-value)' */
 INTDEF NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno_neg)(errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2kos)(/*dos*/ errno_t value);
 INTDEF NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ errno_t value);
+
+INTDEF NOBLOCK ATTR_CONST /*kos*/ signo_t NOTHROW(LIBDCALL libd_signo_dos2kos)(/*dos*/ signo_t value);
+INTDEF NOBLOCK ATTR_CONST /*dos*/ signo_t NOTHROW(LIBDCALL libd_signo_kos2dos)(/*kos*/ signo_t value);
 
 /* DOS filesystem compatibility controls. */
 INTDEF oflag_t libd_O_DOSPATH;   /* Either `0' or `O_DOSPATH' */

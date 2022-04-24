@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6e8c638 */
+/* HASH CRC-32:0x5a0dfb9d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "termios.h"
-#include "../user/string.h"
+#include "string.h"
 #include "../user/sys.ioctl.h"
 #include "../user/unistd.h"
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9791cbe9 */
+/* HASH CRC-32:0x76a96731 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/fstab.h"
-#include "../user/string.h"
+#include "string.h"
 
 DECL_BEGIN
 

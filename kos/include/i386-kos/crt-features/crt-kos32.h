@@ -4609,6 +4609,8 @@
 #define __CRT_HAVE_significand
 #define __CRT_HAVE_significandf
 #define __CRT_HAVE_significandl
+#define __CRT_HAVE_signo_dos2kos
+#define __CRT_HAVE_signo_kos2dos
 #define __CRT_HAVE_signo_max
 #define __CRT_HAVE_sigorset
 #define __CRT_HAVE_sigpause
@@ -6727,6 +6729,7 @@
 #define __CRT_HAVE_KOS$__wcstoull_l
 #define __CRT_HAVE_KOS$__wcsxfrm_l
 #define __CRT_HAVE_KOS$__winitenv
+#define __CRT_HAVE_KOS$__xpg_strerror_r
 #define __CRT_HAVE_KOS$_access
 #define __CRT_HAVE_KOS$_access_s
 #define __CRT_HAVE_KOS$_cgetws
@@ -7192,6 +7195,7 @@
 #define __CRT_HAVE_KOS$stat64
 #define __CRT_HAVE_KOS$strerrno
 #define __CRT_HAVE_KOS$strerror
+#define __CRT_HAVE_KOS$strerror_l
 #define __CRT_HAVE_KOS$strerror_r
 #define __CRT_HAVE_KOS$strerrordesc_np
 #define __CRT_HAVE_KOS$strerrorname_np
@@ -7614,6 +7618,7 @@
 #define __CRT_HAVE_DOS$__wcsxfrm_l
 #define __CRT_HAVE_DOS$__wgetmainargs
 #define __CRT_HAVE_DOS$__winitenv
+#define __CRT_HAVE_DOS$__xpg_strerror_r
 #define __CRT_HAVE_DOS$_access
 #define __CRT_HAVE_DOS$_access_s
 #define __CRT_HAVE_DOS$_aexit_rtn
@@ -8223,6 +8228,7 @@
 #define __CRT_HAVE_DOS$stat64
 #define __CRT_HAVE_DOS$strerrno
 #define __CRT_HAVE_DOS$strerror
+#define __CRT_HAVE_DOS$strerror_l
 #define __CRT_HAVE_DOS$strerror_r
 #define __CRT_HAVE_DOS$strerrordesc_np
 #define __CRT_HAVE_DOS$strerrorname_np

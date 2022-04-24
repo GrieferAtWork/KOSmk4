@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x961b5ea7 */
+/* HASH CRC-32:0x8c88553f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include "../user/process.h"
 #include "../user/fcntl.h"
 #include "../user/stdlib.h"
-#include "../user/string.h"
+#include "string.h"
 #include "../user/sys.wait.h"
 #include "../user/unistd.h"
 

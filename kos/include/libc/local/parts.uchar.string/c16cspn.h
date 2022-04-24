@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4e6d895 */
+/* HASH CRC-32:0x6f825f0b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,18 +21,13 @@
 #ifndef __local_c16cspn_defined
 #define __local_c16cspn_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16chr_defined
 #define __local___localdep_c16chr_defined
 #if defined(__CRT_HAVE_wcschr) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16chr,(__CHAR16_TYPE__ const *__restrict __haystack, __CHAR16_TYPE__ __needle),wcschr,(__haystack,__needle))
 #elif defined(__CRT_HAVE_DOS$wcschr)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16chr,(__CHAR16_TYPE__ const *__restrict __haystack, __CHAR16_TYPE__ __needle),wcschr,(__haystack,__needle))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
@@ -46,9 +41,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16chr __LIBC_LOCAL_NAME(c16chr)
 #endif /* !... */
 #endif /* !__local___localdep_c16chr_defined */
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16cspn) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16cspn))(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__reject) {
 	__CHAR16_TYPE__ const *__iter = __haystack;

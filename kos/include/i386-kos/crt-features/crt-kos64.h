@@ -4455,6 +4455,8 @@
 #define __CRT_HAVE_significand
 #define __CRT_HAVE_significandf
 #define __CRT_HAVE_significandl
+#define __CRT_HAVE_signo_dos2kos
+#define __CRT_HAVE_signo_kos2dos
 #define __CRT_HAVE_signo_max
 #define __CRT_HAVE_sigorset
 #define __CRT_HAVE_sigpause
