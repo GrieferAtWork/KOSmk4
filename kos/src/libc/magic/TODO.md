@@ -156,7 +156,6 @@
 - `<timeconv.h>`            (libbsd)
 - `<thread_db.h>`           (GLibc!)
 - libiberty:
-	- `<libiberty/dyn-string.h>`
 	- `<libiberty/fibheap.h>`
 	- `<libiberty/floatformat.h>`
 	- `<libiberty/hashtab.h>`

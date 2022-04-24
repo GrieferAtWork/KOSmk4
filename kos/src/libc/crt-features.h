@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67aaff73 */
+/* HASH CRC-32:0xd4f38764 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1323,6 +1323,24 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$dupargv
 #define __CRT_HAVE_DOS$duplocale
+#define __CRT_HAVE_DOS$dyn_string_append
+#define __CRT_HAVE_DOS$dyn_string_append_char
+#define __CRT_HAVE_DOS$dyn_string_append_cstr
+#define __CRT_HAVE_DOS$dyn_string_clear
+#define __CRT_HAVE_DOS$dyn_string_copy
+#define __CRT_HAVE_DOS$dyn_string_copy_cstr
+#define __CRT_HAVE_DOS$dyn_string_delete
+#define __CRT_HAVE_DOS$dyn_string_eq
+#define __CRT_HAVE_DOS$dyn_string_init
+#define __CRT_HAVE_DOS$dyn_string_insert
+#define __CRT_HAVE_DOS$dyn_string_insert_char
+#define __CRT_HAVE_DOS$dyn_string_insert_cstr
+#define __CRT_HAVE_DOS$dyn_string_new
+#define __CRT_HAVE_DOS$dyn_string_prepend
+#define __CRT_HAVE_DOS$dyn_string_prepend_cstr
+#define __CRT_HAVE_DOS$dyn_string_release
+#define __CRT_HAVE_DOS$dyn_string_resize
+#define __CRT_HAVE_DOS$dyn_string_substring
 #define __CRT_HAVE_DOS$dysize
 #define __CRT_HAVE_DOS$ecvt
 #define __CRT_HAVE_DOS$ecvt_r
@@ -5412,6 +5430,24 @@
 #define __CRT_HAVE_dup3
 #define __CRT_HAVE_dupargv
 #define __CRT_HAVE_duplocale
+#define __CRT_HAVE_dyn_string_append
+#define __CRT_HAVE_dyn_string_append_char
+#define __CRT_HAVE_dyn_string_append_cstr
+#define __CRT_HAVE_dyn_string_clear
+#define __CRT_HAVE_dyn_string_copy
+#define __CRT_HAVE_dyn_string_copy_cstr
+#define __CRT_HAVE_dyn_string_delete
+#define __CRT_HAVE_dyn_string_eq
+#define __CRT_HAVE_dyn_string_init
+#define __CRT_HAVE_dyn_string_insert
+#define __CRT_HAVE_dyn_string_insert_char
+#define __CRT_HAVE_dyn_string_insert_cstr
+#define __CRT_HAVE_dyn_string_new
+#define __CRT_HAVE_dyn_string_prepend
+#define __CRT_HAVE_dyn_string_prepend_cstr
+#define __CRT_HAVE_dyn_string_release
+#define __CRT_HAVE_dyn_string_resize
+#define __CRT_HAVE_dyn_string_substring
 #define __CRT_HAVE_dysize
 #define __CRT_HAVE_ecvt
 #define __CRT_HAVE_ecvt_r

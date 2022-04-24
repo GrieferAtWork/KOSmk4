@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72de4f2c */
+/* HASH CRC-32:0xae8fc075 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -357,6 +357,26 @@ DEFINE_PUBLIC_ALIAS(DOS$kreaddir, libd_kreaddir);
 DEFINE_PUBLIC_ALIAS(DOS$kreaddirf, libd_kreaddirf);
 DEFINE_PUBLIC_ALIAS(DOS$kreaddir64, libd_kreaddir64);
 DEFINE_PUBLIC_ALIAS(DOS$kreaddirf64, libd_kreaddirf64);
+
+/* dyn-string */
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_init, libd_dyn_string_init);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_new, libd_dyn_string_new);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_delete, libd_dyn_string_delete);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_release, libd_dyn_string_release);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_resize, libd_dyn_string_resize);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_clear, libd_dyn_string_clear);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_copy, libd_dyn_string_copy);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_copy_cstr, libd_dyn_string_copy_cstr);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_prepend, libd_dyn_string_prepend);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_prepend_cstr, libd_dyn_string_prepend_cstr);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_insert, libd_dyn_string_insert);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_insert_cstr, libd_dyn_string_insert_cstr);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_insert_char, libd_dyn_string_insert_char);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_append, libd_dyn_string_append);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_append_cstr, libd_dyn_string_append_cstr);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_append_char, libd_dyn_string_append_char);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_substring, libd_dyn_string_substring);
+DEFINE_PUBLIC_ALIAS(DOS$dyn_string_eq, libd_dyn_string_eq);
 
 /* envz */
 DEFINE_PUBLIC_ALIAS(DOS$envz_entry, libd_envz_entry);

@@ -253,6 +253,7 @@ incdir("");
 #include <bits/crt/db/ttyent.h>
 #include <bits/crt/db/utmp.h>
 #include <bits/crt/db/utmpx.h>
+#include <bits/crt/dyn-string.h>
 #include <bits/crt/environments.h>
 #include <bits/crt/fenv-inline.h>
 #include <bits/crt/fenv.h>
@@ -516,6 +517,7 @@ incdir("");
 #include <dirent.h>
 #include <dlfcn.h>
 #include <dos.h>
+#include <dyn-string.h>
 #include <elf.h>
 #include <elf_abi.h>
 #include <endian.h>
@@ -819,6 +821,7 @@ incdir("");
 #include <libgen86/gen.h>
 #include <libgen86/register.h>
 #include <libiberty/ansidecl.h>
+#include <libiberty/dyn-string.h>
 #include <libiberty/libiberty.h>
 #include <libiberty/objalloc.h>
 #include <libiberty/partition.h>

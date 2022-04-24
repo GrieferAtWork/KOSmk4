@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdc48335 */
+/* HASH CRC-32:0x1fd6ef04 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -404,6 +404,26 @@ DFUN(".text.crt.dos.fs.dir", libd_kreaddir, libc_kreaddir, TI, 4, TIn(__SIZEOF_F
 DFUN(".text.crt.dos.fs.dir", libd_kreaddirf, libc_kreaddirf, TI, 5, TIn(__SIZEOF_FD_T__), TP, TI, TD, TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.fs.dir", libd_kreaddir64, libc_kreaddir64, TI, 4, TIn(__SIZEOF_FD_T__), TP, TI, TD)
 DFUN(".text.crt.dos.fs.dir", libd_kreaddirf64, libc_kreaddirf64, TI, 5, TIn(__SIZEOF_FD_T__), TP, TI, TD, TIn(__SIZEOF_OFLAG_T__))
+
+/* dyn-string */
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_init, libc_dyn_string_init, TD, 2, TP, TD)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_new, libc_dyn_string_new, TP, 1, TD)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_delete, libc_dyn_string_delete, TV, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_release, libc_dyn_string_release, TP, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_resize, libc_dyn_string_resize, TP, 2, TP, TD)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_clear, libc_dyn_string_clear, TV, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_copy, libc_dyn_string_copy, TD, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_copy_cstr, libc_dyn_string_copy_cstr, TD, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_prepend, libc_dyn_string_prepend, TD, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_prepend_cstr, libc_dyn_string_prepend_cstr, TD, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_insert, libc_dyn_string_insert, TD, 3, TP, TD, TP)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_insert_cstr, libc_dyn_string_insert_cstr, TD, 3, TP, TD, TP)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_insert_char, libc_dyn_string_insert_char, TD, 3, TP, TD, TD)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_append, libc_dyn_string_append, TD, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_append_cstr, libc_dyn_string_append_cstr, TD, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_append_char, libc_dyn_string_append_char, TD, 2, TP, TD)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_substring, libc_dyn_string_substring, TD, 4, TP, TP, TD, TD)
+DFUN(".text.crt.dos.libiberty", libd_dyn_string_eq, libc_dyn_string_eq, TD, 2, TP, TP)
 
 /* envz */
 DFUN(".text.crt.dos.string.envz", libd_envz_entry, libc_envz_entry, TP, 3, TP, TI, TP)
