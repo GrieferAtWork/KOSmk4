@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80abdae */
+/* HASH CRC-32:0xb68474bf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1311,9 +1311,9 @@
 #define __CRT_HAVE_DOS$dn_skipname
 #define __CRT_HAVE_DOS$dngettext
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(_WIN32)
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(_WIN32)
 #define __CRT_HAVE_DOS$dos_lbasename
-#endif /* !__LIBCCALL_IS_LIBDCALL && !_WIN32 */
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !_WIN32 */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$dosfs_setenabled
 #define __CRT_HAVE_DOS$dprintf
@@ -3564,9 +3564,9 @@
 #define __CRT_HAVE_DOS$unicode_writeutf16_chk
 #define __CRT_HAVE_DOS$unicode_writeutf8
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && defined(_WIN32)
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && defined(_WIN32)
 #define __CRT_HAVE_DOS$unix_lbasename
-#endif /* !__LIBCCALL_IS_LIBDCALL && _WIN32 */
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && _WIN32 */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$unlink
 #endif /* !__KERNEL__ */
@@ -5417,9 +5417,9 @@
 #define __CRT_HAVE_dn_skipname
 #define __CRT_HAVE_dngettext
 #endif /* !__KERNEL__ */
-#ifndef _WIN32
+#if !defined(__KERNEL__) && !defined(_WIN32)
 #define __CRT_HAVE_dos_lbasename
-#endif /* !_WIN32 */
+#endif /* !__KERNEL__ && !_WIN32 */
 #ifndef __KERNEL__
 #define __CRT_HAVE_dosfs_getenabled
 #define __CRT_HAVE_dosfs_setenabled
@@ -7841,9 +7841,9 @@
 #define __CRT_HAVE_unicode_writeutf16
 #define __CRT_HAVE_unicode_writeutf16_chk
 #define __CRT_HAVE_unicode_writeutf8
-#ifdef _WIN32
+#if !defined(__KERNEL__) && defined(_WIN32)
 #define __CRT_HAVE_unix_lbasename
-#endif /* _WIN32 */
+#endif /* !__KERNEL__ && _WIN32 */
 #ifndef __KERNEL__
 #define __CRT_HAVE_unlink
 #define __CRT_HAVE_unlink_if_ordinary

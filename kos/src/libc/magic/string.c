@@ -1970,9 +1970,9 @@ char const *strerrordesc_np($errno_t errnum) {
 @@pp_endif@@
 }
 
-[[decl_include("<bits/types.h>"), kernel]]
-[[const, wunused, nothrow, section(".text.crt{|.dos}.errno")]]
-[[impl_include("<asm/os/errno.h>")]]
+[[kernel, const, wunused, nothrow]]
+[[decl_include("<bits/types.h>"), alias("strerrno")]]
+[[if(!defined(__KERNEL__)), export_as("strerrno")]]
 [[crt_dos_variant({
 impl: {
 	/* Special handling for a hand full of errno
@@ -1988,7 +1988,9 @@ impl: {
 	errnum = libd_errno_dos2kos(errnum);
 	return libc_strerrorname_np(errnum);
 }
-}), export_alias("strerrno")]]
+})]]
+[[impl_include("<asm/os/errno.h>")]]
+[[section(".text.crt{|.dos}.errno")]]
 char const *strerrorname_np($errno_t errnum) {
 /*[[[deemon
 import * from deemon;

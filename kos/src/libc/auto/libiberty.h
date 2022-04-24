@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe9358f6 */
+/* HASH CRC-32:0x5f74f67f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,18 +41,12 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_stack_limit_increase)(ulongptr_t newlim);
 #ifndef __KERNEL__
 INTDEF void NOTHROW_NCX(LIBCCALL libc_stack_limit_increase)(ulongptr_t newlim);
 #endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(_WIN32)
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED const char *NOTHROW_NCX(LIBDCALL libd_dos_lbasename)(const char *filename);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !_WIN32 */
-#ifndef _WIN32
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED const char *NOTHROW_NCX(LIBCCALL libc_dos_lbasename)(const char *filename);
-#endif /* !_WIN32 */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && defined(_WIN32)
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED const char *NOTHROW_NCX(LIBDCALL libd_unix_lbasename)(const char *filename);
-#endif /* !__LIBCCALL_IS_LIBDCALL && _WIN32 */
-#ifdef _WIN32
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED const char *NOTHROW_NCX(LIBCCALL libc_unix_lbasename)(const char *filename);
-#endif /* _WIN32 */
+#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_lrealpath)(char const *path);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

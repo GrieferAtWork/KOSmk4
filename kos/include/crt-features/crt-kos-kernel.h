@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x731e9ea4 */
+/* HASH CRC-32:0xb43e5436 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-#ifndef _WIN32
-#define __CRT_HAVE_DOS$dos_lbasename
-#endif /* !_WIN32 */
-#ifdef _WIN32
-#define __CRT_HAVE_DOS$unix_lbasename
-#endif /* _WIN32 */
 #define __CRT_HAVE__Unwind_Resume
 #define __CRT_HAVE__ZSt9terminatev
 #define __CRT_HAVE___acheck
@@ -54,9 +48,6 @@
 #define __CRT_HAVE_bzeroq
 #define __CRT_HAVE_bzerow
 #define __CRT_HAVE_cfmakesane
-#ifndef _WIN32
-#define __CRT_HAVE_dos_lbasename
-#endif /* !_WIN32 */
 #define __CRT_HAVE_except_active
 #define __CRT_HAVE_except_as_errno
 #define __CRT_HAVE_except_as_signal
@@ -235,7 +226,6 @@
 #define __CRT_HAVE_strcmp
 #define __CRT_HAVE_strcmpz
 #define __CRT_HAVE_strend
-#define __CRT_HAVE_strerrno
 #define __CRT_HAVE_strerrordesc_np
 #define __CRT_HAVE_strerrorname_np
 #define __CRT_HAVE_strlen
@@ -274,8 +264,5 @@
 #define __CRT_HAVE_unicode_writeutf16
 #define __CRT_HAVE_unicode_writeutf16_chk
 #define __CRT_HAVE_unicode_writeutf8
-#ifdef _WIN32
-#define __CRT_HAVE_unix_lbasename
-#endif /* _WIN32 */
 #define __CRT_HAVE_vsnprintf
 #define __CRT_HAVE_vsprintf

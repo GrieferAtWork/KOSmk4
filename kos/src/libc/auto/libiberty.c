@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x772d95a1 */
+/* HASH CRC-32:0xcf199987 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -115,8 +115,6 @@ NOTHROW_NCX(LIBCCALL libc_stack_limit_increase)(ulongptr_t newlim) {
 	}
 
 }
-#endif /* !__KERNEL__ */
-#ifndef _WIN32
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE ATTR_RETNONNULL WUNUSED const char *
 NOTHROW_NCX(LIBCCALL libc_dos_lbasename)(const char *filename) {
 
@@ -139,29 +137,6 @@ NOTHROW_NCX(LIBCCALL libc_dos_lbasename)(const char *filename) {
 	return result;
 
 }
-#endif /* !_WIN32 */
-#ifdef _WIN32
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE ATTR_RETNONNULL WUNUSED const char *
-NOTHROW_NCX(LIBCCALL libc_unix_lbasename)(const char *filename) {
-
-
-
-	/* >> char *slash = strrchr(filename, '/');
-	 * >> return slash ? slash + 1 : (char *)filename; */
-	char *result, *iter = (char *)filename;
-	result = iter;
-	for (;;) {
-		char ch = *iter++;
-		if (ch == '/')
-			result = iter;
-		if (!ch)
-			break;
-	}
-	return result;
-
-}
-#endif /* _WIN32 */
-#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_lrealpath)(char const *path) {
 	char *result = libc_canonicalize_file_name(path);
@@ -719,14 +694,7 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(C_alloca, libc_C_alloca);
 DEFINE_PUBLIC_ALIAS(stack_limit_increase, libc_stack_limit_increase);
-#endif /* !__KERNEL__ */
-#ifndef _WIN32
 DEFINE_PUBLIC_ALIAS(dos_lbasename, libc_dos_lbasename);
-#endif /* !_WIN32 */
-#ifdef _WIN32
-DEFINE_PUBLIC_ALIAS(unix_lbasename, libc_unix_lbasename);
-#endif /* _WIN32 */
-#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(lrealpath, libc_lrealpath);
 DEFINE_PUBLIC_ALIAS(getpwd, libc_getpwd);
 DEFINE_PUBLIC_ALIAS(errno_max, libc_errno_max);

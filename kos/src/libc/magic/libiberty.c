@@ -234,7 +234,7 @@ void stack_limit_increase($ulongptr_t newlim) {
 
 [[pure, wunused, nonnull]]
 [[if(defined(_WIN32)), alias("basename", "__basename", "lbasename")]]
-[[crt_impl_if(!defined(_WIN32))]]
+[[crt_impl_if(!defined(__KERNEL__) && !defined(_WIN32))]]
 const char *dos_lbasename(const char *filename) {
 @@pp_ifdef _WIN32@@
 	return basename(filename);
@@ -259,7 +259,7 @@ const char *dos_lbasename(const char *filename) {
 
 [[pure, wunused, nonnull]]
 [[if(!defined(_WIN32)), alias("basename", "__basename", "lbasename")]]
-[[crt_impl_if(defined(_WIN32))]]
+[[crt_impl_if(!defined(__KERNEL__) && defined(_WIN32))]]
 const char *unix_lbasename(const char *filename) {
 @@pp_ifndef _WIN32@@
 	return basename(filename);

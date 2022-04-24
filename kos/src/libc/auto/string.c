@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa673d0b0 */
+/* HASH CRC-32:0x7d7415a8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6836,8 +6836,8 @@ DEFINE_PUBLIC_ALIAS(strerrordesc_np, libc_strerrordesc_np);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$strerrno, libd_strerrorname_np);
 DEFINE_PUBLIC_ALIAS(DOS$strerrorname_np, libd_strerrorname_np);
-#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strerrno, libc_strerrorname_np);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strerrorname_np, libc_strerrorname_np);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$signalname, libd_sigabbrev_np);
