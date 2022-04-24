@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfa46d53 */
+/* HASH CRC-32:0xf02c25e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__local
 #endif /* !... */
 #endif /* !__local___localdep_fopen_defined */
 __LOCAL_LIBC(_fsopen) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __FILE *
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_fsopen))(char const *__filename, char const *__modes, int __sflag) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_fsopen))(char const *__filename, char const *__modes, __STDC_INT_AS_UINT_T __sflag) {
 	(void)__sflag;
 	return (__NAMESPACE_LOCAL_SYM __localdep_fopen)(__filename, __modes);
 }

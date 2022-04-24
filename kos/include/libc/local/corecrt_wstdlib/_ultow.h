@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf6ab5aa */
+/* HASH CRC-32:0x34c42550 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__ultow_s __LIBC_LOCAL_NAME(_ultow_s)
 #endif /* !__CRT_HAVE__ultow_s */
 #endif /* !__local___localdep__ultow_s_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_ultow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultow))(unsigned long __val, __WCHAR_TYPE__ *__buf, int __radix) {
 	(__NAMESPACE_LOCAL_SYM __localdep__ultow_s)(__val, __buf, (__SIZE_TYPE__)-1, __radix);

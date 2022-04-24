@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5089ae1a */
+/* HASH CRC-32:0xa0f39409 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,6 +48,7 @@ INTDEF NONNULL((3)) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_strfromd)(c
 INTDEF NONNULL((3)) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_strfromf)(char *__restrict buf, size_t buflen, char const *__restrict format, float fp);
 INTDEF NONNULL((3)) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_strfroml)(char *__restrict buf, size_t buflen, char const *__restrict format, __LONGDOUBLE fp);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_drand48_r)(struct drand48_data *__restrict buffer, double *__restrict result);
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_erand48_r)(unsigned short xsubi[3], struct drand48_data *__restrict buffer, double *__restrict result);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_lrand48_r)(struct drand48_data *__restrict buffer, long *__restrict result);
@@ -68,7 +69,6 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_on_exit)(void (LIBDCALL *func)
 #ifndef __KERNEL__
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_on_exit)(void (LIBCCALL *func)(int status, void *arg), void *arg);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_clearenv)(void);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname, char const *val, int replace);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname, char const *val, int replace);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname);
@@ -151,11 +151,13 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf,
  * associated   with   the   master   descriptor   `fd' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getpt)(void);
-/* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
- * Upon error, `NULL' is returned instead */
+/* >> canonicalize_file_name(3)
+ * Return the result of `realpath(filename)' as a `malloc()'-
+ * allocated  buffer. Upon error, `NULL' is returned instead. */
 INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_canonicalize_file_name)(char const *filename);
-/* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
- * Upon error, `NULL' is returned instead */
+/* >> canonicalize_file_name(3)
+ * Return the result of `realpath(filename)' as a `malloc()'-
+ * allocated  buffer. Upon error, `NULL' is returned instead. */
 INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_canonicalize_file_name)(char const *filename);
 INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_getbsize)(int *headerlenp, __LONGPTR_TYPE__ *blocksizep);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);

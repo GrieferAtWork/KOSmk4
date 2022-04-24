@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8ba0c1b */
+/* HASH CRC-32:0x8129dcbd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,6 +118,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strto64 __LIBC_LOCAL_NAME(strto64)
 #endif /* !... */
 #endif /* !__local___localdep_strto64_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(atoi) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(atoi))(char const *__restrict __nptr) {
 #if __SIZEOF_INT__ <= 4

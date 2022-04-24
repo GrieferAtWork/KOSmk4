@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1db44e51 */
+/* HASH CRC-32:0x950e1a15 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_qecvt_r_defined
 #define __local___localdep_qecvt_r_defined
 #ifdef __CRT_HAVE_qecvt_r
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,__localdep_qecvt_r,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),qecvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
 #else /* __CRT_HAVE_qecvt_r */
 __NAMESPACE_LOCAL_END

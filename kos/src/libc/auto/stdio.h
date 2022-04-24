@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e924782 */
+/* HASH CRC-32:0xfb7657a8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,16 +84,16 @@ INTDEF int (LIBCCALL libc_putchar)(int ch) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fgets(3)
- * Read up  to  `bufsize - 1'  bytes  of  data  from  `stream',  storing  them  into  `buf'  stopped  when
- * the buffer is  full or a  line-feed was read  (in this case,  the line-feed is  also written to  `buf')
- * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
+ * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when the
+ * buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf').
+ * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' on error. */
 INTDEF WUNUSED NONNULL((1, 3)) char *(LIBDCALL libd_fgets)(char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fgets(3)
- * Read up  to  `bufsize - 1'  bytes  of  data  from  `stream',  storing  them  into  `buf'  stopped  when
- * the buffer is  full or a  line-feed was read  (in this case,  the line-feed is  also written to  `buf')
- * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
+ * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when the
+ * buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf').
+ * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' on error. */
 INTDEF WUNUSED NONNULL((1, 3)) char *(LIBCCALL libc_fgets)(char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -418,8 +418,8 @@ INTDEF NONNULL((2)) int (LIBDCALL libd_fputc_unlocked)(int ch, FILE *__restrict 
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBDCALL libd_tempnam)(char const *dir, char const *pfx);
 /* >> fdopen(3)
  * Open a new file stream by inheriting a given file descriptor `fd'
- * Note   that  upon  success  (`return != NULL'),  the  given  `fd'
- * will be `close()'d once `fclose(return)' is called */
+ * Note that upon success (`return != NULL'), the given `fd' will be
+ * `close(2)'d once `fclose(return)' is called. */
 INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBDCALL libd_fdopen)(fd_t fd, char const *__restrict modes);
 /* >> fileno(3)
  * Return the underlying file descriptor number used by `stream' */
@@ -476,7 +476,9 @@ INTDEF NONNULL((1)) void NOTHROW_RPC(LIBDCALL libd_flockfile)(FILE *__restrict s
  * Release a previously acquired lock from `stream' */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_funlockfile)(FILE *__restrict stream);
 /* >> ftrylockfile(3)
- * Try to acquire a lock to `stream' */
+ * Try to acquire a lock to `stream'
+ * @return: == 0 : Lock successfully acquired
+ * @return: != 0 : Failed to acquire lock */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_ftrylockfile)(FILE *__restrict stream);
 /* >> __overflow(3)
  * This is essentially gLibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
@@ -802,8 +804,8 @@ INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen64)(void const *cookie, in
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen2_64)(void const *cookie, ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes), ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes), off64_t (LIBKCALL *seekfn)(void *cookie, off64_t off, int whence), int (LIBKCALL *flushfn)(void *cookie), int (LIBKCALL *closefn)(void *cookie));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd__fsopen)(char const *filename, char const *modes, int sflag);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc__fsopen)(char const *filename, char const *modes, int sflag);
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd__fsopen)(char const *filename, char const *modes, __STDC_INT_AS_UINT_T sflag);
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc__fsopen)(char const *filename, char const *modes, __STDC_INT_AS_UINT_T sflag);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) int (LIBDCALL libd__filbuf)(FILE *__restrict stream) THROWS(...);

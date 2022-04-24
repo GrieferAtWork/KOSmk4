@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b696eb2 */
+/* HASH CRC-32:0x69e0b7b3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,12 +24,10 @@
 #include <asm/os/fcntl.h>
 #include <asm/os/errno.h>
 #if defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat) && (defined(__AT_REMOVEREG) || (defined(__EISDIR) && defined(__ENOTDIR)))
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unlinkat_defined
 #define __local___localdep_unlinkat_defined
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_unlinkat,(__fd_t __dfd, char const *__name, __atflag_t __flags),unlinkat,(__dfd,__name,__flags))
 #endif /* !__local___localdep_unlinkat_defined */
 __NAMESPACE_LOCAL_END

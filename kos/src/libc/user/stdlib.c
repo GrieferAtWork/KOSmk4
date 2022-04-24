@@ -2531,9 +2531,10 @@ NOTHROW_RPC(LIBCCALL libc_getpt)(void)
 }
 /*[[[end:libc_getpt]]]*/
 
-/*[[[head:libd_canonicalize_file_name,hash:CRC-32=0x90a8e285]]]*/
-/* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
- * Upon error, `NULL' is returned instead */
+/*[[[head:libd_canonicalize_file_name,hash:CRC-32=0x95307a1f]]]*/
+/* >> canonicalize_file_name(3)
+ * Return the result of `realpath(filename)' as a `malloc()'-
+ * allocated  buffer. Upon error, `NULL' is returned instead. */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_MALLOC WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBDCALL libd_canonicalize_file_name)(char const *filename)
 /*[[[body:libd_canonicalize_file_name]]]*/
@@ -2542,9 +2543,10 @@ NOTHROW_RPC(LIBDCALL libd_canonicalize_file_name)(char const *filename)
 }
 /*[[[end:libd_canonicalize_file_name]]]*/
 
-/*[[[head:libc_canonicalize_file_name,hash:CRC-32=0xf563004a]]]*/
-/* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
- * Upon error, `NULL' is returned instead */
+/*[[[head:libc_canonicalize_file_name,hash:CRC-32=0xec883933]]]*/
+/* >> canonicalize_file_name(3)
+ * Return the result of `realpath(filename)' as a `malloc()'-
+ * allocated  buffer. Upon error, `NULL' is returned instead. */
 INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_MALLOC WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBCCALL libc_canonicalize_file_name)(char const *filename)
 /*[[[body:libc_canonicalize_file_name]]]*/
@@ -3182,7 +3184,7 @@ NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6ba4a7df]]]*/
+/*[[[start:exports,hash:CRC-32=0x5afa8483]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$getenv, libd_getenv);
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(xexit, libc_exit);
@@ -3205,6 +3207,7 @@ DEFINE_PUBLIC_ALIAS(strfromd, libc_strfromd);
 DEFINE_PUBLIC_ALIAS(strfromf, libc_strfromf);
 DEFINE_PUBLIC_ALIAS(strfroml, libc_strfroml);
 DEFINE_PUBLIC_ALIAS(rand_r, libc_rand_r);
+DEFINE_PUBLIC_ALIAS(getloadavg, libc_getloadavg);
 DEFINE_PUBLIC_ALIAS(drand48_r, libc_drand48_r);
 DEFINE_PUBLIC_ALIAS(erand48_r, libc_erand48_r);
 DEFINE_PUBLIC_ALIAS(lrand48_r, libc_lrand48_r);
@@ -3223,7 +3226,6 @@ DEFINE_PUBLIC_ALIAS(DOS$on_exit, libd_on_exit);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(on_exit, libc_on_exit);
 DEFINE_PUBLIC_ALIAS(clearenv, libc_clearenv);
-DEFINE_PUBLIC_ALIAS(getloadavg, libc_getloadavg);
 DEFINE_PUBLIC_ALIAS(DOS$setenv, libd_setenv);
 DEFINE_PUBLIC_ALIAS(setenv, libc_setenv);
 DEFINE_PUBLIC_ALIAS(DOS$unsetenv, libd_unsetenv);

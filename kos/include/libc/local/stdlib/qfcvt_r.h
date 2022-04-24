@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f411d12 */
+/* HASH CRC-32:0x739cc39c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_qfcvt_r_defined
 #define __local_qfcvt_r_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_dos_fcvt_s_defined) && defined(__CRT_HAVE__fcvt_s)
 #define __local___localdep_dos_fcvt_s_defined

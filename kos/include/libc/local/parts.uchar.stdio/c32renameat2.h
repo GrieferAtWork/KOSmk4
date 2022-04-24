@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9d9b232 */
+/* HASH CRC-32:0xcf6d07c3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,6 +65,9 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #endif /* !__local___localdep_free_defined */
 #ifndef __local___localdep_renameat2_defined
 #define __local___localdep_renameat2_defined
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_renameat2,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),renameat2,(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
 #endif /* !__local___localdep_renameat2_defined */
 __LOCAL_LIBC(c32renameat2) __ATTR_NONNULL((2, 4)) int

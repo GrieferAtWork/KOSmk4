@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f19b4b */
+/* HASH CRC-32:0x1749eb0e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__mbtowc_l_defined
 #define __local__mbtowc_l_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mbtowc_defined
 #define __local___localdep_mbtowc_defined

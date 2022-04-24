@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75b6e7b0 */
+/* HASH CRC-32:0xa43ed7ab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_removeat_defined
 #define __local___localdep_removeat_defined
 #ifdef __CRT_HAVE_removeat
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_removeat,(__fd_t __dirfd, char const *__filename),removeat,(__dirfd,__filename))
 #elif defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat) && (defined(__AT_REMOVEREG) || (defined(__EISDIR) && defined(__ENOTDIR)))
 __NAMESPACE_LOCAL_END

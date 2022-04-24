@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc89cc24 */
+/* HASH CRC-32:0x88f6dc45 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -337,16 +337,19 @@ INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBDCALL libd_strto64_r)(char 
 INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the  end of the number in  `*endptr'.
+ *
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
+ * valid  integer (`U?INTn_(MIN|MAX))'. (though note that `endptr'
+ * (if non-NULL) is still updated in this case!)
+ *
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
  * will not have been modified.
+ *
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
@@ -354,16 +357,19 @@ INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBCCALL libc_strto64_r)(char 
 INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBDCALL libd_strtou32)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the  end of the number in  `*endptr'.
+ *
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
+ * valid  integer (`U?INTn_(MIN|MAX))'. (though note that `endptr'
+ * (if non-NULL) is still updated in this case!)
+ *
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
  * will not have been modified.
+ *
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
@@ -371,16 +377,19 @@ INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBDCALL libd_strtou32)(char 
 INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the  end of the number in  `*endptr'.
+ *
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
+ * valid  integer (`U?INTn_(MIN|MAX))'. (though note that `endptr'
+ * (if non-NULL) is still updated in this case!)
+ *
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
  * will not have been modified.
+ *
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
@@ -388,16 +397,19 @@ INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBCCALL libc_strtou32)(char 
 INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBDCALL libd_strto32)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the  end of the number in  `*endptr'.
+ *
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
+ * valid  integer (`U?INTn_(MIN|MAX))'. (though note that `endptr'
+ * (if non-NULL) is still updated in this case!)
+ *
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
  * will not have been modified.
+ *
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
@@ -405,16 +417,19 @@ INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBDCALL libd_strto32)(char co
 INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBCCALL libc_strto32)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the  end of the number in  `*endptr'.
+ *
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
+ * valid  integer (`U?INTn_(MIN|MAX))'. (though note that `endptr'
+ * (if non-NULL) is still updated in this case!)
+ *
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
  * will not have been modified.
+ *
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
@@ -422,16 +437,19 @@ INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBCCALL libc_strto32)(char co
 INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBDCALL libd_strtou64)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the  end of the number in  `*endptr'.
+ *
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
+ * valid  integer (`U?INTn_(MIN|MAX))'. (though note that `endptr'
+ * (if non-NULL) is still updated in this case!)
+ *
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
  * will not have been modified.
+ *
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
@@ -439,16 +457,19 @@ INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBDCALL libd_strtou64)(char 
 INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the  end of the number in  `*endptr'.
+ *
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
+ * valid  integer (`U?INTn_(MIN|MAX))'. (though note that `endptr'
+ * (if non-NULL) is still updated in this case!)
+ *
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
  * will not have been modified.
+ *
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
@@ -456,16 +477,19 @@ INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBCCALL libc_strtou64)(char 
 INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBDCALL libd_strto64)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the  end of the number in  `*endptr'.
+ *
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
+ * valid  integer (`U?INTn_(MIN|MAX))'. (though note that `endptr'
+ * (if non-NULL) is still updated in this case!)
+ *
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
  * will not have been modified.
+ *
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
@@ -545,6 +569,7 @@ INTDEF WUNUSED NONNULL((3, 4)) char *NOTHROW_NCX(LIBDCALL libd_qfcvt)(__LONGDOUB
 INTDEF WUNUSED NONNULL((3, 4)) char *NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val, int ndigit, int *__restrict decptr, int *__restrict sign);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF int NOTHROW_RPC(LIBDCALL libd_getloadavg)(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_drand48_r)(struct drand48_data *__restrict buffer, double *__restrict result);
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBDCALL libd_erand48_r)(unsigned short xsubi[3], struct drand48_data *__restrict buffer, double *__restrict result);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_lrand48_r)(struct drand48_data *__restrict buffer, long *__restrict result);
@@ -588,7 +613,6 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_rpmatch)(cha
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF int NOTHROW_RPC(LIBDCALL libd_getloadavg)(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
@@ -1374,18 +1398,6 @@ INTDEF ATTR_CONST unsigned int NOTHROW(LIBDCALL libd__rotr)(unsigned int val, in
 INTDEF ATTR_CONST unsigned int NOTHROW(LIBCCALL libc__rotr)(unsigned int val, int shift);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST u64 NOTHROW(LIBDCALL libd__rotl64)(u64 val, int shift);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST u64 NOTHROW(LIBCCALL libc__rotl64)(u64 val, int shift);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST u64 NOTHROW(LIBDCALL libd__rotr64)(u64 val, int shift);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST u64 NOTHROW(LIBCCALL libc__rotr64)(u64 val, int shift);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_CONST unsigned long NOTHROW(LIBDCALL libd__lrotl)(unsigned long val, int shift);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -1396,6 +1408,18 @@ INTDEF ATTR_CONST unsigned long NOTHROW(LIBDCALL libd__lrotr)(unsigned long val,
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_CONST unsigned long NOTHROW(LIBCCALL libc__lrotr)(unsigned long val, int shift);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_CONST u64 NOTHROW(LIBDCALL libd__rotl64)(u64 val, int shift);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_CONST u64 NOTHROW(LIBCCALL libc__rotl64)(u64 val, int shift);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_CONST u64 NOTHROW(LIBDCALL libd__rotr64)(u64 val, int shift);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_CONST u64 NOTHROW(LIBCCALL libc__rotr64)(u64 val, int shift);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__putenv_s)(char const *varname, char const *val);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__putenv_s)(char const *varname, char const *val);
 #endif /* !__KERNEL__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65e20487 */
+/* HASH CRC-32:0xeeb3989f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wctomb_defined
 #define __local___localdep_wctomb_defined
 #ifdef __CRT_HAVE_wctomb
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __WCHAR_TYPE__ __wc),wctomb,(__str,__wc))
 #else /* __CRT_HAVE_wctomb */
 __NAMESPACE_LOCAL_END

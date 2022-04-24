@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe198eb63 */
+/* HASH CRC-32:0x3e4452fc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ecvt_r_defined
 #define __local___localdep_ecvt_r_defined
 #ifdef __CRT_HAVE_ecvt_r
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,__localdep_ecvt_r,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),ecvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
 #else /* __CRT_HAVE_ecvt_r */
 __NAMESPACE_LOCAL_END

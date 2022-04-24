@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3de887ef */
+/* HASH CRC-32:0x3020f76a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_l64a_r_defined
 #define __local___localdep_l64a_r_defined
 #ifdef __CRT_HAVE_l64a_r
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_l64a_r,(long __n, char *__buf, __STDC_INT_AS_SIZE_T __bufsize),l64a_r,(__n,__buf,__bufsize))
 #else /* __CRT_HAVE_l64a_r */
 __NAMESPACE_LOCAL_END

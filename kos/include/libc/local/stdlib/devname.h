@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1f180e4 */
+/* HASH CRC-32:0xfe8bdebb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_devname_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_devname_r
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_devname_r_defined
 #define __local___localdep_devname_r_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86c19abb */
+/* HASH CRC-32:0xdf84bcee */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1826,7 +1826,7 @@ DFUN(".text.crt.dos.FILE.unlocked.read.scanf", libd_vfscanf_unlocked, libc_vfsca
 DFUN(".text.crt.dos.FILE.unlocked.read.scanf", libd_vscanf_unlocked, libc_vscanf_unlocked, TD, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.read.scanf", libd_fmtcheck, libc_fmtcheck, TP, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.read.scanf", libd_fgetln, libc_fgetln, TP, 2, TP, TP)
-DFUN(".text.crt.dos.FILE.locked.access", libd_funopen, libc_funopen, TP, 5, TP, TP, TP, TP, TP)
+DFUN(".text.crt.dos.FILE.locked.utility", libd_funopen, libc_funopen, TP, 5, TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.utility", libd_funopen2, libc_funopen2, TP, 6, TP, TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.utility", libd_funopen64, libc_funopen64, TP, 5, TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.utility", libd_funopen2_64, libc_funopen2_64, TP, 6, TP, TP, TP, TP, TP, TP)
@@ -1956,6 +1956,7 @@ DFUN(".text.crt.dos.unicode.static.convert", libd_qecvt_r, libc_qecvt_r, TD, 6, 
 DFUN(".text.crt.dos.unicode.static.convert", libd_qfcvt_r, libc_qfcvt_r, TD, 6, TFL, TD, TP, TP, TP, TI)
 DFUN(".text.crt.dos.unicode.static.convert", libd_qecvt, libc_qecvt, TP, 4, TFL, TD, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_qfcvt, libc_qfcvt, TP, 4, TFL, TD, TP, TP)
+DFUN(".text.crt.dos.system.utility", libd_getloadavg, libc_getloadavg, TD, 2, TP, TD)
 DFUN(".text.crt.dos.random", libd_drand48_r, libc_drand48_r, TD, 2, TP, TP)
 DFUN(".text.crt.dos.random", libd_erand48_r, libc_erand48_r, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.random", libd_lrand48_r, libc_lrand48_r, TD, 2, TP, TP)
@@ -1971,7 +1972,6 @@ DFUN(".text.crt.dos.random", libd_initstate_r, libc_initstate_r, TD, 4, TD, TP, 
 DFUN(".text.crt.dos.random", libd_setstate_r, libc_setstate_r, TD, 2, TP, TP)
 DFUN(".text.crt.dos.fs.utility", libd_mkstemps, libc_mkstemps, TIn(__SIZEOF_FD_T__), 2, TP, TD)
 DFUN(".text.crt.dos.utility.locale", libd_rpmatch, libc_rpmatch, TD, 1, TP)
-DFUN(".text.crt.dos.system.utility", libd_getloadavg, libc_getloadavg, TD, 2, TP, TD)
 DFUN(".text.crt.dos.unsorted", libd_mkstemps64, libc_mkstemps64, TIn(__SIZEOF_FD_T__), 2, TP, TD)
 DFUN(".text.crt.dos.random", libd_erand48, libc_erand48, TFD, 1, TP)
 DFUN(".text.crt.dos.random", libd_nrand48, libc_nrand48, TL, 1, TP)
@@ -2067,8 +2067,6 @@ DEFINE_INTERN_ALIAS(libd__rotr, libd__rotr64);
 #else /* __SIZEOF_INT__ == 8 */
 DFUN(".text.crt.dos.math.utility", libd__rotr, libc__rotr, TD, 2, TD, TD)
 #endif /* __SIZEOF_INT__ != 8 */
-DFUN(".text.crt.dos.math.utility", libd__rotl64, libc__rotl64, TI64, 2, TI64, TD)
-DFUN(".text.crt.dos.math.utility", libd__rotr64, libc__rotr64, TI64, 2, TI64, TD)
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libd__lrotl, libd__rotl);
 #elif __SIZEOF_LONG__ == 8
@@ -2083,6 +2081,8 @@ DEFINE_INTERN_ALIAS(libd__lrotr, libd__rotr64);
 #else /* ... */
 DFUN(".text.crt.dos.math.utility", libd__lrotr, libc__lrotr, TL, 2, TL, TD)
 #endif /* !... */
+DFUN(".text.crt.dos.math.utility", libd__rotl64, libc__rotl64, TI64, 2, TI64, TD)
+DFUN(".text.crt.dos.math.utility", libd__rotr64, libc__rotr64, TI64, 2, TI64, TD)
 DFUN(".text.crt.dos.fs.utility", libd__searchenv, libc__searchenv, TV, 3, TP, TP, TP)
 DFUN(".text.crt.dos.fs.utility", libd__searchenv_s, libc__searchenv_s, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TP, TI)
 DFUN(".text.crt.dos.fs.utility", libd__makepath, libc__makepath, TV, 5, TP, TP, TP, TP, TP)

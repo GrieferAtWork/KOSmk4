@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bef9cfa */
+/* HASH CRC-32:0xa97c3f58 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,10 @@
 #ifndef __local__wtoi64_l_defined
 #define __local__wtoi64_l_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsto64_l_defined
 #define __local___localdep_wcsto64_l_defined
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_wcstol_l) && __SIZEOF_LONG__ == 8
 __NAMESPACE_LOCAL_END
 #include <features.h>

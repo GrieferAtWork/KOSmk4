@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x475ef540 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,35 +17,62 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__itow_defined
-#define __local__itow_defined
-#include <__crt.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep__itow_s_defined
-#define __local___localdep__itow_s_defined
-#ifdef __CRT_HAVE__itow_s
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itow_s,(int __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_itow_s,(__val,__buf,__buflen,__radix))
-#else /* __CRT_HAVE__itow_s */
-__NAMESPACE_LOCAL_END
-#include <libc/local/corecrt_wstdlib/_itow_s.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep__itow_s __LIBC_LOCAL_NAME(_itow_s)
-#endif /* !__CRT_HAVE__itow_s */
-#endif /* !__local___localdep__itow_s_defined */
-__NAMESPACE_LOCAL_END
+#ifndef _BITS_CRT_RANDOM_DATA_H
+#define _BITS_CRT_RANDOM_DATA_H 1
+
+#include <__stdinc.h>
+
 #include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_itow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itow))(int __val, __WCHAR_TYPE__ *__buf, int __radix) {
-	(__NAMESPACE_LOCAL_SYM __localdep__itow_s)(__val, __buf, (__SIZE_TYPE__)-1, __radix);
-	return __buf;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep__itow_defined
-#define __local___localdep__itow_defined
-#define __localdep__itow __LIBC_LOCAL_NAME(_itow)
-#endif /* !__local___localdep__itow_defined */
-#endif /* !__local__itow_defined */
+
+#ifdef __CC__
+__DECL_BEGIN
+
+struct drand48_data {
+	unsigned short __x[3];
+	unsigned short __old_x[3];
+	unsigned short __c;
+	unsigned short __init;
+	__ULONGLONG    __a;
+};
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("fptr")
+#pragma push_macro("rptr")
+#pragma push_macro("state")
+#pragma push_macro("rand_type")
+#pragma push_macro("rand_deg")
+#pragma push_macro("rand_sep")
+#pragma push_macro("end_ptr")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef fptr
+#undef rptr
+#undef state
+#undef rand_type
+#undef rand_deg
+#undef rand_sep
+#undef end_ptr
+
+struct random_data {
+	__INT32_TYPE__ *fptr;
+	__INT32_TYPE__ *rptr;
+	__INT32_TYPE__ *state;
+	int             rand_type;
+	int             rand_deg;
+	int             rand_sep;
+	__INT32_TYPE__ *end_ptr;
+};
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("end_ptr")
+#pragma pop_macro("rand_sep")
+#pragma pop_macro("rand_deg")
+#pragma pop_macro("rand_type")
+#pragma pop_macro("state")
+#pragma pop_macro("rptr")
+#pragma pop_macro("fptr")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_BITS_CRT_RANDOM_DATA_H */

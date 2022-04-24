@@ -276,6 +276,7 @@ incdir("");
 #include <bits/crt/posix_spawn.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/pthreadtypesizes.h>
+#include <bits/crt/random-data.h>
 #include <bits/crt/resolv.h>
 #include <bits/crt/semaphore.h>
 #include <bits/crt/setjmp.h>

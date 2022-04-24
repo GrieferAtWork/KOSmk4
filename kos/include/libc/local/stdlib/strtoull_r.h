@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3eeeb182 */
+/* HASH CRC-32:0x3c00aea9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,11 @@
 #define __local_strtoull_r_defined
 #include <__crt.h>
 #include <features.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtou32_r_defined
 #define __local___localdep_strtou32_r_defined
 #ifdef __CRT_HAVE_strtou32_r
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou32_r,(__nptr,__endptr,__base,__error))
 #else /* __CRT_HAVE_strtou32_r */
 __NAMESPACE_LOCAL_END
@@ -40,9 +38,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtou64_r_defined
 #define __local___localdep_strtou64_r_defined
 #ifdef __CRT_HAVE_strtou64_r
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou64_r,(__nptr,__endptr,__base,__error))
 #else /* __CRT_HAVE_strtou64_r */
 __NAMESPACE_LOCAL_END

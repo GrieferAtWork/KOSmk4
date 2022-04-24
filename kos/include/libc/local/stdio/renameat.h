@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x705dd1a3 */
+/* HASH CRC-32:0x4cb52552 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_renameat_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_renameat2
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_renameat2_defined
 #define __local___localdep_renameat2_defined

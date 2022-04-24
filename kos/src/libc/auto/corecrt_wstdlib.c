@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5ce0e6c */
+/* HASH CRC-32:0xf7b44e31 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,6 +51,7 @@ NOTHROW_NCX(LIBKCALL libc__wtof_l)(char32_t const *nptr,
                                    locale_t locale) {
 	return libc_wcstod_l(nptr, NULL, locale);
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__itow)(int val,
                                  char16_t *buf,
@@ -58,6 +59,7 @@ NOTHROW_NCX(LIBDCALL libd__itow)(int val,
 	libd__itow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc__itow)(int val,
                                  char32_t *buf,
@@ -65,6 +67,7 @@ NOTHROW_NCX(LIBKCALL libc__itow)(int val,
 	libc__itow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__ltow)(long val,
                                  char16_t *buf,
@@ -72,6 +75,7 @@ NOTHROW_NCX(LIBDCALL libd__ltow)(long val,
 	libd__ltow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc__ltow)(long val,
                                  char32_t *buf,
@@ -79,6 +83,7 @@ NOTHROW_NCX(LIBKCALL libc__ltow)(long val,
 	libc__ltow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__ultow)(unsigned long val,
                                   char16_t *buf,
@@ -86,6 +91,7 @@ NOTHROW_NCX(LIBDCALL libd__ultow)(unsigned long val,
 	libd__ultow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc__ultow)(unsigned long val,
                                   char32_t *buf,
@@ -93,6 +99,7 @@ NOTHROW_NCX(LIBKCALL libc__ultow)(unsigned long val,
 	libc__ultow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__i64tow)(s64 val,
                                    char16_t *buf,
@@ -100,6 +107,7 @@ NOTHROW_NCX(LIBDCALL libd__i64tow)(s64 val,
 	libd__i64tow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc__i64tow)(s64 val,
                                    char32_t *buf,
@@ -107,6 +115,7 @@ NOTHROW_NCX(LIBKCALL libc__i64tow)(s64 val,
 	libc__i64tow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd__ui64tow)(u64 val,
                                     char16_t *buf,
@@ -114,6 +123,7 @@ NOTHROW_NCX(LIBDCALL libd__ui64tow)(u64 val,
 	libd__ui64tow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc__ui64tow)(u64 val,
                                     char32_t *buf,
@@ -293,6 +303,7 @@ NOTHROW_NCX(LIBKCALL libc__ltow_s)(long val,
 	} while ((temp /= (unsigned int)radix) != 0);
 	return EOK;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
@@ -325,6 +336,7 @@ NOTHROW_NCX(LIBDCALL libd__ultow_s)(unsigned long val,
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
@@ -357,6 +369,7 @@ NOTHROW_NCX(LIBKCALL libc__ultow_s)(unsigned long val,
 	} while ((temp /= (unsigned int)radix) != 0);
 	return EOK;
 }
+#include <bits/types.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
@@ -400,6 +413,7 @@ NOTHROW_NCX(LIBDCALL libd__i64tow_s)(s64 val,
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <bits/types.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
@@ -443,6 +457,7 @@ NOTHROW_NCX(LIBKCALL libc__i64tow_s)(s64 val,
 	} while ((temp /= (unsigned int)radix) != 0);
 	return EOK;
 }
+#include <bits/types.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
@@ -475,6 +490,7 @@ NOTHROW_NCX(LIBDCALL libd__ui64tow_s)(u64 val,
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <bits/types.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") NONNULL((2)) errno_t
@@ -661,6 +677,7 @@ NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf,
 
 	return buf;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wmakepath_s)(char16_t *buf,
@@ -712,6 +729,7 @@ err_buflen:
 #undef path_putn
 #undef path_putc
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBKCALL libc__wmakepath_s)(char32_t *buf,
@@ -763,6 +781,7 @@ err_buflen:
 #undef path_putn
 #undef path_putc
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) void
 NOTHROW_NCX(LIBDCALL libd__wmakepath)(char16_t *__restrict buf,
                                       char16_t const *drive,
@@ -771,6 +790,7 @@ NOTHROW_NCX(LIBDCALL libd__wmakepath)(char16_t *__restrict buf,
                                       char16_t const *ext) {
 	libd__wmakepath_s(buf, (size_t)-1, drive, dir, file, ext);
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) void
 NOTHROW_NCX(LIBKCALL libc__wmakepath)(char32_t *__restrict buf,
                                       char32_t const *drive,
@@ -779,12 +799,14 @@ NOTHROW_NCX(LIBKCALL libc__wmakepath)(char32_t *__restrict buf,
                                       char32_t const *ext) {
 	libc__wmakepath_s(buf, (size_t)-1, drive, dir, file, ext);
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) void
 NOTHROW_RPC(LIBDCALL libd__wsearchenv)(char16_t const *file,
                                        char16_t const *envvar,
                                        char16_t *__restrict resultpath) {
 	libd__wsearchenv_s(file, envvar, resultpath, (size_t)-1);
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) void
 NOTHROW_RPC(LIBKCALL libc__wsearchenv)(char32_t const *file,
                                        char32_t const *envvar,
@@ -815,6 +837,7 @@ NOTHROW_NCX(LIBKCALL libc__wsplitpath)(char32_t const *__restrict abspath,
 	             file, file ? 256 : 0,
 	             ext, ext ? 256 : 0);
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBDCALL libd__wsplitpath_s)(char16_t const *__restrict abspath,
@@ -909,6 +932,7 @@ err_range:
 
 
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBKCALL libc__wsplitpath_s)(char32_t const *__restrict abspath,

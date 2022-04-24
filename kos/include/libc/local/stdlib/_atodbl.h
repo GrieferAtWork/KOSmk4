@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56f29d40 */
+/* HASH CRC-32:0x57c9ea84 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,19 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_strtod_defined
 #ifdef __CRT_HAVE_strtod
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_strtod,(char const *__restrict __nptr, char **__endptr),strtod,(__nptr,__endptr))
-#elif defined(__CRT_HAVE_strtold) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#else /* __CRT_HAVE_strtod */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_strtold) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_strtod,(char const *__restrict __nptr, char **__endptr),strtold,(__nptr,__endptr))
-#else /* ... */
+#else /* __CRT_HAVE_strtold && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtod.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtod __LIBC_LOCAL_NAME(strtod)
-#endif /* !... */
+#endif /* !__CRT_HAVE_strtold || __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
+#endif /* !__CRT_HAVE_strtod */
 #endif /* !__local___localdep_strtod_defined */
 __LOCAL_LIBC(_atodbl) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atodbl))(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5dcbcd9 */
+/* HASH CRC-32:0x31ff5ebb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -149,8 +149,8 @@ INTDEF NONNULL((2)) int (LIBCCALL libc_fputc_unlocked)(int ch, FILE *__restrict 
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir, char const *pfx);
 /* >> fdopen(3)
  * Open a new file stream by inheriting a given file descriptor `fd'
- * Note   that  upon  success  (`return != NULL'),  the  given  `fd'
- * will be `close()'d once `fclose(return)' is called */
+ * Note that upon success (`return != NULL'), the given `fd' will be
+ * `close(2)'d once `fclose(return)' is called. */
 INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd, char const *__restrict modes);
 /* >> fileno(3)
  * Return the underlying file descriptor number used by `stream' */
@@ -162,7 +162,9 @@ INTDEF NONNULL((1)) void NOTHROW_RPC(LIBCCALL libc_flockfile)(FILE *__restrict s
  * Release a previously acquired lock from `stream' */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_funlockfile)(FILE *__restrict stream);
 /* >> ftrylockfile(3)
- * Try to acquire a lock to `stream' */
+ * Try to acquire a lock to `stream'
+ * @return: == 0 : Lock successfully acquired
+ * @return: != 0 : Failed to acquire lock */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ftrylockfile)(FILE *__restrict stream);
 /* >> popen(3)
  * Open and return a new process I/O stream for executing `command'

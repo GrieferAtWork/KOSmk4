@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x141bbb41 */
+/* HASH CRC-32:0xd1576953 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___p__wpgmptr_defined
 #define __local___localdep___p__wpgmptr_defined
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__WCHAR_TYPE__ **,__NOTHROW_NCX,__localdep___p__wpgmptr,(void),__p__wpgmptr,())
 #endif /* !__local___localdep___p__wpgmptr_defined */
 __LOCAL_LIBC(_get_wpgmptr) __errno_t

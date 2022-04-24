@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67572e45 */
+/* HASH CRC-32:0x9a6c1205 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,6 +72,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getsubopt) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep) {
 	unsigned int __i;
@@ -79,6 +82,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optio
 	__SIZE_TYPE__ __option_len;
 	__option  = *__optionp;
 	*__valuep = __NULLPTR;
+
 	/* Find the next option */
 	__nextopt = (__NAMESPACE_LOCAL_SYM __localdep_strchr)(__option, ',');
 	if (__nextopt) {
@@ -91,9 +95,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optio
 	*__optionp = __nextopt;
 	for (__i = 0; __tokens[__i]; ++__i) {
 		__SIZE_TYPE__ __toklen = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__tokens[__i]);
+
 		/* Check if this token is matches the found option */
 		if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__tokens[__i], __option, __toklen * sizeof(char)) != 0)
 			continue;
+
 		/* Deal with a potential option value. */
 		if (__option[__toklen] == '=') {
 			*__valuep = __option + __toklen + 1;
@@ -104,6 +110,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optio
 		}
 		return (int)__i;
 	}
+
 	/* Not found (return the whole `name[=value]' string) */
 	*__valuep = __option;
 	return -1;

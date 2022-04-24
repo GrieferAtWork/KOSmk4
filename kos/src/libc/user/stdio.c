@@ -1857,9 +1857,11 @@ NOTHROW_RPC(LIBCCALL libc_renameat2)(fd_t oldfd,
 }
 /*[[[end:libc_renameat2]]]*/
 
-/*[[[head:libc_ftrylockfile,hash:CRC-32=0x740c6ac5]]]*/
+/*[[[head:libc_ftrylockfile,hash:CRC-32=0x5697366c]]]*/
 /* >> ftrylockfile(3)
- * Try to acquire a lock to `stream' */
+ * Try to acquire a lock to `stream'
+ * @return: == 0 : Lock successfully acquired
+ * @return: != 0 : Failed to acquire lock */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_ftrylockfile)(FILE *__restrict stream)
 /*[[[body:libc_ftrylockfile]]]*/
@@ -3008,11 +3010,11 @@ NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
 /* fdopen(3)                                                            */
 /************************************************************************/
 
-/*[[[head:libc_fdopen,hash:CRC-32=0xd9878f49]]]*/
+/*[[[head:libc_fdopen,hash:CRC-32=0xec73f958]]]*/
 /* >> fdopen(3)
  * Open a new file stream by inheriting a given file descriptor `fd'
- * Note   that  upon  success  (`return != NULL'),  the  given  `fd'
- * will be `close()'d once `fclose(return)' is called */
+ * Note that upon success (`return != NULL'), the given `fd' will be
+ * `close(2)'d once `fclose(return)' is called. */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED NONNULL((2)) FILE *
 NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd,
                                   char const *__restrict modes)

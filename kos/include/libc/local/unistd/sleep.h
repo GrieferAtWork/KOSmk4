@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29e9add0 */
+/* HASH CRC-32:0x8029b53e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,14 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__sleep_defined
 #define __local___localdep__sleep_defined
 #ifdef __CRT_HAVE__sleep
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(,__NOTHROW_RPC,__localdep__sleep,(__UINT32_TYPE__ __milli),_sleep,(__milli))
 #elif defined(__CRT_HAVE___crtSleep)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(,__NOTHROW_RPC,__localdep__sleep,(__UINT32_TYPE__ __milli),__crtSleep,(__milli))
 #elif defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 __NAMESPACE_LOCAL_END

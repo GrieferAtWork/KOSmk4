@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3f5d486 */
+/* HASH CRC-32:0x71f8d9da */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -423,6 +423,7 @@ NOTHROW_RPC(LIBKCALL libc_wfrealpathat)(fd_t dirfd,
 
 	return resolved;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wtoi)(char16_t const *nptr) {
 #if __SIZEOF_INT__ <= 4
@@ -431,6 +432,7 @@ NOTHROW_NCX(LIBDCALL libd_wtoi)(char16_t const *nptr) {
 	return (int)libd_wcsto64(nptr, NULL, 10);
 #endif /* __SIZEOF_INT__ > 4 */
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBKCALL libc_wtoi)(char32_t const *nptr) {
 #if __SIZEOF_INT__ <= 4
@@ -439,6 +441,7 @@ NOTHROW_NCX(LIBKCALL libc_wtoi)(char32_t const *nptr) {
 	return (int)libc_wcsto64(nptr, NULL, 10);
 #endif /* __SIZEOF_INT__ > 4 */
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) long
 NOTHROW_NCX(LIBDCALL libd_wtol)(char16_t const *nptr) {
 #if __SIZEOF_LONG__ <= 4
@@ -450,6 +453,7 @@ NOTHROW_NCX(LIBDCALL libd_wtol)(char16_t const *nptr) {
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_wtol, libc_wtoi);
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) long
 NOTHROW_NCX(LIBKCALL libc_wtol)(char32_t const *nptr) {
 #if __SIZEOF_LONG__ <= 4
@@ -459,6 +463,7 @@ NOTHROW_NCX(LIBKCALL libc_wtol)(char32_t const *nptr) {
 #endif /* __SIZEOF_LONG__ > 4 */
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
+#include <hybrid/typecore.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBDCALL libd_wtoll)(char16_t const *nptr) {
 #if __SIZEOF_LONG_LONG__ <= 4
@@ -472,6 +477,7 @@ DEFINE_INTERN_ALIAS(libc_wtoll, libc_wtoi);
 #elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_wtoll, libc_wtol);
 #else /* ... */
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBKCALL libc_wtoll)(char32_t const *nptr) {
 #if __SIZEOF_LONG_LONG__ <= 4

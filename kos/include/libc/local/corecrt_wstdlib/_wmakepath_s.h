@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdda45f35 */
+/* HASH CRC-32:0xec76f14d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,6 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_wcslen */
 #endif /* !__local___localdep_wcslen_defined */
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wmakepath_s) __ATTR_NONNULL((1)) __errno_t

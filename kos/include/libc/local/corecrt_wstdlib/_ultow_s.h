@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd99fc402 */
+/* HASH CRC-32:0x8cb4225d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local__ultow_s_defined
 #include <__crt.h>
 #include <bits/types.h>
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 __NAMESPACE_LOCAL_BEGIN

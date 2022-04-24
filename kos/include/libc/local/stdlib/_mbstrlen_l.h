@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65b29619 */
+/* HASH CRC-32:0x9a9342ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__mbstrlen_l_defined
 #define __local__mbstrlen_l_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbstrlen_defined
 #define __local___localdep__mbstrlen_defined

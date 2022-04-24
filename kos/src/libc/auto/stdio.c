@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb5d2d6e */
+/* HASH CRC-32:0xea201af4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,9 +107,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") int
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
 /* >> fgets(3)
- * Read up  to  `bufsize - 1'  bytes  of  data  from  `stream',  storing  them  into  `buf'  stopped  when
- * the buffer is  full or a  line-feed was read  (in this case,  the line-feed is  also written to  `buf')
- * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
+ * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when the
+ * buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf').
+ * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' on error. */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) char *
 (LIBCCALL libc_fgets)(char *__restrict buf,
                       __STDC_INT_AS_SIZE_T bufsize,
@@ -2130,7 +2130,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !... */
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ || ((!__CRT_HAVE_funopen2 || __FS_SIZEOF(OFF) != __SIZEOF_OFF32_T__) && (!__CRT_HAVE_funopen2_64 || __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__) && ((!__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE_funopen2_64 && !__CRT_HAVE_funopen2))) */
 /* >> funopen(3), funopen64(3) */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED FILE *
+INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED FILE *
 NOTHROW_NCX(LIBCCALL libc_funopen)(void const *cookie,
                                    int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes),
                                    int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes),
@@ -2565,14 +2565,14 @@ NOTHROW_NCX(LIBCCALL libc_funopen64)(void const *cookie,
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
 NOTHROW_RPC(LIBDCALL libd__fsopen)(char const *filename,
                                    char const *modes,
-                                   int sflag) {
+                                   __STDC_INT_AS_UINT_T sflag) {
 	(void)sflag;
 	return libd_fopen(filename, modes);
 }
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.access") WUNUSED NONNULL((1, 2)) FILE *
 NOTHROW_RPC(LIBCCALL libc__fsopen)(char const *filename,
                                    char const *modes,
-                                   int sflag) {
+                                   __STDC_INT_AS_UINT_T sflag) {
 	(void)sflag;
 	return libc_fopen(filename, modes);
 }

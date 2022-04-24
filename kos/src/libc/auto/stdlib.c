@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc79babe */
+/* HASH CRC-32:0x60a5ad87 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -200,6 +200,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void 
 	                         (void *)compar);
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_labs, libc_abs);
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
@@ -208,6 +209,7 @@ NOTHROW(LIBCCALL libc_labs)(long x) {
 	return x < 0 ? -x : x;
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_llabs, libc_abs);
 #elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
@@ -218,6 +220,7 @@ NOTHROW(LIBCCALL libc_llabs)(__LONGLONG x) {
 	return x < 0 ? -x : x;
 }
 #endif /* !... */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_ldiv, libc_div);
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
@@ -230,6 +233,7 @@ NOTHROW_NCX(LIBCCALL libc_ldiv)(long numer,
 	return result;
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_lldiv, libc_div);
 #elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
@@ -359,6 +363,7 @@ INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
 	libc__Exit(__EXIT_FAILURE);
 }
 #endif /* !LIBC_ARCH_HAVE_ABORT */
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_atoi)(char const *__restrict nptr) {
 #if __SIZEOF_INT__ <= 4
@@ -367,6 +372,7 @@ NOTHROW_NCX(LIBCCALL libc_atoi)(char const *__restrict nptr) {
 	return (int)libc_strto64(nptr, NULL, 10);
 #endif /* __SIZEOF_INT__ > 4 */
 }
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_atol, libc_atoi);
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
@@ -379,6 +385,7 @@ NOTHROW_NCX(LIBCCALL libc_atol)(char const *__restrict nptr) {
 #endif /* __SIZEOF_LONG__ > 4 */
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_atoll, libc_atoi);
 #elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
@@ -398,6 +405,7 @@ DEFINE_INTERN_ALIAS(libc_strtoul, libc_strtou32);
 #elif __SIZEOF_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc_strtoul, libc_strtou64);
 #else /* ... */
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBCCALL libc_strtoul)(char const *__restrict nptr,
                                    char **endptr,
@@ -409,6 +417,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoul)(char const *__restrict nptr,
 #endif /* __SIZEOF_LONG__ > 4 */
 }
 #endif /* !... */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == 4
 DEFINE_INTERN_ALIAS(libc_strtol, libc_strto32);
 #elif __SIZEOF_LONG__ == 8
@@ -425,6 +434,7 @@ NOTHROW_NCX(LIBCCALL libc_strtol)(char const *__restrict nptr,
 #endif /* __SIZEOF_LONG__ > 4 */
 }
 #endif /* !... */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc_strtoull, libc_strtou64);
 #elif __SIZEOF_LONG_LONG__ == 4
@@ -441,6 +451,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoull)(char const *__restrict nptr,
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 #endif /* !... */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc_strtoll, libc_strto64);
 #elif __SIZEOF_LONG_LONG__ == 4
@@ -461,6 +472,7 @@ INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF WUNUSED NONNUL
 NOTHROW_NCX(LIBCCALL libc_atof)(char const *__restrict nptr) {
 	return libc_strtod(nptr, NULL);
 }
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 DEFINE_INTERN_ALIAS(libc_strtod, libc_strtod);
 #else /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
@@ -645,6 +657,7 @@ NOTHROW_NCX(LIBCCALL libc_strtof)(char const *__restrict nptr,
 		*endptr = (char *)text_pointer;
 	return result;
 }
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 DEFINE_INTERN_ALIAS(libc_strtold, libc_strtod);
 #else /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
@@ -1351,16 +1364,19 @@ handle_overflow:
 }
 #include <libc/errno.h>
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the  end of the number in  `*endptr'.
+ *
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
+ * valid  integer (`U?INTn_(MIN|MAX))'. (though note that `endptr'
+ * (if non-NULL) is still updated in this case!)
+ *
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
  * will not have been modified.
+ *
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
@@ -1381,16 +1397,19 @@ NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the  end of the number in  `*endptr'.
+ *
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
+ * valid  integer (`U?INTn_(MIN|MAX))'. (though note that `endptr'
+ * (if non-NULL) is still updated in this case!)
+ *
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
  * will not have been modified.
+ *
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
@@ -1411,16 +1430,19 @@ NOTHROW_NCX(LIBCCALL libc_strto32)(char const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the  end of the number in  `*endptr'.
+ *
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
+ * valid  integer (`U?INTn_(MIN|MAX))'. (though note that `endptr'
+ * (if non-NULL) is still updated in this case!)
+ *
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
  * will not have been modified.
+ *
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
@@ -1441,16 +1463,19 @@ NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
+ * Convert a string (radix=`base') from `nptr' into an integer,
+ * and store a pointer to the  end of the number in  `*endptr'.
+ *
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
+ * valid  integer (`U?INTn_(MIN|MAX))'. (though note that `endptr'
+ * (if non-NULL) is still updated in this case!)
+ *
+ * Upon success, `errno' is left unchanged, and the integer repr
+ * of the parsed number is returned. When no integer was parsed,
+ * then `0' is returned, `*endptr' is set to `nptr', but `errno'
  * will not have been modified.
+ *
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
@@ -1869,6 +1894,7 @@ NOTHROW_NCX(LIBCCALL libc_fcvt)(double val,
 		return NULL;
 	return qcvt_buffer;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.application.options") WUNUSED NONNULL((1, 2, 3)) int
 NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
                                      char *const *__restrict tokens,
@@ -1878,6 +1904,7 @@ NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
 	size_t option_len;
 	option  = *optionp;
 	*valuep = NULL;
+
 	/* Find the next option */
 	nextopt = libc_strchr(option, ',');
 	if (nextopt) {
@@ -1890,9 +1917,11 @@ NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
 	*optionp = nextopt;
 	for (i = 0; tokens[i]; ++i) {
 		size_t toklen = libc_strlen(tokens[i]);
+
 		/* Check if this token is matches the found option */
 		if (libc_memcmp(tokens[i], option, toklen * sizeof(char)) != 0)
 			continue;
+
 		/* Deal with a potential option value. */
 		if (option[toklen] == '=') {
 			*valuep = option + toklen + 1;
@@ -1903,6 +1932,7 @@ NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
 		}
 		return (int)i;
 	}
+
 	/* Not found (return the whole `name[=value]' string) */
 	*valuep = option;
 	return -1;
@@ -1972,6 +2002,7 @@ NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd) {
 		return NULL;
 	return buf;
 }
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == 4
 DEFINE_INTERN_ALIAS(libc_strtol_l, libc_strto32_l);
 #elif __SIZEOF_LONG__ == 8
@@ -1986,6 +2017,7 @@ NOTHROW_NCX(LIBCCALL libc_strtol_l)(char const *__restrict nptr,
 	return libc_strtol(nptr, endptr, base);
 }
 #endif /* !... */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == 4
 DEFINE_INTERN_ALIAS(libc_strtoul_l, libc_strtou32_l);
 #elif __SIZEOF_LONG__ == 8
@@ -2000,6 +2032,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoul_l)(char const *__restrict nptr,
 	return libc_strtoul(nptr, endptr, base);
 }
 #endif /* !... */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc_strtoll_l, libc_strto64_l);
 #elif __SIZEOF_LONG_LONG__ == 4
@@ -2014,6 +2047,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoll_l)(char const *__restrict nptr,
 	return libc_strtoll(nptr, endptr, base);
 }
 #endif /* !... */
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc_strtoull_l, libc_strtou64_l);
 #elif __SIZEOF_LONG_LONG__ == 4
@@ -2042,6 +2076,7 @@ NOTHROW_NCX(LIBCCALL libc_strtof_l)(char const *__restrict nptr,
 	(void)locale;
 	return libc_strtof(nptr, endptr);
 }
+#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 DEFINE_INTERN_ALIAS(libc_strtold_l, libc_strtod_l);
 #else /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
@@ -2079,6 +2114,7 @@ NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname) {
 }
 #include <asm/os/oflags.h>
 #include <asm/crt/stdio.h>
+#include <bits/types.h>
 #include <bits/os/timeval.h>
 #include <bits/os/stat.h>
 /* Internal implementation for creating temporary files.
@@ -2651,6 +2687,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((
 	libc_qsort_r(pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_sTPTP_TDTPTPTP_c0A0A1c1, &libd_qsort_r_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#include <hybrid/typecore.h>
 /* >> qsort_r(3) */
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 (LIBCCALL libc_qsort_r)(void *pbase,
@@ -2890,7 +2927,6 @@ NOTHROW_NCX(LIBKCALL libc__get_wpgmptr)(char32_t **pvalue) {
 	*pvalue = *libc___p__wpgmptr();
 	return EOK;
 }
-#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == 8
 DEFINE_INTERN_ALIAS(libc__abs64, libc_abs);
 #elif __SIZEOF_LONG_LONG__ == 8
@@ -3321,6 +3357,7 @@ DEFINE_INTERN_ALIAS(libc__i64toa_s, libc__ltoa_s);
 #elif __SIZEOF_INT__ == 8
 DEFINE_INTERN_ALIAS(libc__i64toa_s, libc__itoa_s);
 #else /* ... */
+#include <bits/types.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
@@ -3374,6 +3411,7 @@ NOTHROW_NCX(LIBDCALL libd__ui64toa_s)(u64 val,
 #if __SIZEOF_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc__ui64toa_s, libc__ultoa_s);
 #else /* __SIZEOF_LONG__ == 8 */
+#include <bits/types.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
 NOTHROW_NCX(LIBCCALL libc__ui64toa_s)(u64 val,
@@ -3499,6 +3537,7 @@ NOTHROW_NCX(LIBKCALL libc__mbstowcs_l)(char32_t *dst,
 	(void)locale;
 	return libc_mbstowcs(dst, src, dstlen);
 }
+#include <bits/types.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
 NOTHROW_NCX(LIBDCALL libd_mbstowcs_s)(size_t *presult,
                                       char16_t *dst,
@@ -3520,6 +3559,7 @@ NOTHROW_NCX(LIBDCALL libd_mbstowcs_s)(size_t *presult,
 
 	return 0;
 }
+#include <bits/types.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") errno_t
 NOTHROW_NCX(LIBKCALL libc_mbstowcs_s)(size_t *presult,
                                       char32_t *dst,
@@ -3541,6 +3581,7 @@ NOTHROW_NCX(LIBKCALL libc_mbstowcs_s)(size_t *presult,
 
 	return EOK;
 }
+#include <bits/types.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") errno_t
 NOTHROW_NCX(LIBDCALL libd__mbstowcs_s_l)(size_t *presult,
                                          char16_t *dst,
@@ -3563,6 +3604,7 @@ NOTHROW_NCX(LIBDCALL libd__mbstowcs_s_l)(size_t *presult,
 
 	return 0;
 }
+#include <bits/types.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") errno_t
 NOTHROW_NCX(LIBKCALL libc__mbstowcs_s_l)(size_t *presult,
                                          char32_t *dst,
@@ -3883,7 +3925,6 @@ NOTHROW_NCX(LIBCCALL libc__atoldbl_l)(__LONGDOUBLE *__restrict result,
 	*result = libc_strtold_l(nptr, NULL, locale);
 	return 0;
 }
-#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == 8
 DEFINE_INTERN_ALIAS(libc__rotl, libc__rotl64);
 #else /* __SIZEOF_INT__ == 8 */
@@ -3894,7 +3935,6 @@ NOTHROW(LIBCCALL libc__rotl)(unsigned int val,
 	return __hybrid_rol(val, (shift_t)(unsigned int)shift);
 }
 #endif /* __SIZEOF_INT__ != 8 */
-#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == 8
 DEFINE_INTERN_ALIAS(libc__rotr, libc__rotr64);
 #else /* __SIZEOF_INT__ == 8 */
@@ -3905,19 +3945,6 @@ NOTHROW(LIBCCALL libc__rotr)(unsigned int val,
 	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }
 #endif /* __SIZEOF_INT__ != 8 */
-#include <hybrid/__rotate.h>
-INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST u64
-NOTHROW(LIBCCALL libc__rotl64)(u64 val,
-                               int shift) {
-	return __hybrid_rol64(val, (shift_t)(unsigned int)shift);
-}
-#include <hybrid/__rotate.h>
-INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST u64
-NOTHROW(LIBCCALL libc__rotr64)(u64 val,
-                               int shift) {
-	return __hybrid_ror64(val, (shift_t)(unsigned int)shift);
-}
-#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc__lrotl, libc__rotl);
 #elif __SIZEOF_LONG__ == 8
@@ -3930,7 +3957,6 @@ NOTHROW(LIBCCALL libc__lrotl)(unsigned long val,
 	return __hybrid_rol(val, (shift_t)(unsigned int)shift);
 }
 #endif /* !... */
-#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc__lrotr, libc__rotr);
 #elif __SIZEOF_LONG__ == 8
@@ -3943,6 +3969,18 @@ NOTHROW(LIBCCALL libc__lrotr)(unsigned long val,
 	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }
 #endif /* !... */
+#include <hybrid/__rotate.h>
+INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST u64
+NOTHROW(LIBCCALL libc__rotl64)(u64 val,
+                               int shift) {
+	return __hybrid_rol64(val, (shift_t)(unsigned int)shift);
+}
+#include <hybrid/__rotate.h>
+INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST u64
+NOTHROW(LIBCCALL libc__rotr64)(u64 val,
+                               int shift) {
+	return __hybrid_ror64(val, (shift_t)(unsigned int)shift);
+}
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") errno_t
 NOTHROW_NCX(LIBDCALL libd__putenv_s)(char const *varname,
                                      char const *val) {
@@ -4615,10 +4653,10 @@ DEFINE_PUBLIC_ALIAS(_atoldbl, libc__atoldbl);
 DEFINE_PUBLIC_ALIAS(_atoldbl_l, libc__atoldbl_l);
 DEFINE_PUBLIC_ALIAS(_rotl, libc__rotl);
 DEFINE_PUBLIC_ALIAS(_rotr, libc__rotr);
-DEFINE_PUBLIC_ALIAS(_rotl64, libc__rotl64);
-DEFINE_PUBLIC_ALIAS(_rotr64, libc__rotr64);
 DEFINE_PUBLIC_ALIAS(_lrotl, libc__lrotl);
 DEFINE_PUBLIC_ALIAS(_lrotr, libc__lrotr);
+DEFINE_PUBLIC_ALIAS(_rotl64, libc__rotl64);
+DEFINE_PUBLIC_ALIAS(_rotr64, libc__rotr64);
 DEFINE_PUBLIC_ALIAS(DOS$_putenv_s, libd__putenv_s);
 DEFINE_PUBLIC_ALIAS(_putenv_s, libc__putenv_s);
 DEFINE_PUBLIC_ALIAS(_searchenv, libc__searchenv);

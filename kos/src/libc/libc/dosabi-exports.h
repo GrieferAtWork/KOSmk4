@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d9941f2 */
+/* HASH CRC-32:0xe2839335 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2411,6 +2411,7 @@ DEFINE_PUBLIC_ALIAS(DOS$qecvt_r, libd_qecvt_r);
 DEFINE_PUBLIC_ALIAS(DOS$qfcvt_r, libd_qfcvt_r);
 DEFINE_PUBLIC_ALIAS(DOS$qecvt, libd_qecvt);
 DEFINE_PUBLIC_ALIAS(DOS$qfcvt, libd_qfcvt);
+DEFINE_PUBLIC_ALIAS(DOS$getloadavg, libd_getloadavg);
 DEFINE_PUBLIC_ALIAS(DOS$drand48_r, libd_drand48_r);
 DEFINE_PUBLIC_ALIAS(DOS$erand48_r, libd_erand48_r);
 DEFINE_PUBLIC_ALIAS(DOS$lrand48_r, libd_lrand48_r);
@@ -2426,7 +2427,6 @@ DEFINE_PUBLIC_ALIAS(DOS$initstate_r, libd_initstate_r);
 DEFINE_PUBLIC_ALIAS(DOS$setstate_r, libd_setstate_r);
 DEFINE_PUBLIC_ALIAS(DOS$mkstemps, libd_mkstemps);
 DEFINE_PUBLIC_ALIAS(DOS$rpmatch, libd_rpmatch);
-DEFINE_PUBLIC_ALIAS(DOS$getloadavg, libd_getloadavg);
 DEFINE_PUBLIC_ALIAS(DOS$mkstemps64, libd_mkstemps64);
 DEFINE_PUBLIC_ALIAS(DOS$erand48, libd_erand48);
 DEFINE_PUBLIC_ALIAS(DOS$nrand48, libd_nrand48);
@@ -2534,10 +2534,10 @@ DEFINE_PUBLIC_ALIAS(DOS$_atoldbl, libd__atoldbl);
 DEFINE_PUBLIC_ALIAS(DOS$_atoldbl_l, libd__atoldbl_l);
 DEFINE_PUBLIC_ALIAS(DOS$_rotl, libd__rotl);
 DEFINE_PUBLIC_ALIAS(DOS$_rotr, libd__rotr);
-DEFINE_PUBLIC_ALIAS(DOS$_rotl64, libd__rotl64);
-DEFINE_PUBLIC_ALIAS(DOS$_rotr64, libd__rotr64);
 DEFINE_PUBLIC_ALIAS(DOS$_lrotl, libd__lrotl);
 DEFINE_PUBLIC_ALIAS(DOS$_lrotr, libd__lrotr);
+DEFINE_PUBLIC_ALIAS(DOS$_rotl64, libd__rotl64);
+DEFINE_PUBLIC_ALIAS(DOS$_rotr64, libd__rotr64);
 DEFINE_PUBLIC_ALIAS(DOS$_searchenv, libd__searchenv);
 DEFINE_PUBLIC_ALIAS(DOS$_searchenv_s, libd__searchenv_s);
 DEFINE_PUBLIC_ALIAS(DOS$_makepath, libd__makepath);

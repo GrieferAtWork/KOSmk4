@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26b8ae1 */
+/* HASH CRC-32:0xba5b6270 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,9 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep__wsearchenv_s,(__WCHAR_TYPE__ const *__file, __WCHAR_TYPE__ const *__envvar, __WCHAR_TYPE__ *__restrict __resultpath, __SIZE_TYPE__ __buflen),_wsearchenv_s,(__file,__envvar,__resultpath,__buflen))
 #endif /* !__local___localdep__wsearchenv_s_defined */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wsearchenv) __ATTR_NONNULL((1, 2, 3)) void
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_wsearchenv))(__WCHAR_TYPE__ const *__file, __WCHAR_TYPE__ const *__envvar, __WCHAR_TYPE__ *__restrict __resultpath) {
 	(__NAMESPACE_LOCAL_SYM __localdep__wsearchenv_s)(__file, __envvar, __resultpath, (__SIZE_TYPE__)-1);

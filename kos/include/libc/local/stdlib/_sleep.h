@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4a9a899 */
+/* HASH CRC-32:0xdb590b49 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #include <features.h>
 #include <bits/types.h>
 #if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_nanosleep_defined
 #define __local___localdep_nanosleep_defined

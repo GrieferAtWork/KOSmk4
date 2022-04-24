@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cd905ee */
+/* HASH CRC-32:0xa00c8854 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_l64a_r_defined
 #define __local_l64a_r_defined
 #include <__crt.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(l64a_r) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(l64a_r))(long __n, char *__buf, __STDC_INT_AS_SIZE_T __bufsize) {

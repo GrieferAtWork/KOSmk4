@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8175d5 */
+/* HASH CRC-32:0x7ab0c849 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,13 +28,18 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtold,(__nptr,__endptr))
 #elif defined(__CRT_HAVE___strtold)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),__strtold,(__nptr,__endptr))
-#elif defined(__CRT_HAVE_strtod) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtod,(__nptr,__endptr))
 #else /* ... */
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_strtod) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtod,(__nptr,__endptr))
+#else /* __CRT_HAVE_strtod && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtold.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtold __LIBC_LOCAL_NAME(strtold)
+#endif /* !__CRT_HAVE_strtod || __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
 #endif /* !... */
 #endif /* !__local___localdep_strtold_defined */
 __LOCAL_LIBC(strtold_l) __ATTR_NONNULL((1)) __LONGDOUBLE
