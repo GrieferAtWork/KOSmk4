@@ -255,7 +255,8 @@ __INTDEF float __LIBCCALL libc___kernel_standard_f(float __arg1, float __arg2, f
 __INTDEF __LONGDOUBLE __LIBCCALL libc___kernel_standard_l(__LONGDOUBLE __arg1, __LONGDOUBLE __arg2, __LONGDOUBLE __retval, enum __libm_matherr __type);
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #define __LIBM_LIB_VERSION libc___LIBM_GET_LIB_VERSION()
-__INTDEF __LIBM_LIB_VERSION_TYPE libc___LIBM_GET_LIB_VERSION(void);
+__INTDEF __ATTR_CONST __ATTR_WUNUSED __LIBM_LIB_VERSION_TYPE
+__NOTHROW(__LIBCCALL libc___LIBM_GET_LIB_VERSION)(void);
 #else /* __CRT_KOS && __BUILDING_LIBC */
 __LIBM_LOCAL_FUNC(kernel_standard) double
 (__LIBCCALL __kernel_standard)(double __arg1, double __arg2,

@@ -72,6 +72,14 @@ DECLARE_NOREL_GLOBAL_META(_LIB_VERSION_TYPE, _LIB_VERSION);
 DEFINE_NOREL_GLOBAL_META(_LIB_VERSION_TYPE, _LIB_VERSION, ".math.math");
 #define _LIB_VERSION GET_NOREL_GLOBAL(_LIB_VERSION)
 
+INTERN ATTR_CONST WUNUSED ATTR_SECTION(".text.crt.math.math") __LIBM_LIB_VERSION_TYPE
+NOTHROW(LIBCCALL libc___LIBM_GET_LIB_VERSION)(void) {
+	return (__LIBM_LIB_VERSION_TYPE)_LIB_VERSION;
+}
+
+#undef _LIB_VERSION
+#define _LIB_VERSION ((_LIB_VERSION_TYPE)libc___LIBM_GET_LIB_VERSION())
+
 /* Default (no-op) matherr fallback. -- Only used when the  main
  * program doesn't export an override function by the same name. */
 /* IMPORTANT: WEAK, so the main program's override has higher priority! */
@@ -105,18 +113,18 @@ INTERN ATTR_SECTION(".bss.crt.math.math") LPMATHERR libc_pdyn_matherr = NULL;
 PRIVATE ATTR_SECTION(".rodata.crt.math.math") char const name_matherr[] = "matherr";
 PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.math.math")
 LPMATHERR NOTHROW(LIBCCALL libc_get_matherr)(void) {
-	LPMATHERR result = ATOMIC_READ(libc_pdyn_matherr);
-	if (!result) {
+	LPMATHERR result;
+	while ((result = ATOMIC_READ(libc_pdyn_matherr)) == NULL) {
 		/* Lazily load on first access. */
 		*(void **)&result = dlsym(RTLD_DEFAULT, name_matherr);
 		if unlikely(!result)
 			result = &libc_matherr; /* Really shouldn't happen. -- libdl should have found our version... */
-		ATOMIC_WRITE(libc_pdyn_matherr, result);
+		ATOMIC_CMPXCH(libc_pdyn_matherr, NULL, result);
 	}
 	return result;
 }
-PRIVATE WUNUSED NONNULL((1)) ATTR_SECTION(".text.crt.math.math")
-int NOTHROW(LIBCCALL libc_call_matherr)(STRUCT_EXCEPTION *__restrict exc) {
+PRIVATE WUNUSED NONNULL((1)) ATTR_SECTION(".text.crt.math.math") int
+NOTHROW(LIBCCALL libc_call_matherr)(STRUCT_EXCEPTION *__restrict exc) {
 	/* NOTE: If  there ever is a need to  support different ABIs on how `matherr(3)'
 	 *       should be called (regarding the `struct exception' it expects to take),
 	 *       then support for them may be added in here (via `libc_compat()' checks) */
@@ -154,7 +162,7 @@ libc_math_funcname_from_pc(void const *return_pc_in_math_function) {
 
 
 
-/* NOTE: The actual selection on how  math errors should be  handled
+/* NOTE: The actual selection of how  math errors should be  handled
  *       is derived from what is done by "fdlibm". See the following
  *       copyright  notice taken from its file "k_standard.c", which
  *       does all of the error handling stuff. */
@@ -171,10 +179,12 @@ libc_math_funcname_from_pc(void const *return_pc_in_math_function) {
  */
 
 #if 0
-static double const zero = 0.0; /* used as const */
+PRIVATE ATTR_SECTION(".rodata.crt.math.math")
+double const zero = 0.0; /* used as const */
 #else
 /* Work-around for a GCC bug that doesn't delay "0.0/0.0" division until runtime. */
-INTERN_CONST double const __libc_matherr_zero = 0.0; /* used as const */
+INTERN_CONST ATTR_SECTION(".rodata.crt.math.math")
+double const __libc_matherr_zero = 0.0; /* used as const */
 INTDEF double zero ASMNAME("__libc_matherr_zero");
 #endif
 
@@ -1262,14 +1272,6 @@ libc___kernel_standard_l(__LONGDOUBLE arg1, __LONGDOUBLE arg2,
 	return libc_handle_matherr(pc, dx, dy, dretval, type);
 }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
-
-INTERN ATTR_SECTION(".text.crt.math.math")
-__LIBM_LIB_VERSION_TYPE libc___LIBM_GET_LIB_VERSION(void) {
-	/* TODO */
-	__COMPILER_IMPURE();
-	return __LIBM_ISOC;
-}
-
 
 DECL_END
 #endif /* !__NO_FPU */
