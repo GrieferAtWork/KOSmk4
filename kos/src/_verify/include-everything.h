@@ -825,6 +825,7 @@ incdir("");
 #include <libiberty/libiberty.h>
 #include <libiberty/objalloc.h>
 #include <libiberty/partition.h>
+#include <libiberty/sort.h>
 #include <libiberty/timeval-utils.h>
 #include <libiberty.h>
 #include <libiconv/api.h>
@@ -1180,6 +1181,7 @@ incdir("");
 #include <share.h>
 #include <siginfo.h>
 #include <signal.h>
+#include <sort.h>
 #include <spawn.h>
 #include <ssp/chk.h>
 #include <ssp/ssp.h>

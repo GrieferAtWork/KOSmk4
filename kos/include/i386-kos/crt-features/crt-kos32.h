@@ -4649,6 +4649,7 @@
 #define __CRT_HAVE_socketcall
 #define __CRT_HAVE_socketpair
 #define __CRT_HAVE_sopen
+#define __CRT_HAVE_sort_pointers
 #define __CRT_HAVE_spaces
 #define __CRT_HAVE_spawnl
 #define __CRT_HAVE_spawnle

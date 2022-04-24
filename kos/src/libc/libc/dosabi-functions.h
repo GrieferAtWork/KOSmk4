@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fd6ef04 */
+/* HASH CRC-32:0x86c19abb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1621,6 +1621,9 @@ DFUN(".text.crt.dos.sched.signal", libd_signalnumber, libc_signalnumber, TIn(__S
 DFUN(".text.crt.dos.sched.signal", libd_signalnext, libc_signalnext, TIn(__SIZEOF_SIGNO_T__), 1, TIn(__SIZEOF_SIGNO_T__))
 DFUN(".text.crt.dos.solaris", libd_sig2str, libc_sig2str, TD, 2, TIn(__SIZEOF_SIGNO_T__), TP)
 DFUN(".text.crt.dos.solaris", libd_str2sig, libc_str2sig, TD, 2, TP, TP)
+
+/* sort */
+DFUN(".text.crt.dos.libiberty", libd_sort_pointers, libc_sort_pointers, TV, 3, TI, TP, TP)
 
 /* spawn */
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_fspawn_np, libc_posix_fspawn_np, TIn(__SIZEOF_ERRNO_T__), 6, TP, TIn(__SIZEOF_FD_T__), TP, TP, TP, TP)

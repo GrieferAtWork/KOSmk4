@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4f38764 */
+/* HASH CRC-32:0x6bfeb57e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3163,6 +3163,7 @@
 #define __CRT_HAVE_DOS$sopen
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$sort_pointers
 #define __CRT_HAVE_DOS$spaces
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -7455,6 +7456,7 @@
 #define __CRT_HAVE_socket
 #define __CRT_HAVE_socketpair
 #define __CRT_HAVE_sopen
+#define __CRT_HAVE_sort_pointers
 #define __CRT_HAVE_spaces
 #define __CRT_HAVE_spawnl
 #define __CRT_HAVE_spawnle

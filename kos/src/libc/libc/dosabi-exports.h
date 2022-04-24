@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae8fc075 */
+/* HASH CRC-32:0x5d9941f2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1989,6 +1989,9 @@ DEFINE_PUBLIC_ALIAS(DOS$signalnumber, libd_signalnumber);
 DEFINE_PUBLIC_ALIAS(DOS$signalnext, libd_signalnext);
 DEFINE_PUBLIC_ALIAS(DOS$sig2str, libd_sig2str);
 DEFINE_PUBLIC_ALIAS(DOS$str2sig, libd_str2sig);
+
+/* sort */
+DEFINE_PUBLIC_ALIAS(DOS$sort_pointers, libd_sort_pointers);
 
 /* spawn */
 DEFINE_PUBLIC_ALIAS(DOS$posix_fspawn_np, libd_posix_fspawn_np);

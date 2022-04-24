@@ -4495,6 +4495,7 @@
 #define __CRT_HAVE_socketcall
 #define __CRT_HAVE_socketpair
 #define __CRT_HAVE_sopen
+#define __CRT_HAVE_sort_pointers
 #define __CRT_HAVE_spaces
 #define __CRT_HAVE_spawnl
 #define __CRT_HAVE_spawnle
@@ -9949,6 +9950,7 @@
 #define __CRT_HAVE_KOS$socket
 #define __CRT_HAVE_KOS$socketpair
 #define __CRT_HAVE_KOS$sopen
+#define __CRT_HAVE_KOS$sort_pointers
 #define __CRT_HAVE_KOS$spaces
 #define __CRT_HAVE_KOS$spawnl
 #define __CRT_HAVE_KOS$spawnle
@@ -14502,6 +14504,7 @@
 #define __CRT_HAVE_DOS$socket
 #define __CRT_HAVE_DOS$socketpair
 #define __CRT_HAVE_DOS$sopen
+#define __CRT_HAVE_DOS$sort_pointers
 #define __CRT_HAVE_DOS$spaces
 #define __CRT_HAVE_DOS$spawnl
 #define __CRT_HAVE_DOS$spawnle

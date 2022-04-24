@@ -160,7 +160,6 @@
 	- `<libiberty/floatformat.h>`
 	- `<libiberty/hashtab.h>`
 	- `<libiberty/safe-ctype.h>`
-	- `<libiberty/sort.h>`
 	- `<libiberty/splay-tree.h>`
 
 
