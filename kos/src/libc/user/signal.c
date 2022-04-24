@@ -1216,7 +1216,7 @@ NOTHROW_NCX(LIBCCALL libc___libc_allocate_rtsig)(int high)
 		/* You'd think `high != 0' allocated from the top, but it doesn't... */
 		return libc_free_sigrtmin++;
 	}
-	return libc_free_sigrtmax++;
+	return libc_free_sigrtmax--;
 }
 /*[[[end:libc___libc_allocate_rtsig]]]*/
 
