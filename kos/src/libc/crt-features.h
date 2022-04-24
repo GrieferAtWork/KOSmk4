@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53201062 */
+/* HASH CRC-32:0x67aaff73 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2497,6 +2497,10 @@
 #define __CRT_HAVE_DOS$p_section
 #define __CRT_HAVE_DOS$p_time
 #define __CRT_HAVE_DOS$p_type
+#define __CRT_HAVE_DOS$partition_delete
+#define __CRT_HAVE_DOS$partition_new
+#define __CRT_HAVE_DOS$partition_print
+#define __CRT_HAVE_DOS$partition_union
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$pathconf
@@ -6671,6 +6675,10 @@
 #define __CRT_HAVE_p_section
 #define __CRT_HAVE_p_time
 #define __CRT_HAVE_p_type
+#define __CRT_HAVE_partition_delete
+#define __CRT_HAVE_partition_new
+#define __CRT_HAVE_partition_print
+#define __CRT_HAVE_partition_union
 #define __CRT_HAVE_pathconf
 #define __CRT_HAVE_pause
 #define __CRT_HAVE_pclose

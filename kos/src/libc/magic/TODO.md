@@ -160,7 +160,6 @@
 	- `<libiberty/fibheap.h>`
 	- `<libiberty/floatformat.h>`
 	- `<libiberty/hashtab.h>`
-	- `<libiberty/partition.h>`
 	- `<libiberty/safe-ctype.h>`
 	- `<libiberty/sort.h>`
 	- `<libiberty/splay-tree.h>`

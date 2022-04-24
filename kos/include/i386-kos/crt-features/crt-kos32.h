@@ -3922,6 +3922,10 @@
 #define __CRT_HAVE_p_section
 #define __CRT_HAVE_p_time
 #define __CRT_HAVE_p_type
+#define __CRT_HAVE_partition_delete
+#define __CRT_HAVE_partition_new
+#define __CRT_HAVE_partition_print
+#define __CRT_HAVE_partition_union
 #define __CRT_HAVE_pathconf
 #define __CRT_HAVE_pause
 #define __CRT_HAVE_pclose

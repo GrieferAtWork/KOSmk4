@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc947edd */
+/* HASH CRC-32:0xcdc48335 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1260,6 +1260,12 @@ DFUN(".text.crt.dos.heap.obstack", libd__obstack_newchunk, libc__obstack_newchun
 DFUN(".text.crt.dos.heap.obstack", libd_obstack_free, libc_obstack_free, TV, 2, TP, TP)
 DFUN(".text.crt.dos.heap.obstack", libd__obstack_memory_used, libc__obstack_memory_used, TI, 1, TP)
 DFUN(".text.crt.dos.heap.obstack", libd__obstack_allocated_p, libc__obstack_allocated_p, TD, 2, TP, TP)
+
+/* partition */
+DFUN(".text.crt.dos.libiberty", libd_partition_new, libc_partition_new, TP, 1, TD)
+DFUN(".text.crt.dos.libiberty", libd_partition_delete, libc_partition_delete, TV, 1, TP)
+DFUN(".text.crt.dos.libiberty", libd_partition_union, libc_partition_union, TD, 3, TP, TD, TD)
+DFUN(".text.crt.dos.libiberty", libd_partition_print, libc_partition_print, TV, 2, TP, TP)
 
 /* process */
 DFUN(".text.crt.dos.sched.thread", libd__beginthread, libc__beginthread, TP, 3, TP, TI32, TP)

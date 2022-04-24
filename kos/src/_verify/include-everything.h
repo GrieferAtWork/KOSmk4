@@ -271,6 +271,7 @@ incdir("");
 #include <bits/crt/ntptimeval.h>
 #include <bits/crt/objalloc.h>
 #include <bits/crt/obstack.h>
+#include <bits/crt/partition.h>
 #include <bits/crt/posix_spawn.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/pthreadtypesizes.h>
@@ -820,6 +821,7 @@ incdir("");
 #include <libiberty/ansidecl.h>
 #include <libiberty/libiberty.h>
 #include <libiberty/objalloc.h>
+#include <libiberty/partition.h>
 #include <libiberty/timeval-utils.h>
 #include <libiberty.h>
 #include <libiconv/api.h>
@@ -1118,6 +1120,7 @@ incdir("");
 #include <optimized/string.h>
 #include <optimized/unistd.h>
 #include <osfcn.h>
+#include <partition.h>
 #include <parts/assert-failed.h>
 #include <parts/assert.h>
 #include <parts/malloca.h>

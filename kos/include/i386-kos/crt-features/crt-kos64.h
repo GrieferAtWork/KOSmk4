@@ -3768,6 +3768,10 @@
 #define __CRT_HAVE_p_section
 #define __CRT_HAVE_p_time
 #define __CRT_HAVE_p_type
+#define __CRT_HAVE_partition_delete
+#define __CRT_HAVE_partition_new
+#define __CRT_HAVE_partition_print
+#define __CRT_HAVE_partition_union
 #define __CRT_HAVE_pathconf
 #define __CRT_HAVE_pause
 #define __CRT_HAVE_pclose
@@ -9320,6 +9324,10 @@
 #define __CRT_HAVE_KOS$p_section
 #define __CRT_HAVE_KOS$p_time
 #define __CRT_HAVE_KOS$p_type
+#define __CRT_HAVE_KOS$partition_delete
+#define __CRT_HAVE_KOS$partition_new
+#define __CRT_HAVE_KOS$partition_print
+#define __CRT_HAVE_KOS$partition_union
 #define __CRT_HAVE_KOS$pathconf
 #define __CRT_HAVE_KOS$pclose
 #define __CRT_HAVE_KOS$perror
@@ -13851,6 +13859,10 @@
 #define __CRT_HAVE_DOS$p_section
 #define __CRT_HAVE_DOS$p_time
 #define __CRT_HAVE_DOS$p_type
+#define __CRT_HAVE_DOS$partition_delete
+#define __CRT_HAVE_DOS$partition_new
+#define __CRT_HAVE_DOS$partition_print
+#define __CRT_HAVE_DOS$partition_union
 #define __CRT_HAVE_DOS$pathconf
 #define __CRT_HAVE_DOS$pclose
 #define __CRT_HAVE_DOS$perror

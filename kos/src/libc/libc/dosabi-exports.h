@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88bb8764 */
+/* HASH CRC-32:0x72de4f2c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1526,6 +1526,12 @@ DEFINE_PUBLIC_ALIAS(DOS$_obstack_free, libd_obstack_free);
 DEFINE_PUBLIC_ALIAS(DOS$obstack_free, libd_obstack_free);
 DEFINE_PUBLIC_ALIAS(DOS$_obstack_memory_used, libd__obstack_memory_used);
 DEFINE_PUBLIC_ALIAS(DOS$_obstack_allocated_p, libd__obstack_allocated_p);
+
+/* partition */
+DEFINE_PUBLIC_ALIAS(DOS$partition_new, libd_partition_new);
+DEFINE_PUBLIC_ALIAS(DOS$partition_delete, libd_partition_delete);
+DEFINE_PUBLIC_ALIAS(DOS$partition_union, libd_partition_union);
+DEFINE_PUBLIC_ALIAS(DOS$partition_print, libd_partition_print);
 
 /* process */
 DEFINE_PUBLIC_ALIAS(DOS$_beginthread, libd__beginthread);
