@@ -1344,6 +1344,7 @@ incdir("");
 #include <syslog.h>
 #include <system-test/api.h>
 #include <tar.h>
+#include <tchar.h>
 #include <termio.h>
 #include <termios.h>
 #include <tgmath.h>

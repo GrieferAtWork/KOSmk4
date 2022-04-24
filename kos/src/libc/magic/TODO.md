@@ -153,7 +153,6 @@
 - `<sys/va_impl.h>`         (OpenSolaris)
 - `<sys/va_list.h>`         (OpenSolaris)
 - `<sys/varargs.h>`         (OpenSolaris)
-- `<tchar.h>`               (DOS)
 - `<timeconv.h>`            (libbsd)
 - `<thread_db.h>`           (GLibc!)
 - libiberty:
