@@ -35,8 +35,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix reading from a buffered input file"
-DEEMON_VERSION="05b752b6d5ca3c9b9295db4bba39c06ba93469f3"
+#     v -- "Change Sequence.empty and nonempty to properties"
+DEEMON_VERSION="35b8e4799319bb4842b0618a9e82f4477a6a95e4"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
