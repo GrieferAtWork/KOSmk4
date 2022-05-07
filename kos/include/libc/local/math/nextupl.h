@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fd08724 */
+/* HASH CRC-32:0xd908060e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,14 +44,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextupl))(__LONGDOUBLE __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 
 
-	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (__LONGDOUBLE)__ieee754_nextup((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (__LONGDOUBLE)__ieee754_nextupf((__IEEE754_FLOAT_TYPE__)__x);
-#else /* ... */
-	return (__LONGDOUBLE)__ieee854_nextupl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#endif /* !... */
+	return __LIBM_MATHFUNL(nextup, __x);
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)(__NAMESPACE_LOCAL_SYM __localdep_nextup)((double)__x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */

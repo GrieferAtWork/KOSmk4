@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52aec962 */
+/* HASH CRC-32:0x73e9161e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,14 +49,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassifyf))(float __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 
 
-	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
-	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
-	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)__x);
-#else /* ... */
-	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#endif /* !... */
+	return __LIBM_MATHFUNIF(fpclassify, __x);
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (__NAMESPACE_LOCAL_SYM __localdep___fpclassify)((double)__x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */

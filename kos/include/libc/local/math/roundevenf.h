@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f838b61 */
+/* HASH CRC-32:0x68665d69 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,14 +44,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(roundevenf))(float __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 
 
-	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
-	return (float)__ieee754_roundeven((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
-	return (float)__ieee754_roundevenf((__IEEE754_FLOAT_TYPE__)__x);
-#else /* ... */
-	return (float)__ieee854_roundevenl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#endif /* !... */
+	return __LIBM_MATHFUNF(roundeven, __x);
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)(__NAMESPACE_LOCAL_SYM __localdep_roundeven)((double)__x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */

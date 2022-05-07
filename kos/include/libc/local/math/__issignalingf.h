@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1005492 */
+/* HASH CRC-32:0xd062eecd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,14 +47,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__issignalingf))(float __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 
 
-	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
-	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
-	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)__x);
-#else /* ... */
-	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#endif /* !... */
+	return __LIBM_MATHFUNIF(issignaling, __x);
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (__NAMESPACE_LOCAL_SYM __localdep___issignaling)((double)__x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */

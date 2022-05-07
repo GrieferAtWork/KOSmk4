@@ -608,6 +608,7 @@
 #define __CRT_HAVE___isascii
 #define __CRT_HAVE___isatty
 #define __CRT_HAVE___isblank_l
+#define __CRT_HAVE___iscanonicall
 #define __CRT_HAVE___iscntrl_l
 #define __CRT_HAVE___iscsym
 #define __CRT_HAVE___iscsymf

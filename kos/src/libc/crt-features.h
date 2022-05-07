@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde3b831e */
+/* HASH CRC-32:0x587d8368 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,6 +82,7 @@
 #define __CRT_HAVE_DOS$__fsetlocking
 #define __CRT_HAVE_DOS$__fwritable
 #define __CRT_HAVE_DOS$__fwriting
+#define __CRT_HAVE_DOS$__iscanonicall
 #define __CRT_HAVE_DOS$__iscsym
 #define __CRT_HAVE_DOS$__iscsymf
 #define __CRT_HAVE_DOS$__issignaling
@@ -4217,6 +4218,7 @@
 #define __CRT_HAVE___gxx_personality_v0
 #ifndef __KERNEL__
 #define __CRT_HAVE___h_errno_location
+#define __CRT_HAVE___iscanonicall
 #define __CRT_HAVE___iscsym
 #define __CRT_HAVE___iscsymf
 #define __CRT_HAVE___issignaling

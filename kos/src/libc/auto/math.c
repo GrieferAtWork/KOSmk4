@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25ca9393 */
+/* HASH CRC-32:0x807b73f4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3935,13 +3935,7 @@ NOTHROW(LIBDCALL libd___fpclassify)(double x) { return fptype_kos2dos(libc___fpc
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___fpclassify)(double x) {
-
-	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)x);
-
-
-
-
-
+	return __LIBM_MATHFUNI(fpclassify, x);
 }
 #include <libm/signbit.h>
 /* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
@@ -3967,13 +3961,7 @@ NOTHROW(LIBCCALL libc___fpclassifyf)(float x) {
 
 
 
-	
-
-
-	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)x);
-
-
-
+	return __LIBM_MATHFUNIF(fpclassify, x);
 
 
 
@@ -4002,13 +3990,7 @@ NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x) {
 
 
 
-	
-
-
-
-
-	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-
+	return __LIBM_MATHFUNIL(fpclassify, x);
 
 
 
@@ -4031,13 +4013,7 @@ NOTHROW(LIBCCALL libc___signbitl)(__LONGDOUBLE x) {
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___issignaling)(double x) {
-
-	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)x);
-
-
-
-
-
+	return __LIBM_MATHFUNI(issignaling, x);
 }
 #include <libm/issignaling.h>
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
@@ -4046,15 +4022,19 @@ NOTHROW(LIBCCALL libc___issignalingf)(float x) {
 
 
 
-	
-
-
-	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)x);
+	return __LIBM_MATHFUNIF(issignaling, x);
 
 
 
+}
+#include <libm/iscanonical.h>
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
+NOTHROW(LIBCCALL libc___iscanonicall)(__LONGDOUBLE x) {
 
 
+
+	(void)x;
+	return 1;
 
 }
 #include <libm/issignaling.h>
@@ -4064,13 +4044,7 @@ NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x) {
 
 
 
-	
-
-
-
-
-	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-
+	return __LIBM_MATHFUNIL(issignaling, x);
 
 
 
@@ -4084,13 +4058,7 @@ NOTHROW(LIBCCALL libc_nextdown)(double x) {
 /* >> nextupf(3), nextup(3), nextupl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_nextup)(double x) {
-
-	return (double)__ieee754_nextup((__IEEE754_DOUBLE_TYPE__)x);
-
-
-
-
-
+	return __LIBM_MATHFUN(nextup, x);
 }
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
@@ -4108,13 +4076,7 @@ NOTHROW(LIBCCALL libc_nextupf)(float x) {
 
 
 
-	
-
-
-	return (float)__ieee754_nextupf((__IEEE754_FLOAT_TYPE__)x);
-
-
-
+	return __LIBM_MATHFUNF(nextup, x);
 
 
 
@@ -4135,13 +4097,7 @@ NOTHROW(LIBCCALL libc_nextupl)(__LONGDOUBLE x) {
 
 
 
-	
-
-
-
-
-	return (__LONGDOUBLE)__ieee854_nextupl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-
+	return __LIBM_MATHFUNL(nextup, x);
 
 
 
@@ -4158,13 +4114,7 @@ NOTHROW(LIBCCALL libc_llogb)(double x) {
 #include <libm/roundeven.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_roundeven)(double x) {
-
-	return (double)__ieee754_roundeven((__IEEE754_DOUBLE_TYPE__)x);
-
-
-
-
-
+	return __LIBM_MATHFUN(roundeven, x);
 }
 #include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
@@ -4185,13 +4135,7 @@ NOTHROW(LIBCCALL libc_roundevenf)(float x) {
 
 
 
-	
-
-
-	return (float)__ieee754_roundevenf((__IEEE754_FLOAT_TYPE__)x);
-
-
-
+	return __LIBM_MATHFUNF(roundeven, x);
 
 
 
@@ -4254,13 +4198,7 @@ NOTHROW(LIBCCALL libc_roundevenl)(__LONGDOUBLE x) {
 
 
 
-	
-
-
-
-
-	return (__LONGDOUBLE)__ieee854_roundevenl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-
+	return __LIBM_MATHFUNL(roundeven, x);
 
 
 
@@ -4978,6 +4916,7 @@ DEFINE_PUBLIC_ALIAS(issignaling, libc___issignaling);
 DEFINE_PUBLIC_ALIAS(__issignaling, libc___issignaling);
 DEFINE_PUBLIC_ALIAS(issignalingf, libc___issignalingf);
 DEFINE_PUBLIC_ALIAS(__issignalingf, libc___issignalingf);
+DEFINE_PUBLIC_ALIAS(__iscanonicall, libc___iscanonicall);
 DEFINE_PUBLIC_ALIAS(issignalingl, libc___issignalingl);
 DEFINE_PUBLIC_ALIAS(__issignalingl, libc___issignalingl);
 DEFINE_PUBLIC_ALIAS(nextdown, libc_nextdown);

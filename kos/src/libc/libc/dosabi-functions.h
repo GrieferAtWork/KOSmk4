@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe67aa789 */
+/* HASH CRC-32:0x82e0e483 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -908,6 +908,7 @@ DFUN(".text.crt.dos.math.math", libd___signbitf, libc___signbitf, TD, 1, TF)
 DFUN(".text.crt.dos.math.math", libd___signbitl, libc___signbitl, TD, 1, TFL)
 DFUN(".text.crt.dos.math.math", libd___issignaling, libc___issignaling, TD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd___issignalingf, libc___issignalingf, TD, 1, TF)
+DFUN(".text.crt.dos.math.math", libd___iscanonicall, libc___iscanonicall, TD, 1, TFL)
 DFUN(".text.crt.dos.math.math", libd___issignalingl, libc___issignalingl, TD, 1, TFL)
 DFUN(".text.crt.dos.math.math", libd_nextdown, libc_nextdown, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_nextup, libc_nextup, TFD, 1, TFD)

@@ -2699,13 +2699,7 @@ double scalb(double x, double fn) {
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 [[crt_dos_variant({ impl:{ return fptype_kos2dos(libc___fpclassify(x)); }})]]
 int __fpclassify(double x) {
-@@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
-	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)x);
-@@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
-	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)x);
-@@pp_else@@
-	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-@@pp_endif@@
+	return __LIBM_MATHFUNI(@fpclassify@, x);
 }
 
 
@@ -2744,6 +2738,11 @@ __signbitl(*) %{generate(double2ldouble("__signbit"))}
 
 %
 %#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+%{
+#define __iscanonicalf(x) ((void)(x), 1)
+#define __iscanonical(x)  ((void)(x), 1)
+}
+
 @@>> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3)
 [[const, wunused, nothrow, preferred_export_alias("issignaling")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/issignaling.h>")]]
@@ -2751,19 +2750,23 @@ __signbitl(*) %{generate(double2ldouble("__signbit"))}
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 int __issignaling(double x) {
-@@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
-	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)x);
-@@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
-	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)x);
-@@pp_else@@
-	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-@@pp_endif@@
+	return __LIBM_MATHFUNI(@issignaling@, x);
 }
 
 [[preferred_export_alias("issignalingf")]]
 __issignalingf(*) %{generate(double2float("__issignaling"))}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
+[[const, wunused, nothrow, impl_include("<libm/iscanonical.h>")]]
+int __iscanonicall(__LONGDOUBLE x) {
+@@pp_ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__@@
+	return __ieee854_iscanonicall((__IEEE854_LONG_DOUBLE_TYPE__)x);
+@@pp_else@@
+	(void)x;
+	return 1;
+@@pp_endif@@
+}
+
 [[preferred_export_alias("issignalingl")]]
 __issignalingl(*) %{generate(double2ldouble("__issignaling"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -2783,13 +2786,7 @@ double nextdown(double x) {
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double nextup(double x) {
-@@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
-	return (double)__ieee754_nextup((__IEEE754_DOUBLE_TYPE__)x);
-@@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
-	return (double)__ieee754_nextupf((__IEEE754_FLOAT_TYPE__)x);
-@@pp_else@@
-	return (double)__ieee854_nextupl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-@@pp_endif@@
+	return __LIBM_MATHFUN(@nextup@, x);
 }
 
 nextdownf(*) %{generate(double2float("nextdown"))}
@@ -2812,13 +2809,7 @@ long int llogb(double x) {
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double roundeven(double x) {
-@@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
-	return (double)__ieee754_roundeven((__IEEE754_DOUBLE_TYPE__)x);
-@@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
-	return (double)__ieee754_roundevenf((__IEEE754_FLOAT_TYPE__)x);
-@@pp_else@@
-	return (double)__ieee854_roundevenl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-@@pp_endif@@
+	return __LIBM_MATHFUN(@roundeven@, x);
 }
 
 [[wunused, decl_include("<hybrid/typecore.h>")]]
@@ -3490,6 +3481,10 @@ __NAMESPACE_STD_USING(islessgreater)
 
 
 #if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+#ifndef iscanonical
+#define iscanonical(x) __FPFUNC(x, __iscanonicalf, __iscanonical, __iscanonicall)
+#endif /* !iscanonical */
+
 #ifndef issignaling
 #define issignaling(x) __FPFUNC(x, __issignalingf, __issignaling, __issignalingl)
 #endif /* !issignaling */

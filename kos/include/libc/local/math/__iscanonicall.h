@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87827a2f */
+/* HASH CRC-32:0xa9572f66 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,23 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local___fpclassify_defined
-#define __local___fpclassify_defined
+#ifndef __local___iscanonicall_defined
+#define __local___iscanonicall_defined
 #include <__crt.h>
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#include <libm/fpclassify.h>
+#include <libm/iscanonical.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__fpclassify) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassify))(double __x) {
-	return __LIBM_MATHFUNI(fpclassify, __x);
+__LOCAL_LIBC(__iscanonicall) __ATTR_CONST __ATTR_WUNUSED int
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__iscanonicall))(__LONGDOUBLE __x) {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee854_iscanonicall((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#else /* __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+	(void)__x;
+	return 1;
+#endif /* !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep___fpclassify_defined
-#define __local___localdep___fpclassify_defined
-#define __localdep___fpclassify __LIBC_LOCAL_NAME(__fpclassify)
-#endif /* !__local___localdep___fpclassify_defined */
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#undef __local___fpclassify_defined
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#endif /* !__local___fpclassify_defined */
+#ifndef __local___localdep___iscanonicall_defined
+#define __local___localdep___iscanonicall_defined
+#define __localdep___iscanonicall __LIBC_LOCAL_NAME(__iscanonicall)
+#endif /* !__local___localdep___iscanonicall_defined */
+#endif /* !__local___iscanonicall_defined */

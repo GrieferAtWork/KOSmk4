@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5216026e */
+/* HASH CRC-32:0x365937a9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -13471,6 +13471,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__signbitl, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* __USE_ISOC99 */
 
 #if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+#define __iscanonicalf(x) ((void)(x), 1)
+#define __iscanonical(x)  ((void)(x), 1)
 #ifdef __CRT_HAVE_issignaling
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignaling,(double __x),issignaling,(__x))
@@ -13494,6 +13496,12 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingf,(float __x),
 __NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __issignalingf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__issignalingf))(__x); })
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
+#ifdef __CRT_HAVE___iscanonicall
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__iscanonicall,(__LONGDOUBLE __x),(__x))
+#else /* __CRT_HAVE___iscanonicall */
+#include <libc/local/math/__iscanonicall.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__iscanonicall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __iscanonicall)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__iscanonicall))(__x); })
+#endif /* !__CRT_HAVE___iscanonicall */
 #ifdef __CRT_HAVE_issignalingl
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(__LONGDOUBLE __x),issignalingl,(__x))
@@ -14263,6 +14271,10 @@ __NAMESPACE_STD_USING(islessgreater)
 
 
 #if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+#ifndef iscanonical
+#define iscanonical(x) __FPFUNC(x, __iscanonicalf, __iscanonical, __iscanonicall)
+#endif /* !iscanonical */
+
 #ifndef issignaling
 #define issignaling(x) __FPFUNC(x, __issignalingf, __issignaling, __issignalingl)
 #endif /* !issignaling */

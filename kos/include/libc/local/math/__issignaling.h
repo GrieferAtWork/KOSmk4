@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cf1f48 */
+/* HASH CRC-32:0xab6c900b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__issignaling) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__issignaling))(double __x) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)__x);
-#else /* ... */
-	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#endif /* !... */
+	return __LIBM_MATHFUNI(issignaling, __x);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___issignaling_defined

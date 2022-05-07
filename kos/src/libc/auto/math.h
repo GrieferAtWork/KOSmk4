@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd69c83d2 */
+/* HASH CRC-32:0x6212a23a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2160,6 +2160,12 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___issignalingf)(float x);
 #ifndef __KERNEL__
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___issignalingf)(float x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___iscanonicall)(__LONGDOUBLE x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___iscanonicall)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */

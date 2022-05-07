@@ -605,6 +605,7 @@
 #define __CRT_HAVE___isalpha_l
 #define __CRT_HAVE___isatty
 #define __CRT_HAVE___isblank_l
+#define __CRT_HAVE___iscanonicall
 #define __CRT_HAVE___iscntrl_l
 #define __CRT_HAVE___iscsym
 #define __CRT_HAVE___iscsymf
@@ -6694,6 +6695,7 @@
 #define __CRT_HAVE_KOS$__isalpha_l
 #define __CRT_HAVE_KOS$__isatty
 #define __CRT_HAVE_KOS$__isblank_l
+#define __CRT_HAVE_KOS$__iscanonicall
 #define __CRT_HAVE_KOS$__iscntrl_l
 #define __CRT_HAVE_KOS$__iscsym
 #define __CRT_HAVE_KOS$__iscsymf
@@ -10950,6 +10952,7 @@
 #define __CRT_HAVE_DOS$__isascii
 #define __CRT_HAVE_DOS$__isatty
 #define __CRT_HAVE_DOS$__isblank_l
+#define __CRT_HAVE_DOS$__iscanonicall
 #define __CRT_HAVE_DOS$__iscntrl_l
 #define __CRT_HAVE_DOS$__iscsym
 #define __CRT_HAVE_DOS$__iscsymf
