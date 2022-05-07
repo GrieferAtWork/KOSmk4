@@ -34,8 +34,16 @@ struct mapfile {
 };
 
 /* Returns non-zero if `mmap(2)' was to used to create the mapping of `self',
- * also consequencly meaning that `munmap(2)' will be used by `unmapfile(3)'. */
-#define mapfile_ismmap(self) ((self)->__mf_mapsize != 0)
+ * consequently also meaning that `munmap(2)' will be used by `unmapfile(3)'.
+ *
+ * NOTE: Don't use this information to try and unmap the buffer yourself! That
+ *       should only be done by `unmapfile(3)' itself (e.g. an  implementation
+ *       for windows would not have munmap(2), but would still have other ways
+ *       of creating/deleting file mappings).
+ *       Instead, this macro is only provided as an optimization hint meaning
+ *       that (when being true) that memory pointed-to by `mf_addr' *may* get
+ *       initialized lazily upon first access. */
+#define mapfile_usesmmap(self) ((self)->__mf_mapsize != 0)
 
 
 __DECL_END
