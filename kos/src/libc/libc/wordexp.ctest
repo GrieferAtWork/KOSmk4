@@ -102,7 +102,7 @@ DEFINE_TEST(wordexp) {
 	assert(getenv("TEST") == NULL);
 	assert_wordexp("a ${TEST=42} b", 3, "a", "42", "b");
 	assert(getenv("TEST") != NULL);
-	assertf(strcmp(getenv("TEST"), "42") == 0, "%q", getenv("TEST"));
+	EQstr("42", getenv("TEST"));
 	assert_wordexp("a ${TEST} b", 3, "a", "42", "b");
 	assert_wordexp("a \"${TEST}\" b", 3, "a", "42", "b");
 	assert_wordexp("a\"${TEST}\" b", 2, "a42", "b");
@@ -176,13 +176,13 @@ DEFINE_TEST(wordexp) {
 	assert(getenv("FOO") == NULL);
 	assert_wordexp("$[FOO=42]", 1, "42");
 	assert(getenv("FOO") != NULL);
-	assertf(strcmp(getenv("FOO"), "42") == 0, "%q", getenv("FOO"));
+	EQstr("42", getenv("FOO"));
 	assert_wordexp("$[FOO++]", 1, "42");
 	assert(getenv("FOO") != NULL);
-	assertf(strcmp(getenv("FOO"), "43") == 0, "%q", getenv("FOO"));
+	EQstr("43", getenv("FOO"));
 	assert_wordexp("$[++FOO]", 1, "44");
 	assert(getenv("FOO") != NULL);
-	assertf(strcmp(getenv("FOO"), "44") == 0, "%q", getenv("FOO"));
+	EQstr("44", getenv("FOO"));
 	unsetenv("FOO");
 
 	/* Test bash-style (and 100% bash-compatible) substring expansion. */

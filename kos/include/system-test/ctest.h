@@ -148,7 +148,8 @@ for (local name, op: {
 		("s", "size_t", "PRIuSIZ"),
 		("ss", "ssize_t", "PRIdSIZ"),
 		("p", "void const *", "\"p\""),
-		("up", "uintptr_t", "\"p\""),
+		("up", "uintptr_t", "PRIuPTR"),
+		("dp", "intptr_t", "PRIdPTR"),
 		("x32", "uint32_t", "PRIx32"),
 		("u32", "uint32_t", "PRIu32"),
 		("d32", "int32_t", "PRId32"),
@@ -167,7 +168,8 @@ for (local name, op: {
 #define LOs(a, b) _OPt(a, <, b, size_t, PRIuSIZ, #a, #b)
 #define LOss(a, b) _OPt(a, <, b, ssize_t, PRIdSIZ, #a, #b)
 #define LOp(a, b) _OPt(a, <, b, void const *, "p", #a, #b)
-#define LOup(a, b) _OPt(a, <, b, uintptr_t, "p", #a, #b)
+#define LOup(a, b) _OPt(a, <, b, uintptr_t, PRIuPTR, #a, #b)
+#define LOdp(a, b) _OPt(a, <, b, intptr_t, PRIdPTR, #a, #b)
 #define LOx32(a, b) _OPt(a, <, b, uint32_t, PRIx32, #a, #b)
 #define LOu32(a, b) _OPt(a, <, b, uint32_t, PRIu32, #a, #b)
 #define LOd32(a, b) _OPt(a, <, b, int32_t, PRId32, #a, #b)
@@ -181,7 +183,8 @@ for (local name, op: {
 #define LEs(a, b) _OPt(a, <=, b, size_t, PRIuSIZ, #a, #b)
 #define LEss(a, b) _OPt(a, <=, b, ssize_t, PRIdSIZ, #a, #b)
 #define LEp(a, b) _OPt(a, <=, b, void const *, "p", #a, #b)
-#define LEup(a, b) _OPt(a, <=, b, uintptr_t, "p", #a, #b)
+#define LEup(a, b) _OPt(a, <=, b, uintptr_t, PRIuPTR, #a, #b)
+#define LEdp(a, b) _OPt(a, <=, b, intptr_t, PRIdPTR, #a, #b)
 #define LEx32(a, b) _OPt(a, <=, b, uint32_t, PRIx32, #a, #b)
 #define LEu32(a, b) _OPt(a, <=, b, uint32_t, PRIu32, #a, #b)
 #define LEd32(a, b) _OPt(a, <=, b, int32_t, PRId32, #a, #b)
@@ -195,7 +198,8 @@ for (local name, op: {
 #define EQs(a, b) _OPt(a, ==, b, size_t, PRIuSIZ, #a, #b)
 #define EQss(a, b) _OPt(a, ==, b, ssize_t, PRIdSIZ, #a, #b)
 #define EQp(a, b) _OPt(a, ==, b, void const *, "p", #a, #b)
-#define EQup(a, b) _OPt(a, ==, b, uintptr_t, "p", #a, #b)
+#define EQup(a, b) _OPt(a, ==, b, uintptr_t, PRIuPTR, #a, #b)
+#define EQdp(a, b) _OPt(a, ==, b, intptr_t, PRIdPTR, #a, #b)
 #define EQx32(a, b) _OPt(a, ==, b, uint32_t, PRIx32, #a, #b)
 #define EQu32(a, b) _OPt(a, ==, b, uint32_t, PRIu32, #a, #b)
 #define EQd32(a, b) _OPt(a, ==, b, int32_t, PRId32, #a, #b)
@@ -209,7 +213,8 @@ for (local name, op: {
 #define NEs(a, b) _OPt(a, !=, b, size_t, PRIuSIZ, #a, #b)
 #define NEss(a, b) _OPt(a, !=, b, ssize_t, PRIdSIZ, #a, #b)
 #define NEp(a, b) _OPt(a, !=, b, void const *, "p", #a, #b)
-#define NEup(a, b) _OPt(a, !=, b, uintptr_t, "p", #a, #b)
+#define NEup(a, b) _OPt(a, !=, b, uintptr_t, PRIuPTR, #a, #b)
+#define NEdp(a, b) _OPt(a, !=, b, intptr_t, PRIdPTR, #a, #b)
 #define NEx32(a, b) _OPt(a, !=, b, uint32_t, PRIx32, #a, #b)
 #define NEu32(a, b) _OPt(a, !=, b, uint32_t, PRIu32, #a, #b)
 #define NEd32(a, b) _OPt(a, !=, b, int32_t, PRId32, #a, #b)
@@ -223,7 +228,8 @@ for (local name, op: {
 #define GRs(a, b) _OPt(a, >, b, size_t, PRIuSIZ, #a, #b)
 #define GRss(a, b) _OPt(a, >, b, ssize_t, PRIdSIZ, #a, #b)
 #define GRp(a, b) _OPt(a, >, b, void const *, "p", #a, #b)
-#define GRup(a, b) _OPt(a, >, b, uintptr_t, "p", #a, #b)
+#define GRup(a, b) _OPt(a, >, b, uintptr_t, PRIuPTR, #a, #b)
+#define GRdp(a, b) _OPt(a, >, b, intptr_t, PRIdPTR, #a, #b)
 #define GRx32(a, b) _OPt(a, >, b, uint32_t, PRIx32, #a, #b)
 #define GRu32(a, b) _OPt(a, >, b, uint32_t, PRIu32, #a, #b)
 #define GRd32(a, b) _OPt(a, >, b, int32_t, PRId32, #a, #b)
@@ -237,7 +243,8 @@ for (local name, op: {
 #define GEs(a, b) _OPt(a, >=, b, size_t, PRIuSIZ, #a, #b)
 #define GEss(a, b) _OPt(a, >=, b, ssize_t, PRIdSIZ, #a, #b)
 #define GEp(a, b) _OPt(a, >=, b, void const *, "p", #a, #b)
-#define GEup(a, b) _OPt(a, >=, b, uintptr_t, "p", #a, #b)
+#define GEup(a, b) _OPt(a, >=, b, uintptr_t, PRIuPTR, #a, #b)
+#define GEdp(a, b) _OPt(a, >=, b, intptr_t, PRIdPTR, #a, #b)
 #define GEx32(a, b) _OPt(a, >=, b, uint32_t, PRIx32, #a, #b)
 #define GEu32(a, b) _OPt(a, >=, b, uint32_t, PRIu32, #a, #b)
 #define GEd32(a, b) _OPt(a, >=, b, int32_t, PRId32, #a, #b)
