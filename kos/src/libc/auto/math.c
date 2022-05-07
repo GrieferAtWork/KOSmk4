@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x807b73f4 */
+/* HASH CRC-32:0x583da7d7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4116,6 +4116,26 @@ INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_roundeven)(double x) {
 	return __LIBM_MATHFUN(roundeven, x);
 }
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_canonicalize)(double *cx,
+                                        double const *x) {
+	double value = *x;
+
+
+
+
+	if (libc___issignaling(value)) {
+		*cx = value + value;
+	} else {
+		*cx = value;
+	}
+	return 0;
+}
 #include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_llogbf, libc_ilogbf);
@@ -4174,10 +4194,25 @@ NOTHROW_NCX(LIBCCALL libc_fminmagf)(float x,
                                     float y) {
 	return (float)libc_fminmag((double)x, (double)y);
 }
-INTERN ATTR_SECTION(".text.crt.math.math") int
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_canonicalizef)(float *cx,
                                          float const *x) {
-	return libc_canonicalize((double *)cx, (double const *)x);
+	float value = *x;
+
+
+
+
+	if (libc___issignalingf(value)) {
+		*cx = value + value;
+	} else {
+		*cx = value;
+	}
+	return 0;
 }
 #include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
@@ -4237,10 +4272,25 @@ NOTHROW_NCX(LIBCCALL libc_fminmagl)(__LONGDOUBLE x,
                                     __LONGDOUBLE y) {
 	return (__LONGDOUBLE)libc_fminmag((double)x, (double)y);
 }
-INTERN ATTR_SECTION(".text.crt.math.math") int
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_canonicalizel)(__LONGDOUBLE *cx,
                                          __LONGDOUBLE const *x) {
-	return libc_canonicalize((double *)cx, (double const *)x);
+	__LONGDOUBLE value = *x;
+
+	if (!libc___iscanonicall(value))
+		return 1;
+
+	if (libc___issignalingl(value)) {
+		*cx = value + value;
+	} else {
+		*cx = value;
+	}
+	return 0;
 }
 #include <libm/fcomp.h>
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
@@ -4927,6 +4977,7 @@ DEFINE_PUBLIC_ALIAS(nextdownl, libc_nextdownl);
 DEFINE_PUBLIC_ALIAS(nextupl, libc_nextupl);
 DEFINE_PUBLIC_ALIAS(llogb, libc_llogb);
 DEFINE_PUBLIC_ALIAS(roundeven, libc_roundeven);
+DEFINE_PUBLIC_ALIAS(canonicalize, libc_canonicalize);
 DEFINE_PUBLIC_ALIAS(llogbf, libc_llogbf);
 DEFINE_PUBLIC_ALIAS(roundevenf, libc_roundevenf);
 DEFINE_PUBLIC_ALIAS(fromfpf, libc_fromfpf);

@@ -2828,7 +2828,30 @@ $uintmax_t ufromfpx(double x, int round, unsigned int width); /* TODO */
 
 [[const, wunused]] double fminmag(double x, double y); /* TODO */
 
-int canonicalize(double *cx, double const *x); /* TODO */
+
+%[define(__MAGIC_FLOAT_TYPE_IS_DOUBLE = 1)]
+%[define(__MAGIC_FLOAT_TYPE_IS_FLOAT = 0)]
+%[define(__MAGIC_FLOAT_TYPE_IS_LONG_DOUBLE = 0)]
+
+@@>> canonicalizef(3), canonicalize(3), canonicalizel(3)
+@@@param: x:  Pointer to the value to canonicalize.
+@@@param: cx: Store the canonicalized value of `*x' here.
+@@@return: 0: Success
+@@@return: 1: Error (`!iscanonical(*x)')
+int canonicalize([[nonnull]] double *cx,
+                 [[nonnull]] double const *x) {
+	double value = *x;
+@@pp_if __MAGIC_FLOAT_TYPE_IS_LONG_DOUBLE@@
+	if (!__iscanonicall(value))
+		return 1;
+@@pp_endif@@
+	if (__issignaling(value)) {
+		*cx = value + value;
+	} else {
+		*cx = value;
+	}
+	return 0;
+}
 
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ilogbf")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), crt_intern_alias("ilogbf")]]

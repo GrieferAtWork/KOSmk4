@@ -123,28 +123,14 @@ NOTHROW_NCX(LIBCCALL libc_fminmag)(double x,
 }
 /*[[[end:libc_fminmag]]]*/
 
-/*[[[head:libc_canonicalize,hash:CRC-32=0xce61121e]]]*/
-INTERN ATTR_SECTION(".text.crt.math.math") int
-NOTHROW_NCX(LIBCCALL libc_canonicalize)(double *cx,
-                                        double const *x)
-/*[[[body:libc_canonicalize]]]*/
-/*AUTO*/{
-	(void)cx;
-	(void)x;
-	CRT_UNIMPLEMENTEDF("canonicalize(%p, %p)", cx, x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_canonicalize]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x43204201]]]*/
+/*[[[start:exports,hash:CRC-32=0x64339966]]]*/
 DEFINE_PUBLIC_ALIAS(fromfp, libc_fromfp);
 DEFINE_PUBLIC_ALIAS(ufromfp, libc_ufromfp);
 DEFINE_PUBLIC_ALIAS(fromfpx, libc_fromfpx);
 DEFINE_PUBLIC_ALIAS(ufromfpx, libc_ufromfpx);
 DEFINE_PUBLIC_ALIAS(fmaxmag, libc_fmaxmag);
 DEFINE_PUBLIC_ALIAS(fminmag, libc_fminmag);
-DEFINE_PUBLIC_ALIAS(canonicalize, libc_canonicalize);
 /*[[[end:exports]]]*/
 
 DECL_END

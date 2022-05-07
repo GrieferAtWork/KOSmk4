@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6212a23a */
+/* HASH CRC-32:0x898108b5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2242,7 +2242,22 @@ INTDEF WUNUSED intmax_t NOTHROW_NCX(LIBDCALL libd_fromfpx)(double x, int round, 
 INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBDCALL libd_ufromfpx)(double x, int round, unsigned int width);
 INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_fmaxmag)(double x, double y);
 INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_fminmag)(double x, double y);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_canonicalize)(double *cx, double const *x);
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_canonicalize)(double *cx, double const *x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_canonicalize)(double *cx, double const *x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED long int NOTHROW(LIBDCALL libd_llogbf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -2291,10 +2306,20 @@ INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBDCALL libd_fminmagf)(float x, flo
 INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBCCALL libc_fminmagf)(float x, float y);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF int NOTHROW_NCX(LIBDCALL libd_canonicalizef)(float *cx, float const *x);
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_canonicalizef)(float *cx, float const *x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF int NOTHROW_NCX(LIBCCALL libc_canonicalizef)(float *cx, float const *x);
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_canonicalizef)(float *cx, float const *x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED long int NOTHROW(LIBDCALL libd_llogbl)(__LONGDOUBLE x);
@@ -2345,10 +2370,20 @@ INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_fminmagl)(__LON
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_fminmagl)(__LONGDOUBLE x, __LONGDOUBLE y);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF int NOTHROW_NCX(LIBDCALL libd_canonicalizel)(__LONGDOUBLE *cx, __LONGDOUBLE const *x);
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_canonicalizel)(__LONGDOUBLE *cx, __LONGDOUBLE const *x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF int NOTHROW_NCX(LIBCCALL libc_canonicalizel)(__LONGDOUBLE *cx, __LONGDOUBLE const *x);
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_canonicalizel)(__LONGDOUBLE *cx, __LONGDOUBLE const *x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */

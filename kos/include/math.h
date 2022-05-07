@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x365937a9 */
+/* HASH CRC-32:0xbe0c3b15 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -13587,7 +13587,22 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpx,(double __x,
 __CDECLARE_OPT(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfpx,(double __x, int __round, unsigned int __width),(__x,__round,__width))
 __CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,fmaxmag,(double __x, double __y),(__x,__y))
 __CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,fminmag,(double __x, double __y),(__x,__y))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,canonicalize,(double *__cx, double const *__x),(__cx,__x))
+#ifdef __CRT_HAVE_canonicalize
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,canonicalize,(double *__cx, double const *__x),(__cx,__x))
+#else /* __CRT_HAVE_canonicalize */
+#include <libc/local/math/canonicalize.h>
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(canonicalize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL canonicalize)(double *__cx, double const *__x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(canonicalize))(__cx, __x); })
+#endif /* !__CRT_HAVE_canonicalize */
 #ifdef __CRT_HAVE_llogbf
 __CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,llogbf,(float __x),(__x))
 #elif defined(__CRT_HAVE_ilogbf) && __SIZEOF_INT__ == __SIZEOF_LONG__
@@ -13639,11 +13654,21 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,fminmagf,(float __x, 
 __NAMESPACE_LOCAL_USING_OR_IMPL(fminmagf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL fminmagf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminmagf))(__x, __y); })
 #endif /* ... */
 #ifdef __CRT_HAVE_canonicalizef
-__CDECLARE(,int,__NOTHROW_NCX,canonicalizef,(float *__cx, float const *__x),(__cx,__x))
-#elif defined(__CRT_HAVE_canonicalize)
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,canonicalizef,(float *__cx, float const *__x),(__cx,__x))
+#else /* __CRT_HAVE_canonicalizef */
 #include <libc/local/math/canonicalizef.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(canonicalizef, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL canonicalizef)(float *__cx, float const *__x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(canonicalizef))(__cx, __x); })
-#endif /* ... */
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(canonicalizef, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL canonicalizef)(float *__cx, float const *__x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(canonicalizef))(__cx, __x); })
+#endif /* !__CRT_HAVE_canonicalizef */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE_llogbl
 __CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,llogbl,(__LONGDOUBLE __x),(__x))
@@ -13696,11 +13721,21 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,fminmagl,(__LO
 __NAMESPACE_LOCAL_USING_OR_IMPL(fminmagl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL fminmagl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminmagl))(__x, __y); })
 #endif /* ... */
 #ifdef __CRT_HAVE_canonicalizel
-__CDECLARE(,int,__NOTHROW_NCX,canonicalizel,(__LONGDOUBLE *__cx, __LONGDOUBLE const *__x),(__cx,__x))
-#elif defined(__CRT_HAVE_canonicalize)
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,canonicalizel,(__LONGDOUBLE *__cx, __LONGDOUBLE const *__x),(__cx,__x))
+#else /* __CRT_HAVE_canonicalizel */
 #include <libc/local/math/canonicalizel.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(canonicalizel, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL canonicalizel)(__LONGDOUBLE *__cx, __LONGDOUBLE const *__x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(canonicalizel))(__cx, __x); })
-#endif /* ... */
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(canonicalizel, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL canonicalizel)(__LONGDOUBLE *__cx, __LONGDOUBLE const *__x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(canonicalizel))(__cx, __x); })
+#endif /* !__CRT_HAVE_canonicalizel */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
 

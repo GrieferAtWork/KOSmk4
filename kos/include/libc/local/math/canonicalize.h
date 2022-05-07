@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5d01deb */
+/* HASH CRC-32:0x5a1af77b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_canonicalizef_defined
-#define __local_canonicalizef_defined
+#ifndef __local_canonicalize_defined
+#define __local_canonicalize_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___iscanonicall_defined
@@ -33,34 +33,34 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep___iscanonicall __LIBC_LOCAL_NAME(__iscanonicall)
 #endif /* !__CRT_HAVE___iscanonicall */
 #endif /* !__local___localdep___iscanonicall_defined */
-#ifndef __local___localdep___issignalingf_defined
-#define __local___localdep___issignalingf_defined
-#ifdef __CRT_HAVE_issignalingf
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___issignalingf,(float __x),issignalingf,(__x))
-#elif defined(__CRT_HAVE___issignalingf)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___issignalingf,(float __x),__issignalingf,(__x))
+#ifndef __local___localdep___issignaling_defined
+#define __local___localdep___issignaling_defined
+#ifdef __CRT_HAVE_issignaling
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___issignaling,(double __x),issignaling,(__x))
+#elif defined(__CRT_HAVE___issignaling)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___issignaling,(double __x),__issignaling,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <ieee754.h>
 __NAMESPACE_LOCAL_BEGIN
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_issignaling) || defined(__CRT_HAVE___issignaling) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
-#include <libc/local/math/__issignalingf.h>
+#include <libc/local/math/__issignaling.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep___issignalingf __LIBC_LOCAL_NAME(__issignalingf)
-#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_issignaling || __CRT_HAVE___issignaling || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#undef __local___localdep___issignalingf_defined
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_issignaling && !__CRT_HAVE___issignaling && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#define __localdep___issignaling __LIBC_LOCAL_NAME(__issignaling)
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local___localdep___issignaling_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !... */
-#endif /* !__local___localdep___issignalingf_defined */
-__LOCAL_LIBC(canonicalizef) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(canonicalizef))(float *__cx, float const *__x) {
-	float ___value = *__x;
+#endif /* !__local___localdep___issignaling_defined */
+__LOCAL_LIBC(canonicalize) __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(canonicalize))(double *__cx, double const *__x) {
+	double ___value = *__x;
 
 
 
 
-	if ((__NAMESPACE_LOCAL_SYM __localdep___issignalingf)(___value)) {
+	if ((__NAMESPACE_LOCAL_SYM __localdep___issignaling)(___value)) {
 		*__cx = ___value + ___value;
 	} else {
 		*__cx = ___value;
@@ -68,8 +68,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(canonicalizef))(float *__cx, float co
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_canonicalizef_defined
-#define __local___localdep_canonicalizef_defined
-#define __localdep_canonicalizef __LIBC_LOCAL_NAME(canonicalizef)
-#endif /* !__local___localdep_canonicalizef_defined */
-#endif /* !__local_canonicalizef_defined */
+#ifndef __local___localdep_canonicalize_defined
+#define __local___localdep_canonicalize_defined
+#define __localdep_canonicalize __LIBC_LOCAL_NAME(canonicalize)
+#endif /* !__local___localdep_canonicalize_defined */
+#endif /* !__local_canonicalize_defined */
