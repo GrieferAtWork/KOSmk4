@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad9722b4 */
+/* HASH CRC-32:0x637e5b47 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -125,7 +125,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_mprotect)(void *addr, size_t len, __ST
  *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
  *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
  *  - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
- *                                    after which up to `max_bytes' bytes are read normally.
+ *                                    after which  up  to  `max_bytes'  bytes  are  read  normally.
  * Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
  * @param: fd:        The file that should be loaded into memory
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
@@ -149,7 +149,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_mprotect)(void *addr, size_t len, __ST
  * @return: -1: [errno=EPERM]  `fd' doesn't support read(2), or (when offset != 0), doesn't support lseek(2)
  * @return: -1: [errno=ENOMEM] Out of memory
  * @return: -1: [errno=*]      Read error */
-INTDEF WUNUSED NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(fd_t fd, struct mapfile *__restrict mapping, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
+INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fmapfile(3)
@@ -159,7 +159,7 @@ INTDEF WUNUSED NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(fd_t fd, str
  *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
  *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
  *  - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
- *                                    after which up to `max_bytes' bytes are read normally.
+ *                                    after which  up  to  `max_bytes'  bytes  are  read  normally.
  * Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
  * @param: fd:        The file that should be loaded into memory
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
@@ -183,29 +183,29 @@ INTDEF WUNUSED NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(fd_t fd, str
  * @return: -1: [errno=EPERM]  `fd' doesn't support read(2), or (when offset != 0), doesn't support lseek(2)
  * @return: -1: [errno=ENOMEM] Out of memory
  * @return: -1: [errno=*]      Read error */
-INTDEF WUNUSED NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_fmapfile)(fd_t fd, struct mapfile *__restrict mapping, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
+INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
-INTDEF WUNUSED NONNULL((2, 3)) int NOTHROW_NCX(LIBDCALL libd_fmapfileat)(fd_t dirfd, char const *filename, struct mapfile *__restrict mapping, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes, atflag_t atflags);
+INTDEF WUNUSED NONNULL((1, 3)) int NOTHROW_NCX(LIBDCALL libd_fmapfileat)(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes, atflag_t atflags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
-INTDEF WUNUSED NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_fmapfileat)(fd_t dirfd, char const *filename, struct mapfile *__restrict mapping, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes, atflag_t atflags);
+INTDEF WUNUSED NONNULL((1, 3)) int NOTHROW_NCX(LIBCCALL libc_fmapfileat)(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes, atflag_t atflags);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mapfile(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)' */
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_mapfile)(char const *filename, struct mapfile *__restrict mapping, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
+INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_mapfile)(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> mapfile(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)' */
-INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_mapfile)(char const *filename, struct mapfile *__restrict mapping, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
+INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_mapfile)(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unmapfile(3)

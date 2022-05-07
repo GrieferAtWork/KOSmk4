@@ -33,6 +33,11 @@ struct mapfile {
 	__SIZE_TYPE__ __mf_mapsize; /* Used internally: the mmap'd file size, or `0' if `mf_addr' was malloc'd */
 };
 
+/* Returns non-zero if `mmap(2)' was to used to create the mapping of `self',
+ * also consequencly meaning that `munmap(2)' will be used by `unmapfile(3)'. */
+#define mapfile_ismmap(self) ((self)->__mf_mapsize != 0)
+
+
 __DECL_END
 #endif /* __CC__ */
 

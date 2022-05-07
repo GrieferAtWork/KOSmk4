@@ -1,0 +1,129 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_MAPFILE_CTEST
+#define GUARD_LIBC_LIBC_MAPFILE_CTEST 1
+#define _KOS_SOURCE 1
+#undef NDEBUG
+
+#include <hybrid/compiler.h>
+
+#include <kos/types.h>
+#include <sys/mman.h>
+#include <system-test/ctest.h>
+
+#include <assert.h>
+#include <fcntl.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <wordexp.h>
+
+DECL_BEGIN
+
+static char *readfile(char const *filename) {
+	size_t bufsize = 4096, ok = 0;
+	char *buf = (char *)malloc(bufsize);
+	ssize_t rsize;
+	fd_t fd = open(filename, O_RDONLY);
+	NEp(NULL, buf);
+	LOd(-1, fd);
+	while ((rsize = read(fd, buf + ok, bufsize - ok)) > 0) {
+		ok += (size_t)rsize;
+		if (ok >= bufsize) {
+			bufsize += 4096;
+			buf = (char *)realloc(buf, bufsize);
+			NEp(NULL, buf);
+		}
+	}
+	GEss(rsize, 0);
+	EQd(0, close(fd));
+	buf = (char *)realloc(buf, ok + 1);
+	NEp(NULL, buf);
+	buf[ok] = '\0';
+	return buf;
+}
+
+
+DEFINE_TEST(mapfile) {
+	struct mapfile mf;
+	char *expected;
+	fd_t pipes[2];
+	fd_t file;
+
+	/* Test mapfile() on ramfs files.
+	 * case: [mmap:yes,pread:yes,read:yes] */
+	unlink("/tmp/test-mapfile");
+	file = open("/tmp/test-mapfile", O_CREAT | O_EXCL | O_WRONLY, 0644);
+	LEd(0, file);
+	EQss(7, write(file, "Content", 7));
+	EQd(0, close(file));
+	EQd(0, mapfile(&mf, "/tmp/test-mapfile", 0, (size_t)-1, 1));
+	EQstr("Content", (char *)mf.mf_addr);
+	assert(mapfile_ismmap(&mf)); /* Should have used mmap! */
+	EQs(7, mf.mf_size);
+	EQd(0, unmapfile(&mf));
+	EQd(0, mapfile(&mf, "/tmp/test-mapfile", 1, (size_t)-1, 1));
+	EQstr("ontent", (char *)mf.mf_addr);
+	assert(mapfile_ismmap(&mf)); /* Should have used mmap! */
+	EQs(6, mf.mf_size);
+	EQd(0, unmapfile(&mf));
+	EQd(0, unlink("/tmp/test-mapfile"));
+
+	/* Test mapfile() on special procfs files.
+	 * case: [mmap:no,pread:yes,read:yes] */
+	expected = readfile("/proc/cmdline");
+	EQd(0, mapfile(&mf, "/proc/cmdline", 0, (size_t)-1, 1));
+	EQstr(expected, (char *)mf.mf_addr);
+	assert(!mapfile_ismmap(&mf)); /* Should have used mmap! */
+	EQd(0, unmapfile(&mf));
+	EQd(0, mapfile(&mf, "/proc/cmdline", 1, (size_t)-1, 1));
+	EQstr(expected + 1, (char *)mf.mf_addr);
+	assert(!mapfile_ismmap(&mf)); /* Should have used mmap! */
+	EQd(0, unmapfile(&mf));
+	free(expected);
+
+	/* Test mapfile() on pipes.
+	 * case: [mmap:no,pread:no,read:yes] */
+	EQd(0, pipe(pipes));
+	EQss(7, write(pipes[1], "Content", 7));
+	EQd(0, close(pipes[1]));
+	EQd(0, fmapfile(&mf, pipes[0], 0, (size_t)-1, 1));
+	EQd(0, close(pipes[0]));
+	EQstr("Content", (char *)mf.mf_addr);
+	EQs(7, mf.mf_size);
+	assert(!mapfile_ismmap(&mf)); /* Should have used mmap! */
+	EQd(0, unmapfile(&mf));
+	EQd(0, pipe(pipes));
+	EQss(7, write(pipes[1], "Content", 7));
+	EQd(0, close(pipes[1]));
+	EQd(0, fmapfile(&mf, pipes[0], 1, (size_t)-1, 1));
+	EQd(0, close(pipes[0]));
+	EQstr("ontent", (char *)mf.mf_addr);
+	EQs(6, mf.mf_size);
+	assert(!mapfile_ismmap(&mf)); /* Should have used mmap! */
+	EQd(0, unmapfile(&mf));
+
+}
+
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_MAPFILE_CTEST */

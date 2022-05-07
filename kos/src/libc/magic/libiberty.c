@@ -734,7 +734,7 @@ void expandargv([[nonnull]] int *p_argc, [[nonnull]] char ***p_argv) {
 		/* Map the specified file into memory. - If doing so fails,
 		 * (due to something other than out-of-memory), then we simply
 		 * ignore the @-directive. */
-		if (mapfile(arg, &mf, 0, (size_t)-1, 1) != 0) {
+		if (mapfile(&mf, arg, 0, (size_t)-1, 1) != 0) {
 @@pp_if defined(libc_geterrno) && $has_function(xmalloc_failed)@@
 			if (libc_geterrno() == ENOMEM)
 				xmalloc_failed(1);

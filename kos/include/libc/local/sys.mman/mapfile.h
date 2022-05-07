@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3ebe55c */
+/* HASH CRC-32:0x57195122 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__libc_close,(__fd
 #ifndef __local___localdep_fmapfile_defined
 #define __local___localdep_fmapfile_defined
 #ifdef __CRT_HAVE_fmapfile
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_fmapfile,(__fd_t __fd, struct mapfile *__restrict __mapping, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes),fmapfile,(__fd,__mapping,__offset,__max_bytes,__num_trailing_nulbytes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_fmapfile,(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes),fmapfile,(__mapping,__fd,__offset,__max_bytes,__num_trailing_nulbytes))
 #elif (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.mman/fmapfile.h>
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fmapfileat_defined
 #define __local___localdep_fmapfileat_defined
 #ifdef __CRT_HAVE_fmapfileat
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,__localdep_fmapfileat,(__fd_t __dirfd, char const *__filename, struct mapfile *__restrict __mapping, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes, __atflag_t __atflags),fmapfileat,(__dirfd,__filename,__mapping,__offset,__max_bytes,__num_trailing_nulbytes,__atflags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,__localdep_fmapfileat,(struct mapfile *__restrict __mapping, __fd_t __dirfd, char const *__filename, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes, __atflag_t __atflags),fmapfileat,(__mapping,__dirfd,__filename,__offset,__max_bytes,__num_trailing_nulbytes,__atflags))
 #elif defined(__O_RDONLY) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_fmapfile) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.mman/fmapfileat.h>
@@ -92,14 +92,14 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_open_defined */
 __LOCAL_LIBC(mapfile) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mapfile))(char const *__filename, struct mapfile *__restrict __mapping, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mapfile))(struct mapfile *__restrict __mapping, char const *__filename, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes) {
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_fmapfileat) || (defined(__O_RDONLY) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_fmapfile) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))))
-	return (__NAMESPACE_LOCAL_SYM __localdep_fmapfileat)(__AT_FDCWD, __filename, __mapping, __offset, __max_bytes, __num_trailing_nulbytes, 0);
+	return (__NAMESPACE_LOCAL_SYM __localdep_fmapfileat)(__mapping, __AT_FDCWD, __filename, __offset, __max_bytes, __num_trailing_nulbytes, 0);
 #else /* __AT_FDCWD && (__CRT_HAVE_fmapfileat || (__O_RDONLY && (__CRT_HAVE_openat64 || __CRT_HAVE_openat) && (__CRT_HAVE_fmapfile || ((__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))))) */
 	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__filename, __O_RDONLY);
 	if __unlikely(__fd < 0)
 		return -1;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_fmapfile)(__fd, __mapping, __offset, __max_bytes, __num_trailing_nulbytes);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_fmapfile)(__mapping, __fd, __offset, __max_bytes, __num_trailing_nulbytes);
 #if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close)
 	(__NAMESPACE_LOCAL_SYM __localdep_close)(__fd);
 #endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close */

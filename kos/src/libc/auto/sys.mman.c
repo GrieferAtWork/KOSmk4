@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d736199 */
+/* HASH CRC-32:0xc55fc095 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -166,7 +166,7 @@ badkey:
  *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
  *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
  *  - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
- *                                    after which up to `max_bytes' bytes are read normally.
+ *                                    after which  up  to  `max_bytes'  bytes  are  read  normally.
  * Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
  * @param: fd:        The file that should be loaded into memory
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
@@ -190,9 +190,9 @@ badkey:
  * @return: -1: [errno=EPERM]  `fd' doesn't support read(2), or (when offset != 0), doesn't support lseek(2)
  * @return: -1: [errno=ENOMEM] Out of memory
  * @return: -1: [errno=*]      Read error */
-INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED NONNULL((2)) int
-NOTHROW_NCX(LIBCCALL libc_fmapfile)(fd_t fd,
-                                    struct mapfile *__restrict mapping,
+INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping,
+                                    fd_t fd,
                                     pos64_t offset,
                                     size_t max_bytes,
                                     size_t num_trailing_nulbytes) {
@@ -216,41 +216,41 @@ NOTHROW_NCX(LIBCCALL libc_fmapfile)(fd_t fd,
 		}
 		if (map_bytes > (size_t)(st.st_size - map_offset))
 			map_bytes = (size_t)(st.st_size - map_offset);
-		if (!map_bytes) {
-			/* Empty file -> only need to map `num_trailing_nulbytes' */
-			buf = (byte_t *)libc_calloc(1, num_trailing_nulbytes);
-			if unlikely(!buf)
-				return -1;
-			mapping->mf_addr = (byte_t *)buf;
-			mapping->mf_size = 0;
-			mapping->__mf_mapsize = 0;
-			return 0;
-		}
-		/* Map file into memory. */
-		buf = (byte_t *)libc_mmap64(NULL, map_bytes + num_trailing_nulbytes,
-		                       __PROT_READ | __PROT_WRITE,
-		                       __MAP_PRIVATE, fd, (__PIO_OFFSET64)offset);
-		if (buf != (byte_t *)__MAP_FAILED) {
-			/* Clear out the caller-required trailing NUL bytes.
-			 * We  do this in a kind-of special was that try not
-			 * to write-fault memory if it already contains NULs */
-			byte_t *nul = buf + map_bytes;
-			while (num_trailing_nulbytes) {
-				if (*nul) {
-					libc_bzero(nul, num_trailing_nulbytes);
-					break;
+		if (map_bytes) {
+			/* Map file into memory. */
+			size_t mapsize = map_bytes + num_trailing_nulbytes;
+			buf = (byte_t *)libc_mmap64(NULL, mapsize,
+			                       __PROT_READ | __PROT_WRITE,
+			                       __MAP_PRIVATE, fd, (__PIO_OFFSET64)offset);
+			if (buf != (byte_t *)__MAP_FAILED) {
+				/* Clear out the caller-required trailing NUL bytes.
+				 * We  do this in a kind-of special was that try not
+				 * to write-fault memory if it already contains NULs */
+				byte_t *nul = buf + map_bytes;
+				while (num_trailing_nulbytes) {
+					if (*nul) {
+						libc_bzero(nul, num_trailing_nulbytes);
+						break;
+					}
+					--num_trailing_nulbytes;
+					++nul;
 				}
-				--num_trailing_nulbytes;
-				++nul;
+				mapping->mf_addr = buf;
+				mapping->mf_size = map_bytes;
+				mapping->__mf_mapsize = mapsize;
+				return 0;
 			}
-			mapping->mf_addr = buf;
-			mapping->mf_size = map_bytes;
-			mapping->__mf_mapsize = 0;
-			return 0;
+
+			__libc_seterrno(saved_errno);
+
+		} else {
+			/* Special files from procfs indicate their size as `0',  even
+			 * though they aren't actually empty. - As such, we can't just
+			 * use the normal approach of read(2)-ing the file.
+			 *
+			 * Only if at that point it still indicates being empty, are we
+			 * actually allowed to believe that claim! */
 		}
-
-		__libc_seterrno(saved_errno);
-
 	}
 #endif /* __PROT_READ && __PROT_WRITE && __MAP_PRIVATE */
 
@@ -268,56 +268,56 @@ NOTHROW_NCX(LIBCCALL libc_fmapfile)(fd_t fd,
 	bufused = 0;
 	buffree = bufsize;
 
-	/* Try to use pread(2) */
+	if (offset != 0) {
+		/* Try to use pread(2) */
 
-	for (;;) {
-		ssize_t error;
-		error = libc_pread64(fd, buf + bufused, buffree, offset);
-		if ((size_t)error != buffree) {
-			if (error >= 0) {
-				/* End-of-file! */
-				byte_t *newbuf;
-				bufused += (size_t)error;
-				newbuf = (byte_t *)libc_realloc(buf, bufused + num_trailing_nulbytes);
-				if likely(newbuf)
-					buf = newbuf;
-				libc_bzero(buf + bufused, num_trailing_nulbytes); /* Trailing NUL-bytes */
-				mapping->mf_addr = buf;
-				mapping->mf_size = bufused;
-				mapping->__mf_mapsize = 0;
-				return 0;
+		for (;;) {
+			ssize_t error;
+			error = libc_pread64(fd, buf + bufused, buffree, offset);
+			if ((size_t)error != buffree) {
+				if (error >= 0) {
+					/* End-of-file! */
+					byte_t *newbuf;
+					bufused += (size_t)error;
+					newbuf = (byte_t *)libc_realloc(buf, bufused + num_trailing_nulbytes);
+					if likely(newbuf)
+						buf = newbuf;
+					libc_bzero(buf + bufused, num_trailing_nulbytes); /* Trailing NUL-bytes */
+					mapping->mf_addr = buf;
+					mapping->mf_size = bufused;
+					mapping->__mf_mapsize = 0;
+					return 0;
+				}
+				if (bufused == 0)
+					break; /* File probably doesn't support `pread(2)'... */
+				/* Read error */
+				goto err_buf;
 			}
-			if (bufused == 0)
-				break; /* File probably doesn't support `pread(2)'... */
-			/* Read error */
-			goto err_buf;
-		}
-		offset  += (size_t)error;
-		bufused += (size_t)error;
-		buffree -= (size_t)error;
-		if (buffree < 1024) {
-			byte_t *newbuf;
-			size_t newsize = bufsize * 2;
-			newbuf = (byte_t *)libc_realloc(buf, newsize + num_trailing_nulbytes);
-			if (!newbuf) {
-				newsize = bufsize + 1024;
+			offset  += (size_t)error;
+			bufused += (size_t)error;
+			buffree -= (size_t)error;
+			if (buffree < 1024) {
+				byte_t *newbuf;
+				size_t newsize = bufsize * 2;
 				newbuf = (byte_t *)libc_realloc(buf, newsize + num_trailing_nulbytes);
 				if (!newbuf) {
-					if (!buffree)
-						goto err_buf;
-					newsize = bufsize;
-					newbuf  = buf;
+					newsize = bufsize + 1024;
+					newbuf = (byte_t *)libc_realloc(buf, newsize + num_trailing_nulbytes);
+					if (!newbuf) {
+						if (!buffree)
+							goto err_buf;
+						newsize = bufsize;
+						newbuf  = buf;
+					}
 				}
+				buffree += newsize - bufsize;
+				bufsize = newsize;
+				buf     = newbuf;
 			}
-			buffree += newsize - bufsize;
-			bufsize = newsize;
-			buf     = newbuf;
 		}
-	}
 
 
-	/* For a non-zero offset, try to use lseek() (or read()) */
-	if (offset != 0) {
+		/* For a non-zero offset, try to use lseek() (or read()) */
 #ifdef __SEEK_SET
 		if (libc_lseek64(fd, (off64_t)offset, __SEEK_SET) != -1) {
 			/* Was able to lseek(2) */
@@ -415,10 +415,10 @@ err_buf:
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
-INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED NONNULL((2, 3)) int
-NOTHROW_NCX(LIBCCALL libc_fmapfileat)(fd_t dirfd,
+INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED NONNULL((1, 3)) int
+NOTHROW_NCX(LIBCCALL libc_fmapfileat)(struct mapfile *__restrict mapping,
+                                      fd_t dirfd,
                                       char const *filename,
-                                      struct mapfile *__restrict mapping,
                                       pos64_t offset,
                                       size_t max_bytes,
                                       size_t num_trailing_nulbytes,
@@ -435,7 +435,7 @@ NOTHROW_NCX(LIBCCALL libc_fmapfileat)(fd_t dirfd,
 
 	if (atflags & __AT_EMPTY_PATH) {
 		if (!*filename)
-			return libc_fmapfile(dirfd, mapping, offset, max_bytes, num_trailing_nulbytes);
+			return libc_fmapfile(mapping, dirfd, offset, max_bytes, num_trailing_nulbytes);
 		atflags &= ~__AT_EMPTY_PATH;
 	}
 
@@ -449,7 +449,7 @@ NOTHROW_NCX(LIBCCALL libc_fmapfileat)(fd_t dirfd,
 	fd = libc_openat(dirfd, filename, oflags);
 	if unlikely(fd < 0)
 		return -1;
-	result = libc_fmapfile(fd, mapping, offset, max_bytes, num_trailing_nulbytes);
+	result = libc_fmapfile(mapping, fd, offset, max_bytes, num_trailing_nulbytes);
 
 	libc_close(fd);
 
@@ -458,13 +458,13 @@ NOTHROW_NCX(LIBCCALL libc_fmapfileat)(fd_t dirfd,
 /* >> mapfile(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)' */
 INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED NONNULL((1, 2)) int
-NOTHROW_NCX(LIBCCALL libc_mapfile)(char const *filename,
-                                   struct mapfile *__restrict mapping,
+NOTHROW_NCX(LIBCCALL libc_mapfile)(struct mapfile *__restrict mapping,
+                                   char const *filename,
                                    pos64_t offset,
                                    size_t max_bytes,
                                    size_t num_trailing_nulbytes) {
 
-	return libc_fmapfileat(__AT_FDCWD, filename, mapping, offset, max_bytes, num_trailing_nulbytes, 0);
+	return libc_fmapfileat(mapping, __AT_FDCWD, filename, offset, max_bytes, num_trailing_nulbytes, 0);
 
 
 

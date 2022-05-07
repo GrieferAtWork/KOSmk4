@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1455fce */
+/* HASH CRC-32:0xa520356d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__libc_close,(__fd
 #ifndef __local___localdep_fmapfile_defined
 #define __local___localdep_fmapfile_defined
 #ifdef __CRT_HAVE_fmapfile
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_fmapfile,(__fd_t __fd, struct mapfile *__restrict __mapping, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes),fmapfile,(__fd,__mapping,__offset,__max_bytes,__num_trailing_nulbytes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_fmapfile,(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes),fmapfile,(__mapping,__fd,__offset,__max_bytes,__num_trailing_nulbytes))
 #elif (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.mman/fmapfile.h>
@@ -73,8 +73,8 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/fcntl.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fmapfileat) __ATTR_WUNUSED __ATTR_NONNULL((2, 3)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfileat))(__fd_t __dirfd, char const *__filename, struct mapfile *__restrict __mapping, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes, __atflag_t __atflags) {
+__LOCAL_LIBC(fmapfileat) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfileat))(struct mapfile *__restrict __mapping, __fd_t __dirfd, char const *__filename, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes, __atflag_t __atflags) {
 	__fd_t __fd;
 	int __result;
 	__oflag_t __oflags = __O_RDONLY;
@@ -87,7 +87,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfileat))(__fd_t __dirfd, char con
 #ifdef __AT_EMPTY_PATH
 	if (__atflags & __AT_EMPTY_PATH) {
 		if (!*__filename)
-			return (__NAMESPACE_LOCAL_SYM __localdep_fmapfile)(__dirfd, __mapping, __offset, __max_bytes, __num_trailing_nulbytes);
+			return (__NAMESPACE_LOCAL_SYM __localdep_fmapfile)(__mapping, __dirfd, __offset, __max_bytes, __num_trailing_nulbytes);
 		__atflags &= ~__AT_EMPTY_PATH;
 	}
 #endif /* __AT_EMPTY_PATH */
@@ -101,7 +101,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfileat))(__fd_t __dirfd, char con
 	__fd = (__NAMESPACE_LOCAL_SYM __localdep_openat)(__dirfd, __filename, __oflags);
 	if __unlikely(__fd < 0)
 		return -1;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_fmapfile)(__fd, __mapping, __offset, __max_bytes, __num_trailing_nulbytes);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_fmapfile)(__mapping, __fd, __offset, __max_bytes, __num_trailing_nulbytes);
 #if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close)
 	(__NAMESPACE_LOCAL_SYM __localdep_close)(__fd);
 #endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close || __CRT_HAVE___libc_close */

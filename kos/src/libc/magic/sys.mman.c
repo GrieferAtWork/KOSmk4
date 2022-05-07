@@ -890,7 +890,7 @@ int pkey_mprotect(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 @@ - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
 @@ - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
 @@ - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
-@@                                   after which up to `max_bytes' bytes are read normally.
+@@                                   after which  up  to  `max_bytes'  bytes  are  read  normally.
 @@Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
 @@@param: fd:        The file that should be loaded into memory
 @@@param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
@@ -919,8 +919,8 @@ int pkey_mprotect(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 [[impl_include("<bits/os/stat.h>", "<bits/crt/mapfile.h>")]]
 [[impl_include("<asm/os/mman.h>", "<libc/errno.h>")]]
 [[impl_include("<asm/os/stdio.h>")]]
-int fmapfile($fd_t fd, [[nonnull]] struct mapfile *__restrict mapping,
-             pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes) {
+int fmapfile([[nonnull]] struct mapfile *__restrict mapping, $fd_t fd,
+             $pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes) {
 	byte_t *buf;
 	size_t bufsize;
 	size_t bufused;
@@ -941,41 +941,41 @@ int fmapfile($fd_t fd, [[nonnull]] struct mapfile *__restrict mapping,
 		}
 		if (map_bytes > (size_t)(st.@st_size@ - map_offset))
 			map_bytes = (size_t)(st.@st_size@ - map_offset);
-		if (!map_bytes) {
-			/* Empty file -> only need to map `num_trailing_nulbytes' */
-			buf = (byte_t *)calloc(1, num_trailing_nulbytes);
-			if unlikely(!buf)
-				return -1;
-			mapping->@mf_addr@ = (byte_t *)buf;
-			mapping->@mf_size@ = 0;
-			mapping->@__mf_mapsize@ = 0;
-			return 0;
-		}
-		/* Map file into memory. */
-		buf = (byte_t *)mmap64(NULL, map_bytes + num_trailing_nulbytes,
-		                       __PROT_READ | __PROT_WRITE,
-		                       __MAP_PRIVATE, fd, (__PIO_OFFSET64)offset);
-		if (buf != (byte_t *)__MAP_FAILED) {
-			/* Clear out the caller-required trailing NUL bytes.
-			 * We  do this in a kind-of special was that try not
-			 * to write-fault memory if it already contains NULs */
-			byte_t *nul = buf + map_bytes;
-			while (num_trailing_nulbytes) {
-				if (*nul) {
-					bzero(nul, num_trailing_nulbytes);
-					break;
+		if (map_bytes) {
+			/* Map file into memory. */
+			size_t mapsize = map_bytes + num_trailing_nulbytes;
+			buf = (byte_t *)mmap64(NULL, mapsize,
+			                       __PROT_READ | __PROT_WRITE,
+			                       __MAP_PRIVATE, fd, (__PIO_OFFSET64)offset);
+			if (buf != (byte_t *)__MAP_FAILED) {
+				/* Clear out the caller-required trailing NUL bytes.
+				 * We  do this in a kind-of special was that try not
+				 * to write-fault memory if it already contains NULs */
+				byte_t *nul = buf + map_bytes;
+				while (num_trailing_nulbytes) {
+					if (*nul) {
+						bzero(nul, num_trailing_nulbytes);
+						break;
+					}
+					--num_trailing_nulbytes;
+					++nul;
 				}
-				--num_trailing_nulbytes;
-				++nul;
+				mapping->@mf_addr@ = buf;
+				mapping->@mf_size@ = map_bytes;
+				mapping->@__mf_mapsize@ = mapsize;
+				return 0;
 			}
-			mapping->@mf_addr@ = buf;
-			mapping->@mf_size@ = map_bytes;
-			mapping->@__mf_mapsize@ = 0;
-			return 0;
-		}
 @@pp_if defined(__libc_geterrno) && defined(__libc_seterrno)@@
-		__libc_seterrno(saved_errno);
+			__libc_seterrno(saved_errno);
 @@pp_endif@@
+		} else {
+			/* Special files from procfs indicate their size as `0',  even
+			 * though they aren't actually empty. - As such, we can't just
+			 * use the normal approach of read(2)-ing the file.
+			 *
+			 * Only if at that point it still indicates being empty, are we
+			 * actually allowed to believe that claim! */
+		}
 	}
 @@pp_endif@@
 
@@ -993,56 +993,56 @@ int fmapfile($fd_t fd, [[nonnull]] struct mapfile *__restrict mapping,
 	bufused = 0;
 	buffree = bufsize;
 
-	/* Try to use pread(2) */
+	if (offset != 0) {
+		/* Try to use pread(2) */
 @@pp_if $has_function(pread64)@@
-	for (;;) {
-		ssize_t error;
-		error = pread64(fd, buf + bufused, buffree, offset);
-		if ((size_t)error != buffree) {
-			if (error >= 0) {
-				/* End-of-file! */
-				byte_t *newbuf;
-				bufused += (size_t)error;
-				newbuf = (byte_t *)realloc(buf, bufused + num_trailing_nulbytes);
-				if likely(newbuf)
-					buf = newbuf;
-				bzero(buf + bufused, num_trailing_nulbytes); /* Trailing NUL-bytes */
-				mapping->@mf_addr@ = buf;
-				mapping->@mf_size@ = bufused;
-				mapping->@__mf_mapsize@ = 0;
-				return 0;
+		for (;;) {
+			ssize_t error;
+			error = pread64(fd, buf + bufused, buffree, offset);
+			if ((size_t)error != buffree) {
+				if (error >= 0) {
+					/* End-of-file! */
+					byte_t *newbuf;
+					bufused += (size_t)error;
+					newbuf = (byte_t *)realloc(buf, bufused + num_trailing_nulbytes);
+					if likely(newbuf)
+						buf = newbuf;
+					bzero(buf + bufused, num_trailing_nulbytes); /* Trailing NUL-bytes */
+					mapping->@mf_addr@ = buf;
+					mapping->@mf_size@ = bufused;
+					mapping->@__mf_mapsize@ = 0;
+					return 0;
+				}
+				if (bufused == 0)
+					break; /* File probably doesn't support `pread(2)'... */
+				/* Read error */
+				goto err_buf;
 			}
-			if (bufused == 0)
-				break; /* File probably doesn't support `pread(2)'... */
-			/* Read error */
-			goto err_buf;
-		}
-		offset  += (size_t)error;
-		bufused += (size_t)error;
-		buffree -= (size_t)error;
-		if (buffree < 1024) {
-			byte_t *newbuf;
-			size_t newsize = bufsize * 2;
-			newbuf = (byte_t *)realloc(buf, newsize + num_trailing_nulbytes);
-			if (!newbuf) {
-				newsize = bufsize + 1024;
+			offset  += (size_t)error;
+			bufused += (size_t)error;
+			buffree -= (size_t)error;
+			if (buffree < 1024) {
+				byte_t *newbuf;
+				size_t newsize = bufsize * 2;
 				newbuf = (byte_t *)realloc(buf, newsize + num_trailing_nulbytes);
 				if (!newbuf) {
-					if (!buffree)
-						goto err_buf;
-					newsize = bufsize;
-					newbuf  = buf;
+					newsize = bufsize + 1024;
+					newbuf = (byte_t *)realloc(buf, newsize + num_trailing_nulbytes);
+					if (!newbuf) {
+						if (!buffree)
+							goto err_buf;
+						newsize = bufsize;
+						newbuf  = buf;
+					}
 				}
+				buffree += newsize - bufsize;
+				bufsize = newsize;
+				buf     = newbuf;
 			}
-			buffree += newsize - bufsize;
-			bufsize = newsize;
-			buf     = newbuf;
 		}
-	}
 @@pp_endif@@
 
-	/* For a non-zero offset, try to use lseek() (or read()) */
-	if (offset != 0) {
+		/* For a non-zero offset, try to use lseek() (or read()) */
 @@pp_if $has_function(lseek64) && defined(__SEEK_SET)@@
 		if (lseek64(fd, (off64_t)offset, __SEEK_SET) != -1) {
 			/* Was able to lseek(2) */
@@ -1145,10 +1145,10 @@ err_buf:
 [[requires(defined(__O_RDONLY) && $has_function(openat, fmapfile))]]
 [[impl_include("<asm/os/oflags.h>", "<asm/os/fcntl.h>")]]
 [[impl_include("<libc/errno.h>")]]
-int fmapfileat(fd_t dirfd, [[nonnull]] char const *filename,
-               [[nonnull]] struct mapfile *__restrict mapping,
-               pos64_t offset, size_t max_bytes,
-               size_t num_trailing_nulbytes, atflag_t atflags) {
+int fmapfileat([[nonnull]] struct mapfile *__restrict mapping,
+               $fd_t dirfd, [[nonnull]] char const *filename,
+               $pos64_t offset, size_t max_bytes,
+               size_t num_trailing_nulbytes, $atflag_t atflags) {
 	fd_t fd;
 	int result;
 	oflag_t oflags = __O_RDONLY;
@@ -1161,7 +1161,7 @@ int fmapfileat(fd_t dirfd, [[nonnull]] char const *filename,
 @@pp_if defined(__AT_EMPTY_PATH)@@
 	if (atflags & __AT_EMPTY_PATH) {
 		if (!*filename)
-			return fmapfile(dirfd, mapping, offset, max_bytes, num_trailing_nulbytes);
+			return fmapfile(mapping, dirfd, offset, max_bytes, num_trailing_nulbytes);
 		atflags &= ~__AT_EMPTY_PATH;
 	}
 @@pp_endif@@
@@ -1175,7 +1175,7 @@ int fmapfileat(fd_t dirfd, [[nonnull]] char const *filename,
 	fd = openat(dirfd, filename, oflags);
 	if unlikely(fd < 0)
 		return -1;
-	result = fmapfile(fd, mapping, offset, max_bytes, num_trailing_nulbytes);
+	result = fmapfile(mapping, fd, offset, max_bytes, num_trailing_nulbytes);
 @@pp_if $has_function(close)@@
 	close(fd);
 @@pp_endif@@
@@ -1190,16 +1190,16 @@ int fmapfileat(fd_t dirfd, [[nonnull]] char const *filename,
 [[requires_include("<asm/os/fcntl.h>", "<asm/os/oflags.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(fmapfileat)) ||
            (defined(__O_RDONLY) && $has_function(open, fmapfile)))]]
-int mapfile([[nonnull]] char const *filename,
-            [[nonnull]] struct mapfile *__restrict mapping,
-            pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes) {
+int mapfile([[nonnull]] struct mapfile *__restrict mapping,
+            [[nonnull]] char const *filename,
+            $pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes) {
 @@pp_if defined(__AT_FDCWD) && $has_function(fmapfileat)@@
-	return fmapfileat(__AT_FDCWD, filename, mapping, offset, max_bytes, num_trailing_nulbytes, 0);
+	return fmapfileat(mapping, __AT_FDCWD, filename, offset, max_bytes, num_trailing_nulbytes, 0);
 @@pp_else@@
 	fd_t fd = open(filename, __O_RDONLY);
 	if unlikely(fd < 0)
 		return -1;
-	result = fmapfile(fd, mapping, offset, max_bytes, num_trailing_nulbytes);
+	result = fmapfile(mapping, fd, offset, max_bytes, num_trailing_nulbytes);
 @@pp_if $has_function(close)@@
 	close(fd);
 @@pp_endif@@

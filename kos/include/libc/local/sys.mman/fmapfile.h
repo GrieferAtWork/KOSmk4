@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0724161 */
+/* HASH CRC-32:0xc7d5f144 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -328,8 +328,8 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 #include <asm/os/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fmapfile) __ATTR_WUNUSED __ATTR_NONNULL((2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(__fd_t __fd, struct mapfile *__restrict __mapping, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes) {
+__LOCAL_LIBC(fmapfile) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes) {
 	__BYTE_TYPE__ *__buf;
 	__SIZE_TYPE__ __bufsize;
 	__SIZE_TYPE__ __bufused;
@@ -350,41 +350,41 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(__fd_t __fd, struct mapfil
 		}
 		if (__map_bytes > (__SIZE_TYPE__)(__st.st_size - __map_offset))
 			__map_bytes = (__SIZE_TYPE__)(__st.st_size - __map_offset);
-		if (!__map_bytes) {
-			/* Empty file -> only need to map `num_trailing_nulbytes' */
-			__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_calloc)(1, __num_trailing_nulbytes);
-			if __unlikely(!__buf)
-				return -1;
-			__mapping->mf_addr = (__BYTE_TYPE__ *)__buf;
-			__mapping->mf_size = 0;
-			__mapping->__mf_mapsize = 0;
-			return 0;
-		}
-		/* Map file into memory. */
-		__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mmap64)(__NULLPTR, __map_bytes + __num_trailing_nulbytes,
-		                       __PROT_READ | __PROT_WRITE,
-		                       __MAP_PRIVATE, __fd, (__PIO_OFFSET64)__offset);
-		if (__buf != (__BYTE_TYPE__ *)__MAP_FAILED) {
-			/* Clear out the caller-required trailing NUL bytes.
-			 * We  do this in a kind-of special was that try not
-			 * to write-fault memory if it already contains NULs */
-			__BYTE_TYPE__ *__nul = __buf + __map_bytes;
-			while (__num_trailing_nulbytes) {
-				if (*__nul) {
-					(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__nul, __num_trailing_nulbytes);
-					break;
+		if (__map_bytes) {
+			/* Map file into memory. */
+			__SIZE_TYPE__ __mapsize = __map_bytes + __num_trailing_nulbytes;
+			__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mmap64)(__NULLPTR, __mapsize,
+			                       __PROT_READ | __PROT_WRITE,
+			                       __MAP_PRIVATE, __fd, (__PIO_OFFSET64)__offset);
+			if (__buf != (__BYTE_TYPE__ *)__MAP_FAILED) {
+				/* Clear out the caller-required trailing NUL bytes.
+				 * We  do this in a kind-of special was that try not
+				 * to write-fault memory if it already contains NULs */
+				__BYTE_TYPE__ *__nul = __buf + __map_bytes;
+				while (__num_trailing_nulbytes) {
+					if (*__nul) {
+						(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__nul, __num_trailing_nulbytes);
+						break;
+					}
+					--__num_trailing_nulbytes;
+					++__nul;
 				}
-				--__num_trailing_nulbytes;
-				++__nul;
+				__mapping->mf_addr = __buf;
+				__mapping->mf_size = __map_bytes;
+				__mapping->__mf_mapsize = __mapsize;
+				return 0;
 			}
-			__mapping->mf_addr = __buf;
-			__mapping->mf_size = __map_bytes;
-			__mapping->__mf_mapsize = 0;
-			return 0;
-		}
 #if defined(__libc_geterrno) && defined(__libc_seterrno)
-		__libc_seterrno(__saved_errno);
+			__libc_seterrno(__saved_errno);
 #endif /* __libc_geterrno && __libc_seterrno */
+		} else {
+			/* Special files from procfs indicate their size as `0',  even
+			 * though they aren't actually empty. - As such, we can't just
+			 * use the normal approach of read(2)-ing the file.
+			 *
+			 * Only if at that point it still indicates being empty, are we
+			 * actually allowed to believe that claim! */
+		}
 	}
 #endif /* __PROT_READ && __PROT_WRITE && __MAP_PRIVATE && (__CRT_HAVE_mmap64 || __CRT_HAVE_mmap) && ((__CRT_HAVE_kfstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kfstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__fstat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE__fstat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE_fstat && __STAT32_MATCHES_STAT64) || __CRT_HAVE_fstat64) */
 
@@ -402,56 +402,56 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(__fd_t __fd, struct mapfil
 	__bufused = 0;
 	__buffree = __bufsize;
 
-	/* Try to use pread(2) */
+	if (__offset != 0) {
+		/* Try to use pread(2) */
 #if defined(__CRT_HAVE_pread64) || defined(__CRT_HAVE___pread64) || defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
-	for (;;) {
-		__SSIZE_TYPE__ __error;
-		__error = (__NAMESPACE_LOCAL_SYM __localdep_pread64)(__fd, __buf + __bufused, __buffree, __offset);
-		if ((__SIZE_TYPE__)__error != __buffree) {
-			if (__error >= 0) {
-				/* End-of-file! */
-				__BYTE_TYPE__ *__newbuf;
-				__bufused += (__SIZE_TYPE__)__error;
-				__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __bufused + __num_trailing_nulbytes);
-				if __likely(__newbuf)
-					__buf = __newbuf;
-				(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__buf + __bufused, __num_trailing_nulbytes); /* Trailing NUL-bytes */
-				__mapping->mf_addr = __buf;
-				__mapping->mf_size = __bufused;
-				__mapping->__mf_mapsize = 0;
-				return 0;
+		for (;;) {
+			__SSIZE_TYPE__ __error;
+			__error = (__NAMESPACE_LOCAL_SYM __localdep_pread64)(__fd, __buf + __bufused, __buffree, __offset);
+			if ((__SIZE_TYPE__)__error != __buffree) {
+				if (__error >= 0) {
+					/* End-of-file! */
+					__BYTE_TYPE__ *__newbuf;
+					__bufused += (__SIZE_TYPE__)__error;
+					__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __bufused + __num_trailing_nulbytes);
+					if __likely(__newbuf)
+						__buf = __newbuf;
+					(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__buf + __bufused, __num_trailing_nulbytes); /* Trailing NUL-bytes */
+					__mapping->mf_addr = __buf;
+					__mapping->mf_size = __bufused;
+					__mapping->__mf_mapsize = 0;
+					return 0;
+				}
+				if (__bufused == 0)
+					break; /* File probably doesn't support `pread(2)'... */
+				/* Read error */
+				goto __err_buf;
 			}
-			if (__bufused == 0)
-				break; /* File probably doesn't support `pread(2)'... */
-			/* Read error */
-			goto __err_buf;
-		}
-		__offset  += (__SIZE_TYPE__)__error;
-		__bufused += (__SIZE_TYPE__)__error;
-		__buffree -= (__SIZE_TYPE__)__error;
-		if (__buffree < 1024) {
-			__BYTE_TYPE__ *__newbuf;
-			__SIZE_TYPE__ __newsize = __bufsize * 2;
-			__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
-			if (!__newbuf) {
-				__newsize = __bufsize + 1024;
+			__offset  += (__SIZE_TYPE__)__error;
+			__bufused += (__SIZE_TYPE__)__error;
+			__buffree -= (__SIZE_TYPE__)__error;
+			if (__buffree < 1024) {
+				__BYTE_TYPE__ *__newbuf;
+				__SIZE_TYPE__ __newsize = __bufsize * 2;
 				__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
 				if (!__newbuf) {
-					if (!__buffree)
-						goto __err_buf;
-					__newsize = __bufsize;
-					__newbuf  = __buf;
+					__newsize = __bufsize + 1024;
+					__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
+					if (!__newbuf) {
+						if (!__buffree)
+							goto __err_buf;
+						__newsize = __bufsize;
+						__newbuf  = __buf;
+					}
 				}
+				__buffree += __newsize - __bufsize;
+				__bufsize = __newsize;
+				__buf     = __newbuf;
 			}
-			__buffree += __newsize - __bufsize;
-			__bufsize = __newsize;
-			__buf     = __newbuf;
 		}
-	}
 #endif /* __CRT_HAVE_pread64 || __CRT_HAVE___pread64 || __CRT_HAVE_pread || ((__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_llseek || __CRT_HAVE___llseek || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) && __SEEK_CUR && __SEEK_SET) */
 
-	/* For a non-zero offset, try to use lseek() (or read()) */
-	if (__offset != 0) {
+		/* For a non-zero offset, try to use lseek() (or read()) */
 #if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && defined(__SEEK_SET)
 		if ((__NAMESPACE_LOCAL_SYM __localdep_lseek64)(__fd, (__off64_t)__offset, __SEEK_SET) != -1) {
 			/* Was able to lseek(2) */
