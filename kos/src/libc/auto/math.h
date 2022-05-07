@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78d4f7bd */
+/* HASH CRC-32:0xd810d9bc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2170,30 +2170,52 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd___issignalingl)(__LONGDOUBLE
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED double NOTHROW_NCX(LIBDCALL libd_nextdown)(double x);
-INTDEF WUNUSED double NOTHROW_NCX(LIBDCALL libd_nextup)(double x);
-INTDEF WUNUSED float NOTHROW_NCX(LIBDCALL libd_nextdownf)(float x);
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_nextdown)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED float NOTHROW_NCX(LIBCCALL libc_nextdownf)(float x);
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_nextdown)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED float NOTHROW_NCX(LIBDCALL libd_nextupf)(float x);
+/* >> nextupf(3), nextup(3), nextupl(3) */
+INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_nextup)(double x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED float NOTHROW_NCX(LIBCCALL libc_nextupf)(float x);
+/* >> nextupf(3), nextup(3), nextupl(3) */
+INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_nextup)(double x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_nextdownl)(__LONGDOUBLE x);
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBDCALL libd_nextdownf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_nextdownl)(__LONGDOUBLE x);
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBCCALL libc_nextdownf)(float x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_nextupl)(__LONGDOUBLE x);
+/* >> nextupf(3), nextup(3), nextupl(3) */
+INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBDCALL libd_nextupf)(float x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_nextupl)(__LONGDOUBLE x);
+/* >> nextupf(3), nextup(3), nextupl(3) */
+INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBCCALL libc_nextupf)(float x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_nextdownl)(__LONGDOUBLE x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_nextdownl)(__LONGDOUBLE x);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> nextupf(3), nextup(3), nextupl(3) */
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_nextupl)(__LONGDOUBLE x);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> nextupf(3), nextup(3), nextupl(3) */
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_nextupl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED long int NOTHROW_NCX(LIBDCALL libd_llogb)(double x);

@@ -2768,9 +2768,26 @@ __issignalingl(*) %{generate(double2ldouble("__issignaling"))}
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-[[wunused]] double nextdown(double x); /* TODO */
+@@>> nextdownf(3), nextdown(3), nextdownl(3)
+[[wunused, const, requires_function(nextup)]]
+double nextdown(double x) {
+	return -nextup(-x);
+}
 
-[[wunused]] double nextup(double x); /* TODO */
+@@>> nextupf(3), nextup(3), nextupl(3)
+[[wunused, const, impl_include("<libm/nextup.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double nextup(double x) {
+@@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
+	return (double)__ieee754_nextup((__IEEE754_DOUBLE_TYPE__)x);
+@@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
+	return (double)__ieee754_nextupf((__IEEE754_FLOAT_TYPE__)x);
+@@pp_else@@
+	return (double)__ieee854_nextupl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+@@pp_endif@@
+}
 
 nextdownf(*) %{generate(double2float("nextdown"))}
 nextupf(*) %{generate(double2float("nextup"))}

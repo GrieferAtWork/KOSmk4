@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86a9b6cb */
+/* HASH CRC-32:0xa0de4d5d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,30 +18,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_MATH_H
-#define GUARD_LIBC_USER_MATH_H 1
-
-#include "../api.h"
-#include "../auto/math.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <math.h>
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-INTDEF WUNUSED long int NOTHROW_NCX(LIBCCALL libc_llogb)(double x);
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_roundeven)(double x);
-INTDEF WUNUSED intmax_t NOTHROW_NCX(LIBCCALL libc_fromfp)(double x, int round, unsigned int width);
-INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBCCALL libc_ufromfp)(double x, int round, unsigned int width);
-INTDEF WUNUSED intmax_t NOTHROW_NCX(LIBCCALL libc_fromfpx)(double x, int round, unsigned int width);
-INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBCCALL libc_ufromfpx)(double x, int round, unsigned int width);
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_fmaxmag)(double x, double y);
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_fminmag)(double x, double y);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_canonicalize)(double *cx, double const *x);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_MATH_H */
+#ifndef __local_nextup_defined
+#define __local_nextup_defined
+#include <__crt.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libm/nextup.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(nextup) __ATTR_CONST __ATTR_WUNUSED double
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(nextup))(double __x) {
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_nextup((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_nextupf((__IEEE754_FLOAT_TYPE__)__x);
+#else /* ... */
+	return (double)__ieee854_nextupl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#endif /* !... */
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_nextup_defined
+#define __local___localdep_nextup_defined
+#define __localdep_nextup __LIBC_LOCAL_NAME(nextup)
+#endif /* !__local___localdep_nextup_defined */
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#undef __local_nextup_defined
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !__local_nextup_defined */

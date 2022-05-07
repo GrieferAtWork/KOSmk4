@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17d1d045 */
+/* HASH CRC-32:0xcc0ddc1f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,22 +21,48 @@
 #ifndef __local_nextdownf_defined
 #define __local_nextdownf_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_nextdown
+#if defined(__CRT_HAVE_nextupf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_nextdown) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_nextdown_defined
 #define __local___localdep_nextdown_defined
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_nextdown,(double __x),nextdown,(__x))
+#ifdef __CRT_HAVE_nextdown
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_nextdown,(double __x),nextdown,(__x))
+#elif defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/nextdown.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_nextdown __LIBC_LOCAL_NAME(nextdown)
+#else /* ... */
+#undef __local___localdep_nextdown_defined
+#endif /* !... */
 #endif /* !__local___localdep_nextdown_defined */
-__LOCAL_LIBC(nextdownf) __ATTR_WUNUSED float
+#ifndef __local___localdep_nextupf_defined
+#define __local___localdep_nextupf_defined
+#ifdef __CRT_HAVE_nextupf
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,__localdep_nextupf,(float __x),nextupf,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/nextupf.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_nextupf __LIBC_LOCAL_NAME(nextupf)
+#else /* ... */
+#undef __local___localdep_nextupf_defined
+#endif /* !... */
+#endif /* !__local___localdep_nextupf_defined */
+__LOCAL_LIBC(nextdownf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(nextdownf))(float __x) {
+#if defined(__CRT_HAVE_nextupf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return -(__NAMESPACE_LOCAL_SYM __localdep_nextupf)(-__x);
+#else /* __CRT_HAVE_nextupf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_nextup || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 	return (float)(__NAMESPACE_LOCAL_SYM __localdep_nextdown)((double)__x);
+#endif /* !__CRT_HAVE_nextupf && !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_nextup && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_nextdownf_defined
 #define __local___localdep_nextdownf_defined
 #define __localdep_nextdownf __LIBC_LOCAL_NAME(nextdownf)
 #endif /* !__local___localdep_nextdownf_defined */
-#else /* __CRT_HAVE_nextdown */
+#else /* __CRT_HAVE_nextupf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_nextdown || __CRT_HAVE_nextup || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_nextdownf_defined
-#endif /* !__CRT_HAVE_nextdown */
+#endif /* !__CRT_HAVE_nextupf && !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_nextdown && !__CRT_HAVE_nextup && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_nextdownf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34ceed64 */
+/* HASH CRC-32:0x1e95b8ba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -13476,32 +13476,54 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingl, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-__CDECLARE_OPT(__ATTR_WUNUSED,double,__NOTHROW_NCX,nextdown,(double __x),(__x))
-__CDECLARE_OPT(__ATTR_WUNUSED,double,__NOTHROW_NCX,nextup,(double __x),(__x))
+#ifdef __CRT_HAVE_nextdown
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,nextdown,(double __x),(__x))
+#elif defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/nextdown.h>
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextdown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL nextdown)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdown))(__x); })
+#endif /* ... */
+#ifdef __CRT_HAVE_nextup
+/* >> nextupf(3), nextup(3), nextupl(3) */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,nextup,(double __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/nextup.h>
+/* >> nextupf(3), nextup(3), nextupl(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL nextup)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextup))(__x); })
+#endif /* ... */
 #ifdef __CRT_HAVE_nextdownf
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,nextdownf,(float __x),(__x))
-#elif defined(__CRT_HAVE_nextdown)
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,nextdownf,(float __x),(__x))
+#elif defined(__CRT_HAVE_nextupf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_nextdown) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextdownf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(nextdownf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL nextdownf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdownf))(__x); })
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextdownf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL nextdownf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdownf))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE_nextupf
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,nextupf,(float __x),(__x))
-#elif defined(__CRT_HAVE_nextup)
+/* >> nextupf(3), nextup(3), nextupl(3) */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,nextupf,(float __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextupf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(nextupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL nextupf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextupf))(__x); })
+/* >> nextupf(3), nextup(3), nextupl(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL nextupf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextupf))(__x); })
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE_nextdownl
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,nextdownl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_nextdown)
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,nextdownl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_nextupl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextdown) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextdownl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(nextdownl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL nextdownl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdownl))(__x); })
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextdownl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL nextdownl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdownl))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE_nextupl
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,nextupl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_nextup)
+/* >> nextupf(3), nextup(3), nextupl(3) */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,nextupl,(__LONGDOUBLE __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextupl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(nextupl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL nextupl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextupl))(__x); })
+/* >> nextupf(3), nextup(3), nextupl(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextupl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL nextupl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextupl))(__x); })
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */

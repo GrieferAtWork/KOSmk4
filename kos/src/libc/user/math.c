@@ -27,29 +27,7 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_nextdown,hash:CRC-32=0x371d36cf]]]*/
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_nextdown)(double x)
-/*[[[body:libc_nextdown]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("nextdown(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_nextdown]]]*/
 
-/*[[[head:libc_nextup,hash:CRC-32=0x6de788a2]]]*/
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_nextup)(double x)
-/*[[[body:libc_nextup]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("nextup(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_nextup]]]*/
 
 /*[[[head:libc_llogb,hash:CRC-32=0x1845ed7f]]]*/
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED long int
@@ -181,9 +159,7 @@ NOTHROW_NCX(LIBCCALL libc_canonicalize)(double *cx,
 }
 /*[[[end:libc_canonicalize]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x9550f5c8]]]*/
-DEFINE_PUBLIC_ALIAS(nextdown, libc_nextdown);
-DEFINE_PUBLIC_ALIAS(nextup, libc_nextup);
+/*[[[start:exports,hash:CRC-32=0x2c3cbb3]]]*/
 DEFINE_PUBLIC_ALIAS(llogb, libc_llogb);
 DEFINE_PUBLIC_ALIAS(roundeven, libc_roundeven);
 DEFINE_PUBLIC_ALIAS(fromfp, libc_fromfp);

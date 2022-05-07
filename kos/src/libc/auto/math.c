@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb3821b0 */
+/* HASH CRC-32:0x1b67d705 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4075,21 +4075,76 @@ NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x) {
 
 
 }
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
+NOTHROW_NCX(LIBCCALL libc_nextdown)(double x) {
+	return -libc_nextup(-x);
+}
+#include <libm/nextup.h>
+/* >> nextupf(3), nextup(3), nextupl(3) */
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
+NOTHROW_NCX(LIBCCALL libc_nextup)(double x) {
+
+	return (double)__ieee754_nextup((__IEEE754_DOUBLE_TYPE__)x);
+
+
+
+
+
+}
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW_NCX(LIBCCALL libc_nextdownf)(float x) {
-	return (float)libc_nextdown((double)x);
+
+	return -libc_nextupf(-x);
+
+
+
 }
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
+#include <libm/nextup.h>
+/* >> nextupf(3), nextup(3), nextupl(3) */
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW_NCX(LIBCCALL libc_nextupf)(float x) {
-	return (float)libc_nextup((double)x);
+
+
+
+	
+
+
+	return (float)__ieee754_nextupf((__IEEE754_FLOAT_TYPE__)x);
+
+
+
+
+
+
 }
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_nextdownl)(__LONGDOUBLE x) {
-	return (__LONGDOUBLE)libc_nextdown((double)x);
+
+	return -libc_nextupl(-x);
+
+
+
 }
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
+#include <libm/nextup.h>
+/* >> nextupf(3), nextup(3), nextupl(3) */
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_nextupl)(__LONGDOUBLE x) {
-	return (__LONGDOUBLE)libc_nextup((double)x);
+
+
+
+	
+
+
+
+
+	return (__LONGDOUBLE)__ieee854_nextupl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED long int
 NOTHROW_NCX(LIBCCALL libc_llogbf)(float x) {
@@ -4861,6 +4916,8 @@ DEFINE_PUBLIC_ALIAS(issignalingf, libc___issignalingf);
 DEFINE_PUBLIC_ALIAS(__issignalingf, libc___issignalingf);
 DEFINE_PUBLIC_ALIAS(issignalingl, libc___issignalingl);
 DEFINE_PUBLIC_ALIAS(__issignalingl, libc___issignalingl);
+DEFINE_PUBLIC_ALIAS(nextdown, libc_nextdown);
+DEFINE_PUBLIC_ALIAS(nextup, libc_nextup);
 DEFINE_PUBLIC_ALIAS(nextdownf, libc_nextdownf);
 DEFINE_PUBLIC_ALIAS(nextupf, libc_nextupf);
 DEFINE_PUBLIC_ALIAS(nextdownl, libc_nextdownl);
