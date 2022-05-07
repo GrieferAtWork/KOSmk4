@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86a9b6cb */
+/* HASH CRC-32:0x5687e98b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF WUNUSED long int NOTHROW_NCX(LIBCCALL libc_llogb)(double x);
-INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_roundeven)(double x);
 INTDEF WUNUSED intmax_t NOTHROW_NCX(LIBCCALL libc_fromfp)(double x, int round, unsigned int width);
 INTDEF WUNUSED uintmax_t NOTHROW_NCX(LIBCCALL libc_ufromfp)(double x, int round, unsigned int width);
 INTDEF WUNUSED intmax_t NOTHROW_NCX(LIBCCALL libc_fromfpx)(double x, int round, unsigned int width);

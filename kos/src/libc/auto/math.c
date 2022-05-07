@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b67d705 */
+/* HASH CRC-32:0x25ca9393 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4077,13 +4077,13 @@ NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x) {
 }
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_nextdown)(double x) {
+NOTHROW(LIBCCALL libc_nextdown)(double x) {
 	return -libc_nextup(-x);
 }
 #include <libm/nextup.h>
 /* >> nextupf(3), nextup(3), nextupl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_nextup)(double x) {
+NOTHROW(LIBCCALL libc_nextup)(double x) {
 
 	return (double)__ieee754_nextup((__IEEE754_DOUBLE_TYPE__)x);
 
@@ -4094,7 +4094,7 @@ NOTHROW_NCX(LIBCCALL libc_nextup)(double x) {
 }
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
-NOTHROW_NCX(LIBCCALL libc_nextdownf)(float x) {
+NOTHROW(LIBCCALL libc_nextdownf)(float x) {
 
 	return -libc_nextupf(-x);
 
@@ -4104,7 +4104,7 @@ NOTHROW_NCX(LIBCCALL libc_nextdownf)(float x) {
 #include <libm/nextup.h>
 /* >> nextupf(3), nextup(3), nextupl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
-NOTHROW_NCX(LIBCCALL libc_nextupf)(float x) {
+NOTHROW(LIBCCALL libc_nextupf)(float x) {
 
 
 
@@ -4121,7 +4121,7 @@ NOTHROW_NCX(LIBCCALL libc_nextupf)(float x) {
 }
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
-NOTHROW_NCX(LIBCCALL libc_nextdownl)(__LONGDOUBLE x) {
+NOTHROW(LIBCCALL libc_nextdownl)(__LONGDOUBLE x) {
 
 	return -libc_nextupl(-x);
 
@@ -4131,7 +4131,7 @@ NOTHROW_NCX(LIBCCALL libc_nextdownl)(__LONGDOUBLE x) {
 #include <libm/nextup.h>
 /* >> nextupf(3), nextup(3), nextupl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
-NOTHROW_NCX(LIBCCALL libc_nextupl)(__LONGDOUBLE x) {
+NOTHROW(LIBCCALL libc_nextupl)(__LONGDOUBLE x) {
 
 
 
@@ -4146,13 +4146,55 @@ NOTHROW_NCX(LIBCCALL libc_nextupl)(__LONGDOUBLE x) {
 
 
 }
+#include <hybrid/typecore.h>
+#if __SIZEOF_INT__ == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libc_llogb, libc_ilogb);
+#else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED long int
-NOTHROW_NCX(LIBCCALL libc_llogbf)(float x) {
-	return libc_llogb((double)x);
+NOTHROW(LIBCCALL libc_llogb)(double x) {
+	return (long int)libc_ilogb(x); /* TODO: support for sizeof(long) > sizeof(int) */
 }
+#endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
+#include <libm/roundeven.h>
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
+NOTHROW(LIBCCALL libc_roundeven)(double x) {
+
+	return (double)__ieee754_roundeven((__IEEE754_DOUBLE_TYPE__)x);
+
+
+
+
+
+}
+#include <hybrid/typecore.h>
+#if __SIZEOF_INT__ == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libc_llogbf, libc_ilogbf);
+#else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED long int
+NOTHROW(LIBCCALL libc_llogbf)(float x) {
+
+	return (long int)libc_ilogbf(x); /* TODO: support for sizeof(long) > sizeof(int) */
+
+
+
+}
+#endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
+#include <libm/roundeven.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
-NOTHROW_NCX(LIBCCALL libc_roundevenf)(float x) {
-	return (float)libc_roundeven((double)x);
+NOTHROW(LIBCCALL libc_roundevenf)(float x) {
+
+
+
+	
+
+
+	return (float)__ieee754_roundevenf((__IEEE754_FLOAT_TYPE__)x);
+
+
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED intmax_t
 NOTHROW_NCX(LIBCCALL libc_fromfpf)(float x,
@@ -4193,13 +4235,35 @@ NOTHROW_NCX(LIBCCALL libc_canonicalizef)(float *cx,
                                          float const *x) {
 	return libc_canonicalize((double *)cx, (double const *)x);
 }
+#include <hybrid/typecore.h>
+#if __SIZEOF_INT__ == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libc_llogbl, libc_ilogbl);
+#else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED long int
-NOTHROW_NCX(LIBCCALL libc_llogbl)(__LONGDOUBLE x) {
-	return libc_llogb((double)x);
+NOTHROW(LIBCCALL libc_llogbl)(__LONGDOUBLE x) {
+
+	return (long int)libc_ilogbl(x); /* TODO: support for sizeof(long) > sizeof(int) */
+
+
+
 }
+#endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
+#include <libm/roundeven.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
-NOTHROW_NCX(LIBCCALL libc_roundevenl)(__LONGDOUBLE x) {
-	return (__LONGDOUBLE)libc_roundeven((double)x);
+NOTHROW(LIBCCALL libc_roundevenl)(__LONGDOUBLE x) {
+
+
+
+	
+
+
+
+
+	return (__LONGDOUBLE)__ieee854_roundevenl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+
+
+
+
 }
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED intmax_t
 NOTHROW_NCX(LIBCCALL libc_fromfpl)(__LONGDOUBLE x,
@@ -4922,6 +4986,8 @@ DEFINE_PUBLIC_ALIAS(nextdownf, libc_nextdownf);
 DEFINE_PUBLIC_ALIAS(nextupf, libc_nextupf);
 DEFINE_PUBLIC_ALIAS(nextdownl, libc_nextdownl);
 DEFINE_PUBLIC_ALIAS(nextupl, libc_nextupl);
+DEFINE_PUBLIC_ALIAS(llogb, libc_llogb);
+DEFINE_PUBLIC_ALIAS(roundeven, libc_roundeven);
 DEFINE_PUBLIC_ALIAS(llogbf, libc_llogbf);
 DEFINE_PUBLIC_ALIAS(roundevenf, libc_roundevenf);
 DEFINE_PUBLIC_ALIAS(fromfpf, libc_fromfpf);

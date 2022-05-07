@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f0cd342 */
+/* HASH CRC-32:0x6d5300e7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_nextup_defined
 #define __local___localdep_nextup_defined
 #ifdef __CRT_HAVE_nextup
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_nextup,(double __x),nextup,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextup,(double __x),nextup,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/nextup.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_END
 #include <libm/nextup.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(nextupf) __ATTR_CONST __ATTR_WUNUSED float
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(nextupf))(float __x) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextupf))(float __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 
 

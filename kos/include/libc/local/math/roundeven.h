@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdef829d2 */
+/* HASH CRC-32:0x7bd66ccb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,28 +18,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_nextup_defined
-#define __local_nextup_defined
+#ifndef __local_roundeven_defined
+#define __local_roundeven_defined
 #include <__crt.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#include <libm/nextup.h>
+#include <libm/roundeven.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(nextup) __ATTR_CONST __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextup))(double __x) {
+__LOCAL_LIBC(roundeven) __ATTR_CONST __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(roundeven))(double __x) {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_nextup((__IEEE754_DOUBLE_TYPE__)__x);
+	return (double)__ieee754_roundeven((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_nextupf((__IEEE754_FLOAT_TYPE__)__x);
+	return (double)__ieee754_roundevenf((__IEEE754_FLOAT_TYPE__)__x);
 #else /* ... */
-	return (double)__ieee854_nextupl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+	return (double)__ieee854_roundevenl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_nextup_defined
-#define __local___localdep_nextup_defined
-#define __localdep_nextup __LIBC_LOCAL_NAME(nextup)
-#endif /* !__local___localdep_nextup_defined */
+#ifndef __local___localdep_roundeven_defined
+#define __local___localdep_roundeven_defined
+#define __localdep_roundeven __LIBC_LOCAL_NAME(roundeven)
+#endif /* !__local___localdep_roundeven_defined */
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#undef __local_nextup_defined
+#undef __local_roundeven_defined
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#endif /* !__local_nextup_defined */
+#endif /* !__local_roundeven_defined */

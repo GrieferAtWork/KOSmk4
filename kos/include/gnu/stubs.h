@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fcbf4f5 */
+/* HASH CRC-32:0xedbdb389 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -332,7 +332,6 @@
 #define __stub_lckpwdf
 #define __stub_lcong48
 #define __stub_lcong48_r
-#define __stub_llogb
 #define __stub___loc_aton
 #define __stub_loc_aton
 #define __stub___loc_ntoa
@@ -519,7 +518,6 @@
 #define __stub_revoke
 #define __stub_rexec
 #define __stub_rexec_af
-#define __stub_roundeven
 #define __stub_rresvport
 #define __stub_rresvport_af
 #define __stub_ruserok

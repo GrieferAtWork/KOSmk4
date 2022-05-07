@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e95b8ba */
+/* HASH CRC-32:0x5216026e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -418,9 +418,10 @@ __NAMESPACE_STD_USING(nextafter)
 #if defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remainder)
 #endif /* __CRT_HAVE_remainder || __CRT_HAVE_drem || __CRT_HAVE___remainder || __CRT_HAVE___drem || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <hybrid/typecore.h>
+#if defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(ilogb)
-#endif /* __CRT_HAVE_ilogb || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
+#endif /* __CRT_HAVE_ilogb || (__CRT_HAVE_llogb && __SIZEOF_INT__ == __SIZEOF_LONG__) || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_rintf) || defined(__CRT_HAVE_nearbyintf) || defined(__CRT_HAVE___rintf) || defined(__CRT_HAVE___nearbyintf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___rint) || defined(__CRT_HAVE___nearbyint) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(rintf)
 #endif /* __CRT_HAVE_rintf || __CRT_HAVE_nearbyintf || __CRT_HAVE___rintf || __CRT_HAVE___nearbyintf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_rint || __CRT_HAVE_nearbyint || __CRT_HAVE___rint || __CRT_HAVE___nearbyint || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -430,9 +431,9 @@ __NAMESPACE_STD_USING(nextafterf)
 #if defined(__CRT_HAVE_remainderf) || defined(__CRT_HAVE_dremf) || defined(__CRT_HAVE___remainderf) || defined(__CRT_HAVE___dremf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remainderf)
 #endif /* __CRT_HAVE_remainderf || __CRT_HAVE_dremf || __CRT_HAVE___remainderf || __CRT_HAVE___dremf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_remainder || __CRT_HAVE_drem || __CRT_HAVE___remainder || __CRT_HAVE___drem || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_ilogbf) || defined(__CRT_HAVE___ilogbf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__CRT_HAVE_ilogbf) || (defined(__CRT_HAVE_llogbf) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogbf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(ilogbf)
-#endif /* __CRT_HAVE_ilogbf || __CRT_HAVE___ilogbf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __CRT_HAVE_ilogb || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
+#endif /* __CRT_HAVE_ilogbf || (__CRT_HAVE_llogbf && __SIZEOF_INT__ == __SIZEOF_LONG__) || __CRT_HAVE___ilogbf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __CRT_HAVE_ilogb || (__CRT_HAVE_llogb && __SIZEOF_INT__ == __SIZEOF_LONG__) || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if defined(__CRT_HAVE_rintl) || defined(__CRT_HAVE_nearbyintl) || defined(__CRT_HAVE___rintl) || defined(__CRT_HAVE___nearbyintl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___rint) || defined(__CRT_HAVE___nearbyint) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(rintl)
@@ -443,16 +444,15 @@ __NAMESPACE_STD_USING(nextafterl)
 #if defined(__CRT_HAVE_remainderl) || defined(__CRT_HAVE_dreml) || defined(__CRT_HAVE___remainderl) || defined(__CRT_HAVE___dreml) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remainderl)
 #endif /* __CRT_HAVE_remainderl || __CRT_HAVE_dreml || __CRT_HAVE___remainderl || __CRT_HAVE___dreml || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_remainder || __CRT_HAVE_drem || __CRT_HAVE___remainder || __CRT_HAVE___drem || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_ilogbl) || defined(__CRT_HAVE___ilogbl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__CRT_HAVE_ilogbl) || (defined(__CRT_HAVE_llogbl) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogbl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(ilogbl)
-#endif /* __CRT_HAVE_ilogbl || __CRT_HAVE___ilogbl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_ilogb || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
+#endif /* __CRT_HAVE_ilogbl || (__CRT_HAVE_llogbl && __SIZEOF_INT__ == __SIZEOF_LONG__) || __CRT_HAVE___ilogbl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_ilogb || (__CRT_HAVE_llogb && __SIZEOF_INT__ == __SIZEOF_LONG__) || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 #ifdef __USE_ISOC99
 #if defined(__CRT_HAVE_nextafterl) || defined(__CRT_HAVE_nexttowardl) || defined(__CRT_HAVE___nextafterl) || defined(__CRT_HAVE___nexttowardl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(nexttoward)
 #endif /* __CRT_HAVE_nextafterl || __CRT_HAVE_nexttowardl || __CRT_HAVE___nextafterl || __CRT_HAVE___nexttowardl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_nextafter || __CRT_HAVE_nexttoward || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter || __CRT_HAVE___nexttoward || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#include <hybrid/typecore.h>
 #if defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn) || (defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(scalbn)
 #endif /* __CRT_HAVE_scalbn || __CRT_HAVE___scalbn || (__CRT_HAVE_scalbln && __SIZEOF_INT__ == __SIZEOF_LONG__) || (__CRT_HAVE___scalbln && __SIZEOF_INT__ == __SIZEOF_LONG__) || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -3202,6 +3202,10 @@ __CEIDECLARE(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(double __x),{ return __builtin_
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(double __x),(__x))
+#elif defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(double __x),llogb,(__x))
 #elif defined(__CRT_HAVE___ilogb)
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
@@ -3322,11 +3326,15 @@ __CEIDECLARE(__ATTR_WUNUSED,int,__NOTHROW,ilogbf,(float __x),{ return __builtin_
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW,ilogbf,(float __x),(__x))
+#elif defined(__CRT_HAVE_llogbf) && __SIZEOF_INT__ == __SIZEOF_LONG__
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogbf,(float __x),llogbf,(__x))
 #elif defined(__CRT_HAVE___ilogbf)
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogbf,(float __x),__ilogbf,(__x))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/ilogbf.h>
 __NAMESPACE_STD_BEGIN
@@ -3439,11 +3447,15 @@ __CEIDECLARE(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(__LONGDOUBLE __x),{ return __b
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_llogbl) && __SIZEOF_INT__ == __SIZEOF_LONG__
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(__LONGDOUBLE __x),llogbl,(__x))
 #elif defined(__CRT_HAVE___ilogbl)
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(__LONGDOUBLE __x),__ilogbl,(__x))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/ilogbl.h>
 __NAMESPACE_STD_BEGIN
@@ -5823,11 +5835,15 @@ __CEIREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(float __x),ilogbf,{ return __b
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(float __x),ilogbf,(__x))
+#elif defined(__CRT_HAVE_llogbf) && __SIZEOF_INT__ == __SIZEOF_LONG__
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(float __x),llogbf,(__x))
 #elif defined(__CRT_HAVE___ilogbf)
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(float __x),__ilogbf,(__x))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/ilogbf.h>
@@ -6104,11 +6120,15 @@ __CEIREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),ilogbl,{ ret
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),ilogbl,(__x))
+#elif defined(__CRT_HAVE_llogbl) && __SIZEOF_INT__ == __SIZEOF_LONG__
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),llogbl,(__x))
 #elif defined(__CRT_HAVE___ilogbl)
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),__ilogbl,(__x))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
 #include <libc/local/math/ilogbl.h>
@@ -7768,9 +7788,9 @@ __NAMESPACE_STD_USING(nextafter)
 #if defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remainder)
 #endif /* __CRT_HAVE_remainder || __CRT_HAVE_drem || __CRT_HAVE___remainder || __CRT_HAVE___drem || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(ilogb)
-#endif /* __CRT_HAVE_ilogb || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
+#endif /* __CRT_HAVE_ilogb || (__CRT_HAVE_llogb && __SIZEOF_INT__ == __SIZEOF_LONG__) || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
 #if defined(__CRT_HAVE_rintf) || defined(__CRT_HAVE_nearbyintf) || defined(__CRT_HAVE___rintf) || defined(__CRT_HAVE___nearbyintf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___rint) || defined(__CRT_HAVE___nearbyint) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(rintf)
 #endif /* __CRT_HAVE_rintf || __CRT_HAVE_nearbyintf || __CRT_HAVE___rintf || __CRT_HAVE___nearbyintf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_rint || __CRT_HAVE_nearbyint || __CRT_HAVE___rint || __CRT_HAVE___nearbyint || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -7780,9 +7800,9 @@ __NAMESPACE_STD_USING(nextafterf)
 #if defined(__CRT_HAVE_remainderf) || defined(__CRT_HAVE_dremf) || defined(__CRT_HAVE___remainderf) || defined(__CRT_HAVE___dremf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remainderf)
 #endif /* __CRT_HAVE_remainderf || __CRT_HAVE_dremf || __CRT_HAVE___remainderf || __CRT_HAVE___dremf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_remainder || __CRT_HAVE_drem || __CRT_HAVE___remainder || __CRT_HAVE___drem || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_ilogbf) || defined(__CRT_HAVE___ilogbf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__CRT_HAVE_ilogbf) || (defined(__CRT_HAVE_llogbf) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogbf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(ilogbf)
-#endif /* __CRT_HAVE_ilogbf || __CRT_HAVE___ilogbf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __CRT_HAVE_ilogb || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
+#endif /* __CRT_HAVE_ilogbf || (__CRT_HAVE_llogbf && __SIZEOF_INT__ == __SIZEOF_LONG__) || __CRT_HAVE___ilogbf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __CRT_HAVE_ilogb || (__CRT_HAVE_llogb && __SIZEOF_INT__ == __SIZEOF_LONG__) || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __CXX_SYSTEM_HEADER
@@ -7795,9 +7815,9 @@ __NAMESPACE_STD_USING(nextafterl)
 #if defined(__CRT_HAVE_remainderl) || defined(__CRT_HAVE_dreml) || defined(__CRT_HAVE___remainderl) || defined(__CRT_HAVE___dreml) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remainderl)
 #endif /* __CRT_HAVE_remainderl || __CRT_HAVE_dreml || __CRT_HAVE___remainderl || __CRT_HAVE___dreml || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_remainder || __CRT_HAVE_drem || __CRT_HAVE___remainder || __CRT_HAVE___drem || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#if defined(__CRT_HAVE_ilogbl) || defined(__CRT_HAVE___ilogbl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__CRT_HAVE_ilogbl) || (defined(__CRT_HAVE_llogbl) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogbl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(ilogbl)
-#endif /* __CRT_HAVE_ilogbl || __CRT_HAVE___ilogbl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_ilogb || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
+#endif /* __CRT_HAVE_ilogbl || (__CRT_HAVE_llogbl && __SIZEOF_INT__ == __SIZEOF_LONG__) || __CRT_HAVE___ilogbl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_ilogb || (__CRT_HAVE_llogb && __SIZEOF_INT__ == __SIZEOF_LONG__) || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
@@ -12029,6 +12049,10 @@ __CEIREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogb,(double __x),ilogb,{ return _
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogb,(double __x),ilogb,(__x))
+#elif defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogb,(double __x),llogb,(__x))
 #elif defined(__CRT_HAVE___ilogb)
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
@@ -12141,11 +12165,15 @@ __CEIREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbf,(float __x),ilogbf,{ return 
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbf,(float __x),ilogbf,(__x))
+#elif defined(__CRT_HAVE_llogbf) && __SIZEOF_INT__ == __SIZEOF_LONG__
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbf,(float __x),llogbf,(__x))
 #elif defined(__CRT_HAVE___ilogbf)
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW,__ilogbf,(float __x),(__x))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 #include <libc/local/math/ilogbf.h>
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
@@ -12250,11 +12278,15 @@ __CEIREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(__LONGDOUBLE __x),ilogbl,{ 
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(__LONGDOUBLE __x),ilogbl,(__x))
+#elif defined(__CRT_HAVE_llogbl) && __SIZEOF_INT__ == __SIZEOF_LONG__
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(__LONGDOUBLE __x),llogbl,(__x))
 #elif defined(__CRT_HAVE___ilogbl)
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(__LONGDOUBLE __x),(__x))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 #include <libc/local/math/ilogbl.h>
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
@@ -13478,57 +13510,69 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingl, __FORCELOCAL __ATTR_ARTIFICIAL _
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 #ifdef __CRT_HAVE_nextdown
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,nextdown,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,nextdown,(double __x),(__x))
 #elif defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextdown.h>
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nextdown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL nextdown)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdown))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextdown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL nextdown)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdown))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE_nextup
 /* >> nextupf(3), nextup(3), nextupl(3) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,nextup,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,nextup,(double __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextup.h>
 /* >> nextupf(3), nextup(3), nextupl(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nextup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL nextup)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextup))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL nextup)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextup))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE_nextdownf
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,nextdownf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextdownf,(float __x),(__x))
 #elif defined(__CRT_HAVE_nextupf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_nextdown) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextdownf.h>
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nextdownf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL nextdownf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdownf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextdownf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nextdownf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdownf))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE_nextupf
 /* >> nextupf(3), nextup(3), nextupl(3) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,nextupf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextupf,(float __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextupf.h>
 /* >> nextupf(3), nextup(3), nextupl(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nextupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL nextupf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextupf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nextupf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextupf))(__x); })
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE_nextdownl
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,nextdownl,(__LONGDOUBLE __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextdownl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE_nextupl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextdown) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextdownl.h>
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nextdownl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL nextdownl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdownl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextdownl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nextdownl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextdownl))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE_nextupl
 /* >> nextupf(3), nextup(3), nextupl(3) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,nextupl,(__LONGDOUBLE __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextupl,(__LONGDOUBLE __x),(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextupl.h>
 /* >> nextupf(3), nextup(3), nextupl(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nextupl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL nextupl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextupl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextupl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nextupl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextupl))(__x); })
 #endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
-__CDECLARE_OPT(__ATTR_WUNUSED,long int,__NOTHROW_NCX,llogb,(double __x),(__x))
-__CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,roundeven,(double __x),(__x))
+#ifdef __CRT_HAVE_llogb
+__CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,llogb,(double __x),(__x))
+#elif defined(__CRT_HAVE_ilogb) && __SIZEOF_INT__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,llogb,(double __x),ilogb,(__x))
+#elif defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <libc/local/math/llogb.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(llogb, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL llogb)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llogb))(__x); })
+#endif /* ... */
+#ifdef __CRT_HAVE_roundeven
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,roundeven,(double __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <libc/local/math/roundeven.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(roundeven, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL roundeven)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundeven))(__x); })
+#endif /* ... */
 __CDECLARE_OPT(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfp,(double __x, int __round, unsigned int __width),(__x,__round,__width))
 __CDECLARE_OPT(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfp,(double __x, int __round, unsigned int __width),(__x,__round,__width))
 __CDECLARE_OPT(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpx,(double __x, int __round, unsigned int __width),(__x,__round,__width))
@@ -13537,16 +13581,18 @@ __CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,fmaxmag,(double 
 __CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,fminmag,(double __x, double __y),(__x,__y))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,canonicalize,(double *__cx, double const *__x),(__cx,__x))
 #ifdef __CRT_HAVE_llogbf
-__CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW_NCX,llogbf,(float __x),(__x))
-#elif defined(__CRT_HAVE_llogb)
+__CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,llogbf,(float __x),(__x))
+#elif defined(__CRT_HAVE_ilogbf) && __SIZEOF_INT__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,llogbf,(float __x),ilogbf,(__x))
+#elif defined(__CRT_HAVE_ilogbf) || defined(__CRT_HAVE___ilogbf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_llogb) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 #include <libc/local/math/llogbf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(llogbf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED long int __NOTHROW_NCX(__LIBCCALL llogbf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llogbf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(llogbf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL llogbf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llogbf))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE_roundevenf
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW_NCX,roundevenf,(float __x),(__x))
-#elif defined(__CRT_HAVE_roundeven)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,roundevenf,(float __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_roundeven) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/roundevenf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(roundevenf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL roundevenf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundevenf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(roundevenf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL roundevenf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundevenf))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE_fromfpf
 __CDECLARE(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpf,(float __x, int __roundf, unsigned int __width),(__x,__roundf,__width))
@@ -13592,16 +13638,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(canonicalizef, __FORCELOCAL __ATTR_ARTIFICIAL in
 #endif /* ... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE_llogbl
-__CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW_NCX,llogbl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_llogb)
+__CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,llogbl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_ilogbl) && __SIZEOF_INT__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,llogbl,(__LONGDOUBLE __x),ilogbl,(__x))
+#elif defined(__CRT_HAVE_ilogbl) || defined(__CRT_HAVE___ilogbl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_llogb) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 #include <libc/local/math/llogbl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(llogbl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED long int __NOTHROW_NCX(__LIBCCALL llogbl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llogbl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(llogbl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL llogbl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llogbl))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE_roundevenl
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,roundevenl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_roundeven)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,roundevenl,(__LONGDOUBLE __x),(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_roundeven) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/roundevenl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(roundevenl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL roundevenl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundevenl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(roundevenl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL roundevenl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundevenl))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE_fromfpl
 __CDECLARE(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),(__x,__roundl,__width))

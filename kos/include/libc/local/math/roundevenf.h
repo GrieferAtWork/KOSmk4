@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa96615d6 */
+/* HASH CRC-32:0x1f838b61 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,22 +21,47 @@
 #ifndef __local_roundevenf_defined
 #define __local_roundevenf_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_roundeven
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_roundeven) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_roundeven_defined
 #define __local___localdep_roundeven_defined
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_roundeven,(double __x),roundeven,(__x))
+#ifdef __CRT_HAVE_roundeven
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_roundeven,(double __x),roundeven,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_LOCAL_END
+#include <libc/local/math/roundeven.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_roundeven __LIBC_LOCAL_NAME(roundeven)
+#else /* ... */
+#undef __local___localdep_roundeven_defined
+#endif /* !... */
 #endif /* !__local___localdep_roundeven_defined */
+__NAMESPACE_LOCAL_END
+#include <libm/roundeven.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(roundevenf) __ATTR_CONST __ATTR_WUNUSED float
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(roundevenf))(float __x) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(roundevenf))(float __x) {
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+
+
+	
+#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
+	return (float)__ieee754_roundeven((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+	return (float)__ieee754_roundevenf((__IEEE754_FLOAT_TYPE__)__x);
+#else /* ... */
+	return (float)__ieee854_roundevenl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#endif /* !... */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)(__NAMESPACE_LOCAL_SYM __localdep_roundeven)((double)__x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_roundevenf_defined
 #define __local___localdep_roundevenf_defined
 #define __localdep_roundevenf __LIBC_LOCAL_NAME(roundevenf)
 #endif /* !__local___localdep_roundevenf_defined */
-#else /* __CRT_HAVE_roundeven */
+#else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_roundeven || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local_roundevenf_defined
-#endif /* !__CRT_HAVE_roundeven */
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && !__CRT_HAVE_roundeven && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #endif /* !__local_roundevenf_defined */

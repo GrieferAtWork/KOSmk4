@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78e5a634 */
+/* HASH CRC-32:0xe67aa789 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -915,7 +915,12 @@ DFUN(".text.crt.dos.math.math", libd_nextdownf, libc_nextdownf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_nextupf, libc_nextupf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_nextdownl, libc_nextdownl, TFL, 1, TFL)
 DFUN(".text.crt.dos.math.math", libd_nextupl, libc_nextupl, TFL, 1, TFL)
+#include <hybrid/typecore.h>
+#if __SIZEOF_INT__ == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libd_llogb, libd_ilogb);
+#else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.math.math", libd_llogb, libc_llogb, TL, 1, TFD)
+#endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.math.math", libd_roundeven, libc_roundeven, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_fromfp, libc_fromfp, TIn(__SIZEOF_INTMAX_T__), 3, TFD, TD, TD)
 DFUN(".text.crt.dos.math.math", libd_ufromfp, libc_ufromfp, TIn(__SIZEOF_INTMAX_T__), 3, TFD, TD, TD)
@@ -924,7 +929,11 @@ DFUN(".text.crt.dos.math.math", libd_ufromfpx, libc_ufromfpx, TIn(__SIZEOF_INTMA
 DFUN(".text.crt.dos.math.math", libd_fmaxmag, libc_fmaxmag, TFD, 2, TFD, TFD)
 DFUN(".text.crt.dos.math.math", libd_fminmag, libc_fminmag, TFD, 2, TFD, TFD)
 DFUN(".text.crt.dos.math.math", libd_canonicalize, libc_canonicalize, TD, 2, TP, TP)
+#if __SIZEOF_INT__ == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libd_llogbf, libd_ilogbf);
+#else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.math.math", libd_llogbf, libc_llogbf, TL, 1, TF)
+#endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.math.math", libd_roundevenf, libc_roundevenf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_fromfpf, libc_fromfpf, TIn(__SIZEOF_INTMAX_T__), 3, TF, TD, TD)
 DFUN(".text.crt.dos.math.math", libd_ufromfpf, libc_ufromfpf, TIn(__SIZEOF_INTMAX_T__), 3, TF, TD, TD)
@@ -933,7 +942,11 @@ DFUN(".text.crt.dos.math.math", libd_ufromfpxf, libc_ufromfpxf, TIn(__SIZEOF_INT
 DFUN(".text.crt.dos.math.math", libd_fmaxmagf, libc_fmaxmagf, TF, 2, TF, TF)
 DFUN(".text.crt.dos.math.math", libd_fminmagf, libc_fminmagf, TF, 2, TF, TF)
 DFUN(".text.crt.dos.math.math", libd_canonicalizef, libc_canonicalizef, TD, 2, TP, TP)
+#if __SIZEOF_INT__ == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libd_llogbl, libd_ilogbl);
+#else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.math.math", libd_llogbl, libc_llogbl, TL, 1, TFL)
+#endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.math.math", libd_roundevenl, libc_roundevenl, TFL, 1, TFL)
 DFUN(".text.crt.dos.math.math", libd_fromfpl, libc_fromfpl, TIn(__SIZEOF_INTMAX_T__), 3, TFL, TD, TD)
 DFUN(".text.crt.dos.math.math", libd_ufromfpl, libc_ufromfpl, TIn(__SIZEOF_INTMAX_T__), 3, TFL, TD, TD)
@@ -2058,7 +2071,6 @@ DFUN(".text.crt.dos.unicode.static.convert", libd__atodbl, libc__atodbl, TD, 2, 
 DFUN(".text.crt.dos.unicode.static.convert", libd__atodbl_l, libc__atodbl_l, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd__atoldbl, libc__atoldbl, TD, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd__atoldbl_l, libc__atoldbl_l, TD, 3, TP, TP, TP)
-#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == 8
 DEFINE_INTERN_ALIAS(libd__rotl, libd__rotl64);
 #else /* __SIZEOF_INT__ == 8 */

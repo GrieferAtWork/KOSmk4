@@ -29,29 +29,7 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_llogb,hash:CRC-32=0x1845ed7f]]]*/
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED long int
-NOTHROW_NCX(LIBCCALL libc_llogb)(double x)
-/*[[[body:libc_llogb]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("llogb(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_llogb]]]*/
 
-/*[[[head:libc_roundeven,hash:CRC-32=0xd8baeb8f]]]*/
-INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
-NOTHROW_NCX(LIBCCALL libc_roundeven)(double x)
-/*[[[body:libc_roundeven]]]*/
-/*AUTO*/{
-	(void)x;
-	CRT_UNIMPLEMENTEDF("roundeven(%f)", x); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_roundeven]]]*/
 
 /*[[[head:libc_fromfp,hash:CRC-32=0xf1b85af2]]]*/
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED intmax_t
@@ -159,9 +137,7 @@ NOTHROW_NCX(LIBCCALL libc_canonicalize)(double *cx,
 }
 /*[[[end:libc_canonicalize]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x2c3cbb3]]]*/
-DEFINE_PUBLIC_ALIAS(llogb, libc_llogb);
-DEFINE_PUBLIC_ALIAS(roundeven, libc_roundeven);
+/*[[[start:exports,hash:CRC-32=0x43204201]]]*/
 DEFINE_PUBLIC_ALIAS(fromfp, libc_fromfp);
 DEFINE_PUBLIC_ALIAS(ufromfp, libc_ufromfp);
 DEFINE_PUBLIC_ALIAS(fromfpx, libc_fromfpx);

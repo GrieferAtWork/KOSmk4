@@ -514,7 +514,7 @@ double sinh(double x) {
 
 @@>> tanhf(3), tanh(3), tanhl(3)
 @@Hyperbolic   tangent   of  `x'
-[[std, wunused, const, nothrow, crtbuiltin, export_alias("__tanh")]]
+[[std, const, wunused, nothrow, crtbuiltin, export_alias("__tanh")]]
 [[impl_include("<libm/tanh.h>")]]
 [[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -554,7 +554,7 @@ double acosh(double x) {
 
 @@>> asinhf(3), asinh(3), asinhl(3)
 @@Hyperbolic  arc   sine   of   `x'
-[[std, wunused, const, nothrow, crtbuiltin, export_alias("__asinh")]]
+[[std, const, wunused, nothrow, crtbuiltin, export_alias("__asinh")]]
 [[impl_include("<libm/asinh.h>")]]
 [[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -795,7 +795,7 @@ double log1p(double x) {
 
 @@>> logbf(3), logb(3), logbl(3)
 @@Return the base 2 signed integral exponent of `x'
-[[std, wunused, const, nothrow, crtbuiltin]]
+[[std, const, wunused, nothrow, crtbuiltin]]
 [[export_alias("__logb"), dos_only_export_alias("_logb")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/logb.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -1133,7 +1133,7 @@ double nan(char const *tagb) {
 %(std, c, ccompat)#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
 
 @@>> erff(3), erf(3), erfl(3)
-[[std, wunused, const, nothrow, crtbuiltin, export_alias("__erf")]]
+[[std, const, wunused, nothrow, crtbuiltin, export_alias("__erf")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/erf.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1143,7 +1143,7 @@ double erf(double x) {
 }
 
 @@>> erfcf(3), erfc(3), erfcl(3)
-[[std, wunused, const, nothrow, crtbuiltin, export_alias("__erfc")]]
+[[std, const, wunused, nothrow, crtbuiltin, export_alias("__erfc")]]
 [[requires_include("<ieee754.h>"), impl_include("<libm/erfc.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -1277,6 +1277,7 @@ double remainder(double x, double p) {
 
 @@>> ilogbf(3), ilogb(3), ilogbl(3)
 @@Return the binary exponent of `x', which must be nonzero
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("llogb")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__ilogb")]]
 [[impl_include("<libm/ilogb.h>", "<libm/matherr.h>", "<bits/crt/mathdef.h>")]]
 [[requires_include("<ieee754.h>")]]
@@ -1309,6 +1310,7 @@ float nextafterf(float x, float y) %{generate(double2float("nextafter"))}
   preferred_extern_inline("dremf", { return __builtin_dremf(x, p); })]]
 float remainderf(float x, float p) %{generate(double2float("remainder"))}
 
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("llogbf")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__ilogbf")]]
 int ilogbf(float x) %{generate(double2float("ilogb"))}
 
@@ -1329,6 +1331,7 @@ __LONGDOUBLE nextafterl(__LONGDOUBLE x, __LONGDOUBLE y) %{generate(double2ldoubl
   preferred_extern_inline("dreml", { return __builtin_dreml(x, p); })]]
 __LONGDOUBLE remainderl(__LONGDOUBLE x, __LONGDOUBLE p) %{generate(double2ldouble("remainder"))}
 
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("llogbl")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__ilogbl")]]
 int ilogbl(__LONGDOUBLE x) %{generate(double2ldouble("ilogb"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -2769,13 +2772,13 @@ __issignalingl(*) %{generate(double2ldouble("__issignaling"))}
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@>> nextdownf(3), nextdown(3), nextdownl(3)
-[[wunused, const, requires_function(nextup)]]
+[[const, wunused, nothrow, requires_function(nextup)]]
 double nextdown(double x) {
 	return -nextup(-x);
 }
 
 @@>> nextupf(3), nextup(3), nextupl(3)
-[[wunused, const, impl_include("<libm/nextup.h>")]]
+[[const, wunused, nothrow, impl_include("<libm/nextup.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
@@ -2797,9 +2800,26 @@ nextupl(*) %{generate(double2ldouble("nextup"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
-[[wunused]] long int llogb(double x); /* TODO */
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ilogb")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), crt_intern_alias("ilogb")]]
+[[wunused, ATTR_MCONST, nothrow, requires_function(ilogb)]]
+long int llogb(double x) {
+	return (long int)ilogb(x); /* TODO: support for sizeof(long) > sizeof(int) */
+}
 
-[[const, wunused]] double roundeven(double x); /* TODO */
+[[const, wunused, nothrow, impl_include("<libm/roundeven.h>")]]
+[[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+           defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+double roundeven(double x) {
+@@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
+	return (double)__ieee754_roundeven((__IEEE754_DOUBLE_TYPE__)x);
+@@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
+	return (double)__ieee754_roundevenf((__IEEE754_FLOAT_TYPE__)x);
+@@pp_else@@
+	return (double)__ieee854_roundevenl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+@@pp_endif@@
+}
 
 [[wunused, decl_include("<hybrid/typecore.h>")]]
 $intmax_t fromfp(double x, int round, unsigned int width); /* TODO */
@@ -2819,7 +2839,10 @@ $uintmax_t ufromfpx(double x, int round, unsigned int width); /* TODO */
 
 int canonicalize(double *cx, double const *x); /* TODO */
 
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ilogbf")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), crt_intern_alias("ilogbf")]]
 llogbf(*) %{generate(double2float("llogb"))}
+
 roundevenf(*) %{generate(double2float("roundeven"))}
 fromfpf(*) %{generate(double2float("fromfp"))}
 ufromfpf(*) %{generate(double2float("ufromfp"))}
@@ -2828,8 +2851,12 @@ ufromfpxf(*) %{generate(double2float("ufromfpx"))}
 fmaxmagf(*) %{generate(double2float("fmaxmag"))}
 fminmagf(*) %{generate(double2float("fminmag"))}
 canonicalizef(*) %{generate(double2float("canonicalize"))}
+
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ilogbl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), crt_intern_alias("ilogbl")]]
 llogbl(*) %{generate(double2ldouble("llogb"))}
+
 roundevenl(*) %{generate(double2ldouble("roundeven"))}
 fromfpl(*) %{generate(double2ldouble("fromfp"))}
 ufromfpl(*) %{generate(double2ldouble("ufromfp"))}
