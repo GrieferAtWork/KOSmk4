@@ -404,7 +404,7 @@ $errno_t fgetpwnam_r([[nonnull]] $FILE *__restrict stream,
 @@@return: * :     Error (one of `E*' from `<errno.h>')
 [[static, cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
 [[impl_include("<libc/errno.h>", "<hybrid/typecore.h>", "<asm/os/syslog.h>")]]
-[[requires_function(fgetpos64, fsetpos64, fparseln)]]
+[[requires_function(fgetpos64, fsetpos64, fparseln, feof)]]
 $errno_t fgetpwfiltered_r([[nonnull]] $FILE *__restrict stream,
                           [[nonnull]] struct passwd *__restrict resultbuf,
                           [[outp(buflen)]] char *__restrict buffer, size_t buflen,
@@ -422,6 +422,8 @@ again_parseln:
 	if unlikely(!dbline)
 		goto err_restore;
 	if (!*dbline) {
+		if (!feof(stream))
+			goto nextline; /* Skip empty lines! */
 		if ((filtered_uid != (uid_t)-1 || filtered_name != NULL) && startpos != 0) {
 			maxpos   = startpos;
 			startpos = 0;

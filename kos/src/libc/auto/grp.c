@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ef3a69b */
+/* HASH CRC-32:0xfc65d664 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -199,6 +199,8 @@ again_parseln:
 	if unlikely(!dbline)
 		goto err_restore;
 	if (!*dbline) {
+		if (!libc_feof(stream))
+			goto nextline; /* Skip empty lines! */
 		if ((filtered_gid != (gid_t)-1 || filtered_name != NULL) && startpos != 0) {
 			maxpos   = startpos;
 			startpos = 0;
@@ -281,7 +283,7 @@ eof:
 			str = field_starts[i];
 			len = (libc_strlen(str) + 1) * sizeof(char);
 			/* Ensure that sufficient space is available in the user-provided buffer. */
-			if unlikely(buflen < len)
+			if unlikely(len > buflen)
 				goto err_ERANGE;
 			/* Set the associated pointer in `resultbuf' */
 			*(char **)((byte_t *)resultbuf + offset) = buffer;
@@ -295,7 +297,7 @@ eof:
 			char *aligned = (char *)(((uintptr_t)buffer + sizeof(void *) - 1) & ~(sizeof(void *) - 1));
 			/* Align to whole pointers. */
 			size_t padsiz = (size_t)(aligned - buffer);
-			if (padsiz > buflen)
+			if unlikely(padsiz > buflen)
 				goto err_ERANGE;
 			buffer = aligned;
 			buflen -= padsiz;
@@ -315,7 +317,7 @@ eof:
 			}
 			resultbuf->gr_mem = (char **)buffer;
 			reqspace = (member_count + 1) * sizeof(char *);
-			if (buflen < reqspace)
+			if unlikely(reqspace > buflen)
 				goto err_ERANGE;
 			buflen -= reqspace;
 			buffer += reqspace;
@@ -327,14 +329,14 @@ eof:
 			if (iter) {
 				for (;;) {
 					size_t siz;
-					siz = (libc_stroff(iter, ',') + 1) * sizeof(char);
-					if (buflen < siz)
+					siz = libc_stroff(iter, ',') * sizeof(char);
+					if unlikely((siz + 1) > buflen)
 						goto err_ERANGE;
 					/* Copy to user-provided buffer. */
 					*(char *)libc_mempcpy(buffer, iter, siz) = '\0';
 					*dst++ = buffer;
-					buflen -= siz;
-					buffer += siz;
+					buflen -= siz + 1;
+					buffer += siz + 1;
 					iter += siz;
 					if (!*iter)
 						break;

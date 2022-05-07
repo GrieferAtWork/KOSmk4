@@ -76,31 +76,57 @@ __DECL_END
 
 #include <parts/assert-failed.h>
 #ifdef __assertion_checkf
-#define _OPt(a, op, b, T, PRIt)                                                         \
-	do {                                                                                \
-		for (;;) {                                                                      \
-			T _a = (T)(a), _b = (T)(b);                                                 \
-			if (_a op _b)                                                               \
-				break;                                                                  \
-			if (!__assertion_checkf(#a " " #op " " #b,                                  \
-			                        #a " " #op " " #b " (%" PRIt " " #op " %" PRIt ")", \
-			                        _a, _b))                                            \
-				break;                                                                  \
-		}                                                                               \
+#define _OPt(a, op, b, T, PRIt, a_str, b_str)                         \
+	do {                                                              \
+		for (;;) {                                                    \
+			T _a = (a);                                               \
+			T _b = (b);                                               \
+			if (_a op _b)                                             \
+				break;                                                \
+			if (!__assertion_checkf(a_str " " #op " " b_str,          \
+			                        a_str " " #op " " b_str           \
+			                        " (%" PRIt " " #op " %" PRIt ")", \
+			                        _a, _b))                          \
+				break;                                                \
+		}                                                             \
+	}	__WHILE0
+#define _OPtPRED(a, op, b, T, PRIt, a_str, b_str, predicate)          \
+	do {                                                              \
+		for (;;) {                                                    \
+			T _a = (a);                                               \
+			T _b = (b);                                               \
+			if (predicate(_a, _b))                                    \
+				break;                                                \
+			if (!__assertion_checkf(a_str " " #op " " b_str,          \
+			                        a_str " " #op " " b_str           \
+			                        " (%" PRIt " " #op " %" PRIt ")", \
+			                        _a, _b))                          \
+				break;                                                \
+		}                                                             \
 	}	__WHILE0
 #else /* __assertion_checkf */
 #include <parts/assert.h>
 #ifdef __do_assertf
 #define _OPt(a, op, b, T, PRIt, a_str, b_str)                                  \
 	do {                                                                       \
-		T _a = (T)(a), _b = (T)(b);                                            \
+		T _a = (a);                                                            \
+		T _b = (b);                                                            \
 		__do_assertf(_a op _b, a_str " " #op " " b_str,                        \
+		             a_str " " #op " " b_str " (%" PRIt " " #op " %" PRIt ")", \
+		             _a, _b);                                                  \
+	}	__WHILE0
+#define _OPtPRED(a, op, b, T, PRIt, a_str, b_str, predicate)                   \
+	do {                                                                       \
+		T _a = (a);                                                            \
+		T _b = (b);                                                            \
+		__do_assertf(predicate(_a, _b), a_str " " #op " " b_str,               \
 		             a_str " " #op " " b_str " (%" PRIt " " #op " %" PRIt ")", \
 		             _a, _b);                                                  \
 	}	__WHILE0
 #else /* __do_assertf */
 #include <assert.h>
-#define _OPt(a, op, b, T, PRIt) assert((T)(a) op (T)(b))
+#define _OPt(a, op, b, T, PRIt, a_str, b_str)                assert((T)(a)op(T)(b))
+#define _OPtPRED(a, op, b, T, PRIt, a_str, b_str, predicate) assert(predicate((T)(a), (T)(b)))
 #endif /* !__do_assertf */
 #endif /* !__assertion_checkf */
 
@@ -121,7 +147,8 @@ for (local name, op: {
 		("x", "unsigned int", "\"x\""),
 		("s", "size_t", "PRIuSIZ"),
 		("ss", "ssize_t", "PRIdSIZ"),
-		("p", "uintptr_t", "\"p\""),
+		("p", "void const *", "\"p\""),
+		("up", "uintptr_t", "\"p\""),
 		("x32", "uint32_t", "PRIx32"),
 		("u32", "uint32_t", "PRIu32"),
 		("d32", "int32_t", "PRId32"),
@@ -139,7 +166,8 @@ for (local name, op: {
 #define LOx(a, b) _OPt(a, <, b, unsigned int, "x", #a, #b)
 #define LOs(a, b) _OPt(a, <, b, size_t, PRIuSIZ, #a, #b)
 #define LOss(a, b) _OPt(a, <, b, ssize_t, PRIdSIZ, #a, #b)
-#define LOp(a, b) _OPt(a, <, b, uintptr_t, "p", #a, #b)
+#define LOp(a, b) _OPt(a, <, b, void const *, "p", #a, #b)
+#define LOup(a, b) _OPt(a, <, b, uintptr_t, "p", #a, #b)
 #define LOx32(a, b) _OPt(a, <, b, uint32_t, PRIx32, #a, #b)
 #define LOu32(a, b) _OPt(a, <, b, uint32_t, PRIu32, #a, #b)
 #define LOd32(a, b) _OPt(a, <, b, int32_t, PRId32, #a, #b)
@@ -152,7 +180,8 @@ for (local name, op: {
 #define LEx(a, b) _OPt(a, <=, b, unsigned int, "x", #a, #b)
 #define LEs(a, b) _OPt(a, <=, b, size_t, PRIuSIZ, #a, #b)
 #define LEss(a, b) _OPt(a, <=, b, ssize_t, PRIdSIZ, #a, #b)
-#define LEp(a, b) _OPt(a, <=, b, uintptr_t, "p", #a, #b)
+#define LEp(a, b) _OPt(a, <=, b, void const *, "p", #a, #b)
+#define LEup(a, b) _OPt(a, <=, b, uintptr_t, "p", #a, #b)
 #define LEx32(a, b) _OPt(a, <=, b, uint32_t, PRIx32, #a, #b)
 #define LEu32(a, b) _OPt(a, <=, b, uint32_t, PRIu32, #a, #b)
 #define LEd32(a, b) _OPt(a, <=, b, int32_t, PRId32, #a, #b)
@@ -165,7 +194,8 @@ for (local name, op: {
 #define EQx(a, b) _OPt(a, ==, b, unsigned int, "x", #a, #b)
 #define EQs(a, b) _OPt(a, ==, b, size_t, PRIuSIZ, #a, #b)
 #define EQss(a, b) _OPt(a, ==, b, ssize_t, PRIdSIZ, #a, #b)
-#define EQp(a, b) _OPt(a, ==, b, uintptr_t, "p", #a, #b)
+#define EQp(a, b) _OPt(a, ==, b, void const *, "p", #a, #b)
+#define EQup(a, b) _OPt(a, ==, b, uintptr_t, "p", #a, #b)
 #define EQx32(a, b) _OPt(a, ==, b, uint32_t, PRIx32, #a, #b)
 #define EQu32(a, b) _OPt(a, ==, b, uint32_t, PRIu32, #a, #b)
 #define EQd32(a, b) _OPt(a, ==, b, int32_t, PRId32, #a, #b)
@@ -178,7 +208,8 @@ for (local name, op: {
 #define NEx(a, b) _OPt(a, !=, b, unsigned int, "x", #a, #b)
 #define NEs(a, b) _OPt(a, !=, b, size_t, PRIuSIZ, #a, #b)
 #define NEss(a, b) _OPt(a, !=, b, ssize_t, PRIdSIZ, #a, #b)
-#define NEp(a, b) _OPt(a, !=, b, uintptr_t, "p", #a, #b)
+#define NEp(a, b) _OPt(a, !=, b, void const *, "p", #a, #b)
+#define NEup(a, b) _OPt(a, !=, b, uintptr_t, "p", #a, #b)
 #define NEx32(a, b) _OPt(a, !=, b, uint32_t, PRIx32, #a, #b)
 #define NEu32(a, b) _OPt(a, !=, b, uint32_t, PRIu32, #a, #b)
 #define NEd32(a, b) _OPt(a, !=, b, int32_t, PRId32, #a, #b)
@@ -191,7 +222,8 @@ for (local name, op: {
 #define GRx(a, b) _OPt(a, >, b, unsigned int, "x", #a, #b)
 #define GRs(a, b) _OPt(a, >, b, size_t, PRIuSIZ, #a, #b)
 #define GRss(a, b) _OPt(a, >, b, ssize_t, PRIdSIZ, #a, #b)
-#define GRp(a, b) _OPt(a, >, b, uintptr_t, "p", #a, #b)
+#define GRp(a, b) _OPt(a, >, b, void const *, "p", #a, #b)
+#define GRup(a, b) _OPt(a, >, b, uintptr_t, "p", #a, #b)
 #define GRx32(a, b) _OPt(a, >, b, uint32_t, PRIx32, #a, #b)
 #define GRu32(a, b) _OPt(a, >, b, uint32_t, PRIu32, #a, #b)
 #define GRd32(a, b) _OPt(a, >, b, int32_t, PRId32, #a, #b)
@@ -204,7 +236,8 @@ for (local name, op: {
 #define GEx(a, b) _OPt(a, >=, b, unsigned int, "x", #a, #b)
 #define GEs(a, b) _OPt(a, >=, b, size_t, PRIuSIZ, #a, #b)
 #define GEss(a, b) _OPt(a, >=, b, ssize_t, PRIdSIZ, #a, #b)
-#define GEp(a, b) _OPt(a, >=, b, uintptr_t, "p", #a, #b)
+#define GEp(a, b) _OPt(a, >=, b, void const *, "p", #a, #b)
+#define GEup(a, b) _OPt(a, >=, b, uintptr_t, "p", #a, #b)
 #define GEx32(a, b) _OPt(a, >=, b, uint32_t, PRIx32, #a, #b)
 #define GEu32(a, b) _OPt(a, >=, b, uint32_t, PRIu32, #a, #b)
 #define GEd32(a, b) _OPt(a, >=, b, int32_t, PRId32, #a, #b)
@@ -212,6 +245,23 @@ for (local name, op: {
 #define GEu64(a, b) _OPt(a, >=, b, uint64_t, PRIu64, #a, #b)
 #define GEd64(a, b) _OPt(a, >=, b, int64_t, PRId64, #a, #b)
 /*[[[end]]]*/
+
+
+#include <libc/string.h>
+#define CTEST_CMPSTR_LO(a, b) (strcmp(a, b) < 0)
+#define CTEST_CMPSTR_LE(a, b) (strcmp(a, b) <= 0)
+#define CTEST_CMPSTR_EQ(a, b) (strcmp(a, b) == 0)
+#define CTEST_CMPSTR_NE(a, b) (strcmp(a, b) != 0)
+#define CTEST_CMPSTR_GR(a, b) (strcmp(a, b) > 0)
+#define CTEST_CMPSTR_GE(a, b) (strcmp(a, b) >= 0)
+
+#define LOstr(a, b) _OPtPRED(a, <, b, char const *, "q", #a, #b, CTEST_CMPSTR_LO)
+#define LEstr(a, b) _OPtPRED(a, <=, b, char const *, "q", #a, #b, CTEST_CMPSTR_LE)
+#define EQstr(a, b) _OPtPRED(a, ==, b, char const *, "q", #a, #b, CTEST_CMPSTR_EQ)
+#define NEstr(a, b) _OPtPRED(a, !=, b, char const *, "q", #a, #b, CTEST_CMPSTR_NE)
+#define GRstr(a, b) _OPtPRED(a, >, b, char const *, "q", #a, #b, CTEST_CMPSTR_GR)
+#define GEstr(a, b) _OPtPRED(a, >=, b, char const *, "q", #a, #b, CTEST_CMPSTR_GE)
+
 
 
 #endif /* !_SYSTEM_TEST_CTEST_H */

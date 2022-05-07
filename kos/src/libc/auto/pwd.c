@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b2479c6 */
+/* HASH CRC-32:0xba969a67 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,6 +227,8 @@ again_parseln:
 	if unlikely(!dbline)
 		goto err_restore;
 	if (!*dbline) {
+		if (!libc_feof(stream))
+			goto nextline; /* Skip empty lines! */
 		if ((filtered_uid != (uid_t)-1 || filtered_name != NULL) && startpos != 0) {
 			maxpos   = startpos;
 			startpos = 0;

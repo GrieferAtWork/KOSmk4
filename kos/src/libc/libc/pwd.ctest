@@ -1,0 +1,149 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_PWD_CTEST
+#define GUARD_LIBC_LIBC_PWD_CTEST 1
+#define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
+#undef NDEBUG
+
+/**/
+#include <hybrid/compiler.h>
+
+#include <kos/types.h>
+#include <system-test/ctest.h>
+
+#include <assert.h>
+#include <errno.h>
+#include <grp.h>
+#include <pwd.h>
+#include <stdio.h>
+#include <string.h>
+/**/
+
+DECL_BEGIN
+
+PRIVATE char const pwdfile[] =
+"# Comment\n"
+"\n"
+"pw_name:pw_passwd:1234:5678:pw_gecos:pw_dir:pw_shell\n"
+"pw_name:pw_passwd:1234:5678:pw_dir:pw_shell\n"
+"pw_name:pw_passwd:1234:5678\n";
+
+
+DEFINE_TEST(passwd) {
+	struct passwd *ent;
+	FILE *pwd = fmemopen((void *)pwdfile, sizeof(pwdfile) - sizeof(char), "r");
+	assertf(pwd, "%m");
+
+	errno = EOK;
+	ent = fgetpwent(pwd);
+	assertf(ent, "%m");
+	EQstr("pw_name", ent->pw_name);
+	EQstr("pw_passwd", ent->pw_passwd);
+	EQu((uid_t)1234, ent->pw_uid);
+	EQu((gid_t)5678, ent->pw_gid);
+	EQstr("pw_gecos", ent->pw_gecos);
+	EQstr("pw_dir", ent->pw_dir);
+	EQstr("pw_shell", ent->pw_shell);
+
+	ent = fgetpwent(pwd);
+	assertf(ent, "%m");
+	EQstr("pw_name", ent->pw_name);
+	EQstr("pw_passwd", ent->pw_passwd);
+	EQu((uid_t)1234, ent->pw_uid);
+	EQu((gid_t)5678, ent->pw_gid);
+	EQstr("", ent->pw_gecos);
+	EQstr("pw_dir", ent->pw_dir);
+	EQstr("pw_shell", ent->pw_shell);
+
+	ent = fgetpwent(pwd);
+	assertf(ent, "%m");
+	EQstr("pw_name", ent->pw_name);
+	EQstr("pw_passwd", ent->pw_passwd);
+	EQu((uid_t)1234, ent->pw_uid);
+	EQu((gid_t)5678, ent->pw_gid);
+	EQstr("", ent->pw_gecos);
+	EQstr("", ent->pw_dir);
+	EQstr("", ent->pw_shell);
+
+	ent = fgetpwent(pwd);
+	assert(!ent);
+	EQd(0, fclose(pwd));
+}
+
+
+PRIVATE char const grpfile[] =
+"# Comment\n"
+"\n"
+"gr_name:gr_passwd:1234\n"
+"gr_name:gr_passwd:1234:\n"
+"gr_name:gr_passwd:1234:,\n"
+"gr_name:gr_passwd:1234:gr_mem[0],gr_mem[1],...\n"
+;
+
+
+DEFINE_TEST(group) {
+	struct group *ent;
+	FILE *grp = fmemopen((void *)grpfile, sizeof(grpfile) - sizeof(char), "r");
+	assertf(grp, "%m");
+
+	errno = EOK;
+	ent = fgetgrent(grp);
+	assertf(ent, "%m");
+	EQstr("gr_name", ent->gr_name);
+	EQstr("gr_passwd", ent->gr_passwd);
+	EQu((gid_t)1234, ent->gr_gid);
+	EQp(NULL, ent->gr_mem[0]);
+
+	ent = fgetgrent(grp);
+	assertf(ent, "%m");
+	EQstr("gr_name", ent->gr_name);
+	EQstr("gr_passwd", ent->gr_passwd);
+	EQu((gid_t)1234, ent->gr_gid);
+	EQstr("", ent->gr_mem[0]);
+	EQp(NULL, ent->gr_mem[1]);
+
+	ent = fgetgrent(grp);
+	assertf(ent, "%m");
+	EQstr("gr_name", ent->gr_name);
+	EQstr("gr_passwd", ent->gr_passwd);
+	EQu((gid_t)1234, ent->gr_gid);
+	EQstr("", ent->gr_mem[0]);
+	EQstr("", ent->gr_mem[1]);
+	EQp(NULL, ent->gr_mem[2]);
+
+	ent = fgetgrent(grp);
+	assertf(ent, "%m");
+	EQstr("gr_name", ent->gr_name);
+	EQstr("gr_passwd", ent->gr_passwd);
+	EQu((gid_t)1234, ent->gr_gid);
+	EQstr("gr_mem[0]", ent->gr_mem[0]);
+	EQstr("gr_mem[1]", ent->gr_mem[1]);
+	EQstr("...", ent->gr_mem[2]);
+	EQp(NULL, ent->gr_mem[3]);
+
+	ent = fgetgrent(grp);
+	assert(!ent);
+	EQd(0, fclose(grp));
+}
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_PWD_CTEST */

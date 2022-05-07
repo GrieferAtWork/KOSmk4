@@ -50,7 +50,7 @@ DEFINE_TEST(sigsuspend) {
 
 	/* Install a custom signal handler. */
 	oldhand = signal(SIGUSR1, &myhandler);
-	NEp(oldhand, SIG_ERR);
+	NEup((uintptr_t)oldhand, (uintptr_t)SIG_ERR);
 
 	/* Mask all signals. */
 	EQd(0, sigfillset(&mask));
@@ -86,7 +86,7 @@ DEFINE_TEST(sigsuspend) {
 	/* Restore signal mask. */
 	EQd(0, sigprocmask(SIG_SETMASK, &omask, NULL));
 	EQu(2, handler_called);
-	NEp(SIG_ERR, signal(SIGUSR1, oldhand));
+	NEup((uintptr_t)SIG_ERR, (uintptr_t)signal(SIGUSR1, oldhand));
 	EQu(2, handler_called);
 }
 

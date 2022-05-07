@@ -44,7 +44,7 @@ PRIVATE sig_atomic_t myrpc_called = 0;
 
 PRIVATE NONNULL((1)) void
 myrpc(struct rpc_context *__restrict ctx, void *cookie) {
-	EQp(ctx->rc_context, RPC_REASONCTX_ASYNC);
+	EQup(ctx->rc_context, RPC_REASONCTX_ASYNC);
 	EQp(cookie, (void *)0x1234);
 	++myrpc_called;
 }

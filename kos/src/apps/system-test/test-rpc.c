@@ -45,10 +45,10 @@ my_rpc_function(struct rpc_context *__restrict ctx,
                 void *cookie) {
 	EQp(cookie, (void *)123);
 	/* This is the context expected from `rpc_serve()' */
-	EQp(ctx->rc_context, RPC_REASONCTX_SYSINT);
-	EQp(ctx->rc_scinfo.rsi_sysno, SYS_rpc_serve);
+	EQup(ctx->rc_context, RPC_REASONCTX_SYSINT);
+	EQup(ctx->rc_scinfo.rsi_sysno, SYS_rpc_serve);
 	assert(!(ctx->rc_scinfo.rsi_flags & RPC_SYSCALL_INFO_FEXCEPT));
-	EQp(ucpustate_getreturn(ctx->rc_state), -EINTR);
+	EQup(ucpustate_getreturn(ctx->rc_state), -EINTR);
 	++rpc_function_called;
 }
 
@@ -62,12 +62,12 @@ my_rpc_function2(struct rpc_context *__restrict ctx,
 	 *               is  trying to send  an RPC to  one's own thread (or
 	 *               process)  while  that RPC  isn't masked,  and while
 	 *               also passing the `RPC_JOIN_WAITFOR' flag. */
-	EQp(ctx->rc_context, RPC_REASONCTX_SYSINT);
-	EQp(ctx->rc_scinfo.rsi_sysno, SYS_rpc_schedule);
+	EQup(ctx->rc_context, RPC_REASONCTX_SYSINT);
+	EQup(ctx->rc_scinfo.rsi_sysno, SYS_rpc_schedule);
 	assertf(ctx->rc_scinfo.rsi_flags & RPC_SYSCALL_INFO_FEXCEPT,
 	        "ctx->rc_scinfo.rsi_flags = %#" PRIxPTR,
 	        ctx->rc_scinfo.rsi_flags);
-	EQp(ucpustate_getreturn(ctx->rc_state), -EOK);
+	EQup(ucpustate_getreturn(ctx->rc_state), -EOK);
 	++rpc_function_called;
 }
 
