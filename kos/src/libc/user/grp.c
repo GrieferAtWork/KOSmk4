@@ -317,45 +317,13 @@ NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count,
 }
 /*[[[end:libc_setgroups]]]*/
 
-/*[[[head:libc_getgrouplist,hash:CRC-32=0xa780df64]]]*/
-/* >> getgrouplist(3) */
-INTERN ATTR_SECTION(".text.crt.database.grp") NONNULL((1, 3, 4)) int
-NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const *user,
-                                        gid_t group,
-                                        gid_t *groups,
-                                        int *ngroups)
-/*[[[body:libc_getgrouplist]]]*/
-/*AUTO*/{
-	(void)user;
-	(void)group;
-	(void)groups;
-	(void)ngroups;
-	CRT_UNIMPLEMENTEDF("getgrouplist(%q, %" PRIxN(__SIZEOF_GID_T__) ", %p, %p)", user, group, groups, ngroups); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_getgrouplist]]]*/
-
-/*[[[head:libc_initgroups,hash:CRC-32=0xe4f308e4]]]*/
-/* >> initgroups(3) */
-INTERN ATTR_SECTION(".text.crt.database.grp") NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user,
-                                      gid_t group)
-/*[[[body:libc_initgroups]]]*/
-/*AUTO*/{
-	(void)user;
-	(void)group;
-	CRT_UNIMPLEMENTEDF("initgroups(%q, %" PRIxN(__SIZEOF_GID_T__) ")", user, group); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_initgroups]]]*/
 
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0xa72d21bb]]]*/
+
+/*[[[start:exports,hash:CRC-32=0x838d2ade]]]*/
 DEFINE_PUBLIC_ALIAS(getgrgid, libc_getgrgid);
 DEFINE_PUBLIC_ALIAS(getgrnam, libc_getgrnam);
 DEFINE_PUBLIC_ALIAS(setgrent, libc_setgrent);
@@ -368,8 +336,6 @@ DEFINE_PUBLIC_ALIAS(fgetgrent, libc_fgetgrent);
 DEFINE_PUBLIC_ALIAS(__setgroups, libc_setgroups);
 DEFINE_PUBLIC_ALIAS(__libc_setgroups, libc_setgroups);
 DEFINE_PUBLIC_ALIAS(setgroups, libc_setgroups);
-DEFINE_PUBLIC_ALIAS(getgrouplist, libc_getgrouplist);
-DEFINE_PUBLIC_ALIAS(initgroups, libc_initgroups);
 /*[[[end:exports]]]*/
 
 DECL_END

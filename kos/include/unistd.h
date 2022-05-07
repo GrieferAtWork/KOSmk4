@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa256c3bf */
+/* HASH CRC-32:0xec28b252 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3203,16 +3203,88 @@ __CSDECLARE2(,char const *const _sys_siglist[],_sys_siglist)
 #define __sa_family_t_defined
 typedef __sa_family_t sa_family_t; /* One of `AF_*' */
 #endif /* !__sa_family_t_defined */
-#if !defined(__getgrouplist_defined) && defined(__CRT_HAVE_getgrouplist)
+#ifndef __getgrouplist_defined
 #define __getgrouplist_defined
-/* >> getgrouplist(3) */
-__CDECLARE(__ATTR_NONNULL((1, 3, 4)),int,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, int *__ngroups),(__user,__group,__groups,__ngroups))
-#endif /* !__getgrouplist_defined && __CRT_HAVE_getgrouplist */
-#if !defined(__initgroups_defined) && defined(__CRT_HAVE_initgroups)
+#ifdef __CRT_HAVE_getgrouplist
+/* >> getgrouplist(3)
+ * Use the groups database to find the GIDs of all of the groups which `user'
+ * is apart of. In case this list doesn't already include `group', it will be
+ * inserted into the list (thus making sure that it is always a member).
+ * @param: user:    The name to seach for in the member lists of groups.
+ * @param: group:   Usually, the default group of `user' (as retrieved from  the
+ *                  functions from `<pwd.h>'). This group will always be made to
+ *                  be a member of the list of GIDs written to `*groups'
+ * @param: groups:  Output buffer for GIDs
+ * @param: ngroups: [in]  The buffer length (max #  of elements) that can be  stored
+ *                        in the given buffer before it become full. When this limit
+ *                  [out] The required buffer size (in elements). Upon success, the
+ *                        value written  here is  identical  to the  return  value.
+ * @return: * : [== *ngroups] The number of items written to `groups'
+ * @return: -1: More than `IN(*ngroups)' elements would have been written to  `groups'.
+ *              In this case, `OUT(*ngroups)' specifies the number of required elements
+ *              in terms of buffer  size to write  all groups (use  this to resize  the
+ *              buffer you're passing for `groups').
+ *              Note that standards don't say anything about `errno' in this case,
+ *              so the KOS implementation of this function simply leaves its value
+ *              untouched when this happens (other implementations might set it to
+ *              `ERANGE' for example...) */
+__CDECLARE(__ATTR_NONNULL((1, 3, 4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups),(__user,__group,__groups,__ngroups))
+#elif defined(__CRT_HAVE_setgrent) && defined(__CRT_HAVE_getgrent)
+#include <libc/local/grp/getgrouplist.h>
+/* >> getgrouplist(3)
+ * Use the groups database to find the GIDs of all of the groups which `user'
+ * is apart of. In case this list doesn't already include `group', it will be
+ * inserted into the list (thus making sure that it is always a member).
+ * @param: user:    The name to seach for in the member lists of groups.
+ * @param: group:   Usually, the default group of `user' (as retrieved from  the
+ *                  functions from `<pwd.h>'). This group will always be made to
+ *                  be a member of the list of GIDs written to `*groups'
+ * @param: groups:  Output buffer for GIDs
+ * @param: ngroups: [in]  The buffer length (max #  of elements) that can be  stored
+ *                        in the given buffer before it become full. When this limit
+ *                  [out] The required buffer size (in elements). Upon success, the
+ *                        value written  here is  identical  to the  return  value.
+ * @return: * : [== *ngroups] The number of items written to `groups'
+ * @return: -1: More than `IN(*ngroups)' elements would have been written to  `groups'.
+ *              In this case, `OUT(*ngroups)' specifies the number of required elements
+ *              in terms of buffer  size to write  all groups (use  this to resize  the
+ *              buffer you're passing for `groups').
+ *              Note that standards don't say anything about `errno' in this case,
+ *              so the KOS implementation of this function simply leaves its value
+ *              untouched when this happens (other implementations might set it to
+ *              `ERANGE' for example...) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getgrouplist, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3, 4)) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL getgrouplist)(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getgrouplist))(__user, __group, __groups, __ngroups); })
+#else /* ... */
+#undef __getgrouplist_defined
+#endif /* !... */
+#endif /* !__getgrouplist_defined */
+#ifndef __initgroups_defined
 #define __initgroups_defined
-/* >> initgroups(3) */
+#ifdef __CRT_HAVE_initgroups
+/* >> initgroups(3)
+ * A helper function that combines `getgrouplist(3)' with `setgroups(2)',
+ * and can be used to set the calling process's group list to that of the
+ * given user, whilst always being guarantied to also include `group'!
+ * @return: 0 : Success
+ * @return: -1: [errno=ENOMEM] Out of member
+ * @return: -1: [errno=EPERM]  You're not allowed  to call  `setgroups(2)',
+ *                             or at least not in the way you're trying to. */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
-#endif /* !__initgroups_defined && __CRT_HAVE_initgroups */
+#elif (defined(__CRT_HAVE_getgrouplist) || (defined(__CRT_HAVE_setgrent) && defined(__CRT_HAVE_getgrent))) && (defined(__CRT_HAVE_setgroups) || defined(__CRT_HAVE___setgroups) || defined(__CRT_HAVE___libc_setgroups)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/grp/initgroups.h>
+/* >> initgroups(3)
+ * A helper function that combines `getgrouplist(3)' with `setgroups(2)',
+ * and can be used to set the calling process's group list to that of the
+ * given user, whilst always being guarantied to also include `group'!
+ * @return: 0 : Success
+ * @return: -1: [errno=ENOMEM] Out of member
+ * @return: -1: [errno=EPERM]  You're not allowed  to call  `setgroups(2)',
+ *                             or at least not in the way you're trying to. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(initgroups, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL initgroups)(char const *__user, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(initgroups))(__user, __group); })
+#else /* ... */
+#undef __initgroups_defined
+#endif /* !... */
+#endif /* !__initgroups_defined */
 #ifndef __mkstemps_defined
 #define __mkstemps_defined
 #include <asm/os/oflags.h>

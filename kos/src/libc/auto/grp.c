@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bf48a2 */
+/* HASH CRC-32:0x6ef3a69b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -250,8 +250,8 @@ eof:
 				goto badline; /* There shouldn't be another ':' */
 		}
 
-		/* All right! we've got all of the fields!
-		 * Now to fill in the 1 numeric field (since it
+		/* All   right!  we've  got  all  of  the  fields!
+		 * Now to fill  in the 1  numeric field (since  it
 		 * might still contain errors that would turn this
 		 * entry into a bad line) */
 		if unlikely(!*field_starts[2]) {
@@ -384,6 +384,115 @@ nextline:
 		goto eof;
 	goto again_parseln;
 }
+#include <bits/crt/db/group.h>
+/* >> getgrouplist(3)
+ * Use the groups database to find the GIDs of all of the groups which `user'
+ * is apart of. In case this list doesn't already include `group', it will be
+ * inserted into the list (thus making sure that it is always a member).
+ * @param: user:    The name to seach for in the member lists of groups.
+ * @param: group:   Usually, the default group of `user' (as retrieved from  the
+ *                  functions from `<pwd.h>'). This group will always be made to
+ *                  be a member of the list of GIDs written to `*groups'
+ * @param: groups:  Output buffer for GIDs
+ * @param: ngroups: [in]  The buffer length (max #  of elements) that can be  stored
+ *                        in the given buffer before it become full. When this limit
+ *                  [out] The required buffer size (in elements). Upon success, the
+ *                        value written  here is  identical  to the  return  value.
+ * @return: * : [== *ngroups] The number of items written to `groups'
+ * @return: -1: More than `IN(*ngroups)' elements would have been written to  `groups'.
+ *              In this case, `OUT(*ngroups)' specifies the number of required elements
+ *              in terms of buffer  size to write  all groups (use  this to resize  the
+ *              buffer you're passing for `groups').
+ *              Note that standards don't say anything about `errno' in this case,
+ *              so the KOS implementation of this function simply leaves its value
+ *              untouched when this happens (other implementations might set it to
+ *              `ERANGE' for example...) */
+INTERN ATTR_SECTION(".text.crt.database.grp") NONNULL((1, 3, 4)) __STDC_INT_AS_SSIZE_T
+NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const *user,
+                                        gid_t group,
+                                        gid_t *groups,
+                                        __STDC_INT_AS_SIZE_T *ngroups) {
+	__STDC_INT_AS_SIZE_T count = 0;
+	__STDC_INT_AS_SIZE_T buflen = *ngroups;
+	struct group *ent;
+	libc_setgrent();
+	while ((ent = libc_getgrent()) != NULL) {
+		size_t i;
+		if (ent->gr_gid == group)
+			goto nextgroup; /* Skip! (always added manually) */
+
+		/* Check if `user' is in this group's member list. */
+		for (i = 0;; ++i) {
+			char *member = ent->gr_mem[i];
+			if (!member)
+				goto nextgroup;
+			if (libc_strcmp(member, user) == 0)
+				break; /* Yup! User is apart of this group! */
+		}
+
+		/* Add this group's GID to the result list. */
+		if (count < buflen)
+			*groups++ = ent->gr_gid;
+		++count;
+nextgroup:
+		;
+	}
+
+	/* Append `group', so it's always apart of the list.
+	 *
+	 * The fact  that in  our  implementation it's  always  the
+	 * last member is an implementation detail we intentionally
+	 * neglect to document! */
+	if (count < buflen)
+		*groups++ = group;
+	++count;
+
+	/* Write-back the required buffer size. */
+	*ngroups = (__STDC_INT_AS_SIZE_T)count;
+	if ((size_t)count > (size_t)buflen)
+		return (__STDC_INT_AS_SSIZE_T)-1; /* Buffer too small. */
+	return (__STDC_INT_AS_SSIZE_T)count;
+}
+/* >> initgroups(3)
+ * A helper function that combines `getgrouplist(3)' with `setgroups(2)',
+ * and can be used to set the calling process's group list to that of the
+ * given user, whilst always being guarantied to also include `group'!
+ * @return: 0 : Success
+ * @return: -1: [errno=ENOMEM] Out of member
+ * @return: -1: [errno=EPERM]  You're not allowed  to call  `setgroups(2)',
+ *                             or at least not in the way you're trying to. */
+INTERN ATTR_SECTION(".text.crt.database.grp") NONNULL((1)) int
+NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user,
+                                      gid_t group) {
+	int result = 0;
+	gid_t initbuf[32], *buf = initbuf;
+	__STDC_INT_AS_SIZE_T buflen = COMPILER_LENOF(initbuf);
+	__STDC_INT_AS_SIZE_T ngroups;
+	for (;;) {
+		gid_t *newbuf;
+		ngroups = buflen;
+		if (libc_getgrouplist(user, group, buf, &ngroups) != -1)
+			break;
+		/* Allocate more space. */
+		if (buf == initbuf)
+			buf = NULL;
+		newbuf = (gid_t *)libc_realloc(buf, ngroups * sizeof(gid_t));
+		if unlikely(!newbuf) {
+			result = -1;
+			goto done;
+		}
+		buf = newbuf;
+	}
+
+	/* Apply the loaded list of groups. */
+	result = libc_setgroups((size_t)ngroups, buf);
+done:
+
+	if (buf != initbuf)
+		libc_free(buf);
+
+	return result;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -393,6 +502,8 @@ DEFINE_PUBLIC_ALIAS(putgrent, libc_putgrent);
 DEFINE_PUBLIC_ALIAS(fgetgrent_r, libc_fgetgrent_r);
 DEFINE_PUBLIC_ALIAS(fgetgrgid_r, libc_fgetgrgid_r);
 DEFINE_PUBLIC_ALIAS(fgetgrnam_r, libc_fgetgrnam_r);
+DEFINE_PUBLIC_ALIAS(getgrouplist, libc_getgrouplist);
+DEFINE_PUBLIC_ALIAS(initgroups, libc_initgroups);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_GRP_C */

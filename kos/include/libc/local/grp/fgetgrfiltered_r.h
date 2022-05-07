@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b63b988 */
+/* HASH CRC-32:0xab3a0cfc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -391,8 +391,8 @@ __eof:
 				goto __badline; /* There shouldn't be another ':' */
 		}
 
-		/* All right! we've got all of the fields!
-		 * Now to fill in the 1 numeric field (since it
+		/* All   right!  we've  got  all  of  the  fields!
+		 * Now to fill  in the 1  numeric field (since  it
 		 * might still contain errors that would turn this
 		 * entry into a bad line) */
 		if __unlikely(!*__field_starts[2]) {

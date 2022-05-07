@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x355ce86 */
+/* HASH CRC-32:0x510451f6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -216,7 +216,6 @@
 #define __stub_getaliasent_r
 #define __stub_getbsize
 #define __stub_getdate
-#define __stub_getgrouplist
 #define __stub_gethostbyaddr
 #define __stub_gethostbyaddr_r
 #define __stub_gethostbyname
@@ -319,7 +318,6 @@
 #define __stub_inet_nsap_ntoa
 #define __stub_inet_ntop
 #define __stub_inet_pton
-#define __stub_initgroups
 #define __stub___initstate
 #define __stub_initstate
 #define __stub_initstate_r

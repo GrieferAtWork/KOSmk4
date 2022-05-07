@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd435207e */
+/* HASH CRC-32:0x7f31e38c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,10 +51,6 @@ INTDEF NONNULL((1, 2, 4)) int NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group
 INTDEF NONNULL((1)) struct group *NOTHROW_RPC(LIBCCALL libc_fgetgrent)(FILE *__restrict stream);
 /* >> setgroups(2) */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count, gid_t const *groups);
-/* >> getgrouplist(3) */
-INTDEF NONNULL((1, 3, 4)) int NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const *user, gid_t group, gid_t *groups, int *ngroups);
-/* >> initgroups(3) */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user, gid_t group);
 #endif /* !__KERNEL__ */
 
 DECL_END

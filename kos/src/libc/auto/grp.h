@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c8691d6 */
+/* HASH CRC-32:0x744eb106 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,11 +109,77 @@ INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetgrfiltered_r)
 INTDEF NONNULL((1)) struct group *NOTHROW_RPC(LIBDCALL libd_fgetgrent)(FILE *__restrict stream);
 /* >> setgroups(2) */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_setgroups)(size_t count, gid_t const *groups);
-/* >> getgrouplist(3) */
-INTDEF NONNULL((1, 3, 4)) int NOTHROW_RPC(LIBDCALL libd_getgrouplist)(char const *user, gid_t group, gid_t *groups, int *ngroups);
-/* >> initgroups(3) */
+/* >> getgrouplist(3)
+ * Use the groups database to find the GIDs of all of the groups which `user'
+ * is apart of. In case this list doesn't already include `group', it will be
+ * inserted into the list (thus making sure that it is always a member).
+ * @param: user:    The name to seach for in the member lists of groups.
+ * @param: group:   Usually, the default group of `user' (as retrieved from  the
+ *                  functions from `<pwd.h>'). This group will always be made to
+ *                  be a member of the list of GIDs written to `*groups'
+ * @param: groups:  Output buffer for GIDs
+ * @param: ngroups: [in]  The buffer length (max #  of elements) that can be  stored
+ *                        in the given buffer before it become full. When this limit
+ *                  [out] The required buffer size (in elements). Upon success, the
+ *                        value written  here is  identical  to the  return  value.
+ * @return: * : [== *ngroups] The number of items written to `groups'
+ * @return: -1: More than `IN(*ngroups)' elements would have been written to  `groups'.
+ *              In this case, `OUT(*ngroups)' specifies the number of required elements
+ *              in terms of buffer  size to write  all groups (use  this to resize  the
+ *              buffer you're passing for `groups').
+ *              Note that standards don't say anything about `errno' in this case,
+ *              so the KOS implementation of this function simply leaves its value
+ *              untouched when this happens (other implementations might set it to
+ *              `ERANGE' for example...) */
+INTDEF NONNULL((1, 3, 4)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_getgrouplist)(char const *user, gid_t group, gid_t *groups, __STDC_INT_AS_SIZE_T *ngroups);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> getgrouplist(3)
+ * Use the groups database to find the GIDs of all of the groups which `user'
+ * is apart of. In case this list doesn't already include `group', it will be
+ * inserted into the list (thus making sure that it is always a member).
+ * @param: user:    The name to seach for in the member lists of groups.
+ * @param: group:   Usually, the default group of `user' (as retrieved from  the
+ *                  functions from `<pwd.h>'). This group will always be made to
+ *                  be a member of the list of GIDs written to `*groups'
+ * @param: groups:  Output buffer for GIDs
+ * @param: ngroups: [in]  The buffer length (max #  of elements) that can be  stored
+ *                        in the given buffer before it become full. When this limit
+ *                  [out] The required buffer size (in elements). Upon success, the
+ *                        value written  here is  identical  to the  return  value.
+ * @return: * : [== *ngroups] The number of items written to `groups'
+ * @return: -1: More than `IN(*ngroups)' elements would have been written to  `groups'.
+ *              In this case, `OUT(*ngroups)' specifies the number of required elements
+ *              in terms of buffer  size to write  all groups (use  this to resize  the
+ *              buffer you're passing for `groups').
+ *              Note that standards don't say anything about `errno' in this case,
+ *              so the KOS implementation of this function simply leaves its value
+ *              untouched when this happens (other implementations might set it to
+ *              `ERANGE' for example...) */
+INTDEF NONNULL((1, 3, 4)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const *user, gid_t group, gid_t *groups, __STDC_INT_AS_SIZE_T *ngroups);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> initgroups(3)
+ * A helper function that combines `getgrouplist(3)' with `setgroups(2)',
+ * and can be used to set the calling process's group list to that of the
+ * given user, whilst always being guarantied to also include `group'!
+ * @return: 0 : Success
+ * @return: -1: [errno=ENOMEM] Out of member
+ * @return: -1: [errno=EPERM]  You're not allowed  to call  `setgroups(2)',
+ *                             or at least not in the way you're trying to. */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_initgroups)(char const *user, gid_t group);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> initgroups(3)
+ * A helper function that combines `getgrouplist(3)' with `setgroups(2)',
+ * and can be used to set the calling process's group list to that of the
+ * given user, whilst always being guarantied to also include `group'!
+ * @return: 0 : Success
+ * @return: -1: [errno=ENOMEM] Out of member
+ * @return: -1: [errno=EPERM]  You're not allowed  to call  `setgroups(2)',
+ *                             or at least not in the way you're trying to. */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user, gid_t group);
+#endif /* !__KERNEL__ */
 
 DECL_END
 
