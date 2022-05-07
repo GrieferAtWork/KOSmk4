@@ -820,7 +820,30 @@ again_handle_col:
 			arguments.extend(joinGccArguments({ "-T", linkerScript }, "-Wl", "-Xlinker"));
 		if (ldFlags)
 			arguments.extend(joinGccArguments(ldFlags, "-Wl", "-Xlinker"));
-		arguments.extend(objFiles);
+		if (#objFiles >= 256) {
+			/* Prevent problems relating to commandline-too-long errors. */
+			local config: Config = step.toolchain.config;
+			local ldObjectsFilename: string = config.getBuildArtifact(step.group, "ld-objects", ".txt");
+			local ldObjectsData = File.Writer();
+			local isFirst = true;
+			for (local arg: objFiles) {
+				if (!isFirst)
+					ldObjectsData.write(" ");
+				isFirst = false;
+				if (" " in arg || '"' in arg) {
+					ldObjectsData.write('"');
+					ldObjectsData.write(arg.replace(r'"', r'\"'));
+					ldObjectsData.write('"');
+				} else {
+					ldObjectsData.write(arg);
+				}
+			}
+			with (local fp = File.open(ldObjectsFilename, "w"))
+				fp.write(ldObjectsData.string.encode("utf-8"));
+			arguments.append("@" + ldObjectsFilename);
+		} else {
+			arguments.extend(objFiles);
+		}
 		for (local l: libraries)
 			arguments.append("-l" + l);
 		return createWaitableProcess(step, none, "ld", ipc.Process(cc, arguments));
