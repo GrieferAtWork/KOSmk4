@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bd3581d */
+/* HASH CRC-32:0x1f68fb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3025,6 +3025,10 @@ DEFINE_PUBLIC_ALIAS(DOS$pkey_get, libd_pkey_get);
 DEFINE_PUBLIC_ALIAS(DOS$pkey_free, libd_pkey_free);
 DEFINE_PUBLIC_ALIAS(DOS$pkey_mprotect, libd_pkey_mprotect);
 #endif /* __ARCH_HAVE_PKEY */
+DEFINE_PUBLIC_ALIAS(DOS$fmapfile, libd_fmapfile);
+DEFINE_PUBLIC_ALIAS(DOS$fmapfileat, libd_fmapfileat);
+DEFINE_PUBLIC_ALIAS(DOS$mapfile, libd_mapfile);
+DEFINE_PUBLIC_ALIAS(DOS$unmapfile, libd_unmapfile);
 
 /* sys.mount */
 DEFINE_PUBLIC_ALIAS(DOS$__mount, libd_mount);

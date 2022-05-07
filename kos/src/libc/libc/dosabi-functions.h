@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82e0e483 */
+/* HASH CRC-32:0x84574c5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2472,6 +2472,10 @@ DFUN(".text.crt.dos.system.mman", libd_pkey_get, libc_pkey_get, TD, 1, TD)
 DFUN(".text.crt.dos.system.mman", libd_pkey_free, libc_pkey_free, TD, 1, TD)
 DFUN(".text.crt.dos.system.mman", libd_pkey_mprotect, libc_pkey_mprotect, TD, 4, TP, TI, TD, TD)
 #endif /* __ARCH_HAVE_PKEY */
+DFUN(".text.crt.dos.system.mman", libd_fmapfile, libc_fmapfile, TD, 5, TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_OFF64_T__), TI, TI)
+DFUN(".text.crt.dos.system.mman", libd_fmapfileat, libc_fmapfileat, TD, 7, TIn(__SIZEOF_FD_T__), TP, TP, TIn(__SIZEOF_OFF64_T__), TI, TI, TIn(__SIZEOF_ATFLAG_T__))
+DFUN(".text.crt.dos.system.mman", libd_mapfile, libc_mapfile, TD, 5, TP, TP, TIn(__SIZEOF_OFF64_T__), TI, TI)
+DFUN(".text.crt.dos.system.mman", libd_unmapfile, libc_unmapfile, TD, 1, TP)
 
 /* sys.mount */
 DFUN(".text.crt.dos.fs.mount", libd_mount, libc_mount, TD, 5, TP, TP, TP, TP, TP)

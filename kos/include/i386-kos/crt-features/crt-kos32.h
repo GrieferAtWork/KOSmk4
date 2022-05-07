@@ -2872,6 +2872,8 @@
 #define __CRT_HAVE_fma
 #define __CRT_HAVE_fmaf
 #define __CRT_HAVE_fmal
+#define __CRT_HAVE_fmapfile
+#define __CRT_HAVE_fmapfileat
 #define __CRT_HAVE_fmax
 #define __CRT_HAVE_fmaxf
 #define __CRT_HAVE_fmaxl
@@ -3627,6 +3629,7 @@
 #define __CRT_HAVE_malloc_trim
 #define __CRT_HAVE_malloc_usable_size
 #define __CRT_HAVE_mallopt
+#define __CRT_HAVE_mapfile
 #define __CRT_HAVE_matherr
 #define __CRT_HAVE_mblen
 #define __CRT_HAVE_mbrlen
@@ -6036,6 +6039,7 @@
 #define __CRT_HAVE_unlock_std_streams
 #define __CRT_HAVE_unlock_stream
 #define __CRT_HAVE_unlockpt
+#define __CRT_HAVE_unmapfile
 #define __CRT_HAVE_unsetenv
 #define __CRT_HAVE_unshare
 #define __CRT_HAVE_updwtmp

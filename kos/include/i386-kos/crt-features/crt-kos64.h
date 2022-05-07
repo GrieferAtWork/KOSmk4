@@ -2719,6 +2719,8 @@
 #define __CRT_HAVE_fma
 #define __CRT_HAVE_fmaf
 #define __CRT_HAVE_fmal
+#define __CRT_HAVE_fmapfile
+#define __CRT_HAVE_fmapfileat
 #define __CRT_HAVE_fmax
 #define __CRT_HAVE_fmaxf
 #define __CRT_HAVE_fmaxl
@@ -3474,6 +3476,7 @@
 #define __CRT_HAVE_malloc_trim
 #define __CRT_HAVE_malloc_usable_size
 #define __CRT_HAVE_mallopt
+#define __CRT_HAVE_mapfile
 #define __CRT_HAVE_matherr
 #define __CRT_HAVE_mblen
 #define __CRT_HAVE_mbrlen
@@ -5693,6 +5696,7 @@
 #define __CRT_HAVE_unlock_std_streams
 #define __CRT_HAVE_unlock_stream
 #define __CRT_HAVE_unlockpt
+#define __CRT_HAVE_unmapfile
 #define __CRT_HAVE_unsetenv
 #define __CRT_HAVE_unshare
 #define __CRT_HAVE_updwtmp
@@ -8472,6 +8476,8 @@
 #define __CRT_HAVE_KOS$fma
 #define __CRT_HAVE_KOS$fmaf
 #define __CRT_HAVE_KOS$fmal
+#define __CRT_HAVE_KOS$fmapfile
+#define __CRT_HAVE_KOS$fmapfileat
 #define __CRT_HAVE_KOS$fmax
 #define __CRT_HAVE_KOS$fmaxf
 #define __CRT_HAVE_KOS$fmaxl
@@ -9078,6 +9084,7 @@
 #define __CRT_HAVE_KOS$malloc_trim
 #define __CRT_HAVE_KOS$malloc_usable_size
 #define __CRT_HAVE_KOS$mallopt
+#define __CRT_HAVE_KOS$mapfile
 #define __CRT_HAVE_KOS$mblen
 #define __CRT_HAVE_KOS$mbrlen
 #define __CRT_HAVE_KOS$mbrtoc16
@@ -10329,6 +10336,7 @@
 #define __CRT_HAVE_KOS$unlinkat
 #define __CRT_HAVE_KOS$unlock_stream
 #define __CRT_HAVE_KOS$unlockpt
+#define __CRT_HAVE_KOS$unmapfile
 #define __CRT_HAVE_KOS$unsetenv
 #define __CRT_HAVE_KOS$unshare
 #define __CRT_HAVE_KOS$updwtmp
@@ -13029,6 +13037,8 @@
 #define __CRT_HAVE_DOS$fma
 #define __CRT_HAVE_DOS$fmaf
 #define __CRT_HAVE_DOS$fmal
+#define __CRT_HAVE_DOS$fmapfile
+#define __CRT_HAVE_DOS$fmapfileat
 #define __CRT_HAVE_DOS$fmax
 #define __CRT_HAVE_DOS$fmaxf
 #define __CRT_HAVE_DOS$fmaxl
@@ -13635,6 +13645,7 @@
 #define __CRT_HAVE_DOS$malloc_trim
 #define __CRT_HAVE_DOS$malloc_usable_size
 #define __CRT_HAVE_DOS$mallopt
+#define __CRT_HAVE_DOS$mapfile
 #define __CRT_HAVE_DOS$mblen
 #define __CRT_HAVE_DOS$mbrlen
 #define __CRT_HAVE_DOS$mbrtoc16
@@ -14886,6 +14897,7 @@
 #define __CRT_HAVE_DOS$unlinkat
 #define __CRT_HAVE_DOS$unlock_stream
 #define __CRT_HAVE_DOS$unlockpt
+#define __CRT_HAVE_DOS$unmapfile
 #define __CRT_HAVE_DOS$unsetenv
 #define __CRT_HAVE_DOS$unshare
 #define __CRT_HAVE_DOS$updwtmp

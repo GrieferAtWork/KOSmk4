@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f3049bc */
+/* HASH CRC-32:0x9ed6e712 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -823,6 +823,118 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_free,(int __pkey),(__pkey))
 /* >> pkey_mprotect(2) */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_mprotect,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, int __pkey),(__addr,__len,__prot,__pkey))
 #endif /* __USE_GNU */
+#ifdef __USE_KOS
+__SYSDECL_END
+#include <bits/crt/mapfile.h>
+__SYSDECL_BEGIN
+#ifdef __CRT_HAVE_fmapfile
+/* >> fmapfile(3)
+ * A helper function that can be used to map a specific sub-range of a given file into memory.
+ * This  function  tries  the   following  (in  order)  in   order  to  create  the   mapping:
+ *  - mmap(2):                        If `fd' can be mmap'd, then that is how the mapping is created
+ *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
+ *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
+ *  - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
+ *                                    after which up to `max_bytes' bytes are read normally.
+ * Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
+ * @param: fd:        The file that should be loaded into memory
+ * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
+ *                     - mf_addr: Filled with the base address of a mapping of the file's contents
+ *                     - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
+ *                     - Other fields are implementation-specific
+ *                    Note that the memory located as `mapping->mf_addr' is writable, though changes  to
+ *                    it are guarantied not to be written back to `fd'. iow: it behaves like MAP_PRIVATE
+ *                    mapped as PROT_READ|PROT_WRITE.
+ * @param: offset:    File offset / number of leading bytes that should not be mapped
+ * @param: max_bytes: The  max number of bytes (excluding num_trailing_nulbytes) that should be mapped
+ *                    starting at `offset'. If the file is  smaller than this, or indicate EOF  before
+ *                    this number of bytes has been reached, simply stop there. - The actual number of
+ *                    mapped bytes is returned in `mapping->mf_size'.
+ * @param: num_trailing_nulbytes: When non-zero, append this many trailing NUL-bytes at the end of the
+ *                    mapping. More bytes than this may be appened if necessary, but at least this many
+ *                    are guarantied to be. - Useful if you want  to load a file as a string, in  which
+ *                    case you can specify `1' to always have a trailing '\0' be appended.
+ * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
+ * @return: -1: [errno=EBADF]  Invalid `fd'
+ * @return: -1: [errno=EPERM]  `fd' doesn't support read(2), or (when offset != 0), doesn't support lseek(2)
+ * @return: -1: [errno=ENOMEM] Out of memory
+ * @return: -1: [errno=*]      Read error */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),int,__NOTHROW_NCX,fmapfile,(__fd_t __fd, struct mapfile *__restrict __mapping, pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes),(__fd,__mapping,__offset,__max_bytes,__num_trailing_nulbytes))
+#elif (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/sys.mman/fmapfile.h>
+/* >> fmapfile(3)
+ * A helper function that can be used to map a specific sub-range of a given file into memory.
+ * This  function  tries  the   following  (in  order)  in   order  to  create  the   mapping:
+ *  - mmap(2):                        If `fd' can be mmap'd, then that is how the mapping is created
+ *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
+ *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
+ *  - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
+ *                                    after which up to `max_bytes' bytes are read normally.
+ * Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
+ * @param: fd:        The file that should be loaded into memory
+ * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
+ *                     - mf_addr: Filled with the base address of a mapping of the file's contents
+ *                     - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
+ *                     - Other fields are implementation-specific
+ *                    Note that the memory located as `mapping->mf_addr' is writable, though changes  to
+ *                    it are guarantied not to be written back to `fd'. iow: it behaves like MAP_PRIVATE
+ *                    mapped as PROT_READ|PROT_WRITE.
+ * @param: offset:    File offset / number of leading bytes that should not be mapped
+ * @param: max_bytes: The  max number of bytes (excluding num_trailing_nulbytes) that should be mapped
+ *                    starting at `offset'. If the file is  smaller than this, or indicate EOF  before
+ *                    this number of bytes has been reached, simply stop there. - The actual number of
+ *                    mapped bytes is returned in `mapping->mf_size'.
+ * @param: num_trailing_nulbytes: When non-zero, append this many trailing NUL-bytes at the end of the
+ *                    mapping. More bytes than this may be appened if necessary, but at least this many
+ *                    are guarantied to be. - Useful if you want  to load a file as a string, in  which
+ *                    case you can specify `1' to always have a trailing '\0' be appended.
+ * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
+ * @return: -1: [errno=EBADF]  Invalid `fd'
+ * @return: -1: [errno=EPERM]  `fd' doesn't support read(2), or (when offset != 0), doesn't support lseek(2)
+ * @return: -1: [errno=ENOMEM] Out of memory
+ * @return: -1: [errno=*]      Read error */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL fmapfile)(__fd_t __fd, struct mapfile *__restrict __mapping, pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmapfile))(__fd, __mapping, __offset, __max_bytes, __num_trailing_nulbytes); })
+#endif /* ... */
+#ifdef __CRT_HAVE_fmapfileat
+/* >> fmapfileat(3)
+ * Map the specified `filename' into memory. s.a. `fmapfile(3)'
+ * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fmapfileat,(fd_t __dirfd, char const *__filename, struct mapfile *__restrict __mapping, pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes, atflag_t __atflags),(__dirfd,__filename,__mapping,__offset,__max_bytes,__num_trailing_nulbytes,__atflags))
+#else /* __CRT_HAVE_fmapfileat */
+#include <asm/os/oflags.h>
+#if defined(__O_RDONLY) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_fmapfile) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
+#include <libc/local/sys.mman/fmapfileat.h>
+/* >> fmapfileat(3)
+ * Map the specified `filename' into memory. s.a. `fmapfile(3)'
+ * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmapfileat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2, 3)) int __NOTHROW_NCX(__LIBCCALL fmapfileat)(fd_t __dirfd, char const *__filename, struct mapfile *__restrict __mapping, pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes, atflag_t __atflags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmapfileat))(__dirfd, __filename, __mapping, __offset, __max_bytes, __num_trailing_nulbytes, __atflags); })
+#endif /* __O_RDONLY && (__CRT_HAVE_openat64 || __CRT_HAVE_openat) && (__CRT_HAVE_fmapfile || ((__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))) */
+#endif /* !__CRT_HAVE_fmapfileat */
+#ifdef __CRT_HAVE_mapfile
+/* >> mapfile(3)
+ * Map the specified `filename' into memory. s.a. `fmapfile(3)' */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,mapfile,(char const *__filename, struct mapfile *__restrict __mapping, pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes),(__filename,__mapping,__offset,__max_bytes,__num_trailing_nulbytes))
+#else /* __CRT_HAVE_mapfile */
+#include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
+#if (defined(__AT_FDCWD) && (defined(__CRT_HAVE_fmapfileat) || (defined(__O_RDONLY) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_fmapfile) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))))) || (defined(__O_RDONLY) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fmapfile) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))))
+#include <libc/local/sys.mman/mapfile.h>
+/* >> mapfile(3)
+ * Map the specified `filename' into memory. s.a. `fmapfile(3)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(mapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL mapfile)(char const *__filename, struct mapfile *__restrict __mapping, pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mapfile))(__filename, __mapping, __offset, __max_bytes, __num_trailing_nulbytes); })
+#endif /* (__AT_FDCWD && (__CRT_HAVE_fmapfileat || (__O_RDONLY && (__CRT_HAVE_openat64 || __CRT_HAVE_openat) && (__CRT_HAVE_fmapfile || ((__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc)))))) || (__O_RDONLY && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fmapfile || ((__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc)))) */
+#endif /* !__CRT_HAVE_mapfile */
+#ifdef __CRT_HAVE_unmapfile
+/* >> unmapfile(3)
+ * Delete a file mapping previously created by `mapfile(3)' */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,unmapfile,(struct mapfile *__restrict __mapping),(__mapping))
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+#include <libc/local/sys.mman/unmapfile.h>
+/* >> unmapfile(3)
+ * Delete a file mapping previously created by `mapfile(3)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(unmapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL unmapfile)(struct mapfile *__restrict __mapping) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unmapfile))(__mapping); })
+#endif /* ... */
+#endif /* __USE_KOS */
 
 __SYSDECL_END
 #endif /* __CC__ */

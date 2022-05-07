@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x587d8368 */
+/* HASH CRC-32:0x68887a5a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1539,6 +1539,8 @@
 #define __CRT_HAVE_DOS$fma
 #define __CRT_HAVE_DOS$fmaf
 #define __CRT_HAVE_DOS$fmal
+#define __CRT_HAVE_DOS$fmapfile
+#define __CRT_HAVE_DOS$fmapfileat
 #define __CRT_HAVE_DOS$fmax
 #define __CRT_HAVE_DOS$fmaxf
 #define __CRT_HAVE_DOS$fmaxl
@@ -2206,6 +2208,7 @@
 #define __CRT_HAVE_DOS$malloc_trim
 #define __CRT_HAVE_DOS$malloc_usable_size
 #define __CRT_HAVE_DOS$mallopt
+#define __CRT_HAVE_DOS$mapfile
 #define __CRT_HAVE_DOS$mblen
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -3582,6 +3585,7 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$unlock_stream
 #define __CRT_HAVE_DOS$unlockpt
+#define __CRT_HAVE_DOS$unmapfile
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$unsetenv
@@ -5669,6 +5673,8 @@
 #define __CRT_HAVE_fma
 #define __CRT_HAVE_fmaf
 #define __CRT_HAVE_fmal
+#define __CRT_HAVE_fmapfile
+#define __CRT_HAVE_fmapfileat
 #define __CRT_HAVE_fmax
 #define __CRT_HAVE_fmaxf
 #define __CRT_HAVE_fmaxl
@@ -6387,6 +6393,7 @@
 #define __CRT_HAVE_malloc_trim
 #define __CRT_HAVE_malloc_usable_size
 #define __CRT_HAVE_mallopt
+#define __CRT_HAVE_mapfile
 #define __CRT_HAVE_mblen
 #define __CRT_HAVE_mbrlen
 #define __CRT_HAVE_mbrtoc16
@@ -7860,6 +7867,7 @@
 #define __CRT_HAVE_unlock_std_streams
 #define __CRT_HAVE_unlock_stream
 #define __CRT_HAVE_unlockpt
+#define __CRT_HAVE_unmapfile
 #define __CRT_HAVE_unsetenv
 #define __CRT_HAVE_unshare
 #define __CRT_HAVE_updwtmp
