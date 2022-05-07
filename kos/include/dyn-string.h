@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73f1627b */
+/* HASH CRC-32:0x1eacde3e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ typedef struct dyn_string *dyn_string_t;
  * @param: min_chars: Minimum value for `self->allocated'
  * @return: 1: Always returns `1' */
 __CDECLARE(,int,__NOTHROW_NCX,dyn_string_init,(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars),(__self,__min_chars))
-#elif defined(__CRT_HAVE_xmalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))
+#elif defined(__CRT_HAVE_xmalloc) || defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xcalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))
 #include <libc/local/dyn-string/dyn_string_init.h>
 /* >> dyn_string_init(3)
  * Initialize a given `struct dyn_string'
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_init, __FORCELOCAL __ATTR_ARTIFICIAL 
  * @return: * : The new dyn_string object (free using `dyn_string_delete(3)')
  *              -> uses `xmalloc(3)', so no error-return-value */
 __CDECLARE(__ATTR_RETNONNULL,struct dyn_string *,__NOTHROW_NCX,dyn_string_new,(__STDC_INT_AS_SIZE_T __min_chars),(__min_chars))
-#elif defined(__CRT_HAVE_xmalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))
+#elif defined(__CRT_HAVE_xmalloc) || defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xcalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))
 #include <libc/local/dyn-string/dyn_string_new.h>
 /* >> dyn_string_init(3)
  * Allocate+initialize a new `dyn_string_t'

@@ -83,20 +83,6 @@ NOTHROW_NCX(LIBCCALL libc_fdmatch)(fd_t fd1,
 /*[[[end:libc_fdmatch]]]*/
 
 
-/*[[[head:libc_expandargv,hash:CRC-32=0xa50b94be]]]*/
-/* >> expandargv(3)
- * Expand special `@file' arguments passed on the commandline */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) void
-NOTHROW_NCX(LIBCCALL libc_expandargv)(int *p_argc,
-                                      char ***p_argv)
-/*[[[body:libc_expandargv]]]*/
-/*AUTO*/{
-	(void)p_argc;
-	(void)p_argv;
-	CRT_UNIMPLEMENTEDF("expandargv(%p, %p)", p_argc, p_argv); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_expandargv]]]*/
 
 
 /*[[[head:libd_concat_copy2,hash:CRC-32=0x957c2430]]]*/
@@ -465,11 +451,10 @@ NOTHROW_NCX(LIBCCALL libc_pwait)(int a,
 }
 /*[[[end:libc_pwait]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x1ffc4319]]]*/
+/*[[[start:exports,hash:CRC-32=0x5ed846ca]]]*/
 DEFINE_PUBLIC_ALIAS(xmalloc_set_program_name, libc_xmalloc_set_program_name);
 DEFINE_PUBLIC_ALIAS(xmalloc_failed, libc_xmalloc_failed);
 DEFINE_PUBLIC_ALIAS(fdmatch, libc_fdmatch);
-DEFINE_PUBLIC_ALIAS(expandargv, libc_expandargv);
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$concat_copy2, libd_concat_copy2);
 #endif /* !__LIBCCALL_IS_LIBDCALL */

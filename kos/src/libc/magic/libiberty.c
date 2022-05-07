@@ -410,10 +410,30 @@ void xmalloc_set_program_name(char const *progname);
 [[noreturn, throws]]
 void xmalloc_failed(size_t num_bytes);
 
+[[hidden, nocrt, alias("xmalloc")]]
+[[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
+void *crt_xmalloc(size_t num_bytes);
+
+[[hidden, nocrt, alias("xcalloc")]]
+[[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
+void *crt_xcalloc(size_t elem_count, size_t elem_size);
+
+[[hidden, nocrt, alias("xrealloc")]]
+[[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
+void *crt_xrealloc(void *ptr, size_t num_bytes);
+
+
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1))]]
-[[nonnull, requires_function(malloc, xmalloc_failed)]]
-[[impl_include("<asm/crt/malloc.h>")]]
+[[requires($has_function(crt_xrealloc) ||
+           $has_function(crt_xcalloc) ||
+           $has_function(malloc, xmalloc_failed))]]
+[[nonnull, impl_include("<asm/crt/malloc.h>")]]
 void *xmalloc(size_t num_bytes) {
+@@pp_if !defined(__BUILDING_LIBC) && $has_function(crt_xrealloc)@@
+	return crt_xrealloc(NULL, num_bytes);
+@@pp_elif !defined(__BUILDING_LIBC) && $has_function(crt_xcalloc)@@
+	return crt_xcalloc(1, num_bytes);
+@@pp_else@@
 	void *result = malloc(num_bytes);
 	if (result == NULL) {
 @@pp_ifndef __MALLOC_ZERO_IS_NONNULL@@
@@ -424,6 +444,7 @@ void *xmalloc(size_t num_bytes) {
 		}
 	}
 	return result;
+@@pp_endif@@
 }
 
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
@@ -441,10 +462,25 @@ void *xrealloc(void *ptr, size_t num_bytes) {
 	return result;
 }
 
-[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
-[[nonnull, requires_function(calloc, xmalloc_failed)]]
+[[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
+[[requires($has_function(crt_xmalloc) ||
+           $has_function(crt_xrealloc) ||
+           $has_function(calloc, xmalloc_failed))]]
 [[impl_include("<asm/crt/malloc.h>", "<hybrid/__overflow.h>")]]
 void *xcalloc(size_t elem_count, size_t elem_size) {
+@@pp_if !defined(__BUILDING_LIBC) && ($has_function(crt_xmalloc) || $has_function(crt_xrealloc))@@
+	void *result;
+	size_t total;
+	if (__hybrid_overflow_umul(elem_count, elem_size, &total))
+		total = (size_t)-1;
+@@pp_if $has_function(crt_xmalloc)@@
+	result = crt_xmalloc(total);
+@@pp_else@@
+	result = crt_xrealloc(NULL, total);
+@@pp_endif@@
+	bzero(result, total);
+	return result;
+@@pp_else@@
 	void *result = calloc(elem_count, elem_size);
 	if (result == NULL) {
 @@pp_ifndef __MALLOC_ZERO_IS_NONNULL@@
@@ -458,6 +494,7 @@ void *xcalloc(size_t elem_count, size_t elem_size) {
 		}
 	}
 	return result;
+@@pp_endif@@
 }
 
 [[decl_include("<hybrid/typecore.h>")]]
@@ -679,7 +716,68 @@ end_of_argument:
 
 @@>> expandargv(3)
 @@Expand special `@file' arguments passed on the commandline
-void expandargv([[nonnull]] int *p_argc, [[nonnull]] char ***p_argv);
+[[requires_function(mapfile, xrealloc, xmalloc)]]
+[[impl_include("<libc/errno.h>", "<hybrid/__assert.h>")]]
+[[impl_include("<bits/crt/mapfile.h>")]]
+void expandargv([[nonnull]] int *p_argc, [[nonnull]] char ***p_argv) {
+	size_t i, argc = (size_t)*p_argc;
+	char **argv = *p_argv;
+	for (i = 0; i < argc; ++i) {
+		@struct mapfile@ mf;
+		char *arg = argv[i];
+		char **inject_argv;
+		size_t inject_argc;
+		if (arg[0] != '@')
+			continue;
+		++arg;
+
+		/* Map the specified file into memory. - If doing so fails,
+		 * (due to something other than out-of-memory), then we simply
+		 * ignore the @-directive. */
+		if (mapfile(arg, &mf, 0, (size_t)-1, 1) != 0) {
+@@pp_if defined(libc_geterrno) && $has_function(xmalloc_failed)@@
+			if (libc_geterrno() == ENOMEM)
+				xmalloc_failed(1);
+@@pp_endif@@
+			continue;
+		}
+
+		/* Build an argument vector from the file.
+		 * Note the forced trailing NUL-byte we requested for the mapping! */
+		inject_argv = buildargv((char *)mf.@mf_addr@);
+@@pp_if $has_function(unmapfile)@@
+		unmapfile(&mf);
+@@pp_endif@@
+
+		/* Count the # of injected arguments. */
+		__hybrid_assert(inject_argv);
+		for (inject_argc = 0; inject_argv[inject_argc]; ++inject_argc)
+			;
+
+		/* Resize the argument vector. */
+		if (argv == *p_argv) {
+			size_t size;
+			size = (argc + inject_argc + 1) * sizeof(char *);
+			argv = (char **)memcpy(xmalloc(size), argv, size - sizeof(char *));
+			argv[argc] = NULL; /* Sentinel */
+		} else {
+			argv = (char **)xrealloc(argv, (argc + inject_argc + 1) * sizeof(char *));
+		}
+		/* Inject arguments */
+		memmoveupc(argv + i + inject_argc,
+		           argv + i,
+		           argc - i, sizeof(char *));
+		memcpyc(argv + i, inject_argv, inject_argc, sizeof(char *));
+@@pp_if $has_function(free)@@
+		free(inject_argv);
+@@pp_endif@@
+		argc += inject_argc;
+		i += inject_argc;
+	}
+	*p_argc = (int)(unsigned int)argc;
+	*p_argv = argv;
+}
+
 
 @@@return: 0 : Success
 @@@return: 1 : Error

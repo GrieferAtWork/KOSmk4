@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xacccd53f */
+/* HASH CRC-32:0x7f042abf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@
 #include "../user/stdio_ext.h"
 #include "../user/stdlib.h"
 #include "string.h"
+#include "../user/sys.mman.h"
 #include "../user/sys.resource.h"
 #include "../user/unistd.h"
 
@@ -232,6 +233,11 @@ NOTHROW_NCX(LIBCCALL libc_spaces)(__STDC_INT_AS_SIZE_T count) {
 #include <asm/crt/malloc.h>
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1)) void *
 NOTHROW_NCX(LIBCCALL libc_xmalloc)(size_t num_bytes) {
+
+
+
+
+
 	void *result = libc_malloc(num_bytes);
 	if (result == NULL) {
 #ifndef __MALLOC_ZERO_IS_NONNULL
@@ -242,6 +248,7 @@ NOTHROW_NCX(LIBCCALL libc_xmalloc)(size_t num_bytes) {
 		}
 	}
 	return result;
+
 }
 #include <asm/crt/malloc.h>
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)) void *
@@ -262,6 +269,19 @@ NOTHROW_NCX(LIBCCALL libc_xrealloc)(void *ptr,
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_xcalloc)(size_t elem_count,
                                    size_t elem_size) {
+
+
+
+
+
+
+
+
+
+
+
+
+
 	void *result = libc_calloc(elem_count, elem_size);
 	if (result == NULL) {
 #ifndef __MALLOC_ZERO_IS_NONNULL
@@ -275,6 +295,7 @@ NOTHROW_NCX(LIBCCALL libc_xcalloc)(size_t elem_count,
 		}
 	}
 	return result;
+
 }
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_xstrdup)(char const *__restrict string) {
@@ -457,6 +478,71 @@ end_of_argument:
 	}
 	argv[argc] = NULL; /* Sentinel */
 	return argv;
+}
+#include <libc/errno.h>
+#include <hybrid/__assert.h>
+#include <bits/crt/mapfile.h>
+/* >> expandargv(3)
+ * Expand special `@file' arguments passed on the commandline */
+INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) void
+NOTHROW_NCX(LIBCCALL libc_expandargv)(int *p_argc,
+                                      char ***p_argv) {
+	size_t i, argc = (size_t)*p_argc;
+	char **argv = *p_argv;
+	for (i = 0; i < argc; ++i) {
+		struct mapfile mf;
+		char *arg = argv[i];
+		char **inject_argv;
+		size_t inject_argc;
+		if (arg[0] != '@')
+			continue;
+		++arg;
+
+		/* Map the specified file into memory. - If doing so fails,
+		 * (due to something other than out-of-memory), then we simply
+		 * ignore the @-directive. */
+		if (libc_mapfile(arg, &mf, 0, (size_t)-1, 1) != 0) {
+#ifdef libc_geterrno
+			if (libc_geterrno() == ENOMEM)
+				libc_xmalloc_failed(1);
+#endif /* libc_geterrno */
+			continue;
+		}
+
+		/* Build an argument vector from the file.
+		 * Note the forced trailing NUL-byte we requested for the mapping! */
+		inject_argv = libc_buildargv((char *)mf.mf_addr);
+
+		libc_unmapfile(&mf);
+
+
+		/* Count the # of injected arguments. */
+		__hybrid_assert(inject_argv);
+		for (inject_argc = 0; inject_argv[inject_argc]; ++inject_argc)
+			;
+
+		/* Resize the argument vector. */
+		if (argv == *p_argv) {
+			size_t size;
+			size = (argc + inject_argc + 1) * sizeof(char *);
+			argv = (char **)libc_memcpy(libc_xmalloc(size), argv, size - sizeof(char *));
+			argv[argc] = NULL; /* Sentinel */
+		} else {
+			argv = (char **)libc_xrealloc(argv, (argc + inject_argc + 1) * sizeof(char *));
+		}
+		/* Inject arguments */
+		libc_memmoveupc(argv + i + inject_argc,
+		           argv + i,
+		           argc - i, sizeof(char *));
+		libc_memcpyc(argv + i, inject_argv, inject_argc, sizeof(char *));
+
+		libc_free(inject_argv);
+
+		argc += inject_argc;
+		i += inject_argc;
+	}
+	*p_argc = (int)(unsigned int)argc;
+	*p_argv = argv;
 }
 #include <asm/crt/stdio.h>
 /* @return: 0 : Success
@@ -809,6 +895,7 @@ DEFINE_PUBLIC_ALIAS(dupargv, libc_dupargv);
 DEFINE_PUBLIC_ALIAS(freeargv, libc_freeargv);
 DEFINE_PUBLIC_ALIAS(countargv, libc_countargv);
 DEFINE_PUBLIC_ALIAS(buildargv, libc_buildargv);
+DEFINE_PUBLIC_ALIAS(expandargv, libc_expandargv);
 DEFINE_PUBLIC_ALIAS(writeargv, libc_writeargv);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf78569e1 */
+/* HASH CRC-32:0xd65ba6ec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,16 @@
 #ifndef __local_xmalloc_defined
 #define __local_xmalloc_defined
 #include <__crt.h>
-#if (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed)
+#if defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xcalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))
 __NAMESPACE_LOCAL_BEGIN
+#if !defined(__local___localdep_crt_xcalloc_defined) && defined(__CRT_HAVE_xcalloc)
+#define __local___localdep_crt_xcalloc_defined
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_crt_xcalloc,(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),xcalloc,(__elem_count,__elem_size))
+#endif /* !__local___localdep_crt_xcalloc_defined && __CRT_HAVE_xcalloc */
+#if !defined(__local___localdep_crt_xrealloc_defined) && defined(__CRT_HAVE_xrealloc)
+#define __local___localdep_crt_xrealloc_defined
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_crt_xrealloc,(void *__ptr, __SIZE_TYPE__ __num_bytes),xrealloc,(__ptr,__num_bytes))
+#endif /* !__local___localdep_crt_xrealloc_defined && __CRT_HAVE_xrealloc */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -49,18 +57,23 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-#ifndef __local___localdep_xmalloc_failed_defined
+#if !defined(__local___localdep_xmalloc_failed_defined) && defined(__CRT_HAVE_xmalloc_failed)
 #define __local___localdep_xmalloc_failed_defined
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_xmalloc_failed,(__SIZE_TYPE__ __num_bytes),xmalloc_failed,(__num_bytes))
-#endif /* !__local___localdep_xmalloc_failed_defined */
+#endif /* !__local___localdep_xmalloc_failed_defined && __CRT_HAVE_xmalloc_failed */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/malloc.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(xmalloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(xmalloc))(__SIZE_TYPE__ __num_bytes) {
+#ifdef __CRT_HAVE_xrealloc
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_xrealloc)(__NULLPTR, __num_bytes);
+#elif defined(__CRT_HAVE_xcalloc)
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_xcalloc)(1, __num_bytes);
+#else /* ... */
 	void *__result = (__NAMESPACE_LOCAL_SYM __localdep_malloc)(__num_bytes);
 	if (__result == __NULLPTR) {
 #ifndef __MALLOC_ZERO_IS_NONNULL
@@ -71,13 +84,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(xmalloc))(__SIZE_TYPE__ __num_bytes) 
 		}
 	}
 	return __result;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_xmalloc_defined
 #define __local___localdep_xmalloc_defined
 #define __localdep_xmalloc __LIBC_LOCAL_NAME(xmalloc)
 #endif /* !__local___localdep_xmalloc_defined */
-#else /* (__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && __CRT_HAVE_xmalloc_failed */
+#else /* __CRT_HAVE_xrealloc || __CRT_HAVE_xcalloc || ((__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && __CRT_HAVE_xmalloc_failed) */
 #undef __local_xmalloc_defined
-#endif /* (!__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign) || !__CRT_HAVE_xmalloc_failed */
+#endif /* !__CRT_HAVE_xrealloc && !__CRT_HAVE_xcalloc && ((!__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign) || !__CRT_HAVE_xmalloc_failed) */
 #endif /* !__local_xmalloc_defined */
