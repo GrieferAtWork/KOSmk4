@@ -31,7 +31,7 @@
 #ifndef __NO_has_feature
 #define __NO_has_extension
 #endif /* !__NO_has_feature */
-#define __has_extension  __has_feature
+#define __has_extension __has_feature
 #endif /* !__has_extension */
 
 #ifndef __has_attribute
@@ -110,16 +110,16 @@
 #define __COMPILER_HAVE_TYPEOF
 #if (__has_feature(cxx_static_assert) || __has_extension(cxx_static_assert) || \
      (defined(__cpp_static_assert) && __cpp_static_assert + 0 != 0))
-#define __STATIC_ASSERT_IS_STATIC_ASSERT 1
+#define __STATIC_ASSERT_IS_static_assert
 #if defined(__cpp_static_assert) && __cpp_static_assert + 0 >= 201411
 #define __STATIC_ASSERT static_assert
 #else /* __cpp_static_assert >= 201411 */
 #define __STATIC_ASSERT(expr) static_assert(expr, #expr)
 #endif /* __cpp_static_assert < 201411 */
-#define __STATIC_ASSERT_MSG   static_assert
+#define __STATIC_ASSERT_MSG static_assert
 #elif (defined(_Static_assert) || __has_feature(c_static_assert) || __has_extension(c_static_assert) || \
        (!defined(__cplusplus) && ((defined(__STDC_VERSION__) && __STDC_VERSION__ + 0 >= 201112L))))
-#define __STATIC_ASSERT_IS__STATIC_ASSERT 1
+#define __STATIC_ASSERT_IS__Static_assert
 #define __STATIC_ASSERT(expr) _Static_assert(expr, #expr)
 #define __STATIC_ASSERT_MSG   _Static_assert
 #elif defined(__COUNTER__)
@@ -733,7 +733,7 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __ULONGLONG unsigned long long
 
 #if !__has_builtin(__builtin_prefetch)
-#define __NO_builtin_prefetch   1
+#define __NO_builtin_prefetch
 #define __builtin_prefetch(...) (void)0
 #endif /* !__builtin_prefetch */
 
@@ -801,8 +801,7 @@ template<class __T, class... Args> __T(__attribute__((__stdcall__)) && ____clang
 #define __IF1     if(1)
 #define __WHILE0  while(0)
 #define __WHILE1  while(1)
-#define __COMPILER_BARRIERS_ALL_IDENTICAL 1
-#define __COMPILER_BARRIERS_ALL_IDENTICAL 1
+#define __COMPILER_BARRIERS_ALL_IDENTICAL
 #define __COMPILER_BARRIER()       __XBLOCK({ __asm__ __volatile__("" : : : "memory"); (void)0; })
 #define __COMPILER_READ_BARRIER()  __XBLOCK({ __asm__ __volatile__("" : : : "memory"); (void)0; })
 #define __COMPILER_WRITE_BARRIER() __XBLOCK({ __asm__ __volatile__("" : : : "memory"); (void)0; })

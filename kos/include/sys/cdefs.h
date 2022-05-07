@@ -276,7 +276,7 @@
 #define _Noreturn __ATTR_NORETURN
 #endif /* ... */
 #if (!defined(_Static_assert) && !defined(__cplusplus) &&               \
-     !defined(__STATIC_ASSERT_IS__STATIC_ASSERT) &&                     \
+     !defined(__STATIC_ASSERT_IS__Static_assert) &&                     \
      (defined(__STDC_VERSION__) ? __STDC_VERSION__ + 0 : 0) < 201112 && \
      (!__GNUC_PREREQ(4, 6) || defined(__STRICT_ANSI__)))
 #define _Static_assert(expr, diagnostic) __STATIC_ASSERT(expr)

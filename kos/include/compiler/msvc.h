@@ -93,7 +93,7 @@
 #if (__has_feature(cxx_static_assert) ||                               \
      (defined(__cpp_static_assert) && __cpp_static_assert + 0 != 0) || \
      _MSC_VER >= 1600)
-#define __STATIC_ASSERT_IS_STATIC_ASSERT
+#define __STATIC_ASSERT_IS_static_assert
 #if defined(__cpp_static_assert) && __cpp_static_assert + 0 >= 201411
 #define __STATIC_ASSERT static_assert
 #else /* __cpp_static_assert >= 201411 */
@@ -103,7 +103,7 @@
 #elif (__has_feature(c_static_assert) || \
        (defined(__STDC_VERSION__) && __STDC_VERSION__ + 0 >= 201112L))
 /* XXX: Knowing Visual C/C++, checking for C11 may not actually allow us to assume this one... */
-#define __STATIC_ASSERT_IS__STATIC_ASSERT
+#define __STATIC_ASSERT_IS__Static_assert
 #define __STATIC_ASSERT(expr) _Static_assert(expr, #expr)
 #define __STATIC_ASSERT_MSG   _Static_assert
 #elif defined(__TPP_COUNTER)
