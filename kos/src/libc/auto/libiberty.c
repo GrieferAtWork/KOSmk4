@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf199987 */
+/* HASH CRC-32:0xacccd53f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -371,6 +371,93 @@ NOTHROW_NCX(LIBCCALL libc_countargv)(char *const *argv) {
 	}
 	return result;
 }
+#include <hybrid/__assert.h>
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char **
+NOTHROW_NCX(LIBCCALL libc_buildargv)(char const *cmdline) {
+	char **argv = NULL;
+	size_t argc = 0;
+	if (!cmdline)
+		return NULL;
+	while (libc_isspace(*cmdline))
+		++cmdline;
+	for (;;) {
+		char const *flush_start = cmdline;
+		char *argcopy_str = NULL;
+		size_t argcopy_len = 0;
+		int quote = 0; /* 0: foo; 1: "foo"; 2: 'foo' */
+		for (;; ++cmdline) {
+			char ch = *cmdline;
+			size_t flushlen;
+			switch (ch) {
+			case '\0':
+				break;
+			case '\'':
+				if (quote == 1)
+					goto cmdline_advance;
+				break;
+			case '\"':
+				if (quote == 2)
+					goto cmdline_advance;
+				break;
+			case '\\':
+				break;
+			default:
+				if (!libc_isspace(ch)) {
+cmdline_advance:
+					++cmdline;
+					continue;
+				}
+				if (quote != 0)
+					goto cmdline_advance;
+				break;
+			}
+
+			/* Flush until this position. */
+			flushlen    = (size_t)(cmdline - flush_start);
+			argcopy_str = (char *)libc_xrealloc(argcopy_str, (argcopy_len + flushlen + 1) * sizeof(char));
+			libc_memcpy(argcopy_str + argcopy_len, flush_start, flushlen);
+			argcopy_len += flushlen;
+			switch (ch) {
+			case '\0':
+				goto end_of_argument;
+			case '\'':
+				quote ^= 2;
+				flush_start = ++cmdline;
+				break;
+			case '\"':
+				quote ^= 1;
+				flush_start = ++cmdline;
+				break;
+			case '\\':
+				++cmdline;
+				flush_start = cmdline; /* Start flushing on escaped character. */
+				if (*cmdline)
+					++cmdline; /* Skip escaped character */
+				break;
+			default:
+				__hybrid_assert(libc_isspace(ch));
+				__hybrid_assert(quote == 0);
+				++cmdline;
+				goto end_of_argument;
+			}
+			flush_start = cmdline;
+		}
+end_of_argument:
+		argcopy_str[argcopy_len] = '\0';
+
+		/* Append the argument. */
+		argv = (char **)libc_xrealloc(argv, (argc + 2) * sizeof(char *));
+		argv[argc++] = argcopy_str;
+
+		/* Skip space past the argument. */
+		while (libc_isspace(*cmdline))
+			++cmdline;
+		if (!*cmdline)
+			break;
+	}
+	argv[argc] = NULL; /* Sentinel */
+	return argv;
+}
 #include <asm/crt/stdio.h>
 /* @return: 0 : Success
  * @return: 1 : Error */
@@ -721,6 +808,7 @@ DEFINE_PUBLIC_ALIAS(xasprintf, libc_xasprintf);
 DEFINE_PUBLIC_ALIAS(dupargv, libc_dupargv);
 DEFINE_PUBLIC_ALIAS(freeargv, libc_freeargv);
 DEFINE_PUBLIC_ALIAS(countargv, libc_countargv);
+DEFINE_PUBLIC_ALIAS(buildargv, libc_buildargv);
 DEFINE_PUBLIC_ALIAS(writeargv, libc_writeargv);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

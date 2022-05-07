@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ca5c372 */
+/* HASH CRC-32:0xe812ca26 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,8 @@ DECL_BEGIN
 INTDEF void NOTHROW_NCX(LIBCCALL libc_xmalloc_set_program_name)(char const *progname);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_xmalloc_failed)(size_t num_bytes) THROWS(...);
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_fdmatch)(fd_t fd1, fd_t fd2);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char **NOTHROW_NCX(LIBCCALL libc_buildargv)(char const *a);
+/* >> expandargv(3)
+ * Expand special `@file' arguments passed on the commandline */
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBCCALL libc_expandargv)(int *p_argc, char ***p_argv);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

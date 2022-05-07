@@ -588,9 +588,98 @@ int fdmatch($fd_t fd1, $fd_t fd2) {
 
 
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
-char **buildargv(char const *a); /* TODO */
+[[requires_function(xrealloc)]]
+[[impl_include("<hybrid/__assert.h>")]]
+char **buildargv(char const *cmdline) {
+	char **argv = NULL;
+	size_t argc = 0;
+	if (!cmdline)
+		return NULL;
+	while (isspace(*cmdline))
+		++cmdline;
+	for (;;) {
+		char const *flush_start = cmdline;
+		char *argcopy_str = NULL;
+		size_t argcopy_len = 0;
+		int quote = 0; /* 0: foo; 1: "foo"; 2: 'foo' */
+		for (;; ++cmdline) {
+			char ch = *cmdline;
+			size_t flushlen;
+			switch (ch) {
+			case '\0':
+				break;
+			case '\'':
+				if (quote == 1)
+					goto cmdline_advance;
+				break;
+			case '\"':
+				if (quote == 2)
+					goto cmdline_advance;
+				break;
+			case '\\':
+				break;
+			default:
+				if (!isspace(ch)) {
+cmdline_advance:
+					++cmdline;
+					continue;
+				}
+				if (quote != 0)
+					goto cmdline_advance;
+				break;
+			}
 
-void expandargv([[nonnull]] int *p_argc, [[nonnull]] char ***p_argv); /* TODO */
+			/* Flush until this position. */
+			flushlen    = (size_t)(cmdline - flush_start);
+			argcopy_str = (char *)xrealloc(argcopy_str, (argcopy_len + flushlen + 1) * sizeof(char));
+			memcpy(argcopy_str + argcopy_len, flush_start, flushlen);
+			argcopy_len += flushlen;
+			switch (ch) {
+			case '\0':
+				goto end_of_argument;
+			case '\'':
+				quote ^= 2;
+				flush_start = ++cmdline;
+				break;
+			case '\"':
+				quote ^= 1;
+				flush_start = ++cmdline;
+				break;
+			case '\\':
+				++cmdline;
+				flush_start = cmdline; /* Start flushing on escaped character. */
+				if (*cmdline)
+					++cmdline; /* Skip escaped character */
+				break;
+			default:
+				__hybrid_assert(isspace(ch));
+				__hybrid_assert(quote == 0);
+				++cmdline;
+				goto end_of_argument;
+			}
+			flush_start = cmdline;
+		}
+end_of_argument:
+		argcopy_str[argcopy_len] = '\0';
+
+		/* Append the argument. */
+		argv = (char **)xrealloc(argv, (argc + 2) * sizeof(char *));
+		argv[argc++] = argcopy_str;
+
+		/* Skip space past the argument. */
+		while (isspace(*cmdline))
+			++cmdline;
+		if (!*cmdline)
+			break;
+	}
+	argv[argc] = NULL; /* Sentinel */
+	return argv;
+}
+
+
+@@>> expandargv(3)
+@@Expand special `@file' arguments passed on the commandline
+void expandargv([[nonnull]] int *p_argc, [[nonnull]] char ***p_argv);
 
 @@@return: 0 : Success
 @@@return: 1 : Error

@@ -82,19 +82,10 @@ NOTHROW_NCX(LIBCCALL libc_fdmatch)(fd_t fd1,
 }
 /*[[[end:libc_fdmatch]]]*/
 
-/*[[[head:libc_buildargv,hash:CRC-32=0xb8366de1]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char **
-NOTHROW_NCX(LIBCCALL libc_buildargv)(char const *a)
-/*[[[body:libc_buildargv]]]*/
-/*AUTO*/{
-	(void)a;
-	CRT_UNIMPLEMENTEDF("buildargv(%q)", a); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_buildargv]]]*/
 
-/*[[[head:libc_expandargv,hash:CRC-32=0xd31d24f8]]]*/
+/*[[[head:libc_expandargv,hash:CRC-32=0xa50b94be]]]*/
+/* >> expandargv(3)
+ * Expand special `@file' arguments passed on the commandline */
 INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) void
 NOTHROW_NCX(LIBCCALL libc_expandargv)(int *p_argc,
                                       char ***p_argv)
@@ -474,11 +465,10 @@ NOTHROW_NCX(LIBCCALL libc_pwait)(int a,
 }
 /*[[[end:libc_pwait]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x363436a8]]]*/
+/*[[[start:exports,hash:CRC-32=0x1ffc4319]]]*/
 DEFINE_PUBLIC_ALIAS(xmalloc_set_program_name, libc_xmalloc_set_program_name);
 DEFINE_PUBLIC_ALIAS(xmalloc_failed, libc_xmalloc_failed);
 DEFINE_PUBLIC_ALIAS(fdmatch, libc_fdmatch);
-DEFINE_PUBLIC_ALIAS(buildargv, libc_buildargv);
 DEFINE_PUBLIC_ALIAS(expandargv, libc_expandargv);
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$concat_copy2, libd_concat_copy2);

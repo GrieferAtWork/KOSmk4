@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6e11670 */
+/* HASH CRC-32:0x66f8392a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1153,7 +1153,14 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,fdmatch,(__fd_t __fd1, __fd_t __fd2)
 __NAMESPACE_LOCAL_USING_OR_IMPL(fdmatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL fdmatch)(__fd_t __fd1, __fd_t __fd2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdmatch))(__fd1, __fd2); })
 #endif /* (__CRT_HAVE_kfstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kfstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__fstat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__fstat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__fstat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__fstat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_fstat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_fstat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) */
 #endif /* !__CRT_HAVE_fdmatch */
-__CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char **,__NOTHROW_NCX,buildargv,(char const *__a),(__a))
+#ifdef __CRT_HAVE_buildargv
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char **,__NOTHROW_NCX,buildargv,(char const *__cmdline),(__cmdline))
+#elif defined(__CRT_HAVE_xrealloc) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && defined(__CRT_HAVE_xmalloc_failed))
+#include <libc/local/libiberty/buildargv.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(buildargv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL buildargv)(char const *__cmdline) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(buildargv))(__cmdline); })
+#endif /* ... */
+/* >> expandargv(3)
+ * Expand special `@file' arguments passed on the commandline */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,expandargv,(int *__p_argc, char ***__p_argv),(__p_argc,__p_argv))
 #ifdef __CRT_HAVE_writeargv
 /* @return: 0 : Success

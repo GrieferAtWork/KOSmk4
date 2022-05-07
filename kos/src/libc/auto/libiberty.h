@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f74f67f */
+/* HASH CRC-32:0x466d5c97 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -161,7 +161,14 @@ INTDEF ATTR_PURE WUNUSED __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_countarg
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_fdmatch)(fd_t fd1, fd_t fd2);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char **NOTHROW_NCX(LIBDCALL libd_buildargv)(char const *a);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char **NOTHROW_NCX(LIBDCALL libd_buildargv)(char const *cmdline);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char **NOTHROW_NCX(LIBCCALL libc_buildargv)(char const *cmdline);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> expandargv(3)
+ * Expand special `@file' arguments passed on the commandline */
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBDCALL libd_expandargv)(int *p_argc, char ***p_argv);
 /* @return: 0 : Success
  * @return: 1 : Error */
