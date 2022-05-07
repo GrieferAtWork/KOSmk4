@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc5665b6 */
+/* HASH CRC-32:0x55474373 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,18 +111,38 @@ __CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endpwent,(void),())
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CDECLARE_OPT(,struct passwd *,__NOTHROW_RPC,getpwent,(void),())
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
+#ifdef __CRT_HAVE_getpwuid
 /* >> getpwuid(3)
  * Search for an entry with a matching user ID
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `uid' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-__CDECLARE_OPT(,struct passwd *,__NOTHROW_RPC,getpwuid,(__uid_t __uid),(__uid))
+__CDECLARE(__ATTR_WUNUSED,struct passwd *,__NOTHROW_RPC,getpwuid,(__uid_t __uid),(__uid))
+#elif defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent)
+#include <libc/local/pwd/getpwuid.h>
+/* >> getpwuid(3)
+ * Search for an entry with a matching user ID
+ * return: * :                         A pointer to the read password entry
+ * return: NULL: (errno = <unchanged>) No entry for `uid' exists
+ * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpwuid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED struct passwd *__NOTHROW_RPC(__LIBCCALL getpwuid)(__uid_t __uid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpwuid))(__uid); })
+#endif /* ... */
+#ifdef __CRT_HAVE_getpwnam
 /* >> getpwnam(3)
  * Search for an entry with a matching username
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `name' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,getpwnam,(const char *__name),(__name))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,getpwnam,(const char *__name),(__name))
+#elif defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent)
+#include <libc/local/pwd/getpwnam.h>
+/* >> getpwnam(3)
+ * Search for an entry with a matching username
+ * return: * :                         A pointer to the read password entry
+ * return: NULL: (errno = <unchanged>) No entry for `name' exists
+ * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpwnam, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct passwd *__NOTHROW_RPC(__LIBCCALL getpwnam)(const char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpwnam))(__name); })
+#endif /* ... */
 
 #ifdef __USE_MISC
 /* >> fgetpwent(3)
@@ -131,14 +151,14 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,getpwnam,(const
  * return: NULL: (errno = <unchanged>) The last entry has already been read
  *                                     (use `rewind(stream)' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,fgetpwent,(__FILE *__restrict __stream),(__stream))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,fgetpwent,(__FILE *__restrict __stream),(__stream))
 #ifdef __CRT_HAVE_putpwent
 /* >> putpwent(3)
  * Write the given entry `ent' into the given `stream'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__THROWING,putpwent,(struct passwd const *__restrict __ent, __FILE *__restrict __stream),(__ent,__stream))
-#elif defined(__CRT_HAVE_fprintf) || defined(__CRT_HAVE__IO_fprintf) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
+#elif defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 #include <libc/local/pwd/putpwent.h>
 /* >> putpwent(3)
  * Write the given entry `ent' into the given `stream'
@@ -239,7 +259,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fgetpwnam_r, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * given  buffer. This  knows the  format that  the caller will
  * expect, but this need not be the format of the password file */
 __CDECLARE(,int,__NOTHROW_RPC,getpw,(__uid_t __uid, char *__buffer),(__uid,__buffer))
-#elif defined(__CRT_HAVE_getpwuid)
+#elif defined(__CRT_HAVE_getpwuid) || (defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent))
 #include <libc/local/pwd/getpw.h>
 /* >> getpw(3)
  * Re-construct the password-file line for the given uid in the

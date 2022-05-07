@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bc18e8f */
+/* HASH CRC-32:0x471339ce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -491,6 +491,8 @@ DEFINE_PUBLIC_ALIAS(DOS$getgrgid_r, libd_getgrgid_r);
 DEFINE_PUBLIC_ALIAS(DOS$getgrnam_r, libd_getgrnam_r);
 DEFINE_PUBLIC_ALIAS(DOS$getgrent_r, libd_getgrent_r);
 DEFINE_PUBLIC_ALIAS(DOS$fgetgrent_r, libd_fgetgrent_r);
+DEFINE_PUBLIC_ALIAS(DOS$fgetgrgid_r, libd_fgetgrgid_r);
+DEFINE_PUBLIC_ALIAS(DOS$fgetgrnam_r, libd_fgetgrnam_r);
 DEFINE_PUBLIC_ALIAS(DOS$fgetgrent, libd_fgetgrent);
 DEFINE_PUBLIC_ALIAS(DOS$__setgroups, libd_setgroups);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_setgroups, libd_setgroups);

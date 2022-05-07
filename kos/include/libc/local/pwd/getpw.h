@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x150e5288 */
+/* HASH CRC-32:0xf0a3adb5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,15 +21,24 @@
 #ifndef __local_getpw_defined
 #define __local_getpw_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_getpwuid
+#if defined(__CRT_HAVE_getpwuid) || (defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getpwuid_defined
 #define __local___localdep_getpwuid_defined
+#ifdef __CRT_HAVE_getpwuid
 __NAMESPACE_LOCAL_END
 #include <bits/crt/db/passwd.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,struct passwd *,__NOTHROW_RPC,__localdep_getpwuid,(__uid_t __uid),getpwuid,(__uid))
+__CREDIRECT(__ATTR_WUNUSED,struct passwd *,__NOTHROW_RPC,__localdep_getpwuid,(__uid_t __uid),getpwuid,(__uid))
+#elif defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent)
+__NAMESPACE_LOCAL_END
+#include <libc/local/pwd/getpwuid.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_getpwuid __LIBC_LOCAL_NAME(getpwuid)
+#else /* ... */
+#undef __local___localdep_getpwuid_defined
+#endif /* !... */
 #endif /* !__local___localdep_getpwuid_defined */
 #ifndef __local___localdep_sprintf_defined
 #define __local___localdep_sprintf_defined
@@ -85,7 +94,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_getpw_defined
 #define __localdep_getpw __LIBC_LOCAL_NAME(getpw)
 #endif /* !__local___localdep_getpw_defined */
-#else /* __CRT_HAVE_getpwuid */
+#else /* __CRT_HAVE_getpwuid || (__CRT_HAVE_setpwent && __CRT_HAVE_getpwent) */
 #undef __local_getpw_defined
-#endif /* !__CRT_HAVE_getpwuid */
+#endif /* !__CRT_HAVE_getpwuid && (!__CRT_HAVE_setpwent || !__CRT_HAVE_getpwent) */
 #endif /* !__local_getpw_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x194408c2 */
+/* HASH CRC-32:0x19aa1249 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,20 +49,20 @@ INTDEF struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwent)(void);
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `uid' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-INTDEF struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwuid)(uid_t uid);
+INTDEF WUNUSED struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwuid)(uid_t uid);
 /* >> getpwnam(3)
  * Search for an entry with a matching username
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `name' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwnam)(const char *name);
+INTDEF WUNUSED NONNULL((1)) struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwnam)(const char *name);
 /* >> fgetpwent(3)
  * Read an entry from `stream'
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) The last entry has already been read
  *                                     (use `rewind(stream)' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream);
+INTDEF WUNUSED NONNULL((1)) struct passwd *NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream);
 /* >> getpwuid_r(3)
  * Search for an entry with a matching user ID
  * @return: 0 : (*result != NULL) Success

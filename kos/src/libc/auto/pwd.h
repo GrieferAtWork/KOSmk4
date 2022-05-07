@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b64ac12 */
+/* HASH CRC-32:0x33aee057 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,20 +35,26 @@ DECL_BEGIN
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `uid' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-INTDEF struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwuid)(uid_t uid);
+INTDEF WUNUSED struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwuid)(uid_t uid);
 /* >> getpwnam(3)
  * Search for an entry with a matching username
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `name' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwnam)(const char *name);
+INTDEF WUNUSED NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwnam)(const char *name);
 /* >> fgetpwent(3)
  * Read an entry from `stream'
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) The last entry has already been read
  *                                     (use `rewind(stream)' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_fgetpwent)(FILE *__restrict stream);
+INTDEF WUNUSED NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_fgetpwent)(FILE *__restrict stream);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_PURE WUNUSED bool NOTHROW_NCX(LIBCCALL libc_nss_checkfield)(char const *field);
+INTDEF ATTR_PURE WUNUSED bool NOTHROW_NCX(LIBCCALL libc_nss_checkfieldlist)(char *const *list);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> putpwent(3)
  * Write the given entry `ent' into the given `stream'
  * @return: 0 : Success

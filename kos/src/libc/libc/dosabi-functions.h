@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87c4a213 */
+/* HASH CRC-32:0x78e5a634 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -524,17 +524,19 @@ DFUN(".text.crt.dos.application.options", libd_getopt_long, libc_getopt_long, TD
 DFUN(".text.crt.dos.application.options", libd_getopt_long_only, libc_getopt_long_only, TD, 5, TD, TP, TP, TP, TP)
 
 /* grp */
-DFUN(".text.crt.dos.database.group", libd_getgrgid, libc_getgrgid, TP, 1, TIn(__SIZEOF_GID_T__))
-DFUN(".text.crt.dos.database.group", libd_getgrnam, libc_getgrnam, TP, 1, TP)
-DFUN(".text.crt.dos.database.group", libd_putgrent, libc_putgrent, TD, 2, TP, TP)
-DFUN(".text.crt.dos.database.group", libd_getgrgid_r, libc_getgrgid_r, TD, 5, TIn(__SIZEOF_GID_T__), TP, TP, TI, TP)
-DFUN(".text.crt.dos.database.group", libd_getgrnam_r, libc_getgrnam_r, TD, 5, TP, TP, TP, TI, TP)
-DFUN(".text.crt.dos.database.group", libd_getgrent_r, libc_getgrent_r, TD, 4, TP, TP, TI, TP)
-DFUN(".text.crt.dos.database.group", libd_fgetgrent_r, libc_fgetgrent_r, TD, 5, TP, TP, TP, TI, TP)
-DFUN(".text.crt.dos.database.group", libd_fgetgrent, libc_fgetgrent, TP, 1, TP)
-DFUN(".text.crt.dos.database.group", libd_setgroups, libc_setgroups, TD, 2, TI, TP)
-DFUN(".text.crt.dos.database.group", libd_getgrouplist, libc_getgrouplist, TD, 4, TP, TIn(__SIZEOF_GID_T__), TP, TP)
-DFUN(".text.crt.dos.database.group", libd_initgroups, libc_initgroups, TD, 2, TP, TIn(__SIZEOF_GID_T__))
+DFUN(".text.crt.dos.database.grp", libd_getgrgid, libc_getgrgid, TP, 1, TIn(__SIZEOF_GID_T__))
+DFUN(".text.crt.dos.database.grp", libd_getgrnam, libc_getgrnam, TP, 1, TP)
+DFUN(".text.crt.dos.database.grp", libd_putgrent, libc_putgrent, TD, 2, TP, TP)
+DFUN(".text.crt.dos.database.grp", libd_getgrgid_r, libc_getgrgid_r, TD, 5, TIn(__SIZEOF_GID_T__), TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.grp", libd_getgrnam_r, libc_getgrnam_r, TD, 5, TP, TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.grp", libd_getgrent_r, libc_getgrent_r, TD, 4, TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.grp", libd_fgetgrent_r, libc_fgetgrent_r, TD, 5, TP, TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.grp", libd_fgetgrgid_r, libc_fgetgrgid_r, TIn(__SIZEOF_ERRNO_T__), 6, TP, TIn(__SIZEOF_GID_T__), TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.grp", libd_fgetgrnam_r, libc_fgetgrnam_r, TIn(__SIZEOF_ERRNO_T__), 6, TP, TP, TP, TP, TI, TP)
+DFUN(".text.crt.dos.database.grp", libd_fgetgrent, libc_fgetgrent, TP, 1, TP)
+DFUN(".text.crt.dos.database.grp", libd_setgroups, libc_setgroups, TD, 2, TI, TP)
+DFUN(".text.crt.dos.database.grp", libd_getgrouplist, libc_getgrouplist, TD, 4, TP, TIn(__SIZEOF_GID_T__), TP, TP)
+DFUN(".text.crt.dos.database.grp", libd_initgroups, libc_initgroups, TD, 2, TP, TIn(__SIZEOF_GID_T__))
 
 /* ifaddrs */
 DFUN(".text.crt.dos.unsorted", libd_getifaddrs, libc_getifaddrs, TD, 1, TP)

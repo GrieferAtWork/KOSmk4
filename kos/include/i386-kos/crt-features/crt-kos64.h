@@ -2677,6 +2677,8 @@
 #define __CRT_HAVE_fgetc_unlocked
 #define __CRT_HAVE_fgetgrent
 #define __CRT_HAVE_fgetgrent_r
+#define __CRT_HAVE_fgetgrgid_r
+#define __CRT_HAVE_fgetgrnam_r
 #define __CRT_HAVE_fgetln
 #define __CRT_HAVE_fgetpos
 #define __CRT_HAVE_fgetpos64
@@ -8430,6 +8432,8 @@
 #define __CRT_HAVE_KOS$fgetc_unlocked
 #define __CRT_HAVE_KOS$fgetgrent
 #define __CRT_HAVE_KOS$fgetgrent_r
+#define __CRT_HAVE_KOS$fgetgrgid_r
+#define __CRT_HAVE_KOS$fgetgrnam_r
 #define __CRT_HAVE_KOS$fgetln
 #define __CRT_HAVE_KOS$fgetpos
 #define __CRT_HAVE_KOS$fgetpos64
@@ -12984,6 +12988,8 @@
 #define __CRT_HAVE_DOS$fgetc_unlocked
 #define __CRT_HAVE_DOS$fgetgrent
 #define __CRT_HAVE_DOS$fgetgrent_r
+#define __CRT_HAVE_DOS$fgetgrgid_r
+#define __CRT_HAVE_DOS$fgetgrnam_r
 #define __CRT_HAVE_DOS$fgetln
 #define __CRT_HAVE_DOS$fgetpos
 #define __CRT_HAVE_DOS$fgetpos64

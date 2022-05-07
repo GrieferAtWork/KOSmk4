@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5de653f */
+/* HASH CRC-32:0xda9bb7c5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3629,7 +3629,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getpass, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
  * given  buffer. This  knows the  format that  the caller will
  * expect, but this need not be the format of the password file */
 __CDECLARE(,int,__NOTHROW_RPC,getpw,(__uid_t __uid, char *__buffer),(__uid,__buffer))
-#elif defined(__CRT_HAVE_getpwuid)
+#elif defined(__CRT_HAVE_getpwuid) || (defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent))
 #include <libc/local/pwd/getpw.h>
 /* >> getpw(3)
  * Re-construct the password-file line for the given uid in the

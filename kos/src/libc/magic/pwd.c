@@ -148,7 +148,17 @@ struct passwd *getpwent();
 @@return: NULL: (errno = <unchanged>) No entry for `uid' exists
 @@return: NULL: (errno = <changed>)   Error (s.a. `errno')
 [[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>"), export_as("_getpwuid")]]
-struct passwd *getpwuid($uid_t uid);
+[[wunused, requires_function(setpwent, getpwent)]]
+[[userimpl, impl_include("<bits/crt/db/passwd.h>")]]
+struct passwd *getpwuid($uid_t uid) {
+	struct passwd *result;
+	setpwent();
+	while ((result = getpwent()) != NULL) {
+		if (result->@pw_uid@ == uid)
+			break;
+	}
+	return result;
+}
 
 @@>> getpwnam(3)
 @@Search for an entry with a matching username
@@ -156,7 +166,17 @@ struct passwd *getpwuid($uid_t uid);
 @@return: NULL: (errno = <unchanged>) No entry for `name' exists
 @@return: NULL: (errno = <changed>)   Error (s.a. `errno')
 [[cp, decl_include("<bits/crt/db/passwd.h>"), export_as("_getpwnam")]]
-struct passwd *getpwnam([[nonnull]] const char *name);
+[[wunused, requires_function(setpwent, getpwent)]]
+[[userimpl, impl_include("<bits/crt/db/passwd.h>")]]
+struct passwd *getpwnam([[nonnull]] const char *name) {
+	struct passwd *result;
+	setpwent();
+	while ((result = getpwent()) != NULL) {
+		if (strcmp(result->@pw_name@, name) == 0)
+			break;
+	}
+	return result;
+}
 
 %
 %#ifdef __USE_MISC
@@ -166,31 +186,112 @@ struct passwd *getpwnam([[nonnull]] const char *name);
 @@return: NULL: (errno = <unchanged>) The last entry has already been read
 @@                                    (use `rewind(stream)' to rewind the database)
 @@return: NULL: (errno = <changed>)   Error (s.a. `errno')
-[[cp, decl_include("<bits/crt/db/passwd.h>"), export_as("_fgetpwent")]]
+[[cp, wunused, decl_include("<bits/crt/db/passwd.h>"), export_as("_fgetpwent")]]
 struct passwd *fgetpwent([[nonnull]] $FILE *__restrict stream);
+
+[[wunused, pure, static]]
+bool nss_checkfield([[nullable]] char const *field) {
+	if (!field)
+		return true;
+	/* Since  ':'  and  '\n'  are  used  as field
+	 * delimiters, they can't appear _in_ fields! */
+	if (strpbrk(field, ":\n"))
+		return false;
+	return true;
+}
+
+[[wunused, pure, static]]
+bool nss_checkfieldlist([[nullable]] char *const *list) {
+	if (!list)
+		return true;
+	for (; *list; ++list) {
+		char const *item = *list;
+		if (strpbrk(item, ":,\n"))
+			return false;
+	}
+	return true;
+}
+
 
 @@>> putpwent(3)
 @@Write the given entry `ent' into the given `stream'
 @@@return: 0 : Success
 @@@return: -1: Error (s.a. `errno')
 [[cp_stdio, decl_include("<bits/crt/db/passwd.h>")]]
-[[requires_function(fprintf), impl_include("<bits/crt/inttypes.h>")]]
+[[requires_function(fprintf_unlocked), impl_include("<bits/crt/inttypes.h>")]]
+[[impl_include("<libc/errno.h>")]]
 int putpwent([[nonnull]] struct passwd const *__restrict ent,
              [[nonnull]] $FILE *__restrict stream) {
 	__STDC_INT_AS_SSIZE_T error;
-	error = fprintf(stream,
-	                "%s:%s:"
-	                "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "u:"
-	                "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "u:"
-	                "%s:%s:%s\n",
-	                ent->@pw_name@,
-	                ent->@pw_passwd@,
-	                ent->@pw_uid@,
-	                ent->@pw_gid@,
-	                ent->@pw_gecos@,
-	                ent->@pw_dir@,
-	                ent->@pw_shell@);
+@@pp_if __SIZEOF_GID_T__ == 1@@
+	char gidbuf[COMPILER_LENOF("255")];
+@@pp_elif __SIZEOF_GID_T__ == 2@@
+	char gidbuf[COMPILER_LENOF("65535")];
+@@pp_elif __SIZEOF_GID_T__ == 4@@
+	char gidbuf[COMPILER_LENOF("4294967295")];
+@@pp_else@@
+	char gidbuf[COMPILER_LENOF("18446744073709551615")];
+@@pp_endif@@
+@@pp_if __SIZEOF_UID_T__ == 1@@
+	char uidbuf[COMPILER_LENOF("255")];
+@@pp_elif __SIZEOF_UID_T__ == 2@@
+	char uidbuf[COMPILER_LENOF("65535")];
+@@pp_elif __SIZEOF_UID_T__ == 4@@
+	char uidbuf[COMPILER_LENOF("4294967295")];
+@@pp_else@@
+	char uidbuf[COMPILER_LENOF("18446744073709551615")];
+@@pp_endif@@
+
+	/* Validate arguments. */
+	if unlikely(!ent)
+		goto err_inval;
+	if unlikely(!stream)
+		goto err_inval;
+	if unlikely(!ent->@pw_name@)
+		goto err_inval;
+	if unlikely(!nss_checkfield(ent->@pw_name@))
+		goto err_inval;
+	if unlikely(!nss_checkfield(ent->@pw_passwd@))
+		goto err_inval;
+	if unlikely(!nss_checkfield(ent->@pw_dir@))
+		goto err_inval;
+	if unlikely(!nss_checkfield(ent->@pw_shell@))
+		goto err_inval;
+	if unlikely(!nss_checkfield(ent->@pw_gecos@)) /* TODO: Replace invalid characters with ' ' */
+		goto err_inval;
+
+	/* Generate the UID+GID strings. */
+	sprintf(uidbuf, "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "u", ent->@pw_uid@);
+	sprintf(gidbuf, "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "u", ent->@pw_gid@);
+	if (ent->@pw_name@[0] == '+' || ent->@pw_name@[0] == '-') {
+		uidbuf[0] = '\0';
+		gidbuf[0] = '\0';
+	}
+
+	/* Generate the entry. */
+@@pp_if $has_function(flockfile, funlockfile)@@
+	flockfile(stream);
+@@pp_endif@@
+	error = fprintf_unlocked(stream,
+	                         "%s:%s:%s:%s:%s:%s:%s\n",
+	                         ent->@pw_name@,
+	                         ent->@pw_passwd@ ? ent->@pw_passwd@ : "",
+	                         uidbuf,
+	                         gidbuf,
+	                         ent->@pw_gecos@ ? ent->@pw_gecos@ : "",
+	                         ent->@pw_dir@ ? ent->@pw_dir@ : "",
+	                         ent->@pw_shell@ ? ent->@pw_shell@ : "");
+@@pp_if $has_function(flockfile, funlockfile)@@
+	funlockfile(stream);
+@@pp_endif@@
+
 	return likely(error >= 0) ? 0 : -1;
+err_inval:
+@@pp_ifdef EINVAL@@
+	return libc_seterrno(EINVAL);
+@@pp_else@@
+	return libc_seterrno(1);
+@@pp_endif@@
 }
 %#endif /* __USE_MISC */
 
@@ -393,20 +494,24 @@ got_all_fields:
 		 * Now to fill in the 2 numeric fields (since those
 		 * might  still contain errors that would turn this
 		 * entry into a bad line) */
-		if unlikely(!*field_starts[2])
-			goto badline;
-		resultbuf->@pw_uid@ = (gid_t)strtoul(field_starts[2], &iter, 10);
-		if unlikely(*iter)
-			goto badline;
-		if (filtered_uid != (uid_t)-1) {
-			if (resultbuf->@pw_uid@ != filtered_uid)
-				goto nextline;
+		if unlikely(!*field_starts[2]) {
+			resultbuf->@pw_uid@ = (uid_t)-1;
+		} else {
+			resultbuf->@pw_uid@ = (uid_t)strtoul(field_starts[2], &iter, 10);
+			if unlikely(*iter)
+				goto badline;
+			if (filtered_uid != (uid_t)-1) {
+				if (resultbuf->@pw_uid@ != filtered_uid)
+					goto nextline;
+			}
 		}
-		if unlikely(!*field_starts[3])
-			goto badline;
-		resultbuf->@pw_gid@ = (gid_t)strtoul(field_starts[3], &iter, 10);
-		if unlikely(*iter)
-			goto badline;
+		if unlikely(!*field_starts[3]) {
+			resultbuf->@pw_gid@ = (gid_t)-1;
+		} else {
+			resultbuf->@pw_gid@ = (gid_t)strtoul(field_starts[3], &iter, 10);
+			if unlikely(*iter)
+				goto badline;
+		}
 		/* All right! Now to fill in all of the string fields.
 		 * We've already turned all of them into NUL-terminated strings  pointing
 		 * into the heap-allocated `dbline' string, however the prototype of this
@@ -465,7 +570,7 @@ err:
 
 badline:
 @@pp_if defined(LOG_ERR) && $has_function(syslog)@@
-	syslog(LOG_ERR, "[passwd] Bad password line %q\n", dbline);
+	syslog(LOG_ERR, "[passwd] Bad db line: %q\n", dbline);
 @@pp_endif@@
 	/* FALLTHRU */
 nextline:

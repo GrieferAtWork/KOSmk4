@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe60bed6 */
+/* HASH CRC-32:0x5b2479c6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,29 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_PURE WUNUSED bool
+NOTHROW_NCX(LIBCCALL libc_nss_checkfield)(char const *field) {
+	if (!field)
+		return true;
+	/* Since  ':'  and  '\n'  are  used  as field
+	 * delimiters, they can't appear _in_ fields! */
+	if (libc_strpbrk(field, ":\n"))
+		return false;
+	return true;
+}
+INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_PURE WUNUSED bool
+NOTHROW_NCX(LIBCCALL libc_nss_checkfieldlist)(char *const *list) {
+	if (!list)
+		return true;
+	for (; *list; ++list) {
+		char const *item = *list;
+		if (libc_strpbrk(item, ":,\n"))
+			return false;
+	}
+	return true;
+}
 #include <bits/crt/inttypes.h>
+#include <libc/errno.h>
 /* >> putpwent(3)
  * Write the given entry `ent' into the given `stream'
  * @return: 0 : Success
@@ -43,19 +65,75 @@ INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1, 2)) int
 (LIBCCALL libc_putpwent)(struct passwd const *__restrict ent,
                          FILE *__restrict stream) THROWS(...) {
 	__STDC_INT_AS_SSIZE_T error;
-	error = libc_fprintf(stream,
-	                "%s:%s:"
-	                "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "u:"
-	                "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "u:"
-	                "%s:%s:%s\n",
-	                ent->pw_name,
-	                ent->pw_passwd,
-	                ent->pw_uid,
-	                ent->pw_gid,
-	                ent->pw_gecos,
-	                ent->pw_dir,
-	                ent->pw_shell);
+#if __SIZEOF_GID_T__ == 1
+	char gidbuf[COMPILER_LENOF("255")];
+#elif __SIZEOF_GID_T__ == 2
+	char gidbuf[COMPILER_LENOF("65535")];
+#elif __SIZEOF_GID_T__ == 4
+	char gidbuf[COMPILER_LENOF("4294967295")];
+#else /* ... */
+	char gidbuf[COMPILER_LENOF("18446744073709551615")];
+#endif /* !... */
+#if __SIZEOF_UID_T__ == 1
+	char uidbuf[COMPILER_LENOF("255")];
+#elif __SIZEOF_UID_T__ == 2
+	char uidbuf[COMPILER_LENOF("65535")];
+#elif __SIZEOF_UID_T__ == 4
+	char uidbuf[COMPILER_LENOF("4294967295")];
+#else /* ... */
+	char uidbuf[COMPILER_LENOF("18446744073709551615")];
+#endif /* !... */
+
+	/* Validate arguments. */
+	if unlikely(!ent)
+		goto err_inval;
+	if unlikely(!stream)
+		goto err_inval;
+	if unlikely(!ent->pw_name)
+		goto err_inval;
+	if unlikely(!libc_nss_checkfield(ent->pw_name))
+		goto err_inval;
+	if unlikely(!libc_nss_checkfield(ent->pw_passwd))
+		goto err_inval;
+	if unlikely(!libc_nss_checkfield(ent->pw_dir))
+		goto err_inval;
+	if unlikely(!libc_nss_checkfield(ent->pw_shell))
+		goto err_inval;
+	if unlikely(!libc_nss_checkfield(ent->pw_gecos)) /* TODO: Replace invalid characters with ' ' */
+		goto err_inval;
+
+	/* Generate the UID+GID strings. */
+	libc_sprintf(uidbuf, "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "u", ent->pw_uid);
+	libc_sprintf(gidbuf, "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "u", ent->pw_gid);
+	if (ent->pw_name[0] == '+' || ent->pw_name[0] == '-') {
+		uidbuf[0] = '\0';
+		gidbuf[0] = '\0';
+	}
+
+	/* Generate the entry. */
+
+	libc_flockfile(stream);
+
+	error = libc_fprintf_unlocked(stream,
+	                         "%s:%s:%s:%s:%s:%s:%s\n",
+	                         ent->pw_name,
+	                         ent->pw_passwd ? ent->pw_passwd : "",
+	                         uidbuf,
+	                         gidbuf,
+	                         ent->pw_gecos ? ent->pw_gecos : "",
+	                         ent->pw_dir ? ent->pw_dir : "",
+	                         ent->pw_shell ? ent->pw_shell : "");
+
+	libc_funlockfile(stream);
+
+
 	return likely(error >= 0) ? 0 : -1;
+err_inval:
+
+	return libc_seterrno(EINVAL);
+
+
+
 }
 /* >> fgetpwent_r(3)
  * Read an entry from `stream'. This function is not standardized and probably never will be.
@@ -221,20 +299,24 @@ got_all_fields:
 		 * Now to fill in the 2 numeric fields (since those
 		 * might  still contain errors that would turn this
 		 * entry into a bad line) */
-		if unlikely(!*field_starts[2])
-			goto badline;
-		resultbuf->pw_uid = (gid_t)libc_strtoul(field_starts[2], &iter, 10);
-		if unlikely(*iter)
-			goto badline;
-		if (filtered_uid != (uid_t)-1) {
-			if (resultbuf->pw_uid != filtered_uid)
-				goto nextline;
+		if unlikely(!*field_starts[2]) {
+			resultbuf->pw_uid = (uid_t)-1;
+		} else {
+			resultbuf->pw_uid = (uid_t)libc_strtoul(field_starts[2], &iter, 10);
+			if unlikely(*iter)
+				goto badline;
+			if (filtered_uid != (uid_t)-1) {
+				if (resultbuf->pw_uid != filtered_uid)
+					goto nextline;
+			}
 		}
-		if unlikely(!*field_starts[3])
-			goto badline;
-		resultbuf->pw_gid = (gid_t)libc_strtoul(field_starts[3], &iter, 10);
-		if unlikely(*iter)
-			goto badline;
+		if unlikely(!*field_starts[3]) {
+			resultbuf->pw_gid = (gid_t)-1;
+		} else {
+			resultbuf->pw_gid = (gid_t)libc_strtoul(field_starts[3], &iter, 10);
+			if unlikely(*iter)
+				goto badline;
+		}
 		/* All right! Now to fill in all of the string fields.
 		 * We've already turned all of them into NUL-terminated strings  pointing
 		 * into the heap-allocated `dbline' string, however the prototype of this
@@ -293,7 +375,7 @@ err:
 
 badline:
 
-	libc_syslog(LOG_ERR, "[passwd] Bad password line %q\n", dbline);
+	libc_syslog(LOG_ERR, "[passwd] Bad db line: %q\n", dbline);
 
 	/* FALLTHRU */
 nextline:

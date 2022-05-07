@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb68474bf */
+/* HASH CRC-32:0xde3b831e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1493,6 +1493,8 @@
 #define __CRT_HAVE_DOS$fgetc_unlocked
 #define __CRT_HAVE_DOS$fgetgrent
 #define __CRT_HAVE_DOS$fgetgrent_r
+#define __CRT_HAVE_DOS$fgetgrgid_r
+#define __CRT_HAVE_DOS$fgetgrnam_r
 #define __CRT_HAVE_DOS$fgetln
 #define __CRT_HAVE_DOS$fgetpos
 #define __CRT_HAVE_DOS$fgetpos64
@@ -5623,6 +5625,9 @@
 #define __CRT_HAVE_fgetc_unlocked
 #define __CRT_HAVE_fgetgrent
 #define __CRT_HAVE_fgetgrent_r
+#define __CRT_HAVE_fgetgrfiltered_r
+#define __CRT_HAVE_fgetgrgid_r
+#define __CRT_HAVE_fgetgrnam_r
 #define __CRT_HAVE_fgetln
 #define __CRT_HAVE_fgetpos
 #define __CRT_HAVE_fgetpos64
@@ -6663,6 +6668,8 @@
 #define __CRT_HAVE_ns_verify
 #define __CRT_HAVE_ns_verify_tcp
 #define __CRT_HAVE_ns_verify_tcp_init
+#define __CRT_HAVE_nss_checkfield
+#define __CRT_HAVE_nss_checkfieldlist
 #define __CRT_HAVE_ntohl
 #define __CRT_HAVE_ntohq
 #define __CRT_HAVE_ntohs

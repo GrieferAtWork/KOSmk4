@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf02bbb02 */
+/* HASH CRC-32:0xd435207e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,25 +32,21 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* >> getgrgid(3), getgrgid_r(3) */
-INTDEF struct group *NOTHROW_RPC(LIBCCALL libc_getgrgid)(gid_t gid);
+INTDEF WUNUSED struct group *NOTHROW_RPC(LIBCCALL libc_getgrgid)(gid_t gid);
 /* >> getgrnam(3), getgrnam_r(3) */
-INTDEF NONNULL((1)) struct group *NOTHROW_RPC(LIBCCALL libc_getgrnam)(char const *__restrict name);
+INTDEF WUNUSED NONNULL((1)) struct group *NOTHROW_RPC(LIBCCALL libc_getgrnam)(char const *__restrict name);
 /* >> setgrent(3) */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setgrent)(void);
 /* >> endgrent(3) */
 INTDEF void NOTHROW_RPC_NOKOS(LIBCCALL libc_endgrent)(void);
 /* >> getgrent(3), getgrent_r(3) */
-INTDEF struct group *NOTHROW_RPC(LIBCCALL libc_getgrent)(void);
-/* >> putgrent(3) */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_putgrent)(struct group const *__restrict entry, FILE *__restrict stream);
+INTDEF WUNUSED struct group *NOTHROW_RPC(LIBCCALL libc_getgrent)(void);
 /* >> getgrgid(3), getgrgid_r(3) */
 INTDEF NONNULL((2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_getgrgid_r)(gid_t gid, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 /* >> getgrnam(3), getgrnam_r(3) */
 INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_getgrnam_r)(char const *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 /* >> getgrent(3), getgrent_r(3) */
 INTDEF NONNULL((1, 2, 4)) int NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
-/* >> fgetgrent(3), fgetgrent_r(3) */
-INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 /* >> fgetgrent(3), fgetgrent_r(3) */
 INTDEF NONNULL((1)) struct group *NOTHROW_RPC(LIBCCALL libc_fgetgrent)(FILE *__restrict stream);
 /* >> setgroups(2) */

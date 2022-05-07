@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3d1fdf3 */
+/* HASH CRC-32:0x355ce86 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,7 +145,6 @@
 #define __stub_encrypt
 #define __stub_encrypt_r
 #define __stub_endaliasent
-#define __stub_endgrent
 #define __stub_endhostent
 #define __stub_endnetent
 #define __stub_endnetgrent
@@ -169,8 +168,6 @@
 #define __stub_fesetexcept
 #define __stub_fesetmode
 #define __stub_fetestexceptflag
-#define __stub_fgetgrent
-#define __stub_fgetgrent_r
 #define __stub_fgetspent
 #define __stub_fgetspent_r
 #define __stub_fgetwln
@@ -219,12 +216,6 @@
 #define __stub_getaliasent_r
 #define __stub_getbsize
 #define __stub_getdate
-#define __stub_getgrent
-#define __stub_getgrent_r
-#define __stub_getgrgid
-#define __stub_getgrgid_r
-#define __stub_getgrnam
-#define __stub_getgrnam_r
 #define __stub_getgrouplist
 #define __stub_gethostbyaddr
 #define __stub_gethostbyaddr_r
@@ -461,7 +452,6 @@
 #define __stub_pthread_setcancelstate
 #define __stub_pthread_setcanceltype
 #define __stub_ptsname_r
-#define __stub_putgrent
 #define __stub_putmsg
 #define __stub_putpmsg
 #define __stub_putspent
@@ -545,7 +535,6 @@
 #define __stub_semop
 #define __stub_semtimedop
 #define __stub_setaliasent
-#define __stub_setgrent
 #define __stub_sethostent
 #define __stub_setipv4sourcefilter
 #define __stub_setkey

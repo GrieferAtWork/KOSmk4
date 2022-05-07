@@ -2830,6 +2830,8 @@
 #define __CRT_HAVE_fgetc_unlocked
 #define __CRT_HAVE_fgetgrent
 #define __CRT_HAVE_fgetgrent_r
+#define __CRT_HAVE_fgetgrgid_r
+#define __CRT_HAVE_fgetgrnam_r
 #define __CRT_HAVE_fgetln
 #define __CRT_HAVE_fgetpos
 #define __CRT_HAVE_fgetpos64

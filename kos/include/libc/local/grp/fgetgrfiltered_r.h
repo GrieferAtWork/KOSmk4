@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x589ff8d1 */
+/* HASH CRC-32:0x1b63b988 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,14 +18,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_fgetpwfiltered_r_defined
-#define __local_fgetpwfiltered_r_defined
+#ifndef __local_fgetgrfiltered_r_defined
+#define __local_fgetgrfiltered_r_defined
 #include <__crt.h>
 #include <features.h>
 #include <bits/crt/stdio.h>
 #include <bits/types.h>
 #if (defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)) && (defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))) && (defined(__CRT_HAVE_fparseln) || ((defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
-#include <bits/crt/db/passwd.h>
+#include <bits/crt/db/group.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetpos64_defined
 #define __local___localdep_fgetpos64_defined
@@ -209,6 +209,23 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__SEEK_SET || (!__CRT_HAVE_fseeko64 && !__CRT_HAVE_fseek64 && !__CRT_HAVE__fseeki64 && !__CRT_HAVE_fseeko64_unlocked && !__CRT_HAVE_fseek64_unlocked && !__CRT_HAVE__fseeki64_nolock && !__CRT_HAVE_fseeko && !__CRT_HAVE_fseeko_unlocked && !__CRT_HAVE_fseek && !__CRT_HAVE_fseek_unlocked && !__CRT_HAVE__fseek_nolock) */
 #endif /* !... */
 #endif /* !__local___localdep_rewind_defined */
+#ifndef __local___localdep_strchr_defined
+#define __local___localdep_strchr_defined
+#if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
+#elif __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),index,{ return __builtin_index(__haystack, __needle); })
+#elif defined(__CRT_HAVE_strchr)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,(__haystack,__needle))
+#elif defined(__CRT_HAVE_index)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),index,(__haystack,__needle))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/strchr.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strchr __LIBC_LOCAL_NAME(strchr)
+#endif /* !... */
+#endif /* !__local___localdep_strchr_defined */
 #ifndef __local___localdep_strchrnul_defined
 #define __local___localdep_strchrnul_defined
 #ifdef __CRT_HAVE_strchrnul
@@ -247,6 +264,20 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
+#ifndef __local___localdep_stroff_defined
+#define __local___localdep_stroff_defined
+#ifdef __CRT_HAVE_stroff
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_stroff,(char const *__restrict __haystack, int __needle),stroff,(__haystack,__needle))
+#else /* __CRT_HAVE_stroff */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/stroff.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_stroff __LIBC_LOCAL_NAME(stroff)
+#endif /* !__CRT_HAVE_stroff */
+#endif /* !__local___localdep_stroff_defined */
 #ifndef __local___localdep_strtoul_defined
 #define __local___localdep_strtoul_defined
 #ifdef __CRT_HAVE_strtoul
@@ -295,8 +326,8 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <asm/os/syslog.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fgetpwfiltered_r) __ATTR_NONNULL((1, 2, 3, 5)) __errno_t
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetpwfiltered_r))(__FILE *__restrict __stream, struct passwd *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct passwd **__restrict __result, __uid_t __filtered_uid, char const *__filtered_name) {
+__LOCAL_LIBC(fgetgrfiltered_r) __ATTR_NONNULL((1, 2, 3, 5)) __errno_t
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetgrfiltered_r))(__FILE *__restrict __stream, struct group *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct group **__restrict __result, __gid_t __filtered_gid, char const *__filtered_name) {
 	__errno_t __retval = 0;
 	char *__dbline;
 	__fpos64_t __startpos, __curpos;
@@ -309,7 +340,7 @@ __again_parseln:
 	if __unlikely(!__dbline)
 		goto __err_restore;
 	if (!*__dbline) {
-		if ((__filtered_uid != (__uid_t)-1 || __filtered_name != __NULLPTR) && __startpos != 0) {
+		if ((__filtered_gid != (__gid_t)-1 || __filtered_name != __NULLPTR) && __startpos != 0) {
 			__maxpos   = __startpos;
 			__startpos = 0;
 #if defined(__CRT_HAVE_rewind) || defined(__CRT_HAVE_rewind_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))
@@ -318,7 +349,7 @@ __again_parseln:
 			if ((__NAMESPACE_LOCAL_SYM __localdep_fsetpos64)(__stream, &__startpos))
 				goto __err;
 #endif /* !__CRT_HAVE_rewind && !__CRT_HAVE_rewind_unlocked && (!__SEEK_SET || (!__CRT_HAVE_fseeko64 && !__CRT_HAVE_fseek64 && !__CRT_HAVE__fseeki64 && !__CRT_HAVE_fseeko64_unlocked && !__CRT_HAVE_fseek64_unlocked && !__CRT_HAVE__fseeki64_nolock && !__CRT_HAVE_fseeko && !__CRT_HAVE_fseeko_unlocked && !__CRT_HAVE_fseek && !__CRT_HAVE_fseek_unlocked && !__CRT_HAVE__fseek_nolock)) */
-			/* Search for the requested uid/name prior to the initial search-start position. */
+			/* Search for the requested gid/name prior to the initial search-start position. */
 			goto __again_parseln;
 		}
 __eof:
@@ -331,93 +362,63 @@ __eof:
 		goto __done_free_dbline;
 	}
 	/* Accepted formats:
-	 *     pw_name:pw_passwd:pw_uid:pw_gid:pw_gecos:pw_dir:pw_shell
-	 *     pw_name:pw_passwd:pw_uid:pw_gid:pw_dir:pw_shell
-	 *     pw_name:pw_passwd:pw_uid:pw_gid */
+	 *     gr_name:gr_passwd:gr_gid
+	 *     gr_name:gr_passwd:gr_gid:gr_mem[0],gr_mem[1],...
+	 */
 	{
-		char *__field_starts[7];
+		char *__field_starts[4];
 		char *__iter = __dbline;
 		unsigned int __i;
-		__field_starts[4] =             /* pw_gecos */
-		__field_starts[5] =             /* pw_dir */
-		__field_starts[6] = (char *)""; /* pw_shell */
-		for (__i = 0; __i < 4; ++__i) {
+		for (__i = 0; __i < 2; ++__i) {
 			__field_starts[__i] = __iter;
 			__iter = (__NAMESPACE_LOCAL_SYM __localdep_strchrnul)(__iter, ':');
-			if __unlikely(!*__iter) {
-				if (__i == 3)
-					goto __got_all_fields; /* This is allowed! */
+			if __unlikely(!*__iter)
 				goto __badline;
-			}
 			*__iter++ = '\0';
 		}
-		/* Right now, `iter' points at the start of `pw_gecos' or `pw_dir' */
-		__field_starts[4] = __iter; /* pw_gecos */
-		__iter = (__NAMESPACE_LOCAL_SYM __localdep_strchrnul)(__iter, ':');
-		if __unlikely(!*__iter)
-			goto __badline;
-		*__iter++ = '\0';
-		__field_starts[5] = __iter; /* pw_dir */
-		__iter = (__NAMESPACE_LOCAL_SYM __localdep_strchrnul)(__iter, ':');
-		if (!*__iter) {
-			/* pw_gecos wasn't given. */
-			__field_starts[6] = __field_starts[5]; /* pw_shell */
-			__field_starts[5] = __field_starts[4]; /* pw_dir */
-			__field_starts[4] = (char *)"";      /* pw_gecos */
-		} else {
-			*__iter++ = '\0';
-			__field_starts[6] = __iter; /* pw_shell */
-			/* Make sure there aren't any more fields! */
-			__iter = (__NAMESPACE_LOCAL_SYM __localdep_strchrnul)(__iter, ':');
-			if __unlikely(*__iter)
-				goto __badline;
-		}
-__got_all_fields:
 		if (__filtered_name) {
 			if ((__NAMESPACE_LOCAL_SYM __localdep_strcmp)(__field_starts[0], __filtered_name) != 0)
 				goto __nextline;
 		}
+		__field_starts[2] = __iter;
+		__field_starts[3] = __NULLPTR;
+		__iter = (__NAMESPACE_LOCAL_SYM __localdep_strchrnul)(__iter, ':');
+		if __likely(*__iter) {
+			*__iter++ = '\0';
+			/* Right now, `iter' points at the start of `gr_mem[0]' */
+			__field_starts[3] = __iter; /* gr_mem[0] */
+			if __unlikely(*(__NAMESPACE_LOCAL_SYM __localdep_strchrnul)(__iter, ':'))
+				goto __badline; /* There shouldn't be another ':' */
+		}
+
 		/* All right! we've got all of the fields!
-		 * Now to fill in the 2 numeric fields (since those
-		 * might  still contain errors that would turn this
+		 * Now to fill in the 1 numeric field (since it
+		 * might still contain errors that would turn this
 		 * entry into a bad line) */
 		if __unlikely(!*__field_starts[2]) {
-			__resultbuf->pw_uid = (__uid_t)-1;
+			__resultbuf->gr_gid = (__gid_t)-1;
 		} else {
-			__resultbuf->pw_uid = (__uid_t)(__NAMESPACE_LOCAL_SYM __localdep_strtoul)(__field_starts[2], &__iter, 10);
+			__resultbuf->gr_gid = (__gid_t)(__NAMESPACE_LOCAL_SYM __localdep_strtoul)(__field_starts[2], &__iter, 10);
 			if __unlikely(*__iter)
 				goto __badline;
-			if (__filtered_uid != (__uid_t)-1) {
-				if (__resultbuf->pw_uid != __filtered_uid)
+			if (__filtered_gid != (__gid_t)-1) {
+				if (__resultbuf->gr_gid != __filtered_gid)
 					goto __nextline;
 			}
 		}
-		if __unlikely(!*__field_starts[3]) {
-			__resultbuf->pw_gid = (__gid_t)-1;
-		} else {
-			__resultbuf->pw_gid = (__gid_t)(__NAMESPACE_LOCAL_SYM __localdep_strtoul)(__field_starts[3], &__iter, 10);
-			if __unlikely(*__iter)
-				goto __badline;
-		}
+
 		/* All right! Now to fill in all of the string fields.
 		 * We've already turned all of them into NUL-terminated strings  pointing
 		 * into the heap-allocated `dbline' string, however the prototype of this
 		 * function requires that they be pointing into `buffer...+=buflen' */
-		for (__i = 0; __i < 7; ++__i) {
-			static __UINTPTR_TYPE__ const __offsets[7] = {
-				__builtin_offsetof(struct passwd, pw_name),
-				__builtin_offsetof(struct passwd, pw_passwd),
-				(__UINTPTR_TYPE__)-1,
-				(__UINTPTR_TYPE__)-1,
-				__builtin_offsetof(struct passwd, pw_gecos),
-				__builtin_offsetof(struct passwd, pw_dir),
-				__builtin_offsetof(struct passwd, pw_shell),
+		for (__i = 0; __i < 2; ++__i) {
+			static __UINTPTR_TYPE__ const __offsets[2] = {
+				__builtin_offsetof(struct group, gr_name),
+				__builtin_offsetof(struct group, gr_passwd),
 			};
 			char *__str;
 			__SIZE_TYPE__ __len;
 			__UINTPTR_TYPE__ __offset = __offsets[__i];
-			if (__offset == (__UINTPTR_TYPE__)-1)
-				continue;
 			__str = __field_starts[__i];
 			__len = ((__NAMESPACE_LOCAL_SYM __localdep_strlen)(__str) + 1) * sizeof(char);
 			/* Ensure that sufficient space is available in the user-provided buffer. */
@@ -428,6 +429,60 @@ __got_all_fields:
 			/* Copy the string to the user-provided buffer. */
 			__buffer = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpy)(__buffer, __str, __len);
 			__buflen -= __len;
+		}
+
+		/* Finally, and the most complicated of all, we have to split the group-member-list. */
+		{
+			char *__aligned = (char *)(((__UINTPTR_TYPE__)__buffer + sizeof(void *) - 1) & ~(sizeof(void *) - 1));
+			/* Align to whole pointers. */
+			__SIZE_TYPE__ __padsiz = (__SIZE_TYPE__)(__aligned - __buffer);
+			if (__padsiz > __buflen)
+				goto __err_ERANGE;
+			__buffer = __aligned;
+			__buflen -= __padsiz;
+		}
+		/* Figure out how many members there are */
+		{
+			__SIZE_TYPE__ __reqspace, __member_count = 0;
+			__iter = __field_starts[3];
+			if (__iter) {
+				for (;;) {
+					++__member_count;
+					__iter = (__NAMESPACE_LOCAL_SYM __localdep_strchr)(__iter, ',');
+					if (!__iter)
+						break;
+					++__iter;
+				}
+			}
+			__resultbuf->gr_mem = (char **)__buffer;
+			__reqspace = (__member_count + 1) * sizeof(char *);
+			if (__buflen < __reqspace)
+				goto __err_ERANGE;
+			__buflen -= __reqspace;
+			__buffer += __reqspace;
+		}
+		/* Assign member names. */
+		{
+			char **__dst = __resultbuf->gr_mem;
+			char *__iter = __field_starts[3];
+			if (__iter) {
+				for (;;) {
+					__SIZE_TYPE__ __siz;
+					__siz = ((__NAMESPACE_LOCAL_SYM __localdep_stroff)(__iter, ',') + 1) * sizeof(char);
+					if (__buflen < __siz)
+						goto __err_ERANGE;
+					/* Copy to user-provided buffer. */
+					*(char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpy)(__buffer, __iter, __siz) = '\0';
+					*__dst++ = __buffer;
+					__buflen -= __siz;
+					__buffer += __siz;
+					__iter += __siz;
+					if (!*__iter)
+						break;
+					++__iter; /* Skip ',' */
+				}
+			}
+			*__dst = __NULLPTR; /* Sentinel / terminator */
 		}
 	}
 __done_free_dbline:
@@ -457,7 +512,7 @@ __err:
 
 __badline:
 #if defined(__LOG_ERR) && (defined(__CRT_HAVE_syslog) || defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer))
-	(__NAMESPACE_LOCAL_SYM __localdep_syslog)(__LOG_ERR, "[passwd] Bad db line: %q\n", __dbline);
+	(__NAMESPACE_LOCAL_SYM __localdep_syslog)(__LOG_ERR, "[group] Bad db line: %q\n", __dbline);
 #endif /* __LOG_ERR && (__CRT_HAVE_syslog || __CRT_HAVE_vsyslog || __CRT_HAVE_syslog_printer) */
 	/* FALLTHRU */
 __nextline:
@@ -471,11 +526,11 @@ __nextline:
 	goto __again_parseln;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_fgetpwfiltered_r_defined
-#define __local___localdep_fgetpwfiltered_r_defined
-#define __localdep_fgetpwfiltered_r __LIBC_LOCAL_NAME(fgetpwfiltered_r)
-#endif /* !__local___localdep_fgetpwfiltered_r_defined */
+#ifndef __local___localdep_fgetgrfiltered_r_defined
+#define __local___localdep_fgetgrfiltered_r_defined
+#define __localdep_fgetgrfiltered_r __LIBC_LOCAL_NAME(fgetgrfiltered_r)
+#endif /* !__local___localdep_fgetgrfiltered_r_defined */
 #else /* (__CRT_HAVE_fgetpos64 || __CRT_HAVE__IO_fgetpos64 || __CRT_HAVE_fgetpos64_unlocked || __CRT_HAVE_ftello64 || __CRT_HAVE_ftell64 || __CRT_HAVE__ftelli64 || __CRT_HAVE_ftello64_unlocked || __CRT_HAVE_ftell64_unlocked || __CRT_HAVE__ftelli64_nolock || __CRT_HAVE_fgetpos || __CRT_HAVE__IO_fgetpos || __CRT_HAVE_fgetpos_unlocked || __CRT_HAVE_ftello || __CRT_HAVE_ftello_unlocked || __CRT_HAVE_ftell || __CRT_HAVE__IO_ftell || __CRT_HAVE_ftell_unlocked || __CRT_HAVE__ftell_nolock) && (__CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || (__SEEK_SET && (__CRT_HAVE_fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock))) && (__CRT_HAVE_fparseln || ((__CRT_HAVE_getc || __CRT_HAVE_fgetc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || __CRT_HAVE__getc_nolock || __CRT_HAVE__fgetc_nolock || (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow || __CRT_HAVE___underflow)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))) */
-#undef __local_fgetpwfiltered_r_defined
+#undef __local_fgetgrfiltered_r_defined
 #endif /* (!__CRT_HAVE_fgetpos64 && !__CRT_HAVE__IO_fgetpos64 && !__CRT_HAVE_fgetpos64_unlocked && !__CRT_HAVE_ftello64 && !__CRT_HAVE_ftell64 && !__CRT_HAVE__ftelli64 && !__CRT_HAVE_ftello64_unlocked && !__CRT_HAVE_ftell64_unlocked && !__CRT_HAVE__ftelli64_nolock && !__CRT_HAVE_fgetpos && !__CRT_HAVE__IO_fgetpos && !__CRT_HAVE_fgetpos_unlocked && !__CRT_HAVE_ftello && !__CRT_HAVE_ftello_unlocked && !__CRT_HAVE_ftell && !__CRT_HAVE__IO_ftell && !__CRT_HAVE_ftell_unlocked && !__CRT_HAVE__ftell_nolock) || (!__CRT_HAVE_fsetpos64 && !__CRT_HAVE__IO_fsetpos64 && !__CRT_HAVE_fsetpos64_unlocked && !__CRT_HAVE_fsetpos && !__CRT_HAVE__IO_fsetpos && !__CRT_HAVE_fsetpos_unlocked && (!__SEEK_SET || (!__CRT_HAVE_fseeko64 && !__CRT_HAVE_fseek64 && !__CRT_HAVE__fseeki64 && !__CRT_HAVE_fseeko64_unlocked && !__CRT_HAVE_fseek64_unlocked && !__CRT_HAVE__fseeki64_nolock && !__CRT_HAVE_fseeko && !__CRT_HAVE_fseeko_unlocked && !__CRT_HAVE_fseek && !__CRT_HAVE_fseek_unlocked && !__CRT_HAVE__fseek_nolock))) || (!__CRT_HAVE_fparseln && ((!__CRT_HAVE_getc && !__CRT_HAVE_fgetc && !__CRT_HAVE__IO_getc && !__CRT_HAVE_fgetc_unlocked && !__CRT_HAVE_getc_unlocked && !__CRT_HAVE__getc_nolock && !__CRT_HAVE__fgetc_nolock && (!__CRT_DOS || (!__CRT_HAVE__filbuf && !__CRT_HAVE___uflow && !__CRT_HAVE___underflow)) && !__CRT_HAVE_fread && !__CRT_HAVE__IO_fread && !__CRT_HAVE_fread_unlocked && !__CRT_HAVE__fread_nolock) || (!__CRT_HAVE_ungetc && !__CRT_HAVE__IO_ungetc && !__CRT_HAVE_ungetc_unlocked && !__CRT_HAVE__ungetc_nolock) || (!__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc))) */
-#endif /* !__local_fgetpwfiltered_r_defined */
+#endif /* !__local_fgetgrfiltered_r_defined */

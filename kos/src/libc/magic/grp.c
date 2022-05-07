@@ -39,7 +39,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(gid_t = __gid_t)]
-%[default:section(".text.crt{|.dos}.database.group")]
+%[default:section(".text.crt{|.dos}.database.grp")]
 
 %[insert:prefix(
 #include <features.h>
@@ -89,11 +89,33 @@ __NAMESPACE_STD_USING(FILE)
 
 @@>> getgrgid(3), getgrgid_r(3)
 [[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
-struct group *getgrgid($gid_t gid);
+[[wunused, requires_function(setgrent, getgrent)]]
+[[userimpl, impl_include("<bits/crt/db/group.h>")]]
+struct group *getgrgid($gid_t gid) {
+	struct group *result;
+	setgrent();
+	while ((result = getgrent()) != NULL) {
+		if (result->@gr_gid@ == gid)
+			break;
+	}
+	return result;
+}
 
 @@>> getgrnam(3), getgrnam_r(3)
 [[cp, decl_include("<bits/crt/db/group.h>")]]
-struct group *getgrnam([[nonnull]] char const *__restrict name);
+[[wunused, requires_function(setgrent, getgrent)]]
+[[userimpl, impl_include("<bits/crt/db/group.h>")]]
+struct group *getgrnam([[nonnull]] char const *__restrict name) {
+	struct group *result;
+	setgrent();
+	while ((result = getgrent()) != NULL) {
+		if (strcmp(result->@gr_name@, name) == 0)
+			break;
+	}
+	return result;
+}
+
+
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
@@ -106,17 +128,99 @@ void setgrent();
 void endgrent();
 
 @@>> getgrent(3), getgrent_r(3)
-[[cp, decl_include("<bits/crt/db/group.h>")]]
+[[cp, wunused, decl_include("<bits/crt/db/group.h>")]]
 struct group *getgrent();
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
+
+
+
+
 
 %
 %#ifdef __USE_GNU
 @@>> putgrent(3)
+@@Write the given entry `ent' into the given `stream'
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
 [[cp, decl_include("<bits/crt/db/group.h>")]]
+[[requires_function(fprintf_unlocked)]]
+[[impl_include("<libc/errno.h>")]]
+[[impl_include("<bits/types.h>")]]
+[[impl_include("<bits/crt/inttypes.h>")]]
 int putgrent([[nonnull]] struct group const *__restrict entry,
-             [[nonnull]] $FILE *__restrict stream);
+             [[nonnull]] $FILE *__restrict stream) {
+	__STDC_INT_AS_SSIZE_T error;
+@@pp_if __SIZEOF_GID_T__ == 1@@
+	char gidbuf[COMPILER_LENOF("255")];
+@@pp_elif __SIZEOF_GID_T__ == 2@@
+	char gidbuf[COMPILER_LENOF("65535")];
+@@pp_elif __SIZEOF_GID_T__ == 4@@
+	char gidbuf[COMPILER_LENOF("4294967295")];
+@@pp_else@@
+	char gidbuf[COMPILER_LENOF("18446744073709551615")];
+@@pp_endif@@
+
+	/* Validate arguments. */
+	if unlikely(!entry)
+		goto err_inval;
+	if unlikely(!stream)
+		goto err_inval;
+	if unlikely(!entry->@gr_name@)
+		goto err_inval;
+	if unlikely(!nss_checkfield(entry->@gr_name@))
+		goto err_inval;
+	if unlikely(!nss_checkfield(entry->@gr_passwd@))
+		goto err_inval;
+	if unlikely(!nss_checkfieldlist(entry->@gr_mem@))
+		goto err_inval;
+
+	/* Generate the GID string. */
+	sprintf(gidbuf, "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "u", entry->@gr_gid@);
+	if (entry->@gr_name@[0] == '+' || entry->@gr_name@[0] == '-')
+		gidbuf[0] = '\0';
+
+	/* Generate the entry. */
+@@pp_if $has_function(flockfile, funlockfile)@@
+	flockfile(stream);
+@@pp_endif@@
+	error = fprintf_unlocked(stream, "%s:%s:%s:",
+	                         entry->@gr_name@,
+	                         entry->@gr_passwd@ ? entry->@gr_passwd@ : "",
+	                         gidbuf);
+	if likely(error >= 0) {
+		/* Print the member list (if it is present) */
+		char *const *list = entry->@gr_mem@;
+		if (list) {
+			bool isfirst = true;
+			for (; *list; ++list) {
+				error = fprintf_unlocked(stream,
+				                         isfirst ? "%s" : ",%s",
+				                         *list);
+				if unlikely(error < 0)
+					break;
+				isfirst = false;
+			}
+		}
+		if likely(error >= 0)
+			error = fputc_unlocked('\n', stream);
+	}
+@@pp_if $has_function(flockfile, funlockfile)@@
+	funlockfile(stream);
+@@pp_endif@@
+
+	return likely(error >= 0) ? 0 : -1;
+err_inval:
+@@pp_ifdef EINVAL@@
+	return libc_seterrno(EINVAL);
+@@pp_else@@
+	return libc_seterrno(1);
+@@pp_endif@@
+}
+
 %#endif /* __USE_GNU */
+
+
+
 
 %
 %#ifdef __USE_POSIX
@@ -131,6 +235,8 @@ int getgrnam_r([[nonnull]] char const *__restrict name,
                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                [[nonnull]] struct group **__restrict result);
 
+
+
 %
 %#ifdef __USE_GNU
 [[cp, doc_alias("getgrent"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
@@ -142,12 +248,284 @@ int getgrent_r([[nonnull]] struct group *__restrict resultbuf,
 %
 %#ifdef __USE_MISC
 [[cp, doc_alias("fgetgrent"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[requires_function(fgetgrfiltered_r)]]
 int fgetgrent_r([[nonnull]] $FILE *__restrict stream,
                 [[nonnull]] struct group *__restrict resultbuf,
                 [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                [[nonnull]] struct group **__restrict result);
+                [[nonnull]] struct group **__restrict result) {
+	return fgetgrfiltered_r(stream, resultbuf, buffer, buflen,
+	                        result, (gid_t)-1, NULL);
+}
+
+%#ifdef __USE_KOS
+@@>> fgetgrgid_r(3)
+@@Search for an entry with a matching user ID
+@@@return: 0 : (*result != NULL) Success
+@@@return: 0 : (*result == NULL) No entry for `gid'
+@@@return: * : Error (one of `E*' from `<errno.h>')
+[[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[requires_function(fgetgrfiltered_r), impl_include("<libc/errno.h>")]]
+$errno_t fgetgrgid_r([[nonnull]] $FILE *__restrict stream, $gid_t gid,
+                     [[nonnull]] struct group *__restrict resultbuf,
+                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
+                     [[nonnull]] struct group **__restrict result) {
+	$errno_t error;
+	error = fgetgrfiltered_r(stream, resultbuf, buffer, buflen,
+	                         result, gid, NULL);
+@@pp_ifdef ENOENT@@
+	if (error == ENOENT)
+		error = 0;
+@@pp_endif@@
+	return error;
+}
+
+@@>> fgetgrnam_r(3)
+@@Search for an entry with a matching username
+@@@return: 0 : (*result != NULL) Success
+@@@return: 0 : (*result == NULL) No entry for `name'
+@@@return: * : Error (one of `E*' from `<errno.h>')
+[[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
+[[requires_function(fgetgrfiltered_r), impl_include("<libc/errno.h>")]]
+$errno_t fgetgrnam_r([[nonnull]] $FILE *__restrict stream,
+                     [[nonnull]] const char *__restrict name,
+                     [[nonnull]] struct group *__restrict resultbuf,
+                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
+                     [[nonnull]] struct group **__restrict result) {
+	$errno_t error;
+	error = fgetgrfiltered_r(stream, resultbuf, buffer, buflen,
+	                         result, (gid_t)-1, name);
+@@pp_ifdef ENOENT@@
+	if (error == ENOENT)
+		error = 0;
+@@pp_endif@@
+	return error;
+}
+%#endif /* __USE_KOS */
+
+
+@@>> fgetgrfiltered_r(3)
+@@Filtered read from `stream'
+@@@param: filtered_gid:  When not equal to `(gid_t)-1', require this GID
+@@@param: filtered_name: When not `NULL', require this username
+@@@return: 0 :     Success (`*result' is made to point at `resultbuf')
+@@@return: ENOENT: The last entry has already been read, or no entry matches the given `filtered_*'
+@@                 Note that in this case, `errno' will have not been changed
+@@@return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
+@@                 Note that in this case, `errno' will have also been set to `ERANGE'
+@@@return: * :     Error (one of `E*' from `<errno.h>')
+[[static, cp, decl_include("<bits/types.h>", "<bits/crt/db/group.h>")]]
+[[impl_include("<libc/errno.h>", "<hybrid/typecore.h>", "<asm/os/syslog.h>")]]
+[[requires_function(fgetpos64, fsetpos64, fparseln)]]
+$errno_t fgetgrfiltered_r([[nonnull]] $FILE *__restrict stream,
+                          [[nonnull]] struct group *__restrict resultbuf,
+                          [[outp(buflen)]] char *__restrict buffer, size_t buflen,
+                          [[nonnull]] struct group **__restrict result,
+                          $gid_t filtered_gid, char const *filtered_name) {
+	$errno_t retval = 0;
+	char *dbline;
+	fpos64_t startpos, curpos;
+	fpos64_t maxpos = (fpos64_t)-1;
+	if (fgetpos64(stream, &startpos))
+		goto err_nodbline;
+	curpos = startpos;
+again_parseln:
+	dbline = fparseln(stream, NULL, NULL, "\0\0#", 0);
+	if unlikely(!dbline)
+		goto err_restore;
+	if (!*dbline) {
+		if ((filtered_gid != (gid_t)-1 || filtered_name != NULL) && startpos != 0) {
+			maxpos   = startpos;
+			startpos = 0;
+@@pp_if $has_function(rewind)@@
+			rewind(stream);
+@@pp_else@@
+			if (fsetpos64(stream, &startpos))
+				goto err;
+@@pp_endif@@
+			/* Search for the requested gid/name prior to the initial search-start position. */
+			goto again_parseln;
+		}
+eof:
+		/* End-of-file */
+@@pp_ifdef ENOENT@@
+		retval = ENOENT;
+@@pp_else@@
+		retval = 1;
+@@pp_endif@@
+		goto done_free_dbline;
+	}
+	/* Accepted formats:
+	 *     gr_name:gr_passwd:gr_gid
+	 *     gr_name:gr_passwd:gr_gid:gr_mem[0],gr_mem[1],...
+	 */
+	{
+		char *field_starts[4];
+		char *iter = dbline;
+		unsigned int i;
+		for (i = 0; i < 2; ++i) {
+			field_starts[i] = iter;
+			iter = strchrnul(iter, ':');
+			if unlikely(!*iter)
+				goto badline;
+			*iter++ = '\0';
+		}
+		if (filtered_name) {
+			if (strcmp(field_starts[0], filtered_name) != 0)
+				goto nextline;
+		}
+		field_starts[2] = iter;
+		field_starts[3] = NULL;
+		iter = strchrnul(iter, ':');
+		if likely(*iter) {
+			*iter++ = '\0';
+			/* Right now, `iter' points at the start of `gr_mem[0]' */
+			field_starts[3] = iter; /* gr_mem[0] */
+			if unlikely(*strchrnul(iter, ':'))
+				goto badline; /* There shouldn't be another ':' */
+		}
+
+		/* All right! we've got all of the fields!
+		 * Now to fill in the 1 numeric field (since it
+		 * might still contain errors that would turn this
+		 * entry into a bad line) */
+		if unlikely(!*field_starts[2]) {
+			resultbuf->@gr_gid@ = (gid_t)-1;
+		} else {
+			resultbuf->@gr_gid@ = (gid_t)strtoul(field_starts[2], &iter, 10);
+			if unlikely(*iter)
+				goto badline;
+			if (filtered_gid != (gid_t)-1) {
+				if (resultbuf->@gr_gid@ != filtered_gid)
+					goto nextline;
+			}
+		}
+
+		/* All right! Now to fill in all of the string fields.
+		 * We've already turned all of them into NUL-terminated strings  pointing
+		 * into the heap-allocated `dbline' string, however the prototype of this
+		 * function requires that they be pointing into `buffer...+=buflen' */
+		for (i = 0; i < 2; ++i) {
+			static uintptr_t const offsets[2] = {
+				offsetof(struct group, @gr_name@),
+				offsetof(struct group, @gr_passwd@),
+			};
+			char *str;
+			size_t len;
+			uintptr_t offset = offsets[i];
+			str = field_starts[i];
+			len = (strlen(str) + 1) * sizeof(char);
+			/* Ensure that sufficient space is available in the user-provided buffer. */
+			if unlikely(buflen < len)
+				goto err_ERANGE;
+			/* Set the associated pointer in `resultbuf' */
+			*(char **)((byte_t *)resultbuf + offset) = buffer;
+			/* Copy the string to the user-provided buffer. */
+			buffer = (char *)mempcpy(buffer, str, len);
+			buflen -= len;
+		}
+
+		/* Finally, and the most complicated of all, we have to split the group-member-list. */
+		{
+			char *aligned = (char *)(((uintptr_t)buffer + sizeof(void *) - 1) & ~(sizeof(void *) - 1));
+			/* Align to whole pointers. */
+			size_t padsiz = (size_t)(aligned - buffer);
+			if (padsiz > buflen)
+				goto err_ERANGE;
+			buffer = aligned;
+			buflen -= padsiz;
+		}
+		/* Figure out how many members there are */
+		{
+			size_t reqspace, member_count = 0;
+			iter = field_starts[3];
+			if (iter) {
+				for (;;) {
+					++member_count;
+					iter = strchr(iter, ',');
+					if (!iter)
+						break;
+					++iter;
+				}
+			}
+			resultbuf->@gr_mem@ = (char **)buffer;
+			reqspace = (member_count + 1) * sizeof(char *);
+			if (buflen < reqspace)
+				goto err_ERANGE;
+			buflen -= reqspace;
+			buffer += reqspace;
+		}
+		/* Assign member names. */
+		{
+			char **dst = resultbuf->@gr_mem@;
+			char *iter = field_starts[3];
+			if (iter) {
+				for (;;) {
+					size_t siz;
+					siz = (stroff(iter, ',') + 1) * sizeof(char);
+					if (buflen < siz)
+						goto err_ERANGE;
+					/* Copy to user-provided buffer. */
+					*(char *)mempcpy(buffer, iter, siz) = '\0';
+					*dst++ = buffer;
+					buflen -= siz;
+					buffer += siz;
+					iter += siz;
+					if (!*iter)
+						break;
+					++iter; /* Skip ',' */
+				}
+			}
+			*dst = NULL; /* Sentinel / terminator */
+		}
+	}
+done_free_dbline:
+@@pp_if $has_function(free)@@
+	free(dbline);
+@@pp_endif@@
+	*result = retval ? NULL : resultbuf;
+	return retval;
+
+err_ERANGE:
+@@pp_ifdef ERANGE@@
+	(void)libc_seterrno(ERANGE);
+@@pp_endif@@
+	/* FALLTHRU */
+err_restore:
+	retval = __libc_geterrno_or(1);
+	if unlikely(fsetpos64(stream, &curpos))
+		goto err;
+	goto done_free_dbline;
+
+err_nodbline:
+	dbline = NULL;
+	/* FALLTHRU */
+err:
+	retval = __libc_geterrno_or(1);
+	goto done_free_dbline;
+
+badline:
+@@pp_if defined(LOG_ERR) && $has_function(syslog)@@
+	syslog(LOG_ERR, "[group] Bad db line: %q\n", dbline);
+@@pp_endif@@
+	/* FALLTHRU */
+nextline:
+@@pp_if $has_function(free)@@
+	free(dbline);
+@@pp_endif@@
+	if unlikely(fgetpos64(stream, &curpos))
+		goto err_nodbline;
+	if (curpos >= maxpos)
+		goto eof;
+	goto again_parseln;
+}
+
+
+
 %#endif /* __USE_MISC */
 %#endif /* __USE_POSIX */
+
+
+
 
 %
 %#ifdef __USE_MISC
