@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0031267 */
+/* HASH CRC-32:0xc46a4491 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -837,7 +837,9 @@ __SYSDECL_BEGIN
  *  - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
  *                                    after which  up  to  `max_bytes'  bytes  are  read  normally.
  * Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
- * @param: fd:        The file that should be loaded into memory
+ * @param: fd:        The  file that should be loaded into memory.  Upon entry to this function it is
+ *                    assumed that the file position of `fd' is `0'. If it isn't, then incorrect data
+ *                    may be mapped. Upon return, the file position of `fd' is undefined.
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
  *                     - mf_addr: Filled with the base address of a mapping of the file's contents
  *                     - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
@@ -855,9 +857,9 @@ __SYSDECL_BEGIN
  *                    are guarantied to be. - Useful if you want  to load a file as a string, in  which
  *                    case you can specify `1' to always have a trailing '\0' be appended.
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
- * @return: -1: [errno=EBADF]  Invalid `fd'
- * @return: -1: [errno=EPERM]  `fd' doesn't support read(2), or (when offset != 0), doesn't support lseek(2)
+ * @return: -1: [errno=EPERM]  `fd' doesn't support read(2)ing
  * @return: -1: [errno=ENOMEM] Out of memory
+ * @return: -1: [errno=EBADF]  Invalid `fd'
  * @return: -1: [errno=*]      Read error */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,fmapfile,(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes),(__mapping,__fd,__offset,__max_bytes,__num_trailing_nulbytes))
 #elif (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
@@ -871,7 +873,9 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,fmapfile,(struct
  *  - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
  *                                    after which  up  to  `max_bytes'  bytes  are  read  normally.
  * Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
- * @param: fd:        The file that should be loaded into memory
+ * @param: fd:        The  file that should be loaded into memory.  Upon entry to this function it is
+ *                    assumed that the file position of `fd' is `0'. If it isn't, then incorrect data
+ *                    may be mapped. Upon return, the file position of `fd' is undefined.
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
  *                     - mf_addr: Filled with the base address of a mapping of the file's contents
  *                     - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
@@ -889,9 +893,9 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,fmapfile,(struct
  *                    are guarantied to be. - Useful if you want  to load a file as a string, in  which
  *                    case you can specify `1' to always have a trailing '\0' be appended.
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
- * @return: -1: [errno=EBADF]  Invalid `fd'
- * @return: -1: [errno=EPERM]  `fd' doesn't support read(2), or (when offset != 0), doesn't support lseek(2)
+ * @return: -1: [errno=EPERM]  `fd' doesn't support read(2)ing
  * @return: -1: [errno=ENOMEM] Out of memory
+ * @return: -1: [errno=EBADF]  Invalid `fd'
  * @return: -1: [errno=*]      Read error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fmapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fmapfile)(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmapfile))(__mapping, __fd, __offset, __max_bytes, __num_trailing_nulbytes); })
 #endif /* ... */

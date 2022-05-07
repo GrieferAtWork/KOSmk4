@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x637e5b47 */
+/* HASH CRC-32:0x8497ede4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,7 +127,9 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_mprotect)(void *addr, size_t len, __ST
  *  - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
  *                                    after which  up  to  `max_bytes'  bytes  are  read  normally.
  * Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
- * @param: fd:        The file that should be loaded into memory
+ * @param: fd:        The  file that should be loaded into memory.  Upon entry to this function it is
+ *                    assumed that the file position of `fd' is `0'. If it isn't, then incorrect data
+ *                    may be mapped. Upon return, the file position of `fd' is undefined.
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
  *                     - mf_addr: Filled with the base address of a mapping of the file's contents
  *                     - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
@@ -145,9 +147,9 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_mprotect)(void *addr, size_t len, __ST
  *                    are guarantied to be. - Useful if you want  to load a file as a string, in  which
  *                    case you can specify `1' to always have a trailing '\0' be appended.
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
- * @return: -1: [errno=EBADF]  Invalid `fd'
- * @return: -1: [errno=EPERM]  `fd' doesn't support read(2), or (when offset != 0), doesn't support lseek(2)
+ * @return: -1: [errno=EPERM]  `fd' doesn't support read(2)ing
  * @return: -1: [errno=ENOMEM] Out of memory
+ * @return: -1: [errno=EBADF]  Invalid `fd'
  * @return: -1: [errno=*]      Read error */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -161,7 +163,9 @@ INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct mapfi
  *  - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
  *                                    after which  up  to  `max_bytes'  bytes  are  read  normally.
  * Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
- * @param: fd:        The file that should be loaded into memory
+ * @param: fd:        The  file that should be loaded into memory.  Upon entry to this function it is
+ *                    assumed that the file position of `fd' is `0'. If it isn't, then incorrect data
+ *                    may be mapped. Upon return, the file position of `fd' is undefined.
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
  *                     - mf_addr: Filled with the base address of a mapping of the file's contents
  *                     - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
@@ -179,9 +183,9 @@ INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct mapfi
  *                    are guarantied to be. - Useful if you want  to load a file as a string, in  which
  *                    case you can specify `1' to always have a trailing '\0' be appended.
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
- * @return: -1: [errno=EBADF]  Invalid `fd'
- * @return: -1: [errno=EPERM]  `fd' doesn't support read(2), or (when offset != 0), doesn't support lseek(2)
+ * @return: -1: [errno=EPERM]  `fd' doesn't support read(2)ing
  * @return: -1: [errno=ENOMEM] Out of memory
+ * @return: -1: [errno=EBADF]  Invalid `fd'
  * @return: -1: [errno=*]      Read error */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
 #endif /* !__KERNEL__ */

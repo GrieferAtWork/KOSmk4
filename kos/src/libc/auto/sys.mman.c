@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc55fc095 */
+/* HASH CRC-32:0x68362218 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -168,7 +168,9 @@ badkey:
  *  - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
  *                                    after which  up  to  `max_bytes'  bytes  are  read  normally.
  * Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
- * @param: fd:        The file that should be loaded into memory
+ * @param: fd:        The  file that should be loaded into memory.  Upon entry to this function it is
+ *                    assumed that the file position of `fd' is `0'. If it isn't, then incorrect data
+ *                    may be mapped. Upon return, the file position of `fd' is undefined.
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
  *                     - mf_addr: Filled with the base address of a mapping of the file's contents
  *                     - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
@@ -186,9 +188,9 @@ badkey:
  *                    are guarantied to be. - Useful if you want  to load a file as a string, in  which
  *                    case you can specify `1' to always have a trailing '\0' be appended.
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
- * @return: -1: [errno=EBADF]  Invalid `fd'
- * @return: -1: [errno=EPERM]  `fd' doesn't support read(2), or (when offset != 0), doesn't support lseek(2)
+ * @return: -1: [errno=EPERM]  `fd' doesn't support read(2)ing
  * @return: -1: [errno=ENOMEM] Out of memory
+ * @return: -1: [errno=EBADF]  Invalid `fd'
  * @return: -1: [errno=*]      Read error */
 INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping,
