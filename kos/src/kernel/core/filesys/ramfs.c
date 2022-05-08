@@ -348,7 +348,7 @@ again:
 	case SEEK_CUR: {
 		newent = oldent;
 		/* Fix deleted nodes. */
-		if (newent->rde_treenode.rb_lhs == RAMFS_DIRENT_TREENODE_DELETED)
+		if (newent && newent->rde_treenode.rb_lhs == RAMFS_DIRENT_TREENODE_DELETED)
 			newent = ramfs_dirent_fixdeleted(newent, dir);
 do_seek_cur:
 		if (offset <= 0) {
