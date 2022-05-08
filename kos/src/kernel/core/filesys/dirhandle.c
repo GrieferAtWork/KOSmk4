@@ -118,8 +118,16 @@ dirhandle_new(struct fdirnode *__restrict self,
 /* Handle operators for `HANDLE_TYPE_DIRHANDLE'                         */
 /************************************************************************/
 DEFINE_HANDLE_REFCNT_FUNCTIONS(dirhandle, struct dirhandle);
+DEFINE_INTERN_ALIAS(handle_dirhandlex_refcnt, handle_dirhandle_refcnt);
+DEFINE_INTERN_ALIAS(handle_dirhandlex_weakgetref, handle_dirhandle_weakgetref);
+/*DEFINE_INTERN_ALIAS(handle_dirhandlex_decref, handle_dirhandle_decref);*/ /* This one's actually different! */
+DEFINE_INTERN_ALIAS(handle_dirhandlex_tryincref, handle_dirhandle_tryincref);
+DEFINE_INTERN_ALIAS(handle_dirhandlex_incref, handle_dirhandle_incref);
+DEFINE_INTERN_ALIAS(handle_dirhandlex_weaklckref, handle_dirhandle_weaklckref);
+DEFINE_INTERN_ALIAS(handle_dirhandlex_weakdecref, handle_dirhandle_weakdecref);
 
 /* Handle operators for `HANDLE_TYPE_DIRHANDLE' (`struct dirhandle') */
+DEFINE_INTERN_ALIAS(handle_dirhandlex_readdir, handle_dirhandle_readdir);
 INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_dirhandle_readdir(struct dirhandle *__restrict self,
                          USER CHECKED struct dirent *buf, size_t bufsize,
@@ -200,6 +208,7 @@ read_normal_entry:
 #define dirhandle_isfsroot(self) \
 	fdirnode_issuper((self)->dh_enum.de_dir)
 
+DEFINE_INTERN_ALIAS(handle_dirhandlex_seek, handle_dirhandle_seek);
 INTERN BLOCKING NONNULL((1)) pos_t KCALL
 handle_dirhandle_seek(struct dirhandle *__restrict self,
                       off_t offset, unsigned int whence)
@@ -321,18 +330,21 @@ do_normal_seek:
 	return result;
 }
 
+DEFINE_INTERN_ALIAS(handle_dirhandlex_ioctl, handle_dirhandle_ioctl);
 INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_dirhandle_ioctl(struct dirhandle *__restrict self, ioctl_t cmd,
                        USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	return fdirenum_ioctl(&self->dh_enum, cmd, arg, mode);
 }
 
+DEFINE_INTERN_ALIAS(handle_dirhandlex_stat, handle_dirhandle_stat);
 INTERN BLOCKING NONNULL((1)) void KCALL
 handle_dirhandle_stat(struct dirhandle *__restrict self,
                       USER CHECKED struct stat *result) THROWS(...) {
 	return mfile_ustat(self->dh_enum.de_dir, result);
 }
 
+DEFINE_INTERN_ALIAS(handle_dirhandlex_tryas, handle_dirhandle_tryas);
 INTERN BLOCKING NONNULL((1)) REF void *KCALL
 handle_dirhandle_tryas(struct dirhandle *__restrict self,
                        uintptr_half_t wanted_type)
@@ -344,11 +356,18 @@ handle_dirhandle_tryas(struct dirhandle *__restrict self,
 		return xincref(self->dh_dirent);
 	case HANDLE_TYPE_PATH:
 		return xincref(self->dh_path);
+	case HANDLE_TYPE_DIRHANDLE:
+		/* NOTE: Normally,  this  case  shouldn't be  here.  However, since
+		 *       this function is also linked as `handle_dirhandlex_tryas',
+		 *       where this  case *should*  exist, we  simply implement  it
+		 *       for both handle types! */
+		return incref(self);
 	default: break;
 	}
 	return mfile_utryas(self->dh_enum.de_dir, wanted_type);
 }
 
+DEFINE_INTERN_ALIAS(handle_dirhandlex_printlink, handle_dirhandle_printlink);
 INTERN BLOCKING NONNULL((1, 2)) ssize_t KCALL
 handle_dirhandle_printlink(struct dirhandle *__restrict self,
                            pformatprinter printer, void *arg)

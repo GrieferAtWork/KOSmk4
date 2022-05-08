@@ -20,6 +20,7 @@
 #ifndef GUARD_APPS_SYSTEM_TEST_TEST_INOTIFY_C
 #define GUARD_APPS_SYSTEM_TEST_TEST_INOTIFY_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 #undef NDEBUG
 
 #include <hybrid/compiler.h>
@@ -32,6 +33,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <stdalign.h>
 #include <stddef.h>
 #include <string.h>
@@ -132,8 +134,58 @@ DEFINE_TEST(inotify) {
 	LEd(0, (fd = open("/tmp", O_RDONLY))); /* This generates `IN_OPEN', but we won't consume that event! */
 	EQd(0, close(fd));
 	EQd(0, close(notify_fd));
-
 }
+
+
+PRIVATE sig_atomic_t volatile sigio = 0;
+PRIVATE void sigio_handler(signo_t signo) {
+	EQd(SIGUSR1, signo);
+	++sigio;
+}
+
+
+DEFINE_TEST(dnotify) {
+	fd_t dirfd, fd;
+	sighandler_t ohand;
+	sigio = 0;
+	ohand = signal(SIGUSR1, &sigio_handler);
+
+	/* Setup SIGIO-based notification for events on /tmp */
+	LEd(0, (dirfd = open("/tmp", O_RDONLY)));
+	EQd(0, fcntl(dirfd, F_NOTIFY,
+	             DN_ACCESS | DN_MODIFY | DN_CREATE |
+	             DN_DELETE | DN_RENAME | DN_ATTRIB |
+	             DN_MULTISHOT));
+	EQd(SIGIO, fcntl(dirfd, F_GETSIG));
+	EQd(0, fcntl(dirfd, F_SETSIG, SIGUSR1));
+	EQd(SIGUSR1, fcntl(dirfd, F_GETSIG));
+	EQd(getpid(), fcntl(dirfd, F_GETOWN));
+	EQd(0, fcntl(dirfd, F_SETOWN, getpid()));
+	EQu(0, sigio);
+
+	/* Trigger some events and assert that each of them raises SIGUSR1 */
+	LEd(0, (fd = open("/tmp/foo", O_WRONLY | O_CREAT, 0644)));
+	EQu(1, sigio); /* DN_CREATE */
+
+	EQss(5, write(fd, "Hello", 5));
+	EQu(2, sigio); /* DN_MODIFY+DN_ATTRIB */
+
+	EQd(0, close(fd));
+	EQu(2, sigio); /* <no event> */
+
+	EQd(0, chmod("/tmp/foo", 0666));
+	EQu(3, sigio); /* DN_ATTRIB */
+
+	EQd(0, unlink("/tmp/foo"));
+	EQu(4, sigio); /* DN_DELETE */
+
+	EQd(0, close(dirfd));
+	EQu(4, sigio); /* <no event> */
+
+	signal(SIGUSR1, ohand);
+	EQu(4, sigio); /* <no event> */
+}
+
 
 DECL_END
 

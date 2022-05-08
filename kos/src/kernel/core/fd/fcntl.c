@@ -25,12 +25,14 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/fs/dirhandlex.h>
 #include <kernel/fs/fifohandle.h>
 #include <kernel/fs/fifonode.h>
 #include <kernel/handle.h>
 #include <kernel/handman.h>
 #include <kernel/pipe.h>
 #include <kernel/syscall.h>
+#include <sched/pid.h>
 
 #include <hybrid/atomic.h>
 
@@ -40,6 +42,8 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <string.h>
 
 /************************************************************************/
 /* fcntl(2)                                                             */
@@ -56,6 +60,59 @@ INTDEF size_t KCALL /* from "misc/pipe.c" */
 ringbuffer_set_pipe_limit(struct ringbuffer *__restrict self,
                           size_t new_lim);
 
+PRIVATE ATTR_RETNONNULL NONNULL((1, 3)) REF struct handle *FCALL
+handman_lookup_and_upgrade(struct handman *__restrict self, fd_t fd,
+                           /*out*/ REF struct handle *__restrict hand,
+                           uintptr_half_t only_this_type)
+		THROWS(E_INVALID_HANDLE_FILE, ...) {
+	union handslot *slot;
+again:
+	handman_read(self);
+	slot = handman_lookup_slot_or_unlock_and_throw(self, fd);
+	if (only_this_type == HANDLE_TYPE_UNDEFINED ||
+	    only_this_type == slot->mh_hand.h_type) {
+		switch (slot->mh_hand.h_type) {
+
+		case HANDLE_TYPE_DIRHANDLE: {
+			/* Automatically convert DIRHANDLE to DIRHANDLEX */
+			REF struct dirhandle *odir;
+			REF struct dirhandlex *ndir;
+			odir = (REF struct dirhandle *)slot->mh_hand.h_data;
+			incref(odir);
+			handman_endread(self);
+			FINALLY_DECREF_UNLIKELY(odir);
+			ndir = dirhandle_xadd(odir);
+			TRY {
+				handman_write(self);
+				slot = handman_lookup_slot_or_unlock_and_throw(self, fd);
+			} EXCEPT {
+				decref_unlikely(ndir);
+				RETHROW();
+			}
+			if (slot->mh_hand.h_data != odir) {
+				handman_endwrite(self);
+				decref_unlikely(ndir);
+				goto again;
+			}
+			assert(slot->mh_hand.h_type == HANDLE_TYPE_DIRHANDLE);
+			slot->mh_hand.h_type = HANDLE_TYPE_DIRHANDLEX;
+			slot->mh_hand.h_data = ndir; /* Inherit reference */
+			handman_endwrite(self);
+			decref_nokill(odir); /* Stolen from `slot->mh_hand.h_data' (nokill because of `FINALLY_DECREF_UNLIKELY' above) */
+			goto again;
+		}	break;
+
+		default:
+			break;
+		}
+	}
+
+	/* Return reference to handle. */
+	hand = (REF struct handle *)memcpy(hand, &slot->mh_hand, sizeof(struct handle));
+	handle_incref(*hand);
+	handman_endread(self);
+	return hand;
+}
 
 PRIVATE syscall_slong_t KCALL
 sys_fcntl_impl(fd_t fd, fcntl_t command,
@@ -169,10 +226,6 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 	//TODO:case F_GETLK32:
 	//TODO:case F_SETLK32:
 	//TODO:case F_SETLKW32:
-	//TODO:case F_SETOWN:
-	//TODO:case F_GETOWN:
-	//TODO:case F_SETSIG:
-	//TODO:case F_GETSIG:
 	//TODO:case F_GETLK64:
 	//TODO:case F_SETLK64:
 	//TODO:case F_SETLKW64:
@@ -180,7 +233,111 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 	//TODO:case F_GETOWN_EX:
 	//TODO:case F_SETLEASE:
 	//TODO:case F_GETLEASE:
-	//TODO:case F_NOTIFY:
+
+	case F_SETOWN:
+	case F_GETOWN:
+	case F_SETSIG:
+	case F_GETSIG: {
+		REF struct handle hand;
+		handman_lookup_and_upgrade(man, fd, &hand, HANDLE_TYPE_UNDEFINED);
+		RAII_FINALLY { handle_decref(hand); };
+		switch (hand.h_type) {
+
+		case HANDLE_TYPE_DIRHANDLEX: {
+			struct dirhandlex_hdr *hdr;
+			struct dirhandlex *dir;
+			dir = (struct dirhandlex *)hand.h_data;
+			hdr = dirhandlex_ashdr(dir);
+			switch (command) {
+
+			case F_SETOWN: {
+				pid_t reqpid = (pid_t)(syscall_slong_t)(intptr_t)(uintptr_t)arg;
+				REF struct taskpid *tpid;
+				tpid = pidns_lookup_srch(THIS_PIDNS, reqpid);
+				arref_set_inherit(&hdr->dxh_thrio, tpid);
+			}	break;
+
+			case F_GETOWN: {
+				pid_t result;
+				REF struct taskpid *tpid;
+				tpid   = dirhandlex_hdr_gettaskpid(hdr);
+				result = taskpid_getpid_s(tpid);
+				decref_unlikely(tpid);
+				return result;
+			}	break;
+
+			case F_SETSIG: {
+				signo_t signo = (signo_t)(syscall_slong_t)(intptr_t)(uintptr_t)arg;
+				if (signo == 0)
+					signo = SIGIO;
+				if unlikely(!sigvalid(signo)) {
+					THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+					      E_INVALID_ARGUMENT_CONTEXT_BAD_SIGNO,
+					      signo);
+				}
+				if (signo >= 32) {
+					/* TODO: Linux allows use of realtime signals instead of SIGIO,
+					 *       however that brings up the issue where we're unable to
+					 *       allocate a pending-signal  descriptor, so our  current
+					 *       implementation only supports use of queuing signals.
+					 * However, only signals [1,31] can be queuing, so as it stands
+					 * right  now, we're unable to use signals larger than that for
+					 * this purpose...
+					 *
+					 * -> Solution: figure  out how linux handles out-of-memory when
+					 *    trying to deliver a SIGIO and copy its behavior. Also note
+					 *    that to leave `dirhandlex_SIGIO_notify_p's NOBLOCK  world,
+					 *    we may need to use a semaphore (to count events), as  well
+					 *    as `async_new()' (to raise signals  in a context where  we
+					 *    are allowed to do stuff  that blocks and/or throws).  This
+					 *    will also be required for  `_task_raisesignoprocessgroup',
+					 *    as that function can throw E_WOULDBLOCK! */
+					THROW(E_NOT_IMPLEMENTED_TODO);
+				}
+				dirhandlex_hdr_setsigio(hdr, signo);
+			}	break;
+
+			case F_GETSIG:
+				return dirhandlex_hdr_getsigio(hdr);
+
+			default: __builtin_unreachable();
+			}
+		}	break;
+
+		default:
+			THROW(E_INVALID_HANDLE_FILETYPE,
+			      /* fd:                 */ (syscall_slong_t)fd,
+			      /* needed_handle_type: */ HANDLE_TYPE_UNDEFINED,
+			      /* actual_handle_type: */ hand.h_type,
+			      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+			      /* actual_handle_kind: */ handle_typekind(&hand));
+			break;
+		}
+	}	break;
+
+	case F_NOTIFY: {
+		REF struct handle hand;
+		struct dirhandlex *dir;
+		/* TODO: Validate `arg'? (`man 2 fcntl' doesn't anything  about
+		 *       this, so look at the linux source to see what it does) */
+		handman_lookup_and_upgrade(man, fd, &hand, HANDLE_TYPE_DIRHANDLE);
+		RAII_FINALLY { handle_decref(hand); };
+		if (hand.h_type != HANDLE_TYPE_DIRHANDLEX) {
+			/* TODO: Linux documents `-ENOTDIR' for this case.
+			 * -> Adjust the exception  to produce that  errno
+			 *    when DIRHANDLE or DIRHANDLEX were requested. */
+			THROW(E_INVALID_HANDLE_FILETYPE,
+			      /* fd:                 */ (syscall_slong_t)fd,
+			      /* needed_handle_type: */ HANDLE_TYPE_DIRHANDLEX,
+			      /* actual_handle_type: */ hand.h_type,
+			      /* needed_handle_kind: */ HANDLE_TYPEKIND_GENERIC,
+			      /* actual_handle_kind: */ handle_typekind(&hand));
+		}
+		dir = (struct dirhandlex *)hand.h_data;
+
+		/* Set notify flags. */
+		dirhandlex_setnotify(dir, (syscall_ulong_t)(uintptr_t)arg);
+	}	break;
 
 	case F_GETPIPE_SZ:
 	case F_SETPIPE_SZ: {

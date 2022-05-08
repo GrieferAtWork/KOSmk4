@@ -191,7 +191,10 @@ struct notifyfd {
 	unsigned int            nf_eventr;  /* [lock(!PREEMPTION && :notify_lock)][< nf_eventa] Index of next unread event */
 	unsigned int            nf_eventc;  /* [lock(!PREEMPTION && :notify_lock)][<= nf_eventa] Number of pending unread events */
 	unsigned int            nf_eventa;  /* [const] Total number of allocated events (including the failsafe overflow-event) */
-	struct sig              nf_avail;   /* Signal broadcast when `nf_eventc' becomes non-zero. */
+	struct sig              nf_avail;   /* Signal broadcast when `nf_eventc' becomes non-zero. When
+	                                     * `nf_eventa == 1', broadcast every time a monitored event
+	                                     * happens (though  in some  situations, multiple  parallel
+	                                     * broadcasts may be merged into one single one) */
 	COMPILER_FLEXIBLE_ARRAY(struct notifyfd_event,
 	                        nf_eventv); /* [nf_eventa] Vector of pending events. */
 };

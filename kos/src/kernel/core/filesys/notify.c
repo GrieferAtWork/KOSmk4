@@ -579,8 +579,16 @@ NOTHROW(FCALL notifyfd_postfsevent_raw_impl)(struct notifyfd *__restrict self,
                                              uint16_t cookie, struct fdirent *ent) {
 	unsigned int slot_wd;
 	struct notifyfd_event *slot;
-	if (self->nf_eventc >= self->nf_eventa)
+	if (self->nf_eventc >= self->nf_eventa) {
+		if (self->nf_eventa == 1) {
+			/* Special case: we don't actually want to gather events, but what we
+			 *               do want is to trigger a broadcast whenever  anything
+			 *               happens that is being monitored.
+			 * This sort of behavior is required for `fcntl(F_NOTIFY)'! */
+			return true;
+		}
 		return false; /* Already full */
+	}
 	assert(!(wd & NOTIFYFD_EVENT_ISDIR_FLAG));
 	assert(wd < self->nf_listenc);
 	slot_wd = wd;

@@ -57,7 +57,10 @@
 #define HANDLE_TYPE_DRIVER_LOADLIST 0x0013 /* `struct driver_loadlist' */
 #define HANDLE_TYPE_REFCOUNTABLE    0x0014 /* `struct refcountable' */
 #define HANDLE_TYPE_NOTIFYFD        0x0015 /* `struct notifyfd' */
-#define HANDLE_TYPE_COUNT           0x0016 /* # of recognized handle types
+#define HANDLE_TYPE_DIRHANDLEX      0x0016 /* `struct dirhandlex'
+                                            * Castable into: HANDLE_TYPE_DIRHANDLE
+                                            * NOTE: Constructed from `HANDLE_TYPE_DIRHANDLE' after `F_NOTIFY' was used. */
+#define HANDLE_TYPE_COUNT           0x0017 /* # of recognized handle types
                                             * NOTE: After changing  this value,  be sure  to
                                             * `touch kos/src/kernel/include/kernel/handle.h' */
 

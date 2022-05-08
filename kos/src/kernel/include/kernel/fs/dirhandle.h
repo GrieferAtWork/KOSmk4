@@ -49,7 +49,7 @@ struct dirhandle {
 	 * Also  note that readdir(2) on its own is entirely thread-safe when it comes to every
 	 * entry (including "." and "..") only being read once, but when combined with seeking,
 	 * there are some situations where an unexpected entry may be read by concurrent reads. */
-	struct fdirenum     dh_enum;   /* Directory enumerator. */
+	struct fdirenum     dh_enum;   /* Directory enumerator. (Flexible size) */
 };
 
 /* Destroy the given dirhandle object. */

@@ -615,6 +615,14 @@ handman_trylookup(struct handman *__restrict self, fd_t fd,
                   /*out*/ REF struct handle *__restrict hand)
 		THROWS(E_WOULDBLOCK);
 
+/* Try to lookup the slot associated with `fd', or return `NULL'.
+ * The caller must be holding a lock to `self' (either rd or  wr) */
+FUNDEF WUNUSED NONNULL((1)) union handslot *
+NOTHROW(FCALL handman_trylookup_slot)(struct handman *__restrict self, fd_t fd);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) union handslot *FCALL
+handman_lookup_slot_or_unlock_and_throw(struct handman *__restrict self, fd_t fd)
+		THROWS(E_INVALID_HANDLE_FILE);
+
 #ifdef __cplusplus
 extern "C++" {
 FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) REF struct handle FCALL

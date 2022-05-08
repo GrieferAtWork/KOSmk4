@@ -333,6 +333,7 @@ struct module;
 struct driver_loadlist;
 struct refcountable;
 struct notifyfd;
+struct dirhandlex;
 
 
 
@@ -965,6 +966,36 @@ INTDEF BLOCKING NONNULL((1)) void KCALL handle_notifyfd_pollconnect(struct notif
 INTDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL handle_notifyfd_polltest(struct notifyfd *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) REF void *KCALL handle_notifyfd_tryas(struct notifyfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_notifyfd_printlink(struct notifyfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
+
+/* Handle operators for `HANDLE_TYPE_DIRHANDLEX' (`struct dirhandlex') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_dirhandlex_refcnt)(struct dirhandlex const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_dirhandlex_incref)(struct dirhandlex *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_dirhandlex_decref)(REF struct dirhandlex *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_dirhandlex_tryincref)(struct dirhandlex *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_dirhandlex_weakgetref)(struct dirhandlex *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct dirhandlex *NOTHROW(FCALL handle_dirhandlex_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_dirhandlex_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_dirhandlex_read(struct dirhandlex *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) size_t KCALL handle_dirhandlex_write(struct dirhandlex *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_dirhandlex_pread(struct dirhandlex *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) size_t KCALL handle_dirhandlex_pwrite(struct dirhandlex *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL handle_dirhandlex_readv(struct dirhandlex *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) size_t KCALL handle_dirhandlex_writev(struct dirhandlex *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL handle_dirhandlex_preadv(struct dirhandlex *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) size_t KCALL handle_dirhandlex_pwritev(struct dirhandlex *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_dirhandlex_readdir(struct dirhandlex *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_dirhandlex_seek(struct dirhandlex *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_dirhandlex_ioctl(struct dirhandlex *__restrict self, ioctl_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandlex_truncate(struct dirhandlex *__restrict self, pos_t new_size) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_dirhandlex_mmap(struct dirhandlex *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_dirhandlex_allocate(struct dirhandlex *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandlex_sync(struct dirhandlex *__restrict self) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandlex_datasync(struct dirhandlex *__restrict self) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandlex_stat(struct dirhandlex *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandlex_pollconnect(struct dirhandlex *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL handle_dirhandlex_polltest(struct dirhandlex *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) REF void *KCALL handle_dirhandlex_tryas(struct dirhandlex *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_dirhandlex_printlink(struct dirhandlex *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 #endif /* __CC__ */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */

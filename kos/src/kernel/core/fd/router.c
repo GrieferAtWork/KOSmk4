@@ -357,7 +357,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          =  "module",
 		[HANDLE_TYPE_DRIVER_LOADLIST] =  "driver_loadlist",
 		[HANDLE_TYPE_REFCOUNTABLE]    =  "refcountable",
-		[HANDLE_TYPE_NOTIFYFD]        =  "notifyfd"
+		[HANDLE_TYPE_NOTIFYFD]        =  "notifyfd",
+		[HANDLE_TYPE_DIRHANDLEX]      =  "dirhandlex"
 	},
 	.h_refcnt = {
 		[HANDLE_TYPE_UNDEFINED]       = (refcnt_t (FCALL *)(void const *__restrict))&handle_undefined_refcnt,
@@ -381,7 +382,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (refcnt_t (FCALL *)(void const *__restrict))&handle_module_refcnt,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_loadlist_refcnt,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (refcnt_t (FCALL *)(void const *__restrict))&handle_refcountable_refcnt,
-		[HANDLE_TYPE_NOTIFYFD]        = (refcnt_t (FCALL *)(void const *__restrict))&handle_notifyfd_refcnt
+		[HANDLE_TYPE_NOTIFYFD]        = (refcnt_t (FCALL *)(void const *__restrict))&handle_notifyfd_refcnt,
+		[HANDLE_TYPE_DIRHANDLEX]      = (refcnt_t (FCALL *)(void const *__restrict))&handle_dirhandlex_refcnt
 	},
 	.h_incref = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (FCALL *)(void *__restrict))&handle_undefined_incref,
@@ -405,7 +407,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (FCALL *)(void *__restrict))&handle_module_incref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (FCALL *)(void *__restrict))&handle_driver_loadlist_incref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (FCALL *)(void *__restrict))&handle_refcountable_incref,
-		[HANDLE_TYPE_NOTIFYFD]        = (void (FCALL *)(void *__restrict))&handle_notifyfd_incref
+		[HANDLE_TYPE_NOTIFYFD]        = (void (FCALL *)(void *__restrict))&handle_notifyfd_incref,
+		[HANDLE_TYPE_DIRHANDLEX]      = (void (FCALL *)(void *__restrict))&handle_dirhandlex_incref
 	},
 	.h_decref = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (FCALL *)(REF void *__restrict))&handle_undefined_decref,
@@ -429,7 +432,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (FCALL *)(REF void *__restrict))&handle_module_decref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (FCALL *)(REF void *__restrict))&handle_driver_loadlist_decref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (FCALL *)(REF void *__restrict))&handle_refcountable_decref,
-		[HANDLE_TYPE_NOTIFYFD]        = (void (FCALL *)(REF void *__restrict))&handle_notifyfd_decref
+		[HANDLE_TYPE_NOTIFYFD]        = (void (FCALL *)(REF void *__restrict))&handle_notifyfd_decref,
+		[HANDLE_TYPE_DIRHANDLEX]      = (void (FCALL *)(REF void *__restrict))&handle_dirhandlex_decref
 	},
 	.h_tryincref = {
 		[HANDLE_TYPE_UNDEFINED]       = (__BOOL (FCALL *)(void *__restrict))&handle_undefined_tryincref,
@@ -453,7 +457,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (__BOOL (FCALL *)(void *__restrict))&handle_module_tryincref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (__BOOL (FCALL *)(void *__restrict))&handle_driver_loadlist_tryincref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (__BOOL (FCALL *)(void *__restrict))&handle_refcountable_tryincref,
-		[HANDLE_TYPE_NOTIFYFD]        = (__BOOL (FCALL *)(void *__restrict))&handle_notifyfd_tryincref
+		[HANDLE_TYPE_NOTIFYFD]        = (__BOOL (FCALL *)(void *__restrict))&handle_notifyfd_tryincref,
+		[HANDLE_TYPE_DIRHANDLEX]      = (__BOOL (FCALL *)(void *__restrict))&handle_dirhandlex_tryincref
 	},
 	.h_weakgetref = {
 		[HANDLE_TYPE_UNDEFINED]       = (WEAK REF void *(FCALL *)(void *__restrict))&handle_undefined_weakgetref,
@@ -477,7 +482,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (WEAK REF void *(FCALL *)(void *__restrict))&handle_module_weakgetref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (WEAK REF void *(FCALL *)(void *__restrict))&handle_driver_loadlist_weakgetref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (WEAK REF void *(FCALL *)(void *__restrict))&handle_refcountable_weakgetref,
-		[HANDLE_TYPE_NOTIFYFD]        = (WEAK REF void *(FCALL *)(void *__restrict))&handle_notifyfd_weakgetref
+		[HANDLE_TYPE_NOTIFYFD]        = (WEAK REF void *(FCALL *)(void *__restrict))&handle_notifyfd_weakgetref,
+		[HANDLE_TYPE_DIRHANDLEX]      = (WEAK REF void *(FCALL *)(void *__restrict))&handle_dirhandlex_weakgetref
 	},
 	.h_weaklckref = {
 		[HANDLE_TYPE_UNDEFINED]       = (REF void *(FCALL *)(void *__restrict))&handle_undefined_weaklckref,
@@ -501,7 +507,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (REF void *(FCALL *)(void *__restrict))&handle_module_weaklckref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (REF void *(FCALL *)(void *__restrict))&handle_driver_loadlist_weaklckref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (REF void *(FCALL *)(void *__restrict))&handle_refcountable_weaklckref,
-		[HANDLE_TYPE_NOTIFYFD]        = (REF void *(FCALL *)(void *__restrict))&handle_notifyfd_weaklckref
+		[HANDLE_TYPE_NOTIFYFD]        = (REF void *(FCALL *)(void *__restrict))&handle_notifyfd_weaklckref,
+		[HANDLE_TYPE_DIRHANDLEX]      = (REF void *(FCALL *)(void *__restrict))&handle_dirhandlex_weaklckref
 	},
 	.h_weakdecref = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (FCALL *)(WEAK REF void *__restrict))&handle_undefined_weakdecref,
@@ -525,7 +532,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (FCALL *)(WEAK REF void *__restrict))&handle_module_weakdecref,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (FCALL *)(WEAK REF void *__restrict))&handle_driver_loadlist_weakdecref,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (FCALL *)(WEAK REF void *__restrict))&handle_refcountable_weakdecref,
-		[HANDLE_TYPE_NOTIFYFD]        = (void (FCALL *)(WEAK REF void *__restrict))&handle_notifyfd_weakdecref
+		[HANDLE_TYPE_NOTIFYFD]        = (void (FCALL *)(WEAK REF void *__restrict))&handle_notifyfd_weakdecref,
+		[HANDLE_TYPE_DIRHANDLEX]      = (void (FCALL *)(WEAK REF void *__restrict))&handle_dirhandlex_weakdecref
 	},
 	.h_read = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_undefined_read,
@@ -549,7 +557,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_module_read,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_driver_loadlist_read,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_refcountable_read,
-		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_notifyfd_read
+		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_notifyfd_read,
+		[HANDLE_TYPE_DIRHANDLEX]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_dirhandlex_read
 	},
 	.h_write = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_undefined_write,
@@ -573,7 +582,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_module_write,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_driver_loadlist_write,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_refcountable_write,
-		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_notifyfd_write
+		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_notifyfd_write,
+		[HANDLE_TYPE_DIRHANDLEX]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_dirhandlex_write
 	},
 	.h_pread = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_undefined_pread,
@@ -597,7 +607,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_module_pread,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_driver_loadlist_pread,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_refcountable_pread,
-		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_notifyfd_pread
+		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_notifyfd_pread,
+		[HANDLE_TYPE_DIRHANDLEX]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_dirhandlex_pread
 	},
 	.h_pwrite = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_undefined_pwrite,
@@ -621,7 +632,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_module_pwrite,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_driver_loadlist_pwrite,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_refcountable_pwrite,
-		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_notifyfd_pwrite
+		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_notifyfd_pwrite,
+		[HANDLE_TYPE_DIRHANDLEX]      = (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_dirhandlex_pwrite
 	},
 	.h_readv = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_undefined_readv,
@@ -645,7 +657,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_readv,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_driver_loadlist_readv,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_refcountable_readv,
-		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_notifyfd_readv
+		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_notifyfd_readv,
+		[HANDLE_TYPE_DIRHANDLEX]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirhandlex_readv
 	},
 	.h_writev = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_undefined_writev,
@@ -669,7 +682,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_module_writev,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_driver_loadlist_writev,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_refcountable_writev,
-		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_notifyfd_writev
+		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_notifyfd_writev,
+		[HANDLE_TYPE_DIRHANDLEX]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_dirhandlex_writev
 	},
 	.h_preadv = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_undefined_preadv,
@@ -693,7 +707,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_preadv,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_loadlist_preadv,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_refcountable_preadv,
-		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_notifyfd_preadv
+		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_notifyfd_preadv,
+		[HANDLE_TYPE_DIRHANDLEX]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirhandlex_preadv
 	},
 	.h_pwritev = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_undefined_pwritev,
@@ -717,7 +732,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_module_pwritev,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_loadlist_pwritev,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_refcountable_pwritev,
-		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_notifyfd_pwritev
+		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_notifyfd_pwritev,
+		[HANDLE_TYPE_DIRHANDLEX]      = (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_dirhandlex_pwritev
 	},
 	.h_readdir = {
 		[HANDLE_TYPE_UNDEFINED]       = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_undefined_readdir,
@@ -741,7 +757,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_module_readdir,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_driver_loadlist_readdir,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_refcountable_readdir,
-		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_notifyfd_readdir
+		[HANDLE_TYPE_NOTIFYFD]        = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_notifyfd_readdir,
+		[HANDLE_TYPE_DIRHANDLEX]      = (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_dirhandlex_readdir
 	},
 	.h_seek = {
 		[HANDLE_TYPE_UNDEFINED]       = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_undefined_seek,
@@ -765,7 +782,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_module_seek,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_driver_loadlist_seek,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_refcountable_seek,
-		[HANDLE_TYPE_NOTIFYFD]        = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_notifyfd_seek
+		[HANDLE_TYPE_NOTIFYFD]        = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_notifyfd_seek,
+		[HANDLE_TYPE_DIRHANDLEX]      = (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_dirhandlex_seek
 	},
 	.h_ioctl = {
 		[HANDLE_TYPE_UNDEFINED]       = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_undefined_ioctl,
@@ -789,7 +807,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_module_ioctl,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_driver_loadlist_ioctl,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_refcountable_ioctl,
-		[HANDLE_TYPE_NOTIFYFD]        = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_notifyfd_ioctl
+		[HANDLE_TYPE_NOTIFYFD]        = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_notifyfd_ioctl,
+		[HANDLE_TYPE_DIRHANDLEX]      = (syscall_slong_t (KCALL *)(void *__restrict, ioctl_t, USER UNCHECKED void *, iomode_t))&handle_dirhandlex_ioctl
 	},
 	.h_truncate = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict, pos_t))&handle_undefined_truncate,
@@ -813,7 +832,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, pos_t))&handle_module_truncate,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, pos_t))&handle_driver_loadlist_truncate,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, pos_t))&handle_refcountable_truncate,
-		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict, pos_t))&handle_notifyfd_truncate
+		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict, pos_t))&handle_notifyfd_truncate,
+		[HANDLE_TYPE_DIRHANDLEX]      = (void (KCALL *)(void *__restrict, pos_t))&handle_dirhandlex_truncate
 	},
 	.h_mmap = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_undefined_mmap,
@@ -837,7 +857,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_module_mmap,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_driver_loadlist_mmap,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_refcountable_mmap,
-		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_notifyfd_mmap
+		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_notifyfd_mmap,
+		[HANDLE_TYPE_DIRHANDLEX]      = (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_dirhandlex_mmap
 	},
 	.h_allocate = {
 		[HANDLE_TYPE_UNDEFINED]       = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_undefined_allocate,
@@ -861,7 +882,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_module_allocate,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_driver_loadlist_allocate,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_refcountable_allocate,
-		[HANDLE_TYPE_NOTIFYFD]        = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_notifyfd_allocate
+		[HANDLE_TYPE_NOTIFYFD]        = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_notifyfd_allocate,
+		[HANDLE_TYPE_DIRHANDLEX]      = (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_dirhandlex_allocate
 	},
 	.h_sync = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict))&handle_undefined_sync,
@@ -885,7 +907,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict))&handle_module_sync,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict))&handle_driver_loadlist_sync,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict))&handle_refcountable_sync,
-		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict))&handle_notifyfd_sync
+		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict))&handle_notifyfd_sync,
+		[HANDLE_TYPE_DIRHANDLEX]      = (void (KCALL *)(void *__restrict))&handle_dirhandlex_sync
 	},
 	.h_datasync = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict))&handle_undefined_datasync,
@@ -909,7 +932,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict))&handle_module_datasync,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict))&handle_driver_loadlist_datasync,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict))&handle_refcountable_datasync,
-		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict))&handle_notifyfd_datasync
+		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict))&handle_notifyfd_datasync,
+		[HANDLE_TYPE_DIRHANDLEX]      = (void (KCALL *)(void *__restrict))&handle_dirhandlex_datasync
 	},
 	.h_stat = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_undefined_stat,
@@ -933,7 +957,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_module_stat,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_driver_loadlist_stat,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_refcountable_stat,
-		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_notifyfd_stat
+		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_notifyfd_stat,
+		[HANDLE_TYPE_DIRHANDLEX]      = (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_dirhandlex_stat
 	},
 	.h_pollconnect = {
 		[HANDLE_TYPE_UNDEFINED]       = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_pollconnect,
@@ -957,7 +982,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_module_pollconnect,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_loadlist_pollconnect,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_refcountable_pollconnect,
-		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_notifyfd_pollconnect
+		[HANDLE_TYPE_NOTIFYFD]        = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_notifyfd_pollconnect,
+		[HANDLE_TYPE_DIRHANDLEX]      = (void (KCALL *)(void *__restrict, poll_mode_t))&handle_dirhandlex_pollconnect
 	},
 	.h_polltest = {
 		[HANDLE_TYPE_UNDEFINED]       = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_polltest,
@@ -981,7 +1007,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_module_polltest,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_loadlist_polltest,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_refcountable_polltest,
-		[HANDLE_TYPE_NOTIFYFD]        = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_notifyfd_polltest
+		[HANDLE_TYPE_NOTIFYFD]        = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_notifyfd_polltest,
+		[HANDLE_TYPE_DIRHANDLEX]      = (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_dirhandlex_polltest
 	},
 	.h_tryas = {
 		[HANDLE_TYPE_UNDEFINED]       = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_undefined_tryas,
@@ -1005,7 +1032,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_module_tryas,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_driver_loadlist_tryas,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_refcountable_tryas,
-		[HANDLE_TYPE_NOTIFYFD]        = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_notifyfd_tryas
+		[HANDLE_TYPE_NOTIFYFD]        = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_notifyfd_tryas,
+		[HANDLE_TYPE_DIRHANDLEX]      = (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_dirhandlex_tryas
 	},
 	.h_printlink = {
 		[HANDLE_TYPE_UNDEFINED]       = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_undefined_printlink,
@@ -1029,7 +1057,8 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		[HANDLE_TYPE_MODULE]          = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_module_printlink,
 		[HANDLE_TYPE_DRIVER_LOADLIST] = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_driver_loadlist_printlink,
 		[HANDLE_TYPE_REFCOUNTABLE]    = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_refcountable_printlink,
-		[HANDLE_TYPE_NOTIFYFD]        = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_notifyfd_printlink
+		[HANDLE_TYPE_NOTIFYFD]        = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_notifyfd_printlink,
+		[HANDLE_TYPE_DIRHANDLEX]      = (ssize_t (KCALL *)(void *__restrict, pformatprinter, void *))&handle_dirhandlex_printlink
 	},
 };
 
@@ -1726,6 +1755,39 @@ DEFINE_INTERN_WEAK_ALIAS(handle_notifyfd_tryas, handle_undefined_tryas);
 INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_notifyfd.printlink") ssize_t KCALL
 handle_notifyfd_printlink(struct notifyfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
 	return handle_generic_printlink(self, HANDLE_TYPE_NOTIFYFD, printer, arg);
+}
+
+/* Weakly define operators for `HANDLE_TYPE_DIRHANDLEX' (`struct dirhandlex') */
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_dirhandlex_tryas, handle_undefined_tryas);
+INTERN BLOCKING NONNULL((1, 2)) ATTR_WEAK ATTR_SECTION(".text.kernel.handle_dirhandlex.printlink") ssize_t KCALL
+handle_dirhandlex_printlink(struct dirhandlex *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...) {
+	return handle_generic_printlink(self, HANDLE_TYPE_DIRHANDLEX, printer, arg);
 }
 //[[[end]]]
 

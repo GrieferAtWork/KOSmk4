@@ -1298,6 +1298,38 @@ err_badfd:
 
 
 
+/* Try to lookup the slot associated with `fd', or return `NULL'.
+ * The caller must be holding a lock to `self' (either rd or  wr) */
+PUBLIC WUNUSED NONNULL((1)) union handslot *
+NOTHROW(FCALL handman_trylookup_slot)(struct handman *__restrict self, fd_t fd) {
+	unsigned int relfd;
+	struct handrange *range;
+	assert(handman_reading(self));
+	range = handman_ranges_locate(self, (unsigned int)fd);
+	if unlikely(!range)
+		goto err_badfd;
+	relfd = (unsigned int)fd - range->hr_minfd;
+	if unlikely(!handrange_slotishand(range, relfd))
+		goto err_badfd;
+	return &range->hr_hand[relfd];
+err_badfd:
+	return NULL;
+}
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) union handslot *FCALL
+handman_lookup_slot_or_unlock_and_throw(struct handman *__restrict self, fd_t fd)
+		THROWS(E_INVALID_HANDLE_FILE) {
+	union handslot *result;
+	result = handman_trylookup_slot(self, fd);
+	if unlikely(!result)
+		handman_unlock_and_throw_invalid_handle(self, fd, handman_writing(self));
+	return result;
+}
+
+
+
+
+
 /* Close the handle `fd' within `self', and store its old contents in `*hand'
  * @return: ohand: Always re-returns `ohand'
  * @throw: E_INVALID_HANDLE_FILE:E_INVALID_HANDLE_FILE_NEGATIVE:fd: `fd < 0'
