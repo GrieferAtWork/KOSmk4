@@ -235,7 +235,7 @@ void stack_limit_increase($ulongptr_t newlim) {
 [[pure, wunused, nonnull]]
 [[if(defined(_WIN32)), alias("basename", "__basename", "lbasename")]]
 [[crt_impl_if(!defined(__KERNEL__) && !defined(_WIN32))]]
-const char *dos_lbasename(const char *filename) {
+char const *dos_lbasename(char const *filename) {
 @@pp_ifdef _WIN32@@
 	return basename(filename);
 @@pp_else@@
@@ -260,7 +260,7 @@ const char *dos_lbasename(const char *filename) {
 [[pure, wunused, nonnull]]
 [[if(!defined(_WIN32)), alias("basename", "__basename", "lbasename")]]
 [[crt_impl_if(!defined(__KERNEL__) && defined(_WIN32))]]
-const char *unix_lbasename(const char *filename) {
+char const *unix_lbasename(char const *filename) {
 @@pp_ifndef _WIN32@@
 	return basename(filename);
 @@pp_else@@
@@ -530,7 +530,7 @@ xmemdup([[inp(src_bytes)]] void const *src, size_t src_bytes, size_t alloc_size)
 
 [[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[doc_alias("strdupf"), requires_function(vstrdupf, xmalloc_failed)]]
-char *xvasprintf([[nonnull, format("printf")]] const char *format, $va_list args) {
+char *xvasprintf([[nonnull, format("printf")]] char const *format, $va_list args) {
 	va_list args2;
 	char *result;
 	va_copy(args2, args);
@@ -899,19 +899,134 @@ long get_run_time(void); /* TODO */
 char *make_relative_prefix(char const *a, char const *b, char const *c); /* TODO */
 
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
-char *make_relative_prefix_ignore_links(const char *a, const char *b, const char *c); /* TODO */
+char *make_relative_prefix_ignore_links(char const *a, char const *b, char const *c); /* TODO */
 
-[[wunused, nonnull]]
-const char *choose_tmpdir(void); /* TODO */
 
+@@>> choose_temp_base(3)
+@@Create a temporary filename in `choose_tmpdir(3)' by use of `mktemp(3)'
+@@The returned string must always be freed, and if no filename could be
+@@generated, an empty string is returned.
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
-char *choose_temp_base(void); /* TODO */
+[[requires_function(choose_tmpdir, xmalloc, mktemp)]]
+char *choose_temp_base(void) {
+	char const *tmpdir = choose_tmpdir();
+	size_t tmpdir_len = strlen(tmpdir);
+	char *result = (char *)xmalloc((tmpdir_len + 6 + 1) * sizeof(char));
+	memcpyc(mempcpyc(result, tmpdir, tmpdir_len, sizeof(char)),
+	        "XXXXXX", 7, sizeof(char));
+	return mktemp(result);
+}
 
-[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
-char *make_temp_file(char const *a); /* TODO */
+@@>> choose_tmpdir(3)
+@@Return the path to a suitable temp directory.
+@@The returned path is guarantied to be non-NULL, and include a trailing slash.
+[[wunused, nonnull, pure]]
+[[requires($has_function(access, xmalloc) && !defined(_WIN32) &&
+           defined(__X_OK) && defined(__W_OK) && defined(__R_OK))]]
+char const *choose_tmpdir(void) {
+	static char const *result = NULL;
+	if (result == NULL) {
+		char const *path;
+		size_t pathlen;
+		char *pathcopy, *ptr;
+		size_t i;
+@@pp_ifdef __KOS__@@
+		static char const defdir_names[][10] = { "/tmp", "/var/tmp", "/usr/tmp" };
+@@pp_else@@
+		static char const defdir_names[][10] = { "/var/tmp", "/usr/tmp", "/tmp" };
+@@pp_endif@@
+@@pp_if $has_function(getenv)@@
+		static char const envvar_names[][8] = { "TMPDIR", "TMP", "TEMP" };
+		for (i = 0; i < COMPILER_LENOF(envvar_names); ++i) {
+			path = getenv(envvar_names[i]);
+			if (path && access(path, __X_OK | __W_OK | __R_OK) == 0)
+				goto got_tmppath;
+		}
+@@pp_endif@@
+		for (i = 0; i < COMPILER_LENOF(defdir_names); ++i) {
+			path = defdir_names[i];
+			if (access(path, __X_OK | __W_OK | __R_OK) == 0)
+				goto got_tmppath;
+		}
 
-[[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
-char *make_temp_file_with_prefix(const char *a, const char *b); /* TODO */
+		/* Fallback: use the current directory. */
+		path = ".";
+got_tmppath:
+
+		pathlen = strlen(path);
+@@pp_ifdef _WIN32@@
+		while (pathlen && (path[pathlen - 1] == '/' || path[pathlen - 1] == '\\'))
+			--pathlen;
+@@pp_else@@
+		while (pathlen && path[pathlen - 1] == '/')
+			--pathlen;
+@@pp_endif@@
+
+		/* Force-append a trailing slash. */
+		pathcopy = (char *)xmalloc((pathlen + 2) * sizeof(char));
+		ptr = (char *)mempcpyc(pathcopy, path, pathlen, sizeof(char));
+@@pp_ifdef _WIN32@@
+		*ptr++ = '\\';
+@@pp_else@@
+		*ptr++ = '/';
+@@pp_endif@@
+		*ptr++ = '\0';
+		result = pathcopy;
+	}
+	return result;
+}
+
+[[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires($has_function(choose_tmpdir, xmalloc, mkstemps, open, fprintf, abort) &&
+           defined(__LOCAL_stderr))]]
+[[impl_include("<parts/printf-config.h>", "<libc/errno.h>")]]
+char *make_temp_file_with_prefix([[nullable]] char const *prefix,
+                                 [[nullable]] char const *suffix) {
+	fd_t tempfd;
+	char *result, *p;
+	const char *tmpdir = choose_tmpdir();
+	size_t tmpdir_len, prefix_len, suffix_len;
+	if (prefix == NULL)
+		prefix = "cc";
+	if (suffix == NULL)
+		suffix = "";
+	tmpdir_len = strlen(tmpdir);
+	prefix_len = strlen(prefix);
+	suffix_len = strlen(suffix);
+
+	/* Construct the full filename. */
+	result = (char *)xmalloc((tmpdir_len +
+	                          prefix_len + 6 +
+	                          suffix_len + 1) *
+	                         sizeof(char));
+	p = (char *)mempcpyc(result, tmpdir, tmpdir_len, sizeof(char));
+	p = (char *)mempcpyc(p, prefix, prefix_len, sizeof(char));
+	p = (char *)mempcpyc(p, "XXXXXX", 6, sizeof(char));
+	p = (char *)mempcpyc(p, suffix, suffix_len, sizeof(char));
+	*p = '\0';
+	tempfd = mkstemps(result, suffix_len);
+	if (tempfd < 0) {
+@@pp_ifdef __NO_PRINTF_STRERROR@@
+		fprintf(stderr, "Cannot create temporary file in %s: %s\n",
+		        tmpdir, strerror(__libc_geterrno_or(1)));
+@@pp_else@@
+		fprintf(stderr, "Cannot create temporary file in %s: %m\n", tmpdir);
+@@pp_endif@@
+		abort();
+	}
+
+@@pp_if $has_function(close)@@
+	close(tempfd);
+@@pp_endif@@
+	return result;
+}
+
+[[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
+[[requires_function(make_temp_file_with_prefix)]]
+char *make_temp_file([[nullable]] char const *suffix) {
+	return make_temp_file_with_prefix(NULL, suffix);
+}
 
 @@>> unlink_if_ordinary(3)
 @@Delete a file, but only if it's S_ISREG or S_ISLNK
@@ -1145,14 +1260,14 @@ struct pex_time {
 %[define(PEX_STDERR_APPEND    = 0x200)]
 
 
-const char *pex_run(struct pex_obj *obj, int flags, const char *executable, char *const *argv,
-                    const char *outname, const char *errname, int *err); /* TODO */
+char const *pex_run(struct pex_obj *obj, int flags, char const *executable, char *const *argv,
+                    char const *outname, char const *errname, int *err); /* TODO */
 
-const char *pex_run_in_environment(struct pex_obj *obj, int flags, const char *executable,
-                                   char *const *argv, char *const *env, const char *outname,
-                                   const char *errname, int *err); /* TODO */
+char const *pex_run_in_environment(struct pex_obj *obj, int flags, char const *executable,
+                                   char *const *argv, char *const *env, char const *outname,
+                                   char const *errname, int *err); /* TODO */
 
-FILE *pex_input_file(struct pex_obj *obj, int flags, const char *in_name); /* TODO */
+FILE *pex_input_file(struct pex_obj *obj, int flags, char const *in_name); /* TODO */
 
 FILE *pex_input_pipe(struct pex_obj *obj, int binary); /* TODO */
 
@@ -1168,8 +1283,8 @@ int pex_get_times(struct pex_obj *obj, int count, struct pex_time *vector); /* T
 
 void pex_free(struct pex_obj *obj); /* TODO */
 
-const char *pex_one(int flags, const char *executable, char *const *argv, const char *pname,
-                    const char *outname, const char *errname, int *status, int *err); /* TODO */
+char const *pex_one(int flags, char const *executable, char *const *argv, char const *pname,
+                    char const *outname, char const *errname, int *status, int *err); /* TODO */
 
 int pexecute(char const *a, char *const *b, char const *c,
              char const *d, char **e, char **f, int g); /* TODO */

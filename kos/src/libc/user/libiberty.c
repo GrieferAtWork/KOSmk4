@@ -140,11 +140,11 @@ NOTHROW_NCX(LIBCCALL libc_make_relative_prefix)(char const *a,
 }
 /*[[[end:libc_make_relative_prefix]]]*/
 
-/*[[[head:libc_make_relative_prefix_ignore_links,hash:CRC-32=0x12954e87]]]*/
+/*[[[head:libc_make_relative_prefix_ignore_links,hash:CRC-32=0x6c52f8c2]]]*/
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc_make_relative_prefix_ignore_links)(const char *a,
-                                                             const char *b,
-                                                             const char *c)
+NOTHROW_NCX(LIBCCALL libc_make_relative_prefix_ignore_links)(char const *a,
+                                                             char const *b,
+                                                             char const *c)
 /*[[[body:libc_make_relative_prefix_ignore_links]]]*/
 /*AUTO*/{
 	(void)a;
@@ -156,53 +156,9 @@ NOTHROW_NCX(LIBCCALL libc_make_relative_prefix_ignore_links)(const char *a,
 }
 /*[[[end:libc_make_relative_prefix_ignore_links]]]*/
 
-/*[[[head:libc_choose_tmpdir,hash:CRC-32=0x3cecd4b]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_RETNONNULL WUNUSED const char *
-NOTHROW_NCX(LIBCCALL libc_choose_tmpdir)(void)
-/*[[[body:libc_choose_tmpdir]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("choose_tmpdir"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_choose_tmpdir]]]*/
 
-/*[[[head:libc_choose_temp_base,hash:CRC-32=0x36925431]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc_choose_temp_base)(void)
-/*[[[body:libc_choose_temp_base]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("choose_temp_base"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_choose_temp_base]]]*/
 
-/*[[[head:libc_make_temp_file,hash:CRC-32=0x65ba2155]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc_make_temp_file)(char const *a)
-/*[[[body:libc_make_temp_file]]]*/
-/*AUTO*/{
-	(void)a;
-	CRT_UNIMPLEMENTEDF("make_temp_file(%q)", a); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_make_temp_file]]]*/
 
-/*[[[head:libc_make_temp_file_with_prefix,hash:CRC-32=0x7ef5c1f7]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc_make_temp_file_with_prefix)(const char *a,
-                                                      const char *b)
-/*[[[body:libc_make_temp_file_with_prefix]]]*/
-/*AUTO*/{
-	(void)a;
-	(void)b;
-	CRT_UNIMPLEMENTEDF("make_temp_file_with_prefix(%q, %q)", a, b); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_make_temp_file_with_prefix]]]*/
 
 
 
@@ -218,14 +174,14 @@ NOTHROW_NCX(LIBCCALL libc_hex_init)(void)
 }
 /*[[[end:libc_hex_init]]]*/
 
-/*[[[head:libc_pex_run,hash:CRC-32=0x586b8bbd]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") const char *
+/*[[[head:libc_pex_run,hash:CRC-32=0x6cc02eb9]]]*/
+INTERN ATTR_SECTION(".text.crt.libiberty") char const *
 NOTHROW_NCX(LIBCCALL libc_pex_run)(struct pex_obj *obj,
                                    int flags,
-                                   const char *executable,
+                                   char const *executable,
                                    char *const *argv,
-                                   const char *outname,
-                                   const char *errname,
+                                   char const *outname,
+                                   char const *errname,
                                    int *err)
 /*[[[body:libc_pex_run]]]*/
 /*AUTO*/{
@@ -242,15 +198,15 @@ NOTHROW_NCX(LIBCCALL libc_pex_run)(struct pex_obj *obj,
 }
 /*[[[end:libc_pex_run]]]*/
 
-/*[[[head:libc_pex_run_in_environment,hash:CRC-32=0xf718ce3b]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") const char *
+/*[[[head:libc_pex_run_in_environment,hash:CRC-32=0x5366e46b]]]*/
+INTERN ATTR_SECTION(".text.crt.libiberty") char const *
 NOTHROW_NCX(LIBCCALL libc_pex_run_in_environment)(struct pex_obj *obj,
                                                   int flags,
-                                                  const char *executable,
+                                                  char const *executable,
                                                   char *const *argv,
                                                   char *const *env,
-                                                  const char *outname,
-                                                  const char *errname,
+                                                  char const *outname,
+                                                  char const *errname,
                                                   int *err)
 /*[[[body:libc_pex_run_in_environment]]]*/
 /*AUTO*/{
@@ -268,11 +224,11 @@ NOTHROW_NCX(LIBCCALL libc_pex_run_in_environment)(struct pex_obj *obj,
 }
 /*[[[end:libc_pex_run_in_environment]]]*/
 
-/*[[[head:libc_pex_input_file,hash:CRC-32=0xb63b82c0]]]*/
+/*[[[head:libc_pex_input_file,hash:CRC-32=0x434ac911]]]*/
 INTERN ATTR_SECTION(".text.crt.libiberty") FILE *
 NOTHROW_NCX(LIBCCALL libc_pex_input_file)(struct pex_obj *obj,
                                           int flags,
-                                          const char *in_name)
+                                          char const *in_name)
 /*[[[body:libc_pex_input_file]]]*/
 /*AUTO*/{
 	(void)obj;
@@ -385,14 +341,14 @@ NOTHROW_NCX(LIBCCALL libc_pex_free)(struct pex_obj *obj)
 }
 /*[[[end:libc_pex_free]]]*/
 
-/*[[[head:libc_pex_one,hash:CRC-32=0xb3939f44]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") const char *
+/*[[[head:libc_pex_one,hash:CRC-32=0xeb3676ab]]]*/
+INTERN ATTR_SECTION(".text.crt.libiberty") char const *
 NOTHROW_NCX(LIBCCALL libc_pex_one)(int flags,
-                                   const char *executable,
+                                   char const *executable,
                                    char *const *argv,
-                                   const char *pname,
-                                   const char *outname,
-                                   const char *errname,
+                                   char const *pname,
+                                   char const *outname,
+                                   char const *errname,
                                    int *status,
                                    int *err)
 /*[[[body:libc_pex_one]]]*/
@@ -451,7 +407,7 @@ NOTHROW_NCX(LIBCCALL libc_pwait)(int a,
 }
 /*[[[end:libc_pwait]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x5ed846ca]]]*/
+/*[[[start:exports,hash:CRC-32=0x2577be9e]]]*/
 DEFINE_PUBLIC_ALIAS(xmalloc_set_program_name, libc_xmalloc_set_program_name);
 DEFINE_PUBLIC_ALIAS(xmalloc_failed, libc_xmalloc_failed);
 DEFINE_PUBLIC_ALIAS(fdmatch, libc_fdmatch);
@@ -462,10 +418,6 @@ DEFINE_PUBLIC_ALIAS(concat_copy2, libc_concat_copy2);
 DEFINE_PUBLIC_ALIAS(get_run_time, libc_get_run_time);
 DEFINE_PUBLIC_ALIAS(make_relative_prefix, libc_make_relative_prefix);
 DEFINE_PUBLIC_ALIAS(make_relative_prefix_ignore_links, libc_make_relative_prefix_ignore_links);
-DEFINE_PUBLIC_ALIAS(choose_tmpdir, libc_choose_tmpdir);
-DEFINE_PUBLIC_ALIAS(choose_temp_base, libc_choose_temp_base);
-DEFINE_PUBLIC_ALIAS(make_temp_file, libc_make_temp_file);
-DEFINE_PUBLIC_ALIAS(make_temp_file_with_prefix, libc_make_temp_file_with_prefix);
 DEFINE_PUBLIC_ALIAS(hex_init, libc_hex_init);
 DEFINE_PUBLIC_ALIAS(pex_run, libc_pex_run);
 DEFINE_PUBLIC_ALIAS(pex_run_in_environment, libc_pex_run_in_environment);

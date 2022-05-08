@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11c040ff */
+/* HASH CRC-32:0x451586ed */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,10 +42,10 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_stack_limit_increase)(ulongptr_t newlim);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_stack_limit_increase)(ulongptr_t newlim);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED const char *NOTHROW_NCX(LIBDCALL libd_dos_lbasename)(const char *filename);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_dos_lbasename)(char const *filename);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED const char *NOTHROW_NCX(LIBCCALL libc_dos_lbasename)(const char *filename);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_dos_lbasename)(char const *filename);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_lrealpath)(char const *path);
@@ -128,12 +128,12 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strdupf(3), vstrdupf(3)
  * Print the given `format' into a newly allocated, heap-allocated string */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_xvasprintf)(const char *format, va_list args);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_xvasprintf)(char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strdupf(3), vstrdupf(3)
  * Print the given `format' into a newly allocated, heap-allocated string */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_xvasprintf)(const char *format, va_list args);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_xvasprintf)(char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) char *NOTHROW_NCX(VLIBDCALL libd_xasprintf)(char const *__restrict format, ...);
@@ -213,9 +213,32 @@ INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(VLIBCCALL libc_concat_copy
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBDCALL libd_make_relative_prefix)(char const *a, char const *b, char const *c);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBDCALL libd_make_relative_prefix_ignore_links)(const char *a, const char *b, const char *c);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBDCALL libd_make_temp_file)(char const *a);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBDCALL libd_make_temp_file_with_prefix)(const char *a, const char *b);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBDCALL libd_make_relative_prefix_ignore_links)(char const *a, char const *b, char const *c);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> choose_temp_base(3)
+ * Create a temporary filename in `choose_tmpdir(3)' by use of `mktemp(3)'
+ * The returned string must always be freed, and if no filename could be
+ * generated, an empty string is returned. */
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_choose_temp_base)(void);
+/* >> choose_tmpdir(3)
+ * Return the path to a suitable temp directory.
+ * The returned path is guarantied to be non-NULL, and include a trailing slash. */
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_choose_tmpdir)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBDCALL libd_make_temp_file_with_prefix)(char const *prefix, char const *suffix);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_temp_file_with_prefix)(char const *prefix, char const *suffix);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBDCALL libd_make_temp_file)(char const *suffix);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_temp_file)(char const *suffix);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unlink_if_ordinary(3)
  * Delete a file, but only if it's S_ISREG or S_ISLNK
  * @return:  0: File was deleted
@@ -240,9 +263,9 @@ INTDEF ATTR_PURE WUNUSED __UINT32_TYPE__ NOTHROW_NCX(LIBDCALL libd_xcrc32)(__BYT
 INTDEF ATTR_PURE WUNUSED __UINT32_TYPE__ NOTHROW_NCX(LIBCCALL libc_xcrc32)(__BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UINT32_TYPE__ crc);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF const char *NOTHROW_NCX(LIBDCALL libd_pex_run)(struct pex_obj *obj, int flags, const char *executable, char *const *argv, const char *outname, const char *errname, int *err);
-INTDEF const char *NOTHROW_NCX(LIBDCALL libd_pex_run_in_environment)(struct pex_obj *obj, int flags, const char *executable, char *const *argv, char *const *env, const char *outname, const char *errname, int *err);
-INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_pex_input_file)(struct pex_obj *obj, int flags, const char *in_name);
+INTDEF char const *NOTHROW_NCX(LIBDCALL libd_pex_run)(struct pex_obj *obj, int flags, char const *executable, char *const *argv, char const *outname, char const *errname, int *err);
+INTDEF char const *NOTHROW_NCX(LIBDCALL libd_pex_run_in_environment)(struct pex_obj *obj, int flags, char const *executable, char *const *argv, char *const *env, char const *outname, char const *errname, int *err);
+INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_pex_input_file)(struct pex_obj *obj, int flags, char const *in_name);
 INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_pex_input_pipe)(struct pex_obj *obj, int binary);
 INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_pex_read_output)(struct pex_obj *obj, int binary);
 INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_pex_read_err)(struct pex_obj *obj, int binary);
@@ -250,7 +273,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_pex_get_status)(struct pex_obj *obj, int co
 INTDEF struct pex_obj *NOTHROW_NCX(LIBDCALL libd_pex_init)(int flags, char const *pname, char const *tempbase);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_pex_get_times)(struct pex_obj *obj, int count, struct pex_time *vector);
 INTDEF void NOTHROW_NCX(LIBDCALL libd_pex_free)(struct pex_obj *obj);
-INTDEF const char *NOTHROW_NCX(LIBDCALL libd_pex_one)(int flags, const char *executable, char *const *argv, const char *pname, const char *outname, const char *errname, int *status, int *err);
+INTDEF char const *NOTHROW_NCX(LIBDCALL libd_pex_one)(int flags, char const *executable, char *const *argv, char const *pname, char const *outname, char const *errname, int *status, int *err);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_pexecute)(char const *a, char *const *b, char const *c, char const *d, char **e, char **f, int g);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_pwait)(int a, int *b, int c);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

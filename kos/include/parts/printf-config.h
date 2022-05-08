@@ -57,6 +57,10 @@
 #define __NO_PRINTF_DISASM
 #undef __NO_PRINTF_VINFO
 #define __NO_PRINTF_VINFO
+#if !defined(__CRT_GLC) && !defined(__CRT_CYG)
+#undef __NO_PRINTF_STRERROR
+#define __NO_PRINTF_STRERROR
+#endif /* !__CRT_GLC && !__CRT_CYG */
 #elif defined(__CRT_KOS) && defined(__BUILDING_LIBC)
 /* For compatibility with `_set_printf_count_output(3)',  '%n'
  * can be disabled at runtime  inside of KOS's libc. For  this

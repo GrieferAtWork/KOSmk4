@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ba33414 */
+/* HASH CRC-32:0x5625ad11 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,15 +42,11 @@ INTDEF char *NOTHROW_NCX(VLIBDCALL libd_concat_copy2)(char const *first, ...);
 INTDEF char *NOTHROW_NCX(VLIBCCALL libc_concat_copy2)(char const *first, ...);
 INTDEF long NOTHROW_NCX(LIBCCALL libc_get_run_time)(void);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_relative_prefix)(char const *a, char const *b, char const *c);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_relative_prefix_ignore_links)(const char *a, const char *b, const char *c);
-INTDEF ATTR_RETNONNULL WUNUSED const char *NOTHROW_NCX(LIBCCALL libc_choose_tmpdir)(void);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_choose_temp_base)(void);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_temp_file)(char const *a);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_temp_file_with_prefix)(const char *a, const char *b);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_relative_prefix_ignore_links)(char const *a, char const *b, char const *c);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_hex_init)(void);
-INTDEF const char *NOTHROW_NCX(LIBCCALL libc_pex_run)(struct pex_obj *obj, int flags, const char *executable, char *const *argv, const char *outname, const char *errname, int *err);
-INTDEF const char *NOTHROW_NCX(LIBCCALL libc_pex_run_in_environment)(struct pex_obj *obj, int flags, const char *executable, char *const *argv, char *const *env, const char *outname, const char *errname, int *err);
-INTDEF FILE *NOTHROW_NCX(LIBCCALL libc_pex_input_file)(struct pex_obj *obj, int flags, const char *in_name);
+INTDEF char const *NOTHROW_NCX(LIBCCALL libc_pex_run)(struct pex_obj *obj, int flags, char const *executable, char *const *argv, char const *outname, char const *errname, int *err);
+INTDEF char const *NOTHROW_NCX(LIBCCALL libc_pex_run_in_environment)(struct pex_obj *obj, int flags, char const *executable, char *const *argv, char *const *env, char const *outname, char const *errname, int *err);
+INTDEF FILE *NOTHROW_NCX(LIBCCALL libc_pex_input_file)(struct pex_obj *obj, int flags, char const *in_name);
 INTDEF FILE *NOTHROW_NCX(LIBCCALL libc_pex_input_pipe)(struct pex_obj *obj, int binary);
 INTDEF FILE *NOTHROW_NCX(LIBCCALL libc_pex_read_output)(struct pex_obj *obj, int binary);
 INTDEF FILE *NOTHROW_NCX(LIBCCALL libc_pex_read_err)(struct pex_obj *obj, int binary);
@@ -58,7 +54,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_pex_get_status)(struct pex_obj *obj, int co
 INTDEF struct pex_obj *NOTHROW_NCX(LIBCCALL libc_pex_init)(int flags, char const *pname, char const *tempbase);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pex_get_times)(struct pex_obj *obj, int count, struct pex_time *vector);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_pex_free)(struct pex_obj *obj);
-INTDEF const char *NOTHROW_NCX(LIBCCALL libc_pex_one)(int flags, const char *executable, char *const *argv, const char *pname, const char *outname, const char *errname, int *status, int *err);
+INTDEF char const *NOTHROW_NCX(LIBCCALL libc_pex_one)(int flags, char const *executable, char *const *argv, char const *pname, char const *outname, char const *errname, int *status, int *err);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pexecute)(char const *a, char *const *b, char const *c, char const *d, char **e, char **f, int g);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pwait)(int a, int *b, int c);
 #endif /* !__KERNEL__ */

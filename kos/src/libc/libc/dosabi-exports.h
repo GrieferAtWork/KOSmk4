@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f68fb */
+/* HASH CRC-32:0x8366e784 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -604,8 +604,8 @@ DEFINE_PUBLIC_ALIAS(DOS$expandargv, libd_expandargv);
 DEFINE_PUBLIC_ALIAS(DOS$writeargv, libd_writeargv);
 DEFINE_PUBLIC_ALIAS(DOS$make_relative_prefix, libd_make_relative_prefix);
 DEFINE_PUBLIC_ALIAS(DOS$make_relative_prefix_ignore_links, libd_make_relative_prefix_ignore_links);
-DEFINE_PUBLIC_ALIAS(DOS$make_temp_file, libd_make_temp_file);
 DEFINE_PUBLIC_ALIAS(DOS$make_temp_file_with_prefix, libd_make_temp_file_with_prefix);
+DEFINE_PUBLIC_ALIAS(DOS$make_temp_file, libd_make_temp_file);
 DEFINE_PUBLIC_ALIAS(DOS$unlink_if_ordinary, libd_unlink_if_ordinary);
 DEFINE_PUBLIC_ALIAS(DOS$xcrc32, libd_xcrc32);
 DEFINE_PUBLIC_ALIAS(DOS$pex_run, libd_pex_run);

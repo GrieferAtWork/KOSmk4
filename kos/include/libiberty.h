@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1bd4cd3 */
+/* HASH CRC-32:0xe59cbdac */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -914,28 +914,28 @@ __CDECLARE_VOID(,__NOTHROW_NCX,stack_limit_increase,(__ULONGPTR_TYPE__ __newlim)
 __NAMESPACE_LOCAL_USING_OR_IMPL(stack_limit_increase, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL stack_limit_increase)(__ULONGPTR_TYPE__ __newlim) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stack_limit_increase))(__newlim); })
 #endif /* !__CRT_HAVE_stack_limit_increase */
 #ifdef __CRT_HAVE_dos_lbasename
-__CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,const char *,__NOTHROW_NCX,dos_lbasename,(const char *__filename),(__filename))
+__CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_NCX,dos_lbasename,(char const *__filename),(__filename))
 #elif defined(__CRT_HAVE_basename) && defined(_WIN32)
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,const char *,__NOTHROW_NCX,dos_lbasename,(const char *__filename),basename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_NCX,dos_lbasename,(char const *__filename),basename,(__filename))
 #elif defined(__CRT_HAVE___basename) && defined(_WIN32)
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,const char *,__NOTHROW_NCX,dos_lbasename,(const char *__filename),__basename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_NCX,dos_lbasename,(char const *__filename),__basename,(__filename))
 #elif defined(__CRT_HAVE_lbasename) && defined(_WIN32)
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,const char *,__NOTHROW_NCX,dos_lbasename,(const char *__filename),lbasename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_NCX,dos_lbasename,(char const *__filename),lbasename,(__filename))
 #else /* ... */
 #include <libc/local/libiberty/dos_lbasename.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(dos_lbasename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED const char *__NOTHROW_NCX(__LIBCCALL dos_lbasename)(const char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dos_lbasename))(__filename); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dos_lbasename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL dos_lbasename)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dos_lbasename))(__filename); })
 #endif /* !... */
 #ifdef __CRT_HAVE_unix_lbasename
-__CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,const char *,__NOTHROW_NCX,unix_lbasename,(const char *__filename),(__filename))
+__CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_NCX,unix_lbasename,(char const *__filename),(__filename))
 #elif defined(__CRT_HAVE_basename) && !defined(_WIN32)
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,const char *,__NOTHROW_NCX,unix_lbasename,(const char *__filename),basename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_NCX,unix_lbasename,(char const *__filename),basename,(__filename))
 #elif defined(__CRT_HAVE___basename) && !defined(_WIN32)
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,const char *,__NOTHROW_NCX,unix_lbasename,(const char *__filename),__basename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_NCX,unix_lbasename,(char const *__filename),__basename,(__filename))
 #elif defined(__CRT_HAVE_lbasename) && !defined(_WIN32)
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,const char *,__NOTHROW_NCX,unix_lbasename,(const char *__filename),lbasename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_NCX,unix_lbasename,(char const *__filename),lbasename,(__filename))
 #else /* ... */
 #include <libc/local/libiberty/unix_lbasename.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(unix_lbasename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED const char *__NOTHROW_NCX(__LIBCCALL unix_lbasename)(const char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unix_lbasename))(__filename); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unix_lbasename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL unix_lbasename)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unix_lbasename))(__filename); })
 #endif /* !... */
 #ifdef __CRT_HAVE_lrealpath
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,lrealpath,(char const *__path),(__path))
@@ -1073,12 +1073,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(xmemdup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_M
 #ifdef __CRT_HAVE_xvasprintf
 /* >> strdupf(3), vstrdupf(3)
  * Print the given `format' into a newly allocated, heap-allocated string */
-__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,xvasprintf,(const char *__format, __builtin_va_list __args),(__format,__args))
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,xvasprintf,(char const *__format, __builtin_va_list __args),(__format,__args))
 #elif (defined(__CRT_HAVE_vstrdupf) || defined(__CRT_HAVE_vasprintf) || ((defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)))) && defined(__CRT_HAVE_xmalloc_failed)
 #include <libc/local/libiberty/xvasprintf.h>
 /* >> strdupf(3), vstrdupf(3)
  * Print the given `format' into a newly allocated, heap-allocated string */
-__NAMESPACE_LOCAL_USING_OR_IMPL(xvasprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL xvasprintf)(const char *__format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(xvasprintf))(__format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(xvasprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL xvasprintf)(char const *__format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(xvasprintf))(__format, __args); })
 #endif /* ... */
 #ifdef __CRT_HAVE_xasprintf
 __LIBC __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__VLIBCCALL xasprintf)(char const *__restrict __format, ...) __CASMNAME_SAME("xasprintf");
@@ -1240,11 +1240,63 @@ __CSDECLARE(,char *,libiberty_concat_ptr)
 #endif /* __alloca && __libiberty_concat_ptr && __CRT_HAVE_concat_copy2 */
 __CDECLARE_OPT(,long,__NOTHROW_NCX,get_run_time,(void),())
 __CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,make_relative_prefix,(char const *__a, char const *__b, char const *__c),(__a,__b,__c))
-__CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,make_relative_prefix_ignore_links,(const char *__a, const char *__b, const char *__c),(__a,__b,__c))
-__CDECLARE_OPT(__ATTR_RETNONNULL __ATTR_WUNUSED,const char *,__NOTHROW_NCX,choose_tmpdir,(void),())
-__CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,choose_temp_base,(void),())
-__CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,make_temp_file,(char const *__a),(__a))
-__CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,make_temp_file_with_prefix,(const char *__a, const char *__b),(__a,__b))
+__CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,make_relative_prefix_ignore_links,(char const *__a, char const *__b, char const *__c),(__a,__b,__c))
+#ifdef __CRT_HAVE_choose_temp_base
+/* >> choose_temp_base(3)
+ * Create a temporary filename in `choose_tmpdir(3)' by use of `mktemp(3)'
+ * The returned string must always be freed, and if no filename could be
+ * generated, an empty string is returned. */
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,choose_temp_base,(void),())
+#else /* __CRT_HAVE_choose_temp_base */
+#include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
+#include <bits/os/stat.h>
+#if (defined(__CRT_HAVE_choose_tmpdir) || ((defined(__CRT_HAVE_access) || defined(__CRT_HAVE__access) || defined(__CRT_HAVE___access) || defined(__CRT_HAVE___libc_access) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat))) && !defined(_WIN32) && defined(__X_OK) && defined(__W_OK) && defined(__R_OK))) && (defined(__CRT_HAVE_xmalloc) || defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xcalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))) && (defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))) || (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))))
+#include <libc/local/libiberty/choose_temp_base.h>
+/* >> choose_temp_base(3)
+ * Create a temporary filename in `choose_tmpdir(3)' by use of `mktemp(3)'
+ * The returned string must always be freed, and if no filename could be
+ * generated, an empty string is returned. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(choose_temp_base, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL choose_temp_base)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(choose_temp_base))(); })
+#endif /* (__CRT_HAVE_choose_tmpdir || ((__CRT_HAVE_access || __CRT_HAVE__access || __CRT_HAVE___access || __CRT_HAVE___libc_access || (__AT_FDCWD && __CRT_HAVE_faccessat)) && !_WIN32 && __X_OK && __W_OK && __R_OK)) && (__CRT_HAVE_xmalloc || __CRT_HAVE_xrealloc || __CRT_HAVE_xcalloc || ((__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && __CRT_HAVE_xmalloc_failed)) && (__CRT_HAVE_mktemp || __CRT_HAVE__mktemp || __CRT_HAVE___mktemp || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) || (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64))) */
+#endif /* !__CRT_HAVE_choose_temp_base */
+#ifdef __CRT_HAVE_choose_tmpdir
+/* >> choose_tmpdir(3)
+ * Return the path to a suitable temp directory.
+ * The returned path is guarantied to be non-NULL, and include a trailing slash. */
+__CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_NCX,choose_tmpdir,(void),())
+#else /* __CRT_HAVE_choose_tmpdir */
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_HAVE_access) || defined(__CRT_HAVE__access) || defined(__CRT_HAVE___access) || defined(__CRT_HAVE___libc_access) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat))) && (defined(__CRT_HAVE_xmalloc) || defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xcalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))) && !defined(_WIN32) && defined(__X_OK) && defined(__W_OK) && defined(__R_OK)
+#include <libc/local/libiberty/choose_tmpdir.h>
+/* >> choose_tmpdir(3)
+ * Return the path to a suitable temp directory.
+ * The returned path is guarantied to be non-NULL, and include a trailing slash. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(choose_tmpdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL choose_tmpdir)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(choose_tmpdir))(); })
+#endif /* (__CRT_HAVE_access || __CRT_HAVE__access || __CRT_HAVE___access || __CRT_HAVE___libc_access || (__AT_FDCWD && __CRT_HAVE_faccessat)) && (__CRT_HAVE_xmalloc || __CRT_HAVE_xrealloc || __CRT_HAVE_xcalloc || ((__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && __CRT_HAVE_xmalloc_failed)) && !_WIN32 && __X_OK && __W_OK && __R_OK */
+#endif /* !__CRT_HAVE_choose_tmpdir */
+#ifdef __CRT_HAVE_make_temp_file_with_prefix
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,make_temp_file_with_prefix,(char const *__prefix, char const *__suffix),(__prefix,__suffix))
+#else /* __CRT_HAVE_make_temp_file_with_prefix */
+#include <libc/template/stdstreams.h>
+#include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
+#if (defined(__CRT_HAVE_choose_tmpdir) || ((defined(__CRT_HAVE_access) || defined(__CRT_HAVE__access) || defined(__CRT_HAVE___access) || defined(__CRT_HAVE___libc_access) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat))) && !defined(_WIN32) && defined(__X_OK) && defined(__W_OK) && defined(__R_OK))) && (defined(__CRT_HAVE_xmalloc) || defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xcalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fprintf) || defined(__CRT_HAVE__IO_fprintf) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)) && (defined(__CRT_HAVE_abort) || defined(__CRT_HAVE__ZSt9terminatev) || defined(__CRT_HAVE_terminate) || defined(__CRT_HAVE___chk_fail) || defined(__CRT_HAVE_$Qterminate$A$AYAXXZ) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && defined(__LOCAL_stderr)
+#include <libc/local/libiberty/make_temp_file_with_prefix.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(make_temp_file_with_prefix, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL make_temp_file_with_prefix)(char const *__prefix, char const *__suffix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(make_temp_file_with_prefix))(__prefix, __suffix); })
+#endif /* (__CRT_HAVE_choose_tmpdir || ((__CRT_HAVE_access || __CRT_HAVE__access || __CRT_HAVE___access || __CRT_HAVE___libc_access || (__AT_FDCWD && __CRT_HAVE_faccessat)) && !_WIN32 && __X_OK && __W_OK && __R_OK)) && (__CRT_HAVE_xmalloc || __CRT_HAVE_xrealloc || __CRT_HAVE_xcalloc || ((__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && __CRT_HAVE_xmalloc_failed)) && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fprintf || __CRT_HAVE__IO_fprintf || __CRT_HAVE_fprintf_s || __CRT_HAVE_fprintf_unlocked || __CRT_HAVE_vfprintf || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_putc || __CRT_HAVE_fputc || __CRT_HAVE__IO_putc || __CRT_HAVE_putc_unlocked || __CRT_HAVE_fputc_unlocked || __CRT_HAVE__putc_nolock || __CRT_HAVE__fputc_nolock || (__CRT_DOS && (__CRT_HAVE__flsbuf || __CRT_HAVE___swbuf)) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) && (__CRT_HAVE_abort || __CRT_HAVE__ZSt9terminatev || __CRT_HAVE_terminate || __CRT_HAVE___chk_fail || __CRT_HAVE_$Qterminate$A$AYAXXZ || __CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && __LOCAL_stderr */
+#endif /* !__CRT_HAVE_make_temp_file_with_prefix */
+#ifdef __CRT_HAVE_make_temp_file
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,make_temp_file,(char const *__suffix),(__suffix))
+#else /* __CRT_HAVE_make_temp_file */
+#include <libc/template/stdstreams.h>
+#include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
+#if defined(__CRT_HAVE_make_temp_file_with_prefix) || ((defined(__CRT_HAVE_choose_tmpdir) || ((defined(__CRT_HAVE_access) || defined(__CRT_HAVE__access) || defined(__CRT_HAVE___access) || defined(__CRT_HAVE___libc_access) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat))) && !defined(_WIN32) && defined(__X_OK) && defined(__W_OK) && defined(__R_OK))) && (defined(__CRT_HAVE_xmalloc) || defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xcalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fprintf) || defined(__CRT_HAVE__IO_fprintf) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)) && (defined(__CRT_HAVE_abort) || defined(__CRT_HAVE__ZSt9terminatev) || defined(__CRT_HAVE_terminate) || defined(__CRT_HAVE___chk_fail) || defined(__CRT_HAVE_$Qterminate$A$AYAXXZ) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && defined(__LOCAL_stderr))
+#include <libc/local/libiberty/make_temp_file.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(make_temp_file, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL make_temp_file)(char const *__suffix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(make_temp_file))(__suffix); })
+#endif /* __CRT_HAVE_make_temp_file_with_prefix || ((__CRT_HAVE_choose_tmpdir || ((__CRT_HAVE_access || __CRT_HAVE__access || __CRT_HAVE___access || __CRT_HAVE___libc_access || (__AT_FDCWD && __CRT_HAVE_faccessat)) && !_WIN32 && __X_OK && __W_OK && __R_OK)) && (__CRT_HAVE_xmalloc || __CRT_HAVE_xrealloc || __CRT_HAVE_xcalloc || ((__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && __CRT_HAVE_xmalloc_failed)) && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fprintf || __CRT_HAVE__IO_fprintf || __CRT_HAVE_fprintf_s || __CRT_HAVE_fprintf_unlocked || __CRT_HAVE_vfprintf || __CRT_HAVE__IO_vfprintf || __CRT_HAVE_vfprintf_s || __CRT_HAVE_vfprintf_unlocked || __CRT_HAVE_file_printer || __CRT_HAVE_file_printer_unlocked || __CRT_HAVE_putc || __CRT_HAVE_fputc || __CRT_HAVE__IO_putc || __CRT_HAVE_putc_unlocked || __CRT_HAVE_fputc_unlocked || __CRT_HAVE__putc_nolock || __CRT_HAVE__fputc_nolock || (__CRT_DOS && (__CRT_HAVE__flsbuf || __CRT_HAVE___swbuf)) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) && (__CRT_HAVE_abort || __CRT_HAVE__ZSt9terminatev || __CRT_HAVE_terminate || __CRT_HAVE___chk_fail || __CRT_HAVE_$Qterminate$A$AYAXXZ || __CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && __LOCAL_stderr) */
+#endif /* !__CRT_HAVE_make_temp_file */
 #ifdef __CRT_HAVE_unlink_if_ordinary
 /* >> unlink_if_ordinary(3)
  * Delete a file, but only if it's S_ISREG or S_ISLNK
@@ -1326,9 +1378,9 @@ struct pex_time {
 	unsigned long system_microseconds;
 };
 
-__CDECLARE_OPT(,const char *,__NOTHROW_NCX,pex_run,(struct pex_obj *__obj, int __flags, const char *__executable, char *const *___argv, const char *__outname, const char *__errname, int *__err),(__obj,__flags,__executable,___argv,__outname,__errname,__err))
-__CDECLARE_OPT(,const char *,__NOTHROW_NCX,pex_run_in_environment,(struct pex_obj *__obj, int __flags, const char *__executable, char *const *___argv, char *const *__env, const char *__outname, const char *__errname, int *__err),(__obj,__flags,__executable,___argv,__env,__outname,__errname,__err))
-__CDECLARE_OPT(,FILE *,__NOTHROW_NCX,pex_input_file,(struct pex_obj *__obj, int __flags, const char *__in_name),(__obj,__flags,__in_name))
+__CDECLARE_OPT(,char const *,__NOTHROW_NCX,pex_run,(struct pex_obj *__obj, int __flags, char const *__executable, char *const *___argv, char const *__outname, char const *__errname, int *__err),(__obj,__flags,__executable,___argv,__outname,__errname,__err))
+__CDECLARE_OPT(,char const *,__NOTHROW_NCX,pex_run_in_environment,(struct pex_obj *__obj, int __flags, char const *__executable, char *const *___argv, char *const *__env, char const *__outname, char const *__errname, int *__err),(__obj,__flags,__executable,___argv,__env,__outname,__errname,__err))
+__CDECLARE_OPT(,FILE *,__NOTHROW_NCX,pex_input_file,(struct pex_obj *__obj, int __flags, char const *__in_name),(__obj,__flags,__in_name))
 __CDECLARE_OPT(,FILE *,__NOTHROW_NCX,pex_input_pipe,(struct pex_obj *__obj, int __binary),(__obj,__binary))
 __CDECLARE_OPT(,FILE *,__NOTHROW_NCX,pex_read_output,(struct pex_obj *__obj, int __binary),(__obj,__binary))
 __CDECLARE_OPT(,FILE *,__NOTHROW_NCX,pex_read_err,(struct pex_obj *__obj, int __binary),(__obj,__binary))
@@ -1336,7 +1388,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,pex_get_status,(struct pex_obj *__obj, int __c
 __CDECLARE_OPT(,struct pex_obj *,__NOTHROW_NCX,pex_init,(int __flags, char const *__pname, char const *__tempbase),(__flags,__pname,__tempbase))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,pex_get_times,(struct pex_obj *__obj, int __count, struct pex_time *__vector),(__obj,__count,__vector))
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,pex_free,(struct pex_obj *__obj),(__obj))
-__CDECLARE_OPT(,const char *,__NOTHROW_NCX,pex_one,(int __flags, const char *__executable, char *const *___argv, const char *__pname, const char *__outname, const char *__errname, int *__status, int *__err),(__flags,__executable,___argv,__pname,__outname,__errname,__status,__err))
+__CDECLARE_OPT(,char const *,__NOTHROW_NCX,pex_one,(int __flags, char const *__executable, char *const *___argv, char const *__pname, char const *__outname, char const *__errname, int *__status, int *__err),(__flags,__executable,___argv,__pname,__outname,__errname,__status,__err))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,pexecute,(char const *__a, char *const *__b, char const *__c, char const *__d, char **__e, char **__f, int __g),(__a,__b,__c,__d,__e,__f,__g))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,pwait,(int __a, int *__b, int __c),(__a,__b,__c))
 

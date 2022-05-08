@@ -2737,7 +2737,7 @@ char *frealpathat($fd_t dirfd, [[nonnull]] char const *filename,
 [[guard, dos_only_export_alias("_mktemp"), export_alias("__mktemp")]]
 [[requires(($has_function(open) || $has_function(stat)) && $has_function(system_mktemp))]]
 [[nonnull]] char *mktemp([[nonnull]] char *template_) {
-	if (system_mktemp(2, template_, 0, 0) )
+	if (system_mktemp(2, template_, 0, 0))
 		*template_ = 0;
 	return template_;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d4fc941 */
+/* HASH CRC-32:0x1d0bb497 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -635,8 +635,8 @@ DFUN(".text.crt.dos.libiberty", libd_expandargv, libc_expandargv, TV, 2, TP, TP)
 DFUN(".text.crt.dos.libiberty", libd_writeargv, libc_writeargv, TD, 2, TP, TP)
 DFUN(".text.crt.dos.libiberty", libd_make_relative_prefix, libc_make_relative_prefix, TP, 3, TP, TP, TP)
 DFUN(".text.crt.dos.libiberty", libd_make_relative_prefix_ignore_links, libc_make_relative_prefix_ignore_links, TP, 3, TP, TP, TP)
-DFUN(".text.crt.dos.libiberty", libd_make_temp_file, libc_make_temp_file, TP, 1, TP)
 DFUN(".text.crt.dos.libiberty", libd_make_temp_file_with_prefix, libc_make_temp_file_with_prefix, TP, 2, TP, TP)
+DFUN(".text.crt.dos.libiberty", libd_make_temp_file, libc_make_temp_file, TP, 1, TP)
 DFUN(".text.crt.dos.libiberty", libd_unlink_if_ordinary, libc_unlink_if_ordinary, TD, 1, TP)
 DFUN(".text.crt.dos.libiberty", libd_xcrc32, libc_xcrc32, TI32, 3, TP, TD, TI32)
 DFUN(".text.crt.dos.libiberty", libd_pex_run, libc_pex_run, TP, 7, TP, TD, TP, TP, TP, TP, TP)

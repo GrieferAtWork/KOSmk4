@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9135d13e */
+/* HASH CRC-32:0x7abe2d4d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1866,7 +1866,7 @@ NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd,
  *       re-return it like it would if everything had worked! */
 INTERN ATTR_SECTION(".text.crt.fs.utility") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_mktemp)(char *template_) {
-	if (libc_system_mktemp(2, template_, 0, 0) )
+	if (libc_system_mktemp(2, template_, 0, 0))
 		*template_ = 0;
 	return template_;
 }

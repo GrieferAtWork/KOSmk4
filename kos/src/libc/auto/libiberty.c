@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d75ebfd */
+/* HASH CRC-32:0xb10afc1e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,8 +116,8 @@ NOTHROW_NCX(LIBCCALL libc_stack_limit_increase)(ulongptr_t newlim) {
 	}
 
 }
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE ATTR_RETNONNULL WUNUSED const char *
-NOTHROW_NCX(LIBCCALL libc_dos_lbasename)(const char *filename) {
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE ATTR_RETNONNULL WUNUSED char const *
+NOTHROW_NCX(LIBCCALL libc_dos_lbasename)(char const *filename) {
 
 
 
@@ -323,7 +323,7 @@ NOTHROW_NCX(LIBCCALL libc_xmemdup)(void const *src,
 /* >> strdupf(3), vstrdupf(3)
  * Print the given `format' into a newly allocated, heap-allocated string */
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_xvasprintf)(const char *format,
+NOTHROW_NCX(LIBCCALL libc_xvasprintf)(char const *format,
                                       va_list args) {
 	va_list args2;
 	char *result;
@@ -701,6 +701,122 @@ NOTHROW_NCX(VLIBCCALL libc_concat_copy)(char *dst,
 	*ptr = '\0';
 	return dst;
 }
+/* >> choose_temp_base(3)
+ * Create a temporary filename in `choose_tmpdir(3)' by use of `mktemp(3)'
+ * The returned string must always be freed, and if no filename could be
+ * generated, an empty string is returned. */
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *
+NOTHROW_NCX(LIBCCALL libc_choose_temp_base)(void) {
+	char const *tmpdir = libc_choose_tmpdir();
+	size_t tmpdir_len = libc_strlen(tmpdir);
+	char *result = (char *)libc_xmalloc((tmpdir_len + 6 + 1) * sizeof(char));
+	libc_memcpyc(libc_mempcpyc(result, tmpdir, tmpdir_len, sizeof(char)),
+	        "XXXXXX", 7, sizeof(char));
+	return libc_mktemp(result);
+}
+/* >> choose_tmpdir(3)
+ * Return the path to a suitable temp directory.
+ * The returned path is guarantied to be non-NULL, and include a trailing slash. */
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE ATTR_RETNONNULL WUNUSED char const *
+NOTHROW_NCX(LIBCCALL libc_choose_tmpdir)(void) {
+	static char const *result = NULL;
+	if (result == NULL) {
+		char const *path;
+		size_t pathlen;
+		char *pathcopy, *ptr;
+		size_t i;
+
+		static char const defdir_names[][10] = { "/tmp", "/var/tmp", "/usr/tmp" };
+
+
+
+
+		static char const envvar_names[][8] = { "TMPDIR", "TMP", "TEMP" };
+		for (i = 0; i < COMPILER_LENOF(envvar_names); ++i) {
+			path = libc_getenv(envvar_names[i]);
+			if (path && libc_access(path, __X_OK | __W_OK | __R_OK) == 0)
+				goto got_tmppath;
+		}
+
+		for (i = 0; i < COMPILER_LENOF(defdir_names); ++i) {
+			path = defdir_names[i];
+			if (libc_access(path, __X_OK | __W_OK | __R_OK) == 0)
+				goto got_tmppath;
+		}
+
+		/* Fallback: use the current directory. */
+		path = ".";
+got_tmppath:
+
+		pathlen = libc_strlen(path);
+
+
+
+
+		while (pathlen && path[pathlen - 1] == '/')
+			--pathlen;
+
+
+		/* Force-append a trailing slash. */
+		pathcopy = (char *)libc_xmalloc((pathlen + 2) * sizeof(char));
+		ptr = (char *)libc_mempcpyc(pathcopy, path, pathlen, sizeof(char));
+
+
+
+		*ptr++ = '/';
+
+		*ptr++ = '\0';
+		result = pathcopy;
+	}
+	return result;
+}
+#include <parts/printf-config.h>
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *
+NOTHROW_NCX(LIBCCALL libc_make_temp_file_with_prefix)(char const *prefix,
+                                                      char const *suffix) {
+	fd_t tempfd;
+	char *result, *p;
+	const char *tmpdir = libc_choose_tmpdir();
+	size_t tmpdir_len, prefix_len, suffix_len;
+	if (prefix == NULL)
+		prefix = "cc";
+	if (suffix == NULL)
+		suffix = "";
+	tmpdir_len = libc_strlen(tmpdir);
+	prefix_len = libc_strlen(prefix);
+	suffix_len = libc_strlen(suffix);
+
+	/* Construct the full filename. */
+	result = (char *)libc_xmalloc((tmpdir_len +
+	                          prefix_len + 6 +
+	                          suffix_len + 1) *
+	                         sizeof(char));
+	p = (char *)libc_mempcpyc(result, tmpdir, tmpdir_len, sizeof(char));
+	p = (char *)libc_mempcpyc(p, prefix, prefix_len, sizeof(char));
+	p = (char *)libc_mempcpyc(p, "XXXXXX", 6, sizeof(char));
+	p = (char *)libc_mempcpyc(p, suffix, suffix_len, sizeof(char));
+	*p = '\0';
+	tempfd = libc_mkstemps(result, suffix_len);
+	if (tempfd < 0) {
+
+
+
+
+		libc_fprintf(stderr, "Cannot create temporary file in %s: %m\n", tmpdir);
+
+		libc_abort();
+	}
+
+
+	libc_close(tempfd);
+
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *
+NOTHROW_NCX(LIBCCALL libc_make_temp_file)(char const *suffix) {
+	return libc_make_temp_file_with_prefix(NULL, suffix);
+}
 #include <bits/os/stat.h>
 #include <asm/os/stat.h>
 /* >> unlink_if_ordinary(3)
@@ -921,6 +1037,10 @@ DEFINE_PUBLIC_ALIAS(DOS$concat_copy, libd_concat_copy);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(concat_copy, libc_concat_copy);
+DEFINE_PUBLIC_ALIAS(choose_temp_base, libc_choose_temp_base);
+DEFINE_PUBLIC_ALIAS(choose_tmpdir, libc_choose_tmpdir);
+DEFINE_PUBLIC_ALIAS(make_temp_file_with_prefix, libc_make_temp_file_with_prefix);
+DEFINE_PUBLIC_ALIAS(make_temp_file, libc_make_temp_file);
 DEFINE_PUBLIC_ALIAS(unlink_if_ordinary, libc_unlink_if_ordinary);
 DEFINE_PUBLIC_ALIAS(physmem_total, libc_physmem_total);
 DEFINE_PUBLIC_ALIAS(physmem_available, libc_physmem_available);

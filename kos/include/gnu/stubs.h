@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x459a5bca */
+/* HASH CRC-32:0x7a875a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,8 +121,6 @@
 #define __stub_catclose
 #define __stub_catgets
 #define __stub_catopen
-#define __stub_choose_temp_base
-#define __stub_choose_tmpdir
 #define __stub_clock
 #define __stub_clock_adjtime
 #define __stub_clock_adjtime64
@@ -341,8 +339,6 @@
 #define __stub_lrand48_r
 #define __stub_make_relative_prefix
 #define __stub_make_relative_prefix_ignore_links
-#define __stub_make_temp_file
-#define __stub_make_temp_file_with_prefix
 #define __stub_mrand48
 #define __stub_mrand48_r
 #define __stub_msgctl
