@@ -410,15 +410,15 @@ void xmalloc_set_program_name(char const *progname);
 [[noreturn, throws]]
 void xmalloc_failed(size_t num_bytes);
 
-[[hidden, nocrt, alias("xmalloc")]]
+[[ignore, nocrt, alias("xmalloc")]]
 [[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 void *crt_xmalloc(size_t num_bytes);
 
-[[hidden, nocrt, alias("xcalloc")]]
+[[ignore, nocrt, alias("xcalloc")]]
 [[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 void *crt_xcalloc(size_t elem_count, size_t elem_size);
 
-[[hidden, nocrt, alias("xrealloc")]]
+[[ignore, nocrt, alias("xrealloc")]]
 [[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 void *crt_xrealloc(void *ptr, size_t num_bytes);
 

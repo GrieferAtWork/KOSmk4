@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc46a4491 */
+/* HASH CRC-32:0x173d0ff2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -829,8 +829,8 @@ __SYSDECL_END
 __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_fmapfile
 /* >> fmapfile(3)
- * A helper function that can be used to map a specific sub-range of a given file into memory.
- * This  function  tries  the   following  (in  order)  in   order  to  create  the   mapping:
+ * A function that can be used to map a specific sub-range of some file into memory.
+ * This  function tries the following (in order)  when trying to create the mapping:
  *  - mmap(2):                        If `fd' can be mmap'd, then that is how the mapping is created
  *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
  *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
@@ -843,19 +843,22 @@ __SYSDECL_BEGIN
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
  *                     - mf_addr: Filled with the base address of a mapping of the file's contents
  *                     - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
+ *                                This will always be `<= max_bytes'.
  *                     - Other fields are implementation-specific
- *                    Note that the memory located as `mapping->mf_addr' is writable, though changes  to
+ *                    Note that the memory located at `mapping->mf_addr' is writable, though changes  to
  *                    it are guarantied not to be written back to `fd'. iow: it behaves like MAP_PRIVATE
  *                    mapped as PROT_READ|PROT_WRITE.
  * @param: offset:    File offset / number of leading bytes that should not be mapped
  * @param: max_bytes: The  max number of bytes (excluding num_trailing_nulbytes) that should be mapped
- *                    starting at `offset'. If the file is  smaller than this, or indicate EOF  before
+ *                    starting  at `offset'. If the file is smaller than this, or indicates EOF before
  *                    this number of bytes has been reached, simply stop there. - The actual number of
- *                    mapped bytes is returned in `mapping->mf_size'.
- * @param: num_trailing_nulbytes: When non-zero, append this many trailing NUL-bytes at the end of the
- *                    mapping. More bytes than this may be appened if necessary, but at least this many
- *                    are guarantied to be. - Useful if you want  to load a file as a string, in  which
- *                    case you can specify `1' to always have a trailing '\0' be appended.
+ *                    mapped bytes (excluding `num_trailing_nulbytes') is `mapping->mf_size'.
+ * @param: num_trailing_nulbytes: When non-zero, append this many trailing NUL-bytes at the end of
+ *                    the mapping. More bytes than this may be appended if necessary, but at least
+ *                    this many are guarantied  to be. - Useful  if you want to  load a file as  a
+ *                    string,  in which case you can specify `1' to always have a trailing '\0' be
+ *                    appended:
+ *                    >> bzero(mapping->mf_addr + mapping->mf_size, num_trailing_nulbytes);
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
  * @return: -1: [errno=EPERM]  `fd' doesn't support read(2)ing
  * @return: -1: [errno=ENOMEM] Out of memory
@@ -865,8 +868,8 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,fmapfile,(struct
 #elif (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/sys.mman/fmapfile.h>
 /* >> fmapfile(3)
- * A helper function that can be used to map a specific sub-range of a given file into memory.
- * This  function  tries  the   following  (in  order)  in   order  to  create  the   mapping:
+ * A function that can be used to map a specific sub-range of some file into memory.
+ * This  function tries the following (in order)  when trying to create the mapping:
  *  - mmap(2):                        If `fd' can be mmap'd, then that is how the mapping is created
  *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
  *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
@@ -879,19 +882,22 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,fmapfile,(struct
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
  *                     - mf_addr: Filled with the base address of a mapping of the file's contents
  *                     - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
+ *                                This will always be `<= max_bytes'.
  *                     - Other fields are implementation-specific
- *                    Note that the memory located as `mapping->mf_addr' is writable, though changes  to
+ *                    Note that the memory located at `mapping->mf_addr' is writable, though changes  to
  *                    it are guarantied not to be written back to `fd'. iow: it behaves like MAP_PRIVATE
  *                    mapped as PROT_READ|PROT_WRITE.
  * @param: offset:    File offset / number of leading bytes that should not be mapped
  * @param: max_bytes: The  max number of bytes (excluding num_trailing_nulbytes) that should be mapped
- *                    starting at `offset'. If the file is  smaller than this, or indicate EOF  before
+ *                    starting  at `offset'. If the file is smaller than this, or indicates EOF before
  *                    this number of bytes has been reached, simply stop there. - The actual number of
- *                    mapped bytes is returned in `mapping->mf_size'.
- * @param: num_trailing_nulbytes: When non-zero, append this many trailing NUL-bytes at the end of the
- *                    mapping. More bytes than this may be appened if necessary, but at least this many
- *                    are guarantied to be. - Useful if you want  to load a file as a string, in  which
- *                    case you can specify `1' to always have a trailing '\0' be appended.
+ *                    mapped bytes (excluding `num_trailing_nulbytes') is `mapping->mf_size'.
+ * @param: num_trailing_nulbytes: When non-zero, append this many trailing NUL-bytes at the end of
+ *                    the mapping. More bytes than this may be appended if necessary, but at least
+ *                    this many are guarantied  to be. - Useful  if you want to  load a file as  a
+ *                    string,  in which case you can specify `1' to always have a trailing '\0' be
+ *                    appended:
+ *                    >> bzero(mapping->mf_addr + mapping->mf_size, num_trailing_nulbytes);
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
  * @return: -1: [errno=EPERM]  `fd' doesn't support read(2)ing
  * @return: -1: [errno=ENOMEM] Out of memory

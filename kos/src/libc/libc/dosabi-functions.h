@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58a0e066 */
+/* HASH CRC-32:0x2d4fc941 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2812,11 +2812,23 @@ DFUN(".text.crt.dos.time.timezone", libd__get_timezone, libc__get_timezone, TIn(
 DFUN(".text.crt.dos.time.timezone", libd__get_dstbias, libc__get_dstbias, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.time", libd__get_tzname, libc__get_tzname, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TI, TD)
 DFUN(".text.crt.dos.time", libd__gmtime32_s, libc__gmtime32_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libd__gmtime64_s, libd__gmtime32_s);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 DFUN(".text.crt.dos.time", libd__gmtime64_s, libc__gmtime64_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DFUN(".text.crt.dos.time", libd__localtime32_s, libc__localtime32_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libd__localtime64_s, libd__localtime32_s);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 DFUN(".text.crt.dos.time", libd__localtime64_s, libc__localtime64_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DFUN(".text.crt.dos.time", libd__ctime32_s, libc__ctime32_s, TIn(__SIZEOF_ERRNO_T__), 3, TP, TI, TP)
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libd__ctime64_s, libd__ctime32_s);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 DFUN(".text.crt.dos.time", libd__ctime64_s, libc__ctime64_s, TIn(__SIZEOF_ERRNO_T__), 3, TP, TI, TP)
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DFUN(".text.crt.dos.time", libd__strtime, libc__strtime, TP, 1, TP)
 DFUN(".text.crt.dos.time", libd__strdate, libc__strdate, TP, 1, TP)
 DFUN(".text.crt.dos.time", libd__strtime_s, libc__strtime_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TI)

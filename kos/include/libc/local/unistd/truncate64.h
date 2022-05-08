@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f9f484d */
+/* HASH CRC-32:0x293518c6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,18 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__libc_close,(__fd
 #undef __local___localdep_close_defined
 #endif /* !... */
 #endif /* !__local___localdep_close_defined */
+#ifndef __local___localdep_crt_truncate32_defined
+#define __local___localdep_crt_truncate32_defined
+#ifdef __CRT_HAVE_truncate
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_truncate32,(char const *__file, __pos32_t __length),truncate,(__file,__length))
+#elif defined(__CRT_HAVE___truncate)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_truncate32,(char const *__file, __pos32_t __length),__truncate,(__file,__length))
+#elif defined(__CRT_HAVE___libc_truncate)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_truncate32,(char const *__file, __pos32_t __length),__libc_truncate,(__file,__length))
+#else /* ... */
+#undef __local___localdep_crt_truncate32_defined
+#endif /* !... */
+#endif /* !__local___localdep_crt_truncate32_defined */
 #ifndef __local___localdep_ftruncate64_defined
 #define __local___localdep_ftruncate64_defined
 #if defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -171,18 +183,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_open64_defined
 #endif /* !... */
 #endif /* !__local___localdep_open64_defined */
-#ifndef __local___localdep_truncate32_defined
-#define __local___localdep_truncate32_defined
-#ifdef __CRT_HAVE_truncate
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_truncate32,(char const *__file, __pos32_t __length),truncate,(__file,__length))
-#elif defined(__CRT_HAVE___truncate)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_truncate32,(char const *__file, __pos32_t __length),__truncate,(__file,__length))
-#elif defined(__CRT_HAVE___libc_truncate)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_truncate32,(char const *__file, __pos32_t __length),__libc_truncate,(__file,__length))
-#else /* ... */
-#undef __local___localdep_truncate32_defined
-#endif /* !... */
-#endif /* !__local___localdep_truncate32_defined */
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #ifndef __PIO_OFFSET
@@ -198,7 +198,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(truncate64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(truncate64))(char const *__file, __PIO_OFFSET64 __length) {
 #if defined(__CRT_HAVE_truncate) || defined(__CRT_HAVE___truncate) || defined(__CRT_HAVE___libc_truncate)
-	return (__NAMESPACE_LOCAL_SYM __localdep_truncate32)(__file, (__PIO_OFFSET)__length);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_truncate32)(__file, (__PIO_OFFSET)__length);
 #else /* __CRT_HAVE_truncate || __CRT_HAVE___truncate || __CRT_HAVE___libc_truncate */
 	int __result;
 	__fd_t __fd;

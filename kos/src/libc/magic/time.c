@@ -2248,6 +2248,7 @@ errno_t _gmtime32_s([[nonnull]] struct $tm *__restrict tp,
 
 [[doc_alias("gmtime64_r"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
 [[impl_include("<libc/errno.h>")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), crt_intern_alias("_gmtime32_s")]]
 errno_t _gmtime64_s([[nonnull]] struct $tm *__restrict tp,
                     [[nonnull]] $time64_t const *__restrict timer) {
 @@pp_ifdef __BUILDING_LIBC@@
@@ -2283,6 +2284,7 @@ errno_t _localtime32_s([[nonnull]] struct $tm *__restrict tp,
 }
 
 [[doc_alias("localtime64_r"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), crt_intern_alias("_localtime32_s")]]
 errno_t _localtime64_s([[nonnull]] struct $tm *__restrict tp,
                        [[nonnull]] $time64_t const *__restrict timer) {
 	localtime64_r(timer, tp);
@@ -2318,6 +2320,7 @@ errno_t _ctime32_s([[nonnull]] char buf[26], $size_t bufsize,
 
 [[doc_alias("ctime64_r"), decl_include("<bits/types.h>")]]
 [[impl_include("<libc/errno.h>")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), crt_intern_alias("_ctime32_s")]]
 errno_t _ctime64_s([[nonnull]] char buf[26], $size_t bufsize,
                    [[nonnull]] $time64_t const *__restrict timer) {
 	if unlikely(bufsize < 26)

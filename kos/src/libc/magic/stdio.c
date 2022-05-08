@@ -105,6 +105,10 @@
 %[assume_defined_in_kos_userspace(stderr, __LOCAL_stderr)]
 %[assume_defined_in_kos_userspace(stdtty, __LOCAL_stdtty)]
 
+%[assume_defined_in_kos(SEEK_SET, __SEEK_SET)]
+%[assume_defined_in_kos(SEEK_CUR, __SEEK_CUR)]
+%[assume_defined_in_kos(SEEK_END, __SEEK_END)]
+
 
 %(auto_source){
 #include "../libc/globals.h"
@@ -813,7 +817,8 @@ int rename([[nonnull]] char const *oldname,
 
 
 @@>> tmpnam(3), tmpnam_r(3)
-[[crt_dos_variant, std, wunused, section(".text.crt{|.dos}.fs.utility")]]
+[[crt_dos_variant, std, wunused]]
+[[section(".text.crt{|.dos}.fs.utility")]]
 char *tmpnam([[nonnull]] char *buf);
 
 
@@ -826,11 +831,11 @@ int fclose([[nonnull]] FILE *__restrict stream);
 
 @@>> fflush(3)
 @@Flush any unwritten data from `stream' to the underlying filesystem/TTY
-[[std, cp_stdio, userimpl, section(".text.crt{|.dos}.FILE.locked.write.utility")]]
-[[no_crt_self_import, no_crt_self_export, export_as(CNL_fflush...)]]
+[[std, cp_stdio, no_crt_self_import, no_crt_self_export, export_as(CNL_fflush...)]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), alias(CNL_fflush_unlocked...)]]
 [[                                                                           alias(CNL_fflush...)]]
 [[                                                                           alias(CNL_fflush_unlocked...)]]
+[[userimpl, section(".text.crt{|.dos}.FILE.locked.write.utility")]]
 int fflush([[nullable]] FILE *stream) {
 	/* NO-OP  (When  not  implemented  by  the  CRT,  assume  no
 	 * buffering being done, meaning this function isn't needed) */
@@ -1052,7 +1057,8 @@ int ungetc(int ch, [[nonnull]] FILE *__restrict stream);
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), alias(CNL_fread_unlocked...)]]
 [[                                                                           alias(CNL_fread...)]]
 [[                                                                           alias(CNL_fread_unlocked...)]]
-[[userimpl, requires_function(fgetc), section(".text.crt{|.dos}.FILE.locked.read.read")]]
+[[userimpl, requires_function(fgetc)]]
+[[section(".text.crt{|.dos}.FILE.locked.read.read")]]
 size_t fread([[inp(min(elemsize * return, elemsize * elemcount))]] void *__restrict buf,
              size_t elemsize, size_t elemcount, [[nonnull]] FILE *__restrict stream) {
 	size_t i, result = 0;
@@ -1078,8 +1084,8 @@ done:
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias(CNL_fwrite_unlocked...)]]
 [[                                                                           alias(CNL_fwrite...)]]
 [[                                                                           alias(CNL_fwrite_unlocked...)]]
-[[crtbuiltin, section(".text.crt{|.dos}.FILE.locked.write.write")]]
-[[userimpl, requires_function(fputc)]]
+[[crtbuiltin, userimpl, requires_function(fputc)]]
+[[section(".text.crt{|.dos}.FILE.locked.write.write")]]
 size_t fwrite([[inp(min(elemsize * return, elemsize * elemcount))]] void const *__restrict buf,
               size_t elemsize, size_t elemcount, [[nonnull]] FILE *__restrict stream) {
 	size_t i, result = 0;

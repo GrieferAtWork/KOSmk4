@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff6504c9 */
+/* HASH CRC-32:0xb9966d8c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -160,8 +160,8 @@ badkey:
 #include <libc/errno.h>
 #include <asm/os/stdio.h>
 /* >> fmapfile(3)
- * A helper function that can be used to map a specific sub-range of a given file into memory.
- * This  function  tries  the   following  (in  order)  in   order  to  create  the   mapping:
+ * A function that can be used to map a specific sub-range of some file into memory.
+ * This  function tries the following (in order)  when trying to create the mapping:
  *  - mmap(2):                        If `fd' can be mmap'd, then that is how the mapping is created
  *  - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
  *  - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
@@ -174,19 +174,22 @@ badkey:
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
  *                     - mf_addr: Filled with the base address of a mapping of the file's contents
  *                     - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
+ *                                This will always be `<= max_bytes'.
  *                     - Other fields are implementation-specific
- *                    Note that the memory located as `mapping->mf_addr' is writable, though changes  to
+ *                    Note that the memory located at `mapping->mf_addr' is writable, though changes  to
  *                    it are guarantied not to be written back to `fd'. iow: it behaves like MAP_PRIVATE
  *                    mapped as PROT_READ|PROT_WRITE.
  * @param: offset:    File offset / number of leading bytes that should not be mapped
  * @param: max_bytes: The  max number of bytes (excluding num_trailing_nulbytes) that should be mapped
- *                    starting at `offset'. If the file is  smaller than this, or indicate EOF  before
+ *                    starting  at `offset'. If the file is smaller than this, or indicates EOF before
  *                    this number of bytes has been reached, simply stop there. - The actual number of
- *                    mapped bytes is returned in `mapping->mf_size'.
- * @param: num_trailing_nulbytes: When non-zero, append this many trailing NUL-bytes at the end of the
- *                    mapping. More bytes than this may be appened if necessary, but at least this many
- *                    are guarantied to be. - Useful if you want  to load a file as a string, in  which
- *                    case you can specify `1' to always have a trailing '\0' be appended.
+ *                    mapped bytes (excluding `num_trailing_nulbytes') is `mapping->mf_size'.
+ * @param: num_trailing_nulbytes: When non-zero, append this many trailing NUL-bytes at the end of
+ *                    the mapping. More bytes than this may be appended if necessary, but at least
+ *                    this many are guarantied  to be. - Useful  if you want to  load a file as  a
+ *                    string,  in which case you can specify `1' to always have a trailing '\0' be
+ *                    appended:
+ *                    >> bzero(mapping->mf_addr + mapping->mf_size, num_trailing_nulbytes);
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
  * @return: -1: [errno=EPERM]  `fd' doesn't support read(2)ing
  * @return: -1: [errno=ENOMEM] Out of memory
@@ -204,7 +207,7 @@ NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping,
 	size_t buffree;
 
 	/* Try to use mmap(2) */
-#if defined(__PROT_READ) && defined(__PROT_WRITE) && defined(__MAP_PRIVATE)
+
 	struct stat64 st;
 	if (fstat64(fd, &st) == 0) {
 
@@ -254,7 +257,7 @@ NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping,
 			 * actually allowed to believe that claim! */
 		}
 	}
-#endif /* __PROT_READ && __PROT_WRITE && __MAP_PRIVATE */
+
 
 	/* Allocate a heap buffer. */
 	bufsize = max_bytes;
@@ -320,11 +323,11 @@ NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping,
 
 
 		/* For a non-zero offset, try to use lseek() (or read()) */
-#ifdef __SEEK_SET
+
 		if (libc_lseek64(fd, (off64_t)offset, __SEEK_SET) != -1) {
 			/* Was able to lseek(2) */
 		} else
-#endif /* __SEEK_SET */
+
 		{
 			/* Try to use read(2) to skip leading data. */
 			while (offset) {

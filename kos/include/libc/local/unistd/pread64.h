@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c1d565c */
+/* HASH CRC-32:0x154e7114 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,10 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
+#if !defined(__local___localdep_crt_pread32_defined) && defined(__CRT_HAVE_pread)
+#define __local___localdep_crt_pread32_defined
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_crt_pread32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),pread,(__fd,__buf,__bufsize,__offset))
+#endif /* !__local___localdep_crt_pread32_defined && __CRT_HAVE_pread */
 #ifndef __local___localdep_lseek32_defined
 #define __local___localdep_lseek32_defined
 #ifdef __CRT_HAVE_lseek
@@ -76,10 +80,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_lseek64_defined
 #endif /* !... */
 #endif /* !__local___localdep_lseek64_defined */
-#if !defined(__local___localdep_pread32_defined) && defined(__CRT_HAVE_pread)
-#define __local___localdep_pread32_defined
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),pread,(__fd,__buf,__bufsize,__offset))
-#endif /* !__local___localdep_pread32_defined && __CRT_HAVE_pread */
 #ifndef __local___localdep_read_defined
 #define __local___localdep_read_defined
 #ifdef __CRT_HAVE_read
@@ -97,7 +97,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
 __LOCAL_LIBC(pread64) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pread64))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset) {
 #ifdef __CRT_HAVE_pread
-	return (__NAMESPACE_LOCAL_SYM __localdep_pread32)(__fd, __buf, __bufsize, (__pos32_t)__offset);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_pread32)(__fd, __buf, __bufsize, (__pos32_t)__offset);
 #elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
 	/* It may not be quick, and it may not be SMP-safe, but it'll still do the job! */
 	__off64_t __oldpos;

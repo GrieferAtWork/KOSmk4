@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2818014b */
+/* HASH CRC-32:0x293b1ac1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #include <asm/os/features.h>
 #if defined(__OS_HAVE_PROCFS_SELF_FD) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve))
 #include <features.h>
+#include <bits/types.h>
 #ifndef __TARGV
 #ifdef __USE_DOS_ALTERATIONS
 #define __TARGV char const *const *___argv
@@ -33,7 +34,6 @@
 #define __TENVP char *const ___envp[__restrict_arr]
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_execve_defined
 #define __local___localdep_execve_defined

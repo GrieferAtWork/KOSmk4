@@ -601,6 +601,84 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 
 %[insert:prefix(DEFINE_PIO_OFFSET)]
 
+%[assume_defined_in_kos(PROT_NONE, __PROT_NONE)]
+%[assume_defined_in_kos(PROT_EXEC, __PROT_EXEC)]
+%[assume_defined_in_kos(PROT_WRITE, __PROT_WRITE)]
+%[assume_defined_in_kos(PROT_READ, __PROT_READ)]
+%[assume_defined_in_kos(PROT_SEM, __PROT_SEM)]
+%[assume_defined_in_kos(PROT_MASK, __PROT_MASK)]
+%[assume_defined_in_kos(PROT_GROWSDOWN, __PROT_GROWSDOWN)]
+%[assume_defined_in_kos(PROT_GROWSUP, __PROT_GROWSUP)]
+%[assume_defined_in_kos(MAP_SHARED, __MAP_SHARED)]
+%[assume_defined_in_kos(MAP_PRIVATE, __MAP_PRIVATE)]
+%[assume_defined_in_kos(MAP_TYPE, __MAP_TYPE)]
+%[assume_defined_in_kos(MAP_FILE, __MAP_FILE)]
+%[assume_defined_in_kos(MAP_FIXED, __MAP_FIXED)]
+%[assume_defined_in_kos(MAP_ANON, __MAP_ANON)]
+%[assume_defined_in_kos(MAP_32BIT, __MAP_32BIT)]
+%[assume_defined_in_kos(MAP_GROWSDOWN, __MAP_GROWSDOWN)]
+%[assume_defined_in_kos(MAP_GROWSUP, __MAP_GROWSUP)]
+%[assume_defined_in_kos(MAP_DENYWRITE, __MAP_DENYWRITE)]
+%[assume_defined_in_kos(MAP_EXECUTABLE, __MAP_EXECUTABLE)]
+%[assume_defined_in_kos(MAP_LOCKED, __MAP_LOCKED)]
+%[assume_defined_in_kos(MAP_NORESERVE, __MAP_NORESERVE)]
+%[assume_defined_in_kos(MAP_POPULATE, __MAP_POPULATE)]
+%[assume_defined_in_kos(MAP_NONBLOCK, __MAP_NONBLOCK)]
+%[assume_defined_in_kos(MAP_STACK, __MAP_STACK)]
+%[assume_defined_in_kos(MAP_SYNC, __MAP_SYNC)]
+%[assume_defined_in_kos(MAP_HUGETLB, __MAP_HUGETLB)]
+%[assume_defined_in_kos(MAP_FIXED_NOREPLACE, __MAP_FIXED_NOREPLACE)]
+%[assume_defined_in_kos(MAP_UNINITIALIZED, __MAP_UNINITIALIZED)]
+%[assume_defined_in_kos(MAP_HUGE_SHIFT, __MAP_HUGE_SHIFT)]
+%[assume_defined_in_kos(MAP_HUGE_MASK, __MAP_HUGE_MASK)]
+%[assume_defined_in_kos(MAP_AUTOMATIC, __MAP_AUTOMATIC)]
+%[assume_defined_in_kos(MAP_NOASLR, __MAP_NOASLR)]
+%[assume_defined_in_kos(MAP_OFFSET64_POINTER, __MAP_OFFSET64_POINTER)]
+%[assume_defined_in_kos(MAP_FAILED, __MAP_FAILED)]
+%[assume_defined_in_kos(MS_ASYNC, __MS_ASYNC)]
+%[assume_defined_in_kos(MS_INVALIDATE, __MS_INVALIDATE)]
+%[assume_defined_in_kos(MS_SYNC, __MS_SYNC)]
+%[assume_defined_in_kos(MREMAP_MAYMOVE, __MREMAP_MAYMOVE)]
+%[assume_defined_in_kos(MREMAP_FIXED, __MREMAP_FIXED)]
+%[assume_defined_in_kos(MREMAP_32BIT, __MREMAP_32BIT)]
+%[assume_defined_in_kos(MREMAP_GROWSDOWN, __MREMAP_GROWSDOWN)]
+%[assume_defined_in_kos(MREMAP_GROWSUP, __MREMAP_GROWSUP)]
+%[assume_defined_in_kos(MREMAP_POPULATE, __MREMAP_POPULATE)]
+%[assume_defined_in_kos(MREMAP_NONBLOCK, __MREMAP_NONBLOCK)]
+%[assume_defined_in_kos(MREMAP_STACK, __MREMAP_STACK)]
+%[assume_defined_in_kos(MREMAP_FIXED_NOREPLACE, __MREMAP_FIXED_NOREPLACE)]
+%[assume_defined_in_kos(MREMAP_NOASLR, __MREMAP_NOASLR)]
+%[assume_defined_in_kos(MFD_CLOEXEC, __MFD_CLOEXEC)]
+%[assume_defined_in_kos(MFD_ALLOW_SEALING, __MFD_ALLOW_SEALING)]
+%[assume_defined_in_kos(MFD_HUGETLB, __MFD_HUGETLB)]
+%[assume_defined_in_kos(MFD_CLOFORK, __MFD_CLOFORK)]
+%[assume_defined_in_kos(MLOCK_ONFAULT, __MLOCK_ONFAULT)]
+%[assume_defined_in_kos(PKEY_DISABLE_ACCESS, __PKEY_DISABLE_ACCESS)]
+%[assume_defined_in_kos(PKEY_DISABLE_WRITE, __PKEY_DISABLE_WRITE)]
+%[assume_defined_in_kos(MADV_NORMAL, __MADV_NORMAL)]
+%[assume_defined_in_kos(MADV_RANDOM, __MADV_RANDOM)]
+%[assume_defined_in_kos(MADV_SEQUENTIAL, __MADV_SEQUENTIAL)]
+%[assume_defined_in_kos(MADV_WILLNEED, __MADV_WILLNEED)]
+%[assume_defined_in_kos(MADV_DONTNEED, __MADV_DONTNEED)]
+%[assume_defined_in_kos(MADV_REMOVE, __MADV_REMOVE)]
+%[assume_defined_in_kos(MADV_DONTFORK, __MADV_DONTFORK)]
+%[assume_defined_in_kos(MADV_DOFORK, __MADV_DOFORK)]
+%[assume_defined_in_kos(MADV_MERGEABLE, __MADV_MERGEABLE)]
+%[assume_defined_in_kos(MADV_UNMERGEABLE, __MADV_UNMERGEABLE)]
+%[assume_defined_in_kos(MADV_HUGEPAGE, __MADV_HUGEPAGE)]
+%[assume_defined_in_kos(MADV_NOHUGEPAGE, __MADV_NOHUGEPAGE)]
+%[assume_defined_in_kos(MADV_DONTDUMP, __MADV_DONTDUMP)]
+%[assume_defined_in_kos(MADV_DODUMP, __MADV_DODUMP)]
+%[assume_defined_in_kos(MADV_HWPOISON, __MADV_HWPOISON)]
+%[assume_defined_in_kos(POSIX_MADV_NORMAL, __POSIX_MADV_NORMAL)]
+%[assume_defined_in_kos(POSIX_MADV_RANDOM, __POSIX_MADV_RANDOM)]
+%[assume_defined_in_kos(POSIX_MADV_SEQUENTIAL, __POSIX_MADV_SEQUENTIAL)]
+%[assume_defined_in_kos(POSIX_MADV_WILLNEED, __POSIX_MADV_WILLNEED)]
+%[assume_defined_in_kos(POSIX_MADV_DONTNEED, __POSIX_MADV_DONTNEED)]
+%[assume_defined_in_kos(MCL_CURRENT, __MCL_CURRENT)]
+%[assume_defined_in_kos(MCL_FUTURE, __MCL_FUTURE)]
+%[assume_defined_in_kos(MCL_ONFAULT, __MCL_ONFAULT)]
+
 
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[doc_alias("mmap"), ignore, nocrt, alias("mmap")]]
@@ -884,8 +962,8 @@ int pkey_mprotect(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 
 
 @@>> fmapfile(3)
-@@A helper function that can be used to map a specific sub-range of a given file into memory.
-@@This  function  tries  the   following  (in  order)  in   order  to  create  the   mapping:
+@@A function that can be used to map a specific sub-range of some file into memory.
+@@This  function tries the following (in order)  when trying to create the mapping:
 @@ - mmap(2):                        If `fd' can be mmap'd, then that is how the mapping is created
 @@ - malloc(3) + pread(2):           If `fd' supports pread(2), use that to fill a buffer
 @@ - malloc(3) + lseek(2) + read(2): For a non-zero offset, try to use lseek(2) to move to `offset'
@@ -898,19 +976,22 @@ int pkey_mprotect(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 @@@param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
 @@                    - mf_addr: Filled with the base address of a mapping of the file's contents
 @@                    - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
+@@                               This will always be `<= max_bytes'.
 @@                    - Other fields are implementation-specific
-@@                   Note that the memory located as `mapping->mf_addr' is writable, though changes  to
+@@                   Note that the memory located at `mapping->mf_addr' is writable, though changes  to
 @@                   it are guarantied not to be written back to `fd'. iow: it behaves like MAP_PRIVATE
 @@                   mapped as PROT_READ|PROT_WRITE.
 @@@param: offset:    File offset / number of leading bytes that should not be mapped
 @@@param: max_bytes: The  max number of bytes (excluding num_trailing_nulbytes) that should be mapped
-@@                   starting at `offset'. If the file is  smaller than this, or indicate EOF  before
+@@                   starting  at `offset'. If the file is smaller than this, or indicates EOF before
 @@                   this number of bytes has been reached, simply stop there. - The actual number of
-@@                   mapped bytes is returned in `mapping->mf_size'.
-@@@param: num_trailing_nulbytes: When non-zero, append this many trailing NUL-bytes at the end of the
-@@                   mapping. More bytes than this may be appened if necessary, but at least this many
-@@                   are guarantied to be. - Useful if you want  to load a file as a string, in  which
-@@                   case you can specify `1' to always have a trailing '\0' be appended.
+@@                   mapped bytes (excluding `num_trailing_nulbytes') is `mapping->mf_size'.
+@@@param: num_trailing_nulbytes: When non-zero, append this many trailing NUL-bytes at the end of
+@@                   the mapping. More bytes than this may be appended if necessary, but at least
+@@                   this many are guarantied  to be. - Useful  if you want to  load a file as  a
+@@                   string,  in which case you can specify `1' to always have a trailing '\0' be
+@@                   appended:
+@@                   >> bzero(mapping->mf_addr + mapping->mf_size, num_trailing_nulbytes);
 @@@return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
 @@@return: -1: [errno=EPERM]  `fd' doesn't support read(2)ing
 @@@return: -1: [errno=ENOMEM] Out of memory

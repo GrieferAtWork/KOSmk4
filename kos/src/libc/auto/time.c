@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfeda0720 */
+/* HASH CRC-32:0x9c8ca646 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -905,6 +905,10 @@ NOTHROW_NCX(LIBCCALL libc__gmtime32_s)(struct tm *__restrict tp,
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 	return 0;
 }
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc__gmtime64_s, libc__gmtime32_s);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <libc/errno.h>
 /* >> gmtime_r(3), gmtime64_r(3)
  * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
@@ -919,6 +923,7 @@ NOTHROW_NCX(LIBCCALL libc__gmtime64_s)(struct tm *__restrict tp,
 
 	return 0;
 }
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <libc/errno.h>
 /* >> localtime_r(3), localtime64_r(3)
  * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
@@ -943,6 +948,10 @@ NOTHROW_NCX(LIBCCALL libc__localtime32_s)(struct tm *__restrict tp,
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 	return 0;
 }
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc__localtime64_s, libc__localtime32_s);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> localtime_r(3), localtime64_r(3)
  * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) errno_t
@@ -951,6 +960,7 @@ NOTHROW_NCX(LIBCCALL libc__localtime64_s)(struct tm *__restrict tp,
 	libc_localtime64_r(timer, tp);
 	return 0;
 }
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <libc/errno.h>
 /* >> ctime_r(3), ctime64_r(3)
  * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
@@ -980,6 +990,10 @@ NOTHROW_NCX(LIBCCALL libc__ctime32_s)(char buf[26],
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 	return 0;
 }
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc__ctime64_s, libc__ctime32_s);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <libc/errno.h>
 /* >> ctime_r(3), ctime64_r(3)
  * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
@@ -997,6 +1011,7 @@ NOTHROW_NCX(LIBCCALL libc__ctime64_s)(char buf[26],
 
 	return 0;
 }
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/crt/tm.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) char *

@@ -638,17 +638,17 @@ void ChRoot([[nonnull]] char const *__restrict path);
 %#if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 
 [[throws, decl_include("<bits/types.h>")]]
-[[doc_alias("ftruncate32"), ignore, nocrt, alias("FTruncate")]]
-int FTruncate32($fd_t fd, __pos32_t length);
+[[doc_alias("crt_ftruncate32"), ignore, nocrt, alias("FTruncate")]]
+int crt_FTruncate32($fd_t fd, __pos32_t length);
 
 [[throws, decl_include("<bits/types.h>"), doc_alias("ftruncate"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("FTruncate")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("FTruncate64")]]
-[[userimpl, requires($has_function(FTruncate32) || $has_function(FTruncate64))]]
+[[userimpl, requires($has_function(crt_FTruncate32) || $has_function(FTruncate64))]]
 [[section(".text.crt{|.dos}.except.io.write")]]
 void FTruncate($fd_t fd, pos_t length) {
-@@pp_if $has_function(FTruncate32)@@
-	FTruncate32(fd, (__pos32_t)length);
+@@pp_if $has_function(crt_FTruncate32)@@
+	crt_FTruncate32(fd, (__pos32_t)length);
 @@pp_else@@
 	FTruncate64(fd, (__pos64_t)length);
 @@pp_endif@@
@@ -659,10 +659,10 @@ void FTruncate($fd_t fd, pos_t length) {
 
 [[throws, decl_include("<bits/types.h>")]]
 [[preferred_off64_variant_of(FTruncate), doc_alias("ftruncate64")]]
-[[userimpl, requires_function(FTruncate32)]]
+[[userimpl, requires_function(crt_FTruncate32)]]
 [[section(".text.crt{|.dos}.except.io.large.write")]]
 void FTruncate64($fd_t fd, pos64_t length) {
-	FTruncate32(fd, (pos32_t)length);
+	crt_FTruncate32(fd, (pos32_t)length);
 }
 
 %#endif /* __USE_LARGEFILE64 */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37df0ca0 */
+/* HASH CRC-32:0x83d6ba1f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,6 @@
 #if defined(__CRT_HAVE_FTruncate64) || defined(__CRT_HAVE_FTruncate)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_FTruncate32_defined) && defined(__CRT_HAVE_FTruncate)
-#define __local___localdep_FTruncate32_defined
-__CREDIRECT(,int,__THROWING,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
-#endif /* !__local___localdep_FTruncate32_defined && __CRT_HAVE_FTruncate */
 #ifndef __local___localdep_FTruncate64_defined
 #define __local___localdep_FTruncate64_defined
 #if defined(__CRT_HAVE_FTruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -44,10 +40,14 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_FTruncate64_defined
 #endif /* !... */
 #endif /* !__local___localdep_FTruncate64_defined */
+#if !defined(__local___localdep_crt_FTruncate32_defined) && defined(__CRT_HAVE_FTruncate)
+#define __local___localdep_crt_FTruncate32_defined
+__CREDIRECT(,int,__THROWING,__localdep_crt_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
+#endif /* !__local___localdep_crt_FTruncate32_defined && __CRT_HAVE_FTruncate */
 __LOCAL_LIBC(FTruncate) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FTruncate))(__fd_t __fd, __FS_TYPE(pos) __length) __THROWS(...) {
 #ifdef __CRT_HAVE_FTruncate
-	(__NAMESPACE_LOCAL_SYM __localdep_FTruncate32)(__fd, (__pos32_t)__length);
+	(__NAMESPACE_LOCAL_SYM __localdep_crt_FTruncate32)(__fd, (__pos32_t)__length);
 #else /* __CRT_HAVE_FTruncate */
 	(__NAMESPACE_LOCAL_SYM __localdep_FTruncate64)(__fd, (__pos64_t)__length);
 #endif /* !__CRT_HAVE_FTruncate */
