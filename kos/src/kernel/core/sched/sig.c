@@ -500,7 +500,7 @@ again:
 #endif /* SIG_CONTROL_SMPLOCK != 0 */
 
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((2)) bool
-NOTHROW(FCALL is_connection_is_chain)(struct task_connection *chain,
+NOTHROW(FCALL is_connection_in_chain)(struct task_connection *chain,
                                       struct task_connection *con) {
 	for (; chain; chain = chain->tc_signext) {
 		if (chain == con)
@@ -645,15 +645,11 @@ NOTHROW(FCALL sig_intern_broadcast)(struct sig *self,
 again:
 	ctl = ATOMIC_READ(self->s_ctl);
 	con = sig_smplock_clr(ctl);
-	if unlikely(!con) {
+	if (!con) {
 no_cons:
-		/* No one else here! (and nothing for us to do...)
-		 * This  is an  undefined situation,  since the  original call to
-		 * `sig_send()' that caused the signal which we ended up ignoring
-		 * to  be delivered returned `true', even though now, in the end,
-		 * no one actually ended up getting the signal... */
+		/* No one else here! (and nothing for us to do...) */
 #if SIG_CONTROL_SMPLOCK != 0
-		if (!ATOMIC_CMPXCH_WEAK(self->s_ctl, ctl, 0))
+		if (!ATOMIC_CMPXCH_WEAK(self->s_ctl, ctl, (uintptr_t)con))
 			goto again;
 #endif /* SIG_CONTROL_SMPLOCK != 0 */
 
@@ -668,7 +664,7 @@ no_cons:
 		sig_run_phase_2(phase2, &context);
 		return result;
 	}
-	if (!is_connection_is_chain(sc_pending, con)) {
+	if (!is_connection_in_chain(sc_pending, con)) {
 		/* Use the first connection */
 		receiver = con;
 #ifndef CONFIG_NO_SMP
@@ -686,7 +682,7 @@ no_cons:
 			receiver = *preceiver;
 			if (!receiver)
 				goto no_cons;
-			if (!is_connection_is_chain(sc_pending, receiver))
+			if (!is_connection_in_chain(sc_pending, receiver))
 				break;
 			preceiver = &receiver->tc_signext;
 		}
@@ -792,7 +788,7 @@ again:
 		 * to  be delivered returned `true', even though now, in the end,
 		 * no one actually ended up getting the signal... */
 #if SIG_CONTROL_SMPLOCK != 0
-		if (!ATOMIC_CMPXCH_WEAK(self->s_ctl, ctl, 0))
+		if (!ATOMIC_CMPXCH_WEAK(self->s_ctl, ctl, (uintptr_t)con))
 			goto again;
 #endif /* SIG_CONTROL_SMPLOCK != 0 */
 
@@ -1030,7 +1026,8 @@ no_cons:
 		 * to  be delivered returned `true', even though now, in the end,
 		 * no one actually ended up getting the signal... */
 #if SIG_CONTROL_SMPLOCK != 0
-		if (!ATOMIC_CMPXCH_WEAK(self->s_ctl, ctl, 0))
+		con = sig_smplock_clr(ctl);
+		if (!ATOMIC_CMPXCH_WEAK(self->s_ctl, ctl, (uintptr_t)con))
 			goto again;
 #endif /* SIG_CONTROL_SMPLOCK != 0 */
 		result = false;
@@ -1055,7 +1052,7 @@ no_cons:
 				/* Make sure that  `con' isn't a  phase-2-pending completion  callback.
 				 * If it is, then the callback of `con' used `sig_completion_reprime()'
 				 * during phase-1 in order to re-queue itself. */
-				if (!is_connection_is_chain(sc_pending, con))
+				if (!is_connection_in_chain(sc_pending, con))
 					receiver = con; /* This connection is still in alive. */
 			}
 		}
