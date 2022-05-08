@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2f619b6 */
+/* HASH CRC-32:0xeaaaa7e4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <asm/os/resource.h>
 #include <bits/os/rusage.h>
+#include <bits/crt/vtimes.h>
 /* >> vtimes(3)
  * Return  timing information about the calling process
  * (in `*current'), or its children (in `*child'). This

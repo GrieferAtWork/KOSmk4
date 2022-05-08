@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb10afc1e */
+/* HASH CRC-32:0xc5b91778 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,9 @@
 #include "string.h"
 #include "../user/sys.mman.h"
 #include "../user/sys.resource.h"
+#include "../user/sys.times.h"
+#include "sys.vtimes.h"
+#include "../user/time.h"
 #include "../user/unistd.h"
 
 DECL_BEGIN
@@ -701,6 +704,42 @@ NOTHROW_NCX(VLIBCCALL libc_concat_copy)(char *dst,
 	*ptr = '\0';
 	return dst;
 }
+#include <asm/os/resource.h>
+#include <bits/os/rusage.h>
+#include <asm/crt/confname.h>
+#include <bits/os/tms.h>
+#include <bits/crt/vtimes.h>
+/* >> get_run_time(3)
+ * Return the amount of time the calling process has run (in microseconds)
+ * If possible, time spent idling isn't counted, though if not possible, it
+ * is included, also. */
+INTERN ATTR_SECTION(".text.crt.libiberty") WUNUSED long
+NOTHROW_NCX(LIBCCALL libc_get_run_time)(void) {
+	uint64_t result;
+#ifdef __RUSAGE_SELF
+	struct rusage64 ru;
+	libc_getrusage64(RUSAGE_SELF, &ru);
+	result  = ((uint64_t)ru.ru_utime.tv_sec * 1000000) + ru.ru_utime.tv_usec;
+	result += ((uint64_t)ru.ru_stime.tv_sec * 1000000) + ru.ru_stime.tv_usec;
+#elif defined(times)
+	struct tms ts;
+	libc_times(&ts);
+	result = ts.tms_utime + ts.tms_stime;
+	result *= 1000000;
+	result /= libc_sysconf(_SC_CLK_TCK);
+#elif defined(__VTIMES_UNITS_PER_SECOND)
+	struct libc_vtimes vt;
+	libc_vtimes(&vt, NULL);
+	result = vt->vm_utime + vt->vm_stime;
+	result *= 1000000;
+	result /= __VTIMES_UNITS_PER_SECOND;
+#else /* ... */
+	result = libc_clock();
+	result *= 1000000;
+	result /= __CLOCKS_PER_SEC;
+#endif /* !... */
+	return (long)result;
+}
 /* >> choose_temp_base(3)
  * Create a temporary filename in `choose_tmpdir(3)' by use of `mktemp(3)'
  * The returned string must always be freed, and if no filename could be
@@ -1037,6 +1076,7 @@ DEFINE_PUBLIC_ALIAS(DOS$concat_copy, libd_concat_copy);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(concat_copy, libc_concat_copy);
+DEFINE_PUBLIC_ALIAS(get_run_time, libc_get_run_time);
 DEFINE_PUBLIC_ALIAS(choose_temp_base, libc_choose_temp_base);
 DEFINE_PUBLIC_ALIAS(choose_tmpdir, libc_choose_tmpdir);
 DEFINE_PUBLIC_ALIAS(make_temp_file_with_prefix, libc_make_temp_file_with_prefix);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe59cbdac */
+/* HASH CRC-32:0xd37b445b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1238,7 +1238,26 @@ __CSDECLARE(,char *,libiberty_concat_ptr)
 	(libiberty_concat_ptr = (char *)alloca(concat_length paren_args + 1), \
 	 concat_copy2 paren_args)
 #endif /* __alloca && __libiberty_concat_ptr && __CRT_HAVE_concat_copy2 */
-__CDECLARE_OPT(,long,__NOTHROW_NCX,get_run_time,(void),())
+#ifdef __CRT_HAVE_get_run_time
+/* >> get_run_time(3)
+ * Return the amount of time the calling process has run (in microseconds)
+ * If possible, time spent idling isn't counted, though if not possible, it
+ * is included, also. */
+__CDECLARE(__ATTR_WUNUSED,long,__NOTHROW_NCX,get_run_time,(void),())
+#else /* __CRT_HAVE_get_run_time */
+#include <asm/os/resource.h>
+#include <asm/crt/confname.h>
+#include <asm/os/clock.h>
+#include <bits/crt/vtimes.h>
+#if (defined(__RUSAGE_SELF) && ((defined(__CRT_HAVE_getrusage) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || (defined(__CRT_HAVE___getrusage) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || (defined(__CRT_HAVE___libc_getrusage) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_getrusage64))) || (defined(_SC_CLK_TCK) && (defined(__CRT_HAVE_sysconf) || defined(__CRT_HAVE___sysconf)) && (defined(__CRT_HAVE_times) || defined(__CRT_HAVE___times) || defined(__CRT_HAVE___libc_times))) || (defined(__VTIMES_UNITS_PER_SECOND) && (defined(__CRT_HAVE_vtimes) || (defined(__RUSAGE_SELF) && defined(__RUSAGE_CHILDREN) && ((defined(__CRT_HAVE_getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE___getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE___libc_getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_getrusage64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)))))) || (defined(__CLOCKS_PER_SEC) && defined(__CRT_HAVE_clock))
+#include <libc/local/libiberty/get_run_time.h>
+/* >> get_run_time(3)
+ * Return the amount of time the calling process has run (in microseconds)
+ * If possible, time spent idling isn't counted, though if not possible, it
+ * is included, also. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(get_run_time, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED long __NOTHROW_NCX(__LIBCCALL get_run_time)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(get_run_time))(); })
+#endif /* (__RUSAGE_SELF && ((__CRT_HAVE_getrusage && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || (__CRT_HAVE___getrusage && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || (__CRT_HAVE___libc_getrusage && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || __CRT_HAVE_getrusage64)) || (_SC_CLK_TCK && (__CRT_HAVE_sysconf || __CRT_HAVE___sysconf) && (__CRT_HAVE_times || __CRT_HAVE___times || __CRT_HAVE___libc_times)) || (__VTIMES_UNITS_PER_SECOND && (__CRT_HAVE_vtimes || (__RUSAGE_SELF && __RUSAGE_CHILDREN && ((__CRT_HAVE_getrusage && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE___getrusage && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE___libc_getrusage && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE_getrusage64 && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)))))) || (__CLOCKS_PER_SEC && __CRT_HAVE_clock) */
+#endif /* !__CRT_HAVE_get_run_time */
 __CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,make_relative_prefix,(char const *__a, char const *__b, char const *__c),(__a,__b,__c))
 __CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,make_relative_prefix_ignore_links,(char const *__a, char const *__b, char const *__c),(__a,__b,__c))
 #ifdef __CRT_HAVE_choose_temp_base

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5625ad11 */
+/* HASH CRC-32:0xb91f54ea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,6 @@ INTDEF char *NOTHROW_NCX(VLIBDCALL libd_concat_copy2)(char const *first, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF char *NOTHROW_NCX(VLIBCCALL libc_concat_copy2)(char const *first, ...);
-INTDEF long NOTHROW_NCX(LIBCCALL libc_get_run_time)(void);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_relative_prefix)(char const *a, char const *b, char const *c);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_relative_prefix_ignore_links)(char const *a, char const *b, char const *c);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_hex_init)(void);

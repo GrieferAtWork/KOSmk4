@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a875a6 */
+/* HASH CRC-32:0x953c78a7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -202,7 +202,6 @@
 #define __stub_gai_suspend64
 #define __stub_get_nprocs
 #define __stub_get_nprocs_conf
-#define __stub_get_run_time
 #define __stub_getaddrinfo
 #define __stub_getaddrinfo_a
 #define __stub_getaliasbyname

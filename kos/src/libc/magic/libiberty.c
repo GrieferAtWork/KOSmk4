@@ -893,7 +893,46 @@ __CSDECLARE(,char *,libiberty_concat_ptr)
 }
 %[insert:pp_endif]
 
-long get_run_time(void); /* TODO */
+@@>> get_run_time(3)
+@@Return the amount of time the calling process has run (in microseconds)
+@@If possible, time spent idling isn't counted, though if not possible, it
+@@is included, also.
+[[wunused]]
+[[requires_include("<asm/os/resource.h>", "<asm/crt/confname.h>")]]
+[[requires_include("<asm/os/clock.h>", "<bits/crt/vtimes.h>")]]
+[[requires((defined(__RUSAGE_SELF) && $has_function(getrusage64)) ||
+           (defined(_SC_CLK_TCK) && $has_function(sysconf, times)) ||
+           (defined(__VTIMES_UNITS_PER_SECOND) && $has_function(vtimes)) ||
+           (defined(__CLOCKS_PER_SEC) && $has_function(clock)))]]
+[[impl_include("<asm/os/resource.h>", "<bits/os/rusage.h>")]]
+[[impl_include("<asm/crt/confname.h>", "<bits/os/tms.h>")]]
+[[impl_include("<bits/crt/vtimes.h>")]]
+long get_run_time(void) {
+	uint64_t result;
+@@pp_if defined(__RUSAGE_SELF) && $has_function(getrusage64)@@
+	struct rusage64 ru;
+	getrusage64(RUSAGE_SELF, &ru);
+	result  = ((uint64_t)ru.@ru_utime@.@tv_sec@ * 1000000) + ru.@ru_utime@.@tv_usec@;
+	result += ((uint64_t)ru.@ru_stime@.@tv_sec@ * 1000000) + ru.@ru_stime@.@tv_usec@;
+@@pp_elif defined(times)@@
+	struct tms ts;
+	times(&ts);
+	result = ts.@tms_utime@ + ts.@tms_stime@;
+	result *= 1000000;
+	result /= sysconf(_SC_CLK_TCK);
+@@pp_elif defined(__VTIMES_UNITS_PER_SECOND) && $has_function(vtimes)@@
+	struct vtimes vt;
+	vtimes(&vt, NULL);
+	result = vt->@vm_utime@ + vt->@vm_stime@;
+	result *= 1000000;
+	result /= __VTIMES_UNITS_PER_SECOND;
+@@pp_else@@
+	result = clock();
+	result *= 1000000;
+	result /= __CLOCKS_PER_SEC;
+@@pp_endif@@
+	return (long)result;
+}
 
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 char *make_relative_prefix(char const *a, char const *b, char const *c); /* TODO */

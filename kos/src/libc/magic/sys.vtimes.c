@@ -52,7 +52,7 @@ __SYSDECL_BEGIN
 [[decl_include("<bits/crt/vtimes.h>")]]
 [[requires_include("<asm/os/resource.h>")]]
 [[requires(defined(__RUSAGE_SELF) && defined(__RUSAGE_CHILDREN) && $has_function(getrusage))]]
-[[impl_include("<asm/os/resource.h>", "<bits/os/rusage.h>")]]
+[[impl_include("<asm/os/resource.h>", "<bits/os/rusage.h>", "<bits/crt/vtimes.h>")]]
 [[section(".text.crt.compat.glibc")]]
 int vtimes(struct vtimes *current, struct vtimes *child) {
 	int result = 0;
