@@ -1153,7 +1153,15 @@ int fmapfileat([[nonnull]] struct mapfile *__restrict mapping,
                size_t num_trailing_nulbytes, $atflag_t atflags) {
 	fd_t fd;
 	int result;
+@@pp_if defined(__O_CLOEXEC) && defined(__O_CLOFORK)@@
+	oflag_t oflags = __O_RDONLY | __O_CLOEXEC | __O_CLOFORK;
+@@pp_elif defined(__O_CLOEXEC)@@
+	oflag_t oflags = __O_RDONLY | __O_CLOEXEC;
+@@pp_elif defined(__O_CLOFORK)@@
+	oflag_t oflags = __O_RDONLY | __O_CLOFORK;
+@@pp_else@@
 	oflag_t oflags = __O_RDONLY;
+@@pp_endif@@
 @@pp_if defined(__AT_DOSPATH) && defined(__O_DOSPATH)@@
 	if (atflags & __AT_DOSPATH) {
 		oflags |= __O_DOSPATH;
@@ -1198,7 +1206,15 @@ int mapfile([[nonnull]] struct mapfile *__restrict mapping,
 @@pp_if defined(__AT_FDCWD) && $has_function(fmapfileat)@@
 	return fmapfileat(mapping, __AT_FDCWD, filename, offset, max_bytes, num_trailing_nulbytes, 0);
 @@pp_else@@
+@@pp_if defined(__O_CLOEXEC) && defined(__O_CLOFORK)@@
+	fd_t fd = open(filename, __O_RDONLY | __O_CLOEXEC | __O_CLOFORK);
+@@pp_elif defined(__O_CLOEXEC)@@
+	fd_t fd = open(filename, __O_RDONLY | __O_CLOEXEC);
+@@pp_elif defined(__O_CLOFORK)@@
+	fd_t fd = open(filename, __O_RDONLY | __O_CLOFORK);
+@@pp_else@@
 	fd_t fd = open(filename, __O_RDONLY);
+@@pp_endif@@
 	if unlikely(fd < 0)
 		return -1;
 	result = fmapfile(mapping, fd, offset, max_bytes, num_trailing_nulbytes);

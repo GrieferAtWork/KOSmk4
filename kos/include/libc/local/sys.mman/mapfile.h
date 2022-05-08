@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57195122 */
+/* HASH CRC-32:0xf76398e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,7 +96,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mapfile))(struct mapfile *__restrict 
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_fmapfileat) || (defined(__O_RDONLY) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_fmapfile) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))))
 	return (__NAMESPACE_LOCAL_SYM __localdep_fmapfileat)(__mapping, __AT_FDCWD, __filename, __offset, __max_bytes, __num_trailing_nulbytes, 0);
 #else /* __AT_FDCWD && (__CRT_HAVE_fmapfileat || (__O_RDONLY && (__CRT_HAVE_openat64 || __CRT_HAVE_openat) && (__CRT_HAVE_fmapfile || ((__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))))) */
+#if defined(__O_CLOEXEC) && defined(__O_CLOFORK)
+	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__filename, __O_RDONLY | __O_CLOEXEC | __O_CLOFORK);
+#elif defined(__O_CLOEXEC)
+	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__filename, __O_RDONLY | __O_CLOEXEC);
+#elif defined(__O_CLOFORK)
+	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__filename, __O_RDONLY | __O_CLOFORK);
+#else /* ... */
 	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__filename, __O_RDONLY);
+#endif /* !... */
 	if __unlikely(__fd < 0)
 		return -1;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_fmapfile)(__mapping, __fd, __offset, __max_bytes, __num_trailing_nulbytes);

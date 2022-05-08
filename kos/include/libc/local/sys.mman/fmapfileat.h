@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa520356d */
+/* HASH CRC-32:0x94a2663d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,7 +77,15 @@ __LOCAL_LIBC(fmapfileat) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfileat))(struct mapfile *__restrict __mapping, __fd_t __dirfd, char const *__filename, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes, __atflag_t __atflags) {
 	__fd_t __fd;
 	int __result;
+#if defined(__O_CLOEXEC) && defined(__O_CLOFORK)
+	__oflag_t __oflags = __O_RDONLY | __O_CLOEXEC | __O_CLOFORK;
+#elif defined(__O_CLOEXEC)
+	__oflag_t __oflags = __O_RDONLY | __O_CLOEXEC;
+#elif defined(__O_CLOFORK)
+	__oflag_t __oflags = __O_RDONLY | __O_CLOFORK;
+#else /* ... */
 	__oflag_t __oflags = __O_RDONLY;
+#endif /* !... */
 #if defined(__AT_DOSPATH) && defined(__O_DOSPATH)
 	if (__atflags & __AT_DOSPATH) {
 		__oflags |= __O_DOSPATH;
