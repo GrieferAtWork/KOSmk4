@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a77a228 */
+/* HASH CRC-32:0xfbddc618 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -204,12 +204,19 @@ INTDEF ulongptr_t NOTHROW_NCX(VLIBDCALL libd_concat_length)(char const *first, .
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ulongptr_t NOTHROW_NCX(VLIBCCALL libc_concat_length)(char const *first, ...);
+INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_concat_vcopy)(char *dst, char const *first, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(VLIBDCALL libd_concat_copy)(char *dst, char const *first, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(VLIBCCALL libc_concat_copy)(char *dst, char const *first, ...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF char *NOTHROW_NCX(VLIBDCALL libd_concat_copy2)(char const *first, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF char *NOTHROW_NCX(VLIBCCALL libc_concat_copy2)(char const *first, ...);
 /* >> get_run_time(3)
  * Return the amount of time the calling process has run (in microseconds)
  * If possible, time spent idling isn't counted, though if not possible, it

@@ -126,9 +126,11 @@ DEFINE_NOREL_GLOBAL_META(int, optopt, ".crt.application.options");
 #undef _nl_msg_cat_cntr
 DEFINE_NOREL_GLOBAL_META(int, _nl_msg_cat_cntr, ".crt.i18n");
 
+
 /* <math.h> */
 #undef signgam
 DEFINE_NOREL_GLOBAL_META(int, signgam, ".crt.math.math");
+
 
 /* <signal.h> */
 #undef _sigintr
@@ -141,15 +143,23 @@ DEFINE_NOREL_GLOBAL_META(sigset_t, _sigintr, ".crt.sched.signal");
 DEFINE_NOREL_GLOBAL_META(unsigned char, _mbctype, ".crt.dos.mbstring");
 DEFINE_NOREL_GLOBAL_META(unsigned char, _mbcasemap, ".crt.dos.mbstring");
 
+
 /* <obstack.h> */
 #undef obstack_alloc_failed_handler
 #undef obstack_exit_failure
 DEFINE_NOREL_GLOBAL_META(POBSTACK_ALLOC_FAILED_HANDLER, obstack_alloc_failed_handler, ".crt.heap.obstack");
 DEFINE_NOREL_GLOBAL_META(int, obstack_exit_failure, ".crt.heap.obstack");
 
+
+/* <libiberty.h> */
+#undef libiberty_concat_ptr
+DEFINE_NOREL_GLOBAL_META(char *, libiberty_concat_ptr, ".crt.libiberty");
+
+
 /* Misc... */
 #undef __libc_enable_secure
 DEFINE_NOREL_GLOBAL_META(int, __libc_enable_secure, ".crt.compat.glibc");
+
 
 DECL_END
 

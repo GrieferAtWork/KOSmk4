@@ -67,12 +67,19 @@ typedef __FILE FILE;
 #ifndef __KERNEL__
 #include "../libc/globals.h"
 #include <sys/stat.h>
+#undef libiberty_optr
+#undef libiberty_nptr
+#undef libiberty_len
+#undef libiberty_concat_ptr
 INTERN ATTR_SECTION(".bss.crt.libiberty") char const *libc_libiberty_optr      = NULL;
 INTERN ATTR_SECTION(".bss.crt.libiberty") char *libc_libiberty_nptr            = NULL;
 INTERN ATTR_SECTION(".bss.crt.libiberty") __ULONGPTR_TYPE__ libc_libiberty_len = 0;
+INTERN ATTR_SECTION(".bss.crt.libiberty") char *libc_libiberty_concat_ptr      = NULL;
 DEFINE_PUBLIC_ALIAS(libiberty_optr, libc_libiberty_optr);
 DEFINE_PUBLIC_ALIAS(libiberty_nptr, libc_libiberty_nptr);
 DEFINE_PUBLIC_ALIAS(libiberty_len, libc_libiberty_len);
+DEFINE_PUBLIC_ALIAS(libiberty_concat_ptr, libc_libiberty_concat_ptr);
+#define libiberty_concat_ptr GET_NOREL_GLOBAL(libiberty_concat_ptr)
 #endif /* !__KERNEL__ */
 }
 
@@ -860,25 +867,44 @@ $ulongptr_t concat_length(char const *first, ...) {
 	return (ulongptr_t)totlen;
 }
 
-[[nonnull]]
-char *concat_copy([[nonnull]] char *dst, char const *first, ...) {
+[[static, nonnull]]
+char *concat_vcopy([[nonnull]] char *dst, char const *first, va_list args) {
 	char *ptr = dst;
-	va_list args;
-	va_start(args, first);
 	for (; first; first = va_arg(args, char *))
 		ptr = (char *)mempcpyc(ptr, first, strlen(first), sizeof(char));
-	va_end(args);
 	*ptr = '\0';
 	return dst;
 }
 
+[[nonnull, requires_function(concat_vcopy)]]
+char *concat_copy([[nonnull]] char *dst, char const *first, ...) {
+	char *result;
+	va_list args;
+	va_start(args, first);
+	result = concat_vcopy(dst, first, args);
+	va_end(args);
+	return result;
+}
 
-char *concat_copy2(char const *first, ...); /* TODO: `return concat_copy(libiberty_concat_ptr, ...)' */
+%[define_replacement(libiberty_concat_ptr = __LOCAL_libiberty_concat_ptr)]
+
+[[requires_include("<libc/template/libiberty_concat_ptr.h>")]]
+[[requires($has_function(concat_copy) && defined(__LOCAL_libiberty_concat_ptr))]]
+char *concat_copy2(char const *first, ...) {
+	char *result;
+	va_list args;
+	va_start(args, first);
+	result = concat_vcopy(libiberty_concat_ptr, first, args);
+	va_end(args);
+	return result;
+}
 
 
 %{
 #ifndef libiberty_concat_ptr
-#ifdef __CRT_HAVE_libiberty_concat_ptr
+#ifdef __LOCAL_libiberty_concat_ptr
+#define libiberty_concat_ptr __LOCAL_libiberty_concat_ptr
+#elif defined(__CRT_HAVE_libiberty_concat_ptr)
 __CSDECLARE(,char *,libiberty_concat_ptr)
 #define libiberty_concat_ptr libiberty_concat_ptr
 #endif /* __CRT_HAVE_libiberty_concat_ptr */

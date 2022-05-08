@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5b91778 */
+/* HASH CRC-32:0x93f099e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,12 +42,19 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include "../libc/globals.h"
 #include <sys/stat.h>
+#undef libiberty_optr
+#undef libiberty_nptr
+#undef libiberty_len
+#undef libiberty_concat_ptr
 INTERN ATTR_SECTION(".bss.crt.libiberty") char const *libc_libiberty_optr      = NULL;
 INTERN ATTR_SECTION(".bss.crt.libiberty") char *libc_libiberty_nptr            = NULL;
 INTERN ATTR_SECTION(".bss.crt.libiberty") __ULONGPTR_TYPE__ libc_libiberty_len = 0;
+INTERN ATTR_SECTION(".bss.crt.libiberty") char *libc_libiberty_concat_ptr      = NULL;
 DEFINE_PUBLIC_ALIAS(libiberty_optr, libc_libiberty_optr);
 DEFINE_PUBLIC_ALIAS(libiberty_nptr, libc_libiberty_nptr);
 DEFINE_PUBLIC_ALIAS(libiberty_len, libc_libiberty_len);
+DEFINE_PUBLIC_ALIAS(libiberty_concat_ptr, libc_libiberty_concat_ptr);
+#define libiberty_concat_ptr GET_NOREL_GLOBAL(libiberty_concat_ptr)
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #include <hybrid/host.h>
@@ -674,20 +681,28 @@ NOTHROW_NCX(VLIBCCALL libc_concat_length)(char const *first,
 	va_end(args);
 	return (ulongptr_t)totlen;
 }
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_RETNONNULL NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc_concat_vcopy)(char *dst,
+                                        char const *first,
+                                        va_list args) {
+	char *ptr = dst;
+	for (; first; first = va_arg(args, char *))
+		ptr = (char *)libc_mempcpyc(ptr, first, libc_strlen(first), sizeof(char));
+	*ptr = '\0';
+	return dst;
+}
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(VLIBDCALL libd_concat_copy)(char *dst,
                                         char const *first,
                                         ...) {
-	char *ptr = dst;
+	char *result;
 	va_list args;
 	va_start(args, first);
-	for (; first; first = va_arg(args, char *))
-		ptr = (char *)libc_mempcpyc(ptr, first, libc_strlen(first), sizeof(char));
+	result = libc_concat_vcopy(dst, first, args);
 	va_end(args);
-	*ptr = '\0';
-	return dst;
+	return result;
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -695,14 +710,36 @@ INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(VLIBCCALL libc_concat_copy)(char *dst,
                                         char const *first,
                                         ...) {
-	char *ptr = dst;
+	char *result;
 	va_list args;
 	va_start(args, first);
-	for (; first; first = va_arg(args, char *))
-		ptr = (char *)libc_mempcpyc(ptr, first, libc_strlen(first), sizeof(char));
+	result = libc_concat_vcopy(dst, first, args);
 	va_end(args);
-	*ptr = '\0';
-	return dst;
+	return result;
+}
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") char *
+NOTHROW_NCX(VLIBDCALL libd_concat_copy2)(char const *first,
+                                         ...) {
+	char *result;
+	va_list args;
+	va_start(args, first);
+	result = libc_concat_vcopy(libiberty_concat_ptr, first, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTERN ATTR_SECTION(".text.crt.libiberty") char *
+NOTHROW_NCX(VLIBCCALL libc_concat_copy2)(char const *first,
+                                         ...) {
+	char *result;
+	va_list args;
+	va_start(args, first);
+	result = libc_concat_vcopy(libiberty_concat_ptr, first, args);
+	va_end(args);
+	return result;
 }
 #include <asm/os/resource.h>
 #include <bits/os/rusage.h>
@@ -1076,6 +1113,12 @@ DEFINE_PUBLIC_ALIAS(DOS$concat_copy, libd_concat_copy);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(concat_copy, libc_concat_copy);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$concat_copy2, libd_concat_copy2);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(concat_copy2, libc_concat_copy2);
 DEFINE_PUBLIC_ALIAS(get_run_time, libc_get_run_time);
 DEFINE_PUBLIC_ALIAS(choose_temp_base, libc_choose_temp_base);
 DEFINE_PUBLIC_ALIAS(choose_tmpdir, libc_choose_tmpdir);

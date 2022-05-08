@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x953c78a7 */
+/* HASH CRC-32:0x207864ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,7 +127,6 @@
 #define __stub___clock_getcpuclockid
 #define __stub_clock_getcpuclockid
 #define __stub_closelog
-#define __stub_concat_copy2
 #define __stub_crypt
 #define __stub_crypt_r
 #define __stub_dehumanize_number
@@ -609,7 +608,6 @@
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$__clone
 #define __stub_DOS$clone
-#define __stub_DOS$concat_copy2
 #endif /* !__COMPILER_NO_DOLLAR_IN_SYMBOL */
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL

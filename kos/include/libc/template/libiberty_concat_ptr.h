@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x56b70f3f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,29 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_concat_copy_defined
-#define __local_concat_copy_defined
+#ifndef __LOCAL_libiberty_concat_ptr
 #include <__crt.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_concat_vcopy_defined
-#define __local___localdep_concat_vcopy_defined
-__NAMESPACE_LOCAL_END
-#include <libc/local/libiberty/concat_vcopy.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_concat_vcopy __LIBC_LOCAL_NAME(concat_vcopy)
-#endif /* !__local___localdep_concat_vcopy_defined */
-__LOCAL_LIBC(concat_copy) __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
-__NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(concat_copy))(char *__dst, char const *__first, ...) {
-	char *__result;
-	__builtin_va_list __args;
-	__builtin_va_start(__args, __first);
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_concat_vcopy)(__dst, __first, __args);
-	__builtin_va_end(__args);
-	return __result;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_concat_copy_defined
-#define __local___localdep_concat_copy_defined
-#define __localdep_concat_copy __LIBC_LOCAL_NAME(concat_copy)
-#endif /* !__local___localdep_concat_copy_defined */
-#endif /* !__local_concat_copy_defined */
+#ifndef __LOCAL_libiberty_concat_ptr
+__DECL_BEGIN
+#ifdef libiberty_concat_ptr
+#define __LOCAL_libiberty_concat_ptr libiberty_concat_ptr
+#elif defined(__CRT_HAVE_libiberty_concat_ptr)
+#ifdef __NO_COMPILER_SREDIRECT
+__CSDECLARE(,__FILE *,libiberty_concat_ptr)
+#define libiberty_concat_ptr         libiberty_concat_ptr
+#define __LOCAL_libiberty_concat_ptr libiberty_concat_ptr
+#else /* __NO_COMPILER_SREDIRECT */
+__CSREDIRECT(,__FILE *,__LOCAL_libiberty_concat_ptr,libiberty_concat_ptr)
+#define __LOCAL_libiberty_concat_ptr __LOCAL_libiberty_concat_ptr
+#endif /* !__NO_COMPILER_SREDIRECT */
+#endif /* ... */
+__DECL_END
+#endif /* !__LOCAL_libiberty_concat_ptr */
+#endif /* !__LOCAL_libiberty_concat_ptr */

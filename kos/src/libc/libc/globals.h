@@ -276,6 +276,14 @@ DECLARE_NOREL_GLOBAL_META(int, obstack_exit_failure);
 #define __LOCAL_obstack_exit_failure         GET_NOREL_GLOBAL(obstack_exit_failure)
 
 
+/* <libiberty.h> */
+#undef libiberty_concat_ptr
+#undef __LOCAL_libiberty_concat_ptr
+DECLARE_NOREL_GLOBAL_META(char *, libiberty_concat_ptr);
+#define libiberty_concat_ptr         GET_NOREL_GLOBAL(libiberty_concat_ptr)
+#define __LOCAL_libiberty_concat_ptr GET_NOREL_GLOBAL(libiberty_concat_ptr)
+
+
 /* Misc... */
 #undef __libc_enable_secure
 #undef __LOCAL___libc_enable_secure

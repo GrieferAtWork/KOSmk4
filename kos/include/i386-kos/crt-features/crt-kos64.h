@@ -3384,6 +3384,7 @@
 #define __CRT_HAVE_lgammal
 #define __CRT_HAVE_lgammal_r
 #define __CRT_HAVE_lgetxattr
+#define __CRT_HAVE_libiberty_concat_ptr
 #define __CRT_HAVE_libiberty_len
 #define __CRT_HAVE_libiberty_nptr
 #define __CRT_HAVE_libiberty_optr

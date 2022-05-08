@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd37b445b */
+/* HASH CRC-32:0xf3494c84 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1225,19 +1225,32 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(concat_copy, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* !__CRT_HAVE_concat_copy */
 #ifdef __CRT_HAVE_concat_copy2
 __LIBC char *__NOTHROW_NCX(__VLIBCCALL concat_copy2)(char const *__first, ...) __CASMNAME_SAME("concat_copy2");
-#endif /* __CRT_HAVE_concat_copy2 */
+#else /* __CRT_HAVE_concat_copy2 */
+#include <libc/template/libiberty_concat_ptr.h>
+#ifdef __LOCAL_libiberty_concat_ptr
+#include <libc/local/libiberty/concat_copy2.h>
+#if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
+__NAMESPACE_LOCAL_USING_OR_IMPL(concat_copy2, __FORCELOCAL __ATTR_ARTIFICIAL char *__NOTHROW_NCX(__VLIBCCALL concat_copy2)(char const *__first, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(concat_copy2))(__first, __builtin_va_arg_pack()); })
+#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#define concat_copy2(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(concat_copy2))(__VA_ARGS__)
+#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
+#endif /* __LOCAL_libiberty_concat_ptr */
+#endif /* !__CRT_HAVE_concat_copy2 */
 #ifndef libiberty_concat_ptr
-#ifdef __CRT_HAVE_libiberty_concat_ptr
+#ifdef __LOCAL_libiberty_concat_ptr
+#define libiberty_concat_ptr __LOCAL_libiberty_concat_ptr
+#elif defined(__CRT_HAVE_libiberty_concat_ptr)
 __CSDECLARE(,char *,libiberty_concat_ptr)
 #define libiberty_concat_ptr libiberty_concat_ptr
 #endif /* __CRT_HAVE_libiberty_concat_ptr */
 #endif /* !libiberty_concat_ptr */
 
-#if defined(__alloca) && defined(__libiberty_concat_ptr) && defined(__CRT_HAVE_concat_copy2)
+#include <libc/template/libiberty_concat_ptr.h>
+#if defined(__alloca) && defined(libiberty_concat_ptr) && (defined(__CRT_HAVE_concat_copy2) || defined(__LOCAL_libiberty_concat_ptr))
 #define ACONCAT(paren_args)                                               \
 	(libiberty_concat_ptr = (char *)alloca(concat_length paren_args + 1), \
 	 concat_copy2 paren_args)
-#endif /* __alloca && __libiberty_concat_ptr && __CRT_HAVE_concat_copy2 */
+#endif /* __alloca && libiberty_concat_ptr && (__CRT_HAVE_concat_copy2 || __LOCAL_libiberty_concat_ptr) */
 #ifdef __CRT_HAVE_get_run_time
 /* >> get_run_time(3)
  * Return the amount of time the calling process has run (in microseconds)

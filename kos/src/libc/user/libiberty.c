@@ -85,33 +85,7 @@ NOTHROW_NCX(LIBCCALL libc_fdmatch)(fd_t fd1,
 
 
 
-/*[[[head:libd_concat_copy2,hash:CRC-32=0x957c2430]]]*/
-#ifndef __LIBCCALL_IS_LIBDCALL
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") char *
-NOTHROW_NCX(VLIBDCALL libd_concat_copy2)(char const *first,
-                                         ...)
-/*[[[body:libd_concat_copy2]]]*/
-/*AUTO*/{
-	(void)first;
-	CRT_UNIMPLEMENTEDF("concat_copy2(%q, ...)", first); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-#endif /* MAGIC:impl_if */
-/*[[[end:libd_concat_copy2]]]*/
 
-/*[[[head:libc_concat_copy2,hash:CRC-32=0x5022194d]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") char *
-NOTHROW_NCX(VLIBCCALL libc_concat_copy2)(char const *first,
-                                         ...)
-/*[[[body:libc_concat_copy2]]]*/
-/*AUTO*/{
-	(void)first;
-	CRT_UNIMPLEMENTEDF("concat_copy2(%q, ...)", first); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_concat_copy2]]]*/
 
 
 /*[[[head:libc_make_relative_prefix,hash:CRC-32=0x6ed98811]]]*/
@@ -397,14 +371,10 @@ NOTHROW_NCX(LIBCCALL libc_pwait)(int a,
 }
 /*[[[end:libc_pwait]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x53830069]]]*/
+/*[[[start:exports,hash:CRC-32=0xcf8493b3]]]*/
 DEFINE_PUBLIC_ALIAS(xmalloc_set_program_name, libc_xmalloc_set_program_name);
 DEFINE_PUBLIC_ALIAS(xmalloc_failed, libc_xmalloc_failed);
 DEFINE_PUBLIC_ALIAS(fdmatch, libc_fdmatch);
-#ifndef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(DOS$concat_copy2, libd_concat_copy2);
-#endif /* !__LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(concat_copy2, libc_concat_copy2);
 DEFINE_PUBLIC_ALIAS(make_relative_prefix, libc_make_relative_prefix);
 DEFINE_PUBLIC_ALIAS(make_relative_prefix_ignore_links, libc_make_relative_prefix_ignore_links);
 DEFINE_PUBLIC_ALIAS(hex_init, libc_hex_init);

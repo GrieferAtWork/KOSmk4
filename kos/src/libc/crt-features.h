@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68887a5a */
+/* HASH CRC-32:0xc054657a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5321,6 +5321,7 @@
 #define __CRT_HAVE_concat_copy
 #define __CRT_HAVE_concat_copy2
 #define __CRT_HAVE_concat_length
+#define __CRT_HAVE_concat_vcopy
 #define __CRT_HAVE_confstr
 #define __CRT_HAVE_conj
 #define __CRT_HAVE_conjf

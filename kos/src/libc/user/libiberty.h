@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb91f54ea */
+/* HASH CRC-32:0xcb1c2bf7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,12 +34,6 @@ DECL_BEGIN
 INTDEF void NOTHROW_NCX(LIBCCALL libc_xmalloc_set_program_name)(char const *progname);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_xmalloc_failed)(size_t num_bytes) THROWS(...);
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_fdmatch)(fd_t fd1, fd_t fd2);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF char *NOTHROW_NCX(VLIBDCALL libd_concat_copy2)(char const *first, ...);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF char *NOTHROW_NCX(VLIBCCALL libc_concat_copy2)(char const *first, ...);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_relative_prefix)(char const *a, char const *b, char const *c);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_relative_prefix_ignore_links)(char const *a, char const *b, char const *c);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_hex_init)(void);
