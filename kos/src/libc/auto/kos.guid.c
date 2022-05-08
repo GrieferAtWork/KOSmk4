@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe3c021a */
+/* HASH CRC-32:0xc519f4fd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 
 DECL_BEGIN
 
+#include <libc/template/hex.h>
 /* >> guid_fromstr(3)
  * Convert a given `string' into a GUID
  * >> guid_t g;
@@ -55,15 +56,8 @@ NOTHROW_NCX(LIBCCALL libc_guid_fromstr)(char const string[GUID_STRLEN],
 		/* Decode nibbles */
 		for (j = 0; j < 2; ++j) {
 			char ch = *string++;
-			if (ch >= '0' && ch <= '9') {
-				nibbles[j] = ch - '0';
-			} else if (ch >= 'a' && ch <= 'f') {
-				nibbles[j] = 10 + ch - 'a';
-			} else if (ch >= 'A' && ch <= 'F') {
-				nibbles[j] = 10 + ch - 'A';
-			} else {
+			if (!__libc_hex2int(ch, &nibbles[j]))
 				goto inval;
-			}
 		}
 
 		/* Convert nibbles to byte */

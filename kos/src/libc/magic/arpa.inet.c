@@ -218,8 +218,9 @@ int inet_aton([[nonnull]] char const *__restrict cp,
 @@@param: network_addr: When non-zero, `*pcp' is a network address
 @@@return: 0: Bad input format
 @@@return: 1: Success
-[[wunused, impl_include("<hybrid/__byteswap.h>")]]
+[[wunused]]
 [[decl_include("<netinet/bits/in.h>")]]
+[[impl_include("<hybrid/__byteswap.h>", "<libc/template/hex.h>")]]
 int inet_paton([[nonnull]] char const **__restrict pcp,
                [[nonnull]] struct in_addr *__restrict inp,
                int network_addr) {
@@ -257,15 +258,8 @@ int inet_paton([[nonnull]] char const **__restrict pcp,
 				for (;;) {
 					uint8_t digit;
 					ch = *cp;
-					if (ch >= '0' && ch <= '9') {
-						digit = (uint8_t)(ch - '0');
-					} else if (ch >= 'a' && ch <= 'f') {
-						digit = (uint8_t)(10 + ch - 'a');
-					} else if (ch >= 'A' && ch <= 'F') {
-						digit = (uint8_t)(10 + ch - 'A');
-					} else {
+					if (!__libc_hex2int(ch, &digit))
 						break;
-					}
 					new_part = part * 16;
 					new_part += digit;
 					if unlikely(new_part < part)

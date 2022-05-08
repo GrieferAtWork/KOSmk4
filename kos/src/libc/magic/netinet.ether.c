@@ -80,35 +80,23 @@ struct ether_addr *ether_aton_r([[nonnull]] char const *__restrict asc,
 
 %#ifdef __USE_KOS
 [[decl_prefix(struct ether_addr;)]]
-[[wunused, doc_alias("ether_aton"), impl_include("<net/ethernet.h>")]]
+[[wunused, doc_alias("ether_aton")]]
+[[impl_include("<net/ethernet.h>", "<libc/template/hex.h>")]]
 struct ether_addr *ether_paton_r([[nonnull]] char const **__restrict pasc,
                                  [[nonnull]] struct ether_addr *__restrict addr) {
 	unsigned int i;
 	char const *asc = *pasc;
 	for (i = 0; i < 6; ++i) {
-		u8 octet;
+		u8 octet, lo_octet;
 		char c;
 		c = *asc++;
-		if (c >= '0' && c <= '9')
-			octet = c - '0';
-		else if (c >= 'a' && c <= 'f')
-			octet = 10 + c - 'a';
-		else if (c >= 'A' && c <= 'F')
-			octet = 10 + c - 'A';
-		else {
+		if (!__libc_hex2int(c, &octet))
 			return NULL;
-		}
 		c = *asc++;
 		octet <<= 4;
-		if (c >= '0' && c <= '9')
-			octet |= c - '0';
-		else if (c >= 'a' && c <= 'f')
-			octet |= 10 + c - 'a';
-		else if (c >= 'A' && c <= 'F')
-			octet |= 10 + c - 'A';
-		else {
+		if (!__libc_hex2int(c, &lo_octet))
 			return NULL;
-		}
+		octet |= lo_octet;
 		c = *asc++;
 		if (c == ':') {
 			if (i >= 5)

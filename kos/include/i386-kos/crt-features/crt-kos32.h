@@ -1588,6 +1588,7 @@
 #define __CRT_HAVE__gmtime32_s
 #define __CRT_HAVE__gmtime64
 #define __CRT_HAVE__gmtime64_s
+#define __CRT_HAVE__hex_value
 #define __CRT_HAVE__hypot
 #define __CRT_HAVE__hypotf
 #define __CRT_HAVE__i64toa

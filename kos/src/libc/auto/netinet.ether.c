@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22240cf2 */
+/* HASH CRC-32:0x344f6ca4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,6 +69,7 @@ NOTHROW_NCX(LIBCCALL libc_ether_aton_r)(char const *__restrict asc,
 	return libc_ether_paton_r((char const **)&asc, addr);
 }
 #include <net/ethernet.h>
+#include <libc/template/hex.h>
 /* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED NONNULL((1, 2)) struct ether_addr *
@@ -77,29 +78,16 @@ NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc,
 	unsigned int i;
 	char const *asc = *pasc;
 	for (i = 0; i < 6; ++i) {
-		u8 octet;
+		u8 octet, lo_octet;
 		char c;
 		c = *asc++;
-		if (c >= '0' && c <= '9')
-			octet = c - '0';
-		else if (c >= 'a' && c <= 'f')
-			octet = 10 + c - 'a';
-		else if (c >= 'A' && c <= 'F')
-			octet = 10 + c - 'A';
-		else {
+		if (!__libc_hex2int(c, &octet))
 			return NULL;
-		}
 		c = *asc++;
 		octet <<= 4;
-		if (c >= '0' && c <= '9')
-			octet |= c - '0';
-		else if (c >= 'a' && c <= 'f')
-			octet |= 10 + c - 'a';
-		else if (c >= 'A' && c <= 'F')
-			octet |= 10 + c - 'A';
-		else {
+		if (!__libc_hex2int(c, &lo_octet))
 			return NULL;
-		}
+		octet |= lo_octet;
 		c = *asc++;
 		if (c == ':') {
 			if (i >= 5)

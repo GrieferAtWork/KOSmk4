@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5f926d6 */
+/* HASH CRC-32:0x74ec4915 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,6 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_unicode_readutf8_n_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/template/itoa_digits.h>
+#include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_wescape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_wescape))(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) {
@@ -241,9 +242,7 @@ __encode_hex:
 #else /* ... */
 					__next_ch = (__UINT32_TYPE__)*__new_text++;
 #endif /* !... */
-					if ((__next_ch >= 'a' && __next_ch <= 'f') ||
-					    (__next_ch >= 'A' && __next_ch <= 'F') ||
-					    (__next_ch >= '0' && __next_ch <= '9'))
+					if (__libc_ishexU(__next_ch))
 						goto __encode_uni;
 				}
 				if (__ch <= 0xf) {

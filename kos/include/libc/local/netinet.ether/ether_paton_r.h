@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc19fe5 */
+/* HASH CRC-32:0x928bd302 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,35 +45,23 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_isspace_defined */
 __NAMESPACE_LOCAL_END
 #include <net/ethernet.h>
+#include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ether_paton_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct ether_addr *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_paton_r))(char const **__restrict __pasc, struct ether_addr *__restrict __addr) {
 	unsigned int __i;
 	char const *__asc = *__pasc;
 	for (__i = 0; __i < 6; ++__i) {
-		__UINT8_TYPE__ __octet;
+		__UINT8_TYPE__ __octet, __lo_octet;
 		char __c;
 		__c = *__asc++;
-		if (__c >= '0' && __c <= '9')
-			__octet = __c - '0';
-		else if (__c >= 'a' && __c <= 'f')
-			__octet = 10 + __c - 'a';
-		else if (__c >= 'A' && __c <= 'F')
-			__octet = 10 + __c - 'A';
-		else {
+		if (!__libc_hex2int(__c, &__octet))
 			return __NULLPTR;
-		}
 		__c = *__asc++;
 		__octet <<= 4;
-		if (__c >= '0' && __c <= '9')
-			__octet |= __c - '0';
-		else if (__c >= 'a' && __c <= 'f')
-			__octet |= 10 + __c - 'a';
-		else if (__c >= 'A' && __c <= 'F')
-			__octet |= 10 + __c - 'A';
-		else {
+		if (!__libc_hex2int(__c, &__lo_octet))
 			return __NULLPTR;
-		}
+		__octet |= __lo_octet;
 		__c = *__asc++;
 		if (__c == ':') {
 			if (__i >= 5)

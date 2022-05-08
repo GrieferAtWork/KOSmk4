@@ -49,6 +49,7 @@ gcc_opt.append("-fexceptions");
 #include <string.h>
 #include <unistd.h>
 
+#include <libc/template/hex.h>
 #include <libintl.h>
 
 #include "../libc/dl.h"
@@ -512,27 +513,13 @@ again:
 		if (ch == 'x' || ch == 'X') {
 			/* Hex constant */
 			ch = *++ptr;
-			if (ch >= '0' && ch <= '9') {
-				value = ch - '0';
-			} else if (ch >= 'a' && ch <= 'f') {
-				value = 10 + ch - 'a';
-			} else if (ch >= 'A' && ch <= 'F') {
-				value = 10 + ch - 'A';
-			} else {
+			if (!__libc_hex2int(ch, &value))
 				goto eof; /* Error */
-			}
 			for (;;) {
 				ulongptr_t addend;
 				ch = *++ptr;
-				if (ch >= '0' && ch <= '9') {
-					addend = ch - '0';
-				} else if (ch >= 'a' && ch <= 'f') {
-					addend = 10 + ch - 'a';
-				} else if (ch >= 'A' && ch <= 'F') {
-					addend = 10 + ch - 'A';
-				} else {
+				if (!__libc_hex2int(ch, &addend))
 					break; /* Error */
-				}
 				value *= 16;
 				value += addend;
 			}

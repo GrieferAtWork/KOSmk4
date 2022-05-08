@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc054657a */
+/* HASH CRC-32:0x30e691f2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4557,6 +4557,7 @@
 #define __CRT_HAVE__getws_s
 #define __CRT_HAVE__gmtime32_s
 #define __CRT_HAVE__gmtime64_s
+#define __CRT_HAVE__hex_value
 #define __CRT_HAVE__i64toa
 #define __CRT_HAVE__i64toa_s
 #define __CRT_HAVE__i64tow
@@ -6310,6 +6311,10 @@
 #define __CRT_HAVE_lgammal
 #define __CRT_HAVE_lgammal_r
 #define __CRT_HAVE_lgetxattr
+#define __CRT_HAVE_libiberty_concat_ptr
+#define __CRT_HAVE_libiberty_len
+#define __CRT_HAVE_libiberty_nptr
+#define __CRT_HAVE_libiberty_optr
 #define __CRT_HAVE_link
 #define __CRT_HAVE_linkat
 #define __CRT_HAVE_lio_listio

@@ -162,7 +162,7 @@ typedef union __ATTR_PACKED {
 @@>> guid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
 @@@return: string + GUID_STRLEN: Success
 @@@return: NULL:                 `string' isn't a valid GUID.
-[[kernel]]
+[[kernel, impl_include("<libc/template/hex.h>")]]
 char const *guid_fromstr([[nonnull]] char const string[@GUID_STRLEN@],
                          [[nonnull]] guid_t *__restrict result) {
 	unsigned int i;
@@ -183,15 +183,8 @@ char const *guid_fromstr([[nonnull]] char const string[@GUID_STRLEN@],
 		/* Decode nibbles */
 		for (j = 0; j < 2; ++j) {
 			char ch = *string++;
-			if (ch >= '0' && ch <= '9') {
-				nibbles[j] = ch - '0';
-			} else if (ch >= 'a' && ch <= 'f') {
-				nibbles[j] = 10 + ch - 'a';
-			} else if (ch >= 'A' && ch <= 'F') {
-				nibbles[j] = 10 + ch - 'A';
-			} else {
+			if (!__libc_hex2int(ch, &nibbles[j]))
 				goto inval;
-			}
 		}
 
 		/* Convert nibbles to byte */

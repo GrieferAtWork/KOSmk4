@@ -399,7 +399,7 @@ err:
 [[kernel, throws, alias("format_quote")]]
 [[if(!defined(__KERNEL__)), export_as("format_quote")]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
-[[impl_include("<libc/template/itoa_digits.h>")]]
+[[impl_include("<libc/template/itoa_digits.h>", "<libc/template/hex.h>")]]
 $ssize_t format_escape([[nonnull]] pformatprinter printer, void *arg,
                        /*utf-8*/ char const *__restrict text,
                        $size_t textlen, unsigned int flags) {
@@ -592,9 +592,7 @@ encode_hex:
 @@pp_else@@
 					next_ch = (uint32_t)*new_text++;
 @@pp_endif@@
-					if ((next_ch >= 'a' && next_ch <= 'f') ||
-					    (next_ch >= 'A' && next_ch <= 'F') ||
-					    (next_ch >= '0' && next_ch <= '9'))
+					if (__libc_ishexU(next_ch))
 						goto encode_uni;
 				}
 				if (ch <= 0xf) {

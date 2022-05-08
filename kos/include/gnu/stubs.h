@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x207864ca */
+/* HASH CRC-32:0x9fde95b7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -277,7 +277,6 @@
 #define __stub_grantpt
 #define __stub_gtty
 #define __stub_herror
-#define __stub_hex_init
 #define __stub___hostalias
 #define __stub_hostalias
 #define __stub_hstrerror

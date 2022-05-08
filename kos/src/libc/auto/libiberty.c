@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93f099e0 */
+/* HASH CRC-32:0x7feb14c7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,15 @@ DEFINE_PUBLIC_ALIAS(libiberty_nptr, libc_libiberty_nptr);
 DEFINE_PUBLIC_ALIAS(libiberty_len, libc_libiberty_len);
 DEFINE_PUBLIC_ALIAS(libiberty_concat_ptr, libc_libiberty_concat_ptr);
 #define libiberty_concat_ptr GET_NOREL_GLOBAL(libiberty_concat_ptr)
+
+#undef _hex_value
+DEFINE_PUBLIC_ALIAS(_hex_value, libc__hex_value);
+INTDEF unsigned char const libc__hex_value[256];
+INTERN_CONST ATTR_SECTION(".rodata.crt.libiberty")
+unsigned char const libc__hex_value[256] =
+#include <libc/template/_hex-values.h>
+;
+
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #include <hybrid/host.h>
@@ -1052,6 +1061,13 @@ NOTHROW_NCX(LIBCCALL libc_xcrc32)(__BYTE_TYPE__ const *buf,
 	}
 	return crc;
 }
+/* >> hex_init(3)
+ * Initialize the `_hex_value' array (unless it was already statically initialized) */
+INTERN ATTR_SECTION(".text.crt.libiberty") void
+NOTHROW_NCX(LIBCCALL libc_hex_init)(void) {
+	/* Nothing :) */
+	COMPILER_IMPURE();
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -1128,6 +1144,7 @@ DEFINE_PUBLIC_ALIAS(unlink_if_ordinary, libc_unlink_if_ordinary);
 DEFINE_PUBLIC_ALIAS(physmem_total, libc_physmem_total);
 DEFINE_PUBLIC_ALIAS(physmem_available, libc_physmem_available);
 DEFINE_PUBLIC_ALIAS(xcrc32, libc_xcrc32);
+DEFINE_PUBLIC_ALIAS(hex_init, libc_hex_init);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_LIBIBERTY_C */

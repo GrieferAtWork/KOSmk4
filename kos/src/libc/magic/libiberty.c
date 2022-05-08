@@ -63,6 +63,12 @@ typedef __FILE FILE;
 
 }
 
+%[declare_user_export("libiberty_optr")]
+%[declare_user_export("libiberty_nptr")]
+%[declare_user_export("libiberty_len")]
+%[declare_user_export("libiberty_concat_ptr")]
+%[declare_user_export("_hex_value")]
+
 %(auto_source){
 #ifndef __KERNEL__
 #include "../libc/globals.h"
@@ -80,6 +86,15 @@ DEFINE_PUBLIC_ALIAS(libiberty_nptr, libc_libiberty_nptr);
 DEFINE_PUBLIC_ALIAS(libiberty_len, libc_libiberty_len);
 DEFINE_PUBLIC_ALIAS(libiberty_concat_ptr, libc_libiberty_concat_ptr);
 #define libiberty_concat_ptr GET_NOREL_GLOBAL(libiberty_concat_ptr)
+
+#undef _hex_value
+DEFINE_PUBLIC_ALIAS(_hex_value, libc__hex_value);
+INTDEF unsigned char const libc__hex_value[256];
+INTERN_CONST ATTR_SECTION(".rodata.crt.libiberty")
+unsigned char const libc__hex_value[256] =
+#include <libc/template/_hex-values.h>
+;
+
 #endif /* !__KERNEL__ */
 }
 
@@ -1258,14 +1273,36 @@ __UINT32_TYPE__ xcrc32(__BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UIN
 
 
 %{
-#define _hex_array_size 256
-#define _hex_bad        99
-extern unsigned char const _hex_value[_hex_array_size];
-#define hex_value(c) ((unsigned int)_hex_value[(unsigned char)(c)])
-#define hex_p(c)     (hex_value(c) != _hex_bad)
+#define _hex_array_size 256 /* # of elements in `_hex_value' */
+#define _hex_bad        99  /* Returned by `hex_value()' for bad characters */
+
+/* Return integer values of hex character `ch', or `_hex_bad' if invalid. */
+#define hex_value(ch) ((unsigned int)_hex_value[(unsigned char)(ch)])
+
+/* Check if `ch' is a valid hex-character. */
+#define hex_p(ch) (hex_value(ch) != _hex_bad)
+
+/* >> _hex_value(3)
+ * Lookup array for characters -> hex values. */
+#ifndef _hex_value
+#ifdef __CRT_HAVE__hex_value
+__CSDECLARE2(,unsigned char const _hex_value[_hex_array_size],_hex_value)
+#define _hex_value _hex_value
+#else /* __CRT_HAVE__hex_value */
+#include <libc/template/_hex_value.h>
+#define _hex_value __LOCAL__hex_value
+#endif /* !__CRT_HAVE__hex_value */
+#endif /* !_hex_value */
+
 }
 
-void hex_init(void);
+
+@@>> hex_init(3)
+@@Initialize the `_hex_value' array (unless it was already statically initialized)
+void hex_init(void) {
+	/* Nothing :) */
+	COMPILER_IMPURE();
+}
 
 
 %{

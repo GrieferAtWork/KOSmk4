@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb1c2bf7 */
+/* HASH CRC-32:0xa77163c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,6 @@ INTDEF ATTR_NORETURN void (LIBCCALL libc_xmalloc_failed)(size_t num_bytes) THROW
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_fdmatch)(fd_t fd1, fd_t fd2);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_relative_prefix)(char const *a, char const *b, char const *c);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_make_relative_prefix_ignore_links)(char const *a, char const *b, char const *c);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_hex_init)(void);
 INTDEF char const *NOTHROW_NCX(LIBCCALL libc_pex_run)(struct pex_obj *obj, int flags, char const *executable, char *const *argv, char const *outname, char const *errname, int *err);
 INTDEF char const *NOTHROW_NCX(LIBCCALL libc_pex_run_in_environment)(struct pex_obj *obj, int flags, char const *executable, char *const *argv, char *const *env, char const *outname, char const *errname, int *err);
 INTDEF FILE *NOTHROW_NCX(LIBCCALL libc_pex_input_file)(struct pex_obj *obj, int flags, char const *in_name);

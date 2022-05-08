@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbddc618 */
+/* HASH CRC-32:0xc7eca23 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -273,6 +273,9 @@ INTDEF ATTR_PURE WUNUSED __UINT32_TYPE__ NOTHROW_NCX(LIBDCALL libd_xcrc32)(__BYT
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED __UINT32_TYPE__ NOTHROW_NCX(LIBCCALL libc_xcrc32)(__BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UINT32_TYPE__ crc);
+/* >> hex_init(3)
+ * Initialize the `_hex_value' array (unless it was already statically initialized) */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_hex_init)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF char const *NOTHROW_NCX(LIBDCALL libd_pex_run)(struct pex_obj *obj, int flags, char const *executable, char *const *argv, char const *outname, char const *errname, int *err);

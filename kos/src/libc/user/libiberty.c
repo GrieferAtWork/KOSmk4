@@ -128,15 +128,6 @@ NOTHROW_NCX(LIBCCALL libc_make_relative_prefix_ignore_links)(char const *a,
 
 
 
-/*[[[head:libc_hex_init,hash:CRC-32=0xd35a74f8]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") void
-NOTHROW_NCX(LIBCCALL libc_hex_init)(void)
-/*[[[body:libc_hex_init]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("hex_init"); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_hex_init]]]*/
 
 /*[[[head:libc_pex_run,hash:CRC-32=0x6cc02eb9]]]*/
 INTERN ATTR_SECTION(".text.crt.libiberty") char const *
@@ -371,13 +362,12 @@ NOTHROW_NCX(LIBCCALL libc_pwait)(int a,
 }
 /*[[[end:libc_pwait]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xcf8493b3]]]*/
+/*[[[start:exports,hash:CRC-32=0x696f1e20]]]*/
 DEFINE_PUBLIC_ALIAS(xmalloc_set_program_name, libc_xmalloc_set_program_name);
 DEFINE_PUBLIC_ALIAS(xmalloc_failed, libc_xmalloc_failed);
 DEFINE_PUBLIC_ALIAS(fdmatch, libc_fdmatch);
 DEFINE_PUBLIC_ALIAS(make_relative_prefix, libc_make_relative_prefix);
 DEFINE_PUBLIC_ALIAS(make_relative_prefix_ignore_links, libc_make_relative_prefix_ignore_links);
-DEFINE_PUBLIC_ALIAS(hex_init, libc_hex_init);
 DEFINE_PUBLIC_ALIAS(pex_run, libc_pex_run);
 DEFINE_PUBLIC_ALIAS(pex_run_in_environment, libc_pex_run_in_environment);
 DEFINE_PUBLIC_ALIAS(pex_input_file, libc_pex_input_file);

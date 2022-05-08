@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cc934d1 */
+/* HASH CRC-32:0x918aa277 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,6 +155,7 @@ err:
 	return temp;
 }
 #include <libc/template/itoa_digits.h>
+#include <libc/template/hex.h>
 /* >> format_escape(3)
  * Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -364,9 +365,7 @@ encode_hex:
 
 
 
-					if ((next_ch >= 'a' && next_ch <= 'f') ||
-					    (next_ch >= 'A' && next_ch <= 'F') ||
-					    (next_ch >= '0' && next_ch <= '9'))
+					if (__libc_ishexU(next_ch))
 						goto encode_uni;
 				}
 				if (ch <= 0xf) {
@@ -427,6 +426,7 @@ err:
 	return temp;
 }
 #include <libc/template/itoa_digits.h>
+#include <libc/template/hex.h>
 /* >> format_escape(3)
  * Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -636,9 +636,7 @@ encode_hex:
 
 					next_ch = (uint32_t)*new_text++;
 
-					if ((next_ch >= 'a' && next_ch <= 'f') ||
-					    (next_ch >= 'A' && next_ch <= 'F') ||
-					    (next_ch >= '0' && next_ch <= '9'))
+					if (__libc_ishexU(next_ch))
 						goto encode_uni;
 				}
 				if (ch <= 0xf) {

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x36c151f0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,49 +17,42 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_guid_fromstr_defined
-#define __local_guid_fromstr_defined
+#ifndef __LOCAL__hex_value
+#ifdef _hex_value
+#define __LOCAL__hex_value _hex_value
+#else /* _hex_value */
 #include <__crt.h>
-#include <libc/template/hex.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(guid_fromstr) __ATTR_NONNULL((1, 2)) char const *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(guid_fromstr))(char const __string[GUID_STRLEN], guid_t *__restrict __result) {
-	unsigned int __i;
-	for (__i = 0; __i < 16; ++__i) {
-		__BYTE_TYPE__ __nibbles[2];
-		unsigned int __j;
-
-		/* [05][4b][1d][ef]-[b2][ae]-[4d][99]-[a9][9c]-[54][b9][73][0c][3d][c3]
-		 *  0   1   2   3    4   5    6   7    8   9    10  11  12  13  14  15
-		 *
-		 * There are mandatory '-' characters before bytes: 4, 6, 8 and 10 */
-		if (!(__i & 1) && __i >= 4 && __i <= 10) {
-			if (*__string != '-')
-				goto __inval;
-			++__string;
-		}
-
-		/* Decode nibbles */
-		for (__j = 0; __j < 2; ++__j) {
-			char __ch = *__string++;
-			if (!__libc_hex2int(__ch, &__nibbles[__j]))
-				goto __inval;
-		}
-
-		/* Convert nibbles to byte */
-		__nibbles[0] <<= 4;
-		__nibbles[0] |= __nibbles[1];
-
-		/* Write byte to result GUID */
-		((__BYTE_TYPE__ *)__result)[__i] = __nibbles[0];
-	}
-	return __string;
-__inval:
-	return __NULLPTR;
+#include <hybrid/typecore.h>
+#ifdef _hex_value
+#define __LOCAL__hex_value _hex_value
+#else /* _hex_value */
+#ifdef __CRT_HAVE__hex_value
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT2(,unsigned char const __LOCAL__hex_value[256],__LOCAL__hex_value,_hex_value)
+#define __LOCAL__hex_value __LOCAL__hex_value
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE2(,unsigned char const _hex_value[256],_hex_value)
+#define _hex_value         _hex_value
+#define __LOCAL__hex_value _hex_value
+#endif /* __NO_COMPILER_SREDIRECT */
+#elif defined(__cplusplus)
+#define __LOCAL__hex_value (__LOCAL__hex_value_p())
+__ATTR_FORCEINLINE __ATTR_UNUSED __ATTR_VISIBILITY("hidden")
+unsigned char const *(__LOCAL__hex_value_p)(void) {
+	__ATTR_VISIBILITY("hidden")
+	static __LOCAL_LIBC_CONST_DATA_SECTION(_hex_value)
+	unsigned char const ___hex_value_p[256] =
+#include "_hex-values.h"
+	;
+	return ___hex_value_p;
 }
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_guid_fromstr_defined
-#define __local___localdep_guid_fromstr_defined
-#define __localdep_guid_fromstr __LIBC_LOCAL_NAME(guid_fromstr)
-#endif /* !__local___localdep_guid_fromstr_defined */
-#endif /* !__local_guid_fromstr_defined */
+#else /* ... */
+#define __LOCAL__hex_value _hex_value
+__LOCAL_LIBC_CONST_DATA(_hex_value)
+unsigned char const _hex_value[256] =
+#include "_hex-values.h"
+;
+#endif /* !... */
+#endif /* !_hex_value */
+#endif /* !_hex_value */
+#endif /* !__LOCAL__hex_value */

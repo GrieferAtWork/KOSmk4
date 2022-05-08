@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8c541d4 */
+/* HASH CRC-32:0x5c843b20 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -163,6 +163,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp,
 	return libc_inet_paton((char const **)&cp, inp, 0) && !*cp;
 }
 #include <hybrid/__byteswap.h>
+#include <libc/template/hex.h>
 /* >> inet_paton(3)
  * Same as `inet_aton()', but update `*pcp' to point past the address
  * Accepted notations are:
@@ -215,15 +216,8 @@ NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp,
 				for (;;) {
 					uint8_t digit;
 					ch = *cp;
-					if (ch >= '0' && ch <= '9') {
-						digit = (uint8_t)(ch - '0');
-					} else if (ch >= 'a' && ch <= 'f') {
-						digit = (uint8_t)(10 + ch - 'a');
-					} else if (ch >= 'A' && ch <= 'F') {
-						digit = (uint8_t)(10 + ch - 'A');
-					} else {
+					if (!__libc_hex2int(ch, &digit))
 						break;
-					}
 					new_part = part * 16;
 					new_part += digit;
 					if unlikely(new_part < part)

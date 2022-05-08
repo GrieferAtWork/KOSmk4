@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3494c84 */
+/* HASH CRC-32:0x24327fbc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1375,12 +1375,37 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__UINT32_TYPE__,__NOTHROW_NCX,xcrc32,(__BY
 #include <libc/local/libiberty/xcrc32.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(xcrc32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL xcrc32)(__BYTE_TYPE__ const *__buf, __STDC_INT_AS_SIZE_T __len, __UINT32_TYPE__ __crc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(xcrc32))(__buf, __len, __crc); })
 #endif /* !__CRT_HAVE_xcrc32 */
-#define _hex_array_size 256
-#define _hex_bad        99
-extern unsigned char const _hex_value[_hex_array_size];
-#define hex_value(c) ((unsigned int)_hex_value[(unsigned char)(c)])
-#define hex_p(c)     (hex_value(c) != _hex_bad)
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,hex_init,(void),())
+#define _hex_array_size 256 /* # of elements in `_hex_value' */
+#define _hex_bad        99  /* Returned by `hex_value()' for bad characters */
+
+/* Return integer values of hex character `ch', or `_hex_bad' if invalid. */
+#define hex_value(ch) ((unsigned int)_hex_value[(unsigned char)(ch)])
+
+/* Check if `ch' is a valid hex-character. */
+#define hex_p(ch) (hex_value(ch) != _hex_bad)
+
+/* >> _hex_value(3)
+ * Lookup array for characters -> hex values. */
+#ifndef _hex_value
+#ifdef __CRT_HAVE__hex_value
+__CSDECLARE2(,unsigned char const _hex_value[_hex_array_size],_hex_value)
+#define _hex_value _hex_value
+#else /* __CRT_HAVE__hex_value */
+#include <libc/template/_hex_value.h>
+#define _hex_value __LOCAL__hex_value
+#endif /* !__CRT_HAVE__hex_value */
+#endif /* !_hex_value */
+
+#ifdef __CRT_HAVE_hex_init
+/* >> hex_init(3)
+ * Initialize the `_hex_value' array (unless it was already statically initialized) */
+__CDECLARE_VOID(,__NOTHROW_NCX,hex_init,(void),())
+#else /* __CRT_HAVE_hex_init */
+#include <libc/local/libiberty/hex_init.h>
+/* >> hex_init(3)
+ * Initialize the `_hex_value' array (unless it was already statically initialized) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(hex_init, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL hex_init)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hex_init))(); })
+#endif /* !__CRT_HAVE_hex_init */
 
 
 #define PEX_RECORD_TIMES 0x1

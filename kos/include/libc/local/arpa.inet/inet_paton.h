@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3466e17 */
+/* HASH CRC-32:0x69c63b56 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <netinet/bits/in.h>
 #include <hybrid/__byteswap.h>
+#include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(inet_paton) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_paton))(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr) {
@@ -60,15 +61,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_paton))(char const **__restrict 
 				for (;;) {
 					__UINT8_TYPE__ __digit;
 					__ch = *__cp;
-					if (__ch >= '0' && __ch <= '9') {
-						__digit = (__UINT8_TYPE__)(__ch - '0');
-					} else if (__ch >= 'a' && __ch <= 'f') {
-						__digit = (__UINT8_TYPE__)(10 + __ch - 'a');
-					} else if (__ch >= 'A' && __ch <= 'F') {
-						__digit = (__UINT8_TYPE__)(10 + __ch - 'A');
-					} else {
+					if (!__libc_hex2int(__ch, &__digit))
 						break;
-					}
 					__new_part = __part * 16;
 					__new_part += __digit;
 					if __unlikely(__new_part < __part)
