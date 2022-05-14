@@ -21,6 +21,8 @@
 /* (#) Portability: Windows Kits (/ucrt/corecrt_wtime.h) */
 }
 
+%[define_decl_include("<bits/crt/tm.h>": ["struct tm"])]
+
 %[default:section(".text.crt.dos.wchar.time")]
 
 %[insert:prefix(

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0f039fb */
+/* HASH CRC-32:0xebe41ab7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_inotify_add_watch_at)
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_inotify_add_watch_at_defined
 #define __local___localdep_inotify_add_watch_at_defined

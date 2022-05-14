@@ -33,7 +33,10 @@
 /* (#) Portability: uClibc        (/include/sys/select.h) */
 }
 
-%[define_replacement(sigset_t   = "struct __sigset_struct")]
+%[define_decl_include_implication("<bits/os/sigset.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/sigset.h>": ["struct __sigset_struct"])]
+%[define_replacement(sigset_t = "struct __sigset_struct")]
+
 %[define_replacement(time_t     = "__TM_TYPE(time)")]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]

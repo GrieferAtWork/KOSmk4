@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x601b597f */
+/* HASH CRC-32:0x67ec48b3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3054,7 +3054,6 @@ NOTHROW_NCX(LIBCCALL libc__vsscanf_l)(char const *buf,
 	return libc__vsnscanf_l(buf, (size_t)-1, format, locale, args);
 }
 DEFINE_INTERN_ALIAS(libc__vsscanf_s_l, libc__vsscanf_l);
-#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsnscanf)(char const *buf,
                                      size_t bufsize,

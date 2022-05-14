@@ -22,6 +22,13 @@
 %[default:section(".text.crt{|.dos}.except.io.utility")]
 %[default:nodos]
 
+%[define_decl_include_implication("<bits/os/epoll.h>" => ["<bits/types.h>"])]
+%[define_decl_include("<bits/os/epoll.h>": ["union epoll_data", "struct epoll_event"])]
+
+%[define_decl_include_implication("<bits/os/sigset.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/sigset.h>": ["struct __sigset_struct"])]
+%[define_replacement(sigset_t = "struct __sigset_struct")]
+
 %[insert:prefix(
 #include <sys/epoll.h>
 )]%{
@@ -38,26 +45,26 @@ typedef struct __sigset_struct sigset_t;
 
 
 [[throws, doc_alias("epoll_create")]]
-[[wunused, decl_include("<features.h>")]]
+[[wunused, decl_include("<features.h>", "<bits/types.h>")]]
 $fd_t EPollCreate(__STDC_INT_AS_SIZE_T size);
 
 [[throws, doc_alias("epoll_create1")]]
-[[wunused, decl_include("<features.h>")]]
+[[wunused, decl_include("<features.h>", "<bits/types.h>")]]
 $fd_t EPollCreate1(__STDC_INT_AS_UINT_T flags);
 
 
 [[throws, doc_alias("epoll_ctl")]]
-[[decl_include("<bits/epoll.h>")]]
+[[decl_include("<bits/os/epoll.h>")]]
 void EPollCtl($fd_t epfd, __epoll_ctl_t op,
               $fd_t fd, struct epoll_event *event);
 
 [[cp, throws, doc_alias("epoll_wait")]]
-[[decl_include("<features.h>", "<bits/epoll.h>")]]
+[[decl_include("<features.h>", "<bits/os/epoll.h>")]]
 __STDC_UINT_AS_SIZE_T EPollWait($fd_t epfd, [[nonnull]] struct epoll_event *events,
                                 __STDC_UINT_AS_SIZE_T maxevents, int timeout);
 
 [[cp, throws, doc_alias("epoll_pwait")]]
-[[decl_include("<features.h>", "<bits/epoll.h>")]]
+[[decl_include("<features.h>", "<bits/os/epoll.h>")]]
 __STDC_UINT_AS_SIZE_T EPollPWait($fd_t epfd, [[nonnull]] struct epoll_event *events,
                                  __STDC_UINT_AS_SIZE_T maxevents, int timeout,
                                  sigset_t const *ss);
@@ -84,7 +91,7 @@ typedef __ATTR_NONNULL((1)) void
 }
 
 [[throws, doc_alias("epoll_rpc_exec")]]
-[[decl_include("<bits/epoll.h>")]]
+[[decl_include("<bits/os/epoll.h>")]]
 void EPollRpcExec($fd_t epfd, $fd_t fd,
                   [[nonnull]] struct epoll_event *event,
                   $pid_t target_tid, unsigned int mode,

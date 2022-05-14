@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd28a039b */
+/* HASH CRC-32:0xb5fef75a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,16 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep__get_mbbtype_l_defined && (__CRT_HAVE__mbctype || __CRT_HAVE___p__mbctype) */
 #if !defined(__local___localdep__mbctouni_l_defined) && defined(__CRT_HAVE__mbctouni_l)
 #define __local___localdep__mbctouni_l_defined
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__CHAR32_TYPE__,__NOTHROW_NCX,__localdep__mbctouni_l,(unsigned int __ch, __locale_t __locale),_mbctouni_l,(__ch,__locale))
 #endif /* !__local___localdep__mbctouni_l_defined && __CRT_HAVE__mbctouni_l */
 #if !defined(__local___localdep__unitombc_l_defined) && defined(__CRT_HAVE__unitombc_l)
 #define __local___localdep__unitombc_l_defined
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,__localdep__unitombc_l,(__CHAR32_TYPE__ __ch, __locale_t __locale),_unitombc_l,(__ch,__locale))
 #endif /* !__local___localdep__unitombc_l_defined && __CRT_HAVE__unitombc_l */
 __NAMESPACE_LOCAL_END

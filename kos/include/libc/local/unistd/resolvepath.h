@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70542368 */
+/* HASH CRC-32:0x57b447bd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_frealpathat) && defined(__AT_FDCWD)
+#include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_frealpathat_defined

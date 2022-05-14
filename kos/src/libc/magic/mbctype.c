@@ -165,8 +165,8 @@ int _getmbcp_l($locale_t locale) {
 %
 %/* KOS extension: convert a multi-byte character to/from unicode (UTF-32) */
 %#ifdef __USE_KOS
-[[pure, wunused]] $char32_t _mbctouni_l(unsigned int ch, $locale_t locale);
-[[pure, wunused]] unsigned int _unitombc_l($char32_t ch, $locale_t locale);
+[[pure, wunused, decl_include("<hybrid/typecore.h>")]] $char32_t _mbctouni_l(unsigned int ch, $locale_t locale);
+[[pure, wunused, decl_include("<hybrid/typecore.h>")]] unsigned int _unitombc_l($char32_t ch, $locale_t locale);
 %#endif /* __USE_KOS */
 
 

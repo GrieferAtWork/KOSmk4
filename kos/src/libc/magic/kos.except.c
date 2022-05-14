@@ -20,6 +20,9 @@
 %[default:section(".text.crt{|.dos}.except.io.utility")]
 %[default:nodos]
 
+%[define_decl_include_implication("<bits/os/siginfo.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/siginfo.h>": ["struct __siginfo_struct"])]
+
 %(auto_source){
 #include <errno.h>
 #include <signal.h>
@@ -913,7 +916,7 @@ for (local name: classes.keys.sorted()) {
 @@is returned.
 [[wunused, kernel, cc(LIBKCALL)]]
 [[decl_prefix(struct exception_data;)]]
-[[decl_prefix(struct __siginfo_struct;)]]
+[[decl_include("<bits/os/siginfo.h>")]]
 [[impl_include("<hybrid/host.h>")]]
 [[impl_include("<asm/os/siginfo.h>")]]
 [[impl_include("<asm/os/signal.h>")]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d34caa5 */
+/* HASH CRC-32:0x6b2a7240 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strsigcode_s_defined
 #define __local_strsigcode_s_defined
 #include <__crt.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strend_defined
 #define __local___localdep_strend_defined

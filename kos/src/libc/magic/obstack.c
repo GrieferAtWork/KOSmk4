@@ -29,6 +29,10 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.heap.obstack")]
 
+%[define_decl_include_implication("<bits/crt/obstack.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/crt/obstack.h>": ["struct obstack", "_OBSTACK_SIZE_T", "_CHUNK_SIZE_T"])]
+
+
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(

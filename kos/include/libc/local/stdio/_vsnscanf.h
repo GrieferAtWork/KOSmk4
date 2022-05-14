@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40115aef */
+/* HASH CRC-32:0x529224e3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local__vsnscanf_defined
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vsnscanf_l_defined
 #define __local___localdep__vsnscanf_l_defined
@@ -34,9 +35,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__vsnscanf_l __LIBC_LOCAL_NAME(_vsnscanf_l)
 #endif /* !__CRT_HAVE__vsnscanf_l */
 #endif /* !__local___localdep__vsnscanf_l_defined */
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_vsnscanf) __ATTR_WUNUSED __ATTR_LIBC_SCANF(3, 0) __ATTR_NONNULL((3)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnscanf))(char const *__buf, __SIZE_TYPE__ __bufsize, char const *__format, __builtin_va_list __args) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__vsnscanf_l)(__buf, __bufsize, __format, __NULLPTR, __args);

@@ -38,6 +38,9 @@
 /* (#) Portability: uClibc        (/include/sys/stat.h) */
 }
 
+%[define_decl_include_implication("<bits/os/stat.h>" => ["<bits/types.h>"])]
+%[define_decl_include("<bits/os/stat.h>": ["struct stat", "struct stat64"])]
+
 %[define_replacement(fd_t       = __fd_t)]
 %[define_replacement(atflag_t   = __atflag_t)]
 %[define_replacement(mode_t     = __mode_t)]
@@ -1004,18 +1007,22 @@ int _fstat64i32($fd_t fd, [[nonnull]] struct __dos_stat64i32 *__restrict buf);
 [[decl_prefix(struct __dos_stat64;), decl_include("<bits/types.h>")]]
 int _fstat64($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[wchar, decl_prefix(struct __dos_stat32;), export_alias("_wstat")]]
 int _wstat32([[nonnull]] $wchar_t const *filename,
              [[nonnull]] struct __dos_stat32 *buf);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[wchar, decl_prefix(struct __dos_stat64;), alias("_wstat64i32")]]
 int _wstat64([[nonnull]] $wchar_t const *filename,
              [[nonnull]] struct __dos_stat64 *buf);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[wchar, decl_prefix(struct __dos_stat32i64;), export_alias("_wstati64")]]
 int _wstat32i64([[nonnull]] $wchar_t const *filename,
                 [[nonnull]] struct __dos_stat32i64 *buf);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[wchar, decl_prefix(struct __dos_stat64i32;), alias("_wstat64")]]
 int _wstat64i32([[nonnull]] $wchar_t const *filename,
                 [[nonnull]] struct __dos_stat64i32 *buf);

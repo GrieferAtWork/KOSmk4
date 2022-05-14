@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34910e14 */
+/* HASH CRC-32:0x1902f87d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,14 +44,15 @@
 #include <asm/crt/pthreadvalues.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/setjmp.h>
+#include <bits/os/cpu_set.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
-#if 1 /* ??? */
+#ifdef __USE_GLIBC
 #include <endian.h>
 #include <sched.h>
 #include <time.h>
-#endif
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
@@ -922,6 +923,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstack, __FORCELOCAL __ATTR_ARTIF
 #endif /* ... */
 #endif /* __USE_XOPEN2K */
 #ifdef __USE_GNU
+#ifndef __cpu_set_t_defined
+#define __cpu_set_t_defined
+typedef struct __cpu_set_struct cpu_set_t;
+#endif /* !__cpu_set_t_defined */
 /* >> pthread_attr_setaffinity_np(3)
  * Thread  created with attribute `attr' will be limited
  * to run only on the processors represented in `cpuset'

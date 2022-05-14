@@ -68,13 +68,13 @@ __SYSDECL_BEGIN
 @@stdout,   and  stderr.  Afterwards,  `fd'  is  closed.
 @@@return: 0 : Success
 @@@return: * : Error
-[[guard, cp_kos, section(".text.crt{|.dos}.io.tty")]]
-[[impl_include("<asm/os/tty.h>")]]
-[[impl_include("<asm/os/stdio.h>")]]
+[[guard, cp_kos, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires(defined(@__TIOCSCTTY@) && $has_function(ioctl) &&
            $has_function(setsid) && $has_function(dup2) &&
            $has_function(close))]]
+[[impl_include("<asm/os/tty.h>", "<asm/os/stdio.h>")]]
+[[section(".text.crt{|.dos}.io.tty")]]
 int login_tty($fd_t fd) {
 	if unlikely(setsid() < 0)
 		goto err;

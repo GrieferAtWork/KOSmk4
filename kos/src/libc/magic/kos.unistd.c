@@ -93,7 +93,8 @@ void Execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, 
 }
 
 
-[[throws, doc_alias("pipe"), section(".text.crt{|.dos}.except.io.access")]]
+[[throws, doc_alias("pipe"), decl_include("<bits/types.h>")]]
+[[section(".text.crt{|.dos}.except.io.access")]]
 void Pipe([[nonnull]] $fd_t pipedes[2]);
 
 

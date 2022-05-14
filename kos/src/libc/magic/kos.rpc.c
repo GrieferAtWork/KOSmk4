@@ -160,7 +160,7 @@ typedef __ATTR_NONNULL((1)) void
 @@                            still many  reasons outside  of your  control
 @@                            for why  it may  terminate immediately  after
 @@                            the RPC program finished.
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 int rpc_schedule($pid_t target_tid, unsigned int mode,
                  [[nonnull]] void const *program,
                  [[inp_opt(max_param_count)]] void const *const *params,
@@ -202,7 +202,7 @@ int rpc_schedule($pid_t target_tid, unsigned int mode,
 @@                            still many  reasons outside  of your  control
 @@                            for why  it may  terminate immediately  after
 @@                            the RPC program finished.
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 int rpc_exec($pid_t target_tid, unsigned int mode,
              [[nonnull]] prpc_exec_callback_t func, void *cookie);
 
@@ -233,7 +233,7 @@ int rpc_exec($pid_t target_tid, unsigned int mode,
 @@                           still many  reasons outside  of your  control
 @@                           for why  it may  terminate immediately  after
 @@                           the RPC program finished.
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 int rpc_interrupt($pid_t target_tid, unsigned int mode);
 
 
@@ -244,17 +244,17 @@ int rpc_interrupt($pid_t target_tid, unsigned int mode);
 /* Exception-enabled version of the above API                           */
 /************************************************************************/
 
-[[cp, throws, doc_alias("rpc_schedule")]]
+[[cp, throws, doc_alias("rpc_schedule"), decl_include("<bits/types.h>")]]
 void RpcSchedule($pid_t target_tid, unsigned int mode,
                  [[nonnull]] void const *program,
                  [[inp_opt(max_param_count)]] void const *const *params,
                  $size_t max_param_count);
 
-[[cp, throws, doc_alias("rpc_exec")]]
+[[cp, throws, doc_alias("rpc_exec"), decl_include("<bits/types.h>")]]
 void RpcExec($pid_t target_tid, unsigned int mode,
              [[nonnull]] prpc_exec_callback_t func, void *cookie);
 
-[[cp, throws, doc_alias("rpc_interrupt")]]
+[[cp, throws, doc_alias("rpc_interrupt"), decl_include("<bits/types.h>")]]
 void RpcInterrupt($pid_t target_tid, unsigned int mode);
 
 

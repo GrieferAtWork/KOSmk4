@@ -40,6 +40,7 @@ __SYSDECL_BEGIN
 
 %[define_str2wcs_replacement(system = wsystem)]
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[cp, guard, wchar, dos_export_alias("_wsystem")]]
 [[section(".text.crt{|.dos}.wchar.fs.exec.system")]]
 [[requires_function(system, convert_wcstombs)]]
@@ -64,11 +65,12 @@ int wsystem([[nullable]] wchar_t const *cmd) {
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 %[define_str2wcs_replacement(realpath = wrealpath)]
 
-[[wchar, cp, wunused, section(".text.crt{|.dos}.wchar.fs.property")]]
+[[wchar, cp, wunused, decl_include("<hybrid/typecore.h>")]]
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wfrealpathat)) ||
            $has_function(realpath, convert_wcstombs, convert_mbstowcs))]]
 [[impl_include("<asm/os/fcntl.h>", "<asm/os/limits.h>", "<libc/errno.h>")]]
+[[section(".text.crt{|.dos}.wchar.fs.property")]]
 wchar_t *wrealpath([[nonnull]] wchar_t const *filename, wchar_t *resolved) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wfrealpathat)@@
 @@pp_if   defined(__PATH_MAX)   &&   __PATH_MAX   !=    -1@@
@@ -256,13 +258,13 @@ wchar_t *wfrealpathat($fd_t dirfd, [[nonnull]] wchar_t const *filename,
 }
 
 %[default:section(".text.crt{|.dos}.wchar.unicode.static.convert")]
-[[wchar, pure, wunused, dos_export_alias("_wtoi")]]
+[[wchar, pure, wunused, dos_export_alias("_wtoi"), decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("wtol", "_wtol")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_wtoi64")]]
 int wtoi([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atoi"))}
 
-[[wchar, pure, wunused, dos_export_alias("_wtol")]]
+[[wchar, pure, wunused, dos_export_alias("_wtol"), decl_include("<hybrid/typecore.h>")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, wtoi)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_wtoi")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]]
@@ -270,7 +272,7 @@ int wtoi([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atoi"))}
 long wtol([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atol"))}
 
 %#ifdef __LONGLONG
-[[wchar, pure, wunused, dos_export_alias("_wtoll")]]
+[[wchar, pure, wunused, dos_export_alias("_wtoll"), decl_include("<hybrid/typecore.h>")]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, "wtoi")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias("_wtoi")]]
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, "wtol")]]

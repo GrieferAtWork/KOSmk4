@@ -1459,7 +1459,7 @@ strfry:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 @@>> memfrob(3)
 @@Xor every byte in `buf...+=num_bytes' with decimal `42' (yeah...)
 @@Always re-return the given `buf'
-[[leaf, impl_include("<hybrid/typecore.h>")]]
+[[leaf, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 memfrob:([[nonnull]] void *buf, $size_t num_bytes) -> [[== buf]] void * {
 	byte_t *iter = (byte_t *)buf;
 	while (num_bytes--)
@@ -7318,7 +7318,7 @@ memrevq:([[nonnull]] void *__restrict base, $size_t n_qwords) -> [[== base]] $ui
 @@> char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
 @@> *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
 @@> return strcmp(lhs, dup);
-[[kernel, pure, wunused]]
+[[kernel, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 int strcmpz([[nonnull]] char const *lhs,
             [[nonnull]] char const *rhs, size_t rhs_len) {
 	char c1, c2;
@@ -7368,7 +7368,7 @@ int strstartcmp([[nonnull]] char const *str,
 @@>> strstartcmpz(3)
 @@Compare the first `strnlen(str, startswith_len)' characters of
 @@`str' with  `startswith', returning  the  usual >0,  <0,  ==0.
-[[kernel, pure, wunused]]
+[[kernel, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 int strstartcmpz([[nonnull]] char const *str,
                  [[nonnull]] char const *startswith,
                  size_t startswith_len) {
@@ -7596,7 +7596,7 @@ strrev:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	return 0;
 }
 
-[[guard, inline, nocrt, pure, wunused]]
+[[guard, inline, nocrt, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 $size_t strnlen_s([[nullable]] char const *str, $size_t maxlen) {
 	return str ? strnlen(str, maxlen) : 0;
 }
@@ -8278,7 +8278,7 @@ void strmode($mode_t mode, [[nonnull]] char p[12]) {
 @@@return: != 0: Memory blocks are non-equal.
 [[nocrt, no_crt_self_import, wunused/*, pure*/]]
 [[alias("timingsafe_bcmp", "timingsafe_memcmp")]]
-[[bind_local_function(timingsafe_memcmp)]]
+[[bind_local_function(timingsafe_memcmp), decl_include("<hybrid/typecore.h>")]]
 int timingsafe_bcmp([[nonnull]] void const *s1,
                     [[nonnull]] void const *s2, size_t n_bytes);
 
@@ -8289,7 +8289,7 @@ int timingsafe_bcmp([[nonnull]] void const *s1,
 @@@return: >  0: Block `s1' should be considered greater than `s2'
 [[section(".text.crt{|.dos}.bsd"), wunused/*, pure*/]]
 [[impl_include("<hybrid/typecore.h>"), export_as("timingsafe_bcmp")]]
-[[impl_include("<asm/signed-shift.h>")]]
+[[impl_include("<asm/signed-shift.h>"), decl_include("<hybrid/typecore.h>")]]
 int timingsafe_memcmp([[nonnull]] void const *s1,
                       [[nonnull]] void const *s2, size_t n_bytes) {
 	int result = 0, finished = 0;
@@ -8366,6 +8366,7 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 @@Return the signal number for a given name.
 @@e.g.: `strtosigno("SIGINT") == SIGINT'
 @@When `name' isn't recognized, return `0' instead.
+[[decl_include("<bits/types.h>")]]
 [[pure, wunused, impl_include("<asm/os/signal.h>")]]
 [[guard, requires_function(signalnumber, isupper)]]
 $signo_t strtosigno([[nonnull]] const char *name) {
@@ -8431,6 +8432,7 @@ char *stresep([[nonnull]] char **__restrict stringp,
 @@Compare `s1...+=n_bytes' with `s2...+=n_bytes' in constant, armored `O(n_bytes)'-time
 @@@return: == 0: Memory blocks are non-equal.
 @@@return: != 0: Memory blocks are equal.
+[[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.bsd"), wunused/*, pure*/]]
 int consttime_memequal([[nonnull]] void const *s1,
                        [[nonnull]] void const *s2, size_t n_bytes) {
@@ -8446,6 +8448,7 @@ int consttime_memequal([[nonnull]] void const *s1,
 @@faulty memory access is handled by returning `-1' with `errno=EFAULT'
 @@@return: 0 : Success
 @@@return: -1: [errno=EFAULT] Faulty memory access
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires(defined(__KOS__) && defined(__cplusplus) && $has_function(except_nesting_begin, except_nesting_end))]]
 [[impl_include("<kos/except.h>", "<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.solaris")]]
@@ -8470,6 +8473,7 @@ int uucopy(void const *__restrict src, void *__restrict dst, size_t num_bytes) {
 @@@return: * : The number of copied characters (including trialing NUL; )
 @@@return: -1: [errno=EFAULT]       Faulty memory access
 @@@return: -1: [errno=ENAMETOOLONG] `strlen(src) >= maxlen'
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[requires(defined(__KOS__) && defined(__cplusplus) && $has_function(except_nesting_begin, except_nesting_end))]]
 [[impl_include("<kos/except.h>", "<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.solaris")]]

@@ -263,6 +263,7 @@ struct group_filter {
 }
 
 %[default:section(".text.crt{|.dos}.net.convert")]
+[[decl_include("<hybrid/typecore.h>")]]
 [[guard, const, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
 [[if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohs")]]
 [[export_alias("__htons")]]
@@ -271,6 +272,7 @@ $uint16_t htons($uint16_t hostword) {
 	return ($uint16_t)__hybrid_htobe32(hostword);
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[guard, const, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
 [[alt_variant_of($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH), htons)]]
 [[export_alias("__ntohs")]]
@@ -279,6 +281,7 @@ $uint16_t ntohs($uint16_t netshort) {
 	return ($uint16_t)__hybrid_betoh16(netshort);
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[guard, const, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
 [[if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohl")]]
 [[export_alias("__htonl")]]
@@ -287,6 +290,7 @@ $uint32_t htonl($uint32_t hostlong) {
 	return ($uint32_t)__hybrid_htobe32(hostlong);
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[guard, const, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
 [[alt_variant_of($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH), htonl)]]
 [[export_alias("__ntohl")]]
@@ -296,12 +300,14 @@ $uint32_t ntohl($uint32_t netlong) {
 }
 
 %#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
+[[decl_include("<hybrid/typecore.h>")]]
 [[const, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
 [[if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohq")]]
 $uint64_t htonq($uint64_t hostquad) {
 	return ($uint64_t)__hybrid_htobe64(hostquad);
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[const, impl_include("<hybrid/__byteswap.h>"), extern_inline]]
 [[alt_variant_of($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH), htonq)]]
 $uint64_t ntohq($uint64_t netquad) {
@@ -404,8 +410,8 @@ $uint64_t ntohq($uint64_t netquad) {
 
 %
 %#ifdef __USE_MISC
-[[cp]] int bindresvport($fd_t sockfd, struct sockaddr_in *sock_in);
-[[cp]] int bindresvport6($fd_t sockfd, struct sockaddr_in6 *sock_in);
+[[cp, decl_include("<bits/types.h>")]] int bindresvport($fd_t sockfd, struct sockaddr_in *sock_in);
+[[cp, decl_include("<bits/types.h>")]] int bindresvport6($fd_t sockfd, struct sockaddr_in6 *sock_in);
 %#endif /* __USE_MISC */
 
 %
@@ -448,51 +454,51 @@ int inet6_option_space(int nbytes);
 [[cp_kos, deprecated, doc_alias("inet6_option_space")]]
 int inet6_option_init(void *bp, struct cmsghdr **cmsgp, int type);
 
-[[cp_kos, deprecated, doc_alias("inet6_option_space")]]
+[[cp_kos, deprecated, doc_alias("inet6_option_space"), decl_include("<hybrid/typecore.h>")]]
 int inet6_option_append(struct cmsghdr *cmsg, $uint8_t const *typep, int multx, int plusy);
 
-[[cp_kos, deprecated, doc_alias("inet6_option_space")]]
+[[cp_kos, deprecated, doc_alias("inet6_option_space"), decl_include("<hybrid/typecore.h>")]]
 $uint8_t *inet6_option_alloc(struct cmsghdr *cmsg, int datalen, int multx, int plusy);
 
-[[cp_kos, deprecated, doc_alias("inet6_option_space")]]
+[[cp_kos, deprecated, doc_alias("inet6_option_space"), decl_include("<hybrid/typecore.h>")]]
 int inet6_option_next(struct cmsghdr const *cmsg, $uint8_t **tptrp);
 
-[[cp_kos, deprecated, doc_alias("inet6_option_space")]]
+[[cp_kos, deprecated, doc_alias("inet6_option_space"), decl_include("<hybrid/typecore.h>")]]
 int inet6_option_find(struct cmsghdr const *cmsg, $uint8_t **tptrp, int type);
 
 
 %[default:section(".text.crt{|.dos}.net.inet.6.RFC_3542")]
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/types.h>")]]
 int inet6_opt_init(void *extbuf, socklen_t extlen);
 
-[[cp_kos, doc_alias("inet6_opt_init")]]
+[[cp_kos, doc_alias("inet6_opt_init"), decl_include("<bits/types.h>")]]
 int inet6_opt_append(void *extbuf, socklen_t extlen, int offset, $uint8_t type,
                      socklen_t len, $uint8_t align, void **databufp);
 
-[[cp_kos, doc_alias("inet6_opt_init")]]
+[[cp_kos, doc_alias("inet6_opt_init"), decl_include("<bits/types.h>")]]
 int inet6_opt_finish(void *extbuf, socklen_t extlen, int offset);
 
-[[cp_kos, doc_alias("inet6_opt_init")]]
+[[cp_kos, doc_alias("inet6_opt_init"), decl_include("<bits/types.h>")]]
 int inet6_opt_set_val(void *databuf, int offset, void *val, socklen_t vallen);
 
-[[cp_kos, doc_alias("inet6_opt_init")]]
+[[cp_kos, doc_alias("inet6_opt_init"), decl_include("<bits/types.h>")]]
 int inet6_opt_next(void *extbuf, socklen_t extlen, int offset,
                    $uint8_t *typep, socklen_t *lenp, void **databufp);
 
-[[cp_kos, doc_alias("inet6_opt_init")]]
+[[cp_kos, doc_alias("inet6_opt_init"), decl_include("<bits/types.h>")]]
 int inet6_opt_find(void *extbuf, socklen_t extlen, int offset,
                    $uint8_t type, socklen_t *lenp, void **databufp);
 
-[[cp_kos, doc_alias("inet6_opt_init")]]
+[[cp_kos, doc_alias("inet6_opt_init"), decl_include("<bits/types.h>")]]
 int inet6_opt_get_val(void *databuf, int offset, void *val, socklen_t vallen);
 
 
 %[default:section(".text.crt{|.dos}.net.inet.6.RFC_3542")]
 
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/types.h>")]]
 socklen_t inet6_rth_space(int type, int segments);
 
-[[cp_kos, doc_alias("inet6_rth_space")]]
+[[cp_kos, doc_alias("inet6_rth_space"), decl_include("<bits/types.h>")]]
 void *inet6_rth_init(void *bp, socklen_t bp_len, int type, int segments);
 
 [[cp_kos, doc_alias("inet6_rth_space")]]
@@ -509,25 +515,25 @@ struct in6_addr *inet6_rth_getaddr(void const *bp, int index);
 
 %[default:section(".text.crt{|.dos}.net.inet.6.ipv4_source_filter")]
 
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/types.h>")]]
 int getipv4sourcefilter($fd_t sockfd, struct in_addr interface_addr,
                         struct in_addr group, $uint32_t *fmode,
                         $uint32_t *numsrc, struct in_addr *slist);
 
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/types.h>")]]
 int setipv4sourcefilter($fd_t sockfd, struct in_addr interface_addr,
                         struct in_addr group, $uint32_t fmode,
                         $uint32_t numsrc, struct in_addr const *slist);
 
 %[default:section(".text.crt{|.dos}.net.inet.6.source_filter")]
 
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/types.h>")]]
 int getsourcefilter($fd_t sockfd, $uint32_t interface_addr,
                     struct sockaddr const *group, socklen_t grouplen,
                     $uint32_t *fmode, $uint32_t *numsrc,
                     struct sockaddr_storage *slist);
 
-[[cp_kos]]
+[[cp_kos, decl_include("<bits/types.h>")]]
 int setsourcefilter($fd_t sockfd, $uint32_t interface_addr,
                     struct sockaddr const *group, socklen_t grouplen,
                     $uint32_t fmode, $uint32_t numsrc,

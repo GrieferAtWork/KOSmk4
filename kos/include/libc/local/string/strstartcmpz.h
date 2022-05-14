@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x672c2007 */
+/* HASH CRC-32:0xb264fec7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strstartcmpz_defined
 #define __local_strstartcmpz_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strstartcmpz) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strstartcmpz))(char const *__str, char const *__startswith, __SIZE_TYPE__ __startswith_len) {

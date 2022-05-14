@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5de9c88 */
+/* HASH CRC-32:0xf0965636 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,10 @@
 #ifndef __local_c32toll_defined
 #define __local_c32toll_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32sto32_defined
 #define __local___localdep_c32sto32_defined
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_wcstol) && __SIZEOF_LONG__ == 4 && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -91,9 +89,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_c32sto32_defined */
 #ifndef __local___localdep_c32sto64_defined
 #define __local___localdep_c32sto64_defined
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_wcstol) && __SIZEOF_LONG__ == 8 && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -166,9 +161,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32sto64 __LIBC_LOCAL_NAME(c32sto64)
 #endif /* !... */
 #endif /* !__local___localdep_c32sto64_defined */
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32toll) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32toll))(__CHAR32_TYPE__ const *__nptr) {
 #if __SIZEOF_LONG_LONG__ <= 4

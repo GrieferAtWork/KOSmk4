@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x348bb5b5 */
+/* HASH CRC-32:0xd68bb00a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_except_as_signal_defined
 #include <__crt.h>
 struct exception_data;
-struct __siginfo_struct;
+#include <bits/os/siginfo.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_bzero_defined
 #define __local___localdep_bzero_defined
@@ -66,7 +66,6 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>
 #include <asm/os/siginfo.h>
 #include <asm/os/signal.h>
-#include <bits/os/siginfo.h>
 #include <kos/bits/exception_data.h>
 #include <kos/except/codes.h>
 #include <kos/kernel/handle.h>

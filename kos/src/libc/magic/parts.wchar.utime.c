@@ -24,6 +24,10 @@
 %[define_replacement(utimbuf64 = __utimbuf64)]
 %[default:section(".text.crt{|.dos}.wchar.fs.modify_time")]
 
+%[define_decl_include("<bits/os/utimbuf.h>": [
+	"struct utimbuf", "struct utimbuf32", "struct utimbuf64"
+])]
+
 %[insert:prefix(
 #include <features.h>
 )]%{
@@ -43,10 +47,12 @@ __SYSDECL_BEGIN
 
 }
 
+[[decl_include("<hybrid/typecore.h>", "<bits/os/utimbuf.h>")]]
 [[cp, wchar, ignore, nocrt, alias("wutime", "_wutime", "_wutime32")]]
 int crt_wutime32([[nonnull]] $wchar_t const *file,
                  [[nullable]] struct $utimbuf32 const *file_times);
 
+[[decl_include("<hybrid/typecore.h>", "<bits/os/utimbuf.h>")]]
 [[cp, wchar, ignore, nocrt, alias("wutime64", "_wutime64")]]
 int crt_wutime64([[nonnull]] $wchar_t const *file,
                  [[nullable]] struct $utimbuf64 const *file_times);
@@ -57,6 +63,7 @@ int crt_wutime64([[nonnull]] $wchar_t const *file,
 [[ignore]] crt_c32utime64(*) %{uchar32("crt_wutime64")}
 
 
+[[decl_include("<hybrid/typecore.h>", "<bits/os/utimbuf.h>")]]
 [[cp, wchar, no_crt_self_import, dos_export_alias("_wutime", "_wutime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("wutime", "_wutime", "_wutime32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("wutime64", "_wutime64")]]
@@ -107,6 +114,7 @@ int wutime([[nonnull]] wchar_t const *file,
 %
 %#ifdef __USE_TIME64
 
+[[decl_include("<hybrid/typecore.h>", "<bits/os/utimbuf.h>")]]
 [[preferred_time64_variant_of(wutime), doc_alias("wutime")]]
 [[cp, wchar, dos_export_alias("_wutime64")]]
 [[requires($has_function(utime64, convert_wcstombs) ||

@@ -22,6 +22,13 @@
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 %[default:section(".text.crt{|.dos}.wchar.string.format")]
 
+%[define_decl_include_implication("<bits/crt/uformat-printer.h>" => [
+	"<hybrid/typecore.h>",
+	"<bits/crt/format-printer.h>",
+	"<bits/crt/wformat-printer.h>",
+])]
+
+
 %[insert:prefix(
 #include <features.h>
 )]%{

@@ -831,7 +831,7 @@ enum __ptrace_peeksiginfo_flags {
 
 }
 
-[[vartypes($pid_t, void *, void *)]]
+[[vartypes($pid_t, void *, void *), decl_include("<hybrid/typecore.h>")]]
 $longptr_t ptrace(__ptrace_request_t request, ...
                   /* pid_t pid, void *addr, void *data */);
 

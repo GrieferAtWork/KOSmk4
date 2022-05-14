@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbf30aae */
+/* HASH CRC-32:0xab4f1f72 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,13 @@
 #define __local__mbsnbset_s_l_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE__mbsnbset_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
-#include <hybrid/typecore.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsnbset_l_defined
 #define __local___localdep__mbsnbset_l_defined
 #ifdef __CRT_HAVE__mbsnbset_l
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,__localdep__mbsnbset_l,(unsigned char *__buf, unsigned int __ch, __SIZE_TYPE__ __max_bytes, __locale_t __locale),_mbsnbset_l,(__buf,__ch,__max_bytes,__locale))
 #elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
@@ -43,10 +43,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strnlen_defined
 #define __local___localdep_strnlen_defined
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),strnlen,{ return __builtin_strnlen(__str, __maxlen); })
 #elif defined(__CRT_HAVE_strnlen)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),strnlen,(__str,__maxlen))
 #elif defined(__CRT_HAVE___strncnt)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),__strncnt,(__str,__maxlen))
 #else /* ... */
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd03d1d18 */
+/* HASH CRC-32:0xfb4f53ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,6 +65,9 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #ifndef __local___localdep_xrealloc_defined
 #define __local___localdep_xrealloc_defined
 #ifdef __CRT_HAVE_xrealloc
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_xrealloc,(void *__ptr, __SIZE_TYPE__ __num_bytes),xrealloc,(__ptr,__num_bytes))
 #elif defined(__CRT_HAVE_xmalloc_failed)
 __NAMESPACE_LOCAL_END

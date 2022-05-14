@@ -55,6 +55,12 @@ typedef __FILE FILE;
 
 }
 
+%[define_decl_include([
+	"struct partition_elem",
+	"struct partition_def",
+] = "<bits/crt/partition.h>")]
+
+
 @@>> partition_new(3)
 @@Create a new partition for `num_elements' elements.
 @@ - Uses `xmalloc(3)', so never returns `NULL'!

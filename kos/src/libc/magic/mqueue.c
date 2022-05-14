@@ -32,6 +32,8 @@
 
 %[default:section(".text.crt{|.dos}.utility.mqueue")]
 
+%[define_decl_include("<bits/os/sigevent.h>": ["struct sigevent"])]
+
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
@@ -60,6 +62,11 @@ typedef struct sigevent sigevent_t;
 typedef __mqd_t mqd_t;
 
 }
+
+%[define_decl_include_implication("<bits/os/mqueue.h>" => ["<bits/types.h>"])]
+%[define_decl_include("<bits/os/mqueue.h>": ["__mqd_t", "struct mq_attr"])]
+%[define_decl_include("<bits/os/sigevent.h>": ["struct sigevent"])]
+
 %[define_type_class(__mqd_t = "TD")]
 %[define_replacement(mqd_t = __mqd_t)]
 %[define_replacement(mq_attr = mq_attr)]
@@ -67,7 +74,7 @@ typedef __mqd_t mqd_t;
 
 @@>> mq_open(3)
 [[cp, wunused, vartypes($mode_t)]]
-[[decl_include("<bits/os/mqueue.h>", "<bits/types.h>")]]
+[[decl_include("<bits/os/mqueue.h>")]]
 mqd_t mq_open([[nonnull]] char const *__restrict name,
               $oflag_t oflags, ...);
 

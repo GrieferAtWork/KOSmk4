@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0ff3377 */
+/* HASH CRC-32:0xa4b59487 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local__sc16printf_defined
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vsc16printf_defined
 #define __local___localdep__vsc16printf_defined

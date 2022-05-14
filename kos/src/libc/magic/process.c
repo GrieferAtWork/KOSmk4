@@ -235,44 +235,44 @@ int _execvpe([[nonnull]] char const *__restrict file,
 
 %[insert:function(_cwait = cwait)]
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 intptr_t _spawnv(__STDC_INT_AS_UINT_T mode,
                  [[nonnull]] char const *__restrict path,
                  [[nonnull]] char const *const *___argv) = spawnv;
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 intptr_t _spawnvp(__STDC_INT_AS_UINT_T mode,
                   [[nonnull]] char const *__restrict file,
                   [[nonnull]] char const *const *___argv) = spawnvp;
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 intptr_t _spawnve(__STDC_INT_AS_UINT_T mode,
                   [[nonnull]] char const *__restrict path,
                   [[nonnull]] char const *const *___argv,
                   [[nonnull]] char const *const *___envp) = spawnve;
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 intptr_t _spawnvpe(__STDC_INT_AS_UINT_T mode,
                    [[nonnull]] char const *__restrict file,
                    [[nonnull]] char const *const *___argv,
                    [[nonnull]] char const *const *___envp) = spawnvpe;
 
-[[ATTR_SENTINEL, decl_include("<features.h>", "<bits/types.h>")]]
+[[ATTR_SENTINEL, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 intptr_t _spawnl(__STDC_INT_AS_UINT_T mode,
                  [[nonnull]] char const *__restrict path,
                  char const *args, ... /*, (char *)NULL*/) = spawnl;
 
-[[ATTR_SENTINEL, decl_include("<features.h>", "<bits/types.h>")]]
+[[ATTR_SENTINEL, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 intptr_t _spawnlp(__STDC_INT_AS_UINT_T mode,
                   [[nonnull]] char const *__restrict file,
                   char const *args, ... /*, (char *)NULL*/) = spawnlp;
 
-[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<bits/types.h>")]]
+[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 intptr_t _spawnle(__STDC_INT_AS_UINT_T mode,
                   [[nonnull]] char const *__restrict path,
                   char const *args, ... /*, (char *)NULL, (char **)environ*/) = spawnle;
 
-[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<bits/types.h>")]]
+[[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 intptr_t _spawnlpe(__STDC_INT_AS_UINT_T mode,
                    [[nonnull]] char const *__restrict file,
                    char const *args, ... /*, (char *)NULL, (char **)environ*/) = spawnlpe;

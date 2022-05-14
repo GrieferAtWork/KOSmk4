@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5eb229a */
+/* HASH CRC-32:0xeea99926 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_nanosleep32_defined
 #define __local___localdep_nanosleep32_defined
 #ifdef __CRT_HAVE_nanosleep
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct timespec const *__requested_time, struct __timespec32 *__remaining),nanosleep,(__requested_time,__remaining))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct __timespec32 const *__requested_time, struct __timespec32 *__remaining),nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___nanosleep)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct timespec const *__requested_time, struct __timespec32 *__remaining),__nanosleep,(__requested_time,__remaining))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct __timespec32 const *__requested_time, struct __timespec32 *__remaining),__nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___libc_nanosleep)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct timespec const *__requested_time, struct __timespec32 *__remaining),__libc_nanosleep,(__requested_time,__remaining))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct __timespec32 const *__requested_time, struct __timespec32 *__remaining),__libc_nanosleep,(__requested_time,__remaining))
 #else /* ... */
 #undef __local___localdep_nanosleep32_defined
 #endif /* !... */

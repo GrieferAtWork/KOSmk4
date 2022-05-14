@@ -29,6 +29,10 @@
 
 %[default:section(".text.crt{|.dos}.utility.aio")]
 
+%[define_decl_include_implication("<bits/crt/aiocb.h>" => ["<bits/os/sigevent.h>", "<bits/types.h>"])]
+%[define_decl_include("<bits/crt/aiocb.h>": ["struct aiocb", "struct __aiocb64"])]
+%[define_decl_include("<bits/os/sigevent.h>": ["struct sigevent"])]
+
 %[insert:prefix(
 #include <features.h>
 )]%{
@@ -222,7 +226,7 @@ int aio_write([[nonnull]] struct aiocb *self);
 @@@return: -1: [errno=EAGAIN] Insufficient resources  (read:  `ENOMEM',  but  posix
 @@                            didn't want to use that errno for whatever reason...)
 @@@return: -1: [errno=EINVAL] `operation' was invalid
-[[decl_include("<bits/types.h>", "<bits/crt/aiocb.h>"), no_crt_self_import]]
+[[decl_include("<bits/crt/aiocb.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("aio_fsync")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("aio_fsync64")]]
 int aio_fsync($oflag_t operation, [[nonnull]] struct aiocb *self);
@@ -375,7 +379,8 @@ int aio_read64([[nonnull]] struct aiocb64 *self);
 [[decl_include("<bits/crt/aiocb.h>"), doc_alias("aio_write")]]
 int aio_write64([[nonnull]] struct aiocb64 *self);
 
-[[preferred_off64_variant_of(aio_fsync), doc_alias("aio_fsync")]]
+[[preferred_off64_variant_of(aio_fsync)]]
+[[decl_include("<bits/crt/aiocb.h>"), doc_alias("aio_fsync")]]
 int aio_fsync64(int operation, [[nonnull]] struct aiocb64 *self);
 
 [[preferred_off64_variant_of(lio_listio), doc_alias("lio_listio")]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1998c8f5 */
+/* HASH CRC-32:0x5d88ad82 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,9 +22,13 @@
 #define __local_inotify_init_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_inotify_init1
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_inotify_init1_defined
 #define __local___localdep_inotify_init1_defined
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_inotify_init1,(__STDC_INT_AS_UINT_T __flags),inotify_init1,(__flags))
 #endif /* !__local___localdep_inotify_init1_defined */
 __LOCAL_LIBC(inotify_init) __fd_t

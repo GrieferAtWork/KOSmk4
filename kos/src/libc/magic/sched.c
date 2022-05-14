@@ -268,7 +268,7 @@ __SYSDECL_BEGIN
 %#if defined(__USE_GNU) || defined(__USE_KOS)
 %[define_type_class(__clone_func_t = "TP")]
 
-[[section(".text.crt{|.dos}.sched.access")]]
+[[section(".text.crt{|.dos}.sched.access"), decl_include("<bits/types.h>")]]
 [[vartypes($pid_t, void *, $pid_t), export_alias("__clone")]]
 [[crt_dos_impl_if(!defined(__LIBCCALL_IS_LIBDCALL)), crt_dos_variant]]
 $pid_t clone([[nonnull]] int (LIBCCALL *fn)(void *arg), void *child_stack, int flags,
@@ -340,7 +340,10 @@ void exit_thread(int exit_code);
 %{
 
 #ifdef __CC__
+#ifndef __cpu_set_t_defined
+#define __cpu_set_t_defined
 typedef struct __cpu_set_struct cpu_set_t;
+#endif /* !__cpu_set_t_defined */
 #endif /* __CC__ */
 
 #ifdef __USE_KOS

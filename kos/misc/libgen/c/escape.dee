@@ -106,6 +106,9 @@ global keywordEscapes: {string: string} = Dict({
 	"wchar_t" : "__WCHAR_TYPE__",
 	"char16_t" : "__CHAR16_TYPE__",
 	"char32_t" : "__CHAR32_TYPE__",
+	"wint_t" : "__WINT_TYPE__",
+	"wint16_t" : "__WINT16_TYPE__",
+	"wint32_t" : "__WINT32_TYPE__",
 	"int_least8_t" : "__INT_LEAST8_TYPE__",
 	"int_least16_t" : "__INT_LEAST16_TYPE__",
 	"int_least32_t" : "__INT_LEAST32_TYPE__",
@@ -369,6 +372,234 @@ global partialKeywordEscapes: {string: string} = Dict({
 });
 
 
+@@Mapping of typenames to headers that must be included to get them
+@@e.g. "__fd_t" -> "<bits/types.h>"
+@@
+@@Used for generating warnings about missing include prefixes
+global typeHeaders: {string: string} = Dict({
+	/* <bits/types.h> */
+	"__int8_t" : "<bits/types.h>",
+	"__int16_t" : "<bits/types.h>",
+	"__int32_t" : "<bits/types.h>",
+	"__int64_t" : "<bits/types.h>",
+	"__uint8_t" : "<bits/types.h>",
+	"__uint16_t" : "<bits/types.h>",
+	"__uint32_t" : "<bits/types.h>",
+	"__uint64_t" : "<bits/types.h>",
+	"__u_char" : "<bits/types.h>",
+	"__u_short" : "<bits/types.h>",
+	"__u_int" : "<bits/types.h>",
+	"__u_long" : "<bits/types.h>",
+	"__ptrdiff_t" : "<bits/types.h>",
+	"__size_t" : "<bits/types.h>",
+	"__ssize_t" : "<bits/types.h>",
+	"__intptr_t" : "<bits/types.h>",
+	"__uintptr_t" : "<bits/types.h>",
+	"__byte_t" : "<bits/types.h>",
+	"__register_t" : "<bits/types.h>",
+	"__sregister_t" : "<bits/types.h>",
+	"__quad_t" : "<bits/types.h>",
+	"__u_quad_t" : "<bits/types.h>",
+	"__syscall_slong_t" : "<bits/types.h>",
+	"__syscall_ulong_t" : "<bits/types.h>",
+	"__errno_t" : "<bits/types.h>",
+	"__signo_t" : "<bits/types.h>",
+	"__iomode_t" : "<bits/types.h>",
+	"__fd_t" : "<bits/types.h>",
+	"__ufd_t" : "<bits/types.h>",
+	"__major_t" : "<bits/types.h>",
+	"__minor_t" : "<bits/types.h>",
+	"__dev_t" : "<bits/types.h>",
+	"__id_t" : "<bits/types.h>",
+	"__pid_t" : "<bits/types.h>",
+	"__upid_t" : "<bits/types.h>",
+	"__key_t" : "<bits/types.h>",
+	"__daddr_t" : "<bits/types.h>",
+	"__qaddr_t" : "<bits/types.h>",
+	"__off32_t" : "<bits/types.h>",
+	"__off64_t" : "<bits/types.h>",
+	"__fsblkcnt32_t" : "<bits/types.h>",
+	"__fsblkcnt64_t" : "<bits/types.h>",
+	"__fsfilcnt32_t" : "<bits/types.h>",
+	"__fsfilcnt64_t" : "<bits/types.h>",
+	"__ino32_t" : "<bits/types.h>",
+	"__ino64_t" : "<bits/types.h>",
+	"__pos32_t" : "<bits/types.h>",
+	"__pos64_t" : "<bits/types.h>",
+	"__loff_t" : "<bits/types.h>",
+	"__lpos_t" : "<bits/types.h>",
+	"__socklen_t" : "<bits/types.h>",
+	"__ssocklen_t" : "<bits/types.h>",
+	"__rlim32_t" : "<bits/types.h>",
+	"__rlim64_t" : "<bits/types.h>",
+	"__nlink_t" : "<bits/types.h>",
+	"__quantum_diff_t" : "<bits/types.h>",
+	"__clock_t" : "<bits/types.h>",
+	"__suseconds_t" : "<bits/types.h>",
+	"__clockid_t" : "<bits/types.h>",
+	"__gid_t" : "<bits/types.h>",
+	"__uid_t" : "<bits/types.h>",
+	"__useconds_t" : "<bits/types.h>",
+	"__fsword_t" : "<bits/types.h>",
+	"__port_t" : "<bits/types.h>",
+	"__physaddr_t" : "<bits/types.h>",
+	"__physpage_t" : "<bits/types.h>",
+	"__sa_family_t" : "<bits/types.h>",
+	"__time32_t" : "<bits/types.h>",
+	"__time64_t" : "<bits/types.h>",
+	"__ioctl_t" : "<bits/types.h>",
+	"__fcntl_t" : "<bits/types.h>",
+	"__oflag_t" : "<bits/types.h>",
+	"__atflag_t" : "<bits/types.h>",
+	"__blkcnt32_t" : "<bits/types.h>",
+	"__blkcnt64_t" : "<bits/types.h>",
+	"__blksize_t" : "<bits/types.h>",
+	"__mode_t" : "<bits/types.h>",
+	"__caddr_t" : "<bits/types.h>",
+	"__fsid_t" : "<bits/types.h>",
+	"__timer_t" : "<bits/types.h>",
+	"__le8" : "<bits/types.h>",
+	"__be8" : "<bits/types.h>",
+	"__le16" : "<bits/types.h>",
+	"__be16" : "<bits/types.h>",
+	"__le32" : "<bits/types.h>",
+	"__be32" : "<bits/types.h>",
+	"__le64" : "<bits/types.h>",
+	"__be64" : "<bits/types.h>",
+	"__s8" : "<bits/types.h>",
+	"__u8" : "<bits/types.h>",
+	"__s16" : "<bits/types.h>",
+	"__u16" : "<bits/types.h>",
+	"__s32" : "<bits/types.h>",
+	"__u32" : "<bits/types.h>",
+	"__s64" : "<bits/types.h>",
+	"__u64" : "<bits/types.h>",
+
+	/* <hybrid/typecore.h> */
+	"__CHAR8_TYPE__": "<hybrid/typecore.h>",
+	"__INT8_TYPE__": "<hybrid/typecore.h>",
+	"__INT16_TYPE__": "<hybrid/typecore.h>",
+	"__INT32_TYPE__": "<hybrid/typecore.h>",
+	"__INT64_TYPE__": "<hybrid/typecore.h>",
+	"__UINT8_TYPE__": "<hybrid/typecore.h>",
+	"__UINT16_TYPE__": "<hybrid/typecore.h>",
+	"__UINT32_TYPE__": "<hybrid/typecore.h>",
+	"__UINT64_TYPE__": "<hybrid/typecore.h>",
+	"__INT_LEAST8_TYPE__": "<hybrid/typecore.h>",
+	"__INT_LEAST16_TYPE__": "<hybrid/typecore.h>",
+	"__INT_LEAST32_TYPE__": "<hybrid/typecore.h>",
+	"__INT_LEAST64_TYPE__": "<hybrid/typecore.h>",
+	"__UINT_LEAST8_TYPE__": "<hybrid/typecore.h>",
+	"__UINT_LEAST16_TYPE__": "<hybrid/typecore.h>",
+	"__UINT_LEAST32_TYPE__": "<hybrid/typecore.h>",
+	"__UINT_LEAST64_TYPE__": "<hybrid/typecore.h>",
+	"__INT_FAST8_TYPE__": "<hybrid/typecore.h>",
+	"__INT_FAST16_TYPE__": "<hybrid/typecore.h>",
+	"__INT_FAST32_TYPE__": "<hybrid/typecore.h>",
+	"__INT_FAST64_TYPE__": "<hybrid/typecore.h>",
+	"__UINT_FAST8_TYPE__": "<hybrid/typecore.h>",
+	"__UINT_FAST16_TYPE__": "<hybrid/typecore.h>",
+	"__UINT_FAST32_TYPE__": "<hybrid/typecore.h>",
+	"__UINT_FAST64_TYPE__": "<hybrid/typecore.h>",
+	"__INTPTR_TYPE__": "<hybrid/typecore.h>",
+	"__UINTPTR_TYPE__": "<hybrid/typecore.h>",
+	"__SIZE_TYPE__": "<hybrid/typecore.h>",
+	"__SSIZE_TYPE__": "<hybrid/typecore.h>",
+	"__INTMAX_TYPE__": "<hybrid/typecore.h>",
+	"__UINTMAX_TYPE__": "<hybrid/typecore.h>",
+	"__LONGPTR_TYPE__": "<hybrid/typecore.h>",
+	"__ULONGPTR_TYPE__": "<hybrid/typecore.h>",
+	"__INTPTR_HALF_TYPE__": "<hybrid/typecore.h>",
+	"__UINTPTR_HALF_TYPE__": "<hybrid/typecore.h>",
+	"__INTPTR_QUARTER_TYPE__": "<hybrid/typecore.h>",
+	"__UINTPTR_QUARTER_TYPE__": "<hybrid/typecore.h>",
+	"__SBYTE_TYPE__": "<hybrid/typecore.h>",
+	"__BYTE_TYPE__": "<hybrid/typecore.h>",
+	"__WCHAR_TYPE__": "<hybrid/typecore.h>",
+	"__WCHAR16_TYPE__": "<hybrid/typecore.h>",
+	"__WCHAR32_TYPE__": "<hybrid/typecore.h>",
+	"__WINT_TYPE__": "<hybrid/typecore.h>",
+	"__WINT16_TYPE__": "<hybrid/typecore.h>",
+	"__WINT32_TYPE__": "<hybrid/typecore.h>",
+	"__CHAR16_TYPE__": "<hybrid/typecore.h>",
+	"__CHAR32_TYPE__": "<hybrid/typecore.h>",
+	"__SHIFT_TYPE__": "<hybrid/typecore.h>",
+	"__SIG_ATOMIC_TYPE__": "<hybrid/typecore.h>",
+	"__INTSIZE_TYPE__": "<hybrid/typecore.h>",
+	"__INTSSIZE_TYPE__": "<hybrid/typecore.h>",
+	"__LONGSIZE_TYPE__": "<hybrid/typecore.h>",
+	"__LONGSSIZE_TYPE__": "<hybrid/typecore.h>",
+	"__LONG32_TYPE__": "<hybrid/typecore.h>",
+	"__ULONG32_TYPE__": "<hybrid/typecore.h>",
+	"__LONG64_TYPE__": "<hybrid/typecore.h>",
+	"__ULONG64_TYPE__": "<hybrid/typecore.h>",
+	"__BUSINT_TYPE__": "<hybrid/typecore.h>",
+	"__UBUSINT_TYPE__": "<hybrid/typecore.h>",
+	"__REGISTER_TYPE__": "<hybrid/typecore.h>",
+	"__SREGISTER_TYPE__": "<hybrid/typecore.h>",
+	"__MAX_ALIGN_TYPE__": "<hybrid/typecore.h>",
+	"__FIFTHINT_TYPE__": "<hybrid/typecore.h>",
+	"__UFIFTHINT_TYPE__": "<hybrid/typecore.h>",
+	"__FIFTHINT_ALIAS_TYPE__": "<hybrid/typecore.h>",
+	"__UFIFTHINT_ALIAS_TYPE__": "<hybrid/typecore.h>",
+	"__PTRDIFF_TYPE__": "<hybrid/typecore.h>",
+
+	/* <features.h> */
+	"__STDC_INT_AS_SSIZE_T": "<features.h>",
+	"__STDC_INT_AS_SIZE_T": "<features.h>",
+	"__STDC_LONG_AS_SIZE_T": "<features.h>",
+	"__STDC_INT32_AS_SSIZE_T": "<features.h>",
+	"__STDC_INT32_AS_SIZE_T": "<features.h>",
+	"__STDC_UINT_AS_SIZE_T": "<features.h>",
+	"__STDC_UINT32_AS_SIZE_T": "<features.h>",
+	"__STDC_INT_AS_UINT_T": "<features.h>",
+	
+	/* <bits/os/...> */
+	"__timespec": "<bits/os/timespec.h>",
+	"__timespec32": "<bits/os/timespec.h>",
+	"__timespec64": "<bits/os/timespec.h>",
+	"__timeval": "<bits/os/timeval.h>",
+	"__timeval32": "<bits/os/timeval.h>",
+	"__timeval64": "<bits/os/timeval.h>",
+
+});
+
+@@Include implications.
+@@e.g. "<bits/types.h>" implies "<hybrid/typecore.h>"
+@@Written as @{headerName: {impliedBy...}}
+global typeHeadersImplications: {string: HashSet with string} = Dict({
+	"<hybrid/typecore.h>" : HashSet({ "<bits/types.h>" }),
+	"<features.h>" : HashSet({ "<bits/types.h>" }),
+	"<bits/types.h>" : HashSet({
+		"<bits/os/timeval.h>",
+		"<bits/os/timespec.h>",
+	}),
+});
+
+
+@@Get all headers that implicitly include @thisHeader
+function getHeadersThatImply(thisHeader: string): none | HashSet with string {
+	local result = typeHeadersImplications.get(thisHeader);
+	if (result !is none) {
+		result = HashSet(result);
+		for (;;) {
+			local gotMore = false;
+			for (local x: result) {
+				for (local more: typeHeadersImplications.get(x)) {
+					if (result.insert(more))
+						gotMore = true;
+				}
+				if (gotMore)
+					break;
+			}
+			if (!gotMore)
+				break;
+		}
+	}
+	return result;
+}
+
+
 
 @@Construct a preprocessor expression to check if the to-be linked CRT is exporting @symbolName
 function keyCrtHave(symbolName: string | UserString): string {
@@ -514,6 +745,9 @@ global final special_escapes: {string...} = {
 	"__inout_z",     /* SAL macro */
 	"__inout_opt",   /* SAL macro */
 	"__inout_z_opt", /* SAL macro */
+	"__argv",        /* Macro from <stdlib.h> */
+	"__envp",        /* Macro from <stdlib.h> */
+	"__environ",     /* Macro from <stdlib.h> */
 };
 
 
@@ -575,6 +809,41 @@ function skipEscapingPreproessorBlock(self: CParser): int {
 		} while (tok !in ["", "@@"]);
 		tok = self.next();
 	}
+}
+
+
+function normalizeForTypeHeader(typename: string): string {
+	if (typename.endswith("__restrict"))
+		typename = typename[:-10].rstrip();
+	if (typename.startswith("struct ")) {
+		typename = typename[7:].lstrip();
+	} else if (typename.startswith("union ")) {
+		typename = typename[6:].lstrip();
+	} else if (typename.startswith("enum ")) {
+		typename = typename[5:].lstrip();
+	}
+	typename = typename
+		.replace("\t", " ")
+		.replace("const", "")
+		.replace("volatile", "")
+		.replace("*", "")
+		.replace("&", "")
+		.strip()
+		.lstrip("$")
+		.lstrip();
+	while ("  " in typename)
+		typename = typename.replace("  ", " ");
+
+
+	local escaped = partialKeywordEscapes.get(typename);
+	if (escaped !is none)
+		return escaped;
+	local escaped = keywordEscapes.get(typename);
+	if (escaped !is none)
+		return escaped;
+	if (typename in cLanguageKeywords)
+		return typename;
+	return escapeKeywordIfNotAlreadyEscaped(typename);
 }
 
 

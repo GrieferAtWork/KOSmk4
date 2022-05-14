@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5aa6b52d */
+/* HASH CRC-32:0xd93b002b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,6 +43,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_convert_wcstombs_defined */
 #if !defined(__local___localdep_dos_wmkdir_defined) && defined(__CRT_HAVE__wmkdir)
 #define __local___localdep_dos_wmkdir_defined
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_dos_wmkdir,(__WCHAR_TYPE__ const *__pathname),_wmkdir,(__pathname))
 #endif /* !__local___localdep_dos_wmkdir_defined && __CRT_HAVE__wmkdir */
 #ifndef __local___localdep_free_defined

@@ -605,6 +605,7 @@ char *_conio_getpass([[nonnull]] const char *prompt, [[nonnull]] char *str) {
 	return result;
 }
 
+%[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 @@>> cputsxy(3)
 @@Combination of `gotoxy(3)' and `cputs(3)'
@@ -624,10 +625,10 @@ void putchxy(int x, int y, char ch) {
 
 %[insert:guarded_function(delay = _sleep)] /* Also declared in <dos.h> */
 
+[[static, decl_include("<hybrid/typecore.h>")]]
 [[requires((defined(__KOS__) && defined(__CRT_HAVE_stdtty) && $has_function(fileno, ioctl)) ||
            $has_function(_getch, _ungetch, _cscanf))]]
-[[impl_include("<libc/template/stdtty.h>", "<kos/ioctl/video.h>")]]
-[[impl_include("<bits/crt/inttypes.h>"), static]]
+[[impl_include("<libc/template/stdtty.h>", "<kos/ioctl/video.h>", "<bits/crt/inttypes.h>")]]
 int _conio_wherexy($uint16_t xy[2]) {
 @@pp_if defined(__KOS__) && defined(__CRT_HAVE_stdtty) && $has_function(fileno, ioctl)@@
 	return (int)ioctl(fileno(stdtty), @VID_IOC_GETCURSOR@, xy);

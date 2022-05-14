@@ -44,6 +44,10 @@
 /* (#) Portability: uClibc        (/include/stdlib.h) */
 }
 
+%[define_decl_include("<bits/crt/random-data.h>": [
+	"struct random_data",
+])]
+
 %[define_ccompat_header("cstdlib")]
 
 %[define_replacement(fd_t = __fd_t)]
@@ -2370,7 +2374,7 @@ int random_r([[nonnull]] struct random_data *__restrict buf, [[nonnull]] $int32_
 [[section(".text.crt{|.dos}.random")]]
 int srandom_r(unsigned int seed, [[nonnull]] struct random_data *buf);
 
-[[decl_include("<bits/crt/random-data.h>")]]
+[[decl_include("<bits/crt/random-data.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.random")]]
 int initstate_r(unsigned int seed,
                 [[nonnull]] char *__restrict statebuf, $size_t statelen,

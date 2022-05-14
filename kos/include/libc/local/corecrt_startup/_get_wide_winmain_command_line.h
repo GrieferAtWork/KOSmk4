@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23402650 */
+/* HASH CRC-32:0xd10e4090 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local__get_wide_winmain_command_line_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE___p__wcmdln) && defined(__PE__)) || defined(__CRT_HAVE_DOS$__p__wcmdln)
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___p__wcmdln_defined
 #define __local___localdep___p__wcmdln_defined

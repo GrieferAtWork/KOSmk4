@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa07db152 */
+/* HASH CRC-32:0xc2d6b5ea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,11 @@
 #define __local_thr_join_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_join
+#include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_join_defined
 #define __local___localdep_pthread_join_defined
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __pthread, void **__thread_return),pthread_join,(__pthread,__thread_return))
 #endif /* !__local___localdep_pthread_join_defined */
 __LOCAL_LIBC(thr_join) __errno_t

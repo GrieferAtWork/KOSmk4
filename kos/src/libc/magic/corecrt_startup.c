@@ -98,10 +98,10 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 %[define_type_class(_onexit_t = "TP")]
 %[define_type_class(onexit_t  = "TP")]
 
-[[crt_dos_only]]
+[[crt_dos_only, decl_include("<hybrid/typecore.h>")]]
 int _seh_filter_dll(__ULONG32_TYPE__ xno, [[nonnull]] struct _EXCEPTION_POINTERS *infp_ptrs);
 
-[[crt_dos_only]]
+[[crt_dos_only, decl_include("<hybrid/typecore.h>")]]
 int _seh_filter_exe(__ULONG32_TYPE__ xno, [[nonnull]] struct _EXCEPTION_POINTERS *infp_ptrs);
 
 [[const, wunused, crt_dos_only]]
@@ -150,6 +150,7 @@ char **_get_initial_narrow_environment(void) {
 	return *__p___initenv();
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[wunused, pure, crt_dos_only, requires_function(__p___c16initenv)]]
 __WCHAR16_TYPE__ **_get_initial_wide_environment(void) {
 	return (__WCHAR16_TYPE__ **)*__p___c16initenv();
@@ -160,6 +161,7 @@ char *_get_narrow_winmain_command_line(void) {
 	return *__p__acmdln();
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[wunused, pure, crt_dos_only, requires_function(__p__wcmdln)]]
 __WCHAR16_TYPE__ *_get_wide_winmain_command_line(void) {
 	return (__WCHAR16_TYPE__ *)*__p__wcmdln();
@@ -170,6 +172,7 @@ __WCHAR16_TYPE__ *_get_wide_winmain_command_line(void) {
 [[crt_dos_only]]
 char **__p__acmdln(void);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[crt_dos_only, no_crt_self_import, no_crt_self_export]]
 [[if(defined(__PE__)), alias("__p__wcmdln")]]
 [[alias("DOS$__p__wcmdln"), export_as("DOS$__p__wcmdln")]]

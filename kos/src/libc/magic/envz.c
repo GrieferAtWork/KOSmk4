@@ -87,7 +87,7 @@ char *envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len,
 @@already existed before, that entry is removed. If `name' is NULL,
 @@the entry created  doesn't have a  value-portion (i.e. `name'  is
 @@added to `penvz' as-is, without the trailing `=value')
-[[impl_include("<libc/errno.h>"), decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<libc/errno.h>"), decl_include("<bits/types.h>")]]
 [[requires_function(realloc, argz_add)]]
 error_t envz_add([[nonnull]] char **__restrict penvz,
                  [[nonnull]] size_t *__restrict penvz_len,
@@ -127,7 +127,7 @@ error_t envz_add([[nonnull]] char **__restrict penvz,
 @@If individual entries already existed in `penvz', behavior  depends
 @@on `override_', which if non-zero will cause existing entries to be
 @@overwritten, and otherwise if zero, will cause them to stay.
-[[requires_function(argz_append), decl_include("<hybrid/typecore.h>")]]
+[[requires_function(argz_append), decl_include("<bits/types.h>")]]
 error_t envz_merge([[nonnull]] char **__restrict penvz,
                    [[nonnull]] size_t *__restrict penvz_len,
                    [[nonnull]] char const *__restrict envz2,

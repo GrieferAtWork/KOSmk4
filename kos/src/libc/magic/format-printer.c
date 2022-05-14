@@ -20,6 +20,10 @@
 
 %[default:section(".text.crt{|.dos}.string.format")]
 
+%[define_decl_include_implication("<bits/crt/format-printer.h>" => [
+	"<hybrid/typecore.h>",
+])]
+
 %[define_replacement(pformatprinter   = __pformatprinter)]
 %[define_replacement(pformatgetc      = __pformatgetc)]
 %[define_replacement(pformatungetc    = __pformatungetc)]
@@ -1190,7 +1194,7 @@ struct format_aprintf_data {
 @@                 printed to the aprintf-printer at one point.
 @@                 (e.g. `format_aprintf_printer(&my_printer, "\0", 1)')
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
-[[decl_prefix(struct format_aprintf_data;)]]
+[[decl_prefix(struct format_aprintf_data;), decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/__assert.h>"), impl_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
 char *format_aprintf_pack([[nonnull]] struct format_aprintf_data *__restrict self,
                           [[nullable]] $size_t *pstrlen) {
@@ -1250,7 +1254,7 @@ char *format_aprintf_pack([[nonnull]] struct format_aprintf_data *__restrict sel
 @@to append additional data to the end of `self'
 @@@return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM')
 [[impl_include("<hybrid/__assert.h>"), wunused]]
-[[decl_prefix(struct format_aprintf_data;)]]
+[[decl_prefix(struct format_aprintf_data;), decl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
 [[requires_function(realloc)]]
 format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,

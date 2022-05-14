@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1d9b69 */
+/* HASH CRC-32:0x55d38a7b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,8 @@
 #define __local_uucopystr_defined
 #include <__crt.h>
 #if defined(__KOS__) && defined(__cplusplus) && defined(__CRT_HAVE_except_nesting_begin) && defined(__CRT_HAVE_except_nesting_end)
+#include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_except_as_errno_defined
 #define __local___localdep_except_as_errno_defined

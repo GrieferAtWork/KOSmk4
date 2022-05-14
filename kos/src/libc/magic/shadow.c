@@ -28,15 +28,17 @@
 /* (#) Portability: uClibc        (/include/shadow.h) */
 }
 
-%[define_replacement(sigset_t = "struct __sigset_struct")]
 %[default:section(".text.crt{|.dos}.database.shadow")]
 
+%[define_decl_include("<bits/crt/db/spwd.h>": ["struct spwd"])]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <paths.h>
-
+)]%[insert:prefix(
 #include <bits/crt/db/spwd.h>
+)]%{
 
 #ifdef _PATH_SHADOW
 #define SHADOW _PATH_SHADOW /* `/etc/shadow' */
@@ -91,24 +93,24 @@ int putspent([[nonnull]] struct spwd const *__restrict p,
 
 %
 %#ifdef __USE_MISC
-[[cp, decl_include("<bits/crt/db/spwd.h>")]]
+[[cp, decl_include("<bits/crt/db/spwd.h>", "<hybrid/typecore.h>")]]
 int getspent_r([[nonnull]] struct spwd *__restrict result_buf,
                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
                [[nonnull]] struct spwd **__restrict result);
 
-[[cp, doc_alias("getspent_r"), decl_include("<bits/crt/db/spwd.h>")]]
+[[cp, doc_alias("getspent_r"), decl_include("<bits/crt/db/spwd.h>", "<hybrid/typecore.h>")]]
 int getspnam_r([[nonnull]] char const *__restrict name,
                [[nonnull]] struct spwd *__restrict result_buf,
                [[nonnull]] char *__restrict buffer, size_t buflen,
                [[nonnull]] struct spwd **__restrict result);
 
-[[cp, doc_alias("getspent_r"), decl_include("<bits/crt/db/spwd.h>")]]
+[[cp, doc_alias("getspent_r"), decl_include("<bits/crt/db/spwd.h>", "<hybrid/typecore.h>")]]
 int sgetspent_r([[nonnull]] char const *__restrict string,
                 [[nonnull]] struct spwd *__restrict result_buf,
                 [[nonnull]] char *__restrict buffer, size_t buflen,
                 [[nonnull]] struct spwd **__restrict result);
 
-[[cp, doc_alias("getspent_r"), decl_include("<bits/crt/db/spwd.h>")]]
+[[cp, doc_alias("getspent_r"), decl_include("<bits/crt/db/spwd.h>", "<hybrid/typecore.h>")]]
 int fgetspent_r([[nonnull]] $FILE *__restrict stream,
                 [[nonnull]] struct spwd *__restrict result_buf,
                 [[nonnull]] char *__restrict buffer, size_t buflen,

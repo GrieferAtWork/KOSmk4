@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee65c352 */
+/* HASH CRC-32:0x47f4f6cd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_ns_name_compress_defined
 #define __local_ns_name_compress_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ns_name_compress) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ns_name_compress))(char const *__srcbuf, unsigned char *__dstbuf, __SIZE_TYPE__ __dstbufsize, unsigned char const **__d, unsigned char const **__e) {

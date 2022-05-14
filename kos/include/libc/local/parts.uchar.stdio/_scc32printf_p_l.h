@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d756a77 */
+/* HASH CRC-32:0xdcc40cf9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local__scc32printf_p_l_defined
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vscc32printf_p_l_defined
 #define __local___localdep__vscc32printf_p_l_defined

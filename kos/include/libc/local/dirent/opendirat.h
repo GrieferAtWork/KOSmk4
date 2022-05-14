@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22cbde33 */
+/* HASH CRC-32:0x584f1aac */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,14 +24,12 @@
 #include <features.h>
 #include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#include <bits/types.h>
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fopendirat_defined
 #define __local___localdep_fopendirat_defined
 #ifdef __CRT_HAVE_fopendirat
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),struct __dirstream *,__NOTHROW_RPC,__localdep_fopendirat,(__fd_t __dirfd, char const *__name, __oflag_t __oflags),fopendirat,(__dirfd,__name,__oflags))
 #elif defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))
 __NAMESPACE_LOCAL_END

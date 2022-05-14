@@ -77,6 +77,7 @@ wchar_t *_wgetdcwd(int drive, wchar_t *buf, size_t size) {
 %[insert:function(_wrmdir = wrmdir)]
 
 [[wchar, cp, requires_function(wmkdir)]]
+[[decl_include("<hybrid/typecore.h>")]]
 int _wmkdir([[nonnull]] wchar_t const *path) {
 	return wmkdir(path, DOS_MKDIR_ACCESS_MODE);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x462db78c */
+/* HASH CRC-32:0x9fa85c0e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING,EPollCreate1,(__STDC_INT_AS_UINT
  * @throw: E_ILLEGAL_REFERENCE_LOOP: The  given  `fd'  is  another  epoll  that either
  *                                   forms a loop with `epfd', or has too many nested.
  * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
-__CDECLARE_VOID_OPT(,__THROWING,EPollCtl,(__fd_t __epfd, __epoll_ctl_t __op, __fd_t __fd, struct epoll_event *__event),(__epfd,__op,__fd,__event))
+__CDECLARE_VOID_OPT(,__THROWING,EPollCtl,(__fd_t __epfd, __epoll_ctl_t __op, __fd_t __fd, struct epoll_event *___event),(__epfd,__op,__fd,___event))
 /* >> epoll_wait(2)
  * Wait until at least one of the conditions monitored by `epfd' to be met.
  * @param: epfd:      The epoll controller on which to wait.
@@ -144,7 +144,7 @@ typedef __ATTR_NONNULL((1)) void
  *                             intact, and the  RPC will be  discarded as  soon
  *                             as an attempt to send it is made, or the monitor
  *                             is manually deleted via `EPOLL_CTL_DEL' */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((3, 6)),__THROWING,EPollRpcExec,(__fd_t __epfd, __fd_t __fd, struct epoll_event *__event, __pid_t __target_tid, unsigned int __mode, prpc_exec_callback_t __func),(__epfd,__fd,__event,__target_tid,__mode,__func))
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((3, 6)),__THROWING,EPollRpcExec,(__fd_t __epfd, __fd_t __fd, struct epoll_event *___event, __pid_t __target_tid, unsigned int __mode, prpc_exec_callback_t __func),(__epfd,__fd,___event,__target_tid,__mode,__func))
 #endif /* __USE_KOS */
 
 __SYSDECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddf42366 */
+/* HASH CRC-32:0xd1f56c47 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_consttime_memequal_defined
 #define __local_consttime_memequal_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_timingsafe_memcmp_defined
 #define __local___localdep_timingsafe_memcmp_defined

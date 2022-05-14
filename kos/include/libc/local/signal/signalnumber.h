@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x718517ac */
+/* HASH CRC-32:0x5e0a3246 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_signalnumber_defined
 #define __local_signalnumber_defined
 #include <__crt.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcasecmp_defined
 #define __local___localdep_memcasecmp_defined
@@ -49,19 +50,10 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigabbrev_np_defined
 #define __local___localdep_sigabbrev_np_defined
 #ifdef __CRT_HAVE_sigabbrev_np
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signo),sigabbrev_np,(__signo))
 #elif defined(__CRT_HAVE_signalname)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signo),signalname,(__signo))
 #elif defined(__CRT_HAVE_strsigno)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signo),strsigno,(__signo))
 #else /* ... */
 __NAMESPACE_LOCAL_END

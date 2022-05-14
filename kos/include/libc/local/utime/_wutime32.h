@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3783ccb2 */
+/* HASH CRC-32:0x5c7c228b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #if defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)
 #include <features.h>
 #include <bits/os/utimbuf.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_wutime64_defined
 #define __local___localdep_crt_wutime64_defined

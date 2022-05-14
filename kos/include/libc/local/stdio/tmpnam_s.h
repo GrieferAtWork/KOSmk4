@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8e5e196 */
+/* HASH CRC-32:0xb608542c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_tmpnam_s_defined
 #include <__crt.h>
 #ifdef __CRT_HAVE_tmpnam
-#include <hybrid/typecore.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tmpnam_defined
 #define __local___localdep_tmpnam_defined

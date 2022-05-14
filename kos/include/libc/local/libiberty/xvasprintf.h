@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9b52997 */
+/* HASH CRC-32:0xbe881fd9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,6 +67,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_xmalloc_failed_defined
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_xmalloc_failed,(__SIZE_TYPE__ __num_bytes),xmalloc_failed,(__num_bytes))
 #endif /* !__local___localdep_xmalloc_failed_defined */

@@ -36,6 +36,8 @@
 %[define_replacement(mbstate_t = "struct __mbstate")]
 %[default:section(".text.crt{|.dos}.unicode.mbr")]
 
+%[define_decl_include("<bits/crt/mbstate.h>": ["struct __mbstate"])]
+
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
@@ -119,43 +121,43 @@ typedef __CHAR32_TYPE__ char32_t;
 
 @@>> mbrtoc16(3)
 [[std, no_crt, preferred_alias("mbrtoc16")]]
+[[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("mbrtowc", "__mbrtowc")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$mbrtowc")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(mbrtowc)]]
 [[exposed_name("mbrtoc16"), bind_local_function(uchar_mbrtoc16)]]
-[[decl_include("<bits/crt/mbstate.h>")]]
 size_t stdc_mbrtoc16([[nullable]] char16_t *pc16,
                      [[inp_opt(maxlen)]] char const *__restrict str,
                      size_t maxlen, [[nullable]] mbstate_t *mbs);
 
 @@>> mbrtoc32(3)
 [[std, no_crt, preferred_alias("mbrtoc32")]]
+[[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("mbrtowc", "__mbrtowc")]]
 [[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$mbrtowc")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(mbrtowc)]]
 [[exposed_name("mbrtoc32"), bind_local_function(uchar_mbrtoc32)]]
-[[decl_include("<bits/crt/mbstate.h>")]]
 size_t stdc_mbrtoc32([[nullable]] char32_t *pc32,
                      [[inp_opt(maxlen)]] char const *__restrict str,
                      size_t maxlen, [[nullable]] mbstate_t *mbs);
 
 @@>> c16rtomb(3)
 [[std, no_crt, preferred_alias("c16rtomb")]]
+[[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wcrtomb")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wcrtomb")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcrtomb)]]
 [[exposed_name("c16rtomb"), bind_local_function(uchar_c16rtomb)]]
-[[decl_include("<bits/crt/mbstate.h>")]]
 size_t stdc_c16rtomb(char *__restrict str, char16_t c16,
                      [[nullable]] mbstate_t *mbs);
 
 @@>> c32rtomb(3)
 [[std, no_crt, preferred_alias("c32rtomb")]]
+[[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wcrtomb")]]
 [[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wcrtomb")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcrtomb)]]
 [[exposed_name("c32rtomb"), bind_local_function(uchar_c32rtomb)]]
-[[decl_include("<bits/crt/mbstate.h>")]]
 size_t stdc_c32rtomb(char *__restrict str, char32_t c32,
                      [[nullable]] mbstate_t *mbs);
 

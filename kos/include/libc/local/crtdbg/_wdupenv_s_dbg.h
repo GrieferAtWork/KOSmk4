@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96711281 */
+/* HASH CRC-32:0xe46be4af */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__wdupenv_s_dbg_defined
 #define __local__wdupenv_s_dbg_defined
 #include <__crt.h>
-#include <hybrid/typecore.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wdupenv_s_dbg) _Check_return_wat_ __ATTR_NONNULL((3)) __errno_t
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_wdupenv_s_dbg))(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line) {

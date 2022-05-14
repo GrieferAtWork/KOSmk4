@@ -32,6 +32,31 @@
 /* (#) Portability: uClibc        (/libpthread/nptl/sysdeps/pthread/pthread.h) */
 }
 
+%[define_decl_include("<bits/os/cpu_set.h>": ["struct __cpu_set_struct", "__cpu_mask_t"])]
+
+%[define_decl_include_implication("<bits/crt/setjmp.h>" => ["<hybrid/typecore.h>", "<bits/os/sigset.h>"])]
+%[define_decl_include("<bits/crt/setjmp.h>": ["struct __jmp_buf", "struct __sigjmp_buf"])]
+
+%[define_decl_include_implication("<bits/crt/pthreadtypes.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/crt/pthreadtypes.h>": [
+	"__pthread_key_t",
+	"__pthread_once_t",
+	"__pthread_t",
+	"__pthread_attr_t",
+	"__pthread_mutexattr_t",
+	"__pthread_list_t",
+	"__pthread_slist_t",
+	"__pthread_mutex_t", "struct __pthread_mutex_s",
+	"__pthread_condattr_t",
+	"__pthread_cond_t", "struct __pthread_cond_s",
+	"__pthread_rwlockattr_t",
+	"__pthread_rwlock_t", "struct __pthread_rwlock_s",
+	"__pthread_spinlock_t",
+	"__pthread_barrierattr_t",
+	"__pthread_barrier_t",
+])]
+
+
 %[default:section(".text.crt{|.dos}.sched.pthread")]
 %[define_replacement(clockid_t = __clockid_t)]
 %[define_replacement(pthread_t = __pthread_t)]
@@ -63,16 +88,18 @@
 )]%[insert:prefix(
 #include <bits/crt/setjmp.h>
 )]%[insert:prefix(
+#include <bits/os/cpu_set.h>
+)]%[insert:prefix(
 #include <bits/types.h>
 )]%[insert:prefix(
 #include <kos/anno.h>
 )]%{
 
-#if 1 /* ??? */
+#ifdef __USE_GLIBC
 #include <endian.h>
 #include <sched.h>
 #include <time.h>
-#endif
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
@@ -999,6 +1026,12 @@ $errno_t pthread_attr_setstack([[nonnull]] pthread_attr_t *attr,
 %#endif /* __USE_XOPEN2K */
 
 %#ifdef __USE_GNU
+%#ifndef __cpu_set_t_defined
+%#define __cpu_set_t_defined
+%typedef struct __cpu_set_struct cpu_set_t;
+%#endif /* !__cpu_set_t_defined */
+
+
 @@>> pthread_attr_setaffinity_np(3)
 @@Thread  created with attribute `attr' will be limited
 @@to run only on the processors represented in `cpuset'

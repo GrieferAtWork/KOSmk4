@@ -594,7 +594,7 @@ int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (
 @@>> getpid(2)
 @@Return the PID of the calling process (that is the TID of the calling thread group's leader)
 @@THIS_THREAD->LEADER->PID
-[[guard, const, wunused, nothrow]]
+[[guard, const, wunused, nothrow, decl_include("<bits/types.h>")]]
 [[dos_only_export_alias("_getpid"), export_alias("__getpid", "__libc_getpid")]]
 $pid_t getpid();
 
@@ -602,7 +602,7 @@ $pid_t getpid();
 @@>> gettid(2)
 @@Return the TID of the calling thread
 @@THIS_THREAD->PID
-[[guard, const, wunused, nothrow]]
+[[guard, const, wunused, nothrow, decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.sched.thread")]]
 [[dos_only_export_alias("__threadid", "?GetCurrentThreadId@platform@details@Concurrency@@YAJXZ")]]
 $pid_t gettid();
@@ -868,7 +868,7 @@ int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 @@return: * : The configuration limit associated with `name' for `path'
 @@return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
 @@return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option
-[[crt_dos_variant, cp, section(".text.crt{|.dos}.fs.property"), decl_include("<features.h>")]]
+[[crt_dos_variant, cp, section(".text.crt{|.dos}.fs.property"), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[userimpl, requires_include("<asm/os/oflags.h>"), export_alias("__pathconf")]]
 [[requires($has_function(fpathconf) && $has_function(open) && defined(__O_RDONLY))]]
 $longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name) {
@@ -1694,6 +1694,7 @@ int setresgid($gid_t rgid, $gid_t egid, $gid_t sgid);
 
 @@Hidden function exported by DOS that allows for millisecond precision
 [[cp, ignore, nocrt, alias("__crtSleep", "delay")]]
+[[decl_include("<hybrid/typecore.h>")]]
 void __crtSleep($uint32_t msecs);
 
 
@@ -2026,7 +2027,7 @@ int setreuid($uid_t ruid, $uid_t euid);
 int setregid($gid_t rgid, $gid_t egid);
 
 @@>> gethostid(3)
-[[wunused]]
+[[wunused, decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.system.configuration")]]
 $longptr_t gethostid();
 
@@ -2206,6 +2207,7 @@ int setlogin([[nonnull]] char const *name);
 int sethostname([[inp(len)]] char const *name, size_t len);
 
 @@>> sethostid(3)
+[[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.system.configuration")]]
 int sethostid($longptr_t id);
 
@@ -2350,6 +2352,7 @@ int ftruncate64($fd_t fd, __PIO_OFFSET64 length) {
 [[section(".text.crt{|.dos}.heap.utility")]]
 int brk(void *addr);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__sbrk"), doc_alias("brk")]]
 [[section(".text.crt{|.dos}.heap.utility")]]
 void *sbrk(intptr_t delta);
@@ -3164,12 +3167,13 @@ char *getpass_r([[nullable]] char const *prompt, char *buf, size_t bufsize) {
 [[guard, wunused]]
 void *setmode([[nonnull]] char const *mode_str); /* TODO: Implement here! */
 
-[[wunused, doc_alias("setmode")]]
+[[wunused, doc_alias("setmode"), decl_include("<bits/types.h>")]]
 $mode_t getmode([[nonnull]] void const *bbox, $mode_t mode); /* TODO: Implement here! */
 
 @@>> getpeereid(3)
 @@Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)'
-[[guard, requires_include("<asm/os/socket.h>")]]
+[[guard, decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/socket.h>")]]
 [[requires($has_function(getsockopt) &&
            (defined(__SOL_SOCKET) && defined(__SO_PEERCRED)))]]
 [[impl_include("<bits/os/ucred.h>", "<libc/errno.h>")]]
@@ -3250,7 +3254,7 @@ char *ctermid_r([[nullable]] char *s) {
 @@return: -1: [errno=<unchanged>] `name'  refers to a maximum or minimum
 @@                                limit, and that limit is indeterminate
 @@return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option
-[[cp, wunused, decl_include("<features.h>")]]
+[[cp, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[export_alias("__sysconf")]]
 [[section(".text.crt{|.dos}.system.configuration")]]
 $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
@@ -3310,7 +3314,8 @@ $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 
 @@>> closefrom(2)
 @@Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)')
-[[guard, requires_include("<asm/os/fcntl.h>")]]
+[[guard, decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/fcntl.h>")]]
 [[requires(($has_function(fcntl) && defined(__F_CLOSEM)) || $has_function(close_range))]]
 [[section(".text.crt{|.dos}.bsd.io.access")]]
 void closefrom($fd_t lowfd) {
@@ -3353,8 +3358,9 @@ int issetugid(void) {
 @@and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
 @@No special permissions  are required to  use this function,  since a malicious  application
 @@could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument.
-[[requires($has_function(dup2) && defined(__AT_FDROOT))]]
+[[decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/fcntl.h>")]]
+[[requires($has_function(dup2) && defined(__AT_FDROOT))]]
 [[impl_include("<asm/os/fcntl.h>")]]
 int fchroot($fd_t fd) {
 	fd_t result;
@@ -3397,7 +3403,7 @@ int fchroot($fd_t fd) {
 @@the function will set errno=ERANGE and return -1
 @@@return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
 @@@return: -1: Error. (s.a. `errno')
-[[decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(frealpathat) && defined(__AT_FDCWD))]]
 [[crt_dos_variant, impl_include("<libc/errno.h>")]]

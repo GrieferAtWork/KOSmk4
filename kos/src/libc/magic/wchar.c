@@ -42,6 +42,9 @@
 
 %[define_ccompat_header("cwchar")]
 
+%[define_decl_include("<bits/crt/tm.h>": ["struct tm"])]
+%[define_decl_include("<bits/crt/mbstate.h>": ["struct __mbstate"])]
+
 %[define_replacement(mbstate_t = "struct __mbstate")]
 %[define_replacement(wchar_t = __WCHAR_TYPE__)]
 %[define_replacement(wint_t = __WINT_TYPE__)]
@@ -1181,7 +1184,7 @@ __LOCAL_LIBC(@vsc32scanf_ungetc@) ssize_t
 
 
 
-[[std, guard, wchar, wunused, decl_include("<features.h>"), doc_alias("swscanf")]]
+[[std, guard, wchar, wunused, decl_include("<features.h>", "<hybrid/typecore.h>"), doc_alias("swscanf")]]
 [[impl_include("<hybrid/typecore.h>", "<bits/crt/format-printer.h>", "<asm/crt/stdio.h>")]]
 [[impl_prefix(DEFINE_VSWSCANF_HELPERS)]]
 __STDC_INT_AS_SIZE_T vswscanf([[nonnull]] wchar_t const *__restrict input,
@@ -2329,9 +2332,9 @@ wildwcscasecmp_l(*) %{generate(str2wcs("wildstrcasecmp_l"))}
 %
 %#ifdef __USE_BSD
 @@>> fgetwln(3)
-[[wchar, guard, wunused]] wchar_t *
-fgetwln([[nonnull]] FILE *__restrict fp,
-        [[nonnull]] $size_t *__restrict lenp);
+[[wchar, guard, wunused, decl_include("<hybrid/typecore.h>")]]
+wchar_t *fgetwln([[nonnull]] FILE *__restrict fp,
+                 [[nonnull]] $size_t *__restrict lenp);
 
 @@>> wcslcat(3)
 [[wchar, guard]]

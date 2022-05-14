@@ -43,7 +43,7 @@ __SYSDECL_BEGIN
 %[default:section(".text.crt{|.dos}.wchar.fs.modify")]
 
 [[wchar, cp, dos_export_alias("_wremove")]]
-[[requires_include("<asm/os/fcntl.h>")]]
+[[requires_include("<asm/os/fcntl.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wremoveat)) ||
            $has_function(remove, convert_wcstombs))]]
 int wremove([[nonnull]] wchar_t const *filename) {
@@ -64,7 +64,7 @@ int wremove([[nonnull]] wchar_t const *filename) {
 }
 
 [[wchar, cp, dos_export_alias("_wrename")]]
-[[requires_include("<asm/os/fcntl.h>")]]
+[[requires_include("<asm/os/fcntl.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wrenameat)) ||
            $has_function(renameat, convert_wcstombs))]]
 int wrename([[nonnull]] wchar_t const *oldname,
@@ -96,7 +96,7 @@ int wrename([[nonnull]] wchar_t const *oldname,
 
 %
 %#ifdef __USE_ATFILE
-[[wchar, cp]]
+[[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires($has_function(wrenameat2) ||
            $has_function(renameat, convert_wcstombs))]]
 int wrenameat($fd_t oldfd, [[nonnull]] wchar_t const *oldname,
@@ -129,7 +129,7 @@ int wrenameat($fd_t oldfd, [[nonnull]] wchar_t const *oldname,
 %
 %#ifdef __USE_KOS
 [[wchar, cp, requires_function(removeat, convert_wcstombs)]]
-[[impl_include("<asm/os/fcntl.h>")]]
+[[impl_include("<asm/os/fcntl.h>"), decl_include("<bits/types.h>")]]
 int wremoveat($fd_t dirfd, [[nonnull]] wchar_t const *filename) {
 @@pp_if $has_function(wunlinkat) && defined(__AT_REMOVEREG) && defined(__AT_REMOVEDIR)@@
 	return wunlinkat(dirfd, filename, __AT_REMOVEREG | __AT_REMOVEDIR);
@@ -151,6 +151,7 @@ int wremoveat($fd_t dirfd, [[nonnull]] wchar_t const *filename) {
 
 
 %#ifdef __USE_GNU
+[[decl_include("<bits/types.h>")]]
 [[wchar, cp, requires_function(renameat2, convert_wcstombs)]]
 int wrenameat2($fd_t oldfd, [[nonnull]] wchar_t const *oldname,
                $fd_t newfd, [[nonnull]] wchar_t const *newname_or_path,
@@ -179,6 +180,7 @@ int wrenameat2($fd_t oldfd, [[nonnull]] wchar_t const *oldname,
 
 
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[wchar, wunused, dos_export_alias("_wfopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
 [[requires_function(fopen, convert_wcstombs)]]
@@ -205,6 +207,7 @@ done:
 	return result;
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[wchar, wunused, dos_export_alias("_wfreopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
 [[requires_function(freopen, convert_wcstombs)]]
@@ -232,6 +235,7 @@ done:
 	return result;
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[guard, wchar, wunused, dos_export_alias("_wpopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
 [[requires_function(popen, convert_wcstombs)]]

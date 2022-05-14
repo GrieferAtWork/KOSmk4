@@ -113,6 +113,7 @@ typedef __SIZE_TYPE__ size_t;
 @@away uses of this function when they (think) that clearing the memory
 @@wouldn't  have  any visible  side-effects (though  those side-effects
 @@may be a security-concious application trying to wipe sensitive data)
+[[decl_include("<hybrid/typecore.h>")]]
 [[libc, nocrt, no_crt_self_import, guard]]
 [[alias("bzero", "explicit_bzero", "__bzero")]]
 void explicit_bzero(void *dst, size_t n_bytes) {
@@ -217,6 +218,7 @@ unsigned int popcountll(__ULONGLONG i) {
 }
 %#endif /* __LONGLONG */
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[const, wunused, nothrow, crtbuiltin, doc_alias("popcount")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 4),       alias("popcount")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias("popcountl")]]
@@ -228,6 +230,7 @@ unsigned int popcount32($uint32_t i) {
 }
 
 %#ifdef __UINT64_TYPE__
+[[decl_include("<hybrid/typecore.h>")]]
 [[const, wunused, nothrow, crtbuiltin, doc_alias("popcount")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8),       alias("popcount")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias("popcountl")]]

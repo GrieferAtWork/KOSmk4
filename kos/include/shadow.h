@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5424bf72 */
+/* HASH CRC-32:0x83962f0f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,6 @@
 
 #include <features.h>
 #include <paths.h>
-
 #include <bits/crt/db/spwd.h>
 
 #ifdef _PATH_SHADOW

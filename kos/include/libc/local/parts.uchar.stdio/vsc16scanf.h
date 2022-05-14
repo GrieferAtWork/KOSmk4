@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x114e4e15 */
+/* HASH CRC-32:0xa4bc3035 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_vsc16scanf_defined
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_vc16scanf_defined
 #define __local___localdep_format_vc16scanf_defined
@@ -29,14 +30,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/crt/format-printer.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LIBC_C16SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__localdep_format_vc16scanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwscanf,(__pgetc,__pungetc,__arg,__format,__args))
 #elif defined(__CRT_HAVE_DOS$format_vwscanf)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/crt/format-printer.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_DOS(__ATTR_LIBC_C16SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__localdep_format_vc16scanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwscanf,(__pgetc,__pungetc,__arg,__format,__args))
 #elif __SIZEOF_WCHAR_T__ == 2
@@ -52,7 +51,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_format_vc16scanf_defined */
 __NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 #include <asm/crt/stdio.h>
 #ifndef ____vsc16scanf_getc_defined

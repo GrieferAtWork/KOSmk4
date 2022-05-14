@@ -454,10 +454,9 @@ int mtx_lock([[nonnull]] mtx_t *__restrict mutex) {
 @@@return: thrd_success:  Success
 @@@return: thrd_timedout: Timeout
 @@@return: thrd_error:    Error
-[[cp, no_crt_self_import]]
+[[cp, no_crt_self_import, decl_include("<bits/crt/threads.h>", "<bits/os/timespec.h>")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mtx_timedlock")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mtx_timedlock64")]]
-[[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<asm/os/errno.h>")]]
 [[requires_function(pthread_mutex_timedlock)]]
 int mtx_timedlock([[nonnull]] mtx_t *__restrict mutex,
@@ -474,7 +473,7 @@ int mtx_timedlock([[nonnull]] mtx_t *__restrict mutex,
 }
 
 %#ifdef __USE_TIME64
-[[cp, decl_include("<bits/crt/threads.h>")]]
+[[cp, decl_include("<bits/crt/threads.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(mtx_timedlock), doc_alias("mtx_timedlock")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<asm/os/errno.h>")]]
 [[requires_function(pthread_mutex_timedlock64)]]

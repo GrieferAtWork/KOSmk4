@@ -36,6 +36,16 @@
 %[default:section(".text.crt{|.dos}.net.nameser")]
 %[define_replacement(fd_t = __fd_t)]
 
+%[define_decl_include_implication("<bits/crt/resolv.h>" => [
+	"<bits/types.h>", "<netinet/bits/in.h>", "<netinet/in.h>",
+])]
+
+%[define_decl_include("<bits/crt/resolv.h>": [
+	"res_sendhookact", "res_send_qhook", "res_send_rhook",
+	"struct __res_state", "res_state"
+])]
+
+
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
@@ -141,7 +151,9 @@ __SYSDECL_BEGIN
 /* TODO: Figure out what these functions do and (try to) implement them */
 
 
+[[decl_include("<bits/crt/resolv.h>")]]
 [[const]] struct __res_state *__res_state(void);
+
 %[insert:pp_if($has_function(__res_state))]
 %#define _res (*__res_state())
 %[insert:pp_endif]
@@ -269,9 +281,11 @@ done:
 }
 
 [[export_alias("__b64_ntop")]]
+[[decl_include("<hybrid/typecore.h>")]]
 int b64_ntop($u_char const *a, size_t b, char *c, size_t d);
 
 [[export_alias("__b64_pton")]]
+[[decl_include("<hybrid/typecore.h>")]]
 int b64_pton(char const *a, $u_char *b, size_t c);
 
 [[export_alias("__loc_aton")]]
@@ -292,12 +306,16 @@ int dn_skipname([[nonnull]] $u_char const *msg_ptr,
 	return (int)(unsigned int)(size_t)(msg_ptr - orig_msg_ptr);
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 void putlong($u_int32_t a, $u_char *b) = ns_put32;
+
+[[decl_include("<hybrid/typecore.h>")]]
 void putshort($u_int16_t a, $u_char *b) = ns_put16;
 
 [[export_alias("__p_class")]]
 char const *p_class(int a);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__p_time")]]
 char const *p_time($u_int32_t a);
 
@@ -365,6 +383,7 @@ void fp_resstat(res_state a, $FILE *b);
 [[export_alias("__res_npquery"), decl_include("<bits/crt/resolv.h>")]]
 void res_npquery(res_state a, $u_char const *b, int c, $FILE *d);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__res_hostalias"), decl_include("<bits/crt/resolv.h>")]]
 char const *res_hostalias(res_state a, char const *b, char *c, size_t d);
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87a5c767 */
+/* HASH CRC-32:0x5e3001b7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,18 +22,13 @@
 #define __local_sc32scanf_s_defined
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vsc32scanf_s_defined
 #define __local___localdep_vsc32scanf_s_defined
 #if defined(__CRT_HAVE_vswscanf_s) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsc32scanf_s,(__CHAR32_TYPE__ const *__buf, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),vswscanf_s,(__buf,__format,__args))
 #elif defined(__CRT_HAVE_KOS$vswscanf_s)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsc32scanf_s,(__CHAR32_TYPE__ const *__buf, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),vswscanf_s,(__buf,__format,__args))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END

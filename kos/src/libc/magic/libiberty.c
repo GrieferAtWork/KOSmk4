@@ -99,6 +99,7 @@ unsigned char const libc__hex_value[256] =
 }
 
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1))]]
 [[requires_function(xmalloc), impl_include("<hybrid/host.h>")]]
 void *C_alloca(size_t num_bytes) {
@@ -339,7 +340,7 @@ int signo_max(void) {
 }
 
 
-[[wunused, pure]]
+[[wunused, pure, decl_include("<bits/types.h>")]]
 [[requires_function(errno_max, strerrorname_np)]]
 $errno_t strtoerrno([[nullable]] char const *name) {
 	errno_t result = 0;
@@ -390,6 +391,7 @@ FILE *fopen_unlocked(char const *filename, char const *mode) {
 	return result;
 }
 
+[[decl_include("<bits/types.h>")]]
 [[requires_function(fdopen, unlock_stream)]]
 FILE *fdopen_unlocked($fd_t fd, char const *mode) {
 	FILE *result = fdopen(fd, mode);
@@ -429,23 +431,24 @@ char const *spaces(__STDC_INT_AS_SIZE_T count) {
 
 void xmalloc_set_program_name(char const *progname);
 
-[[noreturn, throws]]
+[[noreturn, throws, decl_include("<hybrid/typecore.h>")]]
 void xmalloc_failed(size_t num_bytes);
 
-[[ignore, nocrt, alias("xmalloc")]]
+[[ignore, nocrt, alias("xmalloc"), decl_include("<hybrid/typecore.h>")]]
 [[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 void *crt_xmalloc(size_t num_bytes);
 
-[[ignore, nocrt, alias("xcalloc")]]
+[[ignore, nocrt, alias("xcalloc"), decl_include("<hybrid/typecore.h>")]]
 [[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 void *crt_xcalloc(size_t elem_count, size_t elem_size);
 
-[[ignore, nocrt, alias("xrealloc")]]
+[[ignore, nocrt, alias("xrealloc"), decl_include("<hybrid/typecore.h>")]]
 [[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 void *crt_xrealloc(void *ptr, size_t num_bytes);
 
 
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1))]]
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires($has_function(crt_xrealloc) ||
            $has_function(crt_xcalloc) ||
            $has_function(malloc, xmalloc_failed))]]
@@ -469,6 +472,7 @@ void *xmalloc(size_t num_bytes) {
 @@pp_endif@@
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 [[nonnull, requires_function(realloc, xmalloc_failed)]]
 [[impl_include("<asm/crt/malloc.h>")]]
@@ -484,6 +488,7 @@ void *xrealloc(void *ptr, size_t num_bytes) {
 	return result;
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((1, 2))]]
 [[requires($has_function(crt_xmalloc) ||
            $has_function(crt_xrealloc) ||
@@ -622,7 +627,7 @@ void freeargv(char **argv) {
 	free(argv);
 }
 
-[[pure, wunused]]
+[[pure, wunused, decl_include("<features.h>")]]
 __STDC_INT_AS_SIZE_T countargv(char *const *argv) {
 	__STDC_INT_AS_SIZE_T result = 0;
 	if (argv != NULL) {
@@ -634,7 +639,7 @@ __STDC_INT_AS_SIZE_T countargv(char *const *argv) {
 
 
 [[wunused, userimpl]] /* `userimpl' because we want to use `kcmp()' (if available) */
-[[requires_function(fstat)]]
+[[requires_function(fstat), decl_include("<bits/types.h>")]]
 [[impl_include("<bits/os/stat.h>")]]
 int fdmatch($fd_t fd1, $fd_t fd2) {
 	@struct stat@ st1, st2;
@@ -1143,7 +1148,7 @@ double physmem_available(void) {
 	return (double)pages * (double)pagesize;
 }
 
-[[wunused, pure, decl_include("<hybrid/typecore.h>")]]
+[[wunused, pure, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 __UINT32_TYPE__ xcrc32(__BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UINT32_TYPE__ crc) {
 	/* Taken from `libiberty' (which is the  same library also used by  `gdbserver')
 	 * Note that even though `libiberty' is the origin of the contents of this file,

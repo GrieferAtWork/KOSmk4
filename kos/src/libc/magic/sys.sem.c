@@ -33,6 +33,8 @@
 /* (#) Portability: uClibc        (/include/sys/sem.h) */
 }
 
+%[define_decl_include("<bits/os/sembuf.h>": ["struct sembuf"])]
+
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.io.poll")]
 
@@ -125,19 +127,18 @@ int semctl(int semid,
            __STDC_INT_AS_UINT_T cmd, ...);
 
 @@Get semaphore
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 int semget(key_t key,
            __STDC_INT_AS_UINT_T nsems,
            __STDC_INT_AS_UINT_T semflg);
 
 @@Operate on semaphore
-[[decl_include("<bits/os/sembuf.h>")]]
+[[decl_include("<bits/os/sembuf.h>", "<hybrid/typecore.h>")]]
 int semop(int semid, struct sembuf *sops, size_t nsops);
 
 %#ifdef __USE_GNU
 @@Operate on semaphore with timeout
-[[decl_include("<bits/os/sembuf.h>")]]
-[[decl_include("<bits/os/timespec.h>")]]
+[[decl_include("<bits/os/sembuf.h>", "<bits/os/timespec.h>")]]
 int semtimedop(int semid,
                struct sembuf *sops, size_t nsops,
                struct timespec const *timeout);

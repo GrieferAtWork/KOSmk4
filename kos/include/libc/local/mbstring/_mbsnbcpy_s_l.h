@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16917019 */
+/* HASH CRC-32:0x7cafd530 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,14 @@
 #define __local__mbsnbcpy_s_l_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE__mbsnbcpy_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
-#include <hybrid/typecore.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsnbcpy_l_defined
 #define __local___localdep__mbsnbcpy_l_defined
 #ifdef __CRT_HAVE__mbsnbcpy_l
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),unsigned char *,__NOTHROW_NCX,__localdep__mbsnbcpy_l,(unsigned char *__buf, unsigned char const *__src, __SIZE_TYPE__ __bufsize, __locale_t __locale),_mbsnbcpy_l,(__buf,__src,__bufsize,__locale))
 #elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END

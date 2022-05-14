@@ -758,18 +758,19 @@ void ns_put32($u_long val, [[nonnull]] $u_char *destptr) {
 int ns_initparse($u_char const *a, int b, ns_msg *c);
 int ns_skiprr($u_char const *a, $u_char const *b, ns_sect c, int d);
 int ns_parserr(ns_msg *a, ns_sect b, int c, ns_rr *d);
-int ns_sprintrr(ns_msg const *a, ns_rr const *b, char const *c, char const *d, char *e, size_t f);
-int ns_sprintrrf($u_char const *a, size_t, char const *b, ns_class c, ns_type d, $u_long e, $u_char const *f, size_t g, char const *h, char const *i, char *j, size_t k);
-int ns_format_ttl($u_long a, char *b, size_t c);
+[[decl_include("<hybrid/typecore.h>")]] int ns_sprintrr(ns_msg const *a, ns_rr const *b, char const *c, char const *d, char *e, size_t f);
+[[decl_include("<hybrid/typecore.h>")]] int ns_sprintrrf($u_char const *a, size_t, char const *b, ns_class c, ns_type d, $u_long e, $u_char const *f, size_t g, char const *h, char const *i, char *j, size_t k);
+[[decl_include("<hybrid/typecore.h>")]] int ns_format_ttl($u_long a, char *b, size_t c);
 int ns_parse_ttl(char const *a, $u_long *b);
-u_int32_t ns_datetosecs(char const *a, int *b);
-int ns_name_ntol($u_char const *a, $u_char *b, size_t c);
-int ns_name_ntop($u_char const *a, char *b, size_t c);
-int ns_name_pton(char const *a, $u_char *b, size_t c);
-int ns_name_unpack($u_char const *a, $u_char const *b, $u_char const *c, $u_char *d, size_t e);
+[[decl_include("<hybrid/typecore.h>")]] u_int32_t ns_datetosecs(char const *a, int *b);
+[[decl_include("<hybrid/typecore.h>")]] int ns_name_ntol($u_char const *a, $u_char *b, size_t c);
+[[decl_include("<hybrid/typecore.h>")]] int ns_name_ntop($u_char const *a, char *b, size_t c);
+[[decl_include("<hybrid/typecore.h>")]] int ns_name_pton(char const *a, $u_char *b, size_t c);
+[[decl_include("<hybrid/typecore.h>")]] int ns_name_unpack($u_char const *a, $u_char const *b, $u_char const *c, $u_char *d, size_t e);
 int ns_name_pack($u_char const *a, $u_char *b, int c, $u_char const **d, $u_char const **e);
-int ns_name_uncompress($u_char const *a, $u_char const *b, $u_char const *c, char *d, size_t e);
+[[decl_include("<hybrid/typecore.h>")]] int ns_name_uncompress($u_char const *a, $u_char const *b, $u_char const *c, char *d, size_t e);
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[if(__SIZEOF_INT__ == __SIZEOF_SIZE_T__), alias("dn_comp", "__dn_comp")]]
 int ns_name_compress(char const *srcbuf, $u_char *dstbuf, size_t dstbufsize,
                      $u_char const **d, $u_char const **e) {
@@ -796,7 +797,7 @@ int ns_verify_tcp($u_char *a, int *b, ns_tcp_tsig_state *c, int d);
 int ns_verify_tcp_init(void *a, $u_char const *b, int c, ns_tcp_tsig_state *d);
 int ns_samedomain(char const *a, char const *b);
 int ns_subdomain(char const *a, char const *b);
-int ns_makecanon(char const *a, char *b, size_t c);
+[[decl_include("<hybrid/typecore.h>")]] int ns_makecanon(char const *a, char *b, size_t c);
 int ns_samename(char const *a, char const *b);
 
 /* From <resolv.h> */

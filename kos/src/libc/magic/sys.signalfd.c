@@ -27,6 +27,13 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.sched.signalfd")]
 
+%[define_decl_include_implication("<bits/os/sigset.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/sigset.h>": ["struct __sigset_struct"])]
+
+%[define_decl_include_implication("<bits/os/sigset.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/sigset.h>": ["struct __sigset_struct"])]
+%[define_replacement(sigset_t = "struct __sigset_struct")]
+
 %[insert:prefix(
 #include <features.h>
 )]%{
@@ -109,7 +116,7 @@ typedef struct __sigset_struct sigset_t;
 @@               mask should be updated to `sigmask'.
 @@@param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK'
 @@               Meaningless,  but  still  validated  when  `fd != -1'
-[[wunused, decl_include("<features.h>", "<bits/os/sigset.h>")]]
+[[wunused, decl_include("<features.h>", "<bits/os/sigset.h>", "<bits/types.h>")]]
 $fd_t signalfd($fd_t fd, [[nonnull]] sigset_t const *sigmask,
                __STDC_INT_AS_UINT_T flags);
 

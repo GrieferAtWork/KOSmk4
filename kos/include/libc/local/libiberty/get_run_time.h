@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28ebed08 */
+/* HASH CRC-32:0x2e8bddff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,8 +62,14 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getrusage64,(int __
 #ifndef __local___localdep_sysconf_defined
 #define __local___localdep_sysconf_defined
 #ifdef __CRT_HAVE_sysconf
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_sysconf,(__STDC_INT_AS_UINT_T __name),sysconf,(__name))
 #elif defined(__CRT_HAVE___sysconf)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_sysconf,(__STDC_INT_AS_UINT_T __name),__sysconf,(__name))
 #else /* ... */
 #undef __local___localdep_sysconf_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80d05644 */
+/* HASH CRC-32:0xca070076 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,12 @@
 #include <__crt.h>
 #include <asm/os/socket.h>
 #if defined(__CRT_HAVE_getsockopt) && defined(__SOL_SOCKET) && defined(__SO_PEERCRED)
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getsockopt_defined
 #define __local___localdep_getsockopt_defined
 __NAMESPACE_LOCAL_END
 #include <features.h>
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((4, 5)),int,__NOTHROW_NCX,__localdep_getsockopt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void *__restrict __optval, __socklen_t *__restrict __optlen),getsockopt,(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* !__local___localdep_getsockopt_defined */

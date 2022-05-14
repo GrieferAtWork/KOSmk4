@@ -37,7 +37,7 @@ __SYSDECL_BEGIN
 }
 
 @@Change I/O port permissions for a specific I/O port range
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[export_alias("__ioperm", "__libc_ioperm")]]
 int ioperm($ulongptr_t from, $ulongptr_t num, __STDC_INT_AS_UINT_T turn_on);
 

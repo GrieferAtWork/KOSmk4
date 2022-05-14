@@ -1476,7 +1476,7 @@ size_t _mbclen_l([[nonnull]] unsigned char const *str, $locale_t locale) {
 	return 0;
 }
 
-[[decl_include("<hybrid/typecore.h>", "<bits/types.h>")]]
+[[decl_include("<bits/types.h>")]]
 [[requires_function(_mbsnbcpy_l)]]
 /*dos*/ errno_t _mbsnbcpy_s_l([[outp(bufsize)]] unsigned char *buf, size_t true_bufsize,
                               [[nonnull]] unsigned char const *src, size_t bufsize,
@@ -1487,7 +1487,7 @@ size_t _mbclen_l([[nonnull]] unsigned char const *str, $locale_t locale) {
 	return 0;
 }
 
-[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/__minmax.h>")]]
+[[decl_include("<bits/types.h>"), impl_include("<hybrid/__minmax.h>")]]
 [[requires_function(_mbsnbset_l)]]
 /*dos*/ errno_t _mbsnbset_s_l([[inoutp(true_bufsize)]] unsigned char *buf, size_t true_bufsize,
                               unsigned int ch, size_t max_bytes, $locale_t locale) {

@@ -46,6 +46,8 @@
 %[define_replacement(locale_t = __locale_t)]
 %[default:section(".text.crt{|.dos}.i18n")]
 
+%[define_decl_include("<bits/crt/tm.h>": ["struct tm"])]
+
 %[assume_defined_in_kos_userspace(LC_CTYPE, __LC_CTYPE)]
 %[assume_defined_in_kos_userspace(LC_NUMERIC, __LC_NUMERIC)]
 %[assume_defined_in_kos_userspace(LC_TIME, __LC_TIME)]
@@ -284,9 +286,9 @@ $locale_t _create_locale(int category, char const *locale);
 [[export_alias("__free_locale")]]
 void _free_locale($locale_t locale);
 
-[[wchar]] $wchar_t *_wsetlocale(int category, $wchar_t const *locale);
-[[wchar]] $locale_t _wcreate_locale(int category, $wchar_t const *locale);
-[[wchar, wunused]] $wchar_t **___lc_locale_name_func(void);
+[[wchar, decl_include("<hybrid/typecore.h>")]] $wchar_t *_wsetlocale(int category, $wchar_t const *locale);
+[[wchar, decl_include("<hybrid/typecore.h>")]] $locale_t _wcreate_locale(int category, $wchar_t const *locale);
+[[wchar, decl_include("<hybrid/typecore.h>"), wunused]] $wchar_t **___lc_locale_name_func(void);
 [[wunused]] unsigned int ___lc_codepage_func(void);
 [[wunused]] unsigned int ___lc_collate_cp_func(void);
 
@@ -324,7 +326,7 @@ char *_Getdays(void) {
 }
 
 [[wunused, requires_function(nl_langinfo, malloc)]]
-[[wchar, impl_include("<asm/crt/langinfo.h>")]]
+[[wchar, impl_include("<asm/crt/langinfo.h>"), decl_include("<hybrid/typecore.h>")]]
 $wchar_t *_W_Getdays(void) {
 	/* Essentially, we do:
 	 * >> wcsdup(L":Sun:Sunday:Mon:Monday:Tue:Tuesday:Wed:Wednesday:Thu:Thursday:Fri:Friday:Sat:Saturday") */
@@ -393,7 +395,7 @@ char *_Getmonths(void) {
 }
 
 [[wunused, requires_function(nl_langinfo, malloc)]]
-[[wchar, impl_include("<asm/crt/langinfo.h>")]]
+[[wchar, impl_include("<asm/crt/langinfo.h>"), decl_include("<hybrid/typecore.h>")]]
 $wchar_t *_W_Getmonths(void) {
 	/* Essentially, we do:
 	 * >> wcsdup(L":Jan:January:Feb:February:Mar:March:Apr:April:May:May:Jun:June:Jul:July:Aug:August:Sep:September:Oct:October:Nov:November:Dec:December") */
@@ -432,9 +434,10 @@ $wchar_t *_W_Getmonths(void) {
 [[wunused]] void *_Gettnames(void);
 [[wchar, wunused]] void *_W_Gettnames(void);
 
+[[decl_include("<bits/crt/tm.h>", "<hybrid/typecore.h>")]]
 $size_t _Strftime(char *buf, $size_t bufsize, [[nonnull]] char const *format,
                   [[nonnull]] struct tm const *tms, void *lc_time_arg);
-[[wchar]]
+[[wchar, decl_include("<bits/crt/tm.h>", "<hybrid/typecore.h>")]]
 $size_t _Wcsftime($wchar_t *buf, $size_t bufsize, [[nonnull]] $wchar_t const *format,
                   [[nonnull]] struct tm const *tms, void *lc_time_arg);
 

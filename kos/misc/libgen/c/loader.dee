@@ -2433,6 +2433,107 @@ again:
 		self.next();
 	}
 
+	public function parseDirective_define_decl_include() {
+		/* Define headers needed for type declarations
+		 * >> %[define_decl_include(["struct partition_def"] = "<bits/crt/partition.h>")]
+		 * >> %[define_decl_include("struct partition_def" = "<bits/crt/partition.h>")]
+		 * >> %[define_decl_include("<bits/crt/partition.h>": "struct partition_def")]
+		 * >> %[define_decl_include("<bits/crt/partition.h>": ["struct partition_def"])]
+		 */
+		self.next();
+		self.skip("(");
+		local decls: {string...} = [];
+		local newHeaderName;
+		if (self.tok == "[") {
+			self.next();
+			for (;;) {
+				decls.append(self.parseCStringOrKeyword());
+				if (self.tok != ",")
+					break;
+				self.next();
+				if (self.tok == "]")
+					break;
+			}
+			self.skip("]");
+			self.skip("=");
+			newHeaderName = str(self.parseCStringOrKeyword());
+		} else {
+			decls.append(self.parseCStringOrKeyword());
+			if (self.tok == ":") {
+				newHeaderName = str(decls.first);
+				decls = [];
+				self.next();
+				if (self.tok == "[") {
+					self.next();
+					for (;;) {
+						decls.append(self.parseCStringOrKeyword());
+						if (self.tok != ",")
+							break;
+						self.next();
+						if (self.tok == "]")
+							break;
+					}
+					self.skip("]");
+				} else {
+					decls.append(self.parseCStringOrKeyword());
+				}
+			} else {
+				self.skip("=");
+				newHeaderName = str(self.parseCStringOrKeyword());
+			}
+		}
+		for (local decl: decls) {
+			decl = normalizeForTypeHeader(str(decl));
+			local ok, oldHeaderName = typeHeaders.setnew_ex(decl, newHeaderName)...;
+			if (!ok && oldHeaderName != newHeaderName) {
+				self.err("define_decl_include re-definition: {!r} defined as {!r} (was: {!r})"
+					.format({ decl, newHeaderName, oldHeaderName }));
+			}
+		}
+		self.skip(")");
+	}
+
+	public function parseDirective_define_decl_include_implication() {
+		/* Define headers needed for type declarations
+		 * >> %[define_decl_include_implication("<bits/crt/aiocb.h>" => "<bits/os/sigevent.h>")]
+		 * >> %[define_decl_include_implication("<bits/crt/aiocb.h>" => ["<bits/os/sigevent.h>", "<bits/types.h>"])]
+		 */
+		self.next();
+		self.skip("(");
+		local baseHeader: string = str(self.parseCStringOrKeyword());
+		self.skip("=");
+		self.skip(">");
+		local impliedHeaders: {string...} = [];
+		if (self.tok == "[") {
+			self.next();
+			for (;;) {
+				impliedHeaders.append(str(self.parseCStringOrKeyword()));
+				if (self.tok != ",")
+					break;
+				self.next();
+				if (self.tok == "]")
+					break;
+			}
+			self.skip("]");
+		} else {
+			impliedHeaders.append(str(self.parseCStringOrKeyword()));
+		}
+		for (local impliedHeader: impliedHeaders) {
+			local impliedBySet: HashSet with string =
+				typeHeadersImplications.get(impliedHeader);
+			if (impliedBySet is none) {
+				/* Lazily create */
+				impliedBySet = HashSet();
+				local ok, oldImpliedBySet = typeHeadersImplications
+					.setnew_ex(impliedHeader, impliedBySet)...;
+				if (!ok)
+					impliedBySet = oldImpliedBySet;
+			}
+			impliedBySet.insert(baseHeader);
+		}
+		self.skip(")");
+	}
+
 	public function parseDirective_define_wchar_replacement_header() {
 		return parseDirective_define_wchar_replacement(true);
 	}
@@ -3615,7 +3716,8 @@ function loadSystemHeaderDefinitions(
 		local currentFeatures = copy context.defaultFeatures;
 		local current: Function = Function(originalSystemHeaderName: headerName);
 		local currentPrototype = FunctionPrototype(nothrow: DEFAULT_NOTHROW);
-		local currentPrototypes = [("1", { currentPrototype })];
+		local currentPrototypes: {(string, {FunctionPrototype...})...} =
+			[("1", { currentPrototype })];
 		local currentKosLibraryFunction: LibraryFunction = none;
 		local currentDosLibraryFunction: LibraryFunction = none;
 		/* # of leading entries in @current.bindings that should appear before the self-binding */
@@ -4769,6 +4871,32 @@ again_skip_annotation_rbracket:
 			currentPrototypes.insert(0,
 				("defined(__cplusplus) && defined(__CORRECT_ISO_CPP_{}_H_PROTO)"
 					.format({ headerName.upper() }), cxxPrototypes));
+		}
+
+		/* Generate warnings about missing [[decl_include()]]-s */
+		{
+			local loadedHeaders: {string...} = HashSet(currentPrototype.declPrefixHeaders);
+			local alreadyWarnedHeaders: {string...} = HashSet();
+			for (local typ/*: CType*/: currentPrototype.referencedTypes) {
+				local normalType = normalizeForTypeHeader(str(typ.beforeName));
+				local neededDeclHeader: string | none = typeHeaders.get(normalType);
+				if (neededDeclHeader !is none && neededDeclHeader !in loadedHeaders) {
+					local impliedBy: none | HashSet with string =
+						getHeadersThatImply(neededDeclHeader);
+					if ((for (local x: impliedBy) x in loadedHeaders) || ...) {
+						/* Implied include */
+					} else if (neededDeclHeader in alreadyWarnedHeaders) {
+						/* Already warned once */
+					} else {
+						alreadyWarnedHeaders.insert(neededDeclHeader);
+						self.warnAt(currentNameTokStart,
+							"Missing '[[decl_include({!r})]]' on {!r} needed for {!r} (in {!r})"
+							.format({ neededDeclHeader, currentName, normalType, typ.beforeName }));
+					}
+				}
+			}
+			/* TODO: Warn about redundant [[decl_include()]]-s (iow: ones already implied by other includes) */
+			/* TODO: Warn about unnecessary includes (iow: ones that could also be served by smaller implications) */
 		}
 
 		/* Right now, @tok points at the first token after the prototype

@@ -844,6 +844,7 @@ int madvise([[nonnull]] void *addr, size_t len,
 	return 0;
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 int mincore([[nonnull]] void *start, size_t len, unsigned char *vec);
 
 %#endif /* __USE_MISC */
@@ -898,6 +899,7 @@ int remap_file_pages(void *start, size_t size,
 @@>> memfd_create(2)
 @@@param: name:  Set `/proc/[pid]/fd/[return]' = "memfd:${name}"
 @@@param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB'
+[[decl_include("<bits/types.h>")]]
 $fd_t memfd_create(char const *name, unsigned int flags);
 
 @@>> mlock2(2)

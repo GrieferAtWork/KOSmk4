@@ -56,10 +56,12 @@ typedef __ssize_t ssize_t;
 
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 ssize_t strfmon([[nonnull]] char *__restrict s, size_t maxsize,
                 [[nonnull, format("strfmon")]] char const *__restrict format, ...);
 
 %#ifdef __USE_XOPEN2K8
+[[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__strfmon_l")]]
 ssize_t strfmon_l([[nonnull]] char *__restrict s, size_t maxsize, $locale_t loc,
                   [[nonnull, format("strfmon")]] const char *__restrict format, ...);

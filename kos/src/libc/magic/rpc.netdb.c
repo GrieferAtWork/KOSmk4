@@ -28,9 +28,14 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.net.rpc")]
 
-%{
+%[define_decl_include("<bits/crt/db/rpcent.h>": ["struct rpcent"])]
+
+
+%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <bits/crt/db/rpcent.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -59,15 +64,15 @@ struct rpcent *getrpcent();
 
 %
 %#ifdef __USE_MISC
-[[cp_kos, decl_include("<bits/crt/db/rpcent.h>")]]
+[[cp_kos, decl_include("<bits/crt/db/rpcent.h>", "<hybrid/typecore.h>")]]
 int getrpcbyname_r(char const *name, struct rpcent *result_buf,
                    char *buffer, size_t buflen,
                    struct rpcent **result); /* XXX: [[nonnull]] annotations? */
-[[cp_kos, decl_include("<bits/crt/db/rpcent.h>")]]
+[[cp_kos, decl_include("<bits/crt/db/rpcent.h>", "<hybrid/typecore.h>")]]
 int getrpcbynumber_r(int number, struct rpcent *result_buf,
                      char *buffer, size_t buflen,
                      struct rpcent **result); /* XXX: [[nonnull]] annotations? */
-[[cp_kos, decl_include("<bits/crt/db/rpcent.h>")]]
+[[cp_kos, decl_include("<bits/crt/db/rpcent.h>", "<hybrid/typecore.h>")]]
 int getrpcent_r(struct rpcent *result_buf,
                 char *buffer, size_t buflen,
                 struct rpcent **result); /* XXX: [[nonnull]] annotations? */

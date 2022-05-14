@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cadda21 */
+/* HASH CRC-32:0x6375afa1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local___stdio_common_vsc16scanf_defined
 #define __local___stdio_common_vsc16scanf_defined
 #include <__crt.h>
+#include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__stdio_common_vsc16scanf) __ATTR_LIBC_C16SCANF(4, 0) __ATTR_NONNULL((4)) __STDC_INT_AS_SSIZE_T

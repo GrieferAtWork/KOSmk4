@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb444395 */
+/* HASH CRC-32:0x7334e355 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -315,7 +315,10 @@ __CDECLARE_VOID_OPT(__ATTR_NORETURN,__NOTHROW_NCX,exit_thread,(int __exit_code),
 #ifdef __USE_GNU
 
 #ifdef __CC__
+#ifndef __cpu_set_t_defined
+#define __cpu_set_t_defined
 typedef struct __cpu_set_struct cpu_set_t;
+#endif /* !__cpu_set_t_defined */
 #endif /* __CC__ */
 
 #ifdef __USE_KOS

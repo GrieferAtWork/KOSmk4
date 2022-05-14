@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74223c5b */
+/* HASH CRC-32:0x1631a4a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #if defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
 #include <features.h>
 #include <bits/os/utimbuf.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_futime64_defined
 #define __local___localdep_crt_futime64_defined

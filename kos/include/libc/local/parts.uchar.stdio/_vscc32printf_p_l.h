@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44449544 */
+/* HASH CRC-32:0x2b3104d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,18 +22,13 @@
 #define __local__vscc32printf_p_l_defined
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___stdio_common_vsc32printf_p_defined
 #define __local___localdep___stdio_common_vsc32printf_p_defined
 #if defined(__CRT_HAVE___stdio_common_vswprintf_p) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LIBC_C32PRINTF_P(4, 0) __ATTR_NONNULL((4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vsc32printf_p,(__UINT64_TYPE__ __options, __CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vswprintf_p,(__options,__buf,__bufsize,__format,__locale,__args))
 #elif defined(__CRT_HAVE_KOS$__stdio_common_vswprintf_p)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_KOS(__ATTR_LIBC_C32PRINTF_P(4, 0) __ATTR_NONNULL((4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vsc32printf_p,(__UINT64_TYPE__ __options, __CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vswprintf_p,(__options,__buf,__bufsize,__format,__locale,__args))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END

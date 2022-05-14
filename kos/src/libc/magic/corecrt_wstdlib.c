@@ -119,13 +119,13 @@ typedef __SIZE_TYPE__ rsize_t;
 %[insert:function(_wcstold_l = wcstold_l)]
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
-[[wchar, pure, wunused]]
+[[wchar, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.wchar.unicode.static.convert")]]
 double _wtof([[nonnull]] wchar_t const *nptr) {
 	return wcstod(nptr, NULL);
 }
 
-[[wchar, pure, wunused]]
+[[wchar, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.wchar.unicode.static.convert")]]
 double _wtof_l([[nonnull]] wchar_t const *nptr,
                [[nullable]] $locale_t locale) {

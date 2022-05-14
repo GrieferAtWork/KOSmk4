@@ -36,6 +36,9 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.fs.statfs.statvfs")]
 
+%[define_decl_include_implication("<bits/os/statvfs.h>" => ["<bits/types.h>"])]
+%[define_decl_include("<bits/os/statvfs.h>": ["struct statvfs", "struct statvfs64"])]
+
 %[insert:prefix(
 #include <features.h>
 )]%{

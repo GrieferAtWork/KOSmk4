@@ -64,7 +64,7 @@ typedef __errno_t errno_t; /* Errno code (one of `E*' from <errno.h>) */
 }
 
 
-[[wchar, wunused]]
+[[wchar, wunused, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("_getwch_nolock")]]
 [[requires(defined(__CRT_HAVE_stdtty) && $has_function(_getwch_nolock))]]
 [[impl_include("<libc/template/stdtty.h>")]]
@@ -81,7 +81,7 @@ wint_t _getwch(void) {
 	return result;
 }
 
-[[wchar, wunused, doc_alias("_getwch")]]
+[[wchar, wunused, doc_alias("_getwch"), decl_include("<hybrid/typecore.h>")]]
 [[requires($extended_include_prefix("<asm/os/termios.h>")
            defined(__ECHO) && defined(__TCSANOW) && defined(__CRT_HAVE_stdtty) &&
            $has_function(fileno, fgetwc_unlocked, tcgetattr, tcsetattr))]]
@@ -100,7 +100,7 @@ wint_t _getwch_nolock(void) {
 	return result;
 }
 
-[[wchar, wunused]]
+[[wchar, wunused, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("_getwche_nolock")]]
 [[requires(defined(__CRT_HAVE_stdtty) && $has_function(_getwche_nolock))]]
 [[impl_include("<libc/template/stdtty.h>")]]
@@ -117,7 +117,7 @@ wint_t _getwche(void) {
 	return result;
 }
 
-[[wchar, wunused, doc_alias("_getwche")]]
+[[wchar, wunused, doc_alias("_getwche"), decl_include("<hybrid/typecore.h>")]]
 [[requires($extended_include_prefix("<asm/os/termios.h>")
            defined(__ECHO) && defined(__TCSANOW) && defined(__CRT_HAVE_stdtty) &&
            $has_function(fileno, fgetwc_unlocked, tcgetattr, tcsetattr))]]
@@ -136,6 +136,7 @@ wint_t _getwche_nolock(void) {
 	return result;
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires(defined(__CRT_HAVE_stdtty) && $has_function(fputwc))]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("_putwch_nolock")]]
 [[impl_include("<libc/template/stdtty.h>")]]
@@ -143,12 +144,14 @@ wint_t _getwche_nolock(void) {
 	return fputwc(ch, stdtty);
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires(defined(__CRT_HAVE_stdtty) && $has_function(fputwc_unlocked))]]
 [[impl_include("<libc/template/stdtty.h>")]]
 [[wchar]] wint_t _putwch_nolock(wchar_t ch) {
 	return fputwc_unlocked(ch, stdtty);
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires(defined(__CRT_HAVE_stdtty) && $has_function(ungetwc))]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("_ungetwch_nolock")]]
 [[impl_include("<libc/template/stdtty.h>")]]
@@ -156,6 +159,7 @@ wint_t _getwche_nolock(void) {
 	return ungetwc(ch, stdtty);
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires(defined(__CRT_HAVE_stdtty) && $has_function(ungetwc_unlocked))]]
 [[impl_include("<libc/template/stdtty.h>")]]
 [[wchar]] wint_t _ungetwch_nolock(wint_t ch) {
@@ -163,7 +167,8 @@ wint_t _getwche_nolock(void) {
 }
 
 
-[[wchar, decl_include("<bits/types.h>"), requires_function(_cgetws_s)]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[wchar, requires_function(_cgetws_s)]]
 wchar_t *_cgetws([[nonnull]] wchar_t *__restrict buf) {
 	wchar_t *result = buf + 2;
 	size_t readsize;
@@ -203,6 +208,7 @@ errno_t _cgetws_s([[outp(bufsize)]] wchar_t *buf, size_t bufsize,
 }
 
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[wchar, impl_include("<libc/template/stdtty.h>")]]
 [[requires($has_function(_putwch) || (defined(__CRT_HAVE_stdtty) && $has_function(file_wprinter)))]]
 int _cputws([[nonnull]] wchar_t const *__restrict str) {
@@ -283,28 +289,28 @@ __STDC_INT_AS_SSIZE_T __conio_common_vcwscanf($uint64_t options, [[nonnull, form
 /************************************************************************/
 /* __conio_common_* wrappers.                                           */
 /************************************************************************/
-[[wchar, decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcwprintf)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcwprintf)]]
 __STDC_INT_AS_SSIZE_T _vcwprintf_l([[nonnull, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return __conio_common_vcwprintf(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, format, locale, args);
 }
 
-[[wchar, decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcwprintf_s)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcwprintf_s)]]
 __STDC_INT_AS_SSIZE_T _vcwprintf_s_l([[nonnull, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return __conio_common_vcwprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, format, locale, args);
 }
 
-[[wchar, decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcwprintf_p)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcwprintf_p)]]
 [[crt_intern_alias("_vcwprintf_l")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vcwprintf_p_l([[nonnull, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return __conio_common_vcwprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, format, locale, args);
 }
 
-[[wchar, decl_include("<features.h>"), wunused, impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcwscanf)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), wunused, impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcwscanf)]]
 __STDC_INT_AS_SSIZE_T _vcwscanf_l([[nonnull, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return __conio_common_vcwscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS, format, locale, args);
 }
 
-[[wchar, decl_include("<features.h>"), wunused, impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcwscanf)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), wunused, impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcwscanf)]]
 __STDC_INT_AS_SSIZE_T _vcwscanf_s_l([[nonnull, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return __conio_common_vcwscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS |
 	                               _CRT_INTERNAL_SCANF_SECURECRT,
@@ -315,28 +321,28 @@ __STDC_INT_AS_SSIZE_T _vcwscanf_s_l([[nonnull, format]] wchar_t const *format, $
 /************************************************************************/
 /* Simple wrappers.                                                     */
 /************************************************************************/
-[[wchar, decl_include("<features.h>"), requires_function(_vcwprintf_l)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vcwprintf_l)]]
 __STDC_INT_AS_SSIZE_T _vcwprintf([[nonnull, format]] wchar_t const *format, $va_list args) {
 	return _vcwprintf_l(format, NULL, args);
 }
 
-[[wchar, decl_include("<features.h>"), requires_function(_vcwprintf_s_l)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vcwprintf_s_l)]]
 __STDC_INT_AS_SSIZE_T _vcwprintf_s([[nonnull, format]] wchar_t const *format, $va_list args) {
 	return _vcwprintf_s_l(format, NULL, args);
 }
 
-[[wchar, decl_include("<features.h>"), requires_function(_vcwprintf_p_l)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vcwprintf_p_l)]]
 [[crt_intern_alias("_vcwprintf")]] /* Normal printf already supports positional arguments! */
 __STDC_INT_AS_SSIZE_T _vcwprintf_p([[nonnull, format]] const wchar_t *format, $va_list args) {
 	return _vcwprintf_p_l(format, NULL, args);
 }
 
-[[wchar, decl_include("<features.h>"), wunused, requires_function(_vcwscanf_l)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), wunused, requires_function(_vcwscanf_l)]]
 __STDC_INT_AS_SSIZE_T _vcwscanf([[nonnull, format]] wchar_t const *format, $va_list args) {
 	return _vcwscanf_l(format, NULL, args);
 }
 
-[[wchar, decl_include("<features.h>"), wunused, requires_function(_vcwscanf_s_l)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), wunused, requires_function(_vcwscanf_s_l)]]
 __STDC_INT_AS_SSIZE_T _vcwscanf_s([[nonnull, format]] wchar_t const *format, $va_list args) {
 	return _vcwscanf_s_l(format, NULL, args);
 }
@@ -346,18 +352,18 @@ __STDC_INT_AS_SSIZE_T _vcwscanf_s([[nonnull, format]] wchar_t const *format, $va
 /************************************************************************/
 /* Varargs wrappers.                                                    */
 /************************************************************************/
-[[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cwprintf([[nonnull, format]] wchar_t const *format, ...) %{printf("_vcwprintf")}
-[[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cwprintf_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vcwprintf_l")}
-[[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cwprintf_s([[nonnull, format]] wchar_t const *format, ...) %{printf("_vcwprintf_s")}
-[[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cwprintf_s_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vcwprintf_s_l")}
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _cwprintf([[nonnull, format]] wchar_t const *format, ...) %{printf("_vcwprintf")}
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _cwprintf_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vcwprintf_l")}
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _cwprintf_s([[nonnull, format]] wchar_t const *format, ...) %{printf("_vcwprintf_s")}
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _cwprintf_s_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vcwprintf_s_l")}
 [[crt_intern_alias("_cwprintf")]] /* Normal printf already supports positional arguments! */
-[[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cwprintf_p([[nonnull, format]] wchar_t const *format, ...) %{printf("_vcwprintf_p")}
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _cwprintf_p([[nonnull, format]] wchar_t const *format, ...) %{printf("_vcwprintf_p")}
 [[crt_intern_alias("_cwprintf_l")]] /* Normal printf already supports positional arguments! */
-[[wchar, decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cwprintf_p_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vcwprintf_p_l")}
-[[wchar, decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cwscanf([[nonnull, format]] wchar_t const *format, ...) %{printf("_vcwscanf")}
-[[wchar, decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cwscanf_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vcwscanf_l")}
-[[wchar, decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cwscanf_s([[nonnull, format]] wchar_t const *format, ...) %{printf("_vcwscanf_s")}
-[[wchar, decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cwscanf_s_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vcwscanf_s_l")}
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]] __STDC_INT_AS_SSIZE_T _cwprintf_p_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vcwprintf_p_l")}
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cwscanf([[nonnull, format]] wchar_t const *format, ...) %{printf("_vcwscanf")}
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cwscanf_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vcwscanf_l")}
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cwscanf_s([[nonnull, format]] wchar_t const *format, ...) %{printf("_vcwscanf_s")}
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cwscanf_s_l([[nonnull, format]] wchar_t const *format, $locale_t locale, ...) %{printf("_vcwscanf_s_l")}
 
 
 

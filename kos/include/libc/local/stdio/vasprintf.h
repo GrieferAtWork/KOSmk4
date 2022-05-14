@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb65d1e1e */
+/* HASH CRC-32:0xf2554383 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_format_aprintf_pack
 __NAMESPACE_LOCAL_END
 struct format_aprintf_data;
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_format_aprintf_pack,(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),format_aprintf_pack,(__self,__pstrlen))
 #else /* __CRT_HAVE_format_aprintf_pack */

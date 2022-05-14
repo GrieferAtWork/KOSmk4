@@ -74,7 +74,7 @@ struct _wfinddata64i32_t;
 
 %[insert:function(_waccess = waccess)]
 
-[[wchar, cp, wunused, decl_include("<features.h>")]]
+[[wchar, cp, wunused, decl_include("<features.h>", "<bits/types.h>")]]
 [[section(".text.crt.dos.wchar.fs.property")]]
 [[requires_function(waccess), impl_include("<libc/errno.h>")]]
 errno_t _waccess_s([[nonnull]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
@@ -92,10 +92,10 @@ errno_t _waccess_s([[nonnull]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
 
 %[default:section(".text.crt.dos.wchar.fs.utility")]
 
-[[wchar]]
+[[wchar, decl_include("<bits/types.h>")]]
 errno_t _wmktemp_s([[nonnull]] wchar_t *template_, size_t bufsize);
 
-[[wchar, nonnull]]
+[[wchar, nonnull, decl_include("<hybrid/typecore.h>")]]
 wchar_t *_wmktemp([[nonnull]] wchar_t *template_);
 
 

@@ -109,7 +109,7 @@ int sem_destroy([[nonnull]] sem_t *self);
 @@@return: SEM_FAILED: [errno=EINVAL] The given `name' contains no characters after the initial `/'
 @@@return: SEM_FAILED: Error (s.a. `errno')
 [[cp_kos, vartypes($mode_t, unsigned int)]]
-[[decl_include("<bits/crt/semaphore.h>")]]
+[[decl_include("<bits/crt/semaphore.h>", "<bits/types.h>")]]
 sem_t *sem_open([[nonnull]] char const *name, $oflag_t oflags,
                 ... /*mode_t mode, unsigned int value*/);
 

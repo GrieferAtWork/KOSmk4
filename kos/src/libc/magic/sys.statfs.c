@@ -31,6 +31,9 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.fs.statfs.statfs")]
 
+%[define_decl_include_implication("<bits/os/statfs.h>" => ["<bits/types.h>"])]
+%[define_decl_include("<bits/os/statfs.h>": ["struct statfs", "struct statfs64"])]
+
 %[insert:prefix(
 #include <features.h>
 )]%{
@@ -65,15 +68,15 @@ int fstatfs($fd_t filedes, [[nonnull]] struct statfs *buf);
 %
 %#ifdef __USE_LARGEFILE64
 %#ifndef statfs64
+[[decl_include("<bits/os/statfs.h>")]]
 [[preferred_statfs64_variant_of(statfs), doc_alias("statfs")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("statfs", "__statfs", "__libc_statfs")]]
-[[decl_include("<bits/os/statfs.h>")]]
 int statfs64([[nonnull]] const char *file, [[nonnull]] struct statfs64 *buf);
 %#endif /* !statfs64 */
 
+[[decl_include("<bits/os/statfs.h>")]]
 [[preferred_statfs64_variant_of(fstatfs), doc_alias("fstatfs")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("fstatfs", "__fstatfs", "__libc_fstatfs")]]
-[[decl_include("<bits/os/statfs.h>")]]
 int fstatfs64($fd_t filedes, [[nonnull]] struct statfs64 *buf);
 %#endif /* __USE_LARGEFILE64 */
 

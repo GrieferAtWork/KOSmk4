@@ -56,6 +56,7 @@ typedef __size_t size_t;
 
 %[insert:function(_recalloc = recallocv)]
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires_function(malloc)]]
 _aligned_malloc:($size_t num_bytes, $size_t min_alignment)
 	-> [[memalign(min_alignment, num_bytes)]] void *
@@ -70,6 +71,7 @@ _aligned_malloc:($size_t num_bytes, $size_t min_alignment)
 	return result;
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires_function(malloc)]]
 _aligned_offset_malloc:($size_t num_bytes, $size_t min_alignment, $size_t offset)
 	-> [[malloc_unaligned(num_bytes)]] void *
@@ -86,6 +88,7 @@ _aligned_offset_malloc:($size_t num_bytes, $size_t min_alignment, $size_t offset
 	return result;
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires_function(_aligned_malloc, _aligned_free, _aligned_msize)]]
 _aligned_realloc:(void *aligned_mallptr, $size_t newsize, $size_t min_alignment)
 	-> [[realign(aligned_mallptr, min_alignment, newsize)]] void *
@@ -102,6 +105,7 @@ _aligned_realloc:(void *aligned_mallptr, $size_t newsize, $size_t min_alignment)
 	return result;
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires_function(_aligned_malloc, _aligned_free, _aligned_msize)]]
 _aligned_recalloc:(void *aligned_mallptr, $size_t count, $size_t num_bytes, $size_t min_alignment)
 	-> [[realign(aligned_mallptr, min_alignment, count * num_bytes)]] void *
@@ -120,6 +124,7 @@ _aligned_recalloc:(void *aligned_mallptr, $size_t count, $size_t num_bytes, $siz
 	return result;
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires_function(_aligned_offset_malloc, _aligned_free, _aligned_msize)]]
 _aligned_offset_realloc:(void *aligned_mallptr, $size_t newsize, $size_t min_alignment, $size_t offset)
 	-> [[realloc_unaligned(aligned_mallptr, newsize)]] void *
@@ -136,6 +141,7 @@ _aligned_offset_realloc:(void *aligned_mallptr, $size_t newsize, $size_t min_ali
 	return result;
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[requires_function(_aligned_offset_malloc, _aligned_free, _aligned_msize)]]
 _aligned_offset_recalloc:(void *aligned_mallptr, $size_t count, $size_t num_bytes, $size_t min_alignment, $size_t offset)
 	-> [[realloc_unaligned(aligned_mallptr, count * num_bytes)]] void *
@@ -154,7 +160,7 @@ _aligned_offset_recalloc:(void *aligned_mallptr, $size_t count, $size_t num_byte
 	return result;
 }
 
-[[pure, wunused]]
+[[pure, wunused, decl_include("<hybrid/typecore.h>")]]
 $size_t _aligned_msize(void *aligned_mallptr, $size_t min_alignment, $size_t offset) {
 	(void)min_alignment;
 	(void)offset;

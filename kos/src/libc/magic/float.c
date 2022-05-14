@@ -302,7 +302,7 @@ void _set_controlfp($uint32_t newval, $uint32_t mask) {
 	_controlfp(newval, mask);
 }
 
-[[decl_include("<hybrid/typecore.h>"), requires_function(_controlfp)]]
+[[decl_include("<bits/types.h>"), requires_function(_controlfp)]]
 $errno_t _controlfp_s($uint32_t *pcurrent, $uint32_t newval, $uint32_t mask) {
 	uint32_t st = _controlfp(newval, mask);
 	if (pcurrent)

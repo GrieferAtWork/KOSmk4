@@ -23,6 +23,10 @@
 
 %[default:section(".text.crt{|.dos}.sched.threads")]
 
+%[define_decl_include_implication("<bits/os/sigset.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/sigset.h>": ["struct __sigset_struct"])]
+%[define_replacement(sigset_t = "struct __sigset_struct")]
+
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
@@ -174,7 +178,7 @@ done_attr:;
 }
 
 
-[[cp, decl_include("<bits/crt/pthreadtypes.h>")]]
+[[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_join)]]
 $errno_t thr_join(thread_t thr, thread_t *p_departed, void **thread_return) {
 	errno_t result;
@@ -236,8 +240,10 @@ $errno_t thr_keycreate_once([[nonnull]] thread_key_t *key,
 	= pthread_key_create_once_np;
 
 
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t thr_setspecific(thread_key_t key, void *val) = pthread_setspecific;
 
+[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_getspecific, pthread_setspecific)]]
 $errno_t thr_getspecific(thread_key_t key, void **p_val) {
 	void *val;

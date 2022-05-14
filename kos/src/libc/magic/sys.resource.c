@@ -38,6 +38,9 @@
 %[define_replacement(id_t = __id_t)]
 %[default:section(".text.crt{|.dos}.sched.resource")]
 
+%[define_decl_include("<bits/os/rlimit.h>": ["struct rlimit", "struct rlimit64"])]
+%[define_decl_include("<bits/os/rusage.h>": ["struct rusage", "struct rusage64"])]
+
 %[insert:prefix(
 #include <features.h>
 )]%{
@@ -418,7 +421,7 @@ typedef int __priority_which_t;
 
 
 %#ifdef __USE_GNU
-[[decl_include("<bits/os/rlimit.h>"), no_crt_self_import]]
+[[decl_include("<bits/os/rlimit.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), alias("prlimit")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), alias("prlimit64")]]
 int prlimit($pid_t pid, __rlimit_resource_t resource,
@@ -427,7 +430,7 @@ int prlimit($pid_t pid, __rlimit_resource_t resource,
 
 %#ifdef __USE_LARGEFILE64
 [[preferred_rlim64_variant_of(prlimit)]]
-[[decl_include("<bits/os/rlimit.h>")]]
+[[decl_include("<bits/os/rlimit.h>", "<bits/types.h>")]]
 int prlimit64($pid_t pid, __rlimit_resource_t resource,
               [[nullable]] struct rlimit64 const *new_limit,
               [[nullable]] struct rlimit64 *old_limit);

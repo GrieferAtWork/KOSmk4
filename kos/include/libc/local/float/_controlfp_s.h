@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96bec6c0 */
+/* HASH CRC-32:0x91cd22cb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +23,14 @@
 #include <__crt.h>
 #include <fpu_control.h>
 #if defined(__CRT_HAVE__controlfp) || (defined(_FPU_GETCW) && defined(_FPU_SETCW))
-#include <hybrid/typecore.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__controlfp_defined
 #define __local___localdep__controlfp_defined
 #ifdef __CRT_HAVE__controlfp
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__UINT32_TYPE__,__NOTHROW_NCX,__localdep__controlfp,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),_controlfp,(__newval,__mask))
 #elif defined(_FPU_GETCW) && defined(_FPU_SETCW)
 __NAMESPACE_LOCAL_END

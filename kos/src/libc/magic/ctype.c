@@ -1047,6 +1047,7 @@ __CSDECLARE(,int,__mb_cur_max)
 }
 
 [[hidden, const, wunused]]
+[[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<libc/template/MB_CUR_MAX.h>")]]
 [[export_alias("___mb_cur_max_func")]]
 [[section(".text.crt{|.dos}.unicode.static.ctype")]]

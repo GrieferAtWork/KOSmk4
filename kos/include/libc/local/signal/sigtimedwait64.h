@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65e49670 */
+/* HASH CRC-32:0xb6b0fb42 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigtimedwait32_defined
 #define __local___localdep_sigtimedwait32_defined
+__NAMESPACE_LOCAL_END
+#include <bits/os/sigset.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec32 const *__rel_timeout),sigtimedwait,(__set,__info,__rel_timeout))
 #endif /* !__local___localdep_sigtimedwait32_defined */
 __LOCAL_LIBC(sigtimedwait64) __ATTR_NONNULL((1)) int

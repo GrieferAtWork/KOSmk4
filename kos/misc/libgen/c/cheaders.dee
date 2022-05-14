@@ -499,6 +499,39 @@ class FunctionPrototype {
 	@@      their  dependencies,  as  well  as  the  dependencies  of  inline   functions
 	public member declPrefix: {(string | UserString)...} = ();
 
+	@@List all types used by this prototype
+	public property referencedTypes: {CType...} = {
+		get(): {CType...} {
+			yield returnType;
+			for (local arg: argv) {
+				yield arg.ctype;
+			}
+		}
+	}
+
+	@@List all headers included by @declPrefix
+	public property declPrefixHeaders: {string...} = {
+		get(): {string...} {
+			for (local prefix: declPrefix) {
+				prefix = str(prefix).strip();
+				for (local line: prefix.splitlines(false)) {
+					try {
+						line = line.scanf(" # include %[^]")...;
+					} catch (...) {
+						break;
+					}
+					line = line.strip();
+					if ((line.startswith("\"") && line.endswith("\"")) ||
+					    (line.startswith("<") && line.endswith(">"))) {
+						yield line;
+					} else {
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	@@Wrapper around @attributes that will automatically sort and unwind attributes
 	public property prototypeAttributes: {(string | UserString)...} = {
 		get(): {(string | UserString)...} {

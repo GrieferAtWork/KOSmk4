@@ -40,6 +40,8 @@
 %[define_replacement(speed_t  = __UINT32_TYPE__)]
 %[define_replacement(tcflag_t = __UINT32_TYPE__)]
 
+%[define_decl_include("<bits/os/termios.h>": ["struct termios"])]
+
 %[default:section(".text.crt{|.dos}.io.tty")]
 
 %[insert:prefix(
@@ -675,7 +677,7 @@ int cfsetispeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed)
 
 @@>> tcgetattr(3)
 @@Get terminal attributes
-[[decl_include("<bits/os/termios.h>"), export_alias("__tcgetattr")]]
+[[decl_include("<bits/os/termios.h>", "<bits/types.h>"), export_alias("__tcgetattr")]]
 [[requires_include("<asm/os/tty.h>")]] /* __TCGETA */
 [[requires($has_function(ioctl) && defined(__TCGETA))]]
 int tcgetattr($fd_t fd, [[nonnull]] struct termios *__restrict termios_p) {
@@ -686,7 +688,7 @@ int tcgetattr($fd_t fd, [[nonnull]] struct termios *__restrict termios_p) {
 @@Set terminal attributes
 @@@param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH'
 [[impl_include("<asm/os/tty.h>", "<asm/os/termios.h>", "<libc/errno.h>")]]
-[[decl_include("<features.h>", "<bits/os/termios.h>")]]
+[[decl_include("<features.h>", "<bits/os/termios.h>", "<bits/types.h>")]]
 [[requires_function(ioctl)]]
 int tcsetattr($fd_t fd, __STDC_INT_AS_UINT_T optional_actions,
               [[nonnull]] struct termios const *__restrict termios_p) {
@@ -723,6 +725,7 @@ int tcsetattr($fd_t fd, __STDC_INT_AS_UINT_T optional_actions,
 
 
 @@>> tcsendbreak(3)
+[[decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TCSBRKP))]]
 int tcsendbreak($fd_t fd, int duration) {
@@ -730,6 +733,7 @@ int tcsendbreak($fd_t fd, int duration) {
 }
 
 @@>> tcdrain(3)
+[[decl_include("<bits/types.h>")]]
 [[cp, requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TCSBRK))]]
 int tcdrain($fd_t fd) {
@@ -742,7 +746,7 @@ int tcdrain($fd_t fd) {
 
 @@>> tcflush(3)
 @@@param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH'
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TCFLSH))]]
 int tcflush($fd_t fd, __STDC_INT_AS_UINT_T queue_selector) {
@@ -751,7 +755,7 @@ int tcflush($fd_t fd, __STDC_INT_AS_UINT_T queue_selector) {
 
 @@>> tcflow(3)
 @@@param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION'
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TCXONC))]]
 int tcflow($fd_t fd, __STDC_INT_AS_UINT_T action) {
@@ -763,6 +767,7 @@ int tcflow($fd_t fd, __STDC_INT_AS_UINT_T action) {
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 @@>> tcgetsid(3)
+[[decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TIOCGSID))]]
 $pid_t tcgetsid($fd_t fd) {
@@ -778,6 +783,7 @@ $pid_t tcgetsid($fd_t fd) {
 %
 %#if defined(__USE_BSD)
 @@>> tcsetsid(3)
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<libc/errno.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TIOCSCTTY))]]

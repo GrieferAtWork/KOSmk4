@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9cc47c2 */
+/* HASH CRC-32:0x689b58bf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,6 +50,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcmpz_defined
 #define __local___localdep_strcmpz_defined
 #ifdef __CRT_HAVE_strcmpz
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmpz,(char const *__lhs, char const *__rhs, __SIZE_TYPE__ __rhs_len),strcmpz,(__lhs,__rhs,__rhs_len))
 #else /* __CRT_HAVE_strcmpz */
 __NAMESPACE_LOCAL_END

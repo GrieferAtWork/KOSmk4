@@ -607,7 +607,7 @@ __WCHAR16_TYPE__ *_wgetdcwd_dbg(int driveno, [[outp_opt(buflen)]] __WCHAR16_TYPE
 
 [[guard, attribute(@_Check_return_wat_@)]]
 [[crt_dos_only, requires_function(_dupenv_s)]]
-[[decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t _dupenv_s_dbg([[nullable]] char **pbuf, [[nullable]] $size_t *pbufsize,
                        [[nonnull]] char const *varname,
                        int block_type, char const *filename, int line) {
@@ -618,7 +618,7 @@ $errno_t _dupenv_s_dbg([[nullable]] char **pbuf, [[nullable]] $size_t *pbufsize,
 }
 
 [[guard, attribute(@_Check_return_wat_@), crt_dos_only]]
-[[decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<bits/types.h>")]]
 $errno_t _wdupenv_s_dbg([[nullable]] __WCHAR16_TYPE__ **pbuf, [[nullable]] $size_t *pbuflen,
                         [[nonnull]] __WCHAR16_TYPE__ const *varname,
                         int block_type, char const *filename, int line) {

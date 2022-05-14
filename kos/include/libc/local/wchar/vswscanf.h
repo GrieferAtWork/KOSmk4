@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x918f4b4b */
+/* HASH CRC-32:0xe95a57dd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_vswscanf_defined
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_vwscanf_defined
 #define __local___localdep_format_vwscanf_defined
@@ -29,7 +30,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/crt/format-printer.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__localdep_format_vwscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwscanf,(__pgetc,__pungetc,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vwscanf */
@@ -40,7 +40,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_format_vwscanf */
 #endif /* !__local___localdep_format_vwscanf_defined */
 __NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 #include <asm/crt/stdio.h>
 #ifndef ____vswscanf_getc_defined

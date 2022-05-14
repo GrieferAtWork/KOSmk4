@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd338fb32 */
+/* HASH CRC-32:0xd5105c2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,18 +22,14 @@
 #define __local_thr_getspecific_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get) || defined(__CRT_HAVE_pthread_getspecificptr_np)) && (defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific))
+#include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_getspecific_defined
 #define __local___localdep_pthread_getspecific_defined
 #ifdef __CRT_HAVE_pthread_getspecific
-__NAMESPACE_LOCAL_END
-#include <bits/crt/pthreadtypes.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_pthread_getspecific,(__pthread_key_t __key),pthread_getspecific,(__key))
 #elif defined(__CRT_HAVE_tss_get)
-__NAMESPACE_LOCAL_END
-#include <bits/crt/pthreadtypes.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_pthread_getspecific,(__pthread_key_t __key),tss_get,(__key))
 #elif defined(__CRT_HAVE_pthread_getspecificptr_np)
 __NAMESPACE_LOCAL_END
@@ -47,16 +43,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_setspecific_defined
 #define __local___localdep_pthread_setspecific_defined
 #ifdef __CRT_HAVE_pthread_setspecific
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-#include <bits/crt/pthreadtypes.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),pthread_setspecific,(__key,__pointer))
 #elif defined(__CRT_HAVE_thr_setspecific)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-#include <bits/crt/pthreadtypes.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),thr_setspecific,(__key,__pointer))
 #else /* ... */
 #undef __local___localdep_pthread_setspecific_defined

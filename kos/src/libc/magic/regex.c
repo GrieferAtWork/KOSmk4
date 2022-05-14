@@ -354,6 +354,7 @@ typedef struct {
 
 @@Sets the current default syntax to `syntax', and return the old syntax.
 @@You  can  also  simply  assign  to  the  `re_syntax_options'   variable
+[[decl_include("<hybrid/typecore.h>")]]
 reg_syntax_t re_set_syntax(reg_syntax_t syntax);
 
 @@Compile   the   regular  expression   `pattern',  with   length  `length'
@@ -362,6 +363,7 @@ reg_syntax_t re_set_syntax(reg_syntax_t syntax);
 @@To  free  the allocated  storage, you  must  call `regfree'  on `buffer'.
 @@Note  that  the  translate table  must  either have  been  initialized by
 @@`regcomp', with a malloc'd value, or set to NULL before calling `regfree'
+[[decl_include("<hybrid/typecore.h>")]]
 char const *re_compile_pattern(char const *pattern, size_t length,
                                struct re_pattern_buffer *buffer);
 
@@ -400,6 +402,7 @@ int re_match_2(struct re_pattern_buffer *buffer, char const *string1,
 @@If `num_regs == 0', then subsequent matches should allocate their own register data.
 @@Unless this function is called, the first search or match using
 @@PATTERN_BUFFER will allocate its own register data, without freeing the old data
+[[decl_include("<hybrid/typecore.h>")]]
 void re_set_registers(struct re_pattern_buffer *buffer, struct re_registers *regs,
                       unsigned int num_regs, regoff_t *starts, regoff_t *ends);
 %#endif /* __USE_GNU */
@@ -409,10 +412,15 @@ void re_set_registers(struct re_pattern_buffer *buffer, struct re_registers *reg
 %/* POSIX compatibility.  */
 
 int regcomp(regex_t *__restrict preg, char const *__restrict pattern, int cflags);
+
+[[decl_include("<hybrid/typecore.h>")]]
 int regexec(regex_t const *__restrict preg, char const *__restrict string,
             size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags);
+
+[[decl_include("<hybrid/typecore.h>")]]
 size_t regerror(int errcode, regex_t const *__restrict preg,
                 char *__restrict errbuf, size_t errbuf_size);
+
 void regfree(regex_t *preg);
 
 %{

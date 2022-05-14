@@ -85,7 +85,7 @@ int lsetxattr([[nonnull]] char const *path,
 
 @@>> fsetxattr(2)
 @@@param: flags: One of `XATTR_*', or `0'
-[[cp, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[cp, decl_include("<features.h>", "<bits/types.h>")]]
 int fsetxattr($fd_t fd,
               [[nonnull]] char const *name,
               [[inp_opt(bufsize)]] void const *buf,
@@ -142,7 +142,7 @@ int lremovexattr([[nonnull]] char const *path,
                  [[nonnull]] char const *name);
 
 @@>> fremovexattr(2)
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 int fremovexattr($fd_t fd,
                  [[nonnull]] char const *name);
 

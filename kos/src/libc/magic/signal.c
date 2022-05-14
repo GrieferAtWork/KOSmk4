@@ -41,6 +41,18 @@
 /* (#) Portability: uClibc        (/include/signal.h) */
 }
 
+%[define_decl_include_implication("<bits/os/sigevent.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/sigevent.h>": ["struct sigevent"])]
+
+%[define_decl_include_implication("<bits/os/sigval.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/sigval.h>": ["union sigval"])]
+
+%[define_decl_include_implication("<bits/os/siginfo.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/siginfo.h>": ["struct __siginfo_struct"])]
+
+%[define_decl_include_implication("<bits/os/sigset.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/sigset.h>": ["struct __sigset_struct"])]
+
 %[define_ccompat_header("csignal")]
 %[define_replacement(longptr_t    = __LONGPTR_TYPE__)]
 %[define_replacement(ulongptr_t   = __ULONGPTR_TYPE__)]
@@ -2021,12 +2033,12 @@ int signandset([[nonnull]] $sigset_t *set,
 @@@param: set:  The set of signals on which to wait
 @@@param: info: Information about the signal on which to wait.
 @@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
-[[cp, decl_include("<bits/os/siginfo.h>")]]
+[[cp, decl_include("<bits/os/siginfo.h>", "<bits/os/sigset.h>")]]
 int sigwaitinfo([[nonnull]] $sigset_t const *__restrict set,
                 [[nullable]] siginfo_t *__restrict info);
 
 [[cp, ignore, nocrt, alias("sigtimedwait"), doc_alias("sigtimedwait")]]
-[[decl_include("<bits/os/siginfo.h>")]]
+[[decl_include("<bits/os/siginfo.h>", "<bits/os/sigset.h>", "<bits/os/timespec.h>")]]
 int sigtimedwait32([[nonnull]] $sigset_t const *__restrict set,
                    [[nullable]] siginfo_t *__restrict info,
                    [[nullable]] struct $timespec32 const *rel_timeout);
@@ -2077,7 +2089,7 @@ int sigtimedwait([[nonnull]] $sigset_t const *__restrict set,
 @@@return: -1:   [errno=EINVAL] The given `signo' is invalid
 @@@return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
 @@@return: -1:   [errno=ESRCH]  No process is identified by `pid'
-[[decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/sigval.h>")]]
 int sigqueue($pid_t pid, $signo_t signo, union sigval const val);
 
 %#ifdef __USE_TIME64
@@ -2262,7 +2274,7 @@ void psiginfo([[nonnull]] siginfo_t const *pinfo,
 @@Return a textual description of `code', as read from `siginfo_t::si_code',
 @@and used in conjunction with a given signal `signo'. This function is used
 @@for the implementation of `psiginfo(3)'
-[[const, wunused]]
+[[const, wunused, decl_include("<bits/types.h>")]]
 [[impl_include("<asm/os/signal.h>", "<asm/os/siginfo.h>")]]
 char const *strsigcode_s($signo_t signo, int code) {
 	char const *result = NULL;
@@ -2891,7 +2903,7 @@ $signo_t __libc_current_sigrtmax() {
 @@this function if they intend to use multiple threads.
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid `how'
-[[guard, decl_include("<features.h>", "<bits/os/sigset.h>")]]
+[[guard, decl_include("<features.h>", "<bits/os/sigset.h>", "<bits/types.h>")]]
 /* NOTE: Aliasing to `sigprocmask' breaks the meaning of return values, but
  *       while not 100% conforming, I  don't personally see any problem  in
  *       doing it this ways, especially  since the only possible error  can
@@ -2991,6 +3003,7 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 @@isn't recognized, return `0' instead.
 @@This function also handles stuff like "SIGRTMIN+1" or "9"
 [[pure, wunused, impl_include("<asm/os/signal.h>")]]
+[[decl_include("<bits/types.h>")]]
 $signo_t signalnumber([[nonnull]] const char *name) {
 	$signo_t result;
 
@@ -3050,6 +3063,7 @@ return_rt_signal:
 @@When  no such signal number exists, return `0'. When the given
 @@`signo' is `0', return the lowest valid signal number.
 [[const, wunused, impl_include("<asm/os/signal.h>")]]
+[[decl_include("<bits/types.h>")]]
 $signo_t signalnext($signo_t signo) {
 	if (signo >= (__NSIG - 1))
 		return 0;
@@ -3068,6 +3082,7 @@ $signo_t signalnext($signo_t signo) {
 @@handling for `SIGRTMIN...`SIGRTMAX' signals, which are encoded
 @@in a way that is compatible with `str2sig(3)'.
 [[requires_function(sigabbrev_np)]]
+[[decl_include("<bits/types.h>")]]
 [[impl_include("<asm/os/signal.h>")]]
 [[section(".text.crt{|.dos}.solaris")]]
 int sig2str($signo_t signo, [[nonnull]] char buf[SIG2STR_MAX]) {
@@ -3093,6 +3108,7 @@ int sig2str($signo_t signo, [[nonnull]] char buf[SIG2STR_MAX]) {
 @@ - Doesn't automatically remove any "SIG" prefix.
 @@@return: 0 : Success; `*p_signo' was filled
 @@@return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified)
+[[decl_include("<bits/types.h>")]]
 [[requires_function(signalnumber)]]
 [[section(".text.crt{|.dos}.solaris")]]
 int str2sig([[nonnull]] const char *name, [[nonnull]] $signo_t *p_signo) {

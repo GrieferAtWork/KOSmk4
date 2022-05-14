@@ -29,6 +29,8 @@
 %[default:section(".text.crt{|.dos}.unicode.UTF")]
 %[define_wchar_replacement(__SIZEOF_WCHAR_T__ = "2", "4")]
 
+%[define_decl_include("<bits/crt/mbstate.h>": ["struct __mbstate"])]
+
 /* /kos/src/libc/hybrid/unicode.c */
 %[declare_kernel_export("unicode_utf8seqlen")]
 

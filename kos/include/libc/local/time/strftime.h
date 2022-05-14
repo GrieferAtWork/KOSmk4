@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf53b8c05 */
+/* HASH CRC-32:0x4e4f871b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_strftime_defined
 #include <__crt.h>
 #include <bits/crt/tm.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_strftime_l_defined
 #define __local___localdep_crt_strftime_l_defined

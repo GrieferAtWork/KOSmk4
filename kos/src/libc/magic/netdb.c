@@ -36,6 +36,8 @@
 
 %[default:section(".text.crt{|.dos}.net.db")]
 
+%[define_decl_include("<bits/os/sigevent.h>": ["struct sigevent"])]
+
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(sa_family_t = __UINT16_TYPE__)]
 %[define_replacement(socklen_t = __socklen_t)]
@@ -313,7 +315,7 @@ void endhostent();
 struct hostent *gethostent();
 
 @@Return entry from host data base which address match `addr' with length `len' and type `type'
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 struct hostent *gethostbyaddr(void const *addr, socklen_t len, int type);
 
 @@Return entry from host data base for host with `name'
@@ -334,27 +336,27 @@ struct hostent *gethostbyname2(char const *name, int af);
 @@pointer to a variable  which gets the value  which would be stored  in
 @@the global variable `herrno' by the non-reentrant functions.
 @@These functions are not part of POSIX and therefore no official cancellation point
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 int gethostent_r(struct hostent *__restrict result_buf,
                  char *__restrict buf, size_t buflen,
                  struct hostent **__restrict result,
                  int *__restrict h_errnop);
 
-[[cp, doc_alias("gethostent_r")]]
+[[cp, doc_alias("gethostent_r"), decl_include("<bits/types.h>")]]
 int gethostbyaddr_r(void const *__restrict addr, socklen_t len, int type,
                     struct hostent *__restrict result_buf,
                     char *__restrict buf, size_t buflen,
                     struct hostent **__restrict result,
                     int *__restrict h_errnop);
 
-[[cp, doc_alias("gethostent_r")]]
+[[cp, doc_alias("gethostent_r"), decl_include("<bits/types.h>")]]
 int gethostbyname_r(char const *__restrict name,
                     struct hostent *__restrict result_buf,
                     char *__restrict buf, size_t buflen,
                     struct hostent **__restrict result,
                     int *__restrict h_errnop);
 
-[[cp, doc_alias("gethostent_r")]]
+[[cp, doc_alias("gethostent_r"), decl_include("<bits/types.h>")]]
 int gethostbyname2_r(char const *__restrict name, int af,
                      struct hostent *__restrict result_buf,
                      char *__restrict buf, size_t buflen,
@@ -377,7 +379,7 @@ void endnetent();
 struct netent *getnetent();
 
 @@Return entry from network data base which address match `net' and type `type'
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 struct netent *getnetbyaddr(uint32_t net, int type);
 
 @@Return entry from network data base for network with `name'
@@ -393,20 +395,20 @@ struct netent *getnetbyname(char const *name);
 @@non-reentrant functions.
 @@These functions are not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 int getnetent_r(struct netent *__restrict result_buf,
                 char *__restrict buf, size_t buflen,
                 struct netent **__restrict result,
                 int *__restrict h_errnop);
 
-[[cp, doc_alias("getnetent_r")]]
+[[cp, doc_alias("getnetent_r"), decl_include("<hybrid/typecore.h>")]]
 int getnetbyaddr_r(uint32_t net, int type,
                    struct netent *__restrict result_buf,
                    char *__restrict buf, size_t buflen,
                    struct netent **__restrict result,
                    int *__restrict h_errnop);
 
-[[cp, doc_alias("getnetent_r")]]
+[[cp, doc_alias("getnetent_r"), decl_include("<hybrid/typecore.h>")]]
 int getnetbyname_r(char const *__restrict name,
                    struct netent *__restrict result_buf,
                    char *__restrict buf, size_t buflen,
@@ -442,19 +444,19 @@ struct servent *getservbyport(int port, char const *proto);
 @@arguments specify  a  buffer  of `buflen'  starting  at  `buf'.
 @@These functions are not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 int getservent_r(struct servent *__restrict result_buf,
                  char *__restrict buf, size_t buflen,
                  struct servent **__restrict result);
 
-[[cp, doc_alias("getservent_r")]]
+[[cp, doc_alias("getservent_r"), decl_include("<hybrid/typecore.h>")]]
 int getservbyname_r(char const *__restrict name,
                     char const *__restrict proto,
                     struct servent *__restrict result_buf,
                     char *__restrict buf, size_t buflen,
                     struct servent **__restrict result);
 
-[[cp, doc_alias("getservent_r")]]
+[[cp, doc_alias("getservent_r"), decl_include("<hybrid/typecore.h>")]]
 int getservbyport_r(int port, char const *__restrict proto,
                     struct servent *__restrict result_buf,
                     char *__restrict buf, size_t buflen,
@@ -489,18 +491,18 @@ struct protoent *getprotobynumber(int proto);
 @@arguments specify  a  buffer  of `buflen'  starting  at  `buf'.
 @@These functions are not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 int getprotoent_r(struct protoent *__restrict result_buf,
                   char *__restrict buf, size_t buflen,
                   struct protoent **__restrict result);
 
-[[cp, doc_alias("getprotoent_r")]]
+[[cp, doc_alias("getprotoent_r"), decl_include("<hybrid/typecore.h>")]]
 int getprotobyname_r(char const *__restrict name,
                      struct protoent *__restrict result_buf,
                      char *__restrict buf, size_t buflen,
                      struct protoent **__restrict result);
 
-[[cp, doc_alias("getprotoent_r")]]
+[[cp, doc_alias("getprotoent_r"), decl_include("<hybrid/typecore.h>")]]
 int getprotobynumber_r(int proto,
                        struct protoent *__restrict result_buf,
                        char *__restrict buf, size_t buflen,
@@ -539,7 +541,7 @@ int innetgr(char const *netgroup,
 @@Reentrant version of `getnetgrent' where result is placed in `buf'.
 @@This  function  is  not part  of  POSIX and  therefore  no official
 @@cancellation point
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 int getnetgrent_r(char **__restrict hostp,
                   char **__restrict userp,
                   char **__restrict domainp,
@@ -557,7 +559,7 @@ int getnetgrent_r(char **__restrict hostp,
 @@official host name.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp, guard]]
+[[cp, guard, decl_include("<hybrid/typecore.h>")]]
 int rcmd(char **__restrict ahost, $uint16_t rport,
          char const *__restrict locuser,
          char const *__restrict remuser,
@@ -568,7 +570,7 @@ int rcmd(char **__restrict ahost, $uint16_t rport,
 @@and which therefore can be used for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp, guard]]
+[[cp, guard, decl_include("<hybrid/typecore.h>")]]
 int rcmd_af(char **__restrict ahost, $uint16_t rport,
             char const *__restrict locuser,
             char const *__restrict remuser,
@@ -593,7 +595,7 @@ int rexec(char **__restrict ahost, int rport,
 @@and which therefore can be used for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp, guard]]
+[[cp, guard, decl_include("<hybrid/typecore.h>")]]
 int rexec_af(char **__restrict ahost, int rport,
              char const *__restrict name,
              char const *__restrict pass,
@@ -615,7 +617,7 @@ int ruserok(char const *rhost, int suser,
 @@and which therefore can be used for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 int ruserok_af(char const *rhost, int suser,
                char const *remuser,
                char const *locuser,
@@ -627,7 +629,7 @@ int ruserok_af(char const *rhost, int suser,
 @@superuser. Return 0 if it is possible.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 int iruserok(uint32_t raddr, int suser,
              char const *remuser,
              char const *locuser);
@@ -637,7 +639,7 @@ int iruserok(uint32_t raddr, int suser,
 @@therefore can be used for IPv6
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
+[[cp, decl_include("<hybrid/typecore.h>")]]
 int iruserok_af(void const *raddr, int suser,
                 char const *remuser,
                 char const *locuser,
@@ -655,7 +657,7 @@ int rresvport(int *alport);
 @@and which therefore can be used for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp, guard]]
+[[cp, guard, decl_include("<hybrid/typecore.h>")]]
 int rresvport_af(int *alport, $sa_family_t af);
 %#endif /* __USE_MISC */
 
@@ -678,7 +680,7 @@ void freeaddrinfo(struct addrinfo *ai);
 char const *gai_strerror(int ecode);
 
 @@Translate a socket address to a location and service name
-[[cp]]
+[[cp, decl_include("<bits/types.h>")]]
 int getnameinfo(struct sockaddr const *__restrict sa, socklen_t salen,
                 char *__restrict host, socklen_t hostlen,
                 char *__restrict serv, socklen_t servlen,
@@ -711,7 +713,7 @@ int getaddrinfo_a(int mode,
 @@longest time the function keeps  waiting before returning with an  error.
 @@This   function  is  not   part  of  POSIX   and  therefore  no  official
 @@cancellation point
-[[cp, no_crt_self_import]]
+[[cp, no_crt_self_import, decl_include("<bits/os/timespec.h>")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gai_suspend")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gai_suspend64")]]
 [[userimpl, requires($has_function(gai_suspend64) || $has_function(gai_suspend32))]]
@@ -736,12 +738,12 @@ int gai_suspend(struct gaicb const *const list[],
 
 %
 %#ifdef __USE_TIME64
-[[cp, doc_alias("gai_suspend"), ignore, nocrt, alias("gai_suspend")]]
+[[cp, doc_alias("gai_suspend"), ignore, nocrt, alias("gai_suspend"), decl_include("<bits/os/timespec.h>")]]
 int gai_suspend32(struct gaicb const *const list[],
                   int ent, struct $timespec32 const *timeout);
 
 [[cp, preferred_time64_variant_of(gai_suspend), doc_alias("gai_suspend")]]
-[[userimpl, requires_function(gai_suspend32)]]
+[[userimpl, requires_function(gai_suspend32), decl_include("<bits/os/timespec.h>")]]
 int gai_suspend64(struct gaicb const *const list[],
                   int ent, struct timespec64 const *timeout) {
 	struct timespec32 tmo32;

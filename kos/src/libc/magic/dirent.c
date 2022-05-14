@@ -51,6 +51,9 @@
 %[define_replacement(DIR        = "struct __dirstream")]
 %[default:section(".text.crt{|.dos}.fs.dir")]
 
+%[define_decl_include_implication("<bits/os/dirent.h>" => ["<bits/types.h>"])]
+%[define_decl_include("<bits/os/dirent.h>": ["struct dirent", "struct dirent64"])]
+
 
 %[insert:prefix(
 #include <features.h>
@@ -303,6 +306,7 @@ DIR *fopendirat($fd_t dirfd, [[nonnull]] char const *name, $oflag_t oflags) {
 
 @@>> opendirat(3)
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
+[[decl_include("<bits/types.h>")]]
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[crt_dos_variant, userimpl, requires_function(fopendirat)]]
 DIR *opendirat($fd_t dirfd, [[nonnull]] char const *name) {

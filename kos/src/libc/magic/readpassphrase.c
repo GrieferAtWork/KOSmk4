@@ -71,7 +71,7 @@ typedef __SIZE_TYPE__ size_t;
 @@@param: flags: Set of `RPP_*' (from `<readpassphrase.h>')
 @@@return: buf:  Success
 @@@return: NULL: Error (s.a. `errno')
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<bits/types.h>", "<asm/os/stdio.h>", "<asm/os/oflags.h>")]]
 [[impl_include("<libc/errno.h>", "<paths.h>", "<asm/crt/readpassphrase.h>")]]
 [[impl_include("<asm/os/termios.h>", "<bits/os/termios.h>")]]

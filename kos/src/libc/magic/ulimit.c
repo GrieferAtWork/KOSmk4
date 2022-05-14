@@ -78,7 +78,7 @@ enum {
 
 @@>> ulimit(2)
 @@@param: cmd: One OF `UL_*'
-[[vartypes(long), decl_include("<features.h>")]]
+[[vartypes(long), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 $longptr_t ulimit(__STDC_INT_AS_UINT_T cmd, ...);
 
 %{

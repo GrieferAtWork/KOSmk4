@@ -46,6 +46,10 @@
 %[define_ccompat_header("ctime")]
 %[default:section(".text.crt{|.dos}.time")]
 
+%[define_decl_include("<bits/crt/tm.h>": ["struct tm"])]
+%[define_decl_include("<bits/os/sigevent.h>": ["struct sigevent"])]
+%[define_decl_include("<bits/os/timex.h>": ["struct timex", "struct timex64"])]
+
 %[define_replacement(time_t    = "__TM_TYPE(time)")]
 %[define_replacement(time32_t  = __time32_t)]
 %[define_replacement(time64_t  = __time64_t)]
@@ -635,7 +639,7 @@ struct $tm *normalize_struct_tm([[nonnull]] struct $tm *__restrict tp) {
 @@>> clock(3)
 @@Time used by the program so  far (user time + system  time)
 @@The `result / CLOCKS_PER_SECOND' is program time in seconds
-[[std, wunused]] clock_t clock();
+[[std, wunused, decl_include("<bits/types.h>")]] clock_t clock();
 
 @@>> time(2), time64(2)
 @@Return the current time and put it in `*timer' if `timer' is not `NULL'
@@ -771,7 +775,7 @@ DEFINE_GMTIME_BUFFER
 }
 
 
-[[decl_include("<bits/crt/tm.h>"), doc_alias("strftime_l")]]
+[[decl_include("<bits/crt/tm.h>", "<hybrid/typecore.h>"), doc_alias("strftime_l")]]
 [[ignore, nocrt, alias("strftime_l", "_strftime_l", "__strftime_l")]]
 $size_t crt_strftime_l([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
                        [[nonnull]] char const *__restrict format,
@@ -783,7 +787,7 @@ $size_t crt_strftime_l([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
 @@Format `tp' into `s' according to `format'.
 @@Write no more than `maxsize' characters and return the number
 @@of characters  written, or  0 if  it would  exceed  `maxsize'
-[[std, decl_include("<bits/crt/tm.h>"), crtbuiltin, alias("_Strftime")]]
+[[std, decl_include("<bits/crt/tm.h>", "<hybrid/typecore.h>"), crtbuiltin, alias("_Strftime")]]
 size_t strftime([[outp(bufsize)]] char *__restrict buf, size_t bufsize,
                 [[nonnull]] char const *__restrict format,
                 [[nonnull]] struct tm const *__restrict tp) {
@@ -820,7 +824,7 @@ __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 %(std)#ifdef __USE_ISOC11
 @@>> asctime_s(3)
 [[std, guard, impl_include("<libc/errno.h>")]]
-[[decl_include("<bits/crt/tm.h>")]]
+[[decl_include("<bits/crt/tm.h>", "<bits/types.h>")]]
 $errno_t asctime_s([[outp(buflen)]] char *__restrict buf, size_t buflen,
                    [[nonnull]] struct tm const *__restrict tp) {
 	if (buflen < 26)
@@ -1246,8 +1250,9 @@ timelocal64(*) = mktime64;
 %
 %#ifdef __USE_POSIX199309
 
-[[cp, doc_alias("nanosleep"), ignore, nocrt, alias("nanosleep", "__nanosleep", "__libc_nanosleep")]]
-int nanosleep32([[nonnull]] struct timespec const *requested_time,
+[[cp, ignore, doc_alias("nanosleep"), decl_include("<bits/os/timespec.h>")]]
+[[nocrt, alias("nanosleep", "__nanosleep", "__libc_nanosleep")]]
+int nanosleep32([[nonnull]] struct $timespec32 const *requested_time,
                 [[nullable]] struct $timespec32 *remaining);
 
 @@>> nanosleep(2), nanosleep64(2)
@@ -1753,7 +1758,7 @@ INTDEF longptr_t libc_timezone;
 @@>> strftime_l(3)
 @@Similar to `strftime(3)' but take the information from
 @@the   provided  locale  and   not  the  global  locale
-[[decl_include("<bits/crt/tm.h>")]]
+[[decl_include("<bits/crt/tm.h>", "<hybrid/typecore.h>")]]
 [[dos_only_export_alias("_strftime_l"), export_alias("__strftime_l")]]
 $size_t strftime_l([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
                    [[nonnull]] char const *__restrict format,
@@ -1826,14 +1831,14 @@ int getdate_r([[nonnull]] char const *__restrict string,
 }
 
 @@>> clock_adjtime(2), clock_adjtime64(2)
-[[guard, no_crt_self_import]]
+[[guard, no_crt_self_import, decl_include("<bits/types.h>", "<bits/os/timex.h>")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("clock_adjtime")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("clock_adjtime64")]]
 int clock_adjtime($clockid_t clock_id, struct timex *utx);
 
 %
 %#ifdef __USE_TIME64
-[[guard]]
+[[guard, decl_include("<bits/types.h>", "<bits/os/timex.h>")]]
 [[preferred_time64_variant_of(clock_adjtime), doc_alias("clock_adjtime")]]
 int clock_adjtime64($clockid_t clock_id, struct timex64 *utx);
 %#endif /* __USE_TIME64 */
@@ -2155,7 +2160,7 @@ typedef __errno_t errno_t;
 
 
 /* gLibc doesn't have `__dstbias', so this one we can expose. */
-[[nodos, cc(LIBDCALL), no_crt_self_export, no_crt_self_import]]
+[[nodos, cc(LIBDCALL), no_crt_self_export, no_crt_self_import, decl_include("<hybrid/typecore.h>")]]
 [[export_alias("DOS$__dstbias"), if(defined(__CRT_DOS)), preferred_alias("__dstbias")]]
 [[requires_include("<libc/template/dstbias.h>"), requires(defined(__LOCAL_dstbias))]]
 [[impl_include("<libc/template/dstbias.h>"), export_alias("__p__dstbias")]]
@@ -2451,7 +2456,7 @@ char *_strdate([[nonnull]] char buf[9]) {
 }
 
 [[nocrt, pure, wunused, alias("timespec_get", "_timespec32_get")]]
-[[doc_alias("timespec_get")]]
+[[doc_alias("timespec_get"), decl_include("<features.h>", "<bits/os/timespec.h>")]]
 int _timespec32_get([[nonnull]] struct __timespec32 *ts, __STDC_INT_AS_UINT_T base);
 
 %[insert:function(_timespec64_get = timespec_get64)]

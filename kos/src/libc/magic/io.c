@@ -253,6 +253,7 @@ errno_t _sopen_dispatch([[nonnull]] char const *filename,
 
 
 [[section(".text.crt.dos.fs.utility")]]
+[[decl_include("<bits/types.h>")]]
 errno_t _mktemp_s([[nonnull]] char *template_, size_t size);
 
 %[insert:function(_sopen = sopen)]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc9f1d4c */
+/* HASH CRC-32:0x7c2ff35c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #include <bits/types.h>
 #if defined(__CRT_HAVE_UTimensAt64) || defined(__CRT_HAVE_UTimensAt)
 #include <kos/anno.h>
+#include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_UTimensAt32_defined) && defined(__CRT_HAVE_UTimensAt)
 #define __local___localdep_UTimensAt32_defined

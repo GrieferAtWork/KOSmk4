@@ -35,6 +35,9 @@
 /* (#) Portability: uClibc        (/include/sys/wait.h) */
 }
 
+%[define_decl_include_implication("<bits/os/siginfo.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/siginfo.h>": ["struct __siginfo_struct"])]
+
 %[define_replacement(pid_t = __pid_t)]
 %[define_replacement(rusage32 = __rusage32)]
 %[define_replacement(rusage64 = __rusage64)]
@@ -125,7 +128,7 @@ typedef __id_t id_t;
 @@@param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
 @@@param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
 @@                 optionally     or'd     with     `WNOHANG | WNOWAIT'
-[[cp, decl_include("<features.h>")]]
+[[cp, decl_include("<features.h>", "<bits/os/siginfo.h>", "<bits/types.h>")]]
 int waitid(idtype_t idtype, id_t id,
            [[nullable]] siginfo_t *infop,
            __STDC_INT_AS_UINT_T options);

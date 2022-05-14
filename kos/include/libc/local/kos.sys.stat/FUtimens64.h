@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x517dff4 */
+/* HASH CRC-32:0x6a456a27 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE_FUtimens
 #include <kos/anno.h>
+#include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_FUtimens32_defined
 #define __local___localdep_FUtimens32_defined

@@ -39,7 +39,7 @@ __SYSDECL_BEGIN
 
 %[default:section(".text.crt{|.dos}.fs.modify")];
 
-[[wchar, cp, ignore, nocrt, alias("_wmkdir")]]
+[[wchar, cp, ignore, nocrt, alias("_wmkdir"), decl_include("<hybrid/typecore.h>")]]
 int dos_wmkdir([[nonnull]] wchar_t const *pathname);
 
 [[ignore]] dos_c16mkdir(*) %{uchar16("dos_wmkdir")}

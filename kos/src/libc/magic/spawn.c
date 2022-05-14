@@ -32,6 +32,21 @@
 /* (#) Portability: uClibc        (/include/spawn.h) */
 }
 
+%[define_decl_include_implication("<bits/crt/posix_spawn.h>" => [
+	"<bits/types.h>",
+	"<bits/os/sched.h>",
+	"<bits/os/sigset.h>",
+])]
+%[define_decl_include("<bits/crt/posix_spawn.h>": [
+	"struct __posix_spawnattr",
+	"struct __spawn_action",
+	"struct __posix_spawn_file_actions",
+])]
+
+%[define_decl_include_implication("<bits/os/sigset.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/sigset.h>": ["struct __sigset_struct"])]
+%[define_replacement(sigset_t = "struct __sigset_struct")]
+
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]
 %[define_replacement(posix_spawnattr_t = "struct __posix_spawnattr")]
@@ -706,7 +721,7 @@ $errno_t posix_spawnp([[nonnull]] pid_t *__restrict pid,
 @@>> posix_spawnattr_init(3)
 @@Initialize a given set of spawn attributes to all zero
 @@@return: 0 : Success
-[[decl_include("<bits/crt/posix_spawn.h>")]]
+[[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
 $errno_t posix_spawnattr_init([[nonnull]] posix_spawnattr_t *__restrict attr) {
 	bzero(attr, sizeof(*attr));
 	return 0;

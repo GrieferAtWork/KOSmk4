@@ -121,7 +121,7 @@ typedef __SIZE_TYPE__ rsize_t;
 %/* DOS-specific functions */
 %[default:section(".text.crt.dos.wchar.errno")];
 
-[[wchar, decl_include("<hybrid/typecore.h>")]]
+[[wchar, decl_include("<bits/types.h>")]]
 wchar_t *_wcserror($errno_t errno_value);
 
 [[wchar, decl_include("<bits/types.h>")]]

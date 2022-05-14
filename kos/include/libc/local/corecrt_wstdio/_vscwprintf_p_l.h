@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75082482 */
+/* HASH CRC-32:0x53e38c4c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,11 @@
 #define __local__vscwprintf_p_l_defined
 #include <__crt.h>
 #include <features.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___stdio_common_vswprintf_p_defined
 #define __local___localdep___stdio_common_vswprintf_p_defined
 #ifdef __CRT_HAVE___stdio_common_vswprintf_p
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_LIBC_WPRINTF_P(4, 0) __ATTR_NONNULL((4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vswprintf_p,(__UINT64_TYPE__ __options, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vswprintf_p,(__options,__buf,__bufsize,__format,__locale,__args))
 #else /* __CRT_HAVE___stdio_common_vswprintf_p */
 __NAMESPACE_LOCAL_END

@@ -35,6 +35,11 @@
 
 %[default:section(".text.crt{|.dos}.wchar.string.format")]
 
+%[define_decl_include_implication("<bits/crt/wformat-printer.h>" => [
+	"<hybrid/typecore.h>",
+	"<bits/crt/format-printer.h>",
+])]
+
 
 %(auto_header){
 #include <parts/uchar/format-printer.h>
@@ -381,6 +386,7 @@ struct format_waprintf_data {
 @@                 (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)')
 [[wchar, impl_include("<hybrid/__assert.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
+[[decl_include("<hybrid/typecore.h>")]]
 [[decl_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]]
 [[requires_function(realloc)]]
 wchar_t *format_waprintf_pack([[nonnull]] struct format_waprintf_data *__restrict self,
@@ -432,6 +438,7 @@ wchar_t *format_waprintf_pack([[nonnull]] struct format_waprintf_data *__restric
 @@the format_aprintf buffer `self' is finalized,  or some other function is  used
 @@to append additional data to the end of `self'
 @@@return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM')
+[[decl_include("<hybrid/typecore.h>")]]
 [[wchar, wunused, impl_include("<hybrid/__assert.h>")]]
 [[decl_prefix(DEFINE_FORMAT_WAPRINTF_DATA), requires_function(realloc)]]
 format_waprintf_alloc:([[nonnull]] struct format_waprintf_data *__restrict self,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ebcfc7c */
+/* HASH CRC-32:0x70381a9c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ns_name_compress_defined
 #define __local___localdep_ns_name_compress_defined
 #ifdef __CRT_HAVE_ns_name_compress
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ns_name_compress,(char const *__srcbuf, unsigned char *__dstbuf, __SIZE_TYPE__ __dstbufsize, unsigned char const **__d, unsigned char const **__e),ns_name_compress,(__srcbuf,__dstbuf,__dstbufsize,__d,__e))
 #elif defined(__CRT_HAVE_dn_comp) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ns_name_compress,(char const *__srcbuf, unsigned char *__dstbuf, __SIZE_TYPE__ __dstbufsize, unsigned char const **__d, unsigned char const **__e),dn_comp,(__srcbuf,__dstbuf,__dstbufsize,__d,__e))
 #elif defined(__CRT_HAVE___dn_comp) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ns_name_compress,(char const *__srcbuf, unsigned char *__dstbuf, __SIZE_TYPE__ __dstbufsize, unsigned char const **__d, unsigned char const **__e),__dn_comp,(__srcbuf,__dstbuf,__dstbufsize,__d,__e))
 #else /* ... */
 __NAMESPACE_LOCAL_END

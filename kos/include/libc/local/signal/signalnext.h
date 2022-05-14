@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe43b421b */
+/* HASH CRC-32:0xdefd75b2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_signalnext_defined
 #define __local_signalnext_defined
 #include <__crt.h>
+#include <bits/types.h>
 #include <asm/os/signal.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(signalnext) __ATTR_CONST __ATTR_WUNUSED __signo_t

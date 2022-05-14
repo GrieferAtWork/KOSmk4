@@ -54,6 +54,7 @@ typedef __watchfd_t watchfd_t;
 
 
 @@>> inotify_init(2)
+[[decl_include("<bits/types.h>")]]
 [[userimpl, requires_function(inotify_init1)]]
 $fd_t inotify_init(void) {
 	return inotify_init1(0);
@@ -61,10 +62,12 @@ $fd_t inotify_init(void) {
 
 @@>> inotify_init1(2)
 @@@param: flags: Set of `IN_NONBLOCK | IN_CLOEXEC | IN_CLOFORK'
+[[decl_include("<features.h>", "<bits/types.h>")]]
 $fd_t inotify_init1(__STDC_INT_AS_UINT_T flags);
 
 @@>> inotify_add_watch(2)
 @@@param: mask: Set of `IN_ALL_EVENTS | ...'
+[[decl_include("<bits/types.h>")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(inotify_add_watch_at))]]
 [[impl_include("<linux/inotify.h>"), crt_dos_variant]]
@@ -81,6 +84,7 @@ __watchfd_t inotify_add_watch($fd_t notify_fd, char const *pathname, $uint32_t m
 
 @@>> inotify_rm_watch(2)
 @@@param: wd: Watch fd (as returned by `inotify_add_watch{_at}')
+[[decl_include("<bits/types.h>")]]
 int inotify_rm_watch($fd_t notify_fd, __watchfd_t wd);
 
 
@@ -90,7 +94,7 @@ int inotify_rm_watch($fd_t notify_fd, __watchfd_t wd);
 @@>> inotify_add_watch_at(2)
 @@@param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH | AT_EMPTY_PATH'
 @@@param: mask:    Set of `IN_ALL_EVENTS | ...'
-[[crt_dos_variant]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
 __watchfd_t inotify_add_watch_at($fd_t notify_fd, $fd_t dirfd, char const *pathname,
                                  $atflag_t atflags, $uint32_t mask);
 %#endif /* __USE_KOS */

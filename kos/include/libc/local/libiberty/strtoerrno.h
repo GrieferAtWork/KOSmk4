@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8bc5e31 */
+/* HASH CRC-32:0x9090034c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <asm/os/errno.h>
 #if defined(__CRT_HAVE_errno_max) || defined(__ECOUNT)
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_errno_max_defined
 #define __local___localdep_errno_max_defined
@@ -53,14 +54,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strerrorname_np_defined
 #define __local___localdep_strerrorname_np_defined
 #ifdef __CRT_HAVE_strerrorname_np
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerrorname_np,(__errno_t __errnum),strerrorname_np,(__errnum))
 #elif defined(__CRT_HAVE_strerrno)
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerrorname_np,(__errno_t __errnum),strerrno,(__errnum))
 #else /* ... */
 __NAMESPACE_LOCAL_END

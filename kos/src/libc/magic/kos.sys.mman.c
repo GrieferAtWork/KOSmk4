@@ -50,7 +50,7 @@ __SYSDECL_BEGIN
 void *MMap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
              __STDC_INT_AS_UINT_T flags, $fd_t fd, $pos32_t offset);
 
-[[throws, wunused, doc_alias("mmap"), decl_include("<features.h>", "<hybrid/typecore.h>"), no_crt_self_import]]
+[[throws, wunused, doc_alias("mmap"), decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("MMap")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("MMap64")]]
 [[userimpl, requires($has_function(MMap32) || $has_function(MMap64))]]
@@ -228,7 +228,7 @@ void RemapFilePages(void *start, size_t size,
                     __STDC_INT_AS_UINT_T prot, size_t pgoff,
                     __STDC_INT_AS_UINT_T flags);
 
-[[throws, doc_alias("memfd_create")]]
+[[throws, doc_alias("memfd_create"), decl_include("<bits/types.h>")]]
 $fd_t MemFdCreate(char const *name, unsigned int flags);
 
 [[throws, doc_alias("mlock2")]]

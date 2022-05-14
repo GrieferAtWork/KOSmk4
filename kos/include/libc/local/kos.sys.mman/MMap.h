@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bec49ed */
+/* HASH CRC-32:0x94eb780f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #if defined(__CRT_HAVE_MMap64) || defined(__CRT_HAVE_MMap)
 #include <kos/anno.h>
 #include <features.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_MMap32_defined) && defined(__CRT_HAVE_MMap)
 #define __local___localdep_MMap32_defined

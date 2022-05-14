@@ -40,6 +40,8 @@
 %[define_replacement(uid_t = __uid_t)]
 %[default:section(".text.crt{|.dos}.database.pwd")]
 
+%[define_decl_include("<bits/crt/db/passwd.h>": ["struct passwd"])]
+
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
@@ -313,7 +315,7 @@ $errno_t getpwuid_r($uid_t uid,
 @@@return: 0 : (*result != NULL) Success
 @@@return: 0 : (*result == NULL) No entry for `name'
 @@@return: * : Error (one of `E*' from `<errno.h>')
-[[cp, decl_include("<bits/crt/db/passwd.h>")]]
+[[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
 $errno_t getpwnam_r([[nonnull]] const char *__restrict name,
                     [[nonnull]] struct passwd *__restrict resultbuf,
                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
@@ -623,6 +625,7 @@ err:
 
 @@>> sgetpwent(3)
 @@Old libc4/5 function (only here for compat)
+[[decl_include("<bits/crt/db/passwd.h>")]]
 [[hidden, section(".text.crt.compat.linux")]]
 [[requires_function(fmemopen, fgetpwent)]]
 /* NOTE: `_sgetpwent()' behaves slightly different:

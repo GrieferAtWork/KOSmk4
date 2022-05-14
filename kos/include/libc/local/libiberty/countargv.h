@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa570bb7 */
+/* HASH CRC-32:0x2207ccad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_countargv_defined
 #define __local_countargv_defined
 #include <__crt.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(countargv) __ATTR_PURE __ATTR_WUNUSED __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(countargv))(char *const *___argv) {

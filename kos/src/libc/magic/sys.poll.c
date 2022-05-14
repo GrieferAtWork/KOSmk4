@@ -31,8 +31,14 @@
 /* (#) Portability: uClibc        (/include/sys/poll.h) */
 }
 
+%[define_decl_include_implication("<bits/os/pollfd.h>" => ["<bits/types.h>"])]
+%[define_decl_include("<bits/os/pollfd.h>": ["struct pollfd"])]
+
+%[define_decl_include_implication("<bits/os/sigset.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/sigset.h>": ["struct __sigset_struct"])]
+%[define_replacement(sigset_t = "struct __sigset_struct")]
+
 %[define_replacement(nfds_t     = __UINTPTR_TYPE__)]
-%[define_replacement(sigset_t   = "struct __sigset_struct")]
 %[define_replacement(fd_t       = __fd_t)]
 %[define_replacement(time_t     = "__TM_TYPE(time)")]
 %[define_replacement(time32_t   = __time32_t)]

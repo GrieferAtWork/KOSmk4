@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29ece7ca */
+/* HASH CRC-32:0x6cab521d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,10 @@
 #ifndef __local_wtoll_defined
 #define __local_wtoll_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsto32_defined
 #define __local___localdep_wcsto32_defined
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_wcstol) && __SIZEOF_LONG__ == 4
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -61,9 +59,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_wcsto32_defined */
 #ifndef __local___localdep_wcsto64_defined
 #define __local___localdep_wcsto64_defined
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_wcstol) && __SIZEOF_LONG__ == 8
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -101,9 +96,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcsto64 __LIBC_LOCAL_NAME(wcsto64)
 #endif /* !... */
 #endif /* !__local___localdep_wcsto64_defined */
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wtoll) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wtoll))(__WCHAR_TYPE__ const *__nptr) {
 #if __SIZEOF_LONG_LONG__ <= 4

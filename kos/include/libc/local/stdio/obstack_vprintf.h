@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e4ac9b2 */
+/* HASH CRC-32:0x50447ec6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <bits/crt/obstack.h>
 #if defined(__CRT_HAVE_obstack_printer) || defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)
 #include <features.h>
-struct obstack;
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_vprintf_defined
 #define __local___localdep_format_vprintf_defined

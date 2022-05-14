@@ -26,6 +26,13 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.io.poll")]
 
+%[define_decl_include_implication("<bits/os/epoll.h>" => ["<bits/types.h>"])]
+%[define_decl_include("<bits/os/epoll.h>": ["union epoll_data", "struct epoll_event"])]
+
+%[define_decl_include_implication("<bits/os/sigset.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/os/sigset.h>": ["struct __sigset_struct"])]
+%[define_replacement(sigset_t = "struct __sigset_struct")]
+
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
@@ -376,7 +383,7 @@ typedef struct __sigset_struct sigset_t;
 @@Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
 @@@return: * : The newly created epoll control descriptor.
 @@@return: -1: Error (s.a. `errno')
-[[wunused, decl_include("<features.h>")]]
+[[wunused, decl_include("<features.h>", "<bits/types.h>")]]
 $fd_t epoll_create(__STDC_INT_AS_SIZE_T size);
 
 @@>> epoll_create1(2)
@@ -386,7 +393,7 @@ $fd_t epoll_create(__STDC_INT_AS_SIZE_T size);
 @@@return: * :   The newly created epoll control descriptor.
 @@@return: -1:   Error (s.a. `errno')
 @@@throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...]
-[[wunused, decl_include("<features.h>")]]
+[[wunused, decl_include("<features.h>", "<bits/types.h>")]]
 $fd_t epoll_create1(__STDC_INT_AS_UINT_T flags);
 
 
@@ -404,7 +411,7 @@ $fd_t epoll_create1(__STDC_INT_AS_UINT_T flags);
 @@@throw: E_ILLEGAL_REFERENCE_LOOP: The  given  `fd'  is  another  epoll  that either
 @@                                  forms a loop with `epfd', or has too many nested.
 @@@throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...]
-[[decl_include("<bits/epoll.h>")]]
+[[decl_include("<bits/os/epoll.h>")]]
 int epoll_ctl($fd_t epfd, __epoll_ctl_t op,
               $fd_t fd, struct epoll_event *event);
 
@@ -422,7 +429,7 @@ int epoll_ctl($fd_t epfd, __epoll_ctl_t op,
 @@                   items of `events')
 @@@return: 0:        No events happened before `timeout' expired.
 @@@return: -1:       Error (s.a. `errno')
-[[cp, decl_include("<features.h>", "<bits/epoll.h>")]]
+[[cp, decl_include("<features.h>", "<bits/os/epoll.h>")]]
 __STDC_INT_AS_SSIZE_T epoll_wait($fd_t epfd, [[nonnull]] struct epoll_event *events,
                                  __STDC_INT_AS_SIZE_T maxevents, int timeout);
 
@@ -441,7 +448,7 @@ __STDC_INT_AS_SSIZE_T epoll_wait($fd_t epfd, [[nonnull]] struct epoll_event *eve
 @@                   items of `events')
 @@@return: 0:        No events happened before `timeout' expired.
 @@@return: -1:       Error (s.a. `errno')
-[[cp, decl_include("<features.h>", "<bits/epoll.h>")]]
+[[cp, decl_include("<features.h>", "<bits/os/epoll.h>")]]
 __STDC_INT_AS_SSIZE_T epoll_pwait($fd_t epfd, [[nonnull]] struct epoll_event *events,
                                   __STDC_INT_AS_SIZE_T maxevents, int timeout,
                                   sigset_t const *ss);
@@ -497,7 +504,7 @@ typedef __ATTR_NONNULL((1)) void
 @@                            intact, and the  RPC will be  discarded as  soon
 @@                            as an attempt to send it is made, or the monitor
 @@                            is manually deleted via `EPOLL_CTL_DEL'
-[[decl_include("<bits/epoll.h>")]]
+[[decl_include("<bits/os/epoll.h>")]]
 int epoll_rpc_exec($fd_t epfd, $fd_t fd,
                    [[nonnull]] struct epoll_event *event,
                    $pid_t target_tid, unsigned int mode,

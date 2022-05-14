@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5bac048 */
+/* HASH CRC-32:0xe71accb9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_strtosigno_defined
 #define __local_strtosigno_defined
 #include <__crt.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_isupper_defined
 #define __local___localdep_isupper_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed0fb491 */
+/* HASH CRC-32:0xd50e916f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,19 +22,18 @@
 #define __local_c32gethostname_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_uname) || defined(__CRT_HAVE___uname) || defined(__CRT_HAVE___libc_uname)
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_8to32_defined
 #define __local___localdep_format_8to32_defined
 #if defined(__CRT_HAVE_format_8tow) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_8to32,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$format_8tow) && defined(__LIBKCALL_IS_FORMATPRINTER_CC)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_KOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_8to32,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 4
@@ -54,19 +53,16 @@ __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_format_wsnprintf_printer) && __SIZEOF_WCHAR_T__ == 4 && defined(__C32FORMATPRINTER_CC_IS_WFORMATPRINTER_CC)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __COMPILER_CREDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,__localdep_format_c32snprintf_printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsnprintf_printer,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$format_wsnprintf_printer)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __COMPILER_CREDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__C32FORMATPRINTER_CC,__localdep_format_c32snprintf_printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),KOS$format_wsnprintf_printer,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
-#include <hybrid/typecore.h>
 #include <libc/local/parts.wchar.format-printer/format_wsnprintf_printer.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_c32snprintf_printer __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__C32FORMATPRINTER_CC*)(void *,__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),__SSIZE_TYPE__(__C32FORMATPRINTER_CC&)(void *,__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),format_wsnprintf_printer)
@@ -80,19 +76,10 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strnlen_defined
 #define __local___localdep_strnlen_defined
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),strnlen,{ return __builtin_strnlen(__str, __maxlen); })
 #elif defined(__CRT_HAVE_strnlen)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),strnlen,(__str,__maxlen))
 #elif defined(__CRT_HAVE___strncnt)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),__strncnt,(__str,__maxlen))
 #else /* ... */
 __NAMESPACE_LOCAL_END

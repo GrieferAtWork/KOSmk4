@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c76350 */
+/* HASH CRC-32:0x603963f1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@ __SYSDECL_BEGIN
 #ifndef ____libc_core_getauxval_defined
 #define ____libc_core_getauxval_defined
 #ifdef __CRT_HAVE_getauxval
+#include <hybrid/typecore.h>
 /* >> getauxval(3)
  * Return the value associated with  a named `type' from  the
  * auxiliary information vector passed to the calling program
@@ -39,6 +40,7 @@ __SYSDECL_BEGIN
  * @param: type: One of `AT_*' from <elf.h> */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__ULONGPTR_TYPE__,__NOTHROW_NCX,__libc_core_getauxval,(__ULONGPTR_TYPE__ __type),getauxval,(__type))
 #elif defined(__CRT_HAVE___getauxval)
+#include <hybrid/typecore.h>
 /* >> getauxval(3)
  * Return the value associated with  a named `type' from  the
  * auxiliary information vector passed to the calling program

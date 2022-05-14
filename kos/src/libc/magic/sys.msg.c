@@ -84,11 +84,11 @@ int msgctl(int msqid, __STDC_INT_AS_UINT_T cmd, struct msqid_ds *buf);
 [[decl_include("<features.h>", "<bits/types.h>")]]
 int msgget(key_t key, __STDC_INT_AS_UINT_T msgflg);
 
-[[cp, decl_include("<features.h>"), export_alias("__libc_msgrcv")]]
+[[cp, decl_include("<features.h>", "<hybrid/typecore.h>"), export_alias("__libc_msgrcv")]]
 ssize_t msgrcv(int msqid, void *msgp, size_t msgsz,
                $longptr_t msgtyp, __STDC_INT_AS_UINT_T msgflg);
 
-[[cp, decl_include("<features.h>"), export_alias("__libc_msgsnd")]]
+[[cp, decl_include("<features.h>", "<hybrid/typecore.h>"), export_alias("__libc_msgsnd")]]
 int msgsnd(int msqid, const void *msgp,
            size_t msgsz, __STDC_INT_AS_UINT_T msgflg);
 
