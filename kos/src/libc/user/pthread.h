@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a51bb8d */
+/* HASH CRC-32:0xc32ea015 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -195,25 +195,23 @@ INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstac
  * @return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstack)(pthread_attr_t *attr, void *stackaddr, size_t stacksize);
 /* >> pthread_attr_setaffinity_np(3)
- * Thread  created with attribute `attr' will be limited
- * to run only on the processors represented in `cpuset'
+ * Set cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
  * @return: EINVAL: The given set contains a non-existant CPU
  * @return: ENOMEM: Insufficient memory */
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_setaffinity_np)(pthread_attr_t *attr, size_t cpusetsize, cpu_set_t const *cpuset);
 /* >> pthread_attr_getaffinity_np(3)
- * Get bit set in `cpuset' representing the processors
- * threads created with `attr' can run on
+ * Get cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
  * @return: EINVAL: `cpusetsize' is too small */
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_getaffinity_np)(pthread_attr_t const *attr, size_t cpusetsize, cpu_set_t *cpuset);
 /* >> pthread_getattr_default_np(3)
- * Get the default attributes used by pthread_create in this process
+ * Get the default attributes used by `pthread_create(3)' when given `NULL' for its `attr' argument.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_getattr_default_np)(pthread_attr_t *attr);
 /* >> pthread_setattr_default_np(3)
- * Set the default attributes to be used by pthread_create in this process
+ * Set the default attributes to be used by `pthread_create(3)' when given `NULL' for its `attr' argument.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_setattr_default_np)(pthread_attr_t const *attr);

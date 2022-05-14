@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa627b42f */
+/* HASH CRC-32:0xdba30847 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,10 @@
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_pthread_timedjoin32_np_defined) && defined(__CRT_HAVE_pthread_timedjoin_np)
-#define __local___localdep_pthread_timedjoin32_np_defined
-__CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_timedjoin32_np,(__pthread_t __pthread, void **__thread_return, struct __timespec32 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
-#endif /* !__local___localdep_pthread_timedjoin32_np_defined && __CRT_HAVE_pthread_timedjoin_np */
+#if !defined(__local___localdep_crt_pthread_timedjoin32_np_defined) && defined(__CRT_HAVE_pthread_timedjoin_np)
+#define __local___localdep_crt_pthread_timedjoin32_np_defined
+__CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_timedjoin32_np,(__pthread_t __pthread, void **__thread_return, struct __timespec32 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
+#endif /* !__local___localdep_crt_pthread_timedjoin32_np_defined && __CRT_HAVE_pthread_timedjoin_np */
 #ifndef __local___localdep_pthread_timedjoin64_np_defined
 #define __local___localdep_pthread_timedjoin64_np_defined
 #if defined(__CRT_HAVE_pthread_timedjoin_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -52,7 +52,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__pthread_t __
 	struct __timespec32 __abstime32;
 	__abstime32.tv_sec  = (__time32_t)__abstime->tv_sec;
 	__abstime32.tv_nsec = __abstime->tv_nsec;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_timedjoin32_np)(__pthread, __thread_return, &__abstime32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_timedjoin32_np)(__pthread, __thread_return, &__abstime32);
 	return __result;
 #else /* __CRT_HAVE_pthread_timedjoin_np */
 	__errno_t __result;

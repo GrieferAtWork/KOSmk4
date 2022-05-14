@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58b9daa8 */
+/* HASH CRC-32:0xf90a91cd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,7 +117,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pthread_t,__NOTHROW,__localdep_pthread
 #undef __local___localdep_pthread_self_defined
 #endif /* !... */
 #endif /* !__local___localdep_pthread_self_defined */
-__LOCAL_LIBC(pthread_main_np) __ATTR_CONST int
+__LOCAL_LIBC(pthread_main_np) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pthread_main_np))(void) {
 #if defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self))
 	return (__NAMESPACE_LOCAL_SYM __localdep_pthread_equal)((__NAMESPACE_LOCAL_SYM __localdep_pthread_mainthread_np)(), (__NAMESPACE_LOCAL_SYM __localdep_pthread_self)());

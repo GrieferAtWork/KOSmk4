@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1902f87d */
+/* HASH CRC-32:0xebb47bae */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -928,25 +928,23 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstack, __FORCELOCAL __ATTR_ARTIF
 typedef struct __cpu_set_struct cpu_set_t;
 #endif /* !__cpu_set_t_defined */
 /* >> pthread_attr_setaffinity_np(3)
- * Thread  created with attribute `attr' will be limited
- * to run only on the processors represented in `cpuset'
+ * Set cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
  * @return: EINVAL: The given set contains a non-existant CPU
  * @return: ENOMEM: Insufficient memory */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,pthread_attr_setaffinity_np,(pthread_attr_t *__attr, size_t __cpusetsize, cpu_set_t const *__cpuset),(__attr,__cpusetsize,__cpuset))
 /* >> pthread_attr_getaffinity_np(3)
- * Get bit set in `cpuset' representing the processors
- * threads created with `attr' can run on
+ * Get cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
  * @return: EINVAL: `cpusetsize' is too small */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,pthread_attr_getaffinity_np,(pthread_attr_t const *__attr, size_t __cpusetsize, cpu_set_t *__cpuset),(__attr,__cpusetsize,__cpuset))
 /* >> pthread_getattr_default_np(3)
- * Get the default attributes used by pthread_create in this process
+ * Get the default attributes used by `pthread_create(3)' when given `NULL' for its `attr' argument.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_getattr_default_np,(pthread_attr_t *__attr),(__attr))
 /* >> pthread_setattr_default_np(3)
- * Set the default attributes to be used by pthread_create in this process
+ * Set the default attributes to be used by `pthread_create(3)' when given `NULL' for its `attr' argument.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_setattr_default_np,(pthread_attr_t const *__attr),(__attr))
@@ -2534,12 +2532,12 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(void (__LIBCCALL *__prepare)
 #ifdef __CRT_HAVE_pthread_num_processors_np
 /* >> pthread_num_processors_np(3)
  * @return: * : The number of cpus that the calling thread is able to run on */
-__CDECLARE(,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,pthread_num_processors_np,(void),())
+__CDECLARE(__ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,pthread_num_processors_np,(void),())
 #elif defined(__CRT_HAVE_sched_getaffinity)
 #include <libc/local/pthread/pthread_num_processors_np.h>
 /* >> pthread_num_processors_np(3)
  * @return: * : The number of cpus that the calling thread is able to run on */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_num_processors_np, __FORCELOCAL __ATTR_ARTIFICIAL __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL pthread_num_processors_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_num_processors_np))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_num_processors_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL pthread_num_processors_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_num_processors_np))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_set_num_processors_np
 /* >> pthread_set_num_processors_np(3)
@@ -2567,7 +2565,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_set_num_processors_np, __FORCELOCAL __AT
  * calling program), and 0  otherwise. Additionally, -1 is  returned
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
-__CDECLARE(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,pthread_main_np,(void),())
 #elif defined(__CRT_HAVE_thr_main)
 /* >> pthread_main_np(3)
  * Returns  1 if the  calling thread is the  main() thread (i.e. the
@@ -2575,7 +2573,7 @@ __CDECLARE(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),())
  * calling program), and 0  otherwise. Additionally, -1 is  returned
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
-__CREDIRECT(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),thr_main,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,pthread_main_np,(void),thr_main,())
 #elif (defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self))) || ((defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> pthread_main_np(3)
@@ -2584,7 +2582,7 @@ __CREDIRECT(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),thr_main,())
  * calling program), and 0  otherwise. Additionally, -1 is  returned
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW(__LIBCCALL pthread_main_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL pthread_main_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); })
 #else /* ... */
 #undef __pthread_main_np_defined
 #endif /* !... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49d9817e */
+/* HASH CRC-32:0xfa49c67a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -305,7 +305,7 @@ again:
 #include <bits/os/cpu_set.h>
 /* >> pthread_num_processors_np(3)
  * @return: * : The number of cpus that the calling thread is able to run on */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") __STDC_INT_AS_SIZE_T
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") WUNUSED __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void) {
 	cpu_set_t cset;
 	if unlikely(libc_sched_getaffinity(0, sizeof(cset), &cset) != 0)
@@ -346,7 +346,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n) {
  * calling program), and 0  otherwise. Additionally, -1 is  returned
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
-INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_CONST int
+INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc_pthread_main_np)(void) {
 
 	return libc_pthread_equal(libc_pthread_mainthread_np(), libc_pthread_self());

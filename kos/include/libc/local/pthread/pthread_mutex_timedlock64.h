@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5978b55e */
+/* HASH CRC-32:0x73bb2d2b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,17 +26,17 @@
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_pthread_mutex_timedlock32_defined
-#define __local___localdep_pthread_mutex_timedlock32_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock32,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
-#endif /* !__local___localdep_pthread_mutex_timedlock32_defined */
+#ifndef __local___localdep_crt_pthread_mutex_timedlock32_defined
+#define __local___localdep_crt_pthread_mutex_timedlock32_defined
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_mutex_timedlock32,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
+#endif /* !__local___localdep_crt_pthread_mutex_timedlock32_defined */
 __LOCAL_LIBC(pthread_mutex_timedlock64) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_mutex_timedlock64))(__pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __abstime) {
 	__errno_t __result;
 	struct __timespec32 __abstime32;
 	__abstime32.tv_sec  = (__time32_t)__abstime->tv_sec;
 	__abstime32.tv_nsec = __abstime->tv_nsec;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_mutex_timedlock32)(__mutex, &__abstime32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_mutex_timedlock32)(__mutex, &__abstime32);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

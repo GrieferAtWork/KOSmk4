@@ -169,6 +169,12 @@ NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 	dltlsfreeseg(self->pt_tls);
 }
 
+LOCAL ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void
+NOTHROW(LIBCCALL decref)(struct pthread *__restrict self) {
+	if (ATOMIC_FETCHDEC(self->pt_refcnt) == 1)
+		destroy(self);
+}
+
 
 /* Attributes  used  by  `pthread_create()'  when  the  given  `ATTR'  is  NULL
  * NOTE: When `pa_stacksize' is zero, `PTHREAD_STACK_MIN' will be used instead! */
@@ -583,8 +589,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pthread_t pthread,
 	if (ATOMIC_READ(pthread->pt_tid) == 0) {
 		if (thread_return)
 			*thread_return = pthread->pt_retval;
-		if (ATOMIC_FETCHDEC(pthread->pt_refcnt) == 1)
-			destroy(pthread);
+		decref(pthread);
 		return EOK;
 	}
 	if unlikely(pthread == &current)
@@ -625,8 +630,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t pthread,
 	}
 	if (thread_return)
 		*thread_return = pthread->pt_retval;
-	if (ATOMIC_FETCHDEC(pthread->pt_refcnt) == 1)
-		destroy(pthread);
+	decref(pthread);
 	return EOK;
 }
 /*[[[end:libc_pthread_timedjoin_np]]]*/
@@ -667,8 +671,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t pthread,
 	}
 	if (thread_return)
 		*thread_return = pthread->pt_retval;
-	if (ATOMIC_FETCHDEC(pthread->pt_refcnt) == 1)
-		destroy(pthread);
+	decref(pthread);
 	return EOK;
 #else /* __SIZEOF_POINTER__ == 4 */
 	errno_t result;
@@ -1133,10 +1136,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstack)(pthread_attr_t *attr,
 }
 /*[[[end:libc_pthread_attr_setstack]]]*/
 
-/*[[[head:libc_pthread_attr_setaffinity_np,hash:CRC-32=0x20677fb8]]]*/
+/*[[[head:libc_pthread_attr_setaffinity_np,hash:CRC-32=0x650d70c8]]]*/
 /* >> pthread_attr_setaffinity_np(3)
- * Thread  created with attribute `attr' will be limited
- * to run only on the processors represented in `cpuset'
+ * Set cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
  * @return: EINVAL: The given set contains a non-existant CPU
  * @return: ENOMEM: Insufficient memory */
@@ -1190,10 +1192,9 @@ use_newset:
 }
 /*[[[end:libc_pthread_attr_setaffinity_np]]]*/
 
-/*[[[head:libc_pthread_attr_getaffinity_np,hash:CRC-32=0xce28472d]]]*/
+/*[[[head:libc_pthread_attr_getaffinity_np,hash:CRC-32=0x5b6ee854]]]*/
 /* >> pthread_attr_getaffinity_np(3)
- * Get bit set in `cpuset' representing the processors
- * threads created with `attr' can run on
+ * Get cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
  * @return: EINVAL: `cpusetsize' is too small */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 3)) errno_t
@@ -1225,9 +1226,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getaffinity_np)(pthread_attr_t const *att
 }
 /*[[[end:libc_pthread_attr_getaffinity_np]]]*/
 
-/*[[[head:libc_pthread_getattr_default_np,hash:CRC-32=0x209323b2]]]*/
+/*[[[head:libc_pthread_getattr_default_np,hash:CRC-32=0xba2de5af]]]*/
 /* >> pthread_getattr_default_np(3)
- * Get the default attributes used by pthread_create in this process
+ * Get the default attributes used by `pthread_create(3)' when given `NULL' for its `attr' argument.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
@@ -1266,9 +1267,9 @@ again:
 }
 /*[[[end:libc_pthread_getattr_default_np]]]*/
 
-/*[[[head:libc_pthread_setattr_default_np,hash:CRC-32=0x7d8fe913]]]*/
+/*[[[head:libc_pthread_setattr_default_np,hash:CRC-32=0x487460d6]]]*/
 /* >> pthread_setattr_default_np(3)
- * Set the default attributes to be used by pthread_create in this process
+ * Set the default attributes to be used by `pthread_create(3)' when given `NULL' for its `attr' argument.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
@@ -3967,7 +3968,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict con
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
-		 *       we're released `mutex',  else there'd be  a race  condition! */
+		 *       we've released `mutex',  else there'd be  a race  condition! */
 		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
@@ -4009,7 +4010,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict c
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
-		 *       we're released `mutex',  else there'd be  a race  condition! */
+		 *       we've released `mutex',  else there'd be  a race  condition! */
 		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
@@ -4046,7 +4047,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait_np)(pthread_cond_t *__restri
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
-		 *       we're released `mutex',  else there'd be  a race  condition! */
+		 *       we've released `mutex',  else there'd be  a race  condition! */
 		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
@@ -4086,7 +4087,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait64_np)(pthread_cond_t *__rest
 	libc_pthread_mutex_unlock(mutex);
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
-		 *       we're released `mutex',  else there'd be  a race  condition! */
+		 *       we've released `mutex',  else there'd be  a race  condition! */
 		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe042b11f */
+/* HASH CRC-32:0xabdf3740 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,10 @@
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_pthread_rwlock_timedwrlock32_defined) && defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
-#define __local___localdep_pthread_rwlock_timedwrlock32_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_timedwrlock32,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__rwlock,__abstime))
-#endif /* !__local___localdep_pthread_rwlock_timedwrlock32_defined && __CRT_HAVE_pthread_rwlock_timedwrlock */
+#if !defined(__local___localdep_crt_pthread_rwlock_timedwrlock32_defined) && defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
+#define __local___localdep_crt_pthread_rwlock_timedwrlock32_defined
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_rwlock_timedwrlock32,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__rwlock,__abstime))
+#endif /* !__local___localdep_crt_pthread_rwlock_timedwrlock32_defined && __CRT_HAVE_pthread_rwlock_timedwrlock */
 #ifndef __local___localdep_pthread_rwlock_timedwrlock64_defined
 #define __local___localdep_pthread_rwlock_timedwrlock64_defined
 #if defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -52,7 +52,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__pthrea
 	struct __timespec32 __abstime32;
 	__abstime32.tv_sec  = (__time32_t)__abstime->tv_sec;
 	__abstime32.tv_nsec = __abstime->tv_nsec;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_rwlock_timedwrlock32)(__rwlock, &__abstime32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_rwlock_timedwrlock32)(__rwlock, &__abstime32);
 	return __result;
 #else /* __CRT_HAVE_pthread_rwlock_timedwrlock */
 	__errno_t __result;

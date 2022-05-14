@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40e0c151 */
+/* HASH CRC-32:0x6884da46 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getaffinity,(__pid_t __pid, __SI
 __NAMESPACE_LOCAL_END
 #include <bits/os/cpu_set.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(pthread_num_processors_np) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(pthread_num_processors_np) __ATTR_WUNUSED __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_num_processors_np))(void) {
 	struct __cpu_set_struct __cset;
 	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_sched_getaffinity)(0, sizeof(__cset), &__cset) != 0)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c1e25b */
+/* HASH CRC-32:0xb65991ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,10 @@
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_pthread_mutex_reltimedlock32_np_defined) && defined(__CRT_HAVE_pthread_mutex_reltimedlock_np)
-#define __local___localdep_pthread_mutex_reltimedlock32_np_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_reltimedlock32_np,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_mutex_reltimedlock_np,(__mutex,__reltime))
-#endif /* !__local___localdep_pthread_mutex_reltimedlock32_np_defined && __CRT_HAVE_pthread_mutex_reltimedlock_np */
+#if !defined(__local___localdep_crt_pthread_mutex_reltimedlock32_np_defined) && defined(__CRT_HAVE_pthread_mutex_reltimedlock_np)
+#define __local___localdep_crt_pthread_mutex_reltimedlock32_np_defined
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_mutex_reltimedlock32_np,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_mutex_reltimedlock_np,(__mutex,__reltime))
+#endif /* !__local___localdep_crt_pthread_mutex_reltimedlock32_np_defined && __CRT_HAVE_pthread_mutex_reltimedlock_np */
 #ifndef __local___localdep_pthread_mutex_reltimedlock64_np_defined
 #define __local___localdep_pthread_mutex_reltimedlock64_np_defined
 #if defined(__CRT_HAVE_pthread_mutex_reltimedlock_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -52,7 +52,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock_np))(__pth
 	struct __timespec32 __reltime32;
 	__reltime32.tv_sec  = (__time32_t)__reltime->tv_sec;
 	__reltime32.tv_nsec = __reltime->tv_nsec;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_mutex_reltimedlock32_np)(__mutex, &__reltime32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_mutex_reltimedlock32_np)(__mutex, &__reltime32);
 	return __result;
 #else /* __CRT_HAVE_pthread_mutex_reltimedlock_np */
 	__errno_t __result;

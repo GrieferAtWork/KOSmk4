@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaba0b9b7 */
+/* HASH CRC-32:0x950e5d15 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,17 +26,17 @@
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_pthread_cond_reltimedwait32_np_defined
-#define __local___localdep_pthread_cond_reltimedwait32_np_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_reltimedwait32_np,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__cond,__mutex,__reltime))
-#endif /* !__local___localdep_pthread_cond_reltimedwait32_np_defined */
+#ifndef __local___localdep_crt_pthread_cond_reltimedwait32_np_defined
+#define __local___localdep_crt_pthread_cond_reltimedwait32_np_defined
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_cond_reltimedwait32_np,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__cond,__mutex,__reltime))
+#endif /* !__local___localdep_crt_pthread_cond_reltimedwait32_np_defined */
 __LOCAL_LIBC(pthread_cond_reltimedwait64_np) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_cond_reltimedwait64_np))(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime) {
 	__errno_t __result;
 	struct __timespec32 __reltime32;
 	__reltime32.tv_sec  = (__time32_t)__reltime->tv_sec;
 	__reltime32.tv_nsec = __reltime->tv_nsec;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_cond_reltimedwait32_np)(__cond, __mutex, &__reltime32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_cond_reltimedwait32_np)(__cond, __mutex, &__reltime32);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

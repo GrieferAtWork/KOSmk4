@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e75d30b */
+/* HASH CRC-32:0xb03e5f67 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -184,25 +184,23 @@ INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_getstac
  * @return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setstack)(pthread_attr_t *attr, void *stackaddr, size_t stacksize);
 /* >> pthread_attr_setaffinity_np(3)
- * Thread  created with attribute `attr' will be limited
- * to run only on the processors represented in `cpuset'
+ * Set cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
  * @return: EINVAL: The given set contains a non-existant CPU
  * @return: ENOMEM: Insufficient memory */
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_setaffinity_np)(pthread_attr_t *attr, size_t cpusetsize, cpu_set_t const *cpuset);
 /* >> pthread_attr_getaffinity_np(3)
- * Get bit set in `cpuset' representing the processors
- * threads created with `attr' can run on
+ * Get cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
  * @return: EINVAL: `cpusetsize' is too small */
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_attr_getaffinity_np)(pthread_attr_t const *attr, size_t cpusetsize, cpu_set_t *cpuset);
 /* >> pthread_getattr_default_np(3)
- * Get the default attributes used by pthread_create in this process
+ * Get the default attributes used by `pthread_create(3)' when given `NULL' for its `attr' argument.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getattr_default_np)(pthread_attr_t *attr);
 /* >> pthread_setattr_default_np(3)
- * Set the default attributes to be used by pthread_create in this process
+ * Set the default attributes to be used by `pthread_create(3)' when given `NULL' for its `attr' argument.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_setattr_default_np)(pthread_attr_t const *attr);
@@ -816,7 +814,7 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_atfork)(void (LIBDCALL *prepare
 #ifndef __KERNEL__
 /* >> pthread_num_processors_np(3)
  * @return: * : The number of cpus that the calling thread is able to run on */
-INTDEF __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void);
+INTDEF WUNUSED __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pthread_set_num_processors_np(3)
@@ -839,7 +837,7 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n);
  * calling program), and 0  otherwise. Additionally, -1 is  returned
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
-INTDEF ATTR_CONST int NOTHROW(LIBCCALL libc_pthread_main_np)(void);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_pthread_main_np)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END
