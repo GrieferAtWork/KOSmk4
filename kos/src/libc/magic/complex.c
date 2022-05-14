@@ -37,6 +37,10 @@
 
 %[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
+#include <ieee754.h>
+)]%[insert:prefix(
+#include <hybrid/typecore.h>
 )]%{
 
 #if !defined(__NO_FPU) && defined(_Complex_I)
@@ -542,7 +546,7 @@ double _Complex cacos(double _Complex z) {
 }
 
 [[requires_function(creal, cimag, atan2, _redupi, log)]]
-[[wunused, impl_include("<bits/crt/complex.h>")]]
+[[wunused, impl_include("<bits/crt/complex.h>", "<hybrid/floatcore.h>")]]
 double _Complex catan(double _Complex z) {
 	COMPLEX_IMPL_COPYRIGHT_NOTICE
 	double _Complex w;

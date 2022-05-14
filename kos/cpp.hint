@@ -715,6 +715,7 @@
 #define __LIBM_LOCAL_DECLARE(T, name, value)   T const __libm_##name;
 #define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n) T const __libm_##name[n] =
 #define __LIBM_LOCAL_VALUE(name)               ::__local_imp::__libm_##name
+#define __LIBM_LOCAL_FUNC(name)
 
 
 #define __ATTR_MALL_DEFAULT_ALIGNED
@@ -1330,11 +1331,6 @@
 #define SIMPLEQ_TRYREPLACE_R(...)
 #define SIMPLEQ_TRYREPLACE_R_P(...)
 
-
-#define ATREE_HEAD(T)             T*
-#define ATREE_NODE(T,Tkey)        struct{T*a_min,*a_max;Tkey a_vmin,a_vmax;}
-#define ATREE_NODE_SINGLE(T,Tkey) struct{T*a_min,*a_max;Tkey a_vaddr;}
-#define ATREE_XNODE(T)            struct{T*a_min,*a_max;}
 #define RBTREE_NODE(T)                   struct{struct T*rb_par,*rb_lhs,*rb_rhs;}
 #define RBTREE_NODE_P(T)                 struct{T*rb_par,*rb_lhs,*rb_rhs;}
 #define RBTREE_NODE_WITH_KEY(T,Tkey)     struct{struct T*rb_par,*rb_lhs,*rb_rhs;Tkey rb_min,rb_max;}
@@ -1345,6 +1341,19 @@
 #define LLRBTREE_NODE_WITH_KEY_P(T,Tkey) struct{T*rb_lhs,*rb_rhs;Tkey rb_min,rb_max;}
 #define RBTREE_ROOT(T)                   struct T*
 #define LLRBTREE_ROOT(T)                 struct T*
+
+#define RBTREE_DECL
+#define RBTREE_IMPL
+#define RBTREE_NOTHROW
+#define RBTREE_NOTHROW_U
+#define RBTREE_CC
+#define RBTREE(x) rbtree_##x
+#define RBTREE_SLOT__ARGS
+#define RBTREE_SLOT__PARAMS
+#define RBTREE_T struct my_node
+#define RBTREE_Tkey int
+#define RBTREE_DEFINE_FUNCTION(decl,attr,returnType,nothrow,cc,name,params,args) decl returnType name params
+
 #define BSEARCH(...) for(;;)
 #define BSEARCH_EX(...) for(;;)
 #define BSEARCHR(...) for(;;)
@@ -1477,30 +1486,6 @@
 #define __USERKERN_PAD_GID(x)
 
 
-#define MFILE_OPS_FIELDS(prefix, T)\
-	void (*prefix##destroy)(T *self);\
-	struct mpart *(*prefix##newpart)(T *self, pos_t minaddr, size_t num_bytes);\
-	void (*prefix##loadblocks)(T *self, pos_t addr, physaddr_t buf, size_t num_bytes);\
-	void (*prefix##saveblocks)(T *self, pos_t addr, physaddr_t buf, size_t num_bytes);\
-	void (*prefix##changed)(T *self, uintptr_t oldflags, uintptr_t newflags);\
-	struct mfile_stream_ops const *prefix##stream;\
-	struct vio_operators const *prefix##vio
-#define FNODE_OPS_FIELDS(prefix, T) MFILE_OPS_FIELDS(prefix, T)
-#define FDIRNODE_OPS_FIELDS(prefix, T)\
-	FNODE_OPS_FIELDS(prefix, T);\
-	struct fdirent *(*prefix##lookup)(T *self, struct flookup_info *info);\
-	void (*prefix##enum)(T *self, struct fdirenum *result);\
-	void (*prefix##mkfile)(T *self, struct fmkfile_info *info);\
-	void (*prefix##unlink)(T *self, struct fdirent *entry, struct fnode *file);\
-	void (*prefix##rename)(T *self, struct frename_info *info)
-#define FLINDIRNODE_OPS_FIELDS(prefix, T)\
-	FDIRNODE_OPS_FIELDS(prefix, T);\
-	struct flindirent *(*prefix##readdir)(T *self, pos_t *pentry_pos)
-#define FDYNDIRNODE_OPS_FIELDS(prefix, T)\
-	FDIRNODE_OPS_FIELDS(prefix, T);\
-	void (*prefix##enumdir)(T *self, fdyndir_enum_callback_t cb, void *cookie)
-
-
 #define __C89_NAMELESS
 #define DUMMYUNIONNAME
 #define DUMMYUNIONNAME2
@@ -1545,6 +1530,12 @@
 #define NCURSES_CPP_TRY
 #define NCURSES_CPP_CATCH(e) if(0)
 #define NCURSES_FIELD_INTERNALS
+#define FORM_EXPORT(T) T
+#define FORM_EXPORT_VAR(T) T
+#define MENU_EXPORT(T) T
+#define MENU_EXPORT_VAR(T) T
+#define PANEL_EXPORT(T) T
+#define PANEL_EXPORT_VAR(T) T
 #define THROW2(...)
 #define UNDEF(x) CUR_##x
 #define BZ_EXTERN
@@ -1645,6 +1636,7 @@
 #define Py_LL(x) x##LL
 #define Py_ULL(x) x##ULL
 #define __owur
+#define ossl_bio__attr__(x)
 #define OPENSSL_EXPORT
 #define OPENSSL_EXTERN
 #define OPENSSL_IMPLEMENT_GLOBAL(t,n,v) t _shadow_##n=v;
@@ -2035,6 +2027,8 @@
 #define GLIB_DEPRECATED_TYPE_IN_2_68_FOR(f)
 #define GLIB_DEPRECATED_TYPE_IN_2_70
 #define GLIB_DEPRECATED_TYPE_IN_2_70_FOR(f)
+#define G_DEFINE_AUTOPTR_CLEANUP_FUNC(a,b)
+#define G_DECLARE_INTERFACE(...)
 #define __GMP_DECLSPEC
 #define __GMP_DECLSPEC_XX
 #define __GMP_ATTRIBUTE_PURE
@@ -2229,4 +2223,7 @@
 #define __wctrans_t           wctrans_t
 #define __shift_t             shift_t
 #define __SHIFT_TYPE__        shift_t
+#define __IEEE754_FLOAT_TYPE__ float
+#define __IEEE754_DOUBLE_TYPE__ double
+#define __IEEE854_LONG_DOUBLE_TYPE__ long double
 

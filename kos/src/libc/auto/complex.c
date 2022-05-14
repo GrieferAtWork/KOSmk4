@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61cb9adc */
+/* HASH CRC-32:0x2a2ebb6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1198,6 +1198,7 @@ NOTHROW_NCX(LIBCCALL libc_cacosf)(float _Complex z) {
 
 }
 #include <bits/crt/complex.h>
+#include <hybrid/floatcore.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED float _Complex
 NOTHROW_NCX(LIBCCALL libc_catanf)(float _Complex z) {
 
@@ -2113,6 +2114,7 @@ NOTHROW_NCX(LIBCCALL libc_cacos)(double _Complex z) {
 	return w;
 }
 #include <bits/crt/complex.h>
+#include <hybrid/floatcore.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED double _Complex
 NOTHROW_NCX(LIBCCALL libc_catan)(double _Complex z) {
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
@@ -3032,6 +3034,7 @@ NOTHROW_NCX(LIBCCALL libc_cacosl)(long double _Complex z) {
 
 }
 #include <bits/crt/complex.h>
+#include <hybrid/floatcore.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_catanl)(long double _Complex z) {
 

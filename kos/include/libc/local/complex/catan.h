@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5c22c4 */
+/* HASH CRC-32:0xe32f7a6e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,6 +98,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_log_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/crt/complex.h>
+#include <hybrid/floatcore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(catan) __ATTR_WUNUSED double _Complex
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(catan))(double _Complex __z) {
