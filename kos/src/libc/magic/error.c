@@ -63,7 +63,7 @@ __SYSDECL_BEGIN
 
 %[define(DEFINE_LOCAL_error_print_progname =
 @@pp_ifndef __LOCAL_error_print_progname@@
-@@pp_if defined(@error_print_progname@)@@
+@@pp_if  defined(@error_print_progname@)@@
 #define __LOCAL_error_print_progname @error_print_progname@
 @@pp_elif defined(__CRT_HAVE_error_print_progname)@@
 @@pp_ifdef __NO_COMPILER_SREDIRECT@@
@@ -79,7 +79,7 @@ __CSDECLARE2(,void (__LIBKCALL *@error_print_progname@)(void),@error_print_progn
 
 %[define(DEFINE_LOCAL_error_message_count =
 @@pp_ifndef __LOCAL_error_message_count@@
-@@pp_if defined(@error_message_count@)@@
+@@pp_if  defined(@error_message_count@)@@
 #define __LOCAL_error_message_count @error_message_count@
 @@pp_elif defined(__CRT_HAVE_error_message_count)@@
 @@pp_ifdef __NO_COMPILER_SREDIRECT@@
@@ -95,7 +95,7 @@ __CSDECLARE(,unsigned int,@error_message_count@)
 
 %[define(DEFINE_LOCAL_error_one_per_line =
 @@pp_ifndef __LOCAL_error_one_per_line@@
-@@pp_if defined(@error_one_per_line@)@@
+@@pp_if  defined(@error_one_per_line@)@@
 #define __LOCAL_error_one_per_line @error_one_per_line@
 @@pp_elif defined(__CRT_HAVE_error_one_per_line)@@
 @@pp_ifdef __NO_COMPILER_SREDIRECT@@

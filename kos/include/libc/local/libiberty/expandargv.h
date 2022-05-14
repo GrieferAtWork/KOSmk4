@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x125f28a2 */
+/* HASH CRC-32:0x76ffda2c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -177,7 +177,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(expandargv))(int *__p_argc, char ***_
 			continue;
 		++__arg;
 
-		/* Map the specified file into memory. - If doing so fails,
+		/* Map  the specified file  into memory. -  If doing so fails,
 		 * (due to something other than out-of-memory), then we simply
 		 * ignore the @-directive. */
 		if ((__NAMESPACE_LOCAL_SYM __localdep_mapfile)(&__mf, __arg, 0, (__SIZE_TYPE__)-1, 1) != 0) {

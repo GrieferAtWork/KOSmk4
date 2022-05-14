@@ -2644,7 +2644,7 @@ char *getpassfd([[nullable]] char const *prompt,
 	if (!fds) {
 		fds = default_fds;
 @@pp_if $has_function(open)@@
-@@pp_ifdef __O_CLOEXEC@@
+@@pp_ifdef      __O_CLOEXEC@@
 #define __PRIVATE_GETPASSFD_O_CLOEXEC __O_CLOEXEC
 @@pp_else@@
 #define __PRIVATE_GETPASSFD_O_CLOEXEC 0

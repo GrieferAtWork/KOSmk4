@@ -432,7 +432,9 @@
  *     which  is  guarantied  to happen  without  any further
  *     intervention by means of having an active system  call
  *     return with -EINTR, or having it be restarted once the
- *     RPC function returns. */
+ *     RPC function returns.
+ *     Restart behavior can further be configured by use of
+ *     `RPC_SYSRESTART_*' options. */
 #define RPC_SYNCMODE_ASYNC RPC_SYNCMODE_F_ALLOW_ASYNC
 
 /* RPC  may only be executed when the target thread is making

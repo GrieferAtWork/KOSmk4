@@ -292,7 +292,7 @@ int dyn_string_append_char([[nonnull]] struct dyn_string *dst, int ch) {
 
 
 @@>> dyn_string_substring(3)
-@@Assign the substring `src[start:end]' to `dst'. Note that
+@@Assign  the substring `src[start:end]'  to `dst'. Note that
 @@the given indices _must_ be properly ordered, and in-range!
 @@@return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value)
 [[decl_include("<features.h>", "<bits/crt/dyn-string.h>")]]

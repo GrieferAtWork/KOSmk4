@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7feb14c7 */
+/* HASH CRC-32:0xfab92318 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -517,7 +517,7 @@ NOTHROW_NCX(LIBCCALL libc_expandargv)(int *p_argc,
 			continue;
 		++arg;
 
-		/* Map the specified file into memory. - If doing so fails,
+		/* Map  the specified file  into memory. -  If doing so fails,
 		 * (due to something other than out-of-memory), then we simply
 		 * ignore the @-directive. */
 		if (libc_mapfile(&mf, arg, 0, (size_t)-1, 1) != 0) {
@@ -756,7 +756,7 @@ NOTHROW_NCX(VLIBCCALL libc_concat_copy2)(char const *first,
 #include <bits/os/tms.h>
 #include <bits/crt/vtimes.h>
 /* >> get_run_time(3)
- * Return the amount of time the calling process has run (in microseconds)
+ * Return the amount of time the calling process has run (in  microseconds)
  * If possible, time spent idling isn't counted, though if not possible, it
  * is included, also. */
 INTERN ATTR_SECTION(".text.crt.libiberty") WUNUSED long
@@ -788,7 +788,7 @@ NOTHROW_NCX(LIBCCALL libc_get_run_time)(void) {
 }
 /* >> choose_temp_base(3)
  * Create a temporary filename in `choose_tmpdir(3)' by use of `mktemp(3)'
- * The returned string must always be freed, and if no filename could be
+ * The  returned string must always be freed,  and if no filename could be
  * generated, an empty string is returned. */
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_choose_temp_base)(void) {
@@ -916,7 +916,7 @@ NOTHROW_NCX(LIBCCALL libc_unlink_if_ordinary)(char const *filename) {
 		return 1;
 	if (!__S_ISREG(st.st_mode) && !__S_ISLNK(st.st_mode))
 		return 1;
-	/* Sorry, no way to prevent the race where
+	/* Sorry, no way  to prevent  the race  where
 	 * the file is replaced before we get here... */
 	return libc_unlink(filename);
 }

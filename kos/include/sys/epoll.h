@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x824e78bf */
+/* HASH CRC-32:0x26b6f981 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -244,7 +244,7 @@ typedef enum __epoll_ctl {
 	EPOLL_CTL_MOD = __EPOLL_CTL_MOD, /* Change the `struct epoll_event' associated with a given file descriptor. */
 #endif /* __EPOLL_CTL_MOD */
 #if defined(__USE_KOS_KERNEL) && defined(__EPOLL_CTL_RPC_PROG)
-	EPOLL_CTL_RPC_PROG = __EPOLL_CTL_RPC_PROG, /* Add  a file monitor that will deliver an RPC (~aka <kos/rpc.h>) once any of
+	EPOLL_CTL_RPC_PROG = __EPOLL_CTL_RPC_PROG, /* Add  a file monitor that will deliver an RPC (~ala <kos/rpc.h>) once any of
 	                                            * the monitored events are triggered  (iow: on the first raising-edge  event,
 	                                            * or immediately if any event is already asserted). This mechanism allows for
 	                                            * asynchronous  notification of any pollable file event by means of injecting
@@ -274,7 +274,7 @@ typedef enum __epoll_ctl {
 #define EPOLL_CTL_MOD      EPOLL_CTL_MOD      /* Change the `struct epoll_event' associated with a given file descriptor. */
 #endif /* __EPOLL_CTL_MOD */
 #if defined(__USE_KOS_KERNEL) && defined(__EPOLL_CTL_RPC_PROG)
-#define EPOLL_CTL_RPC_PROG EPOLL_CTL_RPC_PROG /* Add  a file monitor that will deliver an RPC (~aka <kos/rpc.h>) once any of
+#define EPOLL_CTL_RPC_PROG EPOLL_CTL_RPC_PROG /* Add  a file monitor that will deliver an RPC (~ala <kos/rpc.h>) once any of
                                                * the monitored events are triggered  (iow: on the first raising-edge  event,
                                                * or immediately if any event is already asserted). This mechanism allows for
                                                * asynchronous  notification of any pollable file event by means of injecting
@@ -301,7 +301,7 @@ typedef enum __epoll_ctl {
 #define EPOLL_CTL_MOD      __EPOLL_CTL_MOD      /* Change the `struct epoll_event' associated with a given file descriptor. */
 #endif /* __EPOLL_CTL_MOD */
 #if defined(__USE_KOS_KERNEL) && defined(__EPOLL_CTL_RPC_PROG)
-#define EPOLL_CTL_RPC_PROG __EPOLL_CTL_RPC_PROG /* Add  a file monitor that will deliver an RPC (~aka <kos/rpc.h>) once any of
+#define EPOLL_CTL_RPC_PROG __EPOLL_CTL_RPC_PROG /* Add  a file monitor that will deliver an RPC (~ala <kos/rpc.h>) once any of
                                                  * the monitored events are triggered  (iow: on the first raising-edge  event,
                                                  * or immediately if any event is already asserted). This mechanism allows for
                                                  * asynchronous  notification of any pollable file event by means of injecting
@@ -442,13 +442,13 @@ typedef __ATTR_NONNULL((1)) void
 		__THROWS(...);
 #endif /* !__prpc_exec_callback_t_defined */
 /* >> epoll_rpc_exec(3)
- * Helper  wrapper  for `EPOLL_CTL_RPC_PROG'  that automatically  provides the
- * necessary  arch-specific RPC program to invoke `func(..., event->data.ptr)'
- * as soon as any  of `event->events' become raised  in `fd'. The monitor  for
- * this  is associated with `epfd' and the  RPC (if not already delivered) can
- * be canceled by `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'. Not that as soon
- * as  the RPC  is send, the  associated monitor will  have automatically been
- * deleted.
+ * Helper wrapper for  `EPOLL_CTL_RPC_PROG' that  automatically provides  the
+ * necessary arch-specific RPC program to invoke `func(..., event->data.ptr)'
+ * as  soon as any of `event->events' become  raised in `fd'. The monitor for
+ * this is associated with `epfd' and the RPC (if not already delivered)  can
+ * be canceled  by `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'.  Note that  as
+ * soon  as the RPC  is send, the associated  monitor will have automatically
+ * been deleted.
  *
  * This  function can be used to implement asynchronous notification of file
  * events to-be  delivered  to  arbitrary threads.  Using  this,  you  could
@@ -459,7 +459,7 @@ typedef __ATTR_NONNULL((1)) void
  * @param: event:      Epoll event information, including monitored  events,
  *                     and the cookie argument that will be passed to `func'
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ * @param: mode:       One of `RPC_SYNCMODE_*',  optionally or'd  with
  *                     one of `RPC_SYSRESTART_*', optionally or'd with
  *                     one of `RPC_DOMAIN_*'
  * @param: func:       The function executed by the RPC

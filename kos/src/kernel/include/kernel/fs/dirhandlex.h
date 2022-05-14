@@ -38,6 +38,9 @@
  * - Missing support for F_SETOWN_EX
  * - Missing support for F_SETSIG with real-time signals
  * - Missing support for SI_SIGIO and siginfo_t::si_fd
+ *   TODO: man says that `si_fd' is the fd used when calling F_SETSIG
+ *   TODO: man says that a real-time signal is used when F_SETSIG!=0,
+ *         and   otherwise   a   queuing   signal   SIGIO   is  used.
  *
  */
 
@@ -58,7 +61,7 @@ struct dirhandlex_hdr {
 	REF struct notifyfd  *dxh_notify; /* [1..1][const] Associated notify controller. */
 	struct sig_completion dxh_com;    /* [const] Completion controller listening to `dxh_notify->nf_avail' */
 	signo_t               dxh_sigio;  /* [lock(ATOMIC)][sigvalid(.)] Signal send upon notify */
-	/* TODO: To support F_SETOWN_EX, we must be able to specify targets:
+	/* TODO: To support F_SETOWN_EX, we must be able to specify target types:
 	 *  - thread         (deliver signal using `_task_raisesignothread()')
 	 *  - process        (deliver signal using `_task_raisesignoprocess()')
 	 *  - process-group  (deliver signal using `_task_raisesignoprocessgroup()')
@@ -99,8 +102,10 @@ DEFINE_REFCOUNT_FUNCTIONS(struct dirhandlex, dh_refcnt, dirhandlex_destroy)
  * should then use to replace the old object in the caller's handle table. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct dirhandlex *KCALL
 dirhandle_xadd(struct dirhandle *__restrict self);
+#if 0
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct dirhandle *KCALL
 dirhandle_xdel(struct dirhandlex *__restrict self);
+#endif
 
 
 /* Implementation for `fcntl(F_NOTIFY)'

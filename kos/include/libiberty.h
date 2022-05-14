@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24327fbc */
+/* HASH CRC-32:0xdac2bcf0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -766,23 +766,23 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW
 #ifdef __CRT_HAVE_sigabbrev_np
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
- * When the given `signo' isn't  recognized, `NULL' is returned  instead. */
+ * When the given  `signo' isn't recognized,  `NULL' is returned  instead. */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strsigno,(__signo_t __signo),sigabbrev_np,(__signo))
 #elif defined(__CRT_HAVE_signalname)
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
- * When the given `signo' isn't  recognized, `NULL' is returned  instead. */
+ * When the given  `signo' isn't recognized,  `NULL' is returned  instead. */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strsigno,(__signo_t __signo),signalname,(__signo))
 #elif defined(__CRT_HAVE_strsigno)
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
- * When the given `signo' isn't  recognized, `NULL' is returned  instead. */
+ * When the given  `signo' isn't recognized,  `NULL' is returned  instead. */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strsigno,(__signo_t __signo),(__signo))
 #else /* ... */
 #include <libc/local/string/sigabbrev_np.h>
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
- * When the given `signo' isn't  recognized, `NULL' is returned  instead. */
+ * When the given  `signo' isn't recognized,  `NULL' is returned  instead. */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL strsigno)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigabbrev_np))(__signo); }
 #endif /* !... */
 #ifdef __CRT_HAVE_atexit
@@ -1253,7 +1253,7 @@ __CSDECLARE(,char *,libiberty_concat_ptr)
 #endif /* __alloca && libiberty_concat_ptr && (__CRT_HAVE_concat_copy2 || __LOCAL_libiberty_concat_ptr) */
 #ifdef __CRT_HAVE_get_run_time
 /* >> get_run_time(3)
- * Return the amount of time the calling process has run (in microseconds)
+ * Return the amount of time the calling process has run (in  microseconds)
  * If possible, time spent idling isn't counted, though if not possible, it
  * is included, also. */
 __CDECLARE(__ATTR_WUNUSED,long,__NOTHROW_NCX,get_run_time,(void),())
@@ -1265,7 +1265,7 @@ __CDECLARE(__ATTR_WUNUSED,long,__NOTHROW_NCX,get_run_time,(void),())
 #if (defined(__RUSAGE_SELF) && ((defined(__CRT_HAVE_getrusage) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || (defined(__CRT_HAVE___getrusage) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || (defined(__CRT_HAVE___libc_getrusage) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_getrusage64))) || (defined(_SC_CLK_TCK) && (defined(__CRT_HAVE_sysconf) || defined(__CRT_HAVE___sysconf)) && (defined(__CRT_HAVE_times) || defined(__CRT_HAVE___times) || defined(__CRT_HAVE___libc_times))) || (defined(__VTIMES_UNITS_PER_SECOND) && (defined(__CRT_HAVE_vtimes) || (defined(__RUSAGE_SELF) && defined(__RUSAGE_CHILDREN) && ((defined(__CRT_HAVE_getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE___getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE___libc_getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_getrusage64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)))))) || (defined(__CLOCKS_PER_SEC) && defined(__CRT_HAVE_clock))
 #include <libc/local/libiberty/get_run_time.h>
 /* >> get_run_time(3)
- * Return the amount of time the calling process has run (in microseconds)
+ * Return the amount of time the calling process has run (in  microseconds)
  * If possible, time spent idling isn't counted, though if not possible, it
  * is included, also. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(get_run_time, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED long __NOTHROW_NCX(__LIBCCALL get_run_time)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(get_run_time))(); })
@@ -1276,7 +1276,7 @@ __CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,_
 #ifdef __CRT_HAVE_choose_temp_base
 /* >> choose_temp_base(3)
  * Create a temporary filename in `choose_tmpdir(3)' by use of `mktemp(3)'
- * The returned string must always be freed, and if no filename could be
+ * The  returned string must always be freed,  and if no filename could be
  * generated, an empty string is returned. */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOTHROW_NCX,choose_temp_base,(void),())
 #else /* __CRT_HAVE_choose_temp_base */
@@ -1287,7 +1287,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED,char *,__NOT
 #include <libc/local/libiberty/choose_temp_base.h>
 /* >> choose_temp_base(3)
  * Create a temporary filename in `choose_tmpdir(3)' by use of `mktemp(3)'
- * The returned string must always be freed, and if no filename could be
+ * The  returned string must always be freed,  and if no filename could be
  * generated, an empty string is returned. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(choose_temp_base, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL choose_temp_base)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(choose_temp_base))(); })
 #endif /* (__CRT_HAVE_choose_tmpdir || ((__CRT_HAVE_access || __CRT_HAVE__access || __CRT_HAVE___access || __CRT_HAVE___libc_access || (__AT_FDCWD && __CRT_HAVE_faccessat)) && !_WIN32 && __X_OK && __W_OK && __R_OK)) && (__CRT_HAVE_xmalloc || __CRT_HAVE_xrealloc || __CRT_HAVE_xcalloc || ((__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && __CRT_HAVE_xmalloc_failed)) && (__CRT_HAVE_mktemp || __CRT_HAVE__mktemp || __CRT_HAVE___mktemp || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) || (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64))) */

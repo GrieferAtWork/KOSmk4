@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7d5f144 */
+/* HASH CRC-32:0x4b46d45 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -521,6 +521,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 __empty_file:
 	{
 		__BYTE_TYPE__ *__newbuf;
+		/* Because of how large our original buffer was, and because at this
+		 * point all  we want  to do  is return  a  `num_trailing_nulbytes'-
+		 * large buffer of  all NUL-bytes, it's  probably more efficient  to
+		 * allocate a new  (small) buffer,  than trying to  realloc the  old
+		 * buffer. If we try  to do realloc(), the  heap might see that  all
+		 * we're  trying to do  is truncate the buffer,  and so might choose
+		 * not to alter its base  address, which (if done repeatedly)  might
+		 * lead to memory becoming very badly fragmented. */
 		__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_calloc)(1, __num_trailing_nulbytes);
 		if __likely(__newbuf) {
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)

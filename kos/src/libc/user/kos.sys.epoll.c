@@ -72,15 +72,15 @@ INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((2)) __STDC_UINT_AS_S
 }
 /*[[[end:libc_EPollPWait]]]*/
 
-/*[[[head:libc_EPollRpcExec,hash:CRC-32=0xac3db6d9]]]*/
+/*[[[head:libc_EPollRpcExec,hash:CRC-32=0xabac40dd]]]*/
 /* >> epoll_rpc_exec(3)
- * Helper  wrapper  for `EPOLL_CTL_RPC_PROG'  that automatically  provides the
- * necessary  arch-specific RPC program to invoke `func(..., event->data.ptr)'
- * as soon as any  of `event->events' become raised  in `fd'. The monitor  for
- * this  is associated with `epfd' and the  RPC (if not already delivered) can
- * be canceled by `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'. Not that as soon
- * as  the RPC  is send, the  associated monitor will  have automatically been
- * deleted.
+ * Helper wrapper for  `EPOLL_CTL_RPC_PROG' that  automatically provides  the
+ * necessary arch-specific RPC program to invoke `func(..., event->data.ptr)'
+ * as  soon as any of `event->events' become  raised in `fd'. The monitor for
+ * this is associated with `epfd' and the RPC (if not already delivered)  can
+ * be canceled  by `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'.  Note that  as
+ * soon  as the RPC  is send, the associated  monitor will have automatically
+ * been deleted.
  *
  * This  function can be used to implement asynchronous notification of file
  * events to-be  delivered  to  arbitrary threads.  Using  this,  you  could
@@ -91,7 +91,7 @@ INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((2)) __STDC_UINT_AS_S
  * @param: event:      Epoll event information, including monitored  events,
  *                     and the cookie argument that will be passed to `func'
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ * @param: mode:       One of `RPC_SYNCMODE_*',  optionally or'd  with
  *                     one of `RPC_SYSRESTART_*', optionally or'd with
  *                     one of `RPC_DOMAIN_*'
  * @param: func:       The function executed by the RPC

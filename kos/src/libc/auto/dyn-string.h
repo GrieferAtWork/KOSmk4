@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x278208a0 */
+/* HASH CRC-32:0x13b70ce7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -229,14 +229,14 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_dyn_string_append_char)(struct
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> dyn_string_substring(3)
- * Assign the substring `src[start:end]' to `dst'. Note that
+ * Assign  the substring `src[start:end]'  to `dst'. Note that
  * the given indices _must_ be properly ordered, and in-range!
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_dyn_string_substring)(struct dyn_string *dst, struct dyn_string __KOS_FIXED_CONST *src, __STDC_INT_AS_SIZE_T start, __STDC_INT_AS_SIZE_T end);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> dyn_string_substring(3)
- * Assign the substring `src[start:end]' to `dst'. Note that
+ * Assign  the substring `src[start:end]'  to `dst'. Note that
  * the given indices _must_ be properly ordered, and in-range!
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_dyn_string_substring)(struct dyn_string *dst, struct dyn_string __KOS_FIXED_CONST *src, __STDC_INT_AS_SIZE_T start, __STDC_INT_AS_SIZE_T end);

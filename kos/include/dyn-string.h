@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1eacde3e */
+/* HASH CRC-32:0x8f7df867 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -246,14 +246,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_append_char, __FORCELOCAL __ATTR_ARTI
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_substring
 /* >> dyn_string_substring(3)
- * Assign the substring `src[start:end]' to `dst'. Note that
+ * Assign  the substring `src[start:end]'  to `dst'. Note that
  * the given indices _must_ be properly ordered, and in-range!
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,dyn_string_substring,(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src, __STDC_INT_AS_SIZE_T __start, __STDC_INT_AS_SIZE_T __end),(__dst,__src,__start,__end))
 #elif defined(__CRT_HAVE_dyn_string_copy) || defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 #include <libc/local/dyn-string/dyn_string_substring.h>
 /* >> dyn_string_substring(3)
- * Assign the substring `src[start:end]' to `dst'. Note that
+ * Assign  the substring `src[start:end]'  to `dst'. Note that
  * the given indices _must_ be properly ordered, and in-range!
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_substring, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL dyn_string_substring)(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src, __STDC_INT_AS_SIZE_T __start, __STDC_INT_AS_SIZE_T __end) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_substring))(__dst, __src, __start, __end); })

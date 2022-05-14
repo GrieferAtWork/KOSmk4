@@ -753,7 +753,7 @@ void expandargv([[nonnull]] int *p_argc, [[nonnull]] char ***p_argv) {
 			continue;
 		++arg;
 
-		/* Map the specified file into memory. - If doing so fails,
+		/* Map  the specified file  into memory. -  If doing so fails,
 		 * (due to something other than out-of-memory), then we simply
 		 * ignore the @-directive. */
 		if (mapfile(&mf, arg, 0, (size_t)-1, 1) != 0) {
@@ -935,7 +935,7 @@ __CSDECLARE(,char *,libiberty_concat_ptr)
 %[insert:pp_endif]
 
 @@>> get_run_time(3)
-@@Return the amount of time the calling process has run (in microseconds)
+@@Return the amount of time the calling process has run (in  microseconds)
 @@If possible, time spent idling isn't counted, though if not possible, it
 @@is included, also.
 [[wunused]]
@@ -984,7 +984,7 @@ char *make_relative_prefix_ignore_links(char const *a, char const *b, char const
 
 @@>> choose_temp_base(3)
 @@Create a temporary filename in `choose_tmpdir(3)' by use of `mktemp(3)'
-@@The returned string must always be freed, and if no filename could be
+@@The  returned string must always be freed,  and if no filename could be
 @@generated, an empty string is returned.
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[requires_function(choose_tmpdir, xmalloc, mktemp)]]
@@ -1122,7 +1122,7 @@ int unlink_if_ordinary(char const *filename) {
 		return 1;
 	if (!__S_ISREG(st.@st_mode@) && !__S_ISLNK(st.@st_mode@))
 		return 1;
-	/* Sorry, no way to prevent the race where
+	/* Sorry, no way  to prevent  the race  where
 	 * the file is replaced before we get here... */
 	return unlink(filename);
 }

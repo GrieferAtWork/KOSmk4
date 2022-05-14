@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x355b4c0 */
+/* HASH CRC-32:0x6a1a3294 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,8 +65,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(objalloc_free_block))(struct objalloc
 				(__NAMESPACE_LOCAL_SYM __localdep_free)(__iter);
 
 				/* Find the preceding small-chunk into which `self->@current_ptr@' points.
-				 * Because of constraints, that is guarantied to be the most-recently
-				 * allocated small-chunk, meaning we only have to skip additional large
+				 * Because of  constraints, that  is guarantied  to be  the  most-recently
+				 * allocated small-chunk, meaning  we only have  to skip additional  large
 				 * chunks allocated at this point. */
 				__prev_small_chunk = (struct __objalloc_chunk *)__self->chunks;
 				while (__prev_small_chunk->__oc_curptr != __NULLPTR) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7eca23 */
+/* HASH CRC-32:0x5ae2025 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -218,7 +218,7 @@ INTDEF char *NOTHROW_NCX(VLIBDCALL libd_concat_copy2)(char const *first, ...);
 #ifndef __KERNEL__
 INTDEF char *NOTHROW_NCX(VLIBCCALL libc_concat_copy2)(char const *first, ...);
 /* >> get_run_time(3)
- * Return the amount of time the calling process has run (in microseconds)
+ * Return the amount of time the calling process has run (in  microseconds)
  * If possible, time spent idling isn't counted, though if not possible, it
  * is included, also. */
 INTDEF WUNUSED long NOTHROW_NCX(LIBCCALL libc_get_run_time)(void);
@@ -230,7 +230,7 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBDCALL 
 #ifndef __KERNEL__
 /* >> choose_temp_base(3)
  * Create a temporary filename in `choose_tmpdir(3)' by use of `mktemp(3)'
- * The returned string must always be freed, and if no filename could be
+ * The  returned string must always be freed,  and if no filename could be
  * generated, an empty string is returned. */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL libc_choose_temp_base)(void);
 /* >> choose_tmpdir(3)

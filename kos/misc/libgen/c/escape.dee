@@ -502,6 +502,7 @@ global final special_escapes: {string...} = {
 	"__unused",      /* Macro in <sys/cdefs.h> */
 	"__packed",      /* Macro in <sys/cdefs.h> */
 	"__value",       /* Compiler keyword in MSVC */
+	"__event",       /* Compiler keyword in MSVC */
 	"__in",          /* SAL macro */
 	"__in_z",        /* SAL macro */
 	"__in_opt",      /* SAL macro */
@@ -521,10 +522,12 @@ function escapeKeywordIfNotAlreadyEscaped(
 		word: string | UserString): string {
 	if (word is UserString)
 		word = word.text;
-	if (word.startswith("__") && word !in special_escapes)
-		return word;
-	if (word.startswith("_") && #word >= 2 && word.isupper(1) && word !in special_escapes)
-		return word;
+	if (word !in special_escapes) {
+		if (word.startswith("__"))
+			return word;
+		if (word.startswith("_") && #word >= 2 && word.isupper(1))
+			return word;
+	}
 	local result = "__" + word;
 	if (result in special_escapes)
 		result = "_" + result;

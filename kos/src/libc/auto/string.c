@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d7415a8 */
+/* HASH CRC-32:0xab3b6587 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2125,13 +2125,13 @@ print("	};");
 #ifndef __KERNEL__
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
- * When the given `signo' isn't  recognized, `NULL' is returned  instead. */
+ * When the given  `signo' isn't recognized,  `NULL' is returned  instead. */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBDCALL libd_sigabbrev_np)(signo_t signo) { return libc_sigabbrev_np(libd_signo_dos2kos(signo)); }
 #include <asm/os/signal.h>
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
- * When the given `signo' isn't  recognized, `NULL' is returned  instead. */
+ * When the given  `signo' isn't recognized,  `NULL' is returned  instead. */
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBCCALL libc_sigabbrev_np)(signo_t signo) {
 /*[[[deemon

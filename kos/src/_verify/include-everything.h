@@ -266,6 +266,7 @@ incdir("");
 #include <bits/crt/io-file.h>
 #include <bits/crt/lconv.h>
 #include <bits/crt/locale.h>
+#include <bits/crt/mapfile.h>
 #include <bits/crt/math-vector.h>
 #include <bits/crt/mathdef.h>
 #include <bits/crt/mbstate.h>
@@ -893,6 +894,7 @@ incdir("");
 #include <libm/hypot.h>
 #include <libm/ilogb.h>
 #include <libm/inf.h>
+#include <libm/iscanonical.h>
 #include <libm/isinf.h>
 #include <libm/isnan.h>
 #include <libm/issignaling.h>
@@ -917,6 +919,7 @@ incdir("");
 #include <libm/nan.h>
 #include <libm/nextafter.h>
 #include <libm/nexttoward.h>
+#include <libm/nextup.h>
 #include <libm/pone.h>
 #include <libm/pow.h>
 #include <libm/pzero.h>
@@ -925,6 +928,7 @@ incdir("");
 #include <libm/remquo.h>
 #include <libm/rint.h>
 #include <libm/round.h>
+#include <libm/roundeven.h>
 #include <libm/scalb.h>
 #include <libm/scalbn.h>
 #include <libm/signbit.h>

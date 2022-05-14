@@ -590,8 +590,8 @@ void obstack_chunk_free(void *ptr);
 @@>> obstack_printer(3)
 @@A pformatprinter-compatible printer  sink that appends  data to  the
 @@object currently being constructed by a given `struct obstack *arg'.
-@@Note that obstacks don't have out-of-memory errors (you have to use
-@@longjmp from a custom `obstack_alloc_failed_handler'), so in turn,
+@@Note  that obstacks don't have out-of-memory errors (you have to use
+@@longjmp  from a custom  `obstack_alloc_failed_handler'), so in turn,
 @@this function doesn't have an error return-value!
 @@HINT: Ths function does the same as `obstack_grow(3)'!
 @@@return: datalen: Success.

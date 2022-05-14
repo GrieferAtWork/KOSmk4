@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41dececb */
+/* HASH CRC-32:0x948cc397 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -352,8 +352,8 @@ void obstack_chunk_free(void *ptr);
 /* >> obstack_printer(3)
  * A pformatprinter-compatible printer  sink that appends  data to  the
  * object currently being constructed by a given `struct obstack *arg'.
- * Note that obstacks don't have out-of-memory errors (you have to use
- * longjmp from a custom `obstack_alloc_failed_handler'), so in turn,
+ * Note  that obstacks don't have out-of-memory errors (you have to use
+ * longjmp  from a custom  `obstack_alloc_failed_handler'), so in turn,
  * this function doesn't have an error return-value!
  * HINT: Ths function does the same as `obstack_grow(3)'!
  * @return: datalen: Success. */
@@ -363,8 +363,8 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORM
 /* >> obstack_printer(3)
  * A pformatprinter-compatible printer  sink that appends  data to  the
  * object currently being constructed by a given `struct obstack *arg'.
- * Note that obstacks don't have out-of-memory errors (you have to use
- * longjmp from a custom `obstack_alloc_failed_handler'), so in turn,
+ * Note  that obstacks don't have out-of-memory errors (you have to use
+ * longjmp  from a custom  `obstack_alloc_failed_handler'), so in turn,
  * this function doesn't have an error return-value!
  * HINT: Ths function does the same as `obstack_grow(3)'!
  * @return: datalen: Success. */

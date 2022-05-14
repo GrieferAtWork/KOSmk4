@@ -171,8 +171,8 @@ void objalloc_free_block([[nonnull]] struct objalloc *self,
 				free(iter);
 
 				/* Find the preceding small-chunk into which `self->@current_ptr@' points.
-				 * Because of constraints, that is guarantied to be the most-recently
-				 * allocated small-chunk, meaning we only have to skip additional large
+				 * Because of  constraints, that  is guarantied  to be  the  most-recently
+				 * allocated small-chunk, meaning  we only have  to skip additional  large
 				 * chunks allocated at this point. */
 				prev_small_chunk = (struct __objalloc_chunk *)self->@chunks@;
 				while (prev_small_chunk->@__oc_curptr@ != NULL) {

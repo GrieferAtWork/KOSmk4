@@ -1195,6 +1195,14 @@ int fmapfile([[nonnull]] struct mapfile *__restrict mapping, $fd_t fd,
 empty_file:
 	{
 		byte_t *newbuf;
+		/* Because of how large our original buffer was, and because at this
+		 * point all  we want  to do  is return  a  `num_trailing_nulbytes'-
+		 * large buffer of  all NUL-bytes, it's  probably more efficient  to
+		 * allocate a new  (small) buffer,  than trying to  realloc the  old
+		 * buffer. If we try  to do realloc(), the  heap might see that  all
+		 * we're  trying to do  is truncate the buffer,  and so might choose
+		 * not to alter its base  address, which (if done repeatedly)  might
+		 * lead to memory becoming very badly fragmented. */
 		newbuf = (byte_t *)calloc(1, num_trailing_nulbytes);
 		if likely(newbuf) {
 @@pp_if $has_function(free)@@

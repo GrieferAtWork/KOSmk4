@@ -291,7 +291,7 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 					 *    as `async_new()' (to raise signals  in a context where  we
 					 *    are allowed to do stuff  that blocks and/or throws).  This
 					 *    will also be required for  `_task_raisesignoprocessgroup',
-					 *    as that function can throw E_WOULDBLOCK! */
+					 *    as that function can already throw E_WOULDBLOCK! */
 					THROW(E_NOT_IMPLEMENTED_TODO);
 				}
 				dirhandlex_hdr_setsigio(hdr, signo);
@@ -318,8 +318,8 @@ sys_fcntl_impl(fd_t fd, fcntl_t command,
 	case F_NOTIFY: {
 		REF struct handle hand;
 		struct dirhandlex *dir;
-		/* TODO: Validate `arg'? (`man 2 fcntl' doesn't anything  about
-		 *       this, so look at the linux source to see what it does) */
+		/* TODO: Validate `arg'? (`man 2 fcntl' doesn't say anything about
+		 *       this,  so look at  the linux source to  see what it does) */
 		handman_lookup_and_upgrade(man, fd, &hand, HANDLE_TYPE_DIRHANDLE);
 		RAII_FINALLY { handle_decref(hand); };
 		if (hand.h_type != HANDLE_TYPE_DIRHANDLEX) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1d95650 */
+/* HASH CRC-32:0x22a82b9b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -257,7 +257,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_append_char)(struct dyn_string *dst,
 #include <bits/crt/dyn-string.h>
 #include <hybrid/__assert.h>
 /* >> dyn_string_substring(3)
- * Assign the substring `src[start:end]' to `dst'. Note that
+ * Assign  the substring `src[start:end]'  to `dst'. Note that
  * the given indices _must_ be properly ordered, and in-range!
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
 INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) int

@@ -579,7 +579,7 @@
 #endif /* !_NO_THREADING */
 #endif /* ... */
 
-/* When multi-threading is explicitly disabled (by one of these macros), then
+/* When  multi-threading is explicitly disabled (by one of these macros), then
  * we can safely override normal stdio functions with their unlocked variants. */
 #if defined(_NO_THREADING) || defined(_USE_UNLOCKED_STDIO)
 #undef __USE_STDIO_UNLOCKED

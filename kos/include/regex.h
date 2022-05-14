@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ff4cd77 */
+/* HASH CRC-32:0x345edc66 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -150,17 +150,17 @@ __CSDECLARE(,reg_syntax_t,re_syntax_options)
 /* Flags for `regcomp(3)'s `cflags' argument.
  * NOTE: REG_EXTENDED does the following:
  *  - Enable support for [:class:] (as opposed to being the
- *    equivalent of "[:clas]", aka regular set-matching)
+ *    equivalent  of  "[:clas]", aka  regular set-matching)
  *  - . matches \n  (as opposed to it not doing so)
  *  - . doesn't match \0  (as opposed to it doing so)
  *  - f{0-3} interval matching (as opposed to the equivalent of "f\{0-3\}")
  *  - [z-a] is invalid  (as opposed to never matched)
- *  - ^ and $ are always matched as operators (as opposed to only
+ *  - ^  and $ are  always matched as operators  (as opposed to only
  *    at the start or end of a pattern, and in "abc(^foo$|^bar$)def"
  *  - *, + and ? are always special (as opposed to only as a suffix;
- *    aka. in non-suffix places using these becomes an error)
+ *    aka. in  non-suffix  places  using  these  becomes  an  error)
  *  - (foo|bar) groups and |-alternatives are supported (as
- *    opposed to being the equivalent of "\(foo\|bar\)")
+ *    opposed to  being the  equivalent of  "\(foo\|bar\)")
  *     - An unmatched ) is still allowed to be parsed as \), without causing an error
  *  - {, +, * or ? cannot appear at the start of a pattern, or after ( or |, as
  *    opposed to being processed like regular match-characters in these locations. */

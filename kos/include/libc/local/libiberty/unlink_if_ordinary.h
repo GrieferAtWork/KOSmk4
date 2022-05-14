@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71ca19ca */
+/* HASH CRC-32:0xb29db6b8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unlink_if_ordinary))(char const *__fi
 		return 1;
 	if (!__S_ISREG(__st.st_mode) && !__S_ISLNK(__st.st_mode))
 		return 1;
-	/* Sorry, no way to prevent the race where
+	/* Sorry, no way  to prevent  the race  where
 	 * the file is replaced before we get here... */
 	return (__NAMESPACE_LOCAL_SYM __localdep_unlink)(__filename);
 }

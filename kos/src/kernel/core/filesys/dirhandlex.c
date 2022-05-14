@@ -214,6 +214,7 @@ dirhandle_xadd(struct dirhandle *__restrict self) {
 	return result;
 }
 
+#if 0
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct dirhandle *KCALL
 dirhandle_xdel(struct dirhandlex *__restrict self) {
 	REF struct dirhandle *result;
@@ -231,6 +232,7 @@ dirhandle_xdel(struct dirhandlex *__restrict self) {
 	}
 	return result;
 }
+#endif
 
 
 /* Implementation for `fcntl(F_NOTIFY)'

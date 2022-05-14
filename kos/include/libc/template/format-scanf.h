@@ -76,7 +76,7 @@ __next:
 	__ch = *__FORMAT_FORMAT++;
 
 	/* TODO: Re-work this function to deal with the fact that `__FORMAT_PGETC()'
-	 *       returns BYTE/WORD/DWORD, rather than unicode characters! */
+	 *       returns   BYTE/WORD/DWORD,   rather   than   unicode    characters! */
 	switch (__ch) {
 
 	case '\0':

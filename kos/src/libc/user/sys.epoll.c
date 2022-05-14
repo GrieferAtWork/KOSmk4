@@ -160,15 +160,15 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
 }
 /*[[[end:libc_epoll_pwait]]]*/
 
-/*[[[head:libc_epoll_rpc_exec,hash:CRC-32=0xbf04f811]]]*/
+/*[[[head:libc_epoll_rpc_exec,hash:CRC-32=0x465878d4]]]*/
 /* >> epoll_rpc_exec(3)
- * Helper  wrapper  for `EPOLL_CTL_RPC_PROG'  that automatically  provides the
- * necessary  arch-specific RPC program to invoke `func(..., event->data.ptr)'
- * as soon as any  of `event->events' become raised  in `fd'. The monitor  for
- * this  is associated with `epfd' and the  RPC (if not already delivered) can
- * be canceled by `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'. Not that as soon
- * as  the RPC  is send, the  associated monitor will  have automatically been
- * deleted.
+ * Helper wrapper for  `EPOLL_CTL_RPC_PROG' that  automatically provides  the
+ * necessary arch-specific RPC program to invoke `func(..., event->data.ptr)'
+ * as  soon as any of `event->events' become  raised in `fd'. The monitor for
+ * this is associated with `epfd' and the RPC (if not already delivered)  can
+ * be canceled  by `epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL)'.  Note that  as
+ * soon  as the RPC  is send, the associated  monitor will have automatically
+ * been deleted.
  *
  * This  function can be used to implement asynchronous notification of file
  * events to-be  delivered  to  arbitrary threads.  Using  this,  you  could
@@ -179,7 +179,7 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
  * @param: event:      Epoll event information, including monitored  events,
  *                     and the cookie argument that will be passed to `func'
  * @param: target_tid: The TID of the targeted thread
- * @param: mode:       One of  `RPC_SYNCMODE_*', optionally or'd  with
+ * @param: mode:       One of `RPC_SYNCMODE_*',  optionally or'd  with
  *                     one of `RPC_SYSRESTART_*', optionally or'd with
  *                     one of `RPC_DOMAIN_*'
  * @param: func:       The function executed by the RPC
