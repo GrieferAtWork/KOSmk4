@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7abe2d4d */
+/* HASH CRC-32:0xa5301799 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2557,6 +2557,24 @@ NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
 		libc_free(mallptr);
 	}
 }
+/* >> daemon(3), daemonfd(3) */
+INTERN ATTR_SECTION(".text.crt.system.utility") int
+NOTHROW_RPC(LIBCCALL libc_daemonfd)(fd_t chdirfd,
+                                    fd_t nullfd) {
+	int error = libc_daemon_setup();
+	if likely(error == 0) {
+		if (chdirfd != -1)
+			(void)libc_fchdir(chdirfd);
+		if (nullfd != -1) {
+			fd_t i;
+			for (i = 0; i < 3; ++i) {
+				if (nullfd != i)
+					(void)libc_dup2(nullfd, i);
+			}
+		}
+	}
+	return error;
+}
 /* >> l64a_r(3)
  * Reentrant variant of `l64a(3)'. Note that the max required buffer size
  * @param: buf:     Target buffer (with a size of `bufsize' bytes)
@@ -4539,6 +4557,7 @@ DEFINE_PUBLIC_ALIAS(ulltostr, libc_ulltostr);
 DEFINE_PUBLIC_ALIAS(reallocf, libc_reallocf);
 DEFINE_PUBLIC_ALIAS(recallocarray, libc_recallocarray);
 DEFINE_PUBLIC_ALIAS(freezero, libc_freezero);
+DEFINE_PUBLIC_ALIAS(daemonfd, libc_daemonfd);
 DEFINE_PUBLIC_ALIAS(l64a_r, libc_l64a_r);
 DEFINE_PUBLIC_ALIAS(getprogname, libc_getprogname);
 DEFINE_PUBLIC_ALIAS(setprogname, libc_setprogname);

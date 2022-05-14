@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x434d1038 */
+/* HASH CRC-32:0xbce03854 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -542,6 +542,78 @@ NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
 		libc_strncpy(name, pwname, name_len - 1);
 	}
 	return 0;
+}
+#include <bits/os/sigaction.h>
+#include <asm/os/signal.h>
+/* >> daemon_setup(3)
+ * Do the common setup required by `daemon(3)' and `daemonfd(3)' */
+INTERN ATTR_SECTION(".text.crt.system.utility") int
+NOTHROW_RPC(LIBCCALL libc_daemon_setup)(void) {
+	int result;
+
+	int has_old_sa;
+	struct sigaction new_sa, old_sa;
+	/* To quote POSIX:
+	 * """
+	 * If the process  is a controlling  process, the  SIGHUP
+	 * signal shall be sent to each process in the foreground
+	 * process group  of the  controlling terminal  belonging
+	 * to the calling process.
+	 * """
+	 * In other words: if our process is both the controlling
+	 * process, as  well as  part of  the foreground  process
+	 * group  (meaning that  our child  will also  be of said
+	 * group, then it would be sent a SIGHUP which might even
+	 * kill it. To prevent this from happening, ignore SIGHUP
+	 * while we pass  kill ourselves and  spawn a new  child! */
+	libc_sigemptyset(&new_sa.sa_mask);
+	new_sa.sa_handler = (__sighandler_t)__SIG_IGN;
+	new_sa.sa_flags   = 0;
+	has_old_sa = libc_sigaction(__SIGHUP, &new_sa, &old_sa);
+
+	{
+		pid_t cpid = libc_fork();
+		if unlikely(cpid < 0)
+			return cpid;
+		if (cpid != 0)
+			libc__Exit(0); /* The parent process dies. */
+	}
+	result = libc_setsid();
+
+	if (has_old_sa == 0)
+		libc_sigaction(__SIGHUP, &old_sa, NULL);
+
+	return result;
+}
+#include <paths.h>
+/* >> daemon(3), daemonfd(3) */
+INTERN ATTR_SECTION(".text.crt.system.utility") int
+NOTHROW_RPC(LIBCCALL libc_daemon)(int nochdir,
+                                  int noclose) {
+	int error = libc_daemon_setup();
+	if likely(error == 0) {
+		if (!nochdir)
+			(void)libc_chdir("/");
+		if (!noclose) {
+			fd_t i, nul = libc_open(_PATH_DEVNULL, O_RDWR);
+			if unlikely(nul < 0)
+				return nul;
+			/* NOTE: Glibc does an additional check to ensure that `nul'  really
+			 *       is a character-device with the  correct dev_t. We could  do
+			 *       that as well, however I'd consider a system where /dev/null
+			 *       isn't actually /dev/null to  already be broken... (and  the
+			 *       check only adds unnecessary overhead if you ask me) */
+			for (i = 0; i < 3; ++i) {
+				if (nul != i)
+					(void)libc_dup2(nul, i);
+			}
+
+			if (nul >= 3)
+				(void)libc_close(nul);
+
+		}
+	}
+	return error;
 }
 #include <asm/crt/readpassphrase.h>
 /* >> getpass(3), getpassphrase(3) */
@@ -1414,6 +1486,7 @@ DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(__getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(getlogin_r, libc_getlogin_r);
+DEFINE_PUBLIC_ALIAS(daemon, libc_daemon);
 DEFINE_PUBLIC_ALIAS(getpassphrase, libc_getpass);
 DEFINE_PUBLIC_ALIAS(getpass, libc_getpass);
 #ifdef __LIBCCALL_IS_LIBDCALL

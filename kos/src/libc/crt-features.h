@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30e691f2 */
+/* HASH CRC-32:0x6262ced2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1294,6 +1294,7 @@
 #define __CRT_HAVE_DOS$cuserid
 #define __CRT_HAVE_DOS$cwait
 #define __CRT_HAVE_DOS$daemon
+#define __CRT_HAVE_DOS$daemonfd
 #define __CRT_HAVE_DOS$dcgettext
 #define __CRT_HAVE_DOS$dcngettext
 #define __CRT_HAVE_DOS$dehumanize_number
@@ -5390,6 +5391,8 @@
 #define __CRT_HAVE_cuserid
 #define __CRT_HAVE_cwait
 #define __CRT_HAVE_daemon
+#define __CRT_HAVE_daemon_setup
+#define __CRT_HAVE_daemonfd
 #define __CRT_HAVE_dcgettext
 #define __CRT_HAVE_dcngettext
 #define __CRT_HAVE_dehumanize_number

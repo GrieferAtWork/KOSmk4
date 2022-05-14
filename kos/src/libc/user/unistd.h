@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1994d58 */
+/* HASH CRC-32:0xcdd00e20 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -568,8 +568,6 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_getusershell)(void);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_endusershell)(void);
 /* >> setusershell(3) */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setusershell)(void);
-/* >> daemon(3) */
-INTDEF int NOTHROW_RPC(LIBCCALL libc_daemon)(__STDC_INT_AS_UINT_T nochdir, __STDC_INT_AS_UINT_T noclose);
 /* >> revoke(3) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file);
 /* >> syscall(2), syscall64(2) */

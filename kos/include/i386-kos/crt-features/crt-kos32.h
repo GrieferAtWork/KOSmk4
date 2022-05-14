@@ -2590,6 +2590,7 @@
 #define __CRT_HAVE_cuserid
 #define __CRT_HAVE_cwait
 #define __CRT_HAVE_daemon
+#define __CRT_HAVE_daemonfd
 #define __CRT_HAVE_daylight
 #define __CRT_HAVE_dcgettext
 #define __CRT_HAVE_dcngettext

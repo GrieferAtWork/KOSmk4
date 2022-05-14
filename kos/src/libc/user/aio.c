@@ -37,6 +37,7 @@
 #include <fcntl.h>
 #include <malloc.h>
 #include <pthread.h>
+#include <sched.h>
 #include <signal.h>
 #include <string.h>
 #include <syscall.h>

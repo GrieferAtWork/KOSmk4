@@ -2108,46 +2108,6 @@ NOTHROW_RPC(LIBCCALL libc_setusershell)(void)
 }
 /*[[[end:libc_setusershell]]]*/
 
-PRIVATE ATTR_SECTION(".rodata.crt.system.utility") char const root[] = "/";
-PRIVATE ATTR_SECTION(".rodata.crt.system.utility") char const dev_null[] = "/dev/null";
-
-/*[[[head:libc_daemon,hash:CRC-32=0xbc774599]]]*/
-/* >> daemon(3) */
-INTERN ATTR_SECTION(".text.crt.system.utility") int
-NOTHROW_RPC(LIBCCALL libc_daemon)(__STDC_INT_AS_UINT_T nochdir,
-                                  __STDC_INT_AS_UINT_T noclose)
-/*[[[body:libc_daemon]]]*/
-{
-	pid_t cpid;
-	cpid = fork();
-	if (cpid < 0)
-		return -1;
-	if (cpid != 0)
-		_Exit(0); /* The parent process dies. */
-	if (setsid() < 0)
-		return -1;
-	if (!nochdir)
-		chdir(root);
-	if (!noclose) {
-		fd_t i, nul = open(dev_null, O_RDWR);
-		if (nul < 0)
-			return -1;
-		/* NOTE: Glibc does an additional check to ensure that `nul'  really
-		 *       is a character-device with the  correct dev_t. We could  do
-		 *       that as well, however I'd consider a system where /dev/null
-		 *       isn't actually /dev/null to  already be broken... (and  the
-		 *       check only adds unnecessary overhead if you ask me) */
-		for (i = 0; i < 3; ++i) {
-			if (nul != i)
-				sys_dup2(nul, i);
-		}
-		if (nul >= 3)
-			sys_close(nul);
-	}
-	return 0;
-}
-/*[[[end:libc_daemon]]]*/
-
 /*[[[head:libc_revoke,hash:CRC-32=0x96b7f405]]]*/
 /* >> revoke(3) */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
@@ -4011,7 +3971,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc19718c]]]*/
+/*[[[start:exports,hash:CRC-32=0xd2a87c59]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -4298,7 +4258,6 @@ DEFINE_PUBLIC_ALIAS(profil, libc_profil);
 DEFINE_PUBLIC_ALIAS(getusershell, libc_getusershell);
 DEFINE_PUBLIC_ALIAS(endusershell, libc_endusershell);
 DEFINE_PUBLIC_ALIAS(setusershell, libc_setusershell);
-DEFINE_PUBLIC_ALIAS(daemon, libc_daemon);
 DEFINE_PUBLIC_ALIAS(revoke, libc_revoke);
 DEFINE_PUBLIC_ALIAS(DOS$__chroot, libd_chroot);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_chroot, libd_chroot);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde7ec400 */
+/* HASH CRC-32:0x4623e2c1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -456,8 +456,21 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_getdomainname)(char *name, siz
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_setdomainname)(char const *name, size_t len);
 /* >> profil(3) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_profil)(uint16_t *sample_buffer, size_t size, size_t offset, unsigned int scale);
-/* >> daemon(3) */
-INTDEF int NOTHROW_RPC(LIBDCALL libd_daemon)(__STDC_INT_AS_UINT_T nochdir, __STDC_INT_AS_UINT_T noclose);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> daemon_setup(3)
+ * Do the common setup required by `daemon(3)' and `daemonfd(3)' */
+INTDEF int NOTHROW_RPC(LIBCCALL libc_daemon_setup)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> daemon(3), daemonfd(3) */
+INTDEF int NOTHROW_RPC(LIBDCALL libd_daemon)(int nochdir, int noclose);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> daemon(3), daemonfd(3) */
+INTDEF int NOTHROW_RPC(LIBCCALL libc_daemon)(int nochdir, int noclose);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> revoke(3) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_revoke)(char const *file);
 /* >> syscall(2), syscall64(2) */

@@ -3632,7 +3632,26 @@ char *getbsize([[nonnull]] int *headerlenp,
 
 %[insert:extern(daemon)]
 
-//TODO:int daemonfd($fd_t chdirfd, $fd_t nullfd);
+[[cp, guard, doc_alias("daemon")]]
+[[decl_include("<bits/types.h>")]]
+[[requires_function(daemon_setup, fchdir, dup2)]]
+[[section(".text.crt{|.dos}.system.utility")]]
+int daemonfd($fd_t chdirfd, $fd_t nullfd) {
+	int error = daemon_setup();
+	if likely(error == 0) {
+		if (chdirfd != -1)
+			(void)fchdir(chdirfd);
+		if (nullfd != -1) {
+			fd_t i;
+			for (i = 0; i < 3; ++i) {
+				if (nullfd != i)
+					(void)dup2(nullfd, i);
+			}
+		}
+	}
+	return error;
+}
+
 //TODO:char *devname($dev_t dev, $mode_t mode);
 //TODO:char *devname_r($dev_t dev, $mode_t mode, char *buf, __STDC_INT_AS_SIZE_T buflen);
 //TODO:char *fdevname($fd_t fd);

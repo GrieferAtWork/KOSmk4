@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88f6dc45 */
+/* HASH CRC-32:0x490e4a52 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -967,6 +967,14 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr, size_t num_bytes)
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_getbsize)(int *headerlenp, __LONGPTR_TYPE__ *blocksizep);
+/* >> daemon(3), daemonfd(3) */
+INTDEF int NOTHROW_RPC(LIBDCALL libd_daemonfd)(fd_t chdirfd, fd_t nullfd);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> daemon(3), daemonfd(3) */
+INTDEF int NOTHROW_RPC(LIBCCALL libc_daemonfd)(fd_t chdirfd, fd_t nullfd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> l64a_r(3)
  * Reentrant variant of `l64a(3)'. Note that the max required buffer size
  * @param: buf:     Target buffer (with a size of `bufsize' bytes)

@@ -2438,6 +2438,7 @@
 #define __CRT_HAVE_cuserid
 #define __CRT_HAVE_cwait
 #define __CRT_HAVE_daemon
+#define __CRT_HAVE_daemonfd
 #define __CRT_HAVE_daylight
 #define __CRT_HAVE_dcgettext
 #define __CRT_HAVE_dcngettext
@@ -8260,6 +8261,7 @@
 #define __CRT_HAVE_KOS$cuserid
 #define __CRT_HAVE_KOS$cwait
 #define __CRT_HAVE_KOS$daemon
+#define __CRT_HAVE_KOS$daemonfd
 #define __CRT_HAVE_KOS$dcgettext
 #define __CRT_HAVE_KOS$dcngettext
 #define __CRT_HAVE_KOS$dehumanize_number
@@ -12821,6 +12823,7 @@
 #define __CRT_HAVE_DOS$cuserid
 #define __CRT_HAVE_DOS$cwait
 #define __CRT_HAVE_DOS$daemon
+#define __CRT_HAVE_DOS$daemonfd
 #define __CRT_HAVE_DOS$dcgettext
 #define __CRT_HAVE_DOS$dcngettext
 #define __CRT_HAVE_DOS$dehumanize_number

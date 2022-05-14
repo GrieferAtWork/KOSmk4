@@ -2250,11 +2250,82 @@ void endusershell();
 [[section(".text.crt{|.dos}.database.shell")]]
 void setusershell();
 
-@@>> daemon(3)
-[[cp, guard, decl_include("<features.h>")]]
+@@>> daemon_setup(3)
+@@Do the common setup required by `daemon(3)' and `daemonfd(3)'
+[[cp, static]]
+[[requires_function(fork, _Exit, setsid)]]
+[[impl_include("<bits/os/sigaction.h>", "<asm/os/signal.h>")]]
 [[section(".text.crt{|.dos}.system.utility")]]
-int daemon(__STDC_INT_AS_UINT_T nochdir,
-           __STDC_INT_AS_UINT_T noclose);
+int daemon_setup() {
+	int result;
+@@pp_if $has_function(sigaction) && defined(__SIG_IGN) && defined(__SIGHUP)@@
+	int has_old_sa;
+	@struct sigaction@ new_sa, old_sa;
+	/* To quote POSIX:
+	 * """
+	 * If the process  is a controlling  process, the  SIGHUP
+	 * signal shall be sent to each process in the foreground
+	 * process group  of the  controlling terminal  belonging
+	 * to the calling process.
+	 * """
+	 * In other words: if our process is both the controlling
+	 * process, as  well as  part of  the foreground  process
+	 * group  (meaning that  our child  will also  be of said
+	 * group, then it would be sent a SIGHUP which might even
+	 * kill it. To prevent this from happening, ignore SIGHUP
+	 * while we pass  kill ourselves and  spawn a new  child! */
+	sigemptyset(&new_sa.@sa_mask@);
+	new_sa.@sa_handler@ = (__sighandler_t)__SIG_IGN;
+	new_sa.@sa_flags@   = 0;
+	has_old_sa = sigaction(__SIGHUP, &new_sa, &old_sa);
+@@pp_endif@@
+	{
+		pid_t cpid = fork();
+		if unlikely(cpid < 0)
+			return cpid;
+		if (cpid != 0)
+			_Exit(0); /* The parent process dies. */
+	}
+	result = setsid();
+@@pp_if $has_function(sigaction) && defined(__SIG_IGN) && defined(__SIGHUP)@@
+	if (has_old_sa == 0)
+		sigaction(__SIGHUP, &old_sa, NULL);
+@@pp_endif@@
+	return result;
+}
+
+@@>> daemon(3), daemonfd(3)
+[[cp, guard]]
+[[requires_function(daemon_setup, chdir, open, dup2)]]
+[[impl_include("<paths.h>")]]
+[[section(".text.crt{|.dos}.system.utility")]]
+int daemon(int nochdir, int noclose) {
+	int error = daemon_setup();
+	if likely(error == 0) {
+		if (!nochdir)
+			(void)chdir("/");
+		if (!noclose) {
+			fd_t i, nul = open(_PATH_DEVNULL, O_RDWR);
+			if unlikely(nul < 0)
+				return nul;
+			/* NOTE: Glibc does an additional check to ensure that `nul'  really
+			 *       is a character-device with the  correct dev_t. We could  do
+			 *       that as well, however I'd consider a system where /dev/null
+			 *       isn't actually /dev/null to  already be broken... (and  the
+			 *       check only adds unnecessary overhead if you ask me) */
+			for (i = 0; i < 3; ++i) {
+				if (nul != i)
+					(void)dup2(nul, i);
+			}
+@@pp_if $has_function(close)@@
+			if (nul >= 3)
+				(void)close(nul);
+@@pp_endif@@
+		}
+	}
+	return error;
+}
+
 
 @@>> revoke(3)
 [[cp]]
