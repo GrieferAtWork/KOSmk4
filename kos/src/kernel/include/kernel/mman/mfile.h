@@ -578,7 +578,7 @@ struct mfile_ops {
 	/* [0..1] VIO file operators. When non-NULL,  then this file is backed  by
 	 * VIO, and the `mo_loadblocks' and `mo_saveblocks' operators are ignored,
 	 * though should still be set to `NULL' for consistency. */
-	struct vio_operators const *mo_vio;
+	struct vio_ops const *mo_vio;
 #endif /* LIBVIO_CONFIG_ENABLED */
 };
 

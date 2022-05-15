@@ -33,7 +33,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 
 /* vio_create(3):
- * >> fd_t vio_create(struct vio_operators *ops, void *cookie,
+ * >> fd_t vio_create(struct vio_ops *ops, void *cookie,
  * >>                 size_t initial_size, oflag_t flags);
  * Create  an mmap(2)able VIO object where memory accesses
  * made to the object are serviced by dispatching them via
@@ -52,7 +52,7 @@ DECL_BEGIN
  *                       This  size may be  altered at a  later point in time
  *                       through use of `ftruncate(return)' */
 INTDEF WUNUSED NONNULL((1)) fd_t
-NOTHROW_NCX(CC libvio_create)(struct vio_operators const *ops, void *cookie,
+NOTHROW_NCX(CC libvio_create)(struct vio_ops const *ops, void *cookie,
                               size_t initial_size, oflag_t flags);
 
 

@@ -194,7 +194,7 @@ uvio_request(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 co
 	assert(!task_wasconnected());
 	self = (struct uvio *)args->va_file;
 	assert(self->mf_ops == &uvio_mfile_ops);
-	assert(self->mf_ops->mo_vio == &uvio_operators);
+	assert(self->mf_ops->mo_vio == &uvio_ops);
 
 	/* UVIO request have a _mandatory_ dependency on preemption being enabled.
 	 * If  preemption  were disabled,  `uvio_freerequest()'  could deadlock... */
@@ -325,7 +325,7 @@ uvio_requestx(/*in|out*/ struct vioargs *__restrict args,
 #endif /* SIZEOF_KERNEL_UVIO_UINTMAX_T >= 16 */
 
 
-/* Define wrappers for operators from `uvio_operators' */
+/* Define wrappers for operators from `uvio_ops' */
 #define DEFINE_UNARY_VIO_OPERATOR(name, bwlqx, T, opcode)                          \
 	PRIVATE NONNULL((1)) T LIBVIO_CC                                               \
 	name(struct vioargs *__restrict args, vio_addr_t addr) {                       \
@@ -433,8 +433,8 @@ DEFINE_BINARY_VIO_OPERATOR_ATOMIC(uvio_operator_xorq, q, uint64_t, UVIO_OPCODE_X
 #undef DEFINE_TRINARY_VIO_OPERATOR_ATOMIC
 
 
-/* VIO operator callbacks for UVIO datablocks. */
-PUBLIC_CONST struct vio_operators const uvio_operators = {
+/* VIO operator callbacks for UVIO mfiles. */
+PUBLIC_CONST struct vio_ops const uvio_ops = {
 	.vo_read  = VIO_CALLBACK_INIT(&uvio_operator_readb, &uvio_operator_readw, &uvio_operator_readl, &uvio_operator_readq),
 	.vo_write = VIO_CALLBACK_INIT(&uvio_operator_writeb, &uvio_operator_writew, &uvio_operator_writel, &uvio_operator_writeq),
 	.vo_cmpxch = {
@@ -966,7 +966,7 @@ NOTHROW(KCALL uvio_server_polltest)(struct mfile *__restrict self,
 }
 
 
-/* The datablock type used by UVIO objects. */
+/* The mfile type used by UVIO objects. */
 PRIVATE struct mfile_stream_ops const uvio_v_stream_ops = {
 	.mso_read        = &uvio_server_read,
 	.mso_write       = &uvio_server_write,
@@ -975,7 +975,7 @@ PRIVATE struct mfile_stream_ops const uvio_v_stream_ops = {
 };
 PUBLIC_CONST struct mfile_ops const uvio_mfile_ops = {
 	.mo_stream = &uvio_v_stream_ops,
-	.mo_vio    = &uvio_operators,
+	.mo_vio    = &uvio_ops,
 };
 
 /* Construct a new UVIO object.

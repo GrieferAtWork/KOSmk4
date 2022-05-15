@@ -34,9 +34,9 @@
  *  - Use libemu86 to emulate the instruction that caused the memory access (on x86)
  *  - Go back into libviocore to filter emulated memory accesses pointing into VIO memory
  *  - Dispatch memory accesses via <libvio/access.h>
- *  - Functions  from  <libvio/access.h>  invoke  kernel-space  operators  of  the
- *    associated mfile's VIO function table (here, that table is `uvio_operators')
- *  - Functions from `uvio_operators' construct a request that is passed to `uvio_request()'
+ *  - Functions  from <libvio/access.h> invoke kernel-space operators of the
+ *    associated mfile's VIO function table (here, that table is `uvio_ops')
+ *  - Functions from `uvio_ops' construct a request that is passed to `uvio_request()'
  *  - `uvio_request()' waits for a request slot to become available
  *  - `uvio_request()' stores the request in `struct uvio::uv_req' and broadcasts `uv_reqmore'
  *  - A dedicated user-space thread created alongside the UVIO object is resumed, such that
@@ -44,7 +44,7 @@
  *    of a  `struct uvio_request', before  changing the  request's state  to DELIVERED  and
  *    broadcasting `struct uvio::uv_reqdlvr'
  *  - User-space parses the returned request and dispatches it once again through a
- *    user-space version of the `struct vio_operators' structure that was passed to
+ *    user-space  version  of the  `struct vio_ops'  structure that  was  passed to
  *    the dedicated thread upon creation.
  *  - The  actual user-space VIO  callback function performs the  request (if no appropriate
  *    callback   function   was    defined,   an   `E_SEGFAULT'    exception   is    thrown)
@@ -104,8 +104,8 @@
 #include <libvio/userviofd.h>
 #include <libvio/vio.h>
 
-/* Max # of UVIO requests that can be in use at the
- * same  time for any  given UVIO datablock object. */
+/* Max # of UVIO requests  that can be in use  at
+ * the same time for any given UVIO mfile object. */
 #ifndef CONFIG_UVIO_MAX_PARALLEL_REQUESTS
 #define CONFIG_UVIO_MAX_PARALLEL_REQUESTS 4
 #endif /* !CONFIG_UVIO_MAX_PARALLEL_REQUESTS */
@@ -338,11 +338,11 @@ struct uvio
 #define mfile_asuvio(self) ((struct uvio *)(self))
 
 
-/* The datablock type used by UVIO objects. */
+/* The mfile type used by UVIO objects. */
 DATDEF struct mfile_ops const uvio_mfile_ops;
 
-/* VIO operator callbacks for UVIO datablocks. */
-DATDEF struct vio_operators const uvio_operators;
+/* VIO operator callbacks for UVIO mfiles. */
+DATDEF struct vio_ops const uvio_ops;
 
 /* Construct a new UVIO object.
  * Note that UVIO is derived from `struct mfile', so the returned

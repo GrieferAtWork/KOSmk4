@@ -553,7 +553,7 @@ global typeHeaders: {string: string} = Dict({
 	"__STDC_UINT_AS_SIZE_T": "<features.h>",
 	"__STDC_UINT32_AS_SIZE_T": "<features.h>",
 	"__STDC_INT_AS_UINT_T": "<features.h>",
-	
+
 	/* <bits/os/...> */
 	"__timespec": "<bits/os/timespec.h>",
 	"__timespec32": "<bits/os/timespec.h>",
@@ -566,7 +566,7 @@ global typeHeaders: {string: string} = Dict({
 
 @@Include implications.
 @@e.g. "<bits/types.h>" implies "<hybrid/typecore.h>"
-@@Written as @{headerName: {impliedBy...}}
+@@Written     as     @{headerName:    {impliedBy...}}
 global typeHeadersImplications: {string: HashSet with string} = Dict({
 	"<hybrid/typecore.h>" : HashSet({ "<bits/types.h>" }),
 	"<features.h>" : HashSet({ "<bits/types.h>" }),

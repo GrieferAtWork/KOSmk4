@@ -82,7 +82,7 @@ DBG_AUTOCOMPLETE(lsmm,
 
 /* Check if `self' has a special names, and if so: return that name. */
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) char const *
-NOTHROW(FCALL nameof_special_datablock)(struct mfile *__restrict self) {
+NOTHROW(FCALL nameof_special_mfile)(struct mfile *__restrict self) {
 	/* The libdl program hard-coded into the kernel. */
 	if (self == &execabi_system_rtld_file.mrf_file)
 		return "[" RTLD_LIBDL "]";
@@ -157,10 +157,10 @@ lsmm_enum_callback(void *UNUSED(arg), struct mmapinfo *__restrict info) {
 			           info->mmi_fsname->fd_name);
 		}
 	} else {
-		/* Check for special names for certain datablocks. */
+		/* Check for special names for certain mfiles. */
 		if (info->mmi_file) {
 			char const *special_name;
-			special_name = nameof_special_datablock(info->mmi_file);
+			special_name = nameof_special_mfile(info->mmi_file);
 			if (special_name) {
 				dbg_setcolor(ANSITTY_CL_AQUA, ANSITTY_CL_DARK_GRAY);
 				dbg_print(special_name);

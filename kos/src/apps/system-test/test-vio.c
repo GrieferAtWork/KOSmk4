@@ -72,7 +72,7 @@ myvio_writel(struct vioargs *__restrict UNUSED(args),
 	num_vio_write++;
 }
 
-PRIVATE struct vio_operators const myvio_ops = {
+PRIVATE struct vio_ops const myvio_ops = {
 	/* .vo_read  = */ VIO_CALLBACK_INIT_READ(NULL, NULL, &myvio_readl, NULL),
 	/* .vo_write = */ VIO_CALLBACK_INIT_WRITE(NULL, NULL, &myvio_writel, NULL),
 };

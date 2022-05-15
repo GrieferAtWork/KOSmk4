@@ -1105,22 +1105,15 @@
 #define FUNC(x) x
 #define FUNC0(x,...) x
 #define FUNC2(x,...) x
-#define NAME(x) x
 #define SYM(x) x
 #define KERNEL_SELECT(a,b) b
 #define ERROR(err) goto err
 #define ERRORF(err,...) goto err
 #define DECL
-#define RETURN_TYPE(T) T
 #define IFELSERW(r,w) r
 #define IFRD(...) __VA_ARGS__
 #define IFWR(...)
 #define IFELSE(a,b) a
-#define IE(a,b) a
-#define VALUE_ARG(T)
-#define FUNC_RW(x) vm_datablock_read##x
-#define FUNC_VIO_RW(x) vm_datablock_vio_read##x
-#define VM_FUNCTION(x) vm_##x
 #define SYSCALL_RETURN_TYPE_OF(...) int
 #define SYSCALL_ARG_TYPE_OF(...) int
 #define COMPAT_SYSCALL_RETURN_TYPE_OF(...) int

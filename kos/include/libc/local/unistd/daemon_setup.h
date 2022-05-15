@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d438699 */
+/* HASH CRC-32:0x6692b1bc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,7 +148,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(daemon_setup))(void) {
 #if (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction)) && defined(__SIG_IGN) && defined(__SIGHUP)
 	int __has_old_sa;
 	struct sigaction __new_sa, __old_sa;
-	/* To quote POSIX:
+	/* To quote POSIX (on `_Exit(2)'):
 	 * """
 	 * If the process  is a controlling  process, the  SIGHUP
 	 * signal shall be sent to each process in the foreground
@@ -157,7 +157,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(daemon_setup))(void) {
 	 * """
 	 * In other words: if our process is both the controlling
 	 * process, as  well as  part of  the foreground  process
-	 * group  (meaning that  our child  will also  be of said
+	 * group,  meaning that  our child  will also  be of said
 	 * group, then it would be sent a SIGHUP which might even
 	 * kill it. To prevent this from happening, ignore SIGHUP
 	 * while we pass  kill ourselves and  spawn a new  child! */

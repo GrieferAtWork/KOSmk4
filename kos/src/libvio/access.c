@@ -345,7 +345,7 @@ typedef union ATTR_PACKED {
  * If an operation is impossible, these functions will throw a SEGFAULT exception. */
 INTERN NONNULL((1)) u8 CC
 libvio_readb(struct vioargs *__restrict args, vio_addr_t addr) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (ops->vo_read.f_byte) return (*ops->vo_read.f_byte)(args, addr);
 	if (ops->vo_read.f_word) { word x = { (*ops->vo_read.f_word)(args, AW) }; return B1; }
 	if (ops->vo_read.f_dword) { dword x = { (*ops->vo_read.f_dword)(args, AL) }; return B3; }
@@ -381,7 +381,7 @@ libvio_readb(struct vioargs *__restrict args, vio_addr_t addr) {
 
 INTERN NONNULL((1)) u16 CC
 libvio_readw(struct vioargs *__restrict args, vio_addr_t addr) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (((uintptr_t)addr & 1) != 1) {
 		if (ops->vo_read.f_word) return (*ops->vo_read.f_word)(args, addr);
 		if (ops->vo_cmpxch.f_word) return (*ops->vo_cmpxch.f_word)(args, addr, 0, 0, false);
@@ -484,7 +484,7 @@ libvio_readw(struct vioargs *__restrict args, vio_addr_t addr) {
 
 INTERN NONNULL((1)) u32 CC
 libvio_readl(struct vioargs *__restrict args, vio_addr_t addr) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (((uintptr_t)addr & 3) == 0) {
 		if (ops->vo_read.f_dword) return (*ops->vo_read.f_dword)(args, addr);
 		if (ops->vo_cmpxch.f_dword) return (*ops->vo_cmpxch.f_dword)(args, addr, 0, 0, false);
@@ -592,7 +592,7 @@ libvio_readl(struct vioargs *__restrict args, vio_addr_t addr) {
 
 INTERN NONNULL((1)) u16 CC
 libvio_readw_aligned(struct vioargs *__restrict args, vio_addr_t addr) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	assert(((uintptr_t)addr & 1) == 0);
 	if (ops->vo_read.f_word) return (*ops->vo_read.f_word)(args, addr);
 	if (ops->vo_cmpxch.f_word) return (*ops->vo_cmpxch.f_word)(args, addr, 0, 0, false);
@@ -637,7 +637,7 @@ libvio_readw_aligned(struct vioargs *__restrict args, vio_addr_t addr) {
 
 INTERN NONNULL((1)) u32 CC
 libvio_readl_aligned(struct vioargs *__restrict args, vio_addr_t addr) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	assert(((uintptr_t)addr & 3) == 0);
 	if (ops->vo_read.f_dword) return (*ops->vo_read.f_dword)(args, addr);
 	if (ops->vo_cmpxch.f_dword) return (*ops->vo_cmpxch.f_dword)(args, addr, 0, 0, false);
@@ -694,7 +694,7 @@ libvio_readl_aligned(struct vioargs *__restrict args, vio_addr_t addr) {
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 INTERN NONNULL((1)) u64 CC
 libvio_readq(struct vioargs *__restrict args, vio_addr_t addr) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (((uintptr_t)addr & 7) == 0) {
 		if (ops->vo_read.f_qword) return (*ops->vo_read.f_qword)(args, addr);
 		if (ops->vo_cmpxch.f_qword) return (*ops->vo_cmpxch.f_qword)(args, addr, 0, 0, false);
@@ -815,7 +815,7 @@ libvio_readq(struct vioargs *__restrict args, vio_addr_t addr) {
 
 INTERN NONNULL((1)) u64 CC
 libvio_readq_aligned(struct vioargs *__restrict args, vio_addr_t addr) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	assert(((uintptr_t)addr & 7) == 0);
 	if (ops->vo_read.f_qword) return (*ops->vo_read.f_qword)(args, addr);
 	if (ops->vo_cmpxch.f_qword) return (*ops->vo_cmpxch.f_qword)(args, addr, 0, 0, false);
@@ -883,7 +883,7 @@ libvio_readq_aligned(struct vioargs *__restrict args, vio_addr_t addr) {
 
 
 PRIVATE NONNULL((1)) void CC
-_do_writeb_vo_cmpxch(struct vio_operators const *__restrict ops,
+_do_writeb_vo_cmpxch(struct vio_ops const *__restrict ops,
                      struct vioargs *__restrict args,
                      vio_addr_t addr, u8 value) {
 	u8 oldval = 0;
@@ -900,7 +900,7 @@ _do_writeb_vo_cmpxch(struct vio_operators const *__restrict ops,
 }
 
 PRIVATE NONNULL((1)) void CC
-_do_writew_vo_cmpxch(struct vio_operators const *__restrict ops,
+_do_writew_vo_cmpxch(struct vio_ops const *__restrict ops,
                      struct vioargs *__restrict args,
                      vio_addr_t addr, u16 value) {
 	u16 oldval = 0;
@@ -917,7 +917,7 @@ _do_writew_vo_cmpxch(struct vio_operators const *__restrict ops,
 }
 
 PRIVATE NONNULL((1)) void CC
-_do_writel_vo_cmpxch(struct vio_operators const *__restrict ops,
+_do_writel_vo_cmpxch(struct vio_ops const *__restrict ops,
                      struct vioargs *__restrict args,
                      vio_addr_t addr, u32 value) {
 	u32 oldval = 0;
@@ -935,7 +935,7 @@ _do_writel_vo_cmpxch(struct vio_operators const *__restrict ops,
 
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
 PRIVATE NONNULL((1)) void CC
-_do_writeq_vo_cmpxch(struct vio_operators const *__restrict ops,
+_do_writeq_vo_cmpxch(struct vio_ops const *__restrict ops,
                      struct vioargs *__restrict args,
                      vio_addr_t addr, u64 value) {
 	u64 oldval = 0;
@@ -956,7 +956,7 @@ _do_writeq_vo_cmpxch(struct vio_operators const *__restrict ops,
 
 #ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 PRIVATE NONNULL((1)) void CC
-_do_writex_vo_cmpxch(struct vio_operators const *__restrict ops,
+_do_writex_vo_cmpxch(struct vio_ops const *__restrict ops,
                      struct vioargs *__restrict args,
                      vio_addr_t addr, uint128_t value) {
 	uint128_t oldval;
@@ -1012,7 +1012,7 @@ DECL_BEGIN
 
 INTERN NONNULL((1)) void CC
 libvio_writeb(struct vioargs *__restrict args, vio_addr_t addr, u8 value) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 #ifndef __INTELLISENSE__
 	if (libvio_writeb_vo_write(ops, args, addr, value))
 		return;
@@ -1027,7 +1027,7 @@ libvio_writeb(struct vioargs *__restrict args, vio_addr_t addr, u8 value) {
 
 INTERN NONNULL((1)) void CC
 libvio_writew(struct vioargs *__restrict args, vio_addr_t addr, u16 value) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 #ifndef __INTELLISENSE__
 	if (libvio_writew_vo_write(ops, args, addr, value))
 		return;
@@ -1041,7 +1041,7 @@ libvio_writew(struct vioargs *__restrict args, vio_addr_t addr, u16 value) {
 
 INTERN NONNULL((1)) void CC
 libvio_writew_aligned(struct vioargs *__restrict args, vio_addr_t addr, u16 value) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 #ifndef __INTELLISENSE__
 	if (libvio_writew_aligned_vo_write(ops, args, addr, value))
 		return;
@@ -1056,7 +1056,7 @@ libvio_writew_aligned(struct vioargs *__restrict args, vio_addr_t addr, u16 valu
 INTERN NONNULL((1)) void CC
 libvio_writel(struct vioargs *__restrict args,
               vio_addr_t addr, u32 value) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 #ifndef __INTELLISENSE__
 	if (libvio_writel_vo_write(ops, args, addr, value))
 		return;
@@ -1071,7 +1071,7 @@ libvio_writel(struct vioargs *__restrict args,
 INTERN NONNULL((1)) void CC
 libvio_writel_aligned(struct vioargs *__restrict args,
                       vio_addr_t addr, u32 value) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 #ifndef __INTELLISENSE__
 	if (libvio_writel_aligned_vo_write(ops, args, addr, value))
 		return;
@@ -1087,7 +1087,7 @@ libvio_writel_aligned(struct vioargs *__restrict args,
 INTERN NONNULL((1)) void CC
 libvio_writeq(struct vioargs *__restrict args,
               vio_addr_t addr, u64 value) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 #ifndef __INTELLISENSE__
 	if (libvio_writeq_vo_write(ops, args, addr, value))
 		return;
@@ -1101,7 +1101,7 @@ libvio_writeq(struct vioargs *__restrict args,
 INTERN NONNULL((1)) void CC
 libvio_writeq_aligned(struct vioargs *__restrict args,
                       vio_addr_t addr, u64 value) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 #ifndef __INTELLISENSE__
 	if (libvio_writeq_aligned_vo_write(ops, args, addr, value))
 		return;
@@ -1118,7 +1118,7 @@ libvio_writeq_aligned(struct vioargs *__restrict args,
 INTERN NONNULL((1)) u8 CC
 libvio_cmpxchb(struct vioargs *__restrict args,
                vio_addr_t addr, u8 oldvalue, u8 newvalue, bool atomic) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (ops->vo_cmpxch.f_byte)
 		return (*ops->vo_cmpxch.f_byte)(args, addr, oldvalue, newvalue, atomic);
 	if (ops->vo_cmpxch.f_word) {
@@ -1182,7 +1182,7 @@ libvio_cmpxchb(struct vioargs *__restrict args,
 INTERN NONNULL((1)) u16 CC
 libvio_cmpxchw(struct vioargs *__restrict args,
                vio_addr_t addr, u16 oldvalue, u16 newvalue, bool atomic) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (ops->vo_cmpxch.f_word && ((uintptr_t)addr & 1) == 0)
 		return (*ops->vo_cmpxch.f_word)(args, addr, oldvalue, newvalue, atomic);
 	if (ops->vo_cmpxch.f_dword && ((uintptr_t)addr & 3) <= 2) {
@@ -1233,7 +1233,7 @@ libvio_cmpxchw(struct vioargs *__restrict args,
 INTERN NONNULL((1)) u32 CC
 libvio_cmpxchl(struct vioargs *__restrict args,
                vio_addr_t addr, u32 oldvalue, u32 newvalue, bool atomic) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (ops->vo_cmpxch.f_dword && ((uintptr_t)addr & 3) == 0)
 		return (*ops->vo_cmpxch.f_dword)(args, addr, oldvalue, newvalue, atomic);
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
@@ -1271,7 +1271,7 @@ libvio_cmpxchl(struct vioargs *__restrict args,
 INTERN NONNULL((1)) u64 CC
 libvio_cmpxchq(struct vioargs *__restrict args,
                vio_addr_t addr, u64 oldvalue, u64 newvalue, bool atomic) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (ops->vo_cmpxch.f_qword && ((uintptr_t)addr & 7) == 0)
 		return (*ops->vo_cmpxch.f_qword)(args, addr, oldvalue, newvalue, atomic);
 	/* Non-atomic compare-exchange */
@@ -1303,7 +1303,7 @@ INTERN NONNULL((1)) uint128_t CC
 libvio_cmpxchx(struct vioargs *__restrict args,
                vio_addr_t addr, uint128_t oldvalue,
                uint128_t newvalue, bool atomic) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (ops->vo_cmpxch.f_xword && ((uintptr_t)addr & 15) == 0)
 		return (*ops->vo_cmpxch.f_xword)(args, addr, oldvalue, newvalue, atomic);
 	/* Non-atomic compare-exchange */
@@ -1343,7 +1343,7 @@ INTERN NONNULL((1)) u8 CC
 libvio_cmpxch_or_writeb(struct vioargs *__restrict args,
                         vio_addr_t addr, u8 oldvalue,
                         u8 newvalue, bool atomic) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (ops->vo_cmpxch.f_byte)
 		return (*ops->vo_cmpxch.f_byte)(args, addr, oldvalue, newvalue, atomic);
 	if (ops->vo_cmpxch.f_word) {
@@ -1404,7 +1404,7 @@ INTERN NONNULL((1)) u16 CC
 libvio_cmpxch_or_writew(struct vioargs *__restrict args,
                      vio_addr_t addr, u16 oldvalue,
                      u16 newvalue, bool atomic) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (ops->vo_cmpxch.f_word && ((uintptr_t)addr & 1) == 0)
 		return (*ops->vo_cmpxch.f_word)(args, addr, oldvalue, newvalue, atomic);
 	if (ops->vo_cmpxch.f_dword && ((uintptr_t)addr & 3) <= 2) {
@@ -1452,7 +1452,7 @@ INTERN NONNULL((1)) u32 CC
 libvio_cmpxch_or_writel(struct vioargs *__restrict args,
                         vio_addr_t addr, u32 oldvalue,
                         u32 newvalue, bool atomic) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (ops->vo_cmpxch.f_dword && ((uintptr_t)addr & 3) == 0)
 		return (*ops->vo_cmpxch.f_dword)(args, addr, oldvalue, newvalue, atomic);
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
@@ -1487,7 +1487,7 @@ INTERN NONNULL((1)) u64 CC
 libvio_cmpxch_or_writeq(struct vioargs *__restrict args,
                         vio_addr_t addr, u64 oldvalue,
                         u64 newvalue, bool atomic) {
-	struct vio_operators const *ops = args->va_ops;
+	struct vio_ops const *ops = args->va_ops;
 	if (ops->vo_cmpxch.f_qword && ((uintptr_t)addr & 7) == 0)
 		return (*ops->vo_cmpxch.f_qword)(args, addr, oldvalue, newvalue, atomic);
 	/* Non-atomic compare-exchange */

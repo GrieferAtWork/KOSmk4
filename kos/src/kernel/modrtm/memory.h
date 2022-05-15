@@ -72,7 +72,7 @@ DECL_BEGIN
 struct rtm_memory_region {
 	void                           *mr_addrlo; /* Lowest region address. (1-byte granularity) */
 	void                           *mr_addrhi; /* Greatest region address. */
-	REF /*struct mpart*/void       *mr_part;   /* [1..1] The datapart used  for backing this  region.
+	REF /*struct mpart*/void       *mr_part;   /* [1..1] The mpart used for backing this region.
 	                                            * NOTE: The least significant 2 bits has special use. */
 	uintptr_t                       mr_vers;   /* Region RTM version before the initial read. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, mr_data);  /* [rtm_memory_region_getsize(self)] Cached RTM region data. */

@@ -38,17 +38,17 @@
 
 DECL_BEGIN
 
-struct vio_operators;
+struct vio_ops;
 struct mfile;
 struct mpart;
 
 /* VIO bindings for the kernel-reserve segment of user-space VMs */
-DATDEF struct vio_operators userkern_segment_vio;
+DATDEF struct vio_ops userkern_segment_vio;
 DATDEF struct mfile userkern_segment_file;
 DATDEF struct mpart userkern_segment_part;
 
 #ifdef __ARCH_HAVE_COMPAT
-DATDEF struct vio_operators userkern_segment_vio_compat;
+DATDEF struct vio_ops userkern_segment_vio_compat;
 DATDEF struct mfile userkern_segment_file_compat;
 DATDEF struct mpart userkern_segment_part_compat;
 #endif /* __ARCH_HAVE_COMPAT */

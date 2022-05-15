@@ -265,12 +265,12 @@ typedef unsigned int gfp_t;
 
 
 #ifdef CONFIG_TRACE_MALLOC
-#define GFP_NOLEAK 0x10000 /* Don't consider the datablock a leak, even if it cannot be reached. */
-#define GFP_NOWALK 0x20000 /* When searching for memory leaks, don't search the datablock for
+#define GFP_NOLEAK 0x10000 /* Don't consider the data-blob a leak, even if it cannot be reached. */
+#define GFP_NOWALK 0x20000 /* When searching for memory leaks, don't search the data-blob for
                             * pointers that may point to other heap-blocks. */
 #else /* CONFIG_TRACE_MALLOC */
-#define GFP_NOLEAK 0       /* Don't consider the datablock a leak, even if it cannot be reached. */
-#define GFP_NOWALK 0       /* When searching for memory leaks, don't search the datablock for
+#define GFP_NOLEAK 0       /* Don't consider the data-blob a leak, even if it cannot be reached. */
+#define GFP_NOWALK 0       /* When searching for memory leaks, don't search the data-blob for
                             * pointers that may point to other heap-blocks. */
 #endif /* !CONFIG_TRACE_MALLOC */
 

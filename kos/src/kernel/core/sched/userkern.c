@@ -173,7 +173,7 @@ err_invalid_addr:
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 
 /* VIO bindings for the kernel-reserve segment of user-space VMs */
-PUBLIC struct vio_operators userkern_segment_vio =
+PUBLIC struct vio_ops userkern_segment_vio =
 VIO_OPERATORS_INIT_EX(INIT_OPERATION_PTR(read),
                       INIT_OPERATION_PTR(write),
                       VIO_CALLBACK_INIT_CMPXCH(NULL, NULL, NULL, NULL, NULL),
@@ -304,7 +304,7 @@ err_invalid_addr:
 	      E_SEGFAULT_CONTEXT_USERCODE);
 }
 
-PUBLIC struct vio_operators userkern_segment_vio_compat =
+PUBLIC struct vio_ops userkern_segment_vio_compat =
 VIO_OPERATORS_INIT_EX(INIT_OPERATION_PTR(read),
                       INIT_OPERATION_PTR(write),
                       VIO_CALLBACK_INIT_CMPXCH(NULL, NULL, NULL, NULL, NULL),

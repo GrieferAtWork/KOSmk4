@@ -57,7 +57,7 @@ DECL_BEGIN
 
 struct uvio_service_startup_args {
 	fd_t                        ssa_fd;     /* UVIO fd */
-	struct vio_operators const *ssa_ops;    /* [1..1] UVIO callbacks */
+	struct vio_ops const *ssa_ops;    /* [1..1] UVIO callbacks */
 	void                       *ssa_cookie; /* [?..?] UVIO callback cookie */
 };
 
@@ -433,7 +433,7 @@ done:
  * @return: -1: Error (s.a. `errno') */
 PRIVATE int CC
 spawn_uvio_service_thread(fd_t fd,
-                          struct vio_operators const *ops,
+                          struct vio_ops const *ops,
                           void *cookie) {
 	int error;
 	pthread_t thread;
@@ -464,7 +464,7 @@ err0:
 
 
 /* vio_create(3):
- * >> fd_t vio_create(struct vio_operators *ops, void *cookie,
+ * >> fd_t vio_create(struct vio_ops *ops, void *cookie,
  * >>                 size_t initial_size, oflag_t flags);
  * Create  an mmap(2)able VIO object where memory accesses
  * made to the object are serviced by dispatching them via
@@ -483,7 +483,7 @@ err0:
  *                       This  size may be  altered at a  later point in time
  *                       through use of `ftruncate(return)' */
 INTERN WUNUSED NONNULL((1)) fd_t
-NOTHROW_NCX(CC libvio_create)(struct vio_operators const *ops, void *cookie,
+NOTHROW_NCX(CC libvio_create)(struct vio_ops const *ops, void *cookie,
                               size_t initial_size, oflag_t flags) {
 	fd_t result;
 	/* Validate the given `flags'

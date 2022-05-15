@@ -43,7 +43,7 @@
 
 DECL_BEGIN
 
-/* VM nodes / datapart for the LAPIC identity mapping. */
+/* MMan nodes / parts for the LAPIC identity mapping. */
 INTDEF struct mpart x86_lapic_mpart;
 INTDEF struct mnode x86_lapic_mnode;
 

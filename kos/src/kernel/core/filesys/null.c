@@ -558,7 +558,7 @@ devkmem_v_cmpxchx(struct vioargs *__restrict UNUSED(args), vio_addr_t addr,
 #endif
 #endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 
-PRIVATE struct vio_operators const devkmem_vio_ops = {
+PRIVATE struct vio_ops const devkmem_vio_ops = {
 	VIO_CALLBACK_INIT_READ(&devkmem_v_rdb, &devkmem_v_rdw, &devkmem_v_rdl, &devkmem_v_rdq),
 	VIO_CALLBACK_INIT_WRITE(&devkmem_v_wrb, &devkmem_v_wrw, &devkmem_v_wrl, &devkmem_v_wrq),
 	VIO_CALLBACK_INIT_CMPXCH(&devkmem_v_cmpxchb, &devkmem_v_cmpxchw, &devkmem_v_cmpxchl, &devkmem_v_cmpxchq, P_devkmem_v_cmpxchx),
@@ -663,7 +663,7 @@ devport_v_wrl(struct vioargs *__restrict UNUSED(args), vio_addr_t addr, uint32_t
 	outl((port_t)addr, value);
 }
 
-PRIVATE struct vio_operators const devport_vio_ops = {
+PRIVATE struct vio_ops const devport_vio_ops = {
 	VIO_CALLBACK_INIT_READ(&devport_v_rdb, &devport_v_rdw, &devport_v_rdl, NULL),
 	VIO_CALLBACK_INIT_WRITE(&devport_v_wrb, &devport_v_wrw, &devport_v_wrl, NULL),
 };
@@ -804,7 +804,7 @@ devrandom_v_rdq(struct vioargs *__restrict UNUSED(args), vio_addr_t UNUSED(addr)
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
-PRIVATE struct vio_operators const devrandom_vio_ops = {
+PRIVATE struct vio_ops const devrandom_vio_ops = {
 	VIO_CALLBACK_INIT_READ(&devrandom_v_rdb, &devrandom_v_rdw,
 	                       &devrandom_v_rdl, &devrandom_v_rdq),
 };
@@ -894,7 +894,7 @@ devurandom_v_rdq(struct vioargs *__restrict UNUSED(args), vio_addr_t UNUSED(addr
 }
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 
-PRIVATE struct vio_operators const devurandom_vio_ops = {
+PRIVATE struct vio_ops const devurandom_vio_ops = {
 	VIO_CALLBACK_INIT_READ(&devurandom_v_rdb, &devurandom_v_rdw,
 	                       &devurandom_v_rdl, &devurandom_v_rdq),
 };

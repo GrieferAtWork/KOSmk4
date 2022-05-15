@@ -514,7 +514,7 @@ extern __declspec(dllimport) void (__cdecl _vacopy)(__builtin_va_list *, __built
 
 #if defined(__INTELLISENSE__) && defined(__cplusplus)
 /* Help  detect invalid argument count that can easily be caused by copying the `va_start'
- * source  line and  replacing `start' with  `end' without removing  the section argument.
+ * source line and  replacing `start'  with `end'  without removing  the second  argument.
  * (The following hack causes the second argument in such use cases to be underlined red). */
 #undef __builtin_va_end
 void __builtin_va_end(__builtin_va_list &__ap);

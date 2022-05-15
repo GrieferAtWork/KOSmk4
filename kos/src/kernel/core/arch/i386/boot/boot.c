@@ -657,11 +657,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       is passed to `sys_userviofd(2)' (with the new FS, that size
 	 *       becomes relevant and must be stored in `mf_filesize') */
 
-	/* TODO: Lots of places throughout the kernel still talk about  "datablock"s;
-	 *       they're called "mfile"s. The same also goes for "datapart" ("mpart") */
-
-	/* TODO: Refactor `vio_operators' -> `vio_ops' */
-
 	/* TODO: Add support for /proc/[PID]/mem,  including the ability to  mmap
 	 *       the resulting file (by having the special node object  implement
 	 *       a custom mmap operator! _NOT_ by providing a loadblocks operator

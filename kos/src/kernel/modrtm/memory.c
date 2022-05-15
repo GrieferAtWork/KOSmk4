@@ -358,7 +358,7 @@ NOTHROW(FCALL rtm_memory_fini)(struct rtm_memory *__restrict self) {
 		struct rtm_memory_region *region;
 		region = self->rm_regionv[i];
 		assert(region);
-		/* Drop our reference to the accessed datapart */
+		/* Drop our reference to the accessed mpart */
 		decref_unlikely(rtm_memory_region_getpart(region));
 		kfree(region);
 	}
@@ -1000,9 +1000,9 @@ verify_access_range:
 		 * actual memory. (rather than some other kind of mapping)
 		 *
 		 * At this point, we must check for some other RTM region that way already
-		 * exist  for  `part', since  the RTM  region list  may only  ever contain
-		 * a single region for any given datapart, and because every data part can
-		 * be mapped an arbitrary number of times within a single MMan, we have to
+		 * exist for `part',  since the RTM  region list may  only ever contain  a
+		 * single  region for any given mpart, and  because every data part can be
+		 * mapped an arbitrary number  of times within a  single MMan, we have  to
 		 * make sure that no other region already describes this one! */
 		for (j = 0; j < self->rm_regionc; ++j) {
 			struct mnode *aliasing_node;
@@ -1014,7 +1014,7 @@ verify_access_range:
 			region = self->rm_regionv[j];
 			if likely(rtm_memory_region_getpart(region) != part)
 				continue;
-			/* Welp... There's an overlap with this region's datapart. */
+			/* Welp... There's an overlap with this region's mpart. */
 			assert((byte_t *)region->mr_addrhi < (byte_t *)addr ||
 			       (byte_t *)region->mr_addrlo > (byte_t *)addr + access_bytes - 1);
 #if CONFIG_RTM_FAR_REGIONS
@@ -1720,8 +1720,8 @@ again_acquire_region_locks_for_mman_lock:
 #endif /* !CONFIG_RTM_FAR_REGIONS */
 	}
 #if CONFIG_RTM_FAR_REGIONS
-	/* With far regions, we must release datapart locks during a second
-	 * pass,  as far  regions may  re-use locks  of adjacent dataparts! */
+	/* With far regions, we must release mpart locks during a second
+	 * pass,  as far  regions may  re-use locks  of adjacent mparts! */
 	i = self->rm_regionc;
 	while (i) {
 		struct rtm_memory_region *region;

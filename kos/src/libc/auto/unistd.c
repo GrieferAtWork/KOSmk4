@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbce03854 */
+/* HASH CRC-32:0x262afdc4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -553,7 +553,7 @@ NOTHROW_RPC(LIBCCALL libc_daemon_setup)(void) {
 
 	int has_old_sa;
 	struct sigaction new_sa, old_sa;
-	/* To quote POSIX:
+	/* To quote POSIX (on `_Exit(2)'):
 	 * """
 	 * If the process  is a controlling  process, the  SIGHUP
 	 * signal shall be sent to each process in the foreground
@@ -562,7 +562,7 @@ NOTHROW_RPC(LIBCCALL libc_daemon_setup)(void) {
 	 * """
 	 * In other words: if our process is both the controlling
 	 * process, as  well as  part of  the foreground  process
-	 * group  (meaning that  our child  will also  be of said
+	 * group,  meaning that  our child  will also  be of said
 	 * group, then it would be sent a SIGHUP which might even
 	 * kill it. To prevent this from happening, ignore SIGHUP
 	 * while we pass  kill ourselves and  spawn a new  child! */

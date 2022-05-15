@@ -48,7 +48,7 @@ typedef struct ucpustate vio_cpustate_t;
 struct mpart;
 struct mfile;
 #endif /* __KERNEL__ */
-struct vio_operators;
+struct vio_ops;
 
 #ifdef __KERNEL__
 #ifndef __pos_t_defined
@@ -64,7 +64,7 @@ typedef __pos64_t vio_addr_t;
 
 /* Argument structure passed to VIO callbacks. */
 struct vioargs {
-	struct vio_operators const *va_ops;          /* [1..1][== va_file->mf_ops->dt_vio] */
+	struct vio_ops const *va_ops;          /* [1..1][== va_file->mf_ops->dt_vio] */
 	void                       *va_acmap_page;   /* Page-aligned virtual base address of the accessed mapping (== mmap:return). */
 	vio_addr_t                  va_acmap_offset; /* VIO file offset at `va_acmap_page' (== mmap:offset). */
 	vio_cpustate_t             *va_state;        /* [0..1][in|out] The CPU  state at the  time of the  access
@@ -109,7 +109,7 @@ __NOTHROW_NCX(LIBVIO_CC vioargs_getstate)(struct vioargs *__restrict self);
 #define VIO_CALLBACK_INIT(b, w, l, q) { b, w, l }
 #endif /* !LIBVIO_CONFIG_HAVE_QWORD */
 
-struct vio_operators {
+struct vio_ops {
 	/* VIO callbacks (`addr' is always relative to the data-block)
 	 * NOTE:  For   unrecognized  addresses,   VIO  should   throw
 	 *      `E_SEGFAULT_NOTREADABLE' / `E_SEGFAULT_NOTWRITABLE' exceptions.
@@ -317,7 +317,7 @@ struct vio_operators {
 #ifndef __KERNEL__
 
 /* vio_create(3):
- * >> fd_t vio_create(struct vio_operators *ops, void *cookie,
+ * >> fd_t vio_create(struct vio_ops *ops, void *cookie,
  * >>                 size_t initial_size, oflag_t flags);
  * Create  an mmap(2)able VIO object where memory accesses
  * made to the object are serviced by dispatching them via
@@ -336,11 +336,11 @@ struct vio_operators {
  *                       This  size may be  altered at a  later point in time
  *                       through use of `ftruncate(return)' */
 typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
-/*__NOTHROW_NCX*/ (LIBVIO_CC *PVIO_CREATE)(struct vio_operators const *ops, void *cookie,
+/*__NOTHROW_NCX*/ (LIBVIO_CC *PVIO_CREATE)(struct vio_ops const *ops, void *cookie,
                                            __size_t initial_size, __oflag_t flags);
 #ifdef LIBVIO_WANT_PROTOTYPES
 LIBVIO_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
-__NOTHROW_NCX(LIBVIO_CC vio_create)(struct vio_operators const *ops, void *cookie,
+__NOTHROW_NCX(LIBVIO_CC vio_create)(struct vio_ops const *ops, void *cookie,
                                     __size_t initial_size, __oflag_t flags);
 #endif /* LIBVIO_WANT_PROTOTYPES */
 
