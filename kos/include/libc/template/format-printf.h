@@ -547,7 +547,11 @@ __nextfmt:
 		__is_neg = 0;
 		if ((__flags & __PRINTF_F_SIGNED) && __data.__i < 0) {
 			__is_neg = 1;
-			__data.__i = -__data.__i;
+#ifdef __UINT64_TYPE__
+			__data.__u = (__uint64_t)0 - (__uint64_t)__data.__i;
+#else /* __UINT64_TYPE__ */
+			__data.__u = (__uint32_t)0 - (__uint32_t)__data.__i;
+#endif /* !__UINT64_TYPE__ */
 		}
 		__iter = __COMPILER_ENDOF(__buffer);
 		/* Actually translate the given input integer. */

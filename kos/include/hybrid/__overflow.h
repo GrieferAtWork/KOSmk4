@@ -21,6 +21,7 @@
 #define __GUARD_HYBRID___OVERFLOW_H 1
 
 #include "../__stdinc.h"
+#include "__assert.h"
 #include "limitcore.h"
 #include "typecore.h"
 
@@ -49,6 +50,7 @@ __DECL_BEGIN
  *                 e.g.: `UINT_MAX + 42u' and `11u - 19u' overflow, but `32u + 42u'
  *                       or `11 - 19' don't
  * @return: false: `*res' contains the correct result. */
+#define __HYBRID_OVERFLOW_USES_BUILTINS
 #ifdef __NO_builtin_expect
 #define __hybrid_overflow_uadd __builtin_add_overflow
 #define __hybrid_overflow_sadd __builtin_add_overflow
@@ -460,6 +462,116 @@ __LOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL __NOTHROW_NC
 #define __hybrid_overflow_umul64 __hybrid_overflow_umul
 #define __hybrid_overflow_smul64 __hybrid_overflow_smul
 #endif /* __INT64_TYPE__ */
+
+
+/* >> bool __hybrid_overflow_sneg(T x, T *p_result);
+ * >> bool __hybrid_overflow_sneg_p2n(T x, T *p_result);    -- @assume(x >= 0)
+ * >> bool __hybrid_overflow_sneg_n2p(T x, T *p_result);    -- @assume(x < 0)
+ * Do the operation `*p_result = -x'
+ * @return: true:  Overflow happened
+ * @return: false: Overflow didn't happen */
+#ifdef __HYBRID_OVERFLOW_USES_BUILTINS
+#define __hybrid_overflow_sneg(x, p_result) __hybrid_overflow_ssub(0, x, p_result)
+#define __hybrid_overflow_sneg8             __hybrid_overflow_sneg
+#define __hybrid_overflow_sneg16            __hybrid_overflow_sneg
+#define __hybrid_overflow_sneg32            __hybrid_overflow_sneg
+#ifdef __INT64_TYPE__
+#define __hybrid_overflow_sneg64 __hybrid_overflow_sneg
+#endif /* __INT64_TYPE__ */
+#else /* __HYBRID_OVERFLOW_USES_BUILTINS */
+#ifdef __NO_builtin_expect
+#define __hybrid_overflow_sneg8(x, p_result)  (((__UINT8_TYPE__)(*(p_result) = (__INT8_TYPE__)-(__UINT8_TYPE__)(x))) == __UINT8_C(0x80))
+#define __hybrid_overflow_sneg16(x, p_result) (((__UINT16_TYPE__)(*(p_result) = (__INT16_TYPE__)-(__UINT16_TYPE__)(x))) == __UINT16_C(0x8000))
+#define __hybrid_overflow_sneg32(x, p_result) (((__UINT32_TYPE__)(*(p_result) = (__INT32_TYPE__)-(__UINT32_TYPE__)(x))) == __UINT32_C(0x80000000))
+#ifdef __INT64_TYPE__
+#define __hybrid_overflow_sneg64(x, p_result) (((__UINT64_TYPE__)(*(p_result) = (__INT64_TYPE__)-(__UINT64_TYPE__)(x))) == __UINT64_C(0x8000000000000000))
+#endif /* __INT64_TYPE__ */
+#else /* __NO_builtin_expect */
+#define __hybrid_overflow_sneg8(x, p_result)  __builtin_expect(((__UINT8_TYPE__)(*(p_result) = (__INT8_TYPE__)-(__UINT8_TYPE__)(x))) == __UINT8_C(0x80), 0)
+#define __hybrid_overflow_sneg16(x, p_result) __builtin_expect(((__UINT16_TYPE__)(*(p_result) = (__INT16_TYPE__)-(__UINT16_TYPE__)(x))) == __UINT16_C(0x8000), 0)
+#define __hybrid_overflow_sneg32(x, p_result) __builtin_expect(((__UINT32_TYPE__)(*(p_result) = (__INT32_TYPE__)-(__UINT32_TYPE__)(x))) == __UINT32_C(0x80000000), 0)
+#ifdef __INT64_TYPE__
+#define __hybrid_overflow_sneg64(x, p_result) __builtin_expect(((__UINT64_TYPE__)(*(p_result) = (__INT64_TYPE__)-(__UINT64_TYPE__)(x))) == __UINT64_C(0x8000000000000000), 0)
+#endif /* __INT64_TYPE__ */
+#endif /* !__NO_builtin_expect */
+#ifdef __NO_builtin_choose_expr
+#ifdef __INT64_TYPE__
+#define __hybrid_overflow_sneg(x, p_result)                                                 \
+	(sizeof(*(p_result)) == 1 ? __hybrid_overflow_sneg8(x, (__INT8_TYPE__ *)(p_result)) :   \
+	 sizeof(*(p_result)) == 2 ? __hybrid_overflow_sneg16(x, (__INT16_TYPE__ *)(p_result)) : \
+	 sizeof(*(p_result)) == 4 ? __hybrid_overflow_sneg32(x, (__INT32_TYPE__ *)(p_result)) : \
+	                            __hybrid_overflow_sneg64(x, (__INT64_TYPE__ *)(p_result)))
+#else /* __INT64_TYPE__ */
+#define __hybrid_overflow_sneg(x, p_result)                                                 \
+	(sizeof(*(p_result)) == 1 ? __hybrid_overflow_sneg8(x, (__INT8_TYPE__ *)(p_result)) :   \
+	 sizeof(*(p_result)) == 2 ? __hybrid_overflow_sneg16(x, (__INT16_TYPE__ *)(p_result)) : \
+	                            __hybrid_overflow_sneg32(x, (__INT32_TYPE__ *)(p_result)))
+#endif /* !__INT64_TYPE__ */
+#else /* __NO_builtin_choose_expr */
+#ifdef __INT64_TYPE__
+#define __hybrid_overflow_sneg(x, p_result)                                                                    \
+	__builtin_choose_expr(sizeof(*(p_result)) == 1, __hybrid_overflow_sneg8(x, (__INT8_TYPE__ *)(p_result)),   \
+	__builtin_choose_expr(sizeof(*(p_result)) == 2, __hybrid_overflow_sneg16(x, (__INT16_TYPE__ *)(p_result)), \
+	__builtin_choose_expr(sizeof(*(p_result)) == 4, __hybrid_overflow_sneg32(x, (__INT32_TYPE__ *)(p_result)), \
+	                                                __hybrid_overflow_sneg64(x, (__INT64_TYPE__ *)(p_result)))))
+#else /* __INT64_TYPE__ */
+#define __hybrid_overflow_sneg(x, p_result)                                                                    \
+	__builtin_choose_expr(sizeof(*(p_result)) == 1, __hybrid_overflow_sneg8(x, (__INT8_TYPE__ *)(p_result)),   \
+	__builtin_choose_expr(sizeof(*(p_result)) == 2, __hybrid_overflow_sneg16(x, (__INT16_TYPE__ *)(p_result)), \
+	                                                __hybrid_overflow_sneg32(x, (__INT32_TYPE__ *)(p_result))))
+#endif /* !__INT64_TYPE__ */
+#endif /* !__NO_builtin_choose_expr */
+#endif /* !__HYBRID_OVERFLOW_USES_BUILTINS */
+#ifdef NDEBUG
+#define __hybrid_overflow_sneg8_p2n(x, p_result)  (*(p_result) = (__INT8_TYPE__)-(__UINT8_TYPE__)(x), 0)
+#define __hybrid_overflow_sneg16_p2n(x, p_result) (*(p_result) = (__INT16_TYPE__)-(__UINT16_TYPE__)(x), 0)
+#define __hybrid_overflow_sneg32_p2n(x, p_result) (*(p_result) = (__INT32_TYPE__)-(__UINT32_TYPE__)(x), 0)
+#ifdef __INT64_TYPE__
+#define __hybrid_overflow_sneg64_p2n(x, p_result) (*(p_result) = (__INT64_TYPE__)-(__UINT64_TYPE__)(x), 0)
+#endif /* __INT64_TYPE__ */
+#else /* NDEBUG */
+#define __hybrid_overflow_sneg8_p2n(x, p_result)  (__hybrid_asserte((__INT8_TYPE__)(*(p_result) = (__INT8_TYPE__)-(__UINT8_TYPE__)(x)) < 0), 0)
+#define __hybrid_overflow_sneg16_p2n(x, p_result) (__hybrid_asserte((__INT16_TYPE__)(*(p_result) = (__INT16_TYPE__)-(__UINT16_TYPE__)(x)) < 0), 0)
+#define __hybrid_overflow_sneg32_p2n(x, p_result) (__hybrid_asserte((__INT32_TYPE__)(*(p_result) = (__INT32_TYPE__)-(__UINT32_TYPE__)(x)) < 0), 0)
+#ifdef __INT64_TYPE__
+#define __hybrid_overflow_sneg64_p2n(x, p_result) (__hybrid_asserte((__INT64_TYPE__)(*(p_result) = (__INT64_TYPE__)-(__UINT64_TYPE__)(x)) < 0), 0)
+#endif /* __INT64_TYPE__ */
+#endif /* !NDEBUG */
+#ifdef __NO_builtin_choose_expr
+#ifdef __INT64_TYPE__
+#define __hybrid_overflow_sneg_p2n(x, p_result)                                                 \
+	(sizeof(*(p_result)) == 1 ? __hybrid_overflow_sneg8_p2n(x, (__INT8_TYPE__ *)(p_result)) :   \
+	 sizeof(*(p_result)) == 2 ? __hybrid_overflow_sneg16_p2n(x, (__INT16_TYPE__ *)(p_result)) : \
+	 sizeof(*(p_result)) == 4 ? __hybrid_overflow_sneg32_p2n(x, (__INT32_TYPE__ *)(p_result)) : \
+	                            __hybrid_overflow_sneg64_p2n(x, (__INT64_TYPE__ *)(p_result)))
+#else /* __INT64_TYPE__ */
+#define __hybrid_overflow_sneg_p2n(x, p_result)                                                 \
+	(sizeof(*(p_result)) == 1 ? __hybrid_overflow_sneg8_p2n(x, (__INT8_TYPE__ *)(p_result)) :   \
+	 sizeof(*(p_result)) == 2 ? __hybrid_overflow_sneg16_p2n(x, (__INT16_TYPE__ *)(p_result)) : \
+	                            __hybrid_overflow_sneg32_p2n(x, (__INT32_TYPE__ *)(p_result)))
+#endif /* !__INT64_TYPE__ */
+#else /* __NO_builtin_choose_expr */
+#ifdef __INT64_TYPE__
+#define __hybrid_overflow_sneg_p2n(x, p_result)                                                                    \
+	__builtin_choose_expr(sizeof(*(p_result)) == 1, __hybrid_overflow_sneg8_p2n(x, (__INT8_TYPE__ *)(p_result)),   \
+	__builtin_choose_expr(sizeof(*(p_result)) == 2, __hybrid_overflow_sneg16_p2n(x, (__INT16_TYPE__ *)(p_result)), \
+	__builtin_choose_expr(sizeof(*(p_result)) == 4, __hybrid_overflow_sneg32_p2n(x, (__INT32_TYPE__ *)(p_result)), \
+	                                                __hybrid_overflow_sneg64_p2n(x, (__INT64_TYPE__ *)(p_result)))))
+#else /* __INT64_TYPE__ */
+#define __hybrid_overflow_sneg_p2n(x, p_result)                                                                    \
+	__builtin_choose_expr(sizeof(*(p_result)) == 1, __hybrid_overflow_sneg8_p2n(x, (__INT8_TYPE__ *)(p_result)),   \
+	__builtin_choose_expr(sizeof(*(p_result)) == 2, __hybrid_overflow_sneg16_p2n(x, (__INT16_TYPE__ *)(p_result)), \
+	                                                __hybrid_overflow_sneg32_p2n(x, (__INT32_TYPE__ *)(p_result))))
+#endif /* !__INT64_TYPE__ */
+#endif /* !__NO_builtin_choose_expr */
+#define __hybrid_overflow_sneg_n2p   __hybrid_overflow_sneg
+#define __hybrid_overflow_sneg8_n2p  __hybrid_overflow_sneg8
+#define __hybrid_overflow_sneg16_n2p __hybrid_overflow_sneg16
+#define __hybrid_overflow_sneg32_n2p __hybrid_overflow_sneg32
+#ifdef __INT64_TYPE__
+#define __hybrid_overflow_sneg64_n2p __hybrid_overflow_sneg64
+#endif /* __INT64_TYPE__ */
+
 
 
 __DECL_END

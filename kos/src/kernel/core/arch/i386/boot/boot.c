@@ -502,8 +502,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       on  a compiler-basis  and won't make  the library call  mandatory for all
 	 *       code compiled with debug enabled) */
 
-	/* TODO: Look into enabling `-fsanitize=signed-integer-overflow' for all code... */
-
 	/* TODO: Add a KOS-specific libcrypt */
 
 	/* TODO: Investigate into an execution-time profiling system (using some kind

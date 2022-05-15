@@ -37,4 +37,15 @@
 #define OVERFLOW_UMUL __hybrid_overflow_umul
 #define OVERFLOW_SMUL __hybrid_overflow_smul
 
+/* >> bool OVERFLOW_SNEG(T x, T *p_result);
+ * >> bool OVERFLOW_SNEG_P2N(T x, T *p_result);    -- @assume(x >= 0)
+ * >> bool OVERFLOW_SNEG_N2P(T x, T *p_result);    -- @assume(x < 0)
+ * Do the operation `*p_result = -x'
+ * @return: true:  Overflow happened
+ * @return: false: Overflow didn't happen */
+#define OVERFLOW_SENG     __hybrid_overflow_sneg
+#define OVERFLOW_SENG_P2N __hybrid_overflow_sneg_p2n
+#define OVERFLOW_SENG_N2P __hybrid_overflow_sneg_n2p
+
+
 #endif /* !__GUARD_HYBRID_OVERFLOW_H */

@@ -45,6 +45,7 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <libdebuginfo/cfi_entry.h>
@@ -1087,8 +1088,7 @@ do_make_second_const:
 				goto do_make_top_const;
 			switch (opcode) {
 			case DW_OP_abs:
-				if (TOP.s_sconst < 0)
-					TOP.s_sconst = -TOP.s_sconst;
+				TOP.s_sconst = abs(TOP.s_sconst);
 				break;
 			case DW_OP_neg:
 				TOP.s_sconst = -TOP.s_sconst;

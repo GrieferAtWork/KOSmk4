@@ -1358,8 +1358,7 @@ handle_overflow:
 		}
 	}
 	if (sign == '-') {
-		result = -result;
-		if unlikely(result > 0)
+		if (__hybrid_overflow_sneg_p2n(result, &result))
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
@@ -1639,8 +1638,7 @@ handle_overflow:
 		}
 	}
 	if (sign == '-') {
-		result = -result;
-		if unlikely(result > 0)
+		if (__hybrid_overflow_sneg_p2n(result, &result))
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
