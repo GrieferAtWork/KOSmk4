@@ -100,7 +100,7 @@ struct syslog_sink_array {
 
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(FCALL syslog_sink_array_destroy)(struct syslog_sink_array *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct syslog_sink_array, ssa_refcnt, syslog_sink_array_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct syslog_sink_array, ssa_refcnt, syslog_sink_array_destroy)
 
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(FCALL syslog_sink_array_destroy)(struct syslog_sink_array *__restrict self) {

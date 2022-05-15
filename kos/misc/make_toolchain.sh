@@ -40,13 +40,27 @@ DEEMON_VERSION="35b8e4799319bb4842b0618a9e82f4477a6a95e4"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
-# Version numbers for dependencies
-BINUTILS_VERSION_NUMBER="2.32"
-GCC_VERSION_NUMBER="9.1.0"
+###############################################################
+####### Version numbers for dependencies
+#config: gcc-12.1.0                    (>= 20220515)
+BINUTILS_VERSION_NUMBER="2.38"
+GCC_VERSION_NUMBER="12.1.0"
 LIBGCC_VERSION="1"
 LIBGCC_VERSION_FULL="1"
 LIBSTDCXX_VERSION="6"
-LIBSTDCXX_VERSION_FULL="6.0.26"
+LIBSTDCXX_VERSION_FULL="6.0.30"
+
+##config: gcc-9.1.0                    (< 20220515)
+#	BINUTILS_VERSION_NUMBER="2.32"
+#	GCC_VERSION_NUMBER="9.1.0"
+#	LIBGCC_VERSION="1"
+#	LIBGCC_VERSION_FULL="1"
+#	LIBSTDCXX_VERSION="6"
+#	LIBSTDCXX_VERSION_FULL="6.0.26"
+###############################################################
+
+###############################################################
+####### Version number for mtools
 MTOOLS_VERSION_NUMBER="4.0.23"
 
 # The KOS configuration used for generating libc/libm/crt0 for libgcc_s and libstdc++
@@ -59,6 +73,9 @@ CXX_COMPAT_HEADER_NAMES=(
 	"stdarg" "stdbool" "stddef" "stdint"
 	"stdio" "stdlib" "string" "time" "uchar"
 	"wchar" "wctype" "tgmath" "complex"
+)
+CXX_COMPAT_HEADER_FILES=(
+	"bits/std_abs.h"
 )
 
 
@@ -73,9 +90,9 @@ KOS_MISC="$(dirname "$(readlink -f "$0")")"
 
 if (($# < 1)); then
 	echo "Usage: ./make_toolchain.sh <TARGET>"
-	echo "    TARGET must be one of:"
-	echo "        i386-kos"
-	echo "        x86_64-kos"
+	echo "	TARGET must be one of:"
+	echo "		i386-kos"
+	echo "		x86_64-kos"
 	exit 1
 fi
 
@@ -92,13 +109,13 @@ download_binutils() {
 		cmd cd "src"
 		if ! [ -f "$BINUTILS_VERSION.tar" ]; then
 			if ! [ -f "$BINUTILS_VERSION.tar.gz" ]; then
-				echo "    Downloading: $BINUTILS_VERSION_URL"
+				echo "	Downloading: $BINUTILS_VERSION_URL"
 				cmd wget "$BINUTILS_VERSION_URL"
 			fi
-			echo "    Decompressing: $BINUTILS_VERSION.tar.gz"
+			echo "	Decompressing: $BINUTILS_VERSION.tar.gz"
 			cmd gunzip "$BINUTILS_VERSION.tar.gz"
 		fi
-		echo "    Unpacking: $BINUTILS_VERSION.tar"
+		echo "	Unpacking: $BINUTILS_VERSION.tar"
 		cmd tar -xf "$BINUTILS_VERSION.tar"
 		cmd cd ".."
 		if ! [ -f "src/$BINUTILS_VERSION/configure" ]; then
@@ -106,20 +123,20 @@ download_binutils() {
 			exit 1
 		fi
 	else
-		echo "    Already present"
+		echo "	Already present"
 	fi
 }
 
 patch_binutils() {
 	echo "Checking if $BINUTILS_VERSION has been patched"
 	if ! [ -f "$KOS_PATCHES/$BINUTILS_VERSION.patch" ]; then
-		echo "    No patch file found: $KOS_PATCHES/$BINUTILS_VERSION.patch"
+		echo "	No patch file found: $KOS_PATCHES/$BINUTILS_VERSION.patch"
 	elif ! [ -f "src/$BINUTILS_VERSION/.kos_patched" ]; then
-		echo "    Applying patch: $KOS_PATCHES/$BINUTILS_VERSION.patch to src/$BINUTILS_VERSION"
+		echo "	Applying patch: $KOS_PATCHES/$BINUTILS_VERSION.patch to src/$BINUTILS_VERSION"
 		cmd patch -d "src/$BINUTILS_VERSION" -p1 < "$KOS_PATCHES/$BINUTILS_VERSION.patch"
 		> "src/$BINUTILS_VERSION/.kos_patched"
 	else
-		echo "    Already patched"
+		echo "	Already patched"
 	fi
 }
 
@@ -134,13 +151,13 @@ download_gcc() {
 		cmd cd "src"
 		if ! [ -f "$GCC_VERSION.tar" ]; then
 			if ! [ -f "$GCC_VERSION.tar.gz" ]; then
-				echo "    Downloading: $GCC_VERSION_URL"
+				echo "	Downloading: $GCC_VERSION_URL"
 				cmd wget "$GCC_VERSION_URL"
 			fi
-			echo "    Decompressing: $GCC_VERSION.tar.gz"
+			echo "	Decompressing: $GCC_VERSION.tar.gz"
 			cmd gunzip "$GCC_VERSION.tar.gz"
 		fi
-		echo "    Unpacking: $GCC_VERSION.tar"
+		echo "	Unpacking: $GCC_VERSION.tar"
 		cmd tar -xf "$GCC_VERSION.tar"
 		cmd cd ".."
 		if ! [ -f "src/$GCC_VERSION/configure" ]; then
@@ -148,33 +165,33 @@ download_gcc() {
 			exit 1
 		fi
 	else
-		echo "    Already present"
+		echo "	Already present"
 	fi
 }
 
 patch_gcc() {
 	echo "Checking if $GCC_VERSION has been patched"
 	if ! [ -f "$KOS_PATCHES/$GCC_VERSION.patch" ]; then
-		echo "    No patch file found: $KOS_PATCHES/$GCC_VERSION.patch"
+		echo "	No patch file found: $KOS_PATCHES/$GCC_VERSION.patch"
 	elif ! [ -f "src/$GCC_VERSION/.kos_patched" ]; then
-		echo "    Applying patch: $KOS_PATCHES/$GCC_VERSION.patch to src/$GCC_VERSION"
+		echo "	Applying patch: $KOS_PATCHES/$GCC_VERSION.patch to src/$GCC_VERSION"
 		cmd patch -d "src/$GCC_VERSION" -p1 < "$KOS_PATCHES/$GCC_VERSION.patch"
 		> "src/$GCC_VERSION/.kos_patched"
 	else
-		echo "    Already patched"
+		echo "	Already patched"
 	fi
 }
 
 patch_mtools() {
 	echo "Checking if $MTOOLS_VERSION has been patched"
 	if ! [ -f "$KOS_PATCHES/$MTOOLS_VERSION.patch" ]; then
-		echo "    No patch file found: $KOS_PATCHES/$MTOOLS_VERSION.patch"
+		echo "	No patch file found: $KOS_PATCHES/$MTOOLS_VERSION.patch"
 	elif ! [ -f "src/$MTOOLS_VERSION/.kos_patched" ]; then
-		echo "    Applying patch: $KOS_PATCHES/$MTOOLS_VERSION.patch to src/$MTOOLS_VERSION"
+		echo "	Applying patch: $KOS_PATCHES/$MTOOLS_VERSION.patch to src/$MTOOLS_VERSION"
 		cmd patch -d "src/$MTOOLS_VERSION" -p1 < "$KOS_PATCHES/$MTOOLS_VERSION.patch"
 		> "src/$MTOOLS_VERSION/.kos_patched"
 	else
-		echo "    Already patched"
+		echo "	Already patched"
 	fi
 }
 
@@ -189,13 +206,13 @@ download_mtool() {
 		cmd cd "src"
 		if ! [ -f "$MTOOLS_VERSION.tar" ]; then
 			if ! [ -f "$MTOOLS_VERSION.tar.gz" ]; then
-				echo "    Downloading: $MTOOLS_VERSION_URL"
+				echo "	Downloading: $MTOOLS_VERSION_URL"
 				cmd wget "$MTOOLS_VERSION_URL"
 			fi
-			echo "    Decompressing: $MTOOLS_VERSION.tar.gz"
+			echo "	Decompressing: $MTOOLS_VERSION.tar.gz"
 			cmd gunzip "$MTOOLS_VERSION.tar.gz"
 		fi
-		echo "    Unpacking: $MTOOLS_VERSION.tar"
+		echo "	Unpacking: $MTOOLS_VERSION.tar"
 		cmd tar -xf "$MTOOLS_VERSION.tar"
 		cmd cd ".."
 		if ! [ -f "src/$MTOOLS_VERSION/configure" ]; then
@@ -203,14 +220,14 @@ download_mtool() {
 			exit 1
 		fi
 	else
-		echo "    Already present"
+		echo "	Already present"
 	fi
 }
 
 configure_mtools() {
 	echo "Checking if $MTOOLS_VERSION has been configured"
 	if ! [ -f "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION/Makefile" ]; then
-		echo "    Now configuring $MTOOLS_VERSION"
+		echo "	Now configuring $MTOOLS_VERSION"
 		cmd mkdir -p "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION"
 		cmd cd "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION"
 		cmd bash "$KOS_BINUTILS/src/$MTOOLS_VERSION/configure" \
@@ -223,7 +240,7 @@ configure_mtools() {
 
 		cmd cd "$KOS_BINUTILS"
 	else
-		echo "    $MTOOLS_VERSION has already been configured"
+		echo "	$MTOOLS_VERSION has already been configured"
 	fi
 }
 
@@ -233,18 +250,18 @@ build_mtools() {
 	   ! [ -f "$KOS_BINUTILS/misc/bin/mtools.exe" ]; then
 		if ! [ -f "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION/mtools" ] && \
 		   ! [ -f "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION/mtools.exe" ]; then
-			echo "    Now building $MTOOLS_VERSION"
+			echo "	Now building $MTOOLS_VERSION"
 			cmd cd "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION"
 			cmd make -j $MAKE_PARALLEL_COUNT
 		else
-			echo "    $MTOOLS_VERSION has already been built"
+			echo "	$MTOOLS_VERSION has already been built"
 		fi
-		echo "    Now installing $MTOOLS_VERSION (to '$KOS_BINUTILS/misc/')"
+		echo "	Now installing $MTOOLS_VERSION (to '$KOS_BINUTILS/misc/')"
 		cmd cd "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION"
 		cmd make -j $MAKE_PARALLEL_COUNT install
 		cmd cd "$KOS_BINUTILS"
 	else
-		echo "    $MTOOLS_VERSION has already been installed"
+		echo "	$MTOOLS_VERSION has already been installed"
 	fi
 }
 
@@ -295,7 +312,7 @@ require_program() {
 	which $1 > /dev/null 2>&1 || {
 		local error=$?
 		echo "ERROR: Required program not found '$1' -> '$error'"
-		echo "       Check if this program is installed, and make sure that it's in \$PATH"
+		echo "	   Check if this program is installed, and make sure that it's in \$PATH"
 		exit $error
 	}
 }
@@ -334,12 +351,12 @@ echo "Check if deemon is installed on the machine"
 echo "Check if deemon was installed under '$KOS_BINUTILS/deemon'"
 if [ -f "$KOS_BINUTILS/deemon/deemon.exe" ]; then
 	DEEMON="$KOS_BINUTILS/deemon/deemon.exe"
-	echo "    Found deemon in '$KOS_BINUTILS/deemon/deemon.exe'"
+	echo "	Found deemon in '$KOS_BINUTILS/deemon/deemon.exe'"
 elif [ -f "$KOS_BINUTILS/deemon/deemon" ]; then
 	DEEMON="$KOS_BINUTILS/deemon/deemon"
-	echo "    Found deemon in '$KOS_BINUTILS/deemon/deemon'"
+	echo "	Found deemon in '$KOS_BINUTILS/deemon/deemon'"
 else
-	echo "    Deemon is missing (now downloading, configuring and building a local copy)"
+	echo "	Deemon is missing (now downloading, configuring and building a local copy)"
 	if ! [ -f "$KOS_BINUTILS/deemon/configure" ]; then
 		require_program "git"
 		rm -rf "$KOS_BINUTILS/deemon" > /dev/null 2>&1
@@ -423,7 +440,7 @@ do_symlink "../../../../kos/include"              "$PREFIX/$TARGET/usr/include"
 
 echo "Checking if $BINUTILS_VERSION has been configured"
 if ! [ -f "$PREFIX/binutils/Makefile" ]; then
-	echo "    Now configuring $BINUTILS_VERSION"
+	echo "	Now configuring $BINUTILS_VERSION"
 	cmd cd "$PREFIX/binutils"
 	cmd bash "../../src/$BINUTILS_VERSION/configure" \
 		"${CONFIGURE_OPTIONS_BINUTILS[@]}" \
@@ -436,7 +453,7 @@ if ! [ -f "$PREFIX/binutils/Makefile" ]; then
 		"--enable-multilib"
 	cmd cd "$KOS_BINUTILS"
 else
-	echo "    Already configured"
+	echo "	Already configured"
 fi
 
 unlink "$PREFIX/$TARGET/sys-include" > /dev/null 2>&1
@@ -450,20 +467,20 @@ do_symlink "../../../kos/include/$INCLUDE_NAME" "$PREFIX/$TARGET/include"
 
 echo "Check if $BINUTILS_VERSION needs to be built"
 if ! [ -f "$PREFIX/bin/${TARGET}-ld" ] && ! [ -f "$PREFIX/bin/${TARGET}-ld.exe" ]; then
-	echo "    Making $BINUTILS_VERSION"
+	echo "	Making $BINUTILS_VERSION"
 	cmd cd "$PREFIX/binutils"
 	cmd make -j $MAKE_PARALLEL_COUNT
 	cmd make -j $MAKE_PARALLEL_COUNT install
 	cmd cd "$KOS_BINUTILS"
 else
-	echo "    Binutils $BINUTILS_VERSION has already been built"
+	echo "	Binutils $BINUTILS_VERSION has already been built"
 fi
 
 
 
 echo "Checking if $GCC_VERSION has been configured"
 if ! [ -f "$PREFIX/gcc/Makefile" ]; then
-	echo "    Now configuring $GCC_VERSION"
+	echo "	Now configuring $GCC_VERSION"
 	cmd cd "$PREFIX/gcc"
 	cmd bash "../../src/$GCC_VERSION/configure" \
 		"${CONFIGURE_OPTIONS_GCC[@]}" \
@@ -486,37 +503,37 @@ if ! [ -f "$PREFIX/gcc/Makefile" ]; then
 		"--enable-gnu-indirect-function"
 	cmd cd "$KOS_BINUTILS"
 else
-	echo "    Already configured"
+	echo "	Already configured"
 fi
 
 echo "Check if $GCC_VERSION needs to be built"
 if ! [ -f "$PREFIX/bin/${TARGET}-gcc" ] && ! [ -f "$PREFIX/bin/${TARGET}-gcc.exe" ]; then
-	echo "    Making $GCC_VERSION"
+	echo "	Making $GCC_VERSION"
 	cmd cd "$PREFIX/gcc"
 	cmd make -j $MAKE_PARALLEL_COUNT all-gcc
 	cmd make -j $MAKE_PARALLEL_COUNT install-gcc
 	cmd cd "$KOS_BINUTILS"
 else
-	echo "    $GCC_VERSION has already been built"
+	echo "	$GCC_VERSION has already been built"
 fi
 
 remove_fixinclude() {
 	echo "Checking for $1"
 	if [ -f "$1" ]; then
-		echo "    Removing fixinclude header file $1"
+		echo "	Removing fixinclude header file $1"
 		cmd unlink "$1"
 #	else
-#		echo "    Already deleted"
+#		echo "	Already deleted"
 	fi
 }
 
 delete_header_file() {
 	echo "Checking for $1"
 	if [ -f "$1" ]; then
-		echo "    Removing header file $1"
+		echo "	Removing header file $1"
 		cmd rm "$1"
 #	else
-#		echo "    Already deleted"
+#		echo "	Already deleted"
 	fi
 }
 
@@ -540,7 +557,7 @@ remove_bad_fixinclude
 echo "Check if $GCC_VERSION:libgcc needs to be built"
 if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
    ! [ -f "$PREFIX/$TARGET/lib/libgcc_s.so.1" ]; then
-	echo "    Making crt0.o and crt0S.o for $GCC_VERSION:libgcc"
+	echo "	Making crt0.o and crt0S.o for $GCC_VERSION:libgcc"
 	cmd cd "$KOS_ROOT"
 
 	# If this is the first time that "magic.dee" is being run after the git was cloned,
@@ -561,7 +578,7 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
 		"--gen=bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0S.o" \
 		"--target=$TARGET_NAME" \
 		"--config=$KOS_CONFIG_FOR_LINKING"
-	echo "    Making $GCC_VERSION:libgcc"
+	echo "	Making $GCC_VERSION:libgcc"
 	cmd cd "$PREFIX/gcc"
 	if ! make -j "$MAKE_PARALLEL_COUNT" "all-target-libgcc"; then
 		echo ">>>> DON'T PANIC! -- I think I know how to fix that error ;)"
@@ -599,7 +616,7 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
 	remove_bad_fixinclude
 	cmd cd "$KOS_BINUTILS"
 else
-	echo "    $GCC_VERSION:libgcc has already been built"
+	echo "	$GCC_VERSION:libgcc has already been built"
 fi
 
 
@@ -623,10 +640,10 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 				"$PREFIX/$TARGET/include/c++-backup-$GCC_VERSION_NUMBER-$OTHER_TOOLCHAIN"
 		fi
 	fi
-	echo "    Make sure to delete any existing installation of c++ headers"
+	echo "	Make sure to delete any existing installation of c++ headers"
 	rm -r "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER"
 	# Build our own libc.so and libm.so before building libstdc++, so GCC can link against our code!
-	echo "    Making libc.so and libm.so for $GCC_VERSION:libstdc++"
+	echo "	Making libc.so and libm.so for $GCC_VERSION:libstdc++"
 	cmd cd "$KOS_ROOT"
 	cmd "$DEEMON" "magic.dee" \
 		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0.o" \
@@ -635,7 +652,7 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/libm.so" \
 		--target="$TARGET_NAME" \
 		--config="$KOS_CONFIG_FOR_LINKING"
-	echo "    Making $GCC_VERSION:libstdc++"
+	echo "	Making $GCC_VERSION:libstdc++"
 	cmd cd "$PREFIX/gcc"
 	if ! make -j "$MAKE_PARALLEL_COUNT" "all-target-libstdc++-v3"; then
 		echo ">>>> DON'T PANIC! -- I think I know how to fix that error ;)"
@@ -657,16 +674,21 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 
 		# $1: header name (e.g. `stdlib')
 		use_real_header() {
-			echo "    Link real header for '$PREFIX/gcc/$TARGET/libstdc++-v3/include/c$1'"
+			echo "	Link real header for '$PREFIX/gcc/$TARGET/libstdc++-v3/include/c$1'"
 			unlink "$PREFIX/gcc/$TARGET/libstdc++-v3/include/c$1" > /dev/null 2>&1
 			cmd ln -s "$KOS_ROOT/kos/include/c$1" "$PREFIX/gcc/$TARGET/libstdc++-v3/include/c$1"
-			echo "    Link real header for '$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h'"
+			echo "	Link real header for '$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h'"
 			unlink "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h" > /dev/null 2>&1
 			cmd ln -s "$KOS_ROOT/kos/include/$1.h" "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h"
 		}
 		echo "Fixup libstdc++ build-time headers"
 		for HEADER_NAME in "${CXX_COMPAT_HEADER_NAMES[@]}"; do
 			use_real_header "$HEADER_NAME"
+		done
+		for HEADER_NAME in "${CXX_COMPAT_HEADER_FILES[@]}"; do
+			echo "	Link real header for '$PREFIX/gcc/$TARGET/libstdc++-v3/include/$HEADER_NAME'"
+			unlink "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$HEADER_NAME" > /dev/null 2>&1
+			cmd ln -s "$KOS_ROOT/kos/include/$HEADER_NAME" "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$HEADER_NAME"
 		done
 		cmd make -j "$MAKE_PARALLEL_COUNT" "all-target-libstdc++-v3"
 	fi
@@ -682,52 +704,52 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 		fi
 	fi
 else
-	echo "    $GCC_VERSION:libstdc++ has already been built"
+	echo "	$GCC_VERSION:libstdc++ has already been built"
 fi
 
 install_libstdcxx() {
 	echo "Check if $GCC_VERSION:libstdc++ was installed into $1"
 	if ! [ -f "$1/libstdc++.so.$LIBSTDCXX_VERSION" ]; then
-		echo "    Copying $GCC_VERSION:libstdc++ into $1"
+		echo "	Copying $GCC_VERSION:libstdc++ into $1"
 		cmd mkdir -p "$1"
 		cmd cp \
 			"$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" \
 			"$1/libstdc++.so.$LIBSTDCXX_VERSION"
 	else
-		echo "    $GCC_VERSION:libstdc++ has already installed to $1"
+		echo "	$GCC_VERSION:libstdc++ has already installed to $1"
 	fi
 	echo "Check if $GCC_VERSION:libgcc_s was installed into $1"
 	if ! [ -f "$1/libgcc_s.so.$LIBGCC_VERSION" ]; then
-		echo "    Copying $GCC_VERSION:libgcc_s into $1"
+		echo "	Copying $GCC_VERSION:libgcc_s into $1"
 		cmd mkdir -p "$1"
 		cmd cp \
 			"$PREFIX/$TARGET/lib/libgcc_s.so.$LIBGCC_VERSION_FULL" \
 			"$1/libgcc_s.so.$LIBGCC_VERSION"
 	else
-		echo "    $GCC_VERSION:libgcc_s has already been installed to $1"
+		echo "	$GCC_VERSION:libgcc_s has already been installed to $1"
 	fi
 }
 
 install_libstdcxx_symlinks() {
 	echo "Check if $GCC_VERSION:libstdc++ was installed into $1"
 	if ! [ -f "$1/libstdc++.so.$LIBSTDCXX_VERSION" ]; then
-		echo "    Installing $GCC_VERSION:libstdc++ into $1"
+		echo "	Installing $GCC_VERSION:libstdc++ into $1"
 		cmd mkdir -p "$1"
 		cmd ln -s \
 			"../../${NAME}-common/$BINLIBDIRNAME/libstdc++.so.$LIBSTDCXX_VERSION" \
 			"$1/libstdc++.so.$LIBSTDCXX_VERSION"
 	else
-		echo "    $GCC_VERSION:libstdc++ has already installed to $1"
+		echo "	$GCC_VERSION:libstdc++ has already installed to $1"
 	fi
 	echo "Check if $GCC_VERSION:libgcc_s was installed into $1"
 	if ! [ -f "$1/libgcc_s.so.$LIBGCC_VERSION" ]; then
-		echo "    Installing $GCC_VERSION:libgcc_s into $1"
+		echo "	Installing $GCC_VERSION:libgcc_s into $1"
 		cmd mkdir -p "$1"
 		cmd ln -s \
 			"../../${NAME}-common/$BINLIBDIRNAME/libgcc_s.so.$LIBGCC_VERSION_FULL" \
 			"$1/libgcc_s.so.$LIBGCC_VERSION_FULL"
 	else
-		echo "    $GCC_VERSION:libgcc_s has already been installed to $1"
+		echo "	$GCC_VERSION:libgcc_s has already been installed to $1"
 	fi
 }
 
@@ -742,6 +764,9 @@ for HEADER_NAME in "${CXX_COMPAT_HEADER_NAMES[@]}"; do
 	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/c$HEADER_NAME"
 	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/$HEADER_NAME.h"
 done
+for HEADER_NAME in "${CXX_COMPAT_HEADER_FILES[@]}"; do
+	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/$HEADER_NAME"
+done
 
 # KOS overrides the <bits/os_defines.h> header from libstdc++, so to prevent confusion,
 # simply delete that header from the installed libstdc++ headers.
@@ -752,13 +777,13 @@ delete_header_file "$PREFIX/$TARGET/include/c++/${GCC_VERSION_NUMBER}/${TARGET}/
 apply_libstdcxx_header_patch() {
 	echo "Check if our headers for $GCC_VERSION:libstdc++ ($2) need to be patched"
 	if ! [ -f "$1" ]; then
-		echo "    No patch file found: $1"
+		echo "	No patch file found: $1"
 	elif ! [ -f "$2/.libstdc++.kos_patched" ]; then
-		echo "    Applying patch: $1 to $2"
+		echo "	Applying patch: $1 to $2"
 		cmd patch -d "$2" -p1 < "$1"
 		> "$2/.libstdc++.kos_patched"
 	else
-		echo "    Our headers for $GCC_VERSION:libstdc++ ($2) have already been patched"
+		echo "	Our headers for $GCC_VERSION:libstdc++ ($2) have already been patched"
 	fi
 }
 
@@ -832,7 +857,7 @@ install_cat_file() {
 		echo "Creating file $1"
 		cat > "$1"
 	else
-		echo "    File already exists"
+		echo "	File already exists"
 	fi
 }
 
@@ -886,7 +911,7 @@ done
 # On windows, try to build the gdbridge wrapper program
 if [[ "$(uname -s)" == *"CYGWIN"* ]]; then
 	if ! [ -f "$KOS_MISC/gdbridge/gdbridge.exe" ] || \
-	     [ "$KOS_MISC/gdbridge/gdbridge.exe" -ot "$KOS_MISC/gdbridge/gdbridge.c" ]; then
+		 [ "$KOS_MISC/gdbridge/gdbridge.exe" -ot "$KOS_MISC/gdbridge/gdbridge.c" ]; then
 		echo "Building GDBridge wrapper"
 		GDBRIDGE_FLAGS=("-g" "-Wall")
 		GDBRIDGE_SCRIPT="$(cygpath -w "$KOS_MISC/gdbridge/gdbridge.dee")"

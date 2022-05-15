@@ -431,7 +431,7 @@ struct handman {
 /* Destroy the given handle manager. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL handman_destroy)(struct handman *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct handman, hm_refcnt, handman_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct handman, hm_refcnt, handman_destroy)
 
 /* Helpers for accessing `hm_lock' */
 #define _handman_reap(self)        _oblockop_reap_atomic_rwlock(&(self)->hm_lops, &(self)->hm_lock, self)

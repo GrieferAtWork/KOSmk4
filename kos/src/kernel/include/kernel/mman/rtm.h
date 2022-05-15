@@ -65,7 +65,7 @@ struct mrtm_driver_hooks {
 };
 #define __mrtm_driver_hooks_refcnt(self) __driver_refcnt((self)->rdh_driver)
 #define mrtm_driver_hooks_destroy(self)  __driver_destroy((self)->rdh_driver)
-DEFINE_REFCOUNT_FUNCTIONS_P(struct mrtm_driver_hooks,
+DEFINE_REFCNT_FUNCTIONS_P(struct mrtm_driver_hooks,
                             __mrtm_driver_hooks_refcnt,
                             mrtm_driver_hooks_destroy)
 

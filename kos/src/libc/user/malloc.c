@@ -77,8 +77,8 @@ NOTHROW_NCX(LIBCCALL libc_memdup)(void const *__restrict ptr,
 }
 /*[[[end:libc_memdup]]]*/
 
-/*[[[head:libc_reallocarray,hash:CRC-32=0xa588a3ee]]]*/
-INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_SIZE((2, 3)) void *
+/*[[[head:libc_reallocarray,hash:CRC-32=0xff244eca]]]*/
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *
 NOTHROW_NCX(LIBCCALL libc_reallocarray)(void *ptr,
                                         size_t elem_count,
                                         size_t elem_size)

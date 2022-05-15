@@ -3,9 +3,9 @@
 		{
 			"name": "i386-kos (DEBUG)",
 			"includePath": [
-				"${workspaceFolder}/include/i386-kos/c++/9.1.0",
-				"${workspaceFolder}/include/i386-kos/c++/9.1.0/i686-kos",
-				"${workspaceFolder}/include/i386-kos/c++/9.1.0/backward",
+				"${workspaceFolder}/include/i386-kos/c++/12.1.0",
+				"${workspaceFolder}/include/i386-kos/c++/12.1.0/i686-kos",
+				"${workspaceFolder}/include/i386-kos/c++/12.1.0/backward",
 				"${workspaceFolder}/include/i386-kos",
 				"${workspaceFolder}/include"
 			],

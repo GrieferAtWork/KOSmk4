@@ -55,7 +55,7 @@ struct dirhandle {
 /* Destroy the given dirhandle object. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL dirhandle_destroy)(struct dirhandle *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct dirhandle, dh_refcnt, dirhandle_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct dirhandle, dh_refcnt, dirhandle_destroy)
 
 /* Allocate and return a new  directory enumeration wrapper for  the
  * given directory node `self'. This  function is used to  implement

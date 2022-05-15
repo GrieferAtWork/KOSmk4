@@ -149,7 +149,7 @@ struct sighand_ptr {
 
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sighand_ptr_destroy)(struct sighand_ptr *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct sighand_ptr, sp_refcnt, sighand_ptr_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct sighand_ptr, sp_refcnt, sighand_ptr_destroy)
 
 /* [0..1][lock(PRIVATE(THIS_TASK))]
  * User-space signal handlers for the calling thread. */

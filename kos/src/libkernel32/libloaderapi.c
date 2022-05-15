@@ -93,7 +93,7 @@ INTERN WINBOOL WINAPI
 libk32_GetModuleHandleExA(DWORD dwFlags, LPCSTR lpModuleName, HMODULE *phModule) {
 	unsigned int dlflags = 0;
 	TRACE("GetModuleHandleExA(%#x, %q, %p)", dwFlags, lpModuleName, phModule);
-	if (!(dwFlags & GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT))
+	if (!(dwFlags & GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCNT))
 		dlflags |= DLGETHANDLE_FINCREF;
 	if (dwFlags & GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS)
 		return (*phModule = (HMODULE)dlgethandle(lpModuleName, dlflags)) != NULL;

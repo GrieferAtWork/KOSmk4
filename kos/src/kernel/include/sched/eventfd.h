@@ -41,7 +41,7 @@ struct eventfd {
 #define eventfd_destroy(self)                    \
 	(sig_broadcast_for_fini(&(self)->ef_signal), \
 	 kfree(self))
-DEFINE_REFCOUNT_FUNCTIONS(struct eventfd, ef_refcnt, eventfd_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct eventfd, ef_refcnt, eventfd_destroy)
 
 #endif /* __CC__ */
 

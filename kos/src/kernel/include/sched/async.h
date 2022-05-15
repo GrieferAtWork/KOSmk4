@@ -298,7 +298,7 @@ NOTHROW(__async_init_aio_ptr_nx)(struct async *self,
 /* Destroy a given async controller. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_destroy)(struct async *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct async, a_refcnt, async_destroy);
+DEFINE_REFCNT_FUNCTIONS(struct async, a_refcnt, async_destroy);
 
 /* Start (or re-start) a given async job.
  * Note that when re-starting an async controller, previously attached

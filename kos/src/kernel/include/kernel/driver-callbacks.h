@@ -59,7 +59,7 @@ struct callback_list_struct {
 	COMPILER_FLEXIBLE_ARRAY(struct callback_node_struct,cl_list);  /* [cl_count] List of registered callbacks */
 };
 FUNDEF NOBLOCK void NOTHROW(KCALL callback_list_detroy)(struct callback_list_struct *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct callback_list_struct, cl_refcnt, callback_list_detroy);
+DEFINE_REFCNT_FUNCTIONS(struct callback_list_struct, cl_refcnt, callback_list_detroy);
 
 typedef ARREF(__callback_list, callback_list_struct) __callback_list_t;
 FUNDEF __BOOL KCALL __callback_list_insert(__callback_list_t *__restrict self, void (*func)(), struct driver *__restrict orig) THROWS(E_BADALLOC, E_WOULDBLOCK) ASMNAME("callback_list_insert");

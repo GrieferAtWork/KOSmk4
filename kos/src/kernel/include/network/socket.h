@@ -605,7 +605,7 @@ struct socket_connect_aio {
 /* Destroy a given socket-connect AIO controller */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL socket_connect_aio_destroy)(struct socket_connect_aio *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct socket_connect_aio, sca_refcnt, socket_connect_aio_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct socket_connect_aio, sca_refcnt, socket_connect_aio_destroy)
 
 /* Mask of the message flags addend described by `sk_msgflags' for `send()' operation */
 #define SOCKET_MSGFLAGS_ADDEND_SENDMASK           \
@@ -664,12 +664,12 @@ struct socket {
 /* Destroy a given socket object, and decrement its weak reference counter. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL socket_destroy)(struct socket *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct socket, sk_refcnt, socket_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct socket, sk_refcnt, socket_destroy)
 
 /* Free up the memory used by a given socket once its weak reference counter hits `0'. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL socket_free)(struct socket *__restrict self);
-DEFINE_WEAKREFCOUNT_FUNCTIONS(struct socket, sk_weakrefcnt, socket_free)
+DEFINE_WEAKREFCNT_FUNCTIONS(struct socket, sk_weakrefcnt, socket_free)
 
 /* Create a new socket
  * @param: family:   Socket family (one of `AF_*')

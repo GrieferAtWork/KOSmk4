@@ -200,8 +200,8 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _epoll_controller_lock_reap)(stru
 /* Destroy the given epoll controller. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL epoll_controller_destroy)(struct epoll_controller *__restrict self);
-DEFINE_WEAKREFCOUNT_FUNCTIONS(struct epoll_controller, ec_weakrefcnt, kfree)
-DEFINE_REFCOUNT_FUNCTIONS(struct epoll_controller, ec_refcnt, epoll_controller_destroy)
+DEFINE_WEAKREFCNT_FUNCTIONS(struct epoll_controller, ec_weakrefcnt, kfree)
+DEFINE_REFCNT_FUNCTIONS(struct epoll_controller, ec_refcnt, epoll_controller_destroy)
 
 /* Create  a new epoll  controller and return  a reference to it.
  * This function is used by the `epoll_create(2)' syscall family. */

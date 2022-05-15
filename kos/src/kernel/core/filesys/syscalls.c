@@ -2313,7 +2313,7 @@ struct kernel_exec_rpc_data {
 	struct sig            er_error;  /* Signal broadcast upon error. */
 };
 #define kernel_exec_rpc_data_destroy(self) (execargs_fini(&(self)->er_args), kfree(self))
-DEFINE_REFCOUNT_FUNCTIONS(struct kernel_exec_rpc_data, er_refcnt, kernel_exec_rpc_data_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct kernel_exec_rpc_data, er_refcnt, kernel_exec_rpc_data_destroy)
 
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 kernel_exec_rpc(struct rpc_context *__restrict ctx, void *cookie) {

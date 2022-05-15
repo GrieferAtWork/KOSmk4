@@ -36,6 +36,7 @@ final local GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS = {
 	"-feliminate-unused-debug-symbols",
 	"-feliminate-unused-debug-types",
 	"-fdelete-null-pointer-checks",
+	"-fpermissive"
 };
 
 final function isUnrelatedGCCFlag(flag: string): bool {

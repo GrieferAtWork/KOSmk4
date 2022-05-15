@@ -98,7 +98,7 @@ struct unix_client {
 /* Destroy a given Unix domain socket client descriptor. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unix_client_destroy)(struct unix_client *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct unix_client, uc_refcnt, unix_client_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct unix_client, uc_refcnt, unix_client_destroy)
 
 
 

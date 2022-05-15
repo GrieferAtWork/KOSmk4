@@ -75,7 +75,7 @@ struct fdirent {
 };
 
 #define fdirent_destroy(self) ((*(self)->fd_ops->fdo_destroy)(self))
-DEFINE_REFCOUNT_FUNCTIONS(struct fdirent, fd_refcnt, fdirent_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct fdirent, fd_refcnt, fdirent_destroy)
 
 /* Open the node associated with this directory entry. */
 #ifdef CONFIG_HAVE_FS_NOTIFY

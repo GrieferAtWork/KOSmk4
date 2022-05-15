@@ -362,7 +362,7 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDL_CC DlModule_Free)(__USER DlModule *se
  * throw exceptions. (Whether or not they should do that is another story, though) */
 #undef __REFCNT_NOTHROW
 #define __REFCNT_NOTHROW /* nothing */
-__DEFINE_REFCOUNT_FUNCTIONS(DlModule, dm_refcnt, DlModule_Destroy)
+__DEFINE_REFCNT_FUNCTIONS(DlModule, dm_refcnt, DlModule_Destroy)
 #undef __REFCNT_NOTHROW
 #ifdef __KERNEL__
 #define __REFCNT_NOTHROW __NOTHROW
@@ -370,7 +370,7 @@ __DEFINE_REFCOUNT_FUNCTIONS(DlModule, dm_refcnt, DlModule_Destroy)
 #define __REFCNT_NOTHROW __NOTHROW_NCX
 #endif /* !__KERNEL__ */
 
-__DEFINE_WEAKREFCOUNT_FUNCTIONS(DlModule, dm_weakrefcnt, DlModule_Free)
+__DEFINE_WEAKREFCNT_FUNCTIONS(DlModule, dm_weakrefcnt, DlModule_Free)
 
 
 #ifndef __dlmodule_tailq_defined

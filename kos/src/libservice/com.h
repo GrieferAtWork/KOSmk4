@@ -388,7 +388,7 @@ struct service_shm_handle {
  * HINT: This function uses lockops to remove `self' from `self->ssh_service->s_shm_tree'! */
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL service_shm_handle_destroy)(struct service_shm_handle *__restrict self);
-__DEFINE_REFCOUNT_FUNCTIONS(struct service_shm_handle, ssh_refcnt, service_shm_handle_destroy)
+__DEFINE_REFCNT_FUNCTIONS(struct service_shm_handle, ssh_refcnt, service_shm_handle_destroy)
 
 /* Helpers for operating with SHM handle tree functions. */
 #define service_shm_handle_getminaddr(self) ((byte_t *)(self)->ssh_shm)

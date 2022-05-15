@@ -82,7 +82,7 @@ struct svga_ttyaccess: vidttyaccess {
 
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL svga_ttyaccess_destroy)(struct vidttyaccess *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct svga_ttyaccess, vta_refcnt, svga_ttyaccess_destroy);
+DEFINE_REFCNT_FUNCTIONS(struct svga_ttyaccess, vta_refcnt, svga_ttyaccess_destroy);
 
 /* Check if a given `struct vidttyaccess' is actually `struct svga_ttyaccess' */
 #define vidttyaccess_issvga(self)     ((self)->vta_destroy == &svga_ttyaccess_destroy)

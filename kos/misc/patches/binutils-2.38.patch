@@ -1,0 +1,390 @@
+diff -Naur binutils-2.38-orig/bfd/config.bfd binutils-2.38/bfd/config.bfd
+--- binutils-2.38-orig/bfd/config.bfd	2022-01-22 13:14:07.000000000 +0100
++++ binutils-2.38/bfd/config.bfd	2022-05-15 17:28:11.854578400 +0200
+@@ -578,7 +578,7 @@
+     targ_selvecs=hppa_elf32_vec
+     ;;
+ 
+-  i[3-7]86-*-elf* | i[3-7]86-*-rtems* | i[3-7]86-*-genode*)
++  i[3-7]86-*-elf* | i[3-7]86-*-rtems* | i[3-7]86-*-genode* | i[3-7]86-*-kos*)
+     targ_defvec=i386_elf32_vec
+     targ_selvecs="iamcu_elf32_vec i386_coff_vec"
+     ;;
+@@ -672,7 +672,7 @@
+     targ_selvecs="i386_elf32_vec iamcu_elf32_vec l1om_elf64_vec k1om_elf64_vec"
+     want64=true
+     ;;
+-  x86_64-*-elf* | x86_64-*-rtems* | x86_64-*-fuchsia | x86_64-*-genode*)
++  x86_64-*-elf* | x86_64-*-rtems* | x86_64-*-fuchsia | x86_64-*-genode* | x86_64-*-kos*)
+     targ_defvec=x86_64_elf64_vec
+     targ_selvecs="i386_elf32_vec iamcu_elf32_vec x86_64_elf32_vec l1om_elf64_vec k1om_elf64_vec"
+     case "${targ}" in
+diff -Naur binutils-2.38-orig/bfd/elf-eh-frame.c binutils-2.38/bfd/elf-eh-frame.c
+--- binutils-2.38-orig/bfd/elf-eh-frame.c	2022-02-05 09:45:22.000000000 +0100
++++ binutils-2.38/bfd/elf-eh-frame.c	2022-05-15 17:28:42.762274500 +0200
+@@ -358,6 +358,8 @@
+     case DW_CFA_restore:
+     case DW_CFA_remember_state:
+     case DW_CFA_restore_state:
++    case DW_CFA_KOS_startcapsule:
++    case DW_CFA_KOS_endcapsule:
+     case DW_CFA_GNU_window_save:
+       /* No arguments.  */
+       return true;
+diff -Naur binutils-2.38-orig/bfd/elf.c binutils-2.38/bfd/elf.c
+--- binutils-2.38-orig/bfd/elf.c	2022-02-05 09:45:22.000000000 +0100
++++ binutils-2.38/bfd/elf.c	2022-05-15 17:29:22.586550400 +0200
+@@ -8416,7 +8416,7 @@
+       if ((flags & BSF_THREAD_LOCAL) != 0)
+ 	type = STT_TLS;
+       else if ((flags & BSF_GNU_INDIRECT_FUNCTION) != 0)
+-	type = STT_GNU_IFUNC;
++	type = (flags & BSF_OBJECT) ? 11 : STT_GNU_IFUNC;
+       else if ((flags & BSF_FUNCTION) != 0)
+ 	type = STT_FUNC;
+       else if ((flags & BSF_OBJECT) != 0)
+diff -Naur binutils-2.38-orig/bfd/elf64-x86-64.c binutils-2.38/bfd/elf64-x86-64.c
+--- binutils-2.38-orig/bfd/elf64-x86-64.c	2022-01-22 13:14:07.000000000 +0100
++++ binutils-2.38/bfd/elf64-x86-64.c	2022-05-15 17:29:42.212028700 +0200
+@@ -3135,6 +3135,13 @@
+ 	  if ((input_section->flags & SEC_ALLOC) != 0
+ 	      && (input_section->flags & SEC_READONLY) != 0
+ 	      && h != NULL
++	      /* PATCH for KOS: Allow non-64-bit PC-relative relocation in shared objects
++	       *                when `-Wl,-z,noreloc-overflow' is passed.
++	       *                Why this isn't standard behavior, I don't know, but if
++	       *                you understand what's happening here, you should conclude
++	       *                that this makes sense. (after all: disallowing it is done
++	       *                to prevent a potential overflow at runtime) */
++	      && !info->no_reloc_overflow_check
+ 	      && ((bfd_link_executable (info)
+ 		   && ((h->root.type == bfd_link_hash_undefweak
+ 			&& (eh == NULL
+diff -Naur binutils-2.38-orig/bfd/elfcode.h binutils-2.38/bfd/elfcode.h
+--- binutils-2.38-orig/bfd/elfcode.h	2022-01-22 13:14:07.000000000 +0100
++++ binutils-2.38/bfd/elfcode.h	2022-05-15 17:30:05.857173700 +0200
+@@ -1382,6 +1382,9 @@
+ 	    case STT_GNU_IFUNC:
+ 	      sym->symbol.flags |= BSF_GNU_INDIRECT_FUNCTION;
+ 	      break;
++	    case 11:
++	      sym->symbol.flags |= BSF_OBJECT | BSF_GNU_INDIRECT_FUNCTION;
++	      break;
+ 	    }
+ 
+ 	  if (dynamic)
+diff -Naur binutils-2.38-orig/bfd/elflink.c binutils-2.38/bfd/elflink.c
+--- binutils-2.38-orig/bfd/elflink.c	2022-02-05 09:45:22.000000000 +0100
++++ binutils-2.38/bfd/elflink.c	2022-05-15 17:33:14.397396000 +0200
+@@ -574,13 +574,18 @@
+ 	 table.  */
+       name = h->root.root.string;
+       p = strchr (name, ELF_VER_CHR);
+-      if (p != NULL)
+-	/* We know that the p points into writable memory.  In fact,
+-	   there are only a few symbols that have read-only names, being
+-	   those like _GLOBAL_OFFSET_TABLE_ that are created specially
+-	   by the backends.  Most symbols will have names pointing into
+-	   an ELF string table read from a file, or to objalloc memory.  */
+-	*p = 0;
++      if (p != NULL) {
++		  if (name[0] == '?')
++			  p = NULL;
++		  else {
++			/* We know that the p points into writable memory.  In fact,
++			there are only a few symbols that have read-only names, being
++			those like _GLOBAL_OFFSET_TABLE_ that are created specially
++			by the backends.  Most symbols will have names pointing into
++			an ELF string table read from a file, or to objalloc memory.  */
++			*p = 0;
++		  }
++	  }
+ 
+       indx = _bfd_elf_strtab_add (dynstr, name, p != NULL);
+ 
+@@ -654,7 +659,7 @@
+     {
+       /* Set versioned if symbol version is unknown.  */
+       char *version = strrchr (name, ELF_VER_CHR);
+-      if (version)
++      if (version && name[0] != '?')
+ 	{
+ 	  if (version > name && version[-1] != ELF_VER_CHR)
+ 	    h->versioned = versioned_hidden;
+@@ -1113,6 +1118,8 @@
+     {
+       /* Symbol version is unknown or versioned.  */
+       new_version = strrchr (name, ELF_VER_CHR);
++	  if (new_version && name[0] == '?')
++		  new_version = NULL;
+       if (new_version)
+ 	{
+ 	  if (h->versioned == unknown)
+@@ -1895,6 +1902,8 @@
+      decorated name.  This will cause external references which do not
+      specify a version to be bound to this version of the symbol.  */
+   p = strchr (name, ELF_VER_CHR);
++  if (p && name[0] == '?')
++	  p = NULL;
+   if (h->versioned == unknown)
+     {
+       if (p == NULL)
+@@ -2402,7 +2411,7 @@
+ 	    return false;
+ 	  memcpy (alc, h->root.root.string, len - 1);
+ 	  alc[len - 1] = '\0';
+-	  if (alc[len - 2] == ELF_VER_CHR)
++	  if (alc[len - 2] == ELF_VER_CHR && alc[0] != '?')
+ 	    alc[len - 2] = '\0';
+ 
+ 	  h->verinfo.vertree = t;
+@@ -2449,6 +2458,8 @@
+     return true;
+ 
+   p = strchr (h->root.root.string, ELF_VER_CHR);
++  if (p && h->root.root.string[0] == '?')
++	  p = NULL;
+   if (p != NULL && h->verinfo.vertree == NULL)
+     {
+       struct bfd_elf_version_tree *t;
+@@ -2528,6 +2539,8 @@
+ 
+   hide = false;
+   p = strchr (h->root.root.string, ELF_VER_CHR);
++  if (p && h->root.root.string[0] == '?')
++	  p = NULL;
+   if (p != NULL && h->verinfo.vertree == NULL)
+     {
+       struct bfd_elf_version_tree *t;
+@@ -5344,6 +5357,9 @@
+ 	      if (type == STT_GNU_IFUNC
+ 		  && (abfd->flags & DYNAMIC) != 0)
+ 		type = STT_FUNC;
++	      if (type == 11
++		  && (abfd->flags & DYNAMIC) != 0)
++		type = STT_OBJECT;
+ 
+ 	      if (h->type != type)
+ 		{
+@@ -5381,7 +5397,7 @@
+ 	  if (definition && !dynamic)
+ 	    {
+ 	      char *p = strchr (name, ELF_VER_CHR);
+-	      if (p != NULL && p[1] != ELF_VER_CHR)
++	      if (p != NULL && p[1] != ELF_VER_CHR && name[0] != '?')
+ 		{
+ 		  /* Queue non-default versions so that .symver x, x@FOO
+ 		     aliases can be checked.  */
+@@ -5625,6 +5641,8 @@
+ 	      || (h->root.type != bfd_link_hash_defined
+ 		  && h->root.type != bfd_link_hash_defweak))
+ 	    continue;
++	  if (h->root.root.string[0] == '?')
++	    continue;
+ 
+ 	  amt = p - h->root.root.string;
+ 	  shortname = (char *) bfd_malloc (amt + 1);
+@@ -5912,6 +5930,8 @@
+   p = strchr (name, ELF_VER_CHR);
+   if (p == NULL || p[1] != ELF_VER_CHR)
+     return h;
++  if (name[0] == '?')
++    return h;
+ 
+   /* First check with only one `@'.  */
+   len = strlen (name);
+@@ -6150,7 +6170,7 @@
+   if (h->versioned >= versioned)
+     {
+       char *p = strchr (name, ELF_VER_CHR);
+-      if (p != NULL)
++      if (p != NULL && name[0] != '?')
+ 	{
+ 	  alc = (char *) bfd_malloc (p - name + 1);
+ 	  if (alc == NULL)
+@@ -6223,7 +6243,7 @@
+   if (h->versioned >= versioned)
+     {
+       char *p = strchr (name, ELF_VER_CHR);
+-      if (p != NULL)
++      if (p != NULL && name[0] != '?')
+ 	{
+ 	  alc = (char *) bfd_malloc (p - name + 1);
+ 	  if (alc == NULL)
+@@ -10702,7 +10722,7 @@
+ 	{
+ 	  char *p = strrchr (h->root.root.string, ELF_VER_CHR);
+ 
+-	  if (p && p [1] != '\0')
++	  if (p && p [1] != '\0' && h->root.root.string[0] != '?')
+ 	    {
+ 	      _bfd_error_handler
+ 		/* xgettext:c-format */
+diff -Naur binutils-2.38-orig/binutils/dwarf.c binutils-2.38/binutils/dwarf.c
+--- binutils-2.38-orig/binutils/dwarf.c	2022-01-22 13:14:07.000000000 +0100
++++ binutils-2.38/binutils/dwarf.c	2022-05-15 17:35:25.707636400 +0200
+@@ -9284,6 +9284,7 @@
+ 	      break;
+ 
+ 	    case DW_CFA_remember_state:
++	    case DW_CFA_KOS_startcapsule:
+ 	      if (! do_debug_frames_interp)
+ 		printf ("  DW_CFA_remember_state\n");
+ 	      rs = (Frame_Chunk *) xmalloc (sizeof (Frame_Chunk));
+@@ -9302,6 +9303,7 @@
+ 	      break;
+ 
+ 	    case DW_CFA_restore_state:
++	    case DW_CFA_KOS_endcapsule:
+ 	      if (! do_debug_frames_interp)
+ 		printf ("  DW_CFA_restore_state\n");
+ 	      rs = remembered_state;
+diff -Naur binutils-2.38-orig/config.sub binutils-2.38/config.sub
+--- binutils-2.38-orig/config.sub	2022-01-22 13:14:07.000000000 +0100
++++ binutils-2.38/config.sub	2022-05-15 17:35:49.506654400 +0200
+@@ -1754,7 +1754,7 @@
+ 	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
+ 	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
+ 	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx* | zephyr* \
+-	     | fiwix* )
++	     | fiwix* | kos* )
+ 		;;
+ 	# This one is extra strict with allowed versions
+ 	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
+diff -Naur binutils-2.38-orig/gas/config/obj-elf.c binutils-2.38/gas/config/obj-elf.c
+--- binutils-2.38-orig/gas/config/obj-elf.c	2022-01-22 13:14:08.000000000 +0100
++++ binutils-2.38/gas/config/obj-elf.c	2022-05-15 17:36:27.794542900 +0200
+@@ -2412,6 +2412,12 @@
+       elf_tdata (stdoutput)->has_gnu_osabi |= elf_gnu_osabi_ifunc;
+       type = BSF_FUNCTION | BSF_GNU_INDIRECT_FUNCTION;
+     }
++  else if (strcmp (type_name, "kos_indirect_data") == 0
++	   || strcmp (type_name, "11") == 0
++	   || strcmp (type_name, "STT_KOS_IDATA") == 0)
++    {
++      type = BSF_OBJECT | BSF_GNU_INDIRECT_FUNCTION;
++    }
+   else if (strcmp (type_name, "gnu_unique_object") == 0)
+     {
+       const struct elf_backend_data *bed;
+diff -Naur binutils-2.38-orig/gas/configure.tgt binutils-2.38/gas/configure.tgt
+--- binutils-2.38-orig/gas/configure.tgt	2022-01-22 13:14:08.000000000 +0100
++++ binutils-2.38/gas/configure.tgt	2022-05-15 17:36:47.731891000 +0200
+@@ -125,6 +125,7 @@
+ generic_target=${cpu_type}-$vendor-$os
+ # Note: This table is alpha-sorted, please try to keep it that way.
+ case ${generic_target} in
++  i386-*-kos*)			fmt=elf em=linux ;;
+   aarch64*-*-elf*)			fmt=elf;;
+   aarch64*-*-fuchsia*)			fmt=elf;;
+   aarch64*-*-haiku*)			fmt=elf em=haiku ;;
+diff -Naur binutils-2.38-orig/include/dwarf2.def binutils-2.38/include/dwarf2.def
+--- binutils-2.38-orig/include/dwarf2.def	2022-01-22 13:14:09.000000000 +0100
++++ binutils-2.38/include/dwarf2.def	2022-05-15 17:37:09.120791400 +0200
+@@ -792,6 +792,10 @@
+ DW_CFA (DW_CFA_GNU_args_size, 0x2e)
+ DW_CFA (DW_CFA_GNU_negative_offset_extended, 0x2f)
+ 
++/* KOS extensions. */
++DW_CFA (DW_CFA_KOS_startcapsule, 0x38)
++DW_CFA (DW_CFA_KOS_endcapsule, 0x39)
++
+ DW_END_CFA
+ 
+ /* Index attributes in the Abbreviations Table.  */
+diff -Naur binutils-2.38-orig/ld/Makefile.am binutils-2.38/ld/Makefile.am
+--- binutils-2.38-orig/ld/Makefile.am	2022-01-22 13:14:09.000000000 +0100
++++ binutils-2.38/ld/Makefile.am	2022-05-15 17:37:36.742206900 +0200
+@@ -278,6 +278,7 @@
+ 	eelf32xtensa.c \
+ 	eelf32z80.c \
+ 	eelf_i386.c \
++	eelf_i386_kos.c \
+ 	eelf_i386_be.c \
+ 	eelf_i386_fbsd.c \
+ 	eelf_i386_haiku.c \
+@@ -460,6 +461,7 @@
+ 	eelf_l1om_fbsd.c \
+ 	eelf_mipsel_haiku.c \
+ 	eelf_x86_64.c \
++	eelf_x86_64_kos.c \
+ 	eelf_x86_64_cloudabi.c \
+ 	eelf_x86_64_fbsd.c \
+ 	eelf_x86_64_haiku.c \
+diff -Naur binutils-2.38-orig/ld/Makefile.in binutils-2.38/ld/Makefile.in
+--- binutils-2.38-orig/ld/Makefile.in	2022-02-09 12:49:03.000000000 +0100
++++ binutils-2.38/ld/Makefile.in	2022-05-15 17:40:11.197984200 +0200
+@@ -1447,6 +1447,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_be.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_kos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_haiku.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_ldso.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_sol2.Po@am__quote@
+@@ -1461,6 +1462,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_cloudabi.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_fbsd.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_kos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_haiku.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_sol2.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eh8300elf.Po@am__quote@
+diff -Naur binutils-2.38-orig/ld/configure.tgt binutils-2.38/ld/configure.tgt
+--- binutils-2.38-orig/ld/configure.tgt	2022-01-22 15:19:36.000000000 +0100
++++ binutils-2.38/ld/configure.tgt	2022-05-15 17:40:51.272198800 +0200
+@@ -43,6 +43,15 @@
+ # Please try to keep this table more or less in alphabetic order - it
+ # makes it much easier to lookup a specific archictecture.
+ case "${targ}" in
++i[3-7]86-*-kos*)
++			targ_emul=elf_i386_kos
++			targ_extra_emuls=elf_i386
++			targ64_extra_emuls="elf_x86_64_kos elf_x86_64"
++			;;
++x86_64-*-kos*)
++			targ_emul=elf_x86_64_kos
++			targ_extra_emuls="elf_i386_kos elf_x86_64 elf_i386"
++			;;
+ aarch64_be-*-elf)	targ_emul=aarch64elfb
+ 			targ_extra_emuls="aarch64elf aarch64elf32 aarch64elf32b armelfb armelf"
+ 			;;
+diff -Naur binutils-2.38-orig/ld/emulparams/elf_i386_kos.sh binutils-2.38/ld/emulparams/elf_i386_kos.sh
+--- binutils-2.38-orig/ld/emulparams/elf_i386_kos.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.38/ld/emulparams/elf_i386_kos.sh	2022-05-15 17:41:11.327858400 +0200
+@@ -0,0 +1,4 @@
++. ${srcdir}/emulparams/elf_i386.sh
++GENERATE_SHLIB_SCRIPT=yes
++GENERATE_PIE_SCRIPT=yes
++XDATA_NAME=.xdata
+diff -Naur binutils-2.38-orig/ld/emulparams/elf_x86_64_kos.sh binutils-2.38/ld/emulparams/elf_x86_64_kos.sh
+--- binutils-2.38-orig/ld/emulparams/elf_x86_64_kos.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.38/ld/emulparams/elf_x86_64_kos.sh	2022-05-15 17:41:26.888567800 +0200
+@@ -0,0 +1,4 @@
++. ${srcdir}/emulparams/elf_x86_64.sh
++GENERATE_SHLIB_SCRIPT=yes
++GENERATE_PIE_SCRIPT=yes
++XDATA_NAME=.xdata
+diff -Naur binutils-2.38-orig/ld/scripttempl/elf.sc binutils-2.38/ld/scripttempl/elf.sc
+--- binutils-2.38-orig/ld/scripttempl/elf.sc	2022-01-22 13:14:09.000000000 +0100
++++ binutils-2.38/ld/scripttempl/elf.sc	2022-05-15 17:41:52.801308700 +0200
+@@ -565,6 +565,19 @@
+   ${RELOCATING+${TEXT_SEGMENT_ALIGN}}
+ EOF
+ 
++if test -n "$XDATA_NAME"; then
++cat <<EOF
++  ${XDATA_NAME} :
++  {
++    ${RELOCATING+*(.xdata.unlikely .xdata.*_unlikely .xdata.unlikely.*)}
++    ${RELOCATING+*(.xdata.exit .xdata.exit.*)}
++    ${RELOCATING+*(.xdata.startup .xdata.startup.*)}
++    ${RELOCATING+*(.xdata.hot .xdata.hot.*)}
++    *(.xdata ${RELOCATING+ .xdata.*})
++  } ${FILL}
++EOF
++fi
++
+ if test -n "${SEPARATE_CODE}${SEPARATE_TEXT}"; then
+   if test -n "${RODATA_ADDR}"; then
+     RODATA_ADDR="\

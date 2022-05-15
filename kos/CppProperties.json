@@ -13,9 +13,9 @@
 				}
 			],
 			"includePath": [
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\i686-kos",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\backward",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\i686-kos",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\backward",
 				"${workspaceRoot}\\include\\i386-kos",
 				"${workspaceRoot}\\include"
 			],
@@ -43,9 +43,9 @@
 				}
 			],
 			"includePath": [
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\i686-kos",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\backward",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\i686-kos",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\backward",
 				"${workspaceRoot}\\include\\i386-kos",
 				"${workspaceRoot}\\include"
 			],
@@ -74,9 +74,9 @@
 				}
 			],
 			"includePath": [
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\i686-kos",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\backward",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\i686-kos",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\backward",
 				"${workspaceRoot}\\include\\i386-kos",
 				"${workspaceRoot}\\include"
 			],
@@ -103,9 +103,9 @@
 				}
 			],
 			"includePath": [
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\i686-kos",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\backward",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\i686-kos",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\backward",
 				"${workspaceRoot}\\include\\i386-kos",
 				"${workspaceRoot}\\include"
 			],
@@ -133,9 +133,9 @@
 				}
 			],
 			"includePath": [
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\x86_64-kos",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\backward",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\x86_64-kos",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\backward",
 				"${workspaceRoot}\\include\\i386-kos",
 				"${workspaceRoot}\\include"
 			],
@@ -163,9 +163,9 @@
 				}
 			],
 			"includePath": [
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\x86_64-kos",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\backward",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\x86_64-kos",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\backward",
 				"${workspaceRoot}\\include\\i386-kos",
 				"${workspaceRoot}\\include"
 			],
@@ -194,9 +194,9 @@
 				}
 			],
 			"includePath": [
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\x86_64-kos",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\backward",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\x86_64-kos",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\backward",
 				"${workspaceRoot}\\include\\i386-kos",
 				"${workspaceRoot}\\include"
 			],
@@ -223,9 +223,9 @@
 				}
 			],
 			"includePath": [
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\x86_64-kos",
-				"${workspaceRoot}\\include\\i386-kos\\c++\\9.1.0\\backward",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\x86_64-kos",
+				"${workspaceRoot}\\include\\i386-kos\\c++\\12.1.0\\backward",
 				"${workspaceRoot}\\include\\i386-kos",
 				"${workspaceRoot}\\include"
 			],

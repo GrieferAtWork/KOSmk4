@@ -64,7 +64,7 @@ struct signalfd {
 
 #define signalfd_alloc()    ((struct signalfd *)kmalloc(sizeof(struct signalfd), GFP_NORMAL))
 #define signalfd_free(self) __os_free(self)
-DEFINE_REFCOUNT_FUNCTIONS(struct signalfd, sf_refcnt, signalfd_free)
+DEFINE_REFCNT_FUNCTIONS(struct signalfd, sf_refcnt, signalfd_free)
 
 DECL_END
 #endif /* __CC__ */

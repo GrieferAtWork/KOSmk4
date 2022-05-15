@@ -79,7 +79,7 @@ struct mfutexfd {
 /* Destroy a given mem-futex-fd object. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfutexfd_destroy)(struct mfutexfd *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct mfutexfd, mfd_refcnt, mfutexfd_destroy);
+DEFINE_REFCNT_FUNCTIONS(struct mfutexfd, mfd_refcnt, mfutexfd_destroy);
 
 /* Create a new futexfd object.
  * @throw: E_INSUFFICIENT_RIGHTS: Tried to exceed `mfutexfd_maxexpr' w/o `CAP_SYS_RESOURCE' */

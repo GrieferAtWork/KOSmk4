@@ -195,6 +195,15 @@ struct path {
 	                                  * paths. Set to `PATH_CLDLIST_DELETED' when this path was deleted */
 };
 
+/* Destroy a given path, automatically removing it from:
+ *  - self->p_parent->p_cldlist       (asynchronously via lockops in self->p_parent->p_cldlops)
+ *  - path_getsuper(self)->fs_mounts  (asynchronously via lockops in path_getsuper(self)->fs_mountslockops.
+ *                                    If  this path  was the  last mounting  point, call `fsuper_delete()') */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL path_destroy)(struct path *__restrict self);
+DEFINE_REFCNT_FUNCTIONS(struct path, p_refcnt, path_destroy)
+
+
 /* Allocate normal paths */
 #define _path_alloc() ((struct path *)kmalloc(sizeof(struct path), GFP_NORMAL))
 #define _path_free(p) kfree(p)
@@ -281,15 +290,6 @@ NOTHROW(FCALL path_isdescendantof)(struct path *child,
 /* Return a pointer to the VFS associated with `self' */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct vfs *
 NOTHROW(FCALL _path_getvfs)(struct path *__restrict self);
-
-
-/* Destroy a given path, automatically removing it from:
- *  - self->p_parent->p_cldlist       (asynchronously via lockops in self->p_parent->p_cldlops)
- *  - path_getsuper(self)->fs_mounts  (asynchronously via lockops in path_getsuper(self)->fs_mountslockops.
- *                                    If  this path  was the  last mounting  point, call `fsuper_delete()') */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL path_destroy)(struct path *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct path, p_refcnt, path_destroy)
 
 
 /* Special superblock (and directory) set for unmounted filesystem root paths.

@@ -1117,7 +1117,7 @@ NOTHROW(FCALL mfile_alloc_physmem)(struct mfile *__restrict self,
 
 /* Destroy a given mem-file */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 
 
 /* Check if the given mem-file has been marked as  anonymous.

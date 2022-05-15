@@ -126,8 +126,8 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 /* Destroy the given mem-futex. */
 #define mfutex_free(self) __os_free(self)
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mfutex_destroy)(struct mfutex *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct mfutex, mfu_refcnt, mfutex_destroy)
-DEFINE_WEAKREFCOUNT_FUNCTIONS(struct mfutex, mfu_weakrefcnt, mfutex_free)
+DEFINE_REFCNT_FUNCTIONS(struct mfutex, mfu_refcnt, mfutex_destroy)
+DEFINE_WEAKREFCNT_FUNCTIONS(struct mfutex, mfu_weakrefcnt, mfutex_free)
 
 /* Helper macros. */
 #define mfutex_send(self)                    sig_send(&(self)->mfu_signal)

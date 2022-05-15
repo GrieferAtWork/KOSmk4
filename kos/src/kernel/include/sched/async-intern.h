@@ -47,7 +47,7 @@ struct async_thread_data {
 /* Destroy the given async-thread-data. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_thread_data_destroy)(struct async_thread_data *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct async_thread_data, atd_refcnt, async_thread_data_destroy);
+DEFINE_REFCNT_FUNCTIONS(struct async_thread_data, atd_refcnt, async_thread_data_destroy);
 
 
 struct async_thread_controller {
@@ -64,7 +64,7 @@ struct async_thread_controller {
 /* Destroy the given async-thread-controller. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL async_thread_controller_destroy)(struct async_thread_controller *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct async_thread_controller, atc_refcnt, async_thread_controller_destroy);
+DEFINE_REFCNT_FUNCTIONS(struct async_thread_controller, atc_refcnt, async_thread_controller_destroy);
 
 
 #ifndef __async_thread_controller_arref_defined

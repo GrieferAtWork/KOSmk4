@@ -193,7 +193,7 @@ struct vidttyaccess {
 };
 
 #define vidttyaccess_destroy(self) (*(self)->vta_destroy)(self)
-DEFINE_REFCOUNT_FUNCTIONS(struct vidttyaccess, vta_refcnt, vidttyaccess_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct vidttyaccess, vta_refcnt, vidttyaccess_destroy)
 
 #ifndef __vidttyaccess_arref_defined
 #define __vidttyaccess_arref_defined

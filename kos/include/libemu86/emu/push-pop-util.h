@@ -288,11 +288,11 @@
 		})
 
 
-#define EMU86_POP163264_NOSUP()      \
-	do {                             \
-		byte_t *sp;                  \
-		sp = EMU86_GETSTACKPTR();    \
-		EMU86_POP163264_NOSUP_IMPL() \
+#define EMU86_POP163264_NOSUP()           \
+	do {                                  \
+		byte_t *sp = EMU86_GETSTACKPTR(); \
+		(void)sp;                         \
+		EMU86_POP163264_NOSUP_IMPL()      \
 	}	__WHILE0
 #define EMU86_POP163264_NOSUP_IMPL()                                   \
 		if (IS_16BIT()) {                                              \

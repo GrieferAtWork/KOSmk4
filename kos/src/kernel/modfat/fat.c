@@ -213,7 +213,7 @@ NOTHROW(KCALL fatdirent_v_destroy)(struct fdirent *__restrict self) {
 	_fatdirent_free(me);
 }
 #define __fatdirent_destroy(self) fatdirent_v_destroy(&(self)->fad_ent.fde_ent)
-DEFINE_REFCOUNT_FUNCTIONS(struct fatdirent, fad_ent.fde_ent.fd_refcnt, __fatdirent_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct fatdirent, fad_ent.fde_ent.fd_refcnt, __fatdirent_destroy)
 PRIVATE struct fdirent_ops const fatdirent_ops = {
 	.fdo_destroy  = &fatdirent_v_destroy,
 	.fdo_opennode = &flatdirent_v_opennode,

@@ -66,7 +66,7 @@ DATDEF ATTR_PERCPU struct ioperm_bitmap *thiscpu_x86_ioperm_bitmap;
 /* Destroy the given I/O permissions bitmap. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL ioperm_bitmap_destroy)(struct ioperm_bitmap *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct ioperm_bitmap, ib_refcnt, ioperm_bitmap_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct ioperm_bitmap, ib_refcnt, ioperm_bitmap_destroy)
 
 /* Allocate a new io permissions bitmap with all permission bits set to disallow access. */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct ioperm_bitmap *KCALL

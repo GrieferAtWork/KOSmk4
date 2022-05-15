@@ -113,7 +113,7 @@ DATDEF char const syslog_level_names[SYSLOG_LEVEL_COUNT][8];
 
 /* Destroy the given syslog sink */
 FUNDEF NOBLOCK void NOTHROW(KCALL syslog_sink_destroy)(struct syslog_sink *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct syslog_sink, ss_refcnt, syslog_sink_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct syslog_sink, ss_refcnt, syslog_sink_destroy)
 
 /* Register/Delete custom system log sinks
  * By default after boot, either 1 or 2 sinks are registered:

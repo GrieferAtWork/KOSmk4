@@ -52,7 +52,7 @@ struct refcountable {
 };
 
 #define refcountable_destroy(self) ((*(self)->rca_destroy)(self))
-DEFINE_REFCOUNT_FUNCTIONS(struct refcountable, rca_refcnt, refcountable_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct refcountable, rca_refcnt, refcountable_destroy)
 
 DECL_END
 #endif /* __CC__ */

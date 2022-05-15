@@ -1032,18 +1032,18 @@ ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
 
 	/* Read the Ext2 disk header. */
 #if PAGESIZE >= 256
-	if (mfile_getblocksize(dev) <= 256) {
+	{
 		STATIC_ASSERT((EXT2_SUPERBLOCK_OFFSET % 256) == 0);
 		STATIC_ASSERT(sizeof(Ext2DiskSuperblock) > 128 && sizeof(Ext2DiskSuperblock) <= 256);
-		desc = (Ext2DiskSuperblock *)aligned_alloca(256, 256);
-		mfile_rdblocks(dev, (pos_t)EXT2_SUPERBLOCK_OFFSET,
-		               pagedir_translate(desc), 256);
-	} else
-#endif /* PAGESIZE >= 256 */
-	{
-		desc = (Ext2DiskSuperblock *)alloca(sizeof(Ext2DiskSuperblock));
-		mfile_readall(dev, desc, sizeof(Ext2DiskSuperblock), (pos_t)EXT2_SUPERBLOCK_OFFSET);
 	}
+	(mfile_getblocksize(dev) <= 256)
+	? (desc = (Ext2DiskSuperblock *)aligned_alloca(256, 256),
+	   mfile_rdblocks(dev, (pos_t)EXT2_SUPERBLOCK_OFFSET,
+	                  pagedir_translate(desc), 256))
+	:
+#endif /* PAGESIZE >= 256 */
+	(desc = (Ext2DiskSuperblock *)alloca(sizeof(Ext2DiskSuperblock)),
+	 mfile_readall(dev, desc, sizeof(Ext2DiskSuperblock), (pos_t)EXT2_SUPERBLOCK_OFFSET));
 
 	/* Do some basic verification to check if this is really an EXT2 filesystem. */
 	if (LETOH16(desc->e_signature) != EXT2_SIGNATURE)

@@ -49,6 +49,7 @@ case EMU86_OPCODE_ENCODE(0xd7): {
 		baseaddr = EMU86_SEGADDR(EMU86_GETDSBASE(), EMU86_GETBX() + al);
 	});
 #endif /* !EMU86_GETSEGBASE_IS_NOOP_DS */
+	(void)baseaddr;
 #if EMU86_EMULATE_CONFIG_WANT_XLATB
 	/* Read memory from the specified address */
 	{

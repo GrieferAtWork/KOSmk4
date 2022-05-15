@@ -124,8 +124,8 @@ DATDEF ATTR_PERTASK REF struct mman *this_mman;
 /* Memory manager reference counting control. */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mman_free)(struct mman *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mman_destroy)(struct mman *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct mman, mm_refcnt, mman_destroy)
-DEFINE_WEAKREFCOUNT_FUNCTIONS(struct mman, mm_weakrefcnt, mman_free)
+DEFINE_REFCNT_FUNCTIONS(struct mman, mm_refcnt, mman_destroy)
+DEFINE_WEAKREFCNT_FUNCTIONS(struct mman, mm_weakrefcnt, mman_free)
 
 /* Memory manager construction functions.
  * - mman_fork() will fork the current mman; guess what system call uses it (:P)

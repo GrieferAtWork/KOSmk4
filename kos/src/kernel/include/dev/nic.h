@@ -138,7 +138,7 @@ struct nic_packet {
 /* Destroy a given network packet. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL nic_packet_destroy)(struct nic_packet *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct nic_packet, np_refcnt, nic_packet_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct nic_packet, np_refcnt, nic_packet_destroy)
 
 
 struct nic_device_stat {

@@ -1393,6 +1393,7 @@ incdir("");
 //[[[end]]]
 
 
+#if 0 /* TODO: Need a patch for 12.1.0 to fix use of SAL macro names. */
 #ifdef __cplusplus
 /* libstdc++ doesn't work in freestanding mode. */
 #ifndef __CRT_FREESTANDING
@@ -1446,3 +1447,4 @@ incdir("");
 #endif /* _GNU_SOURCE */
 #endif /* !__CRT_FREESTANDING */
 #endif /* __cplusplus */
+#endif

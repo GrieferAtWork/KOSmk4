@@ -133,7 +133,7 @@ struct refcountable_dmalock
 /* Callback for `struct refcountable_dmalock::rca_destroy' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL refcountable_dmalock_destroy)(struct refcountable *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct refcountable_dmalock, rca_refcnt, refcountable_dmalock_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct refcountable_dmalock, rca_refcnt, refcountable_dmalock_destroy)
 
 /* A function that may be called as-is from `mdma_range_callback_t' in order
  * to convert  a  DMA-lock  to `lock'  into  a  refcnt-controlled  DMA-lock. */

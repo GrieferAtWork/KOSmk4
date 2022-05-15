@@ -290,7 +290,7 @@ public:
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL _finally_decref(T &ptr) __CXX_NOEXCEPT
 	    : m_ptr(ptr) { }
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL ~_finally_decref() __CXX_NOEXCEPT {
-		::refcnt_methods<T>::decref(&this->m_ptr);
+		(::refcnt_methods<T>::decref)(&this->m_ptr);
 	}
 };
 template<class T> class _finally_decref_likely {
@@ -303,7 +303,7 @@ public:
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL _finally_decref_likely(T &ptr) __CXX_NOEXCEPT
 	    : m_ptr(ptr) { }
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL ~_finally_decref_likely() __CXX_NOEXCEPT {
-		::refcnt_methods<T>::decref_likely(&this->m_ptr);
+		(::refcnt_methods<T>::decref_likely)(&this->m_ptr);
 	}
 };
 template<class T> class _finally_decref_unlikely {
@@ -316,7 +316,7 @@ public:
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL _finally_decref_unlikely(T &ptr) __CXX_NOEXCEPT
 	    : m_ptr(ptr) { }
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL ~_finally_decref_unlikely() __CXX_NOEXCEPT {
-		::refcnt_methods<T>::decref_unlikely(&this->m_ptr);
+		(::refcnt_methods<T>::decref_unlikely)(&this->m_ptr);
 	}
 };
 template<class T> class _finally_decref_nokill {
@@ -329,7 +329,7 @@ public:
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL _finally_decref_nokill(T &ptr) __CXX_NOEXCEPT
 	    : m_ptr(ptr) { }
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL ~_finally_decref_nokill() __CXX_NOEXCEPT {
-		::refcnt_methods<T>::decref_nokill(&this->m_ptr);
+		(::refcnt_methods<T>::decref_nokill)(&this->m_ptr);
 	}
 };
 template<class T> class _finally_destroy {
@@ -342,7 +342,7 @@ public:
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL _finally_destroy(T &ptr) __CXX_NOEXCEPT
 	    : m_ptr(ptr) { }
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL ~_finally_destroy() __CXX_NOEXCEPT {
-		::refcnt_methods<T>::destroy(&this->m_ptr);
+		(::refcnt_methods<T>::destroy)(&this->m_ptr);
 	}
 };
 
@@ -358,7 +358,7 @@ public:
 	    : m_ptr(ptr) { }
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL ~_finally_xdecref() __CXX_NOEXCEPT {
 		if (this->m_ptr)
-			::refcnt_methods<T>::decref(this->m_ptr);
+			(::refcnt_methods<T>::decref)(this->m_ptr);
 	}
 };
 template<class T> class _finally_xdecref_likely {
@@ -372,7 +372,7 @@ public:
 	    : m_ptr(ptr) { }
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL ~_finally_xdecref_likely() __CXX_NOEXCEPT {
 		if (this->m_ptr)
-			::refcnt_methods<T>::decref_likely(this->m_ptr);
+			(::refcnt_methods<T>::decref_likely)(this->m_ptr);
 	}
 };
 template<class T> class _finally_xdecref_unlikely {
@@ -386,7 +386,7 @@ public:
 	    : m_ptr(ptr) { }
 	__CXX_FORCEINLINE ATTR_ARTIFICIAL ~_finally_xdecref_unlikely() __CXX_NOEXCEPT {
 		if (this->m_ptr)
-			::refcnt_methods<T>::decref_unlikely(this->m_ptr);
+			(::refcnt_methods<T>::decref_unlikely)(this->m_ptr);
 	}
 };
 __NAMESPACE_INT_END
@@ -402,10 +402,10 @@ __NAMESPACE_INT_END
 #define FINALLY_XDECREF_UNLIKELY(ptr) __NAMESPACE_INT_SYM _finally_xdecref_unlikely<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fxdecref_u)(ptr)
 #endif /* __cplusplus */
 
-#define DEFINE_REFCOUNT_FUNCTIONS       __DEFINE_REFCOUNT_FUNCTIONS
-#define DEFINE_REFCOUNT_FUNCTIONS_P     __DEFINE_REFCOUNT_FUNCTIONS_P
-#define DEFINE_WEAKREFCOUNT_FUNCTIONS   __DEFINE_WEAKREFCOUNT_FUNCTIONS
-#define DEFINE_WEAKREFCOUNT_FUNCTIONS_P __DEFINE_WEAKREFCOUNT_FUNCTIONS_P
+#define DEFINE_REFCNT_FUNCTIONS       __DEFINE_REFCNT_FUNCTIONS
+#define DEFINE_REFCNT_FUNCTIONS_P     __DEFINE_REFCNT_FUNCTIONS_P
+#define DEFINE_WEAKREFCNT_FUNCTIONS   __DEFINE_WEAKREFCNT_FUNCTIONS
+#define DEFINE_WEAKREFCNT_FUNCTIONS_P __DEFINE_WEAKREFCNT_FUNCTIONS_P
 
 #include <kernel/arch/compiler.h>
 

@@ -525,7 +525,7 @@ DATDEF __BOOL fsuper_allow_fs_oob;
  * can  simply be used in order to implement `fs_root', allowing for binary compatibility in
  * terms of fsuper field offsets between all possible variants. */
 #define fsuper_destroy(self) mfile_destroy(_fnode_asfile(_fdirnode_asnode(&(self)->fs_root)))
-DEFINE_REFCOUNT_FUNCTIONS(struct fsuper, fs_root._fdirnode_node_ _fnode_file_ mf_refcnt, fsuper_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct fsuper, fs_root._fdirnode_node_ _fnode_file_ mf_refcnt, fsuper_destroy)
 
 
 /* Default operators for `struct fsuper_ops' */

@@ -191,7 +191,7 @@
 #define __GNUC_MINOR__ 1
 #define __GNUC_PATCHLEVEL__ 0
 #define __GNUC_STDC_INLINE__ 1
-#define __GNUC__ 9
+#define __GNUC__ 12
 #define __GXX_ABI_VERSION 1013
 #define __HAVE_SPECULATION_SAFE_VALUE 1
 #define __INT16_C(c) c
@@ -332,7 +332,7 @@
 #define __UINT_LEAST8_MAX__ 0xff
 #define __UINT_LEAST8_TYPE__ unsigned char
 #define __USER_LABEL_PREFIX__
-#define __VERSION__ "9.1.0"
+#define __VERSION__ "12.1.0"
 #define __WCHAR_MAX__ 0x7fffffff
 #define __WCHAR_MIN__ (-__WCHAR_MAX__ - 1)
 #define __WCHAR_TYPE__ int

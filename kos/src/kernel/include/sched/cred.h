@@ -279,7 +279,7 @@ DATDEF struct cred_groups cred_groups_empty;
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 #endif /* !____os_free_defined */
 #define cred_groups_destroy(self) __os_free(self)
-DEFINE_REFCOUNT_FUNCTIONS(struct cred_groups, cg_refcnt, cred_groups_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct cred_groups, cg_refcnt, cred_groups_destroy)
 
 /* Check if the groups from `subset' are a sub-set of those from `superset' */
 FUNDEF ATTR_PURE WUNUSED NONNULL((1, 2)) __BOOL
@@ -376,7 +376,7 @@ struct cred {
 /* Destroy the given credentials controller. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL cred_destroy)(struct cred *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct cred, c_refcnt, cred_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct cred, c_refcnt, cred_destroy)
 
 /* Clone the given credentials controller `self' and return the copy */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *FCALL

@@ -482,7 +482,6 @@ task_clone(struct icpustate const *init_state,
 
 		/* Map the new thread's kernel stack. */
 		mman_lock_acquire(&mman_kernel);
-		KERNEL_STACKSIZE_WITH_GUARD;
 		mapaddr = (byte_t *)mman_findunmapped(&mman_kernel,
 		                                      MHINT_GETADDR(KERNEL_MHINT_KERNSTACK),
 		                                      KERNEL_STACKSIZE_WITH_GUARD,

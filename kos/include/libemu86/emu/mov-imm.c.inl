@@ -176,6 +176,7 @@ case EMU86_OPCODE_ENCODE(0xc7):
 			offset = (s32)UNALIGNED_GETLE32((u32 const *)pc);
 			pc += 4;
 		}
+		(void)offset;
 #ifdef EMU86_EMULATE_RETURN_AFTER_XBEGIN
 		/* Set the instruction to the start of RTM execution. */
 		EMU86_SETPCPTR(REAL_IP());

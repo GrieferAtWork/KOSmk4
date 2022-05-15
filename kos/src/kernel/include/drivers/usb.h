@@ -70,7 +70,7 @@ struct usb_endpoint {
 
 /* Destroy the given USB endpoint descriptor */
 FUNDEF NOBLOCK void NOTHROW(KCALL usb_endpoint_destroy)(struct usb_endpoint *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct usb_endpoint, ue_refcnt, usb_endpoint_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct usb_endpoint, ue_refcnt, usb_endpoint_destroy)
 
 struct usb_interface
 #ifdef __cplusplus
@@ -219,7 +219,7 @@ struct usb_interrupt {
 /* Destroy the given USB interrupt descriptor. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL usb_interrupt_destroy)(struct usb_interrupt *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct usb_interrupt, ui_refcnt, usb_interrupt_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct usb_interrupt, ui_refcnt, usb_interrupt_destroy)
 
 /* Similar to `decref()', but simultaneously prevent the interrupt for ever firing again.
  * Note  that a USB interrupt will stop firing and be removed from the controller's chain

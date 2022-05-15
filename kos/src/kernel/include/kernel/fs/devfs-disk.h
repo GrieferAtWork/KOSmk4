@@ -102,11 +102,11 @@ struct devdiskrule {
 #ifdef __WANT_FS_INLINE_STRUCTURES
 #define devdiskrule_asdirent(self)   ((struct fdirent *)&(self)->fd_refcnt)
 #define devdiskrule_fromdirent(self) COMPILER_CONTAINER_OF(&(self)->fd_refcnt, struct devdiskrule, fd_refcnt)
-DEFINE_REFCOUNT_FUNCTIONS(struct devdiskrule, fd_refcnt, __devdiskrule_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct devdiskrule, fd_refcnt, __devdiskrule_destroy)
 #else /* __WANT_FS_INLINE_STRUCTURES */
 #define devdiskrule_asdirent(self) (&(self)->ddre_ent)
 #define devdiskrule_fromdirent(self) COMPILER_CONTAINER_OF(self, struct devdiskrule, ddre_ent)
-DEFINE_REFCOUNT_FUNCTIONS(struct devdiskrule, ddre_ent.fd_refcnt, __devdiskrule_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct devdiskrule, ddre_ent.fd_refcnt, __devdiskrule_destroy)
 #endif /* !__WANT_FS_INLINE_STRUCTURES */
 
 

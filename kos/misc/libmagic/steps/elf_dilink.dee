@@ -236,9 +236,14 @@ link_again_with_new_guesses:
 			}
 			/* Check if we've guessed correctly! */
 			for (local name: guessedSectionOffsetsAndSizes.keys) {
-				if (name !in correctSectionOffsetsAndSizes)
+				if (name !in correctSectionOffsetsAndSizes) {
+#if 1
+					correctSectionOffsetsAndSizes[name] = (0, 0);
+#else
 					throw Error("Section {!r} not present in final link ({!r})"
 						.format({ name, correctSectionOffsetsAndSizes }));
+#endif
+				}
 			}
 			for (local name, data: guessedSectionOffsetsAndSizes) {
 				if (data != correctSectionOffsetsAndSizes[name]) {

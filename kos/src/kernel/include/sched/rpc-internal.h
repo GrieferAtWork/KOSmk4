@@ -117,7 +117,7 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _pending_rpc_destroy_user)(struct pending_rpc *__restrict self);
 #define _pending_user_rpc_destroy(self) \
 	_pending_rpc_destroy_user(COMPILER_CONTAINER_OF(self, struct pending_rpc, pr_user))
-DEFINE_REFCOUNT_FUNCTIONS(struct pending_user_rpc, pur_refcnt, _pending_user_rpc_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct pending_user_rpc, pur_refcnt, _pending_user_rpc_destroy)
 
 #ifndef ____os_free_defined
 #define ____os_free_defined

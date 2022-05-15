@@ -40,7 +40,7 @@
 #include <ciso646>
 #include <climits>
 #include <clocale>
-#include <cmath>
+/*#include <cmath>*/ /* Breaks because of `#include <bits/specfun.h>' */
 #include <csetjmp>
 #include <csignal>
 #include <cstdalign>

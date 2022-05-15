@@ -593,7 +593,7 @@ NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self);
 /* Reference counting control for `struct mpart' */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mpart_free)(struct mpart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL mpart_destroy)(struct mpart *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct mpart, mp_refcnt, mpart_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct mpart, mp_refcnt, mpart_destroy)
 
 
 /* Reap lock operations enqueued for execution when `self' can be locked. */

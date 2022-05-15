@@ -362,7 +362,7 @@ NOTHROW(FCALL rising_edge_detector_destroy)(struct rising_edge_detector *__restr
 	sig_completion_disconnect(&self->red_compl);
 	kfree(self);
 }
-DEFINE_REFCOUNT_FUNCTIONS(struct rising_edge_detector, red_refcnt, rising_edge_detector_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct rising_edge_detector, red_refcnt, rising_edge_detector_destroy)
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL red_phase2)(struct sig_completion_context *__restrict UNUSED(context),

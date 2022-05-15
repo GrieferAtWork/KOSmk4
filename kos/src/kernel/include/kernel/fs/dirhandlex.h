@@ -91,7 +91,7 @@ struct dirhandlex {
 /* Destroy the given dirhandlex object. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL dirhandlex_destroy)(struct dirhandlex *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct dirhandlex, dh_refcnt, dirhandlex_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct dirhandlex, dh_refcnt, dirhandlex_destroy)
 
 /* Return the nhdr of a given `struct dirhandle *self' */
 #define dirhandlex_ashdr(self)  (((struct dirhandlex_hdr *)(self)) - 1)

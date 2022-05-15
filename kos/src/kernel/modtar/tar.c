@@ -1788,13 +1788,11 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	struct tarhdr *hdr;
 	struct tarfile *firstfile;
 	uint32_t first_filesize;
-	if (mfile_getblockshift(dev) <= TBLOCKSHIFT) {
-		hdr = (struct tarhdr *)aligned_alloca(TBLOCKSIZE, TBLOCKSIZE);
-		mfile_rdblocks(dev, 0, pagedir_translate(hdr), TBLOCKSIZE);
-	} else {
-		hdr = (struct tarhdr *)alloca(sizeof(struct tarhdr));
-		mfile_readall(dev, hdr, sizeof(struct tarhdr), 0);
-	}
+	(mfile_getblockshift(dev) <= TBLOCKSHIFT)
+	? (hdr = (struct tarhdr *)aligned_alloca(TBLOCKSIZE, TBLOCKSIZE),
+	   mfile_rdblocks(dev, 0, pagedir_translate(hdr), TBLOCKSIZE))
+	: (hdr = (struct tarhdr *)alloca(sizeof(struct tarhdr)),
+	   mfile_readall(dev, hdr, sizeof(struct tarhdr), 0));
 
 	/* To determine if this really is a tar file, we try to load the first file. */
 	TRY {

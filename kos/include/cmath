@@ -33,4 +33,18 @@
 #undef __CXX_SYSTEM_HEADER
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* !_MATH_H */
+
+/* Compatibility with libstdc++ */
+#ifdef __cplusplus
+#if __has_include(<bits/c++config.h>)
+#include <bits/c++config.h>
+#include <bits/std_abs.h>
+#if _GLIBCXX_USE_STD_SPEC_FUNCS
+#if __has_include(<bits/specfun.h>)
+#include <bits/specfun.h>
+#endif /* __has_include(<bits/specfun.h>) */
+#endif /* _GLIBCXX_USE_STD_SPEC_FUNCS */
+#endif /* __has_include(<bits/c++config.h>) */
+#endif /* __cplusplus */
+
 #endif /* !_CXX_CMATH */

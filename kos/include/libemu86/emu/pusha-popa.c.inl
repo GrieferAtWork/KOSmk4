@@ -156,6 +156,7 @@ case EMU86_OPCODE_ENCODE(0x61): {
 	IF_64BIT(if (!EMU86_F_IS64(op_flags))) {
 		byte_t *sp;
 		sp = EMU86_GETSTACKPTR();
+		(void)sp;
 		if (!IS_16BIT()) {
 			EMU86_EMULATE_POP(sp, 32);
 			EMU86_UNSUPPORTED_MEMACCESS(sp, 32, true, false);

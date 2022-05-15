@@ -140,7 +140,7 @@ struct driver_section
 #define __driver_section_as_module_section(self)  (&(self)->ds_sect)
 #define __driver_section_destroy(self)    module_section_destroy(&(self)->ds_sect)
 #define __driver_section_refcnt(self)     (self)->ds_sect.ms_refcnt
-DEFINE_REFCOUNT_FUNCTIONS_P(struct driver_section, __driver_section_refcnt, __driver_section_destroy)
+DEFINE_REFCNT_FUNCTIONS_P(struct driver_section, __driver_section_refcnt, __driver_section_destroy)
 #else /* !__cplusplus || __WANT_DRIVER_SECTION_ds_sect */
 #define __driver_section_as_module_section /* nothing */
 #endif /* __cplusplus && !__WANT_DRIVER_SECTION_ds_sect */
@@ -473,8 +473,8 @@ struct driver
 #define __driver_refcnt(self)     (self)->d_module.md_refcnt
 #define __driver_weakrefcnt(self) (self)->d_module.md_weakrefcnt
 #ifndef __DRIVER_REFCNT_FUNCTIONS_DEFINED
-DEFINE_REFCOUNT_FUNCTIONS_P(struct driver, __driver_refcnt, __driver_destroy)
-DEFINE_WEAKREFCOUNT_FUNCTIONS_P(struct driver, __driver_weakrefcnt, __driver_free)
+DEFINE_REFCNT_FUNCTIONS_P(struct driver, __driver_refcnt, __driver_destroy)
+DEFINE_WEAKREFCNT_FUNCTIONS_P(struct driver, __driver_weakrefcnt, __driver_free)
 #endif /* !__DRIVER_REFCNT_FUNCTIONS_DEFINED */
 #else /* !__cplusplus || __WANT_DRIVER_d_module */
 #define __driver_as_module /* nothing */
@@ -906,7 +906,7 @@ struct driver_loadlist {
 	                                                                 * NOTE: This vector is sorted by `md_loadmin' */
 };
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL driver_loadlist_destroy)(struct driver_loadlist *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct driver_loadlist, dll_refcnt, driver_loadlist_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct driver_loadlist, dll_refcnt, driver_loadlist_destroy)
 
 /* Return the list of currently loaded drivers.
  * Note that this function is  NOBLOCK+NOTHROW! */
@@ -938,7 +938,7 @@ struct driver_libpath_struct {
 #define ____os_free_defined
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 #endif /* !____os_free_defined */
-DEFINE_REFCOUNT_FUNCTIONS(struct driver_libpath_struct, dlp_refcnt, __os_free);
+DEFINE_REFCNT_FUNCTIONS(struct driver_libpath_struct, dlp_refcnt, __os_free);
 
 #ifndef __driver_libpath_arref_defined
 #define __driver_libpath_arref_defined

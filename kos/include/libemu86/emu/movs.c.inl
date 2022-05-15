@@ -62,6 +62,8 @@ case EMU86_OPCODE_ENCODE(0xa5):
 #endif /* EMU86_EMULATE_CONFIG_WANT_MOVS */
 	EMU86_PSIPDIn_LOAD_POINTERS(psi, pdi, psi_addr, pdi_addr,
 	                            op_flags & EMU86_F_REP);
+	(void)psi_addr;
+	(void)pdi_addr;
 #if EMU86_EMULATE_CONFIG_WANT_MOVS
 	DEFINE_MOVSn_TRANSFER(B, 8, 1);
 do_movs_save_pointer:

@@ -48,7 +48,7 @@ struct filehandle {
 /* Destroy the given filehandle object. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL filehandle_destroy)(struct filehandle *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct filehandle, fh_refcnt, filehandle_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct filehandle, fh_refcnt, filehandle_destroy)
 
 /* Allocate and return a new file handle wrapper for the given  file.
  * This function is used to implement `mfile_v_open()', which is  the

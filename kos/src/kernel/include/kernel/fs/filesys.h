@@ -159,7 +159,7 @@ struct ffilesys {
 
 #define ffilesys_destroy(self)   module_destroy((struct module *)(self)->ffs_drv)
 #define _ffilesys_refcnt_p(self) ((struct module *)(self)->ffs_drv)->md_refcnt
-DEFINE_REFCOUNT_FUNCTIONS_P(struct ffilesys, _ffilesys_refcnt_p, ffilesys_destroy)
+DEFINE_REFCNT_FUNCTIONS_P(struct ffilesys, _ffilesys_refcnt_p, ffilesys_destroy)
 
 
 /* Global set of registered filesystem formats. */

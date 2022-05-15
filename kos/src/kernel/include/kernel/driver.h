@@ -44,8 +44,8 @@ struct driver;
 #define __driver_refcnt(self)     ((struct module *)(self))->md_refcnt
 #define __driver_weakrefcnt(self) ((struct module *)(self))->md_weakrefcnt
 #define __DRIVER_REFCNT_FUNCTIONS_DEFINED
-DEFINE_REFCOUNT_FUNCTIONS_P(struct driver, __driver_refcnt, __driver_destroy)
-DEFINE_WEAKREFCOUNT_FUNCTIONS_P(struct driver, __driver_weakrefcnt, __driver_free)
+DEFINE_REFCNT_FUNCTIONS_P(struct driver, __driver_refcnt, __driver_destroy)
+DEFINE_WEAKREFCNT_FUNCTIONS_P(struct driver, __driver_weakrefcnt, __driver_free)
 #else /* !__driver_defined */
 #ifndef __driver_destroy
 #define __driver_destroy(self)    module_destroy(__driver_as_module(self))

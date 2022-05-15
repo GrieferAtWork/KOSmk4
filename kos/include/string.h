@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c5ae7eb */
+/* HASH CRC-32:0x76a8feaf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,9 +105,9 @@ __NAMESPACE_STD_USING(strerror)
 #include <libc/errno.h>
 #include <crtdefs.h>
 #endif /* __USE_DOS */
-#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+#ifdef __USE_STRING_OVERLOADS
 #include <hybrid/pp/__va_nargs.h>
-#endif /* !__cplusplus && __USE_STRING_OVERLOADS */
+#endif /* __USE_STRING_OVERLOADS */
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */

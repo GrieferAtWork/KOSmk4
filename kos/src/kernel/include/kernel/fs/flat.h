@@ -70,7 +70,7 @@ struct flatdirent {
 
 
 #define flatdirent_destroy(self) fdirent_destroy(&(self)->fde_ent)
-DEFINE_REFCOUNT_FUNCTIONS(struct flatdirent, fde_ent.fd_refcnt, flatdirent_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct flatdirent, fde_ent.fd_refcnt, flatdirent_destroy)
 
 #define fdirent_asflat(self)      COMPILER_CONTAINER_OF(self, struct flatdirent, fde_ent)
 #define flatdirent_basaddr(self) ((self)->fde_pos)

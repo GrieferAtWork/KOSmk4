@@ -198,7 +198,7 @@ struct iofile_data: iofile_data_novtab {
 
 /* Destroy the given file */
 INTDEF NONNULL((1)) void LIBCCALL file_destroy(FILE *__restrict self);
-__DEFINE_REFCOUNT_FUNCTIONS(FILE, if_exdata->io_refcnt, file_destroy);
+__DEFINE_REFCNT_FUNCTIONS(FILE, if_exdata->io_refcnt, file_destroy);
 
 
 /* Synchronize unwritten data of all line-buffered files. */

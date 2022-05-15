@@ -245,7 +245,7 @@ struct execabis_struct {
 
 /* Destroy a given exec-ABIs listing. */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL execabis_destroy)(struct execabis_struct *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct execabis_struct, eas_refcnt, execabis_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct execabis_struct, eas_refcnt, execabis_destroy)
 
 #ifndef __execabis_arref_defined
 #define __execabis_arref_defined

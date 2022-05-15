@@ -75,7 +75,7 @@ struct fs {
 /* Destroy the given FS controller. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fs_destroy)(struct fs *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct fs, fs_refcnt, fs_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct fs, fs_refcnt, fs_destroy)
 
 
 /* Helper macros for working with `struct fs::fs_pathlock' */

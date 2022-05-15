@@ -86,7 +86,7 @@ struct tarfile {
 /*	char                          tf_hrdstr[]; * [EXISTS_IF((tf_mode & S_IFMT) == 0)] Name of linked file */
 };
 #define tarfile_destroy(self) kfree(self)
-DEFINE_REFCOUNT_FUNCTIONS(struct tarfile, tf_refcnt, tarfile_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct tarfile, tf_refcnt, tarfile_destroy)
 
 /* Accessors for hidden fields. */
 #define __tarfile_hidden(self)   (strend((self)->tf_name) + 1)

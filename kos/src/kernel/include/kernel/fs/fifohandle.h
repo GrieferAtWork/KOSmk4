@@ -41,7 +41,7 @@ struct fifohandle {
 };
 
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL fifohandle_destroy)(struct fifohandle *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct fifohandle, fu_refcnt, fifohandle_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct fifohandle, fu_refcnt, fifohandle_destroy)
 
 /* Create a reader/writer for the given fifo `self'
  * NOTE: If  applicable,  the  caller  should  fill  in `fu_path'

@@ -38,7 +38,7 @@ struct pipe {
 	WEAK refcnt_t     p_wrcnt;  /* Number of writer objects (when this hits 0, the ringbuffer is closed) */
 };
 FUNDEF NOBLOCK void NOTHROW(KCALL pipe_destroy)(struct pipe *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct pipe, p_refcnt, pipe_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct pipe, p_refcnt, pipe_destroy)
 
 /* The  max pipe buffer size which may  be set by an unprivileged process.
  * NOTE: This value can be read/written using `/proc/sys/fs/pipe-max-size' */
@@ -57,8 +57,8 @@ struct pipe_writer {
 };
 FUNDEF NOBLOCK void NOTHROW(KCALL pipe_reader_destroy)(struct pipe_reader *__restrict self);
 FUNDEF NOBLOCK void NOTHROW(KCALL pipe_writer_destroy)(struct pipe_writer *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct pipe_reader, pr_refcnt, pipe_reader_destroy)
-DEFINE_REFCOUNT_FUNCTIONS(struct pipe_writer, pw_refcnt, pipe_writer_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct pipe_reader, pr_refcnt, pipe_reader_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct pipe_writer, pw_refcnt, pipe_writer_destroy)
 
 /* Create a new pipe object. */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct pipe *KCALL

@@ -236,7 +236,7 @@ struct ctype {
 /* Destroy the given C-type. */
 FUNDEF NONNULL((1)) void
 NOTHROW(FCALL ctype_destroy)(struct ctype *__restrict self);
-__DEFINE_NONATOMIC_REFCOUNT_FUNCTIONS(struct ctype, ct_refcnt, ctype_destroy)
+__DEFINE_NONATOMIC_REFCNT_FUNCTIONS(struct ctype, ct_refcnt, ctype_destroy)
 
 
 /* Return the pointer-version of the given C-type

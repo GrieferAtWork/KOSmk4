@@ -235,10 +235,12 @@ void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes
 	return memdup(ptr, n_bytes);
 }
 
-[[decl_include("<hybrid/typecore.h>"), export_alias("reallocarr")]]
-[[guard, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
-[[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl]]
-[[impl_include("<hybrid/__overflow.h>"), requires_function(realloc)]]
+[[guard, wunused, ATTR_MALL_DEFAULT_ALIGNED]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[export_alias("reallocarr")]]
+[[userimpl, requires_function(realloc)]]
+[[impl_include("<hybrid/__overflow.h>")]]
+[[section(".text.crt{|.dos}.heap.rare_helpers")]]
 reallocarray(void *ptr, $size_t elem_count, $size_t elem_size)
 		-> [[realloc(mallptr, elem_count * elem_size)]] void * {
 	size_t total_bytes;
@@ -249,9 +251,9 @@ reallocarray(void *ptr, $size_t elem_count, $size_t elem_size)
 
 [[guard]] reallocv(*) = reallocarray;
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[guard, section(".text.crt{|.dos}.heap.rare_helpers")]]
+[[guard, decl_include("<hybrid/typecore.h>")]]
 [[userimpl, requires_function(realloc, malloc_usable_size)]]
+[[section(".text.crt{|.dos}.heap.rare_helpers")]]
 recalloc(void *mallptr, $size_t num_bytes)
 		-> [[realloc(mallptr, num_bytes)]] void * {
 	void *result;

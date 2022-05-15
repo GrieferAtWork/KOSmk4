@@ -66,7 +66,7 @@ global final DL_HAVE_PE_COMPAT = true;
 function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 	toolchain.provideStdlibCache(
 		("c++", ("-fstack-protector-strong", )), (
-			{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
+			{	"binutils/i386-kos/lib/gcc/i686-kos/12.1.0",
 				"binutils/i386-kos/i686-kos/lib",
 				"binutils/i386-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -75,7 +75,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("c++", ()), (
-			{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
+			{	"binutils/i386-kos/lib/gcc/i686-kos/12.1.0",
 				"binutils/i386-kos/i686-kos/lib",
 				"binutils/i386-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -84,7 +84,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("c", ("-fstack-protector-strong",)), (
-			{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
+			{	"binutils/i386-kos/lib/gcc/i686-kos/12.1.0",
 				"binutils/i386-kos/i686-kos/lib",
 				"binutils/i386-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -93,7 +93,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("c", ()), (
-			{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
+			{	"binutils/i386-kos/lib/gcc/i686-kos/12.1.0",
 				"binutils/i386-kos/i686-kos/lib",
 				"binutils/i386-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -102,7 +102,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("assembler-with-cpp", ()), (
-			{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
+			{	"binutils/i386-kos/lib/gcc/i686-kos/12.1.0",
 				"binutils/i386-kos/i686-kos/lib",
 				"binutils/i386-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },
@@ -111,7 +111,7 @@ function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
 		));
 	toolchain.provideStdlibCache(
 		("assembler-with-cpp", ("-fstack-protector-strong",)), (
-			{	"binutils/i386-kos/lib/gcc/i686-kos/9.1.0",
+			{	"binutils/i386-kos/lib/gcc/i686-kos/12.1.0",
 				"binutils/i386-kos/i686-kos/lib",
 				"binutils/i386-kos/lib",
 				"bin/" + TARGET_NAME + "/lib" },

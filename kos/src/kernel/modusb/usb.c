@@ -71,7 +71,7 @@ struct usb_probe_vector {
 	size_t                                          upv_count;  /* Number of elements. */
 	COMPILER_FLEXIBLE_ARRAY(struct usb_probe_entry, upv_elem);  /* [0..upv_count] Vector of elements. */
 };
-DEFINE_REFCOUNT_FUNCTIONS(struct usb_probe_vector, upv_refcnt, kfree)
+DEFINE_REFCNT_FUNCTIONS(struct usb_probe_vector, upv_refcnt, kfree)
 
 ARREF(usb_probe_vector_arref, usb_probe_vector);
 
@@ -100,7 +100,7 @@ NOTHROW(KCALL usb_unknown_interface_destroy)(struct usb_unknown_interface *__res
 	kfree(self);
 }
 
-DEFINE_REFCOUNT_FUNCTIONS(struct usb_unknown_interface, uui_refcnt, usb_unknown_interface_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct usb_unknown_interface, uui_refcnt, usb_unknown_interface_destroy)
 
 
 /* [lock(ATOMIC)] Chain of unknown USB interfaces.

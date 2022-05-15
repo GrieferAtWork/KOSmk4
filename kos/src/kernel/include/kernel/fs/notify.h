@@ -206,7 +206,7 @@ struct notifyfd {
 /* Destroy a given notifyfd object. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL notifyfd_destroy)(struct notifyfd *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct notifyfd, nf_refcnt, notifyfd_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct notifyfd, nf_refcnt, notifyfd_destroy)
 
 /* >> /proc/sys/fs/inotify/max_queued_events
  * Default # of max pending events in newly created `struct notifyfd' */

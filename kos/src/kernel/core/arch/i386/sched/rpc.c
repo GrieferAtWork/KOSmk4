@@ -131,8 +131,9 @@ NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
 
 
 /* Saved IRET tail for `x86_userexcept_sysret' */
+DATDEF struct irregs_kernel this_x86_sysret_iret_ ASMNAME("this_x86_sysret_iret");
 PUBLIC ATTR_SECTION(".data.pertask.early")
-ATTR_ALIGN(struct irregs_kernel) this_x86_sysret_iret = { 0 };
+ATTR_ALIGN(struct irregs_kernel) this_x86_sysret_iret_ = { 0 };
 
 
 /* Arch-specific function:

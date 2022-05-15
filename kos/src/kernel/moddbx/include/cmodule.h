@@ -317,7 +317,7 @@ struct cmodule {
 
 /* Destroy the given CModule. (called when its reference counter hits `0') */
 FUNDEF NONNULL((1)) void NOTHROW(FCALL cmodule_destroy)(struct cmodule *__restrict self);
-__DEFINE_NONATOMIC_REFCOUNT_FUNCTIONS(struct cmodule, cm_refcnt, cmodule_destroy)
+__DEFINE_NONATOMIC_REFCNT_FUNCTIONS(struct cmodule, cm_refcnt, cmodule_destroy)
 
 /* Callback for `cmodule_enum()'
  * @return: * : pformatprinter-compatible return value. */

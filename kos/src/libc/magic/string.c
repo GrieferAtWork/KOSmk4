@@ -502,9 +502,9 @@ for (local f: funcs) {
 #include <libc/errno.h>
 #include <crtdefs.h>
 #endif /* __USE_DOS */
-#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+#ifdef __USE_STRING_OVERLOADS
 #include <hybrid/pp/__va_nargs.h>
-#endif /* !__cplusplus && __USE_STRING_OVERLOADS */
+#endif /* __USE_STRING_OVERLOADS */
 }%[insert:prefix(
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>

@@ -49,7 +49,7 @@ struct cpf_rtdata {
 	struct sig                      cpf_done;   /* Signal broadcast when `cpf_refcnt' hits `1'. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, cpf_data);  /* User-provided buffer. */
 };
-DEFINE_REFCOUNT_FUNCTIONS(struct cpf_rtdata, cpf_refcnt, kfree)
+DEFINE_REFCNT_FUNCTIONS(struct cpf_rtdata, cpf_refcnt, kfree)
 
 
 #define CPF_IPI_RTDATA 0

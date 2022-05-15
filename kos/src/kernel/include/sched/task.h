@@ -152,7 +152,7 @@ task_alloc(struct mman *__restrict task_mman)
 
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL task_destroy)(struct task *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct task, t_refcnt, task_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct task, t_refcnt, task_destroy)
 #endif /* __CC__ */
 
 

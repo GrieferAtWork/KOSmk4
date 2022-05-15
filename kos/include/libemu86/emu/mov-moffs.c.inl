@@ -60,6 +60,7 @@ case EMU86_OPCODE_ENCODE(0xa0): {
 		pc += 4;
 	}
 	addr = SEGMENT_ADDR(offset);
+	(void)addr;
 #if EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS
 	EMU86_READ_USER_MEMORY(addr, 1);
 	value = EMU86_MEMREADB(addr);
@@ -89,6 +90,7 @@ case EMU86_OPCODE_ENCODE(0xa1): {
 		pc += 4;
 	}
 	addr = SEGMENT_ADDR(offset);
+	(void)addr;
 #if EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS
 	IF_64BIT(if (IS_64BIT()) {
 		u64 value;
@@ -132,6 +134,7 @@ case EMU86_OPCODE_ENCODE(0xa2): {
 		pc += 4;
 	}
 	addr = SEGMENT_ADDR(offset);
+	(void)addr;
 #if EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS
 	EMU86_WRITE_USER_MEMORY(addr, 1);
 	value = EMU86_GETAL();
@@ -161,6 +164,7 @@ case EMU86_OPCODE_ENCODE(0xa3): {
 		pc += 4;
 	}
 	addr = SEGMENT_ADDR(offset);
+	(void)addr;
 #if EMU86_EMULATE_CONFIG_WANT_MOV_MOFFS
 	IF_64BIT(if (IS_64BIT()) {
 		u64 value;

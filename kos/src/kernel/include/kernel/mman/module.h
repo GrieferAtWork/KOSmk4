@@ -133,7 +133,7 @@ struct module_section {
 };
 
 #define module_section_destroy(self) (*(self)->ms_ops->ms_destroy)(self)
-DEFINE_REFCOUNT_FUNCTIONS(struct module_section, ms_refcnt, module_section_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct module_section, ms_refcnt, module_section_destroy)
 
 /* Wrappers for module section operators. */
 #ifdef __INTELLISENSE__
@@ -260,8 +260,8 @@ struct module {
 
 #define module_free(self)    (*(self)->md_ops->mo_free)(self)
 #define module_destroy(self) (*(self)->md_ops->mo_destroy)(self)
-DEFINE_REFCOUNT_FUNCTIONS(struct module, md_refcnt, module_destroy)
-DEFINE_WEAKREFCOUNT_FUNCTIONS(struct module, md_weakrefcnt, module_free)
+DEFINE_REFCNT_FUNCTIONS(struct module, md_refcnt, module_destroy)
+DEFINE_WEAKREFCNT_FUNCTIONS(struct module, md_weakrefcnt, module_free)
 
 /* Clear all of the mman->mnode->module self-pointers associated with `self',
  * drop a weak reference from `self->md_mman', and finally `weakdecref(self)'

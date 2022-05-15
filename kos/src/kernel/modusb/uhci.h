@@ -90,7 +90,7 @@ FUNDEF NOBLOCK void NOTHROW(FCALL uhci_ostd_free)(struct uhci_ostd *__restrict s
 FUNDEF NOBLOCK void NOTHROW(FCALL uhci_osqh_free)(struct uhci_osqh *__restrict self);
 
 FUNDEF NOBLOCK void NOTHROW(FCALL uhci_osqh_destroy)(struct uhci_osqh *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct uhci_osqh, qh_refcnt, uhci_osqh_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct uhci_osqh, qh_refcnt, uhci_osqh_destroy)
 
 
 struct uhci_interrupt;

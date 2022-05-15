@@ -873,6 +873,8 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 				base  = EMU86_MEMREADL(rmaddr + 2);
 			}
 		}
+		(void)limit;
+		(void)base;
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LGDT */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER()) {
@@ -1055,6 +1057,8 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 				base  = EMU86_MEMREADL(rmaddr + 2);
 			}
 		}
+		(void)limit;
+		(void)base;
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LIDT */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 		if (EMU86_ISUSER()) {

@@ -85,7 +85,7 @@ struct devdirent {
 DATDEF struct fdirent_ops const devdirent_ops;
 
 #define devdirent_destroy(self) fdirent_destroy(&(self)->dd_dirent)
-DEFINE_REFCOUNT_FUNCTIONS(struct devdirent, dd_dirent.fd_refcnt, devdirent_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct devdirent, dd_dirent.fd_refcnt, devdirent_destroy)
 
 
 
@@ -125,7 +125,7 @@ struct device
 
 #ifdef __WANT_FS_INLINE_STRUCTURES
 #define __struct_device_destroy(self) mfile_destroy(_fnode_asfile(_fdevnode_asnode(_device_asdevnode(self))))
-__DEFINE_REFCOUNT_FUNCTIONS(struct device, _device_devnode_ _fdevnode_node_ _fnode_file_ mf_refcnt, __struct_device_destroy)
+__DEFINE_REFCNT_FUNCTIONS(struct device, _device_devnode_ _fdevnode_node_ _fnode_file_ mf_refcnt, __struct_device_destroy)
 #endif /* __WANT_FS_INLINE_STRUCTURES */
 
 /* Default operators for `struct device_ops' */

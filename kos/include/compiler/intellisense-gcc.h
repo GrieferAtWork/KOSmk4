@@ -43,8 +43,8 @@
 /* Native GCC support in intellisense */
 #define __INTELLISENSE_GCC__ 1
 
-#define __GNUC__                           9
-#define __GNUG__                           9
+#define __GNUC__                           12
+#define __GNUG__                           12
 #define __GNUC_MINOR__                     1
 #define __GNUC_PATCHLEVEL__                0
 #define __GXX_ABI_VERSION                  1013
@@ -52,7 +52,7 @@
 #define __GXX_RTTI                         1
 #define __GXX_WEAK__                       1
 #define __DEPRECATED                       1
-#define __VERSION__                        "9.1.0"
+#define __VERSION__                        "12.1.0"
 #define __STDC_UTF_16__                    1
 #define __STDC_UTF_32__                    1
 #define __STDC__                           1

@@ -118,7 +118,7 @@ NOTHROW(KCALL awork_vector_destroy)(struct awork_vector *__restrict self) {
 	kfree(self);
 }
 
-DEFINE_REFCOUNT_FUNCTIONS(struct awork_vector, av_refcnt, awork_vector_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct awork_vector, av_refcnt, awork_vector_destroy)
 
 PRIVATE struct awork_vector empty_awork = {
 	.av_refcnt = 2, /* +1: empty_awork; +1: awork */

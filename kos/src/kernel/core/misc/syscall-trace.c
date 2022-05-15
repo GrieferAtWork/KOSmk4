@@ -61,7 +61,7 @@ struct sct_entry {
 	uintptr_half_t           te_inuse;    /* # of CPUs using `te_object' right now. */
 #endif /* !CONFIG_NO_SMP */
 };
-DEFINE_REFCOUNT_FUNCTIONS(struct sct_entry, te_refcnt, kfree)
+DEFINE_REFCNT_FUNCTIONS(struct sct_entry, te_refcnt, kfree)
 
 
 LOCAL NOBLOCK bool
@@ -121,7 +121,7 @@ NOTHROW(KCALL sct_table_destroy)(struct sct_table_struct *__restrict self) {
 	kfree(self);
 }
 
-DEFINE_REFCOUNT_FUNCTIONS(struct sct_table_struct, tt_refcnt, sct_table_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct sct_table_struct, tt_refcnt, sct_table_destroy)
 
 /* Define the empty SCT Table. */
 PRIVATE struct sct_table_struct empty_sct_table = {

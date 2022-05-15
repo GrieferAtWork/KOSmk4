@@ -54,7 +54,7 @@ struct net_peeraddr {
 #define net_peeraddr_destroy(self) kfree(self)
 #define net_peeraddr_malloc() \
 	((struct net_peeraddr *)kmalloc(sizeof(struct net_peeraddr), GFP_CALLOC))
-DEFINE_REFCOUNT_FUNCTIONS(struct net_peeraddr, npa_refcnt, net_peeraddr_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct net_peeraddr, npa_refcnt, net_peeraddr_destroy)
 
 struct net_peeraddrs {
 	WEAK refcnt_t                                      nps_refcnt; /* Reference counter. */
@@ -71,7 +71,7 @@ NOTHROW(KCALL net_peeraddrs_destroy)(struct net_peeraddrs *__restrict self);
 	((struct net_peeraddrs *)kmalloc(__builtin_offsetof(struct net_peeraddrs, nps_addrs) + \
 	                                 (count) * sizeof(struct net_peeraddr),                \
 	                                 GFP_NORMAL))
-DEFINE_REFCOUNT_FUNCTIONS(struct net_peeraddrs, nps_refcnt, net_peeraddrs_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct net_peeraddrs, nps_refcnt, net_peeraddrs_destroy)
 
 
 /* Lookup a peer address descriptor for `ip' and return its pointer.

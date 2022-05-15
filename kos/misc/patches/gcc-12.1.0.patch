@@ -1,0 +1,1976 @@
+diff -Naur gcc-12.1.0-orig/config.sub gcc-12.1.0/config.sub
+--- gcc-12.1.0-orig/config.sub	2022-05-06 09:30:56.000000000 +0200
++++ gcc-12.1.0/config.sub	2022-05-15 17:51:26.180768800 +0200
+@@ -1749,7 +1749,7 @@
+ 	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
+ 	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
+ 	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx* | zephyr* \
+-	     | fiwix* )
++	     | fiwix* | kos* )
+ 		;;
+ 	# This one is extra strict with allowed versions
+ 	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
+diff -Naur gcc-12.1.0-orig/configure gcc-12.1.0/configure
+--- gcc-12.1.0-orig/configure	2022-05-06 09:31:19.000000000 +0200
++++ gcc-12.1.0/configure	2022-05-15 18:05:31.726418700 +0200
+@@ -766,6 +766,7 @@
+ docdir
+ oldincludedir
+ includedir
++runstatedir
+ localstatedir
+ sharedstatedir
+ sysconfdir
+@@ -934,6 +935,7 @@
+ sysconfdir='${prefix}/etc'
+ sharedstatedir='${prefix}/com'
+ localstatedir='${prefix}/var'
++runstatedir='${localstatedir}/run'
+ includedir='${prefix}/include'
+ oldincludedir='/usr/include'
+ docdir='${datarootdir}/doc/${PACKAGE}'
+@@ -1186,6 +1188,15 @@
+   | -silent | --silent | --silen | --sile | --sil)
+     silent=yes ;;
+ 
++  -runstatedir | --runstatedir | --runstatedi | --runstated \
++  | --runstate | --runstat | --runsta | --runst | --runs \
++  | --run | --ru | --r)
++    ac_prev=runstatedir ;;
++  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
++  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
++  | --run=* | --ru=* | --r=*)
++    runstatedir=$ac_optarg ;;
++
+   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
+     ac_prev=sbindir ;;
+   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
+@@ -1323,7 +1334,7 @@
+ for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
+ 		datadir sysconfdir sharedstatedir localstatedir includedir \
+ 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
+-		libdir localedir mandir
++		libdir localedir mandir runstatedir
+ do
+   eval ac_val=\$$ac_var
+   # Remove trailing slashes.
+@@ -1483,6 +1494,7 @@
+   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
++  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
+   --libdir=DIR            object code libraries [EPREFIX/lib]
+   --includedir=DIR        C header files [PREFIX/include]
+   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+diff -Naur gcc-12.1.0-orig/fixincludes/mkfixinc.sh gcc-12.1.0/fixincludes/mkfixinc.sh
+--- gcc-12.1.0-orig/fixincludes/mkfixinc.sh	2022-05-06 09:30:56.000000000 +0200
++++ gcc-12.1.0/fixincludes/mkfixinc.sh	2022-05-15 17:51:52.633413900 +0200
+@@ -11,6 +11,7 @@
+ 
+ # Check for special fix rules for particular targets
+ case $machine in
++    *-kos* | \
+     i?86-*-cygwin* | \
+     i?86-*-mingw32* | \
+     x86_64-*-mingw32* | \
+diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos.h gcc-12.1.0/gcc/config/i386/kos.h
+--- gcc-12.1.0-orig/gcc/config/i386/kos.h	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/i386/kos.h	2022-05-15 17:52:17.220389500 +0200
+@@ -0,0 +1,36 @@
++
++#undef TARGET_KOS
++#define TARGET_KOS 1
++
++#undef LIB_SPEC
++/* link against C standard library and dynamic linker
++ * dl is required because some symbols normally found
++ * in libc are actually defined by libdl (such as `environ'),
++ * so to prevent any confusion, we simply always link
++ * against our dynamic linker library. */
++#define LIB_SPEC "%{pthread: } -lc -ldl"
++
++#undef STARTFILE_SPEC
++#define STARTFILE_SPEC "%{!shared: crt0.o%s} %{shared: crt0S.o%s}"
++
++#undef ENDFILE_SPEC
++#define ENDFILE_SPEC ""
++
++#undef TARGET_OS_CPP_BUILTINS
++#define TARGET_OS_CPP_BUILTINS()      \
++  do {                                \
++    builtin_define ("__KOS__");       \
++    builtin_define ("__unix");        \
++    builtin_define ("__unix__");      \
++    builtin_assert ("system=kos");    \
++    builtin_assert ("system=unix");   \
++    builtin_assert ("system=posix");  \
++  } while(0);
++
++#undef CPP_SPEC
++#define CPP_SPEC "%{pthread:-D_REENTRANT}"
++
++#undef LINK_SPEC
++#define LINK_SPEC "%{shared:-shared} %{static:-static} %{!shared: %{!static: %{rdynamic:-export-dynamic} %{!dynamic-linker:-dynamic-linker /lib/libld.so}}}"
++
++
+diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos.opt gcc-12.1.0/gcc/config/i386/kos.opt
+--- gcc-12.1.0-orig/gcc/config/i386/kos.opt	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/i386/kos.opt	2022-05-15 17:52:37.986345500 +0200
+@@ -0,0 +1,6 @@
++; Kos-specific options.
++
++pthread
++Driver
++
++; Retain blank line above
+diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos64.h gcc-12.1.0/gcc/config/i386/kos64.h
+--- gcc-12.1.0-orig/gcc/config/i386/kos64.h	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/i386/kos64.h	2022-05-15 17:52:49.447194900 +0200
+@@ -0,0 +1,5 @@
++
++#include "kos.h"
++
++#undef TARGET_KOS64
++#define TARGET_KOS64 1
+diff -Naur gcc-12.1.0-orig/gcc/config/i386/t-kos gcc-12.1.0/gcc/config/i386/t-kos
+--- gcc-12.1.0-orig/gcc/config/i386/t-kos	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/i386/t-kos	2022-05-15 17:53:05.048178200 +0200
+@@ -0,0 +1 @@
++MULTIARCH_DIRNAME = i386-kos
+diff -Naur gcc-12.1.0-orig/gcc/config/i386/t-kos64 gcc-12.1.0/gcc/config/i386/t-kos64
+--- gcc-12.1.0-orig/gcc/config/i386/t-kos64	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/i386/t-kos64	2022-05-15 17:53:05.048178200 +0200
+@@ -0,0 +1 @@
++MULTIARCH_DIRNAME = i386-kos
+diff -Naur gcc-12.1.0-orig/gcc/config/t-kos gcc-12.1.0/gcc/config/t-kos
+--- gcc-12.1.0-orig/gcc/config/t-kos	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/t-kos	2022-05-15 17:53:05.048178200 +0200
+@@ -0,0 +1 @@
++MULTIARCH_DIRNAME = i386-kos
+diff -Naur gcc-12.1.0-orig/gcc/config/t-kos64 gcc-12.1.0/gcc/config/t-kos64
+--- gcc-12.1.0-orig/gcc/config/t-kos64	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/t-kos64	2022-05-15 17:53:05.048178200 +0200
+@@ -0,0 +1 @@
++MULTIARCH_DIRNAME = i386-kos
+diff -Naur gcc-12.1.0-orig/gcc/config.gcc gcc-12.1.0/gcc/config.gcc
+--- gcc-12.1.0-orig/gcc/config.gcc	2022-05-06 09:30:56.000000000 +0200
++++ gcc-12.1.0/gcc/config.gcc	2022-05-15 17:54:05.396256200 +0200
+@@ -673,6 +673,12 @@
+ 
+ # Common parts for widely ported systems.
+ case ${target} in
++*-*-kos*)
++  gas=yes
++  gnu_ld=yes
++  default_use_cxa_atexit=yes
++  use_gcc_stdint=none
++  ;;
+ *-*-darwin*)
+   tmake_file="t-darwin "
+   tm_file="${tm_file} darwin.h"
+@@ -1087,6 +1093,16 @@
+ esac
+ 
+ case ${target} in
++i[34567]86-*-kos*)
++    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h i386/kos.h"
++    tmake_file="${tmake_file} i386/t-kos"
++    extra_options="${extra_options} i386/kos.opt"
++    ;;
++x86_64-*-kos*)
++    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h i386/x86-64.h i386/kos64.h"
++    tmake_file="${tmake_file} i386/t-kos64"
++    extra_options="${extra_options} i386/kos.opt"
++    ;;
+ aarch64*-*-elf | aarch64*-*-fuchsia* | aarch64*-*-rtems*)
+ 	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h"
+ 	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-errata.h aarch64/aarch64-elf-raw.h"
+diff -Naur gcc-12.1.0-orig/gcc/configure gcc-12.1.0/gcc/configure
+--- gcc-12.1.0-orig/gcc/configure	2022-05-06 09:30:57.000000000 +0200
++++ gcc-12.1.0/gcc/configure	2022-05-15 18:05:45.536329200 +0200
+@@ -914,6 +914,7 @@
+ docdir
+ oldincludedir
+ includedir
++runstatedir
+ localstatedir
+ sharedstatedir
+ sysconfdir
+@@ -1088,6 +1089,7 @@
+ sysconfdir='${prefix}/etc'
+ sharedstatedir='${prefix}/com'
+ localstatedir='${prefix}/var'
++runstatedir='${localstatedir}/run'
+ includedir='${prefix}/include'
+ oldincludedir='/usr/include'
+ docdir='${datarootdir}/doc/${PACKAGE}'
+@@ -1340,6 +1342,15 @@
+   | -silent | --silent | --silen | --sile | --sil)
+     silent=yes ;;
+ 
++  -runstatedir | --runstatedir | --runstatedi | --runstated \
++  | --runstate | --runstat | --runsta | --runst | --runs \
++  | --run | --ru | --r)
++    ac_prev=runstatedir ;;
++  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
++  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
++  | --run=* | --ru=* | --r=*)
++    runstatedir=$ac_optarg ;;
++
+   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
+     ac_prev=sbindir ;;
+   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
+@@ -1477,7 +1488,7 @@
+ for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
+ 		datadir sysconfdir sharedstatedir localstatedir includedir \
+ 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
+-		libdir localedir mandir
++		libdir localedir mandir runstatedir
+ do
+   eval ac_val=\$$ac_var
+   # Remove trailing slashes.
+@@ -1630,6 +1641,7 @@
+   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
++  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
+   --libdir=DIR            object code libraries [EPREFIX/lib]
+   --includedir=DIR        C header files [PREFIX/include]
+   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+@@ -14607,6 +14619,10 @@
+   lt_cv_deplibs_check_method=pass_all
+   ;;
+ 
++kos*)
++  lt_cv_deplibs_check_method=pass_all
++  ;;
++
+ haiku*)
+   lt_cv_deplibs_check_method=pass_all
+   ;;
+@@ -19066,6 +19082,17 @@
+   hardcode_into_libs=yes
+   ;;
+ 
++kos*)
++  version_type=linux
++  need_lib_prefix=no
++  need_version=no
++  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}${major} ${libname}${shared_ext}'
++  soname_spec='${libname}${release}${shared_ext}$major'
++  shlibpath_var=LD_LIBRARY_PATH
++  shlibpath_overrides_runpath=no
++  hardcode_into_libs=yes
++  ;;
++
+ newsos6)
+   version_type=linux
+   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
+@@ -19673,7 +19700,7 @@
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 19676 "configure"
++#line 19703 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -19779,7 +19806,7 @@
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 19782 "configure"
++#line 19809 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -22721,6 +22748,17 @@
+   hardcode_into_libs=yes
+   ;;
+ 
++kos*)
++  version_type=linux
++  need_lib_prefix=no
++  need_version=no
++  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}${major} ${libname}${shared_ext}'
++  soname_spec='${libname}${release}${shared_ext}$major'
++  shlibpath_var=LD_LIBRARY_PATH
++  shlibpath_overrides_runpath=no
++  hardcode_into_libs=yes
++  ;;
++
+ newsos6)
+   version_type=linux
+   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
+diff -Naur gcc-12.1.0-orig/gcc/dwarf2cfi.cc gcc-12.1.0/gcc/dwarf2cfi.cc
+--- gcc-12.1.0-orig/gcc/dwarf2cfi.cc	2022-05-06 09:30:57.000000000 +0200
++++ gcc-12.1.0/gcc/dwarf2cfi.cc	2022-05-15 17:54:52.717749100 +0200
+@@ -742,11 +742,13 @@
+       break;
+ 
+     case DW_CFA_remember_state:
++    case DW_CFA_KOS_startcapsule:
+       gcc_assert (!remember->in_use);
+       *remember = *loc;
+       remember->in_use = 1;
+       break;
+     case DW_CFA_restore_state:
++    case DW_CFA_KOS_endcapsule:
+       gcc_assert (remember->in_use);
+       *loc = *remember;
+       remember->in_use = 0;
+@@ -2454,6 +2456,7 @@
+ 	case DW_CFA_def_cfa_sf:
+ 	case DW_CFA_def_cfa_expression:
+ 	case DW_CFA_restore_state:
++	case DW_CFA_KOS_endcapsule:
+ 	  return true;
+ 	default:
+ 	  return false;
+@@ -3610,6 +3613,12 @@
+     case DW_CFA_restore_state:
+       fprintf (f, "\t.cfi_restore_state\n");
+       break;
++    case DW_CFA_KOS_startcapsule:
++      fprintf (f, "\t.cfi_escape 0x38\n");
++      break;
++    case DW_CFA_KOS_endcapsule:
++      fprintf (f, "\t.cfi_escape 0x39\n");
++      break;
+ 
+     case DW_CFA_GNU_args_size:
+       if (f == asm_out_file)
+diff -Naur gcc-12.1.0-orig/gcc/dwarf2out.cc gcc-12.1.0/gcc/dwarf2out.cc
+--- gcc-12.1.0-orig/gcc/dwarf2out.cc	2022-05-06 09:30:57.000000000 +0200
++++ gcc-12.1.0/gcc/dwarf2out.cc	2022-05-15 17:55:08.979793900 +0200
+@@ -525,6 +525,8 @@
+     case DW_CFA_GNU_window_save:
+     case DW_CFA_remember_state:
+     case DW_CFA_restore_state:
++    case DW_CFA_KOS_startcapsule:
++    case DW_CFA_KOS_endcapsule:
+       return dw_cfi_oprnd_unused;
+ 
+     case DW_CFA_set_loc:
+diff -Naur gcc-12.1.0-orig/include/dwarf2.def gcc-12.1.0/include/dwarf2.def
+--- gcc-12.1.0-orig/include/dwarf2.def	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/include/dwarf2.def	2022-05-15 17:55:31.540523400 +0200
+@@ -792,6 +792,10 @@
+ DW_CFA (DW_CFA_GNU_args_size, 0x2e)
+ DW_CFA (DW_CFA_GNU_negative_offset_extended, 0x2f)
+ 
++/* KOS extensions. */
++DW_CFA (DW_CFA_KOS_startcapsule, 0x38)
++DW_CFA (DW_CFA_KOS_endcapsule, 0x39)
++
+ DW_END_CFA
+ 
+ /* Index attributes in the Abbreviations Table.  */
+diff -Naur gcc-12.1.0-orig/libgcc/config.host gcc-12.1.0/libgcc/config.host
+--- gcc-12.1.0-orig/libgcc/config.host	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/config.host	2022-05-15 17:55:52.262592600 +0200
+@@ -376,6 +376,16 @@
+ esac
+ 
+ case ${host} in
++i[34567]86-*-kos*)
++	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
++	tmake_file="$tmake_file t-slibgcc t-slibgcc-gld t-slibgcc-elf-ver t-libgcc-pic"
++	md_unwind_header=i386/linux-unwind.h
++	;;
++x86_64-*-kos*)
++	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
++	tmake_file="$tmake_file t-slibgcc t-slibgcc-gld t-slibgcc-elf-ver t-libgcc-pic"
++	md_unwind_header=i386/linux-unwind.h
++	;;
+ aarch64*-*-elf | aarch64*-*-rtems*)
+ 	extra_parts="$extra_parts crtbegin.o crtend.o crti.o crtn.o"
+ 	extra_parts="$extra_parts crtfastmath.o"
+diff -Naur gcc-12.1.0-orig/libgcc/unwind-arm-common.inc gcc-12.1.0/libgcc/unwind-arm-common.inc
+--- gcc-12.1.0-orig/libgcc/unwind-arm-common.inc	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/unwind-arm-common.inc	2022-05-15 17:56:17.528274700 +0200
+@@ -21,6 +21,7 @@
+    see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
++#ifndef __KOS__
+ #include "tconfig.h"
+ #include "tsystem.h"
+ #include "unwind.h"
+@@ -1065,3 +1066,4 @@
+ 
+   return _URC_CONTINUE_UNWIND;
+ }
++#endif /* !__KOS__ */
+diff -Naur gcc-12.1.0-orig/libgcc/unwind-c.c gcc-12.1.0/libgcc/unwind-c.c
+--- gcc-12.1.0-orig/libgcc/unwind-c.c	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/unwind-c.c	2022-05-15 17:56:32.120047300 +0200
+@@ -24,6 +24,7 @@
+ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ <http://www.gnu.org/licenses/>.  */
+ 
++#ifndef __KOS__
+ #include "tconfig.h"
+ #include "tsystem.h"
+ #include "auto-target.h"
+@@ -244,3 +245,4 @@
+ 				ms_disp, __gcc_personality_imp);
+ }
+ #endif /* SEH */
++#endif /* !__KOS__ */
+diff -Naur gcc-12.1.0-orig/libgcc/unwind-compat.c gcc-12.1.0/libgcc/unwind-compat.c
+--- gcc-12.1.0-orig/libgcc/unwind-compat.c	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/unwind-compat.c	2022-05-15 17:56:50.252040300 +0200
+@@ -22,6 +22,7 @@
+    see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
++#ifndef __KOS__
+ #if defined (USE_GAS_SYMVER) && defined (USE_LIBUNWIND_EXCEPTIONS)
+ #include "tconfig.h"
+ #include "tsystem.h"
+@@ -207,3 +208,4 @@
+ }
+ symver (_Unwind_SetIP, GCC_3.0);
+ #endif
++#endif /* !__KOS__ */
+diff -Naur gcc-12.1.0-orig/libgcc/unwind-dw2-fde-compat.c gcc-12.1.0/libgcc/unwind-dw2-fde-compat.c
+--- gcc-12.1.0-orig/libgcc/unwind-dw2-fde-compat.c	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/unwind-dw2-fde-compat.c	2022-05-15 17:57:46.061005000 +0200
+@@ -22,6 +22,7 @@
+    see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
++#ifndef __KOS__
+ #if defined (USE_GAS_SYMVER) && defined (USE_LIBUNWIND_EXCEPTIONS)
+ #include "tconfig.h"
+ #include "tsystem.h"
+@@ -40,3 +41,4 @@
+ 
+ symver (_Unwind_Find_FDE, GCC_3.0);
+ #endif
++#endif /* !__KOS__ */
+diff -Naur gcc-12.1.0-orig/libgcc/unwind-dw2-fde-dip.c gcc-12.1.0/libgcc/unwind-dw2-fde-dip.c
+--- gcc-12.1.0-orig/libgcc/unwind-dw2-fde-dip.c	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/unwind-dw2-fde-dip.c	2022-05-15 17:57:52.363919000 +0200
+@@ -26,6 +26,7 @@
+    segment and dl_iterate_phdr to avoid register/deregister calls at
+    DSO load/unload.  */
+ 
++#ifndef __KOS__
+ #ifndef _GNU_SOURCE
+ #define _GNU_SOURCE 1
+ #endif
+@@ -544,3 +545,4 @@
+ #if defined (USE_GAS_SYMVER) && defined (SHARED) && defined (USE_LIBUNWIND_EXCEPTIONS)
+ alias (_Unwind_Find_FDE);
+ #endif
++#endif /* !__KOS__ */
+diff -Naur gcc-12.1.0-orig/libgcc/unwind-dw2-fde.c gcc-12.1.0/libgcc/unwind-dw2-fde.c
+--- gcc-12.1.0-orig/libgcc/unwind-dw2-fde.c	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/unwind-dw2-fde.c	2022-05-15 17:57:41.150362000 +0200
+@@ -23,6 +23,7 @@
+ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ <http://www.gnu.org/licenses/>.  */
+ 
++#ifndef __KOS__
+ #ifndef _Unwind_Find_FDE
+ #include "tconfig.h"
+ #include "tsystem.h"
+@@ -1100,3 +1101,4 @@
+ 
+   return f;
+ }
++#endif /* !__KOS__ */
+diff -Naur gcc-12.1.0-orig/libgcc/unwind-dw2.c gcc-12.1.0/libgcc/unwind-dw2.c
+--- gcc-12.1.0-orig/libgcc/unwind-dw2.c	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/unwind-dw2.c	2022-05-15 17:57:36.783587600 +0200
+@@ -22,6 +22,7 @@
+    see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
++#ifndef __KOS__
+ #include "tconfig.h"
+ #include "tsystem.h"
+ #include "coretypes.h"
+@@ -1747,3 +1748,4 @@
+ #endif
+ 
+ #endif /* !USING_SJLJ_EXCEPTIONS */
++#endif /* !__KOS__ */
+diff -Naur gcc-12.1.0-orig/libgcc/unwind-seh.c gcc-12.1.0/libgcc/unwind-seh.c
+--- gcc-12.1.0-orig/libgcc/unwind-seh.c	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/unwind-seh.c	2022-05-15 17:58:06.194945400 +0200
+@@ -22,6 +22,7 @@
+    see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
++#ifndef __KOS__
+ #include "tconfig.h"
+ #include "tsystem.h"
+ #include "coretypes.h"
+@@ -481,3 +482,4 @@
+     }
+ }
+ #endif /* __SEH__  && !defined (__USING_SJLJ_EXCEPTIONS__)  */
++#endif /* !__KOS__ */
+diff -Naur gcc-12.1.0-orig/libgcc/unwind-sjlj.c gcc-12.1.0/libgcc/unwind-sjlj.c
+--- gcc-12.1.0-orig/libgcc/unwind-sjlj.c	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/unwind-sjlj.c	2022-05-15 17:58:10.730573900 +0200
+@@ -22,6 +22,7 @@
+    see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
++#ifndef __KOS__
+ #include "tconfig.h"
+ #include "tsystem.h"
+ #include "coretypes.h"
+@@ -325,3 +326,4 @@
+ #include "unwind.inc"
+ 
+ #endif /* USING_SJLJ_EXCEPTIONS */
++#endif /* !__KOS__ */
+diff -Naur gcc-12.1.0-orig/libgcc/unwind.inc gcc-12.1.0/libgcc/unwind.inc
+--- gcc-12.1.0-orig/libgcc/unwind.inc	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/unwind.inc	2022-05-15 17:57:25.834771200 +0200
+@@ -34,6 +34,7 @@
+    the first such frame here.  Cleanup code will call back into
+    _Unwind_Resume and we'll continue Phase 2 there.  */
+ 
++#ifndef __KOS__
+ static _Unwind_Reason_Code
+ _Unwind_RaiseException_Phase2(struct _Unwind_Exception *exc,
+ 			      struct _Unwind_Context *context,
+@@ -328,3 +329,4 @@
+ 
+   return code;
+ }
++#endif /* !__KOS__ */
+diff -Naur gcc-12.1.0-orig/libstdc++-v3/acinclude.m4 gcc-12.1.0/libstdc++-v3/acinclude.m4
+--- gcc-12.1.0-orig/libstdc++-v3/acinclude.m4	2022-05-06 09:31:00.000000000 +0200
++++ gcc-12.1.0/libstdc++-v3/acinclude.m4	2022-05-15 17:58:47.041598500 +0200
+@@ -4513,7 +4513,7 @@
+       freebsd*|netbsd*|openbsd*|dragonfly*|darwin*)
+         enable_libstdcxx_filesystem_ts=yes
+         ;;
+-      gnu* | linux* | kfreebsd*-gnu | knetbsd*-gnu | uclinux*)
++      gnu* | linux* | kfreebsd*-gnu | knetbsd*-gnu | uclinux* | *kos*)
+         enable_libstdcxx_filesystem_ts=yes
+         ;;
+       rtems*)
+diff -Naur gcc-12.1.0-orig/libstdc++-v3/configure gcc-12.1.0/libstdc++-v3/configure
+--- gcc-12.1.0-orig/libstdc++-v3/configure	2022-05-06 09:31:00.000000000 +0200
++++ gcc-12.1.0/libstdc++-v3/configure	2022-05-15 18:04:52.446437800 +0200
+@@ -886,6 +886,7 @@
+ docdir
+ oldincludedir
+ includedir
++runstatedir
+ localstatedir
+ sharedstatedir
+ sysconfdir
+@@ -1015,6 +1016,7 @@
+ sysconfdir='${prefix}/etc'
+ sharedstatedir='${prefix}/com'
+ localstatedir='${prefix}/var'
++runstatedir='${localstatedir}/run'
+ includedir='${prefix}/include'
+ oldincludedir='/usr/include'
+ docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
+@@ -1267,6 +1269,15 @@
+   | -silent | --silent | --silen | --sile | --sil)
+     silent=yes ;;
+ 
++  -runstatedir | --runstatedir | --runstatedi | --runstated \
++  | --runstate | --runstat | --runsta | --runst | --runs \
++  | --run | --ru | --r)
++    ac_prev=runstatedir ;;
++  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
++  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
++  | --run=* | --ru=* | --r=*)
++    runstatedir=$ac_optarg ;;
++
+   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
+     ac_prev=sbindir ;;
+   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
+@@ -1404,7 +1415,7 @@
+ for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
+ 		datadir sysconfdir sharedstatedir localstatedir includedir \
+ 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
+-		libdir localedir mandir
++		libdir localedir mandir runstatedir
+ do
+   eval ac_val=\$$ac_var
+   # Remove trailing slashes.
+@@ -1557,6 +1568,7 @@
+   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
++  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
+   --libdir=DIR            object code libraries [EPREFIX/lib]
+   --includedir=DIR        C header files [PREFIX/include]
+   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+@@ -6963,6 +6975,10 @@
+   lt_cv_deplibs_check_method=pass_all
+   ;;
+ 
++kos*)
++  lt_cv_deplibs_check_method=pass_all
++  ;;
++
+ haiku*)
+   lt_cv_deplibs_check_method=pass_all
+   ;;
+@@ -11569,6 +11585,17 @@
+   hardcode_into_libs=yes
+   ;;
+ 
++kos*)
++  version_type=linux
++  need_lib_prefix=no
++  need_version=no
++  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}${major} ${libname}${shared_ext}'
++  soname_spec='${libname}${release}${shared_ext}$major'
++  shlibpath_var=LD_LIBRARY_PATH
++  shlibpath_overrides_runpath=no
++  hardcode_into_libs=yes
++  ;;
++
+ newsos6)
+   version_type=linux
+   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
+@@ -12191,7 +12218,7 @@
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 12194 "configure"
++#line 12221 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -12297,7 +12324,7 @@
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 12300 "configure"
++#line 12327 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -15248,6 +15275,17 @@
+   hardcode_into_libs=yes
+   ;;
+ 
++kos*)
++  version_type=linux
++  need_lib_prefix=no
++  need_version=no
++  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}${major} ${libname}${shared_ext}'
++  soname_spec='${libname}${release}${shared_ext}$major'
++  shlibpath_var=LD_LIBRARY_PATH
++  shlibpath_overrides_runpath=no
++  hardcode_into_libs=yes
++  ;;
++
+ newsos6)
+   version_type=linux
+   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
+@@ -15981,7 +16019,7 @@
+   # Fake what AC_TRY_COMPILE does.
+ 
+     cat > conftest.$ac_ext << EOF
+-#line 15984 "configure"
++#line 16022 "configure"
+ int main()
+ {
+   typedef bool atomic_type;
+@@ -16016,7 +16054,7 @@
+     rm -f conftest*
+ 
+     cat > conftest.$ac_ext << EOF
+-#line 16019 "configure"
++#line 16057 "configure"
+ int main()
+ {
+   typedef short atomic_type;
+@@ -16051,7 +16089,7 @@
+     rm -f conftest*
+ 
+     cat > conftest.$ac_ext << EOF
+-#line 16054 "configure"
++#line 16092 "configure"
+ int main()
+ {
+   // NB: _Atomic_word not necessarily int.
+@@ -16087,7 +16125,7 @@
+     rm -f conftest*
+ 
+     cat > conftest.$ac_ext << EOF
+-#line 16090 "configure"
++#line 16128 "configure"
+ int main()
+ {
+   typedef long long atomic_type;
+@@ -16243,7 +16281,7 @@
+   # unnecessary for this test.
+ 
+     cat > conftest.$ac_ext << EOF
+-#line 16246 "configure"
++#line 16284 "configure"
+ int main()
+ {
+   _Decimal32 d1;
+@@ -16285,7 +16323,7 @@
+   # unnecessary for this test.
+ 
+   cat > conftest.$ac_ext << EOF
+-#line 16288 "configure"
++#line 16326 "configure"
+ template<typename T1, typename T2>
+   struct same
+   { typedef T2 type; };
+@@ -29241,6 +29279,1051 @@
+ 
+ # Base decisions on target environment.
+ case "${host}" in
++  *-kos*)
++
++  # All these tests are for C++; save the language and the compiler flags.
++  # The CXXFLAGS thing is suspicious, but based on similar bits previously
++  # found in GLIBCXX_CONFIGURE.
++
++  ac_ext=cpp
++ac_cpp='$CXXCPP $CPPFLAGS'
++ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
++ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
++
++  ac_test_CXXFLAGS="${CXXFLAGS+set}"
++  ac_save_CXXFLAGS="$CXXFLAGS"
++
++  # Check for -ffunction-sections -fdata-sections
++  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for g++ that supports -ffunction-sections -fdata-sections" >&5
++$as_echo_n "checking for g++ that supports -ffunction-sections -fdata-sections... " >&6; }
++  CXXFLAGS='-g -Werror -ffunction-sections -fdata-sections'
++  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++int foo; void bar() { };
++int
++main ()
++{
++
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_cxx_try_compile "$LINENO"; then :
++  ac_fdsections=yes
++else
++  ac_fdsections=no
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++  if test "$ac_test_CXXFLAGS" = set; then
++    CXXFLAGS="$ac_save_CXXFLAGS"
++  else
++    # this is the suspicious part
++    CXXFLAGS=''
++  fi
++  if test x"$ac_fdsections" = x"yes"; then
++    SECTION_FLAGS='-ffunction-sections -fdata-sections'
++  fi
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_fdsections" >&5
++$as_echo "$ac_fdsections" >&6; }
++
++  ac_ext=c
++ac_cpp='$CPP $CPPFLAGS'
++ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
++ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_compiler_gnu=$ac_cv_c_compiler_gnu
++
++
++
++
++  # If we're not using GNU ld, then there's no point in even trying these
++  # tests.  Check for that first.  We should have already tested for gld
++  # by now (in libtool), but require it now just to be safe...
++  test -z "$SECTION_LDFLAGS" && SECTION_LDFLAGS=''
++  test -z "$OPT_LDFLAGS" && OPT_LDFLAGS=''
++
++
++
++  # The name set by libtool depends on the version of libtool.  Shame on us
++  # for depending on an impl detail, but c'est la vie.  Older versions used
++  # ac_cv_prog_gnu_ld, but now it's lt_cv_prog_gnu_ld, and is copied back on
++  # top of with_gnu_ld (which is also set by --with-gnu-ld, so that actually
++  # makes sense).  We'll test with_gnu_ld everywhere else, so if that isn't
++  # set (hence we're using an older libtool), then set it.
++  if test x${with_gnu_ld+set} != xset; then
++    if test x${ac_cv_prog_gnu_ld+set} != xset; then
++      # We got through "ac_require(ac_prog_ld)" and still not set?  Huh?
++      with_gnu_ld=no
++    else
++      with_gnu_ld=$ac_cv_prog_gnu_ld
++    fi
++  fi
++
++  # Start by getting the version number.  I think the libtool test already
++  # does some of this, but throws away the result.
++  glibcxx_ld_is_gold=no
++  glibcxx_ld_is_mold=no
++  if test x"$with_gnu_ld" = x"yes"; then
++    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ld version" >&5
++$as_echo_n "checking for ld version... " >&6; }
++
++    if $LD --version 2>/dev/null | grep 'GNU gold' >/dev/null 2>&1; then
++      glibcxx_ld_is_gold=yes
++    elif $LD --version 2>/dev/null | grep 'mold' >/dev/null 2>&1; then
++      glibcxx_ld_is_mold=yes
++    fi
++    ldver=`$LD --version 2>/dev/null |
++	   sed -e 's/[. ][0-9]\{8\}$//;s/.* \([^ ]\{1,\}\)$/\1/; q'`
++
++    glibcxx_gnu_ld_version=`echo $ldver | \
++	   $AWK -F. '{ if (NF<3) $3=0; print ($1*100+$2)*100+$3 }'`
++    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $glibcxx_gnu_ld_version" >&5
++$as_echo "$glibcxx_gnu_ld_version" >&6; }
++  fi
++
++  # Set --gc-sections.
++  glibcxx_have_gc_sections=no
++  if test "$glibcxx_ld_is_gold" = "yes" || test "$glibcxx_ld_is_mold" = "yes" ; then
++    if $LD --help 2>/dev/null | grep gc-sections >/dev/null 2>&1; then
++      glibcxx_have_gc_sections=yes
++    fi
++  else
++    glibcxx_gcsections_min_ld=21602
++    if test x"$with_gnu_ld" = x"yes" &&
++	test $glibcxx_gnu_ld_version -gt $glibcxx_gcsections_min_ld ; then
++      glibcxx_have_gc_sections=yes
++    fi
++  fi
++  if test "$glibcxx_have_gc_sections" = "yes"; then
++    # Sufficiently young GNU ld it is!  Joy and bunny rabbits!
++    # NB: This flag only works reliably after 2.16.1. Configure tests
++    # for this are difficult, so hard wire a value that should work.
++
++    ac_test_CFLAGS="${CFLAGS+set}"
++    ac_save_CFLAGS="$CFLAGS"
++    CFLAGS='-Wl,--gc-sections'
++
++    # Check for -Wl,--gc-sections
++    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ld that supports -Wl,--gc-sections" >&5
++$as_echo_n "checking for ld that supports -Wl,--gc-sections... " >&6; }
++    if test x$gcc_no_link = xyes; then
++  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
++fi
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++ int one(void) { return 1; }
++     int two(void) { return 2; }
++
++int
++main ()
++{
++ two();
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_link "$LINENO"; then :
++  ac_gcsections=yes
++else
++  ac_gcsections=no
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++    if test "$ac_gcsections" = "yes"; then
++      rm -f conftest.c
++      touch conftest.c
++      if $CC -c conftest.c; then
++	if $LD --gc-sections -o conftest conftest.o 2>&1 | \
++	   grep "Warning: gc-sections option ignored" > /dev/null; then
++	  ac_gcsections=no
++	fi
++      fi
++      rm -f conftest.c conftest.o conftest
++    fi
++    if test "$ac_gcsections" = "yes"; then
++      SECTION_LDFLAGS="-Wl,--gc-sections $SECTION_LDFLAGS"
++    fi
++    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_gcsections" >&5
++$as_echo "$ac_gcsections" >&6; }
++
++    if test "$ac_test_CFLAGS" = set; then
++      CFLAGS="$ac_save_CFLAGS"
++    else
++      # this is the suspicious part
++      CFLAGS=''
++    fi
++  fi
++
++  # Set -z,relro.
++  # Note this is only for shared objects.
++  ac_ld_relro=no
++  if test x"$with_gnu_ld" = x"yes"; then
++    # cygwin and mingw uses PE, which has no ELF relro support,
++    # multi target ld may confuse configure machinery
++    case "$host" in
++    *-*-cygwin*)
++     ;;
++    *-*-mingw*)
++     ;;
++    *)
++      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ld that supports -Wl,-z,relro" >&5
++$as_echo_n "checking for ld that supports -Wl,-z,relro... " >&6; }
++      cxx_z_relo=`$LD -v --help 2>/dev/null | grep "z relro"`
++      if test -n "$cxx_z_relo"; then
++        OPT_LDFLAGS="-Wl,-z,relro"
++        ac_ld_relro=yes
++      fi
++      { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ld_relro" >&5
++$as_echo "$ac_ld_relro" >&6; }
++    esac
++  fi
++
++  # Set linker optimization flags.
++  if test x"$with_gnu_ld" = x"yes"; then
++    OPT_LDFLAGS="-Wl,-O1 $OPT_LDFLAGS"
++  fi
++
++
++
++
++
++  ac_test_CXXFLAGS="${CXXFLAGS+set}"
++  ac_save_CXXFLAGS="$CXXFLAGS"
++  CXXFLAGS='-fno-builtin -D_GNU_SOURCE'
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for at_quick_exit declaration" >&5
++$as_echo_n "checking for at_quick_exit declaration... " >&6; }
++  if test x${glibcxx_cv_func_at_quick_exit_use+set} != xset; then
++    if ${glibcxx_cv_func_at_quick_exit_use+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++
++
++      ac_ext=cpp
++ac_cpp='$CXXCPP $CPPFLAGS'
++ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
++ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
++
++      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <stdlib.h>
++int
++main ()
++{
++ at_quick_exit(0);
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_cxx_try_compile "$LINENO"; then :
++  glibcxx_cv_func_at_quick_exit_use=yes
++else
++  glibcxx_cv_func_at_quick_exit_use=no
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++      ac_ext=c
++ac_cpp='$CPP $CPPFLAGS'
++ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
++ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_compiler_gnu=$ac_cv_c_compiler_gnu
++
++
++fi
++
++  fi
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $glibcxx_cv_func_at_quick_exit_use" >&5
++$as_echo "$glibcxx_cv_func_at_quick_exit_use" >&6; }
++  if test x$glibcxx_cv_func_at_quick_exit_use = x"yes"; then
++    for ac_func in at_quick_exit
++do :
++  ac_fn_c_check_func "$LINENO" "at_quick_exit" "ac_cv_func_at_quick_exit"
++if test "x$ac_cv_func_at_quick_exit" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
++#define HAVE_AT_QUICK_EXIT 1
++_ACEOF
++
++fi
++done
++
++  fi
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for quick_exit declaration" >&5
++$as_echo_n "checking for quick_exit declaration... " >&6; }
++  if test x${glibcxx_cv_func_quick_exit_use+set} != xset; then
++    if ${glibcxx_cv_func_quick_exit_use+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++
++
++      ac_ext=cpp
++ac_cpp='$CXXCPP $CPPFLAGS'
++ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
++ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
++
++      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <stdlib.h>
++int
++main ()
++{
++ quick_exit(0);
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_cxx_try_compile "$LINENO"; then :
++  glibcxx_cv_func_quick_exit_use=yes
++else
++  glibcxx_cv_func_quick_exit_use=no
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++      ac_ext=c
++ac_cpp='$CPP $CPPFLAGS'
++ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
++ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_compiler_gnu=$ac_cv_c_compiler_gnu
++
++
++fi
++
++  fi
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $glibcxx_cv_func_quick_exit_use" >&5
++$as_echo "$glibcxx_cv_func_quick_exit_use" >&6; }
++  if test x$glibcxx_cv_func_quick_exit_use = x"yes"; then
++    for ac_func in quick_exit
++do :
++  ac_fn_c_check_func "$LINENO" "quick_exit" "ac_cv_func_quick_exit"
++if test "x$ac_cv_func_quick_exit" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
++#define HAVE_QUICK_EXIT 1
++_ACEOF
++
++fi
++done
++
++  fi
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for strtold declaration" >&5
++$as_echo_n "checking for strtold declaration... " >&6; }
++  if test x${glibcxx_cv_func_strtold_use+set} != xset; then
++    if ${glibcxx_cv_func_strtold_use+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++
++
++      ac_ext=cpp
++ac_cpp='$CXXCPP $CPPFLAGS'
++ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
++ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
++
++      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <stdlib.h>
++int
++main ()
++{
++ strtold(0, 0);
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_cxx_try_compile "$LINENO"; then :
++  glibcxx_cv_func_strtold_use=yes
++else
++  glibcxx_cv_func_strtold_use=no
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++      ac_ext=c
++ac_cpp='$CPP $CPPFLAGS'
++ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
++ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_compiler_gnu=$ac_cv_c_compiler_gnu
++
++
++fi
++
++  fi
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $glibcxx_cv_func_strtold_use" >&5
++$as_echo "$glibcxx_cv_func_strtold_use" >&6; }
++  if test x$glibcxx_cv_func_strtold_use = x"yes"; then
++    for ac_func in strtold
++do :
++  ac_fn_c_check_func "$LINENO" "strtold" "ac_cv_func_strtold"
++if test "x$ac_cv_func_strtold" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
++#define HAVE_STRTOLD 1
++_ACEOF
++
++fi
++done
++
++  fi
++
++
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for strtof declaration" >&5
++$as_echo_n "checking for strtof declaration... " >&6; }
++  if test x${glibcxx_cv_func_strtof_use+set} != xset; then
++    if ${glibcxx_cv_func_strtof_use+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++
++
++      ac_ext=cpp
++ac_cpp='$CXXCPP $CPPFLAGS'
++ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
++ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
++
++      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <stdlib.h>
++int
++main ()
++{
++ strtof(0, 0);
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_cxx_try_compile "$LINENO"; then :
++  glibcxx_cv_func_strtof_use=yes
++else
++  glibcxx_cv_func_strtof_use=no
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++      ac_ext=c
++ac_cpp='$CPP $CPPFLAGS'
++ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
++ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
++ac_compiler_gnu=$ac_cv_c_compiler_gnu
++
++
++fi
++
++  fi
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $glibcxx_cv_func_strtof_use" >&5
++$as_echo "$glibcxx_cv_func_strtof_use" >&6; }
++  if test x$glibcxx_cv_func_strtof_use = x"yes"; then
++    for ac_func in strtof
++do :
++  ac_fn_c_check_func "$LINENO" "strtof" "ac_cv_func_strtof"
++if test "x$ac_cv_func_strtof" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
++#define HAVE_STRTOF 1
++_ACEOF
++
++fi
++done
++
++  fi
++
++
++
++
++  CXXFLAGS="$ac_save_CXXFLAGS"
++
++    $as_echo "#define _GLIBCXX_USE_DEV_RANDOM 1" >>confdefs.h
++
++    $as_echo "#define _GLIBCXX_USE_RANDOM_TR1 1" >>confdefs.h
++
++
++
++   # Check whether --enable-tls was given.
++if test "${enable_tls+set}" = set; then :
++  enableval=$enable_tls;
++      case "$enableval" in
++       yes|no) ;;
++       *) as_fn_error $? "Argument to enable/disable tls must be yes or no" "$LINENO" 5 ;;
++      esac
++
++else
++  enable_tls=yes
++fi
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the target supports thread-local storage" >&5
++$as_echo_n "checking whether the target supports thread-local storage... " >&6; }
++if ${gcc_cv_have_tls+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++
++    if test "$cross_compiling" = yes; then :
++                if test x$gcc_no_link = xyes; then
++  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
++fi
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++__thread int a; int b; int main() { return a = b; }
++_ACEOF
++if ac_fn_c_try_link "$LINENO"; then :
++  chktls_save_LDFLAGS="$LDFLAGS"
++	  	  	  case $host in
++	    *-*-linux* | -*-uclinuxfdpic*)
++	      LDFLAGS="-shared -Wl,--no-undefined $LDFLAGS"
++	      ;;
++	  esac
++	  chktls_save_CFLAGS="$CFLAGS"
++	  CFLAGS="-fPIC $CFLAGS"
++	  	  if test x$gcc_no_link = xyes; then
++  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
++fi
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++int f() { return 0; }
++_ACEOF
++if ac_fn_c_try_link "$LINENO"; then :
++  if test x$gcc_no_link = xyes; then
++  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
++fi
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++__thread int a; int b; int f() { return a = b; }
++_ACEOF
++if ac_fn_c_try_link "$LINENO"; then :
++  gcc_cv_have_tls=yes
++else
++  gcc_cv_have_tls=no
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++else
++  gcc_cv_have_tls=yes
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++	  CFLAGS="$chktls_save_CFLAGS"
++	  LDFLAGS="$chktls_save_LDFLAGS"
++else
++  gcc_cv_have_tls=no
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++
++
++else
++  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++__thread int a; int b; int main() { return a = b; }
++_ACEOF
++if ac_fn_c_try_run "$LINENO"; then :
++                      chktls_save_LDFLAGS="$LDFLAGS"
++      LDFLAGS="-static $LDFLAGS"
++      if test x$gcc_no_link = xyes; then
++  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
++fi
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++int main() { return 0; }
++_ACEOF
++if ac_fn_c_try_link "$LINENO"; then :
++  if test "$cross_compiling" = yes; then :
++  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
++$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
++as_fn_error $? "cannot run test program while cross compiling
++See \`config.log' for more details" "$LINENO" 5; }
++else
++  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++__thread int a; int b; int main() { return a = b; }
++_ACEOF
++if ac_fn_c_try_run "$LINENO"; then :
++  gcc_cv_have_tls=yes
++else
++  gcc_cv_have_tls=no
++fi
++rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
++  conftest.$ac_objext conftest.beam conftest.$ac_ext
++fi
++
++else
++  gcc_cv_have_tls=yes
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++      LDFLAGS="$chktls_save_LDFLAGS"
++      if test $gcc_cv_have_tls = yes; then
++						chktls_save_CFLAGS="$CFLAGS"
++	thread_CFLAGS=failed
++	for flag in '' '-pthread' '-lpthread'; do
++	  CFLAGS="$flag $chktls_save_CFLAGS"
++	  if test x$gcc_no_link = xyes; then
++  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
++fi
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <pthread.h>
++		void *g(void *d) { return NULL; }
++int
++main ()
++{
++pthread_t t; pthread_create(&t,NULL,g,NULL);
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_link "$LINENO"; then :
++  thread_CFLAGS="$flag"
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++	  if test "X$thread_CFLAGS" != Xfailed; then
++	    break
++	  fi
++	done
++	CFLAGS="$chktls_save_CFLAGS"
++	if test "X$thread_CFLAGS" != Xfailed; then
++	  CFLAGS="$thread_CFLAGS $chktls_save_CFLAGS"
++ 	  	  	  	  	  	  if test "$cross_compiling" = yes; then :
++  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
++$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
++as_fn_error $? "cannot run test program while cross compiling
++See \`config.log' for more details" "$LINENO" 5; }
++else
++  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <pthread.h>
++		__thread int a;
++		static int *volatile a_in_other_thread;
++		static void *
++		thread_func (void *arg)
++		{
++		  a_in_other_thread = &a;
++		  return (void *)0;
++		}
++int
++main ()
++{
++pthread_t thread;
++		void *thread_retval;
++		int *volatile a_in_main_thread;
++		a_in_main_thread = &a;
++		if (pthread_create (&thread, (pthread_attr_t *)0,
++				    thread_func, (void *)0))
++		  return 0;
++		if (pthread_join (thread, &thread_retval))
++		  return 0;
++		return (a_in_other_thread == a_in_main_thread);
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_run "$LINENO"; then :
++  gcc_cv_have_tls=yes
++else
++  gcc_cv_have_tls=no
++fi
++rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
++  conftest.$ac_objext conftest.beam conftest.$ac_ext
++fi
++
++	  CFLAGS="$chktls_save_CFLAGS"
++	fi
++      fi
++else
++  gcc_cv_have_tls=no
++fi
++rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
++  conftest.$ac_objext conftest.beam conftest.$ac_ext
++fi
++
++fi
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $gcc_cv_have_tls" >&5
++$as_echo "$gcc_cv_have_tls" >&6; }
++  if test "$enable_tls $gcc_cv_have_tls" = "yes yes"; then
++
++$as_echo "#define HAVE_TLS 1" >>confdefs.h
++
++  fi
++    for ac_func in __cxa_thread_atexit_impl
++do :
++  ac_fn_c_check_func "$LINENO" "__cxa_thread_atexit_impl" "ac_cv_func___cxa_thread_atexit_impl"
++if test "x$ac_cv_func___cxa_thread_atexit_impl" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
++#define HAVE___CXA_THREAD_ATEXIT_IMPL 1
++_ACEOF
++
++fi
++done
++
++    for ac_func in aligned_alloc posix_memalign memalign _aligned_malloc
++do :
++  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
++ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
++if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
++  cat >>confdefs.h <<_ACEOF
++#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
++_ACEOF
++
++fi
++done
++
++    for ac_func in timespec_get
++do :
++  ac_fn_c_check_func "$LINENO" "timespec_get" "ac_cv_func_timespec_get"
++if test "x$ac_cv_func_timespec_get" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
++#define HAVE_TIMESPEC_GET 1
++_ACEOF
++
++fi
++done
++
++    for ac_func in sockatmark
++do :
++  ac_fn_c_check_func "$LINENO" "sockatmark" "ac_cv_func_sockatmark"
++if test "x$ac_cv_func_sockatmark" = xyes; then :
++  cat >>confdefs.h <<_ACEOF
++#define HAVE_SOCKATMARK 1
++_ACEOF
++
++fi
++done
++
++
++
++
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for iconv" >&5
++$as_echo_n "checking for iconv... " >&6; }
++if ${am_cv_func_iconv+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++
++    am_cv_func_iconv="no, consider installing GNU libiconv"
++    am_cv_lib_iconv=no
++                    am_save_CPPFLAGS="$CPPFLAGS"
++    CPPFLAGS="$CPPFLAGS $INCICONV"
++    if test x$gcc_no_link = xyes; then
++  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
++fi
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <stdlib.h>
++#include <iconv.h>
++int
++main ()
++{
++iconv_t cd = iconv_open("","");
++       iconv(cd,NULL,NULL,NULL,NULL);
++       iconv_close(cd);
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_link "$LINENO"; then :
++  am_cv_func_iconv=yes
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++    CPPFLAGS="$am_save_CPPFLAGS"
++
++    if test "$am_cv_func_iconv" != yes && test -d ../libiconv; then
++      for _libs in .libs _libs; do
++        am_save_CPPFLAGS="$CPPFLAGS"
++        am_save_LIBS="$LIBS"
++        CPPFLAGS="$CPPFLAGS -I../libiconv/include"
++        LIBS="$LIBS ../libiconv/lib/$_libs/libiconv.a"
++        if test x$gcc_no_link = xyes; then
++  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
++fi
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <stdlib.h>
++#include <iconv.h>
++int
++main ()
++{
++iconv_t cd = iconv_open("","");
++           iconv(cd,NULL,NULL,NULL,NULL);
++           iconv_close(cd);
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_link "$LINENO"; then :
++  INCICONV="-I../libiconv/include"
++          LIBICONV='${top_builddir}'/../libiconv/lib/$_libs/libiconv.a
++          LTLIBICONV='${top_builddir}'/../libiconv/lib/libiconv.la
++          am_cv_lib_iconv=yes
++          am_cv_func_iconv=yes
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++        CPPFLAGS="$am_save_CPPFLAGS"
++        LIBS="$am_save_LIBS"
++        if test "$am_cv_func_iconv" = "yes"; then
++          break
++        fi
++      done
++    fi
++
++    if test "$am_cv_func_iconv" != yes; then
++      am_save_CPPFLAGS="$CPPFLAGS"
++      am_save_LIBS="$LIBS"
++      CPPFLAGS="$CPPFLAGS $INCICONV"
++      LIBS="$LIBS $LIBICONV"
++      if test x$gcc_no_link = xyes; then
++  as_fn_error $? "Link tests are not allowed after GCC_NO_EXECUTABLES." "$LINENO" 5
++fi
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <stdlib.h>
++#include <iconv.h>
++int
++main ()
++{
++iconv_t cd = iconv_open("","");
++         iconv(cd,NULL,NULL,NULL,NULL);
++         iconv_close(cd);
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_link "$LINENO"; then :
++  am_cv_lib_iconv=yes
++        am_cv_func_iconv=yes
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++      CPPFLAGS="$am_save_CPPFLAGS"
++      LIBS="$am_save_LIBS"
++    fi
++
++fi
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $am_cv_func_iconv" >&5
++$as_echo "$am_cv_func_iconv" >&6; }
++  if test "$am_cv_func_iconv" = yes; then
++
++$as_echo "#define HAVE_ICONV 1" >>confdefs.h
++
++  fi
++  if test "$am_cv_lib_iconv" = yes; then
++
++  for element in $INCICONV; do
++    haveit=
++    for x in $CPPFLAGS; do
++
++  acl_save_prefix="$prefix"
++  prefix="$acl_final_prefix"
++  acl_save_exec_prefix="$exec_prefix"
++  exec_prefix="$acl_final_exec_prefix"
++  eval x=\"$x\"
++  exec_prefix="$acl_save_exec_prefix"
++  prefix="$acl_save_prefix"
++
++      if test "X$x" = "X$element"; then
++        haveit=yes
++        break
++      fi
++    done
++    if test -z "$haveit"; then
++      CPPFLAGS="${CPPFLAGS}${CPPFLAGS:+ }$element"
++    fi
++  done
++
++    { $as_echo "$as_me:${as_lineno-$LINENO}: checking how to link with libiconv" >&5
++$as_echo_n "checking how to link with libiconv... " >&6; }
++    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $LIBICONV" >&5
++$as_echo "$LIBICONV" >&6; }
++  else
++    LIBICONV=
++    LTLIBICONV=
++  fi
++
++
++
++  if test "$am_cv_func_iconv" = yes; then
++    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for iconv declaration" >&5
++$as_echo_n "checking for iconv declaration... " >&6; }
++    if ${am_cv_proto_iconv+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++
++      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++
++#include <stdlib.h>
++#include <iconv.h>
++extern
++#ifdef __cplusplus
++"C"
++#endif
++#if defined(__STDC__) || defined(__cplusplus)
++size_t iconv (iconv_t cd, char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);
++#else
++size_t iconv();
++#endif
++
++int
++main ()
++{
++
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_compile "$LINENO"; then :
++  am_cv_proto_iconv_arg1=""
++else
++  am_cv_proto_iconv_arg1="const"
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++      am_cv_proto_iconv="extern size_t iconv (iconv_t cd, $am_cv_proto_iconv_arg1 char * *inbuf, size_t *inbytesleft, char * *outbuf, size_t *outbytesleft);"
++fi
++
++    am_cv_proto_iconv=`echo "$am_cv_proto_iconv" | tr -s ' ' | sed -e 's/( /(/'`
++    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${ac_t:-
++         }$am_cv_proto_iconv" >&5
++$as_echo "${ac_t:-
++         }$am_cv_proto_iconv" >&6; }
++
++cat >>confdefs.h <<_ACEOF
++#define ICONV_CONST $am_cv_proto_iconv_arg1
++_ACEOF
++
++  fi
++
++    $as_echo "#define HAVE_SETENV 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ACOSF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ACOSL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ASINF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ASINL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ATAN2F 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ATAN2L 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ATANF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ATANL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_CEILF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_CEILL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_COSF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_COSHF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_COSHL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_COSL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_EXPF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_EXPL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_FABSF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_FABSL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_FINITE 1" >>confdefs.h
++
++    $as_echo "#define HAVE_FINITEF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_FINITEL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_FLOORF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_FLOORL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_FMODF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_FMODL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_FPCLASS 1" >>confdefs.h
++
++    $as_echo "#define HAVE_FREXPF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_FREXPL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_HYPOT 1" >>confdefs.h
++
++    $as_echo "#define HAVE_HYPOTF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_HYPOTL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ISINF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ISINFF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ISINFL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ISNAN 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ISNANF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_ISNANL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_LDEXPF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_LDEXPL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_LOG10F 1" >>confdefs.h
++
++    $as_echo "#define HAVE_LOG10L 1" >>confdefs.h
++
++    $as_echo "#define HAVE_LOGF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_LOGL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_MODF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_MODFF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_MODFL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_POWF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_POWL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_QFPCLASS 1" >>confdefs.h
++
++    $as_echo "#define HAVE_SINCOS 1" >>confdefs.h
++
++    $as_echo "#define HAVE_SINCOSF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_SINCOSL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_SINF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_SINHF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_SINHL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_SINL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_SQRTF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_SQRTL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_STRTOF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_STRTOLD 1" >>confdefs.h
++
++    $as_echo "#define HAVE_TANF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_TANHF 1" >>confdefs.h
++
++    $as_echo "#define HAVE_TANHL 1" >>confdefs.h
++
++    $as_echo "#define HAVE_TANL 1" >>confdefs.h
++
++    ;;
++
+   arm*-*-symbianelf*)
+     # This is a freestanding configuration; there is nothing to do here.
+     ;;
+@@ -76246,7 +77329,7 @@
+       freebsd*|netbsd*|openbsd*|dragonfly*|darwin*)
+         enable_libstdcxx_filesystem_ts=yes
+         ;;
+-      gnu* | linux* | kfreebsd*-gnu | knetbsd*-gnu | uclinux*)
++      gnu* | linux* | kfreebsd*-gnu | knetbsd*-gnu | uclinux* | *kos*)
+         enable_libstdcxx_filesystem_ts=yes
+         ;;
+       rtems*)
+diff -Naur gcc-12.1.0-orig/libstdc++-v3/crossconfig.m4 gcc-12.1.0/libstdc++-v3/crossconfig.m4
+--- gcc-12.1.0-orig/libstdc++-v3/crossconfig.m4	2022-05-06 09:31:00.000000000 +0200
++++ gcc-12.1.0/libstdc++-v3/crossconfig.m4	2022-05-15 17:59:37.135659700 +0200
+@@ -5,6 +5,85 @@
+ AC_DEFUN([GLIBCXX_CROSSCONFIG],[
+ # Base decisions on target environment.
+ case "${host}" in
++  *-kos*)
++    GLIBCXX_CHECK_COMPILER_FEATURES
++    GLIBCXX_CHECK_LINKER_FEATURES
++    GLIBCXX_CHECK_STDLIB_SUPPORT
++    AC_DEFINE(_GLIBCXX_USE_DEV_RANDOM)
++    AC_DEFINE(_GLIBCXX_USE_RANDOM_TR1)
++    GCC_CHECK_TLS
++    AC_CHECK_FUNCS(__cxa_thread_atexit_impl)
++    AC_CHECK_FUNCS(aligned_alloc posix_memalign memalign _aligned_malloc)
++    AC_CHECK_FUNCS(timespec_get)
++    AC_CHECK_FUNCS(sockatmark)
++    AM_ICONV
++    AC_DEFINE(HAVE_SETENV)
++    AC_DEFINE(HAVE_ACOSF)
++    AC_DEFINE(HAVE_ACOSL)
++    AC_DEFINE(HAVE_ASINF)
++    AC_DEFINE(HAVE_ASINL)
++    AC_DEFINE(HAVE_ATAN2F)
++    AC_DEFINE(HAVE_ATAN2L)
++    AC_DEFINE(HAVE_ATANF)
++    AC_DEFINE(HAVE_ATANL)
++    AC_DEFINE(HAVE_CEILF)
++    AC_DEFINE(HAVE_CEILL)
++    AC_DEFINE(HAVE_COSF)
++    AC_DEFINE(HAVE_COSHF)
++    AC_DEFINE(HAVE_COSHL)
++    AC_DEFINE(HAVE_COSL)
++    AC_DEFINE(HAVE_EXPF)
++    AC_DEFINE(HAVE_EXPL)
++    AC_DEFINE(HAVE_FABSF)
++    AC_DEFINE(HAVE_FABSL)
++    AC_DEFINE(HAVE_FINITE)
++    AC_DEFINE(HAVE_FINITEF)
++    AC_DEFINE(HAVE_FINITEL)
++    AC_DEFINE(HAVE_FLOORF)
++    AC_DEFINE(HAVE_FLOORL)
++    AC_DEFINE(HAVE_FMODF)
++    AC_DEFINE(HAVE_FMODL)
++    AC_DEFINE(HAVE_FPCLASS)
++    AC_DEFINE(HAVE_FREXPF)
++    AC_DEFINE(HAVE_FREXPL)
++    AC_DEFINE(HAVE_HYPOT)
++    AC_DEFINE(HAVE_HYPOTF)
++    AC_DEFINE(HAVE_HYPOTL)
++    AC_DEFINE(HAVE_ISINF)
++    AC_DEFINE(HAVE_ISINFF)
++    AC_DEFINE(HAVE_ISINFL)
++    AC_DEFINE(HAVE_ISNAN)
++    AC_DEFINE(HAVE_ISNANF)
++    AC_DEFINE(HAVE_ISNANL)
++    AC_DEFINE(HAVE_LDEXPF)
++    AC_DEFINE(HAVE_LDEXPL)
++    AC_DEFINE(HAVE_LOG10F)
++    AC_DEFINE(HAVE_LOG10L)
++    AC_DEFINE(HAVE_LOGF)
++    AC_DEFINE(HAVE_LOGL)
++    AC_DEFINE(HAVE_MODF)
++    AC_DEFINE(HAVE_MODFF)
++    AC_DEFINE(HAVE_MODFL)
++    AC_DEFINE(HAVE_POWF)
++    AC_DEFINE(HAVE_POWL)
++    AC_DEFINE(HAVE_QFPCLASS)
++    AC_DEFINE(HAVE_SINCOS)
++    AC_DEFINE(HAVE_SINCOSF)
++    AC_DEFINE(HAVE_SINCOSL)
++    AC_DEFINE(HAVE_SINF)
++    AC_DEFINE(HAVE_SINHF)
++    AC_DEFINE(HAVE_SINHL)
++    AC_DEFINE(HAVE_SINL)
++    AC_DEFINE(HAVE_SQRTF)
++    AC_DEFINE(HAVE_SQRTL)
++    AC_DEFINE(HAVE_STRTOF)
++    AC_DEFINE(HAVE_STRTOLD)
++    AC_DEFINE(HAVE_TANF)
++    AC_DEFINE(HAVE_TANHF)
++    AC_DEFINE(HAVE_TANHL)
++    AC_DEFINE(HAVE_TANL)
++    ;;
++
+   arm*-*-symbianelf*)
+     # This is a freestanding configuration; there is nothing to do here.
+     ;;
+diff -Naur gcc-12.1.0-orig/libstdc++-v3/include/ext/string_conversions.h gcc-12.1.0/libstdc++-v3/include/ext/string_conversions.h
+--- gcc-12.1.0-orig/libstdc++-v3/include/ext/string_conversions.h	2022-05-06 09:31:00.000000000 +0200
++++ gcc-12.1.0/libstdc++-v3/include/ext/string_conversions.h	2022-05-15 18:01:12.213805700 +0200
+@@ -47,6 +47,16 @@
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+ 
++  // Support wrapper for KOS's `unsigned int base` extension
++  template<typename _TRet, typename _Ret = _TRet, typename _CharT>
++    _Ret
++    __stoa(_TRet (*__convf) (const _CharT*, _CharT**, unsigned int),
++	   const char* __name, const _CharT* __str, std::size_t* __idx,
++	   int __base)
++    {
++		return __stoa<_TRet, _Ret, _CharT, unsigned int>(__convf, __name, __str, __idx, __base);
++    }
++
+   // Helper for all the sto* functions.
+   template<typename _TRet, typename _Ret = _TRet, typename _CharT,
+ 	   typename... _Base>
+@@ -94,9 +104,9 @@
+     }
+ 
+   // Helper for the to_string / to_wstring functions.
+-  template<typename _String, typename _CharT = typename _String::value_type>
++  template<typename _String, typename _ReturnType, typename _CharT = typename _String::value_type>
+     _String
+-    __to_xstring(int (*__convf) (_CharT*, std::size_t, const _CharT*,
++    __to_xstring(_ReturnType (*__convf) (_CharT*, std::size_t, const _CharT*,
+ 				 __builtin_va_list), std::size_t __n,
+ 		 const _CharT* __fmt, ...)
+     {
+@@ -108,7 +118,7 @@
+       __builtin_va_list __args;
+       __builtin_va_start(__args, __fmt);
+ 
+-      const int __len = __convf(__s, __n, __fmt, __args);
++      const _ReturnType __len = __convf(__s, __n, __fmt, __args);
+ 
+       __builtin_va_end(__args);
+ 
+diff -Naur gcc-12.1.0-orig/libstdc++-v3/include/tr1/cctype gcc-12.1.0/libstdc++-v3/include/tr1/cctype
+--- gcc-12.1.0-orig/libstdc++-v3/include/tr1/cctype	2022-05-06 09:31:00.000000000 +0200
++++ gcc-12.1.0/libstdc++-v3/include/tr1/cctype	2022-05-15 18:01:29.385005400 +0200
+@@ -31,6 +31,7 @@
+ 
+ #include <bits/c++config.h>
+ #include <cctype>
++#include <ctype.h>
+ 
+ #ifdef _GLIBCXX_USE_C99_CTYPE_TR1
+ 
+diff -Naur gcc-12.1.0-orig/libstdc++-v3/include/tr1/cmath gcc-12.1.0/libstdc++-v3/include/tr1/cmath
+--- gcc-12.1.0-orig/libstdc++-v3/include/tr1/cmath	2022-05-06 09:31:00.000000000 +0200
++++ gcc-12.1.0/libstdc++-v3/include/tr1/cmath	2022-05-15 18:01:38.103098800 +0200
+@@ -32,6 +32,7 @@
+ #pragma GCC system_header
+ 
+ #include <cmath>
++#include <math.h>
+ 
+ #ifdef _GLIBCXX_USE_C99_MATH_TR1
+ 
+diff -Naur gcc-12.1.0-orig/libtool.m4 gcc-12.1.0/libtool.m4
+--- gcc-12.1.0-orig/libtool.m4	2022-05-06 09:31:01.000000000 +0200
++++ gcc-12.1.0/libtool.m4	2022-05-15 18:02:46.427026900 +0200
+@@ -2509,6 +2509,17 @@
+   hardcode_into_libs=yes
+   ;;
+ 
++kos*)
++  version_type=linux
++  need_lib_prefix=no
++  need_version=no
++  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}${major} ${libname}${shared_ext}'
++  soname_spec='${libname}${release}${shared_ext}$major'
++  shlibpath_var=LD_LIBRARY_PATH
++  shlibpath_overrides_runpath=no
++  hardcode_into_libs=yes
++  ;;
++
+ newsos6)
+   version_type=linux
+   library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major $libname${shared_ext}'
+@@ -3048,6 +3059,10 @@
+   lt_cv_deplibs_check_method=pass_all
+   ;;
+ 
++kos*)
++  lt_cv_deplibs_check_method=pass_all
++  ;;
++
+ haiku*)
+   lt_cv_deplibs_check_method=pass_all
+   ;;

@@ -80,7 +80,7 @@ struct task_setcomm_rpc: pending_rpc_head {
 	unsigned int  tscr_state;               /* One of `TASK_SETCOMM_RPC_ST_*' */
 	char          tscr_name[TASK_COMM_LEN]; /* The new name that should be set. */
 };
-DEFINE_REFCOUNT_FUNCTIONS(struct task_setcomm_rpc, tscr_refcnt, kfree)
+DEFINE_REFCNT_FUNCTIONS(struct task_setcomm_rpc, tscr_refcnt, kfree)
 
 PRIVATE NONNULL((1, 2)) void
 NOTHROW(PRPC_EXEC_CALLBACK_CC task_setcomm_rpcfun)(struct rpc_context *__restrict ctx,

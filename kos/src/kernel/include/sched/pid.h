@@ -164,7 +164,7 @@ struct taskpid {
 /* Destroy the given taskpid. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL taskpid_destroy)(struct taskpid *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct taskpid, tp_refcnt, taskpid_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct taskpid, tp_refcnt, taskpid_destroy)
 
 /* [1..1][const] The PID associated with the calling thread. */
 DATDEF ATTR_PERTASK REF struct taskpid *this_taskpid;
@@ -315,7 +315,7 @@ DATDEF struct pidns pidns_root;
 /* Destroy a given PID namespace. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL pidns_destroy)(struct pidns *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct pidns, pn_refcnt, pidns_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct pidns, pn_refcnt, pidns_destroy)
 
 /* Allocate a new child PID namespace for `parent' */
 FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct pidns *FCALL

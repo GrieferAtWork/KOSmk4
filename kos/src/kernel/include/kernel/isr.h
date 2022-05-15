@@ -115,7 +115,7 @@ struct isr_vector_state {
 };
 
 FUNDEF NOBLOCK void NOTHROW(KCALL isr_vector_state_destroy)(struct isr_vector_state *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct isr_vector_state, ivs_refcnt, isr_vector_state_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct isr_vector_state, ivs_refcnt, isr_vector_state_destroy)
 
 /* Return the usage descriptor for the given ISR vector. */
 FUNDEF NOBLOCK ATTR_RETNONNULL REF struct isr_vector_state *

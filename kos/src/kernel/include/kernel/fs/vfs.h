@@ -82,12 +82,12 @@ struct vfs {
 };
 
 #define vfs_free(self) __os_free(self)
-DEFINE_WEAKREFCOUNT_FUNCTIONS(struct vfs, vf_weakrefcnt, vfs_free)
+DEFINE_WEAKREFCNT_FUNCTIONS(struct vfs, vf_weakrefcnt, vfs_free)
 
 /* Destroy the given VFS controller. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL vfs_destroy)(struct vfs *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct vfs, vf_refcnt, vfs_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct vfs, vf_refcnt, vfs_destroy)
 
 /* Helper macros for working with `struct vfs::vf_rootlock' */
 #define _vfs_rootlock_reap(self)        (void)0

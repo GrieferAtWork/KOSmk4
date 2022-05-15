@@ -44,6 +44,7 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 	pbp = EMU86_GETPBP(op_flags);
 	if (IS_16BIT()) {
 		size_t push_total = 2 * (nesting_level + 1);
+		(void)push_total;
 		EMU86_EMULATE_PUSH(sp - (push_total + alloc_size), push_total + alloc_size);
 #if EMU86_EMULATE_CONFIG_WANT_ENTER
 		EMU86_WRITE_USER_MEMORY(sp - push_total, push_total);
@@ -54,6 +55,7 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 #endif /* !EMU86_EMULATE_CONFIG_WANT_ENTER */
 	} else IF_64BIT(IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
 		size_t push_total = 8 * (nesting_level + 1);
+		(void)push_total;
 		EMU86_EMULATE_PUSH(sp - (push_total + alloc_size), push_total + alloc_size);
 #if EMU86_EMULATE_CONFIG_WANT_ENTER
 		EMU86_WRITE_USER_MEMORY(sp - push_total, push_total);
@@ -65,6 +67,7 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 #endif /* !EMU86_EMULATE_CONFIG_WANT_ENTER */
 	} IF_16BIT_OR_32BIT(else)) IF_16BIT_OR_32BIT({
 		size_t push_total = 4 * (nesting_level + 1);
+		(void)push_total;
 		EMU86_EMULATE_PUSH(sp - (push_total + alloc_size), push_total + alloc_size);
 #if EMU86_EMULATE_CONFIG_WANT_ENTER
 		EMU86_WRITE_USER_MEMORY(sp - push_total, push_total);
@@ -104,6 +107,7 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 				} IF_16BIT_OR_32BIT(else)) IF_16BIT_OR_32BIT({
 					access_total = (size_t)(nesting_level - 1) * 4;
 				});
+				(void)access_total;
 				EMU86_VALIDATE_READABLE(pbp_addr - access_total, access_total);
 			}
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER */

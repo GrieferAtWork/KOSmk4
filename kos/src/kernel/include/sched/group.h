@@ -216,7 +216,7 @@ struct procgrp {
 /* Destroy the given process group. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL procgrp_destroy)(struct procgrp *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
+DEFINE_REFCNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
 
 
 /* Check if a given process group is considered "orphaned" (as per

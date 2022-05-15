@@ -86,7 +86,7 @@ case EMU86_OPCODE_ENCODE(0xcb): {
 	EMU86_VALIDATE_IPCS(ip, cs);
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR && defined(EMU86_VALIDATE_IPCS) */
 	goto return_unsupported_instruction;
-#define NEED_return_unsupported_instruction;
+#define NEED_return_unsupported_instruction
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LRET */
 }
 #endif /* EMU86_EMULATE_CONFIG_CHECKERROR || EMU86_EMULATE_CONFIG_WANT_LRET */
