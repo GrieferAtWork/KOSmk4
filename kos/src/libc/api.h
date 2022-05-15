@@ -107,6 +107,10 @@ __asm__("_Unwind_Resume = libc_Unwind_Resume");
 //__asm__("__gcc_personality_v0 = libc_gxx_personality_v0");
 //__asm__("__gxx_personality_v0 = libc_gxx_personality_v0");
 //#endif /* !GUARD_LIBC_LIBC_EXCEPT_PERSONALITY_C */
+
+#ifndef GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_S
+__asm__("__ubsan_handle_builtin_unreachable = libc___ubsan_handle_builtin_unreachable");
+#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_S */
 #endif /* __CC__ */
 
 #include <__crt.h>

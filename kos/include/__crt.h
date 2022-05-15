@@ -1183,17 +1183,19 @@ struct __locale_struct;
  * However, this  makes debugging  much harder  than it  needs to  be, so  to
  * make our lives a bit easier, provide a functions that gets called in these
  * situations, with the equivalent effect of `abort()' and `std::terminate()' */
-#if !defined(NDEBUG) && !defined(NDEBUG_UNREACHABLE) && defined(__CRT_HAVE___crt_unreachable)
+#if (!defined(NDEBUG) && !defined(NDEBUG_UNREACHABLE) && \
+     defined(__CRT_HAVE___ubsan_handle_builtin_unreachable))
+/* XXX: Don't do this if user already passed `-fsanitize=unreachable' */
 __DECL_BEGIN
-__CDECLARE_VOID(__ATTR_NORETURN,,__crt_unreachable,(void),())
+__CDECLARE_VOID(__ATTR_NORETURN,,__ubsan_handle_builtin_unreachable,(void),())
 __DECL_END
 #undef __builtin_unreachable
 #if __has_builtin(__builtin_unreachable)
-#define __builtin_unreachable() (__crt_unreachable(), __builtin_unreachable())
+#define __builtin_unreachable() (__ubsan_handle_builtin_unreachable(), __builtin_unreachable())
 #else /* __has_builtin(__builtin_unreachable) */
-#define __builtin_unreachable() __crt_unreachable()
+#define __builtin_unreachable() __ubsan_handle_builtin_unreachable()
 #endif /* !__has_builtin(__builtin_unreachable) */
-#endif /* __BUILDING_LIBC || __CRT_HAVE___crt_unreachable */
+#endif /* __BUILDING_LIBC || __CRT_HAVE___ubsan_handle_builtin_unreachable */
 #endif /* __CC__ */
 
 /* Include __stub_XXX definitions (checked by configure scripts) */

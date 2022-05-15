@@ -81,14 +81,18 @@ END(libc_abort)
 DEFINE_PUBLIC_ALIAS(abort, libc_abort)
 
 /* Provide debugging facilities for __builtin_unreachable() (s.a. <__crt.h>) */
-DEFINE_PUBLIC_ALIAS(__crt_unreachable, libc_abort)
-DEFINE_INTERN_ALIAS(libc___crt_unreachable, libc_abort)
+DEFINE_PUBLIC_ALIAS(__ubsan_handle_builtin_unreachable, libc_abort)
+DEFINE_INTERN_ALIAS(libc___ubsan_handle_builtin_unreachable, libc_abort)
 DEFINE_PUBLIC_ALIAS(_ZSt9terminatev, libc_abort) /* std::terminate(void) */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(terminate, libc_abort)           /* std::terminate(void) */
 DEFINE_PUBLIC_ALIAS("?terminate@@YAXXZ", libc_abort) /* std::terminate(void) */
 DEFINE_PUBLIC_ALIAS(__chk_fail, libc_abort)
 #endif /* !__KERNEL__ */
+
+/* TODO: Remove me (only still needed because I don't want to
+ *       rebuild  libstdc++, which still uses this symbol...) */
+DEFINE_PUBLIC_ALIAS(__crt_unreachable, libc_abort)
 
 
 

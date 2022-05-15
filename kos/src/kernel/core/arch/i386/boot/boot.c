@@ -497,11 +497,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     - Properly implement libc's regex functions
 	 */
 
-	/* TODO: Don't #define __builtin_unreachable() in <__crt.h> to __crt_unreachable()
-	 *       Instead  look into `-fsanitize=unreachable' (which does something similar
-	 *       on  a compiler-basis  and won't make  the library call  mandatory for all
-	 *       code compiled with debug enabled) */
-
 	/* TODO: Add a KOS-specific libcrypt */
 
 	/* TODO: Investigate into an execution-time profiling system (using some kind

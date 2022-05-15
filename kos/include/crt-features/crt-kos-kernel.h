@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb43e5436 */
+/* HASH CRC-32:0x215097c8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #define __CRT_HAVE___acheckf
 #define __CRT_HAVE___afail
 #define __CRT_HAVE___afailf
-#define __CRT_HAVE___crt_unreachable
 #define __CRT_HAVE___ctype_C_flags
 #define __CRT_HAVE___ctype_C_tolower
 #define __CRT_HAVE___ctype_C_toupper
@@ -36,6 +35,7 @@
 #define __CRT_HAVE___gxx_personality_v0
 #define __CRT_HAVE___stack_chk_fail
 #define __CRT_HAVE___stack_chk_guard
+#define __CRT_HAVE___ubsan_handle_builtin_unreachable
 #define __CRT_HAVE__except_badusage_no_nesting
 #define __CRT_HAVE__except_check_no_nesting
 #define __CRT_HAVE__itoa_digits

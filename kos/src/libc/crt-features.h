@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6262ced2 */
+/* HASH CRC-32:0x2b18c142 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4182,7 +4182,6 @@
 #define __CRT_HAVE___conio_common_vcwscanf
 #define __CRT_HAVE___control87_2
 #endif /* !__KERNEL__ */
-#define __CRT_HAVE___crt_unreachable
 #define __CRT_HAVE___ctype_C_flags
 #define __CRT_HAVE___ctype_C_tolower
 #define __CRT_HAVE___ctype_C_toupper
@@ -4353,6 +4352,9 @@
 #define __CRT_HAVE___sys_nerr
 #define __CRT_HAVE___timezone
 #define __CRT_HAVE___tzname
+#endif /* !__KERNEL__ */
+#define __CRT_HAVE___ubsan_handle_builtin_unreachable
+#ifndef __KERNEL__
 #define __CRT_HAVE___unicode_descriptor
 #define __CRT_HAVE___unicode_descriptor_digit
 #define __CRT_HAVE___unicode_descriptor_digit64
