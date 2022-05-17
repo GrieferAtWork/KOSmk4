@@ -1,0 +1,4114 @@
+diff -Naur 12.1.0-orig/bits/atomic_base.h 12.1.0/bits/atomic_base.h
+--- 12.1.0-orig/bits/atomic_base.h	2022-05-17 17:46:54.704412000 +0200
++++ 12.1.0/bits/atomic_base.h	2022-05-17 18:01:11.793971600 +0200
+@@ -984,27 +984,27 @@
+     template<typename _Tp>
+       _GLIBCXX_ALWAYS_INLINE bool
+       compare_exchange_weak(_Tp* __ptr, _Val<_Tp>& __expected,
+-			    _Val<_Tp> __desired, memory_order __success,
++			    _Val<_Tp> __desired, memory_order ___success,
+ 			    memory_order __failure) noexcept
+       {
+ 	__glibcxx_assert(__is_valid_cmpexch_failure_order(__failure));
+ 
+ 	return __atomic_compare_exchange(__ptr, std::__addressof(__expected),
+ 					 std::__addressof(__desired), true,
+-					 int(__success), int(__failure));
++					 int(___success), int(__failure));
+       }
+ 
+     template<typename _Tp>
+       _GLIBCXX_ALWAYS_INLINE bool
+       compare_exchange_strong(_Tp* __ptr, _Val<_Tp>& __expected,
+-			      _Val<_Tp> __desired, memory_order __success,
++			      _Val<_Tp> __desired, memory_order ___success,
+ 			      memory_order __failure) noexcept
+       {
+ 	__glibcxx_assert(__is_valid_cmpexch_failure_order(__failure));
+ 
+ 	return __atomic_compare_exchange(__ptr, std::__addressof(__expected),
+ 					 std::__addressof(__desired), false,
+-					 int(__success), int(__failure));
++					 int(___success), int(__failure));
+       }
+ 
+ #if __cpp_lib_atomic_wait
+@@ -1213,42 +1213,42 @@
+ 
+       bool
+       compare_exchange_weak(_Fp& __expected, _Fp __desired,
+-			    memory_order __success,
++			    memory_order ___success,
+ 			    memory_order __failure) noexcept
+       {
+ 	return __atomic_impl::compare_exchange_weak(&_M_fp,
+ 						    __expected, __desired,
+-						    __success, __failure);
++						    ___success, __failure);
+       }
+ 
+       bool
+       compare_exchange_weak(_Fp& __expected, _Fp __desired,
+-			    memory_order __success,
++			    memory_order ___success,
+ 			    memory_order __failure) volatile noexcept
+       {
+ 	return __atomic_impl::compare_exchange_weak(&_M_fp,
+ 						    __expected, __desired,
+-						    __success, __failure);
++						    ___success, __failure);
+       }
+ 
+       bool
+       compare_exchange_strong(_Fp& __expected, _Fp __desired,
+-			      memory_order __success,
++			      memory_order ___success,
+ 			      memory_order __failure) noexcept
+       {
+ 	return __atomic_impl::compare_exchange_strong(&_M_fp,
+ 						      __expected, __desired,
+-						      __success, __failure);
++						      ___success, __failure);
+       }
+ 
+       bool
+       compare_exchange_strong(_Fp& __expected, _Fp __desired,
+-			      memory_order __success,
++			      memory_order ___success,
+ 			      memory_order __failure) volatile noexcept
+       {
+ 	return __atomic_impl::compare_exchange_strong(&_M_fp,
+ 						      __expected, __desired,
+-						      __success, __failure);
++						      ___success, __failure);
+       }
+ 
+       bool
+@@ -1408,22 +1408,22 @@
+ 
+       bool
+       compare_exchange_weak(_Tp& __expected, _Tp __desired,
+-			    memory_order __success,
++			    memory_order ___success,
+ 			    memory_order __failure) const noexcept
+       {
+ 	return __atomic_impl::compare_exchange_weak(_M_ptr,
+ 						    __expected, __desired,
+-						    __success, __failure);
++						    ___success, __failure);
+       }
+ 
+       bool
+       compare_exchange_strong(_Tp& __expected, _Tp __desired,
+-			    memory_order __success,
++			    memory_order ___success,
+ 			    memory_order __failure) const noexcept
+       {
+ 	return __atomic_impl::compare_exchange_strong(_M_ptr,
+ 						      __expected, __desired,
+-						      __success, __failure);
++						      ___success, __failure);
+       }
+ 
+       bool
+@@ -1523,22 +1523,22 @@
+ 
+       bool
+       compare_exchange_weak(_Tp& __expected, _Tp __desired,
+-			    memory_order __success,
++			    memory_order ___success,
+ 			    memory_order __failure) const noexcept
+       {
+ 	return __atomic_impl::compare_exchange_weak(_M_ptr,
+ 						    __expected, __desired,
+-						    __success, __failure);
++						    ___success, __failure);
+       }
+ 
+       bool
+       compare_exchange_strong(_Tp& __expected, _Tp __desired,
+-			      memory_order __success,
++			      memory_order ___success,
+ 			      memory_order __failure) const noexcept
+       {
+ 	return __atomic_impl::compare_exchange_strong(_M_ptr,
+ 						      __expected, __desired,
+-						      __success, __failure);
++						      ___success, __failure);
+       }
+ 
+       bool
+@@ -1698,22 +1698,22 @@
+ 
+       bool
+       compare_exchange_weak(_Fp& __expected, _Fp __desired,
+-			    memory_order __success,
++			    memory_order ___success,
+ 			    memory_order __failure) const noexcept
+       {
+ 	return __atomic_impl::compare_exchange_weak(_M_ptr,
+ 						    __expected, __desired,
+-						    __success, __failure);
++						    ___success, __failure);
+       }
+ 
+       bool
+       compare_exchange_strong(_Fp& __expected, _Fp __desired,
+-			    memory_order __success,
++			    memory_order ___success,
+ 			    memory_order __failure) const noexcept
+       {
+ 	return __atomic_impl::compare_exchange_strong(_M_ptr,
+ 						      __expected, __desired,
+-						      __success, __failure);
++						      ___success, __failure);
+       }
+ 
+       bool
+@@ -1827,22 +1827,22 @@
+ 
+       bool
+       compare_exchange_weak(_Tp*& __expected, _Tp* __desired,
+-			    memory_order __success,
++			    memory_order ___success,
+ 			    memory_order __failure) const noexcept
+       {
+ 	return __atomic_impl::compare_exchange_weak(_M_ptr,
+ 						    __expected, __desired,
+-						    __success, __failure);
++						    ___success, __failure);
+       }
+ 
+       bool
+       compare_exchange_strong(_Tp*& __expected, _Tp* __desired,
+-			    memory_order __success,
++			    memory_order ___success,
+ 			    memory_order __failure) const noexcept
+       {
+ 	return __atomic_impl::compare_exchange_strong(_M_ptr,
+ 						      __expected, __desired,
+-						      __success, __failure);
++						      ___success, __failure);
+       }
+ 
+       bool
+diff -Naur 12.1.0-orig/bits/basic_string.h 12.1.0/bits/basic_string.h
+--- 12.1.0-orig/bits/basic_string.h	2022-05-17 17:46:54.704412000 +0200
++++ 12.1.0/bits/basic_string.h	2022-05-17 18:01:11.874118200 +0200
+@@ -3942,13 +3942,13 @@
+ 
+   template<>
+     basic_istream<char>&
+-    getline(basic_istream<char>& __in, basic_string<char>& __str,
++    getline(basic_istream<char>& ___in, basic_string<char>& __str,
+ 	    char __delim);
+ 
+ #ifdef _GLIBCXX_USE_WCHAR_T
+   template<>
+     basic_istream<wchar_t>&
+-    getline(basic_istream<wchar_t>& __in, basic_string<wchar_t>& __str,
++    getline(basic_istream<wchar_t>& ___in, basic_string<wchar_t>& __str,
+ 	    wchar_t __delim);
+ #endif  
+ 
+diff -Naur 12.1.0-orig/bits/basic_string.tcc 12.1.0/bits/basic_string.tcc
+--- 12.1.0-orig/bits/basic_string.tcc	2022-05-17 17:46:54.704412000 +0200
++++ 12.1.0/bits/basic_string.tcc	2022-05-17 18:01:11.900975300 +0200
+@@ -937,7 +937,7 @@
+   // 21.3.7.9 basic_string::getline and operators
+   template<typename _CharT, typename _Traits, typename _Alloc>
+     basic_istream<_CharT, _Traits>&
+-    operator>>(basic_istream<_CharT, _Traits>& __in,
++    operator>>(basic_istream<_CharT, _Traits>& ___in,
+ 	       basic_string<_CharT, _Traits, _Alloc>& __str)
+     {
+       typedef basic_istream<_CharT, _Traits>		__istream_type;
+@@ -950,7 +950,7 @@
+ 
+       __size_type __extracted = 0;
+       typename __ios_base::iostate __err = __ios_base::goodbit;
+-      typename __istream_type::sentry __cerb(__in, false);
++      typename __istream_type::sentry __cerb(___in, false);
+       if (__cerb)
+ 	{
+ 	  __try
+@@ -959,12 +959,12 @@
+ 	      __str.erase();
+ 	      _CharT __buf[128];
+ 	      __size_type __len = 0;	      
+-	      const streamsize __w = __in.width();
++	      const streamsize __w = ___in.width();
+ 	      const __size_type __n = __w > 0 ? static_cast<__size_type>(__w)
+ 		                              : __str.max_size();
+-	      const __ctype_type& __ct = use_facet<__ctype_type>(__in.getloc());
++	      const __ctype_type& __ct = use_facet<__ctype_type>(___in.getloc());
+ 	      const __int_type __eof = _Traits::eof();
+-	      __int_type __c = __in.rdbuf()->sgetc();
++	      __int_type __c = ___in.rdbuf()->sgetc();
+ 
+ 	      while (__extracted < __n
+ 		     && !_Traits::eq_int_type(__c, __eof)
+@@ -978,17 +978,17 @@
+ 		    }
+ 		  __buf[__len++] = _Traits::to_char_type(__c);
+ 		  ++__extracted;
+-		  __c = __in.rdbuf()->snextc();
++		  __c = ___in.rdbuf()->snextc();
+ 		}
+ 	      __str.append(__buf, __len);
+ 
+ 	      if (__extracted < __n && _Traits::eq_int_type(__c, __eof))
+ 		__err |= __ios_base::eofbit;
+-	      __in.width(0);
++	      ___in.width(0);
+ 	    }
+ 	  __catch(__cxxabiv1::__forced_unwind&)
+ 	    {
+-	      __in._M_setstate(__ios_base::badbit);
++	      ___in._M_setstate(__ios_base::badbit);
+ 	      __throw_exception_again;
+ 	    }
+ 	  __catch(...)
+@@ -996,20 +996,20 @@
+ 	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
+ 	      // 91. Description of operator>> and getline() for string<>
+ 	      // might cause endless loop
+-	      __in._M_setstate(__ios_base::badbit);
++	      ___in._M_setstate(__ios_base::badbit);
+ 	    }
+ 	}
+       // 211.  operator>>(istream&, string&) doesn't set failbit
+       if (!__extracted)
+ 	__err |= __ios_base::failbit;
+       if (__err)
+-	__in.setstate(__err);
+-      return __in;
++	___in.setstate(__err);
++      return ___in;
+     }
+ 
+   template<typename _CharT, typename _Traits, typename _Alloc>
+     basic_istream<_CharT, _Traits>&
+-    getline(basic_istream<_CharT, _Traits>& __in,
++    getline(basic_istream<_CharT, _Traits>& ___in,
+ 	    basic_string<_CharT, _Traits, _Alloc>& __str, _CharT __delim)
+     {
+       typedef basic_istream<_CharT, _Traits>		__istream_type;
+@@ -1021,7 +1021,7 @@
+       __size_type __extracted = 0;
+       const __size_type __n = __str.max_size();
+       typename __ios_base::iostate __err = __ios_base::goodbit;
+-      typename __istream_type::sentry __cerb(__in, true);
++      typename __istream_type::sentry __cerb(___in, true);
+       if (__cerb)
+ 	{
+ 	  __try
+@@ -1029,7 +1029,7 @@
+ 	      __str.erase();
+ 	      const __int_type __idelim = _Traits::to_int_type(__delim);
+ 	      const __int_type __eof = _Traits::eof();
+-	      __int_type __c = __in.rdbuf()->sgetc();
++	      __int_type __c = ___in.rdbuf()->sgetc();
+ 
+ 	      while (__extracted < __n
+ 		     && !_Traits::eq_int_type(__c, __eof)
+@@ -1037,7 +1037,7 @@
+ 		{
+ 		  __str += _Traits::to_char_type(__c);
+ 		  ++__extracted;
+-		  __c = __in.rdbuf()->snextc();
++		  __c = ___in.rdbuf()->snextc();
+ 		}
+ 
+ 	      if (_Traits::eq_int_type(__c, __eof))
+@@ -1045,14 +1045,14 @@
+ 	      else if (_Traits::eq_int_type(__c, __idelim))
+ 		{
+ 		  ++__extracted;		  
+-		  __in.rdbuf()->sbumpc();
++		  ___in.rdbuf()->sbumpc();
+ 		}
+ 	      else
+ 		__err |= __ios_base::failbit;
+ 	    }
+ 	  __catch(__cxxabiv1::__forced_unwind&)
+ 	    {
+-	      __in._M_setstate(__ios_base::badbit);
++	      ___in._M_setstate(__ios_base::badbit);
+ 	      __throw_exception_again;
+ 	    }
+ 	  __catch(...)
+@@ -1060,14 +1060,14 @@
+ 	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
+ 	      // 91. Description of operator>> and getline() for string<>
+ 	      // might cause endless loop
+-	      __in._M_setstate(__ios_base::badbit);
++	      ___in._M_setstate(__ios_base::badbit);
+ 	    }
+ 	}
+       if (!__extracted)
+ 	__err |= __ios_base::failbit;
+       if (__err)
+-	__in.setstate(__err);
+-      return __in;
++	___in.setstate(__err);
++      return ___in;
+     }
+ 
+   // Inhibit implicit instantiations for required instantiations,
+diff -Naur 12.1.0-orig/bits/istream.tcc 12.1.0/bits/istream.tcc
+--- 12.1.0-orig/bits/istream.tcc	2022-05-17 17:46:54.674554200 +0200
++++ 12.1.0/bits/istream.tcc	2022-05-17 18:01:12.258918100 +0200
+@@ -44,22 +44,22 @@
+ 
+   template<typename _CharT, typename _Traits>
+     basic_istream<_CharT, _Traits>::sentry::
+-    sentry(basic_istream<_CharT, _Traits>& __in, bool __noskip) : _M_ok(false)
++    sentry(basic_istream<_CharT, _Traits>& ___in, bool __noskip) : _M_ok(false)
+     {
+       ios_base::iostate __err = ios_base::goodbit;
+-      if (__in.good())
++      if (___in.good())
+ 	{
+ 	  __try
+ 	    {
+-	      if (__in.tie())
+-		__in.tie()->flush();
+-	      if (!__noskip && bool(__in.flags() & ios_base::skipws))
++	      if (___in.tie())
++		___in.tie()->flush();
++	      if (!__noskip && bool(___in.flags() & ios_base::skipws))
+ 		{
+ 		  const __int_type __eof = traits_type::eof();
+-		  __streambuf_type* __sb = __in.rdbuf();
++		  __streambuf_type* __sb = ___in.rdbuf();
+ 		  __int_type __c = __sb->sgetc();
+ 
+-		  const __ctype_type& __ct = __check_facet(__in._M_ctype);
++		  const __ctype_type& __ct = __check_facet(___in._M_ctype);
+ 		  while (!traits_type::eq_int_type(__c, __eof)
+ 			 && __ct.is(ctype_base::space,
+ 				    traits_type::to_char_type(__c)))
+@@ -74,19 +74,19 @@
+ 	    }
+ 	  __catch(__cxxabiv1::__forced_unwind&)
+ 	    {
+-	      __in._M_setstate(ios_base::badbit);
++	      ___in._M_setstate(ios_base::badbit);
+ 	      __throw_exception_again;
+ 	    }
+ 	  __catch(...)
+-	    { __in._M_setstate(ios_base::badbit); }
++	    { ___in._M_setstate(ios_base::badbit); }
+ 	}
+ 
+-      if (__in.good() && __err == ios_base::goodbit)
++      if (___in.good() && __err == ios_base::goodbit)
+ 	_M_ok = true;
+       else
+ 	{
+ 	  __err |= ios_base::failbit;
+-	  __in.setstate(__err);
++	  ___in.setstate(__err);
+ 	}
+     }
+ 
+@@ -957,18 +957,18 @@
+   // 27.6.1.2.3 Character extraction templates
+   template<typename _CharT, typename _Traits>
+     basic_istream<_CharT, _Traits>&
+-    operator>>(basic_istream<_CharT, _Traits>& __in, _CharT& __c)
++    operator>>(basic_istream<_CharT, _Traits>& ___in, _CharT& __c)
+     {
+       typedef basic_istream<_CharT, _Traits>		__istream_type;
+       typedef typename __istream_type::int_type         __int_type;
+ 
+-      typename __istream_type::sentry __cerb(__in, false);
++      typename __istream_type::sentry __cerb(___in, false);
+       if (__cerb)
+ 	{
+ 	  ios_base::iostate __err = ios_base::goodbit;
+ 	  __try
+ 	    {
+-	      const __int_type __cb = __in.rdbuf()->sbumpc();
++	      const __int_type __cb = ___in.rdbuf()->sbumpc();
+ 	      if (!_Traits::eq_int_type(__cb, _Traits::eof()))
+ 		__c = _Traits::to_char_type(__cb);
+ 	      else
+@@ -976,20 +976,20 @@
+ 	    }
+ 	  __catch(__cxxabiv1::__forced_unwind&)
+ 	    {
+-	      __in._M_setstate(ios_base::badbit);
++	      ___in._M_setstate(ios_base::badbit);
+ 	      __throw_exception_again;
+ 	    }
+ 	  __catch(...)
+-	    { __in._M_setstate(ios_base::badbit); }
++	    { ___in._M_setstate(ios_base::badbit); }
+ 	  if (__err)
+-	    __in.setstate(__err);
++	    ___in.setstate(__err);
+ 	}
+-      return __in;
++      return ___in;
+     }
+ 
+   template<typename _CharT, typename _Traits>
+     void
+-    __istream_extract(basic_istream<_CharT, _Traits>& __in, _CharT* __s,
++    __istream_extract(basic_istream<_CharT, _Traits>& ___in, _CharT* __s,
+ 		      streamsize __num)
+     {
+       typedef basic_istream<_CharT, _Traits>		__istream_type;
+@@ -1000,20 +1000,20 @@
+ 
+       streamsize __extracted = 0;
+       ios_base::iostate __err = ios_base::goodbit;
+-      typename __istream_type::sentry __cerb(__in, false);
++      typename __istream_type::sentry __cerb(___in, false);
+       if (__cerb)
+ 	{
+ 	  __try
+ 	    {
+ 	      // Figure out how many characters to extract.
+-	      streamsize __width = __in.width();
++	      streamsize __width = ___in.width();
+ 	      if (0 < __width && __width < __num)
+ 		__num = __width;
+ 
+-	      const __ctype_type& __ct = use_facet<__ctype_type>(__in.getloc());
++	      const __ctype_type& __ct = use_facet<__ctype_type>(___in.getloc());
+ 
+ 	      const int_type __eof = _Traits::eof();
+-	      __streambuf_type* __sb = __in.rdbuf();
++	      __streambuf_type* __sb = ___in.rdbuf();
+ 	      int_type __c = __sb->sgetc();
+ 
+ 	      while (__extracted < __num - 1
+@@ -1033,26 +1033,26 @@
+ 	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
+ 	      // 68.  Extractors for char* should store null at end
+ 	      *__s = char_type();
+-	      __in.width(0);
++	      ___in.width(0);
+ 	    }
+ 	  __catch(__cxxabiv1::__forced_unwind&)
+ 	    {
+-	      __in._M_setstate(ios_base::badbit);
++	      ___in._M_setstate(ios_base::badbit);
+ 	      __throw_exception_again;
+ 	    }
+ 	  __catch(...)
+-	    { __in._M_setstate(ios_base::badbit); }
++	    { ___in._M_setstate(ios_base::badbit); }
+ 	}
+       if (!__extracted)
+ 	__err |= ios_base::failbit;
+       if (__err)
+-	__in.setstate(__err);
++	___in.setstate(__err);
+     }
+ 
+   // 27.6.1.4 Standard basic_istream manipulators
+   template<typename _CharT, typename _Traits>
+     basic_istream<_CharT, _Traits>&
+-    ws(basic_istream<_CharT, _Traits>& __in)
++    ws(basic_istream<_CharT, _Traits>& ___in)
+     {
+       typedef basic_istream<_CharT, _Traits>		__istream_type;
+       typedef basic_streambuf<_CharT, _Traits>          __streambuf_type;
+@@ -1061,15 +1061,15 @@
+ 
+       // _GLIBCXX_RESOLVE_LIB_DEFECTS
+       // 451. behavior of std::ws
+-      typename __istream_type::sentry __cerb(__in, true);
++      typename __istream_type::sentry __cerb(___in, true);
+       if (__cerb)
+ 	{
+ 	  ios_base::iostate __err = ios_base::goodbit;
+ 	  __try
+ 	    {
+-	      const __ctype_type& __ct = use_facet<__ctype_type>(__in.getloc());
++	      const __ctype_type& __ct = use_facet<__ctype_type>(___in.getloc());
+ 	      const __int_type __eof = _Traits::eof();
+-	      __streambuf_type* __sb = __in.rdbuf();
++	      __streambuf_type* __sb = ___in.rdbuf();
+ 	      __int_type __c = __sb->sgetc();
+ 
+ 	      while (true)
+@@ -1086,17 +1086,17 @@
+ 	    }
+ 	  __catch (const __cxxabiv1::__forced_unwind&)
+ 	    {
+-	      __in._M_setstate(ios_base::badbit);
++	      ___in._M_setstate(ios_base::badbit);
+ 	      __throw_exception_again;
+ 	    }
+ 	  __catch (...)
+ 	    {
+-	      __in._M_setstate(ios_base::badbit);
++	      ___in._M_setstate(ios_base::badbit);
+ 	    }
+ 	  if (__err)
+-	    __in.setstate(__err);
++	    ___in.setstate(__err);
+ 	}
+-      return __in;
++      return ___in;
+     }
+ 
+   // Inhibit implicit instantiations for required instantiations,
+diff -Naur 12.1.0-orig/bits/locale_conv.h 12.1.0/bits/locale_conv.h
+--- 12.1.0-orig/bits/locale_conv.h	2022-05-17 17:46:54.674554200 +0200
++++ 12.1.0/bits/locale_conv.h	2022-05-17 18:01:12.313681500 +0200
+@@ -337,10 +337,10 @@
+       {
+ 	if (!_M_with_cvtstate)
+ 	  _M_state = state_type();
+-	wide_string __out{ _M_wide_err_string.get_allocator() };
+-	if (__str_codecvt_in(__first, __last, __out, *_M_cvt, _M_state,
++	wide_string ___out{ _M_wide_err_string.get_allocator() };
++	if (__str_codecvt_in(__first, __last, ___out, *_M_cvt, _M_state,
+ 			     _M_count))
+-	  return __out;
++	  return ___out;
+ 	if (_M_with_strings)
+ 	  return _M_wide_err_string;
+ 	__throw_range_error("wstring_convert::from_bytes");
+@@ -373,10 +373,10 @@
+       {
+ 	if (!_M_with_cvtstate)
+ 	  _M_state = state_type();
+-	byte_string __out{ _M_byte_err_string.get_allocator() };
+-	if (__str_codecvt_out(__first, __last, __out, *_M_cvt, _M_state,
++	byte_string ___out{ _M_byte_err_string.get_allocator() };
++	if (__str_codecvt_out(__first, __last, ___out, *_M_cvt, _M_state,
+ 			      _M_count))
+-	  return __out;
++	  return ___out;
+ 	if (_M_with_strings)
+ 	  return _M_byte_err_string;
+ 	__throw_range_error("wstring_convert::to_bytes");
+@@ -465,13 +465,13 @@
+       { return _M_buf && _M_conv_put() && !_M_buf->pubsync() ? 0 : -1; }
+ 
+       typename _Wide_streambuf::int_type
+-      overflow(typename _Wide_streambuf::int_type __out)
++      overflow(typename _Wide_streambuf::int_type ___out)
+       {
+ 	if (!_M_buf || !_M_conv_put())
+ 	  return _Tr::eof();
+-	else if (!_Tr::eq_int_type(__out, _Tr::eof()))
+-	  return this->sputc(__out);
+-	return _Tr::not_eof(__out);
++	else if (!_Tr::eq_int_type(___out, _Tr::eof()))
++	  return this->sputc(___out);
++	return _Tr::not_eof(___out);
+       }
+ 
+       typename _Wide_streambuf::int_type
+diff -Naur 12.1.0-orig/bits/locale_facets.h 12.1.0/bits/locale_facets.h
+--- 12.1.0-orig/bits/locale_facets.h	2022-05-17 17:46:54.674554200 +0200
++++ 12.1.0/bits/locale_facets.h	2022-05-17 18:01:12.338935000 +0200
+@@ -232,7 +232,7 @@
+        *  @return  The uppercase char_type if convertible, else @a __c.
+       */
+       char_type
+-      toupper(char_type __c) const
++      (toupper)(char_type __c) const
+       { return this->do_toupper(__c); }
+ 
+       /**
+@@ -247,7 +247,7 @@
+        *  @return  @a __hi.
+       */
+       const char_type*
+-      toupper(char_type *__lo, const char_type* __hi) const
++      (toupper)(char_type *__lo, const char_type* __hi) const
+       { return this->do_toupper(__lo, __hi); }
+ 
+       /**
+@@ -261,7 +261,7 @@
+        *  @return  The lowercase char_type if convertible, else @a __c.
+       */
+       char_type
+-      tolower(char_type __c) const
++      (tolower)(char_type __c) const
+       { return this->do_tolower(__c); }
+ 
+       /**
+@@ -276,7 +276,7 @@
+        *  @return  @a __hi.
+       */
+       const char_type*
+-      tolower(char_type* __lo, const char_type* __hi) const
++      (tolower)(char_type* __lo, const char_type* __hi) const
+       { return this->do_tolower(__lo, __hi); }
+ 
+       /**
+@@ -807,7 +807,7 @@
+        *  @return  The uppercase char if convertible, else @a __c.
+       */
+       char_type
+-      toupper(char_type __c) const
++      (toupper)(char_type __c) const
+       { return this->do_toupper(__c); }
+ 
+       /**
+@@ -824,7 +824,7 @@
+        *  @return  @a __hi.
+       */
+       const char_type*
+-      toupper(char_type *__lo, const char_type* __hi) const
++      (toupper)(char_type *__lo, const char_type* __hi) const
+       { return this->do_toupper(__lo, __hi); }
+ 
+       /**
+@@ -840,7 +840,7 @@
+        *  @return  The lowercase char if convertible, else @a __c.
+       */
+       char_type
+-      tolower(char_type __c) const
++      (tolower)(char_type __c) const
+       { return this->do_tolower(__c); }
+ 
+       /**
+@@ -857,7 +857,7 @@
+        *  @return  @a __hi.
+       */
+       const char_type*
+-      tolower(char_type* __lo, const char_type* __hi) const
++      (tolower)(char_type* __lo, const char_type* __hi) const
+       { return this->do_tolower(__lo, __hi); }
+ 
+       /**
+@@ -2004,9 +2004,9 @@
+        *  @return  Iterator after reading.
+       */
+       iter_type
+-      get(iter_type __in, iter_type __end, ios_base& __io,
++      get(iter_type ___in, iter_type __end, ios_base& __io,
+ 	  ios_base::iostate& __err, bool& __v) const
+-      { return this->do_get(__in, __end, __io, __err, __v); }
++      { return this->do_get(___in, __end, __io, __err, __v); }
+ 
+       ///@{
+       /**
+@@ -2041,35 +2041,35 @@
+        *  @return  Iterator after reading.
+       */
+       iter_type
+-      get(iter_type __in, iter_type __end, ios_base& __io,
++      get(iter_type ___in, iter_type __end, ios_base& __io,
+ 	  ios_base::iostate& __err, long& __v) const
+-      { return this->do_get(__in, __end, __io, __err, __v); }
++      { return this->do_get(___in, __end, __io, __err, __v); }
+ 
+       iter_type
+-      get(iter_type __in, iter_type __end, ios_base& __io,
++      get(iter_type ___in, iter_type __end, ios_base& __io,
+ 	  ios_base::iostate& __err, unsigned short& __v) const
+-      { return this->do_get(__in, __end, __io, __err, __v); }
++      { return this->do_get(___in, __end, __io, __err, __v); }
+ 
+       iter_type
+-      get(iter_type __in, iter_type __end, ios_base& __io,
++      get(iter_type ___in, iter_type __end, ios_base& __io,
+ 	  ios_base::iostate& __err, unsigned int& __v)   const
+-      { return this->do_get(__in, __end, __io, __err, __v); }
++      { return this->do_get(___in, __end, __io, __err, __v); }
+ 
+       iter_type
+-      get(iter_type __in, iter_type __end, ios_base& __io,
++      get(iter_type ___in, iter_type __end, ios_base& __io,
+ 	  ios_base::iostate& __err, unsigned long& __v)  const
+-      { return this->do_get(__in, __end, __io, __err, __v); }
++      { return this->do_get(___in, __end, __io, __err, __v); }
+ 
+ #ifdef _GLIBCXX_USE_LONG_LONG
+       iter_type
+-      get(iter_type __in, iter_type __end, ios_base& __io,
++      get(iter_type ___in, iter_type __end, ios_base& __io,
+ 	  ios_base::iostate& __err, long long& __v) const
+-      { return this->do_get(__in, __end, __io, __err, __v); }
++      { return this->do_get(___in, __end, __io, __err, __v); }
+ 
+       iter_type
+-      get(iter_type __in, iter_type __end, ios_base& __io,
++      get(iter_type ___in, iter_type __end, ios_base& __io,
+ 	  ios_base::iostate& __err, unsigned long long& __v)  const
+-      { return this->do_get(__in, __end, __io, __err, __v); }
++      { return this->do_get(___in, __end, __io, __err, __v); }
+ #endif
+       ///@}
+ 
+@@ -2101,19 +2101,19 @@
+        *  @return  Iterator after reading.
+       */
+       iter_type
+-      get(iter_type __in, iter_type __end, ios_base& __io,
++      get(iter_type ___in, iter_type __end, ios_base& __io,
+ 	  ios_base::iostate& __err, float& __v) const
+-      { return this->do_get(__in, __end, __io, __err, __v); }
++      { return this->do_get(___in, __end, __io, __err, __v); }
+ 
+       iter_type
+-      get(iter_type __in, iter_type __end, ios_base& __io,
++      get(iter_type ___in, iter_type __end, ios_base& __io,
+ 	  ios_base::iostate& __err, double& __v) const
+-      { return this->do_get(__in, __end, __io, __err, __v); }
++      { return this->do_get(___in, __end, __io, __err, __v); }
+ 
+       iter_type
+-      get(iter_type __in, iter_type __end, ios_base& __io,
++      get(iter_type ___in, iter_type __end, ios_base& __io,
+ 	  ios_base::iostate& __err, long double& __v) const
+-      { return this->do_get(__in, __end, __io, __err, __v); }
++      { return this->do_get(___in, __end, __io, __err, __v); }
+       ///@}
+ 
+       /**
+@@ -2144,9 +2144,9 @@
+        *  @return  Iterator after reading.
+       */
+       iter_type
+-      get(iter_type __in, iter_type __end, ios_base& __io,
++      get(iter_type ___in, iter_type __end, ios_base& __io,
+ 	  ios_base::iostate& __err, void*& __v) const
+-      { return this->do_get(__in, __end, __io, __err, __v); }
++      { return this->do_get(___in, __end, __io, __err, __v); }
+ 
+     protected:
+       /// Destructor.
+@@ -2598,88 +2598,88 @@
+   /// Convenience interface to ctype.is(ctype_base::space, __c).
+   template<typename _CharT>
+     inline bool
+-    isspace(_CharT __c, const locale& __loc)
++    (isspace)(_CharT __c, const locale& __loc)
+     { return use_facet<ctype<_CharT> >(__loc).is(ctype_base::space, __c); }
+ 
+   /// Convenience interface to ctype.is(ctype_base::print, __c).
+   template<typename _CharT>
+     inline bool
+-    isprint(_CharT __c, const locale& __loc)
++    (isprint)(_CharT __c, const locale& __loc)
+     { return use_facet<ctype<_CharT> >(__loc).is(ctype_base::print, __c); }
+ 
+   /// Convenience interface to ctype.is(ctype_base::cntrl, __c).
+   template<typename _CharT>
+     inline bool
+-    iscntrl(_CharT __c, const locale& __loc)
++    (iscntrl)(_CharT __c, const locale& __loc)
+     { return use_facet<ctype<_CharT> >(__loc).is(ctype_base::cntrl, __c); }
+ 
+   /// Convenience interface to ctype.is(ctype_base::upper, __c).
+   template<typename _CharT>
+     inline bool
+-    isupper(_CharT __c, const locale& __loc)
++    (isupper)(_CharT __c, const locale& __loc)
+     { return use_facet<ctype<_CharT> >(__loc).is(ctype_base::upper, __c); }
+ 
+   /// Convenience interface to ctype.is(ctype_base::lower, __c).
+   template<typename _CharT>
+     inline bool
+-    islower(_CharT __c, const locale& __loc)
++    (islower)(_CharT __c, const locale& __loc)
+     { return use_facet<ctype<_CharT> >(__loc).is(ctype_base::lower, __c); }
+ 
+   /// Convenience interface to ctype.is(ctype_base::alpha, __c).
+   template<typename _CharT>
+     inline bool
+-    isalpha(_CharT __c, const locale& __loc)
++    (isalpha)(_CharT __c, const locale& __loc)
+     { return use_facet<ctype<_CharT> >(__loc).is(ctype_base::alpha, __c); }
+ 
+   /// Convenience interface to ctype.is(ctype_base::digit, __c).
+   template<typename _CharT>
+     inline bool
+-    isdigit(_CharT __c, const locale& __loc)
++    (isdigit)(_CharT __c, const locale& __loc)
+     { return use_facet<ctype<_CharT> >(__loc).is(ctype_base::digit, __c); }
+ 
+   /// Convenience interface to ctype.is(ctype_base::punct, __c).
+   template<typename _CharT>
+     inline bool
+-    ispunct(_CharT __c, const locale& __loc)
++    (ispunct)(_CharT __c, const locale& __loc)
+     { return use_facet<ctype<_CharT> >(__loc).is(ctype_base::punct, __c); }
+ 
+   /// Convenience interface to ctype.is(ctype_base::xdigit, __c).
+   template<typename _CharT>
+     inline bool
+-    isxdigit(_CharT __c, const locale& __loc)
++    (isxdigit)(_CharT __c, const locale& __loc)
+     { return use_facet<ctype<_CharT> >(__loc).is(ctype_base::xdigit, __c); }
+ 
+   /// Convenience interface to ctype.is(ctype_base::alnum, __c).
+   template<typename _CharT>
+     inline bool
+-    isalnum(_CharT __c, const locale& __loc)
++    (isalnum)(_CharT __c, const locale& __loc)
+     { return use_facet<ctype<_CharT> >(__loc).is(ctype_base::alnum, __c); }
+ 
+   /// Convenience interface to ctype.is(ctype_base::graph, __c).
+   template<typename _CharT>
+     inline bool
+-    isgraph(_CharT __c, const locale& __loc)
++    (isgraph)(_CharT __c, const locale& __loc)
+     { return use_facet<ctype<_CharT> >(__loc).is(ctype_base::graph, __c); }
+ 
+ #if __cplusplus >= 201103L
+   /// Convenience interface to ctype.is(ctype_base::blank, __c).
+   template<typename _CharT>
+     inline bool
+-    isblank(_CharT __c, const locale& __loc)
++    (isblank)(_CharT __c, const locale& __loc)
+     { return use_facet<ctype<_CharT> >(__loc).is(ctype_base::blank, __c); }
+ #endif
+ 
+   /// Convenience interface to ctype.toupper(__c).
+   template<typename _CharT>
+     inline _CharT
+-    toupper(_CharT __c, const locale& __loc)
+-    { return use_facet<ctype<_CharT> >(__loc).toupper(__c); }
++    (toupper)(_CharT __c, const locale& __loc)
++    { return (use_facet<ctype<_CharT> >(__loc).toupper)(__c); }
+ 
+   /// Convenience interface to ctype.tolower(__c).
+   template<typename _CharT>
+     inline _CharT
+-    tolower(_CharT __c, const locale& __loc)
+-    { return use_facet<ctype<_CharT> >(__loc).tolower(__c); }
++    (tolower)(_CharT __c, const locale& __loc)
++    { return (use_facet<ctype<_CharT> >(__loc).tolower)(__c); }
+ 
+ _GLIBCXX_END_NAMESPACE_VERSION
+ } // namespace std
+diff -Naur 12.1.0-orig/bits/locale_facets_nonio.tcc 12.1.0/bits/locale_facets_nonio.tcc
+--- 12.1.0-orig/bits/locale_facets_nonio.tcc	2022-05-17 17:46:54.674554200 +0200
++++ 12.1.0/bits/locale_facets_nonio.tcc	2022-05-17 18:01:12.413516900 +0200
+@@ -1017,8 +1017,8 @@
+ 	    {
+ 	      // Verify format and input match, extract and discard.
+ 	      // TODO real case-insensitive comparison
+-	      if (__ctype.tolower(__format[__i]) == __ctype.tolower(*__beg)
+-		  || __ctype.toupper(__format[__i]) == __ctype.toupper(*__beg))
++	      if ((__ctype.tolower)(__format[__i]) == (__ctype.tolower)(*__beg)
++		  || (__ctype.toupper)(__format[__i]) == (__ctype.toupper)(*__beg))
+ 		++__beg;
+ 	      else
+ 		__tmperr |= ios_base::failbit;
+@@ -1106,11 +1106,11 @@
+ 	{
+ 	  const char_type __c = *__beg;
+ 	  // TODO real case-insensitive comparison
+-	  const char_type __cl = __ctype.tolower(__c);
+-	  const char_type __cu = __ctype.toupper(__c);
++	  const char_type __cl = (__ctype.tolower)(__c);
++	  const char_type __cu = (__ctype.toupper)(__c);
+ 	  for (size_t __i1 = 0; __i1 < __indexlen; ++__i1)
+-	    if (__cl == __ctype.tolower(__names[__i1][0])
+-		|| __cu == __ctype.toupper(__names[__i1][0]))
++	    if (__cl == (__ctype.tolower)(__names[__i1][0])
++		|| __cu == (__ctype.toupper)(__names[__i1][0]))
+ 	      {
+ 		__lengths[__nmatches]
+ 		  = __traits_type::length(__names[__i1]);
+@@ -1139,14 +1139,14 @@
+ 	      if (__beg != __end)
+ 		{
+ 		  // TODO real case-insensitive comparison
+-		  const char_type __cl = __ctype.tolower(*__beg);
+-		  const char_type __cu = __ctype.toupper(*__beg);
++		  const char_type __cl = (__ctype.tolower)(*__beg);
++		  const char_type __cu = (__ctype.toupper)(*__beg);
+ 		  for (size_t __i3 = 0; __i3 < __nmatches; ++__i3)
+ 		    {
+ 		      __name = __names[__matches[__i3]];
+ 		      if (__lengths[__i3] > __pos
+-			  && (__ctype.tolower(__name[__pos]) == __cl
+-			      || __ctype.toupper(__name[__pos]) == __cu))
++			  && ((__ctype.tolower)(__name[__pos]) == __cl
++			      || (__ctype.toupper)(__name[__pos]) == __cu))
+ 			{
+ 			  __match_longer = true;
+ 			  break;
+@@ -1192,13 +1192,13 @@
+ 	  if (__pos < __minlen && __beg != __end)
+ 	    {
+ 	      // TODO real case-insensitive comparison
+-	      const char_type __cl = __ctype.tolower(*__beg);
+-	      const char_type __cu = __ctype.toupper(*__beg);
++	      const char_type __cl = (__ctype.tolower)(*__beg);
++	      const char_type __cu = (__ctype.toupper)(*__beg);
+ 	      for (size_t __i6 = 0; __i6 < __nmatches;)
+ 		{
+ 		  __name = __names[__matches[__i6]];
+-		  if (__ctype.tolower(__name[__pos]) != __cl
+-		      && __ctype.toupper(__name[__pos]) != __cu)
++		  if ((__ctype.tolower)(__name[__pos]) != __cl
++		      && (__ctype.toupper)(__name[__pos]) != __cu)
+ 		    {
+ 		      __matches[__i6] = __matches[--__nmatches];
+ 		      __lengths[__i6] = __lengths[__nmatches];
+@@ -1224,9 +1224,9 @@
+ 	  while (__pos < __len
+ 		 && __beg != __end
+ 		 // TODO real case-insensitive comparison
+-		 && (__ctype.tolower(__name[__pos]) == __ctype.tolower(*__beg)
+-		     || (__ctype.toupper(__name[__pos])
+-			 == __ctype.toupper(*__beg))))
++		 && ((__ctype.tolower)(__name[__pos]) == (__ctype.tolower)(*__beg)
++		     || ((__ctype.toupper)(__name[__pos])
++			 == (__ctype.toupper)(*__beg))))
+ 	    ++__beg, (void)++__pos;
+ 
+ 	  if (__len == __pos)
+@@ -1264,7 +1264,7 @@
+ 	  const char_type __c = *__beg;
+ 	  for (size_t __i = 0; __i < 2 * __indexlen; ++__i)
+ 	    if (__c == __names[__i][0]
+-		|| __c == __ctype.toupper(__names[__i][0]))
++		|| __c == (__ctype.toupper)(__names[__i][0]))
+ 	      __matches[__nmatches++] = __i;
+ 	}
+ 
+@@ -1544,8 +1544,8 @@
+                 ++__s;
+             }
+           // TODO real case-insensitive comparison
+-          else if (__ctype.tolower(*__s) == __ctype.tolower(*__fmt) ||
+-                   __ctype.toupper(*__s) == __ctype.toupper(*__fmt))
++          else if ((__ctype.tolower)(*__s) == (__ctype.tolower)(*__fmt) ||
++                   (__ctype.toupper)(*__s) == (__ctype.toupper)(*__fmt))
+             {
+               ++__s;
+               ++__fmt;
+diff -Naur 12.1.0-orig/bits/localefwd.h 12.1.0/bits/localefwd.h
+--- 12.1.0-orig/bits/localefwd.h	2022-05-17 17:46:54.674554200 +0200
++++ 12.1.0/bits/localefwd.h	2022-05-17 18:01:12.293592200 +0200
+@@ -65,61 +65,61 @@
+   // 22.1.3 Convenience interfaces
+   template<typename _CharT>
+     bool
+-    isspace(_CharT, const locale&);
++    (isspace)(_CharT, const locale&);
+ 
+   template<typename _CharT>
+     bool
+-    isprint(_CharT, const locale&);
++    (isprint)(_CharT, const locale&);
+ 
+   template<typename _CharT>
+     bool
+-    iscntrl(_CharT, const locale&);
++    (iscntrl)(_CharT, const locale&);
+ 
+   template<typename _CharT>
+     bool
+-    isupper(_CharT, const locale&);
++    (isupper)(_CharT, const locale&);
+ 
+   template<typename _CharT>
+     bool
+-    islower(_CharT, const locale&);
++    (islower)(_CharT, const locale&);
+ 
+   template<typename _CharT>
+     bool
+-    isalpha(_CharT, const locale&);
++    (isalpha)(_CharT, const locale&);
+ 
+   template<typename _CharT>
+     bool
+-    isdigit(_CharT, const locale&);
++    (isdigit)(_CharT, const locale&);
+ 
+   template<typename _CharT>
+     bool
+-    ispunct(_CharT, const locale&);
++    (ispunct)(_CharT, const locale&);
+ 
+   template<typename _CharT>
+     bool
+-    isxdigit(_CharT, const locale&);
++    (isxdigit)(_CharT, const locale&);
+ 
+   template<typename _CharT>
+     bool
+-    isalnum(_CharT, const locale&);
++    (isalnum)(_CharT, const locale&);
+ 
+   template<typename _CharT>
+     bool
+-    isgraph(_CharT, const locale&);
++    (isgraph)(_CharT, const locale&);
+ 
+ #if __cplusplus >= 201103L
+   template<typename _CharT>
+     bool
+-    isblank(_CharT, const locale&);
++    (isblank)(_CharT, const locale&);
+ #endif
+ 
+   template<typename _CharT>
+     _CharT
+-    toupper(_CharT, const locale&);
++    (toupper)(_CharT, const locale&);
+ 
+   template<typename _CharT>
+     _CharT
+-    tolower(_CharT, const locale&);
++    (tolower)(_CharT, const locale&);
+ 
+   // 22.2.1 and 22.2.1.3 ctype
+   struct ctype_base;
+diff -Naur 12.1.0-orig/bits/ostream.tcc 12.1.0/bits/ostream.tcc
+--- 12.1.0-orig/bits/ostream.tcc	2022-05-17 17:46:54.674554200 +0200
++++ 12.1.0/bits/ostream.tcc	2022-05-17 18:01:12.453808400 +0200
+@@ -299,10 +299,10 @@
+ 
+   template<typename _CharT, typename _Traits>
+     basic_ostream<_CharT, _Traits>&
+-    operator<<(basic_ostream<_CharT, _Traits>& __out, const char* __s)
++    operator<<(basic_ostream<_CharT, _Traits>& ___out, const char* __s)
+     {
+       if (!__s)
+-	__out.setstate(ios_base::badbit);
++	___out.setstate(ios_base::badbit);
+       else
+ 	{
+ 	  // _GLIBCXX_RESOLVE_LIB_DEFECTS
+@@ -320,18 +320,18 @@
+ 
+ 	      _CharT *__ws = __pg.__get();
+ 	      for (size_t  __i = 0; __i < __clen; ++__i)
+-		__ws[__i] = __out.widen(__s[__i]);
+-	      __ostream_insert(__out, __ws, __clen);
++		__ws[__i] = ___out.widen(__s[__i]);
++	      __ostream_insert(___out, __ws, __clen);
+ 	    }
+ 	  __catch(__cxxabiv1::__forced_unwind&)
+ 	    {
+-	      __out._M_setstate(ios_base::badbit);
++	      ___out._M_setstate(ios_base::badbit);
+ 	      __throw_exception_again;
+ 	    }
+ 	  __catch(...)
+-	    { __out._M_setstate(ios_base::badbit); }
++	    { ___out._M_setstate(ios_base::badbit); }
+ 	}
+-      return __out;
++      return ___out;
+     }
+ 
+   // Inhibit implicit instantiations for required instantiations,
+diff -Naur 12.1.0-orig/bits/ostream_insert.h 12.1.0/bits/ostream_insert.h
+--- 12.1.0-orig/bits/ostream_insert.h	2022-05-17 17:46:54.674554200 +0200
++++ 12.1.0/bits/ostream_insert.h	2022-05-17 18:01:12.453808400 +0200
+@@ -42,31 +42,31 @@
+ 
+   template<typename _CharT, typename _Traits>
+     inline void
+-    __ostream_write(basic_ostream<_CharT, _Traits>& __out,
++    __ostream_write(basic_ostream<_CharT, _Traits>& ___out,
+ 		    const _CharT* __s, streamsize __n)
+     {
+       typedef basic_ostream<_CharT, _Traits>       __ostream_type;      
+       typedef typename __ostream_type::ios_base    __ios_base;
+ 
+-      const streamsize __put = __out.rdbuf()->sputn(__s, __n);
++      const streamsize __put = ___out.rdbuf()->sputn(__s, __n);
+       if (__put != __n)
+-	__out.setstate(__ios_base::badbit);
++	___out.setstate(__ios_base::badbit);
+     }
+ 
+   template<typename _CharT, typename _Traits>
+     inline void
+-    __ostream_fill(basic_ostream<_CharT, _Traits>& __out, streamsize __n)
++    __ostream_fill(basic_ostream<_CharT, _Traits>& ___out, streamsize __n)
+     {
+       typedef basic_ostream<_CharT, _Traits>       __ostream_type;      
+       typedef typename __ostream_type::ios_base    __ios_base;
+ 
+-      const _CharT __c = __out.fill();
++      const _CharT __c = ___out.fill();
+       for (; __n > 0; --__n)
+ 	{
+-	  const typename _Traits::int_type __put = __out.rdbuf()->sputc(__c);
++	  const typename _Traits::int_type __put = ___out.rdbuf()->sputc(__c);
+ 	  if (_Traits::eq_int_type(__put, _Traits::eof()))
+ 	    {
+-	      __out.setstate(__ios_base::badbit);
++	      ___out.setstate(__ios_base::badbit);
+ 	      break;
+ 	    }
+ 	}
+@@ -74,43 +74,43 @@
+ 
+   template<typename _CharT, typename _Traits>
+     basic_ostream<_CharT, _Traits>&
+-    __ostream_insert(basic_ostream<_CharT, _Traits>& __out,
++    __ostream_insert(basic_ostream<_CharT, _Traits>& ___out,
+ 		     const _CharT* __s, streamsize __n)
+     {
+       typedef basic_ostream<_CharT, _Traits>       __ostream_type;
+       typedef typename __ostream_type::ios_base    __ios_base;
+ 
+-      typename __ostream_type::sentry __cerb(__out);
++      typename __ostream_type::sentry __cerb(___out);
+       if (__cerb)
+ 	{
+ 	  __try
+ 	    {
+-	      const streamsize __w = __out.width();
++	      const streamsize __w = ___out.width();
+ 	      if (__w > __n)
+ 		{
+-		  const bool __left = ((__out.flags()
++		  const bool __left = ((___out.flags()
+ 					& __ios_base::adjustfield)
+ 				       == __ios_base::left);
+ 		  if (!__left)
+-		    __ostream_fill(__out, __w - __n);
+-		  if (__out.good())
+-		    __ostream_write(__out, __s, __n);
+-		  if (__left && __out.good())
+-		    __ostream_fill(__out, __w - __n);
++		    __ostream_fill(___out, __w - __n);
++		  if (___out.good())
++		    __ostream_write(___out, __s, __n);
++		  if (__left && ___out.good())
++		    __ostream_fill(___out, __w - __n);
+ 		}
+ 	      else
+-		__ostream_write(__out, __s, __n);
+-	      __out.width(0);
++		__ostream_write(___out, __s, __n);
++	      ___out.width(0);
+ 	    }
+ 	  __catch(__cxxabiv1::__forced_unwind&)
+ 	    {
+-	      __out._M_setstate(__ios_base::badbit);
++	      ___out._M_setstate(__ios_base::badbit);
+ 	      __throw_exception_again;
+ 	    }
+ 	  __catch(...)
+-	    { __out._M_setstate(__ios_base::badbit); }
++	    { ___out._M_setstate(__ios_base::badbit); }
+ 	}
+-      return __out;
++      return ___out;
+     }
+ 
+   // Inhibit implicit instantiations for required instantiations,
+diff -Naur 12.1.0-orig/bits/parse_numbers.h 12.1.0/bits/parse_numbers.h
+--- 12.1.0-orig/bits/parse_numbers.h	2022-05-17 17:46:54.674554200 +0200
++++ 12.1.0/bits/parse_numbers.h	2022-05-17 18:01:12.453808400 +0200
+@@ -51,20 +51,20 @@
+   template<unsigned _Base>
+     struct _Digit<_Base, '0'> : integral_constant<unsigned, 0>
+     {
+-      using __valid = true_type;
++      using ___valid = true_type;
+     };
+ 
+   template<unsigned _Base>
+     struct _Digit<_Base, '1'> : integral_constant<unsigned, 1>
+     {
+-      using __valid = true_type;
++      using ___valid = true_type;
+     };
+ 
+   template<unsigned _Base, unsigned _Val>
+     struct _Digit_impl : integral_constant<unsigned, _Val>
+     {
+       static_assert(_Base > _Val, "invalid digit");
+-      using __valid = true_type;
++      using ___valid = true_type;
+     };
+ 
+   template<unsigned _Base>
+@@ -151,7 +151,7 @@
+   template<unsigned _Base>
+     struct _Digit<_Base, '\''> : integral_constant<unsigned, 0>
+     {
+-      using __valid = false_type;
++      using ___valid = false_type;
+     };
+ 
+ //------------------------------------------------------------------------------
+@@ -163,7 +163,7 @@
+     struct _Power_help
+     {
+       using __next = typename _Power_help<_Base, _Digs...>::type;
+-      using __valid_digit = typename _Digit<_Base, _Dig>::__valid;
++      using __valid_digit = typename _Digit<_Base, _Dig>::___valid;
+       using type
+ 	= __ull_constant<__next::value * (__valid_digit{} ? _Base : 1ULL)>;
+     };
+@@ -171,7 +171,7 @@
+   template<unsigned _Base, char _Dig>
+     struct _Power_help<_Base, _Dig>
+     {
+-      using __valid_digit = typename _Digit<_Base, _Dig>::__valid;
++      using __valid_digit = typename _Digit<_Base, _Dig>::___valid;
+       using type = __ull_constant<__valid_digit::value>;
+     };
+ 
+@@ -189,7 +189,7 @@
+     struct _Number_help
+     {
+       using __digit = _Digit<_Base, _Dig>;
+-      using __valid_digit = typename __digit::__valid;
++      using __valid_digit = typename __digit::___valid;
+       using __next = _Number_help<_Base,
+ 				  __valid_digit::value ? _Pow / _Base : _Pow,
+ 				  _Digs...>;
+diff -Naur 12.1.0-orig/bits/ranges_algo.h 12.1.0/bits/ranges_algo.h
+--- 12.1.0-orig/bits/ranges_algo.h	2022-05-17 17:46:54.684523700 +0200
++++ 12.1.0/bits/ranges_algo.h	2022-05-17 18:01:12.717365700 +0200
+@@ -1546,7 +1546,7 @@
+ 	&& indirectly_copyable<_Iter, _Out>
+ 	&& uniform_random_bit_generator<remove_reference_t<_Gen>>
+       _Out
+-      operator()(_Iter __first, _Sent __last, _Out __out,
++      operator()(_Iter __first, _Sent __last, _Out ___out,
+ 		 iter_difference_t<_Iter> __n, _Gen&& __g) const
+       {
+ 	if constexpr (forward_iterator<_Iter>)
+@@ -1555,7 +1555,7 @@
+ 	    // which may take linear time.
+ 	    auto __lasti = ranges::next(__first, __last);
+ 	    return _GLIBCXX_STD_A::
+-	      sample(std::move(__first), std::move(__lasti), std::move(__out),
++	      sample(std::move(__first), std::move(__lasti), std::move(___out),
+ 		     __n, std::forward<_Gen>(__g));
+ 	  }
+ 	else
+@@ -1567,7 +1567,7 @@
+ 	    iter_difference_t<_Iter> __sample_sz = 0;
+ 	    while (__first != __last && __sample_sz != __n)
+ 	      {
+-		__out[__sample_sz++] = *__first;
++		___out[__sample_sz++] = *__first;
+ 		++__first;
+ 	      }
+ 	    for (auto __pop_sz = __sample_sz; __first != __last;
+@@ -1575,9 +1575,9 @@
+ 	      {
+ 		const auto __k = __d(__g, __param_type{0, __pop_sz});
+ 		if (__k < __n)
+-		  __out[__k] = *__first;
++		  ___out[__k] = *__first;
+ 	      }
+-	    return __out + __sample_sz;
++	    return ___out + __sample_sz;
+ 	  }
+       }
+ 
+@@ -1586,11 +1586,11 @@
+ 	&& indirectly_copyable<iterator_t<_Range>, _Out>
+ 	&& uniform_random_bit_generator<remove_reference_t<_Gen>>
+       _Out
+-      operator()(_Range&& __r, _Out __out,
++      operator()(_Range&& __r, _Out ___out,
+ 		 range_difference_t<_Range> __n, _Gen&& __g) const
+       {
+ 	return (*this)(ranges::begin(__r), ranges::end(__r),
+-		       std::move(__out), __n,
++		       std::move(___out), __n,
+ 		       std::forward<_Gen>(__g));
+       }
+   };
+@@ -1967,11 +1967,11 @@
+ 				      projected<iterator_t<_Range2>, _Proj2>>
+       constexpr partial_sort_copy_result<borrowed_iterator_t<_Range1>,
+ 					 borrowed_iterator_t<_Range2>>
+-      operator()(_Range1&& __r, _Range2&& __out, _Comp __comp = {},
++      operator()(_Range1&& __r, _Range2&& ___out, _Comp __comp = {},
+ 		 _Proj1 __proj1 = {}, _Proj2 __proj2 = {}) const
+       {
+ 	return (*this)(ranges::begin(__r), ranges::end(__r),
+-		       ranges::begin(__out), ranges::end(__out),
++		       ranges::begin(___out), ranges::end(___out),
+ 		       std::move(__comp),
+ 		       std::move(__proj1), std::move(__proj2));
+       }
+diff -Naur 12.1.0-orig/bits/ranges_algobase.h 12.1.0/bits/ranges_algobase.h
+--- 12.1.0-orig/bits/ranges_algobase.h	2022-05-17 17:46:54.684523700 +0200
++++ 12.1.0/bits/ranges_algobase.h	2022-05-17 18:01:12.729333700 +0200
+@@ -220,34 +220,34 @@
+       using __detail::__is_normal_iterator;
+       if constexpr (__is_move_iterator<_Iter> && same_as<_Iter, _Sent>)
+ 	{
+-	  auto [__in, __out]
++	  auto [___in, ___out]
+ 	    = ranges::__copy_or_move<true>(std::move(__first).base(),
+ 					   std::move(__last).base(),
+ 					   std::move(__result));
+-	  return {move_iterator{std::move(__in)}, std::move(__out)};
++	  return {move_iterator{std::move(___in)}, std::move(___out)};
+ 	}
+       else if constexpr (__is_reverse_iterator<_Iter> && same_as<_Iter, _Sent>
+ 			 && __is_reverse_iterator<_Out>)
+ 	{
+-	  auto [__in,__out]
++	  auto [___in,___out]
+ 	    = ranges::__copy_or_move_backward<_IsMove>(std::move(__last).base(),
+ 						       std::move(__first).base(),
+ 						       std::move(__result).base());
+-	  return {reverse_iterator{std::move(__in)},
+-		  reverse_iterator{std::move(__out)}};
++	  return {reverse_iterator{std::move(___in)},
++		  reverse_iterator{std::move(___out)}};
+ 	}
+       else if constexpr (__is_normal_iterator<_Iter> && same_as<_Iter, _Sent>)
+ 	{
+-	  auto [__in,__out]
++	  auto [___in,___out]
+ 	    = ranges::__copy_or_move<_IsMove>(__first.base(), __last.base(),
+ 					      __result);
+-	  return {decltype(__first){__in}, std::move(__out)};
++	  return {decltype(__first){___in}, std::move(___out)};
+ 	}
+       else if constexpr (__is_normal_iterator<_Out>)
+ 	{
+-	  auto [__in,__out]
++	  auto [___in,___out]
+ 	    = ranges::__copy_or_move<_IsMove>(std::move(__first), __last, __result.base());
+-	  return {std::move(__in), decltype(__result){__out}};
++	  return {std::move(___in), decltype(__result){___out}};
+ 	}
+       else if constexpr (sized_sentinel_for<_Sent, _Iter>)
+ 	{
+@@ -361,28 +361,28 @@
+       if constexpr (__is_reverse_iterator<_Iter> && same_as<_Iter, _Sent>
+ 		    && __is_reverse_iterator<_Out>)
+ 	{
+-	  auto [__in,__out]
++	  auto [___in,___out]
+ 	    = ranges::__copy_or_move<_IsMove>(std::move(__last).base(),
+ 					      std::move(__first).base(),
+ 					      std::move(__result).base());
+-	  return {reverse_iterator{std::move(__in)},
+-		  reverse_iterator{std::move(__out)}};
++	  return {reverse_iterator{std::move(___in)},
++		  reverse_iterator{std::move(___out)}};
+ 	}
+       else if constexpr (__is_normal_iterator<_Iter> && same_as<_Iter, _Sent>)
+ 	{
+-	  auto [__in,__out]
++	  auto [___in,___out]
+ 	    = ranges::__copy_or_move_backward<_IsMove>(__first.base(),
+ 						       __last.base(),
+ 						       std::move(__result));
+-	  return {decltype(__first){__in}, std::move(__out)};
++	  return {decltype(__first){___in}, std::move(___out)};
+ 	}
+       else if constexpr (__is_normal_iterator<_Out>)
+ 	{
+-	  auto [__in,__out]
++	  auto [___in,___out]
+ 	    = ranges::__copy_or_move_backward<_IsMove>(std::move(__first),
+ 						       std::move(__last),
+ 						       __result.base());
+-	  return {std::move(__in), decltype(__result){__out}};
++	  return {std::move(___in), decltype(__result){___out}};
+ 	}
+       else if constexpr (sized_sentinel_for<_Sent, _Iter>)
+ 	{
+diff -Naur 12.1.0-orig/bits/ranges_uninitialized.h 12.1.0/bits/ranges_uninitialized.h
+--- 12.1.0-orig/bits/ranges_uninitialized.h	2022-05-17 17:46:54.684523700 +0200
++++ 12.1.0/bits/ranges_uninitialized.h	2022-05-17 18:01:12.755997900 +0200
+@@ -361,10 +361,10 @@
+ 	  {
+ 	    auto __d1 = __ilast - __ifirst;
+ 	    auto __d2 = __olast - __ofirst;
+-	    auto [__in, __out]
++	    auto [___in, ___out]
+ 	      = ranges::copy_n(std::make_move_iterator(std::move(__ifirst)),
+ 			       std::min(__d1, __d2), __ofirst);
+-	    return {std::move(__in).base(), __out};
++	    return {std::move(___in).base(), ___out};
+ 	  }
+ 	else
+ 	  {
+@@ -412,10 +412,10 @@
+ 						 iter_rvalue_reference_t<_Iter>>)
+ 	  {
+ 	    auto __d = __olast - __ofirst;
+-	    auto [__in, __out]
++	    auto [___in, ___out]
+ 	      = ranges::copy_n(std::make_move_iterator(std::move(__ifirst)),
+ 			       std::min(__n, __d), __ofirst);
+-	    return {std::move(__in).base(), __out};
++	    return {std::move(___in).base(), ___out};
+ 	  }
+ 	else
+ 	  {
+diff -Naur 12.1.0-orig/bits/regex.h 12.1.0/bits/regex.h
+--- 12.1.0-orig/bits/regex.h	2022-05-17 17:46:54.684523700 +0200
++++ 12.1.0/bits/regex.h	2022-05-17 18:01:12.824639500 +0200
+@@ -207,7 +207,7 @@
+       {
+ 	typedef std::ctype<char_type> __ctype_type;
+ 	const __ctype_type& __fctyp(use_facet<__ctype_type>(_M_locale));
+-	return __fctyp.tolower(__c);
++	return (__fctyp.tolower)(__c);
+       }
+ 
+       /**
+@@ -267,7 +267,7 @@
+ 	  typedef std::ctype<char_type> __ctype_type;
+ 	  const __ctype_type& __fctyp(use_facet<__ctype_type>(_M_locale));
+ 	  _GLIBCXX_STD_C::vector<char_type> __s(__first, __last);
+-	  __fctyp.tolower(__s.data(), __s.data() + __s.size());
++	  (__fctyp.tolower)(__s.data(), __s.data() + __s.size());
+ 	  return this->transform(__s.data(), __s.data() + __s.size());
+ 	}
+ 
+@@ -1976,7 +1976,7 @@
+        */
+       template<typename _Out_iter>
+ 	_Out_iter
+-	format(_Out_iter __out, const char_type* __fmt_first,
++	format(_Out_iter ___out, const char_type* __fmt_first,
+ 	       const char_type* __fmt_last,
+ 	       match_flag_type __flags = regex_constants::format_default) const;
+ 
+@@ -1985,10 +1985,10 @@
+        */
+       template<typename _Out_iter, typename _St, typename _Sa>
+ 	_Out_iter
+-	format(_Out_iter __out, const basic_string<char_type, _St, _Sa>& __fmt,
++	format(_Out_iter ___out, const basic_string<char_type, _St, _Sa>& __fmt,
+ 	       match_flag_type __flags = regex_constants::format_default) const
+ 	{
+-	  return format(__out, __fmt.data(), __fmt.data() + __fmt.size(),
++	  return format(___out, __fmt.data(), __fmt.data() + __fmt.size(),
+ 			__flags);
+ 	}
+ 
+@@ -2489,7 +2489,7 @@
+   template<typename _Out_iter, typename _Bi_iter,
+ 	   typename _Rx_traits, typename _Ch_type>
+     _Out_iter
+-    __regex_replace(_Out_iter __out, _Bi_iter __first, _Bi_iter __last,
++    __regex_replace(_Out_iter ___out, _Bi_iter __first, _Bi_iter __last,
+ 		    const basic_regex<_Ch_type, _Rx_traits>& __e,
+ 		    const _Ch_type* __fmt, size_t __len,
+ 		    regex_constants::match_flag_type __flags);
+@@ -2511,13 +2511,13 @@
+ 	   typename _Rx_traits, typename _Ch_type,
+ 	   typename _St, typename _Sa>
+     inline _Out_iter
+-    regex_replace(_Out_iter __out, _Bi_iter __first, _Bi_iter __last,
++    regex_replace(_Out_iter ___out, _Bi_iter __first, _Bi_iter __last,
+ 		  const basic_regex<_Ch_type, _Rx_traits>& __e,
+ 		  const basic_string<_Ch_type, _St, _Sa>& __fmt,
+ 		  regex_constants::match_flag_type __flags
+ 		  = regex_constants::match_default)
+     {
+-      return std::__regex_replace(__out, __first, __last, __e, __fmt.c_str(),
++      return std::__regex_replace(___out, __first, __last, __e, __fmt.c_str(),
+ 				  __fmt.length(), __flags);
+     }
+ 
+@@ -2537,13 +2537,13 @@
+   template<typename _Out_iter, typename _Bi_iter,
+ 	   typename _Rx_traits, typename _Ch_type>
+     _Out_iter
+-    regex_replace(_Out_iter __out, _Bi_iter __first, _Bi_iter __last,
++    regex_replace(_Out_iter ___out, _Bi_iter __first, _Bi_iter __last,
+ 		  const basic_regex<_Ch_type, _Rx_traits>& __e,
+ 		  const _Ch_type* __fmt,
+ 		  regex_constants::match_flag_type __flags
+ 		  = regex_constants::match_default)
+     {
+-      return std::__regex_replace(__out, __first, __last, __e, __fmt,
++      return std::__regex_replace(___out, __first, __last, __e, __fmt,
+ 				  char_traits<_Ch_type>::length(__fmt),
+ 				  __flags);
+     }
+diff -Naur 12.1.0-orig/bits/regex.tcc 12.1.0/bits/regex.tcc
+--- 12.1.0-orig/bits/regex.tcc	2022-05-17 17:46:54.684523700 +0200
++++ 12.1.0/bits/regex.tcc	2022-05-17 18:01:12.835610100 +0200
+@@ -86,22 +86,22 @@
+ 	  for (auto& __it : __res)
+ 	    if (!__it.matched)
+ 	      __it.first = __it.second = __e;
+-	  auto& __pre = __m._M_prefix();
++	  auto& ___pre = __m._M_prefix();
+ 	  auto& __suf = __m._M_suffix();
+ 	  if (__match_mode)
+ 	    {
+-	      __pre.matched = false;
+-	      __pre.first = __s;
+-	      __pre.second = __s;
++	      ___pre.matched = false;
++	      ___pre.first = __s;
++	      ___pre.second = __s;
+ 	      __suf.matched = false;
+ 	      __suf.first = __e;
+ 	      __suf.second = __e;
+ 	    }
+ 	  else
+ 	    {
+-	      __pre.first = __s;
+-	      __pre.second = __res[0].first;
+-	      __pre.matched = (__pre.first != __pre.second);
++	      ___pre.first = __s;
++	      ___pre.second = __res[0].first;
++	      ___pre.matched = (___pre.first != ___pre.second);
+ 	      __suf.first = __res[0].second;
+ 	      __suf.second = __e;
+ 	      __suf.matched = (__suf.first != __suf.second);
+@@ -305,7 +305,7 @@
+ 
+       string __s;
+       for (; __first != __last; ++__first)
+-	__s += __fctyp.narrow(__fctyp.tolower(*__first), 0);
++	__s += __fctyp.narrow((__fctyp.tolower)(*__first), 0);
+ 
+       for (const auto& __it : __classnames)
+ 	if (__s == __it.first)
+@@ -352,7 +352,7 @@
+   template<typename _Out_iter>
+     _Out_iter
+     match_results<_Bi_iter, _Alloc>::
+-    format(_Out_iter __out,
++    format(_Out_iter ___out,
+ 	   const match_results<_Bi_iter, _Alloc>::char_type* __fmt_first,
+ 	   const match_results<_Bi_iter, _Alloc>::char_type* __fmt_last,
+ 	   match_flag_type __flags) const
+@@ -367,7 +367,7 @@
+ 	{
+ 	  auto& __sub = (*this)[__idx];
+ 	  if (__sub.matched)
+-	    __out = std::copy(__sub.first, __sub.second, __out);
++	    ___out = std::copy(__sub.first, __sub.second, ___out);
+ 	};
+ 
+       if (__flags & regex_constants::format_sed)
+@@ -381,7 +381,7 @@
+ 		  if (__fctyp.is(__ctype_type::digit, *__fmt_first))
+ 		    __output(__traits.value(*__fmt_first, 10));
+ 		  else
+-		    *__out++ = *__fmt_first;
++		    *___out++ = *__fmt_first;
+ 		  continue;
+ 		}
+ 	      if (*__fmt_first == '\\')
+@@ -394,10 +394,10 @@
+ 		  __output(0);
+ 		  continue;
+ 		}
+-	      *__out++ = *__fmt_first;
++	      *___out++ = *__fmt_first;
+ 	    }
+ 	  if (__escaping)
+-	    *__out++ = '\\';
++	    *___out++ = '\\';
+ 	}
+       else
+ 	{
+@@ -407,7 +407,7 @@
+ 	      if (__next == __fmt_last)
+ 		break;
+ 
+-	      __out = std::copy(__fmt_first, __next, __out);
++	      ___out = std::copy(__fmt_first, __next, ___out);
+ 
+ 	      auto __eat = [&](char __ch) -> bool
+ 		{
+@@ -420,22 +420,22 @@
+ 		};
+ 
+ 	      if (++__next == __fmt_last)
+-		*__out++ = '$';
++		*___out++ = '$';
+ 	      else if (__eat('$'))
+-		*__out++ = '$';
++		*___out++ = '$';
+ 	      else if (__eat('&'))
+ 		__output(0);
+ 	      else if (__eat('`'))
+ 		{
+ 		  auto& __sub = _M_prefix();
+ 		  if (__sub.matched)
+-		    __out = std::copy(__sub.first, __sub.second, __out);
++		    ___out = std::copy(__sub.first, __sub.second, ___out);
+ 		}
+ 	      else if (__eat('\''))
+ 		{
+ 		  auto& __sub = _M_suffix();
+ 		  if (__sub.matched)
+-		    __out = std::copy(__sub.first, __sub.second, __out);
++		    ___out = std::copy(__sub.first, __sub.second, ___out);
+ 		}
+ 	      else if (__fctyp.is(__ctype_type::digit, *__next))
+ 		{
+@@ -450,18 +450,18 @@
+ 		    __output(__num);
+ 		}
+ 	      else
+-		*__out++ = '$';
++		*___out++ = '$';
+ 	      __fmt_first = __next;
+ 	    }
+-	  __out = std::copy(__fmt_first, __fmt_last, __out);
++	  ___out = std::copy(__fmt_first, __fmt_last, ___out);
+ 	}
+-      return __out;
++      return ___out;
+     }
+ 
+   template<typename _Out_iter, typename _Bi_iter,
+ 	   typename _Rx_traits, typename _Ch_type>
+     _Out_iter
+-    __regex_replace(_Out_iter __out, _Bi_iter __first, _Bi_iter __last,
++    __regex_replace(_Out_iter ___out, _Bi_iter __first, _Bi_iter __last,
+ 		    const basic_regex<_Ch_type, _Rx_traits>& __e,
+ 		    const _Ch_type* __fmt, size_t __len,
+ 		    regex_constants::match_flag_type __flags)
+@@ -472,7 +472,7 @@
+       if (__i == __end)
+ 	{
+ 	  if (!(__flags & regex_constants::format_no_copy))
+-	    __out = std::copy(__first, __last, __out);
++	    ___out = std::copy(__first, __last, ___out);
+ 	}
+       else
+ 	{
+@@ -480,17 +480,17 @@
+ 	  for (; __i != __end; ++__i)
+ 	    {
+ 	      if (!(__flags & regex_constants::format_no_copy))
+-		__out = std::copy(__i->prefix().first, __i->prefix().second,
+-				  __out);
+-	      __out = __i->format(__out, __fmt, __fmt + __len, __flags);
++		___out = std::copy(__i->prefix().first, __i->prefix().second,
++				  ___out);
++	      ___out = __i->format(___out, __fmt, __fmt + __len, __flags);
+ 	      __last = __i->suffix();
+ 	      if (__flags & regex_constants::format_first_only)
+ 		break;
+ 	    }
+ 	  if (!(__flags & regex_constants::format_no_copy))
+-	    __out = std::copy(__last.first, __last.second, __out);
++	    ___out = std::copy(__last.first, __last.second, ___out);
+ 	}
+-      return __out;
++      return ___out;
+     }
+ 
+   template<typename _Bi_iter,
+diff -Naur 12.1.0-orig/bits/regex_compiler.h 12.1.0/bits/regex_compiler.h
+--- 12.1.0-orig/bits/regex_compiler.h	2022-05-17 17:46:54.684523700 +0200
++++ 12.1.0/bits/regex_compiler.h	2022-05-17 18:01:12.854560400 +0200
+@@ -249,8 +249,8 @@
+       {
+ 	typedef std::ctype<_CharT> __ctype_type;
+ 	const auto& __fctyp = use_facet<__ctype_type>(this->_M_traits.getloc());
+-	auto __lower = __fctyp.tolower(__ch);
+-	auto __upper = __fctyp.toupper(__ch);
++	auto __lower = (__fctyp.tolower)(__ch);
++	auto __upper = (__fctyp.toupper)(__ch);
+ 	return (__first <= __lower && __lower <= __last)
+ 	  || (__first <= __upper && __upper <= __last);
+       }
+diff -Naur 12.1.0-orig/bits/regex_executor.tcc 12.1.0/bits/regex_executor.tcc
+--- 12.1.0-orig/bits/regex_executor.tcc	2022-05-17 17:46:54.684523700 +0200
++++ 12.1.0/bits/regex_executor.tcc	2022-05-17 18:01:12.882485100 +0200
+@@ -374,8 +374,8 @@
+ 			     __actual_begin, __actual_end,
+ 			     [this, &__fctyp](_CharT __lhs, _CharT __rhs)
+ 			     {
+-			       return __fctyp.tolower(__lhs)
+-				 == __fctyp.tolower(__rhs);
++			       return (__fctyp.tolower)(__lhs)
++				 == (__fctyp.tolower)(__rhs);
+ 			     });
+       }
+ 
+diff -Naur 12.1.0-orig/bits/shared_ptr_atomic.h 12.1.0/bits/shared_ptr_atomic.h
+--- 12.1.0-orig/bits/shared_ptr_atomic.h	2022-05-17 17:46:54.684523700 +0200
++++ 12.1.0/bits/shared_ptr_atomic.h	2022-05-17 18:01:12.923596500 +0200
+@@ -256,11 +256,11 @@
+     atomic_compare_exchange_weak_explicit(shared_ptr<_Tp>* __p,
+ 					  shared_ptr<_Tp>* __v,
+ 					  shared_ptr<_Tp> __w,
+-					  memory_order __success,
++					  memory_order ___success,
+ 					  memory_order __failure)
+     {
+       return std::atomic_compare_exchange_strong_explicit(__p, __v,
+-	  std::move(__w), __success, __failure);
++	  std::move(__w), ___success, __failure);
+     }
+ 
+   template<typename _Tp>
+@@ -309,11 +309,11 @@
+     atomic_compare_exchange_weak_explicit(__shared_ptr<_Tp, _Lp>* __p,
+ 					  __shared_ptr<_Tp, _Lp>* __v,
+ 					  __shared_ptr<_Tp, _Lp> __w,
+-					  memory_order __success,
++					  memory_order ___success,
+ 					  memory_order __failure)
+     {
+       return std::atomic_compare_exchange_strong_explicit(__p, __v,
+-	  std::move(__w), __success, __failure);
++	  std::move(__w), ___success, __failure);
+     }
+ 
+   template<typename _Tp, _Lock_policy _Lp>
+diff -Naur 12.1.0-orig/bits/std_function.h 12.1.0/bits/std_function.h
+--- 12.1.0-orig/bits/std_function.h	2022-05-17 17:46:54.684523700 +0200
++++ 12.1.0/bits/std_function.h	2022-05-17 18:01:12.991101100 +0200
+@@ -315,7 +315,7 @@
+   // e.g. _Function_handler<Sig, void()> and _Function_handler<Sig, void>
+   // would be ill-formed.
+   template<typename _Signature, typename _Functor,
+-	   bool __valid = is_object<_Functor>::value>
++	   bool ___valid = is_object<_Functor>::value>
+     struct _Target_handler
+     : _Function_handler<_Signature, typename remove_cv<_Functor>::type>
+     { };
+diff -Naur 12.1.0-orig/bits/std_thread.h 12.1.0/bits/std_thread.h
+--- 12.1.0-orig/bits/std_thread.h	2022-05-17 17:46:54.684523700 +0200
++++ 12.1.0/bits/std_thread.h	2022-05-17 18:01:12.999080000 +0200
+@@ -104,7 +104,7 @@
+ 
+       template<class _CharT, class _Traits>
+ 	friend basic_ostream<_CharT, _Traits>&
+-	operator<<(basic_ostream<_CharT, _Traits>& __out, id __id);
++	operator<<(basic_ostream<_CharT, _Traits>& ___out, id __id);
+     };
+ 
+   private:
+diff -Naur 12.1.0-orig/bits/stl_algo.h 12.1.0/bits/stl_algo.h
+--- 12.1.0-orig/bits/stl_algo.h	2022-05-17 17:46:54.684523700 +0200
++++ 12.1.0/bits/stl_algo.h	2022-05-17 18:01:13.073843600 +0200
+@@ -5767,7 +5767,7 @@
+            typename _Size, typename _UniformRandomBitGenerator>
+     _RandomAccessIterator
+     __sample(_InputIterator __first, _InputIterator __last, input_iterator_tag,
+-	     _RandomAccessIterator __out, random_access_iterator_tag,
++	     _RandomAccessIterator ___out, random_access_iterator_tag,
+ 	     _Size __n, _UniformRandomBitGenerator&& __g)
+     {
+       using __distrib_type = uniform_int_distribution<_Size>;
+@@ -5776,7 +5776,7 @@
+       _Size __sample_sz = 0;
+       while (__first != __last && __sample_sz != __n)
+ 	{
+-	  __out[__sample_sz++] = *__first;
++	  ___out[__sample_sz++] = *__first;
+ 	  ++__first;
+ 	}
+       for (auto __pop_sz = __sample_sz; __first != __last;
+@@ -5784,9 +5784,9 @@
+ 	{
+ 	  const auto __k = __d(__g, __param_type{0, __pop_sz});
+ 	  if (__k < __n)
+-	    __out[__k] = *__first;
++	    ___out[__k] = *__first;
+ 	}
+-      return __out + __sample_sz;
++      return ___out + __sample_sz;
+     }
+ 
+   /// Selection sampling algorithm.
+@@ -5795,7 +5795,7 @@
+     _OutputIterator
+     __sample(_ForwardIterator __first, _ForwardIterator __last,
+ 	     forward_iterator_tag,
+-	     _OutputIterator __out, _Cat,
++	     _OutputIterator ___out, _Cat,
+ 	     _Size __n, _UniformRandomBitGenerator&& __g)
+     {
+       using __distrib_type = uniform_int_distribution<_Size>;
+@@ -5805,7 +5805,7 @@
+       using __uc_type = common_type_t<typename _Gen::result_type, _USize>;
+ 
+       if (__first == __last)
+-	return __out;
++	return ___out;
+ 
+       __distrib_type __d{};
+       _Size __unsampled_sz = std::distance(__first, __last);
+@@ -5827,7 +5827,7 @@
+ 	      --__unsampled_sz;
+ 	      if (__p.first < __n)
+ 		{
+-		  *__out++ = *__first;
++		  *___out++ = *__first;
+ 		  --__n;
+ 		}
+ 
+@@ -5838,7 +5838,7 @@
+ 	      --__unsampled_sz;
+ 	      if (__p.second < __n)
+ 		{
+-		  *__out++ = *__first;
++		  *___out++ = *__first;
+ 		  --__n;
+ 		}
+ 
+@@ -5851,10 +5851,10 @@
+       for (; __n != 0; ++__first)
+ 	if (__d(__g, __param_type{0, --__unsampled_sz}) < __n)
+ 	  {
+-	    *__out++ = *__first;
++	    *___out++ = *__first;
+ 	    --__n;
+ 	  }
+-      return __out;
++      return ___out;
+     }
+ 
+ #if __cplusplus > 201402L
+@@ -5864,7 +5864,7 @@
+            typename _Distance, typename _UniformRandomBitGenerator>
+     _SampleIterator
+     sample(_PopulationIterator __first, _PopulationIterator __last,
+-	   _SampleIterator __out, _Distance __n,
++	   _SampleIterator ___out, _Distance __n,
+ 	   _UniformRandomBitGenerator&& __g)
+     {
+       using __pop_cat = typename
+@@ -5883,7 +5883,7 @@
+ 
+       typename iterator_traits<_PopulationIterator>::difference_type __d = __n;
+       return _GLIBCXX_STD_A::
+-	__sample(__first, __last, __pop_cat{}, __out, __samp_cat{}, __d,
++	__sample(__first, __last, __pop_cat{}, ___out, __samp_cat{}, __d,
+ 		 std::forward<_UniformRandomBitGenerator>(__g));
+     }
+ #endif // C++17
+diff -Naur 12.1.0-orig/bits/stl_pair.h 12.1.0/bits/stl_pair.h
+--- 12.1.0-orig/bits/stl_pair.h	2022-05-17 17:46:54.694444000 +0200
++++ 12.1.0/bits/stl_pair.h	2022-05-17 18:01:13.333700500 +0200
+@@ -852,23 +852,23 @@
+ 
+   template<size_t _Int, class _Tp1, class _Tp2>
+     constexpr typename tuple_element<_Int, pair<_Tp1, _Tp2>>::type&
+-    get(pair<_Tp1, _Tp2>& __in) noexcept
+-    { return __pair_get<_Int>::__get(__in); }
++    get(pair<_Tp1, _Tp2>& ___in) noexcept
++    { return __pair_get<_Int>::__get(___in); }
+ 
+   template<size_t _Int, class _Tp1, class _Tp2>
+     constexpr typename tuple_element<_Int, pair<_Tp1, _Tp2>>::type&&
+-    get(pair<_Tp1, _Tp2>&& __in) noexcept
+-    { return __pair_get<_Int>::__move_get(std::move(__in)); }
++    get(pair<_Tp1, _Tp2>&& ___in) noexcept
++    { return __pair_get<_Int>::__move_get(std::move(___in)); }
+ 
+   template<size_t _Int, class _Tp1, class _Tp2>
+     constexpr const typename tuple_element<_Int, pair<_Tp1, _Tp2>>::type&
+-    get(const pair<_Tp1, _Tp2>& __in) noexcept
+-    { return __pair_get<_Int>::__const_get(__in); }
++    get(const pair<_Tp1, _Tp2>& ___in) noexcept
++    { return __pair_get<_Int>::__const_get(___in); }
+ 
+   template<size_t _Int, class _Tp1, class _Tp2>
+     constexpr const typename tuple_element<_Int, pair<_Tp1, _Tp2>>::type&&
+-    get(const pair<_Tp1, _Tp2>&& __in) noexcept
+-    { return __pair_get<_Int>::__const_move_get(std::move(__in)); }
++    get(const pair<_Tp1, _Tp2>&& ___in) noexcept
++    { return __pair_get<_Int>::__const_move_get(std::move(___in)); }
+ 
+ #if __cplusplus >= 201402L
+ 
+diff -Naur 12.1.0-orig/bits/stl_uninitialized.h 12.1.0/bits/stl_uninitialized.h
+--- 12.1.0-orig/bits/stl_uninitialized.h	2022-05-17 17:46:54.694444000 +0200
++++ 12.1.0/bits/stl_uninitialized.h	2022-05-17 18:01:13.429503700 +0200
+@@ -1109,9 +1109,9 @@
+ 	    {
+ 	      // Can't use memmove. Wrap the pointer so that __relocate_a_1
+ 	      // resolves to the non-trivial overload above.
+-	      __gnu_cxx::__normal_iterator<_Tp*, void> __out(__result);
+-	      __out = std::__relocate_a_1(__first, __last, __out, __alloc);
+-	      return __out.base();
++	      __gnu_cxx::__normal_iterator<_Tp*, void> ___out(__result);
++	      ___out = std::__relocate_a_1(__first, __last, ___out, __alloc);
++	      return ___out.base();
+ 	    }
+ #endif
+ 	  __builtin_memmove(__result, __first, __count * sizeof(_Tp));
+diff -Naur 12.1.0-orig/charconv 12.1.0/charconv
+--- 12.1.0-orig/charconv	2022-05-17 17:46:54.744847400 +0200
++++ 12.1.0/charconv	2022-05-17 18:01:13.653866500 +0200
+@@ -566,25 +566,25 @@
+       _Up __val = 0;
+ 
+       const auto __start = __first;
+-      bool __valid;
++      bool ___valid;
+       if ((__base & (__base - 1)) == 0)
+ 	{
+ 	  if (__base <= 8)
+-	    __valid = __detail::__from_chars_pow2_base<true>(__first, __last, __val, __base);
++	    ___valid = __detail::__from_chars_pow2_base<true>(__first, __last, __val, __base);
+ 	  else
+-	    __valid = __detail::__from_chars_pow2_base<false>(__first, __last, __val, __base);
++	    ___valid = __detail::__from_chars_pow2_base<false>(__first, __last, __val, __base);
+ 	}
+       else if (__base <= 10)
+-	__valid = __detail::__from_chars_alnum<true>(__first, __last, __val, __base);
++	___valid = __detail::__from_chars_alnum<true>(__first, __last, __val, __base);
+       else
+-	__valid = __detail::__from_chars_alnum<false>(__first, __last, __val, __base);
++	___valid = __detail::__from_chars_alnum<false>(__first, __last, __val, __base);
+ 
+       if (__builtin_expect(__first == __start, 0))
+ 	__res.ec = errc::invalid_argument;
+       else
+ 	{
+ 	  __res.ptr = __first;
+-	  if (!__valid)
++	  if (!___valid)
+ 	    __res.ec = errc::result_out_of_range;
+ 	  else
+ 	    {
+diff -Naur 12.1.0-orig/experimental/algorithm 12.1.0/experimental/algorithm
+--- 12.1.0-orig/experimental/algorithm	2022-05-17 17:46:54.724616900 +0200
++++ 12.1.0/experimental/algorithm	2022-05-17 18:01:14.089746300 +0200
+@@ -59,7 +59,7 @@
+            typename _Distance, typename _UniformRandomNumberGenerator>
+     _SampleIterator
+     sample(_PopulationIterator __first, _PopulationIterator __last,
+-	   _SampleIterator __out, _Distance __n,
++	   _SampleIterator ___out, _Distance __n,
+ 	   _UniformRandomNumberGenerator&& __g)
+     {
+       using __pop_cat = typename
+@@ -78,7 +78,7 @@
+ 
+       typename iterator_traits<_PopulationIterator>::difference_type __d = __n;
+       return _GLIBCXX_STD_A::
+-	__sample(__first, __last, __pop_cat{}, __out, __samp_cat{}, __d,
++	__sample(__first, __last, __pop_cat{}, ___out, __samp_cat{}, __d,
+ 		 std::forward<_UniformRandomNumberGenerator>(__g));
+     }
+ 
+@@ -86,9 +86,9 @@
+            typename _Distance>
+     inline _SampleIterator
+     sample(_PopulationIterator __first, _PopulationIterator __last,
+-	   _SampleIterator __out, _Distance __n)
++	   _SampleIterator ___out, _Distance __n)
+     {
+-      return experimental::sample(__first, __last, __out, __n,
++      return experimental::sample(__first, __last, ___out, __n,
+ 				  _S_randint_engine());
+     }
+ 
+diff -Naur 12.1.0-orig/experimental/bits/shared_ptr.h 12.1.0/experimental/bits/shared_ptr.h
+--- 12.1.0-orig/experimental/bits/shared_ptr.h	2022-05-17 17:46:54.734556800 +0200
++++ 12.1.0/experimental/bits/shared_ptr.h	2022-05-17 18:01:14.164560300 +0200
+@@ -599,20 +599,20 @@
+      bool atomic_compare_exchange_weak_explicit(shared_ptr<_Tp>* __p,
+ 						shared_ptr<_Tp>* __v,
+ 						shared_ptr<_Tp> __w,
+-						memory_order __success,
++						memory_order ___success,
+ 						memory_order __failure)
+      { return std::atomic_compare_exchange_weak_explicit<_Tp>(__p, __v, __w,
+-							      __success,
++							      ___success,
+ 							      __failure); }
+ 
+    template<typename _Tp>
+      bool atomic_compare_exchange_strong_explicit(shared_ptr<_Tp>* __p,
+ 						  shared_ptr<_Tp>* __v,
+ 						  shared_ptr<_Tp> __w,
+-						  memory_order __success,
++						  memory_order ___success,
+ 						  memory_order __failure)
+      { return std::atomic_compare_exchange_strong_explicit<_Tp>(__p, __v, __w,
+-								__success,
++								___success,
+ 								__failure); }
+ 
+   //enable_shared_from_this
+diff -Naur 12.1.0-orig/experimental/bits/simd.h 12.1.0/experimental/bits/simd.h
+--- 12.1.0-orig/experimental/bits/simd.h	2022-05-17 17:46:54.734556800 +0200
++++ 12.1.0/experimental/bits/simd.h	2022-05-17 18:01:14.272012600 +0200
+@@ -2170,20 +2170,20 @@
+ 	  typename _R = __vector_type_t<typename _TVT::value_type,
+ 			  _TVT::_S_full_size / _SplitBy>>
+   _GLIBCXX_SIMD_INTRINSIC constexpr _R
+-  __extract(_Tp __in)
++  __extract(_Tp ___in)
+   {
+     using value_type = typename _TVT::value_type;
+ #if _GLIBCXX_SIMD_X86INTRIN // {{{
+     if constexpr (sizeof(_Tp) == 64 && _SplitBy == 4 && _Offset > 0)
+       {
+ 	if constexpr (__have_avx512dq && is_same_v<double, value_type>)
+-	  return _mm512_extractf64x2_pd(__to_intrin(__in), _Offset);
++	  return _mm512_extractf64x2_pd(__to_intrin(___in), _Offset);
+ 	else if constexpr (is_floating_point_v<value_type>)
+ 	  return __vector_bitcast<value_type>(
+-	    _mm512_extractf32x4_ps(__intrin_bitcast<__m512>(__in), _Offset));
++	    _mm512_extractf32x4_ps(__intrin_bitcast<__m512>(___in), _Offset));
+ 	else
+ 	  return reinterpret_cast<_R>(
+-	    _mm512_extracti32x4_epi32(__intrin_bitcast<__m512i>(__in),
++	    _mm512_extracti32x4_epi32(__intrin_bitcast<__m512i>(___in),
+ 				      _Offset));
+       }
+     else
+@@ -2196,12 +2196,12 @@
+ 	static_assert(sizeof(_R) % sizeof(_W) == 0);
+ 	constexpr int __return_width = sizeof(_R) / sizeof(_W);
+ 	using _Up = __vector_type_t<_W, __return_width>;
+-	const auto __x = __vector_bitcast<_W>(__in);
++	const auto __x = __vector_bitcast<_W>(___in);
+ #else
+       constexpr int __return_width = _TVT::_S_full_size / _SplitBy;
+       using _Up = _R;
+       const __vector_type_t<value_type, _TVT::_S_full_size>& __x
+-	= __in; // only needed for _Tp = _SimdWrapper<value_type, _Np>
++	= ___in; // only needed for _Tp = _SimdWrapper<value_type, _Np>
+ #endif
+ 	constexpr int _O = _Offset * __return_width;
+ 	return __call_with_subscripts<__return_width, _O>(
+diff -Naur 12.1.0-orig/experimental/internet 12.1.0/experimental/internet
+--- 12.1.0-orig/experimental/internet	2022-05-17 17:46:54.724616900 +0200
++++ 12.1.0/experimental/internet	2022-05-17 18:01:14.743613400 +0200
+@@ -810,9 +810,9 @@
+     if (__p == nullptr)
+       return __make_address_v6(__str, nullptr, __ec);
+     char __buf[64];
+-    char* __out = __buf;
++    char* ___out = __buf;
+     bool __skip_leading_zero = true;
+-    while (__str < __p && __out < std::end(__buf))
++    while (__str < __p && ___out < std::end(__buf))
+       {
+ 	if (!__skip_leading_zero || *__str != '0')
+ 	  {
+@@ -820,18 +820,18 @@
+ 	      __skip_leading_zero = true;
+ 	    else
+ 	      __skip_leading_zero = false;
+-	    *__out = *__str;
++	    *___out = *__str;
+ 	  }
+ 	__str++;
+       }
+-    if (__out == std::end(__buf))
++    if (___out == std::end(__buf))
+       {
+ 	__ec = std::make_error_code(std::errc::invalid_argument);
+ 	return {};
+       }
+     else
+       {
+-	*__out = '\0';
++	*___out = '\0';
+ 	return __make_address_v6(__buf, __p + 1, __ec);
+       }
+   }
+@@ -847,10 +847,10 @@
+     if (__pos == string::npos)
+       return __make_address_v6(__str.c_str(), nullptr, __ec);
+     char __buf[64];
+-    char* __out = __buf;
++    char* ___out = __buf;
+     bool __skip_leading_zero = true;
+     size_t __n = 0;
+-    while (__n < __pos && __out < std::end(__buf))
++    while (__n < __pos && ___out < std::end(__buf))
+       {
+ 	if (!__skip_leading_zero || __str[__n] != '0')
+ 	  {
+@@ -858,18 +858,18 @@
+ 	      __skip_leading_zero = true;
+ 	    else
+ 	      __skip_leading_zero = false;
+-	    *__out = __str[__n];
++	    *___out = __str[__n];
+ 	  }
+ 	__n++;
+       }
+-    if (__out == std::end(__buf))
++    if (___out == std::end(__buf))
+       {
+ 	__ec = std::make_error_code(std::errc::invalid_argument);
+ 	return {};
+       }
+     else
+       {
+-	*__out = '\0';
++	*___out = '\0';
+ 	return __make_address_v6(__buf, __str.c_str() + __pos + 1, __ec);
+       }
+   }
+@@ -882,20 +882,20 @@
+   make_address_v6(string_view __str, error_code& __ec) noexcept
+   {
+     char __buf[64];
+-    char* __out = __buf;
++    char* ___out = __buf;
+     char* __scope = nullptr;
+     bool __skip_leading_zero = true;
+     size_t __n = 0;
+-    while (__n < __str.length() && __out < std::end(__buf))
++    while (__n < __str.length() && ___out < std::end(__buf))
+       {
+ 	if (__str[__n] == '%')
+ 	  {
+ 	    if (__scope)
+-	      __out = std::end(__buf);
++	      ___out = std::end(__buf);
+ 	    else
+ 	      {
+-		*__out = '\0';
+-		__scope = ++__out;
++		*___out = '\0';
++		__scope = ++___out;
+ 		__skip_leading_zero = true;
+ 	      }
+ 	  }
+@@ -905,19 +905,19 @@
+ 	      __skip_leading_zero = true;
+ 	    else
+ 	      __skip_leading_zero = false;
+-	    *__out = __str[__n];
+-	    __out++;
++	    *___out = __str[__n];
++	    ___out++;
+ 	  }
+ 	__n++;
+       }
+-    if (__out == std::end(__buf))
++    if (___out == std::end(__buf))
+       {
+ 	__ec = std::make_error_code(std::errc::invalid_argument);
+ 	return {};
+       }
+     else
+       {
+-	*__out = '\0';
++	*___out = '\0';
+ 	return __make_address_v6(__buf, __scope, __ec);
+       }
+   }
+diff -Naur 12.1.0-orig/ext/algorithm 12.1.0/ext/algorithm
+--- 12.1.0-orig/ext/algorithm	2022-05-17 17:46:54.874745100 +0200
++++ 12.1.0/ext/algorithm	2022-05-17 18:01:14.893857700 +0200
+@@ -258,7 +258,7 @@
+ 	   typename _Distance>
+     _OutputIterator
+     random_sample_n(_ForwardIterator __first, _ForwardIterator __last,
+-                    _OutputIterator __out, const _Distance __n)
++                    _OutputIterator ___out, const _Distance __n)
+     {
+       // concept requirements
+       __glibcxx_function_requires(_ForwardIteratorConcept<_ForwardIterator>)
+@@ -273,14 +273,14 @@
+ 	{
+ 	  if ((std::rand() % __remaining) < __m)
+ 	    {
+-	      *__out = *__first;
+-	      ++__out;
++	      *___out = *__first;
++	      ++___out;
+ 	      --__m;
+ 	    }
+ 	  --__remaining;
+ 	  ++__first;
+ 	}
+-      return __out;
++      return ___out;
+     }
+ 
+   /**
+@@ -292,7 +292,7 @@
+ 	   typename _Distance, typename _RandomNumberGenerator>
+     _OutputIterator
+     random_sample_n(_ForwardIterator __first, _ForwardIterator __last,
+-                   _OutputIterator __out, const _Distance __n,
++                   _OutputIterator ___out, const _Distance __n,
+ 		   _RandomNumberGenerator& __rand)
+     {
+       // concept requirements
+@@ -310,44 +310,44 @@
+ 	{
+ 	  if (__rand(__remaining) < __m)
+ 	    {
+-	      *__out = *__first;
+-	      ++__out;
++	      *___out = *__first;
++	      ++___out;
+ 	      --__m;
+ 	    }
+ 	  --__remaining;
+ 	  ++__first;
+ 	}
+-      return __out;
++      return ___out;
+     }
+ 
+   template<typename _InputIterator, typename _RandomAccessIterator,
+ 	   typename _Distance>
+     _RandomAccessIterator
+     __random_sample(_InputIterator __first, _InputIterator __last,
+-		    _RandomAccessIterator __out,
++		    _RandomAccessIterator ___out,
+ 		    const _Distance __n)
+     {
+       _Distance __m = 0;
+       _Distance __t = __n;
+       for ( ; __first != __last && __m < __n; ++__m, ++__first)
+-	__out[__m] = *__first;
++	___out[__m] = *__first;
+ 
+       while (__first != __last)
+ 	{
+ 	  ++__t;
+ 	  _Distance __M = std::rand() % (__t);
+ 	  if (__M < __n)
+-	    __out[__M] = *__first;
++	    ___out[__M] = *__first;
+ 	  ++__first;
+ 	}
+-      return __out + __m;
++      return ___out + __m;
+     }
+ 
+   template<typename _InputIterator, typename _RandomAccessIterator,
+ 	   typename _RandomNumberGenerator, typename _Distance>
+     _RandomAccessIterator
+     __random_sample(_InputIterator __first, _InputIterator __last,
+-		    _RandomAccessIterator __out,
++		    _RandomAccessIterator ___out,
+ 		    _RandomNumberGenerator& __rand,
+ 		    const _Distance __n)
+     {
+@@ -358,17 +358,17 @@
+       _Distance __m = 0;
+       _Distance __t = __n;
+       for ( ; __first != __last && __m < __n; ++__m, ++__first)
+-	__out[__m] = *__first;
++	___out[__m] = *__first;
+ 
+       while (__first != __last)
+ 	{
+ 	  ++__t;
+ 	  _Distance __M = __rand(__t);
+ 	  if (__M < __n)
+-	    __out[__M] = *__first;
++	    ___out[__M] = *__first;
+ 	  ++__first;
+ 	}
+-      return __out + __m;
++      return ___out + __m;
+     }
+ 
+   /**
+diff -Naur 12.1.0-orig/ext/pb_ds/detail/debug_map_base.hpp 12.1.0/ext/pb_ds/detail/debug_map_base.hpp
+--- 12.1.0-orig/ext/pb_ds/detail/debug_map_base.hpp	2022-05-17 17:46:54.874745100 +0200
++++ 12.1.0/ext/pb_ds/detail/debug_map_base.hpp	2022-05-17 18:01:15.103602500 +0200
+@@ -57,9 +57,9 @@
+     // Need std::pair ostream extractor.
+     template<typename _CharT, typename _Traits, typename _Tp1, typename _Tp2>
+     inline std::basic_ostream<_CharT, _Traits>&
+-    operator<<(std::basic_ostream<_CharT, _Traits>& __out,
++    operator<<(std::basic_ostream<_CharT, _Traits>& ___out,
+ 	       const std::pair<_Tp1, _Tp2>& p)
+-    { return (__out << '(' << p.first << ',' << p.second << ')'); }
++    { return (___out << '(' << p.first << ',' << p.second << ')'); }
+ 
+ #define PB_DS_CLASS_T_DEC \
+     template<typename Key, typename Eq_Fn, typename Const_Key_Reference>
+diff -Naur 12.1.0-orig/ext/random.tcc 12.1.0/ext/random.tcc
+--- 12.1.0-orig/ext/random.tcc	2022-05-17 17:46:54.794770800 +0200
++++ 12.1.0/ext/random.tcc	2022-05-17 18:01:15.503708900 +0200
+@@ -208,38 +208,38 @@
+   namespace {
+ 
+     template<size_t __shift>
+-      inline void __rshift(uint32_t *__out, const uint32_t *__in)
++      inline void __rshift(uint32_t *___out, const uint32_t *___in)
+       {
+-	uint64_t __th = ((static_cast<uint64_t>(__in[3]) << 32)
+-			 | static_cast<uint64_t>(__in[2]));
+-	uint64_t __tl = ((static_cast<uint64_t>(__in[1]) << 32)
+-			 | static_cast<uint64_t>(__in[0]));
++	uint64_t __th = ((static_cast<uint64_t>(___in[3]) << 32)
++			 | static_cast<uint64_t>(___in[2]));
++	uint64_t __tl = ((static_cast<uint64_t>(___in[1]) << 32)
++			 | static_cast<uint64_t>(___in[0]));
+ 
+ 	uint64_t __oh = __th >> (__shift * 8);
+ 	uint64_t __ol = __tl >> (__shift * 8);
+ 	__ol |= __th << (64 - __shift * 8);
+-	__out[1] = static_cast<uint32_t>(__ol >> 32);
+-	__out[0] = static_cast<uint32_t>(__ol);
+-	__out[3] = static_cast<uint32_t>(__oh >> 32);
+-	__out[2] = static_cast<uint32_t>(__oh);
++	___out[1] = static_cast<uint32_t>(__ol >> 32);
++	___out[0] = static_cast<uint32_t>(__ol);
++	___out[3] = static_cast<uint32_t>(__oh >> 32);
++	___out[2] = static_cast<uint32_t>(__oh);
+       }
+ 
+ 
+     template<size_t __shift>
+-      inline void __lshift(uint32_t *__out, const uint32_t *__in)
++      inline void __lshift(uint32_t *___out, const uint32_t *___in)
+       {
+-	uint64_t __th = ((static_cast<uint64_t>(__in[3]) << 32)
+-			 | static_cast<uint64_t>(__in[2]));
+-	uint64_t __tl = ((static_cast<uint64_t>(__in[1]) << 32)
+-			 | static_cast<uint64_t>(__in[0]));
++	uint64_t __th = ((static_cast<uint64_t>(___in[3]) << 32)
++			 | static_cast<uint64_t>(___in[2]));
++	uint64_t __tl = ((static_cast<uint64_t>(___in[1]) << 32)
++			 | static_cast<uint64_t>(___in[0]));
+ 
+ 	uint64_t __oh = __th << (__shift * 8);
+ 	uint64_t __ol = __tl << (__shift * 8);
+ 	__oh |= __tl >> (64 - __shift * 8);
+-	__out[1] = static_cast<uint32_t>(__ol >> 32);
+-	__out[0] = static_cast<uint32_t>(__ol);
+-	__out[3] = static_cast<uint32_t>(__oh >> 32);
+-	__out[2] = static_cast<uint32_t>(__oh);
++	___out[1] = static_cast<uint32_t>(__ol >> 32);
++	___out[0] = static_cast<uint32_t>(__ol);
++	___out[3] = static_cast<uint32_t>(__oh >> 32);
++	___out[2] = static_cast<uint32_t>(__oh);
+       }
+ 
+ 
+diff -Naur 12.1.0-orig/ext/vstring.tcc 12.1.0/ext/vstring.tcc
+--- 12.1.0-orig/ext/vstring.tcc	2022-05-17 17:46:54.794770800 +0200
++++ 12.1.0/ext/vstring.tcc	2022-05-17 18:01:15.698739100 +0200
+@@ -549,7 +549,7 @@
+   template<typename _CharT, typename _Traits, typename _Alloc,
+            template <typename, typename, typename> class _Base>
+     basic_istream<_CharT, _Traits>&
+-    operator>>(basic_istream<_CharT, _Traits>& __in,
++    operator>>(basic_istream<_CharT, _Traits>& ___in,
+ 	       __gnu_cxx::__versa_string<_CharT, _Traits,
+ 	                                 _Alloc, _Base>& __str)
+     {
+@@ -564,7 +564,7 @@
+ 
+       __size_type __extracted = 0;
+       typename __ios_base::iostate __err = __ios_base::goodbit;
+-      typename __istream_type::sentry __cerb(__in, false);
++      typename __istream_type::sentry __cerb(___in, false);
+       if (__cerb)
+ 	{
+ 	  __try
+@@ -573,12 +573,12 @@
+ 	      __str.erase();
+ 	      _CharT __buf[128];
+ 	      __size_type __len = 0;
+-	      const streamsize __w = __in.width();
++	      const streamsize __w = ___in.width();
+ 	      const __size_type __n = __w > 0 ? static_cast<__size_type>(__w)
+ 		                              : __str.max_size();
+-	      const __ctype_type& __ct = use_facet<__ctype_type>(__in.getloc());
++	      const __ctype_type& __ct = use_facet<__ctype_type>(___in.getloc());
+ 	      const __int_type __eof = _Traits::eof();
+-	      __int_type __c = __in.rdbuf()->sgetc();
++	      __int_type __c = ___in.rdbuf()->sgetc();
+ 
+ 	      while (__extracted < __n
+ 		     && !_Traits::eq_int_type(__c, __eof)
+@@ -592,17 +592,17 @@
+ 		    }
+ 		  __buf[__len++] = _Traits::to_char_type(__c);
+ 		  ++__extracted;
+-		  __c = __in.rdbuf()->snextc();
++		  __c = ___in.rdbuf()->snextc();
+ 		}
+ 	      __str.append(__buf, __len);
+ 
+ 	      if (_Traits::eq_int_type(__c, __eof))
+ 		__err |= __ios_base::eofbit;
+-	      __in.width(0);
++	      ___in.width(0);
+ 	    }
+ 	  __catch(__cxxabiv1::__forced_unwind&)
+ 	    {
+-	      __in._M_setstate(__ios_base::badbit);
++	      ___in._M_setstate(__ios_base::badbit);
+ 	      __throw_exception_again;
+ 	    }
+ 	  __catch(...)
+@@ -610,21 +610,21 @@
+ 	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
+ 	      // 91. Description of operator>> and getline() for string<>
+ 	      // might cause endless loop
+-	      __in._M_setstate(__ios_base::badbit);
++	      ___in._M_setstate(__ios_base::badbit);
+ 	    }
+ 	}
+       // 211.  operator>>(istream&, string&) doesn't set failbit
+       if (!__extracted)
+ 	__err |= __ios_base::failbit;
+       if (__err)
+-	__in.setstate(__err);
+-      return __in;
++	___in.setstate(__err);
++      return ___in;
+     }      
+ 
+   template<typename _CharT, typename _Traits, typename _Alloc,
+            template <typename, typename, typename> class _Base>
+     basic_istream<_CharT, _Traits>&
+-    getline(basic_istream<_CharT, _Traits>& __in,
++    getline(basic_istream<_CharT, _Traits>& ___in,
+ 	    __gnu_cxx::__versa_string<_CharT, _Traits, _Alloc, _Base>& __str,
+ 	    _CharT __delim)
+     {
+@@ -638,7 +638,7 @@
+       __size_type __extracted = 0;
+       const __size_type __n = __str.max_size();
+       typename __ios_base::iostate __err = __ios_base::goodbit;
+-      typename __istream_type::sentry __cerb(__in, true);
++      typename __istream_type::sentry __cerb(___in, true);
+       if (__cerb)
+ 	{
+ 	  __try
+@@ -649,7 +649,7 @@
+ 	      __size_type __len = 0;
+ 	      const __int_type __idelim = _Traits::to_int_type(__delim);
+ 	      const __int_type __eof = _Traits::eof();
+-	      __int_type __c = __in.rdbuf()->sgetc();
++	      __int_type __c = ___in.rdbuf()->sgetc();
+ 
+ 	      while (__extracted < __n
+ 		     && !_Traits::eq_int_type(__c, __eof)
+@@ -662,7 +662,7 @@
+ 		    }
+ 		  __buf[__len++] = _Traits::to_char_type(__c);
+ 		  ++__extracted;
+-		  __c = __in.rdbuf()->snextc();
++		  __c = ___in.rdbuf()->snextc();
+ 		}
+ 	      __str.append(__buf, __len);
+ 
+@@ -671,14 +671,14 @@
+ 	      else if (_Traits::eq_int_type(__c, __idelim))
+ 		{
+ 		  ++__extracted;		  
+-		  __in.rdbuf()->sbumpc();
++		  ___in.rdbuf()->sbumpc();
+ 		}
+ 	      else
+ 		__err |= __ios_base::failbit;
+ 	    }
+ 	  __catch(__cxxabiv1::__forced_unwind&)
+ 	    {
+-	      __in._M_setstate(__ios_base::badbit);
++	      ___in._M_setstate(__ios_base::badbit);
+ 	      __throw_exception_again;
+ 	    }
+ 	  __catch(...)
+@@ -686,14 +686,14 @@
+ 	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
+ 	      // 91. Description of operator>> and getline() for string<>
+ 	      // might cause endless loop
+-	      __in._M_setstate(__ios_base::badbit);
++	      ___in._M_setstate(__ios_base::badbit);
+ 	    }
+ 	}
+       if (!__extracted)
+ 	__err |= __ios_base::failbit;
+       if (__err)
+-	__in.setstate(__err);
+-      return __in;
++	___in.setstate(__err);
++      return ___in;
+     }      
+ 
+ _GLIBCXX_END_NAMESPACE_VERSION
+diff -Naur 12.1.0-orig/istream 12.1.0/istream
+--- 12.1.0-orig/istream	2022-05-17 17:46:54.744847400 +0200
++++ 12.1.0/istream	2022-05-17 18:01:15.788849200 +0200
+@@ -749,17 +749,17 @@
+   */
+   template<typename _CharT, typename _Traits>
+     basic_istream<_CharT, _Traits>&
+-    operator>>(basic_istream<_CharT, _Traits>& __in, _CharT& __c);
++    operator>>(basic_istream<_CharT, _Traits>& ___in, _CharT& __c);
+ 
+   template<class _Traits>
+     inline basic_istream<char, _Traits>&
+-    operator>>(basic_istream<char, _Traits>& __in, unsigned char& __c)
+-    { return (__in >> reinterpret_cast<char&>(__c)); }
++    operator>>(basic_istream<char, _Traits>& ___in, unsigned char& __c)
++    { return (___in >> reinterpret_cast<char&>(__c)); }
+ 
+   template<class _Traits>
+     inline basic_istream<char, _Traits>&
+-    operator>>(basic_istream<char, _Traits>& __in, signed char& __c)
+-    { return (__in >> reinterpret_cast<char&>(__c)); }
++    operator>>(basic_istream<char, _Traits>& ___in, signed char& __c)
++    { return (___in >> reinterpret_cast<char&>(__c)); }
+   ///@}
+ 
+ 
+@@ -800,57 +800,57 @@
+   template<typename _CharT, typename _Traits>
+     __attribute__((__nonnull__(2), __access__(__write_only__, 2)))
+     inline basic_istream<_CharT, _Traits>&
+-    operator>>(basic_istream<_CharT, _Traits>& __in, _CharT* __s)
++    operator>>(basic_istream<_CharT, _Traits>& ___in, _CharT* __s)
+     {
+       size_t __n = __builtin_object_size(__s, 0);
+       if (__builtin_expect(__n < sizeof(_CharT), false))
+ 	{
+ 	  // There is not even space for the required null terminator.
+ 	  __glibcxx_assert(__n >= sizeof(_CharT));
+-	  __in.width(0);
+-	  __in.setstate(ios_base::failbit);
++	  ___in.width(0);
++	  ___in.setstate(ios_base::failbit);
+ 	}
+       else
+ 	{
+ 	  if (__n == (size_t)-1)
+ 	    __n = __gnu_cxx::__numeric_traits<streamsize>::__max;
+-	  std::__istream_extract(__in, __s, __n / sizeof(_CharT));
++	  std::__istream_extract(___in, __s, __n / sizeof(_CharT));
+ 	}
+-      return __in;
++      return ___in;
+     }
+ 
+   template<class _Traits>
+     __attribute__((__nonnull__(2), __access__(__write_only__, 2)))
+     inline basic_istream<char, _Traits>&
+-    operator>>(basic_istream<char, _Traits>& __in, unsigned char* __s)
+-    { return __in >> reinterpret_cast<char*>(__s); }
++    operator>>(basic_istream<char, _Traits>& ___in, unsigned char* __s)
++    { return ___in >> reinterpret_cast<char*>(__s); }
+ 
+   template<class _Traits>
+     __attribute__((__nonnull__(2), __access__(__write_only__, 2)))
+     inline basic_istream<char, _Traits>&
+-    operator>>(basic_istream<char, _Traits>& __in, signed char* __s)
+-    { return __in >> reinterpret_cast<char*>(__s); }
++    operator>>(basic_istream<char, _Traits>& ___in, signed char* __s)
++    { return ___in >> reinterpret_cast<char*>(__s); }
+ #else
+   // _GLIBCXX_RESOLVE_LIB_DEFECTS
+   // 2499. operator>>(istream&, char*) makes it hard to avoid buffer overflows
+   template<typename _CharT, typename _Traits, size_t _Num>
+     inline basic_istream<_CharT, _Traits>&
+-    operator>>(basic_istream<_CharT, _Traits>& __in, _CharT (&__s)[_Num])
++    operator>>(basic_istream<_CharT, _Traits>& ___in, _CharT (&__s)[_Num])
+     {
+       static_assert(_Num <= __gnu_cxx::__numeric_traits<streamsize>::__max);
+-      std::__istream_extract(__in, __s, _Num);
+-      return __in;
++      std::__istream_extract(___in, __s, _Num);
++      return ___in;
+     }
+ 
+   template<class _Traits, size_t _Num>
+     inline basic_istream<char, _Traits>&
+-    operator>>(basic_istream<char, _Traits>& __in, unsigned char (&__s)[_Num])
+-    { return __in >> reinterpret_cast<char(&)[_Num]>(__s); }
++    operator>>(basic_istream<char, _Traits>& ___in, unsigned char (&__s)[_Num])
++    { return ___in >> reinterpret_cast<char(&)[_Num]>(__s); }
+ 
+   template<class _Traits, size_t _Num>
+     inline basic_istream<char, _Traits>&
+-    operator>>(basic_istream<char, _Traits>& __in, signed char (&__s)[_Num])
+-    { return __in >> reinterpret_cast<char(&)[_Num]>(__s); }
++    operator>>(basic_istream<char, _Traits>& ___in, signed char (&__s)[_Num])
++    { return ___in >> reinterpret_cast<char(&)[_Num]>(__s); }
+ #endif
+   ///@}
+ 
+diff -Naur 12.1.0-orig/ostream 12.1.0/ostream
+--- 12.1.0-orig/ostream	2022-05-17 17:46:54.754853300 +0200
++++ 12.1.0/ostream	2022-05-17 18:01:15.893695600 +0200
+@@ -504,40 +504,40 @@
+   */
+   template<typename _CharT, typename _Traits>
+     inline basic_ostream<_CharT, _Traits>&
+-    operator<<(basic_ostream<_CharT, _Traits>& __out, _CharT __c)
++    operator<<(basic_ostream<_CharT, _Traits>& ___out, _CharT __c)
+     {
+-      if (__out.width() != 0)
+-	return __ostream_insert(__out, &__c, 1);
+-      __out.put(__c);
+-      return __out;
++      if (___out.width() != 0)
++	return __ostream_insert(___out, &__c, 1);
++      ___out.put(__c);
++      return ___out;
+     }
+ 
+   template<typename _CharT, typename _Traits>
+     inline basic_ostream<_CharT, _Traits>&
+-    operator<<(basic_ostream<_CharT, _Traits>& __out, char __c)
+-    { return (__out << __out.widen(__c)); }
++    operator<<(basic_ostream<_CharT, _Traits>& ___out, char __c)
++    { return (___out << ___out.widen(__c)); }
+ 
+   // Specialization
+   template<typename _Traits>
+     inline basic_ostream<char, _Traits>&
+-    operator<<(basic_ostream<char, _Traits>& __out, char __c)
++    operator<<(basic_ostream<char, _Traits>& ___out, char __c)
+     {
+-      if (__out.width() != 0)
+-	return __ostream_insert(__out, &__c, 1);
+-      __out.put(__c);
+-      return __out;
++      if (___out.width() != 0)
++	return __ostream_insert(___out, &__c, 1);
++      ___out.put(__c);
++      return ___out;
+     }
+ 
+   // Signed and unsigned
+   template<typename _Traits>
+     inline basic_ostream<char, _Traits>&
+-    operator<<(basic_ostream<char, _Traits>& __out, signed char __c)
+-    { return (__out << static_cast<char>(__c)); }
++    operator<<(basic_ostream<char, _Traits>& ___out, signed char __c)
++    { return (___out << static_cast<char>(__c)); }
+ 
+   template<typename _Traits>
+     inline basic_ostream<char, _Traits>&
+-    operator<<(basic_ostream<char, _Traits>& __out, unsigned char __c)
+-    { return (__out << static_cast<char>(__c)); }
++    operator<<(basic_ostream<char, _Traits>& ___out, unsigned char __c)
++    { return (___out << static_cast<char>(__c)); }
+ 
+ #if __cplusplus > 201703L
+   // The following deleted overloads prevent formatting character values as
+@@ -595,43 +595,43 @@
+   */
+   template<typename _CharT, typename _Traits>
+     inline basic_ostream<_CharT, _Traits>&
+-    operator<<(basic_ostream<_CharT, _Traits>& __out, const _CharT* __s)
++    operator<<(basic_ostream<_CharT, _Traits>& ___out, const _CharT* __s)
+     {
+       if (!__s)
+-	__out.setstate(ios_base::badbit);
++	___out.setstate(ios_base::badbit);
+       else
+-	__ostream_insert(__out, __s,
++	__ostream_insert(___out, __s,
+ 			 static_cast<streamsize>(_Traits::length(__s)));
+-      return __out;
++      return ___out;
+     }
+ 
+   template<typename _CharT, typename _Traits>
+     basic_ostream<_CharT, _Traits> &
+-    operator<<(basic_ostream<_CharT, _Traits>& __out, const char* __s);
++    operator<<(basic_ostream<_CharT, _Traits>& ___out, const char* __s);
+ 
+   // Partial specializations
+   template<typename _Traits>
+     inline basic_ostream<char, _Traits>&
+-    operator<<(basic_ostream<char, _Traits>& __out, const char* __s)
++    operator<<(basic_ostream<char, _Traits>& ___out, const char* __s)
+     {
+       if (!__s)
+-	__out.setstate(ios_base::badbit);
++	___out.setstate(ios_base::badbit);
+       else
+-	__ostream_insert(__out, __s,
++	__ostream_insert(___out, __s,
+ 			 static_cast<streamsize>(_Traits::length(__s)));
+-      return __out;
++      return ___out;
+     }
+ 
+   // Signed and unsigned
+   template<typename _Traits>
+     inline basic_ostream<char, _Traits>&
+-    operator<<(basic_ostream<char, _Traits>& __out, const signed char* __s)
+-    { return (__out << reinterpret_cast<const char*>(__s)); }
++    operator<<(basic_ostream<char, _Traits>& ___out, const signed char* __s)
++    { return (___out << reinterpret_cast<const char*>(__s)); }
+ 
+   template<typename _Traits>
+     inline basic_ostream<char, _Traits> &
+-    operator<<(basic_ostream<char, _Traits>& __out, const unsigned char* __s)
+-    { return (__out << reinterpret_cast<const char*>(__s)); }
++    operator<<(basic_ostream<char, _Traits>& ___out, const unsigned char* __s)
++    { return (___out << reinterpret_cast<const char*>(__s)); }
+ 
+ #if __cplusplus > 201703L
+    // The following deleted overloads prevent formatting strings as
+diff -Naur 12.1.0-orig/parallel/algo.h 12.1.0/parallel/algo.h
+--- 12.1.0-orig/parallel/algo.h	2022-05-17 17:46:54.774471000 +0200
++++ 12.1.0/parallel/algo.h	2022-05-17 18:01:15.943773700 +0200
+@@ -289,67 +289,67 @@
+   // Sequential fallback
+   template<typename _IIter, typename _OutputIterator>
+     inline _OutputIterator
+-    unique_copy(_IIter __begin1, _IIter __end1, _OutputIterator __out,
++    unique_copy(_IIter __begin1, _IIter __end1, _OutputIterator ___out,
+ 		__gnu_parallel::sequential_tag)
+-    { return _GLIBCXX_STD_A::unique_copy(__begin1, __end1, __out); }
++    { return _GLIBCXX_STD_A::unique_copy(__begin1, __end1, ___out); }
+ 
+   // Sequential fallback
+   template<typename _IIter, typename _OutputIterator,
+ 	   typename _Predicate>
+     inline _OutputIterator
+-    unique_copy(_IIter __begin1, _IIter __end1, _OutputIterator __out,
++    unique_copy(_IIter __begin1, _IIter __end1, _OutputIterator ___out,
+ 		_Predicate __pred, __gnu_parallel::sequential_tag)
+-    { return _GLIBCXX_STD_A::unique_copy(__begin1, __end1, __out, __pred); }
++    { return _GLIBCXX_STD_A::unique_copy(__begin1, __end1, ___out, __pred); }
+ 
+   // Sequential fallback for input iterator case
+   template<typename _IIter, typename _OutputIterator,
+ 	   typename _Predicate, typename _IteratorTag1, typename _IteratorTag2>
+     inline _OutputIterator
+     __unique_copy_switch(_IIter __begin, _IIter __last,
+-		       _OutputIterator __out, _Predicate __pred,
++		       _OutputIterator ___out, _Predicate __pred,
+ 		       _IteratorTag1, _IteratorTag2)
+-    { return _GLIBCXX_STD_A::unique_copy(__begin, __last, __out, __pred); }
++    { return _GLIBCXX_STD_A::unique_copy(__begin, __last, ___out, __pred); }
+ 
+   // Parallel unique_copy for random access iterators
+   template<typename _RAIter, typename _RandomAccessOutputIterator,
+ 	   typename _Predicate>
+     _RandomAccessOutputIterator
+     __unique_copy_switch(_RAIter __begin, _RAIter __last,
+-			 _RandomAccessOutputIterator __out, _Predicate __pred,
++			 _RandomAccessOutputIterator ___out, _Predicate __pred,
+ 			 random_access_iterator_tag, random_access_iterator_tag)
+     {
+       if (_GLIBCXX_PARALLEL_CONDITION(
+ 	    static_cast<__gnu_parallel::_SequenceIndex>(__last - __begin)
+ 	    > __gnu_parallel::_Settings::get().unique_copy_minimal_n))
+ 	return __gnu_parallel::__parallel_unique_copy(
+-		 __begin, __last, __out, __pred);
++		 __begin, __last, ___out, __pred);
+       else
+-	return _GLIBCXX_STD_A::unique_copy(__begin, __last, __out, __pred);
++	return _GLIBCXX_STD_A::unique_copy(__begin, __last, ___out, __pred);
+     }
+ 
+   // Public interface
+   template<typename _IIter, typename _OutputIterator>
+     inline _OutputIterator
+-    unique_copy(_IIter __begin1, _IIter __end1, _OutputIterator __out)
++    unique_copy(_IIter __begin1, _IIter __end1, _OutputIterator ___out)
+     {
+       typedef typename std::iterator_traits<_IIter>::value_type _ValueType;
+ 
+       return __unique_copy_switch(
+-	       __begin1, __end1, __out, equal_to<_ValueType>(),
++	       __begin1, __end1, ___out, equal_to<_ValueType>(),
+ 	       std::__iterator_category(__begin1),
+-	       std::__iterator_category(__out));
++	       std::__iterator_category(___out));
+     }
+ 
+   // Public interface
+   template<typename _IIter, typename _OutputIterator, typename _Predicate>
+     inline _OutputIterator
+-    unique_copy(_IIter __begin1, _IIter __end1, _OutputIterator __out,
++    unique_copy(_IIter __begin1, _IIter __end1, _OutputIterator ___out,
+ 		_Predicate __pred)
+     {
+       return __unique_copy_switch(
+-	       __begin1, __end1, __out, __pred,
++	       __begin1, __end1, ___out, __pred,
+ 	       std::__iterator_category(__begin1),
+-	       std::__iterator_category(__out));
++	       std::__iterator_category(___out));
+     }
+ 
+   // Sequential fallback
+@@ -358,9 +358,9 @@
+     inline _OutputIterator
+     set_union(_IIter1 __begin1, _IIter1 __end1,
+ 	      _IIter2 __begin2, _IIter2 __end2,
+-	      _OutputIterator __out, __gnu_parallel::sequential_tag)
++	      _OutputIterator ___out, __gnu_parallel::sequential_tag)
+     { return _GLIBCXX_STD_A::set_union(
+-	       __begin1, __end1, __begin2, __end2, __out); }
++	       __begin1, __end1, __begin2, __end2, ___out); }
+ 
+   // Sequential fallback
+   template<typename _IIter1, typename _IIter2,
+@@ -368,10 +368,10 @@
+     inline _OutputIterator
+     set_union(_IIter1 __begin1, _IIter1 __end1,
+ 	      _IIter2 __begin2, _IIter2 __end2,
+-	      _OutputIterator __out, _Predicate __pred,
++	      _OutputIterator ___out, _Predicate __pred,
+ 	      __gnu_parallel::sequential_tag)
+     { return _GLIBCXX_STD_A::set_union(__begin1, __end1,
+-				       __begin2, __end2, __out, __pred); }
++				       __begin2, __end2, ___out, __pred); }
+ 
+   // Sequential fallback for input iterator case
+   template<typename _IIter1, typename _IIter2, typename _Predicate,
+@@ -412,17 +412,17 @@
+ 	   typename _OutputIterator>
+     inline _OutputIterator
+     set_union(_IIter1 __begin1, _IIter1 __end1,
+-	      _IIter2 __begin2, _IIter2 __end2, _OutputIterator __out)
++	      _IIter2 __begin2, _IIter2 __end2, _OutputIterator ___out)
+     {
+       typedef typename std::iterator_traits<_IIter1>::value_type _ValueType1;
+       typedef typename std::iterator_traits<_IIter2>::value_type _ValueType2;
+ 
+       return __set_union_switch(
+-	       __begin1, __end1, __begin2, __end2, __out,
++	       __begin1, __end1, __begin2, __end2, ___out,
+ 	       __gnu_parallel::_Less<_ValueType1, _ValueType2>(),
+ 	       std::__iterator_category(__begin1),
+ 	       std::__iterator_category(__begin2),
+-	       std::__iterator_category(__out));
++	       std::__iterator_category(___out));
+     }
+ 
+   // Public interface
+@@ -431,13 +431,13 @@
+     inline _OutputIterator
+     set_union(_IIter1 __begin1, _IIter1 __end1,
+ 	      _IIter2 __begin2, _IIter2 __end2,
+-	      _OutputIterator __out, _Predicate __pred)
++	      _OutputIterator ___out, _Predicate __pred)
+     {
+       return __set_union_switch(
+-	       __begin1, __end1, __begin2, __end2, __out, __pred,
++	       __begin1, __end1, __begin2, __end2, ___out, __pred,
+ 	       std::__iterator_category(__begin1),
+ 	       std::__iterator_category(__begin2),
+-	       std::__iterator_category(__out));
++	       std::__iterator_category(___out));
+     }
+ 
+   // Sequential fallback.
+@@ -446,9 +446,9 @@
+     inline _OutputIterator
+     set_intersection(_IIter1 __begin1, _IIter1 __end1,
+ 		     _IIter2 __begin2, _IIter2 __end2,
+-		     _OutputIterator __out, __gnu_parallel::sequential_tag)
++		     _OutputIterator ___out, __gnu_parallel::sequential_tag)
+     { return _GLIBCXX_STD_A::set_intersection(__begin1, __end1,
+-					      __begin2, __end2, __out); }
++					      __begin2, __end2, ___out); }
+ 
+   // Sequential fallback.
+   template<typename _IIter1, typename _IIter2,
+@@ -456,10 +456,10 @@
+     inline _OutputIterator
+     set_intersection(_IIter1 __begin1, _IIter1 __end1,
+ 		     _IIter2 __begin2, _IIter2 __end2,
+-		     _OutputIterator __out, _Predicate __pred,
++		     _OutputIterator ___out, _Predicate __pred,
+ 		     __gnu_parallel::sequential_tag)
+     { return _GLIBCXX_STD_A::set_intersection(
+-	       __begin1, __end1, __begin2, __end2, __out, __pred); }
++	       __begin1, __end1, __begin2, __end2, ___out, __pred); }
+ 
+   // Sequential fallback for input iterator case
+   template<typename _IIter1, typename _IIter2,
+@@ -506,17 +506,17 @@
+     inline _OutputIterator
+     set_intersection(_IIter1 __begin1, _IIter1 __end1,
+ 		     _IIter2 __begin2, _IIter2 __end2,
+-		     _OutputIterator __out)
++		     _OutputIterator ___out)
+     {
+       typedef typename std::iterator_traits<_IIter1>::value_type _ValueType1;
+       typedef typename std::iterator_traits<_IIter2>::value_type _ValueType2;
+ 
+       return __set_intersection_switch(
+-	       __begin1, __end1, __begin2, __end2, __out,
++	       __begin1, __end1, __begin2, __end2, ___out,
+ 	       __gnu_parallel::_Less<_ValueType1, _ValueType2>(),
+ 	       std::__iterator_category(__begin1),
+ 	       std::__iterator_category(__begin2),
+-	       std::__iterator_category(__out));
++	       std::__iterator_category(___out));
+     }
+ 
+   template<typename _IIter1, typename _IIter2,
+@@ -524,13 +524,13 @@
+     inline _OutputIterator
+     set_intersection(_IIter1 __begin1, _IIter1 __end1,
+ 		     _IIter2 __begin2, _IIter2 __end2,
+-		     _OutputIterator __out, _Predicate __pred)
++		     _OutputIterator ___out, _Predicate __pred)
+     {
+       return __set_intersection_switch(
+-	       __begin1, __end1, __begin2, __end2, __out, __pred,
++	       __begin1, __end1, __begin2, __end2, ___out, __pred,
+ 	       std::__iterator_category(__begin1),
+ 	       std::__iterator_category(__begin2),
+-	       std::__iterator_category(__out));
++	       std::__iterator_category(___out));
+     }
+ 
+   // Sequential fallback
+@@ -539,10 +539,10 @@
+     inline _OutputIterator
+     set_symmetric_difference(_IIter1 __begin1, _IIter1 __end1,
+ 			     _IIter2 __begin2, _IIter2 __end2,
+-			     _OutputIterator __out,
++			     _OutputIterator ___out,
+ 			     __gnu_parallel::sequential_tag)
+     { return _GLIBCXX_STD_A::set_symmetric_difference(
+-	       __begin1, __end1, __begin2, __end2, __out); }
++	       __begin1, __end1, __begin2, __end2, ___out); }
+ 
+   // Sequential fallback
+   template<typename _IIter1, typename _IIter2,
+@@ -550,10 +550,10 @@
+     inline _OutputIterator
+     set_symmetric_difference(_IIter1 __begin1, _IIter1 __end1,
+ 			     _IIter2 __begin2, _IIter2 __end2,
+-			     _OutputIterator __out, _Predicate __pred,
++			     _OutputIterator ___out, _Predicate __pred,
+ 			     __gnu_parallel::sequential_tag)
+     { return _GLIBCXX_STD_A::set_symmetric_difference(
+-	       __begin1, __end1, __begin2, __end2, __out, __pred); }
++	       __begin1, __end1, __begin2, __end2, ___out, __pred); }
+ 
+   // Sequential fallback for input iterator case
+   template<typename _IIter1, typename _IIter2,
+@@ -600,17 +600,17 @@
+     inline _OutputIterator
+     set_symmetric_difference(_IIter1 __begin1, _IIter1 __end1,
+ 			     _IIter2 __begin2, _IIter2 __end2,
+-			     _OutputIterator __out)
++			     _OutputIterator ___out)
+     {
+       typedef typename std::iterator_traits<_IIter1>::value_type _ValueType1;
+       typedef typename std::iterator_traits<_IIter2>::value_type _ValueType2;
+ 
+       return __set_symmetric_difference_switch(
+-	       __begin1, __end1, __begin2, __end2, __out,
++	       __begin1, __end1, __begin2, __end2, ___out,
+ 	       __gnu_parallel::_Less<_ValueType1, _ValueType2>(),
+ 	       std::__iterator_category(__begin1),
+ 	       std::__iterator_category(__begin2),
+-	       std::__iterator_category(__out));
++	       std::__iterator_category(___out));
+     }
+ 
+   // Public interface.
+@@ -619,13 +619,13 @@
+     inline _OutputIterator
+     set_symmetric_difference(_IIter1 __begin1, _IIter1 __end1,
+ 			     _IIter2 __begin2, _IIter2 __end2,
+-			     _OutputIterator __out, _Predicate __pred)
++			     _OutputIterator ___out, _Predicate __pred)
+     {
+       return __set_symmetric_difference_switch(
+-	       __begin1, __end1, __begin2, __end2, __out, __pred,
++	       __begin1, __end1, __begin2, __end2, ___out, __pred,
+ 	       std::__iterator_category(__begin1),
+ 	       std::__iterator_category(__begin2),
+-	       std::__iterator_category(__out));
++	       std::__iterator_category(___out));
+     }
+ 
+   // Sequential fallback.
+@@ -634,9 +634,9 @@
+     inline _OutputIterator
+     set_difference(_IIter1 __begin1, _IIter1 __end1,
+ 		   _IIter2 __begin2, _IIter2 __end2,
+-		   _OutputIterator __out, __gnu_parallel::sequential_tag)
++		   _OutputIterator ___out, __gnu_parallel::sequential_tag)
+     { return _GLIBCXX_STD_A::set_difference(
+-	       __begin1,__end1, __begin2, __end2, __out); }
++	       __begin1,__end1, __begin2, __end2, ___out); }
+ 
+   // Sequential fallback.
+   template<typename _IIter1, typename _IIter2,
+@@ -644,10 +644,10 @@
+     inline _OutputIterator
+     set_difference(_IIter1 __begin1, _IIter1 __end1,
+ 		   _IIter2 __begin2, _IIter2 __end2,
+-		   _OutputIterator __out, _Predicate __pred,
++		   _OutputIterator ___out, _Predicate __pred,
+ 		   __gnu_parallel::sequential_tag)
+     { return _GLIBCXX_STD_A::set_difference(__begin1, __end1,
+-					    __begin2, __end2, __out, __pred); }
++					    __begin2, __end2, ___out, __pred); }
+ 
+   // Sequential fallback for input iterator case.
+   template<typename _IIter1, typename _IIter2, typename _Predicate,
+@@ -692,17 +692,17 @@
+     inline _OutputIterator
+     set_difference(_IIter1 __begin1, _IIter1 __end1,
+ 		   _IIter2 __begin2, _IIter2 __end2,
+-		   _OutputIterator __out)
++		   _OutputIterator ___out)
+     {
+       typedef typename std::iterator_traits<_IIter1>::value_type _ValueType1;
+       typedef typename std::iterator_traits<_IIter2>::value_type _ValueType2;
+ 
+       return __set_difference_switch(
+-	       __begin1, __end1, __begin2, __end2, __out,
++	       __begin1, __end1, __begin2, __end2, ___out,
+ 	       __gnu_parallel::_Less<_ValueType1, _ValueType2>(),
+ 	       std::__iterator_category(__begin1),
+ 	       std::__iterator_category(__begin2),
+-	       std::__iterator_category(__out));
++	       std::__iterator_category(___out));
+     }
+ 
+   // Public interface
+@@ -711,13 +711,13 @@
+     inline _OutputIterator
+     set_difference(_IIter1 __begin1, _IIter1 __end1,
+ 		   _IIter2 __begin2, _IIter2 __end2,
+-		   _OutputIterator __out, _Predicate __pred)
++		   _OutputIterator ___out, _Predicate __pred)
+     {
+       return __set_difference_switch(
+-	       __begin1, __end1, __begin2, __end2, __out, __pred,
++	       __begin1, __end1, __begin2, __end2, ___out, __pred,
+ 	       std::__iterator_category(__begin1),
+ 	       std::__iterator_category(__begin2),
+-	       std::__iterator_category(__out));
++	       std::__iterator_category(___out));
+     }
+ 
+   // Sequential fallback
+diff -Naur 12.1.0-orig/parallel/set_operations.h 12.1.0/parallel/set_operations.h
+--- 12.1.0-orig/parallel/set_operations.h	2022-05-17 17:46:54.774471000 +0200
++++ 12.1.0/parallel/set_operations.h	2022-05-17 18:01:16.133994500 +0200
+@@ -130,12 +130,12 @@
+       }
+ 
+       _OutputIterator
+-      __first_empty(_IIter __c, _IIter __d, _OutputIterator __out) const
+-      { return std::copy(__c, __d, __out); }
++      __first_empty(_IIter __c, _IIter __d, _OutputIterator ___out) const
++      { return std::copy(__c, __d, ___out); }
+ 
+       _OutputIterator
+-      __second_empty(_IIter __a, _IIter __b, _OutputIterator __out) const
+-      { return std::copy(__a, __b, __out); }
++      __second_empty(_IIter __a, _IIter __b, _OutputIterator ___out) const
++      { return std::copy(__a, __b, ___out); }
+     };
+ 
+ 
+@@ -198,12 +198,12 @@
+       }
+ 
+       _OutputIterator
+-      __first_empty(_IIter, _IIter, _OutputIterator __out) const
+-      { return __out; }
++      __first_empty(_IIter, _IIter, _OutputIterator ___out) const
++      { return ___out; }
+ 
+       _OutputIterator
+-      __second_empty(_IIter __a, _IIter __b, _OutputIterator __out) const
+-      { return std::copy(__a, __b, __out); }
++      __second_empty(_IIter __a, _IIter __b, _OutputIterator ___out) const
++      { return std::copy(__a, __b, ___out); }
+     };
+ 
+ 
+@@ -265,12 +265,12 @@
+       }
+ 
+       _OutputIterator
+-      __first_empty(_IIter, _IIter, _OutputIterator __out) const
+-      { return __out; }
++      __first_empty(_IIter, _IIter, _OutputIterator ___out) const
++      { return ___out; }
+ 
+       _OutputIterator
+-      __second_empty(_IIter, _IIter, _OutputIterator __out) const
+-      { return __out; }
++      __second_empty(_IIter, _IIter, _OutputIterator ___out) const
++      { return ___out; }
+     };
+ 
+   template<class _IIter, class _OutputIterator, class _Compare>
+@@ -335,12 +335,12 @@
+       }
+ 
+       _OutputIterator
+-      __first_empty(_IIter __c, _IIter __d, _OutputIterator __out) const
+-      { return std::copy(__c, __d, __out); }
++      __first_empty(_IIter __c, _IIter __d, _OutputIterator ___out) const
++      { return std::copy(__c, __d, ___out); }
+ 
+       _OutputIterator
+-      __second_empty(_IIter __a, _IIter __b, _OutputIterator __out) const
+-      { return std::copy(__a, __b, __out); }
++      __second_empty(_IIter __a, _IIter __b, _OutputIterator ___out) const
++      { return std::copy(__a, __b, ___out); }
+     };
+ 
+   template<typename _IIter,
+diff -Naur 12.1.0-orig/parallel/unique_copy.h 12.1.0/parallel/unique_copy.h
+--- 12.1.0-orig/parallel/unique_copy.h	2022-05-17 17:46:54.774471000 +0200
++++ 12.1.0/parallel/unique_copy.h	2022-05-17 18:01:16.143826300 +0200
+@@ -85,7 +85,7 @@
+ 	// Check for length without duplicates
+ 	// Needed for position in output
+ 	_DifferenceType __i = 0;
+-	_OutputIterator __out = __result;
++	_OutputIterator ___out = __result;
+ 
+ 	if (__iam == 0)
+           {
+@@ -93,7 +93,7 @@
+             __end = __borders[__iam + 1];
+ 
+             ++__i;
+-            *__out++ = *__first;
++            *___out++ = *__first;
+ 
+             for (_IIter __iter = __first + __begin; __iter < __first + __end;
+ 		 ++__iter)
+@@ -101,7 +101,7 @@
+         	if (!__binary_pred(*__iter, *(__iter - 1)))
+                   {
+                     ++__i;
+-                    *__out++ = *__iter;
++                    *___out++ = *__iter;
+                   }
+               }
+           }
+diff -Naur 12.1.0-orig/stop_token 12.1.0/stop_token
+--- 12.1.0-orig/stop_token	2022-05-17 17:46:54.754853300 +0200
++++ 12.1.0/stop_token	2022-05-17 18:01:16.593824900 +0200
+@@ -375,7 +375,7 @@
+ 
+       bool
+       _M_do_try_lock(value_type& __curval, value_type __newbits,
+-		     memory_order __success, memory_order __failure) noexcept
++		     memory_order ___success, memory_order __failure) noexcept
+       {
+ 	if (__curval & _S_locked_bit)
+ 	  {
+@@ -385,7 +385,7 @@
+ 	  }
+ 	__newbits |= _S_locked_bit;
+ 	return _M_value.compare_exchange_weak(__curval, __curval | __newbits,
+-					      __success, __failure);
++					      ___success, __failure);
+       }
+     };
+ 
+diff -Naur 12.1.0-orig/thread 12.1.0/thread
+--- 12.1.0-orig/thread	2022-05-17 17:46:54.754853300 +0200
++++ 12.1.0/thread	2022-05-17 18:01:16.633997400 +0200
+@@ -89,12 +89,12 @@
+ 
+   template<class _CharT, class _Traits>
+     inline basic_ostream<_CharT, _Traits>&
+-    operator<<(basic_ostream<_CharT, _Traits>& __out, thread::id __id)
++    operator<<(basic_ostream<_CharT, _Traits>& ___out, thread::id __id)
+     {
+       if (__id == thread::id())
+-	return __out << "thread::id of a non-executing thread";
++	return ___out << "thread::id of a non-executing thread";
+       else
+-	return __out << __id._M_thread;
++	return ___out << __id._M_thread;
+     }
+ 
+ #ifdef __cpp_lib_jthread
+diff -Naur 12.1.0-orig/tr1/regex 12.1.0/tr1/regex
+--- 12.1.0-orig/tr1/regex	2022-05-17 17:46:54.714581900 +0200
++++ 12.1.0/tr1/regex	2022-05-17 18:01:16.903659000 +0200
+@@ -499,7 +499,7 @@
+       {
+ 	using std::ctype;
+ 	using std::use_facet;
+-	return use_facet<ctype<char_type> >(_M_locale).tolower(__c);
++	return (use_facet<ctype<char_type> >(_M_locale).tolower)(__c);
+       }
+       
+       /**
+@@ -687,7 +687,7 @@
+ 	}
+     
+       // special case of [[:space:]] in [[:blank:]]
+-      if (__c == __ctype.isspace(__c))
++      if (__c == (__ctype.isspace)(__c))
+ 	{
+ 	  const char* const __bb[] = "blank";
+ 	  char_class_type __bt = this->lookup_classname(__bb,
+@@ -2005,7 +2005,7 @@
+        */
+       template<typename _Out_iter>
+         _Out_iter
+-        format(_Out_iter __out, const string_type& __fmt,
++        format(_Out_iter ___out, const string_type& __fmt,
+ 	       regex_constants::match_flag_type __flags
+ 	       = regex_constants::format_default) const;
+ 
+@@ -2401,7 +2401,7 @@
+   template<typename _Out_iter, typename _Bi_iter,
+ 	   typename _Rx_traits, typename _Ch_type>
+     inline _Out_iter
+-    regex_replace(_Out_iter __out, _Bi_iter __first, _Bi_iter __last,
++    regex_replace(_Out_iter ___out, _Bi_iter __first, _Bi_iter __last,
+ 		  const basic_regex<_Ch_type, _Rx_traits>& __e,
+ 		  const basic_string<_Ch_type>& __fmt,
+ 		  regex_constants::match_flag_type __flags
+diff -Naur 12.1.0-orig/tr1/tuple 12.1.0/tr1/tuple
+--- 12.1.0-orig/tr1/tuple	2022-05-17 17:46:54.714581900 +0200
++++ 12.1.0/tr1/tuple	2022-05-17 18:01:16.933882500 +0200
+@@ -102,26 +102,26 @@
+       : _Inherited(__tail...), _M_head(__head) { }
+ 
+       template<typename... _UElements>
+-      _Tuple_impl(const _Tuple_impl<_Idx, _UElements...>& __in)
+-      : _Inherited(__in._M_tail()), _M_head(__in._M_head) { }
++      _Tuple_impl(const _Tuple_impl<_Idx, _UElements...>& ___in)
++      : _Inherited(___in._M_tail()), _M_head(___in._M_head) { }
+ 
+-      _Tuple_impl(const _Tuple_impl& __in)
+-      : _Inherited(__in._M_tail()), _M_head(__in._M_head) { }
++      _Tuple_impl(const _Tuple_impl& ___in)
++      : _Inherited(___in._M_tail()), _M_head(___in._M_head) { }
+      
+       template<typename... _UElements>
+         _Tuple_impl&
+-        operator=(const _Tuple_impl<_Idx, _UElements...>& __in)
++        operator=(const _Tuple_impl<_Idx, _UElements...>& ___in)
+         {
+-	  _M_head = __in._M_head;
+-	  _M_tail() = __in._M_tail();
++	  _M_head = ___in._M_head;
++	  _M_tail() = ___in._M_tail();
+ 	  return *this;
+ 	}
+ 
+       _Tuple_impl&
+-      operator=(const _Tuple_impl& __in)
++      operator=(const _Tuple_impl& ___in)
+       {
+-	_M_head = __in._M_head;
+-	_M_tail() = __in._M_tail();
++	_M_head = ___in._M_head;
++	_M_tail() = ___in._M_tail();
+ 	return *this;
+       }
+     };
+@@ -139,24 +139,24 @@
+       : _Inherited(__elements...) { }
+ 
+       template<typename... _UElements>
+-        tuple(const tuple<_UElements...>& __in)
+-	: _Inherited(__in) { }
++        tuple(const tuple<_UElements...>& ___in)
++	: _Inherited(___in) { }
+ 
+-      tuple(const tuple& __in)
+-      : _Inherited(__in) { }
++      tuple(const tuple& ___in)
++      : _Inherited(___in) { }
+ 
+       template<typename... _UElements>
+         tuple&
+-        operator=(const tuple<_UElements...>& __in)
++        operator=(const tuple<_UElements...>& ___in)
+         {
+-	  static_cast<_Inherited&>(*this) = __in;
++	  static_cast<_Inherited&>(*this) = ___in;
+ 	  return *this;
+ 	}
+ 
+       tuple&
+-      operator=(const tuple& __in)
++      operator=(const tuple& ___in)
+       {
+-	static_cast<_Inherited&>(*this) = __in;
++	static_cast<_Inherited&>(*this) = ___in;
+ 	return *this;
+       }
+     };
+@@ -178,41 +178,41 @@
+       : _Inherited(__a1, __a2) { }
+ 
+       template<typename _U1, typename _U2>
+-        tuple(const tuple<_U1, _U2>& __in)
+-	: _Inherited(__in) { }
++        tuple(const tuple<_U1, _U2>& ___in)
++	: _Inherited(___in) { }
+ 
+-      tuple(const tuple& __in)
+-      : _Inherited(__in) { }
++      tuple(const tuple& ___in)
++      : _Inherited(___in) { }
+ 
+       template<typename _U1, typename _U2>
+-        tuple(const pair<_U1, _U2>& __in)
++        tuple(const pair<_U1, _U2>& ___in)
+ 	: _Inherited(_Tuple_impl<0, 
+ 		     typename __add_c_ref<_U1>::type,
+-		     typename __add_c_ref<_U2>::type>(__in.first, 
+-						      __in.second))
++		     typename __add_c_ref<_U2>::type>(___in.first, 
++						      ___in.second))
+         { }
+   
+       template<typename _U1, typename _U2>
+         tuple&
+-        operator=(const tuple<_U1, _U2>& __in)
++        operator=(const tuple<_U1, _U2>& ___in)
+         {
+-	  static_cast<_Inherited&>(*this) = __in;
++	  static_cast<_Inherited&>(*this) = ___in;
+ 	  return *this;
+ 	}
+ 
+       tuple&
+-      operator=(const tuple& __in)
++      operator=(const tuple& ___in)
+       {
+-	static_cast<_Inherited&>(*this) = __in;
++	static_cast<_Inherited&>(*this) = ___in;
+ 	return *this;
+       }
+ 
+       template<typename _U1, typename _U2>
+         tuple&
+-        operator=(const pair<_U1, _U2>& __in)
++        operator=(const pair<_U1, _U2>& ___in)
+         {
+-	  this->_M_head = __in.first;
+-	  this->_M_tail()._M_head = __in.second;
++	  this->_M_head = ___in.first;
++	  this->_M_tail()._M_head = ___in.second;
+ 	  return *this;
+ 	}
+     };
+diff -Naur 12.1.0-orig/tr1/utility 12.1.0/tr1/utility
+--- 12.1.0-orig/tr1/utility	2022-05-17 17:46:54.724616900 +0200
++++ 12.1.0/tr1/utility	2022-05-17 18:01:16.963840800 +0200
+@@ -93,13 +93,13 @@
+ 
+   template<int _Int, class _Tp1, class _Tp2>
+     inline typename tuple_element<_Int, std::pair<_Tp1, _Tp2> >::type&
+-    get(std::pair<_Tp1, _Tp2>& __in)
+-    { return __pair_get<_Int>::__get(__in); }
++    get(std::pair<_Tp1, _Tp2>& ___in)
++    { return __pair_get<_Int>::__get(___in); }
+ 
+   template<int _Int, class _Tp1, class _Tp2>
+     inline const typename tuple_element<_Int, std::pair<_Tp1, _Tp2> >::type&
+-    get(const std::pair<_Tp1, _Tp2>& __in)
+-    { return __pair_get<_Int>::__const_get(__in); }
++    get(const std::pair<_Tp1, _Tp2>& ___in)
++    { return __pair_get<_Int>::__const_get(___in); }
+ }
+ 
+ _GLIBCXX_END_NAMESPACE_VERSION
+diff -Naur 12.1.0-orig/tr2/bool_set 12.1.0/tr2/bool_set
+--- 12.1.0-orig/tr2/bool_set	2022-05-17 17:46:54.724616900 +0200
++++ 12.1.0/tr2/bool_set	2022-05-17 18:01:16.963840800 +0200
+@@ -131,18 +131,18 @@
+ 
+     template<typename CharT, typename Traits>
+       friend std::basic_ostream<CharT, Traits>&
+-      operator<<(std::basic_ostream<CharT, Traits>& __out, bool_set __b)
++      operator<<(std::basic_ostream<CharT, Traits>& ___out, bool_set __b)
+       {
+ 	int __a = __b._M_b;
+-	__out << __a;
++	___out << __a;
+       }
+ 
+     template<typename CharT, typename Traits>
+       friend std::basic_istream<CharT, Traits>&
+-      operator>>(std::basic_istream<CharT, Traits>& __in, bool_set& __b)
++      operator>>(std::basic_istream<CharT, Traits>& ___in, bool_set& __b)
+       {
+ 	long __c;
+-	__in >> __c;
++	___in >> __c;
+ 	if (__c >= _S_false && __c < _S_empty)
+ 	  __b._M_b = static_cast<_Bool_set_val>(__c);
+       }
+diff -Naur 12.1.0-orig/tuple 12.1.0/tuple
+--- 12.1.0-orig/tuple	2022-05-17 17:46:54.754853300 +0200
++++ 12.1.0/tuple	2022-05-17 18:01:17.023894200 +0200
+@@ -302,18 +302,18 @@
+ 
+       template<typename... _UElements>
+ 	constexpr
+-	_Tuple_impl(const _Tuple_impl<_Idx, _UElements...>& __in)
+-	: _Inherited(_Tuple_impl<_Idx, _UElements...>::_M_tail(__in)),
+-	  _Base(_Tuple_impl<_Idx, _UElements...>::_M_head(__in))
++	_Tuple_impl(const _Tuple_impl<_Idx, _UElements...>& ___in)
++	: _Inherited(_Tuple_impl<_Idx, _UElements...>::_M_tail(___in)),
++	  _Base(_Tuple_impl<_Idx, _UElements...>::_M_head(___in))
+ 	{ }
+ 
+       template<typename _UHead, typename... _UTails>
+ 	constexpr
+-	_Tuple_impl(_Tuple_impl<_Idx, _UHead, _UTails...>&& __in)
++	_Tuple_impl(_Tuple_impl<_Idx, _UHead, _UTails...>&& ___in)
+ 	: _Inherited(std::move
+-		     (_Tuple_impl<_Idx, _UHead, _UTails...>::_M_tail(__in))),
++		     (_Tuple_impl<_Idx, _UHead, _UTails...>::_M_tail(___in))),
+ 	  _Base(std::forward<_UHead>
+-		(_Tuple_impl<_Idx, _UHead, _UTails...>::_M_head(__in)))
++		(_Tuple_impl<_Idx, _UHead, _UTails...>::_M_head(___in)))
+ 	{ }
+ 
+       template<typename _Alloc>
+@@ -344,70 +344,70 @@
+       template<typename _Alloc>
+ 	_GLIBCXX20_CONSTEXPR
+ 	_Tuple_impl(allocator_arg_t __tag, const _Alloc& __a,
+-		    const _Tuple_impl& __in)
+-	: _Inherited(__tag, __a, _M_tail(__in)),
+-	  _Base(__use_alloc<_Head, _Alloc, _Head>(__a), _M_head(__in))
++		    const _Tuple_impl& ___in)
++	: _Inherited(__tag, __a, _M_tail(___in)),
++	  _Base(__use_alloc<_Head, _Alloc, _Head>(__a), _M_head(___in))
+ 	{ }
+ 
+       template<typename _Alloc>
+ 	_GLIBCXX20_CONSTEXPR
+ 	_Tuple_impl(allocator_arg_t __tag, const _Alloc& __a,
+-		    _Tuple_impl&& __in)
+-	: _Inherited(__tag, __a, std::move(_M_tail(__in))),
++		    _Tuple_impl&& ___in)
++	: _Inherited(__tag, __a, std::move(_M_tail(___in))),
+ 	  _Base(__use_alloc<_Head, _Alloc, _Head>(__a),
+-		std::forward<_Head>(_M_head(__in)))
++		std::forward<_Head>(_M_head(___in)))
+ 	{ }
+ 
+       template<typename _Alloc, typename _UHead, typename... _UTails>
+ 	_GLIBCXX20_CONSTEXPR
+ 	_Tuple_impl(allocator_arg_t __tag, const _Alloc& __a,
+-		    const _Tuple_impl<_Idx, _UHead, _UTails...>& __in)
++		    const _Tuple_impl<_Idx, _UHead, _UTails...>& ___in)
+ 	: _Inherited(__tag, __a,
+-		     _Tuple_impl<_Idx, _UHead, _UTails...>::_M_tail(__in)),
++		     _Tuple_impl<_Idx, _UHead, _UTails...>::_M_tail(___in)),
+ 	  _Base(__use_alloc<_Head, _Alloc, const _UHead&>(__a),
+-		_Tuple_impl<_Idx, _UHead, _UTails...>::_M_head(__in))
++		_Tuple_impl<_Idx, _UHead, _UTails...>::_M_head(___in))
+ 	{ }
+ 
+       template<typename _Alloc, typename _UHead, typename... _UTails>
+ 	_GLIBCXX20_CONSTEXPR
+ 	_Tuple_impl(allocator_arg_t __tag, const _Alloc& __a,
+-		    _Tuple_impl<_Idx, _UHead, _UTails...>&& __in)
++		    _Tuple_impl<_Idx, _UHead, _UTails...>&& ___in)
+ 	: _Inherited(__tag, __a, std::move
+-		     (_Tuple_impl<_Idx, _UHead, _UTails...>::_M_tail(__in))),
++		     (_Tuple_impl<_Idx, _UHead, _UTails...>::_M_tail(___in))),
+ 	  _Base(__use_alloc<_Head, _Alloc, _UHead>(__a),
+ 		std::forward<_UHead>
+-		(_Tuple_impl<_Idx, _UHead, _UTails...>::_M_head(__in)))
++		(_Tuple_impl<_Idx, _UHead, _UTails...>::_M_head(___in)))
+ 	{ }
+ 
+       template<typename... _UElements>
+ 	_GLIBCXX20_CONSTEXPR
+ 	void
+-	_M_assign(const _Tuple_impl<_Idx, _UElements...>& __in)
++	_M_assign(const _Tuple_impl<_Idx, _UElements...>& ___in)
+ 	{
+-	  _M_head(*this) = _Tuple_impl<_Idx, _UElements...>::_M_head(__in);
++	  _M_head(*this) = _Tuple_impl<_Idx, _UElements...>::_M_head(___in);
+ 	  _M_tail(*this)._M_assign(
+-	      _Tuple_impl<_Idx, _UElements...>::_M_tail(__in));
++	      _Tuple_impl<_Idx, _UElements...>::_M_tail(___in));
+ 	}
+ 
+       template<typename _UHead, typename... _UTails>
+ 	_GLIBCXX20_CONSTEXPR
+ 	void
+-	_M_assign(_Tuple_impl<_Idx, _UHead, _UTails...>&& __in)
++	_M_assign(_Tuple_impl<_Idx, _UHead, _UTails...>&& ___in)
+ 	{
+ 	  _M_head(*this) = std::forward<_UHead>
+-	    (_Tuple_impl<_Idx, _UHead, _UTails...>::_M_head(__in));
++	    (_Tuple_impl<_Idx, _UHead, _UTails...>::_M_head(___in));
+ 	  _M_tail(*this)._M_assign(
+-	      std::move(_Tuple_impl<_Idx, _UHead, _UTails...>::_M_tail(__in)));
++	      std::move(_Tuple_impl<_Idx, _UHead, _UTails...>::_M_tail(___in)));
+ 	}
+ 
+     protected:
+       _GLIBCXX20_CONSTEXPR
+       void
+-      _M_swap(_Tuple_impl& __in)
++      _M_swap(_Tuple_impl& ___in)
+       {
+ 	using std::swap;
+-	swap(_M_head(*this), _M_head(__in));
+-	_Inherited::_M_swap(_M_tail(__in));
++	swap(_M_head(*this), _M_head(___in));
++	_Inherited::_M_swap(_M_tail(___in));
+       }
+     };
+ 
+@@ -451,22 +451,22 @@
+       _Tuple_impl(_Tuple_impl&&) = default;
+ #else
+       constexpr
+-      _Tuple_impl(_Tuple_impl&& __in)
++      _Tuple_impl(_Tuple_impl&& ___in)
+       noexcept(is_nothrow_move_constructible<_Head>::value)
+-      : _Base(static_cast<_Base&&>(__in))
++      : _Base(static_cast<_Base&&>(___in))
+       { }
+ #endif
+ 
+       template<typename _UHead>
+ 	constexpr
+-	_Tuple_impl(const _Tuple_impl<_Idx, _UHead>& __in)
+-	: _Base(_Tuple_impl<_Idx, _UHead>::_M_head(__in))
++	_Tuple_impl(const _Tuple_impl<_Idx, _UHead>& ___in)
++	: _Base(_Tuple_impl<_Idx, _UHead>::_M_head(___in))
+ 	{ }
+ 
+       template<typename _UHead>
+ 	constexpr
+-	_Tuple_impl(_Tuple_impl<_Idx, _UHead>&& __in)
+-	: _Base(std::forward<_UHead>(_Tuple_impl<_Idx, _UHead>::_M_head(__in)))
++	_Tuple_impl(_Tuple_impl<_Idx, _UHead>&& ___in)
++	: _Base(std::forward<_UHead>(_Tuple_impl<_Idx, _UHead>::_M_head(___in)))
+ 	{ }
+ 
+       template<typename _Alloc>
+@@ -493,58 +493,58 @@
+       template<typename _Alloc>
+ 	_GLIBCXX20_CONSTEXPR
+ 	_Tuple_impl(allocator_arg_t __tag, const _Alloc& __a,
+-		    const _Tuple_impl& __in)
+-	: _Base(__use_alloc<_Head, _Alloc, const _Head&>(__a), _M_head(__in))
++		    const _Tuple_impl& ___in)
++	: _Base(__use_alloc<_Head, _Alloc, const _Head&>(__a), _M_head(___in))
+ 	{ }
+ 
+       template<typename _Alloc>
+ 	_GLIBCXX20_CONSTEXPR
+ 	_Tuple_impl(allocator_arg_t __tag, const _Alloc& __a,
+-		    _Tuple_impl&& __in)
++		    _Tuple_impl&& ___in)
+ 	: _Base(__use_alloc<_Head, _Alloc, _Head>(__a),
+-		std::forward<_Head>(_M_head(__in)))
++		std::forward<_Head>(_M_head(___in)))
+ 	{ }
+ 
+       template<typename _Alloc, typename _UHead>
+ 	_GLIBCXX20_CONSTEXPR
+ 	_Tuple_impl(allocator_arg_t __tag, const _Alloc& __a,
+-		    const _Tuple_impl<_Idx, _UHead>& __in)
++		    const _Tuple_impl<_Idx, _UHead>& ___in)
+ 	: _Base(__use_alloc<_Head, _Alloc, const _UHead&>(__a),
+-		_Tuple_impl<_Idx, _UHead>::_M_head(__in))
++		_Tuple_impl<_Idx, _UHead>::_M_head(___in))
+ 	{ }
+ 
+       template<typename _Alloc, typename _UHead>
+ 	_GLIBCXX20_CONSTEXPR
+ 	_Tuple_impl(allocator_arg_t __tag, const _Alloc& __a,
+-		    _Tuple_impl<_Idx, _UHead>&& __in)
++		    _Tuple_impl<_Idx, _UHead>&& ___in)
+ 	: _Base(__use_alloc<_Head, _Alloc, _UHead>(__a),
+-		std::forward<_UHead>(_Tuple_impl<_Idx, _UHead>::_M_head(__in)))
++		std::forward<_UHead>(_Tuple_impl<_Idx, _UHead>::_M_head(___in)))
+ 	{ }
+ 
+       template<typename _UHead>
+ 	_GLIBCXX20_CONSTEXPR
+ 	void
+-	_M_assign(const _Tuple_impl<_Idx, _UHead>& __in)
++	_M_assign(const _Tuple_impl<_Idx, _UHead>& ___in)
+ 	{
+-	  _M_head(*this) = _Tuple_impl<_Idx, _UHead>::_M_head(__in);
++	  _M_head(*this) = _Tuple_impl<_Idx, _UHead>::_M_head(___in);
+ 	}
+ 
+       template<typename _UHead>
+ 	_GLIBCXX20_CONSTEXPR
+ 	void
+-	_M_assign(_Tuple_impl<_Idx, _UHead>&& __in)
++	_M_assign(_Tuple_impl<_Idx, _UHead>&& ___in)
+ 	{
+ 	  _M_head(*this)
+-	    = std::forward<_UHead>(_Tuple_impl<_Idx, _UHead>::_M_head(__in));
++	    = std::forward<_UHead>(_Tuple_impl<_Idx, _UHead>::_M_head(___in));
+ 	}
+ 
+     protected:
+       _GLIBCXX20_CONSTEXPR
+       void
+-      _M_swap(_Tuple_impl& __in)
++      _M_swap(_Tuple_impl& ___in)
+       {
+ 	using std::swap;
+-	swap(_M_head(*this), _M_head(__in));
++	swap(_M_head(*this), _M_head(___in));
+       }
+     };
+ 
+@@ -760,9 +760,9 @@
+ 			   && !__use_other_ctor<const tuple<_UElements...>&>(),
+ 	       _ImplicitCtor<_Valid, const _UElements&...> = true>
+ 	constexpr
+-	tuple(const tuple<_UElements...>& __in)
++	tuple(const tuple<_UElements...>& ___in)
+ 	noexcept(__nothrow_constructible<const _UElements&...>())
+-	: _Inherited(static_cast<const _Tuple_impl<0, _UElements...>&>(__in))
++	: _Inherited(static_cast<const _Tuple_impl<0, _UElements...>&>(___in))
+ 	{ }
+ 
+       template<typename... _UElements,
+@@ -770,9 +770,9 @@
+ 			   && !__use_other_ctor<const tuple<_UElements...>&>(),
+ 	       _ExplicitCtor<_Valid, const _UElements&...> = false>
+ 	explicit constexpr
+-	tuple(const tuple<_UElements...>& __in)
++	tuple(const tuple<_UElements...>& ___in)
+ 	noexcept(__nothrow_constructible<const _UElements&...>())
+-	: _Inherited(static_cast<const _Tuple_impl<0, _UElements...>&>(__in))
++	: _Inherited(static_cast<const _Tuple_impl<0, _UElements...>&>(___in))
+ 	{ }
+ 
+       template<typename... _UElements,
+@@ -780,18 +780,18 @@
+ 			     && !__use_other_ctor<tuple<_UElements...>&&>(),
+ 	       _ImplicitCtor<_Valid, _UElements...> = true>
+ 	constexpr
+-	tuple(tuple<_UElements...>&& __in)
++	tuple(tuple<_UElements...>&& ___in)
+ 	noexcept(__nothrow_constructible<_UElements...>())
+-	: _Inherited(static_cast<_Tuple_impl<0, _UElements...>&&>(__in)) { }
++	: _Inherited(static_cast<_Tuple_impl<0, _UElements...>&&>(___in)) { }
+ 
+       template<typename... _UElements,
+ 	       bool _Valid = (sizeof...(_Elements) == sizeof...(_UElements))
+ 			     && !__use_other_ctor<tuple<_UElements...>&&>(),
+ 	       _ExplicitCtor<_Valid, _UElements...> = false>
+ 	explicit constexpr
+-	tuple(tuple<_UElements...>&& __in)
++	tuple(tuple<_UElements...>&& ___in)
+ 	noexcept(__nothrow_constructible<_UElements...>())
+-	: _Inherited(static_cast<_Tuple_impl<0, _UElements...>&&>(__in)) { }
++	: _Inherited(static_cast<_Tuple_impl<0, _UElements...>&&>(___in)) { }
+ 
+       // Allocator-extended constructors.
+ 
+@@ -837,13 +837,13 @@
+ 
+       template<typename _Alloc>
+ 	_GLIBCXX20_CONSTEXPR
+-	tuple(allocator_arg_t __tag, const _Alloc& __a, const tuple& __in)
+-	: _Inherited(__tag, __a, static_cast<const _Inherited&>(__in)) { }
++	tuple(allocator_arg_t __tag, const _Alloc& __a, const tuple& ___in)
++	: _Inherited(__tag, __a, static_cast<const _Inherited&>(___in)) { }
+ 
+       template<typename _Alloc>
+ 	_GLIBCXX20_CONSTEXPR
+-	tuple(allocator_arg_t __tag, const _Alloc& __a, tuple&& __in)
+-	: _Inherited(__tag, __a, static_cast<_Inherited&&>(__in)) { }
++	tuple(allocator_arg_t __tag, const _Alloc& __a, tuple&& ___in)
++	: _Inherited(__tag, __a, static_cast<_Inherited&&>(___in)) { }
+ 
+       template<typename _Alloc, typename... _UElements,
+ 	       bool _Valid = (sizeof...(_Elements) == sizeof...(_UElements))
+@@ -851,9 +851,9 @@
+ 	       _ImplicitCtor<_Valid, const _UElements&...> = true>
+ 	_GLIBCXX20_CONSTEXPR
+ 	tuple(allocator_arg_t __tag, const _Alloc& __a,
+-	      const tuple<_UElements...>& __in)
++	      const tuple<_UElements...>& ___in)
+ 	: _Inherited(__tag, __a,
+-	             static_cast<const _Tuple_impl<0, _UElements...>&>(__in))
++	             static_cast<const _Tuple_impl<0, _UElements...>&>(___in))
+ 	{ }
+ 
+       template<typename _Alloc, typename... _UElements,
+@@ -863,9 +863,9 @@
+ 	_GLIBCXX20_CONSTEXPR
+ 	explicit
+ 	tuple(allocator_arg_t __tag, const _Alloc& __a,
+-	      const tuple<_UElements...>& __in)
++	      const tuple<_UElements...>& ___in)
+ 	: _Inherited(__tag, __a,
+-	             static_cast<const _Tuple_impl<0, _UElements...>&>(__in))
++	             static_cast<const _Tuple_impl<0, _UElements...>&>(___in))
+ 	{ }
+ 
+       template<typename _Alloc, typename... _UElements,
+@@ -874,9 +874,9 @@
+ 	       _ImplicitCtor<_Valid, _UElements...> = true>
+ 	_GLIBCXX20_CONSTEXPR
+ 	tuple(allocator_arg_t __tag, const _Alloc& __a,
+-	      tuple<_UElements...>&& __in)
++	      tuple<_UElements...>&& ___in)
+ 	: _Inherited(__tag, __a,
+-	             static_cast<_Tuple_impl<0, _UElements...>&&>(__in))
++	             static_cast<_Tuple_impl<0, _UElements...>&&>(___in))
+ 	{ }
+ 
+       template<typename _Alloc, typename... _UElements,
+@@ -886,9 +886,9 @@
+ 	_GLIBCXX20_CONSTEXPR
+ 	explicit
+ 	tuple(allocator_arg_t __tag, const _Alloc& __a,
+-	      tuple<_UElements...>&& __in)
++	      tuple<_UElements...>&& ___in)
+ 	: _Inherited(__tag, __a,
+-	             static_cast<_Tuple_impl<0, _UElements...>&&>(__in))
++	             static_cast<_Tuple_impl<0, _UElements...>&&>(___in))
+ 	{ }
+ 
+       // tuple assignment
+@@ -897,10 +897,10 @@
+       tuple&
+       operator=(__conditional_t<__assignable<const _Elements&...>(),
+ 				const tuple&,
+-				const __nonesuch&> __in)
++				const __nonesuch&> ___in)
+       noexcept(__nothrow_assignable<const _Elements&...>())
+       {
+-	this->_M_assign(__in);
++	this->_M_assign(___in);
+ 	return *this;
+       }
+ 
+@@ -908,39 +908,39 @@
+       tuple&
+       operator=(__conditional_t<__assignable<_Elements...>(),
+ 				tuple&&,
+-				__nonesuch&&> __in)
++				__nonesuch&&> ___in)
+       noexcept(__nothrow_assignable<_Elements...>())
+       {
+-	this->_M_assign(std::move(__in));
++	this->_M_assign(std::move(___in));
+ 	return *this;
+       }
+ 
+       template<typename... _UElements>
+ 	_GLIBCXX20_CONSTEXPR
+ 	__enable_if_t<__assignable<const _UElements&...>(), tuple&>
+-	operator=(const tuple<_UElements...>& __in)
++	operator=(const tuple<_UElements...>& ___in)
+ 	noexcept(__nothrow_assignable<const _UElements&...>())
+ 	{
+-	  this->_M_assign(__in);
++	  this->_M_assign(___in);
+ 	  return *this;
+ 	}
+ 
+       template<typename... _UElements>
+ 	_GLIBCXX20_CONSTEXPR
+ 	__enable_if_t<__assignable<_UElements...>(), tuple&>
+-	operator=(tuple<_UElements...>&& __in)
++	operator=(tuple<_UElements...>&& ___in)
+ 	noexcept(__nothrow_assignable<_UElements...>())
+ 	{
+-	  this->_M_assign(std::move(__in));
++	  this->_M_assign(std::move(___in));
+ 	  return *this;
+ 	}
+ 
+       // tuple swap
+       _GLIBCXX20_CONSTEXPR
+       void
+-      swap(tuple& __in)
++      swap(tuple& ___in)
+       noexcept(__and_<__is_nothrow_swappable<_Elements>...>::value)
+-      { _Inherited::_M_swap(__in); }
++      { _Inherited::_M_swap(___in); }
+     };
+ 
+ #if __cpp_deduction_guides >= 201606
+@@ -1092,60 +1092,60 @@
+       template<typename _U1, typename _U2,
+ 	       _ImplicitCtor<true, const _U1&, const _U2&> = true>
+ 	constexpr
+-	tuple(const tuple<_U1, _U2>& __in)
++	tuple(const tuple<_U1, _U2>& ___in)
+ 	noexcept(__nothrow_constructible<const _U1&, const _U2&>())
+-	: _Inherited(static_cast<const _Tuple_impl<0, _U1, _U2>&>(__in)) { }
++	: _Inherited(static_cast<const _Tuple_impl<0, _U1, _U2>&>(___in)) { }
+ 
+       template<typename _U1, typename _U2,
+ 	       _ExplicitCtor<true, const _U1&, const _U2&> = false>
+ 	explicit constexpr
+-	tuple(const tuple<_U1, _U2>& __in)
++	tuple(const tuple<_U1, _U2>& ___in)
+ 	noexcept(__nothrow_constructible<const _U1&, const _U2&>())
+-	: _Inherited(static_cast<const _Tuple_impl<0, _U1, _U2>&>(__in)) { }
++	: _Inherited(static_cast<const _Tuple_impl<0, _U1, _U2>&>(___in)) { }
+ 
+       template<typename _U1, typename _U2,
+ 	       _ImplicitCtor<true, _U1, _U2> = true>
+ 	constexpr
+-	tuple(tuple<_U1, _U2>&& __in)
++	tuple(tuple<_U1, _U2>&& ___in)
+ 	noexcept(__nothrow_constructible<_U1, _U2>())
+-	: _Inherited(static_cast<_Tuple_impl<0, _U1, _U2>&&>(__in)) { }
++	: _Inherited(static_cast<_Tuple_impl<0, _U1, _U2>&&>(___in)) { }
+ 
+       template<typename _U1, typename _U2,
+ 	       _ExplicitCtor<true, _U1, _U2> = false>
+ 	explicit constexpr
+-	tuple(tuple<_U1, _U2>&& __in)
++	tuple(tuple<_U1, _U2>&& ___in)
+ 	noexcept(__nothrow_constructible<_U1, _U2>())
+-	: _Inherited(static_cast<_Tuple_impl<0, _U1, _U2>&&>(__in)) { }
++	: _Inherited(static_cast<_Tuple_impl<0, _U1, _U2>&&>(___in)) { }
+ 
+       template<typename _U1, typename _U2,
+ 	       _ImplicitCtor<true, const _U1&, const _U2&> = true>
+ 	constexpr
+-	tuple(const pair<_U1, _U2>& __in)
++	tuple(const pair<_U1, _U2>& ___in)
+ 	noexcept(__nothrow_constructible<const _U1&, const _U2&>())
+-	: _Inherited(__in.first, __in.second) { }
++	: _Inherited(___in.first, ___in.second) { }
+ 
+       template<typename _U1, typename _U2,
+ 	       _ExplicitCtor<true, const _U1&, const _U2&> = false>
+ 	explicit constexpr
+-	tuple(const pair<_U1, _U2>& __in)
++	tuple(const pair<_U1, _U2>& ___in)
+ 	noexcept(__nothrow_constructible<const _U1&, const _U2&>())
+-	: _Inherited(__in.first, __in.second) { }
++	: _Inherited(___in.first, ___in.second) { }
+ 
+       template<typename _U1, typename _U2,
+ 	       _ImplicitCtor<true, _U1, _U2> = true>
+ 	constexpr
+-	tuple(pair<_U1, _U2>&& __in)
++	tuple(pair<_U1, _U2>&& ___in)
+ 	noexcept(__nothrow_constructible<_U1, _U2>())
+-	: _Inherited(std::forward<_U1>(__in.first),
+-		     std::forward<_U2>(__in.second)) { }
++	: _Inherited(std::forward<_U1>(___in.first),
++		     std::forward<_U2>(___in.second)) { }
+ 
+       template<typename _U1, typename _U2,
+ 	       _ExplicitCtor<true, _U1, _U2> = false>
+ 	explicit constexpr
+-	tuple(pair<_U1, _U2>&& __in)
++	tuple(pair<_U1, _U2>&& ___in)
+ 	noexcept(__nothrow_constructible<_U1, _U2>())
+-	: _Inherited(std::forward<_U1>(__in.first),
+-		     std::forward<_U2>(__in.second)) { }
++	: _Inherited(std::forward<_U1>(___in.first),
++		     std::forward<_U2>(___in.second)) { }
+ 
+       // Allocator-extended constructors.
+ 
+@@ -1188,21 +1188,21 @@
+ 
+       template<typename _Alloc>
+ 	_GLIBCXX20_CONSTEXPR
+-	tuple(allocator_arg_t __tag, const _Alloc& __a, const tuple& __in)
+-	: _Inherited(__tag, __a, static_cast<const _Inherited&>(__in)) { }
++	tuple(allocator_arg_t __tag, const _Alloc& __a, const tuple& ___in)
++	: _Inherited(__tag, __a, static_cast<const _Inherited&>(___in)) { }
+ 
+       template<typename _Alloc>
+ 	_GLIBCXX20_CONSTEXPR
+-	tuple(allocator_arg_t __tag, const _Alloc& __a, tuple&& __in)
+-	: _Inherited(__tag, __a, static_cast<_Inherited&&>(__in)) { }
++	tuple(allocator_arg_t __tag, const _Alloc& __a, tuple&& ___in)
++	: _Inherited(__tag, __a, static_cast<_Inherited&&>(___in)) { }
+ 
+       template<typename _Alloc, typename _U1, typename _U2,
+ 	       _ImplicitCtor<true, const _U1&, const _U2&> = true>
+ 	_GLIBCXX20_CONSTEXPR
+ 	tuple(allocator_arg_t __tag, const _Alloc& __a,
+-	      const tuple<_U1, _U2>& __in)
++	      const tuple<_U1, _U2>& ___in)
+ 	: _Inherited(__tag, __a,
+-	             static_cast<const _Tuple_impl<0, _U1, _U2>&>(__in))
++	             static_cast<const _Tuple_impl<0, _U1, _U2>&>(___in))
+ 	{ }
+ 
+       template<typename _Alloc, typename _U1, typename _U2,
+@@ -1210,55 +1210,55 @@
+ 	explicit
+ 	_GLIBCXX20_CONSTEXPR
+ 	tuple(allocator_arg_t __tag, const _Alloc& __a,
+-	      const tuple<_U1, _U2>& __in)
++	      const tuple<_U1, _U2>& ___in)
+ 	: _Inherited(__tag, __a,
+-	             static_cast<const _Tuple_impl<0, _U1, _U2>&>(__in))
++	             static_cast<const _Tuple_impl<0, _U1, _U2>&>(___in))
+ 	{ }
+ 
+       template<typename _Alloc, typename _U1, typename _U2,
+ 	       _ImplicitCtor<true, _U1, _U2> = true>
+ 	_GLIBCXX20_CONSTEXPR
+-	tuple(allocator_arg_t __tag, const _Alloc& __a, tuple<_U1, _U2>&& __in)
+-	: _Inherited(__tag, __a, static_cast<_Tuple_impl<0, _U1, _U2>&&>(__in))
++	tuple(allocator_arg_t __tag, const _Alloc& __a, tuple<_U1, _U2>&& ___in)
++	: _Inherited(__tag, __a, static_cast<_Tuple_impl<0, _U1, _U2>&&>(___in))
+ 	{ }
+ 
+       template<typename _Alloc, typename _U1, typename _U2,
+ 	       _ExplicitCtor<true, _U1, _U2> = false>
+ 	explicit
+ 	_GLIBCXX20_CONSTEXPR
+-	tuple(allocator_arg_t __tag, const _Alloc& __a, tuple<_U1, _U2>&& __in)
+-	: _Inherited(__tag, __a, static_cast<_Tuple_impl<0, _U1, _U2>&&>(__in))
++	tuple(allocator_arg_t __tag, const _Alloc& __a, tuple<_U1, _U2>&& ___in)
++	: _Inherited(__tag, __a, static_cast<_Tuple_impl<0, _U1, _U2>&&>(___in))
+ 	{ }
+ 
+       template<typename _Alloc, typename _U1, typename _U2,
+ 	       _ImplicitCtor<true, const _U1&, const _U2&> = true>
+ 	_GLIBCXX20_CONSTEXPR
+ 	tuple(allocator_arg_t __tag, const _Alloc& __a,
+-	      const pair<_U1, _U2>& __in)
+-	: _Inherited(__tag, __a, __in.first, __in.second) { }
++	      const pair<_U1, _U2>& ___in)
++	: _Inherited(__tag, __a, ___in.first, ___in.second) { }
+ 
+       template<typename _Alloc, typename _U1, typename _U2,
+ 	       _ExplicitCtor<true, const _U1&, const _U2&> = false>
+ 	explicit
+ 	_GLIBCXX20_CONSTEXPR
+ 	tuple(allocator_arg_t __tag, const _Alloc& __a,
+-	      const pair<_U1, _U2>& __in)
+-	: _Inherited(__tag, __a, __in.first, __in.second) { }
++	      const pair<_U1, _U2>& ___in)
++	: _Inherited(__tag, __a, ___in.first, ___in.second) { }
+ 
+       template<typename _Alloc, typename _U1, typename _U2,
+ 	       _ImplicitCtor<true, _U1, _U2> = true>
+ 	_GLIBCXX20_CONSTEXPR
+-	tuple(allocator_arg_t __tag, const _Alloc& __a, pair<_U1, _U2>&& __in)
+-	: _Inherited(__tag, __a, std::forward<_U1>(__in.first),
+-		     std::forward<_U2>(__in.second)) { }
++	tuple(allocator_arg_t __tag, const _Alloc& __a, pair<_U1, _U2>&& ___in)
++	: _Inherited(__tag, __a, std::forward<_U1>(___in.first),
++		     std::forward<_U2>(___in.second)) { }
+ 
+       template<typename _Alloc, typename _U1, typename _U2,
+ 	       _ExplicitCtor<true, _U1, _U2> = false>
+ 	explicit
+ 	_GLIBCXX20_CONSTEXPR
+-	tuple(allocator_arg_t __tag, const _Alloc& __a, pair<_U1, _U2>&& __in)
+-	: _Inherited(__tag, __a, std::forward<_U1>(__in.first),
+-		     std::forward<_U2>(__in.second)) { }
++	tuple(allocator_arg_t __tag, const _Alloc& __a, pair<_U1, _U2>&& ___in)
++	: _Inherited(__tag, __a, std::forward<_U1>(___in.first),
++		     std::forward<_U2>(___in.second)) { }
+ 
+       // Tuple assignment.
+ 
+@@ -1266,10 +1266,10 @@
+       tuple&
+       operator=(__conditional_t<__assignable<const _T1&, const _T2&>(),
+ 				const tuple&,
+-				const __nonesuch&> __in)
++				const __nonesuch&> ___in)
+       noexcept(__nothrow_assignable<const _T1&, const _T2&>())
+       {
+-	this->_M_assign(__in);
++	this->_M_assign(___in);
+ 	return *this;
+       }
+ 
+@@ -1277,61 +1277,61 @@
+       tuple&
+       operator=(__conditional_t<__assignable<_T1, _T2>(),
+ 				tuple&&,
+-				__nonesuch&&> __in)
++				__nonesuch&&> ___in)
+       noexcept(__nothrow_assignable<_T1, _T2>())
+       {
+-	this->_M_assign(std::move(__in));
++	this->_M_assign(std::move(___in));
+ 	return *this;
+       }
+ 
+       template<typename _U1, typename _U2>
+ 	_GLIBCXX20_CONSTEXPR
+ 	__enable_if_t<__assignable<const _U1&, const _U2&>(), tuple&>
+-	operator=(const tuple<_U1, _U2>& __in)
++	operator=(const tuple<_U1, _U2>& ___in)
+ 	noexcept(__nothrow_assignable<const _U1&, const _U2&>())
+ 	{
+-	  this->_M_assign(__in);
++	  this->_M_assign(___in);
+ 	  return *this;
+ 	}
+ 
+       template<typename _U1, typename _U2>
+ 	_GLIBCXX20_CONSTEXPR
+ 	__enable_if_t<__assignable<_U1, _U2>(), tuple&>
+-	operator=(tuple<_U1, _U2>&& __in)
++	operator=(tuple<_U1, _U2>&& ___in)
+ 	noexcept(__nothrow_assignable<_U1, _U2>())
+ 	{
+-	  this->_M_assign(std::move(__in));
++	  this->_M_assign(std::move(___in));
+ 	  return *this;
+ 	}
+ 
+       template<typename _U1, typename _U2>
+ 	_GLIBCXX20_CONSTEXPR
+ 	__enable_if_t<__assignable<const _U1&, const _U2&>(), tuple&>
+-	operator=(const pair<_U1, _U2>& __in)
++	operator=(const pair<_U1, _U2>& ___in)
+ 	noexcept(__nothrow_assignable<const _U1&, const _U2&>())
+ 	{
+-	  this->_M_head(*this) = __in.first;
+-	  this->_M_tail(*this)._M_head(*this) = __in.second;
++	  this->_M_head(*this) = ___in.first;
++	  this->_M_tail(*this)._M_head(*this) = ___in.second;
+ 	  return *this;
+ 	}
+ 
+       template<typename _U1, typename _U2>
+ 	_GLIBCXX20_CONSTEXPR
+ 	__enable_if_t<__assignable<_U1, _U2>(), tuple&>
+-	operator=(pair<_U1, _U2>&& __in)
++	operator=(pair<_U1, _U2>&& ___in)
+ 	noexcept(__nothrow_assignable<_U1, _U2>())
+ 	{
+-	  this->_M_head(*this) = std::forward<_U1>(__in.first);
+-	  this->_M_tail(*this)._M_head(*this) = std::forward<_U2>(__in.second);
++	  this->_M_head(*this) = std::forward<_U1>(___in.first);
++	  this->_M_tail(*this)._M_head(*this) = std::forward<_U2>(___in.second);
+ 	  return *this;
+ 	}
+ 
+       _GLIBCXX20_CONSTEXPR
+       void
+-      swap(tuple& __in)
++      swap(tuple& ___in)
+       noexcept(__and_<__is_nothrow_swappable<_T1>,
+ 		      __is_nothrow_swappable<_T2>>::value)
+-      { _Inherited::_M_swap(__in); }
++      { _Inherited::_M_swap(___in); }
+     };
+ 
+ 

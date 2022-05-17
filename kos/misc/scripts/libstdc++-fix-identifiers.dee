@@ -1,0 +1,194 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import fs;
+import * from deemon;
+global SAL_MACRO_NAMES: {string...} = HashSet();
+
+/* Load SAL macro names into identifier blacklist */
+for (local line: (
+		with (local fp = File.open(fs.joinpath(
+				fs.headof(__FILE__), "../../include/sal.h")))
+			fp.readall()
+		).splitlines(false)) {
+	try {
+		line = line.scanf(" # define %[^( ]")...;
+	} catch (...) {
+		continue;
+	}
+	SAL_MACRO_NAMES.insert(line);
+}
+
+/* Some more identifiers we don't want libstdc++ to use
+ * s.a. `kos/misc/libgen/c/escape.dee:special_escapes` */
+SAL_MACRO_NAMES.update({
+	"__used",        /* Macro in <sys/cdefs.h> */
+	"__unused",      /* Macro in <sys/cdefs.h> */
+	"__packed",      /* Macro in <sys/cdefs.h> */
+//	"__value",       /* Compiler keyword in MSVC -- Used by templates :( */
+	"__event",       /* Compiler keyword in MSVC */
+	"__argv",        /* Macro from <stdlib.h> */
+	"__envp",        /* Macro from <stdlib.h> */
+	"__environ",     /* Macro from <stdlib.h> */
+});
+
+
+@@Force parenthesis around these identifiers (but check for leading namespace prefixes)
+global FORCEPAREN_MACRO_NAMES: {string...} = HashSet({
+	"isalnum",  "iswalnum",
+	"isalpha",  "iswalpha",
+	"isupper",  "iswupper",
+	"islower",  "iswlower",
+	"isdigit",  "iswdigit",
+	"isxdigit", "iswxdigit",
+	"isspace",  "iswspace",
+	"ispunct",  "iswpunct",
+	"isprint",  "iswprint",
+	"isgraph",  "iswgraph",
+	"iscntrl",  "iswcntrl",
+	"isblank",  "iswblank",
+	"tolower",  "towlower",
+	"toupper",  "towupper",
+});
+
+
+function fixFile(filename: string) {
+	print("Checking file: ", repr filename);
+	local oldData: string = File.open(filename, "r")
+		.readall().decode("utf-8").unifylines();
+	local newData = File.Writer();
+	local flushStart = 0, len = #oldData, i = 0;
+	while (i < len) {
+		if (!oldData.issymstrt(i)) {
+			/* Skip comments... */
+			if (oldData.startswith("/*", i)) {
+				i = oldData.index("*/", i) + 2;
+				continue;
+			}
+			if (oldData.startswith("//", i)) {
+				i = oldData.find("\n", i);
+				if (i < 0)
+					break;
+				continue;
+			}
+			++i;
+			continue;
+		}
+		local symStart = i;
+		do {
+			++i;
+		} while (i < len && oldData.issymcont(i));
+		local sym = oldData[symStart:i];
+		if (sym in SAL_MACRO_NAMES) {
+			/* Insert another leading "_" before `sym' */
+			newData << oldData[flushStart:symStart] << "_";
+			flushStart = symStart;
+		} else if (sym in FORCEPAREN_MACRO_NAMES) {
+			/* Unread preceding "[namespace] :: " */
+			local lParenPos = symStart;
+			local isRawIdent = true;
+			while (lParenPos > flushStart) {
+				local iter = lParenPos;
+				while (iter > flushStart && oldData.isspace(iter - 1))
+					--iter;
+				if (iter <= flushStart)
+					break;
+				if (oldData.endswith("::", flushStart, iter)) {
+					iter -= 2;
+				} else if (oldData.endswith("->*", flushStart, iter)) {
+					iter -= 3;
+				} else if (oldData.endswith("->", flushStart, iter)) {
+					iter -= 2;
+				} else if (oldData.endswith(".*", flushStart, iter)) {
+					iter -= 2;
+				} else if (oldData.endswith(".", flushStart, iter)) {
+					iter -= 1;
+				} else {
+					break;
+				}
+				isRawIdent = false;
+				lParenPos = iter;
+again_ident_before_ctype:
+				while (iter > flushStart && oldData.isspace(iter - 1))
+					--iter;
+				if (iter <= flushStart)
+					break;
+				if (oldData.issymcont(iter - 1)) {
+					do {
+						--iter;
+					} while (iter > flushStart && oldData.issymcont(iter - 1));
+				} else if (oldData[iter - 1] in ")}>") {
+					local closech = oldData[iter - 1];
+					local opench = { ")" : "(", ">": "<", "}" : "{" }[closech];
+					iter = oldData.rindexmatch(opench, closech, flushStart, iter - 1);
+					goto again_ident_before_ctype;
+				}
+				lParenPos = iter;
+			}
+			local rParenPos = i;
+			local needParen = false;
+			if (rParenPos >= len || oldData[rParenPos] != ")")
+				needParen = true;
+			if (lParenPos <= 0 || oldData[lParenPos - 1] != "(")
+				needParen = true;
+			local beforeLParenPos = lParenPos;
+			while (beforeLParenPos > 0 && oldData.isspace(beforeLParenPos - 1))
+				--beforeLParenPos;
+			if (beforeLParenPos > 0 && isRawIdent && oldData[beforeLParenPos - 1] in "&|=")
+				needParen = false; /* `bool x = isalpha(ch);` --> Don't escape! */
+			local afterRParenPos = rParenPos;
+			while (afterRParenPos < len && oldData.isspace(afterRParenPos))
+				++afterRParenPos;
+			if (afterRParenPos >= len || oldData[afterRParenPos] != "(")
+				needParen = false; /* No need to escape if function-style macro expansion wouldn't happen */
+			if (needParen) {
+				newData
+					<< oldData[flushStart:lParenPos] << "("
+					<< oldData[lParenPos:rParenPos] << ")";
+				flushStart = i = rParenPos;
+			}
+		}
+	}
+	newData << oldData[flushStart:len];
+	newData = newData.string;
+	if (oldData != newData) {
+		print("Updating file: ", repr filename);
+		newData = newData.encode("utf-8");
+		with (local fp = File.open(filename, "w"))
+			fp.write(newData);
+	}
+}
+
+
+function fixPath(path: string) {
+	for (local file: fs.dir(path)) {
+		file = fs.joinpath(path, file);
+		if (fs.stat.isdir(file)) {
+			fixPath(file);
+			continue;
+		}
+		fixFile(file);
+	}
+}
+
+
+fixPath([...][1]);
+
+
