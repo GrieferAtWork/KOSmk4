@@ -45,7 +45,7 @@ diff -Naur binutils-2.38-orig/bfd/elf.c binutils-2.38/bfd/elf.c
        else if ((flags & BSF_OBJECT) != 0)
 diff -Naur binutils-2.38-orig/bfd/elf64-x86-64.c binutils-2.38/bfd/elf64-x86-64.c
 --- binutils-2.38-orig/bfd/elf64-x86-64.c	2022-01-22 13:14:07.000000000 +0100
-+++ binutils-2.38/bfd/elf64-x86-64.c	2022-05-15 17:29:42.212028700 +0200
++++ binutils-2.38/bfd/elf64-x86-64.c	2022-05-17 18:41:07.183867600 +0200
 @@ -3135,6 +3135,13 @@
  	  if ((input_section->flags & SEC_ALLOC) != 0
  	      && (input_section->flags & SEC_READONLY) != 0
@@ -56,7 +56,7 @@ diff -Naur binutils-2.38-orig/bfd/elf64-x86-64.c binutils-2.38/bfd/elf64-x86-64.
 +	       *                you understand what's happening here, you should conclude
 +	       *                that this makes sense. (after all: disallowing it is done
 +	       *                to prevent a potential overflow at runtime) */
-+	      && !info->no_reloc_overflow_check
++	      && !htab->params->no_reloc_overflow_check
  	      && ((bfd_link_executable (info)
  		   && ((h->root.type == bfd_link_hash_undefweak
  			&& (eh == NULL
@@ -294,7 +294,7 @@ diff -Naur binutils-2.38-orig/include/dwarf2.def binutils-2.38/include/dwarf2.de
  /* Index attributes in the Abbreviations Table.  */
 diff -Naur binutils-2.38-orig/ld/Makefile.am binutils-2.38/ld/Makefile.am
 --- binutils-2.38-orig/ld/Makefile.am	2022-01-22 13:14:09.000000000 +0100
-+++ binutils-2.38/ld/Makefile.am	2022-05-15 17:37:36.742206900 +0200
++++ binutils-2.38/ld/Makefile.am	2022-05-15 17:48:38.205735500 +0200
 @@ -278,6 +278,7 @@
  	eelf32xtensa.c \
  	eelf32z80.c \
@@ -311,25 +311,73 @@ diff -Naur binutils-2.38-orig/ld/Makefile.am binutils-2.38/ld/Makefile.am
  	eelf_x86_64_cloudabi.c \
  	eelf_x86_64_fbsd.c \
  	eelf_x86_64_haiku.c \
+@@ -776,6 +778,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32xtensa.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32z80.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_kos.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_be.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_haiku.Pc@am__quote@
+@@ -955,6 +958,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_l1om_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_mipsel_haiku.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_kos.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_cloudabi.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_haiku.Pc@am__quote@
 diff -Naur binutils-2.38-orig/ld/Makefile.in binutils-2.38/ld/Makefile.in
 --- binutils-2.38-orig/ld/Makefile.in	2022-02-09 12:49:03.000000000 +0100
-+++ binutils-2.38/ld/Makefile.in	2022-05-15 17:40:11.197984200 +0200
-@@ -1447,6 +1447,7 @@
++++ binutils-2.38/ld/Makefile.in	2022-05-15 17:49:27.711736900 +0200
+@@ -769,6 +769,7 @@
+ 	eelf32xtensa.c \
+ 	eelf32z80.c \
+ 	eelf_i386.c \
++	eelf_i386_kos.c \
+ 	eelf_i386_be.c \
+ 	eelf_i386_fbsd.c \
+ 	eelf_i386_haiku.c \
+@@ -950,6 +951,7 @@
+ 	eelf_l1om_fbsd.c \
+ 	eelf_mipsel_haiku.c \
+ 	eelf_x86_64.c \
++	eelf_x86_64_kos.c \
+ 	eelf_x86_64_cloudabi.c \
+ 	eelf_x86_64_fbsd.c \
+ 	eelf_x86_64_haiku.c \
+@@ -1445,6 +1447,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64tilegx.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64tilegx_be.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_kos.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_be.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Po@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_kos.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_haiku.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_ldso.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_sol2.Po@am__quote@
-@@ -1461,6 +1462,7 @@
+@@ -1459,6 +1462,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_mipsel_haiku.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_s390.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_kos.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_cloudabi.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_fbsd.Po@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_kos.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_haiku.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_sol2.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eh8300elf.Po@am__quote@
+@@ -2443,6 +2447,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32xtensa.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32z80.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_kos.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_be.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_haiku.Pc@am__quote@
+@@ -2622,6 +2627,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_l1om_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_mipsel_haiku.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_kos.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_cloudabi.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_haiku.Pc@am__quote@
 diff -Naur binutils-2.38-orig/ld/configure.tgt binutils-2.38/ld/configure.tgt
 --- binutils-2.38-orig/ld/configure.tgt	2022-01-22 15:19:36.000000000 +0100
 +++ binutils-2.38/ld/configure.tgt	2022-05-15 17:40:51.272198800 +0200

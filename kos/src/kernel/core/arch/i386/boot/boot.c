@@ -825,18 +825,18 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: `file(1)' appears to be broken */
 
+	/* TODO: Add BOOL_MAX and BOOL_WIDTH to <limits.h> */
+
+	/* TODO: Support for `__has_c_attribute()' in <__stdinc.h> and <compiler/generic.h> */
+
+	/* TODO: Check if we support `__STDC_WANT_IEC_60559_EXT__' in <float.h> */
+
 	/* TODO: Add support for dwarf-5 in `libdebuginfo' (currently, we need to
 	 *       compiled with `-gdwarf-4', and  that should go away  eventually) */
 
 	/* TODO: Fix all remaining warnings that appeared alongside gcc-12.1.0 */
 
 	/* TODO: Stop passing -fpermissive to gcc */
-
-	/* TODO: Write some new patches for libstdc++ to stop it from using identifiers
-	 *       matching  SAL macro names, as well as use paren-escape for identifiers
-	 *       that may be defined as macros (such as `islower()', `isupper()', etc.) */
-
-	/* TODO: Build the gcc-12.1.0 toolchain for x86_64 (currently: completely untested) */
 
 	return state;
 }

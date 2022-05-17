@@ -75,8 +75,8 @@ diff -Naur gcc-12.1.0-orig/fixincludes/mkfixinc.sh gcc-12.1.0/fixincludes/mkfixi
      x86_64-*-mingw32* | \
 diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos.h gcc-12.1.0/gcc/config/i386/kos.h
 --- gcc-12.1.0-orig/gcc/config/i386/kos.h	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-12.1.0/gcc/config/i386/kos.h	2022-05-15 17:52:17.220389500 +0200
-@@ -0,0 +1,36 @@
++++ gcc-12.1.0/gcc/config/i386/kos.h	2022-05-17 16:39:48.928286400 +0200
+@@ -0,0 +1,38 @@
 +
 +#undef TARGET_KOS
 +#define TARGET_KOS 1
@@ -110,9 +110,11 @@ diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos.h gcc-12.1.0/gcc/config/i386/kos.
 +#define CPP_SPEC "%{pthread:-D_REENTRANT}"
 +
 +#undef LINK_SPEC
++#ifdef TARGET_KOS64_WITH_MULTIARCH
++#define LINK_SPEC "%{shared:-shared} %{static:-static} %{!shared: %{!static: %{rdynamic:-export-dynamic} %{!dynamic-linker:-dynamic-linker /lib64/libld.so}}}"
++#else /* TARGET_KOS64_WITH_MULTIARCH */
 +#define LINK_SPEC "%{shared:-shared} %{static:-static} %{!shared: %{!static: %{rdynamic:-export-dynamic} %{!dynamic-linker:-dynamic-linker /lib/libld.so}}}"
-+
-+
++#endif /* !TARGET_KOS64_WITH_MULTIARCH */
 diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos.opt gcc-12.1.0/gcc/config/i386/kos.opt
 --- gcc-12.1.0-orig/gcc/config/i386/kos.opt	1970-01-01 01:00:00.000000000 +0100
 +++ gcc-12.1.0/gcc/config/i386/kos.opt	2022-05-15 17:52:37.986345500 +0200
@@ -125,13 +127,14 @@ diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos.opt gcc-12.1.0/gcc/config/i386/ko
 +; Retain blank line above
 diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos64.h gcc-12.1.0/gcc/config/i386/kos64.h
 --- gcc-12.1.0-orig/gcc/config/i386/kos64.h	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-12.1.0/gcc/config/i386/kos64.h	2022-05-15 17:52:49.447194900 +0200
-@@ -0,0 +1,5 @@
++++ gcc-12.1.0/gcc/config/i386/kos64.h	2022-05-17 16:39:42.678204000 +0200
+@@ -0,0 +1,6 @@
++#undef TARGET_KOS64
++#undef TARGET_KOS64_WITH_MULTIARCH
++#define TARGET_KOS64 1
++#define TARGET_KOS64_WITH_MULTIARCH 1
 +
 +#include "kos.h"
-+
-+#undef TARGET_KOS64
-+#define TARGET_KOS64 1
 diff -Naur gcc-12.1.0-orig/gcc/config/i386/t-kos gcc-12.1.0/gcc/config/i386/t-kos
 --- gcc-12.1.0-orig/gcc/config/i386/t-kos	1970-01-01 01:00:00.000000000 +0100
 +++ gcc-12.1.0/gcc/config/i386/t-kos	2022-05-15 17:53:05.048178200 +0200
