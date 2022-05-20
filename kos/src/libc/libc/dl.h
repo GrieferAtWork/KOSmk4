@@ -31,6 +31,13 @@ DECL_BEGIN
 
 #ifdef __CC__
 
+#ifndef DLFCN_CC
+#define DLFCN_CC __DLFCN_CC
+#endif /* !DLFCN_CC */
+#ifndef DLFCN_VCC
+#define DLFCN_VCC __DLFCN_VCC
+#endif /* !DLFCN_VCC */
+
 #undef HAVE_LAZY_LIBDL_RELOCATIONS
 #if 1
 #define HAVE_LAZY_LIBDL_RELOCATIONS 1
@@ -97,28 +104,28 @@ DECL_BEGIN
 #define LIBC_DLTLSFREE_SECTION     ".crt.sched.pthread" /* Used by pthread */
 #define LIBC_DLADDR_SECTION        ".crt.math.math"     /* Used for <math.h> -- `struct exception::name' */
 
-typedef WUNUSED void *(__DLFCN_CC *PDLOPEN)(char const *filename, int mode) /*THROWS(...)*/;
-typedef NONNULL((1)) int (__DLFCN_CC *PDLCLOSE)(void *handle) /*THROWS(...)*/;
-typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLTLSALLOCSEG)(void);
-typedef NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLTLSFREESEG)(void *ptr);
-typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLGETHANDLE)(void const *static_pointer, unsigned int flags);
-typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLGETMODULE)(char const *name, unsigned int flags);
-typedef WUNUSED NONNULL((1)) fd_t /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULEFD)(void *handle);
-typedef WUNUSED NONNULL((1)) char const * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULENAME)(void *handle);
-typedef void * (__DLFCN_VCC *PDLAUXCTRL)(void *handle, unsigned int cmd, ...) /*THROWS(...)*/;
-typedef WUNUSED char * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLERROR)(void);
-typedef WUNUSED NONNULL((1)) void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULEBASE)(void *handle);
-typedef WUNUSED NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLEXCEPTAWARE)(void *handle);
-typedef WUNUSED NONNULL((1)) void *(__DLFCN_DLTLSADDR_CC *PDLTLSADDR)(void *tls_handle) /*THROWS(...)*/;
-typedef WUNUSED NONNULL((1, 2)) void *(__DLFCN_DLTLSADDR2_CC *PDLTLSADDR2)(void *tls_handle, void *tls_segment) /*THROWS(...)*/;
-typedef WUNUSED void * /*NOTHROW*/ (__DLFCN_CC *PDLTLSALLOC)(size_t num_bytes, size_t min_alignment,
-                                                             void const *template_data, size_t template_size,
-                                                             void (LIBCCALL *perthread_init)(void *arg, void *base, void *tls_segment),
-                                                             void (LIBCCALL *perthread_fini)(void *arg, void *base, void *tls_segment),
-                                                             void *perthread_callback_arg);
-typedef NONNULL((1)) int (__DLFCN_CC *PDLTLSFREE)(void *tls_handle) /*THROWS(...)*/;
-typedef NONNULL((2)) int /*NOTHROW_NCX*/(__DLFCN_CC *PDLADDR)(void const *address, Dl_info *info);
-typedef WUNUSED NONNULL((2)) void * /*NOTHROW_NCX*/(__DLFCN_CC *PDLSYM)(void *handle, char const *symbol_name);
+typedef WUNUSED_T void *(DLFCN_CC *PDLOPEN)(char const *filename, int mode) /*THROWS(...)*/;
+typedef NONNULL_T((1)) int (DLFCN_CC *PDLCLOSE)(void *handle) /*THROWS(...)*/;
+typedef WUNUSED_T void *NOTHROW_NCX_T(DLFCN_CC *PDLTLSALLOCSEG)(void);
+typedef NONNULL_T((1)) int NOTHROW_NCX_T(DLFCN_CC *PDLTLSFREESEG)(void *ptr);
+typedef WUNUSED_T void *NOTHROW_NCX_T(DLFCN_CC *PDLGETHANDLE)(void const *static_pointer, unsigned int flags);
+typedef WUNUSED_T void *NOTHROW_NCX_T(DLFCN_CC *PDLGETMODULE)(char const *name, unsigned int flags);
+typedef WUNUSED_T NONNULL_T((1)) fd_t NOTHROW_NCX_T(DLFCN_CC *PDLMODULEFD)(void *handle);
+typedef WUNUSED_T NONNULL_T((1)) char const * NOTHROW_NCX_T(DLFCN_CC *PDLMODULENAME)(void *handle);
+typedef void * (DLFCN_VCC *PDLAUXCTRL)(void *handle, unsigned int cmd, ...) /*THROWS(...)*/;
+typedef WUNUSED_T char *NOTHROW_NCX_T(DLFCN_CC *PDLERROR)(void);
+typedef WUNUSED_T NONNULL_T((1)) void *NOTHROW_NCX_T(DLFCN_CC *PDLMODULEBASE)(void *handle);
+typedef WUNUSED_T NONNULL_T((1)) int NOTHROW_NCX_T(DLFCN_CC *PDLEXCEPTAWARE)(void *handle);
+typedef WUNUSED_T NONNULL_T((1)) void *(__DLFCN_DLTLSADDR_CC *PDLTLSADDR)(void *tls_handle) /*THROWS(...)*/;
+typedef WUNUSED_T NONNULL_T((1, 2)) void *(__DLFCN_DLTLSADDR2_CC *PDLTLSADDR2)(void *tls_handle, void *tls_segment) /*THROWS(...)*/;
+typedef WUNUSED_T void * NOTHROW_T(DLFCN_CC *PDLTLSALLOC)(size_t num_bytes, size_t min_alignment,
+                                                          void const *template_data, size_t template_size,
+                                                          void (LIBCCALL *perthread_init)(void *arg, void *base, void *tls_segment),
+                                                          void (LIBCCALL *perthread_fini)(void *arg, void *base, void *tls_segment),
+                                                          void *perthread_callback_arg);
+typedef NONNULL_T((1)) int (DLFCN_CC *PDLTLSFREE)(void *tls_handle) /*THROWS(...)*/;
+typedef NONNULL_T((2)) int NOTHROW_NCX_T(DLFCN_CC *PDLADDR)(void const *address, Dl_info *info);
+typedef WUNUSED_T NONNULL_T((2)) void *NOTHROW_NCX_T(DLFCN_CC *PDLSYM)(void *handle, char const *symbol_name);
 
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLOPEN NOTHROW_NCX(LIBCCALL libc_get_dlopen)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLCLOSE NOTHROW_NCX(LIBCCALL libc_get_dlclose)(void);

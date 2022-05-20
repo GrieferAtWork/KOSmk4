@@ -365,7 +365,7 @@ struct json_parser;
  * @return: -1: Error: `writer->jw_result' has a negative value when the function was called.
  * @return: -1: Error: An invocation of the `writer->jw_printer' returned a negative value.
  * @return: -2: Error: Invalid usage during this, or during an earlier call. */
-typedef __ATTR_NONNULL((1, 2, 3)) int
+typedef __ATTR_NONNULL_T((1, 2, 3)) int
 (LIBJSON_CC *PJSON_ENCODE)(struct json_writer *__restrict __writer,
                            void const *__restrict __codec,
                            void const *__restrict __src,
@@ -385,11 +385,11 @@ json_encode(struct json_writer *__restrict __writer,
  * @return: JSON_ERROR_NOOBJ:  A required field doesn't exist or has wrong typing.
  * @return: JSON_ERROR_SYSERR: Malformed codec.
  * @return: JSON_ERROR_RANGE:  The value of an integer field was too large. */
-typedef __ATTR_NONNULL((1, 2, 3)) int
-(LIBJSON_CC *PJSON_DECODE)(struct json_parser *__restrict __parser,
-                           void const *__restrict __codec,
-                           void *__restrict __dst,
-                           void const *const *__ext);
+typedef __ATTR_NONNULL_T((1, 2, 3)) int
+__NOTHROW_NCX_T(LIBJSON_CC *PJSON_DECODE)(struct json_parser *__restrict __parser,
+                                          void const *__restrict __codec,
+                                          void *__restrict __dst,
+                                          void const *const *__ext);
 #ifdef LIBJSON_WANT_PROTOTYPES
 LIBJSON_DECL __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_NCX(LIBJSON_CC json_decode)(struct json_parser *__restrict __parser,

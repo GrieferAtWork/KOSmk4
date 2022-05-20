@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_UNLOAD_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_UNLOAD_C 1
 #define __WANT_SIG_COMPLETION_INIT
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -463,7 +464,7 @@ service_part:
 
 PRIVATE struct async_ops const mpart_ajob_fallback_ops = {
 	.ao_driver  = &drv_self,
-	.ao_destroy = (void (FCALL *)(struct async *__restrict))(void *)(uintptr_t)-1,
+	.ao_destroy = (typeoffield(struct async_ops, ao_destroy))(void *)-1,
 	.ao_connect = &mpart_ajob_fallback_v_connect,
 	.ao_test    = &mpart_ajob_fallback_v_test,
 	.ao_work    = &mpart_ajob_fallback_v_work,

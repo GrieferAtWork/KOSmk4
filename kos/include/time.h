@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24a672bf */
+/* HASH CRC-32:0x52ec3686 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -914,11 +914,11 @@ __CSDECLARE2(,char *__tzname[2],__tzname)
 #elif defined(__CRT_HAVE___tzname) && defined(__CRT_DOS)
 #ifndef ____dos_tzname_defined
 #define ____dos_tzname_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,char **,__NOTHROW_NCX,__dos_tzname,(void),__tzname,())
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_CONST,char **,__NOTHROW_NCX,__dos_tzname,(void),__tzname,())
 #endif /* !____dos_tzname_defined */
 #define __tzname __dos_tzname()
 #elif defined(__CRT_HAVE_DOS$__tzname)
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,char **,__NOTHROW_NCX,__dos_tzname,(void),__tzname,())
+__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_CONST,char **,__NOTHROW_NCX,__dos_tzname,(void),__tzname,())
 #define __tzname __dos_tzname()
 #endif /* ... */
 #endif /* !__tzname */
@@ -950,10 +950,10 @@ __CSREDIRECT(,int,__daylight,_daylight)
 __CSDECLARE(,int,__daylight)
 #define __daylight __daylight
 #elif defined(__CRT_HAVE___daylight) && defined(__CRT_DOS)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,int *,__NOTHROW_NCX,__dos_daylight,(void),__daylight,())
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_CONST,int *,__NOTHROW_NCX,__dos_daylight,(void),__daylight,())
 #define __daylight (*__dos_daylight())
 #elif defined(__CRT_HAVE_DOS$__daylight)
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,int *,__NOTHROW_NCX,__dos_daylight,(void),__daylight,())
+__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_CONST,int *,__NOTHROW_NCX,__dos_daylight,(void),__daylight,())
 #define __daylight (*__dos_daylight())
 #endif /* ... */
 #endif /* !__daylight */
@@ -985,10 +985,10 @@ __CSREDIRECT(,long,__timezone,_timezone)
 __CSDECLARE(,long,__timezone)
 #define __timezone __timezone
 #elif defined(__CRT_HAVE___daylight) && defined(__CRT_DOS)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,long *,__NOTHROW_NCX,__dos_timezone,(void),__timezone,())
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_CONST,long *,__NOTHROW_NCX,__dos_timezone,(void),__timezone,())
 #define __timezone (*__dos_timezone())
 #elif defined(__CRT_HAVE_DOS$__timezone)
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,long *,__NOTHROW_NCX,__dos_timezone,(void),__timezone,())
+__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_CONST,long *,__NOTHROW_NCX,__dos_timezone,(void),__timezone,())
 #define __timezone (*__dos_timezone())
 #endif /* ... */
 #endif /* !__timezone */
@@ -1014,13 +1014,13 @@ __CSREDIRECT2(,char *tzname[2],tzname,__tzname)
 #elif defined(__CRT_HAVE___tzname) && defined(__CRT_DOS)
 #ifndef ____dos_tzname_defined
 #define ____dos_tzname_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,char **,__NOTHROW_NCX,__dos_tzname,(void),__tzname,())
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_CONST,char **,__NOTHROW_NCX,__dos_tzname,(void),__tzname,())
 #endif /* !____dos_tzname_defined */
 #define tzname __dos_tzname()
 #elif defined(__CRT_HAVE_DOS$__tzname)
 #ifndef ____dos_tzname_defined
 #define ____dos_tzname_defined
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,char **,__NOTHROW_NCX,__dos_tzname,(void),__tzname,())
+__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_CONST,char **,__NOTHROW_NCX,__dos_tzname,(void),__tzname,())
 #endif /* !____dos_tzname_defined */
 #define __tzname __dos_tzname()
 #endif /* ... */

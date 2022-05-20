@@ -268,22 +268,22 @@ NOTHROW(FCALL uem_get_dbase)(struct userelf_module *__restrict self) {
 
 /* Operator tables for userelf module objects. */
 INTERN_CONST struct module_section_ops const uems_ops = {
-	.ms_destroy         = (void (FCALL *)(struct module_section *__restrict))&uems_destroy,
-	.ms_getname         = (char const *(FCALL *)(struct module_section *__restrict))&uems_getname,
-	.ms_getaddr         = (byte_t *(FCALL *)(struct module_section *__restrict))&uems_getaddr,
-	.ms_getaddr_alias   = (byte_t *(FCALL *)(struct module_section *__restrict))&uems_getaddr_alias,
-	.ms_getaddr_inflate = (byte_t *(FCALL *)(struct module_section *__restrict, size_t *__restrict))&uems_getaddr_inflate,
+	.ms_destroy         = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module_section *__restrict))&uems_destroy,
+	.ms_getname         = (ATTR_PURE_T WUNUSED_T NONNULL_T((1)) char const *NOTHROW_T(FCALL *)(struct module_section *__restrict))&uems_getname,
+	.ms_getaddr         = (WUNUSED_T NONNULL_T((1)) byte_t *NOTHROW_T(FCALL *)(struct module_section *__restrict))&uems_getaddr,
+	.ms_getaddr_alias   = (WUNUSED_T NONNULL_T((1)) byte_t *NOTHROW_T(FCALL *)(struct module_section *__restrict))&uems_getaddr_alias,
+	.ms_getaddr_inflate = (WUNUSED_T NONNULL_T((1, 2)) byte_t *NOTHROW_T(FCALL *)(struct module_section *__restrict, size_t *__restrict))&uems_getaddr_inflate,
 };
 
 INTERN_CONST struct module_ops const uem_ops = {
-	.mo_free              = (void (FCALL *)(struct module *__restrict))&uem_free,
-	.mo_destroy           = (void (FCALL *)(struct module *__restrict))&uem_destroy,
-	.mo_nonodes           = (void (FCALL *)(struct module *__restrict))&uem_nonodes,
-	.mo_locksection       = (REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&uem_locksection,
-	.mo_locksection_index = (REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&uem_locksection_index,
-	.mo_sectinfo          = (bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&uem_sectinfo,
-	.mo_get_tbase         = (void const *(FCALL *)(struct module *__restrict))&uem_get_tbase,
-	.mo_get_dbase         = (void const *(FCALL *)(struct module *__restrict))&uem_get_dbase
+	.mo_free              = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module *__restrict))&uem_free,
+	.mo_destroy           = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module *__restrict))&uem_destroy,
+	.mo_nonodes           = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module *__restrict))&uem_nonodes,
+	.mo_locksection       = (WUNUSED_T NONNULL_T((1)) REF struct module_section *NOTHROW_T(FCALL *)(struct module *__restrict, USER CHECKED char const *))&uem_locksection,
+	.mo_locksection_index = (WUNUSED_T NONNULL_T((1)) REF struct module_section *NOTHROW_T(FCALL *)(struct module *__restrict, unsigned int))&uem_locksection_index,
+	.mo_sectinfo          = (WUNUSED_T NONNULL_T((1, 3)) bool NOTHROW_T(FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&uem_sectinfo,
+	.mo_get_tbase         = (WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *)(struct module *__restrict))&uem_get_tbase,
+	.mo_get_dbase         = (WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *)(struct module *__restrict))&uem_get_dbase
 };
 
 

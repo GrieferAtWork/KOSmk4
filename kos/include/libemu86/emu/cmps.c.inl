@@ -69,6 +69,8 @@ case EMU86_OPCODE_ENCODE(0xa7):
 #endif /* EMU86_EMULATE_CONFIG_WANT_CMPS */
 	EMU86_PSIPDIn_LOAD_POINTERS(psi, pdi, psi_addr, pdi_addr,
 	                            op_flags & (EMU86_F_REP | EMU86_F_REPNE));
+	(void)psi_addr;
+	(void)pdi_addr;
 #if EMU86_EMULATE_CONFIG_WANT_CMPS
 	DEFINE_CMPSn_COMPARE(b, B, 8, 1);
 do_cmps_save_pointer:

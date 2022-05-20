@@ -55,13 +55,13 @@ struct dirent;
 struct fdirenum;
 struct fdirenum_ops {
 	/* [1..1] Finalization callback. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (KCALL *deo_fini)(struct fdirenum *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(KCALL *deo_fini)(struct fdirenum *__restrict self);
 
 	/* [1..1] Directory reader callback.
 	 * When end-of-file has been reached, `0' is returned.
 	 * NOTE: This function mustn't enumerate the `.' and `..' entries! */
-	BLOCKING NONNULL((1)) size_t
+	BLOCKING NONNULL_T((1)) size_t
 	(KCALL *deo_readdir)(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
 	                     size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
@@ -81,7 +81,7 @@ struct fdirenum_ops {
 	 *              the directory stream.
 	 * @throw: E_OVERFLOW: File position would overflow or underflow.
 	 * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_LSEEK_WHENCE:whence: [...] */
-	BLOCKING NONNULL((1)) pos_t
+	BLOCKING NONNULL_T((1)) pos_t
 	(KCALL *deo_seekdir)(struct fdirenum *__restrict self,
 	                     off_t offset, unsigned int whence)
 			THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_IOERROR, ...);
@@ -89,7 +89,7 @@ struct fdirenum_ops {
 	/* [0..1] If non-NULL, override  for ioctl(2) invocations  done on  the
 	 * directory reader. When `NULL', do `mfile_uioctl()' on the associated
 	 * directory instead. */
-	BLOCKING NONNULL((1)) syscall_slong_t
+	BLOCKING NONNULL_T((1)) syscall_slong_t
 	(KCALL *deo_ioctl)(struct fdirenum *__restrict self, ioctl_t cmd,
 	                   USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
@@ -281,7 +281,7 @@ struct fdirnode_ops {
 
 	/* [1..1] Lookup a directory entry within `self', given its name.
 	 * @return: NULL: No entry exists that is matching the given name. */
-	BLOCKING WUNUSED NONNULL((1, 2)) REF struct fdirent *
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) REF struct fdirent *
 	(KCALL *dno_lookup)(struct fdirnode *__restrict self,
 	                    struct flookup_info *__restrict info)
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
@@ -302,7 +302,7 @@ struct fdirnode_ops {
 	 *  - result->*      = ...;          # Additional fs-specific fields
 	 * If this operator returns with an exception, the caller will decref()
 	 * whatever directory  is stored  in  `result->de_dir' at  that  point. */
-	BLOCKING NONNULL((1)) void
+	BLOCKING NONNULL_T((1)) void
 	(KCALL *dno_enum)(struct fdirenum *__restrict result)
 			THROWS(E_IOERROR, ...);
 
@@ -339,7 +339,7 @@ struct fdirnode_ops {
 	 * >> info->mkf_dent  = incref(newent);
 	 * >> info->mkf_rnode = incref(newfil);
 	 * >> return FDIRNODE_MKFILE_SUCCESS; */
-	BLOCKING WUNUSED NONNULL((1, 2)) unsigned int
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) unsigned int
 	(KCALL *dno_mkfile)(struct fdirnode *__restrict self,
 	                    struct fmkfile_info *__restrict info)
 			THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
@@ -360,7 +360,7 @@ struct fdirnode_ops {
 	 * >> MARK_DELETED(entry);
 	 * >> if (CHANGED(file->fn_nlink))
 	 * >>     mfile_inotify_attrib(file); */
-	BLOCKING WUNUSED NONNULL((1, 2, 3)) unsigned int
+	BLOCKING WUNUSED_T NONNULL_T((1, 2, 3)) unsigned int
 	(KCALL *dno_unlink)(struct fdirnode *__restrict self,
 	                    struct fdirent *__restrict entry,
 	                    struct fnode *__restrict file)
@@ -421,7 +421,7 @@ struct fdirnode_ops {
 	 * >> }
 	 * >> info->frn_dent = incref(newent);
 	 * >> return FDIRNODE_RENAME_SUCCESS; */
-	BLOCKING WUNUSED NONNULL((1, 2)) unsigned int
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) unsigned int
 	(KCALL *dno_rename)(struct fdirnode *__restrict self,
 	                    struct frename_info *__restrict info)
 			THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
@@ -447,7 +447,7 @@ struct fdirnode_ops {
 	 * >>     link->dnl_ent = incref(child_dirent);
 	 * >>     dnotify_link_tree_insert(&dnotify->dnc_files, link);
 	 * >> } */
-	BLOCKING NONNULL((1)) void
+	BLOCKING NONNULL_T((1)) void
 	(KCALL *dno_attach_notify)(struct fdirnode *__restrict self)
 			THROWS(E_BADALLOC, ...);
 #endif /* CONFIG_HAVE_FS_NOTIFY */

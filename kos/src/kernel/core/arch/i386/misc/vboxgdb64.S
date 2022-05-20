@@ -136,7 +136,7 @@ PRIVATE_LABEL(.Lpop_rax_and_resume):
 	.cfi_restore_state
 	.cfi_remember_state
 	popq_cfi_r %rax
-	iret
+	iretq
 
 	.cfi_restore_state
 99:	popq_cfi_r %rax

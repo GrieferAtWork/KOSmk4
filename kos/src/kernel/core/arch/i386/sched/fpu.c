@@ -189,11 +189,11 @@ PRIVATE NOBLOCK ATTR_NOINLINE void
 NOTHROW(FCALL inplace_swap_fpustate_variant)(struct fpustate *__restrict state) {
 	struct fpustate newstate;
 	if (fpustate_isssave(state)) {
+		sfpustate_to_xfpustate(&state->f_ssave, &newstate.f_xsave);
+	} else {
 		bzero((byte_t *)&newstate.f_ssave + offsetafter(struct fpustate, f_ssave),
 		      sizeof(newstate) - offsetafter(struct fpustate, f_ssave));
-		sfpustate_to_xfpustate(&newstate.f_ssave, &state->f_xsave);
-	} else {
-		xfpustate_to_sfpustate(&newstate.f_xsave, &state->f_ssave);
+		xfpustate_to_sfpustate(&state->f_xsave, &newstate.f_ssave);
 	}
 	memcpy(state, &newstate, sizeof(struct fpustate));
 }

@@ -43,16 +43,16 @@ struct mcontext;
 
 /* Dump the contents of the given register state in a human-readable format.
  * @return: * : The usual pformatprinter return value rules... */
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_UCPUSTATE)(struct regdump_printer *__restrict __self, struct ucpustate const *__restrict __data);
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_LCPUSTATE)(struct regdump_printer *__restrict __self, struct lcpustate const *__restrict __data);
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_KCPUSTATE)(struct regdump_printer *__restrict __self, struct kcpustate const *__restrict __data);
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_FCPUSTATE)(struct regdump_printer *__restrict __self, struct fcpustate const *__restrict __data);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_UCPUSTATE)(struct regdump_printer *__restrict __self, struct ucpustate const *__restrict __data);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_LCPUSTATE)(struct regdump_printer *__restrict __self, struct lcpustate const *__restrict __data);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_KCPUSTATE)(struct regdump_printer *__restrict __self, struct kcpustate const *__restrict __data);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_FCPUSTATE)(struct regdump_printer *__restrict __self, struct fcpustate const *__restrict __data);
 #ifdef __KERNEL__
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_ICPUSTATE)(struct regdump_printer *__restrict __self, struct icpustate const *__restrict __data);
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SCPUSTATE)(struct regdump_printer *__restrict __self, struct scpustate const *__restrict __data);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_ICPUSTATE)(struct regdump_printer *__restrict __self, struct icpustate const *__restrict __data);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SCPUSTATE)(struct regdump_printer *__restrict __self, struct scpustate const *__restrict __data);
 #else /* __KERNEL__ */
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_UCONTEXT)(struct regdump_printer *__restrict __self, struct ucontext const *__restrict __data);
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_MCONTEXT)(struct regdump_printer *__restrict __self, struct mcontext const *__restrict __data);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_UCONTEXT)(struct regdump_printer *__restrict __self, struct ucontext const *__restrict __data);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_MCONTEXT)(struct regdump_printer *__restrict __self, struct mcontext const *__restrict __data);
 #endif /* !__KERNEL__ */
 
 #ifdef LIBREGDUMP_WANT_PROTOTYPES

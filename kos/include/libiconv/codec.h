@@ -45,8 +45,8 @@ typedef __UINTPTR_HALF_TYPE__ iconv_codec_t;
  * Casing   is  ignored  and  codec  aliases  are  respected.
  * @return: * :                  Internal codec ID (s.a. `iconv_getcodecnames()')
  * @return: ICONV_CODEC_UNKNOWN: Unrecognized codec. */
-typedef __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) iconv_codec_t
-/*__NOTHROW_NCX*/ (LIBICONV_CC *PICONV_CODECBYNAME)(char const *__restrict name);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) iconv_codec_t
+__NOTHROW_NCX_T(LIBICONV_CC *PICONV_CODECBYNAME)(char const *__restrict name);
 #ifdef LIBICONV_WANT_PROTOTYPES
 LIBICONV_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) iconv_codec_t
 __NOTHROW_NCX(LIBICONV_CC iconv_codecbyname)(char const *__restrict name);
@@ -73,8 +73,8 @@ __NOTHROW_NCX(LIBICONV_CC iconv_codecbyname)(char const *__restrict name);
  * >>     }
  * >>     putc('\n');
  * >> } */
-typedef __ATTR_CONST __ATTR_WUNUSED char const *
-/*__NOTHROW_NCX*/ (LIBICONV_CC *PICONV_GETCODECNAMES)(iconv_codec_t id);
+typedef __ATTR_CONST_T __ATTR_WUNUSED_T char const *
+__NOTHROW_NCX_T(LIBICONV_CC *PICONV_GETCODECNAMES)(iconv_codec_t id);
 #ifdef LIBICONV_WANT_PROTOTYPES
 LIBICONV_DECL __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW_NCX(LIBICONV_CC iconv_getcodecnames)(iconv_codec_t id);
@@ -84,9 +84,9 @@ __NOTHROW_NCX(LIBICONV_CC iconv_getcodecnames)(iconv_codec_t id);
 /* Same as `iconv_codecbyname()', but  also parse possible flag-relation  options.
  * The given `*pflags' argument must already  be populated with valid data  before
  * this function is called, and should usually point to `icd_flags' or `ice_flags' */
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) iconv_codec_t
-/*__NOTHROW_NCX*/ (LIBICONV_CC *PICONV_CODEC_AND_FLAGS_BYNAME)(char const *__restrict name,
-                                                               /*[in|out]*/ __UINTPTR_HALF_TYPE__ *__restrict pflags);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) iconv_codec_t
+__NOTHROW_NCX_T(LIBICONV_CC *PICONV_CODEC_AND_FLAGS_BYNAME)(char const *__restrict name,
+                                                            /*[in|out]*/ __UINTPTR_HALF_TYPE__ *__restrict pflags);
 #ifdef LIBICONV_WANT_PROTOTYPES
 LIBICONV_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) iconv_codec_t
 __NOTHROW_NCX(LIBICONV_CC iconv_codec_and_flags_byname)(char const *__restrict name,
@@ -98,9 +98,9 @@ __NOTHROW_NCX(LIBICONV_CC iconv_codec_and_flags_byname)(char const *__restrict n
  * search the codec database but will simply strip potential  flags,
  * normalize the underlying codec names, and check if the  resulting
  * strings strcasecmp(3) to be equal. */
-typedef __ATTR_CONST __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) bool
-/*__NOTHROW_NCX*/ (LIBICONV_CC *PICONV_SAME_CODEC_NAME)(char const *__restrict a,
-                                                        char const *__restrict b);
+typedef __ATTR_CONST_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) bool
+__NOTHROW_NCX_T(LIBICONV_CC *PICONV_SAME_CODEC_NAME)(char const *__restrict a,
+                                                     char const *__restrict b);
 #ifdef LIBICONV_WANT_PROTOTYPES
 LIBICONV_DECL __ATTR_CONST __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) bool
 __NOTHROW_NCX(LIBICONV_CC iconv_same_codec_name)(char const *__restrict a,
@@ -128,8 +128,8 @@ __NOTHROW_NCX(LIBICONV_CC iconv_same_codec_name)(char const *__restrict a,
  *
  * If the function is unable to determine the codec to-be used, it will return
  * with `ICONV_CODEC_UNKNOWN'. */
-typedef __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) iconv_codec_t
-/*__NOTHROW_NCX*/ (LIBICONV_CC *PICONV_DETECT_CODEC)(void const *__restrict data, size_t size);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) iconv_codec_t
+__NOTHROW_NCX_T(LIBICONV_CC *PICONV_DETECT_CODEC)(void const *__restrict data, size_t size);
 #ifdef LIBICONV_WANT_PROTOTYPES
 LIBICONV_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) iconv_codec_t
 __NOTHROW_NCX(LIBICONV_CC iconv_detect_codec)(void const *__restrict data, size_t size);

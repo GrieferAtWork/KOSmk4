@@ -39,7 +39,7 @@ __DECL_BEGIN
  * encode an entire commandline at once.
  * @return: * : The sum of return values of `printer'
  * @return: <0: The propagation of the first negative return value of `printer' (if any) */
-typedef __ATTR_NONNULL((1, 3)) __ssize_t
+typedef __ATTR_NONNULL_T((1, 3)) __ssize_t
 (LIBCMDLINE_CC *PCMDLINE_ENCODE_ARGUMENT)(__pformatprinter printer, void *arg,
                                           char const *arg_start, __size_t arg_len);
 #ifdef LIBCMDLINE_WANT_PROTOTYPES
@@ -52,7 +52,7 @@ cmdline_encode_argument(__pformatprinter printer, void *arg,
  * the  given  `argv'   vector.  (s.a.   `cmdline_encode_argument()')
  * @return: * : The sum of return values of `printer'
  * @return: <0: The propagation of the first negative return value of `printer' (if any) */
-typedef __ATTR_NONNULL((1, 4)) __ssize_t
+typedef __ATTR_NONNULL_T((1, 4)) __ssize_t
 (LIBCMDLINE_CC *PCMDLINE_ENCODE)(__pformatprinter printer, void *arg,
                                  __size_t argc, char const *const *argv);
 #ifdef LIBCMDLINE_WANT_PROTOTYPES

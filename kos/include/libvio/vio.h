@@ -92,8 +92,8 @@ vio_addr_t vioargs_vioaddr(struct vioargs const *__restrict self, void *virtaddr
  * is requesting the memory access. If the thread is currently inside
  * of kernel-space  (such that  its CPU  state cannot  be  accessed),
  * return `NULL' instead. */
-typedef __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) vio_cpustate_t *
-/*__NOTHROW_NCX*/ (LIBVIO_CC *PVIOARGS_GETSTATE)(struct vioargs *__restrict self);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) vio_cpustate_t *
+__NOTHROW_NCX_T(LIBVIO_CC *PVIOARGS_GETSTATE)(struct vioargs *__restrict self);
 #ifdef LIBVIO_WANT_PROTOTYPES
 LIBVIO_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) vio_cpustate_t *
 __NOTHROW_NCX(LIBVIO_CC vioargs_getstate)(struct vioargs *__restrict self);
@@ -335,9 +335,9 @@ struct vio_ops {
  * @param: initial_size: The initial mmap(2)able size of the returned handle.
  *                       This  size may be  altered at a  later point in time
  *                       through use of `ftruncate(return)' */
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
-/*__NOTHROW_NCX*/ (LIBVIO_CC *PVIO_CREATE)(struct vio_ops const *ops, void *cookie,
-                                           __size_t initial_size, __oflag_t flags);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __fd_t
+__NOTHROW_NCX_T(LIBVIO_CC *PVIO_CREATE)(struct vio_ops const *ops, void *cookie,
+                                        __size_t initial_size, __oflag_t flags);
 #ifdef LIBVIO_WANT_PROTOTYPES
 LIBVIO_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_NCX(LIBVIO_CC vio_create)(struct vio_ops const *ops, void *cookie,

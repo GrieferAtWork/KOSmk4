@@ -35,9 +35,9 @@ struct unlockinfo {
 	 * be called on all `return == false' and `EXCEPT' braches  of
 	 * the called `*_or_unlock()' function. */
 #ifdef __INTELLISENSE__
-	/*   */ NONNULL((1)) void /*NOTHROW*/ (FCALL *ui_unlock)(struct unlockinfo *__restrict self);
+	/*   */ NONNULL_T((1)) void NOTHROW_T(FCALL *ui_unlock)(struct unlockinfo *__restrict self);
 #else /* __INTELLISENSE__ */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (FCALL *ui_unlock)(struct unlockinfo *__restrict self);
+	NOBLOCK NONNULL_T((1)) void NOTHROW_T(FCALL *ui_unlock)(struct unlockinfo *__restrict self);
 #endif /* !__INTELLISENSE__ */
 };
 

@@ -100,18 +100,6 @@
 #include <libzlib/inflate.h>
 
 
-#if __SIZEOF_POINTER__ == 4
-#define BADPOINTER UINT32_C(0xcccccccc)
-#elif __SIZEOF_POINTER__ == 8
-#define BADPOINTER UINT64_C(0xcccccccccccccccc)
-#elif __SIZEOF_POINTER__ == 2
-#define BADPOINTER UINT16_C(0xcccc)
-#elif __SIZEOF_POINTER__ == 1
-#define BADPOINTER UINT8_C(0xcc)
-#else /* __SIZEOF_POINTER__ == ... */
-#error "Unsupported sizeof(void *)"
-#endif /* __SIZEOF_POINTER__ != ... */
-
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
 #else /* !NDEBUG && !NDEBUG_FINI */
@@ -515,11 +503,11 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 
 
 PRIVATE struct module_section_ops const driver_section_ops = {
-	.ms_destroy         = (void (FCALL *)(struct module_section *__restrict))&driver_section_destroy,
-	.ms_getname         = (char const *(FCALL *)(struct module_section *__restrict))&driver_section_getname,
-	.ms_getaddr         = (byte_t *(FCALL *)(struct module_section *__restrict))&driver_section_getaddr,
-	.ms_getaddr_alias   = (byte_t *(FCALL *)(struct module_section *__restrict))&driver_section_getaddr,
-	.ms_getaddr_inflate = (byte_t *(FCALL *)(struct module_section *__restrict, size_t *__restrict))&driver_section_getaddr_inflate,
+	.ms_destroy         = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module_section *__restrict))&driver_section_destroy,
+	.ms_getname         = (ATTR_PURE_T WUNUSED_T NONNULL_T((1)) char const *(FCALL *)(struct module_section *__restrict))&driver_section_getname,
+	.ms_getaddr         = (WUNUSED_T NONNULL_T((1)) byte_t *(FCALL *)(struct module_section *__restrict))&driver_section_getaddr,
+	.ms_getaddr_alias   = (WUNUSED_T NONNULL_T((1)) byte_t *(FCALL *)(struct module_section *__restrict))&driver_section_getaddr,
+	.ms_getaddr_inflate = (WUNUSED_T NONNULL_T((1, 2)) byte_t *(FCALL *)(struct module_section *__restrict, size_t *__restrict))&driver_section_getaddr_inflate,
 };
 
 
@@ -689,14 +677,14 @@ NOTHROW(FCALL kernel_get_dbase)(struct driver const *__restrict UNUSED(self)) {
 #endif /* !KERNEL_DRIVER_FILENAME */
 
 PRIVATE struct module_ops const kernel_module_ops = {
-	.mo_free              = (void(FCALL *)(struct module *__restrict))&driver_free_,  /* Needed for `module_isdriver()' */
-	.mo_destroy           = (typeof(((struct module_ops *)0)->mo_destroy))BADPOINTER, /* Must never be called! */
-	.mo_nonodes           = (typeof(((struct module_ops *)0)->mo_nonodes))BADPOINTER, /* Must never be called! */
-	.mo_locksection       = (REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&kernel_locksection,
-	.mo_locksection_index = (REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&kernel_locksection_index,
-	.mo_sectinfo          = (bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&driver_sectinfo,
-	.mo_get_tbase         = (void const *(FCALL *)(struct module *__restrict))&kernel_get_tbase,
-	.mo_get_dbase         = (void const *(FCALL *)(struct module *__restrict))&kernel_get_dbase
+	.mo_free              = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module *__restrict))&driver_free_,  /* Needed for `module_isdriver()' */
+	.mo_destroy           = (typeoffield(struct module_ops, mo_destroy))(void *)-1, /* Must never be called! */
+	.mo_nonodes           = (typeoffield(struct module_ops, mo_nonodes))(void *)-1, /* Must never be called! */
+	.mo_locksection       = (WUNUSED_T NONNULL_T((1)) REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&kernel_locksection,
+	.mo_locksection_index = (WUNUSED_T NONNULL_T((1)) REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&kernel_locksection_index,
+	.mo_sectinfo          = (WUNUSED_T NONNULL_T((1, 3)) bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&driver_sectinfo,
+	.mo_get_tbase         = (WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *)(struct module *__restrict))&kernel_get_tbase,
+	.mo_get_dbase         = (WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *)(struct module *__restrict))&kernel_get_dbase
 };
 
 PRIVATE ATTR_COLDRODATA char const kernel_driver_name[] = KERNEL_DRIVER_NAME;
@@ -4347,14 +4335,14 @@ NOTHROW(FCALL driver_get_dbase)(struct driver const *__restrict self) {
 
 
 PRIVATE struct module_ops const driver_module_ops = {
-	.mo_free              = (void(FCALL *)(struct module *__restrict))&driver_free_,
-	.mo_destroy           = (void(FCALL *)(struct module *__restrict))&driver_destroy,
-	.mo_nonodes           = (void(FCALL *)(struct module *__restrict))&driver_nonodes,
-	.mo_locksection       = (REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&driver_locksection,
-	.mo_locksection_index = (REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&driver_locksection_index,
-	.mo_sectinfo          = (bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&driver_sectinfo,
-	.mo_get_tbase         = (void const *(FCALL *)(struct module *__restrict))&driver_get_tbase,
-	.mo_get_dbase         = (void const *(FCALL *)(struct module *__restrict))&driver_get_dbase
+	.mo_free              = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module *__restrict))&driver_free_,
+	.mo_destroy           = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module *__restrict))&driver_destroy,
+	.mo_nonodes           = (NONNULL_T((1)) void NOTHROW_T(FCALL *)(struct module *__restrict))&driver_nonodes,
+	.mo_locksection       = (WUNUSED_T NONNULL_T((1)) REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&driver_locksection,
+	.mo_locksection_index = (WUNUSED_T NONNULL_T((1)) REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&driver_locksection_index,
+	.mo_sectinfo          = (WUNUSED_T NONNULL_T((1, 3)) bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&driver_sectinfo,
+	.mo_get_tbase         = (WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *)(struct module *__restrict))&driver_get_tbase,
+	.mo_get_dbase         = (WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *)(struct module *__restrict))&driver_get_dbase
 };
 
 

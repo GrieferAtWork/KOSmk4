@@ -22,21 +22,21 @@
 #endif /* !DL_COREFIELD */
 
 #ifndef DL_COREOP
-#define DL_COREOP(attr, return, cc, name, args) /* nothing */
+#define DL_COREOP(attr, return, nothrow, cc, name, args) /* nothing */
 #endif /* !DL_COREOP */
 
 #ifndef DL_COREOPS_SKIP_DLMODULE_DESTROY
-DL_COREOP(NONNULL((1)), void, LIBDL_CC, DlModule_Destroy, (DlModule *__restrict self))
+DL_COREOP(NONNULL_T((1)), void, , LIBDL_CC, DlModule_Destroy, (DlModule *__restrict self))
 #endif /* !DL_COREOPS_SKIP_DLMODULE_DESTROY */
-DL_COREOP(NONNULL((1)), void, LIBDL_CC, DlModule_Free, (DlModule *__restrict self))
-DL_COREOP(NONNULL((1)), void, LIBDL_CC, DlSection_Destroy, (DlSection *__restrict self))
-DL_COREOP(__REF_IF(!(return->dm_flags & RTLD_NODELETE)), DlModule *, LIBDL_CC, DlModule_FindFromFilename, (char const *__restrict filename))
-DL_COREOP(NONNULL((1)), int, LIBDL_VCC, dl_seterrorf, (char const *__restrict format, ...))
-DL_COREOP(NONNULL((1)), int, LIBDL_CC, dl_vseterrorf, (char const *__restrict format, __builtin_va_list args))
-DL_COREOP(WUNUSED ATTR_PURE_P NONNULL((1)), void *, __FCALL, dlsym_builtin, (char const *__restrict name))
-DL_COREOP(WUNUSED ATTR_PURE_P NONNULL((1)), DlSection *, __FCALL, dlsec_builtin, (char const *__restrict name))
-DL_COREOP(WUNUSED ATTR_CONST_P, DlSection *, __FCALL, dlsec_builtin_index, (size_t sect_index))
-DL_COREOP(WUNUSED ATTR_CONST_P, char const *, __FCALL, dlsec_builtin_name, (size_t sect_index))
+DL_COREOP(NONNULL_T((1)), void, NOTHROW_NCX_T, LIBDL_CC, DlModule_Free, (DlModule *__restrict self))
+DL_COREOP(NONNULL_T((1)), void, NOTHROW_NCX_T, LIBDL_CC, DlSection_Destroy, (DlSection *__restrict self))
+DL_COREOP(__REF_IF(!(return->dm_flags & RTLD_NODELETE)), DlModule *, NOTHROW_NCX_T, LIBDL_CC, DlModule_FindFromFilename, (char const *__restrict filename))
+DL_COREOP(NONNULL_T((1)), int, NOTHROW_NCX_T, LIBDL_VCC, dl_seterrorf, (char const *__restrict format, ...))
+DL_COREOP(NONNULL_T((1)), int, NOTHROW_NCX_T, LIBDL_CC, dl_vseterrorf, (char const *__restrict format, __builtin_va_list args))
+DL_COREOP(WUNUSED_T ATTR_PURE_T NONNULL_T((1)), void *, NOTHROW_NCX_T, __FCALL, dlsym_builtin, (char const *__restrict name))
+DL_COREOP(WUNUSED_T ATTR_PURE_T NONNULL_T((1)), DlSection *, NOTHROW_NCX_T, __FCALL, dlsec_builtin, (char const *__restrict name))
+DL_COREOP(WUNUSED_T ATTR_CONST_T, DlSection *, NOTHROW_T, __FCALL, dlsec_builtin_index, (size_t sect_index))
+DL_COREOP(WUNUSED_T ATTR_CONST_T, char const *, NOTHROW_T, __FCALL, dlsec_builtin_name, (size_t sect_index))
 
 /* [1..1][const] Global variables */
 DL_COREFIELD(struct dlglobals, dl_globals)
@@ -45,12 +45,12 @@ DL_COREFIELD(struct dlglobals, dl_globals)
 DL_COREFIELD(DlModule, dl_rtld_module)
 
 /* Malloc functions to access the heap used by the libdl core. */
-DL_COREOP(ATTR_MALLOC WUNUSED, void *, __LIBCCALL, dlmalloc, (size_t bytes))
-DL_COREOP(, void , __LIBCCALL, dlfree, (void *mem))
-DL_COREOP(ATTR_MALLOC WUNUSED, void *, __LIBCCALL, dlcalloc, (size_t n_elements, size_t elem_size))
-DL_COREOP(WUNUSED, void *, __LIBCCALL, dlrealloc, (void *oldmem, size_t bytes))
-DL_COREOP(WUNUSED, void *, __LIBCCALL, dlrealloc_in_place, (void *oldmem, size_t bytes))
-DL_COREOP(WUNUSED, void *, __LIBCCALL, dlmemalign, (size_t alignment, size_t bytes))
+DL_COREOP(ATTR_MALLOC_T WUNUSED_T, void *, __NOTHROW_NCX, __LIBCCALL, dlmalloc, (size_t bytes))
+DL_COREOP(, void , __NOTHROW_NCX, __LIBCCALL, dlfree, (void *mem))
+DL_COREOP(ATTR_MALLOC_T WUNUSED_T, void *, __NOTHROW_NCX, __LIBCCALL, dlcalloc, (size_t n_elements, size_t elem_size))
+DL_COREOP(WUNUSED_T, void *, __NOTHROW_NCX, __LIBCCALL, dlrealloc, (void *oldmem, size_t bytes))
+DL_COREOP(WUNUSED_T, void *, __NOTHROW_NCX, __LIBCCALL, dlrealloc_in_place, (void *oldmem, size_t bytes))
+DL_COREOP(WUNUSED_T, void *, __NOTHROW_NCX, __LIBCCALL, dlmemalign, (size_t alignment, size_t bytes))
 
 #undef DL_COREFIELD
 #undef DL_COREOP

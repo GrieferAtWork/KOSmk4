@@ -37,22 +37,22 @@ struct fdirnode;
 
 struct fdirent_ops {
 	/* [1..1] Destroy callback. */
-	NOBLOCK NONNULL((1)) void /*NOTHROW*/
-	(KCALL *fdo_destroy)(struct fdirent *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(KCALL *fdo_destroy)(struct fdirent *__restrict self);
 
 	/* [1..1] Open the node  associated with  this directory  entry.
 	 * If the entry has already been deleted, return `NULL' instead.
 	 * @param: dir: The directory that contains `self'
 	 * @return: NULL: `self'  was  deleted and  you must  re-query the
 	 *                containing directory `dir' for the proper entry. */
-	BLOCKING WUNUSED NONNULL((1, 2)) REF struct fnode *
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) REF struct fnode *
 	(KCALL *fdo_opennode)(struct fdirent *__restrict self,
 	                      struct fdirnode *__restrict dir)
 			THROWS(E_BADALLOC, E_IOERROR, ...);
 
 	/* [0..1] Optional override for dynamically calculated `fd_ino' values.
 	 * When this operator is defined, _IT_ must be used instead of `fd_ino' */
-	BLOCKING WUNUSED NONNULL((1, 2)) ino_t
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) ino_t
 	(FCALL *fdo_getino)(struct fdirent *__restrict self,
 	                    struct fdirnode *__restrict dir)
 			THROWS(E_IOERROR, ...);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fa85c0e */
+/* HASH CRC-32:0xa14d06c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,7 +110,7 @@ typedef struct ucpustate rpc_cpustate_t;
 #endif /* !__KERNEL__ */
 #endif /* !PRPC_EXEC_CALLBACK_CC */
 struct rpc_context;
-typedef __ATTR_NONNULL((1)) void
+typedef __ATTR_NONNULL_T((1)) void
 (PRPC_EXEC_CALLBACK_CC *prpc_exec_callback_t)(struct rpc_context *__restrict __ctx, void *__cookie)
 		__THROWS(...);
 #endif /* !__prpc_exec_callback_t_defined */

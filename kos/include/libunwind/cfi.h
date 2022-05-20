@@ -626,8 +626,8 @@ typedef struct {
  * @return: UNWIND_INVALID_REGISTER: The given `dw_regno' is invalid/unsupported.
  * @return: UNWIND_OPTIMIZED_AWAY:   Register information has been optimized away.
  * @return: * :                      Some other error (propagate) */
-typedef __ATTR_NONNULL((3)) unsigned int (LIBUNWIND_CC *unwind_getreg_t)(void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
-typedef __ATTR_NONNULL((3)) unsigned int (LIBUNWIND_CC *unwind_setreg_t)(void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
+typedef __ATTR_NONNULL_T((3)) unsigned int (LIBUNWIND_CC *unwind_getreg_t)(void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
+typedef __ATTR_NONNULL_T((3)) unsigned int (LIBUNWIND_CC *unwind_setreg_t)(void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
 
 typedef struct unwind_emulator_sections_struct {
 	/* NOTE: When individual sections are empty, the associated instructions become illegal
@@ -729,9 +729,9 @@ typedef struct unwind_emulator_struct {
  * @return: UNWIND_SEGFAULT:         ...
  * @return: UNWIND_BADALLOC:         ...
  * @return: UNWIND_EMULATOR_*:       ... */
-typedef __ATTR_NONNULL((1)) unsigned int
+typedef __ATTR_NONNULL_T((1)) unsigned int
 (LIBUNWIND_CC *PUNWIND_EMULATOR_EXEC)(unwind_emulator_t *__restrict __self);
-typedef __ATTR_NONNULL((1)) unsigned int
+typedef __ATTR_NONNULL_T((1)) unsigned int
 (LIBUNWIND_CC *PUNWIND_EMULATOR_EXEC_AUTOSTACK)(unwind_emulator_t *__restrict __self,
                                                 unwind_ste_t const *__pentry_stack_top,
                                                 unwind_ste_t *__pexit_stack_top,
@@ -757,10 +757,10 @@ unwind_emulator_exec_autostack(unwind_emulator_t *__restrict __self,
  * @return: UNWIND_SUCCESS:                      Success.
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self' */
-typedef __ATTR_NONNULL((1, 2, 4)) unsigned int
-/*__NOTHROW_NCX*/ (LIBUNWIND_CC *PUNWIND_STE_ADDR)(unwind_ste_t const *__restrict __self,
-                                                   unwind_getreg_t __regget, void const *__regget_arg,
-                                                   void **__restrict __paddr);
+typedef __ATTR_NONNULL_T((1, 2, 4)) unsigned int
+__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_STE_ADDR)(unwind_ste_t const *__restrict __self,
+                                                unwind_getreg_t __regget, void const *__regget_arg,
+                                                void **__restrict __paddr);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_addr)(unwind_ste_t const *__restrict __self,
@@ -784,17 +784,17 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_addr)(unwind_ste_t const *__restrict __sel
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self'
  * @return: UNWIND_SEGFAULT:                     Attempted to access faulty memory. */
-typedef __ATTR_NONNULL((1, 3, 5)) unsigned int
-/*__NOTHROW_NCX*/ (LIBUNWIND_CC *PUNWIND_STE_READ)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
-                                                   unwind_getreg_t __regget, void const *__regget_arg,
-                                                   void *__restrict __dst, __size_t __num_bits,
-                                                   __size_t __dst_left_shift, __size_t __src_left_shift);
-typedef __ATTR_NONNULL((1, 3, 7)) unsigned int
-/*__NOTHROW_NCX*/ (LIBUNWIND_CC *PUNWIND_STE_WRITE)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
-                                                    /*[1..1]*/ unwind_getreg_t __regget, void const *__regget_arg,
-                                                    /*[0..1]*/ unwind_setreg_t __regset, void *__regset_arg,
-                                                    void const *__restrict __src, __size_t __num_bits,
-                                                    __size_t __dst_left_shift, __size_t __src_left_shift);
+typedef __ATTR_NONNULL_T((1, 3, 5)) unsigned int
+__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_STE_READ)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
+                                                unwind_getreg_t __regget, void const *__regget_arg,
+                                                void *__restrict __dst, __size_t __num_bits,
+                                                __size_t __dst_left_shift, __size_t __src_left_shift);
+typedef __ATTR_NONNULL_T((1, 3, 7)) unsigned int
+__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_STE_WRITE)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
+                                                 /*[1..1]*/ unwind_getreg_t __regget, void const *__regget_arg,
+                                                 /*[0..1]*/ unwind_setreg_t __regset, void *__regset_arg,
+                                                 void const *__restrict __src, __size_t __num_bits,
+                                                 __size_t __dst_left_shift, __size_t __src_left_shift);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 5)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_read)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
@@ -879,7 +879,7 @@ struct di_debuginfo_compile_unit_simple_struct;
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
  * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `module_relative_pc' */
-typedef __ATTR_NONNULL((1, 3, 8, 10)) unsigned int
+typedef __ATTR_NONNULL_T((1, 3, 8, 10)) unsigned int
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_GETVALUE)(di_debuginfo_location_t const *__restrict __self,
                                              unwind_emulator_sections_t const *__sectinfo,
                                              unwind_getreg_t __regget, void *__regget_arg,
@@ -890,7 +890,7 @@ typedef __ATTR_NONNULL((1, 3, 8, 10)) unsigned int
                                              __size_t *__restrict __pnum_written_bits,
                                              di_debuginfo_location_t const *__frame_base_expression,
                                              void const *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
-typedef __ATTR_NONNULL((1, 3, 5, 10, 12)) unsigned int
+typedef __ATTR_NONNULL_T((1, 3, 5, 10, 12)) unsigned int
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_SETVALUE)(di_debuginfo_location_t const *__restrict __self,
                                              unwind_emulator_sections_t const *__sectinfo,
                                              unwind_getreg_t __regget, void *__regget_arg,

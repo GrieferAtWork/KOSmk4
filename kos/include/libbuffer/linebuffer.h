@@ -203,7 +203,7 @@ __NOTHROW(LIBBUFFER_CC linebuffer_clear)(struct linebuffer *__restrict __self);
  * of the capture using `linebuffer_write()', before destroying the  capture.
  * @return: * : The number of re-written bytes.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
-typedef __ATTR_NONNULL((1, 2)) __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __ATTR_NONNULL_T((1, 2)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PLINEBUFFER_REWRITE)(struct linebuffer *__restrict __self,
                                     /*inherit(always)*/ struct linecapture *__restrict __capture)
 /*		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC),
@@ -223,7 +223,7 @@ LIBBUFFER_DECL __ATTR_NONNULL((1, 2)) __KERNEL_SELECT(__size_t, __ssize_t)
  * the amount of written data, or 0 if the buffer was already closed when
  * the function was called.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
-typedef __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __ATTR_NONNULL_T((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PLINEBUFFER_WRITE)(struct linebuffer *__restrict __self,
                                   __USER __CHECKED void const *__src,
                                   __size_t __num_bytes)
@@ -243,7 +243,7 @@ LIBBUFFER_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
  * before at  least  1  byte of  data  could  be written,  0  is  returned.
  * Alternatively, if the given buffer is zero-length, 0 is always returned.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
-typedef __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __ATTR_NONNULL_T((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PLINEBUFFER_WRITESOME)(struct linebuffer *__restrict __self,
                                       __USER __CHECKED void const *__src,
                                       __size_t __num_bytes)
@@ -262,7 +262,7 @@ LIBBUFFER_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
  * If the given buffer was full at the time of this function being called,
  * or had been closed, then 0 is returned immediately.
  * @return: -1: [USERSPACE] An error occurred (s.a. `errno'). */
-typedef __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __ATTR_NONNULL_T((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PLINEBUFFER_WRITE_NONBLOCK)(struct linebuffer *__restrict __self,
                                            __USER __CHECKED void const *__src,
                                            __size_t __num_bytes)

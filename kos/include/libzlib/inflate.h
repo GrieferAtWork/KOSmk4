@@ -129,9 +129,9 @@ struct zlib_reader {
 
 
 /* Initialize a ZLIB reader, given an initial data blob. */
-typedef __ATTR_NONNULL((1)) void
-(LIBZLIB_CC *PZLIB_READER_INIT)(struct zlib_reader *__restrict self,
-                                void const *blob, size_t blob_size);
+typedef __ATTR_NONNULL_T((1)) void
+__NOTHROW_NCX_T(LIBZLIB_CC *PZLIB_READER_INIT)(struct zlib_reader *__restrict self,
+                                               void const *blob, size_t blob_size);
 #ifdef LIBZLIB_WANT_PROTOTYPES
 LIBZLIB_DECL __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(LIBZLIB_CC zlib_reader_init)(struct zlib_reader *__restrict self,
@@ -140,8 +140,8 @@ __NOTHROW_NCX(LIBZLIB_CC zlib_reader_init)(struct zlib_reader *__restrict self,
 
 
 /* Finalize the given zlib reader. */
-typedef __ATTR_NONNULL((1)) void
-(LIBZLIB_CC *PZLIB_READER_FINI)(struct zlib_reader *__restrict self);
+typedef __ATTR_NONNULL_T((1)) void
+__NOTHROW_NCX_T(LIBZLIB_CC *PZLIB_READER_FINI)(struct zlib_reader *__restrict self);
 #ifdef LIBZLIB_WANT_PROTOTYPES
 LIBZLIB_DECL __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(LIBZLIB_CC zlib_reader_fini)(struct zlib_reader *__restrict self);
@@ -155,7 +155,7 @@ __NOTHROW_NCX(LIBZLIB_CC zlib_reader_fini)(struct zlib_reader *__restrict self);
  * @return: 0 :            End  of  input  stream,  or  want  more  input   data.
  *                         You may check for the former using `zlib_reader_eof()'
  * @return: ZLIB_ERROR_* : Deflate error. */
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __ssize_t
 (LIBZLIB_CC *PZLIB_READER_READ)(struct zlib_reader *__restrict self,
                                 void *buf, __size_t bufsize);
 #ifdef LIBZLIB_WANT_PROTOTYPES
@@ -172,7 +172,7 @@ zlib_reader_read(struct zlib_reader *__restrict self,
  *          must   have  access  to  a  sliding  window  buffer.
  *          Otherwise,  you must ensure that the compressed data
  *          blob is already complete from the get-go. */
-typedef __ATTR_NONNULL((1)) void
+typedef __ATTR_NONNULL_T((1)) void
 (LIBZLIB_CC *PZLIB_READER_FEED)(struct zlib_reader *__restrict self,
                                 void const *blob, size_t blob_size);
 #ifdef LIBZLIB_WANT_PROTOTYPES
@@ -187,7 +187,7 @@ zlib_reader_feed(struct zlib_reader *__restrict self,
 /* Set the absolute reader position.
  * @return: >= 0:          The new (actually set) absolute position.
  * @return: ZLIB_ERROR_* : Deflate error. */
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __ssize_t
 (LIBZLIB_CC *PZLIB_READER_SETPOS)(struct zlib_reader *__restrict self,
                                   __uintptr_t pos);
 #ifdef LIBZLIB_WANT_PROTOTYPES
@@ -197,7 +197,7 @@ zlib_reader_setpos(struct zlib_reader *__restrict self,
 #endif /* LIBZLIB_WANT_PROTOTYPES */
 
 /* Rewind the given reader. */
-typedef __ATTR_NONNULL((1)) void
+typedef __ATTR_NONNULL_T((1)) void
 (LIBZLIB_CC *PZLIB_READER_REWIND)(struct zlib_reader *__restrict self);
 #ifdef LIBZLIB_WANT_PROTOTYPES
 LIBZLIB_DECL __ATTR_NONNULL((1)) void LIBZLIB_CC

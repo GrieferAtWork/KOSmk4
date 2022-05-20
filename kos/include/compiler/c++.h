@@ -169,13 +169,11 @@ using namespace std; /* Overlay */
 #define __DFL(expr)           = expr
 
 #ifdef __INTELLISENSE__
-#define __register /* nothing */
+#define __register  /* nothing */
 #elif defined(__cplusplus) && __cplusplus >= 201703L
 #define __register /* nothing (warning : ISO C++17 does not allow 'register' storage class specifier [-Wregister]) */
-#elif 1
-#define __register register
 #else /* ... */
-#define __register /* nothing */
+#define __register register
 #endif /* !... */
 
 #ifdef __INTELLISENSE__

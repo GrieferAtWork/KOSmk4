@@ -26,6 +26,7 @@ gcc_opt.remove("-fno-rtti");
 #ifndef GUARD_MODPROCFS_PROCFSDEFS_C
 #define GUARD_MODPROCFS_PROCFSDEFS_C 1
 #define __WANT_FS_INIT
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -196,47 +197,47 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 		}}},                                                                     \
 		.ptf_string = string_ptr,                                                \
 	};
-#define MKLNK(symbol_name, perm, readlink)                                                     \
-	PRIVATE struct flnknode_ops const __##symbol_name##_ops = {                                \
-		.lno_node = {                                                                          \
-			.no_file = {                                                                       \
-				.mo_destroy = (void (KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1, \
-				.mo_changed = &fnode_v_changed,                                                \
-			},                                                                                 \
-			.no_free   = (void (KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1,      \
-			.no_wrattr = &fnode_v_wrattr_noop,                                                 \
-		},                                                                                     \
-		.lno_readlink = &readlink,                                                             \
-	};                                                                                         \
-	INTERN struct flnknode symbol_name = {{                                                    \
-		.fn_file = {                                                                           \
-			MFILE_INIT_mf_refcnt(2), /* +1: symbol_name, +1: <my dirent> */                    \
-			MFILE_INIT_mf_ops(&__##symbol_name##_ops.lno_node.no_file),                        \
-			MFILE_INIT_mf_lock,                                                                \
-			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                                        \
-			MFILE_INIT_mf_initdone,                                                            \
-			MFILE_INIT_mf_lockops,                                                             \
-			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                                      \
-			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                                    \
-			MFILE_INIT_mf_notify_                                                              \
-			MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |                          \
-			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),                     \
-			MFILE_INIT_mf_trunclock,                                                           \
-			MFILE_INIT_mf_filesize(0),                                                         \
-			MFILE_INIT_mf_atime(0, 0),                                                         \
-			MFILE_INIT_mf_mtime(0, 0),                                                         \
-			MFILE_INIT_mf_ctime(0, 0),                                                         \
-			MFILE_INIT_mf_btime(0, 0),                                                         \
-		},                                                                                     \
-		FNODE_INIT_fn_nlink(1),                                                                \
-		FNODE_INIT_fn_mode(S_IFLNK | (perm)),                                                  \
-		FNODE_INIT_fn_uid(0), /* root */                                                       \
-		FNODE_INIT_fn_gid(0), /* root */                                                       \
-		FNODE_INIT_fn_ino(0),                                                                  \
-		FNODE_INIT_fn_super(&procfs_super),                                                    \
-		FNODE_INIT_fn_changed,                                                                 \
-		.fn_supent = { NULL, FSUPER_NODES_DELETED },                                           \
-		FNODE_INIT_fn_allnodes,                                                                \
+#define MKLNK(symbol_name, perm, readlink)                                           \
+	PRIVATE struct flnknode_ops const __##symbol_name##_ops = {                      \
+		.lno_node = {                                                                \
+			.no_file = {                                                             \
+				.mo_destroy = (typeoffield(struct mfile_ops, mo_destroy))(void *)-1, \
+				.mo_changed = &fnode_v_changed,                                      \
+			},                                                                       \
+			.no_free   = (typeoffield(struct fnode_ops, no_free))(void *)-1,         \
+			.no_wrattr = &fnode_v_wrattr_noop,                                       \
+		},                                                                           \
+		.lno_readlink = &readlink,                                                   \
+	};                                                                               \
+	INTERN struct flnknode symbol_name = {{                                          \
+		.fn_file = {                                                                 \
+			MFILE_INIT_mf_refcnt(2), /* +1: symbol_name, +1: <my dirent> */          \
+			MFILE_INIT_mf_ops(&__##symbol_name##_ops.lno_node.no_file),              \
+			MFILE_INIT_mf_lock,                                                      \
+			MFILE_INIT_mf_parts(MFILE_PARTS_ANONYMOUS),                              \
+			MFILE_INIT_mf_initdone,                                                  \
+			MFILE_INIT_mf_lockops,                                                   \
+			MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),                            \
+			MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),                          \
+			MFILE_INIT_mf_notify_                                                    \
+			MFILE_INIT_mf_flags(MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |                \
+			                    MFILE_F_READONLY | MFILE_F_FIXEDFILESIZE),           \
+			MFILE_INIT_mf_trunclock,                                                 \
+			MFILE_INIT_mf_filesize(0),                                               \
+			MFILE_INIT_mf_atime(0, 0),                                               \
+			MFILE_INIT_mf_mtime(0, 0),                                               \
+			MFILE_INIT_mf_ctime(0, 0),                                               \
+			MFILE_INIT_mf_btime(0, 0),                                               \
+		},                                                                           \
+		FNODE_INIT_fn_nlink(1),                                                      \
+		FNODE_INIT_fn_mode(S_IFLNK | (perm)),                                        \
+		FNODE_INIT_fn_uid(0), /* root */                                             \
+		FNODE_INIT_fn_gid(0), /* root */                                             \
+		FNODE_INIT_fn_ino(0),                                                        \
+		FNODE_INIT_fn_super(&procfs_super),                                          \
+		FNODE_INIT_fn_changed,                                                       \
+		.fn_supent = { NULL, FSUPER_NODES_DELETED },                                 \
+		FNODE_INIT_fn_allnodes,                                                      \
 	}};
 #include "procfs.def"
 
@@ -305,8 +306,8 @@ INTERN struct fsuper procfs_super = {
 	.fs_mountslockops = SLIST_HEAD_INITIALIZER(procfs_super.fs_mountslockops),
 	.fs_sys           = &procfs_filesys,
 	.fs_dev           = NULL,
-	.fs_loadblocks    = (void (KCALL *)(struct mfile *__restrict, pos_t, physaddr_t, size_t, struct aio_multihandle *__restrict))(void *)(uintptr_t)-1,
-	.fs_saveblocks    = (void (KCALL *)(struct mfile *__restrict, pos_t, physaddr_t, size_t, struct aio_multihandle *__restrict))(void *)(uintptr_t)-1,
+	.fs_loadblocks    = (typeoffield(struct fsuper, fs_loadblocks))(void *)-1,
+	.fs_saveblocks    = (typeoffield(struct fsuper, fs_saveblocks))(void *)-1,
 	.fs_feat = {
 		.sf_filesize_max       = (pos_t)-1,
 		.sf_uid_max            = (uid_t)-1,

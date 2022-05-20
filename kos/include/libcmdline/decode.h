@@ -48,7 +48,7 @@ typedef unsigned int gfp_t;
  * When `pargc' is non-NULL, store the number of arguments leading
  * up  to  (but   not  including)   the  terminating   NULL-entry.
  * Upon error, NULL is returned. */
-typedef __ATTR_WUNUSED /*__ATTR_MALLOC*/ __ATTR_NONNULL((1)) char **
+typedef __ATTR_WUNUSED_T __ATTR_MALLOC_T __ATTR_NONNULL((1)) char **
 (LIBCMDLINE_CC *PCMDLINE_DECODE_ARGV)(char *cmdline, __size_t *pargc _os_heap_gfparg(gfp));
 #ifdef LIBCMDLINE_WANT_PROTOTYPES
 LIBCMDLINE_DECL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_NONNULL((1)) char **LIBCMDLINE_CC
@@ -85,7 +85,7 @@ cmdline_decode_argv(char *cmdline, __size_t *pargc _os_heap_gfparg(gfp __DFL(0))
  *     >ls New\ Folder<         { "ls", "New Folder" }
  *     >ls "" foo<              { "ls", "", "foo" }     // Empty argument!
  */
-typedef __ATTR_NONNULL((1, 2)) __ssize_t
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t
 (LIBCMDLINE_CC *PCMDLINE_DECODE)(char *cmdline,
                                  __pformatprinter arg_printer,
                                  void *arg_printer_arg);
@@ -107,7 +107,7 @@ cmdline_decode(char *cmdline,
  * >> }
  * @param: pendptr: When non-NULL, store a pointer to one byte past the end of the last argument
  * @return: * :     The total number of individual argument strings. */
-typedef __ATTR_NONNULL((1)) __size_t
+typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBCMDLINE_CC *PCMDLINE_SPLIT)(/*utf-8*/ char *__restrict cmdline, char **pendptr);
 #ifdef LIBCMDLINE_WANT_PROTOTYPES
 LIBCMDLINE_DECL __ATTR_NONNULL((1)) __size_t LIBCMDLINE_CC

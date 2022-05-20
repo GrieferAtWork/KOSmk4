@@ -204,7 +204,7 @@ typedef struct {
  *                                    levels know is. (all other  fields of `*result' are  NULL-
  *                                    initialized)
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted (`*result' was NULL-initialized). */
-typedef __ATTR_NONNULL((1, 2)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2)) unsigned int
 (LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE)(di_addr2line_sections_t const *__restrict sections,
                                     di_debug_addr2line_t *__restrict result,
                                     __uintptr_t module_relative_pc,
@@ -225,7 +225,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debug_addr2line)(di_addr2line_sections_t const *__
  *   - debug_addr2line_print_filename(..., info.al_cubase, info.al_dclpath, info.al_dclfile);
  *     "/home/me/project/c/foo/include/bar.h"
  */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_PRINT_FILENAME)(__pformatprinter printer, void *arg,
                                                    char const *cubase, char const *pathname,
                                                    char const *filename);
@@ -246,11 +246,11 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
  *                                    sections.
  *                                    In this case, `sections' and `dl_sections' will have both
  *                                    been initialized to all NULL-values. */
-typedef __ATTR_NONNULL((2, 3)) unsigned int
+typedef __ATTR_NONNULL_T((2, 3)) unsigned int
 (LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_SECTIONS_LOCK)(module_t *dl_handle,
                                                   di_addr2line_sections_t *__restrict sections,
                                                   di_addr2line_dl_sections_t *__restrict dl_sections);
-typedef __ATTR_NONNULL((1)) void
+typedef __ATTR_NONNULL_T((1)) void
 (LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_SECTIONS_UNLOCK)(di_addr2line_dl_sections_t *__restrict dl_sections);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((2, 3)) unsigned int

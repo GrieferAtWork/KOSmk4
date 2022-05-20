@@ -86,7 +86,7 @@ struct disassembler;
  *                      or  alternatively `0' in  case `disasm_print()' and friends
  *                      were used to print output, rather than the printer callback
  *                      itself directly. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDISASM_CC *diasm_symbol_printer_t)(struct disassembler *__restrict self,
                                        void const *symbol_addr);
 
@@ -197,7 +197,7 @@ disasm_print_format(struct disassembler *__restrict self,
  * >> return disasm_print_until(&da,(byte_t *)pc + num_bytes);
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDISASM_CC *PDISASM)(__pformatprinter printer, void *arg, void const *pc, __size_t num_bytes,
                         __UINTPTR_HALF_TYPE__ target /*__DFL(DISASSEMBLER_TARGET_CURRENT)*/,
                         __UINTPTR_HALF_TYPE__ flags /*__DFL(DISASSEMBLER_FNORMAL)*/);
@@ -216,7 +216,7 @@ disasm(__pformatprinter printer, void *arg, void const *pc, __size_t num_bytes,
  * >> return disasm_print_instruction(&da);
  * @return: * : The sum of all callbacks to `printer' ever executed with `self'
  * @return: <0: The first negative return value of `printer'. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDISASM_CC *PDISASM_SINGLE)(__pformatprinter printer, void *arg, void const *pc,
                                __UINTPTR_HALF_TYPE__ target /*__DFL(DISASSEMBLER_TARGET_CURRENT)*/,
                                __UINTPTR_HALF_TYPE__ flags /*__DFL(DISASSEMBLER_FNORMAL)*/);
@@ -232,7 +232,7 @@ disasm_single(__pformatprinter printer, void *arg, void const *pc,
  * has been reached, or a printer error has occurred.
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDISASM_CC *PDISASM_PRINT_UNTIL)(struct disassembler *__restrict self,
                                     void const *endpc);
 #ifdef LIBDISASM_WANT_PROTOTYPES
@@ -246,7 +246,7 @@ disasm_print_until(struct disassembler *__restrict self,
  * bytes don't all fit into a single line (s.a. `').
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDISASM_CC *PDISASM_PRINT_LINE)(struct disassembler *__restrict self);
 #ifdef LIBDISASM_WANT_PROTOTYPES
 LIBDISASM_DECL __ATTR_NONNULL((1)) __ssize_t LIBDISASM_CC
@@ -254,7 +254,7 @@ disasm_print_line(struct disassembler *__restrict self);
 #endif /* LIBDISASM_WANT_PROTOTYPES */
 
 /* Same as `libda_disasm_print_line()', but don't print a trailing line-feed. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDISASM_CC *PDISASM_PRINT_LINE_NOLF)(struct disassembler *__restrict self);
 #ifdef LIBDISASM_WANT_PROTOTYPES
 LIBDISASM_DECL __ATTR_NONNULL((1)) __ssize_t LIBDISASM_CC
@@ -265,7 +265,7 @@ disasm_print_line_nolf(struct disassembler *__restrict self);
  * This  function does not include any prefix,  nor does it append a trailing.
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDISASM_CC *PDISASM_PRINT_INSTRUCTION)(struct disassembler *__restrict self);
 #ifdef LIBDISASM_WANT_PROTOTYPES
 LIBDISASM_DECL __ATTR_NONNULL((1)) __ssize_t LIBDISASM_CC
@@ -275,7 +275,7 @@ disasm_print_instruction(struct disassembler *__restrict self);
 /* Print the name+offset/address of a symbol at `symbol_addr'
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDISASM_CC *PDISASM_PRINT_SYMBOL)(struct disassembler *__restrict self, void const *symbol_addr);
 #ifdef LIBDISASM_WANT_PROTOTYPES
 LIBDISASM_DECL __ATTR_NONNULL((1)) __ssize_t LIBDISASM_CC
@@ -283,7 +283,7 @@ disasm_print_symbol(struct disassembler *__restrict self, void const *symbol_add
 #endif /* LIBDISASM_WANT_PROTOTYPES */
 
 /* Returns the length (in bytes) of the next instruction to-be disassembled. */
-typedef __ATTR_NONNULL((1)) __size_t
+typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBDISASM_CC *PDISASM_INSTRLEN)(struct disassembler *__restrict self);
 #ifdef LIBDISASM_WANT_PROTOTYPES
 LIBDISASM_DECL __ATTR_NONNULL((1)) __size_t LIBDISASM_CC
@@ -291,7 +291,7 @@ disasm_instrlen(struct disassembler *__restrict self);
 #endif /* LIBDISASM_WANT_PROTOTYPES */
 
 /* Return the default number of max instruction bytes to print for `target' */
-typedef __ATTR_CONST __UINTPTR_HALF_TYPE__
+typedef __ATTR_CONST_T __UINTPTR_HALF_TYPE__
 (LIBDISASM_CC *PDISASM_DEFAULT_MAXBYTES)(__UINTPTR_HALF_TYPE__ target /*__DFL(DISASSEMBLER_TARGET_CURRENT)*/);
 #ifdef LIBDISASM_WANT_PROTOTYPES
 LIBDISASM_DECL __ATTR_CONST __UINTPTR_HALF_TYPE__ LIBDISASM_CC

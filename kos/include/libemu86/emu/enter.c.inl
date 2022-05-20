@@ -36,6 +36,7 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 	u8 nesting_level;
 	byte_t *sp;
 	alloc_size = UNALIGNED_GETLE16((u16 const *)pc);
+	(void)alloc_size;
 	pc += 2;
 	nesting_level = *(u8 const *)pc;
 	pc += 1;

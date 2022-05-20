@@ -144,7 +144,7 @@ typedef __uintptr_t _Unwind_Ptr;             /* Unwind pointer */
 typedef __uintptr_t _Unwind_Internal_Ptr;    /* Unwind pointer */
 typedef __uint64_t  _Unwind_Exception_Class; /* Unwind exception class (One of `_UEC_*'; may also be some unrecognized value) */
 struct _Unwind_Exception;
-typedef __ATTR_NONNULL((2)) void
+typedef __ATTR_NONNULL_T((2)) void
 (__LIBKCALL *_Unwind_Exception_Cleanup_Fn)(_Unwind_Reason_Code __reason /* = _URC_FOREIGN_EXCEPTION_CAUGHT */,
                                            struct _Unwind_Exception *__restrict __exc);
 
@@ -195,7 +195,7 @@ typedef _Unwind_Reason_Code
 
 
 /* NOTE: `__gcc_personality_v0' has the prototype `_Unwind_Personality_Fn' */
-typedef __ATTR_NONNULL((4, 5)) _Unwind_Reason_Code
+typedef __ATTR_NONNULL_T((4, 5)) _Unwind_Reason_Code
 (__LIBKCALL *_Unwind_Personality_Fn)(int __version /* = 1 */,
                                      _Unwind_Action __actions,
                                      _Unwind_Exception_Class __exception_class,

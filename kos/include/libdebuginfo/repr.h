@@ -41,13 +41,13 @@ __DECL_BEGIN
  *  - debug_repr_DW_CFA():   Returns the `*' portion for one of `DW_CFA_*' (iow. excluding the `DW_CFA_' prefix)
  *  - debug_repr_DW_EH_PE(): Returns the `*' portion for one of `DW_EH_PE_*' (iow. excluding the `DW_EH_PE_' prefix)
  */
-typedef __ATTR_CONST __ATTR_WUNUSED char const *(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_TAG)(dwarf_uleb128_t value);
-typedef __ATTR_CONST __ATTR_WUNUSED char const *(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_AT)(dwarf_uleb128_t value);
-typedef __ATTR_CONST __ATTR_WUNUSED char const *(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_FORM)(dwarf_uleb128_t value);
-typedef __ATTR_CONST __ATTR_WUNUSED char const *(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_ATE)(dwarf_uleb128_t value);
-typedef __ATTR_CONST __ATTR_WUNUSED char const *(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_OP)(__uint8_t value);
-typedef __ATTR_CONST __ATTR_WUNUSED char const *(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_CFA)(__uint8_t value);
-typedef __ATTR_CONST __ATTR_WUNUSED char const *(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_EH_PE)(__uint8_t value);
+typedef __ATTR_CONST_T __ATTR_WUNUSED_T char const *__NOTHROW_T(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_TAG)(dwarf_uleb128_t value);
+typedef __ATTR_CONST_T __ATTR_WUNUSED_T char const *__NOTHROW_T(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_AT)(dwarf_uleb128_t value);
+typedef __ATTR_CONST_T __ATTR_WUNUSED_T char const *__NOTHROW_T(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_FORM)(dwarf_uleb128_t value);
+typedef __ATTR_CONST_T __ATTR_WUNUSED_T char const *__NOTHROW_T(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_ATE)(dwarf_uleb128_t value);
+typedef __ATTR_CONST_T __ATTR_WUNUSED_T char const *__NOTHROW_T(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_OP)(__uint8_t value);
+typedef __ATTR_CONST_T __ATTR_WUNUSED_T char const *__NOTHROW_T(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_CFA)(__uint8_t value);
+typedef __ATTR_CONST_T __ATTR_WUNUSED_T char const *__NOTHROW_T(LIBDEBUGINFO_CC *PDEBUG_REPR_DW_EH_PE)(__uint8_t value);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(LIBDEBUGINFO_CC debug_repr_DW_TAG)(dwarf_uleb128_t value);
 LIBDEBUGINFO_DECL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(LIBDEBUGINFO_CC debug_repr_DW_AT)(dwarf_uleb128_t value);
@@ -73,7 +73,7 @@ LIBDEBUGINFO_DECL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(LIBDEBUGINFO
  * >>                 debug_abbrev_data, debug_abbrev_data + debug_abbrev_size,
  * >>                 debug_loc_data, debug_loc_data + debug_loc_size,
  * >>                 debug_str_data, debug_str_data + debug_str_size); */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUG_REPR_DUMP)(__pformatprinter printer, void *arg,
                                     __byte_t const *debug_info_start, __byte_t const *debug_info_end,
                                     __byte_t const *debug_abbrev_start, __byte_t const *debug_abbrev_end,
@@ -107,7 +107,7 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
  *                               it would be if it wasn't actually the
  *                               first line.
  * @return: * : The usual pformatprinter-style value. */
-typedef __ATTR_NONNULL((1, 3)) __ssize_t
+typedef __ATTR_NONNULL_T((1, 3)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUG_REPR_CFI_EXPRESSION_EX)(__pformatprinter printer, void *arg,
                                                  __byte_t const *__restrict pc, __size_t length,
                                                  __size_t indent, __byte_t addrsize, __byte_t ptrsize,
@@ -135,7 +135,7 @@ debug_repr_cfi_expression_ex(__pformatprinter printer, void *arg,
  * @param: addrsize: s.a. `unwind_instruction_succ(3)'
  * @param: ptrsize:  s.a. `unwind_instruction_succ(3)'
  * @return: * : The usual pformatprinter-style value. */
-typedef __ATTR_NONNULL((1, 3)) __ssize_t
+typedef __ATTR_NONNULL_T((1, 3)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUG_REPR_CFI_EXPRESSION_WITH_LENGTH)(__pformatprinter printer, void *arg,
                                                           __byte_t const *__restrict expr,
                                                           __size_t length, __size_t indent,
@@ -157,7 +157,7 @@ debug_repr_cfi_expression_with_length(__pformatprinter printer, void *arg,
  * @param: addrsize: s.a. `unwind_instruction_succ(3)'
  * @param: ptrsize:  s.a. `unwind_instruction_succ(3)'
  * @return: * : The usual pformatprinter-style value. */
-typedef __ATTR_NONNULL((1, 3)) __ssize_t
+typedef __ATTR_NONNULL_T((1, 3)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUG_REPR_CFI_EXPRESSION)(__pformatprinter printer, void *arg,
                                               __byte_t const *__restrict expr, __size_t indent,
                                               __byte_t addrsize, __byte_t ptrsize);

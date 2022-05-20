@@ -45,8 +45,8 @@ struct refcountable {
 	WEAK refcnt_t rca_refcnt; /* Reference counter */
 
 	/* [1..1][const] Destructor callback */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *rca_destroy)(struct refcountable *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *rca_destroy)(struct refcountable *__restrict self);
 
 	/* The real *magic* of what this object probably is goes here. (sub-classes) */
 };

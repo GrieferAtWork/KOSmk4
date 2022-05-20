@@ -43,6 +43,7 @@ case EMU86_OPCODE_ENCODE(0xc9): {
 		{
 			byte_t *bp_addr;
 			bp_addr = EMU86_SEGADDR(EMU86_GETSSBASE(), bp);
+			(void)bp_addr;
 #if EMU86_EMULATE_CONFIG_WANT_LEAVE
 			EMU86_READ_USER_MEMORY(bp_addr, 2);
 			orig_bp = EMU86_MEMREADW(bp_addr);
@@ -55,7 +56,7 @@ case EMU86_OPCODE_ENCODE(0xc9): {
 		EMU86_READ_USER_MEMORY(bp, 2);
 		orig_bp = EMU86_MEMREADW(bp);
 #else /* EMU86_EMULATE_CONFIG_WANT_LEAVE */
-		EMU86_UNSUPPORTED_MEMACCESS((void *)bp, 2, true, false);
+		EMU86_UNSUPPORTED_MEMACCESS((void *)(uintptr_t)bp, 2, true, false);
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LEAVE */
 #endif /* EMU86_GETSEGBASE_IS_NOOP_SS */
 #if EMU86_EMULATE_CONFIG_WANT_LEAVE
@@ -106,6 +107,7 @@ case EMU86_OPCODE_ENCODE(0xc9): {
 		{
 			byte_t *bp_addr;
 			bp_addr = EMU86_SEGADDR(EMU86_GETSSBASE(), bp);
+			(void)bp_addr;
 #if EMU86_EMULATE_CONFIG_WANT_LEAVE
 			EMU86_READ_USER_MEMORY(bp_addr, 4);
 			orig_bp = EMU86_MEMREADL(bp_addr);
@@ -118,7 +120,7 @@ case EMU86_OPCODE_ENCODE(0xc9): {
 		EMU86_READ_USER_MEMORY(bp, 4);
 		orig_bp = EMU86_MEMREADL(bp);
 #else /* EMU86_EMULATE_CONFIG_WANT_LEAVE */
-		EMU86_UNSUPPORTED_MEMACCESS((void *)bp, 4, true, false);
+		EMU86_UNSUPPORTED_MEMACCESS((void *)(uintptr_t)bp, 4, true, false);
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LEAVE */
 #endif /* EMU86_GETSEGBASE_IS_NOOP_SS */
 #if EMU86_EMULATE_CONFIG_WANT_LEAVE

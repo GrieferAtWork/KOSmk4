@@ -51,8 +51,8 @@ NOTHROW(CC dl_getcoreops)(void) {
 	if (!result->DlModule_Destroy) {
 		COMPILER_WRITE_BARRIER();
 #define DL_COREOPS_SKIP_DLMODULE_DESTROY 1
-#define DL_COREOP(attr, return, cc, name, args) result->name = &name;
-#define DL_COREFIELD(type, name)                result->name = &name;
+#define DL_COREOP(attr, return, nothrow, cc, name, args) result->name = &name;
+#define DL_COREFIELD(type, name)                         result->name = &name;
 #include <libdl/coreops.def>
 #undef DL_COREOPS_SKIP_DLMODULE_DESTROY
 		COMPILER_WRITE_BARRIER();

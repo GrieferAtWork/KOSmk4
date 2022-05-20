@@ -171,10 +171,10 @@ AWREF(device_awref, device);
  *                 if `USB_INTERRUPT_HANDLER_RETURN_STOP' was returned.
  * @param: status: One of `USB_INTERRUPT_HANDLER_STATUS_*'
  * @return: * :    One of `USB_INTERRUPT_HANDLER_RETURN_*' */
-typedef NOBLOCK NONNULL((1)) unsigned int
-/*NOTHROW*/ (KCALL *PUSB_INTERRUPT_HANDLER)(struct device *__restrict self,
-                                            unsigned int status,
-                                            void const *data, size_t datalen);
+typedef NOBLOCK NONNULL_T((1)) unsigned int
+NOTHROW_T(KCALL *PUSB_INTERRUPT_HANDLER)(struct device *__restrict self,
+                                         unsigned int status,
+                                         void const *data, size_t datalen);
 #define USB_INTERRUPT_HANDLER_STATUS_OK    0 /* Data was successfully received. */
 #define USB_INTERRUPT_HANDLER_STATUS_ERROR 1 /* The USB controller has indicated an error.
                                               * In this case, except_data() has  been filled in with  additional
@@ -198,8 +198,8 @@ struct usb_interrupt {
 	 * and interrupt-driven (e.g. a keyboard) USB devices. */
 	WEAK refcnt_t            ui_refcnt; /* Reference counter. */
 	/* [1..1][const] Finalizer for controller-specific data. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (KCALL *ui_fini)(struct usb_interrupt *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(KCALL *ui_fini)(struct usb_interrupt *__restrict self);
 #define USB_INTERRUPT_FLAG_NORMAL      0x0000 /* Normal flags. */
 #define USB_INTERRUPT_FLAG_SHORT       0x0002 /* [const] Allow short packets. */
 #define USB_INTERRUPT_FLAG_EVENPERIOD  0x0004 /* [const] Try to round `poll_interval_in_milliseconds', such

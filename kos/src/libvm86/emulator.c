@@ -78,7 +78,7 @@ libvm86_intr(vm86_state_t *__restrict self, uint8_t intno) {
 		}
 		if (!vm86_state_canpush(self, 6))
 			return VM86_DOUBLE_FAULT;
-		sp = (uint16_t *)vm86_state_sp(self);
+		sp = (uint16_t *)(uintptr_t)vm86_state_sp(self);
 		if (self->vr_trans)
 			sp = (uint16_t *)(*self->vr_trans)(self, sp);
 		sp[-1] = self->vr_regs.vr_flags;

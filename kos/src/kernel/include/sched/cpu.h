@@ -471,9 +471,9 @@ struct icpustate;
  * @param: args: The arguments alongside which the IPI was scheduled.
  * @return: * :  The cpu state to restore, or one of `CPU_IPI_MODE_*'
  */
-typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) struct icpustate *
-/*NOTHROW*/ (FCALL *cpu_ipi_t)(struct icpustate *__restrict state,
-                               void *args[CPU_IPI_ARGCOUNT]);
+typedef NOBLOCK NOPREEMPT NONNULL_T((1, 2)) struct icpustate *
+NOTHROW_T(FCALL *cpu_ipi_t)(struct icpustate *__restrict state,
+                            void *args[CPU_IPI_ARGCOUNT]);
 #endif /* !CONFIG_NO_SMP */
 #endif /* __CC__ */
 

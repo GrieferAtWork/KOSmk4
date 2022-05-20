@@ -211,8 +211,8 @@ struct socket_ops {
 	uintptr_t so_family;
 
 	/* [0..1] Optional finalizer callback. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (KCALL *so_fini)(struct socket *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(KCALL *so_fini)(struct socket *__restrict self);
 
 	/* [0..1] Poll  for  special   condition
 	 * The following conditions are defined:
@@ -222,10 +222,10 @@ struct socket_ops {
 	 *    POLLRDHUP:  Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called
 	 *    POLLHUP:    Socket peer has disconnected (ignored in `what'; always returned when condition is met)
 	 * Other conditions may be defined that are specific to individual socket types. */
-	NONNULL((1)) void
+	NONNULL_T((1)) void
 	(KCALL *so_pollconnect)(struct socket *__restrict self,
 	                        poll_mode_t what);
-	NONNULL((1)) poll_mode_t
+	NONNULL_T((1)) poll_mode_t
 	(KCALL *so_polltest)(struct socket *__restrict self,
 	                     poll_mode_t what);
 
@@ -236,7 +236,7 @@ struct socket_ops {
 	 *       address that is returned by this function is weakly  undefined.
 	 *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
 	 * @return: * : The required buffer size */
-	NONNULL((1)) socklen_t
+	NONNULL_T((1)) socklen_t
 	(KCALL *so_getsockname)(struct socket *__restrict self,
 	                        USER CHECKED struct sockaddr *addr,
 	                        socklen_t addr_len);
@@ -246,7 +246,7 @@ struct socket_ops {
 	 * This is usually the same address as was previously set by `socket_connect()'
 	 * @return: * : The required buffer size
 	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED: [...] */
-	NONNULL((1)) socklen_t
+	NONNULL_T((1)) socklen_t
 	(KCALL *so_getpeername)(struct socket *__restrict self,
 	                        USER CHECKED struct sockaddr *addr,
 	                        socklen_t addr_len)
@@ -259,7 +259,7 @@ struct socket_ops {
 	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND:                 [...]
 	 * @throws: E_NET_ADDRESS_NOT_AVAILABLE:                                                                [...]
 	 * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
-	NONNULL((1)) void
+	NONNULL_T((1)) void
 	(KCALL *so_bind)(struct socket *__restrict self,
 	                 USER CHECKED struct sockaddr const *addr,
 	                 socklen_t addr_len)
@@ -278,7 +278,7 @@ struct socket_ops {
 	 * @throws: E_NET_TIMEOUT:                                                                                 [...]
 	 * @throws: E_NET_UNREACHABLE:                                                                             [...]
 	 * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
-	NONNULL((1, 4)) void
+	NONNULL_T((1, 4)) void
 	(KCALL *so_connect)(struct socket *__restrict self,
 	                    USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
 	                    /*out*/ struct aio_handle *__restrict aio)
@@ -330,7 +330,7 @@ struct socket_ops {
 	 * @throws: E_NET_MESSAGE_TOO_LONG:                                                     [...]
 	 * @throws: E_NET_CONNECTION_RESET:                                                     [...]
 	 * @throws: E_NET_SHUTDOWN: [...] (NOTE: The caller of this function will deal with `SIGPIPE') */
-	NONNULL((1, 6)) void
+	NONNULL_T((1, 6)) void
 	(KCALL *so_send)(struct socket *__restrict self,
 	                 USER CHECKED void const *buf, size_t bufsize,
 	                 struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
@@ -338,7 +338,7 @@ struct socket_ops {
 			THROWS_INDIRECT(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_MESSAGE_TOO_LONG,
 			                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN);
 	/* [if(!so_sendto, [1..1]), else([0..1])] */
-	NONNULL((1, 2, 6)) void
+	NONNULL_T((1, 2, 6)) void
 	(KCALL *so_sendv)(struct socket *__restrict self,
 	                  struct iov_buffer const *__restrict buf, size_t bufsize,
 	                  struct ancillary_message const *msg_control, syscall_ulong_t msg_flags,
@@ -365,7 +365,7 @@ struct socket_ops {
 	 * @throws: E_NET_CONNECTION_RESET:                                                                       [...]
 	 * @throws: E_NET_SHUTDOWN: [...] (NOTE: The caller of this function will deal with `SIGPIPE')
 	 * @throws: E_BUFFER_TOO_SMALL: The given `addr_len' is too small */
-	NONNULL((1, 8)) void
+	NONNULL_T((1, 8)) void
 	(KCALL *so_sendto)(struct socket *__restrict self,
 	                   USER CHECKED void const *buf, size_t bufsize,
 	                   /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
@@ -374,7 +374,7 @@ struct socket_ops {
 			THROWS_INDIRECT(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND, E_NET_MESSAGE_TOO_LONG,
 			                E_NET_CONNECTION_RESET, E_NET_SHUTDOWN, E_BUFFER_TOO_SMALL);
 	/* [if(!so_send, [1..1]), else([0..1])] */
-	NONNULL((1, 2, 8)) void
+	NONNULL_T((1, 2, 8)) void
 	(KCALL *so_sendtov)(struct socket *__restrict self,
 	                    struct iov_buffer const *__restrict buf, size_t bufsize,
 	                    /*?..1*/ USER CHECKED struct sockaddr const *addr, socklen_t addr_len,
@@ -405,7 +405,7 @@ struct socket_ops {
 	 * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
 	 * @throws: E_WOULDBLOCK:  MSG_DONTWAIT was given, and the operation would have blocked.
 	 * @throws: E_NET_TIMEOUT: The given `abs_timeout' expired */
-	NONNULL((1)) size_t
+	NONNULL_T((1)) size_t
 	(KCALL *so_recv)(struct socket *__restrict self,
 	                 USER CHECKED void *buf, size_t bufsize,
 	                 /*0..1*/ USER CHECKED u32 *presult_flags,
@@ -415,7 +415,7 @@ struct socket_ops {
 			THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_NET_CONNECTION_REFUSED,
 			       E_NET_TIMEOUT, E_WOULDBLOCK);
 	/* [if(!so_recvfromv, [1..1]), else([0..1])] */
-	NONNULL((1, 2)) size_t
+	NONNULL_T((1, 2)) size_t
 	(KCALL *so_recvv)(struct socket *__restrict self,
 	                  struct iov_buffer const *__restrict buf, size_t bufsize,
 	                  /*0..1*/ USER CHECKED u32 *presult_flags,
@@ -446,7 +446,7 @@ struct socket_ops {
 	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED: [...]
 	 * @throws: E_NET_CONNECTION_REFUSED:                                                   [...]
 	 * @throws: E_WOULDBLOCK: MSG_DONTWAIT was given, and the operation would have blocked. */
-	NONNULL((1)) size_t
+	NONNULL_T((1)) size_t
 	(KCALL *so_recvfrom)(struct socket *__restrict self,
 	                     USER CHECKED void *buf, size_t bufsize,
 	                     /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
@@ -457,7 +457,7 @@ struct socket_ops {
 	                     ktime_t abs_timeout)
 			THROWS(E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT, E_WOULDBLOCK);
 	/* [0..1][if(!so_recvv, [1..1])] */
-	NONNULL((1, 2)) size_t
+	NONNULL_T((1, 2)) size_t
 	(KCALL *so_recvfromv)(struct socket *__restrict self,
 	                      struct iov_buffer const *__restrict buf, size_t bufsize,
 	                      /*?..1*/ USER CHECKED struct sockaddr *addr, socklen_t addr_len,
@@ -472,7 +472,7 @@ struct socket_ops {
 	 * Begin to listen for incoming client (aka. peer) connection requests.
 	 * @throws: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN: [...] (The bound address is already in use)
 	 * @throws: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN:    [...] (same as not implementing) */
-	NONNULL((1)) void
+	NONNULL_T((1)) void
 	(KCALL *so_listen)(struct socket *__restrict self,
 	                   syscall_ulong_t max_backlog)
 			THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_HANDLE_NET_OPERATION);
@@ -486,7 +486,7 @@ struct socket_ops {
 	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING: [...]
 	 * @throws: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT:                        [...] (same as not implementing)
 	 * @throws: E_NET_CONNECTION_ABORT:                                                       [...] */
-	NONNULL((1)) REF struct socket *
+	NONNULL_T((1)) REF struct socket *
 	(KCALL *so_accept)(struct socket *__restrict self, iomode_t mode)
 			THROWS(E_ILLEGAL_BECAUSE_NOT_READY, E_INVALID_HANDLE_NET_OPERATION,
 			       E_NET_CONNECTION_ABORT);
@@ -497,7 +497,7 @@ struct socket_ops {
 	 * of data (causing `send()' to throw an `E_NET_SHUTDOWN' exception)
 	 * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
 	 * @throws: E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_SHUTDOWN_NOT_CONNECTED: [...] */
-	NONNULL((1)) void
+	NONNULL_T((1)) void
 	(KCALL *so_shutdown)(struct socket *__restrict self,
 	                     syscall_ulong_t how)
 			THROWS(E_ILLEGAL_BECAUSE_NOT_READY);
@@ -513,7 +513,7 @@ struct socket_ops {
 	 * @return: 0 : Same as `THROW(E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT)'
 	 * @return: * : The required buffer size.
 	 * @throws: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT: [...] */
-	NONNULL((1)) socklen_t
+	NONNULL_T((1)) socklen_t
 	(KCALL *so_getsockopt)(struct socket *__restrict self,
 	                       syscall_ulong_t level, syscall_ulong_t optname,
 	                       USER CHECKED void *optval,
@@ -526,7 +526,7 @@ struct socket_ops {
 	 * @return: false: Same as `THROW(E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT)'
 	 * @throws: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT: [...]
 	 * @throws: E_BUFFER_TOO_SMALL: The specified `optlen' is invalid for the given option. */
-	NONNULL((1)) __BOOL
+	NONNULL_T((1)) __BOOL
 	(KCALL *so_setsockopt)(struct socket *__restrict self,
 	                       syscall_ulong_t level, syscall_ulong_t optname,
 	                       USER CHECKED void const *optval,
@@ -536,14 +536,14 @@ struct socket_ops {
 	/* [0..1]
 	 * Custom I/O control command handler for this socket type.
 	 * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
-	NONNULL((1)) syscall_slong_t
+	NONNULL_T((1)) syscall_slong_t
 	(KCALL *so_ioctl)(struct socket *__restrict self, ioctl_t cmd,
 	                  USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 	/* [0..1] Optional free function. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (KCALL *so_free)(struct socket *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(KCALL *so_free)(struct socket *__restrict self);
 
 	/* [0..1] Get/Set the size of the send/receive buffer. These
 	 * functions are supposed to work correctly, no matter  what
@@ -579,10 +579,10 @@ struct socket_ops {
 	 * length buffer  is  used  internally,  and a  user-space  query  will  result
 	 * in `SOCKET_RCVBUFMIN' being returned. When `so_setrcvbuf' isn't implemented,
 	 * a user-space request to set the receive buffer size becomes a no-op. */
-	size_t (KCALL *so_getrcvbuf)(struct socket *__restrict self);
-	void (KCALL *so_setrcvbuf)(struct socket *__restrict self, size_t bufsiz);
-	size_t (KCALL *so_getsndbuf)(struct socket *__restrict self);
-	void (KCALL *so_setsndbuf)(struct socket *__restrict self, size_t bufsiz);
+	NONNULL_T((1)) size_t (KCALL *so_getrcvbuf)(struct socket *__restrict self);
+	NONNULL_T((1)) void (KCALL *so_setrcvbuf)(struct socket *__restrict self, size_t bufsiz);
+	NONNULL_T((1)) size_t (KCALL *so_getsndbuf)(struct socket *__restrict self);
+	NONNULL_T((1)) void (KCALL *so_setsndbuf)(struct socket *__restrict self, size_t bufsiz);
 };
 
 

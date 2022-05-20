@@ -468,7 +468,7 @@ typedef struct ucpustate rpc_cpustate_t;
 #endif /* !__KERNEL__ */
 #endif /* !PRPC_EXEC_CALLBACK_CC */
 struct rpc_context;
-typedef __ATTR_NONNULL((1)) void
+typedef __ATTR_NONNULL_T((1)) void
 (PRPC_EXEC_CALLBACK_CC *prpc_exec_callback_t)(struct rpc_context *__restrict __ctx, void *__cookie)
 		__THROWS(...);
 #endif /* !__prpc_exec_callback_t_defined */

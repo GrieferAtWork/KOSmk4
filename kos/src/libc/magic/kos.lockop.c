@@ -161,19 +161,19 @@ struct obpostlockop;
 
 
 /* Callback prototype for an operation to-be performed once locks have been released. */
-typedef __NOBLOCK __ATTR_NONNULL((1)) void
-/*__NOTHROW*/ (LOCKOP_CC *postlockop_callback_t)(struct postlockop *__restrict __self);
-typedef __NOBLOCK __ATTR_NONNULL((1, 2)) void
-/*__NOTHROW*/ (LOCKOP_CC *obpostlockop_callback_t)(struct obpostlockop *__restrict __self,
-                                                   void *__restrict __obj);
+typedef __NOBLOCK __ATTR_NONNULL_T((1)) void
+__NOTHROW_T(LOCKOP_CC *postlockop_callback_t)(struct postlockop *__restrict __self);
+typedef __NOBLOCK __ATTR_NONNULL_T((1, 2)) void
+__NOTHROW_T(LOCKOP_CC *obpostlockop_callback_t)(struct obpostlockop *__restrict __self,
+                                                void *__restrict __obj);
 
 /* Callback prototype for pending locked operations.
  * @return: NULL: Completed.
  * @return: * :   A descriptor for an operation to perform after the lock has been released. */
-typedef __NOBLOCK __ATTR_NONNULL((1)) struct postlockop *
-/*NOTHROW*/ (LOCKOP_CC *lockop_callback_t)(struct lockop *__restrict __self);
-typedef __NOBLOCK __ATTR_NONNULL((1, 2)) struct obpostlockop *
-/*NOTHROW*/ (LOCKOP_CC *oblockop_callback_t)(struct oblockop *__restrict __self, void *__restrict __obj);
+typedef __NOBLOCK __ATTR_NONNULL_T((1)) struct postlockop *
+__NOTHROW_T(LOCKOP_CC *lockop_callback_t)(struct lockop *__restrict __self);
+typedef __NOBLOCK __ATTR_NONNULL_T((1, 2)) struct obpostlockop *
+__NOTHROW_T(LOCKOP_CC *oblockop_callback_t)(struct oblockop *__restrict __self, void *__restrict __obj);
 
 /* Helper template for copy+paste:
 PRIVATE NOBLOCK NONNULL((1, 2)) void
@@ -243,28 +243,28 @@ template<class __T> struct _Tobpostlockop;
 #define Tobpostlockop_callback_t(type)     _Tobpostlockop_callback_t<struct type>
 #define Toblockop_callback_t_tpl(type)     _Toblockop_callback_t<struct type>
 #define Tobpostlockop_callback_t_tpl(type) _Tobpostlockop_callback_t<struct type>
-template<class __T> using _Toblockop_callback_t     = __NOBLOCK __ATTR_NONNULL((1)) _Tobpostlockop<__T> * /*__NOTHROW*/ (LOCKOP_CC *)(_Toblockop<__T> *__restrict __self, __T *__restrict __obj);
-template<class __T> using _Tobpostlockop_callback_t = __NOBLOCK __ATTR_NONNULL((1)) void /*__NOTHROW*/ (LOCKOP_CC *)(_Tobpostlockop<__T> *__restrict __self, __T *__restrict __obj);
+template<class __T> using _Toblockop_callback_t     = __NOBLOCK __ATTR_NONNULL_T((1)) _Tobpostlockop<__T> * __NOTHROW_T(LOCKOP_CC *)(_Toblockop<__T> *__restrict __self, __T *__restrict __obj);
+template<class __T> using _Tobpostlockop_callback_t = __NOBLOCK __ATTR_NONNULL_T((1)) void __NOTHROW_T(LOCKOP_CC *)(_Tobpostlockop<__T> *__restrict __self, __T *__restrict __obj);
 #else /* __COMPILER_HAVE_CXX_TEMPLATE_USING */
 #define Toblockop_callback_t(type)         _Toblockop_callback_t<struct type>::__T
 #define Tobpostlockop_callback_t(type)     _Tobpostlockop_callback_t<struct type>::__T
 #define Toblockop_callback_t_tpl(type)     __CXX_DEDUCE_TYPENAME _Toblockop_callback_t<struct type>::__T
 #define Tobpostlockop_callback_t_tpl(type) __CXX_DEDUCE_TYPENAME _Tobpostlockop_callback_t<struct type>::__T
-template<class __T> struct _Toblockop_callback_t     { typedef __NOBLOCK __ATTR_NONNULL((1)) _Tobpostlockop<__T> * /*__NOTHROW*/ (LOCKOP_CC *__T)(_Toblockop<__T> *__restrict __self, __T *__restrict __obj); };
-template<class __T> struct _Tobpostlockop_callback_t { typedef __NOBLOCK __ATTR_NONNULL((1)) void /*__NOTHROW*/ (LOCKOP_CC *__T)(_Tobpostlockop<__T> *__restrict __self, __T *__restrict __obj); };
+template<class __T> struct _Toblockop_callback_t     { typedef __NOBLOCK __ATTR_NONNULL_T((1)) _Tobpostlockop<__T> * __NOTHROW_T(LOCKOP_CC *__T)(_Toblockop<__T> *__restrict __self, __T *__restrict __obj); };
+template<class __T> struct _Tobpostlockop_callback_t { typedef __NOBLOCK __ATTR_NONNULL_T((1)) void __NOTHROW_T(LOCKOP_CC *__T)(_Tobpostlockop<__T> *__restrict __self, __T *__restrict __obj); };
 #endif /* !__COMPILER_HAVE_CXX_TEMPLATE_USING */
 
 template<class __T> struct _Toblockop {
 /*	SLIST_ENTRY(_Toblockop<__T>)          olo_link;  * [0..1] Next lock operation. */
 	struct { _Toblockop<__T> *sle_next; } olo_link; /* [0..1] Next lock operation. */
 /*	_Toblockop_callback_t<__T>            olo_func;  * [1..1][const] Operation to perform. */
-	__NOBLOCK __ATTR_NONNULL((1)) _Tobpostlockop<__T> * /*__NOTHROW*/ (LOCKOP_CC *olo_func)(_Toblockop<__T> *__restrict __self, __T *__restrict __obj); /* [1..1][const] Operation to perform. */
+	__NOBLOCK __ATTR_NONNULL_T((1)) _Tobpostlockop<__T> * __NOTHROW_T(LOCKOP_CC *olo_func)(_Toblockop<__T> *__restrict __self, __T *__restrict __obj); /* [1..1][const] Operation to perform. */
 };
 template<class __T> struct _Tobpostlockop {
 /*	SLIST_ENTRY(_Tobpostlockop<__T>)          oplo_link;  * [0..1] Next post-lock operation. */
 	struct { _Tobpostlockop<__T> *sle_next; } oplo_link; /* [0..1] Next post-lock operation. */
 /*	_Tobpostlockop_callback_t<__T>            oplo_func;  * [1..1][const] Callback to invoke. */
-	__NOBLOCK __ATTR_NONNULL((1)) void /*__NOTHROW*/ (LOCKOP_CC *oplo_func)(_Tobpostlockop<__T> *__restrict __self, __T *__restrict __obj); /* [1..1][const] Callback to invoke. */
+	__NOBLOCK __ATTR_NONNULL_T((1)) void __NOTHROW_T(LOCKOP_CC *oplo_func)(_Tobpostlockop<__T> *__restrict __self, __T *__restrict __obj); /* [1..1][const] Callback to invoke. */
 };
 /* template<class __T> SLIST_HEAD(_Toblockop_slist, _Toblockop<__T>); */
 /* template<class __T> SLIST_HEAD(_Tobpostlockop_slist, _Tobpostlockop<__T>); */

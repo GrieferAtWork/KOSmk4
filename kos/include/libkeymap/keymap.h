@@ -153,10 +153,10 @@ struct keymap {
 /* Return the size (in bytes) of the keyboard translation code block,  that
  * is the number of bytes until after the terminating `KMP_OP_STOP' opcode.
  * @return: <0: The code contains unrecognized/invalid instructions. */
-typedef __ATTR_NONNULL((1, 2)) __ssize_t
-(LIBKEYMAP_CC *PKEYMAP_CODESIZE)(__byte_t const *__restrict code,
-                                 __uint8_t *__restrict preg_enc,
-                                 __uint8_t def_enc);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t
+__NOTHROW_NCX_T(LIBKEYMAP_CC *PKEYMAP_CODESIZE)(__byte_t const *__restrict code,
+                                                __uint8_t *__restrict preg_enc,
+                                                __uint8_t def_enc);
 #ifdef LIBKEYMAP_WANT_PROTOTYPES
 LIBKEYMAP_DECL __ATTR_NONNULL((1, 2)) __ssize_t
 __NOTHROW_NCX(LIBKEYMAP_CC keymap_codesize)(__byte_t const *__restrict code,
@@ -167,10 +167,10 @@ __NOTHROW_NCX(LIBKEYMAP_CC keymap_codesize)(__byte_t const *__restrict code,
 /* Same as `keymap_codesize()', but only return the length of a single instruction.
  * @return: 0:  The next instruction is `KMP_OP_STOP'
  * @return: <0: The code contains unrecognized/invalid instructions. */
-typedef __ATTR_NONNULL((1, 2)) __ssize_t
-(LIBKEYMAP_CC *PKEYMAP_INSTRLEN)(__byte_t const *__restrict code,
-                                 __uint8_t *__restrict preg_enc,
-                                 __uint8_t def_enc);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t
+__NOTHROW_NCX_T(LIBKEYMAP_CC *PKEYMAP_INSTRLEN)(__byte_t const *__restrict code,
+                                                __uint8_t *__restrict preg_enc,
+                                                __uint8_t def_enc);
 #ifdef LIBKEYMAP_WANT_PROTOTYPES
 LIBKEYMAP_DECL __ATTR_NONNULL((1, 2)) __ssize_t
 __NOTHROW_NCX(LIBKEYMAP_CC keymap_instrlen)(__byte_t const *__restrict code,
@@ -181,8 +181,8 @@ __NOTHROW_NCX(LIBKEYMAP_CC keymap_instrlen)(__byte_t const *__restrict code,
 /* Initialize the given keymap to represent the map keys according to the en_US layout.
  * This function should be used as fallback when the caller is unable to initialize the
  * desired keyboard layout, as ~any~ mapping is still better than no mapping at all. */
-typedef __ATTR_NONNULL((1)) void
-(LIBKEYMAP_CC *PKEYMAP_INIT_EN_US)(struct keymap *__restrict self);
+typedef __ATTR_NONNULL_T((1)) void
+__NOTHROW_NCX_T(LIBKEYMAP_CC *PKEYMAP_INIT_EN_US)(struct keymap *__restrict self);
 #ifdef LIBKEYMAP_WANT_PROTOTYPES
 LIBKEYMAP_DECL __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(LIBKEYMAP_CC keymap_init_en_US)(struct keymap *__restrict self);
@@ -193,10 +193,10 @@ __NOTHROW_NCX(LIBKEYMAP_CC keymap_init_en_US)(struct keymap *__restrict self);
  * @return: 0  : Either `printer' always returned 0, or the key doesn't have a mapping.
  * @return: *  : Sum of all calls to `printer'
  * @return: <0 : A call to `printer' returned this same negative value */
-typedef __ATTR_NONNULL((1, 4)) __ssize_t
-(LIBKEYMAP_CC *PKEYMAP_TRANSLATE)(struct keymap *__restrict self,
-                                  __uint16_t key, __uint16_t mod,
-                                  __pformatprinter printer, void *arg);
+typedef __ATTR_NONNULL_T((1, 4)) __ssize_t
+__NOTHROW_NCX_T(LIBKEYMAP_CC *PKEYMAP_TRANSLATE)(struct keymap *__restrict self,
+                                                 __uint16_t key, __uint16_t mod,
+                                                 __pformatprinter printer, void *arg);
 #ifdef LIBKEYMAP_WANT_PROTOTYPES
 LIBKEYMAP_DECL __ATTR_NONNULL((1, 4)) __ssize_t
 __NOTHROW_NCX(LIBKEYMAP_CC keymap_translate)(struct keymap *__restrict self,
@@ -214,10 +214,10 @@ __NOTHROW_NCX(LIBKEYMAP_CC keymap_translate)(struct keymap *__restrict self,
  * @param: buflen: The given buffer size.
  * @return: 0 :    The given `key' cannot be translated with `mod'
  * @return: * :    The required number of buffer bytes. (excluding a trailing NUL-character) */
-typedef __ATTR_NONNULL((1, 4)) __size_t
-(LIBKEYMAP_CC *PKEYMAP_TRANSLATE_BUF)(struct keymap *__restrict self,
-                                      __uint16_t key, __uint16_t mod,
-                                      /*utf-8*/ char *buffer, __size_t buflen);
+typedef __ATTR_NONNULL_T((1, 4)) __size_t
+__NOTHROW_NCX_T(LIBKEYMAP_CC *PKEYMAP_TRANSLATE_BUF)(struct keymap *__restrict self,
+                                                     __uint16_t key, __uint16_t mod,
+                                                     /*utf-8*/ char *buffer, __size_t buflen);
 #ifdef LIBKEYMAP_WANT_PROTOTYPES
 LIBKEYMAP_DECL __ATTR_NONNULL((1, 4)) __size_t
 __NOTHROW_NCX(LIBKEYMAP_CC keymap_translate_buf)(struct keymap *__restrict self,
@@ -236,10 +236,10 @@ __NOTHROW_NCX(LIBKEYMAP_CC keymap_translate_buf)(struct keymap *__restrict self,
  *       memory region and free it themself after finalization
  * @return: true:  Successfully loaded the given blob and initialized `self'
  * @return: false: Failed to open the blob (not a valid KMP file) */
-typedef __ATTR_NONNULL((1, 2)) __BOOL
-(LIBKEYMAP_CC *PKEYMAP_OPENBLOB)(struct keymap *__restrict self,
-                                 void const *blob_base,
-                                 __size_t blob_size);
+typedef __ATTR_NONNULL_T((1, 2)) __BOOL
+__NOTHROW_NCX_T(LIBKEYMAP_CC *PKEYMAP_OPENBLOB)(struct keymap *__restrict self,
+                                                void const *blob_base,
+                                                __size_t blob_size);
 #ifdef LIBKEYMAP_WANT_PROTOTYPES
 LIBKEYMAP_DECL __ATTR_NONNULL((1, 2)) __BOOL
 __NOTHROW_NCX(LIBKEYMAP_CC keymap_openblob)(struct keymap *__restrict self,

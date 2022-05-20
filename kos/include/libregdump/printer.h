@@ -56,7 +56,7 @@ struct regdump_printer;
  *               or  alternatively `0' in  case `disasm_print()' and friends
  *               were used to print output, rather than the printer callback
  *               itself directly. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBREGDUMP_CC *regdump_print_format_t)(struct regdump_printer *__restrict __self,
                                         unsigned int __format_option);
 

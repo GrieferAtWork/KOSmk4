@@ -130,6 +130,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 		new_eflags = EMU86_MEMREADW(sp + 4);
 		sp += 6;
 	}
+	(void)new_eflags;
 #if CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT
 	if (!EMU86_F_IS64(op_flags)) {
 		u32 old_eflags = EMU86_GETFLAGS();
@@ -247,6 +248,9 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 #endif /* EMU86_IRET_NEED_NEW_SP */
 			new_ss = EMU86_MEMREADW(sp + 2);
 		}
+#ifdef EMU86_IRET_NEED_NEW_SP
+		(void)new_sp;
+#endif /* EMU86_IRET_NEED_NEW_SP */
 #if EMU86_EMULATE_CONFIG_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT
 		/* Verify segment registers.
 		 * NOTE: We can only get here with `EMU86_ISUSER() == true'

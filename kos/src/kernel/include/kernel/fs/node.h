@@ -218,7 +218,7 @@ struct fnode_perm_ops {
 	 * implemented, the `fn_uid' and `fn_gid' fields container either
 	 * invalid-, or fs-specific data. Furthermore, the file owner can
 	 * not be changed, as though `MFILE_FN_ATTRREADONLY' was set. */
-	BLOCKING NONNULL((1, 2, 3)) void
+	BLOCKING NONNULL_T((1, 2, 3)) void
 	(KCALL *npo_getown)(struct fnode *__restrict self,
 	                    uid_t *__restrict powner,
 	                    gid_t *__restrict pgroup)
@@ -231,8 +231,8 @@ struct fnode_ops {
 	/* [0..1] Optional operator for freeing `self'
 	 * - Called at the end of `fnode_v_destroy()'
 	 * - When not defined, the system instead does `kfree(self)' */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (KCALL *no_free)(struct fnode *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(KCALL *no_free)(struct fnode *__restrict self);
 
 	/* [1..1] Write modified file attributes to disk (must be implemented as no-op for RAM filesystems)
 	 * The following attributes must be saved by this function (note that in order to safely read these
@@ -246,7 +246,7 @@ struct fnode_ops {
 	 *  - self->_fnode_file_ mf_mtime       # Write to disk as would be truncated by `fsuper_truncate_mtime()'
 	 *  - self->_fnode_file_ mf_ctime       # Write to disk as would be truncated by `fsuper_truncate_ctime()'
 	 *  - self->_fnode_file_ mf_btime       # Write to disk as would be truncated by `fsuper_truncate_btime()' */
-	BLOCKING NONNULL((1)) void
+	BLOCKING NONNULL_T((1)) void
 	(KCALL *no_wrattr)(struct fnode *__restrict self)
 			THROWS(E_IOERROR, ...);
 

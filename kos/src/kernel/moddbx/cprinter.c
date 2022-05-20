@@ -723,12 +723,12 @@ struct ctype_printstruct_ismultiline_data {
 	bool         out_contains_lf;  /* [out] Set to true if the output contains line-feeds */
 };
 
-PRIVATE NONNULL((1, 2)) ssize_t KCALL
-ctype_printstruct_ismultiline_callback(void *cookie,
-                                       di_debuginfo_member_t const *__restrict member,
-                                       di_debuginfo_cu_parser_t const *__restrict parser,
-                                       struct cmodule *__restrict mod,
-                                       struct cmodunit *__restrict cu) {
+PRIVATE NONNULL((1, 2, 3, 4, 5)) ssize_t
+NOTHROW(KCALL ctype_printstruct_ismultiline_callback)(void *cookie,
+                                                      di_debuginfo_member_t const *__restrict member,
+                                                      di_debuginfo_cu_parser_t const *__restrict parser,
+                                                      struct cmodule *__restrict mod,
+                                                      struct cmodunit *__restrict cu) {
 	struct ctype_printstruct_ismultiline_data *arg;
 	size_t prefix_length;
 	arg = (struct ctype_printstruct_ismultiline_data *)cookie;
@@ -779,12 +779,12 @@ ctype_printstruct_ismultiline_callback(void *cookie,
 	return 1;
 }
 
-PRIVATE NONNULL((1, 2)) ssize_t KCALL
-ctype_struct_is_nonempty_callback(void *UNUSED(cookie),
-                                  di_debuginfo_member_t const *__restrict UNUSED(member),
-                                  di_debuginfo_cu_parser_t const *__restrict UNUSED(parser),
-                                  struct cmodule *__restrict UNUSED(mod),
-                                  struct cmodunit *__restrict UNUSED(cu)) {
+PRIVATE NONNULL((1, 2)) ssize_t
+NOTHROW(KCALL ctype_struct_is_nonempty_callback)(void *UNUSED(cookie),
+                                                 di_debuginfo_member_t const *__restrict UNUSED(member),
+                                                 di_debuginfo_cu_parser_t const *__restrict UNUSED(parser),
+                                                 struct cmodule *__restrict UNUSED(mod),
+                                                 struct cmodunit *__restrict UNUSED(cu)) {
 	return -1;
 }
 
@@ -803,12 +803,12 @@ struct ctype_printstruct_data {
 	bool                   do_multiline;     /* [const] True if printing in multi-line mode. */
 };
 
-PRIVATE NONNULL((1, 2)) ssize_t KCALL
-ctype_printstruct_callback(void *cookie,
-                           di_debuginfo_member_t const *__restrict member,
-                           di_debuginfo_cu_parser_t const *__restrict parser,
-                           struct cmodule *__restrict mod,
-                           struct cmodunit *__restrict cu) {
+PRIVATE NONNULL((1, 2, 3, 4, 5)) ssize_t
+NOTHROW(KCALL ctype_printstruct_callback)(void *cookie,
+                                          di_debuginfo_member_t const *__restrict member,
+                                          di_debuginfo_cu_parser_t const *__restrict parser,
+                                          struct cmodule *__restrict mod,
+                                          struct cmodunit *__restrict cu) {
 	ssize_t temp, result = 0;
 	struct ctype_printstruct_data *arg;
 	struct ctyperef member_type;

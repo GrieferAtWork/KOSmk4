@@ -160,17 +160,13 @@
 #endif /* !X64 */
 #define __NO_ATTR_SYSVABI
 #define __ATTR_SYSVABI /* Nothing */
-#define __ATTR_PURE    __declspec(noalias)
-#define __ATTR_PURE_P  __declspec(noalias) /* XXX: Is this ok? */
-#define __ATTR_CONST   __declspec(noalias)
-#define __ATTR_CONST_P __declspec(noalias) /* XXX: Is this ok? */
+#define __ATTR_PURE  __declspec(noalias)
+#define __ATTR_CONST __declspec(noalias)
 #define __NO_ATTR_LEAF
 #define __ATTR_LEAF /* Nothing */
-#define __NO_ATTR_LEAF_P
-#define __ATTR_LEAF_P /* Nothing */
 #define __NO_ATTR_FLATTEN
 #define __ATTR_FLATTEN /* Nothing */
-#define __ATTR_MALLOC  __declspec(restrict)
+#define __ATTR_MALLOC __declspec(restrict)
 #define __NO_ATTR_HOT
 #define __ATTR_HOT /* Nothing */
 #define __NO_ATTR_COLD
@@ -460,6 +456,8 @@ extern void (__cdecl _ReadWriteBarrier)(void);
 #define __wchar_t_defined
 #endif /* _WCHAR_T_DEFINED */
 
+#define __NO_register_var
+#define __register_var(T, name, regname) register T name
 
 /* Define varargs macros expected by system headers. */
 #ifdef _M_CEE_PURE

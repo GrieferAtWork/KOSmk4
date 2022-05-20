@@ -1258,6 +1258,7 @@
 #define __CRT_HAVE___ttyname
 #define __CRT_HAVE___twalk
 #define __CRT_HAVE___tzname
+#define __CRT_HAVE___ubsan_handle_builtin_unreachable
 #define __CRT_HAVE___uflow
 #define __CRT_HAVE___ulckpwdf
 #define __CRT_HAVE___umask

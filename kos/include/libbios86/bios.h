@@ -99,15 +99,15 @@ struct bios86 {
  * @return:  0: Success.
  * @return: -1: Failed to initialize (s.a. `errno'). */
 #ifdef __KERNEL__
-typedef __ATTR_NONNULL((1)) void
+typedef __ATTR_NONNULL_T((1)) void
 (LIBBIOS86_CC *PBIOS86_INIT)(struct bios86 *__restrict self);
 #ifdef LIBBIOS86_WANT_PROTOTYPES
 LIBBIOS86_DECL __ATTR_NONNULL((1)) void
 (LIBBIOS86_CC bios86_init)(struct bios86 *__restrict self);
 #endif /* LIBBIOS86_WANT_PROTOTYPES */
 #else /* __KERNEL__ */
-typedef __ATTR_WUNUSED int __ATTR_NONNULL((1))
-/*__NOTHROW*/ (LIBBIOS86_CC *PBIOS86_INIT)(struct bios86 *__restrict self);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) int
+__NOTHROW_T(LIBBIOS86_CC *PBIOS86_INIT)(struct bios86 *__restrict self);
 #ifdef LIBBIOS86_WANT_PROTOTYPES
 LIBBIOS86_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW(LIBBIOS86_CC bios86_init)(struct bios86 *__restrict self);
@@ -117,7 +117,7 @@ __NOTHROW(LIBBIOS86_CC bios86_init)(struct bios86 *__restrict self);
 /* >> bios86_fini(3)
  * Finalize the BIOS buffer interface. */
 typedef __NOBLOCK __ATTR_NONNULL((1)) void
-/*__NOTHROW*/ (LIBBIOS86_CC *PBIOS86_FINI)(struct bios86 *__restrict self);
+__NOTHROW_T(LIBBIOS86_CC *PBIOS86_FINI)(struct bios86 *__restrict self);
 #ifdef LIBBIOS86_WANT_PROTOTYPES
 LIBBIOS86_DECL __NOBLOCK __ATTR_NONNULL((1)) void
 __NOTHROW(LIBBIOS86_CC bios86_fini)(struct bios86 *__restrict self);
@@ -143,15 +143,15 @@ struct bios86_emulator {
  * @return:  0: Success.
  * @return: -1: Failed to initialize (s.a. `errno'). */
 #ifdef __KERNEL__
-typedef __ATTR_NONNULL((1)) void
+typedef __ATTR_NONNULL_T((1)) void
 (LIBBIOS86_CC *PBIOS86_EMULATOR_INIT)(struct bios86_emulator *__restrict self);
 #ifdef LIBBIOS86_WANT_PROTOTYPES
 LIBBIOS86_DECL __ATTR_NONNULL((1)) void
 (LIBBIOS86_CC bios86_emulator_init)(struct bios86_emulator *__restrict self);
 #endif /* LIBBIOS86_WANT_PROTOTYPES */
 #else /* __KERNEL__ */
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) int
-/*__NOTHROW*/ (LIBBIOS86_CC *PBIOS86_EMULATOR_INIT)(struct bios86_emulator *__restrict self);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) int
+__NOTHROW_T(LIBBIOS86_CC *PBIOS86_EMULATOR_INIT)(struct bios86_emulator *__restrict self);
 #ifdef LIBBIOS86_WANT_PROTOTYPES
 LIBBIOS86_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW(LIBBIOS86_CC bios86_emulator_init)(struct bios86_emulator *__restrict self);
@@ -161,7 +161,7 @@ __NOTHROW(LIBBIOS86_CC bios86_emulator_init)(struct bios86_emulator *__restrict 
 /* >> bios86_emulator_fini(3)
  * Finalize the BIOS buffer interface. */
 typedef __NOBLOCK __ATTR_NONNULL((1)) void
-/*__NOTHROW*/ (LIBBIOS86_CC *PBIOS86_EMULATOR_FINI)(struct bios86_emulator *__restrict self);
+__NOTHROW_T(LIBBIOS86_CC *PBIOS86_EMULATOR_FINI)(struct bios86_emulator *__restrict self);
 #ifdef LIBBIOS86_WANT_PROTOTYPES
 LIBBIOS86_DECL __NOBLOCK __ATTR_NONNULL((1)) void
 __NOTHROW(LIBBIOS86_CC bios86_emulator_fini)(struct bios86_emulator *__restrict self);
@@ -175,7 +175,7 @@ __NOTHROW(LIBBIOS86_CC bios86_emulator_fini)(struct bios86_emulator *__restrict 
  *
  * @return: true:  Success.
  * @return: false: Interrupt failed (illegal instruction / bad I/O, etc...) */
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __BOOL
 (LIBBIOS86_CC *PBIOS86_EMULATOR_INT)(struct bios86_emulator *__restrict self,
                                      __uint8_t intno);
 #ifdef LIBBIOS86_WANT_PROTOTYPES
@@ -218,13 +218,13 @@ struct bios86_emulator_for_debugger
 
 
 typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) int
-/*__NOTHROW*/ (LIBBIOS86_CC *PBIOS86_INIT_FOR_DEBUGGER)(struct bios86_for_debugger *__restrict self);
+__NOTHROW_T(LIBBIOS86_CC *PBIOS86_INIT_FOR_DEBUGGER)(struct bios86_for_debugger *__restrict self);
 typedef __NOBLOCK __ATTR_NONNULL((1)) void
-/*__NOTHROW*/ (LIBBIOS86_CC *PBIOS86_FINI_FOR_DEBUGGER)(struct bios86_for_debugger *__restrict self);
+__NOTHROW_T(LIBBIOS86_CC *PBIOS86_FINI_FOR_DEBUGGER)(struct bios86_for_debugger *__restrict self);
 typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) int
-/*__NOTHROW*/ (LIBBIOS86_CC *PBIOS86_EMULATOR_INIT_FOR_DEBUGGER)(struct bios86_emulator_for_debugger *__restrict self);
+__NOTHROW_T(LIBBIOS86_CC *PBIOS86_EMULATOR_INIT_FOR_DEBUGGER)(struct bios86_emulator_for_debugger *__restrict self);
 typedef __NOBLOCK __ATTR_NONNULL((1)) void
-/*__NOTHROW*/ (LIBBIOS86_CC *PBIOS86_EMULATOR_FINI_FOR_DEBUGGER)(struct bios86_emulator_for_debugger *__restrict self);
+__NOTHROW_T(LIBBIOS86_CC *PBIOS86_EMULATOR_FINI_FOR_DEBUGGER)(struct bios86_emulator_for_debugger *__restrict self);
 #ifdef LIBBIOS86_WANT_PROTOTYPES
 LIBBIOS86_DECL __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW(LIBBIOS86_CC bios86_init_for_debugger)(struct bios86_for_debugger *__restrict self);

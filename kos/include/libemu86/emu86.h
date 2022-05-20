@@ -363,10 +363,10 @@ typedef __uint32_t emu86_opflags_t;
  *                  NOTE: The caller  should  have  previously  initialized  flags
  *                        through use of `emu86_opflags_from_*()', or by explicity
  *                        setting `EMU86_F_BITMASK' */
-typedef __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3)) __byte_t *
-/*__NOTHROW_NCX*/ (LIBEMU86_CC *PEMU86_OPCODE_DECODE)(__byte_t const *__restrict pc,
-                                                      emu86_opcode_t *__restrict popcode,
-                                                      emu86_opflags_t *__restrict pflags);
+typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((1, 2, 3)) __byte_t *
+__NOTHROW_NCX_T(LIBEMU86_CC *PEMU86_OPCODE_DECODE)(__byte_t const *__restrict pc,
+                                                   emu86_opcode_t *__restrict popcode,
+                                                   emu86_opflags_t *__restrict pflags);
 #ifdef LIBEMU86_WANT_PROTOTYPES
 LIBEMU86_DECL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3)) __byte_t *
 __NOTHROW_NCX(LIBEMU86_CC emu86_opcode_decode)(__byte_t const *__restrict pc,
@@ -394,10 +394,10 @@ struct emu86_modrm {
 /* Decode a MODRM suffix from `pc' and return a pointer past the end of the suffix.
  * @param: result: Filled in with information regarding the MODRM value.
  * @param: flags:  Opcode flags. */
-typedef __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __byte_t *
-/*__NOTHROW_NCX*/ (LIBEMU86_CC *PEMU86_MODRM_DECODE)(__byte_t const *__restrict pc,
-                                                     struct emu86_modrm *__restrict result,
-                                                     emu86_opflags_t flags);
+typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((1, 2)) __byte_t *
+__NOTHROW_NCX_T(LIBEMU86_CC *PEMU86_MODRM_DECODE)(__byte_t const *__restrict pc,
+                                                  struct emu86_modrm *__restrict result,
+                                                  emu86_opflags_t flags);
 #ifdef LIBEMU86_WANT_PROTOTYPES
 LIBEMU86_DECL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __byte_t *
 __NOTHROW_NCX(LIBEMU86_CC emu86_modrm_decode)(__byte_t const *__restrict pc,

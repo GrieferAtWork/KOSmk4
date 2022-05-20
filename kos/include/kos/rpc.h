@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a4fa5f0 */
+/* HASH CRC-32:0x7232402 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,9 +119,9 @@ NOBLOCK_IF(__ctx->rc_context == RPC_REASONCTX_ASYNC_KERN ||
 NOTHROW_IF(__ctx->rc_context == RPC_REASONCTX_ASYNC_KERN) // You also ~shouldn't~ throw under `RPC_REASONCTX_SHUTDOWN'
 #endif // __KERNEL__
 */
-typedef __ATTR_NONNULL((1)) void
+typedef __ATTR_NONNULL_T((1)) void
 (PRPC_EXEC_CALLBACK_CC *prpc_exec_callback_t)(struct rpc_context *__restrict __ctx, void *__cookie)
-		__TYPEDEF_THROWS(...);
+		__THROWS(...);
 #endif /* !__prpc_exec_callback_t_defined */
 
 /* >> rpc_schedule(2)

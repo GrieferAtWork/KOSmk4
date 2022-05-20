@@ -249,7 +249,7 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
  *       which may not necessarily use the  given, or default `codec' and  `palette'
  * @param: codec:   The preferred video codec, or NULL to use `video_preferred_format()'.
  * @param: palette: The palette to use (only needed if used by `codec') */
-typedef __ATTR_WUNUSED __REF struct video_buffer *
+typedef __ATTR_WUNUSED_T __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CREATE)(unsigned int __type, __size_t __size_x, __size_t __size_y,
                                         struct video_codec const *__codec, struct video_palette *__palette);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
@@ -260,7 +260,7 @@ video_buffer_create(unsigned int __type, __size_t __size_x, __size_t __size_y,
 
 /* Returns a video buffer for the entire screen (or return NULL and set errno on error)
  * Note that  screen buffer  access  is only  granted to  ROOT  and the  window  server */
-typedef __ATTR_WUNUSED __REF struct video_buffer *(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_SCREEN)(void);
+typedef __ATTR_WUNUSED_T __REF struct video_buffer *(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_SCREEN)(void);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC video_buffer_screen(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
@@ -269,14 +269,14 @@ LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC vide
  * If  possible, this format will match the format used by the host's graphics card.
  * If no graphics card exists, or the card isn't clear on its preferred format, some
  * other, common format will be returned instead. */
-typedef __ATTR_WUNUSED __ATTR_RETNONNULL struct video_format const *(LIBVIDEO_GFX_CC *PVIDEO_PREFERRED_FORMAT)(void);
+typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct video_format const *(LIBVIDEO_GFX_CC *PVIDEO_PREFERRED_FORMAT)(void);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_RETNONNULL struct video_format const *LIBVIDEO_GFX_CC video_preferred_format(void);
+LIBVIDEO_GFX_DECL __ATTR_RETNONNULL __ATTR_WUNUSED struct video_format const *LIBVIDEO_GFX_CC video_preferred_format(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Return a handle for the video device driver that is being used.
  * @return: -1:errno=ENODEV: No video driver found */
-typedef __ATTR_WUNUSED __fd_t (LIBVIDEO_GFX_CC *PVIDEO_DRIVER)(void);
+typedef __ATTR_WUNUSED_T __fd_t (LIBVIDEO_GFX_CC *PVIDEO_DRIVER)(void);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __fd_t LIBVIDEO_GFX_CC video_driver(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */

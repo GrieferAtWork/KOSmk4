@@ -52,7 +52,7 @@ struct terminal;
 /* Print the given `src' data
  * @return: >= 0: The number of printed bytes (equal to `num_bytes', unless `IO_NONBLOCK', or EOF was reached)
  * @return: < 0:  An error status that should be propagated immediately. */
-typedef __ATTR_NONNULL((1, 2)) __ssize_t
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t
 (LIBTERM_CC *pterminal_oprinter_t)(struct terminal *__restrict term,
                                    void const *__restrict src,
                                    __size_t num_bytes, iomode_t mode);
@@ -62,7 +62,7 @@ typedef __ATTR_NONNULL((1, 2)) __ssize_t
  * A negative return value of this function is propagated immediately.
  * s.a. `_task_raisesignoprocessgroup()'
  * @return: < 0:  An error status that should be propagated immediately. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBTERM_CC *pterminal_raise_t)(struct terminal *__restrict self,
                                 __signo_t signo);
 
@@ -73,7 +73,7 @@ typedef __ATTR_NONNULL((1)) __ssize_t
  * implementation  of  this   function  may  also   choose  to  do   something
  * completely different. (or just be a no-op; >I'm just a sign, not a cop...<)
  * @return: < 0:  An error status that should be propagated immediately. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBTERM_CC *pterminal_check_sigttou_t)(struct terminal *__restrict self);
 
 struct terminal {
@@ -132,18 +132,18 @@ __NOTHROW_NCX(LIBTERM_CC terminal_init)(struct terminal *__restrict self,
  *                   that can't be added to the input queue)
  * @return: < 0:   A format-printer returned a negative value
  * @return: -1:   [USERSPACE] Printing to one of the linebuffers failed (s.a. `linebuffer_write()'; `errno') */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBTERM_CC *PTERMINAL_OWRITE)(struct terminal *__restrict self,
                                __USER __CHECKED void const *src,
                                __size_t num_bytes, iomode_t mode)
-/*		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
-		                __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...))*/;
-typedef __ATTR_NONNULL((1)) __ssize_t
+		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
+		                __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBTERM_CC *PTERMINAL_IWRITE)(struct terminal *__restrict self,
                                __USER __CHECKED void const *src,
                                __size_t num_bytes, iomode_t mode)
-/*		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
-		                __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...))*/;
+		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, E_BADALLOC, ...),
+		                __THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT, ...));
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __ATTR_NONNULL((1)) __ssize_t LIBTERM_CC
 terminal_owrite(struct terminal *__restrict self,
@@ -164,11 +164,11 @@ terminal_iwrite(struct terminal *__restrict self,
  * @param: mode: Set of `0|IO_NONBLOCK'
  * @return: * :  The number of bytes read
  * @return: <0:  [USERSPACE] An error occurred (s.a. `errno') */
-typedef __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __ATTR_NONNULL_T((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBTERM_CC *PTERMINAL_IREAD)(struct terminal *__restrict self,
                               __USER __CHECKED void *dst,
                               __size_t num_bytes, iomode_t mode)
-		/*__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT)*/;
+		__THROWS(E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBTERM_CC
 terminal_iread(struct terminal *__restrict self,
@@ -181,12 +181,12 @@ terminal_iread(struct terminal *__restrict self,
  * @param: old_tio: When non-NULL, store the old terminal I/O settings here.
  * @return: < 0: [USERSPACE]   A printer callback returned negative, or an error occurred (s.a. `errno')
  * @return: < 0: [KERNELSPACE] A printer callback returned negative */
-typedef __ATTR_NONNULL((1, 2)) __ssize_t
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t
 (LIBTERM_CC *PTERMINAL_SETIOS)(struct terminal *__restrict self,
                                struct termios const *__restrict tio,
                                struct termios *old_tio)
-/*		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
-		                __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...))*/;
+		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
+		                __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...));
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBTERM_CC
 terminal_setios(struct terminal *__restrict self,
@@ -200,10 +200,10 @@ terminal_setios(struct terminal *__restrict self,
  * thus allowing the data to be read by a future call to `terminal_iread()'
  * @return: * : The number of flushed characters.
  * @return: <0: [USERSPACE] An error occurred (s.a. `errno') */
-typedef __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __ATTR_NONNULL_T((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBTERM_CC *PTERMINAL_FLUSH_ICANON)(struct terminal *__restrict self, iomode_t mode)
-/*		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
-		                __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...))*/;
+		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
+		                __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...));
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBTERM_CC
 terminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)

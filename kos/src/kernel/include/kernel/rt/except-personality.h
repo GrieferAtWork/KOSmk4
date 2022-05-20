@@ -54,9 +54,9 @@ struct kcpustate;
  *     that  caused/propagated  an  exception (aka.  the  return address)
  * @param: fde: The FDE pointing to @this personality function.
  * @return: * : One of `DWARF_PERSO_*' */
-typedef ABNORMAL_RETURN NONNULL((1, 2)) unsigned int
-/*NOTHROW*/ (EXCEPT_PERSONALITY_CC *except_personality_t)(struct unwind_fde_struct *__restrict fde,
-                                                          struct kcpustate *__restrict state);
+typedef ABNORMAL_RETURN NONNULL_T((1, 2)) unsigned int
+NOTHROW_T(EXCEPT_PERSONALITY_CC *except_personality_t)(struct unwind_fde_struct *__restrict fde,
+                                                       struct kcpustate *__restrict state);
 
 DECL_END
 #endif /* __CC__ */

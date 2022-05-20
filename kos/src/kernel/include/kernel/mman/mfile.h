@@ -161,7 +161,7 @@ struct mfile_stream_ops {
 	 * >> hand->h_data = incref(self);
 	 * NOTE: `h_data' is reference on entry (when modified, you must
 	 *       `decref_nokill(self)'  and  assign   `incref(new_obj)') */
-	BLOCKING NONNULL((1, 2)) void
+	BLOCKING NONNULL_T((1, 2)) void
 	(KCALL *mso_open)(struct mfile *__restrict self,
 	                  /*in|out*/ REF struct handle *__restrict hand,
 	                  struct path *access_path,
@@ -172,10 +172,10 @@ struct mfile_stream_ops {
 	 * Note that for consistency, anything that implements these operators should
 	 * either document that read(2) returns different data than pread(2)/mmap(2),
 	 * or disallow use of the later with `mf_filesize = 0, MFILE_F_FIXEDFILESIZE' */
-	BLOCKING WUNUSED NONNULL((1)) size_t
+	BLOCKING WUNUSED_T NONNULL_T((1)) size_t
 	(KCALL *mso_read)(struct mfile *__restrict self, USER CHECKED void *dst,
 	                  size_t num_bytes, iomode_t mode) THROWS(...);
-	BLOCKING WUNUSED NONNULL((1, 2)) size_t
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) size_t
 	(KCALL *mso_readv)(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
 	                   size_t num_bytes, iomode_t mode) THROWS(...);
 
@@ -183,10 +183,10 @@ struct mfile_stream_ops {
 	 * Note that for consistency, anything  that implements these operators  should
 	 * either document that write(2) affects different data than pwrite(2)/mmap(2),
 	 * or disallow use of the later with `mf_filesize = 0, MFILE_F_FIXEDFILESIZE' */
-	BLOCKING WUNUSED NONNULL((1)) size_t
+	BLOCKING WUNUSED_T NONNULL_T((1)) size_t
 	(KCALL *mso_write)(struct mfile *__restrict self, USER CHECKED void const *src,
 	                   size_t num_bytes, iomode_t mode) THROWS(...);
-	BLOCKING WUNUSED NONNULL((1, 2)) size_t
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) size_t
 	(KCALL *mso_writev)(struct mfile *__restrict self, struct iov_buffer *__restrict src,
 	                    size_t num_bytes, iomode_t mode) THROWS(...);
 
@@ -194,21 +194,21 @@ struct mfile_stream_ops {
 	/* [0..1] Hooks for `pread(2)' and `pwrite(2)'.
 	 * The pread/pwrite callbacks are only called by handle_pread() and handle_pwrite(),
 	 * and  if  not given,  will default  to  using `mfile_read()'  and `mfile_write()'. */
-	BLOCKING WUNUSED NONNULL((1)) size_t
+	BLOCKING WUNUSED_T NONNULL_T((1)) size_t
 	(KCALL *mso_pread)(struct mfile *__restrict self, USER CHECKED void *dst,
 	                   size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-	BLOCKING WUNUSED NONNULL((1, 2)) size_t
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) size_t
 	(KCALL *mso_preadv)(struct mfile *__restrict self, struct iov_buffer *__restrict dst,
 	                    size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-	BLOCKING WUNUSED NONNULL((1)) size_t
+	BLOCKING WUNUSED_T NONNULL_T((1)) size_t
 	(KCALL *mso_pwrite)(struct mfile *__restrict self, USER CHECKED void const *src,
 	                    size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-	BLOCKING WUNUSED NONNULL((1, 2)) size_t
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) size_t
 	(KCALL *mso_pwritev)(struct mfile *__restrict self, struct iov_buffer *__restrict src,
 	                     size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 
 	/* [0..1] Hook for `lseek(2)': stream-oriented file seeking. */
-	BLOCKING NONNULL((1)) pos_t
+	BLOCKING NONNULL_T((1)) pos_t
 	(KCALL *mso_seek)(struct mfile *__restrict self, off_t offset,
 	                  unsigned int whence) THROWS(...);
 
@@ -219,7 +219,7 @@ struct mfile_stream_ops {
 	 * and that `handle_mfile_truncate()' will not call  the later if this one  was
 	 * called first, meaning that this callback itself must call `mfile_truncate()'
 	 * when conventional file-truncation behavior is wanted. */
-	BLOCKING NONNULL((1)) void
+	BLOCKING NONNULL_T((1)) void
 	(KCALL *mso_truncate)(struct mfile *__restrict self, pos_t new_size)
 			THROWS(...);
 
@@ -231,7 +231,7 @@ struct mfile_stream_ops {
 	 * file as anonymous from the get-go, and possibly also set `mf_filesize = 0',
 	 * as  well as the  `MFILE_F_FIXEDFILESIZE' flag to  prevent anyone from using
 	 * your file's normal mem-file interface. */
-	BLOCKING NONNULL((1, 2)) void
+	BLOCKING NONNULL_T((1, 2)) void
 	(KCALL *mso_mmap)(struct mfile *__restrict self,
 	                  struct handle_mmap_info *__restrict info)
 			THROWS(...);
@@ -242,7 +242,7 @@ struct mfile_stream_ops {
 	 * used to pre-allocate  mem-parts, as well  as initialize their  backing
 	 * memory.
 	 * @return: * : The amount of newly allocated bytes. */
-	BLOCKING NONNULL((1)) pos_t
+	BLOCKING NONNULL_T((1)) pos_t
 	(KCALL *mso_allocate)(struct mfile *__restrict self,
 	                      fallocate_mode_t mode,
 	                      pos_t start, pos_t length)
@@ -269,14 +269,14 @@ struct mfile_stream_ops {
 	 *   - st_uid
 	 *   - st_gid
 	 *   - st_rdev */
-	BLOCKING NONNULL((1)) void
+	BLOCKING NONNULL_T((1)) void
 	(KCALL *mso_stat)(struct mfile *__restrict self,
 	                  USER CHECKED struct stat *result)
 			THROWS(...);
 
 	/* [0..1] Implementation for poll(2): Connect to signals.
 	 * When not implemented, `handle_pollconnect()' simply behaves as a no-op */
-	BLOCKING NONNULL((1)) void
+	BLOCKING NONNULL_T((1)) void
 	(KCALL *mso_pollconnect)(struct mfile *__restrict self,
 	                         poll_mode_t what)
 			THROWS(...);
@@ -286,7 +286,7 @@ struct mfile_stream_ops {
 	 *  - readable: when `MFILE_F_NOUSRIO' isn't set, or `mso_read' or `mso_readv' are defined
 	 *  - writable: when `MFILE_F_NOUSRIO' isn't set, or `mso_write' or `mso_writev' are defined
 	 */
-	BLOCKING WUNUSED NONNULL((1)) poll_mode_t
+	BLOCKING WUNUSED_T NONNULL_T((1)) poll_mode_t
 	(KCALL *mso_polltest)(struct mfile *__restrict self,
 	                      poll_mode_t what)
 			THROWS(...);
@@ -295,7 +295,7 @@ struct mfile_stream_ops {
 	 * Note that no standard ioctl commands are defined for mem-files, meaning that
 	 * this callback has completely unfiltered control over the `ioctl(2)' syscall.
 	 * When `NULL', same as `mfile_v_ioctl'. */
-	BLOCKING NONNULL((1)) syscall_slong_t
+	BLOCKING NONNULL_T((1)) syscall_slong_t
 	(KCALL *mso_ioctl)(struct mfile *__restrict self, ioctl_t cmd,
 	                   USER UNCHECKED void *arg, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...);
@@ -306,17 +306,17 @@ struct mfile_stream_ops {
 	 * never given as `HANDLE_TYPE_MFILE'.
 	 * @param: wanted_type: The requested handle type.
 	 * @return: NULL:       Cannot cast to `wanted_type'. */
-	BLOCKING WUNUSED NONNULL((1)) REF void *
+	BLOCKING WUNUSED_T NONNULL_T((1)) REF void *
 	(KCALL *mso_tryas)(struct mfile *__restrict self, uintptr_half_t wanted_type)
 			THROWS(...);
 
 	/* [0..1] Print the text which should appear under `readlink("/proc/[pid]/fd/[fdno]")' */
-	BLOCKING WUNUSED NONNULL((1, 2)) ssize_t
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) ssize_t
 	(KCALL *mso_printlink)(struct mfile *__restrict self, __pformatprinter printer, void *arg)
 			THROWS(E_WOULDBLOCK, ...);
 
 	/* [0..1] Additional callback that should be invoked during `fsync()' / `fdatasync()' */
-	BLOCKING NONNULL((1)) void
+	BLOCKING NONNULL_T((1)) void
 	(KCALL *mso_sync)(struct mfile *__restrict self)
 			THROWS(E_WOULDBLOCK, E_IOERROR, ...);
 
@@ -330,9 +330,9 @@ struct mfile_stream_ops {
 	 * >> }
 	 * >> ...
 	 * >> mylock_release(self); */
-	NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
-	/*NOTHROW*/ (KCALL *mso_cc)(struct mfile *__restrict self,
-	                            struct ccinfo *__restrict info);
+	NOBLOCK_IF(ccinfo_noblock(info)) NONNULL_T((1)) void
+	NOTHROW_T(KCALL *mso_cc)(struct mfile *__restrict self,
+	                         struct ccinfo *__restrict info);
 
 #ifdef CONFIG_HAVE_FS_NOTIFY
 	/* [0..1] Operator pair used for creating/destroying additional cookie objects
@@ -359,10 +359,10 @@ struct mfile_stream_ops {
 	 * @return: * : Cookie object to store alongside the `struct inotify_controller'.
 	 *              Whatever  is returned here (even if it's NULL) will eventually be
 	 *              passed to `mso_notify_detach' when the notify is detached. */
-	BLOCKING NONNULL((1)) void *
+	BLOCKING NONNULL_T((1)) void *
 	(KCALL *mso_notify_attach)(struct mfile *__restrict self) THROWS(E_BADALLOC, ...);
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (KCALL *mso_notify_detach)(struct mfile *__restrict self, void *cookie);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(KCALL *mso_notify_detach)(struct mfile *__restrict self, void *cookie);
 #endif /* CONFIG_HAVE_FS_NOTIFY */
 
 };
@@ -479,7 +479,7 @@ struct mfile_ops {
 	 * this operator is now supposed to finalize any sub-class fields,
 	 * as well as kfree(self). */
 	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (KCALL *mo_destroy)(struct mfile *__restrict self);
+	NOTHROW_T(KCALL *mo_destroy)(struct mfile *__restrict self);
 
 	/* [0..1] Construct a new given mem-part. When not implemented, use the default
 	 *        mechanism for the creation of new mem-parts.
@@ -568,8 +568,8 @@ struct mfile_ops {
 	 *                   Contains at least one of `MFILE_F_CHANGED | MFILE_F_ATTRCHANGED'
 	 *                   that wasn't already contained in `oldflags' */
 	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (KCALL *mo_changed)(struct mfile *__restrict self,
-	                                uintptr_t oldflags, uintptr_t newflags);
+	NOTHROW_T(KCALL *mo_changed)(struct mfile *__restrict self,
+	                             uintptr_t oldflags, uintptr_t newflags);
 
 	/* [0..1] Stream operators. */
 	struct mfile_stream_ops const *mo_stream;

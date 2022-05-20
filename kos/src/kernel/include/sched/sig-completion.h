@@ -40,9 +40,9 @@ struct sig_completion_context;
  * NOTE: `context->scc_post' is unused  and its value  is undefined when  this
  *       callback is invoked. However, `scc_sender' and `scc_caller' are still
  *       valid when this function is invoked. */
-typedef NOBLOCK NONNULL((1)) void
-/*NOTHROW*/ (FCALL *sig_postcompletion_t)(struct sig_completion_context *__restrict context,
-                                          void *buf);
+typedef NOBLOCK NONNULL_T((1)) void
+NOTHROW_T(FCALL *sig_postcompletion_t)(struct sig_completion_context *__restrict context,
+                                       void *buf);
 
 struct sig_completion_context {
 	struct sig          *scc_sender; /* [1..1][const] The sender-signal (which may differ from `self->tc_sig'
@@ -93,10 +93,10 @@ struct sig_completion_context {
  *                      invoked once all SMP-locks have  been released). Warning: Try to  keep
  *                      the required buffer size as small as possible. - The associated buffer
  *                      needs to be allocated on-stack, and that space might be very  limited. */
-typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-/*NOTHROW*/ (FCALL *sig_completion_t)(struct sig_completion *__restrict self,
-                                      struct sig_completion_context *__restrict context,
-                                      void *buf, size_t bufsize);
+typedef NOBLOCK NOPREEMPT NONNULL_T((1, 2)) size_t
+NOTHROW_T(FCALL *sig_completion_t)(struct sig_completion *__restrict self,
+                                   struct sig_completion_context *__restrict context,
+                                   void *buf, size_t bufsize);
 
 /* Re-prime  the completion callback to be invoked once again the next time that the
  * attached signal is delivered. This function is a no-op if the caller's completion

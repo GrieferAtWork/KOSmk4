@@ -321,8 +321,8 @@ __DEFINE_NONATOMIC_REFCNT_FUNCTIONS(struct cmodule, cm_refcnt, cmodule_destroy)
 
 /* Callback for `cmodule_enum()'
  * @return: * : pformatprinter-compatible return value. */
-typedef NONNULL((2)) ssize_t
-/*NOTHROW*/ (FCALL *cmodule_enum_callback_t)(void *cookie, struct cmodule *__restrict mod);
+typedef NONNULL_T((2)) ssize_t
+NOTHROW_T(FCALL *cmodule_enum_callback_t)(void *cookie, struct cmodule *__restrict mod);
 
 /* Enumerate all CModules that are currently visible in the following order:
  * >> void const *pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
@@ -584,9 +584,9 @@ NOTHROW(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
  *                      loaded, or if this info  (should it be needed) must  be
  *                      loaded manually via a call to `cmod_symenum_loadinfo()'
  * @return: * :         pformatprinter-compatible return value. */
-typedef NONNULL((1)) ssize_t
-/*NOTHROW*/ (FCALL *cmod_symenum_callback_t)(struct cmodsyminfo *__restrict info,
-                                             __BOOL info_loaded);
+typedef NONNULL_T((1)) ssize_t
+NOTHROW_T(FCALL *cmod_symenum_callback_t)(struct cmodsyminfo *__restrict info,
+                                          __BOOL info_loaded);
 
 /* To-be called from inside of `cmod_symenum_callback_t' when
  * `info_loaded == false', and extended symbol information is

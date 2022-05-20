@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_CORE_FILESYS_DEVFS_DEFS_C
 #define GUARD_KERNEL_CORE_FILESYS_DEVFS_DEFS_C 1
 #define __WANT_FS_INIT
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -222,8 +223,8 @@ PUBLIC struct ramfs_super devfs = {
 		.fs_mountslockops = SLIST_HEAD_INITIALIZER(devfs.rs_sup.fs_mountslockops),
 		.fs_sys           = &devfs_filesys,
 		.fs_dev           = NULL,
-		.fs_loadblocks    = (void (KCALL *)(struct mfile *__restrict, pos_t, physaddr_t, size_t, struct aio_multihandle *__restrict))(void *)(uintptr_t)-1,
-		.fs_saveblocks    = (void (KCALL *)(struct mfile *__restrict, pos_t, physaddr_t, size_t, struct aio_multihandle *__restrict))(void *)(uintptr_t)-1,
+		.fs_loadblocks    = (typeoffield(struct fsuper, fs_loadblocks))(void *)-1,
+		.fs_saveblocks    = (typeoffield(struct fsuper, fs_saveblocks))(void *)-1,
 		.fs_feat = {
 			.sf_filesize_max       = (pos_t)-1,
 			.sf_uid_max            = (uid_t)-1,

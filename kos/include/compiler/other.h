@@ -169,16 +169,10 @@
 #define __ATTR_SYSVABI /* Nothing */
 #define __NO_ATTR_PURE
 #define __ATTR_PURE /* Nothing */
-#define __NO_ATTR_PURE_P
-#define __ATTR_PURE_P /* Nothing */
 #define __NO_ATTR_CONST
 #define __ATTR_CONST /* Nothing */
-#define __NO_ATTR_CONST_P
-#define __ATTR_CONST_P /* Nothing */
 #define __NO_ATTR_LEAF
 #define __ATTR_LEAF /* Nothing */
-#define __NO_ATTR_LEAF_P
-#define __ATTR_LEAF_P /* Nothing */
 #define __NO_ATTR_FLATTEN
 #define __ATTR_FLATTEN /* Nothing */
 #define __NO_ATTR_MALLOC
@@ -288,6 +282,8 @@
 #define __NO_builtin_FUNCTION
 #define __builtin_FUNCTION() ""
 #define __FUNCTION__ ""
+#define __NO_register_var
+#define __register_var(T, name, regname) /* nothing */
 
 
 

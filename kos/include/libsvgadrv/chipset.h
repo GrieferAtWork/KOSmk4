@@ -85,7 +85,7 @@ struct svga_chipset;
  * @param: name:  Spec string name.
  * @param: value: Spec string value.
  * @return: * :   pformatprinter-compatible return value. */
-typedef __ATTR_NONNULL((2, 3)) __ssize_t
+typedef __ATTR_NONNULL_T((2, 3)) __ssize_t
 (LIBSVGADRV_CC *svga_chipset_enumstring_t)(void *arg,
                                            char const *__restrict name,
                                            char const *__restrict value);
@@ -95,7 +95,7 @@ struct svga_chipset_ops {
 
 	/* [1..1][const] Chipset-specific finalization. */
 	__NOBLOCK __ATTR_NONNULL((1)) void
-	/*NOTHROW*/ (LIBSVGADRV_CC *sco_fini)(struct svga_chipset *__restrict self);
+	__NOTHROW_T(LIBSVGADRV_CC *sco_fini)(struct svga_chipset *__restrict self);
 
 	/* [const][== sizeof(struct MYCHIPSET_svga_modeinfo)] */
 	__size_t sco_modeinfosize;
@@ -259,8 +259,8 @@ struct svga_chipset_driver {
  * As such, when probing for devices you should simply iterate this list until you
  * find a driver  for which probing  succeeds. Once that  happens, simply keep  on
  * using that driver. */
-typedef __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED struct svga_chipset_driver const *
-/*__NOTHROW*/ (LIBSVGADRV_CC *PSVGA_CHIPSET_GETDRIVERS)(void);
+typedef __ATTR_PURE_T __ATTR_RETNONNULL __ATTR_WUNUSED struct svga_chipset_driver const *
+__NOTHROW_T(LIBSVGADRV_CC *PSVGA_CHIPSET_GETDRIVERS)(void);
 #ifdef LIBSVGADRV_WANT_PROTOTYPES
 LIBSVGADRV_DECL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED struct svga_chipset_driver const *
 __NOTHROW(LIBSVGADRV_CC svga_chipset_getdrivers)(void);

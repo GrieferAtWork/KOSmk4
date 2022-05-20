@@ -55,15 +55,15 @@ struct async_ops {
 
 	/* [0..1] Optional destroy-callback  (fini_oob_fields+free)
 	 * When not defined, simply `kfree(self)' as a replacement. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *ao_destroy)(struct async *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *ao_destroy)(struct async *__restrict self);
 
 	/* [1..1] Connect to signals that  are delivered when work  arrives.
 	 * This function should establish connections with `for_poll = true'
 	 * @return: * : Absolute point in time when `ao_time' should be invoked.
 	 *              You may return  `KTIME_INFINITE' to  indicate that  this
 	 *              async job will never time out. */
-	NONNULL((1)) ktime_t
+	NONNULL_T((1)) ktime_t
 	(FCALL *ao_connect)(struct async *__restrict self);
 
 	/* [1..1] Check if there is any work that needs to be done right  now.
@@ -72,7 +72,7 @@ struct async_ops {
 	 * async job is canceled.
 	 * @return: true:  Work is available.
 	 * @return: false: Nothing to do right now. */
-	WUNUSED NONNULL((1)) __BOOL
+	WUNUSED_T NONNULL_T((1)) __BOOL
 	(FCALL *ao_test)(struct async *__restrict self);
 
 	/* [1..1] Perform the actual work associated with the async job. This
@@ -88,7 +88,7 @@ struct async_ops {
 	 *            through calls to `ao_connect()' and `ao_test()'!
 	 *
 	 * @return: * : One of `ASYNC_RESUME', `ASYNC_FINISHED' or `ASYNC_CANCEL' */
-	WUNUSED NONNULL((1)) unsigned int
+	WUNUSED_T NONNULL_T((1)) unsigned int
 	(FCALL *ao_work)(struct async *__restrict self);
 
 	/* [0..1] Called when the timeout returned by `ao_connect()' has expired.
@@ -99,7 +99,7 @@ struct async_ops {
 	 * to  an  attached  AIO  handle,  or  dumped  to  the  system  log  before  the
 	 * async job is canceled.
 	 * @return: * : One of `ASYNC_RESUME', `ASYNC_FINISHED' or `ASYNC_CANCEL' */
-	WUNUSED NONNULL((1)) unsigned int
+	WUNUSED_T NONNULL_T((1)) unsigned int
 	(FCALL *ao_time)(struct async *__restrict self);
 
 	/* [0..1] Callback invoked (in the context of some async worker-thread)  every
@@ -113,20 +113,20 @@ struct async_ops {
 	 *        again at some point in the future.
 	 * NOTE:  This  callback is not invoked if `ASYNC_FINISHED' is returned by either
 	 *        `ao_work' or `ao_time'. But it is called if `ASYNC_CANCEL' is returned. */
-	NONNULL((1)) void
+	NONNULL_T((1)) void
 	(FCALL *ao_cancel)(struct async *__restrict self);
 
 	/* [0..1] Optional callback to facilitate the `ht_progress' operation of AIO handles.
 	 * @return: * :  One of `AIO_PROGRESS_STATUS_*' */
-	NOBLOCK NONNULL((1)) unsigned int
-	/*NOTHROW*/ (FCALL *ao_progress)(struct async *__restrict self,
-	                                 struct aio_handle_stat *__restrict stat);
+	NOBLOCK NONNULL_T((1)) unsigned int
+	NOTHROW_T(FCALL *ao_progress)(struct async *__restrict self,
+	                              struct aio_handle_stat *__restrict stat);
 
 	/* [0..1] Optional callback to facilitate the `ht_retsize' operation of AIO handles.
 	 * NOTE: This callback will only be called after the handle's callback has completed,
 	 *       and  the  async job  has  already been,  or  is currently  pending deletion. */
-	NOBLOCK NONNULL((1)) size_t
-	/*NOTHROW*/ (FCALL *ao_retsize)(struct async *__restrict self);
+	NOBLOCK NONNULL_T((1)) size_t
+	NOTHROW_T(FCALL *ao_retsize)(struct async *__restrict self);
 };
 
 /* Async work/time return values. */
@@ -369,19 +369,19 @@ struct async_worker_ops {
 	struct async_ops awo_async; /* Underlying async ops. */
 
 	/* [1..1] Connect callback (s.a. `struct async_ops::ao_connect') */
-	NONNULL((1)) ktime_t (FCALL *awo_connect)(void *__restrict self);
+	NONNULL_T((1)) ktime_t (FCALL *awo_connect)(void *__restrict self);
 
 	/* [1..1] Test callback (s.a. `struct async_ops::ao_test') */
-	WUNUSED NONNULL((1)) __BOOL (FCALL *awo_test)(void *__restrict self);
+	WUNUSED_T NONNULL_T((1)) __BOOL (FCALL *awo_test)(void *__restrict self);
 
 	/* [1..1] Work callback (s.a. `struct async_ops::ao_work') */
-	WUNUSED NONNULL((1)) unsigned int (FCALL *awo_work)(void *__restrict self);
+	WUNUSED_T NONNULL_T((1)) unsigned int (FCALL *awo_work)(void *__restrict self);
 
 	/* [0..1] Timeout callback (s.a. `struct async_ops::ao_time') */
-	WUNUSED NONNULL((1)) unsigned int (FCALL *awo_time)(void *__restrict self);
+	WUNUSED_T NONNULL_T((1)) unsigned int (FCALL *awo_time)(void *__restrict self);
 
 	/* [0..1] Cancel callback (s.a. `struct async_ops::ao_time') */
-	NONNULL((1)) void (FCALL *awo_cancel)(void *__restrict self);
+	NONNULL_T((1)) void (FCALL *awo_cancel)(void *__restrict self);
 };
 
 /* Static initializer for `struct async_worker_ops::awo_async' */

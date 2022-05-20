@@ -29,8 +29,8 @@ DECL_BEGIN
 
 struct task;
 
-typedef NOBLOCK NONNULL((2)) void
-/*NOTHROW*/ (FCALL *cpu_private_function_t)(void *buf, struct task *__restrict thread);
+typedef NOBLOCK NONNULL_T((2)) void
+NOTHROW_T(FCALL *cpu_private_function_t)(void *buf, struct task *__restrict thread);
 
 /* Call a given `func' in a context such that thread-private variables of `thread'
  * can be read, and following variable-specific restrictions, may potentially also

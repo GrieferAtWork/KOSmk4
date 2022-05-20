@@ -84,8 +84,8 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 		.fs_mountslockops = SLIST_HEAD_INITIALIZER(fsuper_unmounted.rs_sup.fs_mountslockops),
 		.fs_sys           = &ramfs_filesys,
 		.fs_dev           = NULL,
-		.fs_loadblocks    = (void (KCALL *)(struct mfile *__restrict, pos_t, physaddr_t, size_t, struct aio_multihandle *__restrict))(void *)(uintptr_t)-1,
-		.fs_saveblocks    = (void (KCALL *)(struct mfile *__restrict, pos_t, physaddr_t, size_t, struct aio_multihandle *__restrict))(void *)(uintptr_t)-1,
+		.fs_loadblocks    = (typeoffield(struct fsuper, fs_loadblocks))(void *)-1,
+		.fs_saveblocks    = (typeoffield(struct fsuper, fs_saveblocks))(void *)-1,
 		.fs_feat = {
 			.sf_filesize_max       = (pos_t)-1,
 			.sf_uid_max            = (uid_t)-1,
@@ -164,7 +164,7 @@ fdirent_empty_opennode(struct fdirent *__restrict UNUSED(self),
 
 
 PUBLIC_CONST struct fdirent_ops const fdirent_empty_ops = {
-	.fdo_destroy  = (void(KCALL *)(struct fdirent *__restrict))(void *)(uintptr_t)-1,
+	.fdo_destroy  = (typeoffield(struct fdirent_ops, fdo_destroy))(void *)-1,
 	.fdo_opennode = &fdirent_empty_opennode,
 };
 

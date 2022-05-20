@@ -114,7 +114,7 @@ typedef struct vm86_state_struct vm86_state_t;
  *       code away from the address space bottom, allowing real-mode code to be
  *       mapped anywhere in main memory.
  *       It would be ill advised if this function doesn't execute in O(1) */
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) void *
 (LIBVM86_TRANSLATE_CC *vm86_translate_t)(vm86_state_t *__restrict self, void *ptr);
 
 /* Handle operations on unrecognized I/O ports, where `action' is one of `VM86_HANDLE_IO_*'
@@ -122,7 +122,7 @@ typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
  * cause this callback to be invoked.
  * @return: VM86_SUCCESS: Success.
  * @return: VM86_BADPORT: Bad port. */
-typedef __ATTR_NONNULL((1, 4)) int
+typedef __ATTR_NONNULL_T((1, 4)) int
 (LIBVM86_CC *vm86_handle_io_t)(vm86_state_t *__restrict self, __uint16_t port,
                                unsigned int action, void *__restrict data);
 #define VM86_HANDLE_IO_INB  0 /* *(uint8_t *)data = inb(port); */
@@ -135,7 +135,7 @@ typedef __ATTR_NONNULL((1, 4)) int
 #define VM86_HANDLE_IO_ISOUT(x) (((x) & 4) != 0)
 
 /* Handle an interrupt by updating `self->vr_regs' to load the associated interrupt handler. */
-typedef __ATTR_NONNULL((1)) void
+typedef __ATTR_NONNULL_T((1)) void
 (LIBVM86_CC *vm86_handle_intr_t)(vm86_state_t *__restrict self, __uint8_t intno);
 #endif /* __CC__ */
 
@@ -183,7 +183,7 @@ struct vm86_state_struct {
  * @return: VM86_STOPPED:      The program counter was already placed at 0xffff:0xffff, or has jumped to that location.
  * @return: VM86_INTR_ENABLED: Interrupts should be enabled after the next call to `vm86_step()'
  * @return: * :                One of `VM86_*' */
-typedef __ATTR_NONNULL((1)) int
+typedef __ATTR_NONNULL_T((1)) int
 (LIBVM86_CC *PVM86_STEP)(vm86_state_t *__restrict self);
 #ifdef LIBVM86_WANT_PROTOTYPES
 LIBVM86_DECL __ATTR_NONNULL((1)) int LIBVM86_CC
@@ -191,7 +191,7 @@ vm86_step(vm86_state_t *__restrict self);
 #endif /* LIBVM86_WANT_PROTOTYPES */
 
 /* Execute VM86 emulator code until that code finishes execution. */
-typedef __ATTR_NONNULL((1)) int
+typedef __ATTR_NONNULL_T((1)) int
 (LIBVM86_CC *PVM86_EXEC)(vm86_state_t *__restrict self);
 #ifdef LIBVM86_WANT_PROTOTYPES
 LIBVM86_DECL __ATTR_NONNULL((1)) int LIBVM86_CC
@@ -202,7 +202,7 @@ vm86_exec(vm86_state_t *__restrict self);
  * @return: VM86_SUCCESS:      Success.
  * @return: VM86_DOUBLE_FAULT: Stack overflow.
  * @return: VM86_SEGFAULT:     Segmentation fault. */
-typedef __ATTR_NONNULL((1)) int (LIBVM86_CC *PVM86_INTR)(vm86_state_t *__restrict self, __uint8_t intno);
+typedef __ATTR_NONNULL_T((1)) int (LIBVM86_CC *PVM86_INTR)(vm86_state_t *__restrict self, __uint8_t intno);
 #ifdef LIBVM86_WANT_PROTOTYPES
 LIBVM86_DECL __ATTR_NONNULL((1)) int LIBVM86_CC vm86_intr(vm86_state_t *__restrict self, __uint8_t intno);
 #endif /* LIBVM86_WANT_PROTOTYPES */
@@ -210,12 +210,12 @@ LIBVM86_DECL __ATTR_NONNULL((1)) int LIBVM86_CC vm86_intr(vm86_state_t *__restri
 /* Read/Write values to/from an emulated IO port.
  * @return: VM86_SUCCESS: Success.
  * @return: VM86_BADPORT: Bad port. */
-typedef __ATTR_NONNULL((1, 3)) int (LIBVM86_CC *PVM86_INB)(vm86_state_t *__restrict self, __uint16_t port, __uint8_t *__restrict presult);
-typedef __ATTR_NONNULL((1, 3)) int (LIBVM86_CC *PVM86_INW)(vm86_state_t *__restrict self, __uint16_t port, __uint16_t *__restrict presult);
-typedef __ATTR_NONNULL((1, 3)) int (LIBVM86_CC *PVM86_INL)(vm86_state_t *__restrict self, __uint16_t port, __uint32_t *__restrict presult);
-typedef __ATTR_NONNULL((1)) int (LIBVM86_CC *PVM86_OUTB)(vm86_state_t *__restrict self, __uint16_t port, __uint8_t value);
-typedef __ATTR_NONNULL((1)) int (LIBVM86_CC *PVM86_OUTW)(vm86_state_t *__restrict self, __uint16_t port, __uint16_t value);
-typedef __ATTR_NONNULL((1)) int (LIBVM86_CC *PVM86_OUTL)(vm86_state_t *__restrict self, __uint16_t port, __uint32_t value);
+typedef __ATTR_NONNULL_T((1, 3)) int (LIBVM86_CC *PVM86_INB)(vm86_state_t *__restrict self, __uint16_t port, __uint8_t *__restrict presult);
+typedef __ATTR_NONNULL_T((1, 3)) int (LIBVM86_CC *PVM86_INW)(vm86_state_t *__restrict self, __uint16_t port, __uint16_t *__restrict presult);
+typedef __ATTR_NONNULL_T((1, 3)) int (LIBVM86_CC *PVM86_INL)(vm86_state_t *__restrict self, __uint16_t port, __uint32_t *__restrict presult);
+typedef __ATTR_NONNULL_T((1)) int (LIBVM86_CC *PVM86_OUTB)(vm86_state_t *__restrict self, __uint16_t port, __uint8_t value);
+typedef __ATTR_NONNULL_T((1)) int (LIBVM86_CC *PVM86_OUTW)(vm86_state_t *__restrict self, __uint16_t port, __uint16_t value);
+typedef __ATTR_NONNULL_T((1)) int (LIBVM86_CC *PVM86_OUTL)(vm86_state_t *__restrict self, __uint16_t port, __uint32_t value);
 #ifdef LIBVM86_WANT_PROTOTYPES
 LIBVM86_DECL __ATTR_NONNULL((1, 3)) int LIBVM86_CC vm86_inb(vm86_state_t *__restrict self, __uint16_t port, __uint8_t *__restrict presult);
 LIBVM86_DECL __ATTR_NONNULL((1, 3)) int LIBVM86_CC vm86_inw(vm86_state_t *__restrict self, __uint16_t port, __uint16_t *__restrict presult);

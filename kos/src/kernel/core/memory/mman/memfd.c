@@ -110,15 +110,10 @@ PRIVATE struct fdirent_ops const memfd_name_ops = {
 	/* There is no directory, so there should be no way this operator would
 	 * ever be invoked. As such, assign a bad pointer so the kernel  panics
 	 * if it were to ever be invoked. */
-	.fdo_opennode = (REF struct fnode *(KCALL *)(struct fdirent *__restrict,
-	                                             struct fdirnode *__restrict))
-	                (void *)(uintptr_t)-1,
+	.fdo_opennode = (typeoffield(struct fdirent_ops, fdo_opennode))(void *)-1,
 
-	/* Same as `fdo_opennode': shouldn't ever be invocable, so assign a bad
-	 * pointer. */
-	.fdo_getino = (ino_t (FCALL *)(struct fdirent *__restrict,
-	                               struct fdirnode *__restrict))
-	              (void *)(uintptr_t)-1,
+	/* Same as `fdo_opennode': shouldn't ever be invocable, so assign a bad pointer. */
+	.fdo_getino = (typeoffield(struct fdirent_ops, fdo_getino))(void *)-1,
 };
 
 /* Construct a new mem-fd object (s.a. `memfd_create(2)')

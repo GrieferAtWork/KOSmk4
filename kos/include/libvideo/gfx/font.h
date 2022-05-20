@@ -109,7 +109,7 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_font, vf_refcnt, video_font_destroy)
  * @param: name: The font's name (the name of a file in `/lib/fonts/')
  *               Else,    you   may   pass   one   of   `VIDEO_FONT_*'
  * @return: NULL:errno=ENOENT: Unknown font `name' */
-typedef __ATTR_WUNUSED __REF struct video_font *(LIBVIDEO_GFX_CC *PVIDEO_FONT_LOOKUP)(char const *__name);
+typedef __ATTR_WUNUSED_T __REF struct video_font *(LIBVIDEO_GFX_CC *PVIDEO_FONT_LOOKUP)(char const *__name);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_font *LIBVIDEO_GFX_CC video_font_lookup(char const *__name);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
@@ -139,7 +139,7 @@ struct video_fontprinter_data {
 };
 
 /* Print text into a graphics context through use of this pformatprinter-compatible function. */
-typedef __ATTR_NONNULL((1, 2)) __ssize_t
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t
 (__FORMATPRINTER_CC *PVIDEO_FONTPRINTER)(/*struct video_fontprinter_data **/ void *__arg,
                                          /*utf-8*/ char const *__restrict __data,
                                          __size_t __datalen);
@@ -150,7 +150,7 @@ video_fontprinter(/*struct video_fontprinter_data **/ void *__arg,
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Same as `video_fontprinter()', but used to directly print UTF-32 text. */
-typedef __ATTR_NONNULL((1, 2)) __ssize_t
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t
 (__C32FORMATPRINTER_CC *PVIDEO_FONTPRINTER32)(/*struct video_fontprinter_data **/ void *__arg,
                                               __CHAR32_TYPE__ const *__restrict __data,
                                               __size_t __datalen);
@@ -164,7 +164,7 @@ video_fontprinter32(/*struct video_fontprinter_data **/ void *__arg,
  * @return: * : The  width  of  the  printed  character  (unrecognized characters
  *              are replaced with substitution characters, and control characters
  *              such as '\n' will cause `0' to be returned) */
-typedef __ATTR_NONNULL((1)) __size_t
+typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBVIDEO_GFX_CC *PVIDEO_FONTPRINTCH)(struct video_fontprinter_data *__restrict __self,
                                       __CHAR32_TYPE__ __ch);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES

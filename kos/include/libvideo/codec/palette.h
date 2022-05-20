@@ -64,7 +64,7 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_palette, vp_refcnt, video_palette_destroy
  * NOTE: This function may lazily allocate `self->vp_cache', meaning
  *       that once  used, the  caller is  responsible to  eventually
  *       cleanup that field using `free(self->vp_cache)'. */
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel_t
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
 (LIBVIDEO_CODEC_CC *PVIDEO_PALETTE_GETPIXEL)(struct video_palette *__restrict self, video_color_t color);
 #ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
 LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel_t LIBVIDEO_CODEC_CC

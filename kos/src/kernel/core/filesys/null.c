@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_FILESYS_NULL_C
 #define GUARD_KERNEL_CORE_FILESYS_NULL_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -1144,20 +1145,20 @@ PRIVATE struct mfile_stream_ops const devtty_stream_ops = {
 	.mso_polltest    = &devtty_v_polltest,
 	.mso_ioctl       = &devtty_v_ioctl,
 	.mso_tryas       = &devtty_v_tryas,
-//TODO:	BLOCKING WUNUSED NONNULL((1, 2)) ssize_t
+//TODO:	BLOCKING WUNUSED_T NONNULL_T((1, 2)) ssize_t
 //TODO:	(KCALL *mso_printlink)(struct mfile *__restrict self, __pformatprinter printer, void *arg)
-//TODO:			THROWS(E_WOULDBLOCK, ...);
-//TODO:	BLOCKING NONNULL((1)) void
+//TODO:			THROWS_T(E_WOULDBLOCK, ...);
+//TODO:	BLOCKING NONNULL_T((1)) void
 //TODO:	(KCALL *mso_sync)(struct mfile *__restrict self)
-//TODO:			THROWS(E_WOULDBLOCK, E_IOERROR, ...);
-//TODO:	NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
-//TODO:	/*NOTHROW*/ (KCALL *mso_cc)(struct mfile *__restrict self,
-//TODO:	                            struct ccinfo *__restrict info);
+//TODO:			THROWS_T(E_WOULDBLOCK, E_IOERROR, ...);
+//TODO:	NOBLOCK_IF(ccinfo_noblock(info)) NONNULL_T((1)) void
+//TODO:	NOTHROW_T(KCALL *mso_cc)(struct mfile *__restrict self,
+//TODO:	                         struct ccinfo *__restrict info);
 };
 
 INTERN_CONST struct device_ops const dev_tty_ops = {{{
 	.no_file = {
-		.mo_destroy = (void(KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1,
+		.mo_destroy = (typeoffield(struct mfile_ops, mo_destroy))(void *)-1,
 		.mo_changed = &device_v_changed,
 		.mo_stream  = &devtty_stream_ops,
 	},
@@ -1174,14 +1175,14 @@ INTERN_CONST struct device_ops const dev_tty_ops = {{{
 #else /* LIBVIO_CONFIG_ENABLED */
 #define IF_VIO_ENABLED(...) /* nothing */
 #endif /* !LIBVIO_CONFIG_ENABLED */
-#define DEVICE_OPS_INIT(mo_newpart, mo_loadblocks, mo_stream, mo_vio)       \
-	{{{{                                                                    \
-		{                                                                   \
-			(void(KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1, \
-			mo_newpart, mo_loadblocks, NULL, &device_v_changed, mo_stream,  \
-			IF_VIO_ENABLED(mo_vio)                                          \
-		},                                                                  \
-		&device_v_wrattr                                                    \
+#define DEVICE_OPS_INIT(mo_newpart, mo_loadblocks, mo_stream, mo_vio)      \
+	{{{{                                                                   \
+		{                                                                  \
+			(typeoffield(struct mfile_ops, mo_destroy))(void *)-1,         \
+			mo_newpart, mo_loadblocks, NULL, &device_v_changed, mo_stream, \
+			IF_VIO_ENABLED(mo_vio)                                         \
+		},                                                                 \
+		&device_v_wrattr                                                   \
 	}}}}
 INTERN_CONST struct chrdev_ops const dev_mem_ops     = DEVICE_OPS_INIT(&devmem_v_newpart, NULL, &devmem_stream_ops, NULL);
 INTERN_CONST struct chrdev_ops const dev_kmem_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmem_stream_ops, &devkmem_vio_ops);

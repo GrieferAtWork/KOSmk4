@@ -295,12 +295,12 @@ PRIVATE struct mfile_stream_ops const procfs_regfile_v_stream_ops = {
 INTERN_CONST struct printnode_ops const procfs_regfile_ops = {
 	.pno_reg = {{
 		.no_file = {
-			.mo_destroy    = (void (KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1,
+			.mo_destroy    = (typeoffield(struct mfile_ops, mo_destroy))(void *)-1,
 			.mo_loadblocks = &printnode_v_loadblocks,
 			.mo_changed    = &printnode_v_changed,
 			.mo_stream     = &procfs_regfile_v_stream_ops,
 		},
-		.no_free   = (void (KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1,
+		.no_free   = (typeoffield(struct fnode_ops, no_free))(void *)-1,
 		.no_wrattr = &printnode_v_wrattr,
 	}},
 	.pno_print = &procfs_regfile_v_print,
@@ -318,11 +318,11 @@ procfs_txtfile_v_print(struct printnode *__restrict self,
 INTERN_CONST struct printnode_ops const procfs_txtfile_ops = {
 	.pno_reg = {{
 		.no_file = {
-			.mo_destroy = (void (KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1,
+			.mo_destroy = (typeoffield(struct mfile_ops, mo_destroy))(void *)-1,
 			.mo_changed = &printnode_v_changed,
 			.mo_stream  = &printnode_v_stream_ops,
 		},
-		.no_free   = (void (KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1,
+		.no_free   = (typeoffield(struct fnode_ops, no_free))(void *)-1,
 		.no_wrattr = &printnode_v_wrattr,
 	}},
 	.pno_print = &procfs_txtfile_v_print,
@@ -616,11 +616,11 @@ INTERN_CONST struct fsuper_ops const procfs_super_ops = {
 	.so_fdir = {
 		.dno_node = {
 			.no_file = {
-				.mo_destroy = (void (KCALL *)(struct mfile *__restrict))(void *)(uintptr_t)-1,
+				.mo_destroy = (typeoffield(struct mfile_ops, mo_destroy))(void *)-1,
 				.mo_changed = &fsuper_v_changed,
 				.mo_stream  = &fdirnode_v_stream_ops,
 			},
-			.no_free   = (void (KCALL *)(struct fnode *__restrict))(void *)(uintptr_t)-1,
+			.no_free   = (typeoffield(struct fnode_ops, no_free))(void *)-1,
 			.no_wrattr = &fnode_v_wrattr_noop,
 		},
 		.dno_lookup = &procfs_root_v_lookup,

@@ -130,66 +130,66 @@ struct vidttyaccess {
 	/* Operators... */
 
 	/* [1..1] Called once `vta_refcnt == 0' */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *vta_destroy)(struct vidttyaccess *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *vta_destroy)(struct vidttyaccess *__restrict self);
 
 
 	/* [1..1][lock(vta_lock)] Set the contents of a single cell. (attributes are taken from `tty->at_ansi')
 	 * NOTE: This operator may assume that `address' is visible on-screen
 	 * @param: address: == CELL_X + CELL_Y * vta_scan */
-	NOBLOCK NONNULL((1, 2)) void
-	/*NOTHROW*/ (FCALL *vta_setcell)(struct vidttyaccess *__restrict self,
-	                                 struct ansitty *__restrict tty,
-	                                 uintptr_t address, char32_t ch);
+	NOBLOCK NONNULL_T((1, 2)) void
+	NOTHROW_T(FCALL *vta_setcell)(struct vidttyaccess *__restrict self,
+	                              struct ansitty *__restrict tty,
+	                              uintptr_t address, char32_t ch);
 
 	/* [1..1][lock(vta_lock)] Hide the hardware cursor
 	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *vta_hidecursor)(struct vidttyaccess *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *vta_hidecursor)(struct vidttyaccess *__restrict self);
 
 	/* [1..1][lock(vta_lock)] Show the hardware cursor at the current cursor position.
 	 * NOTE: This operator is only called when `vta_cursor.vtc_celly < vta_resy', which
 	 *       compiled with the  invariant `vta_cursor.vtc_cellx < vta_resx' means  that
 	 *       the cursor is guarantied visible on-screen.
 	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *vta_showcursor)(struct vidttyaccess *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *vta_showcursor)(struct vidttyaccess *__restrict self);
 
 	/* [1..1][lock(vta_lock)] Copy cells across video memory.
 	 * NOTE: The cell addresses taken by this function do _NOT_ account for large scanlines!
 	 * @param: from_cellid/to_cellid: == CELL_X + CELL_Y * vta_resx */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *vta_copycell)(struct vidttyaccess *__restrict self,
-	                                  uintptr_t to_cellid, uintptr_t from_cellid,
-	                                  size_t num_cells);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *vta_copycell)(struct vidttyaccess *__restrict self,
+	                               uintptr_t to_cellid, uintptr_t from_cellid,
+	                               size_t num_cells);
 
 	/* [1..1][lock(vta_lock)] Same as:
 	 * >> while (num_cells--) (*vta_setcell)(self, tty, start++, ch); */
-	NOBLOCK NONNULL((1, 2)) void
-	/*NOTHROW*/ (FCALL *vta_fillcells)(struct vidttyaccess *__restrict self,
-	                                   struct ansitty *__restrict tty,
-	                                   uintptr_t start, char32_t ch, size_t num_cells);
+	NOBLOCK NONNULL_T((1, 2)) void
+	NOTHROW_T(FCALL *vta_fillcells)(struct vidttyaccess *__restrict self,
+	                                struct ansitty *__restrict tty,
+	                                uintptr_t start, char32_t ch, size_t num_cells);
 
 	/* [1..1][lock(vta_lock)] Do additional stuff needed after to activate this tty.
 	 * This includes loading the tty's font into the video card and doing an initial
 	 * full redraw of the entire screen.
 	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *vta_activate)(struct vidttyaccess *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *vta_activate)(struct vidttyaccess *__restrict self);
 
 	/* [1..1][lock(vta_lock)] Get data for the cell at `address'
 	 * @param: address: == CELL_X + CELL_Y * vta_scan
 	 * @param: buf:     A buffer of exactly `vta_cellsize' bytes. */
-	NOBLOCK NONNULL((1, 3)) void
-	/*NOTHROW*/ (FCALL *vta_getcelldata)(struct vidttyaccess *__restrict self,
-	                                     uintptr_t address, byte_t buf[]);
+	NOBLOCK NONNULL_T((1, 3)) void
+	NOTHROW_T(FCALL *vta_getcelldata)(struct vidttyaccess *__restrict self,
+	                                  uintptr_t address, byte_t buf[]);
 
 	/* [1..1][lock(vta_lock)] Set data for the cell at `address'
 	 * @param: address: == CELL_X + CELL_Y * vta_scan
 	 * @param: buf:     A buffer of exactly `vta_cellsize' bytes. */
-	NOBLOCK NONNULL((1, 3)) void
-	/*NOTHROW*/ (FCALL *vta_setcelldata)(struct vidttyaccess *__restrict self,
-	                                     uintptr_t address, byte_t const buf[]);
+	NOBLOCK NONNULL_T((1, 3)) void
+	NOTHROW_T(FCALL *vta_setcelldata)(struct vidttyaccess *__restrict self,
+	                                  uintptr_t address, byte_t const buf[]);
 };
 
 #define vidttyaccess_destroy(self) (*(self)->vta_destroy)(self)
@@ -364,7 +364,7 @@ struct vidlck_ops {
 	 * Restore  _all_  (standard+chipset-specific) registers  to what
 	 * they were before the lock was created. This operator is called
 	 * from an async worker during destruction of the video lock. */
-	BLOCKING NONNULL((1)) void
+	BLOCKING NONNULL_T((1)) void
 	(FCALL *vlo_restore)(struct vidlck *__restrict self,
 	                     struct viddev *__restrict dev)
 			THROWS(E_IOERROR);
@@ -460,7 +460,7 @@ struct viddev_ops {
 
 	/* [1..1][lock(self->vd_lock)]
 	 * Set video mode associated with a TTY access object. */
-	BLOCKING NONNULL((1, 2)) void
+	BLOCKING NONNULL_T((1, 2)) void
 	(FCALL *vdo_setttyvideomode)(struct viddev *__restrict self,
 	                             struct vidttyaccess const *__restrict tty)
 			THROWS(E_IOERROR);
@@ -470,7 +470,7 @@ struct viddev_ops {
 	 *  - return->_vidlck_file_ mf_ops = &MY_vidlck_ops.vlo_file; # Something that includes a destructor that calls `vidlck_v_destroy()'
 	 *  - return->...                                             # Sub-class specific fields (primarily including video registers)
 	 * All other fields are initialized by the caller. */
-	BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1)) struct vidlck *
+	BLOCKING ATTR_RETNONNULL_T WUNUSED_T NONNULL_T((1)) struct vidlck *
 	(FCALL *vdo_alloclck)(struct viddev *__restrict self,
 	                      struct vidtty *active_tty)
 			THROWS(E_IOERROR, E_WOULDBLOCK);
@@ -485,15 +485,15 @@ struct viddev_ops {
 	 *   was displayed just before the debugger was exited the last time.
 	 * - No requirements on minimal terminal size are made, but try to aim for 80x25,
 	 *   as  this is  the resolution which  most debugger applets  were designed for. */
-	ATTR_RETNONNULL WUNUSED NONNULL((1)) struct vidttyaccess *
-	/*NOTHROW*/ (FCALL *vdo_enterdbg)(struct viddev *__restrict self);
+	ATTR_RETNONNULL_T WUNUSED_T NONNULL_T((1)) struct vidttyaccess *
+	NOTHROW_T(FCALL *vdo_enterdbg)(struct viddev *__restrict self);
 
 	/* [0..1] Restore video registers as the result of exiting the builtin debugger.
 	 * - Called while the debugger is still active (dbg_active).
 	 * - s.a. `vdo_enterdbg()'
 	 * - This function and `vdo_enterdbg()' are also used to implement the `screen' command */
-	NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *vdo_leavedbg)(struct viddev *__restrict self);
+	NONNULL_T((1)) void
+	NOTHROW_T(FCALL *vdo_leavedbg)(struct viddev *__restrict self);
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 };

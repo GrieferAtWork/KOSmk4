@@ -411,7 +411,7 @@ struct ansitty {
 
 
 /* Initialize the given ANSI TTY */
-typedef __ATTR_NONNULL((1, 2)) void
+typedef __ATTR_NONNULL_T((1, 2)) void
 (LIBANSITTY_CC *PANSITTY_INIT)(struct ansitty *__restrict self,
                                struct ansitty_operators const *__restrict ops);
 #ifdef LIBANSITTY_WANT_PROTOTYPES
@@ -421,7 +421,7 @@ ansitty_init(struct ansitty *__restrict self,
 #endif /* LIBANSITTY_WANT_PROTOTYPES */
 
 /* Output a single utf-8 character to the given TTY */
-typedef __ATTR_NONNULL((1)) void
+typedef __ATTR_NONNULL_T((1)) void
 (LIBANSITTY_CC *PANSITTY_PUTC)(struct ansitty *__restrict self, /*utf-8*/ char ch);
 #ifdef LIBANSITTY_WANT_PROTOTYPES
 LIBANSITTY_DECL __ATTR_NONNULL((1)) void LIBANSITTY_CC
@@ -429,7 +429,7 @@ ansitty_putc(struct ansitty *__restrict self, /*utf-8*/ char ch);
 #endif /* LIBANSITTY_WANT_PROTOTYPES */
 
 /* Output a single unicode character to the given TTY */
-typedef __ATTR_NONNULL((1)) void
+typedef __ATTR_NONNULL_T((1)) void
 (LIBANSITTY_CC *PANSITTY_PUTUNI)(struct ansitty *__restrict self, __CHAR32_TYPE__ ch);
 #ifdef LIBANSITTY_WANT_PROTOTYPES
 LIBANSITTY_DECL __ATTR_NONNULL((1)) void LIBANSITTY_CC
@@ -439,7 +439,7 @@ ansitty_putuni(struct ansitty *__restrict self, __CHAR32_TYPE__ ch);
 /* pformatprinter-compatible prototype for printing to an ANSI TTY
  * @param: arg: The `struct ansitty *' to which to print.
  * @return: * : Always re-return `(ssize_t)datalen' */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (__FORMATPRINTER_CC *PANSITTY_PRINTER)(void *arg, char const *data, __size_t datalen);
 #ifdef LIBANSITTY_WANT_PROTOTYPES
 LIBANSITTY_DECL __ATTR_NONNULL((1)) __ssize_t __FORMATPRINTER_CC
@@ -457,9 +457,9 @@ ansitty_printer(void *arg, char const *data, __size_t datalen);
  * @return: 0 : The character cannot be represented in the current CP, and
  *              should be discarded. */
 typedef __NOBLOCK __ATTR_NONNULL((1, 2)) __size_t
-/*__NOTHROW_NCX*/ (LIBANSITTY_CC *PANSITTY_TRANSLATE)(struct ansitty *__restrict self,
-                                                      char buf[ANSITTY_TRANSLATE_BUFSIZE],
-                                                      __CHAR32_TYPE__ ch);
+__NOTHROW_NCX_T(LIBANSITTY_CC *PANSITTY_TRANSLATE)(struct ansitty *__restrict self,
+                                                   char buf[ANSITTY_TRANSLATE_BUFSIZE],
+                                                   __CHAR32_TYPE__ ch);
 #ifdef LIBANSITTY_WANT_PROTOTYPES
 LIBANSITTY_DECL __NOBLOCK __ATTR_NONNULL((1, 2)) __size_t
 __NOTHROW_NCX(LIBANSITTY_CC ansitty_translate)(struct ansitty *__restrict self,
@@ -478,9 +478,9 @@ __NOTHROW_NCX(LIBANSITTY_CC ansitty_translate)(struct ansitty *__restrict self,
  * @return: * :  The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
  * @return: 0 :  The key cannot be represented and should be discarded. */
 typedef __NOBLOCK __ATTR_NONNULL((2)) __size_t
-/*__NOTHROW_NCX*/ (LIBANSITTY_CC *PANSITTY_TRANSLATE_MISC)(struct ansitty *self,
-                                                           char buf[ANSITTY_TRANSLATE_BUFSIZE], __size_t len,
-                                                           __UINT16_TYPE__ key, __UINT16_TYPE__ mod);
+__NOTHROW_NCX_T(LIBANSITTY_CC *PANSITTY_TRANSLATE_MISC)(struct ansitty *self,
+                                                        char buf[ANSITTY_TRANSLATE_BUFSIZE], __size_t len,
+                                                        __UINT16_TYPE__ key, __UINT16_TYPE__ mod);
 #ifdef LIBANSITTY_WANT_PROTOTYPES
 LIBANSITTY_DECL __NOBLOCK __ATTR_NONNULL((2)) __size_t
 __NOTHROW_NCX(LIBANSITTY_CC ansitty_translate_misc)(struct ansitty *self,

@@ -112,8 +112,8 @@ thismman_lockops = SLIST_HEAD_INITIALIZER(thismman_lockops);
 
 /* Dynamic per-memory-manager init/fini callbacks.
  * XXX: Maybe get rid of these? (there aren't really ~that~ many of these) */
-typedef NONNULL((1)) void (KCALL *permman_init_t)(struct mman *__restrict self) /*THROWS(...)*/;
-typedef NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *permman_fini_t)(struct mman *__restrict self);
+typedef NONNULL_T((1)) void (KCALL *permman_init_t)(struct mman *__restrict self) /*THROWS(...)*/;
+typedef NOBLOCK NONNULL_T((1)) void NOTHROW_T(KCALL *permman_fini_t)(struct mman *__restrict self);
 extern permman_init_t __kernel_permman_init_start[];
 extern permman_init_t __kernel_permman_init_end[];
 extern permman_fini_t __kernel_permman_fini_start[];

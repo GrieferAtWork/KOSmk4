@@ -57,8 +57,8 @@ struct sig_select_context {
  *          this function mustn't do anything that is unsafe while holding an SMP-lock.
  * @return: * :   The signal (~ala sig_altsend()) that should be send to this target.
  * @return: NULL: Don't send any signal to this target. */
-typedef NOBLOCK NOPREEMPT NONNULL((2)) struct sig *
-/*NOTHROW*/ (FCALL *sig_send_selector_t)(void *cookie, struct sig_select_context *__restrict context);
+typedef NOBLOCK NOPREEMPT NONNULL_T((2)) struct sig *
+NOTHROW_T(FCALL *sig_send_selector_t)(void *cookie, struct sig_select_context *__restrict context);
 
 /* Send  a signal to the oldest (and preferably non-poll-based) connection of
  * `self' for which `selector'  returns non-NULL. Connections are  enumerated

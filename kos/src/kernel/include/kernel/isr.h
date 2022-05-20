@@ -38,12 +38,12 @@ struct driver;
 /* Prototype for a device-related ISR (Interrupt Service Routine)
  * @return: true:  The interrupt was successfully handled.
  * @return: false: The interrupt must have been meant for some other handler. */
-typedef NOBLOCK NOPREEMPT bool /*NOTHROW*/ (FCALL *isr_function_t)(void *arg);
+typedef NOBLOCK NOPREEMPT bool NOTHROW_T(FCALL *isr_function_t)(void *arg);
 
 /* A greedy ISR function doesn't need to check if an interrupt actually belongs to
  * its associated device. Instead, it is installed as the last one in line for its
  * associated interrupt vector, or as the only callback for that vector. */
-typedef NOBLOCK NOPREEMPT void /*NOTHROW*/ (FCALL *isr_greedy_function_t)(void *arg);
+typedef NOBLOCK NOPREEMPT void NOTHROW_T(FCALL *isr_greedy_function_t)(void *arg);
 
 /* Register ISR handlers, either by automatically selecting an
  * appropriate  vector, or by  specifying the required vector.

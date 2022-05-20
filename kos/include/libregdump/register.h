@@ -37,7 +37,7 @@ __DECL_BEGIN
  * @param: arg:     Cookie for `printer'
  * @param: regno:   One of the constants from <asm/registers.h>
  * @return: * : pformatprinter-compatible return value. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBREGDUMP_CC *PREGDUMP_REGISTER_NAME)(__pformatprinter printer, void *arg,
                                         __uintptr_t regno);
 #ifdef LIBREGDUMP_WANT_PROTOTYPES

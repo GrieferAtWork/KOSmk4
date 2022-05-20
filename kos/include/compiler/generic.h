@@ -855,10 +855,6 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __ATTR_FORMAT_ARG(x) /* nothing */
 #endif /* !__has_attribute(__format_arg__) */
 
-#define __ATTR_LEAF_P  __ATTR_LEAF
-#define __ATTR_PURE_P  __ATTR_PURE
-#define __ATTR_CONST_P __ATTR_CONST
-
 #define __LOCAL      static __ATTR_INLINE
 #define __FORCELOCAL static __ATTR_FORCEINLINE
 
@@ -976,6 +972,12 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #endif /* (c_plusplus+0) == 0 */
 #endif /* c_plusplus && !__cplusplus */
 
+#if 1 /* ??? */
+#define __register_var(T, name, regname) register T name __asm__(regname)
+#else
+#define __NO_register_var
+#define __register_var(T, name, regname) register T name
+#endif
 
 #ifndef __COMPILER_IGNORE_UNINITIALIZED
 #define __COMPILER_IGNORE_UNINITIALIZED(var) var

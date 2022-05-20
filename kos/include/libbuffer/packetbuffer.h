@@ -617,16 +617,16 @@ __NOTHROW(pb_packet_get_totalsize)(__size_t payload_size,
  * @return: PB_BUFFER_STARTWRITE_BADALLOC: [...] (user-space only)
  * @throw: E_BADALLOC: Failed to allocate more buffer memory (kernel only) */
 #ifdef __KERNEL__
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) struct pb_packet *
 (LIBBUFFER_CC *PPB_BUFFER_STARTWRITE)(struct pb_buffer *__restrict self,
                                       __size_t payload_size,
                                       __size_t ancillary_size)
 		/*__THROWS(E_BADALLOC)*/;
 #else /* __KERNEL__ */
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
-/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_STARTWRITE)(struct pb_buffer *__restrict self,
-                                                    __size_t payload_size,
-                                                    __size_t ancillary_size);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) struct pb_packet *
+__NOTHROW_T(LIBBUFFER_CC *PPB_BUFFER_STARTWRITE)(struct pb_buffer *__restrict self,
+                                                 __size_t payload_size,
+                                                 __size_t ancillary_size);
 #endif /* !__KERNEL__ */
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 #ifdef __KERNEL__
@@ -657,8 +657,8 @@ __NOTHROW(pb_buffer_endwrite_commit)(struct pb_buffer *__restrict self,
 
 /* Abort writing/discard the given `packet' from the packet stream. */
 typedef __NOBLOCK __ATTR_NONNULL((1, 2)) void
-/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_ENDWRITE_ABORT)(struct pb_buffer *__restrict self,
-                                                        struct pb_packet *__restrict packet);
+__NOTHROW_T(LIBBUFFER_CC *PPB_BUFFER_ENDWRITE_ABORT)(struct pb_buffer *__restrict self,
+                                                     struct pb_packet *__restrict packet);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW(LIBBUFFER_CC pb_buffer_endwrite_abort)(struct pb_buffer *__restrict self,
@@ -705,12 +705,12 @@ __NOTHROW(LIBBUFFER_CC pb_buffer_endwrite_abort)(struct pb_buffer *__restrict se
  * @return: NULL: No unread packet is available at the moment, or the most recent packet is
  *                currently being read. */
 #ifdef __KERNEL__
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) struct pb_packet *
 (LIBBUFFER_CC *PPB_BUFFER_STARTREAD)(struct pb_buffer *__restrict self)
-		/*__THROWS(E_WOULDBLOCK)*/;
+		__THROWS(E_WOULDBLOCK);
 #else /* __KERNEL__ */
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pb_packet *
-/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_STARTREAD)(struct pb_buffer *__restrict self);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) struct pb_packet *
+__NOTHROW_T(LIBBUFFER_CC *PPB_BUFFER_STARTREAD)(struct pb_buffer *__restrict self);
 #endif /* !__KERNEL__ */
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 #ifdef __KERNEL__
@@ -744,9 +744,9 @@ __NOTHROW_NCX(LIBBUFFER_CC pb_buffer_startread)(struct pb_buffer *__restrict sel
  * >> }
  * @return: * : A new handle that should be used for reading packet data. */
 typedef __NOBLOCK __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct pb_packet *
-/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_TRUNCATE_PACKET)(struct pb_buffer *__restrict self,
-                                                         struct pb_packet *__restrict packet,
-                                                         __uint16_t bytes_to_consume);
+__NOTHROW_T(LIBBUFFER_CC *PPB_BUFFER_TRUNCATE_PACKET)(struct pb_buffer *__restrict self,
+                                                      struct pb_packet *__restrict packet,
+                                                      __uint16_t bytes_to_consume);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __NOBLOCK __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct pb_packet *
 __NOTHROW(LIBBUFFER_CC pb_buffer_truncate_packet)(struct pb_buffer *__restrict self,
@@ -757,7 +757,7 @@ __NOTHROW(LIBBUFFER_CC pb_buffer_truncate_packet)(struct pb_buffer *__restrict s
 /* End reading the  current packet, and  discard the packet  from the data  stream.
  * The next call to `pb_buffer_startread()' will return NULL or a different packet. */
 typedef __NOBLOCK __ATTR_NONNULL((1, 2)) void
-/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_ENDREAD_CONSUME)(struct pb_buffer *__restrict self,
+__NOTHROW_T(LIBBUFFER_CC *PPB_BUFFER_ENDREAD_CONSUME)(struct pb_buffer *__restrict self,
                                                          struct pb_packet *__restrict packet);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 LIBBUFFER_DECL __NOBLOCK __ATTR_NONNULL((1, 2)) void
@@ -786,19 +786,19 @@ __NOTHROW_NCX(pb_buffer_endread_restore)(struct pb_buffer *__restrict self,
 #ifdef __KERNEL__
 typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 (LIBBUFFER_CC *PPB_BUFFER_CANREAD)(struct pb_buffer *__restrict self)
-		/*__THROWS(E_WOULDBLOCK)*/;
+		__THROWS(E_WOULDBLOCK);
 typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 (LIBBUFFER_CC *PPB_BUFFER_CANWRITE)(struct pb_buffer *__restrict self,
                                     __size_t payload_size,
                                     __size_t ancillary_size)
-		/*__THROWS(E_WOULDBLOCK)*/;
+		__THROWS(E_WOULDBLOCK);
 #else /* __KERNEL__ */
 typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
-/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_CANREAD)(struct pb_buffer *__restrict self);
+__NOTHROW_T(LIBBUFFER_CC *PPB_BUFFER_CANREAD)(struct pb_buffer *__restrict self);
 typedef __NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
-/*__NOTHROW*/ (LIBBUFFER_CC *PPB_BUFFER_CANWRITE)(struct pb_buffer *__restrict self,
-                                                  __size_t payload_size,
-                                                  __size_t ancillary_size);
+__NOTHROW_T(LIBBUFFER_CC *PPB_BUFFER_CANWRITE)(struct pb_buffer *__restrict self,
+                                               __size_t payload_size,
+                                               __size_t ancillary_size);
 #endif /* !__KERNEL__ */
 #ifdef LIBBUFFER_WANT_PROTOTYPES
 #ifdef __KERNEL__

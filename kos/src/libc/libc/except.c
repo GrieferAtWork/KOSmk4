@@ -1260,10 +1260,10 @@ struct rf_object {
 /* NOTE: In the original version, malloc() failing at this point is entirely undefined! */
 #define rf_object_malloc() ((struct rf_object *)Malloc(sizeof(struct rf_object)))
 
-typedef NONNULL((1, 2)) void (LIBCCALL *P__REGISTER_FRAME_INFO_BASES)(void const *begin, struct rf_object *__restrict ob, void const *tbase, void const *dbase);
-typedef NONNULL((1, 2)) void (LIBCCALL *P__REGISTER_FRAME_INFO_TABLE_BASES)(void const *const *begin, struct rf_object *__restrict ob, void const *tbase, void const *dbase);
-typedef NONNULL((1)) struct rf_object * /*NOTHROW*/ (LIBCCALL *P__DEREGISTER_FRAME_INFO)(void const *begin);
-typedef NONNULL((2)) void const * /*NOTHROW_NCX*/ (LIBCCALL *P_UNWIND_FIND_FDE)(void const *pc, struct dwarf_eh_bases *__restrict bases);
+typedef NONNULL_T((1, 2)) void (LIBCCALL *P__REGISTER_FRAME_INFO_BASES)(void const *begin, struct rf_object *__restrict ob, void const *tbase, void const *dbase);
+typedef NONNULL_T((1, 2)) void (LIBCCALL *P__REGISTER_FRAME_INFO_TABLE_BASES)(void const *const *begin, struct rf_object *__restrict ob, void const *tbase, void const *dbase);
+typedef NONNULL_T((1)) struct rf_object *NOTHROW_T(LIBCCALL *P__DEREGISTER_FRAME_INFO)(void const *begin);
+typedef NONNULL_T((2)) void const *NOTHROW_NCX_T(LIBCCALL *P_UNWIND_FIND_FDE)(void const *pc, struct dwarf_eh_bases *__restrict bases);
 
 PRIVATE ATTR_SECTION(".bss.crt.compat.linux.__register_frame") P__REGISTER_FRAME_INFO_BASES /*      */ pdyn___register_frame_info_bases       = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.compat.linux.__register_frame") P__REGISTER_FRAME_INFO_TABLE_BASES /**/ pdyn___register_frame_info_table_bases = NULL;

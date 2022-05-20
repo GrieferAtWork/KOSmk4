@@ -111,7 +111,7 @@ struct service_specs {
 	 * This function is allowed to call `service_api_context()', which
 	 * simply  returns `ctx', as well as `service_api_getpid()', which
 	 * returns the PID of the client that originally attached. */
-	void /*NOTHROW*/ (LIBSERVICE_CC *ss_context_fini)(void *ctx);
+	void __NOTHROW_T(LIBSERVICE_CC *ss_context_fini)(void *ctx);
 };
 
 
@@ -125,11 +125,11 @@ struct service_specs {
  *                                         when the socket is closed. As such, you really need
  *                                         to handle this case by unlink(2)-ing the file prior
  *                                         to calling this function. */
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct service_api *
-/*__NOTHROW_NCX*/ (LIBSERVICE_CC *PSERVICE_API_CREATE)(char const *__restrict filename,
-                                                       struct service_specs const *__restrict specs);
-typedef __ATTR_NONNULL((1)) void
-/*__NOTHROW*/ (LIBSERVICE_CC *PSERVICE_API_DESTROY)(struct service_api *__restrict self);
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) struct service_api *
+__NOTHROW_NCX_T(LIBSERVICE_CC *PSERVICE_API_CREATE)(char const *__restrict filename,
+                                                    struct service_specs const *__restrict specs);
+typedef __ATTR_NONNULL_T((1)) void
+__NOTHROW_T(LIBSERVICE_CC *PSERVICE_API_DESTROY)(struct service_api *__restrict self);
 #ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct service_api *
 __NOTHROW_NCX(LIBSERVICE_CC service_api_create)(char const *__restrict filename,
@@ -150,8 +150,8 @@ __NOTHROW(LIBSERVICE_CC service_api_destroy)(struct service_api *__restrict self
  * WARNING: Don't call this function from somewhere other than contexts where
  *          the call originates from within the service API. This requirement
  *          is asserted internally! */
-typedef __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED void *
-/*__NOTHROW*/ (LIBSERVICE_CC *PSERVICE_API_CONTEXT)(void);
+typedef __ATTR_CONST_T __ATTR_RETNONNULL_T __ATTR_WUNUSED_T void *
+__NOTHROW_T(LIBSERVICE_CC *PSERVICE_API_CONTEXT)(void);
 #ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED void *
 __NOTHROW(LIBSERVICE_CC service_api_context)(void);
@@ -165,8 +165,8 @@ struct ucred;
  * WARNING: Don't call this function from somewhere other than contexts where
  *          the call originates from within the service API. This requirement
  *          is asserted internally! */
-typedef __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct ucred const *
-/*__NOTHROW*/ (LIBSERVICE_CC *PSERVICE_API_CRED)(void);
+typedef __ATTR_CONST_T __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct ucred const *
+__NOTHROW_T(LIBSERVICE_CC *PSERVICE_API_CRED)(void);
 #ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct ucred const *
 __NOTHROW(LIBSERVICE_CC service_api_cred)(void);
@@ -175,7 +175,7 @@ __NOTHROW(LIBSERVICE_CC service_api_cred)(void);
 
 
 /* Exception-enabled variants of the above functions. */
-typedef __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct service_api *
+typedef __ATTR_RETNONNULL_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) struct service_api *
 (LIBSERVICE_CC *PSERVICEAPICREATE)(char const *__restrict filename,
                                    struct service_specs const *__restrict specs);
 #ifdef LIBSERVICE_WANT_PROTOTYPES

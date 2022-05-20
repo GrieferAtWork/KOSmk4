@@ -92,8 +92,6 @@
 #define PAGEDIR_PAGEALIGNED
 #define THROWS(...)
 #define __THROWS(...)
-#define TYPEDEF_THROWS(...)
-#define __TYPEDEF_THROWS(...)
 #define THROWS_INDIRECT(...)
 #define __THROWS_INDIRECT(...)
 #define KCALL
@@ -235,24 +233,42 @@
 #define __SSIZE_C(c) c
 
 #define NOTHROW(x) x
+#define NOTHROW_T(x) x
 #define __NOTHROW(x) x
+#define __NOTHROW_T(x) x
 #define NOTHROW_NCX(x) x
+#define NOTHROW_NCX_T(x) x
 #define __NOTHROW_NCX(x) x
+#define __NOTHROW_NCX_T(x) x
 #define __NOTHROW_KRN(x) x
 #define NOTHROW_RPC(x) x
+#define NOTHROW_RPC_T(x) x
 #define __NOTHROW_RPC(x) x
+#define __NOTHROW_RPC_T(x) x
 #define NOTHROW_RPC_KOS(x) x
+#define NOTHROW_RPC_KOS_T(x) x
 #define __NOTHROW_RPC_KOS(x) x
+#define __NOTHROW_RPC_KOS_T(x) x
 #define NOTHROW_RPC_NOKOS(x) x
+#define NOTHROW_RPC_NOKOS_T(x) x
 #define __NOTHROW_RPC_NOKOS(x) x
+#define __NOTHROW_RPC_NOKOS_T(x) x
 #define NOTHROW_RPC_PURE(x) x
+#define NOTHROW_RPC_PURE_T(x) x
 #define __NOTHROW_RPC_PURE(x) x
+#define __NOTHROW_RPC_PURE_T(x) x
 #define NOTHROW_KERNEL(x) x
+#define NOTHROW_KERNEL_T(x) x
 #define __NOTHROW_KERNEL(x) x
+#define __NOTHROW_KERNEL_T(x) x
 #define NOTHROW_USER(x) x
+#define NOTHROW_USER_T(x) x
 #define __NOTHROW_USER(x) x
+#define __NOTHROW_USER_T(x) x
 #define THROWING(x) x
+#define THROWING_T(x) x
 #define __THROWING(x) x
+#define __THROWING_T(x) x
 
 #define DECL_BEGIN extern "C" {
 #define __DECL_BEGIN extern "C" {
@@ -366,7 +382,9 @@
 #define ATTR_NOINLINE
 #define __ATTR_NOINLINE
 #define ATTR_NORETURN
+#define ATTR_NORETURN_T
 #define __ATTR_NORETURN
+#define __ATTR_NORETURN_T
 #define ATTR_FASTCALL
 #define __ATTR_FASTCALL
 #define ATTR_STDCALL
@@ -378,35 +396,49 @@
 #define ATTR_MSABI
 #define __ATTR_MSABI
 #define ATTR_PURE
-#define ATTR_PURE_P
+#define ATTR_PURE_T
 #define __ATTR_PURE
-#define __ATTR_PURE_P
+#define __ATTR_PURE_T
 #define ATTR_CONST
-#define ATTR_CONST_P
+#define ATTR_CONST_T
 #define __ATTR_CONST
-#define __ATTR_CONST_P
+#define __ATTR_CONST_T
 #define ATTR_LEAF
 #define ATTR_LEAF_P
 #define __ATTR_LEAF
-#define __ATTR_LEAF_P
+#define __ATTR_LEAF_T
 #define ATTR_FLATTEN
 #define __ATTR_FLATTEN
 #define ATTR_MALLOC
+#define ATTR_MALLOC_T
 #define __ATTR_MALLOC
+#define __ATTR_MALLOC_T
 #define ATTR_HOT
+#define ATTR_HOT_T
 #define __ATTR_HOT
+#define __ATTR_HOT_T
 #define ATTR_COLD
+#define ATTR_COLD_T
 #define __ATTR_COLD
+#define __ATTR_COLD_T
 #define ATTR_WEAK
 #define __ATTR_WEAK
 #define ATTR_ALLOC_SIZE(x)
+#define ATTR_ALLOC_SIZE_T(x)
 #define __ATTR_ALLOC_SIZE(x)
+#define __ATTR_ALLOC_SIZE_T(x)
 #define ATTR_ASSUME_ALIGNED(x)
+#define ATTR_ASSUME_ALIGNED_T(x)
 #define __ATTR_ASSUME_ALIGNED(x)
+#define __ATTR_ASSUME_ALIGNED_T(x)
 #define ATTR_ALLOC_ALIGN(x)
+#define ATTR_ALLOC_ALIGN_T(x)
 #define __ATTR_ALLOC_ALIGN(x)
+#define __ATTR_ALLOC_ALIGN_T(x)
 #define ATTR_NOTHROW
+#define ATTR_NOTHROW_T
 #define __ATTR_NOTHROW
+#define __ATTR_NOTHROW_T
 #define ATTR_DLLIMPORT
 #define __ATTR_DLLIMPORT
 #define ATTR_DLLEXPORT
@@ -418,23 +450,37 @@
 #define ATTR_UNUSED
 #define __ATTR_UNUSED
 #define ATTR_SENTINEL
+#define ATTR_SENTINEL_T
 #define __ATTR_SENTINEL
+#define __ATTR_SENTINEL_T
 #define ATTR_SENTINEL_O(x)
+#define ATTR_SENTINEL_O_T(x)
 #define __ATTR_SENTINEL_O(x)
+#define __ATTR_SENTINEL_O_T(x)
 #define ATTR_THREAD
 #define __ATTR_THREAD
 #define ATTR_DEPRECATED(x)
+#define ATTR_DEPRECATED_T(x)
 #define __ATTR_DEPRECATED(x)
+#define __ATTR_DEPRECATED_T(x)
 #define ATTR_DEPRECATED_
+#define ATTR_DEPRECATED_T_
 #define __ATTR_DEPRECATED_
+#define __ATTR_DEPRECATED_T_
 #define ATTR_WARNING(x)
+#define ATTR_WARNING_T(x)
 #define __ATTR_WARNING(x)
+#define __ATTR_WARNING_T(x)
 #define ATTR_ERROR(x)
+#define ATTR_ERROR_T(x)
 #define __ATTR_ERROR(x)
+#define __ATTR_ERROR_T(x)
 #define ATTR_SECTION(x)
 #define __ATTR_SECTION(x)
 #define ATTR_RETNONNULL
+#define ATTR_RETNONNULL_T
 #define __ATTR_RETNONNULL
+#define __ATTR_RETNONNULL_T
 #define ATTR_ALIGNED(x)
 #define __ATTR_ALIGNED(x)
 #define ATTR_ALIGN(...) __VA_ARGS__
@@ -448,13 +494,17 @@
 #define ATTR_PACKED
 #define __ATTR_PACKED
 #define ATTR_RETURNS_TWICE
+#define ATTR_RETURNS_TWICE_T
 #define __ATTR_RETURNS_TWICE
+#define __ATTR_RETURNS_TWICE_T
 #define ATTR_EXTERNALLY_VISIBLE
 #define __ATTR_EXTERNALLY_VISIBLE
 #define ATTR_ARTIFICIAL
 #define __ATTR_ARTIFICIAL
 #define ATTR_FORMAT_ARG(x)
+#define ATTR_FORMAT_ARG_T(x)
 #define __ATTR_FORMAT_ARG(x)
+#define __ATTR_FORMAT_ARG_T(x)
 #define ATTR_FALLTHROUGH ;
 #define __ATTR_FALLTHROUGH ;
 #define ATTR_OPTIMIZE(x)
@@ -462,13 +512,21 @@
 #define ATTR_TRANSPARENT_UNION
 #define __ATTR_TRANSPARENT_UNION
 #define ATTR_FORMAT_PRINTF(...)
+#define ATTR_FORMAT_PRINTF_T(...)
 #define __ATTR_FORMAT_PRINTF(...)
+#define __ATTR_FORMAT_PRINTF_T(...)
 #define ATTR_FORMAT_SCANF(...)
+#define ATTR_FORMAT_SCANF_T(...)
 #define __ATTR_FORMAT_SCANF(...)
+#define __ATTR_FORMAT_SCANF_T(...)
 #define ATTR_FORMAT_STRFMON(...)
+#define ATTR_FORMAT_STRFMON_T(...)
 #define __ATTR_FORMAT_STRFMON(...)
+#define __ATTR_FORMAT_STRFMON_T(...)
 #define ATTR_FORMAT_STRFTIME(...)
+#define ATTR_FORMAT_STRFTIME_T(...)
 #define __ATTR_FORMAT_STRFTIME(...)
+#define __ATTR_FORMAT_STRFTIME_T(...)
 #define ATTR_NOPLT
 #define __ATTR_NOPLT
 #define ATTR_SELECTANY
@@ -511,14 +569,20 @@
 #define __CXX_THROWS(...)
 
 #define NONNULL(...)
+#define NONNULL_T(...)
 #define ATTR_NONNULL(...)
+#define ATTR_NONNULL_T(...)
 #define __ATTR_NONNULL(...)
+#define __ATTR_NONNULL_T(...)
 #define NONNULL_CXX(...)
 #define ATTR_NONNULL_CXX(...)
 #define __ATTR_NONNULL_CXX(...)
 #define WUNUSED
+#define WUNUSED_T
 #define ATTR_WUNUSED
+#define ATTR_WUNUSED_T
 #define __ATTR_WUNUSED
+#define __ATTR_WUNUSED_T
 #define UNUSED(...) __VA_ARGS__
 #define __UNUSED(...) __VA_ARGS__
 #define IMPDEF

@@ -223,12 +223,12 @@
 #define   ATTR_EXTERNALLY_VISIBLE __attribute__((__externally_visible__))
 #define __ATTR_VISIBILITY(vis)    __attribute__((__visibility__(vis)))
 #define   ATTR_VISIBILITY(vis)    __attribute__((__visibility__(vis)))
-#define __ATTR_LEAF_P             __attribute__((__leaf__))
+#define __ATTR_LEAF_T             __attribute__((__leaf__))
 #define   ATTR_LEAF_P             __attribute__((__leaf__))
-#define __ATTR_PURE_P             __attribute__((__pure__))
-#define   ATTR_PURE_P             __attribute__((__pure__))
-#define __ATTR_CONST_P            __attribute__((__const__))
-#define   ATTR_CONST_P            __attribute__((__const__))
+#define __ATTR_PURE_T             __attribute__((__pure__))
+#define   ATTR_PURE_T             __attribute__((__pure__))
+#define __ATTR_CONST_T            __attribute__((__const__))
+#define   ATTR_CONST_T            __attribute__((__const__))
 #define __COMPILER_IMPURE()       __asm__("")
 #define __XBLOCK                  __extension__
 #define __XRETURN                 /* Nothing */

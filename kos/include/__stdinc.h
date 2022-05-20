@@ -132,6 +132,7 @@
 #define __NOTHROW __ATTR_NOTHROW
 #endif /* !... */
 
+
 /* A  special  variant  of  NOTHROW  that  is  only  applied   when
  * `-fnon-call-exceptions' is disabled  (NCX --  NonCallExceptions)
  * This applies to a huge  set of functions, including  practically
@@ -198,11 +199,6 @@
 #endif /* __cplusplus */
 #endif /* __NON_CALL_EXCEPTIONS || !__NO_RPC_EXCEPTIONS */
 
-#define __untraced    /* Annotation for `if __untraced(...)' or `while __untraced(...)' \
-                       * Using this macro prevents the injection of meta-data profilers \
-                       * which would otherwise allow branches to be traced. */
-
-
 /* Pure RPC exception declaration (functions unrelated to the current NCX mode) */
 #if defined(__NO_RPC_EXCEPTIONS)
 #define __NOTHROW_RPC_PURE      __NOTHROW
@@ -215,6 +211,83 @@
 #define __CXX_NOEXCEPT_RPC_PURE /* Nothing */
 #endif /* __cplusplus */
 #endif /* !__NO_RPC_EXCEPTIONS */
+
+
+/* Same as `__NOTHROW', but must be used in `typedef's or variable declarations:
+ * >> typedef void NOTHROW_T(KCALL *PFUN)(void);
+ * >> typedef void NOTHROW_T(KCALL TFUN)(void);
+ * >> void NOTHROW_T(KCALL *funptr)(void);
+ * >> void NOTHROW(KCALL fun)(void); */
+#if defined(__cplusplus)
+#define __NOTHROW_T           __NOTHROW
+#define __NOTHROW_NCX_T       __NOTHROW_NCX
+#define __NOTHROW_RPC_T       __NOTHROW_RPC
+#define __NOTHROW_RPC_KOS_T   __NOTHROW_RPC_KOS
+#define __NOTHROW_RPC_NOKOS_T __NOTHROW_RPC_NOKOS
+#define __NOTHROW_RPC_PURE_T  __NOTHROW_RPC_PURE
+#else /* __cplusplus */
+#define __NOTHROW_T           /* nothing */
+#define __NOTHROW_NCX_T       /* nothing */
+#define __NOTHROW_RPC_T       /* nothing */
+#define __NOTHROW_RPC_KOS_T   /* nothing */
+#define __NOTHROW_RPC_NOKOS_T /* nothing */
+#define __NOTHROW_RPC_PURE_T  /* nothing */
+#endif /* !__cplusplus */
+#if 0
+#define __ATTR_PURE_T __ATTR_PURE
+#else
+#define __ATTR_PURE_T /* nothing */
+#endif
+#if 1
+#define __ATTR_LEAF_T           __ATTR_LEAF
+#define __ATTR_CONST_T          __ATTR_CONST
+#define __ATTR_WUNUSED_T        __ATTR_WUNUSED
+#define __ATTR_RETNONNULL_T     __ATTR_RETNONNULL
+#define __ATTR_NONNULL_T        __ATTR_NONNULL
+#define __ATTR_NORETURN_T       __ATTR_NORETURN
+#define __ATTR_MALLOC_T         __ATTR_MALLOC
+#define __ATTR_HOT_T            __ATTR_HOT
+#define __ATTR_COLD_T           __ATTR_COLD
+#define __ATTR_ALLOC_SIZE_T     __ATTR_ALLOC_SIZE
+#define __ATTR_ASSUME_ALIGNED_T __ATTR_ASSUME_ALIGNED
+#define __ATTR_ALLOC_ALIGN_T    __ATTR_ALLOC_ALIGN
+#define __ATTR_NOTHROW_T        __ATTR_NOTHROW
+#define __ATTR_SENTINEL_T       __ATTR_SENTINEL
+#define __ATTR_SENTINEL_O_T     __ATTR_SENTINEL_O
+#define __ATTR_DEPRECATED_T     __ATTR_DEPRECATED
+#define __ATTR_DEPRECATED_T_    __ATTR_DEPRECATED_
+#define __ATTR_WARNING_T        __ATTR_WARNING
+#define __ATTR_ERROR_T          __ATTR_ERROR
+#define __ATTR_RETURNS_TWICE_T  __ATTR_RETURNS_TWICE
+#else
+#define __ATTR_LEAF_T           /* nothing */
+#define __ATTR_CONST_T          /* nothing */
+#define __ATTR_WUNUSED_T        /* nothing */
+#define __ATTR_RETNONNULL_T     /* nothing */
+#define __ATTR_NONNULL_T        /* nothing */
+#define __ATTR_NORETURN_T       /* nothing */
+#define __ATTR_MALLOC_T         /* nothing */
+#define __ATTR_HOT_T            /* nothing */
+#define __ATTR_COLD_T           /* nothing */
+#define __ATTR_ALLOC_SIZE_T     /* nothing */
+#define __ATTR_ASSUME_ALIGNED_T /* nothing */
+#define __ATTR_ALLOC_ALIGN_T    /* nothing */
+#define __ATTR_NOTHROW_T        /* nothing */
+#define __ATTR_SENTINEL_T       /* nothing */
+#define __ATTR_SENTINEL_O_T     /* nothing */
+#define __ATTR_DEPRECATED_T     /* nothing */
+#define __ATTR_DEPRECATED_T_    /* nothing */
+#define __ATTR_WARNING_T        /* nothing */
+#define __ATTR_ERROR_T          /* nothing */
+#define __ATTR_RETURNS_TWICE_T  /* nothing */
+#endif
+
+
+/* Annotation for `if __untraced(...)' or `while __untraced(...)'
+ * Using this macro prevents the injection of meta-data profilers
+ * which would otherwise allow branches to be traced. */
+#define __untraced /* nothing */
+
 
 #if defined(__COMPILER_HAVE_AUTOTYPE) && !defined(__NO_XBLOCK)
 #define __COMPILER_UNUSED(expr) __XBLOCK({ __auto_type __cu_expr = (expr); __cu_expr; })

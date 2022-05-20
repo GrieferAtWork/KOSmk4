@@ -53,14 +53,14 @@ struct mman;
 
 struct module_section_ops {
 	/* [1..1] Destroy the given module section. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *ms_destroy)(struct module_section *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *ms_destroy)(struct module_section *__restrict self);
 
 	/* [1..1] Return the name of this section.
 	 * If the name  can't be determined,  then return  `NULL'
 	 * instead. Before calling this function, the caller must
 	 * ensure that `!wasdestroyed(self->ms_module)') */
-	BLOCKING /*ATTR_PURE*/ WUNUSED NONNULL((1)) char const *
+	BLOCKING ATTR_PURE_T WUNUSED_T NONNULL_T((1)) char const *
 	(FCALL *ms_getname)(struct module_section *__restrict self);
 
 	/* [1..1] Return the address of this module's section mapping.
@@ -77,7 +77,7 @@ struct module_section_ops {
 	 *          `SHF_ALLOC'  flag set, the returned buffer obviously
 	 *          resides in user-space, also meaning that it may only
 	 *          be accessed while the correct mman/pagedir is active */
-	BLOCKING WUNUSED NONNULL((1)) USER CHECKED byte_t *
+	BLOCKING WUNUSED_T NONNULL_T((1)) USER CHECKED byte_t *
 	(FCALL *ms_getaddr)(struct module_section *__restrict self);
 
 	/* [1..1] Similar  to `ms_getaddr' (and  identical in case of
@@ -88,7 +88,7 @@ struct module_section_ops {
 	 * address of which is then  returned. As such, the  returned
 	 * buffer  can be dereferenced  irregardless of the currently
 	 * active mman, since it will be apart of kernel-space. */
-	BLOCKING WUNUSED NONNULL((1)) KERNEL byte_t *
+	BLOCKING WUNUSED_T NONNULL_T((1)) KERNEL byte_t *
 	(FCALL *ms_getaddr_alias)(struct module_section *__restrict self);
 
 	/* [1..1] Similar to `ms_getaddr_alias()', but if the section
@@ -98,7 +98,7 @@ struct module_section_ops {
 	 *
 	 * If the section isn't compressed, call `ms_getaddr_alias()'
 	 * and write `self->ms_size' to `*psize' */
-	BLOCKING WUNUSED NONNULL((1, 2)) KERNEL byte_t *
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) KERNEL byte_t *
 	(FCALL *ms_getaddr_inflate)(struct module_section *__restrict self,
 	                            size_t *__restrict psize);
 };
@@ -169,28 +169,28 @@ struct module_sectinfo {
 
 struct module_ops {
 	/* [1..1] Module free callback */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *mo_free)(struct module *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *mo_free)(struct module *__restrict self);
 
 	/* [1..1] Module destroy callback */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *mo_destroy)(struct module *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *mo_destroy)(struct module *__restrict self);
 
 	/* [1..1] Callback invoked when `md_nodecount' drops to 0.
 	 * NOTE: This callback must be invoked while holding a
 	 *       lock to the mappings-tree of `self->md_mman'. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *mo_nonodes)(struct module *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *mo_nonodes)(struct module *__restrict self);
 
 	/* [1..1] Return a reference for a module section, given its name.
 	 * If   the  given  `section_name'  isn't  valid,  return  `NULL'. */
-	BLOCKING WUNUSED NONNULL((1)) REF struct module_section *
+	BLOCKING WUNUSED_T NONNULL_T((1)) REF struct module_section *
 	(FCALL *mo_locksection)(struct module *__restrict self,
 	                        USER CHECKED char const *section_name);
 
 	/* [1..1] Return a reference for a module section, given its index.
 	 * If   the  given  `section_index'  isn't  valid,  return  `NULL'. */
-	BLOCKING WUNUSED NONNULL((1)) REF struct module_section *
+	BLOCKING WUNUSED_T NONNULL_T((1)) REF struct module_section *
 	(FCALL *mo_locksection_index)(struct module *__restrict self,
 	                              unsigned int section_index);
 
@@ -199,7 +199,7 @@ struct module_ops {
 	 * that section in `*info'. Note that only SHF_ALLOC-sections  can
 	 * be found using this function!
 	 * @return: true: Success (section info was filled in) */
-	BLOCKING WUNUSED NONNULL((1, 3)) __BOOL
+	BLOCKING WUNUSED_T NONNULL_T((1, 3)) __BOOL
 	(FCALL *mo_sectinfo)(struct module *__restrict self,
 	                     uintptr_t module_relative_addr,
 	                     struct module_sectinfo *__restrict info);
@@ -207,8 +207,8 @@ struct module_ops {
 	/* [1..1] Return the text/data base address for `self' (as used by unwinding)
 	 * NOTE: `self' is only non-const in  order to allow for lazy  initialization.
 	 * These functions may not alter the state of `self' in any observable manner! */
-	BLOCKING WUNUSED NONNULL((1)) void const * /*NOTHROW*/ (FCALL *mo_get_tbase)(struct module *__restrict self);
-	BLOCKING WUNUSED NONNULL((1)) void const * /*NOTHROW*/ (FCALL *mo_get_dbase)(struct module *__restrict self);
+	BLOCKING WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *mo_get_tbase)(struct module *__restrict self);
+	BLOCKING WUNUSED_T NONNULL_T((1)) void const *NOTHROW_T(FCALL *mo_get_dbase)(struct module *__restrict self);
 };
 
 struct module {

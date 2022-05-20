@@ -95,11 +95,13 @@ struct syslog_sink {
 	 *          buffer has  sufficient size  for holding  `MAX(OLD(sp_len), NEW(sp_len))'
 	 *          characters, meaning that sp_msg[0...ANY(sp_len)-1] can always be accessed
 	 *          without fear of triggering a SEGFAULT. */
-	NOBLOCK void /*NOTHROW*/ (FCALL *ss_sink)(struct syslog_sink *__restrict self,
-	                                          struct syslog_packet const *__restrict packet,
-	                                          unsigned int level);
+	NOBLOCK NONNULL_T((1, 2)) void
+	NOTHROW_T(FCALL *ss_sink)(struct syslog_sink *__restrict self,
+	                          struct syslog_packet const *__restrict packet,
+	                          unsigned int level);
 	/* [0..1] Optional finalizer callback for when the sink is destroyed. */
-	NOBLOCK void /*NOTHROW*/ (FCALL *ss_fini)(struct syslog_sink *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *ss_fini)(struct syslog_sink *__restrict self);
 };
 
 /* Same as the `ss_levels' field found in individual syslog sinks,

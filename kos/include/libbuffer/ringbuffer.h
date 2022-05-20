@@ -215,7 +215,7 @@ typedef __BLOCKING __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
                                  __USER __CHECKED void *__dst,
                                  __size_t __num_bytes)
 		/*__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...)*/;
-typedef __ATTR_NONNULL((1)) __size_t
+typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_READ_NONBLOCK)(struct ringbuffer *__restrict __self,
                                           __USER __CHECKED void *__dst,
                                           __size_t __num_bytes)
@@ -259,7 +259,7 @@ typedef __BLOCKING __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
                                       __size_t __num_bytes)
 /*		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...))*/;
-typedef __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __ATTR_NONNULL_T((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_WRITE_NONBLOCK)(struct ringbuffer *__restrict __self,
                                            __USER __CHECKED void const *__src,
                                            __size_t __num_bytes)
@@ -284,7 +284,7 @@ ringbuffer_write_nonblock(struct ringbuffer *__restrict __self,
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
 /* Same as `ringbuffer_write_nonblock()', but don't increase the buffer's size. */
-typedef __ATTR_NONNULL((1)) __size_t
+typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_WRITE_NONBLOCK_NOALLOC)(struct ringbuffer *__restrict __self,
                                                    __USER __CHECKED void const *__src,
                                                    __size_t __num_bytes)
@@ -322,7 +322,7 @@ __ringbuffer_putc_nonblock_noalloc(struct ringbuffer *__restrict __self, __byte_
 /* Try to unread up to `num_bytes' of data that had yet to be re-written
  * @param: P_RDTOT: When non-NULL, store the new number of total read bytes since the last re-size in there
  * @return: * : The actual number of unread bytes. */
-typedef __ATTR_NONNULL((1)) __size_t
+typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_UNREAD)(struct ringbuffer *__restrict __self,
                                    __size_t __num_bytes,
                                    __size_t *__p_rdtot /*__DFL(__NULLPTR)*/)
@@ -338,7 +338,7 @@ ringbuffer_unread(struct ringbuffer *__restrict __self,
 /* Skip up to `num_bytes' of unread data, returning the actual number of skipped bytes.
  * @param: p_rdtot: When non-NULL, store the new number of total read bytes since the last re-size in there
  * @return: * : The actual number of skipped bytes. */
-typedef __ATTR_NONNULL((1)) __size_t
+typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_SKIPREAD)(struct ringbuffer *__restrict __self,
                                      __size_t __num_bytes,
                                      __size_t *__p_rdtot /*__DFL(__NULLPTR)*/)
@@ -356,7 +356,7 @@ ringbuffer_skipread(struct ringbuffer *__restrict __self,
  * for `offset'  will call  `ringbuffer_unread()', whilst  positive values  will  call
  * `ringbuffer_skipread()'
  * The return value is always the new total number of read bytes since the last re-size. */
-typedef __ATTR_NONNULL((1)) __size_t
+typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_RSEEK)(struct ringbuffer *__restrict __self,
                                   __ssize_t __offset)
 		/*__THROWS(E_WOULDBLOCK)*/;
@@ -369,7 +369,7 @@ ringbuffer_rseek(struct ringbuffer *__restrict __self, __ssize_t __offset)
 /* Try to unwrite up to `num_bytes' of data that had yet to be read
  * @param: P_WRTOT: When non-NULL, store the new number of total written bytes since the last re-size in there
  * @return: * : The actual number of unwritten bytes. */
-typedef __ATTR_NONNULL((1)) __size_t
+typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_UNWRITE)(struct ringbuffer *__restrict __self,
                                     __size_t __num_bytes,
                                     __size_t *__p_wrtot /*__DFL(__NULLPTR)*/)
@@ -385,7 +385,7 @@ ringbuffer_unwrite(struct ringbuffer *__restrict __self,
 /* By using `ringbuffer_unwrite()', implement support for SEEK_CUR when `offset' is negative
  * Alternatively, when `offset' is positive, don't do anything.
  * The return value is always the new total number of written bytes since the last re-size. */
-typedef __ATTR_NONNULL((1)) __size_t
+typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_WSEEK)(struct ringbuffer *__restrict __self,
                                   __ssize_t __offset)
 		/*__THROWS(E_WOULDBLOCK)*/;
@@ -398,7 +398,7 @@ ringbuffer_wseek(struct ringbuffer *__restrict __self, __ssize_t __offset)
 /* Set the total amount of written, but yet-to-be read bytes.
  * If `num_bytes' is larger than the previous total number of written bytes, don't truncate the buffer.
  * @return: * : The actual number of now written bytes. */
-typedef __ATTR_NONNULL((1)) __size_t
+typedef __ATTR_NONNULL_T((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_SETWRITTEN)(struct ringbuffer *__restrict __self,
                                        __size_t __num_bytes)
 		/*__THROWS(E_WOULDBLOCK)*/;

@@ -75,8 +75,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 DECL_BEGIN
 
-typedef NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
-/*NOTHROW*/ (KCALL *PSYSTEMCC)(struct ccinfo *__restrict info);
+typedef NOBLOCK_IF(ccinfo_noblock(info)) NONNULL_T((1)) void
+NOTHROW_T(KCALL *PSYSTEMCC)(struct ccinfo *__restrict info);
 
 #define DOCC(expr)               \
 	do {                         \

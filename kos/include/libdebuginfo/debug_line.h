@@ -63,11 +63,11 @@ typedef struct {
 } di_debugline_unit_t;
 
 /* Decode a given file index into its filename and pathname components. */
-typedef __ATTR_NONNULL((1, 3, 4)) void
-/*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUGLINE_LOADFILE)(di_debugline_unit_t *__restrict self,
-                                                         dwarf_uleb128_t index,
-                                                         char const **__restrict ppathname,
-                                                         char const **__restrict pfilename);
+typedef __ATTR_NONNULL_T((1, 3, 4)) void
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGLINE_LOADFILE)(di_debugline_unit_t *__restrict self,
+                                                      dwarf_uleb128_t index,
+                                                      char const **__restrict ppathname,
+                                                      char const **__restrict pfilename);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3, 4)) void
 __NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadfile)(di_debugline_unit_t *__restrict self,
@@ -129,7 +129,7 @@ typedef struct {
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-typedef __ATTR_NONNULL((1, 2, 3)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 3)) unsigned int
 (LIBDEBUGINFO_CC *PDEBUGLINE_LOADUNIT)(__byte_t const **__restrict preader,
                                        __byte_t const *__restrict text_end,
                                        di_debugline_unit_t *__restrict result);
@@ -147,7 +147,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadunit)(__byte_t const **__restrict pr
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-typedef __ATTR_NONNULL((1, 2)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2)) unsigned int
 (LIBDEBUGINFO_CC *PDEBUGLINE_SCANUNIT)(di_debugline_unit_t const *__restrict self,
                                        di_debugline_info_t *__restrict result,
                                        __uintptr_t module_relative_pc);

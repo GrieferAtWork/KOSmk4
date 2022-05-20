@@ -107,7 +107,7 @@ NOTHROW(FCALL mpart_freefun_noop)(physpage_t UNUSED(base),
 }
 
 typedef NOBLOCK void
-/*NOTHROW*/(FCALL *freefun_t)(physpage_t base, physpagecnt_t num_pages, gfp_t flags);
+NOTHROW_T(FCALL *freefun_t)(physpage_t base, physpagecnt_t num_pages, gfp_t flags);
 INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) freefun_t /* used in `mpart-trim.c' */
 NOTHROW(FCALL mpart_getfreefun)(struct mpart const *__restrict self) {
 	freefun_t result;

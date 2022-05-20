@@ -65,8 +65,8 @@ struct unlockinfo;
  * @return: false: This node's part is of no concern and need not be locked.
  *                 Additionally,  `mrangelock_acquire_or_unlock()'  need not
  *                 split this node if it lies on a boundary. */
-typedef NOBLOCK NONNULL((2)) __BOOL
-/*NOTHROW*/ (FCALL *mrangelock_filter_cb_t)(void *arg, struct mnode *__restrict node);
+typedef NOBLOCK NONNULL_T((2)) __BOOL
+NOTHROW_T(FCALL *mrangelock_filter_cb_t)(void *arg, struct mnode *__restrict node);
 
 
 /* Try to initialize `self' for the purpose of acquiring locks to all of

@@ -131,6 +131,11 @@ typedef __WCHAR_TYPE__ wchar_t;
 #ifdef __USE_KOS
 #define offsetafter(s, m)               __COMPILER_OFFSETAFTER(s, m)
 #define container_of(ptr, type, member) __COMPILER_CONTAINER_OF(ptr, type, member)
+
+#define sizeoffield(s, m) sizeof(((s *)0)->m)
+#ifdef __COMPILER_HAVE_TYPEOF
+#define typeoffield(s, m) __typeof__(((s *)0)->m)
+#endif /* __COMPILER_HAVE_TYPEOF */
 #endif /* __USE_KOS */
 
 #ifndef NULL

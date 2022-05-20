@@ -220,8 +220,8 @@ struct mman_unmap_kram_job;
 SLIST_HEAD(mman_unmap_kram_job_slist, mman_unmap_kram_job);
 
 /* Completion callback for an mman-unmap-kram job. */
-typedef NOBLOCK NONNULL((1)) void
-/*NOTHROW*/ (FCALL *mman_unmap_kram_job_done_t)(struct mman_unmap_kram_job *__restrict self);
+typedef NOBLOCK NONNULL_T((1)) void
+NOTHROW_T(FCALL *mman_unmap_kram_job_done_t)(struct mman_unmap_kram_job *__restrict self);
 
 struct mman_unmap_kram_job {
 	/* [0..1] Callback executed once the job is finished (See the description above).

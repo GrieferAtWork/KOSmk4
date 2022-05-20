@@ -102,7 +102,7 @@ __DECL_BEGIN
  * @return: * :               Number of characters (not bytes) matched in `data'.
  * @return: 0 :               Pattern not found.
  * @return: REGEX_ISERROR(*): Error. */
-typedef __ATTR_NONNULL((1, 3)) __size_t
+typedef __ATTR_NONNULL_T((1, 3)) __size_t
 (LIBREGEX_CC *PREGEX_MATCHES)(/*utf-8*/ char const *__restrict data, __size_t datalen,
                               /*utf-8*/ char const *__restrict pattern, __size_t patternlen,
                               __uintptr_t flags);
@@ -126,7 +126,7 @@ regex_matches(/*utf-8*/ char const *__restrict data, __size_t datalen,
  * @return: * :               Number of characters (not bytes) matched in `data'.
  * @return: 0 :               Pattern not found.
  * @return: REGEX_ISERROR(*): Error. */
-typedef __ATTR_NONNULL((1, 3, 5)) __size_t
+typedef __ATTR_NONNULL_T((1, 3, 5)) __size_t
 (LIBREGEX_CC *PREGEX_MATCHESPTR)(/*utf-8*/ char const *__restrict data, __size_t datalen,
                                  /*utf-8*/ char const *__restrict pattern, __size_t patternlen,
                                  /*utf-8*/ char const **__restrict pdataend,
@@ -162,11 +162,11 @@ struct regex_range_ex {
  * @return: 1:                Pattern was found.
  * @return: 0:                Pattern not found.
  * @return: REGEX_ISERROR(*): Error. */
-typedef __ATTR_NONNULL((1, 3, 5)) int
+typedef __ATTR_NONNULL_T((1, 3, 5)) int
 (LIBREGEX_CC *PREGEX_FIND)(/*utf-8*/ char const *__restrict data, __size_t datalen,
                            /*utf-8*/ char const *__restrict pattern, __size_t patternlen,
                            struct regex_range *__restrict presult, __uintptr_t flags);
-typedef __ATTR_NONNULL((1, 3, 5)) int
+typedef __ATTR_NONNULL_T((1, 3, 5)) int
 (LIBREGEX_CC *PREGEX_RFIND)(/*utf-8*/ char const *__restrict data, __size_t datalen,
                             /*utf-8*/ char const *__restrict pattern, __size_t patternlen,
                             struct regex_range *__restrict presult, __uintptr_t flags);
@@ -182,11 +182,11 @@ regex_rfind(/*utf-8*/ char const *__restrict data, __size_t datalen,
 #endif /* LIBREGEX_WANT_PROTOTYPES */
 
 /* Same as the functions above, but return character pointers, rather than indices. */
-typedef __ATTR_NONNULL((1, 3, 5)) int
+typedef __ATTR_NONNULL_T((1, 3, 5)) int
 (LIBREGEX_CC *PREGEX_FINDPTR)(/*utf-8*/ char const *__restrict data, __size_t datalen,
                               /*utf-8*/ char const *__restrict pattern, __size_t patternlen,
                               struct regex_range_ptr *__restrict presult, __uintptr_t flags);
-typedef __ATTR_NONNULL((1, 3, 5)) int
+typedef __ATTR_NONNULL_T((1, 3, 5)) int
 (LIBREGEX_CC *PREGEX_RFINDPTR)(/*utf-8*/ char const *__restrict data, __size_t datalen,
                                /*utf-8*/ char const *__restrict pattern, __size_t patternlen,
                                struct regex_range_ptr *__restrict presult, __uintptr_t flags);
@@ -202,11 +202,11 @@ regex_rfindptr(/*utf-8*/ char const *__restrict data, __size_t datalen,
 #endif /* LIBREGEX_WANT_PROTOTYPES */
 
 /* Same as the functions above, but return both character indices _and_ pointers. */
-typedef __ATTR_NONNULL((1, 3, 5)) int
+typedef __ATTR_NONNULL_T((1, 3, 5)) int
 (LIBREGEX_CC *PREGEX_FINDEX)(/*utf-8*/ char const *__restrict data, __size_t datalen,
                              /*utf-8*/ char const *__restrict pattern, __size_t patternlen,
                              struct regex_range_ex *__restrict presult, __uintptr_t flags);
-typedef __ATTR_NONNULL((1, 3, 5)) int
+typedef __ATTR_NONNULL_T((1, 3, 5)) int
 (LIBREGEX_CC *PREGEX_RFINDEX)(/*utf-8*/ char const *__restrict data, __size_t datalen,
                               /*utf-8*/ char const *__restrict pattern, __size_t patternlen,
                               struct regex_range_ex *__restrict presult, __uintptr_t flags);

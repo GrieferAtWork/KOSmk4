@@ -78,33 +78,33 @@ struct desctab;
 
 /* Print a general-purpose register (id is one of { a, c, d, b, S, D, B, P } (same as gcc inline assembly register constraints, with B for %ebp and P for %esp))
  * On x86_64, use `0-7' to indicate extended registers `r8-r15' */
-typedef __ATTR_NONNULL((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GPREG)(struct regdump_printer *__restrict __self, char __id, __uintptr_t __value);
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GPREGS)(struct regdump_printer *__restrict __self, struct gpregs const *__restrict __data);
+typedef __ATTR_NONNULL_T((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GPREG)(struct regdump_printer *__restrict __self, char __id, __uintptr_t __value);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GPREGS)(struct regdump_printer *__restrict __self, struct gpregs const *__restrict __data);
 #ifdef __x86_64__
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GPREGS_WITH_SP)(struct regdump_printer *__restrict __self, struct gpregsnsp const *__restrict __data, __uintptr_t __sp);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GPREGS_WITH_SP)(struct regdump_printer *__restrict __self, struct gpregsnsp const *__restrict __data, __uintptr_t __sp);
 #else /* __x86_64__ */
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GPREGS_WITH_SP)(struct regdump_printer *__restrict __self, struct gpregs const *__restrict __data, __uintptr_t __sp);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GPREGS_WITH_SP)(struct regdump_printer *__restrict __self, struct gpregs const *__restrict __data, __uintptr_t __sp);
 #endif /* !__x86_64__ */
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SGREGS)(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data);
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SGREGS_WITH_CS_SS)(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data, __uint16_t __cs, __uint16_t __ss);
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SGREGS_WITH_CS_SS_TR_LDT)(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data, __uint16_t __cs, __uint16_t __ss, __uint16_t __tr, __uint16_t __ldt);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SGREGS)(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SGREGS_WITH_CS_SS)(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data, __uint16_t __cs, __uint16_t __ss);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SGREGS_WITH_CS_SS_TR_LDT)(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data, __uint16_t __cs, __uint16_t __ss, __uint16_t __tr, __uint16_t __ldt);
 #ifdef __x86_64__
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SGBASE)(struct regdump_printer *__restrict __self, struct sgbase const *__restrict __data);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SGBASE)(struct regdump_printer *__restrict __self, struct sgbase const *__restrict __data);
 #endif /* __x86_64__ */
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_COREGS)(struct regdump_printer *__restrict __self, struct coregs const *__restrict __data);
-typedef __ATTR_NONNULL((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_CR0)(struct regdump_printer *__restrict __self, __uintptr_t __cr0);
-typedef __ATTR_NONNULL((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_CR4)(struct regdump_printer *__restrict __self, __uintptr_t __cr4);
-typedef __ATTR_NONNULL((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_DR6)(struct regdump_printer *__restrict __self, __uintptr_t __dr6);
-typedef __ATTR_NONNULL((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_DR7)(struct regdump_printer *__restrict __self, __uintptr_t __dr7);
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_DRREGS)(struct regdump_printer *__restrict __self, struct drregs const *__restrict __data);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_COREGS)(struct regdump_printer *__restrict __self, struct coregs const *__restrict __data);
+typedef __ATTR_NONNULL_T((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_CR0)(struct regdump_printer *__restrict __self, __uintptr_t __cr0);
+typedef __ATTR_NONNULL_T((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_CR4)(struct regdump_printer *__restrict __self, __uintptr_t __cr4);
+typedef __ATTR_NONNULL_T((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_DR6)(struct regdump_printer *__restrict __self, __uintptr_t __dr6);
+typedef __ATTR_NONNULL_T((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_DR7)(struct regdump_printer *__restrict __self, __uintptr_t __dr7);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_DRREGS)(struct regdump_printer *__restrict __self, struct drregs const *__restrict __data);
 /* Print a segment register (id is one of { d[s], e[s], f[s], g[s], c[s], s[s], t[r], l[dt] } (pass the character that doesn't appear in brackets)) */
-typedef __ATTR_NONNULL((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SREG)(struct regdump_printer *__restrict __self, char __id, __uint16_t __value);
+typedef __ATTR_NONNULL_T((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_SREG)(struct regdump_printer *__restrict __self, char __id, __uint16_t __value);
 /* Print the eflags/rflags register */
-typedef __ATTR_NONNULL((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_FLAGS)(struct regdump_printer *__restrict __self, __uintptr_t __flags);
+typedef __ATTR_NONNULL_T((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_FLAGS)(struct regdump_printer *__restrict __self, __uintptr_t __flags);
 /* Print the InstructionPointer register. */
-typedef __ATTR_NONNULL((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_IP)(struct regdump_printer *__restrict __self, __uintptr_t __ip);
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GDT)(struct regdump_printer *__restrict __self, struct desctab const *__restrict __gdt);
-typedef __ATTR_NONNULL((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_IDT)(struct regdump_printer *__restrict __self, struct desctab const *__restrict __idt);
+typedef __ATTR_NONNULL_T((1)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_IP)(struct regdump_printer *__restrict __self, __uintptr_t __ip);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_GDT)(struct regdump_printer *__restrict __self, struct desctab const *__restrict __gdt);
+typedef __ATTR_NONNULL_T((1, 2)) __ssize_t (LIBREGDUMP_CC *PREGDUMP_IDT)(struct regdump_printer *__restrict __self, struct desctab const *__restrict __idt);
 #ifdef LIBREGDUMP_WANT_PROTOTYPES
 /* Print a general-purpose register (id is one of { a, c, d, b, S, D, B, P } (same as gcc inline assembly register constraints, with B for %ebp and P for %esp))
  * On x86_64, use `0-7' to indicate extended registers `r8-r15' */

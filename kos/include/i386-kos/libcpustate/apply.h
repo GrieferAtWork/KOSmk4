@@ -41,16 +41,16 @@ struct mcontext;
 #endif /* !__KERNEL__ */
 
 /* Load the given CPU state and resume execute at its location. */
-typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void /*__NOTHROW*/ (LIBCPUSTATE_CC *PCPU_APPLY_UCPUSTATE)(struct ucpustate const *__restrict __state);
-typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void /*__NOTHROW*/ (LIBCPUSTATE_CC *PCPU_APPLY_LCPUSTATE)(struct lcpustate const *__restrict __state);
-typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void /*__NOTHROW*/ (LIBCPUSTATE_CC *PCPU_APPLY_KCPUSTATE)(struct kcpustate const *__restrict __state);
-typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void /*__NOTHROW*/ (LIBCPUSTATE_CC *PCPU_APPLY_FCPUSTATE)(struct fcpustate const *__restrict __state);
+typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void __NOTHROW_T(LIBCPUSTATE_CC *PCPU_APPLY_UCPUSTATE)(struct ucpustate const *__restrict __state);
+typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void __NOTHROW_T(LIBCPUSTATE_CC *PCPU_APPLY_LCPUSTATE)(struct lcpustate const *__restrict __state);
+typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void __NOTHROW_T(LIBCPUSTATE_CC *PCPU_APPLY_KCPUSTATE)(struct kcpustate const *__restrict __state);
+typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void __NOTHROW_T(LIBCPUSTATE_CC *PCPU_APPLY_FCPUSTATE)(struct fcpustate const *__restrict __state);
 #ifdef __KERNEL__
-typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void /*__NOTHROW*/ (LIBCPUSTATE_CC *PCPU_APPLY_ICPUSTATE)(struct icpustate const *__restrict __state);
-typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void /*__NOTHROW*/ (LIBCPUSTATE_CC *PCPU_APPLY_SCPUSTATE)(struct scpustate const *__restrict __state);
+typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void __NOTHROW_T(LIBCPUSTATE_CC *PCPU_APPLY_ICPUSTATE)(struct icpustate const *__restrict __state);
+typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void __NOTHROW_T(LIBCPUSTATE_CC *PCPU_APPLY_SCPUSTATE)(struct scpustate const *__restrict __state);
 #else /* __KERNEL__ */
-typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void /*__NOTHROW*/ (LIBCPUSTATE_CC *PCPU_APPLY_UCONTEXT)(struct ucontext const *__restrict __state);
-typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void /*__NOTHROW*/ (LIBCPUSTATE_CC *PCPU_APPLY_MCONTEXT)(struct mcontext const *__restrict __state);
+typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void __NOTHROW_T(LIBCPUSTATE_CC *PCPU_APPLY_UCONTEXT)(struct ucontext const *__restrict __state);
+typedef __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void __NOTHROW_T(LIBCPUSTATE_CC *PCPU_APPLY_MCONTEXT)(struct mcontext const *__restrict __state);
 #endif /* !__KERNEL__ */
 
 #ifdef LIBCPUSTATE_WANT_PROTOTYPES

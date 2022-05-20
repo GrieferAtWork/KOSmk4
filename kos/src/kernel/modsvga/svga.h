@@ -117,13 +117,13 @@ struct svga_gfxcell {
 struct svga_ttyaccess_gfx: svga_ttyaccess {
 	/* [1..1][lock(vta_lock)] Redraw the cell at `address' (index into `stx_display')
 	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *stx_redraw_cell)(struct svga_ttyaccess_gfx *__restrict self,
-	                                     uintptr_t address);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *stx_redraw_cell)(struct svga_ttyaccess_gfx *__restrict self,
+	                                  uintptr_t address);
 	/* [1..1][lock(vta_lock)] Draw a cursor at `stx_swcur'
 	 * NOTE: This operator is only invoked when `VIDTTYACCESS_F_ACTIVE' is set. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (FCALL *stx_redraw_cursor)(struct svga_ttyaccess_gfx *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(FCALL *stx_redraw_cursor)(struct svga_ttyaccess_gfx *__restrict self);
 	uint32_t                                     stx_ccolor;     /* [lock(vta_lock)] Cursor color. */
 	union vidtty_cursor                          stx_swcur;      /* [valid_if(_SVGA_TTYACCESS_F_SWCURON)][lock(vta_lock)]
 	                                                              * Current software cursor position. */

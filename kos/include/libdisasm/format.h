@@ -63,7 +63,7 @@ struct disassembler;
  *               or  alternatively `0' in  case `disasm_print()' and friends
  *               were used to print output, rather than the printer callback
  *               itself directly. */
-typedef __ATTR_NONNULL((1)) __ssize_t
+typedef __ATTR_NONNULL_T((1)) __ssize_t
 (LIBDISASM_CC *diasm_print_format_t)(struct disassembler *__restrict self,
                                      unsigned int format_option);
 

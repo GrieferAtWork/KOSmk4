@@ -114,7 +114,7 @@ struct fsuper_ops {
 	 * @return: false: This volume doesn't have a label (same as not implementing
 	 *                 this  operator, except that the special singleton handling
 	 *                 is skipped as well) */
-	BLOCKING WUNUSED NONNULL((1)) __BOOL
+	BLOCKING WUNUSED_T NONNULL_T((1)) __BOOL
 	(KCALL *so_getlabel)(struct fsuper *__restrict self,
 	                     USER CHECKED char buf[FSLABEL_MAX])
 			THROWS(E_IOERROR, E_SEGFAULT, ...);
@@ -123,7 +123,7 @@ struct fsuper_ops {
 	 * @return: true:  Successfully saved the label
 	 * @return: false: This volume doesn't have a label (same as not implementing this operator)
 	 * @throws: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_FSLABEL_TOO_LONG:namelen: [...] */
-	BLOCKING WUNUSED NONNULL((1)) __BOOL
+	BLOCKING WUNUSED_T NONNULL_T((1)) __BOOL
 	(KCALL *so_setlabel)(struct fsuper *__restrict self,
 	                     USER CHECKED char const *name, size_t namelen)
 			THROWS(E_IOERROR, E_FSERROR_READONLY, E_SEGFAULT,
@@ -138,19 +138,19 @@ struct fsuper_ops {
 	 * for compatibility with linux. On KOS, this exception is:
 	 *   - E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_UID:uid
 	 *   - E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_CHOWN_UNSUPP_GID:gid */
-	BLOCKING WUNUSED NONNULL((1)) __BOOL (KCALL *so_validuid)(struct fsuper *__restrict self, uid_t uid) THROWS(...);
-	BLOCKING WUNUSED NONNULL((1)) __BOOL (KCALL *so_validgid)(struct fsuper *__restrict self, gid_t gid) THROWS(...);
+	BLOCKING WUNUSED_T NONNULL_T((1)) __BOOL (KCALL *so_validuid)(struct fsuper *__restrict self, uid_t uid) THROWS(...);
+	BLOCKING WUNUSED_T NONNULL_T((1)) __BOOL (KCALL *so_validgid)(struct fsuper *__restrict self, gid_t gid) THROWS(...);
 
 	/* [0..1] Truncate the given `tms' to the near possible time value which
 	 *        can be encoded within filesystem-specific data structure. */
-	BLOCKING NONNULL((1, 2)) void (KCALL *so_truncate_atime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
-	BLOCKING NONNULL((1, 2)) void (KCALL *so_truncate_mtime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
-	BLOCKING NONNULL((1, 2)) void (KCALL *so_truncate_ctime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
-	BLOCKING NONNULL((1, 2)) void (KCALL *so_truncate_btime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
+	BLOCKING NONNULL_T((1, 2)) void (KCALL *so_truncate_atime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
+	BLOCKING NONNULL_T((1, 2)) void (KCALL *so_truncate_mtime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
+	BLOCKING NONNULL_T((1, 2)) void (KCALL *so_truncate_ctime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
+	BLOCKING NONNULL_T((1, 2)) void (KCALL *so_truncate_btime)(struct fsuper *__restrict self, /*in|out*/ struct timespec *__restrict tms) THROWS(...);
 
 	/* [0..1] Flush unwritten changes from fs-specific
 	 *        superblock buffers to disk and/or disk buffers */
-	BLOCKING NONNULL((1)) void
+	BLOCKING NONNULL_T((1)) void
 	(KCALL *so_sync)(struct fsuper *__restrict self)
 			THROWS(E_IOERROR, ...);
 
@@ -168,7 +168,7 @@ struct fsuper_ops {
 	 *   - f_files
 	 *   - f_ffree
 	 *   - f_fsid */
-	BLOCKING NONNULL((1)) void
+	BLOCKING NONNULL_T((1)) void
 	(KCALL *so_statfs)(struct fsuper *__restrict self,
 	                   USER CHECKED struct statfs *result)
 			THROWS(E_SEGFAULT, E_IOERROR, ...);
@@ -183,8 +183,8 @@ struct fsuper_ops {
 	 * all reachable directories,  resolving the super->dir->dirent->file->super  reference
 	 * loop  that is normally used to prevent ramfs  files from being deleted the second no
 	 * one is explicitly referencing them anymore. */
-	NOBLOCK NONNULL((1)) void
-	/*NOTHROW*/ (KCALL *so_delete)(REF struct fsuper *__restrict self);
+	NOBLOCK NONNULL_T((1)) void
+	NOTHROW_T(KCALL *so_delete)(REF struct fsuper *__restrict self);
 
 	struct fdirnode_ops so_fdir; /* FDirNode operators */
 
@@ -236,8 +236,8 @@ struct fsuper {
 	 *
 	 * Filesystem drivers should use these (or rather: the wrapper macros below) in order
 	 * to perform aligned (O_DIRECT-style) disk I/O. */
-	BLOCKING NONNULL((1, 5)) void (KCALL *fs_loadblocks)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
-	BLOCKING NONNULL((1, 5)) void (KCALL *fs_saveblocks)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
+	BLOCKING NONNULL_T((1, 5)) void (KCALL *fs_loadblocks)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
+	BLOCKING NONNULL_T((1, 5)) void (KCALL *fs_saveblocks)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
 	struct fsuperfeat           fs_feat;          /* [const] Filesystem features. */
 	struct REF fnode_list       fs_changednodes;  /* [0..n][lock(fs_changednodes_lock)][const_if(FSUPER_NODES_DELETED)]
 	                                               * List of changed node (set to FSUPER_NODES_DELETED during unmount). */

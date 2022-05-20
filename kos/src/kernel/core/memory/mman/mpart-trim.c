@@ -277,7 +277,7 @@ NOTHROW(FCALL mnode_load_mhint)(struct mnode *__restrict self) {
 }
 
 typedef NOBLOCK void
-/*NOTHROW*/(FCALL *freefun_t)(physpage_t base, physpagecnt_t num_pages, gfp_t flags);
+NOTHROW_T(FCALL *freefun_t)(physpage_t base, physpagecnt_t num_pages, gfp_t flags);
 
 INTERN NOBLOCK void /* from "kram-unmap.c" */
 NOTHROW(FCALL mpart_freefun_noop)(physpage_t UNUSED(base), physpagecnt_t UNUSED(num_pages), gfp_t UNUSED(flags));

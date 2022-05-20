@@ -115,7 +115,7 @@ struct video_codec {
 
 	/* Get a pixel (The caller must ensure that the given x is in-bounds) */
 	__ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel_t
-	(__ATTR_PURE_P LIBVIDEO_CODEC_CC *vc_getpixel)(__byte_t const *__restrict line, __uintptr_t x);
+	(__ATTR_PURE_T LIBVIDEO_CODEC_CC *vc_getpixel)(__byte_t const *__restrict line, __uintptr_t x);
 
 	/* Set a pixel (The caller must ensure that the given x is in-bounds) */
 	__ATTR_NONNULL((1)) void
@@ -135,16 +135,16 @@ struct video_codec {
 
 	/* Convert between color and pixel values. */
 	__ATTR_WUNUSED __ATTR_NONNULL((1)) video_color_t
-	(__ATTR_PURE_P LIBVIDEO_CODEC_CC *vc_pixel2color)(struct video_format const *__restrict self,
+	(__ATTR_PURE_T LIBVIDEO_CODEC_CC *vc_pixel2color)(struct video_format const *__restrict self,
 	                                                  video_pixel_t pixel);
 	__ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel_t
-	(__ATTR_PURE_P LIBVIDEO_CODEC_CC *vc_color2pixel)(struct video_format const *__restrict self,
+	(__ATTR_PURE_T LIBVIDEO_CODEC_CC *vc_color2pixel)(struct video_format const *__restrict self,
 	                                                  video_color_t color);
 };
 
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported. */
-typedef __ATTR_WUNUSED __ATTR_CONST struct video_codec const *
+typedef __ATTR_WUNUSED_T __ATTR_CONST struct video_codec const *
 (LIBVIDEO_CODEC_CC *PVIDEO_CODEC_LOOKUP)(video_codec_t codec);
 #ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
 LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_CONST struct video_codec const *

@@ -42,8 +42,8 @@ __DECL_BEGIN
  * WARNING: This function may trigger a segmentation fault when `pc' is an invalid pointer.
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
  * @return: 0 : The pointed-to instruction wasn't recognized. */
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __size_t
-/*__NOTHROW_NCX*/ (LIBINSTRLEN_CC *PINSTRUCTION_LENGTH)(void const *pc, instrlen_isa_t isa);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __size_t
+__NOTHROW_NCX_T(LIBINSTRLEN_CC *PINSTRUCTION_LENGTH)(void const *pc, instrlen_isa_t isa);
 #ifdef LIBINSTRLEN_WANT_PROTOTYPES
 LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED __size_t
 __NOTHROW_NCX(LIBINSTRLEN_CC instruction_length)(void const *pc, instrlen_isa_t isa __DFL(INSTRLEN_ISA_DEFAULT));
@@ -54,8 +54,8 @@ __NOTHROW_NCX(LIBINSTRLEN_CC instruction_length)(void const *pc, instrlen_isa_t 
  * WARNING: These functions may trigger a segmentation fault when `pc' is an invalid pointer.
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
  * @return: NULL: The pointed-to instruction wasn't recognized. */
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __byte_t *(LIBINSTRLEN_CC *PINSTRUCTION_SUCC)(void const *pc, instrlen_isa_t isa);
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __byte_t *(LIBINSTRLEN_CC *PINSTRUCTION_PRED)(void const *pc, instrlen_isa_t isa);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __byte_t *__NOTHROW_NCX_T(LIBINSTRLEN_CC *PINSTRUCTION_SUCC)(void const *pc, instrlen_isa_t isa);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __byte_t *__NOTHROW_NCX_T(LIBINSTRLEN_CC *PINSTRUCTION_PRED)(void const *pc, instrlen_isa_t isa);
 #ifdef LIBINSTRLEN_WANT_PROTOTYPES
 LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED __byte_t *
 __NOTHROW_NCX(LIBINSTRLEN_CC instruction_succ)(void const *pc, instrlen_isa_t isa __DFL(INSTRLEN_ISA_DEFAULT));
@@ -66,9 +66,9 @@ __NOTHROW_NCX(LIBINSTRLEN_CC instruction_pred)(void const *pc, instrlen_isa_t is
 /* Same as above, but handle E_SEGFAULT (and E_WOULDBLOCK in kernel-space) by returning `NULL'
  * Other  exceptions are propagated normally (which could  happen due to VIO access emulation)
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __byte_t *
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __byte_t *
 (LIBINSTRLEN_CC *PINSTRUCTION_SUCC_NX)(void const *pc, instrlen_isa_t isa);
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __byte_t *
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __byte_t *
 (LIBINSTRLEN_CC *PINSTRUCTION_PRED_NX)(void const *pc, instrlen_isa_t isa);
 #ifdef LIBINSTRLEN_WANT_PROTOTYPES
 LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED __byte_t *
@@ -79,10 +79,10 @@ __NOTHROW_NCX(LIBINSTRLEN_CC instruction_pred_nx)(void const *pc, instrlen_isa_t
 
 /* Same as `instruction_(succ|pred)_nx', but return pc +/- 1 instead of NULL.
  * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
-typedef /*__ATTR_PURE*/ __ATTR_RETNONNULL __ATTR_WUNUSED __byte_t *
-/*__NOTHROW_NCX*/ (LIBINSTRLEN_CC *PINSTRUCTION_TRYSUCC)(void const *pc, instrlen_isa_t isa);
-typedef /*__ATTR_PURE*/ __ATTR_RETNONNULL __ATTR_WUNUSED __byte_t *
-/*__NOTHROW_NCX*/ (LIBINSTRLEN_CC *PINSTRUCTION_TRYPRED)(void const *pc, instrlen_isa_t isa);
+typedef __ATTR_PURE_T __ATTR_RETNONNULL __ATTR_WUNUSED_T __byte_t *
+__NOTHROW_NCX_T(LIBINSTRLEN_CC *PINSTRUCTION_TRYSUCC)(void const *pc, instrlen_isa_t isa);
+typedef __ATTR_PURE_T __ATTR_RETNONNULL __ATTR_WUNUSED_T __byte_t *
+__NOTHROW_NCX_T(LIBINSTRLEN_CC *PINSTRUCTION_TRYPRED)(void const *pc, instrlen_isa_t isa);
 #ifdef LIBINSTRLEN_WANT_PROTOTYPES
 LIBINSTRLEN_DECL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __byte_t *
 __NOTHROW_NCX(LIBINSTRLEN_CC instruction_trysucc)(void const *pc, instrlen_isa_t isa __DFL(INSTRLEN_ISA_DEFAULT));

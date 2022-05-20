@@ -116,8 +116,8 @@ struct dlglobals;
  * to loader extensions (and loader extensions only), without clobbering the
  * actual export namespace (i.e. functions such as `dlopen()') */
 struct dlcore_ops {
-#define DL_COREOP(attr, return, cc, name, args) attr return (cc *name) args;
-#define DL_COREFIELD(type, name)                type *name;
+#define DL_COREOP(attr, return, nothrow, cc, name, args) attr return nothrow(cc *name) args;
+#define DL_COREFIELD(type, name)                         type *name;
 #include "coreops.def"
 };
 
