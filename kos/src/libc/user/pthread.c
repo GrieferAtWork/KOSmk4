@@ -4540,14 +4540,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecific)(pthread_key_t key)
 }
 /*[[[end:libc_pthread_getspecific]]]*/
 
-/*[[[head:libc_pthread_setspecific,hash:CRC-32=0x2eeff4ed]]]*/
+/*[[[head:libc_pthread_setspecific,hash:CRC-32=0x60e794ce]]]*/
 /* >> pthread_setspecific(3)
  * Store POINTER in the thread-specific data slot identified by `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
  * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
  *                  calling  thread, and an attempt to allocate it just now failed */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_ACCESS_NONE(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
                                                void const *pointer)
 /*[[[body:libc_pthread_setspecific]]]*/

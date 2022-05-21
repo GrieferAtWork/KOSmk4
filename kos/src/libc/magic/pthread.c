@@ -2725,7 +2725,8 @@ void *pthread_getspecific(pthread_key_t key) {
 @@                 calling  thread, and an attempt to allocate it just now failed
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[export_alias("thr_setspecific")]]
-$errno_t pthread_setspecific(pthread_key_t key, void const *pointer);
+$errno_t pthread_setspecific(pthread_key_t key,
+                             [[access(none)]] void const *pointer);
 
 %#ifdef __USE_KOS
 @@>> pthread_getspecificptr_np(3)

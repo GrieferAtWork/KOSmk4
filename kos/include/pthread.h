@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebb47bae */
+/* HASH CRC-32:0x720d19a2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2484,7 +2484,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_getspecific, __FORCELOCAL __ATTR_ARTIFIC
  * @return: EINVAL: Invalid `key'
  * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
  *                  calling  thread, and an attempt to allocate it just now failed */
-__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),(__key,__pointer))
+__CDECLARE(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),(__key,__pointer))
 #elif defined(__CRT_HAVE_thr_setspecific)
 /* >> pthread_setspecific(3)
  * Store POINTER in the thread-specific data slot identified by `key'
@@ -2492,7 +2492,7 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, vo
  * @return: EINVAL: Invalid `key'
  * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
  *                  calling  thread, and an attempt to allocate it just now failed */
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),thr_setspecific,(__key,__pointer))
+__CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),thr_setspecific,(__key,__pointer))
 #endif /* ... */
 #ifdef __USE_KOS
 /* >> pthread_getspecificptr_np(3)

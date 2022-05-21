@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb03e5f67 */
+/* HASH CRC-32:0x786ac640 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -784,7 +784,7 @@ INTDEF WUNUSED void *NOTHROW_NCX(LIBDCALL libd_pthread_getspecific)(pthread_key_
  * @return: EINVAL: Invalid `key'
  * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
  *                  calling  thread, and an attempt to allocate it just now failed */
-INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_setspecific)(pthread_key_t key, void const *pointer);
+INTDEF ATTR_ACCESS_NONE(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_setspecific)(pthread_key_t key, void const *pointer);
 /* >> pthread_getspecificptr_np(3)
  * Return a pointer to the per-thread storage location associated with `key'
  * @return: * :   The address read/written by `pthread_getspecific()' / `pthread_setspecific()'

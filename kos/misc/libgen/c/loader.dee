@@ -536,6 +536,29 @@ again_parse_arg_annotations:
 					tok = self.next();
 					break;
 
+				case "access": {
+					/* Low-level __attribute__((access(...))) annotations. */
+					self.next();
+					self.skip("(");
+					local mode = str self.parseCStringOrKeyword();
+					local attrib = {
+						"none"       : "ATTR_ACCESS_NONE",
+						"rd"         : "ATTR_ACCESS_RD",
+						"ro"         : "ATTR_ACCESS_RD",
+						"read_only"  : "ATTR_ACCESS_RD",
+						"wr"         : "ATTR_ACCESS_WR",
+						"write_only" : "ATTR_ACCESS_WR",
+						"rw"         : "ATTR_ACCESS_RW",
+						"rdwr"       : "ATTR_ACCESS_RW",
+						"read_write" : "ATTR_ACCESS_RW",
+					}.get(mode);
+					if (attrib is none)
+						self.err("Invalid access-mode: {!r}".format({ mode }));
+					self.skip(")");
+					result.attributes.append("{}({})"
+						.format({ attrib, #result.argv + 1 }));
+				}	break;
+
 				case "format_arg":
 					if (result.attributes === defaultAttributes)
 						result.attributes = List(defaultAttributes);

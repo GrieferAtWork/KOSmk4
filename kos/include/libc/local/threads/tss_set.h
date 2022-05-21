@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6bf4f2d */
+/* HASH CRC-32:0x62e22c61 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,13 +31,13 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),pthread_setspecific,(__key,__pointer))
+__CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),pthread_setspecific,(__key,__pointer))
 #elif defined(__CRT_HAVE_thr_setspecific)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),thr_setspecific,(__key,__pointer))
+__CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),thr_setspecific,(__key,__pointer))
 #else /* ... */
 #undef __local___localdep_pthread_setspecific_defined
 #endif /* !... */
