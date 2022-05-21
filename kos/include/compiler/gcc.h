@@ -229,7 +229,6 @@
 #define __LONGDOUBLE long double
 #endif /* !__LONGDOUBLE */
 #define __COMPILER_HAVE_GCC_ASM
-#define __COMPILER_HAVE_REGISTER_VARS
 #define __COMPILER_HAVE_PRAGMA_PACK
 #define __COMPILER_HAVE_ADDRESSIBLE_LABELS /* void *p = &&foo; goto *p; foo: */
 #define __COMPILER_HAVE_TYPEOF
@@ -252,6 +251,13 @@
 #else /* __cplusplus */
 #define __COMPILER_ASM_BUFFER(T, s, p) (*(struct { __extension__ T __d[s]; } *)(p))
 #endif /* !__cplusplus */
+
+#define __COMPILER_HAVE_REGISTER_VARS
+#ifdef __INTELLISENSE__
+#define __register_var(T, name, regname) T name
+#else /* __INTELLISENSE__ */
+#define __register_var(T, name, regname) register T name __asm__(regname)
+#endif /* !__INTELLISENSE__ */
 
 #ifndef __cplusplus
 /* XXX: When was this added in C? */
@@ -872,12 +878,6 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #define _Complex __complex__
 #define _Complex_I (__extension__ 1.0iF)
 #endif
-
-#ifdef __INTELLISENSE__
-#define __register_var(T, name, regname) T name
-#else /* __INTELLISENSE__ */
-#define __register_var(T, name, regname) register T name __asm__(regname)
-#endif /* !__INTELLISENSE__ */
 
 
 #ifdef __cplusplus

@@ -1042,9 +1042,9 @@ libservice_dlsym_lookup_or_create(struct service *__restrict self,
 	tx_bufsize = COM_GENERATOR_INITIAL_TX_BUFSIZ;
 	eh_bufsize = COM_GENERATOR_INITIAL_EH_BUFSIZ;
 	service_textlock_write(self);
+	tx_range = SLIST_FIRST(&self->s_txranges);
+	eh_range = SLIST_FIRST(&self->s_ehranges);
 	TRY {
-		tx_range = SLIST_FIRST(&self->s_txranges);
-		eh_range = SLIST_FIRST(&self->s_ehranges);
 
 		/* Check once again if the function is available.
 		 * It may be if another thread created it while the server was telling us about it. */

@@ -836,8 +836,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Fix all remaining warnings that appeared alongside gcc-12.1.0 */
 
-	/* TODO: Stop passing -fpermissive to gcc */
-
 	return state;
 }
 

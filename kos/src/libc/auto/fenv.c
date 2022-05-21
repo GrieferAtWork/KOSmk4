@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5b66855 */
+/* HASH CRC-32:0x3672ee09 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,6 +76,9 @@ NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp,
 /* >> fetestexcept(3) */
 INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_PURE WUNUSED int
 NOTHROW(LIBCCALL libc_fetestexcept)(int excepts) {
+	/* Do `COMPILER_IMPURE()' to supress a false warning:
+	 * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105682 */
+	COMPILER_IMPURE();
 	return __inline_fetestexcept(excepts);
 }
 #include <bits/crt/fenv-inline.h>

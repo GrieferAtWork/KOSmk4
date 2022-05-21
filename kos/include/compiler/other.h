@@ -282,8 +282,6 @@
 #define __NO_builtin_FUNCTION
 #define __builtin_FUNCTION() ""
 #define __FUNCTION__ ""
-#define __NO_register_var
-#define __register_var(T, name, regname) /* nothing */
 
 
 

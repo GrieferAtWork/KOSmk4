@@ -101,7 +101,9 @@ struct dirent {
 	__UINT8_TYPE__     d_type;
 #if defined(__DIRENT_TEXTSIZE)
 	char               d_name[__DIRENT_TEXTSIZE];
-#elif defined(__USE_KOS_KERNEL)
+#elif (defined(__COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS) && \
+       (defined(__USE_KOS) || defined(__USE_KOS_KERNEL) || \
+        defined(__USE_KOS_ALTERATIONS)))
 	__COMPILER_FLEXIBLE_ARRAY(char, d_name); /* Allocated as required. */
 #else /* ... */
 	char               d_name[256];

@@ -747,7 +747,14 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define _Complex __complex__
 #endif /* __STDC_VERSION__ < 199901 */
 
+#if 1 /* ??? */
+#define __COMPILER_HAVE_REGISTER_VARS
+#ifdef __INTELLISENSE__
+#define __register_var(T, name, regname) T name
+#else /* __INTELLISENSE__ */
 #define __register_var(T, name, regname) register T name __asm__(regname)
+#endif /* !__INTELLISENSE__ */
+#endif
 
 
 #ifdef __clang_tidy__

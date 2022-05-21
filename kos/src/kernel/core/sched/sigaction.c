@@ -797,7 +797,7 @@ DEFINE_SYSCALL2(sighandler_t, signal,
 	if ((void *)handler == (void *)SIG_GET) {
 		sys_sigaction_impl(signo, NULL, oact, 0);
 	} else {
-		bzero(&act, offsetof(struct kernel_sigaction, sa_mask));
+		bzero(act, offsetof(struct kernel_sigaction, sa_mask));
 		act->sa_handler = (typeof(act->sa_handler))(void *)handler;
 		sys_sigaction_impl(signo, act, oact, 0);
 	}
@@ -818,7 +818,7 @@ DEFINE_COMPAT_SYSCALL2(compat_sighandler_t, signal,
 	if ((void *)handler == (void *)SIG_GET) {
 		sys_sigaction_impl(signo, NULL, oact, 0);
 	} else {
-		bzero(&act, offsetof(struct kernel_sigaction, sa_mask));
+		bzero(act, offsetof(struct kernel_sigaction, sa_mask));
 		act->sa_handler = (typeof(act->sa_handler))(void *)handler;
 		sys_sigaction_impl(signo, act, oact, 0);
 	}

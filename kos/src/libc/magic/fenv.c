@@ -135,6 +135,9 @@ int fesetexceptflag([[nonnull]] fexcept_t const *flagp, int excepts) {
 [[std, nothrow, pure, wunused]]
 [[preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fetestexcept(int excepts) {
+	/* Do `COMPILER_IMPURE()' to supress a false warning:
+	 * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105682 */
+	COMPILER_IMPURE();
 	return __inline_fetestexcept(excepts);
 }
 

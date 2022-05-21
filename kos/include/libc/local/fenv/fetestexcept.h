@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89b30b0b */
+/* HASH CRC-32:0xd29d449c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,9 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fetestexcept) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fetestexcept))(int __excepts) {
+	/* Do `COMPILER_IMPURE()' to supress a false warning:
+	 * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105682 */
+	__COMPILER_IMPURE();
 	return __inline_fetestexcept(__excepts);
 }
 __NAMESPACE_LOCAL_END

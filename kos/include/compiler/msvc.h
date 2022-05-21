@@ -456,9 +456,6 @@ extern void (__cdecl _ReadWriteBarrier)(void);
 #define __wchar_t_defined
 #endif /* _WCHAR_T_DEFINED */
 
-#define __NO_register_var
-#define __register_var(T, name, regname) register T name
-
 /* Define varargs macros expected by system headers. */
 #ifdef _M_CEE_PURE
 typedef System::ArgIterator __builtin_va_list;

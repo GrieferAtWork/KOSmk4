@@ -66,7 +66,7 @@ PRIVATE struct feature_offset const feature_offsets[] = {
 
 
 /* Check if the machine supports a given `feature' */
-PRIVATE NOBLOCK ATTR_COLDTEXT WUNUSED bool
+PRIVATE NOBLOCK ATTR_COLDTEXT ATTR_CONST WUNUSED bool
 NOTHROW(FCALL has_feature)(u32 feature) {
 	bool result = false;
 	switch (feature & X86_FEATURE_TYPMASK) {

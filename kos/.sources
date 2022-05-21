@@ -130,17 +130,29 @@ CC_FLAGS({
 	/* For some reason, "Wno-format" disables this, so turn it back on... */
 	"-Wnonnull",
 
-	"-Wsuggest-attribute=pure",
+	/* "-Warray-bounds" is broken in gcc-12:
+	 * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105684 */
+	"-Wno-array-bounds",
+
 	"-Wsuggest-attribute=const",
 	"-Wsuggest-attribute=malloc",
 
-	/* cold attribute suggestions are broken at the moment:
-	 * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93087
-	 * If (and once) they get fixed, and I've updated the
-	 * toolchain, this'll get enabled again. */
+	/* -Wsuggest-attribute=pure is broken in gcc-12:
+	 * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105676 */
+//	"-Wsuggest-attribute=pure",
+
+	/* gcc-9:
+	 *    cold attribute suggestions are broken at the moment:
+	 *    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93087
+	 * gcc-12:
+	 *    Still broken (but in a slightly different way) :/
+	 *    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105685
+	 * If (and once) this gets fixed for real, and I've updated
+	 * the toolchain (once again), this'll get enabled again. */
 //	"-Wsuggest-attribute=cold",
 
-//	"-Wsuggest-attribute=noreturn", /* Causes warnings about functions with `kernel_panic("TO" "DO")', so nope! */
+	/* Causes warnings about functions with `kernel_panic("TO" "DO")', so nope! */
+//	"-Wsuggest-attribute=noreturn",
 
 	/* KOS  never assumes _signed_  overflow (only unsigned overflow),
 	 * so  turn this warning  to max! (most  warnings that this causes

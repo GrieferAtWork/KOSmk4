@@ -973,10 +973,12 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #endif /* c_plusplus && !__cplusplus */
 
 #if 1 /* ??? */
+#define __COMPILER_HAVE_REGISTER_VARS
+#ifdef __INTELLISENSE__
+#define __register_var(T, name, regname) T name
+#else /* __INTELLISENSE__ */
 #define __register_var(T, name, regname) register T name __asm__(regname)
-#else
-#define __NO_register_var
-#define __register_var(T, name, regname) register T name
+#endif /* !__INTELLISENSE__ */
 #endif
 
 #ifndef __COMPILER_IGNORE_UNINITIALIZED
