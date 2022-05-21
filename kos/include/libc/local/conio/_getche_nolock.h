@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa10fc8ec */
+/* HASH CRC-32:0x6867bf08 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,37 +32,37 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),getc_unlocked,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__getc_nolock)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),_getc_nolock,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),_getc_nolock,(__stream))
 #elif defined(__CRT_HAVE__fgetc_nolock)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),_fgetc_nolock,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),_fgetc_nolock,(__stream))
 #elif defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),getc,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),getc,(__stream))
 #elif defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc,(__stream))
 #elif defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),_IO_getc,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),_IO_getc,(__stream))
 #elif (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgetc_unlocked.h>
@@ -78,22 +78,22 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fileno)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno,(__stream))
 #elif defined(__CRT_HAVE__fileno)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),_fileno,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),_fileno,(__stream))
 #elif defined(__CRT_HAVE_fileno_unlocked)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_fileno_defined
 #endif /* !... */

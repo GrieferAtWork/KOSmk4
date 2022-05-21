@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcc04aae */
+/* HASH CRC-32:0x71275676 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ DECL_BEGIN
  * Find and return the entry for `name' in `envz', or `NULL' if not found.
  * If `name' contains a `=' character, only characters leading up to  this
  * position are actually compared! */
-INTERN ATTR_SECTION(".text.crt.string.envz") ATTR_PURE WUNUSED NONNULL((3)) char *
+INTERN ATTR_SECTION(".text.crt.string.envz") ATTR_PURE WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_envz_entry)(char const *__restrict envz,
                                       size_t envz_len,
                                       char const *__restrict name) {
@@ -55,7 +55,7 @@ NOTHROW_NCX(LIBCCALL libc_envz_entry)(char const *__restrict envz,
  * Return the value in `envz'  attached to `name', or  `NULL'
  * if no such entry exists, or the entry doesn't have a value
  * portion (i.e. doesn't contain a `='-character) */
-INTERN ATTR_SECTION(".text.crt.string.envz") ATTR_PURE WUNUSED NONNULL((3)) char *
+INTERN ATTR_SECTION(".text.crt.string.envz") ATTR_PURE WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_envz_get)(char const *__restrict envz,
                                     size_t envz_len,
                                     char const *__restrict name) {
@@ -74,7 +74,7 @@ NOTHROW_NCX(LIBCCALL libc_envz_get)(char const *__restrict envz,
  * already existed before, that entry is removed. If `name' is NULL,
  * the entry created  doesn't have a  value-portion (i.e. `name'  is
  * added to `penvz' as-is, without the trailing `=value') */
-INTERN ATTR_SECTION(".text.crt.string.envz") NONNULL((1, 2, 3)) error_t
+INTERN ATTR_SECTION(".text.crt.string.envz") ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) error_t
 NOTHROW_NCX(LIBCCALL libc_envz_add)(char **__restrict penvz,
                                     size_t *__restrict penvz_len,
                                     char const *__restrict name,
@@ -112,7 +112,7 @@ NOTHROW_NCX(LIBCCALL libc_envz_add)(char **__restrict penvz,
  * If individual entries already existed in `penvz', behavior  depends
  * on `override_', which if non-zero will cause existing entries to be
  * overwritten, and otherwise if zero, will cause them to stay. */
-INTERN ATTR_SECTION(".text.crt.string.envz") NONNULL((1, 2, 3)) error_t
+INTERN ATTR_SECTION(".text.crt.string.envz") ATTR_ACCESS_ROS(3, 4) ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) error_t
 NOTHROW_NCX(LIBCCALL libc_envz_merge)(char **__restrict penvz,
                                       size_t *__restrict penvz_len,
                                       char const *__restrict envz2,
@@ -136,7 +136,7 @@ NOTHROW_NCX(LIBCCALL libc_envz_merge)(char **__restrict penvz,
 /* >> envz_remove(3)
  * Remove an entry matching `name' from `penvz',
  * or  do  nothing  if  no  such  entry  exists. */
-INTERN ATTR_SECTION(".text.crt.string.envz") NONNULL((1, 2, 3)) void
+INTERN ATTR_SECTION(".text.crt.string.envz") ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void
 NOTHROW_NCX(LIBCCALL libc_envz_remove)(char **__restrict penvz,
                                        size_t *__restrict penvz_len,
                                        char const *__restrict name) {
@@ -147,7 +147,7 @@ NOTHROW_NCX(LIBCCALL libc_envz_remove)(char **__restrict penvz,
 }
 /* >> envz_strip(3)
  * Remove all entries from `penvz' that don't have a value-portion. */
-INTERN ATTR_SECTION(".text.crt.string.envz") NONNULL((1, 2)) void
+INTERN ATTR_SECTION(".text.crt.string.envz") ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void
 NOTHROW_NCX(LIBCCALL libc_envz_strip)(char **__restrict penvz,
                                       size_t *__restrict penvz_len) {
 	char *start, *ptr, *end;

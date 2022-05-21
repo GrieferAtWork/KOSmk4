@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3672ee09 */
+/* HASH CRC-32:0x10edd200 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ INTERN ATTR_SECTION(".text.crt.math.fenv") int
 }
 #include <bits/crt/fenv-inline.h>
 /* >> fegetexceptflag(3) */
-INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp,
                                            int excepts) {
 #ifdef __inline_fegetexceptflag
@@ -60,7 +60,7 @@ NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp,
 }
 #include <bits/crt/fenv-inline.h>
 /* >> fesetexceptflag(3) */
-INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp,
                                            int excepts) {
 #ifdef __inline_fesetexceptflag
@@ -107,28 +107,28 @@ NOTHROW(LIBCCALL libc_fesetround)(int rounding_direction) {
 }
 #include <bits/crt/fenv-inline.h>
 /* >> fegetenv(3) */
-INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_fegetenv)(fenv_t *envp) {
 	__inline_fegetenv(envp);
 	return 0;
 }
 #include <bits/crt/fenv-inline.h>
 /* >> feholdexcept(3) */
-INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_feholdexcept)(fenv_t *envp) {
 	__inline_feholdexcept(envp);
 	return 0;
 }
 #include <bits/crt/fenv-inline.h>
 /* >> fesetenv(3) */
-INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBCCALL libc_fesetenv)(fenv_t const *envp) {
 	__inline_fesetenv(envp);
 	return 0;
 }
 #include <bits/crt/fenv-inline.h>
 /* >> feupdateenv(3) */
-INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBCCALL libc_feupdateenv)(fenv_t const *envp) {
 	__inline_feupdateenv(envp);
 	return 0;

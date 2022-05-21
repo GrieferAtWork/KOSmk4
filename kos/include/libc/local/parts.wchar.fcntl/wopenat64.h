@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15978390 */
+/* HASH CRC-32:0xad771cd9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,9 +61,9 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_openat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2),__fd_t,__NOTHROW_RPC,__localdep_openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_openat64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2),__fd_t,__NOTHROW_RPC,__localdep_openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_openat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/openat.h>

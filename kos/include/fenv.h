@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f166ce3 */
+/* HASH CRC-32:0x7b4e2642 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -149,35 +149,35 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(feraiseexcept, __FORCELOCAL __ATTR_ARTIFICIAL in
 #endif /* !... */
 #if defined(__fast_fegetexceptflag_defined) && defined(__CRT_HAVE_fegetexceptflag)
 /* >> fegetexceptflag(3) */
-__CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fegetexceptflag,(fexcept_t *__flagp, int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetexceptflag))(__flagp, __excepts); })
+__CEIDECLARE_GCCNCX(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,fegetexceptflag,(fexcept_t *__flagp, int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetexceptflag))(__flagp, __excepts); })
 #elif defined(__fast_fegetexceptflag_defined)
 /* >> fegetexceptflag(3) */
-__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fegetexceptflag)(fexcept_t *__flagp, int __excepts) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetexceptflag))(__flagp, __excepts); }
+__FORCELOCAL __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL fegetexceptflag)(fexcept_t *__flagp, int __excepts) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetexceptflag))(__flagp, __excepts); }
 #elif defined(__CRT_HAVE_fegetexceptflag)
 /* >> fegetexceptflag(3) */
-__CDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fegetexceptflag,(fexcept_t *__flagp, int __excepts),(__flagp,__excepts))
+__CDECLARE_GCCNCX(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,fegetexceptflag,(fexcept_t *__flagp, int __excepts),(__flagp,__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/fegetexceptflag.h>
 __NAMESPACE_STD_BEGIN
 /* >> fegetexceptflag(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fegetexceptflag, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fegetexceptflag)(fexcept_t *__flagp, int __excepts) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetexceptflag))(__flagp, __excepts); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fegetexceptflag, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL fegetexceptflag)(fexcept_t *__flagp, int __excepts) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetexceptflag))(__flagp, __excepts); })
 #endif /* !... */
 #if defined(__fast_fesetexceptflag_defined) && defined(__CRT_HAVE_fesetexceptflag)
 /* >> fesetexceptflag(3) */
-__CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fesetexceptflag,(fexcept_t const *__flagp, int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetexceptflag))(__flagp, __excepts); })
+__CEIDECLARE_GCCNCX(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,fesetexceptflag,(fexcept_t const *__flagp, int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetexceptflag))(__flagp, __excepts); })
 #elif defined(__fast_fesetexceptflag_defined)
 /* >> fesetexceptflag(3) */
-__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fesetexceptflag)(fexcept_t const *__flagp, int __excepts) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetexceptflag))(__flagp, __excepts); }
+__FORCELOCAL __ATTR_ACCESS_RO(1) int __NOTHROW_NCX(__LIBCCALL fesetexceptflag)(fexcept_t const *__flagp, int __excepts) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetexceptflag))(__flagp, __excepts); }
 #elif defined(__CRT_HAVE_fesetexceptflag)
 /* >> fesetexceptflag(3) */
-__CDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fesetexceptflag,(fexcept_t const *__flagp, int __excepts),(__flagp,__excepts))
+__CDECLARE_GCCNCX(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,fesetexceptflag,(fexcept_t const *__flagp, int __excepts),(__flagp,__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/fesetexceptflag.h>
 __NAMESPACE_STD_BEGIN
 /* >> fesetexceptflag(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fesetexceptflag, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fesetexceptflag)(fexcept_t const *__flagp, int __excepts) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetexceptflag))(__flagp, __excepts); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fesetexceptflag, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_NCX(__LIBCCALL fesetexceptflag)(fexcept_t const *__flagp, int __excepts) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetexceptflag))(__flagp, __excepts); })
 #endif /* !... */
 #if defined(__fast_fetestexcept_defined) && defined(__CRT_HAVE_fetestexcept)
 /* >> fetestexcept(3) */
@@ -277,67 +277,67 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fesetround, __FORCELOCAL __ATTR_ARTIFICIAL int _
 #endif /* !... */
 #if defined(__fast_fegetenv_defined) && defined(__CRT_HAVE_fegetenv)
 /* >> fegetenv(3) */
-__CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fegetenv,(fenv_t *___envp),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetenv))(___envp); })
+__CEIDECLARE_GCCNCX(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,fegetenv,(fenv_t *___envp),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetenv))(___envp); })
 #elif defined(__fast_fegetenv_defined)
 /* >> fegetenv(3) */
-__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fegetenv)(fenv_t *___envp) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetenv))(___envp); }
+__FORCELOCAL __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL fegetenv)(fenv_t *___envp) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetenv))(___envp); }
 #elif defined(__CRT_HAVE_fegetenv)
 /* >> fegetenv(3) */
-__CDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fegetenv,(fenv_t *___envp),(___envp))
+__CDECLARE_GCCNCX(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,fegetenv,(fenv_t *___envp),(___envp))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/fegetenv.h>
 __NAMESPACE_STD_BEGIN
 /* >> fegetenv(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fegetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fegetenv)(fenv_t *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetenv))(___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fegetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL fegetenv)(fenv_t *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetenv))(___envp); })
 #endif /* !... */
 #if defined(__fast_feholdexcept_defined) && defined(__CRT_HAVE_feholdexcept)
 /* >> feholdexcept(3) */
-__CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,feholdexcept,(fenv_t *___envp),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feholdexcept))(___envp); })
+__CEIDECLARE_GCCNCX(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,feholdexcept,(fenv_t *___envp),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feholdexcept))(___envp); })
 #elif defined(__fast_feholdexcept_defined)
 /* >> feholdexcept(3) */
-__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL feholdexcept)(fenv_t *___envp) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feholdexcept))(___envp); }
+__FORCELOCAL __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL feholdexcept)(fenv_t *___envp) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feholdexcept))(___envp); }
 #elif defined(__CRT_HAVE_feholdexcept)
 /* >> feholdexcept(3) */
-__CDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,feholdexcept,(fenv_t *___envp),(___envp))
+__CDECLARE_GCCNCX(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,feholdexcept,(fenv_t *___envp),(___envp))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/feholdexcept.h>
 __NAMESPACE_STD_BEGIN
 /* >> feholdexcept(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(feholdexcept, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL feholdexcept)(fenv_t *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feholdexcept))(___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(feholdexcept, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL feholdexcept)(fenv_t *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feholdexcept))(___envp); })
 #endif /* !... */
 #if defined(__fast_fesetenv_defined) && defined(__CRT_HAVE_fesetenv)
 /* >> fesetenv(3) */
-__CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fesetenv,(fenv_t const *___envp),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetenv))(___envp); })
+__CEIDECLARE_GCCNCX(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,fesetenv,(fenv_t const *___envp),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetenv))(___envp); })
 #elif defined(__fast_fesetenv_defined)
 /* >> fesetenv(3) */
-__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fesetenv)(fenv_t const *___envp) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetenv))(___envp); }
+__FORCELOCAL __ATTR_ACCESS_RO(1) int __NOTHROW_NCX(__LIBCCALL fesetenv)(fenv_t const *___envp) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetenv))(___envp); }
 #elif defined(__CRT_HAVE_fesetenv)
 /* >> fesetenv(3) */
-__CDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fesetenv,(fenv_t const *___envp),(___envp))
+__CDECLARE_GCCNCX(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,fesetenv,(fenv_t const *___envp),(___envp))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/fesetenv.h>
 __NAMESPACE_STD_BEGIN
 /* >> fesetenv(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fesetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fesetenv)(fenv_t const *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetenv))(___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fesetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_NCX(__LIBCCALL fesetenv)(fenv_t const *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetenv))(___envp); })
 #endif /* !... */
 #if defined(__fast_feupdateenv_defined) && defined(__CRT_HAVE_feupdateenv)
 /* >> feupdateenv(3) */
-__CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,feupdateenv,(fenv_t const *___envp),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feupdateenv))(___envp); })
+__CEIDECLARE_GCCNCX(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,feupdateenv,(fenv_t const *___envp),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feupdateenv))(___envp); })
 #elif defined(__fast_feupdateenv_defined)
 /* >> feupdateenv(3) */
-__FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL feupdateenv)(fenv_t const *___envp) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feupdateenv))(___envp); }
+__FORCELOCAL __ATTR_ACCESS_RO(1) int __NOTHROW_NCX(__LIBCCALL feupdateenv)(fenv_t const *___envp) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feupdateenv))(___envp); }
 #elif defined(__CRT_HAVE_feupdateenv)
 /* >> feupdateenv(3) */
-__CDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,feupdateenv,(fenv_t const *___envp),(___envp))
+__CDECLARE_GCCNCX(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,feupdateenv,(fenv_t const *___envp),(___envp))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/feupdateenv.h>
 __NAMESPACE_STD_BEGIN
 /* >> feupdateenv(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(feupdateenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL feupdateenv)(fenv_t const *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feupdateenv))(___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(feupdateenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_NCX(__LIBCCALL feupdateenv)(fenv_t const *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feupdateenv))(___envp); })
 #endif /* !... */
 __NAMESPACE_STD_END
 

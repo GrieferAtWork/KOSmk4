@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57c2e871 */
+/* HASH CRC-32:0x74f8355b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,32 +33,32 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getwc_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__getwc_nolock)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),_getwc_nolock,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),_getwc_nolock,(__stream))
 #elif defined(__CRT_HAVE__fgetwc_nolock)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_getwc)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_fgetwc)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),fgetwc,(__stream))
 #else /* ... */
 #undef __local___localdep_fgetwc_unlocked_defined
 #endif /* !... */
@@ -69,22 +69,22 @@ __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unloc
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fileno)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno,(__stream))
 #elif defined(__CRT_HAVE__fileno)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),_fileno,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),_fileno,(__stream))
 #elif defined(__CRT_HAVE_fileno_unlocked)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_fileno_defined
 #endif /* !... */

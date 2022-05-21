@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75057637 */
+/* HASH CRC-32:0x4315ecf9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,39 +29,39 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_fseek_defined
 #define __local___localdep_crt_fseek_defined
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek64,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek_unlocked)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64_nolock) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #else /* ... */
 #undef __local___localdep_crt_fseek_defined
 #endif /* !... */
@@ -69,44 +69,44 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__r
 #ifndef __local___localdep_crt_fseeko_defined
 #define __local___localdep_crt_fseeko_defined
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko64,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek64,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),_fseeki64,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),_fseeki64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko_unlocked)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #else /* ... */
 #undef __local___localdep_crt_fseeko_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fseeko_defined */
-__LOCAL_LIBC(fseeko64) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(fseeko64) __ATTR_ACCESS_RW(1) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fseeko64))(__FILE *__restrict __stream, __off64_t __off, int __whence) __THROWS(...) {
 #if (defined(__CRT_HAVE_fseek) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || defined(__CRT_HAVE_fseeko) || (defined(__CRT_HAVE_fseeko64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_fseek64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__fseeki64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_fseek_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__fseek_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || defined(__CRT_HAVE_fseeko_unlocked) || (defined(__CRT_HAVE_fseeko64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_fseek64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__fseeki64_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_fseeko)(__stream, (__off32_t)__off, __whence);

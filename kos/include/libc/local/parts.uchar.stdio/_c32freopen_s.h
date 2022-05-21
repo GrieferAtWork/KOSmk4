@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55521939 */
+/* HASH CRC-32:0x42532f91 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_freopen_s_defined
 #define __local___localdep_freopen_s_defined
 #ifdef __CRT_HAVE_freopen_s
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3, 4)),__errno_t,__NOTHROW_RPC,__localdep_freopen_s,(__FILE **__pstream, char const *__filename, char const *__modes, __FILE *__oldstream),freopen_s,(__pstream,__filename,__modes,__oldstream))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(4) __ATTR_NONNULL((2, 3)),__errno_t,__NOTHROW_RPC,__localdep_freopen_s,(__FILE **__pstream, char const *__filename, char const *__modes, __FILE *__oldstream),freopen_s,(__pstream,__filename,__modes,__oldstream))
 #elif (defined(__CRT_HAVE_freopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_freopen64) || (defined(__CRT_HAVE_freopen_unlocked) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_freopen64_unlocked)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/freopen_s.h>
@@ -82,7 +82,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_c32freopen_s) __ATTR_NONNULL((1, 2, 3)) __errno_t
+__LOCAL_LIBC(_c32freopen_s) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_WR(1) __errno_t
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(_c32freopen_s))(__FILE **__pstream, __CHAR32_TYPE__ const *__filename, __CHAR32_TYPE__ const *__mode, __FILE *__stream) {
 	__errno_t __result;
 	char *__utf8_filename;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76a96731 */
+/* HASH CRC-32:0xe55d68ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ DECL_BEGIN
  * @return: * :   Pointer to a statically allocated fstab entry for `special_file'
  * @return: NULL: [errno = <unchanged>] No entry exists matching `special_file'
  * @return: NULL: [errno = *] Error */
-INTERN ATTR_SECTION(".text.crt.database.fstab") WUNUSED NONNULL((1)) struct fstab *
+INTERN ATTR_SECTION(".text.crt.database.fstab") WUNUSED ATTR_ACCESS_RO(1) struct fstab *
 NOTHROW_NCX(LIBCCALL libc_getfsspec)(const char *special_file) {
 	struct fstab *result;
 	if (!libc_setfsent())
@@ -53,7 +53,7 @@ NOTHROW_NCX(LIBCCALL libc_getfsspec)(const char *special_file) {
  * @return: * :   Pointer to a statically allocated fstab entry for `mount_point'
  * @return: NULL: [errno = <unchanged>] No entry exists matching `mount_point'
  * @return: NULL: [errno = *] Error */
-INTERN ATTR_SECTION(".text.crt.database.fstab") WUNUSED NONNULL((1)) struct fstab *
+INTERN ATTR_SECTION(".text.crt.database.fstab") WUNUSED ATTR_ACCESS_RO(1) struct fstab *
 NOTHROW_NCX(LIBCCALL libc_getfsfile)(const char *mount_point) {
 	struct fstab *result;
 	if (!libc_setfsent())

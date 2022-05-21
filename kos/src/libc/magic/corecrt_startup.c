@@ -99,10 +99,10 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 %[define_type_class(onexit_t  = "TP")]
 
 [[crt_dos_only, decl_include("<hybrid/typecore.h>")]]
-int _seh_filter_dll(__ULONG32_TYPE__ xno, [[nonnull]] struct _EXCEPTION_POINTERS *infp_ptrs);
+int _seh_filter_dll(__ULONG32_TYPE__ xno, [[inout]] struct _EXCEPTION_POINTERS *infp_ptrs);
 
 [[crt_dos_only, decl_include("<hybrid/typecore.h>")]]
-int _seh_filter_exe(__ULONG32_TYPE__ xno, [[nonnull]] struct _EXCEPTION_POINTERS *infp_ptrs);
+int _seh_filter_exe(__ULONG32_TYPE__ xno, [[inout]] struct _EXCEPTION_POINTERS *infp_ptrs);
 
 [[const, wunused, crt_dos_only]]
 [[decl_include("<corecrt_startup.h>")]]
@@ -300,8 +300,8 @@ int _execute_onexit_table([[nullable]] struct _onexit_table_t *self) {
 [[hidden, crt_dos_only, requires_function(_register_onexit_function)]]
 [[decl_include("<corecrt_startup.h>"), impl_include("<corecrt_startup.h>")]]
 int __dllonexit(_onexit_t func,
-                [[nonnull]] _onexit_t **p_begin,
-                [[nonnull]] _onexit_t **p_end) {
+                [[inout]] _onexit_t **p_begin,
+                [[inout]] _onexit_t **p_end) {
 	int result;
 	struct _onexit_table_t tab;
 	tab.@_first@ = (_PVFV *)*p_begin;

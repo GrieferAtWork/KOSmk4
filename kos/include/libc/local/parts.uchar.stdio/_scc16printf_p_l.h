@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61b54b35 */
+/* HASH CRC-32:0x8f2ecfbf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vscc16printf_p_l_defined
 #define __local___localdep__vscc16printf_p_l_defined
 #if defined(__CRT_HAVE__vscwprintf_p_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_LIBC_C16PRINTF_P(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vscc16printf_p_l,(__CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vscwprintf_p_l,(__format,__locale,__args))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_LIBC_C16PRINTF_P(1, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vscc16printf_p_l,(__CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vscwprintf_p_l,(__format,__locale,__args))
 #elif defined(__CRT_HAVE_DOS$_vscwprintf_p_l)
-__CREDIRECT_DOS(__ATTR_LIBC_C16PRINTF_P(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vscc16printf_p_l,(__CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vscwprintf_p_l,(__format,__locale,__args))
+__CREDIRECT_DOS(__ATTR_ACCESS_RO(1) __ATTR_LIBC_C16PRINTF_P(1, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vscc16printf_p_l,(__CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vscwprintf_p_l,(__format,__locale,__args))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/_vscwprintf_p_l.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__vscc16printf_p_l __LIBC_LOCAL_NAME(_vscc16printf_p_l)
 #endif /* !... */
 #endif /* !__local___localdep__vscc16printf_p_l_defined */
-__LOCAL_LIBC(_scc16printf_p_l) __ATTR_LIBC_C16PRINTF_P(1, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(_scc16printf_p_l) __ATTR_ACCESS_RO(1) __ATTR_LIBC_C16PRINTF_P(1, 3) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBDCALL __LIBC_LOCAL_NAME(_scc16printf_p_l))(__CHAR16_TYPE__ const *__format, __locale_t __locale, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;

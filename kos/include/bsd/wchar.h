@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda408671 */
+/* HASH CRC-32:0x27493545 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __SYSDECL_BEGIN
 #if !defined(__fgetwln_defined) && defined(__CRT_HAVE_fgetwln)
 #define __fgetwln_defined
 /* >> fgetwln(3) */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),wchar_t *,__NOTHROW_NCX,fgetwln,(FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),(__fp,__lenp))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),wchar_t *,__NOTHROW_NCX,fgetwln,(FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),(__fp,__lenp))
 #endif /* !__fgetwln_defined && __CRT_HAVE_fgetwln */
 #ifndef __wcslcat_defined
 #define __wcslcat_defined

@@ -83,7 +83,7 @@ $FILE *setmntent([[nonnull]] char const *file,
 @@>> endmntent(3)
 [[cp_nokos, requires_function(fclose)]]
 [[export_alias("__endmntent")]]
-int endmntent([[nonnull]] $FILE *stream) {
+int endmntent([[inout]] $FILE *stream) {
 	fclose(stream);
 	return 1;
 }
@@ -92,7 +92,7 @@ int endmntent([[nonnull]] $FILE *stream) {
 [[cp, decl_include("<bits/crt/db/mntent.h>")]]
 [[impl_include("<bits/crt/db/mntent.h>")]]
 [[requires_function(getmntent_r)]]
-struct mntent *getmntent([[nonnull]] $FILE *stream) {
+struct mntent *getmntent([[inout]] $FILE *stream) {
 @@pp_if $has_function(malloc)@@
 	static struct mntent *ent = NULL;
 	static char *buf          = NULL;
@@ -112,7 +112,7 @@ struct mntent *getmntent([[nonnull]] $FILE *stream) {
 [[decl_include("<features.h>", "<bits/crt/db/mntent.h>")]]
 [[cp, doc_alias("getmntent"), export_alias("__getmntent_r")]]
 [[requires_function(fgets)]]
-struct mntent *getmntent_r([[nonnull]] $FILE *__restrict stream,
+struct mntent *getmntent_r([[inout]] $FILE *__restrict stream,
                            [[nonnull]] struct mntent *__restrict result,
                            [[inp(bufsize)]] char *__restrict buffer,
                            __STDC_INT_AS_SIZE_T bufsize) {
@@ -194,7 +194,7 @@ err:
 [[cp_stdio, decl_include("<bits/crt/db/mntent.h>")]]
 [[requires_include("<asm/os/stdio.h>")]]
 [[requires(defined(__SEEK_END) && $has_function(fseek) && $has_function(fprintf))]]
-int addmntent([[nonnull]] $FILE *__restrict stream,
+int addmntent([[inout]] $FILE *__restrict stream,
               [[nonnull]] struct mntent const *__restrict mnt) {
 	if unlikely(!mnt ||
 	            !mnt->@mnt_fsname@ || !mnt->@mnt_dir@ ||

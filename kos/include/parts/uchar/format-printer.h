@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58d432a6 */
+/* HASH CRC-32:0x46acb168 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -142,7 +142,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_c32repeat, __FORCELOCAL __ATTR_ARTIFICIAL
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16escape,(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16escape,(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_DOS$format_wescape)
 /* >> format_escape(3)
  * Do C-style escape on the given text, printing it to the given printer.
@@ -158,7 +158,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16escape,(pc16
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16escape,(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT_DOS(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16escape,(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/parts.wchar.format-printer/format_wescape.h>
 /* >> format_escape(3)
@@ -175,7 +175,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16escape,(
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBDCALL format_c16escape)(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape))((__pwformatprinter)__printer, __arg, (__WCHAR_TYPE__ const *)__text, __textlen, __flags); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBDCALL format_c16escape)(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape))((__pwformatprinter)__printer, __arg, (__WCHAR_TYPE__ const *)__text, __textlen, __flags); }
 #else /* ... */
 #include <libc/local/parts.uchar.format-printer/format_c16escape.h>
 /* >> format_escape(3)
@@ -192,7 +192,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBDCALL fo
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_c16escape, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBDCALL format_c16escape)(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16escape))(__printer, __arg, __text, __textlen, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_c16escape, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBDCALL format_c16escape)(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16escape))(__printer, __arg, __text, __textlen, __flags); })
 #endif /* !... */
 #if defined(__CRT_HAVE_format_wescape) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> format_escape(3)
@@ -209,7 +209,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_c16escape, __FORCELOCAL __ATTR_ARTIFICIAL
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32escape,(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32escape,(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_KOS$format_wescape)
 /* >> format_escape(3)
  * Do C-style escape on the given text, printing it to the given printer.
@@ -225,7 +225,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32escape,(pc32
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32escape,(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT_KOS(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32escape,(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/parts.wchar.format-printer/format_wescape.h>
 /* >> format_escape(3)
@@ -242,7 +242,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32escape,(
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBKCALL format_c32escape)(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape))((__pwformatprinter)__printer, __arg, (__WCHAR_TYPE__ const *)__text, __textlen, __flags); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBKCALL format_c32escape)(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape))((__pwformatprinter)__printer, __arg, (__WCHAR_TYPE__ const *)__text, __textlen, __flags); }
 #else /* ... */
 #include <libc/local/parts.uchar.format-printer/format_c32escape.h>
 /* >> format_escape(3)
@@ -259,7 +259,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBKCALL fo
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_c32escape, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBKCALL format_c32escape)(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32escape))(__printer, __arg, __text, __textlen, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_c32escape, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBKCALL format_c32escape)(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32escape))(__printer, __arg, __text, __textlen, __flags); })
 #endif /* !... */
 #if defined(__CRT_HAVE_format_whexdump) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> format_hexdump(3)
@@ -272,7 +272,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_c32escape, __FORCELOCAL __ATTR_ARTIFICIAL
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16hexdump,(pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
+__CREDIRECT(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16hexdump,(pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #elif defined(__CRT_HAVE_DOS$format_whexdump)
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
@@ -284,7 +284,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16hexdump,(pc1
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16hexdump,(pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
+__CREDIRECT_DOS(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16hexdump,(pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/parts.wchar.format-printer/format_whexdump.h>
 /* >> format_hexdump(3)
@@ -297,7 +297,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c16hexdump,
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBDCALL format_c16hexdump)(pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_whexdump))((__pwformatprinter)__printer, __arg, __data, __size, __linesize, __flags); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBDCALL format_c16hexdump)(pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_whexdump))((__pwformatprinter)__printer, __arg, __data, __size, __linesize, __flags); }
 #else /* ... */
 #include <libc/local/parts.uchar.format-printer/format_c16hexdump.h>
 /* >> format_hexdump(3)
@@ -310,7 +310,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBDCALL fo
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_c16hexdump, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBDCALL format_c16hexdump)(pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16hexdump))(__printer, __arg, __data, __size, __linesize, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_c16hexdump, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBDCALL format_c16hexdump)(pc16formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16hexdump))(__printer, __arg, __data, __size, __linesize, __flags); })
 #endif /* !... */
 #if defined(__CRT_HAVE_format_whexdump) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> format_hexdump(3)
@@ -323,7 +323,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_c16hexdump, __FORCELOCAL __ATTR_ARTIFICIA
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32hexdump,(pc32formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
+__CREDIRECT(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32hexdump,(pc32formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #elif defined(__CRT_HAVE_KOS$format_whexdump)
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
@@ -335,7 +335,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32hexdump,(pc3
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32hexdump,(pc32formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
+__CREDIRECT_KOS(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32hexdump,(pc32formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_whexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/parts.wchar.format-printer/format_whexdump.h>
 /* >> format_hexdump(3)
@@ -348,7 +348,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_c32hexdump,
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBKCALL format_c32hexdump)(pc32formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_whexdump))((__pwformatprinter)__printer, __arg, __data, __size, __linesize, __flags); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBKCALL format_c32hexdump)(pc32formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_whexdump))((__pwformatprinter)__printer, __arg, __data, __size, __linesize, __flags); }
 #else /* ... */
 #include <libc/local/parts.uchar.format-printer/format_c32hexdump.h>
 /* >> format_hexdump(3)
@@ -361,7 +361,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBKCALL fo
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_c32hexdump, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBKCALL format_c32hexdump)(pc32formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32hexdump))(__printer, __arg, __data, __size, __linesize, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_c32hexdump, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBKCALL format_c32hexdump)(pc32formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32hexdump))(__printer, __arg, __data, __size, __linesize, __flags); })
 #endif /* !... */
 
 

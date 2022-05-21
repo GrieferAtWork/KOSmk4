@@ -1629,8 +1629,8 @@ $ssize_t vmsplice($fd_t fdout, struct iovec const *iov,
 
 [[cp, decl_include("<bits/types.h>")]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
-$ssize_t splice($fd_t fdin, __PIO_OFFSET64 *offin,
-                $fd_t fdout, __PIO_OFFSET64 *offout,
+$ssize_t splice($fd_t fdin, [[inout]] __PIO_OFFSET64 *offin,
+                $fd_t fdout, [[inout]] __PIO_OFFSET64 *offout,
                 $size_t length, unsigned int flags);
 
 [[cp, decl_include("<bits/types.h>")]]
@@ -1639,12 +1639,12 @@ $ssize_t tee($fd_t fdin, $fd_t fdout,
 
 [[cp, decl_include("<bits/types.h>")]]
 int name_to_handle_at($fd_t dirfd, char const *name,
-                      struct file_handle *handle,
+                      [[out]] struct file_handle *handle,
                       int *mnt_id, int flags);
 
 [[cp, decl_include("<bits/types.h>")]]
 $fd_t open_by_handle_at($fd_t mountdirfd,
-                        struct file_handle *handle,
+                        [[in]] struct file_handle *handle,
                         int flags);
 
 [[ignore, nocrt, alias("fallocate")]]
@@ -1697,7 +1697,7 @@ __STDC_INT_AS_SSIZE_T fcntl($fd_t fd, $fcntl_t cmd, ...);
 
 [[ignore, vartypes($mode_t), decl_include("<bits/types.h>")]]
 [[nocrt, doc_alias("open"), alias("open", "_open", "__open", "__libc_open"), cp, wunused]]
-$fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
+$fd_t open32([[in]] char const *filename, $oflag_t oflags, ...);
 
 
 @@>> open(2), open64(2), openat(2), openat64(2)
@@ -1718,7 +1718,7 @@ $fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 [[decl_include("<bits/types.h>"), export_as("__open", "__libc_open")]]
 [[crt_dos_variant, dos_export_as("DOS$_open", /*"DOS$"*/ "?_open@@YAHPBDHH@Z"), requires_include("<asm/os/fcntl.h>")]]
 [[userimpl, requires($has_function(open64) || (defined(__AT_FDCWD) && $has_function(openat)))]]
-$fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
+$fd_t open([[in]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
 	va_start(args, oflags);
@@ -1740,7 +1740,7 @@ $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 [[userimpl, requires_include("<asm/os/oflags.h>")]]
 [[requires(defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && $has_function(open))]]
 [[impl_include("<asm/os/oflags.h>"), decl_include("<bits/types.h>")]]
-$fd_t creat([[nonnull]] char const *filename, $mode_t mode) {
+$fd_t creat([[in]] char const *filename, $mode_t mode) {
 	return open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode);
 }
 
@@ -1750,7 +1750,7 @@ $fd_t creat([[nonnull]] char const *filename, $mode_t mode) {
 [[if($extended_include_prefix("<asm/os/oflags.h>")!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), preferred_alias("_open", "__open", "__libc_open")]]
 [[export_alias("__open64"), decl_include("<bits/types.h>"), impl_include("<asm/os/oflags.h>")]]
 [[cp, wunused, userimpl, requires_function(open32)]]
-$fd_t open64([[nonnull]] char const *filename, $oflag_t oflags, ...) {
+$fd_t open64([[in]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
 	mode_t mode;
@@ -1770,7 +1770,7 @@ $fd_t open64([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 [[if($extended_include_prefix("<asm/os/oflags.h>")!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), preferred_alias("_creat", "__creat", "__libc_creat")]]
 [[userimpl, requires_include("<asm/os/oflags.h>")]]
 [[requires(defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && $has_function(open64))]]
-$fd_t creat64([[nonnull]] char const *filename, $mode_t mode) {
+$fd_t creat64([[in]] char const *filename, $mode_t mode) {
 	return open64(filename, __O_CREAT | __O_WRONLY | __O_TRUNC, mode);
 }
 %#endif /* __USE_LARGEFILE64 */
@@ -1779,14 +1779,14 @@ $fd_t creat64([[nonnull]] char const *filename, $mode_t mode) {
 
 [[cp, ignore, nocrt, alias("openat"), doc_alias("openat")]]
 [[wunused, vartypes($mode_t), decl_include("<bits/types.h>")]]
-$fd_t openat32($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...);
+$fd_t openat32($fd_t dirfd, [[in]] char const *filename, $oflag_t oflags, ...);
 
 [[decl_include("<bits/types.h>"), doc_alias("open")]]
 [[cp, guard, wunused, vartypes($mode_t), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("openat")]]
 [[                                                                                                                                                     alias("openat64")]]
 [[crt_dos_variant, userimpl, requires_function(openat64)]]
-$fd_t openat($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) {
+$fd_t openat($fd_t dirfd, [[in]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
 	va_start(args, oflags);
@@ -1799,7 +1799,7 @@ $fd_t openat($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...
 [[cp, guard, wunused, vartypes($mode_t), doc_alias("openat")]]
 [[decl_include("<bits/types.h>"), preferred_largefile64_variant_of(openat)]]
 [[crt_dos_variant, userimpl, requires_function(openat32)]]
-$fd_t openat64($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) {
+$fd_t openat64($fd_t dirfd, [[in]] char const *filename, $oflag_t oflags, ...) {
 	fd_t result;
 	va_list args;
 	mode_t mode;

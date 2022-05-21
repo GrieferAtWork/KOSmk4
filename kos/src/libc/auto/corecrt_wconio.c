@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2075e4ea */
+/* HASH CRC-32:0xe569a126 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -204,7 +204,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") wint32_t
 NOTHROW_NCX(LIBKCALL libc__ungetwch_nolock)(wint32_t ch) {
 	return libc_ungetwc_unlocked(ch, stdtty);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RW(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd__cgetws)(char16_t *__restrict buf) {
 	char16_t *result = buf + 2;
 	size_t readsize;
@@ -213,7 +213,7 @@ NOTHROW_NCX(LIBDCALL libd__cgetws)(char16_t *__restrict buf) {
 	buf[1] = (char16_t)readsize;
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") NONNULL((1)) char32_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RW(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc__cgetws)(char32_t *__restrict buf) {
 	char32_t *result = buf + 2;
 	size_t readsize;
@@ -223,7 +223,7 @@ NOTHROW_NCX(LIBKCALL libc__cgetws)(char32_t *__restrict buf) {
 	return result;
 }
 #include <asm/crt/stdio.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") NONNULL((1, 3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_WR(3) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__cgetws_s)(char16_t *buf,
                                      size_t bufsize,
                                      size_t *__restrict p_readsize) {
@@ -250,7 +250,7 @@ NOTHROW_NCX(LIBDCALL libd__cgetws_s)(char16_t *buf,
 	return 0;
 }
 #include <asm/crt/stdio.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") NONNULL((1, 3)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_WR(3) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc__cgetws_s)(char32_t *buf,
                                      size_t bufsize,
                                      size_t *__restrict p_readsize) {
@@ -277,7 +277,7 @@ NOTHROW_NCX(LIBKCALL libc__cgetws_s)(char32_t *buf,
 	return 0;
 }
 #include <libc/template/stdtty.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBDCALL libd__cputws)(char16_t const *__restrict str) {
 
 
@@ -295,7 +295,7 @@ NOTHROW_NCX(LIBDCALL libd__cputws)(char16_t const *__restrict str) {
 
 }
 #include <libc/template/stdtty.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBKCALL libc__cputws)(char32_t const *__restrict str) {
 
 
@@ -313,7 +313,7 @@ NOTHROW_NCX(LIBKCALL libc__cputws)(char32_t const *__restrict str) {
 
 }
 #include <libc/template/stdtty.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C16PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(2) ATTR_LIBC_C16PRINTF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd___conio_common_vcwprintf)(uint64_t options,
                                                     char16_t const *format,
                                                     locale_t locale,
@@ -321,7 +321,7 @@ NOTHROW_NCX(LIBDCALL libd___conio_common_vcwprintf)(uint64_t options,
 	return libd___stdio_common_vfwprintf(options, stdtty, format, locale, args);
 }
 #include <libc/template/stdtty.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C32PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(2) ATTR_LIBC_C32PRINTF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc___conio_common_vcwprintf)(uint64_t options,
                                                     char32_t const *format,
                                                     locale_t locale,
@@ -329,7 +329,7 @@ NOTHROW_NCX(LIBKCALL libc___conio_common_vcwprintf)(uint64_t options,
 	return libc___stdio_common_vfwprintf(options, stdtty, format, locale, args);
 }
 #include <libc/template/stdtty.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C16PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(2) ATTR_LIBC_C16PRINTF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd___conio_common_vcwprintf_s)(uint64_t options,
                                                       char16_t const *format,
                                                       locale_t locale,
@@ -337,7 +337,7 @@ NOTHROW_NCX(LIBDCALL libd___conio_common_vcwprintf_s)(uint64_t options,
 	return libd___stdio_common_vfwprintf_s(options, stdtty, format, locale, args);
 }
 #include <libc/template/stdtty.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C32PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(2) ATTR_LIBC_C32PRINTF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc___conio_common_vcwprintf_s)(uint64_t options,
                                                       char32_t const *format,
                                                       locale_t locale,
@@ -356,7 +356,7 @@ __LOCAL_LIBC(conio_common_vcc16scanf_ungetc) ssize_t
 	return libd__ungetwch((wint16_t)word);
 }
 __NAMESPACE_LOCAL_END
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(2) ATTR_LIBC_C16SCANF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd___conio_common_vcwscanf)(uint64_t options,
                                                    char16_t const *format,
                                                    locale_t locale,
@@ -377,7 +377,7 @@ __LOCAL_LIBC(conio_common_vcc32scanf_ungetc) ssize_t
 	return libc__ungetwch((wint32_t)word);
 }
 __NAMESPACE_LOCAL_END
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C32SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(2) ATTR_LIBC_C32SCANF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc___conio_common_vcwscanf)(uint64_t options,
                                                    char32_t const *format,
                                                    locale_t locale,
@@ -389,28 +389,28 @@ NOTHROW_NCX(LIBKCALL libc___conio_common_vcwscanf)(uint64_t options,
 	                      NULL, format, args);
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C16PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vcwprintf_l)(char16_t const *format,
                                         locale_t locale,
                                         va_list args) {
 	return libd___conio_common_vcwprintf(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, format, locale, args);
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C32PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C32PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vcwprintf_l)(char32_t const *format,
                                         locale_t locale,
                                         va_list args) {
 	return libc___conio_common_vcwprintf(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, format, locale, args);
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C16PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vcwprintf_s_l)(char16_t const *format,
                                           locale_t locale,
                                           va_list args) {
 	return libd___conio_common_vcwprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, format, locale, args);
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C32PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C32PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vcwprintf_s_l)(char32_t const *format,
                                           locale_t locale,
                                           va_list args) {
@@ -419,21 +419,21 @@ NOTHROW_NCX(LIBKCALL libc__vcwprintf_s_l)(char32_t const *format,
 DEFINE_INTERN_ALIAS(libd__vcwprintf_p_l, libd__vcwprintf_l);
 DEFINE_INTERN_ALIAS(libc__vcwprintf_p_l, libc__vcwprintf_l);
 #include <corecrt_stdio_config.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C16SCANF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vcwscanf_l)(char16_t const *format,
                                        locale_t locale,
                                        va_list args) {
 	return libd___conio_common_vcwscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS, format, locale, args);
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C32SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C32SCANF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vcwscanf_l)(char32_t const *format,
                                        locale_t locale,
                                        va_list args) {
 	return libc___conio_common_vcwscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS, format, locale, args);
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C16SCANF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vcwscanf_s_l)(char16_t const *format,
                                          locale_t locale,
                                          va_list args) {
@@ -442,7 +442,7 @@ NOTHROW_NCX(LIBDCALL libd__vcwscanf_s_l)(char16_t const *format,
 	                               format, locale, args);
 }
 #include <corecrt_stdio_config.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C32SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C32SCANF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vcwscanf_s_l)(char32_t const *format,
                                          locale_t locale,
                                          va_list args) {
@@ -450,49 +450,49 @@ NOTHROW_NCX(LIBKCALL libc__vcwscanf_s_l)(char32_t const *format,
 	                               1,
 	                               format, locale, args);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C16PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vcwprintf)(char16_t const *format,
                                       va_list args) {
 	return libd__vcwprintf_l(format, NULL, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C32PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C32PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vcwprintf)(char32_t const *format,
                                       va_list args) {
 	return libc__vcwprintf_l(format, NULL, args);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C16PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C16PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vcwprintf_s)(char16_t const *format,
                                         va_list args) {
 	return libd__vcwprintf_s_l(format, NULL, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C32PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C32PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vcwprintf_s)(char32_t const *format,
                                         va_list args) {
 	return libc__vcwprintf_s_l(format, NULL, args);
 }
 DEFINE_INTERN_ALIAS(libd__vcwprintf_p, libd__vcwprintf);
 DEFINE_INTERN_ALIAS(libc__vcwprintf_p, libc__vcwprintf);
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C16SCANF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vcwscanf)(char16_t const *format,
                                      va_list args) {
 	return libd__vcwscanf_l(format, NULL, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C32SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C32SCANF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vcwscanf)(char32_t const *format,
                                      va_list args) {
 	return libc__vcwscanf_l(format, NULL, args);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C16SCANF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vcwscanf_s)(char16_t const *format,
                                        va_list args) {
 	return libd__vcwscanf_s_l(format, NULL, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C32SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C32SCANF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vcwscanf_s)(char32_t const *format,
                                        va_list args) {
 	return libc__vcwscanf_s_l(format, NULL, args);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C16PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C16PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cwprintf)(char16_t const *format,
                                       ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -502,7 +502,7 @@ NOTHROW_NCX(VLIBDCALL libd__cwprintf)(char16_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C32PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C32PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__cwprintf)(char32_t const *format,
                                       ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -512,7 +512,7 @@ NOTHROW_NCX(VLIBKCALL libc__cwprintf)(char32_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C16PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C16PRINTF(1, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cwprintf_l)(char16_t const *format,
                                         locale_t locale,
                                         ...) {
@@ -523,7 +523,7 @@ NOTHROW_NCX(VLIBDCALL libd__cwprintf_l)(char16_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C32PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C32PRINTF(1, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__cwprintf_l)(char32_t const *format,
                                         locale_t locale,
                                         ...) {
@@ -534,7 +534,7 @@ NOTHROW_NCX(VLIBKCALL libc__cwprintf_l)(char32_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C16PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C16PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cwprintf_s)(char16_t const *format,
                                         ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -544,7 +544,7 @@ NOTHROW_NCX(VLIBDCALL libd__cwprintf_s)(char16_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C32PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C32PRINTF(1, 2) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__cwprintf_s)(char32_t const *format,
                                         ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -554,7 +554,7 @@ NOTHROW_NCX(VLIBKCALL libc__cwprintf_s)(char32_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C16PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C16PRINTF(1, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cwprintf_s_l)(char16_t const *format,
                                           locale_t locale,
                                           ...) {
@@ -565,7 +565,7 @@ NOTHROW_NCX(VLIBDCALL libd__cwprintf_s_l)(char16_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_LIBC_C32PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") ATTR_ACCESS_RO(1) ATTR_LIBC_C32PRINTF(1, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__cwprintf_s_l)(char32_t const *format,
                                           locale_t locale,
                                           ...) {
@@ -580,7 +580,7 @@ DEFINE_INTERN_ALIAS(libd__cwprintf_p, libd__cwprintf);
 DEFINE_INTERN_ALIAS(libc__cwprintf_p, libc__cwprintf);
 DEFINE_INTERN_ALIAS(libd__cwprintf_p_l, libd__cwprintf_l);
 DEFINE_INTERN_ALIAS(libc__cwprintf_p_l, libc__cwprintf_l);
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C16SCANF(1, 2) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cwscanf)(char16_t const *format,
                                      ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -590,7 +590,7 @@ NOTHROW_NCX(VLIBDCALL libd__cwscanf)(char16_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C32SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C32SCANF(1, 2) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__cwscanf)(char32_t const *format,
                                      ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -600,7 +600,7 @@ NOTHROW_NCX(VLIBKCALL libc__cwscanf)(char32_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C16SCANF(1, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cwscanf_l)(char16_t const *format,
                                        locale_t locale,
                                        ...) {
@@ -611,7 +611,7 @@ NOTHROW_NCX(VLIBDCALL libd__cwscanf_l)(char16_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C32SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C32SCANF(1, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__cwscanf_l)(char32_t const *format,
                                        locale_t locale,
                                        ...) {
@@ -622,7 +622,7 @@ NOTHROW_NCX(VLIBKCALL libc__cwscanf_l)(char32_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C16SCANF(1, 2) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cwscanf_s)(char16_t const *format,
                                        ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -632,7 +632,7 @@ NOTHROW_NCX(VLIBDCALL libd__cwscanf_s)(char16_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C32SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C32SCANF(1, 2) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__cwscanf_s)(char32_t const *format,
                                        ...) {
 	__STDC_INT_AS_SSIZE_T result;
@@ -642,7 +642,7 @@ NOTHROW_NCX(VLIBKCALL libc__cwscanf_s)(char32_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C16SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C16SCANF(1, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__cwscanf_s_l)(char16_t const *format,
                                          locale_t locale,
                                          ...) {
@@ -653,7 +653,7 @@ NOTHROW_NCX(VLIBDCALL libd__cwscanf_s_l)(char16_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_LIBC_C32SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.conio") WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_C32SCANF(1, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__cwscanf_s_l)(char32_t const *format,
                                          locale_t locale,
                                          ...) {

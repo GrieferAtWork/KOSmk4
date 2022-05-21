@@ -82,10 +82,10 @@ PRIVATE ATTR_SECTION(".bss.crt.fs.dir") size_t dirbuf_compat_offset = 0;
 
 
 
-/*[[[head:libd_opendir,hash:CRC-32=0x50ddf814]]]*/
+/*[[[head:libd_opendir,hash:CRC-32=0xfd2b7164]]]*/
 /* >> opendir(3)
  * Open and return a new directory stream for reading, referring to `name' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((1)) DIR *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED ATTR_ACCESS_RO(1) DIR *
 NOTHROW_RPC(LIBDCALL libd_opendir)(char const *name)
 /*[[[body:libd_opendir]]]*/
 {
@@ -93,10 +93,10 @@ NOTHROW_RPC(LIBDCALL libd_opendir)(char const *name)
 }
 /*[[[end:libd_opendir]]]*/
 
-/*[[[head:libc_opendir,hash:CRC-32=0x9539498a]]]*/
+/*[[[head:libc_opendir,hash:CRC-32=0x3b0e1f2e]]]*/
 /* >> opendir(3)
  * Open and return a new directory stream for reading, referring to `name' */
-INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED NONNULL((1)) DIR *
+INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ATTR_ACCESS_RO(1) DIR *
 NOTHROW_RPC(LIBCCALL libc_opendir)(char const *name)
 /*[[[body:libc_opendir]]]*/
 {
@@ -113,10 +113,10 @@ err:
 }
 /*[[[end:libc_opendir]]]*/
 
-/*[[[head:libd_fopendirat,hash:CRC-32=0xba8b7129]]]*/
+/*[[[head:libd_fopendirat,hash:CRC-32=0x2ee8c65a]]]*/
 /* >> fopendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((2)) DIR *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED ATTR_ACCESS_RO(2) DIR *
 NOTHROW_RPC(LIBDCALL libd_fopendirat)(fd_t dirfd,
                                       char const *name,
                                       oflag_t oflags)
@@ -126,10 +126,10 @@ NOTHROW_RPC(LIBDCALL libd_fopendirat)(fd_t dirfd,
 }
 /*[[[end:libd_fopendirat]]]*/
 
-/*[[[head:libc_fopendirat,hash:CRC-32=0x8b96f21e]]]*/
+/*[[[head:libc_fopendirat,hash:CRC-32=0x4481a6b9]]]*/
 /* >> fopendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED NONNULL((2)) DIR *
+INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ATTR_ACCESS_RO(2) DIR *
 NOTHROW_RPC(LIBCCALL libc_fopendirat)(fd_t dirfd,
                                       char const *name,
                                       oflag_t oflags)
@@ -150,10 +150,10 @@ err:
 }
 /*[[[end:libc_fopendirat]]]*/
 
-/*[[[head:libd_opendirat,hash:CRC-32=0xa408c21d]]]*/
+/*[[[head:libd_opendirat,hash:CRC-32=0x96fb6701]]]*/
 /* >> opendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED NONNULL((2)) DIR *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.dir") WUNUSED ATTR_ACCESS_RO(2) DIR *
 NOTHROW_RPC(LIBDCALL libd_opendirat)(fd_t dirfd,
                                      char const *name)
 /*[[[body:libd_opendirat]]]*/
@@ -162,10 +162,10 @@ NOTHROW_RPC(LIBDCALL libd_opendirat)(fd_t dirfd,
 }
 /*[[[end:libd_opendirat]]]*/
 
-/*[[[head:libc_opendirat,hash:CRC-32=0xc595fd2d]]]*/
+/*[[[head:libc_opendirat,hash:CRC-32=0x70dea967]]]*/
 /* >> opendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED NONNULL((2)) DIR *
+INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ATTR_ACCESS_RO(2) DIR *
 NOTHROW_RPC(LIBCCALL libc_opendirat)(fd_t dirfd,
                                      char const *name)
 /*[[[body:libc_opendirat]]]*/
@@ -174,10 +174,10 @@ NOTHROW_RPC(LIBCCALL libc_opendirat)(fd_t dirfd,
 }
 /*[[[end:libc_opendirat]]]*/
 
-/*[[[head:libc_closedir,hash:CRC-32=0xd3d2b85f]]]*/
+/*[[[head:libc_closedir,hash:CRC-32=0x35c8a55c]]]*/
 /* >> closedir(3)
  * Close a directory stream previously returned by `opendir(3)' and friends */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_closedir)(DIR *dirp)
 /*[[[body:libc_closedir]]]*/
 {
@@ -191,10 +191,10 @@ err_null:
 }
 /*[[[end:libc_closedir]]]*/
 
-/*[[[head:libc_fdclosedir,hash:CRC-32=0xb50e593d]]]*/
+/*[[[head:libc_fdclosedir,hash:CRC-32=0xd036e1c6]]]*/
 /* >> fdclosedir(3)
  * Same as `closedir()', but instead of also closing the underlying file descriptor, return it */
-INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.fs.dir") WUNUSED ATTR_ACCESS_RW(1) fd_t
 NOTHROW_NCX(LIBCCALL libc_fdclosedir)(DIR *dirp)
 /*[[[body:libc_fdclosedir]]]*/
 {
@@ -210,11 +210,11 @@ err_null:
 }
 /*[[[end:libc_fdclosedir]]]*/
 
-/*[[[head:libc_rewinddir,hash:CRC-32=0x58c68174]]]*/
+/*[[[head:libc_rewinddir,hash:CRC-32=0x1236be9a]]]*/
 /* >> rewinddir(3)
  * Rewind the given directory stream in such a way that the next call
  * to `readdir(3)' will once again  return the first directory  entry */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_ACCESS_RW(1) void
 NOTHROW_NCX(LIBCCALL libc_rewinddir)(DIR *__restrict dirp)
 /*[[[body:libc_rewinddir]]]*/
 {
@@ -252,10 +252,10 @@ done:
 }
 /*[[[end:libc_fdopendir]]]*/
 
-/*[[[head:libc_seekdir,hash:CRC-32=0xd8b116cf]]]*/
+/*[[[head:libc_seekdir,hash:CRC-32=0x1c114b7b]]]*/
 /* >> seekdir(3)
  * Get the directory stream position */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_ACCESS_RW(1) void
 NOTHROW_NCX(LIBCCALL libc_seekdir)(DIR *__restrict dirp,
                                    longptr_t pos)
 /*[[[body:libc_seekdir]]]*/
@@ -282,10 +282,10 @@ NOTHROW_NCX(LIBCCALL libc_seekdir)(DIR *__restrict dirp,
 }
 /*[[[end:libc_seekdir]]]*/
 
-/*[[[head:libc_telldir,hash:CRC-32=0x5e9558f7]]]*/
+/*[[[head:libc_telldir,hash:CRC-32=0x545363c4]]]*/
 /* >> telldir(3)
  * Get the directory stream position */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1)) longptr_t
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_ACCESS_RW(1) longptr_t
 NOTHROW_NCX(LIBCCALL libc_telldir)(DIR *__restrict dirp)
 /*[[[body:libc_telldir]]]*/
 {
@@ -302,10 +302,10 @@ err_null:
 }
 /*[[[end:libc_telldir]]]*/
 
-/*[[[head:libc_dirfd,hash:CRC-32=0xd60a7988]]]*/
+/*[[[head:libc_dirfd,hash:CRC-32=0xcdae8016]]]*/
 /* >> dirfd(3)
  * Return the underlying file descriptor of the given directory stream */
-INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE ATTR_ACCESS_RO(1) fd_t
 NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR __KOS_FIXED_CONST *__restrict dirp)
 /*[[[body:libc_dirfd]]]*/
 {
@@ -313,10 +313,10 @@ NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR __KOS_FIXED_CONST *__restrict dirp)
 }
 /*[[[end:libc_dirfd]]]*/
 
-/*[[[head:libc_getdirentries,hash:CRC-32=0xdfabe16e]]]*/
+/*[[[head:libc_getdirentries,hash:CRC-32=0x23c2b017]]]*/
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((2, 4)) ssize_t
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_ACCESS_RW(4) ATTR_ACCESS_WRS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_getdirentries)(fd_t fd,
                                          char *__restrict buf,
                                          size_t nbytes,
@@ -391,11 +391,11 @@ NOTHROW_RPC(LIBCCALL libc_kreaddir)(fd_t fd,
 /*[[[end:libc_kreaddir]]]*/
 
 
-/*[[[head:libc_readdirk,hash:CRC-32=0x4c95c35]]]*/
+/*[[[head:libc_readdirk,hash:CRC-32=0x754a2fe5]]]*/
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1)) struct dirent *
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_ACCESS_RW(1) struct dirent *
 NOTHROW_RPC(LIBCCALL libc_readdirk)(DIR *__restrict dirp)
 /*[[[body:libc_readdirk]]]*/
 {
@@ -460,14 +460,14 @@ err_null:
 /*[[[impl:libc_readdirk64]]]*/
 DEFINE_INTERN_ALIAS(libc_readdirk64, libc_readdirk);
 
-/*[[[head:libc_readdirk_r,hash:CRC-32=0xe8f79e3f]]]*/
+/*[[[head:libc_readdirk_r,hash:CRC-32=0x48747226]]]*/
 /* >> readdir_r(3), readdir64_r(3)
  * Reentrant version of `readdir(3)'
  * NOTE: This ~reentrant~ version of readdir()  is strongly discouraged from being  used in KOS, as  the
  *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
  *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1, 2, 3)) int
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) int
 NOTHROW_RPC(LIBCCALL libc_readdirk_r)(DIR *__restrict dirp,
                                       struct dirent *__restrict entry,
                                       struct dirent **__restrict result)
@@ -501,10 +501,10 @@ NOTHROW_RPC(LIBCCALL libc_readdirk_r)(DIR *__restrict dirp,
 /*[[[impl:libc_readdirk64_r]]]*/
 DEFINE_INTERN_ALIAS(libc_readdirk64_r, libc_readdirk_r);
 
-/*[[[head:libc_scandirk,hash:CRC-32=0x36e741eb]]]*/
+/*[[[head:libc_scandirk,hash:CRC-32=0x425457c5]]]*/
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_scandirk)(char const *__restrict dir,
                                     struct dirent ***__restrict namelist,
                                     int (LIBKCALL *selector)(struct dirent const *entry),
@@ -515,10 +515,10 @@ NOTHROW_RPC(LIBCCALL libc_scandirk)(char const *__restrict dir,
 }
 /*[[[end:libc_scandirk]]]*/
 
-/*[[[head:libc_scandiratk,hash:CRC-32=0x49b96a8e]]]*/
+/*[[[head:libc_scandiratk,hash:CRC-32=0x10d6b5f5]]]*/
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
-INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(3) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_scandiratk)(fd_t dirfd,
                                       char const *__restrict dir,
                                       struct dirent ***__restrict namelist,
@@ -1075,10 +1075,10 @@ NOTHROW_RPC(LIBCCALL libc_scandir64)(char const *__restrict dir,
 
 
 
-/*[[[head:libc_alphasortk,hash:CRC-32=0x16da007]]]*/
+/*[[[head:libc_alphasortk,hash:CRC-32=0xa890c44e]]]*/
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_NCX(LIBCCALL libc_alphasortk)(struct dirent const **e1,
                                       struct dirent const **e2)
 /*[[[body:libc_alphasortk]]]*/
@@ -1087,13 +1087,13 @@ NOTHROW_NCX(LIBCCALL libc_alphasortk)(struct dirent const **e1,
 }
 /*[[[end:libc_alphasortk]]]*/
 
-/*[[[head:libc_alphasortk64,hash:CRC-32=0x51c96c94]]]*/
+/*[[[head:libc_alphasortk64,hash:CRC-32=0xed9caf72]]]*/
 #ifdef _DIRENT_MATCHES_DIRENT64
 DEFINE_INTERN_ALIAS(libc_alphasortk64, libc_alphasortk);
 #else /* MAGIC:alias */
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_NCX(LIBCCALL libc_alphasortk64)(struct dirent64 const **e1,
                                         struct dirent64 const **e2)
 /*[[[body:libc_alphasortk64]]]*/
@@ -1103,10 +1103,10 @@ NOTHROW_NCX(LIBCCALL libc_alphasortk64)(struct dirent64 const **e1,
 #endif /* MAGIC:alias */
 /*[[[end:libc_alphasortk64]]]*/
 
-/*[[[head:libc_versionsortk,hash:CRC-32=0x8871c651]]]*/
+/*[[[head:libc_versionsortk,hash:CRC-32=0x51e7f9c3]]]*/
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_NCX(LIBCCALL libc_versionsortk)(struct dirent const **e1,
                                         struct dirent const **e2)
 /*[[[body:libc_versionsortk]]]*/
@@ -1115,13 +1115,13 @@ NOTHROW_NCX(LIBCCALL libc_versionsortk)(struct dirent const **e1,
 }
 /*[[[end:libc_versionsortk]]]*/
 
-/*[[[head:libc_versionsortk64,hash:CRC-32=0x50a26008]]]*/
+/*[[[head:libc_versionsortk64,hash:CRC-32=0xce2dc47c]]]*/
 #ifdef _DIRENT_MATCHES_DIRENT64
 DEFINE_INTERN_ALIAS(libc_versionsortk64, libc_versionsortk);
 #else /* MAGIC:alias */
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_NCX(LIBCCALL libc_versionsortk64)(struct dirent64 const **e1,
                                           struct dirent64 const **e2)
 /*[[[body:libc_versionsortk64]]]*/

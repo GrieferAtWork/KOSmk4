@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77c8f3c9 */
+/* HASH CRC-32:0x43f7a4de */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,7 +117,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wfullpath) __WCHAR_TYPE__ *
+__LOCAL_LIBC(_wfullpath) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wfullpath))(__WCHAR_TYPE__ *__buf, __WCHAR_TYPE__ const *__path, __SIZE_TYPE__ __buflen) {
 	__SIZE_TYPE__ __reqlen;
 	char *__utf8_path, *__utf8_realpath;

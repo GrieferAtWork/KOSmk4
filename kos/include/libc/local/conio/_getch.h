@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b9f444c */
+/* HASH CRC-32:0xd60da255 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,11 +44,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_flockfile_defined
 #define __local___localdep_flockfile_defined
 #ifdef __CRT_HAVE_flockfile
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),flockfile,(__stream))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),flockfile,(__stream))
 #elif defined(__CRT_HAVE__lock_file)
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_lock_file,(__stream))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_lock_file,(__stream))
 #elif defined(__CRT_HAVE__IO_flockfile)
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_IO_flockfile,(__stream))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_IO_flockfile,(__stream))
 #else /* ... */
 #undef __local___localdep_flockfile_defined
 #endif /* !... */
@@ -56,11 +56,11 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE 
 #ifndef __local___localdep_funlockfile_defined
 #define __local___localdep_funlockfile_defined
 #ifdef __CRT_HAVE_funlockfile
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),funlockfile,(__stream))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),funlockfile,(__stream))
 #elif defined(__CRT_HAVE__unlock_file)
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_unlock_file,(__stream))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_unlock_file,(__stream))
 #elif defined(__CRT_HAVE__IO_funlockfile)
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_IO_funlockfile,(__stream))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_IO_funlockfile,(__stream))
 #else /* ... */
 #undef __local___localdep_funlockfile_defined
 #endif /* !... */

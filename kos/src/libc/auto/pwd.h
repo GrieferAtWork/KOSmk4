@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33aee057 */
+/* HASH CRC-32:0xc383f528 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ INTDEF WUNUSED NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwnam)(c
  * return: NULL: (errno = <unchanged>) The last entry has already been read
  *                                     (use `rewind(stream)' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-INTDEF WUNUSED NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_fgetpwent)(FILE *__restrict stream);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) struct passwd *NOTHROW_RPC(LIBDCALL libd_fgetpwent)(FILE *__restrict stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED bool NOTHROW_NCX(LIBCCALL libc_nss_checkfield)(char const *field);
@@ -59,14 +59,14 @@ INTDEF ATTR_PURE WUNUSED bool NOTHROW_NCX(LIBCCALL libc_nss_checkfieldlist)(char
  * Write the given entry `ent' into the given `stream'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF NONNULL((1, 2)) int (LIBDCALL libd_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_ACCESS_RW(2) NONNULL((1)) int (LIBDCALL libd_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> putpwent(3)
  * Write the given entry `ent' into the given `stream'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF NONNULL((1, 2)) int (LIBCCALL libc_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_ACCESS_RW(2) NONNULL((1)) int (LIBCCALL libc_putpwent)(struct passwd const *__restrict ent, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getpwuid_r(3)
@@ -94,7 +94,7 @@ INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_RPC(LIBDCALL libd_getpwent_r)(struct p
  * @return: ENOENT: The last entry has already been read (use `rewind(stream)' to rewind the database)
  * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
  * @return: * :     Error (one of `E*' from `<errno.h>') */
-INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwent_r)(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((2, 3, 5)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwent_r)(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fgetpwent_r(3)
@@ -103,7 +103,7 @@ INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwent_r)(FILE
  * @return: ENOENT: The last entry has already been read (use `rewind(stream)' to rewind the database)
  * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
  * @return: * :     Error (one of `E*' from `<errno.h>') */
-INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((2, 3, 5)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fgetpwuid_r(3)
@@ -111,7 +111,7 @@ INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `uid'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF NONNULL((1, 3, 4, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwuid_r)(FILE *__restrict stream, uid_t uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((3, 4, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwuid_r)(FILE *__restrict stream, uid_t uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fgetpwuid_r(3)
@@ -119,7 +119,7 @@ INTDEF NONNULL((1, 3, 4, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwuid_r)(FILE
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `uid'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF NONNULL((1, 3, 4, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwuid_r)(FILE *__restrict stream, uid_t uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((3, 4, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwuid_r)(FILE *__restrict stream, uid_t uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fgetpwnam_r(3)
@@ -127,7 +127,7 @@ INTDEF NONNULL((1, 3, 4, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwuid_r)(FILE
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF NONNULL((1, 2, 3, 4, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwnam_r)(FILE *__restrict stream, const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((2, 3, 4, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwnam_r)(FILE *__restrict stream, const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fgetpwnam_r(3)
@@ -135,7 +135,7 @@ INTDEF NONNULL((1, 2, 3, 4, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwnam_r)(F
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF NONNULL((1, 2, 3, 4, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream, const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((2, 3, 4, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream, const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 /* >> fgetpwfiltered_r(3)
  * Filtered read from `stream'
  * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
@@ -146,7 +146,7 @@ INTDEF NONNULL((1, 2, 3, 4, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(F
  * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
  *                  Note that in this case, `errno' will have also been set to `ERANGE'
  * @return: * :     Error (one of `E*' from `<errno.h>') */
-INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwfiltered_r)(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result, uid_t filtered_uid, char const *filtered_name);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((2, 3, 5)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwfiltered_r)(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result, uid_t filtered_uid, char const *filtered_name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getpw(3)

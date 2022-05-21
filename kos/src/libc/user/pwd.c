@@ -189,14 +189,14 @@ err:
 }
 
 
-/*[[[head:libc_fgetpwent,hash:CRC-32=0xaca8834c]]]*/
+/*[[[head:libc_fgetpwent,hash:CRC-32=0x2befee0c]]]*/
 /* >> fgetpwent(3)
  * Read an entry from `stream'
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) The last entry has already been read
  *                                     (use `rewind(stream)' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.database.pwd") WUNUSED NONNULL((1)) struct passwd *
+INTERN ATTR_SECTION(".text.crt.database.pwd") WUNUSED ATTR_ACCESS_RW(1) struct passwd *
 NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream)
 /*[[[body:libc_fgetpwent]]]*/
 {

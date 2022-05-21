@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeedc7b15 */
+/* HASH CRC-32:0xef91ea83 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___fpurge_defined
 #define __local___localdep___fpurge_defined
 #ifdef __CRT_HAVE___fpurge
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep___fpurge,(__FILE *__stream),__fpurge,(__stream))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep___fpurge,(__FILE *__stream),__fpurge,(__stream))
 #elif defined(__CRT_HAVE_fpurge)
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep___fpurge,(__FILE *__stream),fpurge,(__stream))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep___fpurge,(__FILE *__stream),fpurge,(__stream))
 #else /* ... */
 #undef __local___localdep___fpurge_defined
 #endif /* !... */
@@ -42,22 +42,22 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep___fpurge,(__FILE *
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fileno)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno,(__stream))
 #elif defined(__CRT_HAVE__fileno)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),_fileno,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),_fileno,(__stream))
 #elif defined(__CRT_HAVE_fileno_unlocked)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_fileno_defined
 #endif /* !... */

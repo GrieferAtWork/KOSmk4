@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x257cc724 */
+/* HASH CRC-32:0x978ac5fe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/byteorder.h>
 #include <libc/template/itoa_digits.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(format_c32hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_c32hexdump) __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBKCALL __LIBC_LOCAL_NAME(format_c32hexdump))(__pc32formatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) {
 	__PRIVATE __CHAR32_TYPE__ const __lf[1] = { '\n' };
 	__BYTE_TYPE__ const *__line_data;

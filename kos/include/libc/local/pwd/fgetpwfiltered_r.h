@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15996918 */
+/* HASH CRC-32:0x3b14eeb4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_feof_defined
 #define __local___localdep_feof_defined
 #if defined(__CRT_HAVE_feof_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_feof,(__FILE __KOS_FIXED_CONST *__restrict __stream),feof_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_feof,(__FILE __KOS_FIXED_CONST *__restrict __stream),feof_unlocked,(__stream))
 #elif defined(__CRT_HAVE_feof)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_feof,(__FILE __KOS_FIXED_CONST *__restrict __stream),feof,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_feof,(__FILE __KOS_FIXED_CONST *__restrict __stream),feof,(__stream))
 #elif defined(__CRT_HAVE__IO_feof)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_feof,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_feof,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_feof,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_feof,(__stream))
 #elif defined(__CRT_HAVE_feof_unlocked)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_feof,(__FILE __KOS_FIXED_CONST *__restrict __stream),feof_unlocked,(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_feof,(__FILE __KOS_FIXED_CONST *__restrict __stream),feof_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_feof_defined
 #endif /* !... */
@@ -47,42 +47,42 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__l
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fgetpos) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),_IO_fgetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),_IO_fgetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fgetpos64)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),_IO_fgetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),_IO_fgetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos_unlocked) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgetpos64.h>
@@ -98,7 +98,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,__localdep_fparseln,(__FILE *__stream, __SIZE_TYPE__ *__plen, __SIZE_TYPE__ *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags),fparseln,(__stream,__plen,__plineno,__delim,__flags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),char *,__NOTHROW_RPC,__localdep_fparseln,(__FILE *__stream, __SIZE_TYPE__ *__plen, __SIZE_TYPE__ *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags),fparseln,(__stream,__plen,__plineno,__delim,__flags))
 #elif (defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 __NAMESPACE_LOCAL_END
 #include <libc/local/util/fparseln.h>
@@ -128,42 +128,42 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fsetpos) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),_IO_fsetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),_IO_fsetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fsetpos64)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),_IO_fsetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),_IO_fsetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos_unlocked) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fsetpos64.h>
@@ -198,17 +198,17 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind_unlocked,(__stream))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind_unlocked,(__stream))
 #elif defined(__CRT_HAVE_rewind)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind,(__stream))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind,(__stream))
 #elif defined(__CRT_HAVE_rewind_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind_unlocked,(__stream))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind_unlocked,(__stream))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <asm/os/stdio.h>
@@ -309,7 +309,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <asm/os/syslog.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fgetpwfiltered_r) __ATTR_NONNULL((1, 2, 3, 5)) __errno_t
+__LOCAL_LIBC(fgetpwfiltered_r) __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2, 3, 5)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetpwfiltered_r))(__FILE *__restrict __stream, struct passwd *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct passwd **__restrict __result, __uid_t __filtered_uid, char const *__filtered_name) {
 	__errno_t __retval = 0;
 	char *__dbline;

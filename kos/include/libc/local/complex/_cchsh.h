@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89e008fe */
+/* HASH CRC-32:0x16015556 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_sinh_defined
 #endif /* !... */
 #endif /* !__local___localdep_sinh_defined */
-__LOCAL_LIBC(_cchsh) __ATTR_NONNULL((2, 3)) void
+__LOCAL_LIBC(_cchsh) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_cchsh))(double __x, double *__c, double *__s) {
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
 	/*-

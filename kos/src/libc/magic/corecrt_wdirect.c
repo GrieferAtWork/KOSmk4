@@ -57,7 +57,7 @@ typedef __WCHAR_TYPE__ wchar_t;
 [[wchar, cp, decl_include("<hybrid/typecore.h>"), dos_export_alias("_wgetdcwd_nolock")]]
 [[requires_include("<asm/os/fcntl.h>"), impl_include("<libc/errno.h>")]]
 [[requires($has_function(wfrealpath4) && defined(__AT_FDDRIVE_CWD))]]
-wchar_t *_wgetdcwd(int drive, wchar_t *buf, size_t size) {
+wchar_t *_wgetdcwd(int drive, [[out(? <= size)]] wchar_t *buf, size_t size) {
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
 @@pp_ifdef EINVAL@@
 		(void)libc_seterrno(EINVAL);
@@ -78,7 +78,7 @@ wchar_t *_wgetdcwd(int drive, wchar_t *buf, size_t size) {
 
 [[wchar, cp, requires_function(wmkdir)]]
 [[decl_include("<hybrid/typecore.h>")]]
-int _wmkdir([[nonnull]] wchar_t const *path) {
+int _wmkdir([[in]] wchar_t const *path) {
 	return wmkdir(path, DOS_MKDIR_ACCESS_MODE);
 }
 

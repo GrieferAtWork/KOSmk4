@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50039ef9 */
+/* HASH CRC-32:0xd0933667 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fegetenv) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(fegetenv) __ATTR_ACCESS_WR(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fegetenv))(struct __fenv_struct *___envp) {
 	__inline_fegetenv(___envp);
 	return 0;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1848f628 */
+/* HASH CRC-32:0xc4f458fb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_c32open_defined
 #endif /* !... */
 #endif /* !__local___localdep_c32open_defined */
-__LOCAL_LIBC(_c32sopen) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
+__LOCAL_LIBC(_c32sopen) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t
 __NOTHROW_RPC(__VLIBKCALL __LIBC_LOCAL_NAME(_c32sopen))(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags, int __sflags, ...) {
 	__fd_t __result;
 	__builtin_va_list __args;

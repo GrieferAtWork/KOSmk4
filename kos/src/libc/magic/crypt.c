@@ -44,11 +44,11 @@ __SYSDECL_BEGIN
 }
 
 @@>> setkey(3), setkey_r(3)
-void setkey([[nonnull]] char const *key);
+void setkey([[in]] char const *key);
 
 @@>> crypt(3), crypt_r(3)
 [[guard]]
-char *crypt([[nonnull]] char const *key, [[nonnull]] char const *salt);
+char *crypt([[in]] char const *key, [[in]] char const *salt);
 
 @@>> encrypt(3), encrypt_r(3)
 [[guard, decl_include("<features.h>")]]
@@ -57,12 +57,12 @@ void encrypt([[nonnull]] char *glibc_block, __STDC_INT_AS_UINT_T edflag);
 %
 %#ifdef __USE_GNU
 [[doc_alias("crypt"), decl_include("<bits/crt/crypt_data.h>")]]
-char *crypt_r([[nonnull]] char const *key,
-              [[nonnull]] char const *salt,
+char *crypt_r([[in]] char const *key,
+              [[in]] char const *salt,
               [[nonnull]] struct crypt_data *__restrict data);
 
 [[doc_alias("setkey"), decl_include("<bits/crt/crypt_data.h>")]]
-void setkey_r([[nonnull]] char const *key,
+void setkey_r([[in]] char const *key,
               [[nonnull]] struct crypt_data *__restrict data);
 
 [[doc_alias("encrypt"), decl_include("<bits/crt/crypt_data.h>")]]

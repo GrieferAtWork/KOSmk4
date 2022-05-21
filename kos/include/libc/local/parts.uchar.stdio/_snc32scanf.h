@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x125a39c1 */
+/* HASH CRC-32:0xa16d6df1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vsnc32scanf_defined
 #define __local___localdep__vsnc32scanf_defined
 #if defined(__CRT_HAVE__vsnwscanf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_LIBC_C32SCANF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnc32scanf,(__CHAR32_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),_vsnwscanf,(__buf,__bufsize,__format,__args))
+__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_ROS(1, 2) __ATTR_LIBC_C32SCANF(3, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnc32scanf,(__CHAR32_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),_vsnwscanf,(__buf,__bufsize,__format,__args))
 #elif defined(__CRT_HAVE_KOS$_vsnwscanf)
-__CREDIRECT_KOS(__ATTR_LIBC_C32SCANF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnc32scanf,(__CHAR32_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),_vsnwscanf,(__buf,__bufsize,__format,__args))
+__CREDIRECT_KOS(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_ROS(1, 2) __ATTR_LIBC_C32SCANF(3, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnc32scanf,(__CHAR32_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),_vsnwscanf,(__buf,__bufsize,__format,__args))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/_vsnwscanf.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__vsnc32scanf __LIBC_LOCAL_NAME(_vsnc32scanf)
 #endif /* !... */
 #endif /* !__local___localdep__vsnc32scanf_defined */
-__LOCAL_LIBC(_snc32scanf) __ATTR_WUNUSED __ATTR_LIBC_C32SCANF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(_snc32scanf) __ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_ROS(1, 2) __ATTR_LIBC_C32SCANF(3, 4) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBKCALL __LIBC_LOCAL_NAME(_snc32scanf))(__CHAR32_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedbbd3db */
+/* HASH CRC-32:0x4a85ed4e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <hybrid/__byteswap.h>
 #include <hybrid/__unaligned.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ns_get16) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int
+__LOCAL_LIBC(ns_get16) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) unsigned int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ns_get16))(unsigned char const *__srcptr) {
 	return __hybrid_unaligned_getbe16(__srcptr);
 }

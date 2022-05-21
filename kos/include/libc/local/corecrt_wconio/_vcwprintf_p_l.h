@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cfcfdee */
+/* HASH CRC-32:0xf481b712 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___conio_common_vcwprintf_p_defined
 #define __local___localdep___conio_common_vcwprintf_p_defined
 #ifdef __CRT_HAVE___conio_common_vcwprintf_p
-__CREDIRECT(__ATTR_LIBC_WPRINTF_P(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___conio_common_vcwprintf_p,(__UINT64_TYPE__ __options, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__conio_common_vcwprintf_p,(__options,__format,__locale,__args))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_LIBC_WPRINTF_P(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___conio_common_vcwprintf_p,(__UINT64_TYPE__ __options, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__conio_common_vcwprintf_p,(__options,__format,__locale,__args))
 #elif defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE___stdio_common_vfwprintf_p) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wconio/__conio_common_vcwprintf_p.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <corecrt_stdio_config.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vcwprintf_p_l) __ATTR_LIBC_WPRINTF_P(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(_vcwprintf_p_l) __ATTR_ACCESS_RO(1) __ATTR_LIBC_WPRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vcwprintf_p_l))(__WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
 	return (__NAMESPACE_LOCAL_SYM __localdep___conio_common_vcwprintf_p)(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, __format, __locale, __args);
 }

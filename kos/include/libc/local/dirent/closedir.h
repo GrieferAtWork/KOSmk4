@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd919087f */
+/* HASH CRC-32:0x5147b6c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifdef __USE_DOS_DIRENT
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(closedir) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(closedir) __ATTR_ACCESS_RW(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(closedir))(struct __dirstream *__dirp) {
 	return __dos_dirent_closedir(__dirp);
 }

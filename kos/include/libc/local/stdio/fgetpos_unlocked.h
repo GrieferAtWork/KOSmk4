@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2051c657 */
+/* HASH CRC-32:0x93552075 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,21 +30,21 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetpos_defined
 #define __local___localdep_fgetpos_defined
 #if defined(__CRT_HAVE_fgetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fgetpos) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),_IO_fgetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),_IO_fgetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fgetpos64) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),_IO_fgetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),_IO_fgetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos_unlocked) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64_unlocked) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),int,__THROWING,__localdep_fgetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgetpos.h>
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_fgetpos __LIBC_LOCAL_NAME(fgetpos)
 #endif /* !... */
 #endif /* !__local___localdep_fgetpos_defined */
-__LOCAL_LIBC(fgetpos_unlocked) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(fgetpos_unlocked) __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetpos_unlocked))(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos) __THROWS(...) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fgetpos)(__stream, __pos);
 }

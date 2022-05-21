@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b6d8097 */
+/* HASH CRC-32:0xec4d41fe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_c32access_s) __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(_c32access_s) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __errno_t
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(_c32access_s))(__CHAR32_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type) {
 	if ((__NAMESPACE_LOCAL_SYM __localdep_c32access)(__file, __type) != 0)
 		return __libc_geterrno_or(1);

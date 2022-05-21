@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcef883b7 */
+/* HASH CRC-32:0x7f6b85aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,14 +96,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(partition_union, __FORCELOCAL __ATTR_ARTIFICIAL 
  * Print classes (and  their elements) of  `self' to  `fp'
  * The format used is: '[' ['(' [0 1 2 3 4]... ')']... ']'
  * Example: "[(0 1 2 4 8)(3 6)(5 7)]" */
-__CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,partition_print,(struct partition_def __KOS_FIXED_CONST *__self, FILE *__fp),(__self,__fp))
+__CDECLARE_VOID(__ATTR_ACCESS_RW(2) __ATTR_NONNULL((1)),__NOTHROW_NCX,partition_print,(struct partition_def __KOS_FIXED_CONST *__self, FILE *__fp),(__self,__fp))
 #elif defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 #include <libc/local/partition/partition_print.h>
 /* >> partition_print(3)
  * Print classes (and  their elements) of  `self' to  `fp'
  * The format used is: '[' ['(' [0 1 2 3 4]... ')']... ']'
  * Example: "[(0 1 2 4 8)(3 6)(5 7)]" */
-__NAMESPACE_LOCAL_USING_OR_IMPL(partition_print, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL partition_print)(struct partition_def __KOS_FIXED_CONST *__self, FILE *__fp) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(partition_print))(__self, __fp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(partition_print, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(2) __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL partition_print)(struct partition_def __KOS_FIXED_CONST *__self, FILE *__fp) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(partition_print))(__self, __fp); })
 #endif /* ... */
 
 /* Return the canonical element for the class containing `element' */

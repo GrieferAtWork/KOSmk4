@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36dc3832 */
+/* HASH CRC-32:0x8db534e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/template/stdtty.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_cputws) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(_cputws) __ATTR_ACCESS_RO(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_cputws))(__WCHAR_TYPE__ const *__restrict __str) {
 #if defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked))
 	__SIZE_TYPE__ __len = (__NAMESPACE_LOCAL_SYM __localdep_wcslen)(__str);

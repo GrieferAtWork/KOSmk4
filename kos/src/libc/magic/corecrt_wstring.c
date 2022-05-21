@@ -125,22 +125,26 @@ typedef __SIZE_TYPE__ rsize_t;
 wchar_t *_wcserror($errno_t errno_value);
 
 [[wchar, decl_include("<bits/types.h>")]]
-$errno_t _wcserror_s(wchar_t *buf, $size_t bufsize, $errno_t errno_value);
+$errno_t _wcserror_s([[out(? <= bufsize)]] wchar_t *buf,
+                     $size_t bufsize, $errno_t errno_value);
 
 [[wchar, decl_include("<hybrid/typecore.h>")]]
-wchar_t *__wcserror(wchar_t const *message);
+wchar_t *__wcserror([[in]] wchar_t const *message);
 
 [[wchar, decl_include("<bits/types.h>")]]
-$errno_t __wcserror_s(wchar_t *buf, $size_t bufsize, wchar_t const *message);
+$errno_t __wcserror_s([[out(? <= bufsize)]] wchar_t *buf, $size_t bufsize,
+                      [[in]] wchar_t const *message);
 
 [[wchar, section(".text.crt.dos.wchar.string.memory")]]
 [[decl_include("<bits/types.h>")]]
-$errno_t _wcsnset_s(wchar_t *__restrict buf, $size_t buflen, wchar_t ch, $size_t maxlen)
+$errno_t _wcsnset_s([[inout_opt(? <= maxlen)]] wchar_t *__restrict buf,
+                    $size_t buflen, wchar_t ch, $size_t maxlen)
 	%{generate(str2wcs("_strnset_s"))}
 
 [[wchar, section(".text.crt.dos.wchar.string.memory")]]
 [[decl_include("<bits/types.h>")]]
-$errno_t _wcsset_s([[nonnull]] wchar_t *dst, $size_t dstsize, wchar_t ch)
+$errno_t _wcsset_s([[inout_opt(? <= dstsize)]] wchar_t *dst,
+                   $size_t dstsize, wchar_t ch)
 	%{generate(str2wcs("_strset_s"))}
 
 [[wchar, section(".text.crt.dos.wchar.unicode.static.memory")]]
@@ -157,14 +161,14 @@ _wcsupr_s_l(*) %{generate(str2wcs("_strupr_s_l"))}
 
 [[decl_include("<bits/types.h>")]]
 [[wchar, section(".text.crt.dos.wchar.string.memory")]]
-$errno_t wmemcpy_s([[nonnull]] wchar_t *dst, rsize_t dstlength,
-                   [[nonnull]] wchar_t const *src, rsize_t srclength)
+$errno_t wmemcpy_s([[out_opt(dstlength)]] wchar_t *dst, rsize_t dstlength,
+                   [[in_opt (srclength)]] wchar_t const *src, rsize_t srclength)
 	%{generate(str2wcs("memcpy_s"))}
 
 [[decl_include("<bits/types.h>")]]
 [[wchar, section(".text.crt.dos.wchar.string.memory")]]
-$errno_t wmemmove_s([[nonnull]] wchar_t *dst, rsize_t dstlength,
-                    [[nonnull]] wchar_t const *src, rsize_t srclength)
+$errno_t wmemmove_s([[out_opt(dstlength)]] wchar_t *dst, rsize_t dstlength,
+                    [[in_opt (srclength)]] wchar_t const *src, rsize_t srclength)
 	%{generate(str2wcs("memmove_s"))}
 
 %
@@ -180,7 +184,7 @@ wcscpy_s(*) %{generate(str2wcs("strcpy_s"))}
 @@>> wcsnlen_s(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[inline, nocrt, pure, wunused]]
-$size_t wcsnlen_s([[nullable]] wchar_t const *str, $size_t maxlen) {
+$size_t wcsnlen_s([[in_opt(strnlen(., maxlen))]] wchar_t const *str, $size_t maxlen) {
 	return str ? wcsnlen(str, maxlen) : 0;
 }
 

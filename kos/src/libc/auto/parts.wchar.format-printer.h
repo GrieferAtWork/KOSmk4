@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66ed692 */
+/* HASH CRC-32:0x24f8d9ba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ INTDEF NONNULL((1)) ssize_t (LIBKCALL libc_format_wrepeat)(pc32formatprinter pri
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_wescape)(pc16formatprinter printer, void *arg, char16_t const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
+INTDEF ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_wescape)(pc16formatprinter printer, void *arg, char16_t const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
 /* >> format_escape(3)
  * Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -78,7 +78,7 @@ INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_wescape)(pc16formatprinter pri
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-INTDEF NONNULL((1)) ssize_t (LIBKCALL libc_format_wescape)(pc32formatprinter printer, void *arg, char32_t const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
+INTDEF ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t (LIBKCALL libc_format_wescape)(pc32formatprinter printer, void *arg, char32_t const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
  * @param: printer:  The format printer callback
@@ -89,7 +89,7 @@ INTDEF NONNULL((1)) ssize_t (LIBKCALL libc_format_wescape)(pc32formatprinter pri
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_whexdump)(pc16formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
+INTDEF ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_whexdump)(pc16formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
  * @param: printer:  The format printer callback
@@ -100,7 +100,7 @@ INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_whexdump)(pc16formatprinter pr
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF NONNULL((1)) ssize_t (LIBKCALL libc_format_whexdump)(pc32formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
+INTDEF ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t (LIBKCALL libc_format_whexdump)(pc32formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
  * this  function will call the given `printer' callback with various strings that, when put

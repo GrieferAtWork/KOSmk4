@@ -79,14 +79,14 @@ typedef __size_t size_t;
 @@Returns the used buffer size of the given `stream' (s.a. `setvbuf(3)')
 @@@return: * : Used buffer size of `stream'
 [[pure, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
-size_t __fbufsize([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
+size_t __fbufsize([[in]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> __freading(3)
 @@Returns  non-zero if the `stream' is read-only, or "the last operation
 @@performed on `stream' was a read-operation". On KOS, this last part is
 @@implemented such that we check for unsaved changes to `stream'.
 [[pure, wunused, decl_include("<features.h>")]]
-int __freading([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
+int __freading([[in]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> __fwriting(3)
 @@Returns non-zero if the `stream'  is "write-only", or "the last  operation
@@ -95,7 +95,7 @@ int __freading([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
 @@enforced on an fd-level by the kernel). Instead, we implement `__fwriting'
 @@to return indicative of `stream' containing any unwritten changes.
 [[pure, wunused, decl_include("<features.h>")]]
-int __fwriting([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
+int __fwriting([[in]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> __freadable(3)
 @@Returns non-zero if `stream'  allows for reading (s.a.  `fread(3)')
@@ -104,13 +104,13 @@ int __fwriting([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
 @@is still attempted). As such, KOS  considers all stdio files to  be
 @@readable, meaning that on KOS this function always returns `1'.
 [[pure, wunused, decl_include("<features.h>")]]
-int __freadable([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
+int __freadable([[in]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> __fwritable(3)
 @@Returns non-zero if `stream' is writable, that is: has been opened
 @@with "w",  "r+", or  some similar  flag that  allows for  writing.
 [[pure, wunused, decl_include("<features.h>")]]
-int __fwritable([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
+int __fwritable([[in]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> __flbf(3)
 @@Return  non-zero  if `stream'  is line-buffered.  (s.a. `_IOLBF')
@@ -120,7 +120,7 @@ int __fwritable([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
 @@the appropriate call to `isatty(3)' and set the internal is-line-
 @@buffered flag accordingly, before returning its state.
 [[pure, wunused]]
-int __flbf([[nonnull]] $FILE *stream);
+int __flbf([[inout]] $FILE *stream);
 
 @@>> __fpurge(3)
 @@Discard all modified, but unwritten data from `stream', as  well
@@ -128,7 +128,7 @@ int __flbf([[nonnull]] $FILE *stream);
 @@a call to this function, the next `fread(3)' or `fwrite(3)' will
 @@start off from a blank state.
 [[export_alias("fpurge")]]
-void __fpurge([[nonnull]] $FILE *stream);
+void __fpurge([[inout]] $FILE *stream);
 
 @@>> __fpending(3)
 @@Returns the number of pending, but not-yet-written bytes of modified
@@ -136,7 +136,7 @@ void __fpurge([[nonnull]] $FILE *stream);
 @@to write all modified data to the system, and following such a call,
 @@this function will return `0' until new unwritten data appears.
 [[pure, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
-size_t __fpending([[nonnull]] $FILE __KOS_FIXED_CONST *stream);
+size_t __fpending([[in]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> _flushlbf(3)
 @@Perform  a call  `fflush(stream)' for  every open  line-buffered stdio file.
@@ -151,13 +151,13 @@ void _flushlbf();
 @@that aren't already lock-less by nature (iow: everything but `*_unlocked(3)')
 @@@param: type: One of `FSETLOCKING_*', as defined in `<stdio_ext.h>'
 @@@return: * : The locking type prior to this call (one of `FSETLOCKING_INTERNAL' or `FSETLOCKING_BYCALLER')
-int __fsetlocking([[nonnull]] $FILE *stream, int type);
+int __fsetlocking([[inout]] $FILE *stream, int type);
 
 @@>> __fseterr(3)
 @@Set the error indicator of `stream', the same an error file error would, such
 @@that `ferror(stream) != 0', and `clearerr(stream)' must be used if one wishes
 @@to clear the error once again.
-void __fseterr([[nonnull]] $FILE *stream);
+void __fseterr([[inout]] $FILE *stream);
 
 %{
 

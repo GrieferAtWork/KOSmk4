@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1639f9cb */
+/* HASH CRC-32:0x9131dae2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -190,7 +190,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)(char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("open");
+__LIBC __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__VLIBCCALL open)(char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("open");
 #elif defined(__CRT_HAVE__open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -204,7 +204,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -218,7 +218,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___libc_open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -232,7 +232,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__libc_open,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__libc_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open64)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -246,7 +246,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open64)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -260,7 +260,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/fcntl/open.h>
 /* >> open(2), open64(2), openat(2), openat64(2)
@@ -276,7 +276,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open)(char const *__filename, __oflag_t __oflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))(__filename, __oflags, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__VLIBCCALL open)(char const *__filename, __oflag_t __oflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))(__filename, __oflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define open(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -289,28 +289,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNU
 #if defined(__CRT_HAVE_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE__creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),_creat,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),_creat,(__filename,__mode))
 #elif defined(__CRT_HAVE___creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),__creat,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),__creat,(__filename,__mode))
 #elif defined(__CRT_HAVE___libc_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),__libc_creat,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),__libc_creat,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat64)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
 #elif defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 #include <libc/local/fcntl/creat.h>
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(creat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__LIBCCALL creat)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creat))(__filename, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(creat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__LIBCCALL creat)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creat))(__filename, __mode); })
 #else /* ... */
 #undef __creat_defined
 #endif /* !... */
@@ -706,28 +706,28 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_
 #if defined(__CRT_HAVE_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),creat,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),creat,(__filename,__mode))
 #elif defined(__CRT_HAVE__creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE___creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),__creat,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),__creat,(__filename,__mode))
 #elif defined(__CRT_HAVE___libc_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),__libc_creat,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),__libc_creat,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat64)
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
 #elif defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 #include <libc/local/fcntl/creat.h>
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__LIBCCALL _creat)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creat))(__filename, __mode); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__LIBCCALL _creat)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creat))(__filename, __mode); }
 #endif /* ... */
 #ifdef __CRT_HAVE_chmod
 /* >> chmod(2) */
@@ -747,10 +747,10 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chmod,(char const *__filename
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _chmod)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(chmod))(__filename, __mode); }
 #endif /* ... */
 #ifdef __CRT_HAVE__access_s
-__CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_RPC,_access_s,(char const *__filename, __STDC_INT_AS_UINT_T __type),(__filename,__type))
+__CDECLARE(__ATTR_ACCESS_RO(1),errno_t,__NOTHROW_RPC,_access_s,(char const *__filename, __STDC_INT_AS_UINT_T __type),(__filename,__type))
 #elif defined(__CRT_HAVE_access) || defined(__CRT_HAVE__access) || defined(__CRT_HAVE___access) || defined(__CRT_HAVE___libc_access) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat))
 #include <libc/local/io/_access_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_access_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) errno_t __NOTHROW_RPC(__LIBCCALL _access_s)(char const *__filename, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_access_s))(__filename, __type); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_access_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) errno_t __NOTHROW_RPC(__LIBCCALL _access_s)(char const *__filename, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_access_s))(__filename, __type); })
 #endif /* ... */
 #if defined(__CRT_HAVE_ftruncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> ftruncate(2), ftruncate64(2)
@@ -1116,7 +1116,7 @@ __CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,_write,(__fd_t __fd, v
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -1130,7 +1130,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL _open)(char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("_open");
+__LIBC __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__VLIBCCALL _open)(char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("_open");
 #elif defined(__CRT_HAVE___open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -1144,7 +1144,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL _open
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___libc_open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -1158,7 +1158,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),__libc_open,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),__libc_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open64)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -1172,7 +1172,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open64)
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
@@ -1186,7 +1186,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_open,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/fcntl/open.h>
 /* >> open(2), open64(2), openat(2), openat64(2)
@@ -1295,10 +1295,10 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOT
 #endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) || (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) */
 #endif /* !... */
 #ifdef __CRT_HAVE__umask_s
-__CDECLARE(__ATTR_NONNULL((2)),errno_t,__NOTHROW_NCX,_umask_s,(__mode_t __nmode, __mode_t *__omode),(__nmode,__omode))
+__CDECLARE(__ATTR_ACCESS_WR(2),errno_t,__NOTHROW_NCX,_umask_s,(__mode_t __nmode, __mode_t *__omode),(__nmode,__omode))
 #elif defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask) || defined(__CRT_HAVE___umask) || defined(__CRT_HAVE___libc_umask)
 #include <libc/local/io/_umask_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_umask_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) errno_t __NOTHROW_NCX(__LIBCCALL _umask_s)(__mode_t __nmode, __mode_t *__omode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_umask_s))(__nmode, __omode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_umask_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(2) errno_t __NOTHROW_NCX(__LIBCCALL _umask_s)(__mode_t __nmode, __mode_t *__omode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_umask_s))(__nmode, __omode); })
 #endif /* ... */
 #ifdef __CRT_HAVE__setmode
 __CDECLARE(,__oflag_t,__NOTHROW_NCX,_setmode,(__fd_t __fd, __oflag_t __mode),(__fd,__mode))
@@ -1313,21 +1313,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_setmode, __FORCELOCAL __ATTR_ARTIFICIAL __oflag
 __CDECLARE(,int,__NOTHROW_NCX,_findclose,(intptr_t __findfd),(__findfd))
 #endif /* !___findclose_defined && __CRT_HAVE__findclose */
 #ifdef __CRT_HAVE__findfirst32
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst32,(char const *__restrict __filename, struct _finddata32_t *__restrict __finddata),(__filename,__finddata))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_findfirst32,(char const *__restrict __filename, struct _finddata32_t *__restrict __finddata),(__filename,__finddata))
 #elif defined(__CRT_HAVE__findfirst)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst32,(char const *__restrict __filename, struct _finddata32_t *__restrict __finddata),_findfirst,(__filename,__finddata))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_findfirst32,(char const *__restrict __filename, struct _finddata32_t *__restrict __finddata),_findfirst,(__filename,__finddata))
 #endif /* ... */
 #ifdef __CRT_HAVE__findfirst32i64
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst32i64,(char const *__restrict __filename, struct _finddata32i64_t *__restrict __finddata),(__filename,__finddata))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_findfirst32i64,(char const *__restrict __filename, struct _finddata32i64_t *__restrict __finddata),(__filename,__finddata))
 #elif defined(__CRT_HAVE__findfirsti64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst32i64,(char const *__restrict __filename, struct _finddata32i64_t *__restrict __finddata),_findfirsti64,(__filename,__finddata))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_findfirst32i64,(char const *__restrict __filename, struct _finddata32i64_t *__restrict __finddata),_findfirsti64,(__filename,__finddata))
 #endif /* ... */
 #ifndef ___findfirst64_defined
 #define ___findfirst64_defined
 #ifdef __CRT_HAVE__findfirst64
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64,(char const *__restrict __filename, struct __finddata64_t *__restrict __finddata),(__filename,__finddata))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_findfirst64,(char const *__restrict __filename, struct __finddata64_t *__restrict __finddata),(__filename,__finddata))
 #elif defined(__CRT_HAVE__findfirst64i32)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64,(char const *__restrict __filename, struct __finddata64_t *__restrict __finddata),_findfirst64i32,(__filename,__finddata))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_findfirst64,(char const *__restrict __filename, struct __finddata64_t *__restrict __finddata),_findfirst64i32,(__filename,__finddata))
 #else /* ... */
 #undef ___findfirst64_defined
 #endif /* !... */
@@ -1335,29 +1335,29 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfi
 #ifndef ___findfirst64i32_defined
 #define ___findfirst64i32_defined
 #ifdef __CRT_HAVE__findfirst64
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64i32,(char const *__restrict __filename, struct _finddata64i32_t *__restrict __finddata),_findfirst64,(__filename,__finddata))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_findfirst64i32,(char const *__restrict __filename, struct _finddata64i32_t *__restrict __finddata),_findfirst64,(__filename,__finddata))
 #elif defined(__CRT_HAVE__findfirst64i32)
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64i32,(char const *__restrict __filename, struct _finddata64i32_t *__restrict __finddata),(__filename,__finddata))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_findfirst64i32,(char const *__restrict __filename, struct _finddata64i32_t *__restrict __finddata),(__filename,__finddata))
 #else /* ... */
 #undef ___findfirst64i32_defined
 #endif /* !... */
 #endif /* !___findfirst64i32_defined */
 #ifdef __CRT_HAVE__findnext32
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32,(intptr_t __findfd, struct _finddata32_t *__restrict __finddata),(__findfd,__finddata))
+__CDECLARE(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_findnext32,(intptr_t __findfd, struct _finddata32_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__findnext)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32,(intptr_t __findfd, struct _finddata32_t *__restrict __finddata),_findnext,(__findfd,__finddata))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_findnext32,(intptr_t __findfd, struct _finddata32_t *__restrict __finddata),_findnext,(__findfd,__finddata))
 #endif /* ... */
 #ifdef __CRT_HAVE__findnext32i64
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32i64,(intptr_t __findfd, struct _finddata32i64_t *__restrict __finddata),(__findfd,__finddata))
+__CDECLARE(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_findnext32i64,(intptr_t __findfd, struct _finddata32i64_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__findnexti64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32i64,(intptr_t __findfd, struct _finddata32i64_t *__restrict __finddata),_findnexti64,(__findfd,__finddata))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_findnext32i64,(intptr_t __findfd, struct _finddata32i64_t *__restrict __finddata),_findnexti64,(__findfd,__finddata))
 #endif /* ... */
 #ifndef ___findnext64_defined
 #define ___findnext64_defined
 #ifdef __CRT_HAVE__findnext64
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64,(intptr_t __findfd, struct __finddata64_t *__restrict __finddata),(__findfd,__finddata))
+__CDECLARE(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_findnext64,(intptr_t __findfd, struct __finddata64_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__findnext64i32)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64,(intptr_t __findfd, struct __finddata64_t *__restrict __finddata),_findnext64i32,(__findfd,__finddata))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_findnext64,(intptr_t __findfd, struct __finddata64_t *__restrict __finddata),_findnext64i32,(__findfd,__finddata))
 #else /* ... */
 #undef ___findnext64_defined
 #endif /* !... */
@@ -1365,50 +1365,50 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64,(intptr_t __findfd
 #ifndef ___findnext64i32_defined
 #define ___findnext64i32_defined
 #ifdef __CRT_HAVE__findnext64
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64i32,(intptr_t __findfd, struct _finddata64i32_t *__restrict __finddata),_findnext64,(__findfd,__finddata))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_findnext64i32,(intptr_t __findfd, struct _finddata64i32_t *__restrict __finddata),_findnext64,(__findfd,__finddata))
 #elif defined(__CRT_HAVE__findnext64i32)
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64i32,(intptr_t __findfd, struct _finddata64i32_t *__restrict __finddata),(__findfd,__finddata))
+__CDECLARE(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_findnext64i32,(intptr_t __findfd, struct _finddata64i32_t *__restrict __finddata),(__findfd,__finddata))
 #else /* ... */
 #undef ___findnext64i32_defined
 #endif /* !... */
 #endif /* !___findnext64i32_defined */
 
 #ifdef __CRT_HAVE__sopen_s
-__CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
+__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),errno_t,__NOTHROW_RPC,_sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE__sopen_s_nolock)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s_nolock,(__fd,__filename,__oflags,__sflags,__mode))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),errno_t,__NOTHROW_RPC,_sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s_nolock,(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE_sopen) || defined(__CRT_HAVE__sopen) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/io/_sopen_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_sopen_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) errno_t __NOTHROW_RPC(__LIBCCALL _sopen_s)(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sopen_s))(__fd, __filename, __oflags, __sflags, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_sopen_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) errno_t __NOTHROW_RPC(__LIBCCALL _sopen_s)(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sopen_s))(__fd, __filename, __oflags, __sflags, __mode); })
 #endif /* ... */
 #ifdef __CRT_HAVE__sopen_s
-__CREDIRECT(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s_nolock,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s,(__fd,__filename,__oflags,__sflags,__mode))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),errno_t,__NOTHROW_RPC,_sopen_s_nolock,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s,(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE__sopen_s_nolock)
-__CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s_nolock,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
+__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),errno_t,__NOTHROW_RPC,_sopen_s_nolock,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE_sopen) || defined(__CRT_HAVE__sopen) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/io/_sopen_s.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) errno_t __NOTHROW_RPC(__LIBCCALL _sopen_s_nolock)(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sopen_s))(__fd, __filename, __oflags, __sflags, __mode); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) errno_t __NOTHROW_RPC(__LIBCCALL _sopen_s_nolock)(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sopen_s))(__fd, __filename, __oflags, __sflags, __mode); }
 #endif /* ... */
 #ifdef __CRT_HAVE__sopen_dispatch
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 5)),errno_t,__NOTHROW_RPC,_sopen_dispatch,(char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode, __fd_t *__fd, int __bsecure),(__filename,__oflags,__sflags,__mode,__fd,__bsecure))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(5),errno_t,__NOTHROW_RPC,_sopen_dispatch,(char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode, __fd_t *__fd, int __bsecure),(__filename,__oflags,__sflags,__mode,__fd,__bsecure))
 #elif defined(__CRT_HAVE__sopen_s) || defined(__CRT_HAVE__sopen_s_nolock) || defined(__CRT_HAVE_sopen) || defined(__CRT_HAVE__sopen) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/io/_sopen_dispatch.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_sopen_dispatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) errno_t __NOTHROW_RPC(__LIBCCALL _sopen_dispatch)(char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode, __fd_t *__fd, int __bsecure) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sopen_dispatch))(__filename, __oflags, __sflags, __mode, __fd, __bsecure); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_sopen_dispatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(5) errno_t __NOTHROW_RPC(__LIBCCALL _sopen_dispatch)(char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode, __fd_t *__fd, int __bsecure) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_sopen_dispatch))(__filename, __oflags, __sflags, __mode, __fd, __bsecure); })
 #endif /* ... */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_mktemp_s,(char *__template_, size_t __size),(__template_,__size))
+__CDECLARE_OPT(__ATTR_ACCESS_RWS(1, 2),errno_t,__NOTHROW_NCX,_mktemp_s,(char *__template_, size_t __size),(__template_,__size))
 #ifdef __CRT_HAVE_sopen
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_sopen,(char const *__filename, __oflag_t __oflags, int __sflags),sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_sopen,(char const *__filename, __oflag_t __oflags, int __sflags),sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__sopen)
-__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL _sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) __CASMNAME_SAME("_sopen");
+__LIBC __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__VLIBCCALL _sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) __CASMNAME_SAME("_sopen");
 #elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/io/sopen.h>
 #define _sopen(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sopen))(__VA_ARGS__)
 #endif /* ... */
 #ifdef __CRT_HAVE__pipe
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_pipe,(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode),(__pipedes,__pipesize,__textmode))
+__CDECLARE(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,_pipe,(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode),(__pipedes,__pipesize,__textmode))
 #elif defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE___libc_pipe)
 #include <libc/local/io/_pipe.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_pipe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _pipe)(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_pipe))(__pipedes, __pipesize, __textmode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_pipe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL _pipe)(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_pipe))(__pipedes, __pipesize, __textmode); })
 #endif /* ... */
 #ifdef __CRT_HAVE__eof
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_eof,(__fd_t __fd),(__fd))
@@ -1569,13 +1569,13 @@ __CREDIRECT(,int,__NOTHROW_RPC,locking,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd,
 __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL locking)(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lockf))(__fd, __cmd, __length); }
 #endif /* ... */
 #ifdef __CRT_HAVE_sopen
-__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) __CASMNAME_SAME("sopen");
+__LIBC __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__VLIBCCALL sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) __CASMNAME_SAME("sopen");
 #elif defined(__CRT_HAVE__sopen)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,sopen,(char const *__filename, __oflag_t __oflags, int __sflags),_sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,sopen,(char const *__filename, __oflag_t __oflags, int __sflags),_sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/io/sopen.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(sopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sopen))(__filename, __oflags, __sflags, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__VLIBCCALL sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sopen))(__filename, __oflags, __sflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define sopen(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sopen))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfaf1313 */
+/* HASH CRC-32:0xe6f80a81 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dyn_string_init_defined
 #define __local___localdep_dyn_string_init_defined
 #ifdef __CRT_HAVE_dyn_string_init
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_dyn_string_init,(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars),dyn_string_init,(__self,__min_chars))
+__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_dyn_string_init,(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars),dyn_string_init,(__self,__min_chars))
 #else /* __CRT_HAVE_dyn_string_init */
 __NAMESPACE_LOCAL_END
 #include <libc/local/dyn-string/dyn_string_init.h>

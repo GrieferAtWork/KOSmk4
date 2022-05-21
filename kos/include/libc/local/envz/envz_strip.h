@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x805a91b1 */
+/* HASH CRC-32:0xed6f6f4c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strend __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
-__LOCAL_LIBC(envz_strip) __ATTR_NONNULL((1, 2)) void
+__LOCAL_LIBC(envz_strip) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_strip))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len) {
 	char *__start, *__ptr, *__end;
 	__SIZE_TYPE__ __oldlen, __newlen;

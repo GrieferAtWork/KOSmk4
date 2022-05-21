@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa32cc9f */
+/* HASH CRC-32:0x78bf3d34 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,7 +104,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_makeaddr, __FORCELOCAL __ATTR_ARTIFICIAL __
  *     123      (decimal)
  *     0x123 (hex)
  *     0123  (oct) */
-__CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),in_addr_t,__NOTHROW_NCX,inet_addr,(char const *__restrict __cp),(__cp))
+__CDECLARE(__ATTR_PURE __ATTR_ACCESS_RO(1),in_addr_t,__NOTHROW_NCX,inet_addr,(char const *__restrict __cp),(__cp))
 #else /* __CRT_HAVE_inet_addr */
 #include <libc/local/arpa.inet/inet_addr.h>
 /* >> inet_addr(3)
@@ -119,7 +119,7 @@ __CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),in_addr_t,__NOTHROW_NCX,inet_addr,(ch
  *     123      (decimal)
  *     0x123 (hex)
  *     0123  (oct) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_addr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1)) in_addr_t __NOTHROW_NCX(__LIBCCALL inet_addr)(char const *__restrict __cp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_addr))(__cp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_addr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_ACCESS_RO(1) in_addr_t __NOTHROW_NCX(__LIBCCALL inet_addr)(char const *__restrict __cp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_addr))(__cp); })
 #endif /* !__CRT_HAVE_inet_addr */
 #ifdef __CRT_HAVE_inet_ntoa
 /* >> inet_ntoa(3)
@@ -142,25 +142,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_ntoa, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifdef __CRT_HAVE_inet_ntoa_r
 /* >> inet_ntoa_r(3)
  * Re-entrant version of `inet_ntoa()' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,inet_ntoa_r,(struct in_addr __inaddr, char __buf[16]),(__inaddr,__buf))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_WR(2),char *,__NOTHROW_NCX,inet_ntoa_r,(struct in_addr __inaddr, char __buf[16]),(__inaddr,__buf))
 #else /* __CRT_HAVE_inet_ntoa_r */
 #include <libc/local/arpa.inet/inet_ntoa_r.h>
 /* >> inet_ntoa_r(3)
  * Re-entrant version of `inet_ntoa()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_ntoa_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL inet_ntoa_r)(struct in_addr __inaddr, char __buf[16]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_ntoa_r))(__inaddr, __buf); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_ntoa_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_WR(2) char *__NOTHROW_NCX(__LIBCCALL inet_ntoa_r)(struct in_addr __inaddr, char __buf[16]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_ntoa_r))(__inaddr, __buf); })
 #endif /* !__CRT_HAVE_inet_ntoa_r */
 #endif /* __USE_KOS */
 #ifdef __CRT_HAVE_inet_network
 /* >> inet_network(3)
  * This function is  the same as  `inet_addr()', except  that
  * the return value is in host-endian, rather than net-endian */
-__CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,inet_network,(char const *__restrict __cp),(__cp))
+__CDECLARE(__ATTR_PURE __ATTR_ACCESS_RO(1),__UINT32_TYPE__,__NOTHROW_NCX,inet_network,(char const *__restrict __cp),(__cp))
 #else /* __CRT_HAVE_inet_network */
 #include <libc/local/arpa.inet/inet_network.h>
 /* >> inet_network(3)
  * This function is  the same as  `inet_addr()', except  that
  * the return value is in host-endian, rather than net-endian */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_network, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL inet_network)(char const *__restrict __cp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_network))(__cp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_network, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_ACCESS_RO(1) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL inet_network)(char const *__restrict __cp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_network))(__cp); })
 #endif /* !__CRT_HAVE_inet_network */
 
 /* The following functions are not part of XNS 5.2. */
@@ -181,7 +181,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_network, __FORCELOCAL __ATTR_ARTIFICIAL __A
  *     0123  (oct)
  * @return: 0: Bad input format
  * @return: 1: Success */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,inet_aton,(char const *__restrict __cp, struct in_addr *__restrict __inp),(__cp,__inp))
+__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,inet_aton,(char const *__restrict __cp, struct in_addr *__restrict __inp),(__cp,__inp))
 #else /* __CRT_HAVE_inet_aton */
 #include <libc/local/arpa.inet/inet_aton.h>
 /* >> inet_aton(3)
@@ -199,7 +199,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,inet_aton,(char const *__res
  *     0123  (oct)
  * @return: 0: Bad input format
  * @return: 1: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_aton, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL inet_aton)(char const *__restrict __cp, struct in_addr *__restrict __inp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_aton))(__cp, __inp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_aton, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) int __NOTHROW_NCX(__LIBCCALL inet_aton)(char const *__restrict __cp, struct in_addr *__restrict __inp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_aton))(__cp, __inp); })
 #endif /* !__CRT_HAVE_inet_aton */
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_inet_paton
@@ -217,7 +217,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_aton, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
  * @param: network_addr: When non-zero, `*pcp' is a network address
  * @return: 0: Bad input format
  * @return: 1: Success */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,inet_paton,(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr),(__pcp,__inp,__network_addr))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,inet_paton,(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr),(__pcp,__inp,__network_addr))
 #else /* __CRT_HAVE_inet_paton */
 #include <libc/local/arpa.inet/inet_paton.h>
 /* >> inet_paton(3)
@@ -234,7 +234,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,inet_paton,(c
  * @param: network_addr: When non-zero, `*pcp' is a network address
  * @return: 0: Bad input format
  * @return: 1: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_paton, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL inet_paton)(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_paton))(__pcp, __inp, __network_addr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_paton, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) int __NOTHROW_NCX(__LIBCCALL inet_paton)(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_paton))(__pcp, __inp, __network_addr); })
 #endif /* !__CRT_HAVE_inet_paton */
 #endif /* __USE_KOS */
 #ifdef __CRT_HAVE_inet_neta

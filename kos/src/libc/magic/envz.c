@@ -47,9 +47,9 @@ __SYSDECL_BEGIN
 @@If `name' contains a `=' character, only characters leading up to  this
 @@position are actually compared!
 [[pure, wunused, decl_include("<hybrid/typecore.h>")]]
-char *envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
-	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
-	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]
+char *envz_entry([in(envz_len)] char const *__restrict envz, size_t envz_len, [[in]] char const *__restrict name)
+	[([in(envz_len)] char *__restrict envz, size_t envz_len, [[in]] char const *__restrict name): char *]
+	[([in(envz_len)] char const *__restrict envz, size_t envz_len, [[in]] char const *__restrict name): char const *]
 {
 	size_t namelen;
 	char *envz_end = (char *)(envz + envz_len);
@@ -68,9 +68,9 @@ char *envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_le
 @@if no such entry exists, or the entry doesn't have a value
 @@portion (i.e. doesn't contain a `='-character)
 [[pure, wunused, decl_include("<hybrid/typecore.h>")]]
-char *envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name)
-	[([inp_opt(envz_len)] char *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char *]
-	[([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len, [[nonnull]] char const *__restrict name): char const *]
+char *envz_get([in(envz_len)] char const *__restrict envz, size_t envz_len, [[in]] char const *__restrict name)
+	[([in(envz_len)] char *__restrict envz, size_t envz_len, [[in]] char const *__restrict name): char *]
+	[([in(envz_len)] char const *__restrict envz, size_t envz_len, [[in]] char const *__restrict name): char const *]
 {
 	char *result;
 	result = (char *)envz_entry(envz, envz_len, name);
@@ -89,10 +89,10 @@ char *envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len,
 @@added to `penvz' as-is, without the trailing `=value')
 [[impl_include("<libc/errno.h>"), decl_include("<bits/types.h>")]]
 [[requires_function(realloc, argz_add)]]
-error_t envz_add([[nonnull]] char **__restrict penvz,
-                 [[nonnull]] size_t *__restrict penvz_len,
-                 [[nonnull]] char const *__restrict name,
-                 [[nullable]] char const *value) {
+error_t envz_add([[inout]] char **__restrict penvz,
+                 [[inout]] size_t *__restrict penvz_len,
+                 [[in]] char const *__restrict name,
+                 [[in_opt]] char const *value) {
 	char *new_envz;
 	size_t namelen, valuelen, morelen;
 	envz_remove(penvz, penvz_len, name);
@@ -128,9 +128,9 @@ error_t envz_add([[nonnull]] char **__restrict penvz,
 @@on `override_', which if non-zero will cause existing entries to be
 @@overwritten, and otherwise if zero, will cause them to stay.
 [[requires_function(argz_append), decl_include("<bits/types.h>")]]
-error_t envz_merge([[nonnull]] char **__restrict penvz,
-                   [[nonnull]] size_t *__restrict penvz_len,
-                   [[nonnull]] char const *__restrict envz2,
+error_t envz_merge([[inout]] char **__restrict penvz,
+                   [[inout]] size_t *__restrict penvz_len,
+                   [[in(envz2_len)]] char const *__restrict envz2,
                    size_t envz2_len, int override_) {
 	error_t result = 0;
 	while (envz2_len && result == 0) {
@@ -152,9 +152,9 @@ error_t envz_merge([[nonnull]] char **__restrict penvz,
 @@Remove an entry matching `name' from `penvz',
 @@or  do  nothing  if  no  such  entry  exists.
 [[decl_include("<hybrid/typecore.h>")]]
-void envz_remove([[nonnull]] char **__restrict penvz,
-                 [[nonnull]] size_t *__restrict penvz_len,
-                 [[nonnull]] char const *__restrict name) {
+void envz_remove([[inout]] char **__restrict penvz,
+                 [[inout]] size_t *__restrict penvz_len,
+                 [[in]] char const *__restrict name) {
 	char *entry;
 	entry = envz_entry(*penvz, *penvz_len, name);
 	if (entry)
@@ -165,8 +165,8 @@ void envz_remove([[nonnull]] char **__restrict penvz,
 @@>> envz_strip(3)
 @@Remove all entries from `penvz' that don't have a value-portion.
 [[decl_include("<hybrid/typecore.h>")]]
-void envz_strip([[nonnull]] char **__restrict penvz,
-                [[nonnull]] size_t *__restrict penvz_len) {
+void envz_strip([[inout]] char **__restrict penvz,
+                [[inout]] size_t *__restrict penvz_len) {
 	char *start, *ptr, *end;
 	size_t oldlen, newlen;
 	ptr = start = *penvz;

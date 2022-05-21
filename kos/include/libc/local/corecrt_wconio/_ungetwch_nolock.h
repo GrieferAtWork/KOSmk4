@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81408e8c */
+/* HASH CRC-32:0x90baf42c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,11 +27,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ungetwc_unlocked_defined
 #define __local___localdep_ungetwc_unlocked_defined
 #ifdef __CRT_HAVE_ungetwc_unlocked
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__ungetwc_nolock)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetwc)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
 #else /* ... */
 #undef __local___localdep_ungetwc_unlocked_defined
 #endif /* !... */

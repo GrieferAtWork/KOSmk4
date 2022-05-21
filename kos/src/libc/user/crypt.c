@@ -27,9 +27,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_crypt,hash:CRC-32=0x1562b560]]]*/
+/*[[[head:libc_crypt,hash:CRC-32=0x6654890a]]]*/
 /* >> crypt(3), crypt_r(3) */
-INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.string.encrypt") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) char *
 NOTHROW_NCX(LIBCCALL libc_crypt)(char const *key,
                                  char const *salt)
 /*[[[body:libc_crypt]]]*/
@@ -42,9 +42,9 @@ NOTHROW_NCX(LIBCCALL libc_crypt)(char const *key,
 }
 /*[[[end:libc_crypt]]]*/
 
-/*[[[head:libc_setkey,hash:CRC-32=0x7ade0f10]]]*/
+/*[[[head:libc_setkey,hash:CRC-32=0x4264ab5f]]]*/
 /* >> setkey(3), setkey_r(3) */
-INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.string.encrypt") void
 NOTHROW_NCX(LIBCCALL libc_setkey)(char const *key)
 /*[[[body:libc_setkey]]]*/
 /*AUTO*/{
@@ -68,9 +68,9 @@ NOTHROW_NCX(LIBCCALL libc_encrypt)(char *glibc_block,
 }
 /*[[[end:libc_encrypt]]]*/
 
-/*[[[head:libc_crypt_r,hash:CRC-32=0xb6793914]]]*/
+/*[[[head:libc_crypt_r,hash:CRC-32=0xfc1df864]]]*/
 /* >> crypt(3), crypt_r(3) */
-INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1, 2, 3)) char *
+INTERN ATTR_SECTION(".text.crt.string.encrypt") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) NONNULL((3)) char *
 NOTHROW_NCX(LIBCCALL libc_crypt_r)(char const *key,
                                    char const *salt,
                                    struct crypt_data *__restrict data)
@@ -85,9 +85,9 @@ NOTHROW_NCX(LIBCCALL libc_crypt_r)(char const *key,
 }
 /*[[[end:libc_crypt_r]]]*/
 
-/*[[[head:libc_setkey_r,hash:CRC-32=0x4f4e7d6d]]]*/
+/*[[[head:libc_setkey_r,hash:CRC-32=0xe8a85cdb]]]*/
 /* >> setkey(3), setkey_r(3) */
-INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1, 2)) void
+INTERN ATTR_SECTION(".text.crt.string.encrypt") ATTR_ACCESS_RO(1) NONNULL((2)) void
 NOTHROW_NCX(LIBCCALL libc_setkey_r)(char const *key,
                                     struct crypt_data *__restrict data)
 /*[[[body:libc_setkey_r]]]*/

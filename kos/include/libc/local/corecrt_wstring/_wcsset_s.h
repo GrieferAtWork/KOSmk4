@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd660ae5b */
+/* HASH CRC-32:0xef6e58c3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <libc/errno.h>
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wcsset_s) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(_wcsset_s) __ATTR_ACCESS_RWS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsset_s))(__WCHAR_TYPE__ *__dst, __SIZE_TYPE__ __dstsize, __WCHAR_TYPE__ __ch) {
 	__WCHAR_TYPE__ *__p;
 	__SIZE_TYPE__ __remaining;

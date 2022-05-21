@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cc726a4 */
+/* HASH CRC-32:0xf9ff7d2c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
-__LOCAL_LIBC(getfsspec) __ATTR_WUNUSED __ATTR_NONNULL((1)) struct fstab *
+__LOCAL_LIBC(getfsspec) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) struct fstab *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getfsspec))(const char *__special_file) {
 	struct fstab *__result;
 	if (!(__NAMESPACE_LOCAL_SYM __localdep_setfsent)())

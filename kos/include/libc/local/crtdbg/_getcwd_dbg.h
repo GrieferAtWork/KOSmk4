@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d0f7ab8 */
+/* HASH CRC-32:0x60fadb13 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT(,char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ 
 #undef __local___localdep_getcwd_defined
 #endif /* !... */
 #endif /* !__local___localdep_getcwd_defined */
-__LOCAL_LIBC(_getcwd_dbg) __ATTR_WUNUSED char *
+__LOCAL_LIBC(_getcwd_dbg) __ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2) char *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_getcwd_dbg))(char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;

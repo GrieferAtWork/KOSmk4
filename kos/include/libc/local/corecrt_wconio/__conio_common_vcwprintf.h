@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd9e6a63 */
+/* HASH CRC-32:0xc0ccedc9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___stdio_common_vfwprintf_defined
 #define __local___localdep___stdio_common_vfwprintf_defined
 #ifdef __CRT_HAVE___stdio_common_vfwprintf
-__CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vfwprintf,(__UINT64_TYPE__ __options, __FILE *__stream, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vfwprintf,(__options,__stream,__format,__locale,__args))
+__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(2) __ATTR_LIBC_WPRINTF(3, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vfwprintf,(__UINT64_TYPE__ __options, __FILE *__stream, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vfwprintf,(__options,__stream,__format,__locale,__args))
 #elif defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/__stdio_common_vfwprintf.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/template/stdtty.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__conio_common_vcwprintf) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(__conio_common_vcwprintf) __ATTR_ACCESS_RO(2) __ATTR_LIBC_WPRINTF(2, 0) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__conio_common_vcwprintf))(__UINT64_TYPE__ __options, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
 	return (__NAMESPACE_LOCAL_SYM __localdep___stdio_common_vfwprintf)(__options, __LOCAL_stdtty, __format, __locale, __args);
 }

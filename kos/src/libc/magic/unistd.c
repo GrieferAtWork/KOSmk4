@@ -821,7 +821,7 @@ char *ttyname($fd_t fd) {
 @@>> ttyname_r(3)
 @@Return the name of a TTY given its file descriptor
 [[cp, decl_include("<bits/types.h>")]]
-int ttyname_r($fd_t fd, [[out(<= buflen)]] char *buf, size_t buflen);
+int ttyname_r($fd_t fd, [[out(? <= buflen)]] char *buf, size_t buflen);
 
 @@>> tcgetpgrp(2)
 @@Return the foreground process group of a given TTY file descriptor
@@ -2152,7 +2152,7 @@ ssize_t readlink([[nonnull]] char const *path,
 [[requires($has_function(getenv) || $has_function(getpwuid_r, geteuid))]]
 [[impl_include("<bits/crt/db/passwd.h>")]] /* struct passwd */
 [[section(".text.crt{|.dos}.io.tty")]]
-int getlogin_r([[out(<= name_len)]] char *name, size_t name_len) {
+int getlogin_r([[out(? <= name_len)]] char *name, size_t name_len) {
 @@pp_if $has_function(getpwuid_r) && $has_function(geteuid)@@
 	char buf[1024]; /* NSS_BUFLEN_PASSWD */
 	struct passwd pwent, *pwptr;
@@ -2190,7 +2190,7 @@ int getlogin_r([[out(<= name_len)]] char *name, size_t name_len) {
 [[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__gethostname")]] /* Yes: no `__libc_gethostname' alias for this one... */
 [[section(".text.crt{|.dos}.system.configuration")]]
-int gethostname([[out(<= buflen)]] char *name, size_t buflen);
+int gethostname([[out(? <= buflen)]] char *name, size_t buflen);
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 %
@@ -2215,7 +2215,7 @@ int sethostid($longptr_t id);
 @@Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)'
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.system.configuration")]]
-int getdomainname([[out(<= buflen)]] char *name, size_t buflen);
+int getdomainname([[out(? <= buflen)]] char *name, size_t buflen);
 
 @@>> setdomainname(2)
 @@Set the name of the hosting machine's domain

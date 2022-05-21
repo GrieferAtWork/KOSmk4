@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa968a84e */
+/* HASH CRC-32:0xb0bca4a0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__c32sopen_defined
 #define __local___localdep__c32sopen_defined
 #if defined(__CRT_HAVE__wsopen) && __SIZEOF_WCHAR_T__ == 4 && defined(__VLIBCCALL_IS_VLIBKCALL)
-__COMPILER_CVREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__VLIBKCALL,__localdep__c32sopen,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags, int __sflags),_wsopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
+__COMPILER_CVREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,__VLIBKCALL,__localdep__c32sopen,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags, int __sflags),_wsopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_KOS$_wsopen)
-__CVREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep__c32sopen,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags, int __sflags),_wsopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
+__CVREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,__localdep__c32sopen,(__CHAR32_TYPE__ const *__filename, __oflag_t __oflags, int __sflags),_wsopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
 #elif (defined(__CRT_HAVE_wopen64) || defined(__CRT_HAVE_wopen) || defined(__CRT_HAVE__wopen) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wopenat64) || defined(__CRT_HAVE_wopenat) || ((defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wio/_wsopen.h>
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_c32sopen_s) __ATTR_NONNULL((1, 2)) __errno_t
+__LOCAL_LIBC(_c32sopen_s) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) __errno_t
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(_c32sopen_s))(__fd_t *__fd, __CHAR32_TYPE__ const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) {
 	__fd_t __result;
 	if (!__fd) {

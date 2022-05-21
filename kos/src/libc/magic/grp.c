@@ -105,7 +105,7 @@ struct group *getgrgid($gid_t gid) {
 [[cp, decl_include("<bits/crt/db/group.h>")]]
 [[wunused, requires_function(setgrent, getgrent)]]
 [[userimpl, impl_include("<bits/crt/db/group.h>")]]
-struct group *getgrnam([[nonnull]] char const *__restrict name) {
+struct group *getgrnam([[in]] char const *__restrict name) {
 	struct group *result;
 	setgrent();
 	while ((result = getgrent()) != NULL) {
@@ -147,8 +147,8 @@ struct group *getgrent();
 [[impl_include("<libc/errno.h>")]]
 [[impl_include("<bits/types.h>")]]
 [[impl_include("<bits/crt/inttypes.h>")]]
-int putgrent([[nonnull]] struct group const *__restrict entry,
-             [[nonnull]] $FILE *__restrict stream) {
+int putgrent([[in]] struct group const *__restrict entry,
+             [[inout]] $FILE *__restrict stream) {
 	__STDC_INT_AS_SSIZE_T error;
 @@pp_if __SIZEOF_GID_T__ == 1@@
 	char gidbuf[COMPILER_LENOF("255")];
@@ -225,34 +225,34 @@ err_inval:
 %
 %#ifdef __USE_POSIX
 [[cp, doc_alias("getgrgid"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
-int getgrgid_r($gid_t gid, [[nonnull]] struct group *__restrict resultbuf,
-               [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-               [[nonnull]] struct group **__restrict result);
+int getgrgid_r($gid_t gid, [[out]] struct group *__restrict resultbuf,
+               [[out(buflen)]] char *__restrict buffer, size_t buflen,
+               [[out]] struct group **__restrict result);
 
 [[cp, doc_alias("getgrnam"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
-int getgrnam_r([[nonnull]] char const *__restrict name,
-               [[nonnull]] struct group *__restrict resultbuf,
-               [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-               [[nonnull]] struct group **__restrict result);
+int getgrnam_r([[in]] char const *__restrict name,
+               [[out]] struct group *__restrict resultbuf,
+               [[out(buflen)]] char *__restrict buffer, size_t buflen,
+               [[out]] struct group **__restrict result);
 
 
 
 %
 %#ifdef __USE_GNU
 [[cp, doc_alias("getgrent"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
-int getgrent_r([[nonnull]] struct group *__restrict resultbuf,
-               [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-               [[nonnull]] struct group **__restrict result);
+int getgrent_r([[out]] struct group *__restrict resultbuf,
+               [[out(buflen)]] char *__restrict buffer, size_t buflen,
+               [[out]] struct group **__restrict result);
 %#endif /* __USE_GNU */
 
 %
 %#ifdef __USE_MISC
 [[cp, doc_alias("fgetgrent"), decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 [[requires_function(fgetgrfiltered_r)]]
-int fgetgrent_r([[nonnull]] $FILE *__restrict stream,
-                [[nonnull]] struct group *__restrict resultbuf,
-                [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                [[nonnull]] struct group **__restrict result) {
+int fgetgrent_r([[inout]] $FILE *__restrict stream,
+                [[out]] struct group *__restrict resultbuf,
+                [[out(buflen)]] char *__restrict buffer, size_t buflen,
+                [[out]] struct group **__restrict result) {
 	return fgetgrfiltered_r(stream, resultbuf, buffer, buflen,
 	                        result, (gid_t)-1, NULL);
 }
@@ -265,10 +265,10 @@ int fgetgrent_r([[nonnull]] $FILE *__restrict stream,
 @@@return: * : Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 [[requires_function(fgetgrfiltered_r), impl_include("<libc/errno.h>")]]
-$errno_t fgetgrgid_r([[nonnull]] $FILE *__restrict stream, $gid_t gid,
-                     [[nonnull]] struct group *__restrict resultbuf,
-                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                     [[nonnull]] struct group **__restrict result) {
+$errno_t fgetgrgid_r([[inout]] $FILE *__restrict stream, $gid_t gid,
+                     [[out]] struct group *__restrict resultbuf,
+                     [[out(buflen)]] char *__restrict buffer, size_t buflen,
+                     [[out]] struct group **__restrict result) {
 	$errno_t error;
 	error = fgetgrfiltered_r(stream, resultbuf, buffer, buflen,
 	                         result, gid, NULL);
@@ -286,11 +286,11 @@ $errno_t fgetgrgid_r([[nonnull]] $FILE *__restrict stream, $gid_t gid,
 @@@return: * : Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 [[requires_function(fgetgrfiltered_r), impl_include("<libc/errno.h>")]]
-$errno_t fgetgrnam_r([[nonnull]] $FILE *__restrict stream,
-                     [[nonnull]] const char *__restrict name,
-                     [[nonnull]] struct group *__restrict resultbuf,
-                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                     [[nonnull]] struct group **__restrict result) {
+$errno_t fgetgrnam_r([[inout]] $FILE *__restrict stream,
+                     [[in]] const char *__restrict name,
+                     [[out]] struct group *__restrict resultbuf,
+                     [[out(buflen)]] char *__restrict buffer, size_t buflen,
+                     [[out]] struct group **__restrict result) {
 	$errno_t error;
 	error = fgetgrfiltered_r(stream, resultbuf, buffer, buflen,
 	                         result, (gid_t)-1, name);
@@ -316,11 +316,12 @@ $errno_t fgetgrnam_r([[nonnull]] $FILE *__restrict stream,
 [[static, cp, decl_include("<bits/types.h>", "<bits/crt/db/group.h>")]]
 [[impl_include("<libc/errno.h>", "<hybrid/typecore.h>", "<asm/os/syslog.h>")]]
 [[requires_function(fgetpos64, fsetpos64, fparseln, feof)]]
-$errno_t fgetgrfiltered_r([[nonnull]] $FILE *__restrict stream,
-                          [[nonnull]] struct group *__restrict resultbuf,
-                          [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                          [[nonnull]] struct group **__restrict result,
-                          $gid_t filtered_gid, char const *filtered_name) {
+$errno_t fgetgrfiltered_r([[inout]] $FILE *__restrict stream,
+                          [[out]] struct group *__restrict resultbuf,
+                          [[out(buflen)]] char *__restrict buffer, size_t buflen,
+                          [[out]] struct group **__restrict result,
+                          $gid_t filtered_gid,
+                          [[in_opt]] char const *filtered_name) {
 	$errno_t retval = 0;
 	char *dbline;
 	fpos64_t startpos, curpos;
@@ -533,12 +534,12 @@ nextline:
 %#ifdef __USE_MISC
 @@>> fgetgrent(3), fgetgrent_r(3)
 [[cp, decl_include("<bits/crt/db/group.h>")]]
-struct group *fgetgrent([[nonnull]] $FILE *__restrict stream);
+struct group *fgetgrent([[inout]] $FILE *__restrict stream);
 
 @@>> setgroups(2)
 [[cp, guard, decl_include("<bits/types.h>")]]
 [[export_alias("__setgroups", "__libc_setgroups")]]
-int setgroups(size_t count, [[inp_opt(count)]] $gid_t const *groups);
+int setgroups(size_t count, [[in(count)]] $gid_t const *groups);
 
 @@>> getgrouplist(3)
 @@Use the groups database to find the GIDs of all of the groups which `user'
@@ -564,9 +565,9 @@ int setgroups(size_t count, [[inp_opt(count)]] $gid_t const *groups);
 @@             `ERANGE' for example...)
 [[cp, guard, decl_include("<features.h>", "<bits/crt/db/group.h>", "<bits/types.h>")]]
 [[requires_function(setgrent, getgrent), impl_include("<bits/crt/db/group.h>")]]
-__STDC_INT_AS_SSIZE_T getgrouplist([[nonnull]] char const *user, $gid_t group,
-                                   [[outp(*ngroups)]] $gid_t *groups,
-                                   [[nonnull]] __STDC_INT_AS_SIZE_T *ngroups) {
+__STDC_INT_AS_SSIZE_T getgrouplist([[in]] char const *user, $gid_t group,
+                                   [[out/*(return <= *ngroups)*/]] $gid_t *groups,
+                                   [[inout]] __STDC_INT_AS_SIZE_T *ngroups) {
 	__STDC_INT_AS_SIZE_T count = 0;
 	__STDC_INT_AS_SIZE_T buflen = *ngroups;
 	struct group *ent;
@@ -619,7 +620,7 @@ nextgroup:
 @@                            or at least not in the way you're trying to.
 [[cp, guard, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 [[requires_function(getgrouplist, setgroups, realloc)]]
-int initgroups([[nonnull]] char const *user, $gid_t group) {
+int initgroups([[in]] char const *user, $gid_t group) {
 	int result = 0;
 	gid_t initbuf[32], *buf = initbuf;
 	__STDC_INT_AS_SIZE_T buflen = COMPILER_LENOF(initbuf);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac1ba501 */
+/* HASH CRC-32:0x9a27c5b9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__local
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fopen_s) __ATTR_NONNULL((1, 2, 3)) __errno_t
+__LOCAL_LIBC(fopen_s) __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2, 3)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fopen_s))(__FILE **__pstream, char const *__filename, char const *__modes) {
 	__FILE *__result;
 	if __unlikely(!__pstream || !__filename || !__modes) {

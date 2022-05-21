@@ -248,7 +248,7 @@ typedef struct __dirstream DIR;
 #include <bits/os/dirent.h>
 @@pp_endif@@
 )]]
-DIR *opendir([[nonnull]] char const *name) {
+DIR *opendir([[in]] char const *name) {
 @@pp_if defined(__AT_FDCWD) && $has_function(opendirat)@@
 	return opendirat(__AT_FDCWD, name);
 @@pp_elif $has_function(fdopendir, open)@@
@@ -285,7 +285,7 @@ DIR *opendir([[nonnull]] char const *name) {
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[crt_dos_variant, userimpl, requires_function(fdopendir, openat)]]
 [[decl_include("<bits/types.h>"), impl_include("<asm/os/oflags.h>")]]
-DIR *fopendirat($fd_t dirfd, [[nonnull]] char const *name, $oflag_t oflags) {
+DIR *fopendirat($fd_t dirfd, [[in]] char const *name, $oflag_t oflags) {
 	DIR *result;
 @@pp_ifdef __O_RDONLY@@
 	oflags |= __O_RDONLY;
@@ -309,7 +309,7 @@ DIR *fopendirat($fd_t dirfd, [[nonnull]] char const *name, $oflag_t oflags) {
 [[decl_include("<bits/types.h>")]]
 [[cp, wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 [[crt_dos_variant, userimpl, requires_function(fopendirat)]]
-DIR *opendirat($fd_t dirfd, [[nonnull]] char const *name) {
+DIR *opendirat($fd_t dirfd, [[in]] char const *name) {
 	return fopendirat(dirfd, name, 0);
 }
 %#endif /* __USE_KOS && __USE_ATFILE */
@@ -320,7 +320,7 @@ DIR *opendirat($fd_t dirfd, [[nonnull]] char const *name) {
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM), export_alias("__libc_closedir")]]
 [[userimpl, requires_include("<bits/os/dirent.h>")]]
 [[requires(defined(__USE_DOS_DIRENT))]]
-int closedir([[nonnull]] DIR *dirp) {
+int closedir([[inout]] DIR *dirp) {
 	return __dos_dirent_closedir(dirp);
 }
 
@@ -330,7 +330,7 @@ int closedir([[nonnull]] DIR *dirp) {
 @@>> fdclosedir(3)
 @@Same as `closedir()', but instead of also closing the underlying file descriptor, return it
 [[wunused, decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<bits/types.h>")]]
-$fd_t fdclosedir([[nonnull]] DIR *dirp);
+$fd_t fdclosedir([[inout]] DIR *dirp);
 %#endif /* __USE_BSD */
 
 %
@@ -343,7 +343,7 @@ $fd_t fdclosedir([[nonnull]] DIR *dirp);
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("readdir", "__libc_readdir")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("readdir64")]]
 [[userimpl, requires_include("<bits/os/dirent.h>"), requires(defined(__USE_DOS_DIRENT))]]
-struct dirent *readdir([[nonnull]] DIR *__restrict dirp) {
+struct dirent *readdir([[inout]] DIR *__restrict dirp) {
 	return (struct dirent *)__dos_dirent_readdir(dirp);
 }
 
@@ -352,7 +352,7 @@ struct dirent *readdir([[nonnull]] DIR *__restrict dirp) {
 @@Rewind the given directory stream in such a way that the next call
 @@to `readdir(3)' will once again  return the first directory  entry
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM), export_alias("__libc_rewinddir")]]
-void rewinddir([[nonnull]] DIR *__restrict dirp);
+void rewinddir([[inout]] DIR *__restrict dirp);
 
 %
 %#ifdef __USE_XOPEN2K8
@@ -372,7 +372,7 @@ DIR *fdopendir($fd_t fd);
 [[if(                                              !defined(__CRT_KOS)                                     ), alias("readdir64")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64)), crt_intern_kos_alias(libc_readdirk)]]
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(__USE_DOS_DIRENT) && defined(_DIRENT_MATCHES_DIRENT64)), bind_local_function("readdir")]]
-struct dirent64 *readdir64([[nonnull]] DIR *__restrict dirp);
+struct dirent64 *readdir64([[inout]] DIR *__restrict dirp);
 %#endif /* __USE_LARGEFILE64 */
 
 
@@ -388,9 +388,9 @@ struct dirent64 *readdir64([[nonnull]] DIR *__restrict dirp);
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("readdirk64_r")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("readdir_r", "__libc_readdir_r")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("readdir64_r")]]
-int readdir_r([[nonnull]] DIR *__restrict dirp,
-              [[nonnull]] struct dirent *__restrict entry,
-              [[nonnull]] struct dirent **__restrict result);
+int readdir_r([[inout]] DIR *__restrict dirp,
+              [[out]] struct dirent *__restrict entry,
+              [[out]] struct dirent **__restrict result);
 
 %
 %#ifdef __USE_LARGEFILE64
@@ -401,9 +401,9 @@ int readdir_r([[nonnull]] DIR *__restrict dirp,
 [[if($extended_include_prefix("<bits/os/dirent.h>")!defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)), alias("readdir_r", "__libc_readdir_r")]]
 [[if(                                              !defined(__CRT_KOS)                                     ), alias("readdir64_r")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64)), crt_intern_kos_alias(libc_readdirk_r)]]
-int readdir64_r([[nonnull]] DIR *__restrict dirp,
-                [[nonnull]] struct dirent64 *__restrict entry,
-                [[nonnull]] struct dirent64 **__restrict result);
+int readdir64_r([[inout]] DIR *__restrict dirp,
+                [[out]] struct dirent64 *__restrict entry,
+                [[out]] struct dirent64 **__restrict result);
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_POSIX */
 
@@ -414,13 +414,13 @@ int readdir64_r([[nonnull]] DIR *__restrict dirp,
 @@Get the directory stream position
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__libc_seekdir")]]
-void seekdir([[nonnull]] DIR *__restrict dirp, $longptr_t pos);
+void seekdir([[inout]] DIR *__restrict dirp, $longptr_t pos);
 
 @@>> telldir(3)
 @@Get the directory stream position
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM), decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__libc_telldir")]]
-$longptr_t telldir([[nonnull]] DIR *__restrict dirp);
+$longptr_t telldir([[inout]] DIR *__restrict dirp);
 
 %#endif /* __USE_MISC || __USE_XOPEN */
 
@@ -433,7 +433,7 @@ $longptr_t telldir([[nonnull]] DIR *__restrict dirp);
 @@Return the underlying file descriptor of the given directory stream
 [[pure, decl_include("<features.h>", "<bits/types.h>")]]
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
-$fd_t dirfd([[nonnull]] DIR __KOS_FIXED_CONST *__restrict dirp);
+$fd_t dirfd([[in]] DIR __KOS_FIXED_CONST *__restrict dirp);
 
 @@>> scandir(3), scandir64(3)
 @@Scan a directory `dir' for all contained directory entries
@@ -444,8 +444,8 @@ $fd_t dirfd([[nonnull]] DIR __KOS_FIXED_CONST *__restrict dirp);
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("scandir64")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(scandirat))]]
-__STDC_INT_AS_SSIZE_T scandir([[nonnull]] char const *__restrict dir,
-                              [[nonnull]] struct dirent ***__restrict namelist,
+__STDC_INT_AS_SSIZE_T scandir([[in]] char const *__restrict dir,
+                              [[out]] struct dirent ***__restrict namelist,
                               int (LIBKCALL *selector)(struct dirent const *entry),
                               int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b)) {
 	return scandirat(__AT_FDCWD, dir, namelist, selector, cmp);
@@ -458,8 +458,8 @@ __STDC_INT_AS_SSIZE_T scandir([[nonnull]] char const *__restrict dir,
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("alphasortk64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("alphasort")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("alphasort64")]]
-int alphasort([[nonnull]] struct dirent const **e1,
-              [[nonnull]] struct dirent const **e2) {
+int alphasort([[in]] struct dirent const **e1,
+              [[in]] struct dirent const **e2) {
 	return strcoll((*e1)->@d_name@, (*e2)->@d_name@);
 }
 
@@ -472,8 +472,8 @@ int alphasort([[nonnull]] struct dirent const **e1,
 [[if($extended_include_prefix("<bits/os/dirent.h>")!defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)), alias("alphasort")]]
 [[if(                                              !defined(__CRT_KOS)                                     ), alias("alphasort64")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64)), crt_intern_kos_alias(libc_alphasortk)]]
-int alphasort64([[nonnull]] struct dirent64 const **e1,
-                [[nonnull]] struct dirent64 const **e2) {
+int alphasort64([[in]] struct dirent64 const **e1,
+                [[in]] struct dirent64 const **e2) {
 	return strcoll((*e1)->@d_name@, (*e2)->@d_name@);
 }
 %#endif /* __USE_LARGEFILE64 */
@@ -487,8 +487,8 @@ int alphasort64([[nonnull]] struct dirent64 const **e1,
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("scandiratk64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("scandirat")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("scandirat64")]]
-__STDC_INT_AS_SSIZE_T scandirat($fd_t dirfd, [[nonnull]] char const *__restrict dir,
-                                [[nonnull]] struct dirent ***__restrict namelist,
+__STDC_INT_AS_SSIZE_T scandirat($fd_t dirfd, [[in]] char const *__restrict dir,
+                                [[out]] struct dirent ***__restrict namelist,
                                 int (LIBKCALL *selector)(struct dirent const *entry),
                                 int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b));
 
@@ -504,8 +504,8 @@ __STDC_INT_AS_SSIZE_T scandirat($fd_t dirfd, [[nonnull]] char const *__restrict 
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64)), crt_intern_kos_alias(libc_scandirk)]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(scandirat64))]]
-__STDC_INT_AS_SSIZE_T scandir64([[nonnull]] char const *__restrict dir,
-                                [[nonnull]] struct dirent64 ***__restrict namelist,
+__STDC_INT_AS_SSIZE_T scandir64([[in]] char const *__restrict dir,
+                                [[out]] struct dirent64 ***__restrict namelist,
                                 int (LIBKCALL *selector)(struct dirent64 const *entry),
                                 int (LIBKCALL *cmp)(struct dirent64 const **a, struct dirent64 const **b)) {
 	return scandirat64(__AT_FDCWD, dir, namelist, selector, cmp);
@@ -518,8 +518,8 @@ __STDC_INT_AS_SSIZE_T scandir64([[nonnull]] char const *__restrict dir,
 [[if($extended_include_prefix("<bits/os/dirent.h>")!defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)), alias("scandirat")]]
 [[if(                                              !defined(__CRT_KOS)                                     ), alias("scandirat64")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64)), crt_intern_kos_alias(libc_scandiratk)]]
-__STDC_INT_AS_SSIZE_T scandirat64($fd_t dirfd, [[nonnull]] char const *__restrict dir,
-                                  [[nonnull]] struct dirent64 ***__restrict namelist,
+__STDC_INT_AS_SSIZE_T scandirat64($fd_t dirfd, [[in]] char const *__restrict dir,
+                                  [[out]] struct dirent64 ***__restrict namelist,
                                   int (LIBKCALL *selector)(struct dirent64 const *entry),
                                   int (LIBKCALL *cmp)(struct dirent64 const **a, struct dirent64 const **b));
 
@@ -534,15 +534,15 @@ __STDC_INT_AS_SSIZE_T scandirat64($fd_t dirfd, [[nonnull]] char const *__restric
 [[cp, decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import, export_as("__getdirentries", "__libc_getdirentries")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), alias("getdirentries", "__getdirentries", "__libc_getdirentries")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), alias("getdirentries64")]]
-$ssize_t getdirentries($fd_t fd, [[nonnull]] char *__restrict buf,
-                       size_t nbytes, [[nonnull]] $off_t *__restrict basep);
+$ssize_t getdirentries($fd_t fd, [[out(return <= nbytes)]] char *__restrict buf,
+                       size_t nbytes, [[inout]] $off_t *__restrict basep);
 
 %#ifdef __USE_LARGEFILE64
 [[cp, decl_include("<bits/types.h>")]]
 [[preferred_dirent64_variant_of(getdirentries), doc_alias("getdirentries")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("__getdirentries", "__libc_getdirentries")]]
-$ssize_t getdirentries64($fd_t fd, [[nonnull]] char *__restrict buf, size_t nbytes,
-                         [[nonnull]] $off64_t *__restrict basep);
+$ssize_t getdirentries64($fd_t fd, [[out(return <= nbytes)]] char *__restrict buf, size_t nbytes,
+                         [[inout]] $off64_t *__restrict basep);
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_MISC */
 
@@ -555,8 +555,8 @@ $ssize_t getdirentries64($fd_t fd, [[nonnull]] char *__restrict buf, size_t nbyt
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>") defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("versionsortk64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("versionsort")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/dirent.h>")!defined(__CRT_KOS) && ( defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))), alias("versionsort64")]]
-int versionsort([[nonnull]] struct dirent const **e1,
-                [[nonnull]] struct dirent const **e2) {
+int versionsort([[in]] struct dirent const **e1,
+                [[in]] struct dirent const **e2) {
 	return strverscmp((*e1)->@d_name@, (*e2)->@d_name@);
 }
 %#ifdef __USE_LARGEFILE64
@@ -567,8 +567,8 @@ int versionsort([[nonnull]] struct dirent const **e1,
 [[if($extended_include_prefix("<bits/os/dirent.h>")!defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)), alias("versionsort")]]
 [[if(                                              !defined(__CRT_KOS)                                     ), alias("versionsort64")]]
 [[if($extended_include_prefix("<bits/os/dirent.h>")defined(_DIRENT_MATCHES_DIRENT64)), crt_intern_kos_alias(libc_versionsortk)]]
-int versionsort64([[nonnull]] struct dirent64 const **e1,
-                  [[nonnull]] struct dirent64 const **e2) {
+int versionsort64([[in]] struct dirent64 const **e1,
+                  [[in]] struct dirent64 const **e2) {
 	return strverscmp((*e1)->@d_name@, (*e2)->@d_name@);
 }
 %#endif /* __USE_LARGEFILE64 */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89e8ada */
+/* HASH CRC-32:0xee0355d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-__LOCAL_LIBC(_wfsopen) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __FILE *
+__LOCAL_LIBC(_wfsopen) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __FILE *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wfsopen))(__WCHAR_TYPE__ const *__filename, __WCHAR_TYPE__ const *__mode, __STDC_INT_AS_UINT_T __sh_flag) {
 	__FILE *__result = __NULLPTR;
 	char *__utf8_filename;

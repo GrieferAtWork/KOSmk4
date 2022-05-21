@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0012c10 */
+/* HASH CRC-32:0x20ec3e7a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtou_defined
 #define __local___localdep_strtou_defined
 #ifdef __CRT_HAVE_strtou
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtou,(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __UINTMAX_TYPE__ __lo, __UINTMAX_TYPE__ __hi, __errno_t *__rstatus),strtou,(__nptr,__endptr,__base,__lo,__hi,__rstatus))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(6),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtou,(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __UINTMAX_TYPE__ __lo, __UINTMAX_TYPE__ __hi, __errno_t *__rstatus),strtou,(__nptr,__endptr,__base,__lo,__hi,__rstatus))
 #else /* __CRT_HAVE_strtou */
 __NAMESPACE_LOCAL_END
 #include <libc/local/inttypes/strtou.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strtou_l) __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__
+__LOCAL_LIBC(strtou_l) __ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(6) __UINTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou_l))(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __UINTMAX_TYPE__ __lo, __UINTMAX_TYPE__ __hi, __errno_t *__rstatus, __locale_t __locale) {
 	(void)__locale;
 	return (__NAMESPACE_LOCAL_SYM __localdep_strtou)(__nptr, __endptr, __base, __lo, __hi, __rstatus);

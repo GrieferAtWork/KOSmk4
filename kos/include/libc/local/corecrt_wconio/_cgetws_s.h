@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ea00ee1 */
+/* HASH CRC-32:0x301f7069 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_cgetws_s) __ATTR_NONNULL((1, 3)) __errno_t
+__LOCAL_LIBC(_cgetws_s) __ATTR_ACCESS_WR(3) __ATTR_ACCESS_WRS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_cgetws_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ *__restrict __p_readsize) {
 	__WCHAR_TYPE__ __ch;
 	if __unlikely(!__bufsize)

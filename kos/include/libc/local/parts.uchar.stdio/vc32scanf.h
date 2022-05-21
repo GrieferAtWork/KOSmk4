@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5a5fb97 */
+/* HASH CRC-32:0x9a23c3b0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,17 +30,17 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vfc32scanf_defined
 #define __local___localdep_vfc32scanf_defined
 #if defined(__CRT_HAVE_vfwscanf_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_KOS$vfwscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfwscanf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_KOS$vfwscanf)
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_KOS$vfwscanf_unlocked)
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vfc32scanf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args))
 #elif (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc) || defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/vfwscanf.h>

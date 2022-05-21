@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c25e1c4 */
+/* HASH CRC-32:0x37d7ba3a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),struct dyn_string *,__NOTHROW_NCX,__localdep_dyn_string_resize,(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars),dyn_string_resize,(__self,__min_chars))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_RW(1),struct dyn_string *,__NOTHROW_NCX,__localdep_dyn_string_resize,(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars),dyn_string_resize,(__self,__min_chars))
 #elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed))
 __NAMESPACE_LOCAL_END
 #include <libc/local/dyn-string/dyn_string_resize.h>
@@ -68,7 +68,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-__LOCAL_LIBC(dyn_string_copy_cstr) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(dyn_string_copy_cstr) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dyn_string_copy_cstr))(struct dyn_string *__dst, char const *__src) {
 	__SIZE_TYPE__ __srclen = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__src);
 	__dst = (__NAMESPACE_LOCAL_SYM __localdep_dyn_string_resize)(__dst, __srclen);

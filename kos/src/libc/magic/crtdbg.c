@@ -528,8 +528,8 @@ __WCHAR16_TYPE__ *_wtempnam_dbg(__WCHAR16_TYPE__ const *dir_name,
 
 [[guard, wunused, crt_dos_only, requires_function(_fullpath)]]
 [[decl_include("<hybrid/typecore.h>")]]
-char *_fullpath_dbg([[outp_opt(bufsize)]] char *full_path,
-                    [[nonnull]] char const *path, $size_t bufsize,
+char *_fullpath_dbg([[out(? <= bufsize)]] char *full_path,
+                    [[in]] char const *path, $size_t bufsize,
                     int block_type, char const *filename, int line) {
 	(void)block_type;
 	(void)filename;
@@ -539,8 +539,8 @@ char *_fullpath_dbg([[outp_opt(bufsize)]] char *full_path,
 
 [[guard, wunused, crt_dos_only]]
 [[decl_include("<hybrid/typecore.h>")]]
-__WCHAR16_TYPE__ *_wfullpath_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *full_path,
-                                 [[nonnull]] __WCHAR16_TYPE__ const *path, $size_t buflen,
+__WCHAR16_TYPE__ *_wfullpath_dbg([[out(? <= buflen)]] __WCHAR16_TYPE__ *full_path,
+                                 [[in]] __WCHAR16_TYPE__ const *path, $size_t buflen,
                                  int block_type, char const *filename, int line) {
 	(void)block_type;
 	(void)filename;
@@ -555,7 +555,7 @@ __WCHAR16_TYPE__ *_wfullpath_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *full_pat
 
 [[decl_include("<features.h>")]]
 [[guard, wunused, crt_dos_only, requires_function(getcwd)]]
-char *_getcwd_dbg([[outp_opt(bufsize)]] char *buf, __STDC_INT_AS_SIZE_T bufsize,
+char *_getcwd_dbg([[out(? <= bufsize)]] char *buf, __STDC_INT_AS_SIZE_T bufsize,
                   int block_type, char const *filename, int line) {
 	(void)block_type;
 	(void)filename;
@@ -565,7 +565,7 @@ char *_getcwd_dbg([[outp_opt(bufsize)]] char *buf, __STDC_INT_AS_SIZE_T bufsize,
 
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[guard, wunused, crt_dos_only, requires_function(c16getcwd)]]
-__WCHAR16_TYPE__ *_wgetcwd_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *buf,
+__WCHAR16_TYPE__ *_wgetcwd_dbg([[out(? <= buflen)]] __WCHAR16_TYPE__ *buf,
                                __STDC_INT_AS_SIZE_T buflen,
                                int block_type, char const *filename, int line) {
 	(void)block_type;
@@ -577,7 +577,7 @@ __WCHAR16_TYPE__ *_wgetcwd_dbg([[outp_opt(buflen)]] __WCHAR16_TYPE__ *buf,
 
 [[decl_include("<features.h>")]]
 [[guard, wunused, crt_dos_only, requires_function(_getdcwd)]]
-char *_getdcwd_dbg(int driveno, [[outp_opt(bufsize)]] char *buf,
+char *_getdcwd_dbg(int driveno, [[out(? <= bufsize)]] char *buf,
                    __STDC_INT_AS_SIZE_T bufsize,
                    int block_type, char const *filename, int line) {
 	(void)block_type;
@@ -588,7 +588,7 @@ char *_getdcwd_dbg(int driveno, [[outp_opt(bufsize)]] char *buf,
 
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[guard, wunused, crt_dos_only]]
-__WCHAR16_TYPE__ *_wgetdcwd_dbg(int driveno, [[outp_opt(buflen)]] __WCHAR16_TYPE__ *buf,
+__WCHAR16_TYPE__ *_wgetdcwd_dbg(int driveno, [[out(? <= buflen)]] __WCHAR16_TYPE__ *buf,
                                 __STDC_INT_AS_SIZE_T buflen, int block_type,
                                 char const *filename, int line) {
 	(void)block_type;
@@ -608,8 +608,8 @@ __WCHAR16_TYPE__ *_wgetdcwd_dbg(int driveno, [[outp_opt(buflen)]] __WCHAR16_TYPE
 [[guard, attribute(@_Check_return_wat_@)]]
 [[crt_dos_only, requires_function(_dupenv_s)]]
 [[decl_include("<bits/types.h>")]]
-$errno_t _dupenv_s_dbg([[nullable]] char **pbuf, [[nullable]] $size_t *pbufsize,
-                       [[nonnull]] char const *varname,
+$errno_t _dupenv_s_dbg([[out]] char **pbuf, [[out]] $size_t *pbufsize,
+                       [[in]] char const *varname,
                        int block_type, char const *filename, int line) {
 	(void)block_type;
 	(void)filename;
@@ -619,8 +619,8 @@ $errno_t _dupenv_s_dbg([[nullable]] char **pbuf, [[nullable]] $size_t *pbufsize,
 
 [[guard, attribute(@_Check_return_wat_@), crt_dos_only]]
 [[decl_include("<bits/types.h>")]]
-$errno_t _wdupenv_s_dbg([[nullable]] __WCHAR16_TYPE__ **pbuf, [[nullable]] $size_t *pbuflen,
-                        [[nonnull]] __WCHAR16_TYPE__ const *varname,
+$errno_t _wdupenv_s_dbg([[out]] __WCHAR16_TYPE__ **pbuf, [[out]] $size_t *pbuflen,
+                        [[in]] __WCHAR16_TYPE__ const *varname,
                         int block_type, char const *filename, int line) {
 	(void)block_type;
 	(void)filename;
@@ -682,14 +682,14 @@ int _CrtReportBlockType(void const *ptr) {
 }
 
 [[crt_dos_only]]
-void _CrtMemCheckpoint([[nonnull]] /*out*/ _CrtMemState *state) {
+void _CrtMemCheckpoint([[out]] _CrtMemState *state) {
 	bzero(state, sizeof(*state));
 }
 
 [[crt_dos_only]]
-int _CrtMemDifference([[nonnull]] /*out*/ _CrtMemState *state,
-                      [[nonnull]] _CrtMemState const *old_state,
-                      [[nonnull]] _CrtMemState const *new_state) {
+int _CrtMemDifference([[out]] _CrtMemState *state,
+                      [[in]] _CrtMemState const *old_state,
+                      [[in]] _CrtMemState const *new_state) {
 	(void)old_state;
 	(void)new_state;
 	bzero(state, sizeof(*state));
@@ -697,13 +697,13 @@ int _CrtMemDifference([[nonnull]] /*out*/ _CrtMemState *state,
 }
 
 [[crt_dos_only]]
-void _CrtMemDumpAllObjectsSince([[nonnull]] _CrtMemState const *state) {
+void _CrtMemDumpAllObjectsSince([[in]] _CrtMemState const *state) {
 	COMPILER_IMPURE();
 	(void)state;
 }
 
 [[crt_dos_only]]
-void _CrtMemDumpStatistics([[nonnull]] _CrtMemState const *state) {
+void _CrtMemDumpStatistics([[in]] _CrtMemState const *state) {
 	COMPILER_IMPURE();
 	(void)state;
 }

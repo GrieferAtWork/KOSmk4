@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc57d64f */
+/* HASH CRC-32:0xa6775a42 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <bits/crt/dyn-string.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(dyn_string_clear) __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(dyn_string_clear) __ATTR_ACCESS_RW(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dyn_string_clear))(struct dyn_string *__self) {
 	__self->length = 0;
 	__self->s[0]   = '\0';

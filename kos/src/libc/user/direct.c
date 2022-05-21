@@ -70,8 +70,8 @@ NOTHROW_RPC(LIBCCALL libc__getdrives)(void)
 }
 /*[[[end:libc__getdrives]]]*/
 
-/*[[[head:libc__getdiskfree,hash:CRC-32=0x62358abe]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") unsigned int
+/*[[[head:libc__getdiskfree,hash:CRC-32=0xe61b62ef]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_WR(2) unsigned int
 NOTHROW_RPC(LIBCCALL libc__getdiskfree)(unsigned int drive,
                                         struct _diskfree_t *diskfree)
 /*[[[body:libc__getdiskfree]]]*/

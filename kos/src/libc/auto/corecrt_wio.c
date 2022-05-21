@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6366e7d */
+/* HASH CRC-32:0xb7ec2e43 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED ATTR_ACCESS_RO(1) errno_t
 NOTHROW_RPC(LIBDCALL libd__waccess_s)(char16_t const *file,
                                       __STDC_INT_AS_UINT_T type) {
 	if (libd_waccess(file, type) != 0)
@@ -40,7 +40,7 @@ NOTHROW_RPC(LIBDCALL libd__waccess_s)(char16_t const *file,
 	return 0;
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED ATTR_ACCESS_RO(1) errno_t
 NOTHROW_RPC(LIBKCALL libc__waccess_s)(char32_t const *file,
                                       __STDC_INT_AS_UINT_T type) {
 	if (libc_waccess(file, type) != 0)
@@ -48,7 +48,7 @@ NOTHROW_RPC(LIBKCALL libc__waccess_s)(char32_t const *file,
 	return 0;
 }
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((1, 2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) errno_t
 NOTHROW_RPC(LIBDCALL libd__wsopen_s)(fd_t *fd,
                                      char16_t const *filename,
                                      oflag_t oflags,
@@ -69,7 +69,7 @@ NOTHROW_RPC(LIBDCALL libd__wsopen_s)(fd_t *fd,
 	return 0;
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((1, 2)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) errno_t
 NOTHROW_RPC(LIBKCALL libc__wsopen_s)(fd_t *fd,
                                      char32_t const *filename,
                                      oflag_t oflags,
@@ -89,7 +89,7 @@ NOTHROW_RPC(LIBKCALL libc__wsopen_s)(fd_t *fd,
 	*fd = result;
 	return 0;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.io") WUNUSED NONNULL((1, 5)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.io") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(5) errno_t
 NOTHROW_RPC(LIBDCALL libd__wsopen_dispatch)(char16_t const *filename,
                                             oflag_t oflags,
                                             int sflags,
@@ -99,7 +99,7 @@ NOTHROW_RPC(LIBDCALL libd__wsopen_dispatch)(char16_t const *filename,
 	(void)bsecure;
 	return libd__wsopen_s(fd, filename, oflags, sflags, mode);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.io") WUNUSED NONNULL((1, 5)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.io") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(5) errno_t
 NOTHROW_RPC(LIBKCALL libc__wsopen_dispatch)(char32_t const *filename,
                                             oflag_t oflags,
                                             int sflags,
@@ -109,7 +109,7 @@ NOTHROW_RPC(LIBKCALL libc__wsopen_dispatch)(char32_t const *filename,
 	(void)bsecure;
 	return libc__wsopen_s(fd, filename, oflags, sflags, mode);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.io") WUNUSED NONNULL((1)) fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.io") WUNUSED ATTR_ACCESS_RO(1) fd_t
 NOTHROW_RPC(VLIBDCALL libd__wsopen)(char16_t const *filename,
                                     oflag_t oflags,
                                     int sflags,
@@ -122,7 +122,7 @@ NOTHROW_RPC(VLIBDCALL libd__wsopen)(char16_t const *filename,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.io") WUNUSED NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.io") WUNUSED ATTR_ACCESS_RO(1) fd_t
 NOTHROW_RPC(VLIBKCALL libc__wsopen)(char32_t const *filename,
                                     oflag_t oflags,
                                     int sflags,

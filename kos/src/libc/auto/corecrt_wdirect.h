@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c2b533e */
+/* HASH CRC-32:0x4ba6ced5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,10 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF char16_t *NOTHROW_RPC(LIBDCALL libd__wgetdcwd)(int drive, char16_t *buf, size_t size);
-INTDEF char32_t *NOTHROW_RPC(LIBKCALL libc__wgetdcwd)(int drive, char32_t *buf, size_t size);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd__wmkdir)(char16_t const *path);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc__wmkdir)(char32_t const *path);
+INTDEF ATTR_ACCESS_WRS(2, 3) char16_t *NOTHROW_RPC(LIBDCALL libd__wgetdcwd)(int drive, char16_t *buf, size_t size);
+INTDEF ATTR_ACCESS_WRS(2, 3) char32_t *NOTHROW_RPC(LIBKCALL libc__wgetdcwd)(int drive, char32_t *buf, size_t size);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd__wmkdir)(char16_t const *path);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBKCALL libc__wmkdir)(char32_t const *path);
 #endif /* !__KERNEL__ */
 
 DECL_END

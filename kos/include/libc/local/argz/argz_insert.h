@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc29ac8a3 */
+/* HASH CRC-32:0xca5aa060 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_argz_add_defined
 #define __local___localdep_argz_add_defined
 #ifdef __CRT_HAVE_argz_add
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),argz_add,(__pargz,__pargz_len,__str))
+__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),argz_add,(__pargz,__pargz_len,__str))
 #elif defined(__CRT_HAVE___argz_add)
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),__argz_add,(__pargz,__pargz_len,__str))
+__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),__argz_add,(__pargz,__pargz_len,__str))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/argz/argz_add.h>
@@ -103,7 +103,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(argz_insert) __ATTR_NONNULL((1, 2, 4)) __errno_t
+__LOCAL_LIBC(argz_insert) __ATTR_ACCESS_RO(4) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__before, char const *__restrict __entry) {
 	char *__argz;
 	__SIZE_TYPE__ __argz_len;

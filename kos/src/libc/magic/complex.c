@@ -132,7 +132,7 @@ __SYSDECL_BEGIN
 
 @@calculate cosh and sinh
 [[static, requires_function(fabs, cosh, sinh, exp)]]
-void _cchsh(double x, [[nonnull]] double *c, [[nonnull]] double *s) {
+void _cchsh(double x, [[out]] double *c, [[out]] double *s) {
 	COMPLEX_IMPL_COPYRIGHT_NOTICE
 	double e, ei;
 	if (fabs(x) <= 0.5) {

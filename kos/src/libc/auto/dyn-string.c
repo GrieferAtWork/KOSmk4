@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22a82b9b */
+/* HASH CRC-32:0x204c1eb3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ DECL_BEGIN
  * Initialize a given `struct dyn_string'
  * @param: min_chars: Minimum value for `self->allocated'
  * @return: 1: Always returns `1' */
-INTERN ATTR_SECTION(".text.crt.libiberty") int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_init)(struct dyn_string *self,
                                            __STDC_INT_AS_SIZE_T min_chars) {
 	if (min_chars == 0)
@@ -70,7 +70,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_new)(__STDC_INT_AS_SIZE_T min_chars) {
 #include <bits/crt/dyn-string.h>
 /* >> dyn_string_delete(3)
  * Delete a `dyn_string_t' previously allocated by `dyn_string_new(3)' */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RW(1) void
 NOTHROW_NCX(LIBCCALL libc_dyn_string_delete)(struct dyn_string *self) {
 	libc_free(self->s);
 	libc_free(self);
@@ -79,7 +79,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_delete)(struct dyn_string *self) {
 /* >> dyn_string_release(3)
  * Steal the  internal string  buffer  of `self'  and  free(self)
  * The returned pointer must be `free(3)'d once no longer needed. */
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_RETNONNULL NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_RETNONNULL ATTR_ACCESS_RW(1) char *
 NOTHROW_NCX(LIBCCALL libc_dyn_string_release)(struct dyn_string *self) {
 	char *result = self->s;
 #ifndef __OPTIMIZE_SIZE__
@@ -97,7 +97,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_release)(struct dyn_string *self) {
  * `min_chars' total characters (excluding the trailing NUL)
  * @return: * : Always re-returns `self'
  *              -> uses `xmalloc(3)', so no error-return-value */
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_RETNONNULL NONNULL((1)) struct dyn_string *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_RETNONNULL ATTR_ACCESS_RW(1) struct dyn_string *
 NOTHROW_NCX(LIBCCALL libc_dyn_string_resize)(struct dyn_string *self,
                                              __STDC_INT_AS_SIZE_T min_chars) {
 	char *newbuf;
@@ -124,7 +124,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_resize)(struct dyn_string *self,
 #include <bits/crt/dyn-string.h>
 /* >> dyn_string_clear(3)
  * Set the length of `self' to `0' */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RW(1) void
 NOTHROW_NCX(LIBCCALL libc_dyn_string_clear)(struct dyn_string *self) {
 	self->length = 0;
 	self->s[0]   = '\0';
@@ -134,7 +134,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_clear)(struct dyn_string *self) {
 /* >> dyn_string_copy(3)
  * Assign `src' to `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_copy)(struct dyn_string *dst,
                                            struct dyn_string __KOS_FIXED_CONST *src) {
 	dst = libc_dyn_string_resize(dst, src->length);
@@ -146,7 +146,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_copy)(struct dyn_string *dst,
 /* >> dyn_string_copy_cstr(3)
  * Assign   `src'   to  `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_copy_cstr)(struct dyn_string *dst,
                                                 char const *src) {
 	size_t srclen = libc_strlen(src);
@@ -160,7 +160,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_copy_cstr)(struct dyn_string *dst,
 /* >> dyn_string_prepend(3)
  * Insert `src' at the start of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_prepend)(struct dyn_string *dst,
                                               struct dyn_string __KOS_FIXED_CONST *src) {
 	return libc_dyn_string_insert(dst, 0, src);
@@ -169,7 +169,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_prepend)(struct dyn_string *dst,
 /* >> dyn_string_prepend_cstr(3)
  * Insert `src' at the start of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_prepend_cstr)(struct dyn_string *dst,
                                                    char const *src) {
 	return libc_dyn_string_insert_cstr(dst, 0, src);
@@ -180,7 +180,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_prepend_cstr)(struct dyn_string *dst,
 /* >> dyn_string_insert(3)
  * Insert `src' into `dst' at position `index'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 3)) int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_insert)(struct dyn_string *dst,
                                              __STDC_INT_AS_SIZE_T index,
                                              struct dyn_string __KOS_FIXED_CONST *src) {
@@ -200,7 +200,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_insert)(struct dyn_string *dst,
 /* >> dyn_string_insert_cstr(3)
  * Insert `src' into `dst' at position `index'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 3)) int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_insert_cstr)(struct dyn_string *dst,
                                                   __STDC_INT_AS_SIZE_T index,
                                                   char const *src) {
@@ -214,7 +214,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_insert_cstr)(struct dyn_string *dst,
 /* >> dyn_string_insert_char(3)
  * Insert `ch' into `dst' at position `index'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_insert_char)(struct dyn_string *dst,
                                                   __STDC_INT_AS_SIZE_T index,
                                                   int ch) {
@@ -230,7 +230,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_insert_char)(struct dyn_string *dst,
 /* >> dyn_string_append(3)
  * Append `src' to the end of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_append)(struct dyn_string *dst,
                                              struct dyn_string __KOS_FIXED_CONST *src) {
 	return libc_dyn_string_insert(dst, dst->length, src);
@@ -239,7 +239,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_append)(struct dyn_string *dst,
 /* >> dyn_string_append_cstr(3)
  * Append `src' to the end of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_append_cstr)(struct dyn_string *dst,
                                                   char const *src) {
 	return libc_dyn_string_insert_cstr(dst, dst->length, src);
@@ -248,7 +248,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_append_cstr)(struct dyn_string *dst,
 /* >> dyn_string_append_char(3)
  * Append `ch' to the end of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_append_char)(struct dyn_string *dst,
                                                   int ch) {
 	return libc_dyn_string_insert_char(dst, dst->length, ch);
@@ -260,7 +260,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_append_char)(struct dyn_string *dst,
  * Assign  the substring `src[start:end]'  to `dst'. Note that
  * the given indices _must_ be properly ordered, and in-range!
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_substring)(struct dyn_string *dst,
                                                 struct dyn_string __KOS_FIXED_CONST *src,
                                                 __STDC_INT_AS_SIZE_T start,
@@ -278,7 +278,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_substring)(struct dyn_string *dst,
  * Return `1' if the contents of the given strings are equal; `0' otherwise.
  * @return: 0 : Strings differ
  * @return: 1 : Strings are identical */
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE WUNUSED int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_NCX(LIBCCALL libc_dyn_string_eq)(struct dyn_string __KOS_FIXED_CONST *lhs,
                                          struct dyn_string __KOS_FIXED_CONST *rhs) {
 	if (lhs->length != rhs->length)

@@ -58,14 +58,14 @@ typedef __SIZE_TYPE__ size_t;
 
 %[default:section(".text.crt.dos.fs.property")]
 %[insert:pp_if($has_function(_getdcwd))]
-%#define _getdcwd_nolock(drive, buf, size) _getdcwd(drive, buf, size)
+%#define _getdcwd_nolock(drive, buf, bufsize) _getdcwd(drive, buf, bufsize)
 %[insert:pp_endif]
 
 [[cp, decl_include("<hybrid/typecore.h>")]]
 [[requires_include("<asm/os/fcntl.h>"), dos_export_alias("_getdcwd_nolock")]]
 [[requires($has_function(frealpath4) && defined(__AT_FDDRIVE_CWD))]]
 [[crt_dos_variant, impl_include("<libc/errno.h>")]]
-char *_getdcwd(int drive, char *buf, size_t size) {
+char *_getdcwd(int drive, [[out(? <= bufsize)]] char *buf, size_t bufsize) {
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
 @@pp_ifdef EINVAL@@
 		(void)libc_seterrno(EINVAL);
@@ -74,7 +74,7 @@ char *_getdcwd(int drive, char *buf, size_t size) {
 @@pp_endif@@
 		return NULL;
 	}
-	return frealpath4(__AT_FDDRIVE_CWD(drive), buf, size, 0);
+	return frealpath4(__AT_FDDRIVE_CWD(drive), buf, bufsize, 0);
 }
 
 [[cp, requires_include("<asm/os/fcntl.h>")]]
@@ -100,7 +100,7 @@ __ULONG32_TYPE__ _getdrives();
 
 %
 [[cp, guard("_GETDISKFREE_DEFINED"), decl_include("<bits/crt/_diskfree_t.h>")]]
-unsigned int _getdiskfree(unsigned int drive, struct _diskfree_t *diskfree);
+unsigned int _getdiskfree(unsigned int drive, [[out]] struct _diskfree_t *diskfree);
 
 /* A small hand full of functions defined in '<direct.h>' */
 %[insert:extern(getcwd)];
@@ -110,7 +110,7 @@ unsigned int _getdiskfree(unsigned int drive, struct _diskfree_t *diskfree);
 
 [[section(".text.crt.dos.fs.modify")]]
 [[cp, crt_dos_variant, requires_function(mkdir)]]
-int _mkdir([[nonnull]] char const *path) {
+int _mkdir([[in]] char const *path) {
 	return mkdir(path, DOS_MKDIR_ACCESS_MODE);
 }
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb90c3cdb */
+/* HASH CRC-32:0x9f1242d7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fmtcheck, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  *                of this function, and documentation states that it may also
  *                be invalidated during any  other I/O operation relating  to
  *                `stream', tough this isn't the case under KOS. */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,fgetln,(__FILE *__restrict __stream, __SIZE_TYPE__ *__restrict __lenp),(__stream,__lenp))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),char *,__NOTHROW_NCX,fgetln,(__FILE *__restrict __stream, __SIZE_TYPE__ *__restrict __lenp),(__stream,__lenp))
 #endif /* !__fgetln_defined && __CRT_HAVE_fgetln */
 #ifndef __fpurge_defined
 #define __fpurge_defined
@@ -92,14 +92,14 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,fgetln,(__FIL
  * as  all unread data previously buffered, but not yet read. After
  * a call to this function, the next `fread(3)' or `fwrite(3)' will
  * start off from a blank state. */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__stream),__fpurge,(__stream))
+__CREDIRECT_VOID(,__NOTHROW_NCX,fpurge,(__FILE *__stream),__fpurge,(__stream))
 #elif defined(__CRT_HAVE_fpurge)
 /* >> __fpurge(3)
  * Discard all modified, but unwritten data from `stream', as  well
  * as  all unread data previously buffered, but not yet read. After
  * a call to this function, the next `fread(3)' or `fwrite(3)' will
  * start off from a blank state. */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,fpurge,(__FILE *__stream),(__stream))
+__CDECLARE_VOID(,__NOTHROW_NCX,fpurge,(__FILE *__stream),(__stream))
 #else /* ... */
 #undef __fpurge_defined
 #endif /* !... */

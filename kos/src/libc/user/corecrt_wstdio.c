@@ -27,8 +27,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libd__wtempnam,hash:CRC-32=0xe7f3fdf2]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") WUNUSED char16_t *
+/*[[[head:libd__wtempnam,hash:CRC-32=0xf2c3ccaa]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory,
                                      char16_t const *file_prefix)
 /*[[[body:libd__wtempnam]]]*/
@@ -41,8 +41,8 @@ NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory,
 }
 /*[[[end:libd__wtempnam]]]*/
 
-/*[[[head:libc__wtempnam,hash:CRC-32=0xdf74d60d]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") WUNUSED char32_t *
+/*[[[head:libc__wtempnam,hash:CRC-32=0xf538d91]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wtempnam)(char32_t const *directory,
                                      char32_t const *file_prefix)
 /*[[[body:libc__wtempnam]]]*/

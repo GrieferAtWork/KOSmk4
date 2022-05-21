@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfce6274a */
+/* HASH CRC-32:0x50a6f6a2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/template/itoa_digits.h>
 #include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_escape) __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_escape))(__pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) {
 	__PRIVATE char const __quote[1] = { '\"' };
 	char __encoded_text[12]; __SIZE_TYPE__ __encoded_text_size;

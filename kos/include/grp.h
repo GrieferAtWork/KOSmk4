@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bc6410f */
+/* HASH CRC-32:0x56be6079 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,11 +93,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getgrgid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* ... */
 #ifdef __CRT_HAVE_getgrnam
 /* >> getgrnam(3), getgrnam_r(3) */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),struct group *,__NOTHROW_RPC,getgrnam,(char const *__restrict __name),(__name))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct group *,__NOTHROW_RPC,getgrnam,(char const *__restrict __name),(__name))
 #elif defined(__CRT_HAVE_setgrent) && defined(__CRT_HAVE_getgrent)
 #include <libc/local/grp/getgrnam.h>
 /* >> getgrnam(3), getgrnam_r(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getgrnam, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct group *__NOTHROW_RPC(__LIBCCALL getgrnam)(char const *__restrict __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getgrnam))(__name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getgrnam, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) struct group *__NOTHROW_RPC(__LIBCCALL getgrnam)(char const *__restrict __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getgrnam))(__name); })
 #endif /* ... */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
@@ -115,38 +115,38 @@ __CDECLARE_OPT(__ATTR_WUNUSED,struct group *,__NOTHROW_RPC,getgrent,(void),())
  * Write the given entry `ent' into the given `stream'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,putgrent,(struct group const *__restrict __entry, __FILE *__restrict __stream),(__entry,__stream))
+__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(2),int,__NOTHROW_RPC,putgrent,(struct group const *__restrict __entry, __FILE *__restrict __stream),(__entry,__stream))
 #elif defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 #include <libc/local/grp/putgrent.h>
 /* >> putgrent(3)
  * Write the given entry `ent' into the given `stream'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(putgrent, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL putgrent)(struct group const *__restrict __entry, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putgrent))(__entry, __stream); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(putgrent, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(2) int __NOTHROW_RPC(__LIBCCALL putgrent)(struct group const *__restrict __entry, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putgrent))(__entry, __stream); })
 #endif /* ... */
 #endif /* __USE_GNU */
 
 #ifdef __USE_POSIX
 /* >> getgrgid(3), getgrgid_r(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((2, 3, 5)),int,__NOTHROW_RPC,getgrgid_r,(__gid_t __gid, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__gid,__resultbuf,__buffer,__buflen,__result))
+__CDECLARE_OPT(__ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(5) __ATTR_ACCESS_WRS(3, 4),int,__NOTHROW_RPC,getgrgid_r,(__gid_t __gid, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__gid,__resultbuf,__buffer,__buflen,__result))
 /* >> getgrnam(3), getgrnam_r(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,getgrnam_r,(char const *__restrict __name, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__name,__resultbuf,__buffer,__buflen,__result))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(5) __ATTR_ACCESS_WRS(3, 4),int,__NOTHROW_RPC,getgrnam_r,(char const *__restrict __name, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__name,__resultbuf,__buffer,__buflen,__result))
 
 #ifdef __USE_GNU
 /* >> getgrent(3), getgrent_r(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 4)),int,__NOTHROW_RPC,getgrent_r,(struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__resultbuf,__buffer,__buflen,__result))
+__CDECLARE_OPT(__ATTR_ACCESS_WR(1) __ATTR_ACCESS_WR(4) __ATTR_ACCESS_WRS(2, 3),int,__NOTHROW_RPC,getgrent_r,(struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__resultbuf,__buffer,__buflen,__result))
 #endif /* __USE_GNU */
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_fgetgrent_r
 /* >> fgetgrent(3), fgetgrent_r(3) */
-__CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,fgetgrent_r,(__FILE *__restrict __stream, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__stream,__resultbuf,__buffer,__buflen,__result))
+__CDECLARE(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(5) __ATTR_ACCESS_WRS(3, 4),int,__NOTHROW_RPC,fgetgrent_r,(__FILE *__restrict __stream, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__stream,__resultbuf,__buffer,__buflen,__result))
 #else /* __CRT_HAVE_fgetgrent_r */
 #include <bits/crt/stdio.h>
 #if (defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)) && (defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))) && (defined(__CRT_HAVE_fparseln) || ((defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && (defined(__CRT_HAVE_feof) || defined(__CRT_HAVE__IO_feof) || defined(__CRT_HAVE_feof_unlocked))
 #include <libc/local/grp/fgetgrent_r.h>
 /* >> fgetgrent(3), fgetgrent_r(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fgetgrent_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3, 5)) int __NOTHROW_RPC(__LIBCCALL fgetgrent_r)(__FILE *__restrict __stream, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetgrent_r))(__stream, __resultbuf, __buffer, __buflen, __result); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fgetgrent_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(5) __ATTR_ACCESS_WRS(3, 4) int __NOTHROW_RPC(__LIBCCALL fgetgrent_r)(__FILE *__restrict __stream, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetgrent_r))(__stream, __resultbuf, __buffer, __buflen, __result); })
 #endif /* (__CRT_HAVE_fgetpos64 || __CRT_HAVE__IO_fgetpos64 || __CRT_HAVE_fgetpos64_unlocked || __CRT_HAVE_ftello64 || __CRT_HAVE_ftell64 || __CRT_HAVE__ftelli64 || __CRT_HAVE_ftello64_unlocked || __CRT_HAVE_ftell64_unlocked || __CRT_HAVE__ftelli64_nolock || __CRT_HAVE_fgetpos || __CRT_HAVE__IO_fgetpos || __CRT_HAVE_fgetpos_unlocked || __CRT_HAVE_ftello || __CRT_HAVE_ftello_unlocked || __CRT_HAVE_ftell || __CRT_HAVE__IO_ftell || __CRT_HAVE_ftell_unlocked || __CRT_HAVE__ftell_nolock) && (__CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || (__SEEK_SET && (__CRT_HAVE_fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock))) && (__CRT_HAVE_fparseln || ((__CRT_HAVE_getc || __CRT_HAVE_fgetc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || __CRT_HAVE__getc_nolock || __CRT_HAVE__fgetc_nolock || (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow || __CRT_HAVE___underflow)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))) && (__CRT_HAVE_feof || __CRT_HAVE__IO_feof || __CRT_HAVE_feof_unlocked) */
 #endif /* !__CRT_HAVE_fgetgrent_r */
 #ifdef __USE_KOS
@@ -156,7 +156,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fgetgrent_r, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `gid'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-__CDECLARE(__ATTR_NONNULL((1, 3, 4, 6)),__errno_t,__NOTHROW_RPC,fgetgrgid_r,(__FILE *__restrict __stream, __gid_t __gid, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__stream,__gid,__resultbuf,__buffer,__buflen,__result))
+__CDECLARE(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(3) __ATTR_ACCESS_WR(6) __ATTR_ACCESS_WRS(4, 5),__errno_t,__NOTHROW_RPC,fgetgrgid_r,(__FILE *__restrict __stream, __gid_t __gid, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__stream,__gid,__resultbuf,__buffer,__buflen,__result))
 #else /* __CRT_HAVE_fgetgrgid_r */
 #include <bits/crt/stdio.h>
 #if (defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)) && (defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))) && (defined(__CRT_HAVE_fparseln) || ((defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && (defined(__CRT_HAVE_feof) || defined(__CRT_HAVE__IO_feof) || defined(__CRT_HAVE_feof_unlocked))
@@ -166,7 +166,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3, 4, 6)),__errno_t,__NOTHROW_RPC,fgetgrgid_r,(__F
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `gid'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fgetgrgid_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3, 4, 6)) __errno_t __NOTHROW_RPC(__LIBCCALL fgetgrgid_r)(__FILE *__restrict __stream, __gid_t __gid, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetgrgid_r))(__stream, __gid, __resultbuf, __buffer, __buflen, __result); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fgetgrgid_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(3) __ATTR_ACCESS_WR(6) __ATTR_ACCESS_WRS(4, 5) __errno_t __NOTHROW_RPC(__LIBCCALL fgetgrgid_r)(__FILE *__restrict __stream, __gid_t __gid, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetgrgid_r))(__stream, __gid, __resultbuf, __buffer, __buflen, __result); })
 #endif /* (__CRT_HAVE_fgetpos64 || __CRT_HAVE__IO_fgetpos64 || __CRT_HAVE_fgetpos64_unlocked || __CRT_HAVE_ftello64 || __CRT_HAVE_ftell64 || __CRT_HAVE__ftelli64 || __CRT_HAVE_ftello64_unlocked || __CRT_HAVE_ftell64_unlocked || __CRT_HAVE__ftelli64_nolock || __CRT_HAVE_fgetpos || __CRT_HAVE__IO_fgetpos || __CRT_HAVE_fgetpos_unlocked || __CRT_HAVE_ftello || __CRT_HAVE_ftello_unlocked || __CRT_HAVE_ftell || __CRT_HAVE__IO_ftell || __CRT_HAVE_ftell_unlocked || __CRT_HAVE__ftell_nolock) && (__CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || (__SEEK_SET && (__CRT_HAVE_fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock))) && (__CRT_HAVE_fparseln || ((__CRT_HAVE_getc || __CRT_HAVE_fgetc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || __CRT_HAVE__getc_nolock || __CRT_HAVE__fgetc_nolock || (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow || __CRT_HAVE___underflow)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))) && (__CRT_HAVE_feof || __CRT_HAVE__IO_feof || __CRT_HAVE_feof_unlocked) */
 #endif /* !__CRT_HAVE_fgetgrgid_r */
 #ifdef __CRT_HAVE_fgetgrnam_r
@@ -175,7 +175,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fgetgrgid_r, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-__CDECLARE(__ATTR_NONNULL((1, 2, 3, 4, 6)),__errno_t,__NOTHROW_RPC,fgetgrnam_r,(__FILE *__restrict __stream, const char *__restrict __name, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__stream,__name,__resultbuf,__buffer,__buflen,__result))
+__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(3) __ATTR_ACCESS_WR(6) __ATTR_ACCESS_WRS(4, 5),__errno_t,__NOTHROW_RPC,fgetgrnam_r,(__FILE *__restrict __stream, const char *__restrict __name, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result),(__stream,__name,__resultbuf,__buffer,__buflen,__result))
 #else /* __CRT_HAVE_fgetgrnam_r */
 #include <bits/crt/stdio.h>
 #if (defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)) && (defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))) && (defined(__CRT_HAVE_fparseln) || ((defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && (defined(__CRT_HAVE_feof) || defined(__CRT_HAVE__IO_feof) || defined(__CRT_HAVE_feof_unlocked))
@@ -185,7 +185,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3, 4, 6)),__errno_t,__NOTHROW_RPC,fgetgrnam_r,(
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fgetgrnam_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3, 4, 6)) __errno_t __NOTHROW_RPC(__LIBCCALL fgetgrnam_r)(__FILE *__restrict __stream, const char *__restrict __name, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetgrnam_r))(__stream, __name, __resultbuf, __buffer, __buflen, __result); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fgetgrnam_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(3) __ATTR_ACCESS_WR(6) __ATTR_ACCESS_WRS(4, 5) __errno_t __NOTHROW_RPC(__LIBCCALL fgetgrnam_r)(__FILE *__restrict __stream, const char *__restrict __name, struct group *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct group **__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetgrnam_r))(__stream, __name, __resultbuf, __buffer, __buflen, __result); })
 #endif /* (__CRT_HAVE_fgetpos64 || __CRT_HAVE__IO_fgetpos64 || __CRT_HAVE_fgetpos64_unlocked || __CRT_HAVE_ftello64 || __CRT_HAVE_ftell64 || __CRT_HAVE__ftelli64 || __CRT_HAVE_ftello64_unlocked || __CRT_HAVE_ftell64_unlocked || __CRT_HAVE__ftelli64_nolock || __CRT_HAVE_fgetpos || __CRT_HAVE__IO_fgetpos || __CRT_HAVE_fgetpos_unlocked || __CRT_HAVE_ftello || __CRT_HAVE_ftello_unlocked || __CRT_HAVE_ftell || __CRT_HAVE__IO_ftell || __CRT_HAVE_ftell_unlocked || __CRT_HAVE__ftell_nolock) && (__CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || (__SEEK_SET && (__CRT_HAVE_fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock))) && (__CRT_HAVE_fparseln || ((__CRT_HAVE_getc || __CRT_HAVE_fgetc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || __CRT_HAVE__getc_nolock || __CRT_HAVE__fgetc_nolock || (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow || __CRT_HAVE___underflow)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))) && (__CRT_HAVE_feof || __CRT_HAVE__IO_feof || __CRT_HAVE_feof_unlocked) */
 #endif /* !__CRT_HAVE_fgetgrnam_r */
 #endif /* __USE_KOS */
@@ -194,18 +194,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fgetgrnam_r, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 
 #ifdef __USE_MISC
 /* >> fgetgrent(3), fgetgrent_r(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),struct group *,__NOTHROW_RPC,fgetgrent,(__FILE *__restrict __stream),(__stream))
+__CDECLARE_OPT(__ATTR_ACCESS_RW(1),struct group *,__NOTHROW_RPC,fgetgrent,(__FILE *__restrict __stream),(__stream))
 #ifndef __setgroups_defined
 #define __setgroups_defined
 #ifdef __CRT_HAVE_setgroups
 /* >> setgroups(2) */
-__CDECLARE(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
+__CDECLARE(__ATTR_ACCESS_ROS(2, 1),int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
 #elif defined(__CRT_HAVE___setgroups)
 /* >> setgroups(2) */
-__CREDIRECT(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__setgroups,(__count,__groups))
+__CREDIRECT(__ATTR_ACCESS_ROS(2, 1),int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__setgroups,(__count,__groups))
 #elif defined(__CRT_HAVE___libc_setgroups)
 /* >> setgroups(2) */
-__CREDIRECT(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__libc_setgroups,(__count,__groups))
+__CREDIRECT(__ATTR_ACCESS_ROS(2, 1),int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__libc_setgroups,(__count,__groups))
 #else /* ... */
 #undef __setgroups_defined
 #endif /* !... */
@@ -235,7 +235,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__group
  *              so the KOS implementation of this function simply leaves its value
  *              untouched when this happens (other implementations might set it to
  *              `ERANGE' for example...) */
-__CDECLARE(__ATTR_NONNULL((1, 3, 4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups),(__user,__group,__groups,__ngroups))
+__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups),(__user,__group,__groups,__ngroups))
 #elif defined(__CRT_HAVE_setgrent) && defined(__CRT_HAVE_getgrent)
 #include <libc/local/grp/getgrouplist.h>
 /* >> getgrouplist(3)
@@ -260,7 +260,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3, 4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,getgrou
  *              so the KOS implementation of this function simply leaves its value
  *              untouched when this happens (other implementations might set it to
  *              `ERANGE' for example...) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getgrouplist, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3, 4)) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL getgrouplist)(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getgrouplist))(__user, __group, __groups, __ngroups); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getgrouplist, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(3) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL getgrouplist)(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getgrouplist))(__user, __group, __groups, __ngroups); })
 #else /* ... */
 #undef __getgrouplist_defined
 #endif /* !... */
@@ -276,7 +276,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getgrouplist, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * @return: -1: [errno=ENOMEM] Out of member
  * @return: -1: [errno=EPERM]  You're not allowed  to call  `setgroups(2)',
  *                             or at least not in the way you're trying to. */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
+__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
 #elif (defined(__CRT_HAVE_getgrouplist) || (defined(__CRT_HAVE_setgrent) && defined(__CRT_HAVE_getgrent))) && (defined(__CRT_HAVE_setgroups) || defined(__CRT_HAVE___setgroups) || defined(__CRT_HAVE___libc_setgroups)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/grp/initgroups.h>
 /* >> initgroups(3)
@@ -287,7 +287,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,initgroups,(char const *__user,
  * @return: -1: [errno=ENOMEM] Out of member
  * @return: -1: [errno=EPERM]  You're not allowed  to call  `setgroups(2)',
  *                             or at least not in the way you're trying to. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(initgroups, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL initgroups)(char const *__user, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(initgroups))(__user, __group); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(initgroups, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL initgroups)(char const *__user, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(initgroups))(__user, __group); })
 #else /* ... */
 #undef __initgroups_defined
 #endif /* !... */

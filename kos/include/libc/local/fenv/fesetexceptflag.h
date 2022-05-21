@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf65e409c */
+/* HASH CRC-32:0x98595643 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fesetexceptflag) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(fesetexceptflag) __ATTR_ACCESS_RO(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fesetexceptflag))(__fexcept_t const *__flagp, int __excepts) {
 #ifdef __inline_fesetexceptflag
 	__inline_fesetexceptflag(__flagp, __excepts);

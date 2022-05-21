@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6edf8ca0 */
+/* HASH CRC-32:0x7b7c0e09 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep___fsetlocking_defined) && defined(__CRT_HAVE___fsetlocking)
 #define __local___localdep___fsetlocking_defined
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep___fsetlocking,(__FILE *__stream, int __type),__fsetlocking,(__stream,__type))
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep___fsetlocking,(__FILE *__stream, int __type),__fsetlocking,(__stream,__type))
 #endif /* !__local___localdep___fsetlocking_defined && __CRT_HAVE___fsetlocking */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio_ext.h>

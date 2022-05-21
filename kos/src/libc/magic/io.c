@@ -125,7 +125,7 @@ struct _finddata64i32_t;
 [[cp, section(".text.crt.dos.fs.property")]]
 [[crt_dos_variant, decl_include("<bits/types.h>", "<features.h>")]]
 [[requires_function(access), impl_include("<libc/errno.h>")]]
-errno_t _access_s([[nonnull]] char const *filename, __STDC_INT_AS_UINT_T type) {
+errno_t _access_s([[in]] char const *filename, __STDC_INT_AS_UINT_T type) {
 	if (access(filename, type) == 0)
 		return $EOK;
 	return $__libc_geterrno_or(1);
@@ -150,7 +150,7 @@ errno_t _access_s([[nonnull]] char const *filename, __STDC_INT_AS_UINT_T type) {
 
 [[section(".text.crt.dos.fs.property")]]
 [[decl_include("<bits/types.h>"), requires_function(umask)]]
-errno_t _umask_s($mode_t nmode, [[nonnull]] $mode_t *omode) {
+errno_t _umask_s($mode_t nmode, [[out]] $mode_t *omode) {
 	*omode = umask(nmode);
 	return $EOK;
 }
@@ -180,38 +180,38 @@ $oflag_t _setmode($fd_t fd, $oflag_t mode) {
 int _findclose(intptr_t findfd);
 
 [[crt_dos_variant, cp, wunused, export_alias("_findfirst"), decl_include("<hybrid/typecore.h>")]]
-intptr_t _findfirst32([[nonnull]] char const *__restrict filename,
-                      [[nonnull]] struct _finddata32_t *__restrict finddata);
+intptr_t _findfirst32([[in]] char const *__restrict filename,
+                      [[out]] struct _finddata32_t *__restrict finddata);
 
 [[crt_dos_variant, cp, wunused, export_alias("_findfirsti64"), decl_include("<hybrid/typecore.h>")]]
-intptr_t _findfirst32i64([[nonnull]] char const *__restrict filename,
-                         [[nonnull]] struct _finddata32i64_t *__restrict finddata);
+intptr_t _findfirst32i64([[in]] char const *__restrict filename,
+                         [[out]] struct _finddata32i64_t *__restrict finddata);
 
 [[guard, cp, wunused, export_alias("_findfirst64i32")]]
 [[crt_dos_variant, decl_include("<hybrid/typecore.h>")]]
-intptr_t _findfirst64([[nonnull]] char const *__restrict filename,
-                      [[nonnull]] struct __finddata64_t *__restrict finddata);
+intptr_t _findfirst64([[in]] char const *__restrict filename,
+                      [[out]] struct __finddata64_t *__restrict finddata);
 
 [[guard, cp, wunused, decl_include("<hybrid/typecore.h>")]]
-intptr_t _findfirst64i32([[nonnull]] char const *__restrict filename,
-                         [[nonnull]] struct _finddata64i32_t *__restrict finddata)
+intptr_t _findfirst64i32([[in]] char const *__restrict filename,
+                         [[out]] struct _finddata64i32_t *__restrict finddata)
 	= _findfirst64;
 
 [[cp, export_alias("_findnext"), decl_include("<hybrid/typecore.h>")]]
 int _findnext32(intptr_t findfd,
-                [[nonnull]] struct _finddata32_t *__restrict finddata);
+                [[out]] struct _finddata32_t *__restrict finddata);
 
 [[cp, export_alias("_findnexti64"), decl_include("<hybrid/typecore.h>")]]
 int _findnext32i64(intptr_t findfd,
-                   [[nonnull]] struct _finddata32i64_t *__restrict finddata);
+                   [[out]] struct _finddata32i64_t *__restrict finddata);
 
 [[guard, cp, export_alias("_findnext64i32"), decl_include("<hybrid/typecore.h>")]]
 int _findnext64(intptr_t findfd,
-                [[nonnull]] struct __finddata64_t *__restrict finddata);
+                [[out]] struct __finddata64_t *__restrict finddata);
 
 [[guard, cp, decl_include("<hybrid/typecore.h>")]]
 int _findnext64i32(intptr_t findfd,
-                   [[nonnull]] struct _finddata64i32_t *__restrict finddata)
+                   [[out]] struct _finddata64i32_t *__restrict finddata)
 	= _findnext64;
 
 
@@ -221,8 +221,8 @@ int _findnext64i32(intptr_t findfd,
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<libc/errno.h>")]]
 [[requires_function(sopen)]]
-errno_t _sopen_s([[nonnull]] $fd_t *fd,
-                 [[nonnull]] char const *filename,
+errno_t _sopen_s([[out]] $fd_t *fd,
+                 [[in]] char const *filename,
                  $oflag_t oflags, int sflags,
                  $mode_t mode) {
 	fd_t result;
@@ -244,9 +244,9 @@ errno_t _sopen_s([[nonnull]] $fd_t *fd,
 
 [[cp, wunused, crt_dos_variant, decl_include("<bits/types.h>")]]
 [[requires_function(_sopen_s), section(".text.crt.dos.fs.io")]]
-errno_t _sopen_dispatch([[nonnull]] char const *filename,
+errno_t _sopen_dispatch([[in]] char const *filename,
                         $oflag_t oflags, int sflags, $mode_t mode,
-                        [[nonnull]] $fd_t *fd, int bsecure) {
+                        [[out]] $fd_t *fd, int bsecure) {
 	(void)bsecure;
 	return _sopen_s(fd, filename, oflags, sflags, mode);
 }
@@ -254,13 +254,13 @@ errno_t _sopen_dispatch([[nonnull]] char const *filename,
 
 [[section(".text.crt.dos.fs.utility")]]
 [[decl_include("<bits/types.h>")]]
-errno_t _mktemp_s([[nonnull]] char *template_, size_t size);
+errno_t _mktemp_s([[inout(? <= size)]] char *template_, size_t size);
 
 %[insert:function(_sopen = sopen)]
 
 [[requires_function(pipe2)]]
 [[decl_include("<bits/types.h>"), section(".text.crt.dos.fs.io")]]
-int _pipe([[nonnull]] $fd_t pipedes[2],
+int _pipe([[out]] $fd_t pipedes[2],
           $uint32_t pipesize, $oflag_t textmode) {
 	(void)pipesize;
 	return pipe2(pipedes, textmode);
@@ -358,7 +358,7 @@ $fd_t _open_osfhandle(intptr_t osfd, $oflag_t flags) {
 [[crt_dos_variant, decl_include("<bits/types.h>")]]
 [[cp, vartypes($mode_t), wunused, dos_export_alias("_sopen")]]
 [[requires_function(open), section(".text.crt.dos.fs.io")]]
-$fd_t sopen([[nonnull]] char const *filename, $oflag_t oflags, int sflags, ...) {
+$fd_t sopen([[in]] char const *filename, $oflag_t oflags, int sflags, ...) {
 	fd_t result;
 	va_list args;
 	va_start(args, sflags);

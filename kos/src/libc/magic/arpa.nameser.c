@@ -733,25 +733,25 @@ typedef enum __ns_cert_types {
 //int ns_msg_getflag(ns_msg a, int b);
 [[wunused, pure]]
 [[impl_include("<hybrid/__byteswap.h>", "<hybrid/__unaligned.h>")]]
-$u_int ns_get16([[nonnull]] $u_char const *srcptr) {
+$u_int ns_get16([[in]] $u_char const *srcptr) {
 	return __hybrid_unaligned_getbe16(srcptr);
 }
 
 [[wunused, pure]]
 [[impl_include("<hybrid/__byteswap.h>", "<hybrid/__unaligned.h>")]]
-$u_long ns_get32([[nonnull]] $u_char const *srcptr) {
+$u_long ns_get32([[in]] $u_char const *srcptr) {
 	return __hybrid_unaligned_getbe32(srcptr);
 }
 
 [[export_alias("putshort", "__putshort")]]
 [[impl_include("<hybrid/__byteswap.h>", "<hybrid/__unaligned.h>")]]
-void ns_put16($u_int val, [[nonnull]] $u_char *destptr) {
+void ns_put16($u_int val, [[out]] $u_char *destptr) {
 	__hybrid_unaligned_setbe16(destptr, val);
 }
 
 [[export_alias("putlong", "__putlong")]]
 [[impl_include("<hybrid/__byteswap.h>", "<hybrid/__unaligned.h>")]]
-void ns_put32($u_long val, [[nonnull]] $u_char *destptr) {
+void ns_put32($u_long val, [[out]] $u_char *destptr) {
 	__hybrid_unaligned_setbe32(destptr, val);
 }
 
@@ -784,7 +784,7 @@ int ns_name_compress(char const *srcbuf, $u_char *dstbuf, size_t dstbufsize,
 	return 0;
 }
 
-int ns_name_skip([[nonnull]] $u_char const **p_msg_ptr, [[nonnull]] $u_char const *msg_end);
+int ns_name_skip([[inout]] $u_char const **p_msg_ptr, [[nonnull]] $u_char const *msg_end);
 void ns_name_rollback($u_char const *a, $u_char const **b, $u_char const **c);
 int ns_sign($u_char *a, int *b, int c, int d, void *e, $u_char const *f, int g, $u_char *h, int *i, time_t j);
 int ns_sign2($u_char *a, int *b, int c, int d, void *e, $u_char const *f, int g, $u_char *h, int *i, time_t j, $u_char **k, $u_char **l);

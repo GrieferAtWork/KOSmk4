@@ -7515,7 +7515,8 @@ strrev:([[inout]] char *__restrict str) -> [[== str]] char * {
 [[impl_include("<libc/errno.h>", "<libc/string.h>")]]
 [[section(".text.crt.dos.string.memory")]]
 [[decl_include("<bits/types.h>")]]
-/*dos*/ $errno_t _strset_s([[inout_opt]] char *dst, $size_t dstsize, int ch) {
+/*dos*/ $errno_t _strset_s([[inout_opt(? <= dstsize)]] char *dst,
+                           $size_t dstsize, int ch) {
 	char *p;
 	size_t remaining;
 	if (!dst && dstsize != 0)
@@ -7538,7 +7539,7 @@ strrev:([[inout]] char *__restrict str) -> [[== str]] char * {
 [[guard, section(".text.crt.dos.string.memory")]]
 [[decl_include("<bits/types.h>")]]
 /*dos*/ $errno_t memcpy_s([[out_opt(dstlength)]] void *dst, rsize_t dstlength,
-                          [[in_opt(srclength)]] void const *src, rsize_t srclength) {
+                          [[in_opt (srclength)]] void const *src, rsize_t srclength) {
 	if (!srclength)
 		return 0;
 	if (dst == NULL)
@@ -7810,7 +7811,7 @@ char *_strerror([[in_opt]] char const *message) {
 [[section(".text.crt.dos.string.memory")]]
 [[impl_include("<libc/errno.h>", "<libc/string.h>")]]
 [[decl_include("<bits/types.h>")]]
-/*dos*/ $errno_t _strnset_s([[inout_opt]] char *__restrict buf,
+/*dos*/ $errno_t _strnset_s([[inout_opt(? <= maxlen)]] char *__restrict buf,
                             $size_t buflen, int ch, $size_t maxlen) {
 	char *iter;
 	size_t remaining;

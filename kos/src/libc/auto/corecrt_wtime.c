@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2049362 */
+/* HASH CRC-32:0xd174c7fd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,17 +30,17 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED ATTR_ACCESS_RO(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wasctime)(struct tm const *tp) {
 	static char16_t wasctime_retbuf[26] = { 0 };
 	return libd__wasctime_s(wasctime_retbuf, 26, tp) ? NULL : wasctime_retbuf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED NONNULL((1)) char32_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED ATTR_ACCESS_RO(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wasctime)(struct tm const *tp) {
 	static char32_t wasctime_retbuf[26] = { 0 };
 	return libc__wasctime_s(wasctime_retbuf, 26, tp) ? NULL : wasctime_retbuf;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1, 3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wasctime_s)(char16_t *buf,
                                        size_t buflen,
                                        struct tm const *tp) {
@@ -56,7 +56,7 @@ NOTHROW_NCX(LIBDCALL libd__wasctime_s)(char16_t *buf,
 		buf[i] = (char16_t)ptr[i];
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1, 3)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc__wasctime_s)(char32_t *buf,
                                        size_t buflen,
                                        struct tm const *tp) {
@@ -75,7 +75,7 @@ NOTHROW_NCX(LIBKCALL libc__wasctime_s)(char32_t *buf,
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libd__wctime32, libd__wctime64);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED ATTR_ACCESS_RO(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wctime32)(time32_t const *timer) {
 	time64_t timer64 = (time64_t)*timer;
 	return libd__wctime64(&timer64);
@@ -84,13 +84,13 @@ NOTHROW_NCX(LIBDCALL libd__wctime32)(time32_t const *timer) {
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc__wctime32, libc__wctime64);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED NONNULL((1)) char32_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED ATTR_ACCESS_RO(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wctime32)(time32_t const *timer) {
 	time64_t timer64 = (time64_t)*timer;
 	return libc__wctime64(&timer64);
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED ATTR_ACCESS_RO(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wctime64)(time64_t const *timer) {
 	static char16_t wctime64_retbuf[26];
 
@@ -100,7 +100,7 @@ NOTHROW_NCX(LIBDCALL libd__wctime64)(time64_t const *timer) {
 
 
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED NONNULL((1)) char32_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.time") WUNUSED ATTR_ACCESS_RO(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wctime64)(time64_t const *timer) {
 	static char32_t wctime64_retbuf[26];
 
@@ -113,7 +113,7 @@ NOTHROW_NCX(LIBKCALL libc__wctime64)(time64_t const *timer) {
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libd__wctime32_s, libd__wctime64_s);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1, 3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wctime32_s)(char16_t *buf,
                                        size_t buflen,
                                        time32_t const *timer) {
@@ -124,7 +124,7 @@ NOTHROW_NCX(LIBDCALL libd__wctime32_s)(char16_t *buf,
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc__wctime32_s, libc__wctime64_s);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-INTERN ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1, 3)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc__wctime32_s)(char32_t *buf,
                                        size_t buflen,
                                        time32_t const *timer) {
@@ -133,7 +133,7 @@ NOTHROW_NCX(LIBKCALL libc__wctime32_s)(char32_t *buf,
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1, 3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wctime64_s)(char16_t *buf,
                                        size_t buflen,
                                        time64_t const *timer) {
@@ -151,7 +151,7 @@ NOTHROW_NCX(LIBDCALL libd__wctime64_s)(char16_t *buf,
 	return 0;
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1, 3)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc__wctime64_s)(char32_t *buf,
                                        size_t buflen,
                                        time64_t const *timer) {
@@ -168,7 +168,7 @@ NOTHROW_NCX(LIBKCALL libc__wctime64_s)(char32_t *buf,
 		buf[i] = (char32_t)ptr[i]; /* Guarantied no unicode in here! */
 	return 0;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_WR(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wstrtime)(char16_t buf[9]) {
 	unsigned int i;
 	char abuf[9], *ptr;
@@ -181,7 +181,7 @@ NOTHROW_NCX(LIBDCALL libd__wstrtime)(char16_t buf[9]) {
 		buf[i] = (char16_t)ptr[i]; /* Guarantied no unicode in here! */
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1)) char32_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_WR(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wstrtime)(char32_t buf[9]) {
 	unsigned int i;
 	char abuf[9], *ptr;
@@ -194,7 +194,7 @@ NOTHROW_NCX(LIBKCALL libc__wstrtime)(char32_t buf[9]) {
 		buf[i] = (char32_t)ptr[i]; /* Guarantied no unicode in here! */
 	return buf;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_WR(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wstrdate)(char16_t buf[9]) {
 	unsigned int i;
 	char abuf[9], *ptr;
@@ -207,7 +207,7 @@ NOTHROW_NCX(LIBDCALL libd__wstrdate)(char16_t buf[9]) {
 		buf[i] = (char16_t)ptr[i]; /* Guarantied no unicode in here! */
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1)) char32_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_WR(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wstrdate)(char32_t buf[9]) {
 	unsigned int i;
 	char abuf[9], *ptr;
@@ -221,7 +221,7 @@ NOTHROW_NCX(LIBKCALL libc__wstrdate)(char32_t buf[9]) {
 	return buf;
 }
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wstrtime_s)(char16_t *buf,
                                        size_t buflen) {
 	if unlikely(buflen < 9)
@@ -235,7 +235,7 @@ NOTHROW_NCX(LIBDCALL libd__wstrtime_s)(char16_t *buf,
 	return 0;
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc__wstrtime_s)(char32_t *buf,
                                        size_t buflen) {
 	if unlikely(buflen < 9)
@@ -249,7 +249,7 @@ NOTHROW_NCX(LIBKCALL libc__wstrtime_s)(char32_t *buf,
 	return 0;
 }
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wstrdate_s)(char16_t *buf,
                                        size_t buflen) {
 	if unlikely(buflen < 9)
@@ -263,7 +263,7 @@ NOTHROW_NCX(LIBDCALL libd__wstrdate_s)(char16_t *buf,
 	return 0;
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.time") NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.time") ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc__wstrdate_s)(char32_t *buf,
                                        size_t buflen) {
 	if unlikely(buflen < 9)

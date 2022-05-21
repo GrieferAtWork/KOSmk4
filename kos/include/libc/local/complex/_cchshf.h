@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c05527c */
+/* HASH CRC-32:0x8b80c20f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,7 +106,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_sinhf_defined
 #endif /* !... */
 #endif /* !__local___localdep_sinhf_defined */
-__LOCAL_LIBC(_cchshf) __ATTR_NONNULL((2, 3)) void
+__LOCAL_LIBC(_cchshf) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_cchshf))(float __x, float *__c, float *__s) {
 #if (defined(__CRT_HAVE_coshf) || defined(__CRT_HAVE___coshf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) && (defined(__CRT_HAVE_sinhf) || defined(__CRT_HAVE___sinhf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) && (defined(__CRT_HAVE_expf) || defined(__CRT_HAVE___expf) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */

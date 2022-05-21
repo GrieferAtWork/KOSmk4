@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf135c581 */
+/* HASH CRC-32:0xc46a26f7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_flockfile_defined
 #define __local___localdep_flockfile_defined
 #ifdef __CRT_HAVE_flockfile
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),flockfile,(__stream))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),flockfile,(__stream))
 #elif defined(__CRT_HAVE__lock_file)
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_lock_file,(__stream))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_lock_file,(__stream))
 #elif defined(__CRT_HAVE__IO_flockfile)
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_IO_flockfile,(__stream))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_RPC,__localdep_flockfile,(__FILE *__restrict __stream),_IO_flockfile,(__stream))
 #else /* ... */
 #undef __local___localdep_flockfile_defined
 #endif /* !... */
@@ -43,17 +43,17 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC,__localdep_flockfile,(__FILE 
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fprintf_unlocked,(__FILE *__restrict __stream, char const *__restrict __format, ...),fprintf_unlocked,{ return __builtin_fprintf_unlocked(__stream, __format, __builtin_va_arg_pack()); })
+__CEIREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fprintf_unlocked,(__FILE *__restrict __stream, char const *__restrict __format, ...),fprintf_unlocked,{ return __builtin_fprintf_unlocked(__stream, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_fprintf_unlocked)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
+__LIBC __ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
 #elif defined(__CRT_HAVE_fprintf_s)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
+__LIBC __ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
 #elif defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fprintf_unlocked.h>
@@ -66,11 +66,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_funlockfile_defined
 #define __local___localdep_funlockfile_defined
 #ifdef __CRT_HAVE_funlockfile
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),funlockfile,(__stream))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),funlockfile,(__stream))
 #elif defined(__CRT_HAVE__unlock_file)
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_unlock_file,(__stream))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_unlock_file,(__stream))
 #elif defined(__CRT_HAVE__IO_funlockfile)
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_IO_funlockfile,(__stream))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_funlockfile,(__FILE *__restrict __stream),_IO_funlockfile,(__stream))
 #else /* ... */
 #undef __local___localdep_funlockfile_defined
 #endif /* !... */
@@ -110,7 +110,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/inttypes.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(putpwent) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(putpwent) __ATTR_ACCESS_RW(2) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(putpwent))(struct passwd const *__restrict __ent, __FILE *__restrict __stream) __THROWS(...) {
 	__STDC_INT_AS_SSIZE_T __error;
 #if __SIZEOF_GID_T__ == 1

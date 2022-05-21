@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9add60fd */
+/* HASH CRC-32:0x57e9c41f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_tolower __LIBC_LOCAL_NAME(tolower)
 #endif /* !... */
 #endif /* !__local___localdep_tolower_defined */
-__LOCAL_LIBC(fnmatch) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(fnmatch) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fnmatch))(char const *__pattern, char const *__name, __STDC_INT_AS_UINT_T __match_flags) {
 	char __card_post;
 	/* TODO: Support for `FNM_NOESCAPE' */

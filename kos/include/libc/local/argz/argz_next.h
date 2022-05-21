@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a93f0c9 */
+/* HASH CRC-32:0x2a3cae43 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strend __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
-__LOCAL_LIBC(argz_next) __ATTR_PURE __ATTR_WUNUSED char *
+__LOCAL_LIBC(argz_next) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_RO_OPT(3) __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_next))(char const *__restrict __argz, __SIZE_TYPE__ __argz_len, char const *__restrict __entry) {
 	char const *__argz_end;
 	if (!__entry)

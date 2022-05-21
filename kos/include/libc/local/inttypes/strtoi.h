@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67ec874e */
+/* HASH CRC-32:0x6bde9eb8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_strto64_r) && __SIZEOF_INTMAX_T__ == 8
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto64_r,(__nptr,__endptr,__base,__error))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto64_r,(__nptr,__endptr,__base,__error))
 #elif defined(__CRT_HAVE_strto32_r) && __SIZEOF_INTMAX_T__ == 4
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto32_r,(__nptr,__endptr,__base,__error))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoimax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto32_r,(__nptr,__endptr,__base,__error))
 #elif __SIZEOF_INTMAX_T__ == 8
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strto64_r.h>
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strtoi) __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__
+__LOCAL_LIBC(strtoi) __ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(6) __INTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoi))(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __INTMAX_TYPE__ __lo, __INTMAX_TYPE__ __hi, __errno_t *__rstatus) {
 	char *__used_endptr;
 	__INTMAX_TYPE__ __result;

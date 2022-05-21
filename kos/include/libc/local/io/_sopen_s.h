@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a63e96c */
+/* HASH CRC-32:0x6a605ac2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sopen_defined
 #define __local___localdep_sopen_defined
 #ifdef __CRT_HAVE_sopen
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_sopen,(char const *__filename, __oflag_t __oflags, int __sflags),sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,__localdep_sopen,(char const *__filename, __oflag_t __oflags, int __sflags),sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__sopen)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_sopen,(char const *__filename, __oflag_t __oflags, int __sflags),_sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,__localdep_sopen,(char const *__filename, __oflag_t __oflags, int __sflags),_sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/io/sopen.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_sopen_s) __ATTR_NONNULL((1, 2)) __errno_t
+__LOCAL_LIBC(_sopen_s) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_sopen_s))(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) {
 	__fd_t __result;
 	if (!__fd) {

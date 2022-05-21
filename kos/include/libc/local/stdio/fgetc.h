@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca9e4fd3 */
+/* HASH CRC-32:0x46c43d0b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__filbuf_defined
 #define __local___localdep__filbuf_defined
 #ifdef __CRT_HAVE__filbuf
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep__filbuf,(__FILE *__restrict __stream),_filbuf,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep__filbuf,(__FILE *__restrict __stream),_filbuf,(__stream))
 #elif defined(__CRT_HAVE___uflow)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep__filbuf,(__FILE *__restrict __stream),__uflow,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep__filbuf,(__FILE *__restrict __stream),__uflow,(__stream))
 #elif defined(__CRT_HAVE___underflow)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep__filbuf,(__FILE *__restrict __stream),__underflow,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep__filbuf,(__FILE *__restrict __stream),__underflow,(__stream))
 #else /* ... */
 #undef __local___localdep__filbuf_defined
 #endif /* !... */
@@ -43,32 +43,32 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep__filbuf,(__FILE *__res
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_NONNULL((1)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE__fread_nolock) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_NONNULL((1)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_fread)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_NONNULL((1)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE__IO_fread)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fread,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_NONNULL((1)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fread,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_fread_unlocked)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_NONNULL((1)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_NONNULL((1)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream))
 #else /* ... */
 #undef __local___localdep_crt_fread_defined
 #endif /* !... */
@@ -76,7 +76,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__loc
 __NAMESPACE_LOCAL_END
 #include <bits/crt/io-file.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fgetc) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(fgetc) __ATTR_ACCESS_RW(1) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetc))(__FILE *__restrict __stream) __THROWS(...) {
 #if defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow)) && (defined(__USE_STDIO_UNLOCKED) || (!defined(__CRT_HAVE_fread) && !defined(__CRT_HAVE__IO_fread) && !defined(__CRT_HAVE_fread_unlocked) && !defined(__CRT_HAVE__fread_nolock)))
 	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)*__stream->__f_ptr++) : (__NAMESPACE_LOCAL_SYM __localdep__filbuf)(__stream);

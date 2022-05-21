@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcfa31aa4 */
+/* HASH CRC-32:0x65a8770f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <libc/errno.h>
 #include <libc/string.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_ACCESS_RWS(1, 4) errno_t
 NOTHROW_NCX(LIBDCALL libd__wcsnset_s)(char16_t *__restrict buf,
                                       size_t buflen,
                                       char16_t ch,
@@ -65,7 +65,7 @@ NOTHROW_NCX(LIBDCALL libd__wcsnset_s)(char16_t *__restrict buf,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_ACCESS_RWS(1, 4) errno_t
 NOTHROW_NCX(LIBKCALL libc__wcsnset_s)(char32_t *__restrict buf,
                                       size_t buflen,
                                       char32_t ch,
@@ -97,7 +97,7 @@ NOTHROW_NCX(LIBKCALL libc__wcsnset_s)(char32_t *__restrict buf,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_ACCESS_RWS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wcsset_s)(char16_t *dst,
                                      size_t dstsize,
                                      char16_t ch) {
@@ -118,7 +118,7 @@ NOTHROW_NCX(LIBDCALL libd__wcsset_s)(char16_t *dst,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_ACCESS_RWS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc__wcsset_s)(char32_t *dst,
                                      size_t dstsize,
                                      char32_t ch) {
@@ -241,7 +241,7 @@ NOTHROW_NCX(LIBKCALL libc__wcsupr_s_l)(char32_t *buf,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((1, 3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_ACCESS_ROS(3, 4) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd_wmemcpy_s)(char16_t *dst,
                                      rsize_t dstlength,
                                      char16_t const *src,
@@ -263,7 +263,7 @@ NOTHROW_NCX(LIBDCALL libd_wmemcpy_s)(char16_t *dst,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((1, 3)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_ACCESS_ROS(3, 4) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc_wmemcpy_s)(char32_t *dst,
                                      rsize_t dstlength,
                                      char32_t const *src,
@@ -285,7 +285,7 @@ NOTHROW_NCX(LIBKCALL libc_wmemcpy_s)(char32_t *dst,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((1, 3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_ACCESS_ROS(3, 4) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd_wmemmove_s)(char16_t *dst,
                                       rsize_t dstlength,
                                       char16_t const *src,
@@ -301,7 +301,7 @@ NOTHROW_NCX(LIBDCALL libd_wmemmove_s)(char16_t *dst,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((1, 3)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_ACCESS_ROS(3, 4) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc_wmemmove_s)(char32_t *dst,
                                       rsize_t dstlength,
                                       char32_t const *src,

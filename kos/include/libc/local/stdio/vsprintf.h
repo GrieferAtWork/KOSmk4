@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccff1d62 */
+/* HASH CRC-32:0x3a9ef328 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_CREDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_sprintf_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_sprintf_printer,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_sprintf_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_sprintf_printer,(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_sprintf_printer */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_sprintf_printer.h>
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
+__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vprintf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_vprintf.h>

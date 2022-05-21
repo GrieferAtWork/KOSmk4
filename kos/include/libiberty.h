@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x477fa325 */
+/* HASH CRC-32:0xc06913e5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1009,19 +1009,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fdopen_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL 
 #if defined(__CRT_HAVE_freopen_unlocked) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),(__filename,__modes,__stream))
+__CDECLARE(__ATTR_ACCESS_RW(3) __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64_unlocked)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64_unlocked,(__filename,__modes,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(3) __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64_unlocked,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen,(__filename,__modes,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(3) __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen,(__filename,__modes,__stream))
 #elif defined(__CRT_HAVE_freopen64)
 /* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given  `stream' as a  file-stream for accessing  `filename' */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64,(__filename,__modes,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(3) __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,freopen_unlocked,(char const *__restrict __filename, char const *__restrict __modes, __FILE *__restrict __stream),freopen64,(__filename,__modes,__stream))
 #else /* ... */
 #undef __freopen_unlocked_defined
 #endif /* !... */

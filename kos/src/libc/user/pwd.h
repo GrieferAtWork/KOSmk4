@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19aa1249 */
+/* HASH CRC-32:0xf607d6ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ INTDEF WUNUSED NONNULL((1)) struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwnam)(c
  * return: NULL: (errno = <unchanged>) The last entry has already been read
  *                                     (use `rewind(stream)' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-INTDEF WUNUSED NONNULL((1)) struct passwd *NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) struct passwd *NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream);
 /* >> getpwuid_r(3)
  * Search for an entry with a matching user ID
  * @return: 0 : (*result != NULL) Success

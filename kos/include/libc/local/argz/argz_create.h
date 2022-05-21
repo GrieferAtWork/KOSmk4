@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59019545 */
+/* HASH CRC-32:0xa32c6626 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(argz_create) __ATTR_NONNULL((1, 2, 3)) __errno_t
+__LOCAL_LIBC(argz_create) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_create))(char *const ___argv[], char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len) {
 	__SIZE_TYPE__ __i, ___argc, __total_len = 0;
 	for (___argc = 0; ___argv[___argc] != __NULLPTR; ++___argc)

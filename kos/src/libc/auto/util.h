@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa0dbdec */
+/* HASH CRC-32:0xa1c90e32 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_opendev)(char const *
  *                  return of this function, `strdup("")' will be returned. (i.e.  NULL
  *                  is only returned in case of an error; _NOT_ in case of end-of-file)
  * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_fparseln)(FILE *stream, size_t *plen, size_t *plineno, char const delim[3], __STDC_INT_AS_UINT_T flags);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) char *NOTHROW_RPC(LIBDCALL libd_fparseln)(FILE *stream, size_t *plen, size_t *plineno, char const delim[3], __STDC_INT_AS_UINT_T flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fparseln(3)
@@ -70,7 +70,7 @@ INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_fparseln)(FILE *stre
  *                  return of this function, `strdup("")' will be returned. (i.e.  NULL
  *                  is only returned in case of an error; _NOT_ in case of end-of-file)
  * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_fparseln)(FILE *stream, size_t *plen, size_t *plineno, char const delim[3], __STDC_INT_AS_UINT_T flags);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) char *NOTHROW_RPC(LIBCCALL libc_fparseln)(FILE *stream, size_t *plen, size_t *plineno, char const delim[3], __STDC_INT_AS_UINT_T flags);
 #endif /* !__KERNEL__ */
 
 DECL_END

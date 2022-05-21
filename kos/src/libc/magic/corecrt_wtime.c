@@ -56,15 +56,15 @@ typedef __size_t size_t;
 
 [[wchar, wunused, requires_function(_wasctime_s)]]
 [[decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
-wchar_t *_wasctime([[nonnull]] struct $tm const *tp) {
+wchar_t *_wasctime([[in]] struct $tm const *tp) {
 	static wchar_t wasctime_retbuf[26] = { 0 };
 	return _wasctime_s(wasctime_retbuf, 26, tp) ? NULL : wasctime_retbuf;
 }
 
 [[wchar, requires_function(asctime_r)]]
 [[decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
-errno_t _wasctime_s([[outp(buflen)]] wchar_t *buf, size_t buflen,
-                    [[nonnull]] struct $tm const *tp) {
+errno_t _wasctime_s([[out(? <= buflen)]] wchar_t *buf, size_t buflen,
+                    [[in]] struct $tm const *tp) {
 	char abuf[26], *ptr;
 	unsigned int i;
 	if unlikely(buflen < 26)
@@ -85,14 +85,14 @@ errno_t _wasctime_s([[outp(buflen)]] wchar_t *buf, size_t buflen,
 [[if(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), crt_intern_dos_alias("libd__wctime64")]]
 [[if(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), crt_intern_kos_alias("libc__wctime64")]]
 [[decl_include("<bits/types.h>")]]
-wchar_t *_wctime32([[nonnull]] $time32_t const *timer) {
+wchar_t *_wctime32([[in]] $time32_t const *timer) {
 	time64_t timer64 = (time64_t)*timer;
 	return _wctime64(&timer64);
 }
 
 [[wchar, wunused, requires_function(_wctime64_s)]]
 [[decl_include("<bits/types.h>")]]
-wchar_t *_wctime64([[nonnull]] $time64_t const *timer) {
+wchar_t *_wctime64([[in]] $time64_t const *timer) {
 	static wchar_t wctime64_retbuf[26];
 @@pp_ifdef __BUILDING_LIBC@@
 	_wctime64_s(wctime64_retbuf, 26, timer);
@@ -106,16 +106,16 @@ wchar_t *_wctime64([[nonnull]] $time64_t const *timer) {
 [[decl_include("<bits/types.h>")]]
 [[if(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), crt_intern_dos_alias("libd__wctime64_s")]]
 [[if(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), crt_intern_kos_alias("libc__wctime64_s")]]
-errno_t _wctime32_s([[outp(buflen)]] wchar_t *buf, size_t buflen,
-                    [[nonnull]] $time32_t const *timer) {
+errno_t _wctime32_s([[out(? <= buflen)]] wchar_t *buf, size_t buflen,
+                    [[in]] $time32_t const *timer) {
 	time64_t timer64 = (time64_t)*timer;
 	return _wctime64_s(buf, buflen, &timer64);
 }
 
 [[wchar, requires_function(_ctime64_s)]]
 [[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
-errno_t _wctime64_s([[outp(buflen)]] wchar_t *buf, size_t buflen,
-                    [[nonnull]] $time64_t const *timer) {
+errno_t _wctime64_s([[out(? <= buflen)]] wchar_t *buf, size_t buflen,
+                    [[in]] $time64_t const *timer) {
 	char abuf[26], *ptr;
 	unsigned int i;
 	if unlikely(buflen < 26)
@@ -132,7 +132,7 @@ errno_t _wctime64_s([[outp(buflen)]] wchar_t *buf, size_t buflen,
 
 [[wchar, requires_function(_strtime)]]
 [[decl_include("<hybrid/typecore.h>")]]
-wchar_t *_wstrtime([[nonnull]] wchar_t buf[9]) {
+wchar_t *_wstrtime([[out]] wchar_t buf[9]) {
 	unsigned int i;
 	char abuf[9], *ptr;
 	ptr = _strtime(abuf);
@@ -147,7 +147,7 @@ wchar_t *_wstrtime([[nonnull]] wchar_t buf[9]) {
 
 [[wchar, requires_function(_strdate)]]
 [[decl_include("<hybrid/typecore.h>")]]
-wchar_t *_wstrdate([[nonnull]] wchar_t buf[9]) {
+wchar_t *_wstrdate([[out]] wchar_t buf[9]) {
 	unsigned int i;
 	char abuf[9], *ptr;
 	ptr = _strdate(abuf);
@@ -162,7 +162,7 @@ wchar_t *_wstrdate([[nonnull]] wchar_t buf[9]) {
 
 [[wchar, requires_function(_wstrtime)]]
 [[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
-errno_t _wstrtime_s([[outp(buflen)]] wchar_t *buf, size_t buflen) {
+errno_t _wstrtime_s([[out(? <= buflen)]] wchar_t *buf, size_t buflen) {
 	if unlikely(buflen < 9)
 		return $ERANGE;
 @@pp_ifdef __BUILDING_LIBC@@
@@ -176,7 +176,7 @@ errno_t _wstrtime_s([[outp(buflen)]] wchar_t *buf, size_t buflen) {
 
 [[wchar, requires_function(_wstrdate)]]
 [[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
-errno_t _wstrdate_s([[outp(buflen)]] wchar_t *buf, size_t buflen) {
+errno_t _wstrdate_s([[out(? <= buflen)]] wchar_t *buf, size_t buflen) {
 	if unlikely(buflen < 9)
 		return $ERANGE;
 @@pp_ifdef __BUILDING_LIBC@@

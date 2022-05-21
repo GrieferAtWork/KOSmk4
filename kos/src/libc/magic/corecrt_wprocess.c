@@ -53,22 +53,22 @@ typedef __INTPTR_TYPE__ intptr_t;
 %#ifndef _WPROCESS_DEFINED
 %#define _WPROCESS_DEFINED 1
 [[argument_names(mode, path, ___argv), decl_include("<features.h>", "<hybrid/typecore.h>")]]
-int _wexecv([[nonnull]] wchar_t const *__restrict path,
-            [[nonnull]] wchar_t const *const *__restrict ___argv) = wexecv;
+int _wexecv([[in]] wchar_t const *__restrict path,
+            [[in]] wchar_t const *const *__restrict ___argv) = wexecv;
 
 [[argument_names(mode, file, ___argv), decl_include("<features.h>", "<hybrid/typecore.h>")]]
-int _wexecvp([[nonnull]] wchar_t const *__restrict file,
-             [[nonnull]] wchar_t const *const *__restrict ___argv) = wexecvp;
+int _wexecvp([[in]] wchar_t const *__restrict file,
+             [[in]] wchar_t const *const *__restrict ___argv) = wexecvp;
 
 [[argument_names(mode, path, ___argv, ___envp), decl_include("<features.h>", "<hybrid/typecore.h>")]]
-int _wexecve([[nonnull]] wchar_t const *__restrict path,
-             [[nonnull]] wchar_t const *const *__restrict ___argv,
-             [[nonnull]] wchar_t const *const *__restrict ___envp) = wexecve;
+int _wexecve([[in]] wchar_t const *__restrict path,
+             [[in]] wchar_t const *const *__restrict ___argv,
+             [[in]] wchar_t const *const *__restrict ___envp) = wexecve;
 
 [[argument_names(mode, file, ___argv, ___envp), decl_include("<features.h>", "<hybrid/typecore.h>")]]
-int _wexecvpe([[nonnull]] wchar_t const *__restrict file,
-              [[nonnull]] wchar_t const *const *__restrict ___argv,
-              [[nonnull]] wchar_t const *const *__restrict ___envp) = wexecvpe;
+int _wexecvpe([[in]] wchar_t const *__restrict file,
+              [[in]] wchar_t const *const *__restrict ___argv,
+              [[in]] wchar_t const *const *__restrict ___envp) = wexecvpe;
 
 %[insert:function(_wexecl = wexecl)]
 %[insert:function(_wexeclp = wexeclp)]
@@ -77,41 +77,41 @@ int _wexecvpe([[nonnull]] wchar_t const *__restrict file,
 
 [[argument_names(mode, path, ___argv), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 intptr_t _wspawnv(__STDC_INT_AS_UINT_T mode,
-                  [[nonnull]] wchar_t const *__restrict path,
-                  [[nonnull]] wchar_t const *const *__restrict ___argv) = wspawnv;
+                  [[in]] wchar_t const *__restrict path,
+                  [[in]] wchar_t const *const *__restrict ___argv) = wspawnv;
 
 [[argument_names(mode, file, ___argv), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 intptr_t _wspawnvp(__STDC_INT_AS_UINT_T mode,
-                   [[nonnull]] wchar_t const *__restrict file,
-                   [[nonnull]] wchar_t const *const *__restrict ___argv) = wspawnvp;
+                   [[in]] wchar_t const *__restrict file,
+                   [[in]] wchar_t const *const *__restrict ___argv) = wspawnvp;
 
 [[argument_names(mode, path, ___argv, ___envp), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 intptr_t _wspawnve(__STDC_INT_AS_UINT_T mode,
-                   [[nonnull]] wchar_t const *__restrict path,
-                   [[nonnull]] wchar_t const *const *__restrict ___argv,
-                   [[nonnull]] wchar_t const *const *__restrict ___envp) = wspawnve;
+                   [[in]] wchar_t const *__restrict path,
+                   [[in]] wchar_t const *const *__restrict ___argv,
+                   [[in]] wchar_t const *const *__restrict ___envp) = wspawnve;
 
 [[argument_names(mode, file, ___argv, ___envp), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 intptr_t _wspawnvpe(__STDC_INT_AS_UINT_T mode,
-                    [[nonnull]] wchar_t const *__restrict file,
-                    [[nonnull]] wchar_t const *const *__restrict ___argv,
-                    [[nonnull]] wchar_t const *const *__restrict ___envp) = wspawnvpe;
+                    [[in]] wchar_t const *__restrict file,
+                    [[in]] wchar_t const *const *__restrict ___argv,
+                    [[in]] wchar_t const *const *__restrict ___envp) = wspawnvpe;
 
 [[ATTR_SENTINEL, decl_include("<features.h>", "<hybrid/typecore.h>")]]
-intptr_t _wspawnl(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path,
-                  wchar_t const *args, ... /*, (wchar_t *)NULL*/) = wspawnl;
+intptr_t _wspawnl(__STDC_INT_AS_UINT_T mode, [[in]] wchar_t const *__restrict path,
+                  [[in_opt]] wchar_t const *args, ... /*, (wchar_t *)NULL*/) = wspawnl;
 
 [[ATTR_SENTINEL, decl_include("<features.h>", "<hybrid/typecore.h>")]]
-intptr_t _wspawnlp(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file,
-                   wchar_t const *args, ... /*, (wchar_t *)NULL*/) = wspawnlp;
+intptr_t _wspawnlp(__STDC_INT_AS_UINT_T mode, [[in]] wchar_t const *__restrict file,
+                   [[in_opt]] wchar_t const *args, ... /*, (wchar_t *)NULL*/) = wspawnlp;
 
 [[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<hybrid/typecore.h>")]]
-intptr_t _wspawnle(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path,
-                   wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) = wspawnle;
+intptr_t _wspawnle(__STDC_INT_AS_UINT_T mode, [[in]] wchar_t const *__restrict path,
+                   [[in_opt]] wchar_t const *args, ... /*, (wchar_t *)NULL, [[in]] wchar_t **environ*/) = wspawnle;
 
 [[ATTR_SENTINEL_O(1), decl_include("<features.h>", "<hybrid/typecore.h>")]]
-intptr_t _wspawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file,
-                    wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) = wspawnlpe;
+intptr_t _wspawnlpe(__STDC_INT_AS_UINT_T mode, [[in]] wchar_t const *__restrict file,
+                    [[in_opt]] wchar_t const *args, ... /*, (wchar_t *)NULL, [[in]] wchar_t **environ*/) = wspawnlpe;
 %#endif /* !_WPROCESS_DEFINED */
 
 %

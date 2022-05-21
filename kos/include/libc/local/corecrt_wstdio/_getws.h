@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa380eab */
+/* HASH CRC-32:0xee67dd56 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__getws_s_defined
 #define __local___localdep__getws_s_defined
 #ifdef __CRT_HAVE__getws_s
-__CREDIRECT(,__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep__getws_s,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen),_getws_s,(__buf,__buflen))
+__CREDIRECT(__ATTR_ACCESS_WRS(1, 2),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep__getws_s,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen),_getws_s,(__buf,__buflen))
 #elif defined(__LOCAL_stdin) && (defined(__CRT_HAVE_fgetws) || defined(__CRT_HAVE_fgetws_unlocked) || defined(__CRT_HAVE__fgetws_nolock) || ((defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc) || defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/_getws_s.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__getws_s_defined
 #endif /* !... */
 #endif /* !__local___localdep__getws_s_defined */
-__LOCAL_LIBC(_getws) __WCHAR_TYPE__ *
+__LOCAL_LIBC(_getws) __ATTR_ACCESS_WR(1) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getws))(__WCHAR_TYPE__ *__buf) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__getws_s)(__buf, (__SIZE_TYPE__)-1);
 }

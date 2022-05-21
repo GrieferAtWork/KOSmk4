@@ -653,7 +653,7 @@ do_add_nonnull_annotation:
 					 * [[inout(sizearg)]]   -->   __attribute__((access(read_write, <I>, <indexof(sizearg)>)))
 					 *
 					 * Advanced annotations:
-					 * 
+					 *
 					 * - >> [[in(strlen(.))]] char const *p
 					 *   Explicitly state that `p' is loaded as a c-string (same as `[[in]] char const *p`)
 					 * - >> [[in(strnlen(., maxlen))]] char const *p, size_t maxlen
@@ -691,28 +691,36 @@ do_add_nonnull_annotation:
 						if (shouldMarkAsNonNull)
 							shouldMarkAsNonNull = result.isPureOrLeaf;
 						/* We recognize the following expressions:
-						 * >> void   foo([[in]]                       void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1)))
-						 * >> void   foo([[in(sizearg)]]              void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
-						 * >> void   foo([[in(<= sizearg)]]           void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
-						 * >> size_t foo([[in(return <= sizearg)]]    void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
-						 * >> void   foo([[in(sizearg * <N>)]]        void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1)))
-						 * >> void   foo([[in(<N> * sizearg)]]        void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1)))
-						 * >> void   foo([[in(strlen(.))]]            char const *p, size_t sizearg);   -->   __attribute__((nonnull(1), access(read_only, 1)))
-						 * >> void   foo([[in(strlen(p))]]            char const *p, size_t sizearg);   -->   __attribute__((nonnull(1), access(read_only, 1)))
-						 * >> void   foo([[in(strnlen(., sizearg))]]  char const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
-						 * >> void   foo([[in(strnlen(p, sizearg))]]  char const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
+						 * >> void   foo([[in]]                         void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1)))
+						 * >> void   foo([[in(sizearg)]]                void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
+						 * >> void   foo([[in(<= sizearg)]]             void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
+						 * >> void   foo([[in(? <= sizearg)]]           void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
+						 * >> size_t foo([[in(return <= sizearg)]]      void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
+						 * >> void   foo([[in(*p_retsize <= sizearg)]]  void const *p, size_t sizearg,
+						 * >>                                           size_t *p_retsize);               -->   __attribute__((access(read_only, 1, 2)))
+						 * >> void   foo([[in(sizearg * <N>)]]          void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1)))
+						 * >> void   foo([[in(<N> * sizearg)]]          void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1)))
+						 * >> void   foo([[in(strlen(.))]]              char const *p, size_t sizearg);   -->   __attribute__((nonnull(1), access(read_only, 1)))
+						 * >> void   foo([[in(strlen(p))]]              char const *p, size_t sizearg);   -->   __attribute__((nonnull(1), access(read_only, 1)))
+						 * >> void   foo([[in(strnlen(., sizearg))]]    char const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
+						 * >> void   foo([[in(strnlen(p, sizearg))]]    char const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
 						 *
 						 * Guarantied equivalencies:
-						 *  - [[in   (strlen(.))]] char const *p  <===>   [[in]]    char const *p
-						 *  - [[inout(strlen(.))]] char *p        <===>   [[inout]] char const *p
+						 *  - [[in(strlen(.))]]           <===>   [[in]]
+						 *  - [[in(strnlen(., maxlen))]]  <===>   [[in(? <= maxlen)]]
 						 *
 						 */
 						self.next();
 						local sizeArgumentName;
 						switch (self.tok) {
-
-						case "return":
+						case "*":
 							self.next();
+							self.parseCStringOrKeyword();
+							goto access_annotation_expected_le;
+						case "return":
+						case "?":
+							self.next();
+access_annotation_expected_le:
 							self.expect("<=");
 							/* FALLTHRU */
 						case "<=":
@@ -788,7 +796,7 @@ annotate_generic_access:
 					}
 					tok = self.tok;
 				}	break;
-				
+
 
 					/* (Mostly) ignored annotations */
 				case "inp":

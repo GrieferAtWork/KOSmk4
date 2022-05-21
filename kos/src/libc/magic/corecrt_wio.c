@@ -77,7 +77,7 @@ struct _wfinddata64i32_t;
 [[wchar, cp, wunused, decl_include("<features.h>", "<bits/types.h>")]]
 [[section(".text.crt.dos.wchar.fs.property")]]
 [[requires_function(waccess), impl_include("<libc/errno.h>")]]
-errno_t _waccess_s([[nonnull]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
+errno_t _waccess_s([[in]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
 	if (waccess(file, type) != 0)
 		return $__libc_geterrno_or(1);
 	return 0;
@@ -93,10 +93,10 @@ errno_t _waccess_s([[nonnull]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
 %[default:section(".text.crt.dos.wchar.fs.utility")]
 
 [[wchar, decl_include("<bits/types.h>")]]
-errno_t _wmktemp_s([[nonnull]] wchar_t *template_, size_t bufsize);
+errno_t _wmktemp_s([[inout(bufsize)]] wchar_t *template_, size_t bufsize);
 
 [[wchar, nonnull, decl_include("<hybrid/typecore.h>")]]
-wchar_t *_wmktemp([[nonnull]] wchar_t *template_);
+wchar_t *_wmktemp([[inout]] wchar_t *template_);
 
 
 %[default:section(".text.crt.dos.fs.io")]
@@ -105,8 +105,8 @@ wchar_t *_wmktemp([[nonnull]] wchar_t *template_);
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<libc/errno.h>")]]
 [[requires_function(_wsopen)]]
-errno_t _wsopen_s([[nonnull]] $fd_t *fd,
-                  [[nonnull]] wchar_t const *filename,
+errno_t _wsopen_s([[out]] $fd_t *fd,
+                  [[in]] wchar_t const *filename,
                   $oflag_t oflags, int sflags,
                   $mode_t mode) {
 	fd_t result;
@@ -126,9 +126,9 @@ errno_t _wsopen_s([[nonnull]] $fd_t *fd,
 
 [[wchar, cp, wunused, decl_include("<bits/types.h>")]]
 [[requires_function(_wsopen_s), section(".text.crt.dos.wchar.fs.io")]]
-errno_t _wsopen_dispatch([[nonnull]] wchar_t const *filename,
+errno_t _wsopen_dispatch([[in]] wchar_t const *filename,
                          $oflag_t oflags, int sflags, $mode_t mode,
-                         [[nonnull]] $fd_t *fd, int bsecure) {
+                         [[out]] $fd_t *fd, int bsecure) {
 	(void)bsecure;
 	return _wsopen_s(fd, filename, oflags, sflags, mode);
 }
@@ -139,7 +139,7 @@ errno_t _wsopen_dispatch([[nonnull]] wchar_t const *filename,
 [[wchar, cp, vartypes($mode_t), wunused, decl_include("<bits/types.h>")]]
 [[requires_function(wopen), section(".text.crt.dos.wchar.fs.io")]]
 [[dos_export_as(/*"DOS$"*/ "?_wsopen@@YAHPB_WHHH@Z")]]
-$fd_t _wsopen([[nonnull]] wchar_t const *filename, $oflag_t oflags, int sflags, ...) {
+$fd_t _wsopen([[in]] wchar_t const *filename, $oflag_t oflags, int sflags, ...) {
 	fd_t result;
 	va_list args;
 	va_start(args, sflags);
@@ -151,37 +151,37 @@ $fd_t _wsopen([[nonnull]] wchar_t const *filename, $oflag_t oflags, int sflags, 
 
 
 [[wchar, cp, wunused, export_alias("_wfindfirst"), decl_include("<hybrid/typecore.h>")]]
-intptr_t _wfindfirst32([[nonnull]] wchar_t const *__restrict filename,
-                       [[nonnull]] struct _wfinddata32_t *__restrict finddata);
+intptr_t _wfindfirst32([[in]] wchar_t const *__restrict filename,
+                       [[out]] struct _wfinddata32_t *__restrict finddata);
 
 [[wchar, cp, wunused, export_alias("_wfindfirsti64"), decl_include("<hybrid/typecore.h>")]]
-intptr_t _wfindfirst32i64([[nonnull]] wchar_t const *__restrict filename,
-                          [[nonnull]] struct _wfinddata32i64_t *__restrict finddata);
+intptr_t _wfindfirst32i64([[in]] wchar_t const *__restrict filename,
+                          [[out]] struct _wfinddata32i64_t *__restrict finddata);
 
 [[wchar, cp, wunused, export_alias("_wfindfirst64i32"), decl_include("<hybrid/typecore.h>")]]
-intptr_t _wfindfirst64([[nonnull]] wchar_t const *__restrict filename,
-                       [[nonnull]] struct _wfinddata64_t *__restrict finddata);
+intptr_t _wfindfirst64([[in]] wchar_t const *__restrict filename,
+                       [[out]] struct _wfinddata64_t *__restrict finddata);
 
 [[/*wchar,*/ cp, wunused, decl_include("<hybrid/typecore.h>")]]
-intptr_t _wfindfirst64i32([[nonnull]] wchar_t const *__restrict filename,
-                          [[nonnull]] struct _wfinddata64i32_t *__restrict finddata)
+intptr_t _wfindfirst64i32([[in]] wchar_t const *__restrict filename,
+                          [[out]] struct _wfinddata64i32_t *__restrict finddata)
 	= _wfindfirst64;
 
 [[wchar, cp, export_alias("_wfindnext"), decl_include("<hybrid/typecore.h>")]]
 int _wfindnext32(intptr_t findfd,
-                 [[nonnull]] struct _wfinddata32_t *__restrict finddata);
+                 [[out]] struct _wfinddata32_t *__restrict finddata);
 
 [[wchar, cp, export_alias("_wfindnexti64"), decl_include("<hybrid/typecore.h>")]]
 int _wfindnext32i64(intptr_t findfd,
-                    [[nonnull]] struct _wfinddata32i64_t *__restrict finddata);
+                    [[out]] struct _wfinddata32i64_t *__restrict finddata);
 
 [[wchar, cp, export_alias("_wfindnext64i32"), decl_include("<hybrid/typecore.h>")]]
 int _wfindnext64(intptr_t findfd,
-                 [[nonnull]] struct _wfinddata64_t *__restrict finddata);
+                 [[out]] struct _wfinddata64_t *__restrict finddata);
 
 [[/*wchar,*/ cp, decl_include("<hybrid/typecore.h>")]]
 int _wfindnext64i32(intptr_t findfd,
-                    [[nonnull]] struct _wfinddata64i32_t *__restrict finddata)
+                    [[out]] struct _wfinddata64i32_t *__restrict finddata)
 	= _wfindnext64;
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf9c5be9 */
+/* HASH CRC-32:0x787e4a85 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,15 +84,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_creat_defined
 #define __local___localdep_creat_defined
 #if defined(__CRT_HAVE_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_creat,(char const *__filename, __mode_t __mode),creat,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,__localdep_creat,(char const *__filename, __mode_t __mode),creat,(__filename,__mode))
 #elif defined(__CRT_HAVE__creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_creat,(char const *__filename, __mode_t __mode),_creat,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,__localdep_creat,(char const *__filename, __mode_t __mode),_creat,(__filename,__mode))
 #elif defined(__CRT_HAVE___creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_creat,(char const *__filename, __mode_t __mode),__creat,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,__localdep_creat,(char const *__filename, __mode_t __mode),__creat,(__filename,__mode))
 #elif defined(__CRT_HAVE___libc_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_creat,(char const *__filename, __mode_t __mode),__libc_creat,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,__localdep_creat,(char const *__filename, __mode_t __mode),__libc_creat,(__filename,__mode))
 #elif defined(__CRT_HAVE_creat64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,__localdep_creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
 #elif defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/creat.h>

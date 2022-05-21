@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac564bb1 */
+/* HASH CRC-32:0xb5239862 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vsnwprintf_s_l_defined
 #define __local___localdep__vsnwprintf_s_l_defined
 #ifdef __CRT_HAVE__vsnwprintf_s_l
-__CREDIRECT(__ATTR_LIBC_WPRINTF(4, 0) __ATTR_NONNULL((4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnwprintf_s_l,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __maxsize, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vsnwprintf_s_l,(__buf,__bufsize,__maxsize,__format,__locale,__args))
+__CREDIRECT(__ATTR_ACCESS_RO(4) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_WPRINTF(4, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnwprintf_s_l,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __maxsize, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vsnwprintf_s_l,(__buf,__bufsize,__maxsize,__format,__locale,__args))
 #else /* __CRT_HAVE__vsnwprintf_s_l */
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/_vsnwprintf_s_l.h>
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__vsnwprintf_s_l __LIBC_LOCAL_NAME(_vsnwprintf_s_l)
 #endif /* !__CRT_HAVE__vsnwprintf_s_l */
 #endif /* !__local___localdep__vsnwprintf_s_l_defined */
-__LOCAL_LIBC(_vsnwprintf_s) __ATTR_LIBC_WPRINTF(4, 0) __ATTR_NONNULL((4)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(_vsnwprintf_s) __ATTR_ACCESS_RO(4) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_WPRINTF(4, 0) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnwprintf_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __maxsize, __WCHAR_TYPE__ const *__format, __builtin_va_list __args) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__vsnwprintf_s_l)(__buf, __bufsize, __maxsize, __format, __NULLPTR, __args);
 }

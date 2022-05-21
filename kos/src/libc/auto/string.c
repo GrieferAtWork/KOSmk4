@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5a5373d */
+/* HASH CRC-32:0x1a0cc13 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5977,7 +5977,7 @@ NOTHROW_NCX(LIBCCALL libc_strrev)(char *__restrict str) {
 }
 #include <libc/errno.h>
 #include <libc/string.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_ACCESS_RW_OPT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_ACCESS_RWS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__strset_s)(char *dst,
                                      size_t dstsize,
                                      int ch) {
@@ -6243,7 +6243,7 @@ NOTHROW_NCX(LIBCCALL libc__strupr_s_l)(char *buf,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
-INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_ACCESS_RW_OPT(1) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.string.memory") ATTR_ACCESS_RWS(1, 4) errno_t
 NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf,
                                       size_t buflen,
                                       int ch,

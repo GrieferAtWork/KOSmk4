@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x289a8aa8 */
+/* HASH CRC-32:0x3d8a9ce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_c32getdcwd) __CHAR32_TYPE__ *
+__LOCAL_LIBC(_c32getdcwd) __ATTR_ACCESS_WRS(2, 3) __CHAR32_TYPE__ *
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(_c32getdcwd))(int __drive, __CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __size) {
 	if __unlikely(__drive < __AT_DOS_DRIVEMIN || __drive > __AT_DOS_DRIVEMAX) {
 #ifdef __EINVAL

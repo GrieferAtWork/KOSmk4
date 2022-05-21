@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb80dd2ef */
+/* HASH CRC-32:0x60897cd8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifdef __USE_DOS_DIRENT
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(readdir) __ATTR_NONNULL((1)) struct dirent *
+__LOCAL_LIBC(readdir) __ATTR_ACCESS_RW(1) struct dirent *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readdir))(struct __dirstream *__restrict __dirp) {
 	return (struct dirent *)__dos_dirent_readdir(__dirp);
 }

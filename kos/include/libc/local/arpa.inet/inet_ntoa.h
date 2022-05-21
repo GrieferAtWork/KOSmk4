@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8ebf5ef */
+/* HASH CRC-32:0x91649fdc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <netinet/bits/in.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,__localdep_inet_ntoa_r,(struct in_addr __inaddr, char __buf[16]),inet_ntoa_r,(__inaddr,__buf))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_WR(2),char *,__NOTHROW_NCX,__localdep_inet_ntoa_r,(struct in_addr __inaddr, char __buf[16]),inet_ntoa_r,(__inaddr,__buf))
 #else /* __CRT_HAVE_inet_ntoa_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/arpa.inet/inet_ntoa_r.h>

@@ -201,7 +201,7 @@ int _ungetch_nolock(int ch) {
 
 
 [[decl_include("<bits/types.h>"), requires_function(_cgets_s)]]
-char *_cgets([[nonnull]] char *__restrict buf) {
+char *_cgets([[inout]] char *__restrict buf) {
 	char *result = buf + 2;
 	size_t readsize;
 	if (_cgets_s(result, buf[0], &readsize) != 0)
@@ -212,8 +212,8 @@ char *_cgets([[nonnull]] char *__restrict buf) {
 
 [[decl_include("<bits/types.h>")]]
 [[requires_function(_getch, _ungetch)]]
-errno_t _cgets_s([[outp(bufsize)]] char *buf, size_t bufsize,
-                 [[nonnull]] size_t *__restrict p_readsize) {
+errno_t _cgets_s([[out(*p_readsize <= bufsize)]] char *buf, size_t bufsize,
+                 [[out]] size_t *__restrict p_readsize) {
 	int ch;
 	if unlikely(!bufsize)
 		return DOS_ENOSPC;
@@ -239,7 +239,7 @@ errno_t _cgets_s([[outp(bufsize)]] char *buf, size_t bufsize,
 
 [[impl_include("<libc/template/stdtty.h>")]]
 [[requires($has_function(_putch) || (defined(__CRT_HAVE_stdtty) && $has_function(fwrite)))]]
-int _cputs([[nonnull]] char const *__restrict str) {
+int _cputs([[in]] char const *__restrict str) {
 @@pp_if defined(__CRT_HAVE_stdtty) && $has_function(fwrite)@@
 	size_t len = strlen(str);
 	size_t ok  = fwrite(str, sizeof(char), len, stdtty);
@@ -259,7 +259,7 @@ int _cputs([[nonnull]] char const *__restrict str) {
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/template/stdtty.h>")]]
 [[requires(defined(__CRT_HAVE_stdtty) && $has_function(__stdio_common_vfprintf))]]
-__STDC_INT_AS_SSIZE_T __conio_common_vcprintf($uint64_t options, [[nonnull, format]] char const *format,
+__STDC_INT_AS_SSIZE_T __conio_common_vcprintf($uint64_t options, [[in, format]] char const *format,
                                               $locale_t locale, $va_list args) {
 	return __stdio_common_vfprintf(options, stdtty, format, locale, args);
 }
@@ -267,7 +267,7 @@ __STDC_INT_AS_SSIZE_T __conio_common_vcprintf($uint64_t options, [[nonnull, form
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/template/stdtty.h>")]]
 [[requires(defined(__CRT_HAVE_stdtty) && $has_function(__stdio_common_vfprintf_s))]]
-__STDC_INT_AS_SSIZE_T __conio_common_vcprintf_s($uint64_t options, [[nonnull, format]] char const *format,
+__STDC_INT_AS_SSIZE_T __conio_common_vcprintf_s($uint64_t options, [[in, format]] char const *format,
                                                 $locale_t locale, $va_list args) {
 	return __stdio_common_vfprintf_s(options, stdtty, format, locale, args);
 }
@@ -276,7 +276,7 @@ __STDC_INT_AS_SSIZE_T __conio_common_vcprintf_s($uint64_t options, [[nonnull, fo
 [[crt_intern_alias("__conio_common_vcprintf")]] /* Normal printf already supports positional arguments! */
 [[impl_include("<libc/template/stdtty.h>")]]
 [[requires(defined(__CRT_HAVE_stdtty) && $has_function(__stdio_common_vfprintf_p))]]
-__STDC_INT_AS_SSIZE_T __conio_common_vcprintf_p($uint64_t options, [[nonnull, format]] char const *format,
+__STDC_INT_AS_SSIZE_T __conio_common_vcprintf_p($uint64_t options, [[in, format]] char const *format,
                                                 $locale_t locale, $va_list args) {
 	return __stdio_common_vfprintf_p(options, stdtty, format, locale, args);
 }
@@ -295,7 +295,7 @@ __LOCAL_LIBC(conio_common_vcscanf_ungetc) ssize_t
 }
 @@pop_namespace@@
 )]]
-__STDC_INT_AS_SSIZE_T __conio_common_vcscanf($uint64_t options, [[nonnull, format]] char const *format,
+__STDC_INT_AS_SSIZE_T __conio_common_vcscanf($uint64_t options, [[in, format]] char const *format,
                                              $locale_t locale, $va_list args) {
 	(void)options;
 	(void)locale;
@@ -309,28 +309,28 @@ __STDC_INT_AS_SSIZE_T __conio_common_vcscanf($uint64_t options, [[nonnull, forma
 /* __conio_common_* wrappers.                                           */
 /************************************************************************/
 [[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcprintf)]]
-__STDC_INT_AS_SSIZE_T _vcprintf_l([[nonnull, format]] char const *format, $locale_t locale, $va_list args) {
+__STDC_INT_AS_SSIZE_T _vcprintf_l([[in, format]] char const *format, $locale_t locale, $va_list args) {
 	return __conio_common_vcprintf(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, format, locale, args);
 }
 
 [[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcprintf_s)]]
-__STDC_INT_AS_SSIZE_T _vcprintf_s_l([[nonnull, format]] char const *format, $locale_t locale, $va_list args) {
+__STDC_INT_AS_SSIZE_T _vcprintf_s_l([[in, format]] char const *format, $locale_t locale, $va_list args) {
 	return __conio_common_vcprintf_s(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, format, locale, args);
 }
 
 [[decl_include("<features.h>"), impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcprintf_p)]]
 [[crt_intern_alias("_vcprintf_l")]] /* Normal printf already supports positional arguments! */
-__STDC_INT_AS_SSIZE_T _vcprintf_p_l([[nonnull, format]] char const *format, $locale_t locale, $va_list args) {
+__STDC_INT_AS_SSIZE_T _vcprintf_p_l([[in, format]] char const *format, $locale_t locale, $va_list args) {
 	return __conio_common_vcprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, format, locale, args);
 }
 
 [[decl_include("<features.h>"), wunused, impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcscanf)]]
-__STDC_INT_AS_SSIZE_T _vcscanf_l([[nonnull, format]] char const *format, $locale_t locale, $va_list args) {
+__STDC_INT_AS_SSIZE_T _vcscanf_l([[in, format]] char const *format, $locale_t locale, $va_list args) {
 	return __conio_common_vcscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS, format, locale, args);
 }
 
 [[decl_include("<features.h>"), wunused, impl_include("<corecrt_stdio_config.h>"), requires_function(__conio_common_vcscanf)]]
-__STDC_INT_AS_SSIZE_T _vcscanf_s_l([[nonnull, format]] char const *format, $locale_t locale, $va_list args) {
+__STDC_INT_AS_SSIZE_T _vcscanf_s_l([[in, format]] char const *format, $locale_t locale, $va_list args) {
 	return __conio_common_vcscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS |
 	                              _CRT_INTERNAL_SCANF_SECURECRT,
 	                              format, locale, args);
@@ -341,28 +341,28 @@ __STDC_INT_AS_SSIZE_T _vcscanf_s_l([[nonnull, format]] char const *format, $loca
 /* Simple wrappers.                                                     */
 /************************************************************************/
 [[decl_include("<features.h>"), requires_function(_vcprintf_l)]]
-__STDC_INT_AS_SSIZE_T _vcprintf([[nonnull, format]] char const *format, $va_list args) {
+__STDC_INT_AS_SSIZE_T _vcprintf([[in, format]] char const *format, $va_list args) {
 	return _vcprintf_l(format, NULL, args);
 }
 
 [[decl_include("<features.h>"), requires_function(_vcprintf_s_l)]]
-__STDC_INT_AS_SSIZE_T _vcprintf_s([[nonnull, format]] char const *format, $va_list args) {
+__STDC_INT_AS_SSIZE_T _vcprintf_s([[in, format]] char const *format, $va_list args) {
 	return _vcprintf_s_l(format, NULL, args);
 }
 
 [[decl_include("<features.h>"), requires_function(_vcprintf_p_l)]]
 [[crt_intern_alias("_vcprintf")]] /* Normal printf already supports positional arguments! */
-__STDC_INT_AS_SSIZE_T _vcprintf_p([[nonnull, format]] char const *format, $va_list args) {
+__STDC_INT_AS_SSIZE_T _vcprintf_p([[in, format]] char const *format, $va_list args) {
 	return _vcprintf_p_l(format, NULL, args);
 }
 
 [[decl_include("<features.h>"), wunused, requires_function(_vcscanf_l)]]
-__STDC_INT_AS_SSIZE_T _vcscanf([[nonnull, format]] char const *format, $va_list args) {
+__STDC_INT_AS_SSIZE_T _vcscanf([[in, format]] char const *format, $va_list args) {
 	return _vcscanf_l(format, NULL, args);
 }
 
 [[decl_include("<features.h>"), wunused, requires_function(_vcscanf_s_l)]]
-__STDC_INT_AS_SSIZE_T _vcscanf_s([[nonnull, format]] char const *format, $va_list args) {
+__STDC_INT_AS_SSIZE_T _vcscanf_s([[in, format]] char const *format, $va_list args) {
 	return _vcscanf_s_l(format, NULL, args);
 }
 
@@ -371,18 +371,18 @@ __STDC_INT_AS_SSIZE_T _vcscanf_s([[nonnull, format]] char const *format, $va_lis
 /************************************************************************/
 /* Varargs wrappers.                                                    */
 /************************************************************************/
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cprintf([[nonnull, format]] char const *format, ...) %{printf("_vcprintf")}
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cprintf_l([[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vcprintf_l")}
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cprintf_s([[nonnull, format]] char const *format, ...) %{printf("_vcprintf_s")}
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cprintf_s_l([[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vcprintf_s_l")}
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cprintf([[in, format]] char const *format, ...) %{printf("_vcprintf")}
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cprintf_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vcprintf_l")}
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cprintf_s([[in, format]] char const *format, ...) %{printf("_vcprintf_s")}
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cprintf_s_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vcprintf_s_l")}
 [[crt_intern_alias("_cprintf")]] /* Normal printf already supports positional arguments! */
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cprintf_p([[nonnull, format]] char const *format, ...) %{printf("_vcprintf_p")}
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cprintf_p([[in, format]] char const *format, ...) %{printf("_vcprintf_p")}
 [[crt_intern_alias("_cprintf_l")]] /* Normal printf already supports positional arguments! */
-[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cprintf_p_l([[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vcprintf_p_l")}
-[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cscanf([[nonnull, format]] char const *format, ...) %{printf("_vcscanf")}
-[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cscanf_l([[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vcscanf_l")}
-[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cscanf_s([[nonnull, format]] char const *format, ...) %{printf("_vcscanf_s")}
-[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cscanf_s_l([[nonnull, format]] char const *format, $locale_t locale, ...) %{printf("_vcscanf_s_l")}
+[[decl_include("<features.h>")]] __STDC_INT_AS_SSIZE_T _cprintf_p_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vcprintf_p_l")}
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cscanf([[in, format]] char const *format, ...) %{printf("_vcscanf")}
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cscanf_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vcscanf_l")}
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cscanf_s([[in, format]] char const *format, ...) %{printf("_vcscanf_s")}
+[[decl_include("<features.h>"), wunused]] __STDC_INT_AS_SSIZE_T _cscanf_s_l([[in, format]] char const *format, $locale_t locale, ...) %{printf("_vcscanf_s_l")}
 
 
 
@@ -595,7 +595,7 @@ void clearkeybuf(void) {
 @@>> _conio_getpass(3)
 @@CONIO version of getpass(3). But note the slightly different variant from `<unistd.h>'
 [[guard, requires_function(getpass_r), exposed_name("getpass")]]
-char *_conio_getpass([[nonnull]] const char *prompt, [[nonnull]] char *str) {
+char *_conio_getpass([[in]] const char *prompt, [[inout]] char *str) {
 	unsigned char buflen = (unsigned char)str[0];
 	char *result = getpass_r(prompt, &str[2], buflen);
 	if (result != NULL) {
@@ -610,7 +610,7 @@ char *_conio_getpass([[nonnull]] const char *prompt, [[nonnull]] char *str) {
 @@>> cputsxy(3)
 @@Combination of `gotoxy(3)' and `cputs(3)'
 [[requires_function(gotoxy, _cputs)]]
-void cputsxy(int x, int y, char __KOS_FIXED_CONST *str) {
+void cputsxy(int x, int y, [[in]] char __KOS_FIXED_CONST *str) {
 	gotoxy(x, y);
 	_cputs(str);
 }
@@ -629,7 +629,7 @@ void putchxy(int x, int y, char ch) {
 [[requires((defined(__KOS__) && defined(__CRT_HAVE_stdtty) && $has_function(fileno, ioctl)) ||
            $has_function(_getch, _ungetch, _cscanf))]]
 [[impl_include("<libc/template/stdtty.h>", "<kos/ioctl/video.h>", "<bits/crt/inttypes.h>")]]
-int _conio_wherexy($uint16_t xy[2]) {
+int _conio_wherexy([[out]] $uint16_t xy[2]) {
 @@pp_if defined(__KOS__) && defined(__CRT_HAVE_stdtty) && $has_function(fileno, ioctl)@@
 	return (int)ioctl(fileno(stdtty), @VID_IOC_GETCURSOR@, xy);
 @@pp_else@@

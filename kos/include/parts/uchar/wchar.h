@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70d4b364 */
+/* HASH CRC-32:0xf9e67a57 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1610,17 +1610,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32width, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifdef __USE_BSD
 #if defined(__CRT_HAVE_fgetwln) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> fgetwln(3) */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char16_t *,__NOTHROW_NCX,fgetc16ln,(FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),fgetwln,(__fp,__lenp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),char16_t *,__NOTHROW_NCX,fgetc16ln,(FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),fgetwln,(__fp,__lenp))
 #elif defined(__CRT_HAVE_DOS$fgetwln)
 /* >> fgetwln(3) */
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char16_t *,__NOTHROW_NCX,fgetc16ln,(FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),fgetwln,(__fp,__lenp))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),char16_t *,__NOTHROW_NCX,fgetc16ln,(FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),fgetwln,(__fp,__lenp))
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetwln) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> fgetwln(3) */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char32_t *,__NOTHROW_NCX,fgetc32ln,(FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),fgetwln,(__fp,__lenp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),char32_t *,__NOTHROW_NCX,fgetc32ln,(FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),fgetwln,(__fp,__lenp))
 #elif defined(__CRT_HAVE_KOS$fgetwln)
 /* >> fgetwln(3) */
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char32_t *,__NOTHROW_NCX,fgetc32ln,(FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),fgetwln,(__fp,__lenp))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),char32_t *,__NOTHROW_NCX,fgetc32ln,(FILE *__restrict __fp, __SIZE_TYPE__ *__restrict __lenp),fgetwln,(__fp,__lenp))
 #endif /* ... */
 #if defined(__CRT_HAVE_wcslcat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> wcslcat(3) */

@@ -48,7 +48,7 @@ __SYSDECL_BEGIN
 @@code having been compiled with function frames enabled.
 @@@return: * : The actual number of pointers written to `array' (always `<= size')
 [[export_alias("__backtrace"), decl_include("<features.h>")]]
-__STDC_INT_AS_SIZE_T backtrace([[nonnull]] void **array,
+__STDC_INT_AS_SIZE_T backtrace([[out(return <= size)]] void **array,
                                __STDC_INT_AS_SIZE_T size);
 
 @@>> backtrace_symbols(3)
@@ -68,7 +68,7 @@ __STDC_INT_AS_SIZE_T backtrace([[nonnull]] void **array,
 @@@return: * :   A heap pointer to a vector of function names
 @@@return: NULL: Insufficient heap memory available
 [[export_alias("__backtrace_symbols"), decl_include("<features.h>")]]
-char **backtrace_symbols([[nonnull]] void *const *array,
+char **backtrace_symbols([[in(size)]] void *const *array,
                          __STDC_INT_AS_SIZE_T size);
 
 @@>> backtrace_symbols_fd(3)
@@ -78,7 +78,7 @@ char **backtrace_symbols([[nonnull]] void *const *array,
 @@written in total.
 [[export_alias("__backtrace_symbols_fd")]]
 [[decl_include("<features.h>", "<bits/types.h>")]]
-void backtrace_symbols_fd([[nonnull]] void *const *array,
+void backtrace_symbols_fd([[in(size)]] void *const *array,
                           __STDC_INT_AS_SIZE_T size,
                           $fd_t fd);
 

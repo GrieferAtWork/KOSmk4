@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd2dc445 */
+/* HASH CRC-32:0x24714793 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_LIBC_SCANF(4, 5) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__VLIBCCALL __localdep_format_scanf)(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("format_scanf");
+__LIBC __ATTR_ACCESS_RO(4) __ATTR_LIBC_SCANF(4, 5) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ (__VLIBCCALL __localdep_format_scanf)(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("format_scanf");
 #else /* __CRT_HAVE_format_scanf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_scanf.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75a0b664 */
+/* HASH CRC-32:0x4cf0494c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,8 +35,8 @@ __CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,__localdep_frealpath4,(__fd_t __
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_getdcwd) char *
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_getdcwd))(int __drive, char *__buf, __SIZE_TYPE__ __size) {
+__LOCAL_LIBC(_getdcwd) __ATTR_ACCESS_WRS(2, 3) char *
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_getdcwd))(int __drive, char *__buf, __SIZE_TYPE__ __bufsize) {
 	if __unlikely(__drive < __AT_DOS_DRIVEMIN || __drive > __AT_DOS_DRIVEMAX) {
 #ifdef __EINVAL
 		(void)__libc_seterrno(__EINVAL);
@@ -45,7 +45,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_getdcwd))(int __drive, char *__buf, 
 #endif /* !__EINVAL */
 		return __NULLPTR;
 	}
-	return (__NAMESPACE_LOCAL_SYM __localdep_frealpath4)(__AT_FDDRIVE_CWD(__drive), __buf, __size, 0);
+	return (__NAMESPACE_LOCAL_SYM __localdep_frealpath4)(__AT_FDDRIVE_CWD(__drive), __buf, __bufsize, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__getdcwd_defined

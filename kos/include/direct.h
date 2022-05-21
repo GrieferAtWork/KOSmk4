@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7e7f752 */
+/* HASH CRC-32:0xe4d71e8a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,15 +102,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL 
 #endif /* !... */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE__getdcwd) || defined(__CRT_HAVE__getdcwd_nolock) || (defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD))
-#define _getdcwd_nolock(drive, buf, size) _getdcwd(drive, buf, size)
+#define _getdcwd_nolock(drive, buf, bufsize) _getdcwd(drive, buf, bufsize)
 #endif /* __CRT_HAVE__getdcwd || __CRT_HAVE__getdcwd_nolock || (__CRT_HAVE_frealpath4 && __AT_FDDRIVE_CWD) */
 #ifdef __CRT_HAVE__getdcwd
-__CDECLARE(,char *,__NOTHROW_RPC,_getdcwd,(int __drive, char *__buf, size_t __size),(__drive,__buf,__size))
+__CDECLARE(__ATTR_ACCESS_WRS(2, 3),char *,__NOTHROW_RPC,_getdcwd,(int __drive, char *__buf, size_t __bufsize),(__drive,__buf,__bufsize))
 #elif defined(__CRT_HAVE__getdcwd_nolock)
-__CREDIRECT(,char *,__NOTHROW_RPC,_getdcwd,(int __drive, char *__buf, size_t __size),_getdcwd_nolock,(__drive,__buf,__size))
+__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),char *,__NOTHROW_RPC,_getdcwd,(int __drive, char *__buf, size_t __bufsize),_getdcwd_nolock,(__drive,__buf,__bufsize))
 #elif defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD)
 #include <libc/local/direct/_getdcwd.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_getdcwd, __FORCELOCAL __ATTR_ARTIFICIAL char *__NOTHROW_RPC(__LIBCCALL _getdcwd)(int __drive, char *__buf, size_t __size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd))(__drive, __buf, __size); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_getdcwd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WRS(2, 3) char *__NOTHROW_RPC(__LIBCCALL _getdcwd)(int __drive, char *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd))(__drive, __buf, __bufsize); })
 #endif /* ... */
 #ifdef __CRT_HAVE__chdrive
 __CDECLARE(,int,__NOTHROW_RPC,_chdrive,(int __drive),(__drive))
@@ -123,7 +123,7 @@ __CDECLARE_OPT(,__ULONG32_TYPE__,__NOTHROW_RPC,_getdrives,(void),())
 
 #if !defined(_GETDISKFREE_DEFINED) && defined(__CRT_HAVE__getdiskfree)
 #define _GETDISKFREE_DEFINED
-__CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
+__CDECLARE(__ATTR_ACCESS_WR(2),unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
 #endif /* !_GETDISKFREE_DEFINED && __CRT_HAVE__getdiskfree */
 #ifndef __getcwd_defined
 #define __getcwd_defined
@@ -167,10 +167,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #endif /* !... */
 #endif /* !__rmdir_defined */
 #ifdef __CRT_HAVE__mkdir
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_mkdir,(char const *__path),(__path))
+__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,_mkdir,(char const *__path),(__path))
 #elif defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))
 #include <libc/local/direct/_mkdir.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _mkdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mkdir))(__path); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL _mkdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mkdir))(__path); })
 #endif /* ... */
 /* DOS  normally defines  mkdir() as  the 1-argument  form, but for
  * compatibility with <sys/stat.h>, we define it as the  2-argument

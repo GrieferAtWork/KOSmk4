@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13751d13 */
+/* HASH CRC-32:0x5b781a29 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3084,7 +3084,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mkdtemp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #if !defined(__setkey_defined) && defined(__CRT_HAVE_setkey)
 #define __setkey_defined
 /* >> setkey(3), setkey_r(3) */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setkey,(char const *__key),(__key))
+__CDECLARE_VOID(,__NOTHROW_NCX,setkey,(char const *__key),(__key))
 #endif /* !__setkey_defined && __CRT_HAVE_setkey */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,grantpt,(__fd_t __fd),(__fd))
 #ifdef __CRT_HAVE_unlockpt

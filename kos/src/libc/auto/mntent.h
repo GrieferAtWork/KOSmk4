@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f041c03 */
+/* HASH CRC-32:0xd4025b86 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,27 +31,27 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> endmntent(3) */
-INTDEF NONNULL((1)) int NOTHROW_RPC_NOKOS(LIBDCALL libd_endmntent)(FILE *stream);
+INTDEF ATTR_ACCESS_RW(1) int NOTHROW_RPC_NOKOS(LIBDCALL libd_endmntent)(FILE *stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> endmntent(3) */
-INTDEF NONNULL((1)) int NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream);
+INTDEF ATTR_ACCESS_RW(1) int NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getmntent(3), getmntent_r(3) */
-INTDEF NONNULL((1)) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent)(FILE *stream);
+INTDEF ATTR_ACCESS_RW(1) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent)(FILE *stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getmntent(3), getmntent_r(3) */
-INTDEF NONNULL((1)) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream);
+INTDEF ATTR_ACCESS_RW(1) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getmntent(3), getmntent_r(3) */
-INTDEF NONNULL((1, 2, 3)) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((2, 3)) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getmntent(3), getmntent_r(3) */
-INTDEF NONNULL((1, 2, 3)) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((2, 3)) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> addmntent(3)
@@ -59,7 +59,7 @@ INTDEF NONNULL((1, 2, 3)) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent_r)(
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
-INTDEF NONNULL((1, 2)) int (LIBDCALL libd_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((2)) int (LIBDCALL libd_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> addmntent(3)
@@ -67,7 +67,7 @@ INTDEF NONNULL((1, 2)) int (LIBDCALL libd_addmntent)(FILE *__restrict stream, st
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
-INTDEF NONNULL((1, 2)) int (LIBCCALL libc_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((2)) int (LIBCCALL libc_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> hasmntopt(3)

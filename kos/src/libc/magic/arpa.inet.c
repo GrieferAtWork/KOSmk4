@@ -129,7 +129,7 @@ struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
 @@    0x123 (hex)
 @@    0123  (oct)
 [[pure, impl_include("<netinet/in.h>"), decl_include("<net/bits/types.h>")]]
-in_addr_t inet_addr([[nonnull]] char const *__restrict cp) {
+in_addr_t inet_addr([[in]] char const *__restrict cp) {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 0) || *cp)
 		return @INADDR_NONE@;
@@ -155,7 +155,7 @@ char *inet_ntoa(struct in_addr inaddr) {
 [[decl_include("<netinet/bits/in.h>")]]
 [[impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
 [[nonnull]]
-char *inet_ntoa_r(struct in_addr inaddr, [[nonnull]] char buf[16]) {
+char *inet_ntoa_r(struct in_addr inaddr, [[out]] char buf[16]) {
 	uint32_t addr = __hybrid_betoh32(inaddr.@s_addr@);
 	sprintf(buf, "%u.%u.%u.%u",
 	        (unsigned int)(u8)((addr & __UINT32_C(0xff000000)) >> 24),
@@ -171,7 +171,7 @@ char *inet_ntoa_r(struct in_addr inaddr, [[nonnull]] char buf[16]) {
 @@the return value is in host-endian, rather than net-endian
 [[decl_include("<hybrid/typecore.h>")]]
 [[pure, impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
-$uint32_t inet_network([[nonnull]] char const *__restrict cp) {
+$uint32_t inet_network([[in]] char const *__restrict cp) {
 	struct @in_addr@ addr;
 	if (!inet_paton((char const **)&cp, &addr, 1) || *cp)
 		return @INADDR_NONE@;
@@ -198,8 +198,8 @@ $uint32_t inet_network([[nonnull]] char const *__restrict cp) {
 @@@return: 0: Bad input format
 @@@return: 1: Success
 [[decl_include("<netinet/bits/in.h>")]]
-int inet_aton([[nonnull]] char const *__restrict cp,
-              [[nonnull]] struct in_addr *__restrict inp) {
+int inet_aton([[in]] char const *__restrict cp,
+              [[out]] struct in_addr *__restrict inp) {
 	return inet_paton((char const **)&cp, inp, 0) && !*cp;
 }
 
@@ -221,8 +221,8 @@ int inet_aton([[nonnull]] char const *__restrict cp,
 [[wunused]]
 [[decl_include("<netinet/bits/in.h>")]]
 [[impl_include("<hybrid/__byteswap.h>", "<libc/template/hex.h>")]]
-int inet_paton([[nonnull]] char const **__restrict pcp,
-               [[nonnull]] struct in_addr *__restrict inp,
+int inet_paton([[inout]] char const **__restrict pcp,
+               [[out]] struct in_addr *__restrict inp,
                int network_addr) {
 	uint32_t result;
 	uint32_t parts[4];
@@ -370,7 +370,7 @@ err:
 @@@return: NULL: [errno=EMSGSIZE]: The given `len' is too small
 [[impl_include("<libc/errno.h>")]]
 [[decl_include("<hybrid/typecore.h>")]]
-char *inet_neta($uint32_t net, [[out(<= len)]] char *buf, $size_t len) {
+char *inet_neta($uint32_t net, [[out(? <= len)]] char *buf, $size_t len) {
 	size_t reqlen;
 	if (net <= 0xff) {
 		if (!net) {

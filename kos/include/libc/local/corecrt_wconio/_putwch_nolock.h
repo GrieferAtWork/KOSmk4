@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9a69331 */
+/* HASH CRC-32:0x17d7ba35 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,32 +30,32 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),putwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE__putwc_nolock)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),_putwc_nolock,(__wc,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),_putwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE__fputwc_nolock)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),putwc,(__wc,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_fputwc)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),fputwc,(__wc,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),__WINT_TYPE__,__THROWING,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),fputwc,(__wc,__stream))
 #else /* ... */
 #undef __local___localdep_fputwc_unlocked_defined
 #endif /* !... */

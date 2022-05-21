@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a7e624a */
+/* HASH CRC-32:0x2a682f70 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dyn_string_insert_defined
 #define __local___localdep_dyn_string_insert_defined
 #ifdef __CRT_HAVE_dyn_string_insert
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,__localdep_dyn_string_insert,(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, struct dyn_string __KOS_FIXED_CONST *__src),dyn_string_insert,(__dst,__index,__src))
+__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_dyn_string_insert,(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, struct dyn_string __KOS_FIXED_CONST *__src),dyn_string_insert,(__dst,__index,__src))
 #elif defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/dyn-string/dyn_string_insert.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_dyn_string_insert_defined
 #endif /* !... */
 #endif /* !__local___localdep_dyn_string_insert_defined */
-__LOCAL_LIBC(dyn_string_insert_char) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(dyn_string_insert_char) __ATTR_ACCESS_RW(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dyn_string_insert_char))(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, int __ch) {
 	char __chstr[1];
 	struct dyn_string __fakesrc;

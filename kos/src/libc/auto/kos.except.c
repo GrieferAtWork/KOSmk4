@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed6f4d47 */
+/* HASH CRC-32:0xe2d5852 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -675,7 +675,7 @@ for (local name: classes.keys.sorted()) {
  * If doing this is possible, fill in `*result' and return `true'.
  * Otherwise, `*result' is left in an undefined state, and `false'
  * is returned. */
-INTERN ATTR_SECTION(".text.crt.except.io.utility") WUNUSED NONNULL((1, 2)) bool
+INTERN ATTR_SECTION(".text.crt.except.io.utility") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) bool
 NOTHROW_NCX(LIBKCALL libc_except_as_signal)(struct exception_data const *__restrict self,
                                             struct __siginfo_struct *__restrict result) {
 	except_code_t code = self->e_code;
@@ -1185,7 +1185,7 @@ NOTHROW(LIBKCALL libc_except_priority)(except_code_t code) {
  * errors, prominent error arguments.
  * @param: flags: Set of `EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_*'
  * @return: * : The usual pformatprinter-compatible return value */
-INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1, 3)) ssize_t
+INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_ACCESS_RO(3) NONNULL((1)) ssize_t
 NOTHROW_NCX(LIBKCALL libc_except_print_short_description)(pformatprinter printer,
                                                           void *arg,
                                                           struct exception_data const *data,
@@ -1488,7 +1488,7 @@ err:
 /* >> except_nesting_begin(3)
  * Begin a nested  TRY-block. (i.e. inside  of another EXCEPT  block)
  * Don't call this function directly; use `NESTED_EXCEPTION' instead. */
-INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_ACCESS_RW(1) void
 NOTHROW(__EXCEPT_NESTING_BEGIN_CC libc_except_nesting_begin)(struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info = libc_except_info();
 	if (info->ei_code == EXCEPT_CODEOF(E_OK)) {
@@ -1511,8 +1511,8 @@ NOTHROW(__EXCEPT_NESTING_BEGIN_CC libc_except_nesting_begin)(struct _exception_n
 #include <hybrid/__assert.h>
 /* >> except_nesting_end(3)
  * End a nested TRY-block. (i.e. inside of another EXCEPT block) */
-INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
-NOTHROW(__EXCEPT_NESTING_END_CC libc_except_nesting_end)(struct _exception_nesting_data *__restrict saved) {
+INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_ACCESS_RO(1) void
+NOTHROW(__EXCEPT_NESTING_END_CC libc_except_nesting_end)(struct _exception_nesting_data const *__restrict saved) {
 	struct exception_info *info;
 	if unlikely(!saved->en_size)
 		return; /* No-op */

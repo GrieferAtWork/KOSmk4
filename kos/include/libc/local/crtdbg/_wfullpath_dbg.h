@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56092b21 */
+/* HASH CRC-32:0xb7ff7b19 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wfullpath_dbg) __ATTR_WUNUSED __ATTR_NONNULL((2)) __WCHAR16_TYPE__ *
+__LOCAL_LIBC(_wfullpath_dbg) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __WCHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_wfullpath_dbg))(__WCHAR16_TYPE__ *__full_path, __WCHAR16_TYPE__ const *__path, __SIZE_TYPE__ __buflen, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;

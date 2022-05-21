@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3966c7a3 */
+/* HASH CRC-32:0x99998328 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,24 +50,24 @@ INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBDCALL libc__strdup_dbg)(char con
 INTDEF ATTR_MALLOC WUNUSED __WCHAR16_TYPE__ *NOTHROW_NCX(LIBDCALL libc__wcsdup_dbg)(__WCHAR16_TYPE__ const *string, int block_type, char const *filename, int line);
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBDCALL libc__tempnam_dbg)(char const *dir_name, char const *file_prefix, int block_type, char const *filename, int line);
 INTDEF WUNUSED __WCHAR16_TYPE__ *NOTHROW_NCX(LIBDCALL libc__wtempnam_dbg)(__WCHAR16_TYPE__ const *dir_name, __WCHAR16_TYPE__ const *file_prefix, int block_type, char const *filename, int line);
-INTDEF WUNUSED NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libc__fullpath_dbg)(char *full_path, char const *path, size_t bufsize, int block_type, char const *filename, int line);
-INTDEF WUNUSED NONNULL((2)) __WCHAR16_TYPE__ *NOTHROW_NCX(LIBDCALL libc__wfullpath_dbg)(__WCHAR16_TYPE__ *full_path, __WCHAR16_TYPE__ const *path, size_t buflen, int block_type, char const *filename, int line);
-INTDEF WUNUSED char *NOTHROW_NCX(LIBDCALL libc__getcwd_dbg)(char *buf, __STDC_INT_AS_SIZE_T bufsize, int block_type, char const *filename, int line);
-INTDEF WUNUSED __WCHAR16_TYPE__ *NOTHROW_NCX(LIBDCALL libc__wgetcwd_dbg)(__WCHAR16_TYPE__ *buf, __STDC_INT_AS_SIZE_T buflen, int block_type, char const *filename, int line);
-INTDEF WUNUSED char *NOTHROW_NCX(LIBDCALL libc__getdcwd_dbg)(int driveno, char *buf, __STDC_INT_AS_SIZE_T bufsize, int block_type, char const *filename, int line);
-INTDEF WUNUSED __WCHAR16_TYPE__ *NOTHROW_NCX(LIBDCALL libc__wgetdcwd_dbg)(int driveno, __WCHAR16_TYPE__ *buf, __STDC_INT_AS_SIZE_T buflen, int block_type, char const *filename, int line);
-INTDEF _Check_return_wat_ NONNULL((3)) errno_t NOTHROW_NCX(LIBDCALL libc__dupenv_s_dbg)(char **pbuf, size_t *pbufsize, char const *varname, int block_type, char const *filename, int line);
-INTDEF _Check_return_wat_ NONNULL((3)) errno_t NOTHROW_NCX(LIBDCALL libc__wdupenv_s_dbg)(__WCHAR16_TYPE__ **pbuf, size_t *pbuflen, __WCHAR16_TYPE__ const *varname, int block_type, char const *filename, int line);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) char *NOTHROW_NCX(LIBDCALL libc__fullpath_dbg)(char *full_path, char const *path, size_t bufsize, int block_type, char const *filename, int line);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) __WCHAR16_TYPE__ *NOTHROW_NCX(LIBDCALL libc__wfullpath_dbg)(__WCHAR16_TYPE__ *full_path, __WCHAR16_TYPE__ const *path, size_t buflen, int block_type, char const *filename, int line);
+INTDEF WUNUSED ATTR_ACCESS_WRS(1, 2) char *NOTHROW_NCX(LIBDCALL libc__getcwd_dbg)(char *buf, __STDC_INT_AS_SIZE_T bufsize, int block_type, char const *filename, int line);
+INTDEF WUNUSED ATTR_ACCESS_WRS(1, 2) __WCHAR16_TYPE__ *NOTHROW_NCX(LIBDCALL libc__wgetcwd_dbg)(__WCHAR16_TYPE__ *buf, __STDC_INT_AS_SIZE_T buflen, int block_type, char const *filename, int line);
+INTDEF WUNUSED ATTR_ACCESS_WRS(2, 3) char *NOTHROW_NCX(LIBDCALL libc__getdcwd_dbg)(int driveno, char *buf, __STDC_INT_AS_SIZE_T bufsize, int block_type, char const *filename, int line);
+INTDEF WUNUSED ATTR_ACCESS_WRS(2, 3) __WCHAR16_TYPE__ *NOTHROW_NCX(LIBDCALL libc__wgetdcwd_dbg)(int driveno, __WCHAR16_TYPE__ *buf, __STDC_INT_AS_SIZE_T buflen, int block_type, char const *filename, int line);
+INTDEF _Check_return_wat_ ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBDCALL libc__dupenv_s_dbg)(char **pbuf, size_t *pbufsize, char const *varname, int block_type, char const *filename, int line);
+INTDEF _Check_return_wat_ ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBDCALL libc__wdupenv_s_dbg)(__WCHAR16_TYPE__ **pbuf, size_t *pbuflen, __WCHAR16_TYPE__ const *varname, int block_type, char const *filename, int line);
 INTDEF int NOTHROW_NCX(LIBDCALL libc__CrtCheckMemory)(void);
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libc__CrtDoForAllClientObjects)(_PFNCRTDOFORALLCLIENTOBJECTS pfn, void *context);
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libc__CrtIsValidPointer)(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, int writable);
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libc__CrtIsValidHeapPointer)(void const *heap_ptr);
 INTDEF int NOTHROW_NCX(LIBDCALL libc__CrtIsMemoryBlock)(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, __LONG32_TYPE__ *prequest_number, char **filename, int *line);
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libc__CrtReportBlockType)(void const *ptr);
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libc__CrtMemCheckpoint)(_CrtMemState *state);
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBDCALL libc__CrtMemDifference)(_CrtMemState *state, _CrtMemState const *old_state, _CrtMemState const *new_state);
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libc__CrtMemDumpAllObjectsSince)(_CrtMemState const *state);
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libc__CrtMemDumpStatistics)(_CrtMemState const *state);
+INTDEF void NOTHROW_NCX(LIBDCALL libc__CrtMemCheckpoint)(_CrtMemState *state);
+INTDEF int NOTHROW_NCX(LIBDCALL libc__CrtMemDifference)(_CrtMemState *state, _CrtMemState const *old_state, _CrtMemState const *new_state);
+INTDEF void NOTHROW_NCX(LIBDCALL libc__CrtMemDumpAllObjectsSince)(_CrtMemState const *state);
+INTDEF void NOTHROW_NCX(LIBDCALL libc__CrtMemDumpStatistics)(_CrtMemState const *state);
 INTDEF int NOTHROW_NCX(LIBDCALL libc__CrtDumpMemoryLeaks)(void);
 INTDEF int NOTHROW_NCX(LIBDCALL libc__CrtSetCheckCount)(int check_count);
 INTDEF ATTR_PURE int NOTHROW_NCX(LIBDCALL libc__CrtGetCheckCount)(void);

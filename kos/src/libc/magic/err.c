@@ -61,12 +61,12 @@ __SYSDECL_BEGIN
 @@>> warn(3), vwarn(3)
 @@Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n'
 [[cp_stdio]]
-void warn([[nullable, format("printf")]] char const *format, ...)
+void warn([[in_opt, format("printf")]] char const *format, ...)
 	%{printf("vwarn")}
 
 [[cp_stdio, doc_alias("warn")]]
 [[requires_function(vwarnc), impl_include("<libc/errno.h>")]]
-void vwarn([[nullable, format("printf")]] char const *format, $va_list args) {
+void vwarn([[in_opt, format("printf")]] char const *format, $va_list args) {
 	vwarnc(__libc_geterrno_or(0), format, args);
 }
 
@@ -76,7 +76,7 @@ void vwarn([[nullable, format("printf")]] char const *format, $va_list args) {
 @@>> warnc(3), vwarnc(3)
 @@Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n'
 [[guard, cp_stdio, decl_include("<bits/types.h>")]]
-void warnc($errno_t used_errno, [[nullable, format("printf")]] char const *format, ...)
+void warnc($errno_t used_errno, [[in_opt, format("printf")]] char const *format, ...)
 	%{printf("vwarnc")}
 
 [[guard, cp_stdio, doc_alias("warnc")]]
@@ -86,7 +86,7 @@ void warnc($errno_t used_errno, [[nullable, format("printf")]] char const *forma
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) &&
            $has_function(fprintf) && $has_function(vfprintf) && $has_function(strerror))]]
-void vwarnc($errno_t used_errno, [[nullable, format("printf")]] char const *format, $va_list args) {
+void vwarnc($errno_t used_errno, [[in_opt, format("printf")]] char const *format, $va_list args) {
 @@pp_if $has_function(flockfile) && $has_function(funlockfile)@@
 	flockfile(stderr);
 @@pp_endif@@
@@ -108,7 +108,7 @@ void vwarnc($errno_t used_errno, [[nullable, format("printf")]] char const *form
 @@>> warnx(3), vwarnx(3)
 @@Print to stderr: `<program_invocation_short_name>: <format...>\n'
 [[cp_stdio]]
-void warnx([[nullable, format("printf")]] char const *format, ...)
+void warnx([[in_opt, format("printf")]] char const *format, ...)
 	%{printf("vwarnx")}
 
 [[cp_stdio, doc_alias("warnx")]]
@@ -118,7 +118,7 @@ void warnx([[nullable, format("printf")]] char const *format, ...)
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) &&
            $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc))]]
-void vwarnx([[nullable, format("printf")]] char const *format, $va_list args) {
+void vwarnx([[in_opt, format("printf")]] char const *format, $va_list args) {
 @@pp_if $has_function(flockfile) && $has_function(funlockfile)@@
 	flockfile(stderr);
 @@pp_endif@@
@@ -135,12 +135,12 @@ void vwarnx([[nullable, format("printf")]] char const *format, $va_list args) {
 @@>> err(3), verr(3)
 @@Same as `warn()', but follow up by calling `exit(status)'
 [[throws, noreturn]]
-void err(int status, [[nullable, format("printf")]] char const *format, ...)
+void err(int status, [[in_opt, format("printf")]] char const *format, ...)
 	%{printf("verr")}
 
 [[doc_alias("err"), throws, noreturn]]
 [[requires_function(verrc), impl_include("<libc/errno.h>")]]
-void verr(int status, [[nullable, format("printf")]] char const *format, $va_list args) {
+void verr(int status, [[in_opt, format("printf")]] char const *format, $va_list args) {
 	verrc(status, __libc_geterrno_or(0), format, args);
 }
 
@@ -149,13 +149,13 @@ void verr(int status, [[nullable, format("printf")]] char const *format, $va_lis
 @@>> errc(3), verrc(3)
 @@Same as `warnc()', but follow up by calling `exit(status)'
 [[guard, throws, noreturn, decl_include("<bits/types.h>")]]
-void errc(int status, $errno_t used_errno, [[nullable, format("printf")]] char const *format, ...)
+void errc(int status, $errno_t used_errno, [[in_opt, format("printf")]] char const *format, ...)
 	%{printf("verrc")}
 
 [[guard, doc_alias("errc"), throws, noreturn]]
 [[decl_include("<bits/types.h>")]]
 [[requires_function(vwarnc, exit)]]
-void verrc(int status, $errno_t used_errno, [[nullable, format("printf")]] char const *format, $va_list args) {
+void verrc(int status, $errno_t used_errno, [[in_opt, format("printf")]] char const *format, $va_list args) {
 	vwarnc(used_errno, format, args);
 	exit(status);
 }
@@ -165,14 +165,14 @@ void verrc(int status, $errno_t used_errno, [[nullable, format("printf")]] char 
 @@>> errx(3), verrx(3)
 @@Same as `warnx()', but follow up by calling `exit(status)'
 [[throws, noreturn, requires_function(verrx)]]
-void errx(int status, [[nullable, format("printf")]] char const *format, ...) {
+void errx(int status, [[in_opt, format("printf")]] char const *format, ...) {
 	va_list args;
 	va_start(args, format);
 	verrx(status, format, args);
 }
 
 [[doc_alias("errx"), throws, noreturn, requires_function(vwarnx, exit)]]
-void verrx(int status, [[nullable, format("printf")]] char const *format, $va_list args) {
+void verrx(int status, [[in_opt, format("printf")]] char const *format, $va_list args) {
 	vwarnx(format, args);
 	exit(status);
 }

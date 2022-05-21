@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9f803e2 */
+/* HASH CRC-32:0x1a152aa6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,26 +31,26 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <hybrid/__byteswap.h>
 #include <hybrid/__unaligned.h>
-INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_PURE WUNUSED NONNULL((1)) u_int
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) u_int
 NOTHROW_NCX(LIBCCALL libc_ns_get16)(u_char const *srcptr) {
 	return __hybrid_unaligned_getbe16(srcptr);
 }
 #include <hybrid/__byteswap.h>
 #include <hybrid/__unaligned.h>
-INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_PURE WUNUSED NONNULL((1)) u_long
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) u_long
 NOTHROW_NCX(LIBCCALL libc_ns_get32)(u_char const *srcptr) {
 	return __hybrid_unaligned_getbe32(srcptr);
 }
 #include <hybrid/__byteswap.h>
 #include <hybrid/__unaligned.h>
-INTERN ATTR_SECTION(".text.crt.net.nameser") NONNULL((2)) void
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_ACCESS_WR(2) void
 NOTHROW_NCX(LIBCCALL libc_ns_put16)(u_int val,
                                     u_char *destptr) {
 	__hybrid_unaligned_setbe16(destptr, val);
 }
 #include <hybrid/__byteswap.h>
 #include <hybrid/__unaligned.h>
-INTERN ATTR_SECTION(".text.crt.net.nameser") NONNULL((2)) void
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_ACCESS_WR(2) void
 NOTHROW_NCX(LIBCCALL libc_ns_put32)(u_long val,
                                     u_char *destptr) {
 	__hybrid_unaligned_setbe32(destptr, val);

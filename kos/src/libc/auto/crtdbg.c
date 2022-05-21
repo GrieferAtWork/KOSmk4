@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68ec11c1 */
+/* HASH CRC-32:0x4c6fa259 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -232,7 +232,7 @@ NOTHROW_NCX(LIBDCALL libc__wtempnam_dbg)(__WCHAR16_TYPE__ const *dir_name,
 	COMPILER_IMPURE();
 	return NULL;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED NONNULL((2)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) char *
 NOTHROW_NCX(LIBDCALL libc__fullpath_dbg)(char *full_path,
                                          char const *path,
                                          size_t bufsize,
@@ -244,7 +244,7 @@ NOTHROW_NCX(LIBDCALL libc__fullpath_dbg)(char *full_path,
 	(void)line;
 	return libc__fullpath(full_path, path, bufsize);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED NONNULL((2)) __WCHAR16_TYPE__ *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) __WCHAR16_TYPE__ *
 NOTHROW_NCX(LIBDCALL libc__wfullpath_dbg)(__WCHAR16_TYPE__ *full_path,
                                           __WCHAR16_TYPE__ const *path,
                                           size_t buflen,
@@ -261,7 +261,7 @@ NOTHROW_NCX(LIBDCALL libc__wfullpath_dbg)(__WCHAR16_TYPE__ *full_path,
 	COMPILER_IMPURE();
 	return NULL;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ACCESS_WRS(1, 2) char *
 NOTHROW_NCX(LIBDCALL libc__getcwd_dbg)(char *buf,
                                        __STDC_INT_AS_SIZE_T bufsize,
                                        int block_type,
@@ -272,7 +272,7 @@ NOTHROW_NCX(LIBDCALL libc__getcwd_dbg)(char *buf,
 	(void)line;
 	return libc_getcwd(buf, (size_t)bufsize);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED __WCHAR16_TYPE__ *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ACCESS_WRS(1, 2) __WCHAR16_TYPE__ *
 NOTHROW_NCX(LIBDCALL libc__wgetcwd_dbg)(__WCHAR16_TYPE__ *buf,
                                         __STDC_INT_AS_SIZE_T buflen,
                                         int block_type,
@@ -283,7 +283,7 @@ NOTHROW_NCX(LIBDCALL libc__wgetcwd_dbg)(__WCHAR16_TYPE__ *buf,
 	(void)line;
 	return (__WCHAR16_TYPE__ *)libd_wgetcwd((char16_t *)buf, buflen);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ACCESS_WRS(2, 3) char *
 NOTHROW_NCX(LIBDCALL libc__getdcwd_dbg)(int driveno,
                                         char *buf,
                                         __STDC_INT_AS_SIZE_T bufsize,
@@ -295,7 +295,7 @@ NOTHROW_NCX(LIBDCALL libc__getdcwd_dbg)(int driveno,
 	(void)line;
 	return libc__getdcwd(driveno, buf, bufsize);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED __WCHAR16_TYPE__ *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ACCESS_WRS(2, 3) __WCHAR16_TYPE__ *
 NOTHROW_NCX(LIBDCALL libc__wgetdcwd_dbg)(int driveno,
                                          __WCHAR16_TYPE__ *buf,
                                          __STDC_INT_AS_SIZE_T buflen,
@@ -312,7 +312,7 @@ NOTHROW_NCX(LIBDCALL libc__wgetdcwd_dbg)(int driveno,
 	COMPILER_IMPURE();
 	return NULL;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _Check_return_wat_ NONNULL((3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _Check_return_wat_ ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) errno_t
 NOTHROW_NCX(LIBDCALL libc__dupenv_s_dbg)(char **pbuf,
                                          size_t *pbufsize,
                                          char const *varname,
@@ -324,7 +324,7 @@ NOTHROW_NCX(LIBDCALL libc__dupenv_s_dbg)(char **pbuf,
 	(void)line;
 	return libc__dupenv_s(pbuf, pbufsize, varname);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _Check_return_wat_ NONNULL((3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") _Check_return_wat_ ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) errno_t
 NOTHROW_NCX(LIBDCALL libc__wdupenv_s_dbg)(__WCHAR16_TYPE__ **pbuf,
                                           size_t *pbuflen,
                                           __WCHAR16_TYPE__ const *varname,
@@ -388,11 +388,11 @@ NOTHROW_NCX(LIBDCALL libc__CrtReportBlockType)(void const *ptr) {
 	COMPILER_IMPURE();
 	return ptr ? 1 /*_NORMAL_BLOCK*/ : 0 /*_FREE_BLOCK*/;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") NONNULL((1)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") void
 NOTHROW_NCX(LIBDCALL libc__CrtMemCheckpoint)(_CrtMemState *state) {
 	libc_bzero(state, sizeof(*state));
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") NONNULL((1, 2, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
 NOTHROW_NCX(LIBDCALL libc__CrtMemDifference)(_CrtMemState *state,
                                              _CrtMemState const *old_state,
                                              _CrtMemState const *new_state) {
@@ -401,12 +401,12 @@ NOTHROW_NCX(LIBDCALL libc__CrtMemDifference)(_CrtMemState *state,
 	libc_bzero(state, sizeof(*state));
 	return 0;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") NONNULL((1)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") void
 NOTHROW_NCX(LIBDCALL libc__CrtMemDumpAllObjectsSince)(_CrtMemState const *state) {
 	COMPILER_IMPURE();
 	(void)state;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") NONNULL((1)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") void
 NOTHROW_NCX(LIBDCALL libc__CrtMemDumpStatistics)(_CrtMemState const *state) {
 	COMPILER_IMPURE();
 	(void)state;

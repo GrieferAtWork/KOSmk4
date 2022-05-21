@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x852878f8 */
+/* HASH CRC-32:0xe43c19a7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
-__LOCAL_LIBC(getgrnam) __ATTR_WUNUSED __ATTR_NONNULL((1)) struct group *
+__LOCAL_LIBC(getgrnam) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) struct group *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getgrnam))(char const *__restrict __name) {
 	struct group *__result;
 	(__NAMESPACE_LOCAL_SYM __localdep_setgrent)();

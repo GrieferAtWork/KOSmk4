@@ -80,8 +80,8 @@ __SYSDECL_BEGIN
 @@@return: 0           : `name' is matched by `pattern'
 @@@return: FNM_NOMATCH : `name' is not matched by `pattern'
 [[pure, wunused, decl_include("<features.h>")]]
-int fnmatch([[nonnull]] char const *pattern,
-            [[nonnull]] char const *name,
+int fnmatch([[in]] char const *pattern,
+            [[in]] char const *name,
             __STDC_INT_AS_UINT_T match_flags) {
 	char card_post;
 	/* TODO: Support for `FNM_NOESCAPE' */

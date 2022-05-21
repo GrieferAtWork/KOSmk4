@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x965dffc1 */
+/* HASH CRC-32:0xf1a7152c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ NOTHROW(LIBCCALL libc_imaxdiv)(intmax_t numer,
 	result.rem  = numer % denom;
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) intmax_t
 NOTHROW_NCX(LIBCCALL libc_strtoimax)(char const *__restrict nptr,
                                      char **endptr,
                                      __STDC_INT_AS_UINT_T base) {
@@ -53,7 +53,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoimax)(char const *__restrict nptr,
 	return (intmax_t)libc_strto64(nptr, endptr, base);
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) uintmax_t
 NOTHROW_NCX(LIBCCALL libc_strtoumax)(char const *__restrict nptr,
                                      char **endptr,
                                      __STDC_INT_AS_UINT_T base) {
@@ -63,7 +63,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoumax)(char const *__restrict nptr,
 	return (uintmax_t)libc_strtou64(nptr, endptr, base);
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) intmax_t
 NOTHROW_NCX(LIBDCALL libd_wcstoimax)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      __STDC_INT_AS_UINT_T base) {
@@ -73,7 +73,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoimax)(char16_t const *__restrict nptr,
 	return (intmax_t)libd_wcsto64(nptr, endptr, base);
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) intmax_t
 NOTHROW_NCX(LIBKCALL libc_wcstoimax)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      __STDC_INT_AS_UINT_T base) {
@@ -83,7 +83,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoimax)(char32_t const *__restrict nptr,
 	return (intmax_t)libc_wcsto64(nptr, endptr, base);
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) uintmax_t
 NOTHROW_NCX(LIBDCALL libd_wcstoumax)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      __STDC_INT_AS_UINT_T base) {
@@ -93,7 +93,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoumax)(char16_t const *__restrict nptr,
 	return (uintmax_t)libd_wcstou64(nptr, endptr, base);
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) uintmax_t
 NOTHROW_NCX(LIBKCALL libc_wcstoumax)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      __STDC_INT_AS_UINT_T base) {
@@ -103,7 +103,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoumax)(char32_t const *__restrict nptr,
 	return (uintmax_t)libc_wcstou64(nptr, endptr, base);
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
-INTERN ATTR_SECTION(".text.crt.unicode.locale.convert") ATTR_LEAF NONNULL((1)) intmax_t
+INTERN ATTR_SECTION(".text.crt.unicode.locale.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) intmax_t
 NOTHROW_NCX(LIBCCALL libc_strtoimax_l)(char const *__restrict nptr,
                                        char **endptr,
                                        __STDC_INT_AS_UINT_T base,
@@ -111,7 +111,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoimax_l)(char const *__restrict nptr,
 	(void)locale;
 	return libc_strtoimax(nptr, endptr, base);
 }
-INTERN ATTR_SECTION(".text.crt.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+INTERN ATTR_SECTION(".text.crt.unicode.locale.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) uintmax_t
 NOTHROW_NCX(LIBCCALL libc_strtoumax_l)(char const *__restrict nptr,
                                        char **endptr,
                                        __STDC_INT_AS_UINT_T base,
@@ -119,7 +119,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoumax_l)(char const *__restrict nptr,
 	(void)locale;
 	return libc_strtoumax(nptr, endptr, base);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) intmax_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) intmax_t
 NOTHROW_NCX(LIBDCALL libd_wcstoimax_l)(char16_t const *__restrict nptr,
                                        char16_t **endptr,
                                        __STDC_INT_AS_UINT_T base,
@@ -127,7 +127,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoimax_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcstoimax(nptr, endptr, base);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) intmax_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) intmax_t
 NOTHROW_NCX(LIBKCALL libc_wcstoimax_l)(char32_t const *__restrict nptr,
                                        char32_t **endptr,
                                        __STDC_INT_AS_UINT_T base,
@@ -135,7 +135,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoimax_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcstoimax(nptr, endptr, base);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) uintmax_t
 NOTHROW_NCX(LIBDCALL libd_wcstoumax_l)(char16_t const *__restrict nptr,
                                        char16_t **endptr,
                                        __STDC_INT_AS_UINT_T base,
@@ -143,7 +143,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoumax_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcstoumax(nptr, endptr, base);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) uintmax_t
 NOTHROW_NCX(LIBKCALL libc_wcstoumax_l)(char32_t const *__restrict nptr,
                                        char32_t **endptr,
                                        __STDC_INT_AS_UINT_T base,
@@ -163,7 +163,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoumax_l)(char32_t const *__restrict nptr,
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
  * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
  * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(6) intmax_t
 NOTHROW_NCX(LIBCCALL libc_strtoi)(char const *__restrict nptr,
                                   char **__restrict endptr,
                                   __STDC_INT_AS_UINT_T base,
@@ -222,7 +222,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoi)(char const *__restrict nptr,
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
  * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
  * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(6) uintmax_t
 NOTHROW_NCX(LIBCCALL libc_strtou)(char const *__restrict nptr,
                                   char **__restrict endptr,
                                   __STDC_INT_AS_UINT_T base,
@@ -281,7 +281,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou)(char const *__restrict nptr,
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
  * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
  * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) intmax_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(6) intmax_t
 NOTHROW_NCX(LIBCCALL libc_strtoi_l)(char const *__restrict nptr,
                                     char **__restrict endptr,
                                     __STDC_INT_AS_UINT_T base,
@@ -304,7 +304,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoi_l)(char const *__restrict nptr,
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
  * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
  * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uintmax_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(6) uintmax_t
 NOTHROW_NCX(LIBCCALL libc_strtou_l)(char const *__restrict nptr,
                                     char **__restrict endptr,
                                     __STDC_INT_AS_UINT_T base,

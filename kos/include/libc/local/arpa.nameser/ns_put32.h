@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c39768e */
+/* HASH CRC-32:0xd1495753 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <hybrid/__byteswap.h>
 #include <hybrid/__unaligned.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ns_put32) __ATTR_NONNULL((2)) void
+__LOCAL_LIBC(ns_put32) __ATTR_ACCESS_WR(2) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ns_put32))(unsigned long __val, unsigned char *__destptr) {
 	__hybrid_unaligned_setbe32(__destptr, __val);
 }

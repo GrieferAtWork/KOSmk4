@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe96ba25d */
+/* HASH CRC-32:0x913e85f1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,20 +33,20 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) double
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) double
 NOTHROW_NCX(LIBDCALL libd__wtof)(char16_t const *nptr) {
 	return libd_wcstod(nptr, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) double
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) double
 NOTHROW_NCX(LIBKCALL libc__wtof)(char32_t const *nptr) {
 	return libc_wcstod(nptr, NULL);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) double
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) double
 NOTHROW_NCX(LIBDCALL libd__wtof_l)(char16_t const *nptr,
                                    locale_t locale) {
 	return libd_wcstod_l(nptr, NULL, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) double
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) double
 NOTHROW_NCX(LIBKCALL libc__wtof_l)(char32_t const *nptr,
                                    locale_t locale) {
 	return libc_wcstod_l(nptr, NULL, locale);
@@ -591,7 +591,7 @@ NOTHROW_NCX(LIBKCALL libc__wtoll_l)(char32_t const *__restrict nptr,
 #endif /* !... */
 #include <libc/errno.h>
 #include <asm/os/fcntl.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf,
                                       char16_t const *path,
                                       size_t buflen) {
@@ -635,7 +635,7 @@ NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf,
 }
 #include <libc/errno.h>
 #include <asm/os/fcntl.h>
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") char32_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf,
                                       char32_t const *path,
                                       size_t buflen) {

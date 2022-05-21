@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf861ae4e */
+/* HASH CRC-32:0x76347a3f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,12 +81,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_DOS$format_wescape)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT_DOS(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
@@ -131,12 +131,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_KOS$format_wescape)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT_KOS(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
@@ -188,9 +188,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_escape_defined
 #define __local___localdep_format_escape_defined
 #ifdef __CRT_HAVE_format_escape
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_escape,(__pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_escape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_escape,(__pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_escape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_format_quote)
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_escape,(__pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_quote,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_escape,(__pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_quote,(__printer,__arg,__text,__textlen,__flags))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_escape.h>
@@ -201,7 +201,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_hexdump_defined
 #define __local___localdep_format_hexdump_defined
 #ifdef __CRT_HAVE_format_hexdump
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_hexdump,(__pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_hexdump,(__printer,__arg,__data,__size,__linesize,__flags))
+__CREDIRECT(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_hexdump,(__pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_hexdump,(__printer,__arg,__data,__size,__linesize,__flags))
 #else /* __CRT_HAVE_format_hexdump */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_hexdump.h>
@@ -223,7 +223,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_width_defined
 #define __local___localdep_format_width_defined
 #ifdef __CRT_HAVE_format_width
-__COMPILER_CREDIRECT(__LIBC,__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_width,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_PURE __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_width,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_width */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_width.h>
@@ -285,7 +285,7 @@ __NAMESPACE_LOCAL_END
 #endif /* __KERNEL__ && __KOS__ */
 #endif /* !__NO_PRINTF_VINFO */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(format_vprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_vprintf) __ATTR_ACCESS_RO(3) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_vprintf))(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER           __printer

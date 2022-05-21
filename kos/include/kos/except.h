@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x640c51dc */
+/* HASH CRC-32:0x59f4a1f1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,7 +191,7 @@ struct __siginfo_struct;
  * If doing this is possible, fill in `*result' and return `true'.
  * Otherwise, `*result' is left in an undefined state, and `false'
  * is returned. */
-__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(__LIBKCALL except_as_signal)(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) __CASMNAME_SAME("except_as_signal");
+__LIBC __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __BOOL __NOTHROW_NCX(__LIBKCALL except_as_signal)(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) __CASMNAME_SAME("except_as_signal");
 #else /* __CRT_HAVE_except_as_signal */
 #include <libc/local/kos.except/except_as_signal.h>
 /* >> except_as_signal(3)
@@ -199,7 +199,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(__LIBKCALL exc
  * If doing this is possible, fill in `*result' and return `true'.
  * Otherwise, `*result' is left in an undefined state, and `false'
  * is returned. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(except_as_signal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(__LIBKCALL except_as_signal)(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_as_signal))(__self, __result); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(except_as_signal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __BOOL __NOTHROW_NCX(__LIBKCALL except_as_signal)(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_as_signal))(__self, __result); })
 #endif /* !__CRT_HAVE_except_as_signal */
 #ifdef __CRT_HAVE_except_name
 /* >> except_name(3)
@@ -241,7 +241,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(except_priority, __FORCELOCAL __ATTR_ARTIFICIAL 
  * errors, prominent error arguments.
  * @param: flags: Set of `EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_*'
  * @return: * : The usual pformatprinter-compatible return value */
-__LIBC __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL except_print_short_description)(__pformatprinter __printer, void *__arg, struct exception_data const *__data, __UINTPTR_TYPE__ __flags) __CASMNAME_SAME("except_print_short_description");
+__LIBC __ATTR_ACCESS_RO(3) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL except_print_short_description)(__pformatprinter __printer, void *__arg, struct exception_data const *__data, __UINTPTR_TYPE__ __flags) __CASMNAME_SAME("except_print_short_description");
 #else /* __CRT_HAVE_except_print_short_description */
 #include <libc/local/kos.except/except_print_short_description.h>
 /* >> except_print_short_description(3)
@@ -250,7 +250,7 @@ __LIBC __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL except_pri
  * errors, prominent error arguments.
  * @param: flags: Set of `EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_*'
  * @return: * : The usual pformatprinter-compatible return value */
-__NAMESPACE_LOCAL_USING_OR_IMPL(except_print_short_description, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL except_print_short_description)(__pformatprinter __printer, void *__arg, struct exception_data const *__data, __UINTPTR_TYPE__ __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_print_short_description))(__printer, __arg, __data, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(except_print_short_description, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(3) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL except_print_short_description)(__pformatprinter __printer, void *__arg, struct exception_data const *__data, __UINTPTR_TYPE__ __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_print_short_description))(__printer, __arg, __data, __flags); })
 #endif /* !__CRT_HAVE_except_print_short_description */
 #ifdef __USE_KOS_KERNEL
 #if defined(__arch_except_info) && defined(__CRT_HAVE_except_info)
@@ -283,7 +283,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(except_info, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 /* >> except_unwind(3)
  * Unwind the given register state to propagate the currently set error.
  * Following this, the  returned register state  should then be  loaded. */
-__LIBC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) except_register_state_t *__NOTHROW_NCX(__EXCEPT_UNWIND_CC except_unwind)(except_register_state_t *__restrict __state) __CASMNAME_SAME("except_unwind");
+__LIBC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RW(1) except_register_state_t *__NOTHROW_NCX(__EXCEPT_UNWIND_CC except_unwind)(except_register_state_t *__restrict __state) __CASMNAME_SAME("except_unwind");
 #endif /* __CRT_HAVE_except_unwind */
 #endif /* __USE_KOS_KERNEL */
 #ifdef __CRT_HAVE_except_throw_current
@@ -409,13 +409,13 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 /* >> except_nesting_begin(3)
  * Begin a nested  TRY-block. (i.e. inside  of another EXCEPT  block)
  * Don't call this function directly; use `NESTED_EXCEPTION' instead. */
-__LIBC __ATTR_NONNULL((1)) void __NOTHROW(__EXCEPT_NESTING_BEGIN_CC except_nesting_begin)(struct _exception_nesting_data *__restrict __saved) __CASMNAME_SAME("except_nesting_begin");
+__LIBC __ATTR_ACCESS_RW(1) void __NOTHROW(__EXCEPT_NESTING_BEGIN_CC except_nesting_begin)(struct _exception_nesting_data *__restrict __saved) __CASMNAME_SAME("except_nesting_begin");
 #endif /* !__except_nesting_begin_defined && __CRT_HAVE_except_nesting_begin */
 #if !defined(__except_nesting_end_defined) && defined(__CRT_HAVE_except_nesting_end)
 #define __except_nesting_end_defined
 /* >> except_nesting_end(3)
  * End a nested TRY-block. (i.e. inside of another EXCEPT block) */
-__LIBC __ATTR_NONNULL((1)) void __NOTHROW(__EXCEPT_NESTING_END_CC except_nesting_end)(struct _exception_nesting_data *__restrict __saved) __CASMNAME_SAME("except_nesting_end");
+__LIBC __ATTR_ACCESS_RO(1) void __NOTHROW(__EXCEPT_NESTING_END_CC except_nesting_end)(struct _exception_nesting_data const *__restrict __saved) __CASMNAME_SAME("except_nesting_end");
 #endif /* !__except_nesting_end_defined && __CRT_HAVE_except_nesting_end */
 #ifdef __cplusplus
 extern "C++" {

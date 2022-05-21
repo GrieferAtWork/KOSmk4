@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b4a9cc3 */
+/* HASH CRC-32:0x5eb0007e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,37 +31,37 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fprintf,(__FILE *__restrict __stream, char const *__restrict __format, ...),fprintf_unlocked,{ return __builtin_fprintf_unlocked(__stream, __format, __builtin_va_arg_pack()); })
+__CEIREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fprintf,(__FILE *__restrict __stream, char const *__restrict __format, ...),fprintf_unlocked,{ return __builtin_fprintf_unlocked(__stream, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_fprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
+__LIBC __ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
 #elif __has_builtin(__builtin_fprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fprintf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fprintf,(__FILE *__restrict __stream, char const *__restrict __format, ...),fprintf,{ return __builtin_fprintf(__stream, __format, __builtin_va_arg_pack()); })
+__CEIREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fprintf,(__FILE *__restrict __stream, char const *__restrict __format, ...),fprintf,{ return __builtin_fprintf(__stream, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_fprintf)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf");
+__LIBC __ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf");
 #elif defined(__CRT_HAVE__IO_fprintf)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_fprintf");
+__LIBC __ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_fprintf");
 #elif defined(__CRT_HAVE_fprintf_s)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
+__LIBC __ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
 #elif defined(__CRT_HAVE_fprintf_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
+__LIBC __ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fprintf.h>
@@ -75,67 +75,67 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,{ return __builtin_fputc_unlocked(__ch, __stream); })
+__CEIREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,{ return __builtin_fputc_unlocked(__ch, __stream); })
 #elif defined(__CRT_HAVE_putc_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__putc_nolock) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_putc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_putc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE__fputc_nolock) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_fputc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_fputc_nolock,(__ch,__stream))
 #elif __has_builtin(__builtin_fputc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,{ return __builtin_fputc(__ch, __stream); })
+__CEIREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,{ return __builtin_fputc(__ch, __stream); })
 #elif defined(__CRT_HAVE_putc)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_putc)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_IO_putc,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_IO_putc,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__putc_nolock)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_putc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_putc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE__fputc_nolock)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_fputc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(2),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_fputc_nolock,(__ch,__stream))
 #elif (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fputc.h>
@@ -145,7 +145,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fputc_defined
 #endif /* !... */
 #endif /* !__local___localdep_fputc_defined */
-__LOCAL_LIBC(partition_print) __ATTR_NONNULL((1, 2)) void
+__LOCAL_LIBC(partition_print) __ATTR_ACCESS_RW(2) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(partition_print))(struct partition_def __KOS_FIXED_CONST *__self, __FILE *__fp) {
 	unsigned int __i;
 	(__NAMESPACE_LOCAL_SYM __localdep_fputc)('[', __fp);

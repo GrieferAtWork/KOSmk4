@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7368c344 */
+/* HASH CRC-32:0xe1e37a19 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___stdio_common_vswprintf_p_defined
 #define __local___localdep___stdio_common_vswprintf_p_defined
 #ifdef __CRT_HAVE___stdio_common_vswprintf_p
-__CREDIRECT(__ATTR_LIBC_WPRINTF_P(4, 0) __ATTR_NONNULL((4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vswprintf_p,(__UINT64_TYPE__ __options, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vswprintf_p,(__options,__buf,__bufsize,__format,__locale,__args))
+__CREDIRECT(__ATTR_ACCESS_RO(4) __ATTR_LIBC_WPRINTF_P(4, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vswprintf_p,(__UINT64_TYPE__ __options, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vswprintf_p,(__options,__buf,__bufsize,__format,__locale,__args))
 #else /* __CRT_HAVE___stdio_common_vswprintf_p */
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/__stdio_common_vswprintf_p.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <corecrt_stdio_config.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vswprintf_p_l) __ATTR_LIBC_WPRINTF_P(3, 0) __ATTR_NONNULL((3)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(_vswprintf_p_l) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_WPRINTF_P(3, 0) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vswprintf_p_l))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
 	int __result = (__NAMESPACE_LOCAL_SYM __localdep___stdio_common_vswprintf_p)(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, __buf, __bufsize, __format, __locale, __args);
 	return __result < 0 ? -1 : __result;

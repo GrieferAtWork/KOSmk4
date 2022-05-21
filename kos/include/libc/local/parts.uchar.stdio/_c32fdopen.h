@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5000da2c */
+/* HASH CRC-32:0x397fc43a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-__LOCAL_LIBC(_c32fdopen) __ATTR_WUNUSED __ATTR_NONNULL((2)) __FILE *
+__LOCAL_LIBC(_c32fdopen) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __FILE *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(_c32fdopen))(__fd_t __fd, __CHAR32_TYPE__ const *__mode) {
 	__FILE *__result = __NULLPTR;
 	char *__utf8_mode;

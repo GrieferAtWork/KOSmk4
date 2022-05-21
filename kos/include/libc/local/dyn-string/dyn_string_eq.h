@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6aa29d3b */
+/* HASH CRC-32:0x403192df */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
 #endif /* !... */
 #endif /* !__local___localdep_memcmp_defined */
-__LOCAL_LIBC(dyn_string_eq) __ATTR_PURE __ATTR_WUNUSED int
+__LOCAL_LIBC(dyn_string_eq) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dyn_string_eq))(struct dyn_string __KOS_FIXED_CONST *__lhs, struct dyn_string __KOS_FIXED_CONST *__rhs) {
 	if (__lhs->length != __rhs->length)
 		return 0;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2b9db50 */
+/* HASH CRC-32:0x8d42178f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_strtou64_r) && __SIZEOF_INTMAX_T__ == 8
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou64_r,(__nptr,__endptr,__base,__error))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou64_r,(__nptr,__endptr,__base,__error))
 #elif defined(__CRT_HAVE_strtou32_r) && __SIZEOF_INTMAX_T__ == 4
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou32_r,(__nptr,__endptr,__base,__error))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou32_r,(__nptr,__endptr,__base,__error))
 #elif __SIZEOF_INTMAX_T__ == 8
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtou64_r.h>
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strtou) __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__
+__LOCAL_LIBC(strtou) __ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(6) __UINTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou))(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __UINTMAX_TYPE__ __lo, __UINTMAX_TYPE__ __hi, __errno_t *__rstatus) {
 	char *__used_endptr;
 	__UINTMAX_TYPE__ __result;

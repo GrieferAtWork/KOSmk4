@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x781e867f */
+/* HASH CRC-32:0xcb22e875 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/except/codes.h>
 #include <kos/kernel/handle.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(except_as_signal) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL
+__LOCAL_LIBC(except_as_signal) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __BOOL
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(except_as_signal))(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) {
 	__except_code_t __code = __self->e_code;
 	(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__result, sizeof(*__result));

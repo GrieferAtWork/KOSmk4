@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb22a1d1 */
+/* HASH CRC-32:0x4499e73b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_vprintf_defined
 #define __local___localdep_format_vprintf_defined
 #ifdef __CRT_HAVE_format_vprintf
-__CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
+__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vprintf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_vprintf.h>
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_vprintf __LIBC_LOCAL_NAME(format_vprintf)
 #endif /* !__CRT_HAVE_format_vprintf */
 #endif /* !__local___localdep_format_vprintf_defined */
-__LOCAL_LIBC(format_printf) __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_printf) __ATTR_ACCESS_RO(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__VLIBCCALL __LIBC_LOCAL_NAME(format_printf))(__pformatprinter __printer, void *__arg, char const *__restrict __format, ...) __THROWS(...) {
 	__SSIZE_TYPE__ __result;
 	__builtin_va_list __args;

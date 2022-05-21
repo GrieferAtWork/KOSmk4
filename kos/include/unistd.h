@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd2a900e */
+/* HASH CRC-32:0x736fc499 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3097,7 +3097,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fdatasync, __FORCELOCAL __ATTR_ARTIFICIAL int __
 #if !defined(__crypt_defined) && defined(__CRT_HAVE_crypt)
 #define __crypt_defined
 /* >> crypt(3), crypt_r(3) */
-__CDECLARE(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,crypt,(char const *__key, char const *__salt),(__key,__salt))
+__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_NCX,crypt,(char const *__key, char const *__salt),(__key,__salt))
 #endif /* !__crypt_defined && __CRT_HAVE_crypt */
 #if !defined(__encrypt_defined) && defined(__CRT_HAVE_encrypt)
 #define __encrypt_defined
@@ -3240,7 +3240,7 @@ typedef __sa_family_t sa_family_t; /* One of `AF_*' */
  *              so the KOS implementation of this function simply leaves its value
  *              untouched when this happens (other implementations might set it to
  *              `ERANGE' for example...) */
-__CDECLARE(__ATTR_NONNULL((1, 3, 4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups),(__user,__group,__groups,__ngroups))
+__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups),(__user,__group,__groups,__ngroups))
 #elif defined(__CRT_HAVE_setgrent) && defined(__CRT_HAVE_getgrent)
 #include <libc/local/grp/getgrouplist.h>
 /* >> getgrouplist(3)
@@ -3265,7 +3265,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3, 4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,getgrou
  *              so the KOS implementation of this function simply leaves its value
  *              untouched when this happens (other implementations might set it to
  *              `ERANGE' for example...) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getgrouplist, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3, 4)) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL getgrouplist)(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getgrouplist))(__user, __group, __groups, __ngroups); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getgrouplist, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(3) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL getgrouplist)(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getgrouplist))(__user, __group, __groups, __ngroups); })
 #else /* ... */
 #undef __getgrouplist_defined
 #endif /* !... */
@@ -3281,7 +3281,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getgrouplist, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * @return: -1: [errno=ENOMEM] Out of member
  * @return: -1: [errno=EPERM]  You're not allowed  to call  `setgroups(2)',
  *                             or at least not in the way you're trying to. */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
+__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
 #elif (defined(__CRT_HAVE_getgrouplist) || (defined(__CRT_HAVE_setgrent) && defined(__CRT_HAVE_getgrent))) && (defined(__CRT_HAVE_setgroups) || defined(__CRT_HAVE___setgroups) || defined(__CRT_HAVE___libc_setgroups)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/grp/initgroups.h>
 /* >> initgroups(3)
@@ -3292,7 +3292,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,initgroups,(char const *__user,
  * @return: -1: [errno=ENOMEM] Out of member
  * @return: -1: [errno=EPERM]  You're not allowed  to call  `setgroups(2)',
  *                             or at least not in the way you're trying to. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(initgroups, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL initgroups)(char const *__user, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(initgroups))(__user, __group); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(initgroups, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL initgroups)(char const *__user, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(initgroups))(__user, __group); })
 #else /* ... */
 #undef __initgroups_defined
 #endif /* !... */
@@ -3386,13 +3386,13 @@ __CDECLARE(,int,__NOTHROW_RPC,rresvport,(int *__alport),(__alport))
 #define __setgroups_defined
 #ifdef __CRT_HAVE_setgroups
 /* >> setgroups(2) */
-__CDECLARE(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
+__CDECLARE(__ATTR_ACCESS_ROS(2, 1),int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
 #elif defined(__CRT_HAVE___setgroups)
 /* >> setgroups(2) */
-__CREDIRECT(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__setgroups,(__count,__groups))
+__CREDIRECT(__ATTR_ACCESS_ROS(2, 1),int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__setgroups,(__count,__groups))
 #elif defined(__CRT_HAVE___libc_setgroups)
 /* >> setgroups(2) */
-__CREDIRECT(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__libc_setgroups,(__count,__groups))
+__CREDIRECT(__ATTR_ACCESS_ROS(2, 1),int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__libc_setgroups,(__count,__groups))
 #else /* ... */
 #undef __setgroups_defined
 #endif /* !... */

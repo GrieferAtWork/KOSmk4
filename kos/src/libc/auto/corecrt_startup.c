@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b84b417 */
+/* HASH CRC-32:0xa42c0f08 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -147,7 +147,7 @@ NOTHROW_NCX(LIBDCALL libc__execute_onexit_table)(struct _onexit_table_t *self) {
 	return result;
 }
 #include <corecrt_startup.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") NONNULL((2, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(3) int
 NOTHROW_NCX(LIBDCALL libc___dllonexit)(_onexit_t func,
                                        _onexit_t **p_begin,
                                        _onexit_t **p_end) {

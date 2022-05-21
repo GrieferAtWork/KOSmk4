@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d0d6bd6 */
+/* HASH CRC-32:0x78f48060 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
-__LOCAL_LIBC(getgrouplist) __ATTR_NONNULL((1, 3, 4)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(getgrouplist) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(3) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getgrouplist))(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups) {
 	__STDC_INT_AS_SIZE_T __count = 0;
 	__STDC_INT_AS_SIZE_T __buflen = *__ngroups;

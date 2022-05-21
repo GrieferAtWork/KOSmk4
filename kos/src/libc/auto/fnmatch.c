@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19283d21 */
+/* HASH CRC-32:0x668034f2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ DECL_BEGIN
  * @param: match_flags:   Set of `FNM_*'
  * @return: 0           : `name' is matched by `pattern'
  * @return: FNM_NOMATCH : `name' is not matched by `pattern' */
-INTERN ATTR_SECTION(".text.crt.string.match") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.string.match") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern,
                                    char const *name,
                                    __STDC_INT_AS_UINT_T match_flags) {

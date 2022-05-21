@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb44ab15b */
+/* HASH CRC-32:0xa05fd9a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dyn_string_copy_defined
 #define __local___localdep_dyn_string_copy_defined
 #ifdef __CRT_HAVE_dyn_string_copy
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_dyn_string_copy,(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src),dyn_string_copy,(__dst,__src))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_dyn_string_copy,(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src),dyn_string_copy,(__dst,__src))
 #elif defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/dyn-string/dyn_string_copy.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(dyn_string_substring) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(dyn_string_substring) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dyn_string_substring))(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src, __STDC_INT_AS_SIZE_T __start, __STDC_INT_AS_SIZE_T __end) {
 	struct dyn_string __fakesrc;
 	__hybrid_assert((__SIZE_TYPE__)__start <= (__SIZE_TYPE__)__end);

@@ -38,6 +38,12 @@ BEGIN
 		 * the `stream == NULL' checks from builds, else we'd end
 		 * up with a non-conforming library... */
 		"-fno-delete-null-pointer-checks",
+
+	})
+
+	CC_FLAGS({
+		/* Don't warn about us passing `(size_t)-1' to __attribute__((access)) functions. */
+		"-Wno-stringop-overflow",
 	})
 
 	LD_FLAGS({

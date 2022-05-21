@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x784d79f5 */
+/* HASH CRC-32:0xc2d3cab6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-__LOCAL_LIBC(dyn_string_delete) __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(dyn_string_delete) __ATTR_ACCESS_RW(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dyn_string_delete))(struct dyn_string *__self) {
 	(__NAMESPACE_LOCAL_SYM __localdep_free)(__self->s);
 	(__NAMESPACE_LOCAL_SYM __localdep_free)(__self);

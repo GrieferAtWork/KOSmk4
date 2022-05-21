@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b81a403 */
+/* HASH CRC-32:0xbdf43264 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCALL __localdep_format_printf)(__pformatprinter __printer, void *__arg, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("format_printf");
+__LIBC __ATTR_ACCESS_RO(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__VLIBCCALL __localdep_format_printf)(__pformatprinter __printer, void *__arg, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("format_printf");
 #else /* __CRT_HAVE_format_printf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_printf.h>
@@ -90,7 +90,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/registers.h>
 #endif /* __i386__ || __x86_64__ */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(except_print_short_description) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__
+__LOCAL_LIBC(except_print_short_description) __ATTR_ACCESS_RO(3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(except_print_short_description))(__pformatprinter __printer, void *__arg, struct exception_data const *__data, __UINTPTR_TYPE__ __flags) {
 #ifndef __PRIxPTR
 #ifdef __PRIP_PREFIX

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11506ef4 */
+/* HASH CRC-32:0x6501468f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_argz_append_defined
 #define __local___localdep_argz_append_defined
 #ifdef __CRT_HAVE_argz_append
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_argz_append,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len),argz_append,(__pargz,__pargz_len,__buf,__buf_len))
+__CREDIRECT(__ATTR_ACCESS_ROS(3, 4) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2),__errno_t,__NOTHROW_NCX,__localdep_argz_append,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len),argz_append,(__pargz,__pargz_len,__buf,__buf_len))
 #elif defined(__CRT_HAVE___argz_create_sep)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_argz_append,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len),__argz_create_sep,(__pargz,__pargz_len,__buf,__buf_len))
+__CREDIRECT(__ATTR_ACCESS_ROS(3, 4) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2),__errno_t,__NOTHROW_NCX,__localdep_argz_append,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len),__argz_create_sep,(__pargz,__pargz_len,__buf,__buf_len))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/argz/argz_append.h>
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-__LOCAL_LIBC(argz_add) __ATTR_NONNULL((1, 2, 3)) __errno_t
+__LOCAL_LIBC(argz_add) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_argz_append)(__pargz, __pargz_len, __str, (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__str) + 1);
 }

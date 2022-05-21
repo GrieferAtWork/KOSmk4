@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb677d05 */
+/* HASH CRC-32:0xb0181d48 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,13 +38,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fileno_unlocked_defined
 #define __local___localdep_fileno_unlocked_defined
 #if defined(__CRT_HAVE_fileno_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno_unlocked,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno_unlocked,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fileno)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno_unlocked,(__FILE *__restrict __stream),fileno,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno_unlocked,(__FILE *__restrict __stream),fileno,(__stream))
 #elif defined(__CRT_HAVE__fileno)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno_unlocked,(__FILE *__restrict __stream),_fileno,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno_unlocked,(__FILE *__restrict __stream),_fileno,(__stream))
 #elif defined(__CRT_HAVE_fileno_unlocked)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno_unlocked,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,__localdep_fileno_unlocked,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_fileno_unlocked_defined
 #endif /* !... */
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_ftruncate64_defined
 #endif /* !... */
 #endif /* !__local___localdep_ftruncate64_defined */
-__LOCAL_LIBC(fftruncate64_unlocked) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(fftruncate64_unlocked) __ATTR_ACCESS_RW(1) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fftruncate64_unlocked))(__FILE *__restrict __stream, __PIO_OFFSET64 __length) __THROWS(...) {
 	int __result = -1;
 	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_fileno_unlocked)(__stream);

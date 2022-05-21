@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c58db33 */
+/* HASH CRC-32:0xb8ff342a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc_except_a
  * If doing this is possible, fill in `*result' and return `true'.
  * Otherwise, `*result' is left in an undefined state, and `false'
  * is returned. */
-INTDEF WUNUSED NONNULL((1, 2)) bool NOTHROW_NCX(LIBKCALL libc_except_as_signal)(struct exception_data const *__restrict self, struct __siginfo_struct *__restrict result);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) bool NOTHROW_NCX(LIBKCALL libc_except_as_signal)(struct exception_data const *__restrict self, struct __siginfo_struct *__restrict result);
 /* >> except_name(3)
  * Return the name of the  given error, or `NULL'  if
  * unknown. This name is one of the `E_*' identifier.
@@ -85,14 +85,14 @@ INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBKCALL libc_except_priority)(ex
  * errors, prominent error arguments.
  * @param: flags: Set of `EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_*'
  * @return: * : The usual pformatprinter-compatible return value */
-INTDEF NONNULL((1, 3)) ssize_t NOTHROW_NCX(LIBKCALL libc_except_print_short_description)(pformatprinter printer, void *arg, struct exception_data const *data, uintptr_t flags);
+INTDEF ATTR_ACCESS_RO(3) NONNULL((1)) ssize_t NOTHROW_NCX(LIBKCALL libc_except_print_short_description)(pformatprinter printer, void *arg, struct exception_data const *data, uintptr_t flags);
 /* >> except_nesting_begin(3)
  * Begin a nested  TRY-block. (i.e. inside  of another EXCEPT  block)
  * Don't call this function directly; use `NESTED_EXCEPTION' instead. */
-INTDEF NONNULL((1)) void NOTHROW(__EXCEPT_NESTING_BEGIN_CC libc_except_nesting_begin)(struct _exception_nesting_data *__restrict saved);
+INTDEF ATTR_ACCESS_RW(1) void NOTHROW(__EXCEPT_NESTING_BEGIN_CC libc_except_nesting_begin)(struct _exception_nesting_data *__restrict saved);
 /* >> except_nesting_end(3)
  * End a nested TRY-block. (i.e. inside of another EXCEPT block) */
-INTDEF NONNULL((1)) void NOTHROW(__EXCEPT_NESTING_END_CC libc_except_nesting_end)(struct _exception_nesting_data *__restrict saved);
+INTDEF ATTR_ACCESS_RO(1) void NOTHROW(__EXCEPT_NESTING_END_CC libc_except_nesting_end)(struct _exception_nesting_data const *__restrict saved);
 
 DECL_END
 

@@ -650,14 +650,14 @@ wint_t putwchar(wchar_t wc) {
 [[cp_stdio, std, guard, wchar, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgetwc_unlocked", "getwc_unlocked")]]
 [[export_alias("getwc"), alias("fgetwc_unlocked", "getwc_unlocked")]]
-wint_t fgetwc([[nonnull]] FILE *__restrict stream);
+wint_t fgetwc([[inout]] FILE *__restrict stream);
 
 @@>> fputwc(3), putwc(3), fputwc_unlocked(3), putwc_unlocked(3)
 [[cp_stdio, std, guard, wchar, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fputwc_unlocked", "putwc_unlocked")]]
 [[export_alias("putwc"), alias("fputwc_unlocked", "putwc_unlocked")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.putc")]]
-wint_t fputwc(wchar_t wc, [[nonnull]] FILE *stream);
+wint_t fputwc(wchar_t wc, [[inout]] FILE *stream);
 
 
 %[insert:guarded_std_function(getwc = fgetwc)]
@@ -673,7 +673,7 @@ wint_t fputwc(wchar_t wc, [[nonnull]] FILE *stream);
 [[section(".text.crt{|.dos}.wchar.FILE.locked.read.read")]]
 wchar_t *fgetws([[outp(bufsize)]] wchar_t *__restrict buf,
                 __STDC_INT_AS_SIZE_T bufsize,
-                [[nonnull]] FILE *__restrict stream) {
+                [[inout]] FILE *__restrict stream) {
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
@@ -720,7 +720,7 @@ wchar_t *fgetws([[outp(bufsize)]] wchar_t *__restrict buf,
 [[requires_function(file_wprinter)]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.write")]]
 __STDC_INT_AS_SIZE_T fputws([[nonnull]] wchar_t const *__restrict str,
-                            [[nonnull]] FILE *__restrict stream) {
+                            [[inout]] FILE *__restrict stream) {
 	__STDC_INT_AS_SIZE_T result;
 	result = file_wprinter(stream, str, wcslen(str));
 	return result;
@@ -731,7 +731,7 @@ __STDC_INT_AS_SIZE_T fputws([[nonnull]] wchar_t const *__restrict str,
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("ungetwc_unlocked")]]
 [[alias("ungetwc_unlocked")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.putc")]]
-wint_t ungetwc(wint_t wc, [[nonnull]] FILE *stream);
+wint_t ungetwc(wint_t wc, [[inout]] FILE *stream);
 
 @@>> wcsftime(3)
 [[std, guard, wchar]]
@@ -838,7 +838,7 @@ wchar_t *wmemchr([[inp(num_chars)]] wchar_t const *__restrict haystack, wchar_t 
 @@>> fwide(3)
 [[std, guard]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.utility")]]
-int fwide([[nonnull]] FILE *fp, int mode) {
+int fwide([[inout]] FILE *fp, int mode) {
 	(void)fp;
 	(void)mode;
 	COMPILER_IMPURE();
@@ -855,7 +855,7 @@ int fwide([[nonnull]] FILE *fp, int mode) {
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fwprintf_unlocked")]]
 [[alias("fwprintf_unlocked"), export_as("_fwprintf_p")]] /* Normal wprintf already supports positional arguments! */
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
-__STDC_INT_AS_SIZE_T fwprintf([[nonnull]] FILE *__restrict stream,
+__STDC_INT_AS_SIZE_T fwprintf([[inout]] FILE *__restrict stream,
                               [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vfwprintf")}
 
@@ -864,7 +864,7 @@ __STDC_INT_AS_SIZE_T fwprintf([[nonnull]] FILE *__restrict stream,
 [[alias("vfwprintf_unlocked"), export_as("_vfwprintf_p")]] /* Normal wprintf already supports positional arguments! */
 [[requires_dependent_function(file_wprinter)]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
-__STDC_INT_AS_SIZE_T vfwprintf([[nonnull]] FILE *__restrict stream,
+__STDC_INT_AS_SIZE_T vfwprintf([[inout]] FILE *__restrict stream,
                                [[nonnull, format]] wchar_t const *__restrict format,
                                $va_list args) {
 	return (__STDC_INT_AS_SSIZE_T)format_vwprintf(&file_wprinter, stream, format, args);
@@ -894,7 +894,7 @@ __STDC_INT_AS_SIZE_T vwprintf([[nonnull, format]] wchar_t const *__restrict form
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fwscanf_unlocked")]]
 [[alias("fwscanf_unlocked")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.read.scanf")]]
-__STDC_INT_AS_SIZE_T fwscanf([[nonnull]] FILE *__restrict stream,
+__STDC_INT_AS_SIZE_T fwscanf([[inout]] FILE *__restrict stream,
                              [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vfwscanf")}
 
@@ -1081,7 +1081,7 @@ __LOCAL_LIBC(@vfc32scanf_ungetc@) ssize_t
 [[requires_dependent_function(fgetwc, ungetwc)]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_VFWSCANF_HELPERS)]]
-__STDC_INT_AS_SIZE_T vfwscanf([[nonnull]] FILE *__restrict stream,
+__STDC_INT_AS_SIZE_T vfwscanf([[inout]] FILE *__restrict stream,
                               [[nonnull, format]] wchar_t const *__restrict format,
                               $va_list args) {
 @@pp_if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__@@
@@ -1549,14 +1549,14 @@ $wint_t putwchar_unlocked(wchar_t wc) {
 [[dos_export_alias("_getwc_nolock", "_fgetwc_nolock")]]
 [[doc_alias("fgetwc"), alias("getwc", "fgetwc")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.read.getc")]]
-$wint_t fgetwc_unlocked([[nonnull]] $FILE *__restrict stream);
+$wint_t fgetwc_unlocked([[inout]] $FILE *__restrict stream);
 
 [[cp_stdio, wchar, decl_include("<hybrid/typecore.h>")]]
 [[export_alias("putwc_unlocked")]]
 [[dos_export_alias("_putwc_nolock", "_fputwc_nolock")]]
 [[doc_alias("fputwc"), alias("putwc", "fputwc")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.write.putc")]]
-$wint_t fputwc_unlocked(wchar_t wc, [[nonnull]] $FILE *__restrict stream);
+$wint_t fputwc_unlocked(wchar_t wc, [[inout]] $FILE *__restrict stream);
 
 [[cp_stdio, wchar, doc_alias("fgetws"), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[dos_export_alias("_fgetws_nolock"), alias("fgetws")]]
@@ -1564,7 +1564,7 @@ $wint_t fputwc_unlocked(wchar_t wc, [[nonnull]] $FILE *__restrict stream);
 [[impl_include("<asm/crt/stdio.h>", "<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.read.read")]]
 wchar_t *fgetws_unlocked([[outp(bufsize)]] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize,
-                         [[nonnull]] $FILE *__restrict stream) {
+                         [[inout]] $FILE *__restrict stream) {
 	$size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
@@ -1607,7 +1607,7 @@ wchar_t *fgetws_unlocked([[outp(bufsize)]] wchar_t *__restrict buf, __STDC_INT_A
 [[requires_function(file_wprinter_unlocked)]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.write.write")]]
 __STDC_INT_AS_SIZE_T fputws_unlocked([[nonnull]] wchar_t const *__restrict str,
-                                     [[nonnull]] $FILE *__restrict stream) {
+                                     [[inout]] $FILE *__restrict stream) {
 	__STDC_INT_AS_SIZE_T result;
 	result = file_wprinter_unlocked(stream, str, wcslen(str));
 	return result;
@@ -1700,7 +1700,7 @@ $ssize_t file_wprinter_unlocked([[nonnull]] void *arg,
 [[wchar, doc_alias("ungetwc"), decl_include("<hybrid/typecore.h>")]]
 [[dos_export_alias("_ungetwc_nolock"), alias("ungetwc")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.write.putc")]]
-$wint_t ungetwc_unlocked($wint_t ch, [[nonnull]] $FILE *__restrict stream);
+$wint_t ungetwc_unlocked($wint_t ch, [[inout]] $FILE *__restrict stream);
 
 
 %[default:section(".text.crt{|.dos}.wchar.FILE.unlocked.write.printf")]
@@ -1709,7 +1709,7 @@ $wint_t ungetwc_unlocked($wint_t ch, [[nonnull]] $FILE *__restrict stream);
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[alias("vfwprintf")]]
 [[requires_dependent_function(file_wprinter_unlocked)]]
-__STDC_INT_AS_SIZE_T vfwprintf_unlocked([[nonnull]] $FILE *__restrict stream,
+__STDC_INT_AS_SIZE_T vfwprintf_unlocked([[inout]] $FILE *__restrict stream,
                                         [[nonnull, format]] wchar_t const *__restrict format,
                                         $va_list args) {
 	return (__STDC_INT_AS_SSIZE_T)format_vwprintf(&file_wprinter_unlocked,
@@ -1719,7 +1719,7 @@ __STDC_INT_AS_SIZE_T vfwprintf_unlocked([[nonnull]] $FILE *__restrict stream,
 [[cp_stdio, wchar, doc_alias("fwprintf")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[alias("fwprintf")]]
-__STDC_INT_AS_SIZE_T fwprintf_unlocked([[nonnull]] $FILE *__restrict stream,
+__STDC_INT_AS_SIZE_T fwprintf_unlocked([[inout]] $FILE *__restrict stream,
                                        [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vfwprintf_unlocked")}
 
@@ -1807,7 +1807,7 @@ __LOCAL_LIBC(@vfc32scanf_unlocked_ungetc@) ssize_t
 [[requires_dependent_function(fgetwc_unlocked, ungetwc_unlocked)]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_VFWSCANF_UNLOCKED_HELPERS)]]
-__STDC_INT_AS_SIZE_T vfwscanf_unlocked([[nonnull]] $FILE *__restrict stream,
+__STDC_INT_AS_SIZE_T vfwscanf_unlocked([[inout]] $FILE *__restrict stream,
                                        [[nonnull, format]] wchar_t const *__restrict format,
                                        $va_list args) {
 @@pp_if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__@@
@@ -1839,7 +1839,7 @@ __STDC_INT_AS_SIZE_T vwscanf_unlocked([[nonnull, format]] wchar_t const *__restr
 [[cp_stdio, wchar, wunused, doc_alias("fwscanf")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[alias("fwscanf")]]
-__STDC_INT_AS_SIZE_T fwscanf_unlocked([[nonnull]] $FILE *__restrict stream,
+__STDC_INT_AS_SIZE_T fwscanf_unlocked([[inout]] $FILE *__restrict stream,
                                       [[nonnull, format]] wchar_t const *__restrict format, ...)
 	%{printf("vfwscanf_unlocked")}
 
@@ -2333,7 +2333,7 @@ wildwcscasecmp_l(*) %{generate(str2wcs("wildstrcasecmp_l"))}
 %#ifdef __USE_BSD
 @@>> fgetwln(3)
 [[wchar, guard, wunused, decl_include("<hybrid/typecore.h>")]]
-wchar_t *fgetwln([[nonnull]] FILE *__restrict fp,
+wchar_t *fgetwln([[inout]] FILE *__restrict fp,
                  [[nonnull]] $size_t *__restrict lenp);
 
 @@>> wcslcat(3)

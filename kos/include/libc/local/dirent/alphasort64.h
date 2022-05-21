@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73d451a0 */
+/* HASH CRC-32:0x692069ce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcoll __LIBC_LOCAL_NAME(strcoll)
 #endif /* !__CRT_HAVE_strcoll */
 #endif /* !__local___localdep_strcoll_defined */
-__LOCAL_LIBC(alphasort64) __ATTR_PURE __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(alphasort64) __ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(alphasort64))(struct dirent64 const **__e1, struct dirent64 const **__e2) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_strcoll)((*__e1)->d_name, (*__e2)->d_name);
 }

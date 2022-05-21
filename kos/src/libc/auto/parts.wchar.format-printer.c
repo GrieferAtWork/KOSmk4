@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x918aa277 */
+/* HASH CRC-32:0xecd5c537 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -170,7 +170,7 @@ err:
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t
 (LIBDCALL libd_format_wescape)(pc16formatprinter printer,
                                void *arg,
                                char16_t const *__restrict text,
@@ -441,7 +441,7 @@ err:
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
+INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t
 (LIBKCALL libc_format_wescape)(pc32formatprinter printer,
                                void *arg,
                                char32_t const *__restrict text,
@@ -710,7 +710,7 @@ err:
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t
 (LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
                                 void *arg,
                                 void const *__restrict data,
@@ -905,7 +905,7 @@ err:
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
+INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t
 (LIBKCALL libc_format_whexdump)(pc32formatprinter printer,
                                 void *arg,
                                 void const *__restrict data,

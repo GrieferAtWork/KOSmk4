@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1cd489b */
+/* HASH CRC-32:0x52c32834 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vsc16scanf_s_l_defined
 #define __local___localdep__vsc16scanf_s_l_defined
 #if defined(__CRT_HAVE__vswscanf_s_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_LIBC_C16SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsc16scanf_s_l,(__CHAR16_TYPE__ const *__buf, __CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vswscanf_s_l,(__buf,__format,__locale,__args))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_LIBC_C16SCANF(2, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsc16scanf_s_l,(__CHAR16_TYPE__ const *__buf, __CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vswscanf_s_l,(__buf,__format,__locale,__args))
 #elif defined(__CRT_HAVE_DOS$_vswscanf_s_l)
-__CREDIRECT_DOS(__ATTR_LIBC_C16SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsc16scanf_s_l,(__CHAR16_TYPE__ const *__buf, __CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vswscanf_s_l,(__buf,__format,__locale,__args))
+__CREDIRECT_DOS(__ATTR_ACCESS_RO(2) __ATTR_LIBC_C16SCANF(2, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsc16scanf_s_l,(__CHAR16_TYPE__ const *__buf, __CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vswscanf_s_l,(__buf,__format,__locale,__args))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/_vswscanf_s_l.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__vsc16scanf_s_l __LIBC_LOCAL_NAME(_vsc16scanf_s_l)
 #endif /* !... */
 #endif /* !__local___localdep__vsc16scanf_s_l_defined */
-__LOCAL_LIBC(vsc16scanf_s) __ATTR_WUNUSED __ATTR_LIBC_C16SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(vsc16scanf_s) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_LIBC_C16SCANF(2, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(vsc16scanf_s))(__CHAR16_TYPE__ const *__buf, __CHAR16_TYPE__ const *__format, __builtin_va_list __args) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__vsc16scanf_s_l)(__buf, __format, __NULLPTR, __args);
 }

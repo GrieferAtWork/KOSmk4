@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1260def */
+/* HASH CRC-32:0xea7bfe7f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __SYSDECL_BEGIN
 
 #if !defined(_GETDISKFREE_DEFINED) && defined(__CRT_HAVE__getdiskfree)
 #define _GETDISKFREE_DEFINED
-__CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
+__CDECLARE(__ATTR_ACCESS_WR(2),unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
 #endif /* !_GETDISKFREE_DEFINED && __CRT_HAVE__getdiskfree */
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -97,7 +97,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL delay)(__UINT32_TYP
 #endif /* !... */
 #endif /* !__delay_defined */
 #ifdef __CRT_HAVE__getdiskfree
-__CREDIRECT(,unsigned int,__NOTHROW_RPC,_dos_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),_getdiskfree,(__drive,__diskfree))
+__CREDIRECT(__ATTR_ACCESS_WR(2),unsigned int,__NOTHROW_RPC,_dos_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),_getdiskfree,(__drive,__diskfree))
 #endif /* __CRT_HAVE__getdiskfree */
 #ifndef __sleep_defined
 #define __sleep_defined

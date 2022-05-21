@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39477441 */
+/* HASH CRC-32:0x5e8e5907 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_wmkdir_defined
 #endif /* !... */
 #endif /* !__local___localdep_wmkdir_defined */
-__LOCAL_LIBC(_wmkdir) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(_wmkdir) __ATTR_ACCESS_RO(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_wmkdir))(__WCHAR_TYPE__ const *__path) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_wmkdir)(__path, 0755);
 }

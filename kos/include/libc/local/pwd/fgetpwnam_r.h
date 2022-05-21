@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ce88707 */
+/* HASH CRC-32:0x35ff2fca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fgetpwnam_r) __ATTR_NONNULL((1, 2, 3, 4, 6)) __errno_t
+__LOCAL_LIBC(fgetpwnam_r) __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2, 3, 4, 6)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetpwnam_r))(__FILE *__restrict __stream, const char *__restrict __name, struct passwd *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct passwd **__restrict __result) {
 	__errno_t __error;
 	__error = (__NAMESPACE_LOCAL_SYM __localdep_fgetpwfiltered_r)(__stream, __resultbuf, __buffer, __buflen,

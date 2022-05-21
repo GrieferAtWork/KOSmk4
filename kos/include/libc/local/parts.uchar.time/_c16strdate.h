@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3528197 */
+/* HASH CRC-32:0xc9cf41a7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__strdate_defined
 #endif /* !... */
 #endif /* !__local___localdep__strdate_defined */
-__LOCAL_LIBC(_c16strdate) __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
+__LOCAL_LIBC(_c16strdate) __ATTR_ACCESS_WR(1) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_c16strdate))(__CHAR16_TYPE__ __buf[9]) {
 	unsigned int __i;
 	char __abuf[9], *__ptr;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44b9d500 */
+/* HASH CRC-32:0x271ef861 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,7 +96,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_wrepeat, __FORCELOCAL __ATTR_ARTIFICIAL _
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wescape,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),(__printer,__arg,__text,__textlen,__flags))
+__CDECLARE(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wescape,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),(__printer,__arg,__text,__textlen,__flags))
 #else /* __CRT_HAVE_format_wescape */
 #include <libc/local/parts.wchar.format-printer/format_wescape.h>
 /* >> format_escape(3)
@@ -113,7 +113,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wescape,(pwforma
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wescape, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_wescape)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape))(__printer, __arg, __text, __textlen, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wescape, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_wescape)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape))(__printer, __arg, __text, __textlen, __flags); })
 #endif /* !__CRT_HAVE_format_wescape */
 #ifdef __CRT_HAVE_format_whexdump
 /* >> format_hexdump(3)
@@ -126,7 +126,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_wescape, __FORCELOCAL __ATTR_ARTIFICIAL _
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_whexdump,(pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),(__printer,__arg,__data,__size,__linesize,__flags))
+__CDECLARE(__ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_whexdump,(pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),(__printer,__arg,__data,__size,__linesize,__flags))
 #else /* __CRT_HAVE_format_whexdump */
 #include <libc/local/parts.wchar.format-printer/format_whexdump.h>
 /* >> format_hexdump(3)
@@ -139,7 +139,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_whexdump,(pwform
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_whexdump, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_whexdump)(pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_whexdump))(__printer, __arg, __data, __size, __linesize, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_whexdump, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_whexdump)(pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_whexdump))(__printer, __arg, __data, __size, __linesize, __flags); })
 #endif /* !__CRT_HAVE_format_whexdump */
 
 

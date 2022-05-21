@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd12cb30a */
+/* HASH CRC-32:0x6f561685 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_name_pton)(char const *a, u_char *b, siz
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_name_unpack)(u_char const *a, u_char const *b, u_char const *c, u_char *d, size_t e);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_name_pack)(u_char const *a, u_char *b, int c, u_char const **d, u_char const **e);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_name_uncompress)(u_char const *a, u_char const *b, u_char const *c, char *d, size_t e);
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_ns_name_skip)(u_char const **p_msg_ptr, u_char const *msg_end);
+INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_ns_name_skip)(u_char const **p_msg_ptr, u_char const *msg_end);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_ns_name_rollback)(u_char const *a, u_char const **b, u_char const **c);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_sign)(u_char *a, int *b, int c, int d, void *e, u_char const *f, int g, u_char *h, int *i, time_t j);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_sign2)(u_char *a, int *b, int c, int d, void *e, u_char const *f, int g, u_char *h, int *i, time_t j, u_char **k, u_char **l);

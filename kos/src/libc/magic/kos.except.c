@@ -924,8 +924,8 @@ for (local name: classes.keys.sorted()) {
 [[impl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<kos/except/codes.h>")]]
 [[impl_include("<kos/kernel/handle.h>")]]
-$bool except_as_signal([[nonnull]] struct exception_data const *__restrict self,
-                       [[nonnull]] struct __siginfo_struct *__restrict result) {
+$bool except_as_signal([[in]] struct exception_data const *__restrict self,
+                       [[out]] struct __siginfo_struct *__restrict result) {
 	except_code_t code = self->@e_code@;
 	bzero(result, sizeof(*result));
 	/* TODO: Make sure that this matches the sysv abi386 requirements:
@@ -1463,8 +1463,8 @@ unsigned int except_priority(except_code_t code) {
 @@pp_endif@@
 )]]
 $ssize_t except_print_short_description([[nonnull]] $pformatprinter printer, void *arg,
-                                       [[nonnull]] struct exception_data const *data,
-                                       $uintptr_t flags) {
+                                        [[in]] struct exception_data const *data,
+                                        $uintptr_t flags) {
 @@pp_ifndef PRIxPTR@@
 @@pp_ifdef __PRIP_PREFIX@@
 #define PRIxPTR __PRIP_PREFIX "x"
@@ -1798,7 +1798,7 @@ struct exception_info *except_info(void) {
 #define __SIZEOF_EXCEPT_REGISTER_STATE __SIZEOF_MCONTEXT
 #endif /* !__EXCEPT_REGISTER_STATE_TYPE */
 )]]
-except_register_state_t *except_unwind([[nonnull]] except_register_state_t *__restrict state);
+except_register_state_t *except_unwind([[inout]] except_register_state_t *__restrict state);
 
 %#endif /* __USE_KOS_KERNEL */
 
@@ -1959,7 +1959,7 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 #endif /* !__EXCEPT_NESTING_BEGIN_CC */
 ), nothrow, kernel, cc(__EXCEPT_NESTING_BEGIN_CC)]]
 [[decl_include("<kos/bits/exception_info.h>", "<bits/types.h>")]]
-void except_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict saved) {
+void except_nesting_begin([[inout]] struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info = except_info();
 	if (info->@ei_code@ == @EXCEPT_CODEOF@(@E_OK@)) {
 		/* Not inside of  a catch-block (ignore  the nesting  request)
@@ -1988,7 +1988,7 @@ void except_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict
 ), nothrow, kernel, cc(__EXCEPT_NESTING_END_CC)]]
 [[decl_include("<kos/bits/exception_info.h>")]]
 [[impl_include("<hybrid/__assert.h>")]]
-void except_nesting_end([[nonnull]] struct _exception_nesting_data *__restrict saved) {
+void except_nesting_end([[in]] struct _exception_nesting_data const *__restrict saved) {
 	struct exception_info *info;
 	if unlikely(!saved->@en_size@)
 		return; /* No-op */

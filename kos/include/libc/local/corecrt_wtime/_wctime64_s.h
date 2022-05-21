@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdb9fb0f */
+/* HASH CRC-32:0x6ddb9fb5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wctime64_s) __ATTR_NONNULL((1, 3)) __errno_t
+__LOCAL_LIBC(_wctime64_s) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wctime64_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __time64_t const *__timer) {
 	char __abuf[26], *__ptr;
 	unsigned int __i;

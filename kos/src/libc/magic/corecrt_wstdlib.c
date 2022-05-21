@@ -121,13 +121,13 @@ typedef __SIZE_TYPE__ rsize_t;
 
 [[wchar, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.wchar.unicode.static.convert")]]
-double _wtof([[nonnull]] wchar_t const *nptr) {
+double _wtof([[in]] wchar_t const *nptr) {
 	return wcstod(nptr, NULL);
 }
 
 [[wchar, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.wchar.unicode.static.convert")]]
-double _wtof_l([[nonnull]] wchar_t const *nptr,
+double _wtof_l([[in]] wchar_t const *nptr,
                [[nullable]] $locale_t locale) {
 	return wcstod_l(nptr, NULL, locale);
 }
@@ -220,7 +220,9 @@ _wtoll_l(*) %{generate(str2wcs("_atoll_l"))}
 [[requires_include("<asm/os/fcntl.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(_fullpath, convert_wcstombs, convert_mbstowcs))]]
 [[impl_include("<libc/errno.h>", "<asm/os/fcntl.h>")]]
-wchar_t *_wfullpath(wchar_t *buf, wchar_t const *path, $size_t buflen) {
+wchar_t *_wfullpath([[out(? <= buflen)]] wchar_t *buf,
+                    [[in]] wchar_t const *path,
+                    $size_t buflen) {
 	size_t reqlen;
 	char *utf8_path, *utf8_realpath;
 	wchar_t *wcs_realpath;

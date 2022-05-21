@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83154f20 */
+/* HASH CRC-32:0x33598ccf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep__wstrdate,(__WCHAR_TYPE__ __buf[9]),_wstrdate,(__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(1),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep__wstrdate,(__WCHAR_TYPE__ __buf[9]),_wstrdate,(__buf))
 #elif defined(__CRT_HAVE__strdate) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wtime/_wstrdate.h>
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wstrdate_s) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(_wstrdate_s) __ATTR_ACCESS_WRS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wstrdate_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen) {
 	if __unlikely(__buflen < 9)
 		return __ERANGE;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8701d749 */
+/* HASH CRC-32:0xa98f3cd3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ struct format_aprintf_data {
 };
 #endif /* !__format_aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(format_aprintf_alloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(format_aprintf_alloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ALLOC_SIZE((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_alloc))(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ __num_chars) {
 	char *__result;
 	if (__self->ap_avail < __num_chars) {

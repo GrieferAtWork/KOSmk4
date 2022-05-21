@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87abb465 */
+/* HASH CRC-32:0x9c25a67 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vfprintf_s_l_defined
 #define __local___localdep__vfprintf_s_l_defined
 #ifdef __CRT_HAVE__vfprintf_s_l
-__CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vfprintf_s_l,(__FILE *__stream, char const *__format, __locale_t __locale, __builtin_va_list __args),_vfprintf_s_l,(__stream,__format,__locale,__args))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vfprintf_s_l,(__FILE *__stream, char const *__format, __locale_t __locale, __builtin_va_list __args),_vfprintf_s_l,(__stream,__format,__locale,__args))
 #elif defined(__CRT_HAVE___stdio_common_vfprintf_s) || defined(__CRT_HAVE___stdio_common_vfprintf) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/_vfprintf_s_l.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__vfprintf_s_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__vfprintf_s_l_defined */
-__LOCAL_LIBC(_fprintf_s_l) __ATTR_LIBC_PRINTF(2, 4) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(_fprintf_s_l) __ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 4) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_fprintf_s_l))(__FILE *__stream, char const *__format, __locale_t __locale, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;

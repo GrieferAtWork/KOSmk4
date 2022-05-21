@@ -161,7 +161,7 @@ __STDC_INT_AS_UINT_T partition_union([[nonnull]] struct partition_def *self,
 [[impl_include("<bits/crt/partition.h>")]]
 [[requires_function(fprintf, fputc)]]
 void partition_print([[nonnull]] struct partition_def __KOS_FIXED_CONST *self,
-                     [[nonnull]] FILE *fp) {
+                     [[inout]] FILE *fp) {
 	unsigned int i;
 	fputc('[', fp);
 	for (i = 0; i < (unsigned int)self->@num_elements@; ++i) {

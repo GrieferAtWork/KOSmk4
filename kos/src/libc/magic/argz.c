@@ -92,9 +92,9 @@ typedef __errno_t error_t;
 [[decl_include("<bits/types.h>")]]
 [[export_alias("__argz_create"), requires_function(malloc)]]
 [[impl_include("<libc/errno.h>", "<hybrid/__assert.h>")]]
-error_t argz_create([[nonnull]] char *const argv[],
-                    [[nonnull]] char **__restrict pargz,
-                    [[nonnull]] size_t *__restrict pargz_len) {
+error_t argz_create([[in]] char *const argv[],
+                    [[out]] char **__restrict pargz,
+                    [[out]] size_t *__restrict pargz_len) {
 	size_t i, argc, total_len = 0;
 	for (argc = 0; argv[argc] != NULL; ++argc)
 		total_len += strlen(argv[argc]) + 1;
@@ -140,9 +140,9 @@ error_t argz_create([[nonnull]] char *const argv[],
 [[export_alias("__argz_create_sep")]]
 [[requires_function(malloc)]]
 [[impl_include("<libc/errno.h>")]]
-error_t argz_create_sep([[nonnull]] char const *__restrict string, int sep,
-                        [[nonnull]] char **__restrict pargz,
-                        [[nonnull]] size_t *__restrict pargz_len) {
+error_t argz_create_sep([[in]] char const *__restrict string, int sep,
+                        [[out]] char **__restrict pargz,
+                        [[out]] size_t *__restrict pargz_len) {
 	/* return string.replace(sep, "\0").replaceall("\0\0", "\0"); */
 	char *result_string, *dst;
 	size_t slen = strlen(string);
@@ -202,7 +202,7 @@ again_check_ch:
 @@Simply count the number of`NUL-characters within `argz...+=argz_len'
 [[pure, decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__argz_count")]]
-size_t argz_count([[inp_opt(argz_len)]] char const *argz, size_t argz_len) {
+size_t argz_count([[in(argz_len)]] char const *argz, size_t argz_len) {
 	size_t result = 0;
 	if likely(argz_len) {
 		for (;;) {
@@ -226,9 +226,9 @@ size_t argz_count([[inp_opt(argz_len)]] char const *argz, size_t argz_len) {
 @@all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements)
 [[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__argz_extract")]]
-void argz_extract([[inp(argz_len)]] char const *__restrict argz, size_t argz_len, [[nonnull]] char **__restrict argv)
-	[[([inp(argz_len)] char *__restrict argz, size_t argz_len, [[nonnull]] char **__restrict argv)]]
-	[[([inp(argz_len)] char const *__restrict argz, size_t argz_len, [[nonnull]] char const **__restrict argv)]]
+void argz_extract([[in(argz_len)]] char const *__restrict argz, size_t argz_len, [[nonnull]] char **__restrict argv)
+	[[([in(argz_len)] char *__restrict argz, size_t argz_len, [[nonnull]] char **__restrict argv)]]
+	[[([in(argz_len)] char const *__restrict argz, size_t argz_len, [[nonnull]] char const **__restrict argv)]]
 {
 	size_t i;
 	if unlikely(!argz_len)
@@ -253,7 +253,7 @@ void argz_extract([[inp(argz_len)]] char const *__restrict argz, size_t argz_len
 @@with `sep'.
 [[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__argz_stringify")]]
-void argz_stringify(char *argz, size_t len, int sep) {
+void argz_stringify([[inout(len)]] char *argz, size_t len, int sep) {
 	/* replace(base: argz, count: len - 1, old: '\0', new: sep); */
 	if unlikely(!len)
 		return;
@@ -279,9 +279,9 @@ void argz_stringify(char *argz, size_t len, int sep) {
 [[requires_function(realloc)]]
 [[export_alias("__argz_create_sep")]]
 [[impl_include("<libc/errno.h>")]]
-error_t argz_append([[nonnull]] char **__restrict pargz,
-                    [[nonnull]] size_t *__restrict pargz_len,
-                    [[inp_opt(buf_len)]] char const *__restrict buf,
+error_t argz_append([[inout]] char **__restrict pargz,
+                    [[inout]] size_t *__restrict pargz_len,
+                    [[in(buf_len)]] char const *__restrict buf,
                     size_t buf_len) {
 	size_t oldlen = *pargz_len;
 	size_t newlen = oldlen + buf_len;
@@ -309,9 +309,9 @@ error_t argz_append([[nonnull]] char **__restrict pargz,
 [[decl_include("<bits/types.h>")]]
 [[export_alias("__argz_add")]]
 [[requires_function(argz_append)]]
-error_t argz_add([[nonnull]] char **__restrict pargz,
-                 [[nonnull]] size_t *__restrict pargz_len,
-                 [[nonnull]] char const *__restrict str) {
+error_t argz_add([[inout]] char **__restrict pargz,
+                 [[inout]] size_t *__restrict pargz_len,
+                 [[in]] char const *__restrict str) {
 	return argz_append(pargz, pargz_len, str, strlen(str) + 1);
 }
 
@@ -330,9 +330,9 @@ error_t argz_add([[nonnull]] char **__restrict pargz,
 [[export_alias("__argz_add_sep")]]
 [[requires_function(realloc)]]
 [[impl_include("<libc/errno.h>")]]
-error_t argz_add_sep([[nonnull]] char **__restrict pargz,
-                     [[nonnull]] size_t *__restrict pargz_len,
-                     [[nonnull]] char const *__restrict string,
+error_t argz_add_sep([[inout]] char **__restrict pargz,
+                     [[inout]] size_t *__restrict pargz_len,
+                     [[in]] char const *__restrict string,
                      int sep) {
 	char *result_string, *dst;
 	size_t oldlen;
@@ -409,9 +409,9 @@ again_check_ch:
 @@of the elements... (took me a while to realize this one)
 [[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__argz_add_sep")]]
-void argz_delete([[nonnull]] char **__restrict pargz,
-                 [[nonnull]] size_t *__restrict pargz_len,
-                 [[nullable]] char *entry) {
+void argz_delete([[inout]] char **__restrict pargz,
+                 [[inout]] size_t *__restrict pargz_len,
+                 [[in_opt]] char *entry) {
 	size_t entrylen, newlen;
 	if unlikely(!entry)
 		return;
@@ -445,10 +445,10 @@ void argz_delete([[nonnull]] char **__restrict pargz,
 [[export_alias("__argz_insert")]]
 [[requires_function(realloc, argz_add)]]
 [[impl_include("<libc/errno.h>")]]
-error_t argz_insert([[nonnull]] char **__restrict pargz,
-                    [[nonnull]] size_t *__restrict pargz_len,
-                    [[nullable]] char *before,
-                    [[nonnull]] char const *__restrict entry) {
+error_t argz_insert([[inout]] char **__restrict pargz,
+                    [[inout]] size_t *__restrict pargz_len,
+                    [[in_opt]] char *before,
+                    [[in]] char const *__restrict entry) {
 	char *argz;
 	size_t argz_len;
 	size_t entry_len;
@@ -519,11 +519,11 @@ error_t argz_insert([[nonnull]] char **__restrict pargz,
 [[export_alias("__argz_replace")]]
 [[requires_function(realloc, free)]]
 [[impl_include("<libc/errno.h>")]]
-error_t argz_replace([[nonnull]] char **__restrict pargz,
-                     [[nonnull]] size_t *__restrict pargz_len,
-                     [[nullable]] char const *__restrict str,
-                     [[nonnull]] char const *__restrict with,
-                     [[nullable]] unsigned int *__restrict replace_count) {
+error_t argz_replace([[inout]] char **__restrict pargz,
+                     [[inout]] size_t *__restrict pargz_len,
+                     [[in_opt]] char const *__restrict str,
+                     [[in]] char const *__restrict with,
+                     [[inout_opt]] unsigned int *__restrict replace_count) {
 	size_t findlen, repllen;
 	size_t find_offset;
 	if unlikely(!str)
@@ -633,9 +633,9 @@ error_t argz_replace([[nonnull]] char **__restrict pargz,
 @@ - Return the successor of `entry' (i.e. `strend(entry) + 1')
 [[pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__argz_next")]]
-char *argz_next([[inp_opt(argz_len)]] char const *__restrict argz, size_t argz_len, [[nullable]] char const *__restrict entry)
-	[[([[inp_opt(argz_len)]] char *__restrict argz, size_t argz_len, [[nullable]] char *__restrict entry): char *]]
-	[[([[inp_opt(argz_len)]] char const *__restrict argz, size_t argz_len, [[nullable]] char const *__restrict entry): char const *]]
+char *argz_next([[in(argz_len)]] char const *__restrict argz, size_t argz_len, [[in_opt]] char const *__restrict entry)
+	[[([[in(argz_len)]] char *__restrict argz, size_t argz_len, [[in_opt]] char *__restrict entry): char *]]
+	[[([[in(argz_len)]] char const *__restrict argz, size_t argz_len, [[in_opt]] char const *__restrict entry): char const *]]
 {
 	char const *argz_end;
 	if (!entry)

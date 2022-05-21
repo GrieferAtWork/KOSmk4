@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15e3d81a */
+/* HASH CRC-32:0x87709b8f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_inet_paton_defined
 #define __local___localdep_inet_paton_defined
 #ifdef __CRT_HAVE_inet_paton
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_inet_paton,(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr),inet_paton,(__pcp,__inp,__network_addr))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_inet_paton,(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr),inet_paton,(__pcp,__inp,__network_addr))
 #else /* __CRT_HAVE_inet_paton */
 __NAMESPACE_LOCAL_END
 #include <libc/local/arpa.inet/inet_paton.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_inet_paton __LIBC_LOCAL_NAME(inet_paton)
 #endif /* !__CRT_HAVE_inet_paton */
 #endif /* !__local___localdep_inet_paton_defined */
-__LOCAL_LIBC(inet_aton) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(inet_aton) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_aton))(char const *__restrict __cp, struct in_addr *__restrict __inp) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_inet_paton)((char const **)&__cp, __inp, 0) && !*__cp;
 }

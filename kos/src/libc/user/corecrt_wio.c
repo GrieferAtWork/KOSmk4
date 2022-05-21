@@ -236,8 +236,8 @@ NOTHROW_RPC(LIBCCALL libd__wfindfirst32_impl)(char16_t const *__restrict filenam
 	return (intptr_t)(uintptr_t)result;
 }
 
-/*[[[head:libd__wfindfirst32,hash:CRC-32=0x81e9b92e]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1, 2)) intptr_t
+/*[[[head:libd__wfindfirst32,hash:CRC-32=0xdbfad640]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) intptr_t
 NOTHROW_RPC(LIBDCALL libd__wfindfirst32)(char16_t const *__restrict filename,
                                          struct _wfinddata32_t *__restrict finddata)
 /*[[[body:libd__wfindfirst32]]]*/
@@ -246,8 +246,8 @@ NOTHROW_RPC(LIBDCALL libd__wfindfirst32)(char16_t const *__restrict filename,
 }
 /*[[[end:libd__wfindfirst32]]]*/
 
-/*[[[head:libc__wfindfirst32,hash:CRC-32=0xb29a3674]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1, 2)) intptr_t
+/*[[[head:libc__wfindfirst32,hash:CRC-32=0x95bce2c2]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) intptr_t
 NOTHROW_RPC(LIBKCALL libc__wfindfirst32)(char32_t const *__restrict filename,
                                          struct _wfinddata32_t *__restrict finddata)
 /*[[[body:libc__wfindfirst32]]]*/
@@ -286,8 +286,8 @@ NOTHROW_RPC(LIBCCALL libc__wfindfirst32i64_impl)(char32_t const *__restrict file
 	return (intptr_t)(uintptr_t)result;
 }
 
-/*[[[head:libd__wfindfirst32i64,hash:CRC-32=0xeb32a14d]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1, 2)) intptr_t
+/*[[[head:libd__wfindfirst32i64,hash:CRC-32=0x8d7be4ae]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) intptr_t
 NOTHROW_RPC(LIBDCALL libd__wfindfirst32i64)(char16_t const *__restrict filename,
                                             struct _wfinddata32i64_t *__restrict finddata)
 /*[[[body:libd__wfindfirst32i64]]]*/
@@ -296,8 +296,8 @@ NOTHROW_RPC(LIBDCALL libd__wfindfirst32i64)(char16_t const *__restrict filename,
 }
 /*[[[end:libd__wfindfirst32i64]]]*/
 
-/*[[[head:libc__wfindfirst32i64,hash:CRC-32=0x3cac6a35]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1, 2)) intptr_t
+/*[[[head:libc__wfindfirst32i64,hash:CRC-32=0x334192ec]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) intptr_t
 NOTHROW_RPC(LIBKCALL libc__wfindfirst32i64)(char32_t const *__restrict filename,
                                             struct _wfinddata32i64_t *__restrict finddata)
 /*[[[body:libc__wfindfirst32i64]]]*/
@@ -336,8 +336,8 @@ NOTHROW_RPC(LIBCCALL libc__wfindfirst64_impl)(char32_t const *__restrict filenam
 	return (intptr_t)(uintptr_t)result;
 }
 
-/*[[[head:libd__wfindfirst64,hash:CRC-32=0xc8280cc9]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1, 2)) intptr_t
+/*[[[head:libd__wfindfirst64,hash:CRC-32=0x923b63a7]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) intptr_t
 NOTHROW_RPC(LIBDCALL libd__wfindfirst64)(char16_t const *__restrict filename,
                                          struct _wfinddata64_t *__restrict finddata)
 /*[[[body:libd__wfindfirst64]]]*/
@@ -346,8 +346,8 @@ NOTHROW_RPC(LIBDCALL libd__wfindfirst64)(char16_t const *__restrict filename,
 }
 /*[[[end:libd__wfindfirst64]]]*/
 
-/*[[[head:libc__wfindfirst64,hash:CRC-32=0xfb5b8393]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED NONNULL((1, 2)) intptr_t
+/*[[[head:libc__wfindfirst64,hash:CRC-32=0xdc7d5725]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) intptr_t
 NOTHROW_RPC(LIBKCALL libc__wfindfirst64)(char32_t const *__restrict filename,
                                          struct _wfinddata64_t *__restrict finddata)
 /*[[[body:libc__wfindfirst64]]]*/
@@ -356,8 +356,8 @@ NOTHROW_RPC(LIBKCALL libc__wfindfirst64)(char32_t const *__restrict filename,
 }
 /*[[[end:libc__wfindfirst64]]]*/
 
-/*[[[head:libd__wfindnext32,hash:CRC-32=0xe7c8bbb5]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((2)) int
+/*[[[head:libd__wfindnext32,hash:CRC-32=0x5ccfb165]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") ATTR_ACCESS_WR(2) int
 NOTHROW_RPC(LIBDCALL libd__wfindnext32)(intptr_t findfd,
                                         struct _wfinddata32_t *__restrict finddata)
 /*[[[body:libd__wfindnext32]]]*/
@@ -369,8 +369,8 @@ NOTHROW_RPC(LIBDCALL libd__wfindnext32)(intptr_t findfd,
 }
 /*[[[end:libd__wfindnext32]]]*/
 
-/*[[[head:libc__wfindnext32,hash:CRC-32=0x4cd8960]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((2)) int
+/*[[[head:libc__wfindnext32,hash:CRC-32=0x4a6976d1]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") ATTR_ACCESS_WR(2) int
 NOTHROW_RPC(LIBKCALL libc__wfindnext32)(intptr_t findfd,
                                         struct _wfinddata32_t *__restrict finddata)
 /*[[[body:libc__wfindnext32]]]*/
@@ -382,8 +382,8 @@ NOTHROW_RPC(LIBKCALL libc__wfindnext32)(intptr_t findfd,
 }
 /*[[[end:libc__wfindnext32]]]*/
 
-/*[[[head:libd__wfindnext32i64,hash:CRC-32=0xf7c482b1]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((2)) int
+/*[[[head:libd__wfindnext32i64,hash:CRC-32=0xc7a90278]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") ATTR_ACCESS_WR(2) int
 NOTHROW_RPC(LIBDCALL libd__wfindnext32i64)(intptr_t findfd,
                                            struct _wfinddata32i64_t *__restrict finddata)
 /*[[[body:libd__wfindnext32i64]]]*/
@@ -395,8 +395,8 @@ NOTHROW_RPC(LIBDCALL libd__wfindnext32i64)(intptr_t findfd,
 }
 /*[[[end:libd__wfindnext32i64]]]*/
 
-/*[[[head:libc__wfindnext32i64,hash:CRC-32=0xac54944c]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((2)) int
+/*[[[head:libc__wfindnext32i64,hash:CRC-32=0x53b6da15]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") ATTR_ACCESS_WR(2) int
 NOTHROW_RPC(LIBKCALL libc__wfindnext32i64)(intptr_t findfd,
                                            struct _wfinddata32i64_t *__restrict finddata)
 /*[[[body:libc__wfindnext32i64]]]*/
@@ -408,8 +408,8 @@ NOTHROW_RPC(LIBKCALL libc__wfindnext32i64)(intptr_t findfd,
 }
 /*[[[end:libc__wfindnext32i64]]]*/
 
-/*[[[head:libd__wfindnext64,hash:CRC-32=0xeed438fd]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((2)) int
+/*[[[head:libd__wfindnext64,hash:CRC-32=0x55d3322d]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") ATTR_ACCESS_WR(2) int
 NOTHROW_RPC(LIBDCALL libd__wfindnext64)(intptr_t findfd,
                                         struct _wfinddata64_t *__restrict finddata)
 /*[[[body:libd__wfindnext64]]]*/
@@ -421,8 +421,8 @@ NOTHROW_RPC(LIBDCALL libd__wfindnext64)(intptr_t findfd,
 }
 /*[[[end:libd__wfindnext64]]]*/
 
-/*[[[head:libc__wfindnext64,hash:CRC-32=0xdd10a28]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") NONNULL((2)) int
+/*[[[head:libc__wfindnext64,hash:CRC-32=0x4375f599]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") ATTR_ACCESS_WR(2) int
 NOTHROW_RPC(LIBKCALL libc__wfindnext64)(intptr_t findfd,
                                         struct _wfinddata64_t *__restrict finddata)
 /*[[[body:libc__wfindnext64]]]*/
@@ -436,8 +436,8 @@ NOTHROW_RPC(LIBKCALL libc__wfindnext64)(intptr_t findfd,
 
 
 
-/*[[[head:libd__wmktemp_s,hash:CRC-32=0xdc4133a5]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
+/*[[[head:libd__wmktemp_s,hash:CRC-32=0x86e7955b]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_ACCESS_RWS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wmktemp_s)(char16_t *template_,
                                       size_t bufsize)
 /*[[[body:libd__wmktemp_s]]]*/
@@ -449,8 +449,8 @@ NOTHROW_NCX(LIBDCALL libd__wmktemp_s)(char16_t *template_,
 }
 /*[[[end:libd__wmktemp_s]]]*/
 
-/*[[[head:libc__wmktemp_s,hash:CRC-32=0x19ad0c21]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
+/*[[[head:libc__wmktemp_s,hash:CRC-32=0x2ac9bac9]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_ACCESS_RWS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc__wmktemp_s)(char32_t *template_,
                                       size_t bufsize)
 /*[[[body:libc__wmktemp_s]]]*/
@@ -462,8 +462,8 @@ NOTHROW_NCX(LIBKCALL libc__wmktemp_s)(char32_t *template_,
 }
 /*[[[end:libc__wmktemp_s]]]*/
 
-/*[[[head:libd__wmktemp,hash:CRC-32=0xcbfd4310]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_RETNONNULL NONNULL((1)) char16_t *
+/*[[[head:libd__wmktemp,hash:CRC-32=0xbbbaaf5]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_RETNONNULL ATTR_ACCESS_RW(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wmktemp)(char16_t *template_)
 /*[[[body:libd__wmktemp]]]*/
 /*AUTO*/{
@@ -474,8 +474,8 @@ NOTHROW_NCX(LIBDCALL libd__wmktemp)(char16_t *template_)
 }
 /*[[[end:libd__wmktemp]]]*/
 
-/*[[[head:libc__wmktemp,hash:CRC-32=0x4c022051]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_RETNONNULL NONNULL((1)) char32_t *
+/*[[[head:libc__wmktemp,hash:CRC-32=0xa57a084b]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_RETNONNULL ATTR_ACCESS_RW(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wmktemp)(char32_t *template_)
 /*[[[body:libc__wmktemp]]]*/
 /*AUTO*/{

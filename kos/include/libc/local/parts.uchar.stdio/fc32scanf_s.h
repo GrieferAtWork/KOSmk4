@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58bd69b3 */
+/* HASH CRC-32:0x9d01f70b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vfc32scanf_s_defined
 #define __local___localdep_vfc32scanf_s_defined
 #if defined(__CRT_HAVE_vfwscanf_s) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vfc32scanf_s,(__FILE *__stream, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),vfwscanf_s,(__stream,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __ATTR_LIBC_C32SCANF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vfc32scanf_s,(__FILE *__stream, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),vfwscanf_s,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_KOS$vfwscanf_s)
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vfc32scanf_s,(__FILE *__stream, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),vfwscanf_s,(__stream,__format,__args))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __ATTR_LIBC_C32SCANF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vfc32scanf_s,(__FILE *__stream, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),vfwscanf_s,(__stream,__format,__args))
 #elif (defined(__CRT_HAVE__vfwscanf_s_l) || defined(__CRT_HAVE___stdio_common_vfscanf) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE___vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE_vfscanf_unlocked) || ((defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)))) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/vfwscanf_s.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_vfc32scanf_s_defined
 #endif /* !... */
 #endif /* !__local___localdep_vfc32scanf_s_defined */
-__LOCAL_LIBC(fc32scanf_s) __ATTR_WUNUSED __ATTR_LIBC_C32SCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(fc32scanf_s) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __ATTR_LIBC_C32SCANF(2, 3) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBKCALL __LIBC_LOCAL_NAME(fc32scanf_s))(__FILE *__stream, __CHAR32_TYPE__ const *__format, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;

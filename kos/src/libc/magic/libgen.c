@@ -216,9 +216,9 @@ typedef __FILE FILE;
 
 // TODO: int isencrypt(char const *textbuf, size_t buflen);
 
-// TODO: int p2open([[nullable]] char const *cmdline, [[nonnull]] FILE *files[2]);
+// TODO: int p2open([[nullable]] char const *cmdline, [[inout]] FILE *files[2]);
 
-// TODO: int p2close([[nonnull]] FILE *files[2]);
+// TODO: int p2close([[inout]] FILE *files[2]);
 
 // TODO: int mkdirp([[nonnull]] char const *pathname, mode_t mode);
 
@@ -247,7 +247,7 @@ typedef __FILE FILE;
 [[nonnull, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[requires_function(fgetc), impl_include("<asm/crt/stdio.h>")]]
 char *bgets([[nonnull]] char *buf, size_t buflen_minus_one,
-            [[nonnull]] FILE *fp,
+            [[inout]] FILE *fp,
             [[nullable]] char __KOS_FIXED_CONST *stop_chars) {
 	char *iter = buf;
 	if (stop_chars == NULL)

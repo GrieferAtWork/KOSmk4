@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74aaad2 */
+/* HASH CRC-32:0x358a4d8c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_envz_entry_defined
 #define __local___localdep_envz_entry_defined
 #ifdef __CRT_HAVE_envz_entry
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)),char *,__NOTHROW_NCX,__localdep_envz_entry,(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name),envz_entry,(__envz,__envz_len,__name))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_envz_entry,(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name),envz_entry,(__envz,__envz_len,__name))
 #else /* __CRT_HAVE_envz_entry */
 __NAMESPACE_LOCAL_END
 #include <libc/local/envz/envz_entry.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strchr __LIBC_LOCAL_NAME(strchr)
 #endif /* !... */
 #endif /* !__local___localdep_strchr_defined */
-__LOCAL_LIBC(envz_get) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *
+__LOCAL_LIBC(envz_get) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_get))(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name) {
 	char *__result;
 	__result = (char *)(__NAMESPACE_LOCAL_SYM __localdep_envz_entry)(__envz, __envz_len, __name);

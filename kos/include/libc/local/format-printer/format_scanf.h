@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a13d5f1 */
+/* HASH CRC-32:0x3d9b459f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_vscanf_defined
 #define __local___localdep_format_vscanf_defined
 #ifdef __CRT_HAVE_format_vscanf
-__CREDIRECT(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__localdep_format_vscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vscanf,(__pgetc,__pungetc,__arg,__format,__args))
+__CREDIRECT(__ATTR_ACCESS_RO(4) __ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_format_vscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vscanf,(__pgetc,__pungetc,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vscanf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_vscanf.h>
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_vscanf __LIBC_LOCAL_NAME(format_vscanf)
 #endif /* !__CRT_HAVE_format_vscanf */
 #endif /* !__local___localdep_format_vscanf_defined */
-__LOCAL_LIBC(format_scanf) __ATTR_LIBC_SCANF(4, 5) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_scanf) __ATTR_ACCESS_RO(4) __ATTR_LIBC_SCANF(4, 5) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__VLIBCCALL __LIBC_LOCAL_NAME(format_scanf))(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, ...) __THROWS(...) {
 	__SSIZE_TYPE__ __result;
 	__builtin_va_list __args;

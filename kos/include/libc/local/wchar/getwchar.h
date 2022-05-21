@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7808c29 */
+/* HASH CRC-32:0x5d238180 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,17 +30,17 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetwc_defined
 #define __local___localdep_fgetwc_defined
 #if defined(__CRT_HAVE_fgetwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetwc)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_fgetwc_unlocked)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getwc_unlocked)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__WINT_TYPE__,__THROWING,__localdep_fgetwc,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_fgetwc_defined
 #endif /* !... */

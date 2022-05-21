@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4502805a */
+/* HASH CRC-32:0x14bdbca6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -218,11 +218,11 @@ typedef struct __dirstream DIR;
 #ifdef __CRT_HAVE_opendir
 /* >> opendir(3)
  * Open and return a new directory stream for reading, referring to `name' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),DIR *,__NOTHROW_RPC,opendir,(char const *__name),(__name))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),DIR *,__NOTHROW_RPC,opendir,(char const *__name),(__name))
 #elif defined(__CRT_HAVE___libc_opendir)
 /* >> opendir(3)
  * Open and return a new directory stream for reading, referring to `name' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),DIR *,__NOTHROW_RPC,opendir,(char const *__name),__libc_opendir,(__name))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),DIR *,__NOTHROW_RPC,opendir,(char const *__name),__libc_opendir,(__name))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #include <asm/os/oflags.h>
@@ -230,7 +230,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),DIR *,__NOTHROW_RPC,opendir,(char
 #include <libc/local/dirent/opendir.h>
 /* >> opendir(3)
  * Open and return a new directory stream for reading, referring to `name' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(opendir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) DIR *__NOTHROW_RPC(__LIBCCALL opendir)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendir))(__name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(opendir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) DIR *__NOTHROW_RPC(__LIBCCALL opendir)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendir))(__name); })
 #endif /* (__AT_FDCWD && (__CRT_HAVE_opendirat || __CRT_HAVE_fopendirat || (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)))) || (__CRT_HAVE_fdopendir && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)))) || __USE_DOS_DIRENT */
 #endif /* !... */
 
@@ -238,27 +238,27 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(opendir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #ifdef __CRT_HAVE_fopendirat
 /* >> fopendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,fopendirat,(__fd_t __dirfd, char const *__name, __oflag_t __oflags),(__dirfd,__name,__oflags))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(2),DIR *,__NOTHROW_RPC,fopendirat,(__fd_t __dirfd, char const *__name, __oflag_t __oflags),(__dirfd,__name,__oflags))
 #else /* __CRT_HAVE_fopendirat */
 #include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))
 #include <libc/local/dirent/fopendirat.h>
 /* >> fopendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fopendirat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) DIR *__NOTHROW_RPC(__LIBCCALL fopendirat)(__fd_t __dirfd, char const *__name, __oflag_t __oflags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fopendirat))(__dirfd, __name, __oflags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fopendirat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(2) DIR *__NOTHROW_RPC(__LIBCCALL fopendirat)(__fd_t __dirfd, char const *__name, __oflag_t __oflags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fopendirat))(__dirfd, __name, __oflags); })
 #endif /* __CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat) */
 #endif /* !__CRT_HAVE_fopendirat */
 #ifdef __CRT_HAVE_opendirat
 /* >> opendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,opendirat,(__fd_t __dirfd, char const *__name),(__dirfd,__name))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(2),DIR *,__NOTHROW_RPC,opendirat,(__fd_t __dirfd, char const *__name),(__dirfd,__name))
 #else /* __CRT_HAVE_opendirat */
 #include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/dirent/opendirat.h>
 /* >> opendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(opendirat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) DIR *__NOTHROW_RPC(__LIBCCALL opendirat)(__fd_t __dirfd, char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendirat))(__dirfd, __name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(opendirat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(2) DIR *__NOTHROW_RPC(__LIBCCALL opendirat)(__fd_t __dirfd, char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendirat))(__dirfd, __name); })
 #endif /* __CRT_HAVE_fopendirat || (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #endif /* !__CRT_HAVE_opendirat */
 #endif /* __USE_KOS && __USE_ATFILE */
@@ -266,67 +266,67 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(opendirat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifdef __CRT_HAVE_closedir
 /* >> closedir(3)
  * Close a directory stream previously returned by `opendir(3)' and friends */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,closedir,(DIR *__dirp),(__dirp))
+__CDECLARE(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,closedir,(DIR *__dirp),(__dirp))
 #elif defined(__CRT_HAVE___libc_closedir)
 /* >> closedir(3)
  * Close a directory stream previously returned by `opendir(3)' and friends */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,closedir,(DIR *__dirp),__libc_closedir,(__dirp))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,closedir,(DIR *__dirp),__libc_closedir,(__dirp))
 #elif defined(__USE_DOS_DIRENT)
 #include <libc/local/dirent/closedir.h>
 /* >> closedir(3)
  * Close a directory stream previously returned by `opendir(3)' and friends */
-__NAMESPACE_LOCAL_USING_OR_IMPL(closedir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL closedir)(DIR *__dirp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(closedir))(__dirp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(closedir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL closedir)(DIR *__dirp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(closedir))(__dirp); })
 #endif /* ... */
 
 #ifdef __USE_BSD
 /* >> fdclosedir(3)
  * Same as `closedir()', but instead of also closing the underlying file descriptor, return it */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,fdclosedir,(DIR *__dirp),(__dirp))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_NCX,fdclosedir,(DIR *__dirp),(__dirp))
 #endif /* __USE_BSD */
 
 #if defined(__CRT_HAVE_readdirk) && defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CREDIRECT(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),readdirk,(__dirp))
+__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),readdirk,(__dirp))
 #elif defined(__CRT_HAVE_readdirk64) && defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CREDIRECT(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),readdirk64,(__dirp))
+__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),readdirk64,(__dirp))
 #elif defined(__CRT_HAVE_readdir) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CDECLARE(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),(__dirp))
+__CDECLARE(__ATTR_ACCESS_RW(1),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),(__dirp))
 #elif defined(__CRT_HAVE___libc_readdir) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CREDIRECT(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),__libc_readdir,(__dirp))
+__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),__libc_readdir,(__dirp))
 #elif defined(__CRT_HAVE_readdir64) && !defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CREDIRECT(__ATTR_NONNULL((1)),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),readdir64,(__dirp))
+__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent *,__NOTHROW_RPC,readdir,(DIR *__restrict __dirp),readdir64,(__dirp))
 #elif defined(__USE_DOS_DIRENT)
 #include <libc/local/dirent/readdir.h>
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__NAMESPACE_LOCAL_USING_OR_IMPL(readdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) struct dirent *__NOTHROW_RPC(__LIBCCALL readdir)(DIR *__restrict __dirp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readdir))(__dirp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(readdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) struct dirent *__NOTHROW_RPC(__LIBCCALL readdir)(DIR *__restrict __dirp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readdir))(__dirp); })
 #endif /* ... */
 
 #ifdef __CRT_HAVE_rewinddir
 /* >> rewinddir(3)
  * Rewind the given directory stream in such a way that the next call
  * to `readdir(3)' will once again  return the first directory  entry */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,rewinddir,(DIR *__restrict __dirp),(__dirp))
+__CDECLARE_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,rewinddir,(DIR *__restrict __dirp),(__dirp))
 #elif defined(__CRT_HAVE___libc_rewinddir)
 /* >> rewinddir(3)
  * Rewind the given directory stream in such a way that the next call
  * to `readdir(3)' will once again  return the first directory  entry */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,rewinddir,(DIR *__restrict __dirp),__libc_rewinddir,(__dirp))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,rewinddir,(DIR *__restrict __dirp),__libc_rewinddir,(__dirp))
 #endif /* ... */
 
 #ifdef __USE_XOPEN2K8
@@ -340,33 +340,33 @@ __CDECLARE_OPT(__ATTR_WUNUSED,DIR *,__NOTHROW_NCX,fdopendir,(__fd_t __fd),(__fd)
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CREDIRECT(__ATTR_NONNULL((1)),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),readdirk,(__dirp))
+__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),readdirk,(__dirp))
 #elif defined(__CRT_HAVE_readdirk64) && defined(__CRT_KOS)
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CREDIRECT(__ATTR_NONNULL((1)),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),readdirk64,(__dirp))
+__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),readdirk64,(__dirp))
 #elif defined(__CRT_HAVE_readdir) && !defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CREDIRECT(__ATTR_NONNULL((1)),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),readdir,(__dirp))
+__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),readdir,(__dirp))
 #elif defined(__CRT_HAVE___libc_readdir) && !defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CREDIRECT(__ATTR_NONNULL((1)),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),__libc_readdir,(__dirp))
+__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),__libc_readdir,(__dirp))
 #elif defined(__CRT_HAVE_readdir64) && !defined(__CRT_KOS)
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CDECLARE(__ATTR_NONNULL((1)),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),(__dirp))
+__CDECLARE(__ATTR_ACCESS_RW(1),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__restrict __dirp),(__dirp))
 #elif defined(__USE_DOS_DIRENT) && defined(_DIRENT_MATCHES_DIRENT64)
 #include <libc/local/dirent/readdir.h>
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) struct dirent64 *__NOTHROW_RPC(__LIBCCALL readdir64)(DIR *__restrict __dirp) { return (struct dirent64 *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readdir))(__dirp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) struct dirent64 *__NOTHROW_RPC(__LIBCCALL readdir64)(DIR *__restrict __dirp) { return (struct dirent64 *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readdir))(__dirp); }
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #ifdef __USE_POSIX
@@ -377,7 +377,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) struct dirent64 *__NOTHROW_RP
  *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
  *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restrict __dirp, struct dirent *__restrict __entry, struct dirent **__restrict __result),readdirk_r,(__dirp,__entry,__result))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_RPC,readdir_r,(DIR *__restrict __dirp, struct dirent *__restrict __entry, struct dirent **__restrict __result),readdirk_r,(__dirp,__entry,__result))
 #elif defined(__CRT_HAVE_readdirk64_r) && defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> readdir_r(3), readdir64_r(3)
  * Reentrant version of `readdir(3)'
@@ -385,7 +385,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restri
  *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
  *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restrict __dirp, struct dirent *__restrict __entry, struct dirent **__restrict __result),readdirk64_r,(__dirp,__entry,__result))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_RPC,readdir_r,(DIR *__restrict __dirp, struct dirent *__restrict __entry, struct dirent **__restrict __result),readdirk64_r,(__dirp,__entry,__result))
 #elif defined(__CRT_HAVE_readdir_r) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> readdir_r(3), readdir64_r(3)
  * Reentrant version of `readdir(3)'
@@ -393,7 +393,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restri
  *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
  *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restrict __dirp, struct dirent *__restrict __entry, struct dirent **__restrict __result),(__dirp,__entry,__result))
+__CDECLARE(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_RPC,readdir_r,(DIR *__restrict __dirp, struct dirent *__restrict __entry, struct dirent **__restrict __result),(__dirp,__entry,__result))
 #elif defined(__CRT_HAVE___libc_readdir_r) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> readdir_r(3), readdir64_r(3)
  * Reentrant version of `readdir(3)'
@@ -401,7 +401,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restric
  *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
  *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restrict __dirp, struct dirent *__restrict __entry, struct dirent **__restrict __result),__libc_readdir_r,(__dirp,__entry,__result))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_RPC,readdir_r,(DIR *__restrict __dirp, struct dirent *__restrict __entry, struct dirent **__restrict __result),__libc_readdir_r,(__dirp,__entry,__result))
 #elif defined(__CRT_HAVE_readdir64_r) && !defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> readdir_r(3), readdir64_r(3)
  * Reentrant version of `readdir(3)'
@@ -409,7 +409,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restri
  *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
  *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restrict __dirp, struct dirent *__restrict __entry, struct dirent **__restrict __result),readdir64_r,(__dirp,__entry,__result))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_RPC,readdir_r,(DIR *__restrict __dirp, struct dirent *__restrict __entry, struct dirent **__restrict __result),readdir64_r,(__dirp,__entry,__result))
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
@@ -417,27 +417,27 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir_r,(DIR *__restri
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir64_r,(DIR *__restrict __dirp, struct dirent64 *__restrict __entry, struct dirent64 **__restrict __result),readdirk_r,(__dirp,__entry,__result))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_RPC,readdir64_r,(DIR *__restrict __dirp, struct dirent64 *__restrict __entry, struct dirent64 **__restrict __result),readdirk_r,(__dirp,__entry,__result))
 #elif defined(__CRT_HAVE_readdirk64_r) && defined(__CRT_KOS)
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir64_r,(DIR *__restrict __dirp, struct dirent64 *__restrict __entry, struct dirent64 **__restrict __result),readdirk64_r,(__dirp,__entry,__result))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_RPC,readdir64_r,(DIR *__restrict __dirp, struct dirent64 *__restrict __entry, struct dirent64 **__restrict __result),readdirk64_r,(__dirp,__entry,__result))
 #elif defined(__CRT_HAVE_readdir_r) && !defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir64_r,(DIR *__restrict __dirp, struct dirent64 *__restrict __entry, struct dirent64 **__restrict __result),readdir_r,(__dirp,__entry,__result))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_RPC,readdir64_r,(DIR *__restrict __dirp, struct dirent64 *__restrict __entry, struct dirent64 **__restrict __result),readdir_r,(__dirp,__entry,__result))
 #elif defined(__CRT_HAVE___libc_readdir_r) && !defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir64_r,(DIR *__restrict __dirp, struct dirent64 *__restrict __entry, struct dirent64 **__restrict __result),__libc_readdir_r,(__dirp,__entry,__result))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_RPC,readdir64_r,(DIR *__restrict __dirp, struct dirent64 *__restrict __entry, struct dirent64 **__restrict __result),__libc_readdir_r,(__dirp,__entry,__result))
 #elif defined(__CRT_HAVE_readdir64_r) && !defined(__CRT_KOS)
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir64_r,(DIR *__restrict __dirp, struct dirent64 *__restrict __entry, struct dirent64 **__restrict __result),(__dirp,__entry,__result))
+__CDECLARE(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_RPC,readdir64_r,(DIR *__restrict __dirp, struct dirent64 *__restrict __entry, struct dirent64 **__restrict __result),(__dirp,__entry,__result))
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_POSIX */
@@ -446,97 +446,97 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,readdir64_r,(DIR *__restr
 #ifdef __CRT_HAVE_seekdir
 /* >> seekdir(3)
  * Get the directory stream position */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,seekdir,(DIR *__restrict __dirp, __LONGPTR_TYPE__ __pos),(__dirp,__pos))
+__CDECLARE_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,seekdir,(DIR *__restrict __dirp, __LONGPTR_TYPE__ __pos),(__dirp,__pos))
 #elif defined(__CRT_HAVE___libc_seekdir)
 /* >> seekdir(3)
  * Get the directory stream position */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,seekdir,(DIR *__restrict __dirp, __LONGPTR_TYPE__ __pos),__libc_seekdir,(__dirp,__pos))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,seekdir,(DIR *__restrict __dirp, __LONGPTR_TYPE__ __pos),__libc_seekdir,(__dirp,__pos))
 #endif /* ... */
 #ifdef __CRT_HAVE_telldir
 /* >> telldir(3)
  * Get the directory stream position */
-__CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_NCX,telldir,(DIR *__restrict __dirp),(__dirp))
+__CDECLARE(__ATTR_ACCESS_RW(1),__LONGPTR_TYPE__,__NOTHROW_NCX,telldir,(DIR *__restrict __dirp),(__dirp))
 #elif defined(__CRT_HAVE___libc_telldir)
 /* >> telldir(3)
  * Get the directory stream position */
-__CREDIRECT(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_NCX,telldir,(DIR *__restrict __dirp),__libc_telldir,(__dirp))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__LONGPTR_TYPE__,__NOTHROW_NCX,telldir,(DIR *__restrict __dirp),__libc_telldir,(__dirp))
 #endif /* ... */
 #endif /* __USE_MISC || __USE_XOPEN */
 
 #ifdef __USE_XOPEN2K8
 /* >> dirfd(3)
  * Return the underlying file descriptor of the given directory stream */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,dirfd,(DIR __KOS_FIXED_CONST *__restrict __dirp),(__dirp))
+__CDECLARE_OPT(__ATTR_PURE __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_NCX,dirfd,(DIR __KOS_FIXED_CONST *__restrict __dirp),(__dirp))
 #if defined(__CRT_HAVE_scandirk) && defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir,(char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),scandirk,(__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir,(char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),scandirk,(__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirk64) && defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir,(char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),scandirk64,(__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir,(char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),scandirk64,(__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandir) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-__CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir,(char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),(__dir,__namelist,__selector,__cmp))
+__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir,(char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),(__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandir64) && !defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir,(char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),scandir64,(__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir,(char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),scandir64,(__dir,__namelist,__selector,__cmp))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_scandiratk) && defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandiratk64) && defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat64) && !defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))))
 #include <libc/local/dirent/scandir.h>
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-__NAMESPACE_LOCAL_USING_OR_IMPL(scandir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL scandir)(char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scandir))(__dir, __namelist, __selector, __cmp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(scandir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL scandir)(char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scandir))(__dir, __namelist, __selector, __cmp); })
 #endif /* __AT_FDCWD && ((__CRT_HAVE_scandiratk && __CRT_KOS && (!__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_scandiratk64 && __CRT_KOS && (__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_scandirat && !__CRT_KOS && (!__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64)) || (__CRT_HAVE_scandirat64 && !__CRT_KOS && (__USE_FILE_OFFSET64 || _DIRENT_MATCHES_DIRENT64))) */
 #endif /* !... */
 #if defined(__CRT_HAVE_alphasortk) && defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,alphasort,(struct dirent const **__e1, struct dirent const **__e2),alphasortk,(__e1,__e2))
+__CREDIRECT(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,alphasort,(struct dirent const **__e1, struct dirent const **__e2),alphasortk,(__e1,__e2))
 #elif defined(__CRT_HAVE_alphasortk64) && defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,alphasort,(struct dirent const **__e1, struct dirent const **__e2),alphasortk64,(__e1,__e2))
+__CREDIRECT(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,alphasort,(struct dirent const **__e1, struct dirent const **__e2),alphasortk64,(__e1,__e2))
 #elif defined(__CRT_HAVE_alphasort) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-__CDECLARE(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,alphasort,(struct dirent const **__e1, struct dirent const **__e2),(__e1,__e2))
+__CDECLARE(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,alphasort,(struct dirent const **__e1, struct dirent const **__e2),(__e1,__e2))
 #elif defined(__CRT_HAVE_alphasort64) && !defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,alphasort,(struct dirent const **__e1, struct dirent const **__e2),alphasort64,(__e1,__e2))
+__CREDIRECT(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,alphasort,(struct dirent const **__e1, struct dirent const **__e2),alphasort64,(__e1,__e2))
 #else /* ... */
 #include <libc/local/dirent/alphasort.h>
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-__NAMESPACE_LOCAL_USING_OR_IMPL(alphasort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL alphasort)(struct dirent const **__e1, struct dirent const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(alphasort))(__e1, __e2); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(alphasort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_NCX(__LIBCCALL alphasort)(struct dirent const **__e1, struct dirent const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(alphasort))(__e1, __e2); })
 #endif /* !... */
 
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_alphasortk) && defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,alphasort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),alphasortk,(__e1,__e2))
+__CREDIRECT(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,alphasort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),alphasortk,(__e1,__e2))
 #elif defined(__CRT_HAVE_alphasortk64) && defined(__CRT_KOS)
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,alphasort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),alphasortk64,(__e1,__e2))
+__CREDIRECT(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,alphasort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),alphasortk64,(__e1,__e2))
 #elif defined(__CRT_HAVE_alphasort) && !defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,alphasort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),alphasort,(__e1,__e2))
+__CREDIRECT(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,alphasort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),alphasort,(__e1,__e2))
 #elif defined(__CRT_HAVE_alphasort64) && !defined(__CRT_KOS)
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-__CDECLARE(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,alphasort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),(__e1,__e2))
+__CDECLARE(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,alphasort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),(__e1,__e2))
 #else /* ... */
 #include <libc/local/dirent/alphasort64.h>
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
-__NAMESPACE_LOCAL_USING_OR_IMPL(alphasort64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL alphasort64)(struct dirent64 const **__e1, struct dirent64 const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(alphasort64))(__e1, __e2); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(alphasort64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_NCX(__LIBCCALL alphasort64)(struct dirent64 const **__e1, struct dirent64 const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(alphasort64))(__e1, __e2); })
 #endif /* !... */
 #endif /* __USE_LARGEFILE64 */
 
@@ -544,63 +544,63 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(alphasort64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__CRT_HAVE_scandiratk) && defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat,(__fd_t __dirfd, char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),scandiratk,(__dirfd,__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat,(__fd_t __dirfd, char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),scandiratk,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandiratk64) && defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat,(__fd_t __dirfd, char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),scandiratk64,(__dirfd,__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat,(__fd_t __dirfd, char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),scandiratk64,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirat) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
-__CDECLARE(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat,(__fd_t __dirfd, char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),(__dirfd,__dir,__namelist,__selector,__cmp))
+__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat,(__fd_t __dirfd, char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirat64) && !defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat,(__fd_t __dirfd, char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),scandirat64,(__dirfd,__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat,(__fd_t __dirfd, char const *__restrict __dir, struct dirent ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent const *__entry), int (__LIBKCALL *__cmp)(struct dirent const **__a, struct dirent const **__b)),scandirat64,(__dirfd,__dir,__namelist,__selector,__cmp))
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_scandirk) && defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir64,(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandirk,(__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir64,(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandirk,(__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirk64) && defined(__CRT_KOS)
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir64,(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandirk64,(__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir64,(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandirk64,(__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandir) && !defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir64,(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandir,(__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir64,(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandir,(__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandir64) && !defined(__CRT_KOS)
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-__CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir64,(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),(__dir,__namelist,__selector,__cmp))
+__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir64,(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),(__dir,__namelist,__selector,__cmp))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_scandiratk) && defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)) || (defined(__CRT_HAVE_scandiratk64) && defined(__CRT_KOS)) || (defined(__CRT_HAVE_scandirat) && !defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)) || (defined(__CRT_HAVE_scandirat64) && !defined(__CRT_KOS)))
 #include <libc/local/dirent/scandir64.h>
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
-__NAMESPACE_LOCAL_USING_OR_IMPL(scandir64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL scandir64)(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scandir64))(__dir, __namelist, __selector, __cmp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(scandir64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL scandir64)(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scandir64))(__dir, __namelist, __selector, __cmp); })
 #endif /* __AT_FDCWD && ((__CRT_HAVE_scandiratk && __CRT_KOS && _DIRENT_MATCHES_DIRENT64) || (__CRT_HAVE_scandiratk64 && __CRT_KOS) || (__CRT_HAVE_scandirat && !__CRT_KOS && _DIRENT_MATCHES_DIRENT64) || (__CRT_HAVE_scandirat64 && !__CRT_KOS)) */
 #endif /* !... */
 #if defined(__CRT_HAVE_scandiratk) && defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandiratk,(__dirfd,__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandiratk,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandiratk64) && defined(__CRT_KOS)
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandiratk64,(__dirfd,__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandiratk64,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirat) && !defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandirat,(__dirfd,__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandirat,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirat64) && !defined(__CRT_KOS)
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
-__CDECLARE(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),(__dirfd,__dir,__namelist,__selector,__cmp))
+__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),(__dirfd,__dir,__namelist,__selector,__cmp))
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_GNU */
@@ -610,37 +610,37 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandirat6
 #if defined(__CRT_HAVE_getdirentries) && (!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-__CDECLARE(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),(__fd,__buf,__nbytes,__basep))
+__CDECLARE(__ATTR_ACCESS_RW(4) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),(__fd,__buf,__nbytes,__basep))
 #elif defined(__CRT_HAVE___getdirentries) && (!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-__CREDIRECT(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),__getdirentries,(__fd,__buf,__nbytes,__basep))
+__CREDIRECT(__ATTR_ACCESS_RW(4) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),__getdirentries,(__fd,__buf,__nbytes,__basep))
 #elif defined(__CRT_HAVE___libc_getdirentries) && (!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-__CREDIRECT(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),__libc_getdirentries,(__fd,__buf,__nbytes,__basep))
+__CREDIRECT(__ATTR_ACCESS_RW(4) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),__libc_getdirentries,(__fd,__buf,__nbytes,__basep))
 #elif defined(__CRT_HAVE_getdirentries64) && (defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-__CREDIRECT(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),getdirentries64,(__fd,__buf,__nbytes,__basep))
+__CREDIRECT(__ATTR_ACCESS_RW(4) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),getdirentries64,(__fd,__buf,__nbytes,__basep))
 #endif /* ... */
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_getdirentries) && defined(__DIRENT32_MATCHES_DIRENT64)
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-__CREDIRECT(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries64,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off64_t *__restrict __basep),getdirentries,(__fd,__buf,__nbytes,__basep))
+__CREDIRECT(__ATTR_ACCESS_RW(4) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries64,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off64_t *__restrict __basep),getdirentries,(__fd,__buf,__nbytes,__basep))
 #elif defined(__CRT_HAVE___getdirentries) && defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-__CREDIRECT(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries64,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off64_t *__restrict __basep),__getdirentries,(__fd,__buf,__nbytes,__basep))
+__CREDIRECT(__ATTR_ACCESS_RW(4) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries64,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off64_t *__restrict __basep),__getdirentries,(__fd,__buf,__nbytes,__basep))
 #elif defined(__CRT_HAVE___libc_getdirentries) && defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-__CREDIRECT(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries64,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off64_t *__restrict __basep),__libc_getdirentries,(__fd,__buf,__nbytes,__basep))
+__CREDIRECT(__ATTR_ACCESS_RW(4) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries64,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off64_t *__restrict __basep),__libc_getdirentries,(__fd,__buf,__nbytes,__basep))
 #elif defined(__CRT_HAVE_getdirentries64)
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-__CDECLARE(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries64,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off64_t *__restrict __basep),(__fd,__buf,__nbytes,__basep))
+__CDECLARE(__ATTR_ACCESS_RW(4) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries64,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off64_t *__restrict __basep),(__fd,__buf,__nbytes,__basep))
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_MISC */
@@ -649,47 +649,47 @@ __CDECLARE(__ATTR_NONNULL((2, 4)),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries64,(
 #if defined(__CRT_HAVE_versionsortk) && defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,versionsort,(struct dirent const **__e1, struct dirent const **__e2),versionsortk,(__e1,__e2))
+__CREDIRECT(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,versionsort,(struct dirent const **__e1, struct dirent const **__e2),versionsortk,(__e1,__e2))
 #elif defined(__CRT_HAVE_versionsortk64) && defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,versionsort,(struct dirent const **__e1, struct dirent const **__e2),versionsortk64,(__e1,__e2))
+__CREDIRECT(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,versionsort,(struct dirent const **__e1, struct dirent const **__e2),versionsortk64,(__e1,__e2))
 #elif defined(__CRT_HAVE_versionsort) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-__CDECLARE(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,versionsort,(struct dirent const **__e1, struct dirent const **__e2),(__e1,__e2))
+__CDECLARE(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,versionsort,(struct dirent const **__e1, struct dirent const **__e2),(__e1,__e2))
 #elif defined(__CRT_HAVE_versionsort64) && !defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,versionsort,(struct dirent const **__e1, struct dirent const **__e2),versionsort64,(__e1,__e2))
+__CREDIRECT(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,versionsort,(struct dirent const **__e1, struct dirent const **__e2),versionsort64,(__e1,__e2))
 #else /* ... */
 #include <libc/local/dirent/versionsort.h>
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(versionsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL versionsort)(struct dirent const **__e1, struct dirent const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(versionsort))(__e1, __e2); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(versionsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_NCX(__LIBCCALL versionsort)(struct dirent const **__e1, struct dirent const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(versionsort))(__e1, __e2); })
 #endif /* !... */
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_versionsortk) && defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,versionsort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),versionsortk,(__e1,__e2))
+__CREDIRECT(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,versionsort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),versionsortk,(__e1,__e2))
 #elif defined(__CRT_HAVE_versionsortk64) && defined(__CRT_KOS)
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,versionsort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),versionsortk64,(__e1,__e2))
+__CREDIRECT(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,versionsort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),versionsortk64,(__e1,__e2))
 #elif defined(__CRT_HAVE_versionsort) && !defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,versionsort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),versionsort,(__e1,__e2))
+__CREDIRECT(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,versionsort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),versionsort,(__e1,__e2))
 #elif defined(__CRT_HAVE_versionsort64) && !defined(__CRT_KOS)
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-__CDECLARE(__ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,versionsort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),(__e1,__e2))
+__CDECLARE(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,versionsort64,(struct dirent64 const **__e1, struct dirent64 const **__e2),(__e1,__e2))
 #else /* ... */
 #include <libc/local/dirent/versionsort64.h>
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(versionsort64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL versionsort64)(struct dirent64 const **__e1, struct dirent64 const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(versionsort64))(__e1, __e2); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(versionsort64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_NCX(__LIBCCALL versionsort64)(struct dirent64 const **__e1, struct dirent64 const **__e2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(versionsort64))(__e1, __e2); })
 #endif /* !... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_GNU */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f7df867 */
+/* HASH CRC-32:0xd3515729 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,14 +51,14 @@ typedef struct dyn_string *dyn_string_t;
  * Initialize a given `struct dyn_string'
  * @param: min_chars: Minimum value for `self->allocated'
  * @return: 1: Always returns `1' */
-__CDECLARE(,int,__NOTHROW_NCX,dyn_string_init,(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars),(__self,__min_chars))
+__CDECLARE(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,dyn_string_init,(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars),(__self,__min_chars))
 #elif defined(__CRT_HAVE_xmalloc) || defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xcalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))
 #include <libc/local/dyn-string/dyn_string_init.h>
 /* >> dyn_string_init(3)
  * Initialize a given `struct dyn_string'
  * @param: min_chars: Minimum value for `self->allocated'
  * @return: 1: Always returns `1' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_init, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL dyn_string_init)(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_init))(__self, __min_chars); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL dyn_string_init)(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_init))(__self, __min_chars); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_new
 /* >> dyn_string_init(3)
@@ -79,24 +79,24 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_new, __FORCELOCAL __ATTR_ARTIFICIAL _
 #ifdef __CRT_HAVE_dyn_string_delete
 /* >> dyn_string_delete(3)
  * Delete a `dyn_string_t' previously allocated by `dyn_string_new(3)' */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,dyn_string_delete,(struct dyn_string *__self),(__self))
+__CDECLARE_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,dyn_string_delete,(struct dyn_string *__self),(__self))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #include <libc/local/dyn-string/dyn_string_delete.h>
 /* >> dyn_string_delete(3)
  * Delete a `dyn_string_t' previously allocated by `dyn_string_new(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_delete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL dyn_string_delete)(struct dyn_string *__self) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_delete))(__self); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_delete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) void __NOTHROW_NCX(__LIBCCALL dyn_string_delete)(struct dyn_string *__self) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_delete))(__self); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_release
 /* >> dyn_string_release(3)
  * Steal the  internal string  buffer  of `self'  and  free(self)
  * The returned pointer must be `free(3)'d once no longer needed. */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,dyn_string_release,(struct dyn_string *__self),(__self))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RW(1),char *,__NOTHROW_NCX,dyn_string_release,(struct dyn_string *__self),(__self))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #include <libc/local/dyn-string/dyn_string_release.h>
 /* >> dyn_string_release(3)
  * Steal the  internal string  buffer  of `self'  and  free(self)
  * The returned pointer must be `free(3)'d once no longer needed. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_release, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL dyn_string_release)(struct dyn_string *__self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_release))(__self); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_release, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RW(1) char *__NOTHROW_NCX(__LIBCCALL dyn_string_release)(struct dyn_string *__self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_release))(__self); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_resize
 /* >> dyn_string_release(3)
@@ -104,7 +104,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_release, __FORCELOCAL __ATTR_ARTIFICI
  * `min_chars' total characters (excluding the trailing NUL)
  * @return: * : Always re-returns `self'
  *              -> uses `xmalloc(3)', so no error-return-value */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),struct dyn_string *,__NOTHROW_NCX,dyn_string_resize,(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars),(__self,__min_chars))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RW(1),struct dyn_string *,__NOTHROW_NCX,dyn_string_resize,(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars),(__self,__min_chars))
 #elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed))
 #include <libc/local/dyn-string/dyn_string_resize.h>
 /* >> dyn_string_release(3)
@@ -112,165 +112,165 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),struct dyn_string *,__NOTHROW_N
  * `min_chars' total characters (excluding the trailing NUL)
  * @return: * : Always re-returns `self'
  *              -> uses `xmalloc(3)', so no error-return-value */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_resize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct dyn_string *__NOTHROW_NCX(__LIBCCALL dyn_string_resize)(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_resize))(__self, __min_chars); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_resize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RW(1) struct dyn_string *__NOTHROW_NCX(__LIBCCALL dyn_string_resize)(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_resize))(__self, __min_chars); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_clear
 /* >> dyn_string_clear(3)
  * Set the length of `self' to `0' */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,dyn_string_clear,(struct dyn_string *__self),(__self))
+__CDECLARE_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,dyn_string_clear,(struct dyn_string *__self),(__self))
 #else /* __CRT_HAVE_dyn_string_clear */
 #include <libc/local/dyn-string/dyn_string_clear.h>
 /* >> dyn_string_clear(3)
  * Set the length of `self' to `0' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_clear, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL dyn_string_clear)(struct dyn_string *__self) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_clear))(__self); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_clear, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) void __NOTHROW_NCX(__LIBCCALL dyn_string_clear)(struct dyn_string *__self) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_clear))(__self); })
 #endif /* !__CRT_HAVE_dyn_string_clear */
 #ifdef __CRT_HAVE_dyn_string_copy
 /* >> dyn_string_copy(3)
  * Assign `src' to `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,dyn_string_copy,(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src),(__dst,__src))
+__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,dyn_string_copy,(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src),(__dst,__src))
 #elif defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 #include <libc/local/dyn-string/dyn_string_copy.h>
 /* >> dyn_string_copy(3)
  * Assign `src' to `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_copy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL dyn_string_copy)(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_copy))(__dst, __src); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_copy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL dyn_string_copy)(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_copy))(__dst, __src); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_copy_cstr
 /* >> dyn_string_copy_cstr(3)
  * Assign   `src'   to  `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,dyn_string_copy_cstr,(struct dyn_string *__dst, char const *__src),(__dst,__src))
+__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,dyn_string_copy_cstr,(struct dyn_string *__dst, char const *__src),(__dst,__src))
 #elif defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 #include <libc/local/dyn-string/dyn_string_copy_cstr.h>
 /* >> dyn_string_copy_cstr(3)
  * Assign   `src'   to  `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_copy_cstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL dyn_string_copy_cstr)(struct dyn_string *__dst, char const *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_copy_cstr))(__dst, __src); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_copy_cstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL dyn_string_copy_cstr)(struct dyn_string *__dst, char const *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_copy_cstr))(__dst, __src); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_prepend
 /* >> dyn_string_prepend(3)
  * Insert `src' at the start of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,dyn_string_prepend,(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src),(__dst,__src))
+__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,dyn_string_prepend,(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src),(__dst,__src))
 #elif defined(__CRT_HAVE_dyn_string_insert) || defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 #include <libc/local/dyn-string/dyn_string_prepend.h>
 /* >> dyn_string_prepend(3)
  * Insert `src' at the start of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_prepend, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL dyn_string_prepend)(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_prepend))(__dst, __src); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_prepend, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL dyn_string_prepend)(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_prepend))(__dst, __src); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_prepend_cstr
 /* >> dyn_string_prepend_cstr(3)
  * Insert `src' at the start of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,dyn_string_prepend_cstr,(struct dyn_string *__dst, char const *__src),(__dst,__src))
+__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,dyn_string_prepend_cstr,(struct dyn_string *__dst, char const *__src),(__dst,__src))
 #elif defined(__CRT_HAVE_dyn_string_insert_cstr) || defined(__CRT_HAVE_dyn_string_insert) || defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 #include <libc/local/dyn-string/dyn_string_prepend_cstr.h>
 /* >> dyn_string_prepend_cstr(3)
  * Insert `src' at the start of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_prepend_cstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL dyn_string_prepend_cstr)(struct dyn_string *__dst, char const *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_prepend_cstr))(__dst, __src); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_prepend_cstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL dyn_string_prepend_cstr)(struct dyn_string *__dst, char const *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_prepend_cstr))(__dst, __src); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_insert
 /* >> dyn_string_insert(3)
  * Insert `src' into `dst' at position `index'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,dyn_string_insert,(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, struct dyn_string __KOS_FIXED_CONST *__src),(__dst,__index,__src))
+__CDECLARE(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,dyn_string_insert,(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, struct dyn_string __KOS_FIXED_CONST *__src),(__dst,__index,__src))
 #elif defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 #include <libc/local/dyn-string/dyn_string_insert.h>
 /* >> dyn_string_insert(3)
  * Insert `src' into `dst' at position `index'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_insert, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int __NOTHROW_NCX(__LIBCCALL dyn_string_insert)(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, struct dyn_string __KOS_FIXED_CONST *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_insert))(__dst, __index, __src); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_insert, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL dyn_string_insert)(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, struct dyn_string __KOS_FIXED_CONST *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_insert))(__dst, __index, __src); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_insert_cstr
 /* >> dyn_string_insert_cstr(3)
  * Insert `src' into `dst' at position `index'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,dyn_string_insert_cstr,(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, char const *__src),(__dst,__index,__src))
+__CDECLARE(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,dyn_string_insert_cstr,(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, char const *__src),(__dst,__index,__src))
 #elif defined(__CRT_HAVE_dyn_string_insert) || defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 #include <libc/local/dyn-string/dyn_string_insert_cstr.h>
 /* >> dyn_string_insert_cstr(3)
  * Insert `src' into `dst' at position `index'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_insert_cstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) int __NOTHROW_NCX(__LIBCCALL dyn_string_insert_cstr)(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, char const *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_insert_cstr))(__dst, __index, __src); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_insert_cstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL dyn_string_insert_cstr)(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, char const *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_insert_cstr))(__dst, __index, __src); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_insert_char
 /* >> dyn_string_insert_char(3)
  * Insert `ch' into `dst' at position `index'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,dyn_string_insert_char,(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, int __ch),(__dst,__index,__ch))
+__CDECLARE(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,dyn_string_insert_char,(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, int __ch),(__dst,__index,__ch))
 #elif defined(__CRT_HAVE_dyn_string_insert) || defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 #include <libc/local/dyn-string/dyn_string_insert_char.h>
 /* >> dyn_string_insert_char(3)
  * Insert `ch' into `dst' at position `index'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_insert_char, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL dyn_string_insert_char)(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_insert_char))(__dst, __index, __ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_insert_char, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL dyn_string_insert_char)(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_insert_char))(__dst, __index, __ch); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_append
 /* >> dyn_string_append(3)
  * Append `src' to the end of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,dyn_string_append,(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src),(__dst,__src))
+__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,dyn_string_append,(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src),(__dst,__src))
 #elif defined(__CRT_HAVE_dyn_string_insert) || defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 #include <libc/local/dyn-string/dyn_string_append.h>
 /* >> dyn_string_append(3)
  * Append `src' to the end of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_append, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL dyn_string_append)(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_append))(__dst, __src); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_append, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL dyn_string_append)(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_append))(__dst, __src); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_append_cstr
 /* >> dyn_string_append_cstr(3)
  * Append `src' to the end of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,dyn_string_append_cstr,(struct dyn_string *__dst, char const *__src),(__dst,__src))
+__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,dyn_string_append_cstr,(struct dyn_string *__dst, char const *__src),(__dst,__src))
 #elif defined(__CRT_HAVE_dyn_string_insert_cstr) || defined(__CRT_HAVE_dyn_string_insert) || defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 #include <libc/local/dyn-string/dyn_string_append_cstr.h>
 /* >> dyn_string_append_cstr(3)
  * Append `src' to the end of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_append_cstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL dyn_string_append_cstr)(struct dyn_string *__dst, char const *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_append_cstr))(__dst, __src); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_append_cstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL dyn_string_append_cstr)(struct dyn_string *__dst, char const *__src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_append_cstr))(__dst, __src); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_append_char
 /* >> dyn_string_append_char(3)
  * Append `ch' to the end of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,dyn_string_append_char,(struct dyn_string *__dst, int __ch),(__dst,__ch))
+__CDECLARE(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,dyn_string_append_char,(struct dyn_string *__dst, int __ch),(__dst,__ch))
 #elif defined(__CRT_HAVE_dyn_string_insert_char) || defined(__CRT_HAVE_dyn_string_insert) || defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 #include <libc/local/dyn-string/dyn_string_append_char.h>
 /* >> dyn_string_append_char(3)
  * Append `ch' to the end of `dst'
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_append_char, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL dyn_string_append_char)(struct dyn_string *__dst, int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_append_char))(__dst, __ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_append_char, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL dyn_string_append_char)(struct dyn_string *__dst, int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_append_char))(__dst, __ch); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_substring
 /* >> dyn_string_substring(3)
  * Assign  the substring `src[start:end]'  to `dst'. Note that
  * the given indices _must_ be properly ordered, and in-range!
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,dyn_string_substring,(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src, __STDC_INT_AS_SIZE_T __start, __STDC_INT_AS_SIZE_T __end),(__dst,__src,__start,__end))
+__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,dyn_string_substring,(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src, __STDC_INT_AS_SIZE_T __start, __STDC_INT_AS_SIZE_T __end),(__dst,__src,__start,__end))
 #elif defined(__CRT_HAVE_dyn_string_copy) || defined(__CRT_HAVE_dyn_string_resize) || ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed)))
 #include <libc/local/dyn-string/dyn_string_substring.h>
 /* >> dyn_string_substring(3)
  * Assign  the substring `src[start:end]'  to `dst'. Note that
  * the given indices _must_ be properly ordered, and in-range!
  * @return: 1 : Always returned (uses `xmalloc(3)', so no error-return-value) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_substring, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL dyn_string_substring)(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src, __STDC_INT_AS_SIZE_T __start, __STDC_INT_AS_SIZE_T __end) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_substring))(__dst, __src, __start, __end); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_substring, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL dyn_string_substring)(struct dyn_string *__dst, struct dyn_string __KOS_FIXED_CONST *__src, __STDC_INT_AS_SIZE_T __start, __STDC_INT_AS_SIZE_T __end) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_substring))(__dst, __src, __start, __end); })
 #endif /* ... */
 #ifdef __CRT_HAVE_dyn_string_eq
 /* >> dyn_string_eq(3)
  * Return `1' if the contents of the given strings are equal; `0' otherwise.
  * @return: 0 : Strings differ
  * @return: 1 : Strings are identical */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,dyn_string_eq,(struct dyn_string __KOS_FIXED_CONST *__lhs, struct dyn_string __KOS_FIXED_CONST *__rhs),(__lhs,__rhs))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,dyn_string_eq,(struct dyn_string __KOS_FIXED_CONST *__lhs, struct dyn_string __KOS_FIXED_CONST *__rhs),(__lhs,__rhs))
 #else /* __CRT_HAVE_dyn_string_eq */
 #include <libc/local/dyn-string/dyn_string_eq.h>
 /* >> dyn_string_eq(3)
  * Return `1' if the contents of the given strings are equal; `0' otherwise.
  * @return: 0 : Strings differ
  * @return: 1 : Strings are identical */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_eq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL dyn_string_eq)(struct dyn_string __KOS_FIXED_CONST *__lhs, struct dyn_string __KOS_FIXED_CONST *__rhs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_eq))(__lhs, __rhs); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dyn_string_eq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_NCX(__LIBCCALL dyn_string_eq)(struct dyn_string __KOS_FIXED_CONST *__lhs, struct dyn_string __KOS_FIXED_CONST *__rhs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dyn_string_eq))(__lhs, __rhs); })
 #endif /* !__CRT_HAVE_dyn_string_eq */
 
 __SYSDECL_END

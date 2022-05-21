@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda7877dc */
+/* HASH CRC-32:0x2481f2fa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __SYSDECL_BEGIN
  * systems, this function is fairly dumb and relies on all traversed
  * code having been compiled with function frames enabled.
  * @return: * : The actual number of pointers written to `array' (always `<= size') */
-__CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_SIZE_T __size),(__array,__size))
+__CDECLARE(__ATTR_ACCESS_WRS(1, 2),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_SIZE_T __size),(__array,__size))
 #elif defined(__CRT_HAVE___backtrace)
 /* >> backtrace(3)
  * Create a  traceback of  up to  `size' instruction  pointers  from
@@ -58,7 +58,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(voi
  * systems, this function is fairly dumb and relies on all traversed
  * code having been compiled with function frames enabled.
  * @return: * : The actual number of pointers written to `array' (always `<= size') */
-__CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_SIZE_T __size),__backtrace,(__array,__size))
+__CREDIRECT(__ATTR_ACCESS_WRS(1, 2),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_SIZE_T __size),__backtrace,(__array,__size))
 #endif /* ... */
 #ifdef __CRT_HAVE_backtrace_symbols
 /* >> backtrace_symbols(3)
@@ -77,7 +77,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(vo
  * not the individual strings pointed-to by that vector!
  * @return: * :   A heap pointer to a vector of function names
  * @return: NULL: Insufficient heap memory available */
-__CDECLARE(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, __STDC_INT_AS_SIZE_T __size),(__array,__size))
+__CDECLARE(__ATTR_ACCESS_ROS(1, 2),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, __STDC_INT_AS_SIZE_T __size),(__array,__size))
 #elif defined(__CRT_HAVE___backtrace_symbols)
 /* >> backtrace_symbols(3)
  * Return  an  array  of  exactly  `size'  elements  that  contains  the
@@ -95,7 +95,7 @@ __CDECLARE(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *co
  * not the individual strings pointed-to by that vector!
  * @return: * :   A heap pointer to a vector of function names
  * @return: NULL: Insufficient heap memory available */
-__CREDIRECT(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, __STDC_INT_AS_SIZE_T __size),__backtrace_symbols,(__array,__size))
+__CREDIRECT(__ATTR_ACCESS_ROS(1, 2),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, __STDC_INT_AS_SIZE_T __size),__backtrace_symbols,(__array,__size))
 #endif /* ... */
 #ifdef __CRT_HAVE_backtrace_symbols_fd
 /* >> backtrace_symbols_fd(3)
@@ -103,14 +103,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *c
  * of symbol names, print the  names directly to `fd', such  that
  * one  function name will be written per line, with `size' lines
  * written in total. */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),(__array,__size,__fd))
+__CDECLARE_VOID(__ATTR_ACCESS_ROS(1, 2),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),(__array,__size,__fd))
 #elif defined(__CRT_HAVE___backtrace_symbols_fd)
 /* >> backtrace_symbols_fd(3)
  * Same as `backtrace_symbols()', but rather than return a vector
  * of symbol names, print the  names directly to `fd', such  that
  * one  function name will be written per line, with `size' lines
  * written in total. */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),__backtrace_symbols_fd,(__array,__size,__fd))
+__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),__backtrace_symbols_fd,(__array,__size,__fd))
 #endif /* ... */
 
 __SYSDECL_END

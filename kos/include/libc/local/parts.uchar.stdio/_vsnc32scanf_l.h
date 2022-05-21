@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca877aec */
+/* HASH CRC-32:0xe8ca5530 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep___stdio_common_vsc32scanf_defined
 #define __local___localdep___stdio_common_vsc32scanf_defined
 #if defined(__CRT_HAVE___stdio_common_vswscanf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_LIBC_C32SCANF(4, 0) __ATTR_NONNULL((4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vsc32scanf,(__UINT64_TYPE__ __options, __CHAR32_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vswscanf,(__options,__buf,__bufsize,__format,__locale,__args))
+__CREDIRECT(__ATTR_ACCESS_RO(4) __ATTR_ACCESS_ROS(2, 3) __ATTR_LIBC_C32SCANF(4, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vsc32scanf,(__UINT64_TYPE__ __options, __CHAR32_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vswscanf,(__options,__buf,__bufsize,__format,__locale,__args))
 #elif defined(__CRT_HAVE_KOS$__stdio_common_vswscanf)
-__CREDIRECT_KOS(__ATTR_LIBC_C32SCANF(4, 0) __ATTR_NONNULL((4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vsc32scanf,(__UINT64_TYPE__ __options, __CHAR32_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vswscanf,(__options,__buf,__bufsize,__format,__locale,__args))
+__CREDIRECT_KOS(__ATTR_ACCESS_RO(4) __ATTR_ACCESS_ROS(2, 3) __ATTR_LIBC_C32SCANF(4, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vsc32scanf,(__UINT64_TYPE__ __options, __CHAR32_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vswscanf,(__options,__buf,__bufsize,__format,__locale,__args))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/__stdio_common_vswscanf.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <corecrt_stdio_config.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vsnc32scanf_l) __ATTR_WUNUSED __ATTR_LIBC_C32SCANF(3, 0) __ATTR_NONNULL((3)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(_vsnc32scanf_l) __ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_ROS(1, 2) __ATTR_LIBC_C32SCANF(3, 0) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(_vsnc32scanf_l))(__CHAR32_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR32_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
 	return (__NAMESPACE_LOCAL_SYM __localdep___stdio_common_vsc32scanf)(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS, __buf, __bufsize, __format, __locale, __args);
 }

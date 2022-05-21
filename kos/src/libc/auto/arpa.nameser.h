@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac6576bd */
+/* HASH CRC-32:0x2951c2e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,28 +30,28 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) u_int NOTHROW_NCX(LIBDCALL libd_ns_get16)(u_char const *srcptr);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) u_int NOTHROW_NCX(LIBDCALL libd_ns_get16)(u_char const *srcptr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) u_int NOTHROW_NCX(LIBCCALL libc_ns_get16)(u_char const *srcptr);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) u_int NOTHROW_NCX(LIBCCALL libc_ns_get16)(u_char const *srcptr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) u_long NOTHROW_NCX(LIBDCALL libd_ns_get32)(u_char const *srcptr);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) u_long NOTHROW_NCX(LIBDCALL libd_ns_get32)(u_char const *srcptr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) u_long NOTHROW_NCX(LIBCCALL libc_ns_get32)(u_char const *srcptr);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) u_long NOTHROW_NCX(LIBCCALL libc_ns_get32)(u_char const *srcptr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((2)) void NOTHROW_NCX(LIBDCALL libd_ns_put16)(u_int val, u_char *destptr);
+INTDEF ATTR_ACCESS_WR(2) void NOTHROW_NCX(LIBDCALL libd_ns_put16)(u_int val, u_char *destptr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF NONNULL((2)) void NOTHROW_NCX(LIBCCALL libc_ns_put16)(u_int val, u_char *destptr);
+INTDEF ATTR_ACCESS_WR(2) void NOTHROW_NCX(LIBCCALL libc_ns_put16)(u_int val, u_char *destptr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((2)) void NOTHROW_NCX(LIBDCALL libd_ns_put32)(u_long val, u_char *destptr);
+INTDEF ATTR_ACCESS_WR(2) void NOTHROW_NCX(LIBDCALL libd_ns_put32)(u_long val, u_char *destptr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF NONNULL((2)) void NOTHROW_NCX(LIBCCALL libc_ns_put32)(u_long val, u_char *destptr);
+INTDEF ATTR_ACCESS_WR(2) void NOTHROW_NCX(LIBCCALL libc_ns_put32)(u_long val, u_char *destptr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd_ns_initparse)(u_char const *a, int b, ns_msg *c);
@@ -74,7 +74,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_ns_name_compress)(char const *srcbuf, u_cha
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ns_name_compress)(char const *srcbuf, u_char *dstbuf, size_t dstbufsize, u_char const **d, u_char const **e);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_ns_name_skip)(u_char const **p_msg_ptr, u_char const *msg_end);
+INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ns_name_skip)(u_char const **p_msg_ptr, u_char const *msg_end);
 INTDEF void NOTHROW_NCX(LIBDCALL libd_ns_name_rollback)(u_char const *a, u_char const **b, u_char const **c);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_ns_sign)(u_char *a, int *b, int c, int d, void *e, u_char const *f, int g, u_char *h, int *i, time_t j);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_ns_sign2)(u_char *a, int *b, int c, int d, void *e, u_char const *f, int g, u_char *h, int *i, time_t j, u_char **k, u_char **l);

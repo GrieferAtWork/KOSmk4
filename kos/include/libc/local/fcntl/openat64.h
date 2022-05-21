@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb213dbc8 */
+/* HASH CRC-32:0xfbd25214 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_openat32_defined
 #define __local___localdep_openat32_defined
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat32,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2),__fd_t,__NOTHROW_RPC,__localdep_openat32,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #endif /* !__local___localdep_openat32_defined */
-__LOCAL_LIBC(openat64) __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t
+__LOCAL_LIBC(openat64) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __fd_t
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(openat64))(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) {
 	__fd_t __result;
 	__builtin_va_list __args;

@@ -56,7 +56,7 @@ typedef struct dyn_string *dyn_string_t;
 [[decl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[impl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[requires_function(xmalloc)]]
-int dyn_string_init(struct dyn_string *self, __STDC_INT_AS_SIZE_T min_chars) {
+int dyn_string_init([[out]] struct dyn_string *self, __STDC_INT_AS_SIZE_T min_chars) {
 	if (min_chars == 0)
 		min_chars = 1;
 	self->@s@ = (char *)xmalloc((size_t)min_chars * sizeof(char));
@@ -91,7 +91,7 @@ struct dyn_string *dyn_string_new(__STDC_INT_AS_SIZE_T min_chars) {
 [[decl_include("<bits/crt/dyn-string.h>")]]
 [[impl_include("<bits/crt/dyn-string.h>")]]
 [[requires_function(free)]]
-void dyn_string_delete([[nonnull]] struct dyn_string *self) {
+void dyn_string_delete([[inout]] struct dyn_string *self) {
 	free(self->@s@);
 	free(self);
 }
@@ -102,7 +102,7 @@ void dyn_string_delete([[nonnull]] struct dyn_string *self) {
 [[nonnull, decl_include("<bits/crt/dyn-string.h>")]]
 [[impl_include("<bits/crt/dyn-string.h>")]]
 [[requires_function(free)]]
-char *dyn_string_release([[nonnull]] struct dyn_string *self) {
+char *dyn_string_release([[inout]] struct dyn_string *self) {
 	char *result = self->@s@;
 @@pp_if $has_function(realloc) && !defined(__OPTIMIZE_SIZE__)@@
 	result = (char *)realloc(result, (self->@length@ + 1) * sizeof(char));
@@ -122,7 +122,7 @@ char *dyn_string_release([[nonnull]] struct dyn_string *self) {
 [[decl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[impl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[requires_function(realloc, xrealloc)]]
-struct dyn_string *dyn_string_resize([[nonnull]] struct dyn_string *self,
+struct dyn_string *dyn_string_resize([[inout]] struct dyn_string *self,
                                      __STDC_INT_AS_SIZE_T min_chars) {
 	char *newbuf;
 	size_t newalloc;
@@ -150,7 +150,7 @@ struct dyn_string *dyn_string_resize([[nonnull]] struct dyn_string *self,
 @@Set the length of `self' to `0'
 [[decl_include("<bits/crt/dyn-string.h>")]]
 [[impl_include("<bits/crt/dyn-string.h>")]]
-void dyn_string_clear([[nonnull]] struct dyn_string *self) {
+void dyn_string_clear([[inout]] struct dyn_string *self) {
 	self->@length@ = 0;
 	self->@s@[0]   = '\0';
 }
@@ -162,8 +162,8 @@ void dyn_string_clear([[nonnull]] struct dyn_string *self) {
 [[decl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[impl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[requires_function(dyn_string_resize)]]
-int dyn_string_copy([[nonnull]] struct dyn_string *dst,
-                    [[nonnull]] struct dyn_string __KOS_FIXED_CONST *src) {
+int dyn_string_copy([[inout]] struct dyn_string *dst,
+                    [[in]] struct dyn_string __KOS_FIXED_CONST *src) {
 	dst = dyn_string_resize(dst, src->@length@);
 	dst->@length@ = src->@length@;
 	memcpyc(dst->@s@, src->@s@, src->@length@ + 1, sizeof(char));
@@ -176,8 +176,8 @@ int dyn_string_copy([[nonnull]] struct dyn_string *dst,
 [[decl_include("<bits/crt/dyn-string.h>")]]
 [[impl_include("<bits/crt/dyn-string.h>")]]
 [[requires_function(dyn_string_resize)]]
-int dyn_string_copy_cstr([[nonnull]] struct dyn_string *dst,
-                         [[nonnull]] char const *src) {
+int dyn_string_copy_cstr([[inout]] struct dyn_string *dst,
+                         [[in]] char const *src) {
 	size_t srclen = strlen(src);
 	dst = dyn_string_resize(dst, srclen);
 	dst->@length@ = srclen;
@@ -191,8 +191,8 @@ int dyn_string_copy_cstr([[nonnull]] struct dyn_string *dst,
 [[decl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[impl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[requires_function(dyn_string_insert)]]
-int dyn_string_prepend([[nonnull]] struct dyn_string *dst,
-                       [[nonnull]] struct dyn_string __KOS_FIXED_CONST *src) {
+int dyn_string_prepend([[inout]] struct dyn_string *dst,
+                       [[in]] struct dyn_string __KOS_FIXED_CONST *src) {
 	return dyn_string_insert(dst, 0, src);
 }
 
@@ -202,8 +202,8 @@ int dyn_string_prepend([[nonnull]] struct dyn_string *dst,
 [[decl_include("<bits/crt/dyn-string.h>")]]
 [[impl_include("<bits/crt/dyn-string.h>")]]
 [[requires_function(dyn_string_insert_cstr)]]
-int dyn_string_prepend_cstr([[nonnull]] struct dyn_string *dst,
-                            [[nonnull]] char const *src) {
+int dyn_string_prepend_cstr([[inout]] struct dyn_string *dst,
+                            [[in]] char const *src) {
 	return dyn_string_insert_cstr(dst, 0, src);
 }
 
@@ -214,8 +214,8 @@ int dyn_string_prepend_cstr([[nonnull]] struct dyn_string *dst,
 [[decl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[impl_include("<features.h>", "<bits/crt/dyn-string.h>", "<hybrid/__assert.h>")]]
 [[requires_function(dyn_string_resize)]]
-int dyn_string_insert([[nonnull]] struct dyn_string *dst, __STDC_INT_AS_SIZE_T index,
-                      [[nonnull]] struct dyn_string __KOS_FIXED_CONST *src) {
+int dyn_string_insert([[inout]] struct dyn_string *dst, __STDC_INT_AS_SIZE_T index,
+                      [[in]] struct dyn_string __KOS_FIXED_CONST *src) {
 	__hybrid_assert((size_t)index <= dst->@length@);
 	dst = dyn_string_resize(dst, dst->@length@ + src->@length@);
 	/* Make space for the new string. */
@@ -234,8 +234,8 @@ int dyn_string_insert([[nonnull]] struct dyn_string *dst, __STDC_INT_AS_SIZE_T i
 [[decl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[impl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[requires_function(dyn_string_insert)]]
-int dyn_string_insert_cstr([[nonnull]] struct dyn_string *dst, __STDC_INT_AS_SIZE_T index,
-                           [[nonnull]] char const *src) {
+int dyn_string_insert_cstr([[inout]] struct dyn_string *dst, __STDC_INT_AS_SIZE_T index,
+                           [[in]] char const *src) {
 	struct dyn_string fakesrc;
 	fakesrc.@s@      = (char *)src;
 	fakesrc.@length@ = strlen(src);
@@ -248,7 +248,7 @@ int dyn_string_insert_cstr([[nonnull]] struct dyn_string *dst, __STDC_INT_AS_SIZ
 [[decl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[impl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[requires_function(dyn_string_insert)]]
-int dyn_string_insert_char([[nonnull]] struct dyn_string *dst,
+int dyn_string_insert_char([[inout]] struct dyn_string *dst,
                            __STDC_INT_AS_SIZE_T index, int ch) {
 	char chstr[1];
 	struct dyn_string fakesrc;
@@ -264,8 +264,8 @@ int dyn_string_insert_char([[nonnull]] struct dyn_string *dst,
 [[decl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[impl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[requires_function(dyn_string_insert)]]
-int dyn_string_append([[nonnull]] struct dyn_string *dst,
-                      [[nonnull]] struct dyn_string __KOS_FIXED_CONST *src) {
+int dyn_string_append([[inout]] struct dyn_string *dst,
+                      [[in]] struct dyn_string __KOS_FIXED_CONST *src) {
 	return dyn_string_insert(dst, dst->@length@, src);
 }
 
@@ -275,8 +275,8 @@ int dyn_string_append([[nonnull]] struct dyn_string *dst,
 [[decl_include("<bits/crt/dyn-string.h>")]]
 [[impl_include("<bits/crt/dyn-string.h>")]]
 [[requires_function(dyn_string_insert_cstr)]]
-int dyn_string_append_cstr([[nonnull]] struct dyn_string *dst,
-                           [[nonnull]] char const *src) {
+int dyn_string_append_cstr([[inout]] struct dyn_string *dst,
+                           [[in]] char const *src) {
 	return dyn_string_insert_cstr(dst, dst->@length@, src);
 }
 
@@ -286,7 +286,7 @@ int dyn_string_append_cstr([[nonnull]] struct dyn_string *dst,
 [[decl_include("<bits/crt/dyn-string.h>")]]
 [[impl_include("<bits/crt/dyn-string.h>")]]
 [[requires_function(dyn_string_insert_char)]]
-int dyn_string_append_char([[nonnull]] struct dyn_string *dst, int ch) {
+int dyn_string_append_char([[inout]] struct dyn_string *dst, int ch) {
 	return dyn_string_insert_char(dst, dst->@length@, ch);
 }
 
@@ -299,8 +299,8 @@ int dyn_string_append_char([[nonnull]] struct dyn_string *dst, int ch) {
 [[impl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[requires_function(dyn_string_copy)]]
-int dyn_string_substring([[nonnull]] struct dyn_string *dst,
-                         [[nonnull]] struct dyn_string __KOS_FIXED_CONST *src,
+int dyn_string_substring([[inout]] struct dyn_string *dst,
+                         [[in]] struct dyn_string __KOS_FIXED_CONST *src,
                          __STDC_INT_AS_SIZE_T start,
                          __STDC_INT_AS_SIZE_T end) {
 	struct dyn_string fakesrc;
@@ -319,8 +319,8 @@ int dyn_string_substring([[nonnull]] struct dyn_string *dst,
 [[pure, wunused]]
 [[decl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
 [[impl_include("<features.h>", "<bits/crt/dyn-string.h>")]]
-int dyn_string_eq(struct dyn_string __KOS_FIXED_CONST *lhs,
-                  struct dyn_string __KOS_FIXED_CONST *rhs) {
+int dyn_string_eq([[in]] struct dyn_string __KOS_FIXED_CONST *lhs,
+                  [[in]] struct dyn_string __KOS_FIXED_CONST *rhs) {
 	if (lhs->@length@ != rhs->@length@)
 		return 0;
 	return memcmp(lhs->@s@, rhs->@s@, lhs->@length@ * sizeof(char)) == 0 ? 1 : 0;

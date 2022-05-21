@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8e7dfcd */
+/* HASH CRC-32:0xf0f12251 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7773,10 +7773,10 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 3
 #endif /* !... */
 #endif /* !__memicmp_defined */
 #ifdef __CRT_HAVE__strset_s
-__CDECLARE(__ATTR_ACCESS_RW_OPT(1),__errno_t,__NOTHROW_NCX,_strset_s,(char *__dst, __SIZE_TYPE__ __dstsize, int __ch),(__dst,__dstsize,__ch))
+__CDECLARE(__ATTR_ACCESS_RWS(1, 2),__errno_t,__NOTHROW_NCX,_strset_s,(char *__dst, __SIZE_TYPE__ __dstsize, int __ch),(__dst,__dstsize,__ch))
 #else /* __CRT_HAVE__strset_s */
 #include <libc/local/string/_strset_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_strset_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW_OPT(1) __errno_t __NOTHROW_NCX(__LIBCCALL _strset_s)(char *__dst, __SIZE_TYPE__ __dstsize, int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strset_s))(__dst, __dstsize, __ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_strset_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RWS(1, 2) __errno_t __NOTHROW_NCX(__LIBCCALL _strset_s)(char *__dst, __SIZE_TYPE__ __dstsize, int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strset_s))(__dst, __dstsize, __ch); })
 #endif /* !__CRT_HAVE__strset_s */
 
 #ifdef __USE_DOS_SLIB
@@ -8069,10 +8069,10 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),i
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_NCX(__LIBCCALL _strnicmp_l)(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncasecmp_l))(__s1, __s2, __maxlen, __locale); }
 #endif /* !... */
 #ifdef __CRT_HAVE__strnset_s
-__CDECLARE(__ATTR_ACCESS_RW_OPT(1),__errno_t,__NOTHROW_NCX,_strnset_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, int __ch, __SIZE_TYPE__ __maxlen),(__buf,__buflen,__ch,__maxlen))
+__CDECLARE(__ATTR_ACCESS_RWS(1, 4),__errno_t,__NOTHROW_NCX,_strnset_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, int __ch, __SIZE_TYPE__ __maxlen),(__buf,__buflen,__ch,__maxlen))
 #else /* __CRT_HAVE__strnset_s */
 #include <libc/local/string/_strnset_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_strnset_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW_OPT(1) __errno_t __NOTHROW_NCX(__LIBCCALL _strnset_s)(char *__restrict __buf, __SIZE_TYPE__ __buflen, int __ch, __SIZE_TYPE__ __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strnset_s))(__buf, __buflen, __ch, __maxlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_strnset_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RWS(1, 4) __errno_t __NOTHROW_NCX(__LIBCCALL _strnset_s)(char *__restrict __buf, __SIZE_TYPE__ __buflen, int __ch, __SIZE_TYPE__ __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_strnset_s))(__buf, __buflen, __ch, __maxlen); })
 #endif /* !__CRT_HAVE__strnset_s */
 #ifdef __CRT_HAVE_strrev
 __CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RW(1),char *,__NOTHROW_NCX,_strrev,(char *__restrict __str),strrev,(__str))

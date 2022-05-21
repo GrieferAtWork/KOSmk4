@@ -134,7 +134,7 @@ $fd_t opendev([[nonnull]] char const *path, $oflag_t oflags,
 [[impl_include("<asm/crt/stdio.h>", "<asm/os/stdio.h>", "<asm/crt/util.h>")]]
 [[guard, requires_function(getline, fgetc, ungetc, realloc)]]
 [[section(".text.crt{|.dos}.FILE.locked.read.read")]]
-char *fparseln([[nonnull]] $FILE *stream,
+char *fparseln([[inout]] $FILE *stream,
                [[nullable]] size_t *plen,
                [[nullable]] size_t *plineno,
                [[nullable]] char const delim[3],

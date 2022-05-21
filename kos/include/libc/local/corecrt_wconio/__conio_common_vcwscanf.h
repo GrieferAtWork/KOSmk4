@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc78b1f00 */
+/* HASH CRC-32:0xb947962d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,7 +84,7 @@ __LOCAL_LIBC(__conio_common_vcwscanf_ungetc) __SSIZE_TYPE__
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__conio_common_vcwscanf) __ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(__conio_common_vcwscanf) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_LIBC_WSCANF(2, 0) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__conio_common_vcwscanf))(__UINT64_TYPE__ __options, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
 	(void)__options;
 	(void)__locale;

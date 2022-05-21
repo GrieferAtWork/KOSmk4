@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x876fcc26 */
+/* HASH CRC-32:0x56f56510 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,14 +70,14 @@ INTDEF NONNULL((1)) __STDC_INT_AS_UINT_T NOTHROW_NCX(LIBCCALL libc_partition_uni
  * Print classes (and  their elements) of  `self' to  `fp'
  * The format used is: '[' ['(' [0 1 2 3 4]... ')']... ']'
  * Example: "[(0 1 2 4 8)(3 6)(5 7)]" */
-INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBDCALL libd_partition_print)(struct partition_def __KOS_FIXED_CONST *self, FILE *fp);
+INTDEF ATTR_ACCESS_RW(2) NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_partition_print)(struct partition_def __KOS_FIXED_CONST *self, FILE *fp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> partition_print(3)
  * Print classes (and  their elements) of  `self' to  `fp'
  * The format used is: '[' ['(' [0 1 2 3 4]... ')']... ']'
  * Example: "[(0 1 2 4 8)(3 6)(5 7)]" */
-INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBCCALL libc_partition_print)(struct partition_def __KOS_FIXED_CONST *self, FILE *fp);
+INTDEF ATTR_ACCESS_RW(2) NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_partition_print)(struct partition_def __KOS_FIXED_CONST *self, FILE *fp);
 #endif /* !__KERNEL__ */
 
 DECL_END

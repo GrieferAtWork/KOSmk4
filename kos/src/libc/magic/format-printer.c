@@ -405,7 +405,7 @@ err:
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>", "<libc/template/hex.h>")]]
 $ssize_t format_escape([[nonnull]] pformatprinter printer, void *arg,
-                       /*utf-8*/ char const *__restrict text,
+                       [[in(textlen)]] /*utf-8*/ char const *__restrict text,
                        $size_t textlen, unsigned int flags) {
 	__PRIVATE char const quote[1] = { '\"' };
 	char encoded_text[12]; size_t encoded_text_size;
@@ -703,7 +703,7 @@ err:
 [[impl_include("<hybrid/__alloca.h>", "<hybrid/__unaligned.h>", "<hybrid/byteorder.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
 $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
-                        void const *__restrict data, $size_t size,
+                        [[in(size)]] void const *__restrict data, $size_t size,
                         $size_t linesize, unsigned int flags) {
 	__PRIVATE char const lf[1] = { '\n' };
 	byte_t const *line_data;
@@ -924,7 +924,7 @@ err:
 @@pp_endif@@
 )]]
 $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
-                        [[nonnull, format]] char const *__restrict format,
+                        [[in, format]] char const *__restrict format,
                         $va_list args) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER           printer
@@ -952,7 +952,7 @@ $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
 [[kernel, throws]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>"), doc_alias("format_vprintf")]]
 $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
-                       [[nonnull, format]] char const *__restrict format, ...) {
+                       [[in, format]] char const *__restrict format, ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -996,7 +996,7 @@ $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
 [[impl_include("<bits/math-constants.h>")]]
 $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
                        [[nonnull]] pformatungetc pungetc, void *arg,
-                       [[nonnull, format]] char const *__restrict format, $va_list args) {
+                       [[in, format]] char const *__restrict format, $va_list args) {
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE      char
 #define __CHAR_SIZE      __SIZEOF_CHAR__
@@ -1014,7 +1014,7 @@ $ssize_t format_vscanf([[nonnull]] pformatgetc pgetc,
 [[doc_alias("format_vscanf"), kernel]]
 $ssize_t format_scanf([[nonnull]] pformatgetc pgetc,
                       [[nonnull]] pformatungetc pungetc, void *arg,
-                      [[nonnull, format]] char const *__restrict format, ...) {
+                      [[in, format]] char const *__restrict format, ...) {
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1033,7 +1033,7 @@ $ssize_t format_scanf([[nonnull]] pformatgetc pgetc,
 [[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_sprintf_printer([[nonnull]] /*char ***/ void *arg,
-                                [[nonnull]] /*utf-8*/ char const *__restrict data,
+                                [[in(datalen)]] /*utf-8*/ char const *__restrict data,
                                 $size_t datalen) {
 	*(char **)arg = (char *)mempcpyc(*(char **)arg, data, datalen, sizeof(char));
 	return (ssize_t)datalen;
@@ -1065,7 +1065,7 @@ struct format_snprintf_data {
 [[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ void *arg,
-                                 [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
+                                 [[in(datalen)]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	struct __local_format_snprintf_data {
 		char  *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		size_t sd_bufsiz; /* Remaining buffer size. */
@@ -1089,7 +1089,7 @@ $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ vo
 [[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_width(void *arg,
-                      [[nonnull]] /*utf-8*/ char const *__restrict data,
+                      [[in(datalen)]] /*utf-8*/ char const *__restrict data,
                       $size_t datalen) {
 	size_t result = 0;
 	char const *iter, *end;
@@ -1113,7 +1113,7 @@ $ssize_t format_width(void *arg,
 [[if(!defined(__KERNEL__)), kos_export_alias("format_wwidth")]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_length(void *arg,
-                       /*utf-8*/ char const *__restrict data,
+                       [[in(datalen)]] /*utf-8*/ char const *__restrict data,
                        $size_t datalen) {
 	(void)arg;
 	(void)data;
@@ -1196,8 +1196,8 @@ struct format_aprintf_data {
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[decl_prefix(struct format_aprintf_data;), decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/__assert.h>"), impl_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
-char *format_aprintf_pack([[nonnull]] struct format_aprintf_data *__restrict self,
-                          [[nullable]] $size_t *pstrlen) {
+char *format_aprintf_pack([[inout]] struct format_aprintf_data *__restrict self,
+                          [[out_opt]] $size_t *pstrlen) {
 	/* Free unused buffer memory. */
 	char *result;
 	if (self->@ap_avail@ != 0) {
@@ -1257,7 +1257,7 @@ char *format_aprintf_pack([[nonnull]] struct format_aprintf_data *__restrict sel
 [[decl_prefix(struct format_aprintf_data;), decl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
 [[requires_function(realloc)]]
-format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
+format_aprintf_alloc:([[inout]] struct format_aprintf_data *__restrict self,
                       $size_t num_chars) -> [[malloc(num_chars)]] char * {
 	char *result;
 	if (self->@ap_avail@ < num_chars) {
@@ -1297,7 +1297,7 @@ err:
 [[no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_aprintf_printer([[nonnull]] /*struct format_aprintf_data **/ void *arg,
-                                [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
+                                [[in(datalen)]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	char *buf;
 	buf = format_aprintf_alloc((struct format_aprintf_data *)arg,
 	                           datalen);

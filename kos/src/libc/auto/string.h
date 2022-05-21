@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e8e1566 */
+/* HASH CRC-32:0x4e554556 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2389,10 +2389,10 @@ INTDEF ATTR_LEAF ATTR_ACCESS_RW(1) char *NOTHROW_NCX(LIBDCALL libd_strrev)(char 
 INTDEF ATTR_LEAF ATTR_ACCESS_RW(1) char *NOTHROW_NCX(LIBCCALL libc_strrev)(char *__restrict str);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW_OPT(1) errno_t NOTHROW_NCX(LIBDCALL libd__strset_s)(char *dst, size_t dstsize, int ch);
+INTDEF ATTR_ACCESS_RWS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__strset_s)(char *dst, size_t dstsize, int ch);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW_OPT(1) errno_t NOTHROW_NCX(LIBCCALL libc__strset_s)(char *dst, size_t dstsize, int ch);
+INTDEF ATTR_ACCESS_RWS(1, 2) errno_t NOTHROW_NCX(LIBCCALL libc__strset_s)(char *dst, size_t dstsize, int ch);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_ACCESS_ROS(3, 4) ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd_memcpy_s)(void *dst, rsize_t dstlength, void const *src, rsize_t srclength);
@@ -2467,10 +2467,10 @@ INTDEF ATTR_ACCESS_RW_OPT(1) errno_t NOTHROW_NCX(LIBDCALL libd__strupr_s_l)(char
 INTDEF ATTR_ACCESS_RW_OPT(1) errno_t NOTHROW_NCX(LIBCCALL libc__strupr_s_l)(char *buf, size_t buflen, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW_OPT(1) errno_t NOTHROW_NCX(LIBDCALL libd__strnset_s)(char *__restrict buf, size_t buflen, int ch, size_t maxlen);
+INTDEF ATTR_ACCESS_RWS(1, 4) errno_t NOTHROW_NCX(LIBDCALL libd__strnset_s)(char *__restrict buf, size_t buflen, int ch, size_t maxlen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW_OPT(1) errno_t NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf, size_t buflen, int ch, size_t maxlen);
+INTDEF ATTR_ACCESS_RWS(1, 4) errno_t NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf, size_t buflen, int ch, size_t maxlen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strnstr(3)

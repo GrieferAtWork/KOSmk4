@@ -136,7 +136,7 @@ NOTHROW(LIBCCALL init_libdebuginfo)(void) {
 
 
 
-/*[[[head:libc_backtrace,hash:CRC-32=0xd3626744]]]*/
+/*[[[head:libc_backtrace,hash:CRC-32=0x128ba2ab]]]*/
 /* >> backtrace(3)
  * Create a  traceback of  up to  `size' instruction  pointers  from
  * the  calling function, their  caller, and so  forth. On KOS, this
@@ -145,7 +145,7 @@ NOTHROW(LIBCCALL init_libdebuginfo)(void) {
  * systems, this function is fairly dumb and relies on all traversed
  * code having been compiled with function frames enabled.
  * @return: * : The actual number of pointers written to `array' (always `<= size') */
-INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) __STDC_INT_AS_SIZE_T
+INTERN ATTR_SECTION(".text.crt.debug") ATTR_ACCESS_WRS(1, 2) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
                                      __STDC_INT_AS_SIZE_T size)
 /*[[[body:libc_backtrace]]]*/
@@ -220,7 +220,7 @@ err0:
 	return 0;
 }
 
-/*[[[head:libc_backtrace_symbols,hash:CRC-32=0x77332862]]]*/
+/*[[[head:libc_backtrace_symbols,hash:CRC-32=0x8735c898]]]*/
 /* >> backtrace_symbols(3)
  * Return  an  array  of  exactly  `size'  elements  that  contains  the
  * names   associated  with  program-counters  from  the  given  `array'
@@ -237,7 +237,7 @@ err0:
  * not the individual strings pointed-to by that vector!
  * @return: * :   A heap pointer to a vector of function names
  * @return: NULL: Insufficient heap memory available */
-INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) char **
+INTERN ATTR_SECTION(".text.crt.debug") ATTR_ACCESS_ROS(1, 2) char **
 NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
                                              __STDC_INT_AS_SIZE_T size)
 /*[[[body:libc_backtrace_symbols]]]*/
@@ -281,13 +281,13 @@ err_nodata:
 }
 /*[[[end:libc_backtrace_symbols]]]*/
 
-/*[[[head:libc_backtrace_symbols_fd,hash:CRC-32=0x9c57ef57]]]*/
+/*[[[head:libc_backtrace_symbols_fd,hash:CRC-32=0x63e115d0]]]*/
 /* >> backtrace_symbols_fd(3)
  * Same as `backtrace_symbols()', but rather than return a vector
  * of symbol names, print the  names directly to `fd', such  that
  * one  function name will be written per line, with `size' lines
  * written in total. */
-INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.debug") ATTR_ACCESS_ROS(1, 2) void
 NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
                                                 __STDC_INT_AS_SIZE_T size,
                                                 fd_t fd)
