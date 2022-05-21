@@ -413,7 +413,9 @@ libda_disasm_instrlen(struct disassembler *__restrict self) {
 	diasm_symbol_printer_t old_symbol_printer;
 	byte_t padbuf[sizeof(self->d_pad0) + sizeof(self->d_pad1)];
 	__STATIC_IF (offsetafter(struct disassembler, d_pad0) == offsetof(struct disassembler, d_pad1)) {
-		memcpy(padbuf, &self->d_pad0, sizeof(padbuf));
+		void const *p = &self->d_pad0;
+		COMPILER_DELETE_ASSUMPTIONS(p);
+		memcpy(padbuf, p, sizeof(padbuf));
 	} __STATIC_ELSE (offsetafter(struct disassembler, d_pad0) == offsetof(struct disassembler, d_pad1)) {
 		memcpy(padbuf, &self->d_pad0, sizeof(self->d_pad0));
 		memcpy(padbuf + sizeof(self->d_pad0), self->d_pad1, sizeof(self->d_pad1));
@@ -432,7 +434,9 @@ libda_disasm_instrlen(struct disassembler *__restrict self) {
 	self->d_result  = oldresult;
 	self->d_pc      = oldpc;
 	__STATIC_IF (offsetafter(struct disassembler, d_pad0) == offsetof(struct disassembler, d_pad1)) {
-		memcpy(&self->d_pad0, padbuf, sizeof(padbuf));
+		void *p = &self->d_pad0;
+		COMPILER_DELETE_ASSUMPTIONS(p);
+		memcpy(p, padbuf, sizeof(padbuf));
 	} __STATIC_ELSE (offsetafter(struct disassembler, d_pad0) == offsetof(struct disassembler, d_pad1)) {
 		memcpy(&self->d_pad0, padbuf, sizeof(self->d_pad0));
 		memcpy(self->d_pad1, padbuf + sizeof(self->d_pad0), sizeof(self->d_pad1));

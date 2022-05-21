@@ -552,18 +552,23 @@ PRIVATE ATTR_DBGBSS volatile u8 initok = 0;
 PRIVATE ATTR_DBGTEXT void FCALL
 x86_dbg_psp0threadstate_save_stacknode(struct x86_dbg_psp0threadstate *__restrict self,
                                        struct mnode const *__restrict src) {
+	void const *p;
 	memcpy(self->_dpts_this_kernel_stacknode, src, offsetof(struct mnode, mn_mement));
+	p = &src->mn_mement + 1;
+	COMPILER_DELETE_ASSUMPTIONS(p);
 	memcpy(self->_dpts_this_kernel_stacknode + offsetof(struct mnode, mn_mement),
-	       &src->mn_mement + 1, sizeof(struct mnode) - offsetafter(struct mnode, mn_mement));
+	       p, sizeof(struct mnode) - offsetafter(struct mnode, mn_mement));
 }
 PRIVATE ATTR_DBGTEXT void FCALL
 x86_dbg_psp0threadstate_load_stacknode(struct x86_dbg_psp0threadstate const *__restrict self,
                                        struct mnode *__restrict dst) {
 	uintptr_t saved_flags;
+	void *p;
 	saved_flags = dst->mn_flags;
 	memcpy(dst, self->_dpts_this_kernel_stacknode, offsetof(struct mnode, mn_mement));
-	memcpy(&dst->mn_mement + 1,
-	       self->_dpts_this_kernel_stacknode + offsetof(struct mnode, mn_mement),
+	p = &dst->mn_mement + 1;
+	COMPILER_DELETE_ASSUMPTIONS(p);
+	memcpy(p, self->_dpts_this_kernel_stacknode + offsetof(struct mnode, mn_mement),
 	       sizeof(struct mnode) - offsetafter(struct mnode, mn_mement));
 	/* The `MNODE_F__RBRED' flag must not be overwritten during  restore.
 	 * It falls under the same category as the `mn_mement' field, meaning

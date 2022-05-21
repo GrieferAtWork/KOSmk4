@@ -904,6 +904,21 @@ __extension__ typedef unsigned long long __ulonglong_t;
 
 #define __COMPILER_IGNORE_UNINITIALIZED(var) var = var
 
+/* Delete assumptions the compiler may have made about `var'.
+ * This includes:
+ *  - __builtin_constant_p(var)
+ *  - __builtin_object_size(var)
+ *  - Object origin
+ * Usage:
+ * >> struct obj {
+ * >>     int field;
+ * >> };
+ * >> struct obj *o = get_object();
+ * >> int *p = &o->field;
+ * >> __COMPILER_DELETE_ASSUMPTIONS(p);  // Prevents out-of-bounds warnings
+ * >> memcpy(p, p + 5, 2 * sizeof(o->field)); */
+#define __COMPILER_DELETE_ASSUMPTIONS(var) __asm__("" : "+g" (var))
+
 #ifdef __cplusplus
 #ifdef __INTELLISENSE__
 #define __NULLPTR nullptr

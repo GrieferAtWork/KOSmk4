@@ -335,6 +335,7 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __attribute__(x)         /* Nothing */
 #define __NO_COMPILER_IGNORE_UNINITIALIZED
 #define __COMPILER_IGNORE_UNINITIALIZED(var) var
+#define __COMPILER_DELETE_ASSUMPTIONS(var) (void)0
 
 #define __INT8_TYPE__   signed __int8
 #define __UINT8_TYPE__  unsigned __int8

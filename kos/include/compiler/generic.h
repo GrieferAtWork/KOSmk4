@@ -1022,6 +1022,27 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __COMPILER_IGNORE_UNINITIALIZED(var) var
 #endif /* !__COMPILER_IGNORE_UNINITIALIZED */
 
+/* Delete assumptions the compiler may have made about `var'.
+ * This includes:
+ *  - __builtin_constant_p(var)
+ *  - __builtin_object_size(var)
+ *  - Object origin
+ * Usage:
+ * >> struct obj {
+ * >>     int field;
+ * >> };
+ * >> struct obj *o = get_object();
+ * >> int *p = &o->field;
+ * >> __COMPILER_DELETE_ASSUMPTIONS(p);  // Prevents out-of-bounds warnings
+ * >> memcpy(p, p + 5, 2 * sizeof(o->field)); */
+#ifndef __COMPILER_DELETE_ASSUMPTIONS
+#ifdef __COMPILER_HAVE_GCC_ASM
+#define __COMPILER_DELETE_ASSUMPTIONS(var) __asm__("" : "+g" (var))
+#else /* __COMPILER_HAVE_GCC_ASM */
+#define __COMPILER_DELETE_ASSUMPTIONS(var) (void)0
+#endif /* !__COMPILER_HAVE_GCC_ASM */
+#endif /* !__COMPILER_DELETE_ASSUMPTIONS */
+
 /* Define varargs macros expected by system headers. */
 #if __has_builtin(__builtin_va_list) || __has_builtin(__builtin_va_start)
 #ifndef __builtin_va_list

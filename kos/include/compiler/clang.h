@@ -903,6 +903,21 @@ template<class __T, class... Args> __T(__attribute__((__stdcall__)) && ____clang
 
 #define __COMPILER_IGNORE_UNINITIALIZED(var) var
 
+/* Delete assumptions the compiler may have made about `var'.
+ * This includes:
+ *  - __builtin_constant_p(var)
+ *  - __builtin_object_size(var)
+ *  - Object origin
+ * Usage:
+ * >> struct obj {
+ * >>     int field;
+ * >> };
+ * >> struct obj *o = get_object();
+ * >> int *p = &o->field;
+ * >> __COMPILER_DELETE_ASSUMPTIONS(p);  // Prevents out-of-bounds warnings
+ * >> memcpy(p, p + 5, 2 * sizeof(o->field)); */
+#define __COMPILER_DELETE_ASSUMPTIONS(var) __asm__("" : "+g" (var))
+
 #if !__has_builtin(__builtin_types_compatible_p)
 /* Emulate: __builtin_types_compatible_p() */
 #ifdef __cplusplus

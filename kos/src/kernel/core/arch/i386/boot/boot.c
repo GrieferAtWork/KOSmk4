@@ -821,6 +821,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Add support for dwarf-5 in `libdebuginfo' (currently, we need to
 	 *       compiled with `-gdwarf-4', and  that should go away  eventually) */
 
+	/* TODO: Fix skipping libstdc++ headers in "include-everything.h" */
+
 	/* TODO: Go through all magic sources and attach in/out annotations:
 	 * >> void foo([[in]] char const *buf);                       --> __attribute__((access(read_only, 1), nonnull(1))) void foo(char const *buf);
 	 * >> void foo([[out]] char *buf);                            --> __attribute__((access(write_only, 1), nonnull(1))) void foo(char *buf);

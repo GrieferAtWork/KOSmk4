@@ -431,10 +431,15 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 					                                     offsetof(struct mb2_tag_string, string)) /
 					                                    sizeof(char));
 					if unlikely(kernel_driver.d_cmdline[x86_kernel_cmdline_length] != 0) {
+						/* By accessing 1 byte before `TAG(mb2_tag_string)->string', we're doing
+						 * a  /bad/ thing and gcc doesn't like  that (and admittedly: it's got a
+						 * point in complaining).
+						 *
+						 * So we have to hide the origin of `kernel_driver.d_cmdline' -- :P */
+						COMPILER_DELETE_ASSUMPTIONS(kernel_driver.d_cmdline);
 						kernel_driver.d_cmdline = (char *)memmovedown(kernel_driver.d_cmdline - 1,
 						                                              kernel_driver.d_cmdline,
-						                                              x86_kernel_cmdline_length,
-						                                              sizeof(char));
+						                                              x86_kernel_cmdline_length);
 						kernel_driver.d_cmdline[x86_kernel_cmdline_length] = 0;
 					}
 					kernel_driver.d_argc = cmdline_split(kernel_driver.d_cmdline, NULL);

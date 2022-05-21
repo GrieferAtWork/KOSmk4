@@ -75,7 +75,8 @@ NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
 	STATIC_ASSERT(SIZEOF_SCPUSTATE64 - OFFSET_SCPUSTATE64_GPREGSNSP == SIZEOF_ICPUSTATE64);
 	STATIC_ASSERT(OFFSET_SCPUSTATE64_GPREGSNSP - OFFSET_SCPUSTATE64_GPREGSNSP == OFFSET_ICPUSTATE64_GPREGSNSP);
 	STATIC_ASSERT(OFFSET_SCPUSTATE64_IRREGS - OFFSET_SCPUSTATE64_GPREGSNSP == OFFSET_ICPUSTATE64_IRREGS);
-	sp       = (byte_t *)&state->scs_gpregs; /* Have `sp' point at the `icpustate' portion of `state' */
+	sp = (byte_t *)&state->scs_gpregs; /* Have `sp' point at the `icpustate' portion of `state' */
+	COMPILER_DELETE_ASSUMPTIONS(sp);
 	rc_state = (struct icpustate *)sp;
 	sp -= offsetof(struct rpc_context, rc_scinfo); /* Allocate space for the `struct rpc_context' */
 	rc = (struct rpc_context *)sp;
