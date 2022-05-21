@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72051af0 */
+/* HASH CRC-32:0x87ef7f2f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #endif /* !__local___localdep_free_defined */
 #ifndef __local___localdep_setlogin_defined
 #define __local___localdep_setlogin_defined
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setlogin,(char const *__name),setlogin,(__name))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_setlogin,(char const *__name),setlogin,(__name))
 #endif /* !__local___localdep_setlogin_defined */
 __LOCAL_LIBC(wsetlogin) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wsetlogin))(__WCHAR_TYPE__ const *__name) {

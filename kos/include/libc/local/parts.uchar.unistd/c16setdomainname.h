@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x612c11f3 */
+/* HASH CRC-32:0xde36a7f4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,11 +61,11 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_setdomainname_defined
 #define __local___localdep_setdomainname_defined
 #ifdef __CRT_HAVE_setdomainname
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setdomainname,(char const *__name, __SIZE_TYPE__ __len),setdomainname,(__name,__len))
+__CREDIRECT(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,__localdep_setdomainname,(char const *__name, __SIZE_TYPE__ __len),setdomainname,(__name,__len))
 #elif defined(__CRT_HAVE___setdomainname)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setdomainname,(char const *__name, __SIZE_TYPE__ __len),__setdomainname,(__name,__len))
+__CREDIRECT(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,__localdep_setdomainname,(char const *__name, __SIZE_TYPE__ __len),__setdomainname,(__name,__len))
 #elif defined(__CRT_HAVE___libc_setdomainname)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setdomainname,(char const *__name, __SIZE_TYPE__ __len),__libc_setdomainname,(__name,__len))
+__CREDIRECT(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,__localdep_setdomainname,(char const *__name, __SIZE_TYPE__ __len),__libc_setdomainname,(__name,__len))
 #else /* ... */
 #undef __local___localdep_setdomainname_defined
 #endif /* !... */

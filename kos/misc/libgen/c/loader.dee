@@ -511,6 +511,7 @@ again_skip_annotation_rbracket:
 		result.attributes = defaultAttributes;
 	}
 	tok = self.skip("(");
+	local extraAttributes: {Callable...} = [];
 	local nonNullArguments: {int...} = none;
 	@@Pair of (format-method, format-string-argument-index)
 	local formatArgument: (string, int)  = none;
@@ -536,6 +537,17 @@ again_parse_arg_annotations:
 					tok = self.next();
 					break;
 
+				case "aligned": {
+					self.next();
+					tok = self.skip("(");
+					local alignment = try int(tok) catch(...) tok;
+					if (alignment !is int)
+						self.err("Expected integer for `[[aligned({})]]'".format({ alignment }));
+					self.next();
+					tok = self.skip(")");
+					/* Do something with `alignment'? */
+				}	break;
+
 				case "access": {
 					/* Low-level __attribute__((access(...))) annotations. */
 					self.next();
@@ -543,9 +555,9 @@ again_parse_arg_annotations:
 					local mode = str self.parseCStringOrKeyword();
 					local attrib = {
 						"none"       : "ATTR_ACCESS_NONE",
-						"rd"         : "ATTR_ACCESS_RD",
-						"ro"         : "ATTR_ACCESS_RD",
-						"read_only"  : "ATTR_ACCESS_RD",
+						"rd"         : "ATTR_ACCESS_RO",
+						"ro"         : "ATTR_ACCESS_RO",
+						"read_only"  : "ATTR_ACCESS_RO",
 						"wr"         : "ATTR_ACCESS_WR",
 						"write_only" : "ATTR_ACCESS_WR",
 						"rw"         : "ATTR_ACCESS_RW",
@@ -629,6 +641,155 @@ do_add_nonnull_annotation:
 					formatArgument = (method, #result.argv + 1);
 				}	break;
 
+					/* Access attributes:
+					 * [[in]]               -->   __attribute__((access(read_only, <I>), nonnull(<I>)))
+					 * [[in_opt]]           -->   __attribute__((access(read_only, <I>)))
+					 * [[out]]              -->   __attribute__((access(write_only, <I>), nonnull(<I>)))
+					 * [[out_opt]]          -->   __attribute__((access(write_only, <I>)))
+					 * [[inout]]            -->   __attribute__((access(read_write, <I>), nonnull(<I>)))
+					 * [[inout_opt]]        -->   __attribute__((access(read_write, <I>)))
+					 * [[in(sizearg)]]      -->   __attribute__((access(read_only, <I>, <indexof(sizearg)>)))
+					 * [[out(sizearg)]]     -->   __attribute__((access(write_only, <I>, <indexof(sizearg)>)))
+					 * [[inout(sizearg)]]   -->   __attribute__((access(read_write, <I>, <indexof(sizearg)>)))
+					 *
+					 * Advanced annotations:
+					 * 
+					 * - >> [[in(strlen(.))]] char const *p
+					 *   Explicitly state that `p' is loaded as a c-string (same as `[[in]] char const *p`)
+					 * - >> [[in(strnlen(., maxlen))]] char const *p, size_t maxlen
+					 *   Specify that `p' is a read_only argument, and that `strnlen(p, maxlen)'
+					 *   characters may be accessed. For gcc, we encode this as:
+					 *   >> __attribute__((access(read_only, <I>, <indexof("maxlen")>)))
+					 *   Since it seems to interprete the size-argument as a sort-of max-size (rather than exact size)
+					 * - >> [[in(return <= num_bytes)]] void const *buf, size_t num_bytes
+					 *   >> [[out(return <= num_bytes)]] void *buf, size_t num_bytes
+					 *   Explicitly specify that up to `num_bytes' (and exactly `return' bytes) are accessed from `buf'
+					 *   For gcc, we encode this as (there doesn't seem to be a way to incorporate `return'):
+					 *   >> __attribute__((access(read_only, <I>, <indexof("num_bytes")>)))
+					 */
+				case "in":
+				case "in_opt":
+				case "out":
+				case "out_opt":
+				case "inout":
+				case "inout_opt": {
+					local mode = {
+						"in"    : "ATTR_ACCESS_RO",
+						"out"   : "ATTR_ACCESS_WR",
+						"inout" : "ATTR_ACCESS_RW",
+					}[tok.rsstrip("_opt")];
+					local argIndex = #result.argv + 1;
+					local shouldMarkAsNonNull = !tok.endswith("_opt");
+					if (self.next() == "(") {
+						/* A sized in/out/inout argument implies a non-NULL argument
+						 * if the function it is attached to is PURE or LEAF. Being
+						 * a pure or leaf function means that we don't modify the
+						 * global state, meaning that NULL-arguments would simply be
+						 * handled as a no-op.
+						 *
+						 * It therefor stands to reason to disallow NULL. */
+						if (shouldMarkAsNonNull)
+							shouldMarkAsNonNull = result.isPureOrLeaf;
+						/* We recognize the following expressions:
+						 * >> void   foo([[in]]                       void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1)))
+						 * >> void   foo([[in(sizearg)]]              void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
+						 * >> void   foo([[in(<= sizearg)]]           void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
+						 * >> size_t foo([[in(return <= sizearg)]]    void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
+						 * >> void   foo([[in(sizearg * <N>)]]        void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1)))
+						 * >> void   foo([[in(<N> * sizearg)]]        void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1)))
+						 * >> void   foo([[in(strlen(.))]]            char const *p, size_t sizearg);   -->   __attribute__((nonnull(1), access(read_only, 1)))
+						 * >> void   foo([[in(strlen(p))]]            char const *p, size_t sizearg);   -->   __attribute__((nonnull(1), access(read_only, 1)))
+						 * >> void   foo([[in(strnlen(., sizearg))]]  char const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
+						 * >> void   foo([[in(strnlen(p, sizearg))]]  char const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
+						 *
+						 * Guarantied equivalencies:
+						 *  - [[in   (strlen(.))]] char const *p  <===>   [[in]]    char const *p
+						 *  - [[inout(strlen(.))]] char *p        <===>   [[inout]] char const *p
+						 *
+						 */
+						self.next();
+						local sizeArgumentName;
+						switch (self.tok) {
+
+						case "return":
+							self.next();
+							self.expect("<=");
+							/* FALLTHRU */
+						case "<=":
+							self.next();
+							/* FALLTHRU */
+						default: {
+							sizeArgumentName = str self.parseCStringOrKeywordOrNumber();
+							if (self.tok == "*") {
+								self.next();
+								local mul = self.parseCStringOrKeywordOrNumber();
+								if (mul == "1") {
+								} else if (sizeArgumentName == "1") {
+									sizeArgumentName = mul;
+								} else {
+									self.skip(")");
+									goto annotate_generic_access;
+								}
+							}
+						}	break;
+
+						case "strlen":
+						case "strnlen": {
+							local strlen_tok = self.tok;
+							self.next();
+							self.skip("(");
+							if (self.tok == ".") {
+								self.next();
+							} else {
+								local stringArg = str self.parseCStringOrKeyword();
+								local expectedArgIndex = #result.argv;
+								local errLog = self.tokStart;
+								extraAttributes.append([]{
+									local realArgName = str result.argv[expectedArgIndex].name;
+									if (stringArg != realArgName) {
+										self.errAt(errLog, "[[<access>(strlen({}))]] attached to wrong argument {!r}"
+											.format({ stringArg, realArgName }));
+									}
+								});
+							}
+							if (strlen_tok == "strlen") {
+								shouldMarkAsNonNull = true;
+								self.skip(")");
+								self.skip(")");
+								goto annotate_generic_access;
+							}
+							self.skip(",");
+							sizeArgumentName = str self.parseCStringOrKeyword();
+							self.skip(")");
+						}	break;
+
+						}
+						self.skip(")");
+						extraAttributes.append([]{
+							local sizeArg = result.argsByName[sizeArgumentName];
+							local sizeIndex = str(result.argv.index(sizeArg) + 1);
+							result.attributes.append("{}S({}, {})"
+								.format({ mode, argIndex, sizeIndex }));
+						});
+						if (shouldMarkAsNonNull) {
+							if (nonNullArguments is none)
+								nonNullArguments = HashSet();
+							nonNullArguments.insert(#result.argv + 1);
+						}
+					} else {
+annotate_generic_access:
+						if (shouldMarkAsNonNull) {
+							result.attributes.append("{}({})"
+								.format({ mode, argIndex }));
+						} else {
+							result.attributes.append("{}_OPT({})"
+								.format({ mode, #result.argv + 1 }));
+						}
+					}
+					tok = self.tok;
+				}	break;
+				
+
 					/* (Mostly) ignored annotations */
 				case "inp":
 				case "inpb":
@@ -688,6 +849,9 @@ again_skip_arg_annotation_rbracket:
 			result.argv = []; /* Argument list is actually empty! */
 	}
 	self.skip(")");
+	/* Resolve extra attributes that must be generated after arguments have all been loaded. */
+	for (local extra: extraAttributes)
+		extra();
 	if (nonNullArguments) {
 		local attrib = "NONNULL(({}))"
 			.format({ ", ".join(nonNullArguments.sorted()) });

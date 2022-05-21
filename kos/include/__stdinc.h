@@ -260,12 +260,15 @@
 #define __ATTR_ERROR_T          __ATTR_ERROR
 #define __ATTR_RETURNS_TWICE_T  __ATTR_RETURNS_TWICE
 #define __ATTR_ACCESS_NONE_T    __ATTR_ACCESS_NONE
-#define __ATTR_ACCESS_RD_T      __ATTR_ACCESS_RD
-#define __ATTR_ACCESS_RDS_T     __ATTR_ACCESS_RDS
-#define __ATTR_ACCESS_WR_T      __ATTR_ACCESS_WR
+#define __ATTR_ACCESS_ROS_T     __ATTR_ACCESS_ROS
 #define __ATTR_ACCESS_WRS_T     __ATTR_ACCESS_WRS
-#define __ATTR_ACCESS_RW_T      __ATTR_ACCESS_RW
 #define __ATTR_ACCESS_RWS_T     __ATTR_ACCESS_RWS
+#define __ATTR_ACCESS_RO_OPT_T  __ATTR_ACCESS_RO_OPT
+#define __ATTR_ACCESS_WR_OPT_T  __ATTR_ACCESS_WR_OPT
+#define __ATTR_ACCESS_RW_OPT_T  __ATTR_ACCESS_RW_OPT
+#define __ATTR_ACCESS_RO_T      __ATTR_ACCESS_RO
+#define __ATTR_ACCESS_WR_T      __ATTR_ACCESS_WR
+#define __ATTR_ACCESS_RW_T      __ATTR_ACCESS_RW
 #else
 #define __ATTR_LEAF_T           /* nothing */
 #define __ATTR_CONST_T          /* nothing */
@@ -287,6 +290,16 @@
 #define __ATTR_WARNING_T        /* nothing */
 #define __ATTR_ERROR_T          /* nothing */
 #define __ATTR_RETURNS_TWICE_T  /* nothing */
+#define __ATTR_ACCESS_NONE_T    /* nothing */
+#define __ATTR_ACCESS_ROS_T     /* nothing */
+#define __ATTR_ACCESS_WRS_T     /* nothing */
+#define __ATTR_ACCESS_RWS_T     /* nothing */
+#define __ATTR_ACCESS_RO_OPT_T  /* nothing */
+#define __ATTR_ACCESS_WR_OPT_T  /* nothing */
+#define __ATTR_ACCESS_RW_OPT_T  /* nothing */
+#define __ATTR_ACCESS_RO_T      /* nothing */
+#define __ATTR_ACCESS_WR_T      /* nothing */
+#define __ATTR_ACCESS_RW_T      /* nothing */
 #endif
 
 

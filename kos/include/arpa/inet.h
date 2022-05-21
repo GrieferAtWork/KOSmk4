@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72f8775a */
+/* HASH CRC-32:0xa32cc9f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -247,7 +247,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_paton, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  *     %u.%u.%u.%u  For everything else
  * @return: buf:  Success
  * @return: NULL: [errno=EMSGSIZE]: The given `len' is too small */
-__CDECLARE(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,inet_neta,(__UINT32_TYPE__ __net, char *__buf, __SIZE_TYPE__ __len),(__net,__buf,__len))
+__CDECLARE(__ATTR_ACCESS_WRS(2, 3),char *,__NOTHROW_NCX,inet_neta,(__UINT32_TYPE__ __net, char *__buf, __SIZE_TYPE__ __len),(__net,__buf,__len))
 #else /* __CRT_HAVE_inet_neta */
 #include <libc/local/arpa.inet/inet_neta.h>
 /* >> inet_neta(3)
@@ -259,7 +259,7 @@ __CDECLARE(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,inet_neta,(__UINT32_TYPE__ _
  *     %u.%u.%u.%u  For everything else
  * @return: buf:  Success
  * @return: NULL: [errno=EMSGSIZE]: The given `len' is too small */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inet_neta, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL inet_neta)(__UINT32_TYPE__ __net, char *__buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_neta))(__net, __buf, __len); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inet_neta, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WRS(2, 3) char *__NOTHROW_NCX(__LIBCCALL inet_neta)(__UINT32_TYPE__ __net, char *__buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_neta))(__net, __buf, __len); })
 #endif /* !__CRT_HAVE_inet_neta */
 /* >> inet_net_ntop(3)
  * TODO: Implement & document */

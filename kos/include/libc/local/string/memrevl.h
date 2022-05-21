@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8964f2c */
+/* HASH CRC-32:0xbd1ed0c1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(memrevl) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT32_TYPE__ *
+__LOCAL_LIBC(memrevl) __ATTR_LEAF __ATTR_ACCESS_RW(1) __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrevl))(void *__restrict __base, __SIZE_TYPE__ __n_dwords) {
 	__UINT32_TYPE__ *__iter, *__end;
 	__end = (__iter = (__UINT32_TYPE__ *)__base) + __n_dwords;

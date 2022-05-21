@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a65ba7b */
+/* HASH CRC-32:0x57b3a857 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrev_defined
 #define __local___localdep_memrev_defined
 #ifdef __CRT_HAVE_memrev
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_ACCESS_RWS(1, 2) __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
 #else /* __CRT_HAVE_memrev */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memrev.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrevl_defined
 #define __local___localdep_memrevl_defined
 #ifdef __CRT_HAVE_memrevl
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrevl,(void *__restrict __base, __SIZE_TYPE__ __n_dwords),memrevl,(__base,__n_dwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RW(1),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrevl,(void *__restrict __base, __SIZE_TYPE__ __n_dwords),memrevl,(__base,__n_dwords))
 #else /* __CRT_HAVE_memrevl */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memrevl.h>
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memrevw_defined
 #define __local___localdep_memrevw_defined
 #ifdef __CRT_HAVE_memrevw
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memrevw,(void *__restrict __base, __SIZE_TYPE__ __n_words),memrevw,(__base,__n_words))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RW(1),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memrevw,(void *__restrict __base, __SIZE_TYPE__ __n_words),memrevw,(__base,__n_words))
 #else /* __CRT_HAVE_memrevw */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memrevw.h>
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcslen_defined
 #define __local___localdep_wcslen_defined
 #ifdef __CRT_HAVE_wcslen
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __str),wcslen,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __str),wcslen,(__str))
 #else /* __CRT_HAVE_wcslen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe55e94da */
+/* HASH CRC-32:0xa57731c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzeroc,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bzeroc,(__dst,__elem_count,__elem_size))
+__CREDIRECT_VOID(__ATTR_LEAF __ATTR_ACCESS_WR(1),__NOTHROW_NCX,__localdep_bzeroc,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bzeroc,(__dst,__elem_count,__elem_size))
 #else /* __CRT_HAVE_bzeroc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/bzeroc.h>

@@ -499,6 +499,23 @@ class FunctionPrototype {
 	@@      their  dependencies,  as  well  as  the  dependencies  of  inline   functions
 	public member declPrefix: {(string | UserString)...} = ();
 
+	@@Check if this function is annotated as `ATTR_PURE` or `ATTR_LEAF`
+	public property isPureOrLeaf: bool = {
+		get(): bool {
+			for (local attr: attributes) {
+				if (attr is UserString)
+					attr = str attr;
+				if (attr is string && attr in {
+						"__ATTR_LEAF", "ATTR_LEAF",
+						"__ATTR_PURE", "ATTR_PURE",
+						"__ATTR_CONST", "ATTR_CONST",
+					})
+					return true;
+			}
+			return false;
+		}
+	}
+
 	@@List all types used by this prototype
 	public property referencedTypes: {CType...} = {
 		get(): {CType...} {

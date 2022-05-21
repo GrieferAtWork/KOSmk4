@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x382c69be */
+/* HASH CRC-32:0xf52167c4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcoll_defined
 #define __local___localdep_strcoll_defined
 #ifdef __CRT_HAVE_strcoll
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcoll,(char const *__s1, char const *__s2),strcoll,(__s1,__s2))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,__localdep_strcoll,(char const *__s1, char const *__s2),strcoll,(__s1,__s2))
 #else /* __CRT_HAVE_strcoll */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcoll.h>
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcoll __LIBC_LOCAL_NAME(strcoll)
 #endif /* !__CRT_HAVE_strcoll */
 #endif /* !__local___localdep_strcoll_defined */
-__LOCAL_LIBC(strcoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(strcoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcoll_l))(char const *__s1, char const *__s2, __locale_t __locale) {
 	/* XXX: Implement properly? */
 	(void)__locale;

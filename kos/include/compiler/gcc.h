@@ -605,32 +605,53 @@
 
 #if __has_attribute(__access__)
 #define __ATTR_ACCESS_NONE(ptr_index)            __attribute__((__access__(__none__, ptr_index)))
-#define __ATTR_ACCESS_RD(ptr_index)              __attribute__((__access__(__read_only__, ptr_index)))
-#define __ATTR_ACCESS_RDS(ptr_index, size_index) __attribute__((__access__(__read_only__, ptr_index, size_index)))
-#define __ATTR_ACCESS_WR(ptr_index)              __attribute__((__access__(__write_only__, ptr_index)))
+#define __ATTR_ACCESS_ROS(ptr_index, size_index) __attribute__((__access__(__read_only__, ptr_index, size_index)))
 #define __ATTR_ACCESS_WRS(ptr_index, size_index) __attribute__((__access__(__write_only__, ptr_index, size_index)))
-#define __ATTR_ACCESS_RW(ptr_index)              __attribute__((__access__(__read_write__, ptr_index)))
 #define __ATTR_ACCESS_RWS(ptr_index, size_index) __attribute__((__access__(__read_write__, ptr_index, size_index)))
+#define __ATTR_ACCESS_RO_OPT(ptr_index)          __attribute__((__access__(__read_only__, ptr_index)))
+#define __ATTR_ACCESS_WR_OPT(ptr_index)          __attribute__((__access__(__write_only__, ptr_index)))
+#define __ATTR_ACCESS_RW_OPT(ptr_index)          __attribute__((__access__(__read_write__, ptr_index)))
+#if __has_attribute(__nonnull__)
+#define __ATTR_ACCESS_RO(ptr_index)              __attribute__((__access__(__read_only__, ptr_index), __nonnull__(ptr_index)))
+#define __ATTR_ACCESS_WR(ptr_index)              __attribute__((__access__(__write_only__, ptr_index), __nonnull__(ptr_index)))
+#define __ATTR_ACCESS_RW(ptr_index)              __attribute__((__access__(__read_write__, ptr_index), __nonnull__(ptr_index)))
+#else /* __has_attribute(__nonnull__) */
+#define __ATTR_ACCESS_RO(ptr_index)              __attribute__((__access__(__read_only__, ptr_index)))
+#define __ATTR_ACCESS_WR(ptr_index)              __attribute__((__access__(__write_only__, ptr_index)))
+#define __ATTR_ACCESS_RW(ptr_index)              __attribute__((__access__(__read_write__, ptr_index)))
+#endif /* !__has_attribute(__nonnull__) */
 #elif defined(__INTELLISENSE__)
 /* Intellisense doesn't understand __access__, but to get error high-lighting (since
  * the `ptr_index' argument must reference a pointer-argument), we can use some other
  * attributes that it does know! */
 #define __ATTR_ACCESS_NONE(ptr_index)            __attribute__((__nonnull__(ptr_index)))
-#define __ATTR_ACCESS_RD(ptr_index)              __attribute__((__nonnull__(ptr_index)))
-#define __ATTR_ACCESS_RDS(ptr_index, size_index) __attribute__((__nonnull__(ptr_index)))
-#define __ATTR_ACCESS_WR(ptr_index)              __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_ROS(ptr_index, size_index) __attribute__((__nonnull__(ptr_index)))
 #define __ATTR_ACCESS_WRS(ptr_index, size_index) __attribute__((__nonnull__(ptr_index)))
-#define __ATTR_ACCESS_RW(ptr_index)              __attribute__((__nonnull__(ptr_index)))
 #define __ATTR_ACCESS_RWS(ptr_index, size_index) __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_RO_OPT(ptr_index)          __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_WR_OPT(ptr_index)          __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_RW_OPT(ptr_index)          __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_RO(ptr_index)              __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_WR(ptr_index)              __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_RW(ptr_index)              __attribute__((__nonnull__(ptr_index)))
 #else /* ... */
 #define __NO_ATTR_ACCESS
 #define __ATTR_ACCESS_NONE(ptr_index)            /* Nothing */
-#define __ATTR_ACCESS_RD(ptr_index)              /* Nothing */
-#define __ATTR_ACCESS_RDS(ptr_index, size_index) /* Nothing */
-#define __ATTR_ACCESS_WR(ptr_index)              /* Nothing */
+#define __ATTR_ACCESS_ROS(ptr_index, size_index) /* Nothing */
 #define __ATTR_ACCESS_WRS(ptr_index, size_index) /* Nothing */
-#define __ATTR_ACCESS_RW(ptr_index)              /* Nothing */
 #define __ATTR_ACCESS_RWS(ptr_index, size_index) /* Nothing */
+#define __ATTR_ACCESS_RO_OPT(ptr_index)          /* Nothing */
+#define __ATTR_ACCESS_WR_OPT(ptr_index)          /* Nothing */
+#define __ATTR_ACCESS_RW_OPT(ptr_index)          /* Nothing */
+#if __has_attribute(__nonnull__)
+#define __ATTR_ACCESS_RO(ptr_index) __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_WR(ptr_index) __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_RW(ptr_index) __attribute__((__nonnull__(ptr_index)))
+#else /* __has_attribute(__nonnull__) */
+#define __ATTR_ACCESS_RO(ptr_index) /* Nothing */
+#define __ATTR_ACCESS_WR(ptr_index) /* Nothing */
+#define __ATTR_ACCESS_RW(ptr_index) /* Nothing */
+#endif /* !__has_attribute(__nonnull__) */
 #endif /* !... */
 
 #define __ATTR_WARNING(text)      __attribute__((__warning__(text)))

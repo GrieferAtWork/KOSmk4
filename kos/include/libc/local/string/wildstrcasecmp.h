@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1be66eec */
+/* HASH CRC-32:0xfd1c102f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_tolower __LIBC_LOCAL_NAME(tolower)
 #endif /* !... */
 #endif /* !__local___localdep_tolower_defined */
-__LOCAL_LIBC(wildstrcasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(wildstrcasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcasecmp))(char const *__pattern, char const *__string) {
 	char __pattern_ch, __string_ch;
 	for (;;) {

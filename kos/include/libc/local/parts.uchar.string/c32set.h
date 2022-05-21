@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7a0040f */
+/* HASH CRC-32:0x29cb2512 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_c32set_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c32set) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
+__LOCAL_LIBC(c32set) __ATTR_LEAF __ATTR_ACCESS_RW(1) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32set))(__CHAR32_TYPE__ *__restrict __str, int __ch) {
 	__CHAR32_TYPE__ *__iter;
 	for (__iter = __str; *__iter; ++__iter)

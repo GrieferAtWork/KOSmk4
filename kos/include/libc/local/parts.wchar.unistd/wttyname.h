@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x910d3d01 */
+/* HASH CRC-32:0x99e145c0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,12 +26,12 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wttyname_r_defined
 #define __local___localdep_wttyname_r_defined
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wttyname_r,(__fd_t __fd, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wttyname_r,(__fd,__buf,__buflen))
+__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),int,__NOTHROW_RPC,__localdep_wttyname_r,(__fd_t __fd, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wttyname_r,(__fd,__buf,__buflen))
 #endif /* !__local___localdep_wttyname_r_defined */
 __LOCAL_LIBC(wttyname) __ATTR_WUNUSED __WCHAR_TYPE__ *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wttyname))(__fd_t __fd) {
 	static __WCHAR_TYPE__ __buf[32];
-	if __likely((__NAMESPACE_LOCAL_SYM __localdep_wttyname_r)(__fd, __buf, sizeof(__buf)) == 0)
+	if __likely((__NAMESPACE_LOCAL_SYM __localdep_wttyname_r)(__fd, __buf, __COMPILER_LENOF(__buf)) == 0)
 		return __buf;
 	return __NULLPTR;
 }

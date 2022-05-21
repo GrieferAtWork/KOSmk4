@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x119bfe20 */
+/* HASH CRC-32:0x511203d1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strstr_defined
 #define __local___localdep_strstr_defined
 #if __has_builtin(__builtin_strstr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strstr)
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strstr,(char const *__haystack, char const *__needle),strstr,{ return __builtin_strstr(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_NCX,__localdep_strstr,(char const *__haystack, char const *__needle),strstr,{ return __builtin_strstr(__haystack, __needle); })
 #elif defined(__CRT_HAVE_strstr)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strstr,(char const *__haystack, char const *__needle),strstr,(__haystack,__needle))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_NCX,__localdep_strstr,(char const *__haystack, char const *__needle),strstr,(__haystack,__needle))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strstr.h>

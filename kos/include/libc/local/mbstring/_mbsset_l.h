@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72b0fae8 */
+/* HASH CRC-32:0xab8382f5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,9 +39,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strset_defined
 #define __local___localdep_strset_defined
 #ifdef __CRT_HAVE_strset
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strset,(char *__restrict __str, int __ch),strset,(__str,__ch))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RW(1),char *,__NOTHROW_NCX,__localdep_strset,(char *__restrict __str, int __ch),strset,(__str,__ch))
 #elif defined(__CRT_HAVE__strset)
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strset,(char *__restrict __str, int __ch),_strset,(__str,__ch))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RW(1),char *,__NOTHROW_NCX,__localdep_strset,(char *__restrict __str, int __ch),_strset,(__str,__ch))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strset.h>

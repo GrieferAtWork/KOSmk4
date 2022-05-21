@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdd00e20 */
+/* HASH CRC-32:0x228c373d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,7 +148,7 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_pause)(void);
 INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd, __STDC_INT_AS_UINT_T name);
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd, char *buf, size_t buflen);
+INTDEF ATTR_ACCESS_WRS(2, 3) int NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd, char *buf, size_t buflen);
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd);
@@ -188,7 +188,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_link)(char const *from, cha
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd, void *buf, size_t bufsize);
+INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd, void *buf, size_t bufsize);
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
@@ -196,7 +196,7 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd, void *buf, 
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd, void const *buf, size_t bufsize);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd, void const *buf, size_t bufsize);
 /* >> readall(3)
  * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
@@ -204,12 +204,12 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd, void const
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd, void *buf, size_t bufsize);
+INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd, void *buf, size_t bufsize);
 /* >> writeall(3)
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd, void const *buf, size_t bufsize);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd, void const *buf, size_t bufsize);
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF off_t NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd, off_t offset, __STDC_INT_AS_UINT_T whence);
@@ -304,7 +304,7 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
+INTDEF ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * WARNING: This  function is badly designed and will neither append a trailing
@@ -313,7 +313,7 @@ INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd, c
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
+INTDEF ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
 /* >> fsymlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path'
@@ -327,11 +327,11 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_fsymlinkat)(char const *lin
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
+INTDEF ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
-INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
+INTDEF ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
@@ -344,31 +344,31 @@ INTDEF off64_t NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd, off64_t offset, __STD
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pread64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pread64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
 INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 /* >> pipe2(2)
@@ -531,7 +531,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_t
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_readlink)(char const *path, char *buf, size_t buflen);
+INTDEF ATTR_ACCESS_WRS(2, 3) NONNULL((1)) ssize_t NOTHROW_RPC(LIBDCALL libd_readlink)(char const *path, char *buf, size_t buflen);
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
@@ -541,23 +541,23 @@ INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_readlink)(char const *p
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlink)(char const *path, char *buf, size_t buflen);
+INTDEF ATTR_ACCESS_WRS(2, 3) NONNULL((1)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlink)(char const *path, char *buf, size_t buflen);
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_gethostname)(char *name, size_t buflen);
+INTDEF ATTR_ACCESS_WRS(1, 2) int NOTHROW_NCX(LIBCCALL libc_gethostname)(char *name, size_t buflen);
 /* >> setlogin(3) */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name);
 /* >> sethostname(2)
  * Set the name of the hosting machine */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sethostname)(char const *name, size_t len);
+INTDEF ATTR_ACCESS_ROS(1, 2) int NOTHROW_NCX(LIBCCALL libc_sethostname)(char const *name, size_t len);
 /* >> sethostid(3) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sethostid)(longptr_t id);
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_getdomainname)(char *name, size_t buflen);
+INTDEF ATTR_ACCESS_WRS(1, 2) int NOTHROW_NCX(LIBCCALL libc_getdomainname)(char *name, size_t buflen);
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setdomainname)(char const *name, size_t len);
+INTDEF ATTR_ACCESS_ROS(1, 2) int NOTHROW_NCX(LIBCCALL libc_setdomainname)(char const *name, size_t len);
 /* >> vhangup(3) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_vhangup)(void);
 /* >> profil(3) */

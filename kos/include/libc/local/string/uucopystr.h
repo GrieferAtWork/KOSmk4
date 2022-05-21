@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55d38a7b */
+/* HASH CRC-32:0x50275cf9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/except.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(uucopystr) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(uucopystr) __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_WR_OPT(2) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(uucopystr))(void const *__restrict __src, void *__restrict __dst, __SIZE_TYPE__ __maxlen) {
 	__SIZE_TYPE__ __result = 0;
 	NESTED_TRY {

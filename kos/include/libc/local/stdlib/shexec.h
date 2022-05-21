@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfefa8f6f */
+/* HASH CRC-32:0x194b32a2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strrchrnul_defined
 #define __local___localdep_strrchrnul_defined
 #ifdef __CRT_HAVE_strrchrnul
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strrchrnul,(char const *__restrict __haystack, int __needle),strrchrnul,(__haystack,__needle))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_strrchrnul,(char const *__restrict __haystack, int __needle),strrchrnul,(__haystack,__needle))
 #else /* __CRT_HAVE_strrchrnul */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strrchrnul.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf3ea242 */
+/* HASH CRC-32:0xc9428ff7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strxfrm_defined
 #define __local___localdep_strxfrm_defined
 #ifdef __CRT_HAVE_strxfrm
-__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strxfrm,(char *__dst, char const *__restrict __src, __SIZE_TYPE__ __maxlen),strxfrm,(__dst,__src,__maxlen))
+__CREDIRECT(__ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_WRS(1, 3),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strxfrm,(char *__dst, char const *__restrict __src, __SIZE_TYPE__ __buflen),strxfrm,(__dst,__src,__buflen))
 #else /* __CRT_HAVE_strxfrm */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strxfrm.h>
@@ -34,10 +34,10 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strxfrm __LIBC_LOCAL_NAME(strxfrm)
 #endif /* !__CRT_HAVE_strxfrm */
 #endif /* !__local___localdep_strxfrm_defined */
-__LOCAL_LIBC(strxfrm_l) __ATTR_NONNULL((2)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strxfrm_l))(char *__dst, char const *__restrict __src, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
+__LOCAL_LIBC(strxfrm_l) __ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_WRS(1, 3) __SIZE_TYPE__
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strxfrm_l))(char *__dst, char const *__restrict __src, __SIZE_TYPE__ __buflen, __locale_t __locale) {
 	(void)__locale;
-	return (__NAMESPACE_LOCAL_SYM __localdep_strxfrm)(__dst, __src, __maxlen);
+	return (__NAMESPACE_LOCAL_SYM __localdep_strxfrm)(__dst, __src, __buflen);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strxfrm_l_defined

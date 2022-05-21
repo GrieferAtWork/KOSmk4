@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfaa14be5 */
+/* HASH CRC-32:0xb0f8a0ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16chr __LIBC_LOCAL_NAME(c16chr)
 #endif /* !... */
 #endif /* !__local___localdep_c16chr_defined */
-__LOCAL_LIBC(c16sep) __ATTR_LEAF __ATTR_NONNULL((1, 2)) __CHAR16_TYPE__ *
+__LOCAL_LIBC(c16sep) __ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sep))(__CHAR16_TYPE__ **__restrict __stringp, __CHAR16_TYPE__ const *__restrict __delim) {
 	__CHAR16_TYPE__ *__result, *__iter;
 	if ((__result = *__stringp) == __NULLPTR || !*__result)

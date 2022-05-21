@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43d98c85 */
+/* HASH CRC-32:0xd24f6701 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_basename_defined
 #define __local___localdep_basename_defined
 #ifdef __CRT_HAVE_basename
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_basename,(char const *__filename),basename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_basename,(char const *__filename),basename,(__filename))
 #elif defined(__CRT_HAVE___basename)
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_basename,(char const *__filename),__basename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_basename,(char const *__filename),__basename,(__filename))
 #elif defined(__CRT_HAVE_lbasename)
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_basename,(char const *__filename),lbasename,(__filename))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_basename,(char const *__filename),lbasename,(__filename))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/basename.h>

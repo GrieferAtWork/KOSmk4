@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c843b20 */
+/* HASH CRC-32:0xadefbd6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -325,7 +325,7 @@ err:
  *     %u.%u.%u.%u  For everything else
  * @return: buf:  Success
  * @return: NULL: [errno=EMSGSIZE]: The given `len' is too small */
-INTERN ATTR_SECTION(".text.crt.net.inet") NONNULL((2)) char *
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_ACCESS_WRS(2, 3) char *
 NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net,
                                      char *buf,
                                      size_t len) {

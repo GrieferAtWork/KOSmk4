@@ -260,12 +260,15 @@
 #define __ATTR_FORMAT_ARG(x) /* nothing */
 #define __NO_ATTR_ACCESS
 #define __ATTR_ACCESS_NONE(ptr_index)            /* Nothing */
-#define __ATTR_ACCESS_RD(ptr_index)              /* Nothing */
-#define __ATTR_ACCESS_RDS(ptr_index, size_index) /* Nothing */
-#define __ATTR_ACCESS_WR(ptr_index)              /* Nothing */
+#define __ATTR_ACCESS_ROS(ptr_index, size_index) /* Nothing */
 #define __ATTR_ACCESS_WRS(ptr_index, size_index) /* Nothing */
-#define __ATTR_ACCESS_RW(ptr_index)              /* Nothing */
 #define __ATTR_ACCESS_RWS(ptr_index, size_index) /* Nothing */
+#define __ATTR_ACCESS_RO_OPT(ptr_index)          /* Nothing */
+#define __ATTR_ACCESS_WR_OPT(ptr_index)          /* Nothing */
+#define __ATTR_ACCESS_RW_OPT(ptr_index)          /* Nothing */
+#define __ATTR_ACCESS_RO(ptr_index)              /* Nothing */
+#define __ATTR_ACCESS_WR(ptr_index)              /* Nothing */
+#define __ATTR_ACCESS_RW(ptr_index)              /* Nothing */
 
 #define __NO_XBLOCK
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x378b2b7b */
+/* HASH CRC-32:0xaf2b002d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcpy_s_defined
 #define __local___localdep_strcpy_s_defined
 #ifdef __CRT_HAVE_strcpy_s
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_strcpy_s,(char *__dst, __SIZE_TYPE__ __dstsize, char const *__src),strcpy_s,(__dst,__dstsize,__src))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_WRS(1, 2),__errno_t,__NOTHROW_NCX,__localdep_strcpy_s,(char *__dst, __SIZE_TYPE__ __dstsize, char const *__src),strcpy_s,(__dst,__dstsize,__src))
 #else /* __CRT_HAVE_strcpy_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcpy_s.h>

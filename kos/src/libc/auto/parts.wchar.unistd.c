@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f654ca5 */
+/* HASH CRC-32:0x11d66a2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ DECL_BEGIN
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") WUNUSED char16_t *
 NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd) {
 	static char16_t buf[32];
-	if likely(libd_wttyname_r(fd, buf, sizeof(buf)) == 0)
+	if likely(libd_wttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
 		return buf;
 	return NULL;
 }
@@ -51,7 +51,7 @@ NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd) {
 INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED char32_t *
 NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd) {
 	static char32_t buf[32];
-	if likely(libc_wttyname_r(fd, buf, sizeof(buf)) == 0)
+	if likely(libc_wttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
 		return buf;
 	return NULL;
 }

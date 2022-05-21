@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x793d659 */
+/* HASH CRC-32:0x71d630bc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_freadlinkat_defined
 #define __local___localdep_freadlinkat_defined
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_freadlinkat,(__fd_t __dfd, char const *__path, char *__buf, __SIZE_TYPE__ __buflen, __atflag_t __flags),freadlinkat,(__dfd,__path,__buf,__buflen,__flags))
+__CREDIRECT(__ATTR_ACCESS_WRS(3, 4) __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_freadlinkat,(__fd_t __dfd, char const *__path, char *__buf, __SIZE_TYPE__ __buflen, __atflag_t __flags),freadlinkat,(__dfd,__path,__buf,__buflen,__flags))
 #endif /* !__local___localdep_freadlinkat_defined */
-__LOCAL_LIBC(readlinkat) __ATTR_NONNULL((2, 3)) __SSIZE_TYPE__
+__LOCAL_LIBC(readlinkat) __ATTR_ACCESS_WRS(3, 4) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readlinkat))(__fd_t __dfd, char const *__path, char *__buf, __SIZE_TYPE__ __buflen) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_freadlinkat)(__dfd, __path, __buf, __buflen, 0);
 }

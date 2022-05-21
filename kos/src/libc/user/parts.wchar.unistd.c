@@ -39,10 +39,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_wttyname_r,hash:CRC-32=0x5a5cd16f]]]*/
+/*[[[head:libc_wttyname_r,hash:CRC-32=0xfe95219]]]*/
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WRS(2, 3) int
 NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd,
                                       char32_t *buf,
                                       size_t buflen)
@@ -57,10 +57,10 @@ NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd,
 }
 /*[[[end:libc_wttyname_r]]]*/
 
-/*[[[head:libd_wttyname_r,hash:CRC-32=0xee755add]]]*/
+/*[[[head:libd_wttyname_r,hash:CRC-32=0xbe374bc5]]]*/
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_ACCESS_WRS(2, 3) int
 NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
                                       char16_t *buf,
                                       size_t buflen)

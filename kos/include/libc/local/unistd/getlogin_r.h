@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a13874f */
+/* HASH CRC-32:0x4de2fc36 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/db/passwd.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getlogin_r) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(getlogin_r) __ATTR_ACCESS_WRS(1, 2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getlogin_r))(char *__name, __SIZE_TYPE__ __name_len) {
 #if defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid))
 	char __buf[1024]; /* NSS_BUFLEN_PASSWD */

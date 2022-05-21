@@ -370,7 +370,7 @@ err:
 @@@return: NULL: [errno=EMSGSIZE]: The given `len' is too small
 [[impl_include("<libc/errno.h>")]]
 [[decl_include("<hybrid/typecore.h>")]]
-char *inet_neta($uint32_t net, [[outp(len)]] char *buf, $size_t len) {
+char *inet_neta($uint32_t net, [[out(<= len)]] char *buf, $size_t len) {
 	size_t reqlen;
 	if (net <= 0xff) {
 		if (!net) {

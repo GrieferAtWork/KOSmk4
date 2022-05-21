@@ -794,19 +794,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * case of KOS, that would be the raw `struct mfile' objects). Currently,  our
 	 * implementation restricts O_PATH to only work for directories. */
 
-	/* TODO: Update the toolchain gcc to the latest version.
-	 *       Afterwards, add `__attribute__((access(...)))' support to magic:
-	 * >> void foo([[in]] char const *buf);                       --> __attribute__((access(read_only, 1), nonnull(1))) void foo(char const *buf);
-	 * >> void foo([[out]] char *buf);                            --> __attribute__((access(write_only, 1), nonnull(1))) void foo(char *buf);
-	 * >> void foo([[inout]] char *buf);                          --> __attribute__((access(read_write, 1), nonnull(1))) void foo(char *buf);
-	 * >> void foo([[in_opt]] char const *buf);                   --> __attribute__((access(read_only, 1))) void foo(char const *buf);
-	 * >> void foo([[out_opt]] char *buf);                        --> __attribute__((access(write_only, 1))) void foo(char *buf);
-	 * >> void foo([[inout_opt]] char *buf);                      --> __attribute__((access(read_write, 1))) void foo(char *buf);
-	 * >> void foo([[in(count)]] void const *buf, size_t count);  --> __attribute__((access(read_only, 1, 2))) void foo(void const *buf, size_t count);
-	 * >> void foo([[out(count)]] void *buf, size_t count);       --> __attribute__((access(write_only, 1, 2))) void foo(void *buf, size_t count);
-	 * >> void foo([[inout(count)]] void *buf, size_t count);     --> __attribute__((access(read_write, 1, 2))) void foo(void *buf, size_t count);
-	 */
-
 	/* TODO: Enable `-Wpadded' (warns about implicit padding in structures; on KOS,
 	 *       structs should be  declared with hidden  padding made visible  through
 	 *       explicitly declared fields) */
@@ -833,6 +820,18 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Add support for dwarf-5 in `libdebuginfo' (currently, we need to
 	 *       compiled with `-gdwarf-4', and  that should go away  eventually) */
+
+	/* TODO: Go through all magic sources and attach in/out annotations:
+	 * >> void foo([[in]] char const *buf);                       --> __attribute__((access(read_only, 1), nonnull(1))) void foo(char const *buf);
+	 * >> void foo([[out]] char *buf);                            --> __attribute__((access(write_only, 1), nonnull(1))) void foo(char *buf);
+	 * >> void foo([[inout]] char *buf);                          --> __attribute__((access(read_write, 1), nonnull(1))) void foo(char *buf);
+	 * >> void foo([[in_opt]] char const *buf);                   --> __attribute__((access(read_only, 1))) void foo(char const *buf);
+	 * >> void foo([[out_opt]] char *buf);                        --> __attribute__((access(write_only, 1))) void foo(char *buf);
+	 * >> void foo([[inout_opt]] char *buf);                      --> __attribute__((access(read_write, 1))) void foo(char *buf);
+	 * >> void foo([[in(count)]] void const *buf, size_t count);  --> __attribute__((access(read_only, 1, 2))) void foo(void const *buf, size_t count);
+	 * >> void foo([[out(count)]] void *buf, size_t count);       --> __attribute__((access(write_only, 1, 2))) void foo(void *buf, size_t count);
+	 * >> void foo([[inout(count)]] void *buf, size_t count);     --> __attribute__((access(read_write, 1, 2))) void foo(void *buf, size_t count);
+	 */
 
 	return state;
 }

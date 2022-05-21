@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe71accb9 */
+/* HASH CRC-32:0xb8f24ac4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/os/signal.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strtosigno) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __signo_t
+__LOCAL_LIBC(strtosigno) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __signo_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtosigno))(const char *__name) {
 	__SIZE_TYPE__ __i;
 	if (__name[0] != 'S' || __name[1] != 'I' || __name[2] != 'G')

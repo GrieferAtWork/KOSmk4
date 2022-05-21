@@ -226,8 +226,15 @@ class CParser {
 	@@the case. Afterwards, advance the current token by @(return  this.tok())
 	public function skip(tok: string): string {
 		if (this.tok != tok)
-			err("Unexpected token (expected {!r}, but got {!r})".format({ tok, this.tok }));
+			unexpected(tok);
 		return this.next();
+	}
+	public function expect(tok: string) {
+		if (this.tok != tok)
+			unexpected(tok);
+	}
+	public function unexpected(expected: string) {
+		err("Unexpected token (expected {!r}, but got {!r})".format({ expected, this.tok }));
 	}
 
 	@@Skip pairs of @open/@close tokens, where the caller should position
@@ -594,6 +601,19 @@ twochar:
 	function parseCStringOrKeyword(): string {
 		local tok = this.tok;
 		if (tok.issymbol()) {
+		} else if (isCString(tok)) {
+			tok = tok.decode("c-escape");
+		} else {
+			err("Expected keyword or C-string, but got {!r}"
+				.format({ tok }));
+		}
+		next();
+		return tok;
+	}
+
+	function parseCStringOrKeywordOrNumber(): string {
+		local tok = this.tok;
+		if (tok.issymbol() || (tok && tok.isdigit(0) && tok.isalnum())) {
 		} else if (isCString(tok)) {
 			tok = tok.decode("c-escape");
 		} else {

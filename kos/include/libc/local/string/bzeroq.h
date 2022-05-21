@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc327902c */
+/* HASH CRC-32:0x2260a750 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_bzerol_defined
 #define __local___localdep_bzerol_defined
 #ifdef __CRT_HAVE_bzerol
-__CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_bzerol,(void *__restrict __dst, __SIZE_TYPE__ __num_dwords),bzerol,(__dst,__num_dwords))
+__CREDIRECT_VOID(__ATTR_LEAF __ATTR_ACCESS_WR(1),__NOTHROW_NCX,__localdep_bzerol,(void *__restrict __dst, __SIZE_TYPE__ __num_dwords),bzerol,(__dst,__num_dwords))
 #else /* __CRT_HAVE_bzerol */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/bzerol.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memsetq_defined
 #define __local___localdep_memsetq_defined
 #ifdef __CRT_HAVE_memsetq
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memsetq,(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memsetq,(__dst,__qword,__n_qwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_WR(1),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memsetq,(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memsetq,(__dst,__qword,__n_qwords))
 #else /* __CRT_HAVE_memsetq */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memsetq.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memsetq __LIBC_LOCAL_NAME(memsetq)
 #endif /* !__CRT_HAVE_memsetq */
 #endif /* !__local___localdep_memsetq_defined */
-__LOCAL_LIBC(bzeroq) __ATTR_LEAF __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(bzeroq) __ATTR_LEAF __ATTR_ACCESS_WR(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bzeroq))(void *__restrict __dst, __SIZE_TYPE__ __num_qwords) {
 #if defined(__UINT64_TYPE__) && __SIZEOF_BUSINT__ >= 8
 	(__NAMESPACE_LOCAL_SYM __localdep_memsetq)(__dst, 0, __num_qwords);

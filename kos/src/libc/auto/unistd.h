@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4623e2c1 */
+/* HASH CRC-32:0xe76924a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -156,7 +156,7 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_ttyname_r)(fd_t fd, char *buf, size_t buflen);
+INTDEF ATTR_ACCESS_WRS(2, 3) int NOTHROW_RPC(LIBDCALL libd_ttyname_r)(fd_t fd, char *buf, size_t buflen);
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_tcgetpgrp)(fd_t fd);
@@ -178,7 +178,7 @@ INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_getlogin)(void);
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_read)(fd_t fd, void *buf, size_t bufsize);
+INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_read)(fd_t fd, void *buf, size_t bufsize);
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
@@ -186,7 +186,7 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_read)(fd_t fd, void *buf, 
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_write)(fd_t fd, void const *buf, size_t bufsize);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_write)(fd_t fd, void const *buf, size_t bufsize);
 /* >> readall(3)
  * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
@@ -194,12 +194,12 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_write)(fd_t fd, void const
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_readall)(fd_t fd, void *buf, size_t bufsize);
+INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_readall)(fd_t fd, void *buf, size_t bufsize);
 /* >> writeall(3)
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_writeall)(fd_t fd, void const *buf, size_t bufsize);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_writeall)(fd_t fd, void const *buf, size_t bufsize);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
@@ -208,7 +208,7 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_writeall)(fd_t fd, void co
  * A pformatprinter-compatible consumer that dumps all input data into `fd' by use
  * of `writeall(3)'. The given `fd' should be encoded by  `WRITE_PRINTER_ARG(fd)'.
  * @return: * : Same as `writeall(3)' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_write_printer)(void *fd, char const *__restrict buf, size_t bufsize);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_write_printer)(void *fd, char const *__restrict buf, size_t bufsize);
 #endif /* !__KERNEL__ && (!__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__) */
 #if !defined(__KERNEL__) && (defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__)
 /* Define the libc internal header variant as an alias for writeall() when it would otherwise not be defined. */
@@ -245,31 +245,31 @@ INTDEF off64_t NOTHROW_NCX(LIBDCALL libd_lseek64)(fd_t fd, off64_t offset, __STD
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pread)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pread)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pread64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pread64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
 /* >> pipe2(2)
  * Construct a [reader,writer]-pair of pipes
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
@@ -429,31 +429,31 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_setegid)(gid_t egid);
 /* >> getlogin_r(3)
  * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
  * s.a. `getlogin()' and `cuserid()' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_getlogin_r)(char *name, size_t name_len);
+INTDEF ATTR_ACCESS_WRS(1, 2) int NOTHROW_RPC(LIBDCALL libd_getlogin_r)(char *name, size_t name_len);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getlogin_r(3)
  * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
  * s.a. `getlogin()' and `cuserid()' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name, size_t name_len);
+INTDEF ATTR_ACCESS_WRS(1, 2) int NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name, size_t name_len);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_gethostname)(char *name, size_t buflen);
+INTDEF ATTR_ACCESS_WRS(1, 2) int NOTHROW_NCX(LIBDCALL libd_gethostname)(char *name, size_t buflen);
 /* >> setlogin(3) */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_setlogin)(char const *name);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd_setlogin)(char const *name);
 /* >> sethostname(2)
  * Set the name of the hosting machine */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sethostname)(char const *name, size_t len);
+INTDEF ATTR_ACCESS_ROS(1, 2) int NOTHROW_NCX(LIBDCALL libd_sethostname)(char const *name, size_t len);
 /* >> sethostid(3) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sethostid)(longptr_t id);
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_getdomainname)(char *name, size_t buflen);
+INTDEF ATTR_ACCESS_WRS(1, 2) int NOTHROW_NCX(LIBDCALL libd_getdomainname)(char *name, size_t buflen);
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_setdomainname)(char const *name, size_t len);
+INTDEF ATTR_ACCESS_ROS(1, 2) int NOTHROW_NCX(LIBDCALL libd_setdomainname)(char const *name, size_t len);
 /* >> profil(3) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_profil)(uint16_t *sample_buffer, size_t size, size_t offset, unsigned int scale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

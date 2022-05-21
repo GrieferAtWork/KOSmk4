@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac7de9d8 */
+/* HASH CRC-32:0x37b386c0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* ... */
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wttyname_r,(__fd_t __fd, wchar_t *__buf, size_t __buflen),(__fd,__buf,__buflen))
+__CDECLARE_OPT(__ATTR_ACCESS_WRS(2, 3),int,__NOTHROW_RPC,wttyname_r,(__fd_t __fd, wchar_t *__buf, size_t __buflen),(__fd,__buf,__buflen))
 #ifdef __CRT_HAVE_wchown
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchown,(wchar_t const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
 #else /* __CRT_HAVE_wchown */

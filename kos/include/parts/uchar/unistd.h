@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f8746e8 */
+/* HASH CRC-32:0x81f7a833 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,20 +88,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32ttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #if defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c16ttyname_r,(__fd_t __fd, char16_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
+__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),int,__NOTHROW_RPC,c16ttyname_r,(__fd_t __fd, char16_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
 #elif defined(__CRT_HAVE_DOS$wttyname_r)
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c16ttyname_r,(__fd_t __fd, char16_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
+__CREDIRECT_DOS(__ATTR_ACCESS_WRS(2, 3),int,__NOTHROW_RPC,c16ttyname_r,(__fd_t __fd, char16_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
 #endif /* ... */
 #if defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32ttyname_r,(__fd_t __fd, char32_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
+__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),int,__NOTHROW_RPC,c32ttyname_r,(__fd_t __fd, char32_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
 #elif defined(__CRT_HAVE_KOS$wttyname_r)
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32ttyname_r,(__fd_t __fd, char32_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
+__CREDIRECT_KOS(__ATTR_ACCESS_WRS(2, 3),int,__NOTHROW_RPC,c32ttyname_r,(__fd_t __fd, char32_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
 #endif /* ... */
 #if defined(__CRT_HAVE_wchown) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16chown,(char16_t const *__file, __uid_t __owner, __gid_t __group),wchown,(__file,__owner,__group))

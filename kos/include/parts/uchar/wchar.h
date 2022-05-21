@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a380dba */
+/* HASH CRC-32:0x70d4b364 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1624,63 +1624,63 @@ __CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char32_t *,__NOTHROW_NCX,f
 #endif /* ... */
 #if defined(__CRT_HAVE_wcslcat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> wcslcat(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,c16lcat,(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcat,(__dst,__src,__bufsize))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RWS(1, 3) __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,c16lcat,(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcat,(__dst,__src,__bufsize))
 #elif defined(__CRT_HAVE_DOS$wcslcat)
 /* >> wcslcat(3) */
-__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,c16lcat,(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcat,(__dst,__src,__bufsize))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RWS(1, 3) __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,c16lcat,(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcat,(__dst,__src,__bufsize))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcslcat.h>
 /* >> wcslcat(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL c16lcat)(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslcat))((__WCHAR_TYPE__ *)__dst, (__WCHAR_TYPE__ const *)__src, __bufsize); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RWS(1, 3) __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL c16lcat)(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslcat))((__WCHAR_TYPE__ *)__dst, (__WCHAR_TYPE__ const *)__src, __bufsize); }
 #else /* ... */
 #include <libc/local/parts.uchar.wchar/c16lcat.h>
 /* >> wcslcat(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16lcat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL c16lcat)(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16lcat))(__dst, __src, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16lcat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RWS(1, 3) __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL c16lcat)(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16lcat))(__dst, __src, __bufsize); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcslcat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> wcslcat(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,c32lcat,(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcat,(__dst,__src,__bufsize))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RWS(1, 3) __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,c32lcat,(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcat,(__dst,__src,__bufsize))
 #elif defined(__CRT_HAVE_KOS$wcslcat)
 /* >> wcslcat(3) */
-__CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,c32lcat,(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcat,(__dst,__src,__bufsize))
+__CREDIRECT_KOS(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RWS(1, 3) __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,c32lcat,(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcat,(__dst,__src,__bufsize))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcslcat.h>
 /* >> wcslcat(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL c32lcat)(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslcat))((__WCHAR_TYPE__ *)__dst, (__WCHAR_TYPE__ const *)__src, __bufsize); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RWS(1, 3) __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL c32lcat)(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslcat))((__WCHAR_TYPE__ *)__dst, (__WCHAR_TYPE__ const *)__src, __bufsize); }
 #else /* ... */
 #include <libc/local/parts.uchar.wchar/c32lcat.h>
 /* >> wcslcat(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32lcat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL c32lcat)(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32lcat))(__dst, __src, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32lcat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RWS(1, 3) __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL c32lcat)(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32lcat))(__dst, __src, __bufsize); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcslcpy) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> wcslcpy(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,c16lcpy,(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcpy,(__dst,__src,__bufsize))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,c16lcpy,(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcpy,(__dst,__src,__bufsize))
 #elif defined(__CRT_HAVE_DOS$wcslcpy)
 /* >> wcslcpy(3) */
-__CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,c16lcpy,(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcpy,(__dst,__src,__bufsize))
+__CREDIRECT_DOS(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,c16lcpy,(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcpy,(__dst,__src,__bufsize))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcslcpy.h>
 /* >> wcslcpy(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL c16lcpy)(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslcpy))((__WCHAR_TYPE__ *)__dst, (__WCHAR_TYPE__ const *)__src, __bufsize); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL c16lcpy)(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslcpy))((__WCHAR_TYPE__ *)__dst, (__WCHAR_TYPE__ const *)__src, __bufsize); }
 #else /* ... */
 #include <libc/local/parts.uchar.wchar/c16lcpy.h>
 /* >> wcslcpy(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16lcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL c16lcpy)(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16lcpy))(__dst, __src, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16lcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL c16lcpy)(char16_t *__restrict __dst, char16_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16lcpy))(__dst, __src, __bufsize); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcslcpy) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> wcslcpy(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,c32lcpy,(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcpy,(__dst,__src,__bufsize))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,c32lcpy,(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcpy,(__dst,__src,__bufsize))
 #elif defined(__CRT_HAVE_KOS$wcslcpy)
 /* >> wcslcpy(3) */
-__CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,c32lcpy,(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcpy,(__dst,__src,__bufsize))
+__CREDIRECT_KOS(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,c32lcpy,(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize),wcslcpy,(__dst,__src,__bufsize))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcslcpy.h>
 /* >> wcslcpy(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL c32lcpy)(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslcpy))((__WCHAR_TYPE__ *)__dst, (__WCHAR_TYPE__ const *)__src, __bufsize); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL c32lcpy)(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslcpy))((__WCHAR_TYPE__ *)__dst, (__WCHAR_TYPE__ const *)__src, __bufsize); }
 #else /* ... */
 #include <libc/local/parts.uchar.wchar/c32lcpy.h>
 /* >> wcslcpy(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32lcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL c32lcpy)(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32lcpy))(__dst, __src, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32lcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL c32lcpy)(char32_t *__restrict __dst, char32_t const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32lcpy))(__dst, __src, __bufsize); })
 #endif /* !... */
 #endif /* __USE_BSD */
 

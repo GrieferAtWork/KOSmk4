@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f150487 */
+/* HASH CRC-32:0x846bf15 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_WRS(1, 3) __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memcpy */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpy.h>
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/except.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(uucopy) int
+__LOCAL_LIBC(uucopy) __ATTR_ACCESS_ROS(1, 3) __ATTR_ACCESS_WRS(2, 3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(uucopy))(void const *__restrict __src, void *__restrict __dst, __SIZE_TYPE__ __num_bytes) {
 	NESTED_TRY {
 		(__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__dst, __src, __num_bytes);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x894ffc02 */
+/* HASH CRC-32:0x2c57d0ab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -213,7 +213,7 @@ INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_inet_paton)(char co
  *     %u.%u.%u.%u  For everything else
  * @return: buf:  Success
  * @return: NULL: [errno=EMSGSIZE]: The given `len' is too small */
-INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_inet_neta)(uint32_t net, char *buf, size_t len);
+INTDEF ATTR_ACCESS_WRS(2, 3) char *NOTHROW_NCX(LIBDCALL libd_inet_neta)(uint32_t net, char *buf, size_t len);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> inet_neta(3)
@@ -225,7 +225,7 @@ INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_inet_neta)(uint32_t net, cha
  *     %u.%u.%u.%u  For everything else
  * @return: buf:  Success
  * @return: NULL: [errno=EMSGSIZE]: The given `len' is too small */
-INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net, char *buf, size_t len);
+INTDEF ATTR_ACCESS_WRS(2, 3) char *NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net, char *buf, size_t len);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_net_ntop(3)

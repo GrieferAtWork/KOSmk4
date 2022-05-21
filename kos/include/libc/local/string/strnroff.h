@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8d49d19 */
+/* HASH CRC-32:0x7ce140df */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strnrchrnul_defined
 #define __local___localdep_strnrchrnul_defined
 #ifdef __CRT_HAVE_strnrchrnul
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnrchrnul,(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen),strnrchrnul,(__haystack,__needle,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 3) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnrchrnul,(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen),strnrchrnul,(__haystack,__needle,__maxlen))
 #else /* __CRT_HAVE_strnrchrnul */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strnrchrnul.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strnrchrnul __LIBC_LOCAL_NAME(strnrchrnul)
 #endif /* !__CRT_HAVE_strnrchrnul */
 #endif /* !__local___localdep_strnrchrnul_defined */
-__LOCAL_LIBC(strnroff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(strnroff) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 3) __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnroff))(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen) {
 	return (__SIZE_TYPE__)((__NAMESPACE_LOCAL_SYM __localdep_strnrchrnul)(__haystack, __needle, __maxlen) - __haystack);
 }

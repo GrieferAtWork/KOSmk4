@@ -813,7 +813,7 @@ $longptr_t fpathconf($fd_t fd, __STDC_INT_AS_UINT_T name);
 [[export_alias("__ttyname"), requires_function(ttyname_r)]]
 char *ttyname($fd_t fd) {
 	static char buf[32];
-	if likely(ttyname_r(fd, buf, sizeof(buf)) == 0)
+	if likely(ttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
 		return buf;
 	return NULL;
 }
@@ -821,7 +821,7 @@ char *ttyname($fd_t fd) {
 @@>> ttyname_r(3)
 @@Return the name of a TTY given its file descriptor
 [[cp, decl_include("<bits/types.h>")]]
-int ttyname_r($fd_t fd, [[outp(buflen)]] char *buf, size_t buflen);
+int ttyname_r($fd_t fd, [[out(<= buflen)]] char *buf, size_t buflen);
 
 @@>> tcgetpgrp(2)
 @@Return the foreground process group of a given TTY file descriptor
@@ -907,7 +907,7 @@ int link([[nonnull]] char const *from, [[nonnull]] char const *to) {
 @@@return: 0         : EOF
 [[dos_only_export_alias("_read"), export_alias("__read", "__libc_read")]]
 [[cp, guard, decl_include("<bits/types.h>"), section(".text.crt{|.dos}.io.read")]]
-ssize_t read($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize);
+ssize_t read($fd_t fd, [[out(return <= bufsize)]] void *buf, size_t bufsize);
 
 @@>> write(2)
 @@Write up to `bufsize' bytes from `buf' into `fd'
@@ -918,7 +918,7 @@ ssize_t read($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize);
 @@@return: 0         : No more data can be written
 [[dos_only_export_alias("_write"), export_alias("__write", "__libc_write")]]
 [[cp, guard, decl_include("<bits/types.h>"), section(".text.crt{|.dos}.io.write")]]
-ssize_t write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
+ssize_t write($fd_t fd, [[in(return <= bufsize)]] void const *buf, size_t bufsize);
 
 %#ifdef __USE_KOS
 @@>> readall(3)
@@ -930,7 +930,7 @@ ssize_t write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
 @@during this phase are silently ignored and don't cause `errno' to change
 [[cp, guard, section(".text.crt{|.dos}.io.read"), impl_include("<libc/errno.h>")]]
 [[userimpl, requires_function(read, lseek), decl_include("<bits/types.h>")]]
-ssize_t readall($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
+ssize_t readall($fd_t fd, [[out(bufsize)]] void *buf, size_t bufsize) {
 	ssize_t result, temp;
 	result = read(fd, buf, bufsize);
 	if (result > 0 && (size_t)result < bufsize) {
@@ -967,7 +967,7 @@ ssize_t readall($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 [[if($extended_include_prefix("<hybrid/typecore.h>", "<bits/crt/format-printer.h>")defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__), export_alias("write_printer")]]
 [[userimpl, requires_function(write)]]
 [[decl_include("<bits/types.h>")]]
-ssize_t writeall($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) {
+ssize_t writeall($fd_t fd, [[in(bufsize)]] void const *buf, size_t bufsize) {
 	ssize_t result, temp;
 	result = write(fd, buf, bufsize);
 	if (result > 0 && (size_t)result < bufsize) {
@@ -997,7 +997,7 @@ ssize_t writeall($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) {
 [[crt_impl_if($extended_include_prefix("<hybrid/typecore.h>", "<bits/crt/format-printer.h>")!defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__))]]
 [[if($extended_include_prefix("<hybrid/typecore.h>", "<bits/crt/format-printer.h>")defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__), preferred_alias("writeall")]]
 ssize_t write_printer(/*fd_t*/ void *fd,
-                      [[inp(bufsize)]] char const *__restrict buf,
+                      [[in(bufsize)]] char const *__restrict buf,
                       size_t bufsize) {
 	return writeall((fd_t)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))(uintptr_t)fd, buf, bufsize);
 }
@@ -1190,7 +1190,7 @@ int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 [[userimpl, requires_function(freadlinkat)]]
 ssize_t readlinkat($fd_t dfd, [[nonnull]] char const *path,
-                   [[outp(buflen)]] char *buf, size_t buflen) {
+                   [[out(return <= buflen)]] char *buf, size_t buflen) {
 	return freadlinkat(dfd, path, buf, buflen, 0);
 }
 
@@ -1208,7 +1208,7 @@ int fsymlinkat([[nonnull]] char const *link_text, $fd_t tofd,
 @@@param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE'
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 ssize_t freadlinkat($fd_t dfd, [[nonnull]] char const *path,
-                    [[outp(buflen)]] char *buf, size_t buflen,
+                    [[out(return <= buflen)]] char *buf, size_t buflen,
                     $atflag_t flags);
 %#endif /* __USE_KOS */
 
@@ -1259,7 +1259,7 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 [[requires($has_function(pread64) ||
            ($has_function(lseek, read) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
 [[section(".text.crt{|.dos}.io.read")]]
-ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf,
+ssize_t pread($fd_t fd, [[out(return <= bufsize)]] void *buf,
               size_t bufsize, __PIO_OFFSET offset) {
 @@pp_if $has_function(pread64)@@
 	return pread64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
@@ -1288,7 +1288,7 @@ ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf,
 [[requires($has_function(pwrite64) ||
            ($has_function(lseek, write) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
 [[section(".text.crt{|.dos}.io.write")]]
-ssize_t pwrite($fd_t fd, [[inp(bufsize)]] void const *buf,
+ssize_t pwrite($fd_t fd, [[in(return <= bufsize)]] void const *buf,
                size_t bufsize, __PIO_OFFSET offset) {
 @@pp_if $has_function(pwrite64)@@
 	return pwrite64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
@@ -1318,7 +1318,7 @@ ssize_t pwrite($fd_t fd, [[inp(bufsize)]] void const *buf,
 [[impl_include("<libc/errno.h>")]]
 [[userimpl, requires_function(preadall64)]]
 [[section(".text.crt{|.dos}.io.read")]]
-ssize_t preadall($fd_t fd, [[outp(bufsize)]] void *buf,
+ssize_t preadall($fd_t fd, [[out(bufsize)]] void *buf,
                  size_t bufsize, __PIO_OFFSET offset) {
 	return preadall64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
 }
@@ -1331,7 +1331,7 @@ ssize_t preadall($fd_t fd, [[outp(bufsize)]] void *buf,
 [[impl_include("<libc/errno.h>")]]
 [[userimpl, requires_function(pwriteall64)]]
 [[section(".text.crt{|.dos}.io.write")]]
-ssize_t pwriteall($fd_t fd, [[inp(bufsize)]] void const *buf,
+ssize_t pwriteall($fd_t fd, [[in(bufsize)]] void const *buf,
                   size_t bufsize, __PIO_OFFSET offset) {
 	return pwriteall64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
 }
@@ -1344,12 +1344,12 @@ ssize_t pwriteall($fd_t fd, [[inp(bufsize)]] void const *buf,
 
 [[cp, ignore, nocrt, alias("pread"), doc_alias("pread")]]
 [[decl_include("<bits/types.h>")]]
-ssize_t crt_pread32($fd_t fd, [[outp(bufsize)]] void *buf,
+ssize_t crt_pread32($fd_t fd, [[out(return <= bufsize)]] void *buf,
                     size_t bufsize, $pos32_t offset);
 
 [[cp, ignore, nocrt, alias("pwrite"), doc_alias("pwrite")]]
 [[decl_include("<bits/types.h>")]]
-ssize_t crt_pwrite32($fd_t fd, [[inp(bufsize)]] void const *buf,
+ssize_t crt_pwrite32($fd_t fd, [[in(return <= bufsize)]] void const *buf,
                      size_t bufsize, $pos32_t offset);
 
 [[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
@@ -1358,7 +1358,7 @@ ssize_t crt_pwrite32($fd_t fd, [[inp(bufsize)]] void const *buf,
 [[requires($has_function(crt_pread32) ||
            ($has_function(lseek, read) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
 [[section(".text.crt{|.dos}.io.large.read")]]
-ssize_t pread64($fd_t fd, [[outp(bufsize)]] void *buf,
+ssize_t pread64($fd_t fd, [[out(return <= bufsize)]] void *buf,
                 size_t bufsize, __PIO_OFFSET64 offset) {
 @@pp_if $has_function(crt_pread32)@@
 	return crt_pread32(fd, buf, bufsize, (pos32_t)offset);
@@ -1395,7 +1395,7 @@ ssize_t pread64($fd_t fd, [[outp(bufsize)]] void *buf,
 [[requires($has_function(crt_pwrite32) ||
            ($has_function(lseek, write) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
 [[section(".text.crt{|.dos}.io.large.write")]]
-ssize_t pwrite64($fd_t fd, [[inp(bufsize)]] void const *buf,
+ssize_t pwrite64($fd_t fd, [[in(return <= bufsize)]] void const *buf,
                  size_t bufsize, __PIO_OFFSET64 offset) {
 @@pp_if $has_function(crt_pwrite32)@@
 	return crt_pwrite32(fd, buf, bufsize, (pos32_t)offset);
@@ -1431,7 +1431,7 @@ ssize_t pwrite64($fd_t fd, [[inp(bufsize)]] void const *buf,
 [[cp, preferred_off64_variant_of(preadall), doc_alias("preadall")]]
 [[userimpl, requires_function(pread64), decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.large.read")]]
-ssize_t preadall64($fd_t fd, [[inp(bufsize)]] void *buf,
+ssize_t preadall64($fd_t fd, [[out(bufsize)]] void *buf,
                    size_t bufsize, __PIO_OFFSET64 offset) {
 	ssize_t result, temp;
 	result = pread64(fd, buf, bufsize, offset);
@@ -1457,7 +1457,7 @@ ssize_t preadall64($fd_t fd, [[inp(bufsize)]] void *buf,
 [[cp, preferred_off64_variant_of(pwriteall), doc_alias("pwriteall")]]
 [[userimpl, requires_function(pwrite64), decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.large.write")]]
-ssize_t pwriteall64($fd_t fd, [[inp(bufsize)]] void const *buf,
+ssize_t pwriteall64($fd_t fd, [[in(bufsize)]] void const *buf,
                     size_t bufsize, __PIO_OFFSET64 offset) {
 	ssize_t result, temp;
 	result = pwrite64(fd, buf, bufsize, offset);
@@ -2136,7 +2136,7 @@ int symlink([[nonnull]] char const *link_text,
 [[requires(defined(__AT_FDCWD) && $has_function(readlinkat))]]
 [[userimpl, section(".text.crt{|.dos}.fs.property")]]
 ssize_t readlink([[nonnull]] char const *path,
-                 [[outp(buflen)]] char *buf,
+                 [[out(return <= buflen)]] char *buf,
                  size_t buflen) {
 	return readlinkat(__AT_FDCWD, path, buf, buflen);
 }
@@ -2152,7 +2152,7 @@ ssize_t readlink([[nonnull]] char const *path,
 [[requires($has_function(getenv) || $has_function(getpwuid_r, geteuid))]]
 [[impl_include("<bits/crt/db/passwd.h>")]] /* struct passwd */
 [[section(".text.crt{|.dos}.io.tty")]]
-int getlogin_r([[outp(name_len)]] char *name, size_t name_len) {
+int getlogin_r([[out(<= name_len)]] char *name, size_t name_len) {
 @@pp_if $has_function(getpwuid_r) && $has_function(geteuid)@@
 	char buf[1024]; /* NSS_BUFLEN_PASSWD */
 	struct passwd pwent, *pwptr;
@@ -2190,21 +2190,21 @@ int getlogin_r([[outp(name_len)]] char *name, size_t name_len) {
 [[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__gethostname")]] /* Yes: no `__libc_gethostname' alias for this one... */
 [[section(".text.crt{|.dos}.system.configuration")]]
-int gethostname([[outp(buflen)]] char *name, size_t buflen);
+int gethostname([[out(<= buflen)]] char *name, size_t buflen);
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 %
 %#ifdef __USE_MISC
 @@>> setlogin(3)
 [[section(".text.crt{|.dos}.io.tty")]]
-int setlogin([[nonnull]] char const *name);
+int setlogin([[in]] char const *name);
 
 @@>> sethostname(2)
 @@Set the name of the hosting machine
 [[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__sethostname", "__libc_sethostname")]]
 [[section(".text.crt{|.dos}.system.configuration")]]
-int sethostname([[inp(len)]] char const *name, size_t len);
+int sethostname([[in(len)]] char const *name, size_t len);
 
 @@>> sethostid(3)
 [[decl_include("<hybrid/typecore.h>")]]
@@ -2215,14 +2215,14 @@ int sethostid($longptr_t id);
 @@Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)'
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.system.configuration")]]
-int getdomainname([[outp(buflen)]] char *name, size_t buflen);
+int getdomainname([[out(<= buflen)]] char *name, size_t buflen);
 
 @@>> setdomainname(2)
 @@Set the name of the hosting machine's domain
 [[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__setdomainname", "__libc_setdomainname")]]
 [[section(".text.crt{|.dos}.system.configuration")]]
-int setdomainname([[inp(len)]] char const *name, size_t len);
+int setdomainname([[in(len)]] char const *name, size_t len);
 
 @@>> vhangup(3)
 [[export_alias("__vhangup", "__libc_vhangup")]]

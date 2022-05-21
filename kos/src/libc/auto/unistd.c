@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x262afdc4 */
+/* HASH CRC-32:0x551b0060 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -290,7 +290,7 @@ NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
 NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd) {
 	static char buf[32];
-	if likely(libc_ttyname_r(fd, buf, sizeof(buf)) == 0)
+	if likely(libc_ttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
 		return buf;
 	return NULL;
 }
@@ -319,7 +319,7 @@ NOTHROW_NCX(LIBCCALL libc_getlogin)(void) {
  * A pformatprinter-compatible consumer that dumps all input data into `fd' by use
  * of `writeall(3)'. The given `fd' should be encoded by  `WRITE_PRINTER_ARG(fd)'.
  * @return: * : Same as `writeall(3)' */
-INTERN ATTR_SECTION(".text.crt.io.write") NONNULL((2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.io.write") ATTR_ACCESS_ROS(2, 3) ssize_t
 NOTHROW_RPC(__FORMATPRINTER_CC libc_write_printer)(void *fd,
                                                    char const *__restrict buf,
                                                    size_t bufsize) {
@@ -512,7 +512,7 @@ NOTHROW(LIBCCALL libc_getdtablesize)(void) {
 /* >> getlogin_r(3)
  * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
  * s.a. `getlogin()' and `cuserid()' */
-INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_WRS(1, 2) int
 NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
                                       size_t name_len) {
 
