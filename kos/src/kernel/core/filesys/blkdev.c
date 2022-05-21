@@ -596,14 +596,12 @@ blkdev_makeparts_loadembr(struct blkdev *__restrict self,
 
 	/* Read the eMBR partition */
 	embr_pos = (pos_t)embr_sectormin << blkdev_getsectorshift(self);
-	if likely(blkdev_getsectorsize(self) == 512) {
-		STATIC_ASSERT(PAGESIZE >= 512);
-		embr = (struct embr_partition *)aligned_alloca(512, 512);
-		blkdev_rdsectors(self, embr_pos, pagedir_translate(embr), 512);
-	} else {
-		embr = (struct embr_partition *)alloca(512);
-		mfile_readall(self, embr, 512, embr_pos);
-	}
+	STATIC_ASSERT(PAGESIZE >= 512);
+	likely(blkdev_getsectorsize(self) == 512)
+	? (embr = (struct embr_partition *)aligned_alloca(512, 512),
+	   blkdev_rdsectors(self, embr_pos, pagedir_translate(embr), 512))
+	: (embr = (struct embr_partition *)alloca(512),
+	   mfile_readall(self, embr, 512, embr_pos));
 
 	/* Verify signature. */
 	if (memcmp(embr->embr_signature, "EmbrrbmE", 8) != 0)

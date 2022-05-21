@@ -396,6 +396,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 				if (req.uq_reqid == UVIO_OPCODE_UCMD_STOP &&
 				    (pid_t)req.uq_pid == getpid())
 					goto done; /* Calling process sent us a stop command */
+				resp_size = sizeof(resp.r); /* ??? */
 				break;
 
 #undef FORCE_ATOMIC

@@ -236,8 +236,10 @@ FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone)(VIRT void *addr);
 #endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_SYNCONE */
 
 /* Translate a virtual address into its physical counterpart. */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS physaddr_t NOTHROW(FCALL pagedir_translate)(VIRT void const *addr);
-FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS physaddr_t NOTHROW(KCALL pagedir_translate_p)(pagedir_phys_t self, VIRT void const *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) PHYS physaddr_t
+NOTHROW(FCALL pagedir_translate)(VIRT void const *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(2) PHYS physaddr_t
+NOTHROW(KCALL pagedir_translate_p)(pagedir_phys_t self, VIRT void const *addr);
 
 /* Low-level Get/Set the physical address of the currently active page directory. */
 #ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETSET
@@ -599,9 +601,9 @@ FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall_smp)(void);
 /* Check if the given page is mapped.
  * NOTE: The given `addr' */
 #ifndef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_ISMAPPED
-FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_ismapped)(VIRT void const *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) __BOOL NOTHROW(FCALL pagedir_ismapped)(VIRT void const *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_iswritable)(VIRT void *addr);
-FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_isuseraccessible)(VIRT void const *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) __BOOL NOTHROW(FCALL pagedir_isuseraccessible)(VIRT void const *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_isuserwritable)(VIRT void *addr);
 #endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_ISMAPPED */
 
@@ -626,9 +628,9 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmapone_p)(pagedir_phys_t self, PAGED
 #ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_denywriteone_p)(pagedir_phys_t self, PAGEDIR_PAGEALIGNED VIRT void *addr);
 #endif /* ARCH_PAGEDIR_HAVE_DENYWRITE */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_ismapped_p)(pagedir_phys_t self, VIRT void const *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(2) __BOOL NOTHROW(KCALL pagedir_ismapped_p)(pagedir_phys_t self, VIRT void const *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_iswritable_p)(pagedir_phys_t self, VIRT void *addr);
-FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_isuseraccessible_p)(pagedir_phys_t self, VIRT void const *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(2) __BOOL NOTHROW(KCALL pagedir_isuseraccessible_p)(pagedir_phys_t self, VIRT void const *addr);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_isuserwritable_p)(pagedir_phys_t self, VIRT void *addr);
 #ifdef ARCH_PAGEDIR_HAVE_CHANGED
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_haschanged_p)(pagedir_phys_t self, VIRT void *addr);

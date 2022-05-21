@@ -834,8 +834,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Add support for dwarf-5 in `libdebuginfo' (currently, we need to
 	 *       compiled with `-gdwarf-4', and  that should go away  eventually) */
 
-	/* TODO: Fix all remaining warnings that appeared alongside gcc-12.1.0 */
-
 	return state;
 }
 

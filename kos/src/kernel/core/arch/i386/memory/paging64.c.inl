@@ -2236,7 +2236,7 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace_nosync)(void) {
 
 
 /* Translate a virtual address into its physical counterpart. */
-INTERN NOBLOCK ATTR_PURE WUNUSED PHYS physaddr_t
+INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) PHYS physaddr_t
 NOTHROW(FCALL p64_pagedir_translate)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec4, vec3, vec2, vec1;
@@ -2260,7 +2260,7 @@ NOTHROW(FCALL p64_pagedir_translate)(VIRT void const *addr) {
 }
 
 /* Check if the given page is mapped. */
-INTERN NOBLOCK ATTR_PURE WUNUSED bool
+INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) bool
 NOTHROW(FCALL p64_pagedir_ismapped)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec4, vec3, vec2, vec1;
@@ -2311,7 +2311,7 @@ NOTHROW(FCALL p64_pagedir_iswritable)(VIRT void *addr) {
 	       /*   */ (P64_PAGE_FPRESENT | P64_PAGE_FWRITE);
 }
 
-INTERN NOBLOCK ATTR_PURE WUNUSED bool
+INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) bool
 NOTHROW(FCALL p64_pagedir_isuseraccessible)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec4, vec3, vec2, vec1;

@@ -375,14 +375,14 @@ __LIBM_LOCAL_FUNC(rem_pio2l) __ATTR_WUNUSED __ATTR_NONNULL((2)) __int32_t
 	__int32_t __n, __exp;
 	__LIBM_GET_LDOUBLE_WORDS(__se, __i0, __i1, __x);
 	__sx = (__se >> 15) & 1;
-	__j0 = (__se & __LIBM_IEEE854_LONG_DOUBLE_MAXEXP) - __LIBM_IEEE854_LONG_DOUBLE_BIAS;
-	if (__j0 < -1) {
+	__j0 = (__se & __LIBM_IEEE854_LONG_DOUBLE_MAXEXP);
+	if (__j0 < (-__INT32_C(1) + __LIBM_IEEE854_LONG_DOUBLE_BIAS)) {
 		/* |x| < pi/4.  */
 		__y[0] = __x;
 		__y[1] = 0;
 		return 0;
 	}
-	if (__j0 >= __INT32_C(0x8000)) {
+	if (__j0 >= (__INT32_C(0x8000) + __LIBM_IEEE854_LONG_DOUBLE_BIAS)) {
 		/* x is infinite or NaN.  */
 		__y[0] = __x - __x;
 		__y[1] = __y[0];
@@ -391,7 +391,7 @@ __LIBM_LOCAL_FUNC(rem_pio2l) __ATTR_WUNUSED __ATTR_NONNULL((2)) __int32_t
 
 	/* Split the 64 bits of the mantissa into three 24-bit integers
 	 * stored in a __IEEE754_DOUBLE_TYPE__ array. */
-	__exp   = __j0 - 23;
+	__exp   = (__j0 - __LIBM_IEEE854_LONG_DOUBLE_BIAS) - 23;
 	__tx[0] = (__IEEE754_DOUBLE_TYPE__)(__i0 >> 8);
 	__tx[1] = (__IEEE754_DOUBLE_TYPE__)(((__i0 << 16) | (__i1 >> 16)) & __INT32_C(0xffffff));
 	__tx[2] = (__IEEE754_DOUBLE_TYPE__)((__i1 << 8) & __INT32_C(0xffffff));

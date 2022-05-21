@@ -259,6 +259,13 @@
 #define __ATTR_WARNING_T        __ATTR_WARNING
 #define __ATTR_ERROR_T          __ATTR_ERROR
 #define __ATTR_RETURNS_TWICE_T  __ATTR_RETURNS_TWICE
+#define __ATTR_ACCESS_NONE_T    __ATTR_ACCESS_NONE
+#define __ATTR_ACCESS_RD_T      __ATTR_ACCESS_RD
+#define __ATTR_ACCESS_RDS_T     __ATTR_ACCESS_RDS
+#define __ATTR_ACCESS_WR_T      __ATTR_ACCESS_WR
+#define __ATTR_ACCESS_WRS_T     __ATTR_ACCESS_WRS
+#define __ATTR_ACCESS_RW_T      __ATTR_ACCESS_RW
+#define __ATTR_ACCESS_RWS_T     __ATTR_ACCESS_RWS
 #else
 #define __ATTR_LEAF_T           /* nothing */
 #define __ATTR_CONST_T          /* nothing */

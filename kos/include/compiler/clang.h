@@ -610,6 +610,25 @@
 #define __ATTR_WUNUSED /* Nothing */
 #endif /* !... */
 
+#if __has_attribute(__access__)
+#define __ATTR_ACCESS_NONE(ptr_index)            __attribute__((__access__(__none__, ptr_index)))
+#define __ATTR_ACCESS_RD(ptr_index)              __attribute__((__access__(__read_only__, ptr_index)))
+#define __ATTR_ACCESS_RDS(ptr_index, size_index) __attribute__((__access__(__read_only__, ptr_index, size_index)))
+#define __ATTR_ACCESS_WR(ptr_index)              __attribute__((__access__(__write_only__, ptr_index)))
+#define __ATTR_ACCESS_WRS(ptr_index, size_index) __attribute__((__access__(__write_only__, ptr_index, size_index)))
+#define __ATTR_ACCESS_RW(ptr_index)              __attribute__((__access__(__read_write__, ptr_index)))
+#define __ATTR_ACCESS_RWS(ptr_index, size_index) __attribute__((__access__(__read_write__, ptr_index, size_index)))
+#else /* ... */
+#define __NO_ATTR_ACCESS
+#define __ATTR_ACCESS_NONE(ptr_index)            /* Nothing */
+#define __ATTR_ACCESS_RD(ptr_index)              /* Nothing */
+#define __ATTR_ACCESS_RDS(ptr_index, size_index) /* Nothing */
+#define __ATTR_ACCESS_WR(ptr_index)              /* Nothing */
+#define __ATTR_ACCESS_WRS(ptr_index, size_index) /* Nothing */
+#define __ATTR_ACCESS_RW(ptr_index)              /* Nothing */
+#define __ATTR_ACCESS_RWS(ptr_index, size_index) /* Nothing */
+#endif /* !... */
+
 #if __has_attribute(__transparent_union__) && 0 /* This one doesn't seem to actually work??? */
 #define __ATTR_TRANSPARENT_UNION __attribute__((__transparent_union__))
 #else /* ... */

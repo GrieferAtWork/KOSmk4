@@ -1047,7 +1047,7 @@ again_read_word:
 }
 
 /* Translate a virtual address into its physical counterpart. */
-INTERN NOBLOCK ATTR_PURE WUNUSED PHYS physaddr_t
+INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) PHYS physaddr_t
 NOTHROW(FCALL p32_pagedir_translate)(VIRT void const *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
@@ -1063,7 +1063,7 @@ NOTHROW(FCALL p32_pagedir_translate)(VIRT void const *addr) {
 }
 
 /* Check if the given page is mapped. */
-INTERN NOBLOCK ATTR_PURE WUNUSED bool
+INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) bool
 NOTHROW(FCALL p32_pagedir_ismapped)(VIRT void const *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
@@ -1094,7 +1094,7 @@ NOTHROW(FCALL p32_pagedir_iswritable)(VIRT void *addr) {
 	       /*   */ (P32_PAGE_FWRITE | P32_PAGE_FPRESENT);
 }
 
-INTERN NOBLOCK ATTR_PURE WUNUSED bool
+INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) bool
 NOTHROW(FCALL p32_pagedir_isuseraccessible)(VIRT void const *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
@@ -1171,7 +1171,7 @@ NOTHROW(FCALL p32_pagedir_unsetchanged)(VIRT void *addr) {
 #if 0 /* TODO */
 #ifndef __OPTIMIZE_SIZE__
 
-INTERN NOBLOCK ATTR_PURE WUNUSED PHYS physaddr_t
+INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(2) PHYS physaddr_t
 NOTHROW(KCALL pagedir_translate_p)(VIRT pagedir_t *__restrict self,
                                    VIRT void const *virt_addr) {
 	u32 result;

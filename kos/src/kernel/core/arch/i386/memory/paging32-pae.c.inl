@@ -1408,7 +1408,7 @@ again_read_word:
 }
 
 /* Translate a virtual address into its physical counterpart. */
-INTERN NOBLOCK ATTR_PURE WUNUSED PHYS physaddr_t
+INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) PHYS physaddr_t
 NOTHROW(FCALL pae_pagedir_translate)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec3, vec2, vec1;
@@ -1426,7 +1426,7 @@ NOTHROW(FCALL pae_pagedir_translate)(VIRT void const *addr) {
 }
 
 /* Check if the given page is mapped. */
-INTERN NOBLOCK ATTR_PURE WUNUSED bool
+INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) bool
 NOTHROW(FCALL pae_pagedir_ismapped)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec3, vec2, vec1;
@@ -1461,7 +1461,7 @@ NOTHROW(FCALL pae_pagedir_iswritable)(VIRT void *addr) {
 	       /*   */ (PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT);
 }
 
-INTERN NOBLOCK ATTR_PURE WUNUSED bool
+INTERN NOBLOCK ATTR_PURE WUNUSED ATTR_ACCESS_NONE(1) bool
 NOTHROW(FCALL pae_pagedir_isuseraccessible)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec3, vec2, vec1;

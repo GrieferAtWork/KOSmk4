@@ -603,6 +603,36 @@
 #define __ATTR_SELECTANY /* Nothing */
 #endif /* !... */
 
+#if __has_attribute(__access__)
+#define __ATTR_ACCESS_NONE(ptr_index)            __attribute__((__access__(__none__, ptr_index)))
+#define __ATTR_ACCESS_RD(ptr_index)              __attribute__((__access__(__read_only__, ptr_index)))
+#define __ATTR_ACCESS_RDS(ptr_index, size_index) __attribute__((__access__(__read_only__, ptr_index, size_index)))
+#define __ATTR_ACCESS_WR(ptr_index)              __attribute__((__access__(__write_only__, ptr_index)))
+#define __ATTR_ACCESS_WRS(ptr_index, size_index) __attribute__((__access__(__write_only__, ptr_index, size_index)))
+#define __ATTR_ACCESS_RW(ptr_index)              __attribute__((__access__(__read_write__, ptr_index)))
+#define __ATTR_ACCESS_RWS(ptr_index, size_index) __attribute__((__access__(__read_write__, ptr_index, size_index)))
+#elif defined(__INTELLISENSE__)
+/* Intellisense doesn't understand __access__, but to get error high-lighting (since
+ * the `ptr_index' argument must reference a pointer-argument), we can use some other
+ * attributes that it does know! */
+#define __ATTR_ACCESS_NONE(ptr_index)            __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_RD(ptr_index)              __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_RDS(ptr_index, size_index) __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_WR(ptr_index)              __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_WRS(ptr_index, size_index) __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_RW(ptr_index)              __attribute__((__nonnull__(ptr_index)))
+#define __ATTR_ACCESS_RWS(ptr_index, size_index) __attribute__((__nonnull__(ptr_index)))
+#else /* ... */
+#define __NO_ATTR_ACCESS
+#define __ATTR_ACCESS_NONE(ptr_index)            /* Nothing */
+#define __ATTR_ACCESS_RD(ptr_index)              /* Nothing */
+#define __ATTR_ACCESS_RDS(ptr_index, size_index) /* Nothing */
+#define __ATTR_ACCESS_WR(ptr_index)              /* Nothing */
+#define __ATTR_ACCESS_WRS(ptr_index, size_index) /* Nothing */
+#define __ATTR_ACCESS_RW(ptr_index)              /* Nothing */
+#define __ATTR_ACCESS_RWS(ptr_index, size_index) /* Nothing */
+#endif /* !... */
+
 #define __ATTR_WARNING(text)      __attribute__((__warning__(text)))
 #define __ATTR_ERROR(text)        __attribute__((__error__(text)))
 #define __ATTR_SECTION(name)      __attribute__((__section__(name)))

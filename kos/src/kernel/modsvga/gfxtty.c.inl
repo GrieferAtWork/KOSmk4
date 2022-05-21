@@ -63,6 +63,16 @@ DECL_BEGIN
 
 
 #ifdef BYTES_PER_PIXEL
+
+/* GCC: """warning : 'bgfg' is used uninitialized [-Wuninitialized]"""
+ * ME:  Nope! It definitly gets initialized. - See:
+ *      >> bgfg[0] = self->stx_colors[(cell->sgc_color & 0xf0) >> 4];
+ *      >> bgfg[1] = self->stx_colors[(cell->sgc_color & 0x0f)]; */
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#endif /* __GNUC__ */
+
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, BPP))(struct svga_ttyaccess_gfx *__restrict self,
                                                               uintptr_t address) {
@@ -122,6 +132,10 @@ NOTHROW(FCALL PP_CAT2(svga_ttyaccess_v_redraw_cell_gfx, BPP))(struct svga_ttyacc
 #undef ADVPIXEL
 #undef SETPIXEL
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif /* __GNUC__ */
 
 
 INTERN NOBLOCK NONNULL((1)) void
