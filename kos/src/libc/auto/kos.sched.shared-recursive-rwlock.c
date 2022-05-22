@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x545b40aa */
+/* HASH CRC-32:0xba9daff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,7 @@ DECL_BEGIN
  * Try  to acquire a read-lock to `self' */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __NOBLOCK ATTR_ACCESS_RW(1) bool
 NOTHROW(__FCALL libc_shared_recursive_rwlock_tryread)(struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (libc_shared_rwlock_tryread(&self->srr_lock))
 		return true;
 	if (__shared_recursive_rwlock_isown(self)) {
@@ -48,6 +49,7 @@ NOTHROW(__FCALL libc_shared_recursive_rwlock_tryread)(struct shared_recursive_rw
  * Try to acquire a recursive write-lock to `self' */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __NOBLOCK ATTR_ACCESS_RW(1) bool
 NOTHROW(__FCALL libc_shared_recursive_rwlock_trywrite)(struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (libc_shared_rwlock_trywrite(&self->srr_lock)) {
 		__shared_recursive_rwlock_setown(self);
 		return true;
@@ -67,6 +69,7 @@ NOTHROW(__FCALL libc_shared_recursive_rwlock_trywrite)(struct shared_recursive_r
  * @return: false: You're still holding the lock */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK ATTR_ACCESS_RW(1) bool
 NOTHROW(__FCALL libc_shared_recursive_rwlock_endwrite)(struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(self->srr_lock.sl_lock == (uintptr_t)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -94,6 +97,7 @@ NOTHROW(__FCALL libc_shared_recursive_rwlock_endwrite)(struct shared_recursive_r
 INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK ATTR_ACCESS_RW(1) bool
 NOTHROW(__FCALL libc_shared_recursive_rwlock_endread)(struct shared_recursive_rwlock *__restrict self) {
 	uintptr_t result;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	COMPILER_READ_BARRIER();
 	if (self->srr_lock.sl_lock == (uintptr_t)-1)
 		return libc_shared_recursive_rwlock_endwrite(self);
@@ -110,6 +114,7 @@ NOTHROW(__FCALL libc_shared_recursive_rwlock_endread)(struct shared_recursive_rw
  * to ensure  that  you're only  holding  a  single write-lock  at  the  moment). */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK ATTR_ACCESS_RW(1) void
 NOTHROW(__FCALL libc_shared_recursive_rwlock_downgrade)(struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(self), "You're not holding this lock");
 	__hybrid_assertf(self->srr_wrcnt > 0, "You're holding more than 1 write-lock");
 	self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
@@ -126,6 +131,7 @@ NOTHROW(__FCALL libc_shared_recursive_rwlock_downgrade)(struct shared_recursive_
  * @return: false: The read-lock had to be released before a recursive write-lock was acquired */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_rwlock_upgrade)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__hybrid_atomic_cmpxch(self->srr_lock.sl_lock, 1, (uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)) {
 		__shared_recursive_rwlock_setown(self);
 		return true; /* Lock wasn't lost */
@@ -138,6 +144,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1
  * Acquire a read-lock to the given shared_recursive_rwlock. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
 (__FCALL libc_shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->srr_wrcnt;
 		return;
@@ -148,6 +155,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
  * Acquire a recursive write-lock to the given shared_recursive_rwlock. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
 (__FCALL libc_shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->srr_wrcnt;
 		return;
@@ -162,6 +170,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_rwlock_read_with_timeout)(struct shared_recursive_rwlock *__restrict self,
                                                          __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->srr_wrcnt;
 		return true;
@@ -176,6 +185,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1
 (__FCALL libc_shared_recursive_rwlock_write_with_timeout)(struct shared_recursive_rwlock *__restrict self,
                                                           __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	bool result;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->srr_wrcnt;
 		return true;
@@ -189,6 +199,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1
  * Wait until acquiring a read-lock to `self' no longer blocks */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
 (__FCALL libc_shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self))
 		return;
 	libc_shared_rwlock_waitread(&self->srr_lock);
@@ -197,6 +208,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
  * Wait until acquiring a recursive write-lock to `self' no longer blocks */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
 (__FCALL libc_shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self))
 		return;
 	libc_shared_rwlock_waitwrite(&self->srr_lock);
@@ -208,6 +220,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_rwlock_waitread_with_timeout)(struct shared_recursive_rwlock *__restrict self,
                                                              __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self))
 		return true;
 	return libc_shared_rwlock_waitread_with_timeout(&self->srr_lock, abs_timeout);
@@ -219,6 +232,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_rwlock_waitwrite_with_timeout)(struct shared_recursive_rwlock *__restrict self,
                                                               __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self))
 		return true;
 	return libc_shared_rwlock_waitwrite_with_timeout(&self->srr_lock, abs_timeout);
@@ -234,6 +248,7 @@ DEFINE_INTERN_ALIAS(libc_shared_recursive_rwlock_read_with_timeout64, libc_share
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_rwlock_read_with_timeout64)(struct shared_recursive_rwlock *__restrict self,
                                                            struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->srr_wrcnt;
 		return true;
@@ -253,6 +268,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RO_O
 (__FCALL libc_shared_recursive_rwlock_write_with_timeout64)(struct shared_recursive_rwlock *__restrict self,
                                                             struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	bool result;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->srr_wrcnt;
 		return true;
@@ -274,6 +290,7 @@ DEFINE_INTERN_ALIAS(libc_shared_recursive_rwlock_waitread_with_timeout64, libc_s
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_rwlock_waitread_with_timeout64)(struct shared_recursive_rwlock *__restrict self,
                                                                struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self))
 		return true;
 	return libc_shared_rwlock_waitread_with_timeout64(&self->srr_lock, abs_timeout);
@@ -290,6 +307,7 @@ DEFINE_INTERN_ALIAS(libc_shared_recursive_rwlock_waitwrite_with_timeout64, libc_
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_rwlock_waitwrite_with_timeout64)(struct shared_recursive_rwlock *__restrict self,
                                                                 struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self))
 		return true;
 	return libc_shared_rwlock_waitwrite_with_timeout64(&self->srr_lock, abs_timeout);

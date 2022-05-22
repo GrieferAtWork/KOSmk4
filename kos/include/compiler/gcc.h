@@ -983,3 +983,19 @@ template<class __T1, class __T2> struct __gcc_types_compatible:
 #undef __builtin_types_compatible_p
 #define __builtin_types_compatible_p(...) (::__intern::__gcc_types_compatible< __VA_ARGS__ >::__val)
 #endif /* __cplusplus */
+
+
+/************************************************************************/
+/* Workarounds for compiler bugs.                                       */
+/************************************************************************/
+
+/* https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105689 */
+#if defined(__OPTIMIZE__) && __has_attribute(__access__)/* && (__GCC_VERSION_NUM <= FIXED_IN_VERSION)*/
+#define __COMPILER_HAVE_BUG_GCC_105689
+#define __COMPILER_WORKAROUND_GCC_105689(ptr)  __asm__("" : : "X" (ptr))
+#define __COMPILER_WORKAROUND_GCC_105689_MAC(self, ...) \
+	({ __auto_type __cw_105689_self = (self); __COMPILER_WORKAROUND_GCC_105689(__cw_105689_self); __VA_ARGS__; })
+#endif /* ... */
+
+/************************************************************************/
+

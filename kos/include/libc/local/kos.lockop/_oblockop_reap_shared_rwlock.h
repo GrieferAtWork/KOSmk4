@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d8842a0 */
+/* HASH CRC-32:0x607c2860 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/asm/futex.h>
 __NAMESPACE_LOCAL_BEGIN
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),void,__NOTHROW,__FCALL,__localdep_shared_rwlock_endwrite,(struct shared_rwlock *__restrict __self),shared_rwlock_endwrite,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
 	__hybrid_atomic_store(__self->sl_lock, 0, __ATOMIC_RELEASE);
@@ -54,6 +55,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/asm/futex.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) void __NOTHROW(__FCALL __localdep_shared_rwlock_endwrite)(struct shared_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
 	__hybrid_atomic_store(__self->sl_lock, 0, __ATOMIC_RELEASE);
@@ -71,6 +73,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_trywrite,(struct shared_rwlock *__restrict __self),shared_rwlock_trywrite,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
@@ -82,6 +85,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_trywrite)(struct shared_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;

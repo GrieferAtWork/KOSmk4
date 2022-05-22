@@ -92,15 +92,27 @@ __SYSDECL_BEGIN
 #endif /* !__KERNEL__ */
 
 /* Check if reading/writing is possible, or a read/write lock is being held. */
+#ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
+#define shared_rwlock_reading(self)  __COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_load(__cw_105689_self->sl_lock, __ATOMIC_ACQUIRE) != 0)
+#define shared_rwlock_writing(self)  __COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_load(__cw_105689_self->sl_lock, __ATOMIC_ACQUIRE) == (__uintptr_t)-1)
+#define shared_rwlock_canread(self)  __COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_load(__cw_105689_self->sl_lock, __ATOMIC_ACQUIRE) != (__uintptr_t)-1)
+#define shared_rwlock_canwrite(self) __COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_load(__cw_105689_self->sl_lock, __ATOMIC_ACQUIRE) == 0)
+#else /* __COMPILER_WORKAROUND_GCC_105689_MAC */
 #define shared_rwlock_reading(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
 #define shared_rwlock_writing(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) == (__uintptr_t)-1)
 #define shared_rwlock_canread(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) != (__uintptr_t)-1)
 #define shared_rwlock_canwrite(self) (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
+#endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
 
 /* >> shared_rwlock_tryupgrade(3)
  * Try to upgrade a read-lock to a write-lock. Return `false' upon failure. */
+#ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
+#define shared_rwlock_tryupgrade(self) \
+	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_cmpxch(__cw_105689_self->sl_lock, 1, (__uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
+#else /* __COMPILER_WORKAROUND_GCC_105689_MAC */
 #define shared_rwlock_tryupgrade(self) \
 	__hybrid_atomic_cmpxch((self)->sl_lock, 1, (__uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)
+#endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
 
 }
 
@@ -112,6 +124,7 @@ __SYSDECL_BEGIN
 [[impl_include("<hybrid/__atomic.h>")]]
 $bool shared_rwlock_tryread([[inout]] struct shared_rwlock *__restrict self) {
 	$uintptr_t temp;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	do {
 		temp = __hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE);
 		if (temp == ($uintptr_t)-1)
@@ -129,6 +142,7 @@ $bool shared_rwlock_tryread([[inout]] struct shared_rwlock *__restrict self) {
 [[decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>")]]
 $bool shared_rwlock_trywrite([[inout]] struct shared_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (!__hybrid_atomic_cmpxch(self->@sl_lock@, 0, ($uintptr_t)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return $false;
@@ -144,6 +158,7 @@ $bool shared_rwlock_trywrite([[inout]] struct shared_rwlock *__restrict self) {
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
 void shared_rwlock_endwrite([[inout]] struct shared_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(self->@sl_lock@ == ($uintptr_t)-1, "Lock isn't in write-mode (%x)", self->@sl_lock@);
 	__hybrid_atomic_store(self->@sl_lock@, 0, __ATOMIC_RELEASE);
@@ -162,6 +177,7 @@ void shared_rwlock_endwrite([[inout]] struct shared_rwlock *__restrict self) {
 [[requires_include("<kos/bits/shared-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
 $bool shared_rwlock_endread([[inout]] struct shared_rwlock *__restrict self) {
 	$uintptr_t __result;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_READ_BARRIER();
 	__hybrid_assertf(self->@sl_lock@ != ($uintptr_t)-1, "Lock is in write-mode (%x)", self->@sl_lock@);
 	__hybrid_assertf(self->@sl_lock@ != 0, "Lock isn't held by anyone");
@@ -181,6 +197,7 @@ $bool shared_rwlock_endread([[inout]] struct shared_rwlock *__restrict self) {
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
 $bool shared_rwlock_end([[inout]] struct shared_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_BARRIER();
 	if (self->@sl_lock@ != ($uintptr_t)-1) {
 		/* Read-lock */
@@ -207,6 +224,7 @@ $bool shared_rwlock_end([[inout]] struct shared_rwlock *__restrict self) {
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
 void shared_rwlock_downgrade([[inout]] struct shared_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(self->@sl_lock@ == ($uintptr_t)-1, "Lock isn't in write-mode (%x)", self->@sl_lock@);
 	__hybrid_atomic_store(self->@sl_lock@, 1, __ATOMIC_RELEASE);
@@ -230,6 +248,7 @@ void shared_rwlock_downgrade([[inout]] struct shared_rwlock *__restrict self) {
 [[requires_function(shared_rwlock_endread, shared_rwlock_write)]]
 [[impl_include("<hybrid/__atomic.h>")]]
 $bool shared_rwlock_upgrade([[inout]] struct shared_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__hybrid_atomic_cmpxch(self->@sl_lock@, 1, ($uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
 		return $true; /* Lock wasn't lost */
 	shared_rwlock_endread(self);

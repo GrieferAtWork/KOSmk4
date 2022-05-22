@@ -1288,7 +1288,9 @@ NOTHROW(FCALL dbg_ungetc)(/*utf-8*/ char ch) {
 		++dbg_getc_pending_cnt;
 		if (dbg_getc_pending_cnt >= reqlen) {
 			u32 ch32;
-			ch32 = unicode_readutf8((char const **)dbg_getc_pending);
+			char const *ptr;
+			ptr  = (char const *)dbg_getc_pending;
+			ch32 = unicode_readutf8(&ptr);
 			dbg_getc_pending_cnt = 0;
 			return dbg_ungetuni(ch32);
 		}

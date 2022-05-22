@@ -92,8 +92,13 @@ __SYSDECL_BEGIN
 #endif /* !__KERNEL__ */
 
 /* Try to acquire a lock to a given `struct shared_lock *self' */
+#ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
+#define shared_lock_tryacquire(self) \
+	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_xch(__cw_105689_self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+#else /* __COMPILER_WORKAROUND_GCC_105689_MAC */
 #define shared_lock_tryacquire(self) \
 	(__hybrid_atomic_xch((self)->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
+#endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
 
 /* Release a lock from a given shared_lock.
  * @return: true:  A waiting thread was signaled.

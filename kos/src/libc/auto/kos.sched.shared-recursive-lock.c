@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13d03358 */
+/* HASH CRC-32:0x6456e97f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,7 @@ DECL_BEGIN
  * Try to acquire a recursive lock to `self' */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __NOBLOCK ATTR_ACCESS_RW(1) bool
 NOTHROW(__FCALL libc_shared_recursive_lock_tryacquire)(struct shared_recursive_lock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__hybrid_atomic_xch(self->sr_lock.sl_lock, 1, __ATOMIC_ACQUIRE) == 0) {
 		__shared_recursive_lock_setown(self);
 		return true;
@@ -54,6 +55,7 @@ NOTHROW(__FCALL libc_shared_recursive_lock_tryacquire)(struct shared_recursive_l
  * @return: false: You're still holding the lock */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK ATTR_ACCESS_RW(1) bool
 NOTHROW(__FCALL libc_shared_recursive_lock_release)(struct shared_recursive_lock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(self->sr_lock.sl_lock != 0, "Lock isn't acquired");
 	__hybrid_assertf(__shared_recursive_lock_isown(self), "You're not the owner of this lock");
@@ -71,6 +73,7 @@ NOTHROW(__FCALL libc_shared_recursive_lock_release)(struct shared_recursive_lock
  * Acquire a recursive lock to the given shared_recursive_lock. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
 (__FCALL libc_shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
 		++self->sr_rcnt;
 		return;
@@ -86,6 +89,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1
 (__FCALL libc_shared_recursive_lock_acquire_with_timeout)(struct shared_recursive_lock *__restrict self,
                                                           __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	bool result;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
 		++self->sr_rcnt;
 		return true;
@@ -99,6 +103,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1
  * Wait until acquiring a recursive lock to `self' no longer blocks */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
 (__FCALL libc_shared_recursive_lock_waitfor)(struct shared_recursive_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self))
 		return;
 	libc_shared_lock_waitfor(&self->sr_lock);
@@ -110,6 +115,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_lock_waitfor_with_timeout)(struct shared_recursive_lock *__restrict self,
                                                           __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self))
 		return true;
 	return libc_shared_lock_waitfor_with_timeout(&self->sr_lock, abs_timeout);
@@ -126,6 +132,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RO_O
 (__FCALL libc_shared_recursive_lock_acquire_with_timeout64)(struct shared_recursive_lock *__restrict self,
                                                             struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	bool result;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
 		++self->sr_rcnt;
 		return true;
@@ -147,6 +154,7 @@ DEFINE_INTERN_ALIAS(libc_shared_recursive_lock_waitfor_with_timeout64, libc_shar
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_lock_waitfor_with_timeout64)(struct shared_recursive_lock *__restrict self,
                                                             struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self))
 		return true;
 	return libc_shared_lock_waitfor_with_timeout64(&self->sr_lock, abs_timeout);

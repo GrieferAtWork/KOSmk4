@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf004ea94 */
+/* HASH CRC-32:0x224975dd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,6 +109,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Try to acquire a read-lock to `self' */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_tryread,(struct shared_rwlock *__restrict __self),shared_rwlock_tryread,{
 	__UINTPTR_TYPE__ __temp;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	do {
 		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
 		if (__temp == (__UINTPTR_TYPE__)-1)
@@ -124,6 +125,7 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOT
  * Try to acquire a read-lock to `self' */
 __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_tryread)(struct shared_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __temp;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	do {
 		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
 		if (__temp == (__UINTPTR_TYPE__)-1)
@@ -140,6 +142,7 @@ __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_tryread(3)
  * Try  to acquire a read-lock to `self' */
 __COMPILER_CEIDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,shared_recursive_rwlock_tryread,(struct shared_recursive_rwlock *__restrict __self),{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if ((__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_tryread)(&__self->srr_lock))
 		return 1;
 	if (__shared_recursive_rwlock_isown(__self)) {
@@ -157,6 +160,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Try to acquire a read-lock to `self' */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_tryread,(struct shared_rwlock *__restrict __self),shared_rwlock_tryread,{
 	__UINTPTR_TYPE__ __temp;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	do {
 		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
 		if (__temp == (__UINTPTR_TYPE__)-1)
@@ -172,6 +176,7 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOT
  * Try to acquire a read-lock to `self' */
 __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_tryread)(struct shared_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __temp;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	do {
 		__temp = __hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE);
 		if (__temp == (__UINTPTR_TYPE__)-1)
@@ -188,6 +193,7 @@ __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_tryread(3)
  * Try  to acquire a read-lock to `self' */
 __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL shared_recursive_rwlock_tryread)(struct shared_recursive_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if ((__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_tryread)(&__self->srr_lock))
 		return 1;
 	if (__shared_recursive_rwlock_isown(__self)) {
@@ -205,6 +211,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> shared_rwlock_trywrite(3)
  * Try to acquire a write-lock to `self' */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_trywrite,(struct shared_rwlock *__restrict __self),shared_rwlock_trywrite,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
@@ -215,6 +222,7 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOT
 /* >> shared_rwlock_trywrite(3)
  * Try to acquire a write-lock to `self' */
 __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_trywrite)(struct shared_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
@@ -227,6 +235,7 @@ __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_trywrite(3)
  * Try to acquire a recursive write-lock to `self' */
 __COMPILER_CEIDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,shared_recursive_rwlock_trywrite,(struct shared_recursive_rwlock *__restrict __self),{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if ((__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_trywrite)(&__self->srr_lock)) {
 		__shared_recursive_rwlock_setown(__self);
 		return 1;
@@ -245,6 +254,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> shared_rwlock_trywrite(3)
  * Try to acquire a write-lock to `self' */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_trywrite,(struct shared_rwlock *__restrict __self),shared_rwlock_trywrite,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
@@ -255,6 +265,7 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOT
 /* >> shared_rwlock_trywrite(3)
  * Try to acquire a write-lock to `self' */
 __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_trywrite)(struct shared_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
@@ -267,6 +278,7 @@ __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_trywrite(3)
  * Try to acquire a recursive write-lock to `self' */
 __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL shared_recursive_rwlock_trywrite)(struct shared_recursive_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if ((__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_trywrite)(&__self->srr_lock)) {
 		__shared_recursive_rwlock_setown(__self);
 		return 1;
@@ -284,6 +296,7 @@ __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL sh
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __COMPILER_CEIDECLARE(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,shared_recursive_rwlock_endwrite,(struct shared_recursive_rwlock *__restrict __self),{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -313,6 +326,7 @@ __LIBC __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL shared_recursive_r
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL shared_recursive_rwlock_endwrite)(struct shared_recursive_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -341,6 +355,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_recursive_rwlock_endwrite,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_endwrite,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -364,6 +379,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_recursive_rwlock_endwrite)(struct shared_recursive_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -390,6 +406,7 @@ __NAMESPACE_LOCAL_END
  * @return: false: The lock is still held by something. */
 __COMPILER_CEIDECLARE(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,shared_recursive_rwlock_endread,(struct shared_recursive_rwlock *__restrict __self),{
 	__UINTPTR_TYPE__ __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_READ_BARRIER();
 	if (__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1)
 		return (__NAMESPACE_LOCAL_SYM __localdep_shared_recursive_rwlock_endwrite)(__self);
@@ -415,6 +432,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_recursive_rwlock_endwrite,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_endwrite,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -438,6 +456,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_recursive_rwlock_endwrite)(struct shared_recursive_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -464,6 +483,7 @@ __NAMESPACE_LOCAL_END
  * @return: false: The lock is still held by something. */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL shared_recursive_rwlock_endread)(struct shared_recursive_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_READ_BARRIER();
 	if (__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1)
 		return (__NAMESPACE_LOCAL_SYM __localdep_shared_recursive_rwlock_endwrite)(__self);
@@ -484,6 +504,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_recursive_rwlock_endwrite,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_endwrite,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -507,6 +528,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_recursive_rwlock_endwrite)(struct shared_recursive_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -533,6 +555,7 @@ __NAMESPACE_LOCAL_END
  * @return: false: The lock is still held by something. */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,shared_recursive_rwlock_end,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_endread,{
 	__UINTPTR_TYPE__ __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_READ_BARRIER();
 	if (__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1)
 		return (__NAMESPACE_LOCAL_SYM __localdep_shared_recursive_rwlock_endwrite)(__self);
@@ -558,6 +581,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_recursive_rwlock_endwrite,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_endwrite,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -581,6 +605,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_recursive_rwlock_endwrite)(struct shared_recursive_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -607,6 +632,7 @@ __NAMESPACE_LOCAL_END
  * @return: false: The lock is still held by something. */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL shared_recursive_rwlock_end)(struct shared_recursive_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_READ_BARRIER();
 	if (__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1)
 		return (__NAMESPACE_LOCAL_SYM __localdep_shared_recursive_rwlock_endwrite)(__self);
@@ -625,6 +651,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> shared_rwlock_downgrade(3)
  * Downgrade a write-lock to a read-lock (Always succeeds). */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),void,__NOTHROW,__FCALL,__localdep_shared_rwlock_downgrade,(struct shared_rwlock *__restrict __self),shared_rwlock_downgrade,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
 	__hybrid_atomic_store(__self->sl_lock, 1, __ATOMIC_RELEASE);
@@ -638,6 +665,7 @@ __COMPILER_CREDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_ACCESS_RW(1),__NOTHROW,__FCALL
 /* >> shared_rwlock_downgrade(3)
  * Downgrade a write-lock to a read-lock (Always succeeds). */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) void __NOTHROW(__FCALL __localdep_shared_rwlock_downgrade)(struct shared_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
 	__hybrid_atomic_store(__self->sl_lock, 1, __ATOMIC_RELEASE);
@@ -652,6 +680,7 @@ __NAMESPACE_LOCAL_END
  * Downgrade a recursive write-lock to a read-lock (Always succeeds, but you have
  * to ensure  that  you're only  holding  a  single write-lock  at  the  moment). */
 __COMPILER_CEIDECLARE(__NOBLOCK __ATTR_ACCESS_RW(1),void,__NOTHROW,__FCALL,shared_recursive_rwlock_downgrade,(struct shared_recursive_rwlock *__restrict __self),{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self), "You're not holding this lock");
 	__hybrid_assertf(__self->srr_wrcnt > 0, "You're holding more than 1 write-lock");
 	__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
@@ -671,6 +700,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> shared_rwlock_downgrade(3)
  * Downgrade a write-lock to a read-lock (Always succeeds). */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),void,__NOTHROW,__FCALL,__localdep_shared_rwlock_downgrade,(struct shared_rwlock *__restrict __self),shared_rwlock_downgrade,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
 	__hybrid_atomic_store(__self->sl_lock, 1, __ATOMIC_RELEASE);
@@ -684,6 +714,7 @@ __COMPILER_CREDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_ACCESS_RW(1),__NOTHROW,__FCALL
 /* >> shared_rwlock_downgrade(3)
  * Downgrade a write-lock to a read-lock (Always succeeds). */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) void __NOTHROW(__FCALL __localdep_shared_rwlock_downgrade)(struct shared_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
 	__hybrid_atomic_store(__self->sl_lock, 1, __ATOMIC_RELEASE);
@@ -698,6 +729,7 @@ __NAMESPACE_LOCAL_END
  * Downgrade a recursive write-lock to a read-lock (Always succeeds, but you have
  * to ensure  that  you're only  holding  a  single write-lock  at  the  moment). */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) void __NOTHROW(__FCALL shared_recursive_rwlock_downgrade)(struct shared_recursive_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(__self), "You're not holding this lock");
 	__hybrid_assertf(__self->srr_wrcnt > 0, "You're holding more than 1 write-lock");
 	__self->srr_writer = __SHARED_RECURSIVE_RWLOCK_BADTID;
@@ -718,6 +750,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_recursive_rwlock_endwrite,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_endwrite,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -741,6 +774,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_recursive_rwlock_endwrite)(struct shared_recursive_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -766,6 +800,7 @@ __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared
  * @return: false: The lock is still held by something. */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_recursive_rwlock_endread,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_endread,{
 	__UINTPTR_TYPE__ __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_READ_BARRIER();
 	if (__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1)
 		return (__localdep_shared_recursive_rwlock_endwrite)(__self);
@@ -790,6 +825,7 @@ __COMPILER_CREDIRECT(__LIBC,__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCA
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_recursive_rwlock_endwrite,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_endwrite,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -813,6 +849,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_recursive_rwlock_endwrite)(struct shared_recursive_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -838,6 +875,7 @@ __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared
  * @return: false: The lock is still held by something. */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_recursive_rwlock_endread)(struct shared_recursive_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_READ_BARRIER();
 	if (__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1)
 		return (__localdep_shared_recursive_rwlock_endwrite)(__self);
@@ -874,6 +912,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> shared_recursive_rwlock_write(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock. */
 __COMPILER_CEIREDIRECT(__BLOCKING __ATTR_ACCESS_RW(1),void,__THROWING,__FCALL,__localdep_shared_recursive_rwlock_write,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_write,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return;
@@ -906,6 +945,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> shared_recursive_rwlock_write(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock. */
 __LOCAL __BLOCKING __ATTR_ACCESS_RW(1) void (__FCALL __localdep_shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return;
@@ -926,6 +966,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  Upgrade was performed without the read-lock being lost
  * @return: false: The read-lock had to be released before a recursive write-lock was acquired */
 __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_upgrade,(struct shared_recursive_rwlock *__restrict __self),{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__hybrid_atomic_cmpxch(__self->srr_lock.sl_lock, 1, (__UINTPTR_TYPE__)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)) {
 		__shared_recursive_rwlock_setown(__self);
 		return 1; /* Lock wasn't lost */
@@ -956,6 +997,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_recursive_rwlock_endwrite,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_endwrite,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -979,6 +1021,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_recursive_rwlock_endwrite)(struct shared_recursive_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -1004,6 +1047,7 @@ __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared
  * @return: false: The lock is still held by something. */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_recursive_rwlock_endread,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_endread,{
 	__UINTPTR_TYPE__ __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_READ_BARRIER();
 	if (__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1)
 		return (__localdep_shared_recursive_rwlock_endwrite)(__self);
@@ -1028,6 +1072,7 @@ __COMPILER_CREDIRECT(__LIBC,__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCA
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_recursive_rwlock_endwrite,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_endwrite,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -1051,6 +1096,7 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_recursive_rwlock_endwrite)(struct shared_recursive_rwlock *__restrict __self) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -1076,6 +1122,7 @@ __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared
  * @return: false: The lock is still held by something. */
 __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_recursive_rwlock_endread)(struct shared_recursive_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_READ_BARRIER();
 	if (__self->srr_lock.sl_lock == (__UINTPTR_TYPE__)-1)
 		return (__localdep_shared_recursive_rwlock_endwrite)(__self);
@@ -1112,6 +1159,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> shared_recursive_rwlock_write(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock. */
 __COMPILER_CEIREDIRECT(__BLOCKING __ATTR_ACCESS_RW(1),void,__THROWING,__FCALL,__localdep_shared_recursive_rwlock_write,(struct shared_recursive_rwlock *__restrict __self),shared_recursive_rwlock_write,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return;
@@ -1144,6 +1192,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> shared_recursive_rwlock_write(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock. */
 __LOCAL __BLOCKING __ATTR_ACCESS_RW(1) void (__FCALL __localdep_shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return;
@@ -1164,6 +1213,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  Upgrade was performed without the read-lock being lost
  * @return: false: The read-lock had to be released before a recursive write-lock was acquired */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_upgrade)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__hybrid_atomic_cmpxch(__self->srr_lock.sl_lock, 1, (__UINTPTR_TYPE__)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)) {
 		__shared_recursive_rwlock_setown(__self);
 		return 1; /* Lock wasn't lost */
@@ -1196,6 +1246,7 @@ __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_read(3)
  * Acquire a read-lock to the given shared_recursive_rwlock. */
 __COMPILER_CEIDECLARE(__BLOCKING __ATTR_ACCESS_RW(1),void,__THROWING,__FCALL,shared_recursive_rwlock_read,(struct shared_recursive_rwlock *__restrict __self),{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return;
@@ -1229,6 +1280,7 @@ __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_read(3)
  * Acquire a read-lock to the given shared_recursive_rwlock. */
 __LOCAL __BLOCKING __ATTR_ACCESS_RW(1) void (__FCALL shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return;
@@ -1259,6 +1311,7 @@ __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_write(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock. */
 __COMPILER_CEIDECLARE(__BLOCKING __ATTR_ACCESS_RW(1),void,__THROWING,__FCALL,shared_recursive_rwlock_write,(struct shared_recursive_rwlock *__restrict __self),{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return;
@@ -1293,6 +1346,7 @@ __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_write(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock. */
 __LOCAL __BLOCKING __ATTR_ACCESS_RW(1) void (__FCALL shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return;
@@ -1336,6 +1390,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_read_with_timeout,(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -1389,6 +1444,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_read_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -1432,6 +1488,7 @@ __NAMESPACE_LOCAL_END
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_write_with_timeout,(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),{
 	__BOOL __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -1489,6 +1546,7 @@ __NAMESPACE_LOCAL_END
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_write_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
 	__BOOL __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -1522,6 +1580,7 @@ __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_waitread(3)
  * Wait until acquiring a read-lock to `self' no longer blocks */
 __COMPILER_CEIDECLARE(__BLOCKING __ATTR_ACCESS_RW(1),void,__THROWING,__FCALL,shared_recursive_rwlock_waitread,(struct shared_recursive_rwlock *__restrict __self),{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return;
 	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitread)(&__self->srr_lock);
@@ -1553,6 +1612,7 @@ __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_waitread(3)
  * Wait until acquiring a read-lock to `self' no longer blocks */
 __LOCAL __BLOCKING __ATTR_ACCESS_RW(1) void (__FCALL shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return;
 	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitread)(&__self->srr_lock);
@@ -1581,6 +1641,7 @@ __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_waitwrite(3)
  * Wait until acquiring a recursive write-lock to `self' no longer blocks */
 __COMPILER_CEIDECLARE(__BLOCKING __ATTR_ACCESS_RW(1),void,__THROWING,__FCALL,shared_recursive_rwlock_waitwrite,(struct shared_recursive_rwlock *__restrict __self),{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return;
 	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitwrite)(&__self->srr_lock);
@@ -1612,6 +1673,7 @@ __NAMESPACE_LOCAL_END
 /* >> shared_recursive_rwlock_waitwrite(3)
  * Wait until acquiring a recursive write-lock to `self' no longer blocks */
 __LOCAL __BLOCKING __ATTR_ACCESS_RW(1) void (__FCALL shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return;
 	(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitwrite)(&__self->srr_lock);
@@ -1652,6 +1714,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_waitread_with_timeout,(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitread_with_timeout)(&__self->srr_lock, __abs_timeout);
@@ -1703,6 +1766,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_waitread_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitread_with_timeout)(&__self->srr_lock, __abs_timeout);
@@ -1743,6 +1807,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_waitwrite_with_timeout,(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitwrite_with_timeout)(&__self->srr_lock, __abs_timeout);
@@ -1794,6 +1859,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_waitwrite_with_timeout)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitwrite_with_timeout)(&__self->srr_lock, __abs_timeout);
@@ -1835,6 +1901,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_read_with_timeout64,(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_rwlock_read_with_timeout,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -1888,6 +1955,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_read_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -1931,6 +1999,7 @@ __NAMESPACE_LOCAL_END
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_write_with_timeout64,(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_rwlock_write_with_timeout,{
 	__BOOL __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -1988,6 +2057,7 @@ __NAMESPACE_LOCAL_END
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_write_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
 	__BOOL __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -2033,6 +2103,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_waitread_with_timeout64,(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_rwlock_waitread_with_timeout,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitread_with_timeout64)(&__self->srr_lock, __abs_timeout);
@@ -2084,6 +2155,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_waitread_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitread_with_timeout64)(&__self->srr_lock, __abs_timeout);
@@ -2124,6 +2196,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_waitwrite_with_timeout64,(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_rwlock_waitwrite_with_timeout,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitwrite_with_timeout64)(&__self->srr_lock, __abs_timeout);
@@ -2175,6 +2248,7 @@ __NAMESPACE_LOCAL_END
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_waitwrite_with_timeout64)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitwrite_with_timeout64)(&__self->srr_lock, __abs_timeout);
@@ -2220,6 +2294,7 @@ extern "C++" {
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_read,(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_recursive_rwlock_read_with_timeout,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -2275,6 +2350,7 @@ extern "C++" {
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -2320,6 +2396,7 @@ extern "C++" {
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_write,(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_recursive_rwlock_write_with_timeout,{
 	__BOOL __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -2379,6 +2456,7 @@ extern "C++" {
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
 	__BOOL __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -2426,6 +2504,7 @@ extern "C++" {
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_waitread,(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_recursive_rwlock_waitread_with_timeout,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitread_with_timeout)(&__self->srr_lock, __abs_timeout);
@@ -2479,6 +2558,7 @@ extern "C++" {
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitread_with_timeout)(&__self->srr_lock, __abs_timeout);
@@ -2521,6 +2601,7 @@ extern "C++" {
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_waitwrite,(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout),shared_recursive_rwlock_waitwrite_with_timeout,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitwrite_with_timeout)(&__self->srr_lock, __abs_timeout);
@@ -2574,6 +2655,7 @@ extern "C++" {
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitwrite_with_timeout)(&__self->srr_lock, __abs_timeout);
@@ -2619,6 +2701,7 @@ extern "C++" {
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_read,(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_rwlock_read_with_timeout,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -2674,6 +2757,7 @@ extern "C++" {
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -2719,6 +2803,7 @@ extern "C++" {
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_write,(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_rwlock_write_with_timeout,{
 	__BOOL __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -2778,6 +2863,7 @@ extern "C++" {
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
 	__BOOL __result;
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self)) {
 		++__self->srr_wrcnt;
 		return 1;
@@ -2825,6 +2911,7 @@ extern "C++" {
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_waitread,(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_rwlock_waitread_with_timeout,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitread_with_timeout64)(&__self->srr_lock, __abs_timeout);
@@ -2878,6 +2965,7 @@ extern "C++" {
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitread_with_timeout64)(&__self->srr_lock, __abs_timeout);
@@ -2920,6 +3008,7 @@ extern "C++" {
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1),__BOOL,__THROWING,__FCALL,shared_recursive_rwlock_waitwrite,(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout),shared_recursive_rwlock_waitwrite_with_timeout,{
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitwrite_with_timeout64)(&__self->srr_lock, __abs_timeout);
@@ -2973,6 +3062,7 @@ extern "C++" {
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
 __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW(1) __BOOL (__FCALL shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict __self, struct timespec64 const *__abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_rwlock_isown(__self))
 		return 1;
 	return (__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_waitwrite_with_timeout64)(&__self->srr_lock, __abs_timeout);

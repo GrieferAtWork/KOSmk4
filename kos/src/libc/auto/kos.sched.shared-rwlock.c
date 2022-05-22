@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a982c1e */
+/* HASH CRC-32:0xb2b0c6bc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,7 @@ DECL_BEGIN
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __NOBLOCK ATTR_ACCESS_RW(1) bool
 NOTHROW(__FCALL libc_shared_rwlock_tryread)(struct shared_rwlock *__restrict self) {
 	uintptr_t temp;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	do {
 		temp = __hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE);
 		if (temp == (uintptr_t)-1)
@@ -49,6 +50,7 @@ NOTHROW(__FCALL libc_shared_rwlock_tryread)(struct shared_rwlock *__restrict sel
  * Try to acquire a write-lock to `self' */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __NOBLOCK ATTR_ACCESS_RW(1) bool
 NOTHROW(__FCALL libc_shared_rwlock_trywrite)(struct shared_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (!__hybrid_atomic_cmpxch(self->sl_lock, 0, (uintptr_t)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return false;
@@ -61,6 +63,7 @@ NOTHROW(__FCALL libc_shared_rwlock_trywrite)(struct shared_rwlock *__restrict se
  * Release a write-lock from `self' */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK ATTR_ACCESS_RW(1) void
 NOTHROW(__FCALL libc_shared_rwlock_endwrite)(struct shared_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(self->sl_lock == (uintptr_t)-1, "Lock isn't in write-mode (%x)", self->sl_lock);
 	__hybrid_atomic_store(self->sl_lock, 0, __ATOMIC_RELEASE);
@@ -74,6 +77,7 @@ NOTHROW(__FCALL libc_shared_rwlock_endwrite)(struct shared_rwlock *__restrict se
 INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK ATTR_ACCESS_RW(1) bool
 NOTHROW(__FCALL libc_shared_rwlock_endread)(struct shared_rwlock *__restrict self) {
 	uintptr_t __result;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_READ_BARRIER();
 	__hybrid_assertf(self->sl_lock != (uintptr_t)-1, "Lock is in write-mode (%x)", self->sl_lock);
 	__hybrid_assertf(self->sl_lock != 0, "Lock isn't held by anyone");
@@ -88,6 +92,7 @@ NOTHROW(__FCALL libc_shared_rwlock_endread)(struct shared_rwlock *__restrict sel
  * @return: false: The lock is still held by something. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK ATTR_ACCESS_RW(1) bool
 NOTHROW(__FCALL libc_shared_rwlock_end)(struct shared_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_BARRIER();
 	if (self->sl_lock != (uintptr_t)-1) {
 		/* Read-lock */
@@ -108,6 +113,7 @@ NOTHROW(__FCALL libc_shared_rwlock_end)(struct shared_rwlock *__restrict self) {
  * Downgrade a write-lock to a read-lock (Always succeeds). */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK ATTR_ACCESS_RW(1) void
 NOTHROW(__FCALL libc_shared_rwlock_downgrade)(struct shared_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(self->sl_lock == (uintptr_t)-1, "Lock isn't in write-mode (%x)", self->sl_lock);
 	__hybrid_atomic_store(self->sl_lock, 1, __ATOMIC_RELEASE);
@@ -122,6 +128,7 @@ NOTHROW(__FCALL libc_shared_rwlock_downgrade)(struct shared_rwlock *__restrict s
  * @return: false: The read-lock had to be released before a write-lock was acquired */
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_rwlock_upgrade)(struct shared_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__hybrid_atomic_cmpxch(self->sl_lock, 1, (uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
 		return true; /* Lock wasn't lost */
 	libc_shared_rwlock_endread(self);

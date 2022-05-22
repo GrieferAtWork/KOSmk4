@@ -58,7 +58,8 @@ __SYSDECL_BEGIN
  * the thread that acquired the lock, thus allowing for recursion
  *
  * NOTE: This interface is not available in kernel-space. For the
- *       rationale, see  `<kos/sched/shared-recursive-rwlock.h>'. */
+ *       rationale, see  `<kos/sched/shared-recursive-rwlock.h>'.
+ */
 
 #define SHARED_RECURSIVE_LOCK_INIT        { SHARED_LOCK_INIT, __SHARED_RECURSIVE_LOCK_BADTID, 0 }
 #define shared_recursive_lock_init(self)  (void)(shared_lock_init(&(self)->sr_lock), (self)->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID, (self)->sr_rcnt = 0)
@@ -86,6 +87,7 @@ __SYSDECL_BEGIN
 [[decl_include("<kos/bits/shared-recursive-lock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>")]]
 $bool shared_recursive_lock_tryacquire([[inout]] struct shared_recursive_lock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__hybrid_atomic_xch(self->@sr_lock@.@sl_lock@, 1, __ATOMIC_ACQUIRE) == 0) {
 		__shared_recursive_lock_setown(self);
 		return $true;
@@ -107,6 +109,7 @@ $bool shared_recursive_lock_tryacquire([[inout]] struct shared_recursive_lock *_
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-recursive-lock.h>"), requires(defined(__shared_lock_send))]]
 $bool shared_recursive_lock_release([[inout]] struct shared_recursive_lock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(self->@sr_lock@.@sl_lock@ != 0, "Lock isn't acquired");
 	__hybrid_assertf(__shared_recursive_lock_isown(self), "You're not the owner of this lock");
@@ -132,6 +135,7 @@ $bool shared_recursive_lock_release([[inout]] struct shared_recursive_lock *__re
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_lock_acquire)]]
 void shared_recursive_lock_acquire([[inout]] struct shared_recursive_lock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
 		++self->@sr_rcnt@;
 		return;
@@ -153,6 +157,7 @@ void shared_recursive_lock_acquire([[inout]] struct shared_recursive_lock *__res
 $bool shared_recursive_lock_acquire_with_timeout([[inout]] struct shared_recursive_lock *__restrict self,
                                                  __shared_lock_timespec abs_timeout) {
 	bool result;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
 		++self->@sr_rcnt@;
 		return true;
@@ -177,6 +182,7 @@ $bool shared_recursive_lock_acquire_with_timeout([[inout]] struct shared_recursi
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_lock_waitfor)]]
 void shared_recursive_lock_waitfor([[inout]] struct shared_recursive_lock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self))
 		return;
 	shared_lock_waitfor(&self->@sr_lock@);
@@ -194,6 +200,7 @@ void shared_recursive_lock_waitfor([[inout]] struct shared_recursive_lock *__res
 [[requires_function(shared_lock_waitfor_with_timeout)]]
 $bool shared_recursive_lock_waitfor_with_timeout([[inout]] struct shared_recursive_lock *__restrict self,
                                                  __shared_lock_timespec abs_timeout) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self))
 		return $true;
 	return shared_lock_waitfor_with_timeout(&self->@sr_lock@, abs_timeout);
@@ -212,6 +219,7 @@ $bool shared_recursive_lock_waitfor_with_timeout([[inout]] struct shared_recursi
 $bool shared_recursive_lock_acquire_with_timeout64([[inout]] struct shared_recursive_lock *__restrict self,
                                                    [[in_opt]] struct timespec64 const *abs_timeout) {
 	bool result;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
 		++self->@sr_rcnt@;
 		return $true;
@@ -228,6 +236,7 @@ $bool shared_recursive_lock_acquire_with_timeout64([[inout]] struct shared_recur
 [[requires_function(shared_lock_waitfor_with_timeout64)]]
 $bool shared_recursive_lock_waitfor_with_timeout64([[inout]] struct shared_recursive_lock *__restrict self,
                                                    [[in_opt]] struct timespec64 const *abs_timeout) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self))
 		return $true;
 	return shared_lock_waitfor_with_timeout64(&self->@sr_lock@, abs_timeout);

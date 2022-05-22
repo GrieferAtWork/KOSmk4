@@ -2461,6 +2461,7 @@ procfs_pp_fdinfo_v_print(struct printnode *__restrict self,
 		size_t i;
 		struct epoll_controller *hand;
 		hand = (struct epoll_controller *)me->pfir_hand.h_data;
+		__COMPILER_WORKAROUND_GCC_105689(&hand->ec_lock);
 		for (i = 0;;) {
 			struct epoll_handle_monitor *mon;
 			uint32_t mon_fdkey;

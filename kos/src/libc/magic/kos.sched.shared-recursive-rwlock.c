@@ -116,6 +116,7 @@ __SYSDECL_BEGIN
 [[decl_include("<kos/bits/shared-recursive-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>"), requires_function(shared_rwlock_tryread)]]
 $bool shared_recursive_rwlock_tryread([[inout]] struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (shared_rwlock_tryread(&self->@srr_lock@))
 		return $true;
 	if (__shared_recursive_rwlock_isown(self)) {
@@ -131,6 +132,7 @@ $bool shared_recursive_rwlock_tryread([[inout]] struct shared_recursive_rwlock *
 [[decl_include("<kos/bits/shared-recursive-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>"), requires_function(shared_rwlock_trywrite)]]
 $bool shared_recursive_rwlock_trywrite([[inout]] struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (shared_rwlock_trywrite(&self->@srr_lock@)) {
 		__shared_recursive_rwlock_setown(self);
 		return $true;
@@ -152,6 +154,7 @@ $bool shared_recursive_rwlock_trywrite([[inout]] struct shared_recursive_rwlock 
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-recursive-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
 $bool shared_recursive_rwlock_endwrite([[inout]] struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(self->@srr_lock@.@sl_lock@ == ($uintptr_t)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -181,6 +184,7 @@ $bool shared_recursive_rwlock_endwrite([[inout]] struct shared_recursive_rwlock 
 [[requires_include("<kos/bits/shared-recursive-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
 $bool shared_recursive_rwlock_endread([[inout]] struct shared_recursive_rwlock *__restrict self) {
 	$uintptr_t result;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	COMPILER_READ_BARRIER();
 	if (self->@srr_lock@.@sl_lock@ == ($uintptr_t)-1)
 		return shared_recursive_rwlock_endwrite(self);
@@ -207,6 +211,7 @@ $bool shared_recursive_rwlock_endread([[inout]] struct shared_recursive_rwlock *
 [[impl_include("<kos/bits/shared-recursive-rwlock.h>", "<hybrid/__assert.h>")]]
 [[requires_function(shared_rwlock_downgrade)]]
 void shared_recursive_rwlock_downgrade([[inout]] struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	__hybrid_assertf(__shared_recursive_rwlock_isown(self), "You're not holding this lock");
 	__hybrid_assertf(self->@srr_wrcnt@ > 0, "You're holding more than 1 write-lock");
 	self->@srr_writer@ = __SHARED_RECURSIVE_RWLOCK_BADTID;
@@ -231,6 +236,7 @@ void shared_recursive_rwlock_downgrade([[inout]] struct shared_recursive_rwlock 
 [[requires_function(shared_recursive_rwlock_endread, shared_recursive_rwlock_write)]]
 [[impl_include("<hybrid/__atomic.h>")]]
 $bool shared_recursive_rwlock_upgrade([[inout]] struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__hybrid_atomic_cmpxch(self->@srr_lock@.@sl_lock@, 1, ($uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)) {
 		__shared_recursive_rwlock_setown(self);
 		return $true; /* Lock wasn't lost */
@@ -254,6 +260,7 @@ $bool shared_recursive_rwlock_upgrade([[inout]] struct shared_recursive_rwlock *
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_rwlock_read)]]
 void shared_recursive_rwlock_read([[inout]] struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->@srr_wrcnt@;
 		return;
@@ -268,6 +275,7 @@ void shared_recursive_rwlock_read([[inout]] struct shared_recursive_rwlock *__re
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_rwlock_write)]]
 void shared_recursive_rwlock_write([[inout]] struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->@srr_wrcnt@;
 		return;
@@ -288,6 +296,7 @@ void shared_recursive_rwlock_write([[inout]] struct shared_recursive_rwlock *__r
 [[requires_function(shared_rwlock_read_with_timeout)]]
 $bool shared_recursive_rwlock_read_with_timeout([[inout]] struct shared_recursive_rwlock *__restrict self,
                                                 __shared_rwlock_timespec abs_timeout) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->@srr_wrcnt@;
 		return true;
@@ -308,6 +317,7 @@ $bool shared_recursive_rwlock_read_with_timeout([[inout]] struct shared_recursiv
 $bool shared_recursive_rwlock_write_with_timeout([[inout]] struct shared_recursive_rwlock *__restrict self,
                                                  __shared_rwlock_timespec abs_timeout) {
 	bool result;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->@srr_wrcnt@;
 		return true;
@@ -333,6 +343,7 @@ $bool shared_recursive_rwlock_write_with_timeout([[inout]] struct shared_recursi
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_rwlock_waitread)]]
 void shared_recursive_rwlock_waitread([[inout]] struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self))
 		return;
 	shared_rwlock_waitread(&self->@srr_lock@);
@@ -345,6 +356,7 @@ void shared_recursive_rwlock_waitread([[inout]] struct shared_recursive_rwlock *
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_rwlock_waitwrite)]]
 void shared_recursive_rwlock_waitwrite([[inout]] struct shared_recursive_rwlock *__restrict self) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self))
 		return;
 	shared_rwlock_waitwrite(&self->@srr_lock@);
@@ -362,6 +374,7 @@ void shared_recursive_rwlock_waitwrite([[inout]] struct shared_recursive_rwlock 
 [[requires_function(shared_rwlock_waitread_with_timeout)]]
 $bool shared_recursive_rwlock_waitread_with_timeout([[inout]] struct shared_recursive_rwlock *__restrict self,
                                                     __shared_rwlock_timespec abs_timeout) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self))
 		return $true;
 	return shared_rwlock_waitread_with_timeout(&self->@srr_lock@, abs_timeout);
@@ -379,6 +392,7 @@ $bool shared_recursive_rwlock_waitread_with_timeout([[inout]] struct shared_recu
 [[requires_function(shared_rwlock_waitwrite_with_timeout)]]
 $bool shared_recursive_rwlock_waitwrite_with_timeout([[inout]] struct shared_recursive_rwlock *__restrict self,
                                                      __shared_rwlock_timespec abs_timeout) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self))
 		return $true;
 	return shared_rwlock_waitwrite_with_timeout(&self->@srr_lock@, abs_timeout);
@@ -396,6 +410,7 @@ $bool shared_recursive_rwlock_waitwrite_with_timeout([[inout]] struct shared_rec
 [[requires_function(shared_rwlock_read_with_timeout64)]]
 $bool shared_recursive_rwlock_read_with_timeout64([[inout]] struct shared_recursive_rwlock *__restrict self,
                                                   [[in_opt]] struct timespec64 const *abs_timeout) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->@srr_wrcnt@;
 		return $true;
@@ -410,6 +425,7 @@ $bool shared_recursive_rwlock_read_with_timeout64([[inout]] struct shared_recurs
 $bool shared_recursive_rwlock_write_with_timeout64([[inout]] struct shared_recursive_rwlock *__restrict self,
                                                    [[in_opt]] struct timespec64 const *abs_timeout) {
 	bool result;
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->@srr_wrcnt@;
 		return $true;
@@ -426,6 +442,7 @@ $bool shared_recursive_rwlock_write_with_timeout64([[inout]] struct shared_recur
 [[requires_function(shared_rwlock_waitread_with_timeout64)]]
 $bool shared_recursive_rwlock_waitread_with_timeout64([[inout]] struct shared_recursive_rwlock *__restrict self,
                                                       [[in_opt]] struct timespec64 const *abs_timeout) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self))
 		return $true;
 	return shared_rwlock_waitread_with_timeout64(&self->@srr_lock@, abs_timeout);
@@ -437,6 +454,7 @@ $bool shared_recursive_rwlock_waitread_with_timeout64([[inout]] struct shared_re
 [[requires_function(shared_rwlock_waitwrite_with_timeout64)]]
 $bool shared_recursive_rwlock_waitwrite_with_timeout64([[inout]] struct shared_recursive_rwlock *__restrict self,
                                                        [[in_opt]] struct timespec64 const *abs_timeout) {
+	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_rwlock_isown(self))
 		return $true;
 	return shared_rwlock_waitwrite_with_timeout64(&self->@srr_lock@, abs_timeout);

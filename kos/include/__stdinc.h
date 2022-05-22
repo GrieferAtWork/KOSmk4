@@ -924,6 +924,14 @@
 #endif /* !__INTELLISENSE__ */
 #endif /* __CC__ */
 
+/************************************************************************/
+/* Workarounds for compiler bugs.                                       */
+/************************************************************************/
+#ifndef __COMPILER_WORKAROUND_GCC_105689
+#define __COMPILER_WORKAROUND_GCC_105689(ptr) /* nothing */
+#endif /* !__COMPILER_WORKAROUND_GCC_105689 */
+
+
 #ifdef __KOS_SYSTEM_HEADERS__
 #if __has_include(<asm/__stdinc.h>)
 #include <asm/__stdinc.h>
