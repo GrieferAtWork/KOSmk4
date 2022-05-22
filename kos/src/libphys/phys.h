@@ -98,7 +98,17 @@ NOTHROW(CC libphys_munmapphys)(void *base, size_t num_bytes);
  * NOTE: Don't try to dup() or close() the file descriptor. - Just  use
  *       it as-is. It will be close()'d automatically once libphys gets
  *       unloaded. */
-INTDEF NOBLOCK WUNUSED fd_t NOTHROW(CC libphys_getdevmem)(void);
+INTDEF NOBLOCK ATTR_PURE WUNUSED fd_t NOTHROW(CC libphys_getdevmem)(void);
+
+/* Sets the internally used /dev/mem file descriptor.
+ * - The old internal /dev/mem file descriptor ISN'T closed
+ * - The given `new_devmem_fd' descriptor ISN'T duped
+ * - When  `new_devmem_fd == -1', the next use of getdevmem()
+ *   or anything else that requires use of /dev/mem will once
+ *   again try to open the device file
+ * - When `new_devmem_fd != -1', the given descriptor will be
+ *   closed when libphys is dlclose'd. */
+INTDEF NOBLOCK void NOTHROW(CC libphys_setdevmem)(fd_t new_devmem_fd);
 
 
 DECL_END

@@ -88,9 +88,9 @@ struct dl_phdr_info {
 #ifndef ____dl_iterator_callback_defined
 #define ____dl_iterator_callback_defined
 /* Callback prototype for `dl_iterate_phdr()' */
-typedef int (__DLFCN_CC *__dl_iterator_callback)(struct dl_phdr_info *__info,
-                                                 __size_t __info_size, void *__arg)
-		/*__THROWS(...)*/;
+typedef int
+(__DLFCN_CC *__dl_iterator_callback)(struct dl_phdr_info *__info,
+                                     __size_t __info_size, void *__arg);
 #endif /* !____dl_iterator_callback_defined */
 
 /* Enumerate all loaded modules, as  well as information about  them.
@@ -100,7 +100,7 @@ typedef int (__DLFCN_CC *__dl_iterator_callback)(struct dl_phdr_info *__info,
 #ifdef __CRT_HAVE_dl_iterate_phdr
 __IMPDEF __ATTR_NONNULL((1)) int
 (__DLFCN_CC dl_iterate_phdr)(__dl_iterator_callback __cb,
-                             void *__arg) /*__THROWS(...)*/;
+                             void *__arg);
 #endif /* __CRT_HAVE_dl_iterate_phdr */
 
 /* The .dynamic section of the calling module. */

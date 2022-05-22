@@ -137,9 +137,22 @@ LIBPHYS_DECL __NOBLOCK void __NOTHROW(LIBPHYS_CC munmapphys)(void *base, size_t 
  * NOTE: Don't try to dup() or close() the file descriptor. - Just  use
  *       it as-is. It will be close()'d automatically once libphys gets
  *       unloaded. */
-typedef __NOBLOCK __ATTR_WUNUSED_T __fd_t __NOTHROW_T(LIBPHYS_CC PGETDEVMEM)(void);
+typedef __NOBLOCK __ATTR_PURE_T __ATTR_WUNUSED_T __fd_t __NOTHROW_T(LIBPHYS_CC *PGETDEVMEM)(void);
 #ifdef LIBPHYS_WANT_PROTOTYPES
-LIBPHYS_DECL __NOBLOCK __ATTR_WUNUSED __fd_t __NOTHROW(LIBPHYS_CC getdevmem)(void);
+LIBPHYS_DECL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __fd_t __NOTHROW(LIBPHYS_CC getdevmem)(void);
+#endif /* LIBPHYS_WANT_PROTOTYPES */
+
+/* Sets the internally used /dev/mem file descriptor.
+ * - The old internal /dev/mem file descriptor ISN'T closed
+ * - The given `new_devmem_fd' descriptor ISN'T duped
+ * - When  `new_devmem_fd == -1', the next use of getdevmem()
+ *   or anything else that requires use of /dev/mem will once
+ *   again try to open the device file
+ * - When `new_devmem_fd != -1', the given descriptor will be
+ *   closed when libphys is dlclose'd. */
+typedef __NOBLOCK void __NOTHROW_T(LIBPHYS_CC *PSETDEVMEM)(__fd_t new_devmem_fd);
+#ifdef LIBPHYS_WANT_PROTOTYPES
+LIBPHYS_DECL __NOBLOCK void __NOTHROW(LIBPHYS_CC setdevmem)(__fd_t new_devmem_fd);
 #endif /* LIBPHYS_WANT_PROTOTYPES */
 
 

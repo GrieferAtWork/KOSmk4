@@ -456,7 +456,12 @@ INTERN errno_t NOTHROW(CC libpci_system_init)(void)
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(pci_system_init_dev_mem, libpci_system_init_dev_mem);
 INTERN void NOTHROW(CC libpci_system_init_dev_mem)(fd_t fd) {
-	(void)fd; /* We use libphys for /dev/mem access, so we can't make use of a custom `fd' */
+	/* We  use libphys for /dev/mem access, but  we will make use of `fd'
+	 * in case our program is otherwise unable to access /dev/mem through
+	 * normal means (useful in case our caller acquired `fd' through some
+	 * unconventional methods, such as a unix domain socket) */
+	if (fd != -1 && getdevmem() == -1)
+		setdevmem(fd);
 	libpci_system_init();
 }
 
