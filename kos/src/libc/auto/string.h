@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5260c35b */
+/* HASH CRC-32:0xe68d7687 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -815,18 +815,22 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrorname_np)(err
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
  * When the given  `signo' isn't recognized,  `NULL' is returned  instead. */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_sigabbrev_np)(signo_t signo);
+#endif /* !__KERNEL__ */
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
  * When the given  `signo' isn't recognized,  `NULL' is returned  instead. */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_sigabbrev_np)(signo_t signo);
+#ifndef __KERNEL__
 /* >> sigdescr_np(3)
  * Return a description for the given signal.
  * If the given `signo' isn't recognized, return `NULL' instead. */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_sigdescr_np)(signo_t signo);
+#endif /* !__KERNEL__ */
 /* >> sigdescr_np(3)
  * Return a description for the given signal.
  * If the given `signo' isn't recognized, return `NULL' instead. */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_sigdescr_np)(signo_t signo);
+#ifndef __KERNEL__
 INTDEF ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_strerror_r)(errno_t errnum, char *buf, size_t buflen);
 INTDEF ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_strerror_r)(errno_t errnum, char *buf, size_t buflen);
 INTDEF ATTR_COLD ATTR_OUTS(2, 3) errno_t NOTHROW_NCX(LIBDCALL libd___xpg_strerror_r)(errno_t errnum, char *buf, size_t buflen);

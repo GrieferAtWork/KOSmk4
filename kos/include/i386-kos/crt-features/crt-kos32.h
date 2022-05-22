@@ -4598,6 +4598,7 @@
 #define __CRT_HAVE_sigaltstack
 #define __CRT_HAVE_sigandset
 #define __CRT_HAVE_sigblock
+#define __CRT_HAVE_sigcodedesc_np
 #define __CRT_HAVE_sigdelset
 #define __CRT_HAVE_sigdescr_np
 #define __CRT_HAVE_sigemptyset
@@ -4791,7 +4792,6 @@
 #define __CRT_HAVE_strrspn
 #define __CRT_HAVE_strsep
 #define __CRT_HAVE_strset
-#define __CRT_HAVE_strsigcode_s
 #define __CRT_HAVE_strsignal
 #define __CRT_HAVE_strsigno
 #define __CRT_HAVE_strspn

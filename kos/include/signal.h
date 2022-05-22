@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x218989c1 */
+/* HASH CRC-32:0xad11c370 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2240,20 +2240,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(psiginfo, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__CRT_HAVE_psiginfo */
 #endif /* !__psiginfo_defined */
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE_strsigcode_s
-/* >> strsigcode_s(3)
+#ifdef __CRT_HAVE_sigcodedesc_np
+/* >> sigcodedesc_np(3)
  * Return a textual description of `code', as read from `siginfo_t::si_code',
  * and used in conjunction with a given signal `signo'. This function is used
  * for the implementation of `psiginfo(3)' */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,strsigcode_s,(__signo_t __signo, int __code),(__signo,__code))
-#else /* __CRT_HAVE_strsigcode_s */
-#include <libc/local/signal/strsigcode_s.h>
-/* >> strsigcode_s(3)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,sigcodedesc_np,(__signo_t __signo, int __code),(__signo,__code))
+#else /* __CRT_HAVE_sigcodedesc_np */
+#include <libc/local/signal/sigcodedesc_np.h>
+/* >> sigcodedesc_np(3)
  * Return a textual description of `code', as read from `siginfo_t::si_code',
  * and used in conjunction with a given signal `signo'. This function is used
  * for the implementation of `psiginfo(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strsigcode_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL strsigcode_s)(__signo_t __signo, int __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strsigcode_s))(__signo, __code); })
-#endif /* !__CRT_HAVE_strsigcode_s */
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigcodedesc_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL sigcodedesc_np)(__signo_t __signo, int __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigcodedesc_np))(__signo, __code); })
+#endif /* !__CRT_HAVE_sigcodedesc_np */
 #endif /* __USE_KOS */
 #endif /* __USE_XOPEN2K8 */
 

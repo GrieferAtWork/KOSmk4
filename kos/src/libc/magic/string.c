@@ -2762,7 +2762,8 @@ print("	};");
 @@Return the name of a given signal, _without_ the leading `SIG*' prefix.
 @@When the given  `signo' isn't recognized,  `NULL' is returned  instead.
 [[const, wunused, nothrow, decl_include("<bits/types.h>")]]
-[[export_alias("signalname", "strsigno")]]
+[[kernel, alias("signalname", "strsigno")]]
+[[if(!defined(__KERNEL__)), export_as("signalname", "strsigno")]]
 [[crt_dos_variant({ impl:{ return libc_sigabbrev_np(libd_signo_dos2kos(signo)); }})]]
 [[impl_include("<asm/os/signal.h>")]]
 [[section(".text.crt{|.dos}.errno")]]
@@ -3115,7 +3116,7 @@ print("	};");
 @@Return a description for the given signal.
 @@If the given `signo' isn't recognized, return `NULL' instead.
 [[const, wunused, nothrow]]
-[[decl_include("<bits/types.h>")]]
+[[kernel, decl_include("<bits/types.h>")]]
 [[impl_include("<asm/os/signal.h>"), impl_prefix(
 @@pp_ifndef __BUILDING_LIBC@@
 @@pp_if defined(__CRT_HAVE__sys_siglist)@@

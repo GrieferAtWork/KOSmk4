@@ -1772,7 +1772,7 @@ libc_siginfolist_init(char const **list, unsigned int count, signo_t signo) {
 	if (!list[count - 1]) {
 		unsigned int i;
 		for (i = 0; i < count; ++i) {
-			char const *str = strsigcode_s(signo, i + 1);
+			char const *str = sigcodedesc_np(signo, i + 1);
 			COMPILER_WRITE_BARRIER();
 			list[i] = str;
 			COMPILER_WRITE_BARRIER();

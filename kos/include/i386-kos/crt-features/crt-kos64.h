@@ -4444,6 +4444,7 @@
 #define __CRT_HAVE_sigaltstack
 #define __CRT_HAVE_sigandset
 #define __CRT_HAVE_sigblock
+#define __CRT_HAVE_sigcodedesc_np
 #define __CRT_HAVE_sigdelset
 #define __CRT_HAVE_sigdescr_np
 #define __CRT_HAVE_sigemptyset
@@ -4637,7 +4638,6 @@
 #define __CRT_HAVE_strrspn
 #define __CRT_HAVE_strsep
 #define __CRT_HAVE_strset
-#define __CRT_HAVE_strsigcode_s
 #define __CRT_HAVE_strsignal
 #define __CRT_HAVE_strsigno
 #define __CRT_HAVE_strspn
@@ -9917,6 +9917,7 @@
 #define __CRT_HAVE_KOS$sigaltstack
 #define __CRT_HAVE_KOS$sigandset
 #define __CRT_HAVE_KOS$sigblock
+#define __CRT_HAVE_KOS$sigcodedesc_np
 #define __CRT_HAVE_KOS$sigdelset
 #define __CRT_HAVE_KOS$sigdescr_np
 #define __CRT_HAVE_KOS$sigemptyset
@@ -10096,7 +10097,6 @@
 #define __CRT_HAVE_KOS$strrspn
 #define __CRT_HAVE_KOS$strsep
 #define __CRT_HAVE_KOS$strset
-#define __CRT_HAVE_KOS$strsigcode_s
 #define __CRT_HAVE_KOS$strsignal
 #define __CRT_HAVE_KOS$strsigno
 #define __CRT_HAVE_KOS$strspn
@@ -14479,6 +14479,7 @@
 #define __CRT_HAVE_DOS$sigaltstack
 #define __CRT_HAVE_DOS$sigandset
 #define __CRT_HAVE_DOS$sigblock
+#define __CRT_HAVE_DOS$sigcodedesc_np
 #define __CRT_HAVE_DOS$sigdelset
 #define __CRT_HAVE_DOS$sigdescr_np
 #define __CRT_HAVE_DOS$sigemptyset
@@ -14658,7 +14659,6 @@
 #define __CRT_HAVE_DOS$strrspn
 #define __CRT_HAVE_DOS$strsep
 #define __CRT_HAVE_DOS$strset
-#define __CRT_HAVE_DOS$strsigcode_s
 #define __CRT_HAVE_DOS$strsignal
 #define __CRT_HAVE_DOS$strsigno
 #define __CRT_HAVE_DOS$strspn

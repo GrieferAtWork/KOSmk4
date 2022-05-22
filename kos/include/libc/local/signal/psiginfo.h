@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a19bbba */
+/* HASH CRC-32:0xa359490d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,20 +96,20 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_sigabbrev_np __LIBC_LOCAL_NAME(sigabbrev_np)
 #endif /* !... */
 #endif /* !__local___localdep_sigabbrev_np_defined */
-#ifndef __local___localdep_strsigcode_s_defined
-#define __local___localdep_strsigcode_s_defined
-#ifdef __CRT_HAVE_strsigcode_s
+#ifndef __local___localdep_sigcodedesc_np_defined
+#define __local___localdep_sigcodedesc_np_defined
+#ifdef __CRT_HAVE_sigcodedesc_np
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep_strsigcode_s,(__signo_t __signo, int __code),strsigcode_s,(__signo,__code))
-#else /* __CRT_HAVE_strsigcode_s */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep_sigcodedesc_np,(__signo_t __signo, int __code),sigcodedesc_np,(__signo,__code))
+#else /* __CRT_HAVE_sigcodedesc_np */
 __NAMESPACE_LOCAL_END
-#include <libc/local/signal/strsigcode_s.h>
+#include <libc/local/signal/sigcodedesc_np.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strsigcode_s __LIBC_LOCAL_NAME(strsigcode_s)
-#endif /* !__CRT_HAVE_strsigcode_s */
-#endif /* !__local___localdep_strsigcode_s_defined */
+#define __localdep_sigcodedesc_np __LIBC_LOCAL_NAME(sigcodedesc_np)
+#endif /* !__CRT_HAVE_sigcodedesc_np */
+#endif /* !__local___localdep_sigcodedesc_np_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/signal.h>
 #include <bits/crt/inttypes.h>
@@ -137,7 +137,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psiginfo))(struct __siginfo_struct co
 	} else {
 		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "Unknown signal %d (", __pinfo->si_signo);
 	}
-	__text = (__NAMESPACE_LOCAL_SYM __localdep_strsigcode_s)(__pinfo->si_signo, __pinfo->si_code);
+	__text = (__NAMESPACE_LOCAL_SYM __localdep_sigcodedesc_np)(__pinfo->si_signo, __pinfo->si_code);
 	if (__text) {
 		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%s ", __text);
 	} else {

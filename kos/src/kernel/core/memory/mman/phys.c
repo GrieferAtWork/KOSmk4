@@ -78,13 +78,13 @@ typedef union {
 
 /************************************************************************/
 /* Helper functions for accessing very small segments of physical memory.
- * WARNING: DON'T SPAM THESE FUNCTIONS! If you want to access consecutive physical memory,
- *          either    make    use   of    `copy(from|to)phys()'    or   `THIS_TRAMPOLINE'.
- *          These functions will try to make use arch-specific physical identity mappings,
- *          like can  be  found  on  `x86_64'  for the  first  1Gib  of  physical  memory.
- *          However  any  memory outside  that region  (or any  memory at  all if  no such
- *          region is  defined by  the arch  (as is  the case  for `i386'),  will need  to
- *          be accessed through use of `THIS_TRAMPOLINE'!) */
+ * WARNING: DON'T SPAM THESE FUNCTIONS! If you want to access consecutive physical
+ *          memory, either make use of `copy(from|to)phys()' or `THIS_TRAMPOLINE'.
+ * - These functions will try to make use arch-specific physical identity mappings,
+ *   like can  be  found  on `x86_64'  for  the  first 64TiB  of  physical  memory.
+ * - However any memory outside that region (or  any memory at all if no  such
+ *   region is defined by the arch -- as is the case for `i386'), will need to
+ *   be accessed through use of `THIS_TRAMPOLINE'! */
 PUBLIC NOBLOCK WUNUSED u8
 NOTHROW(FCALL peekphysb)(PHYS physaddr_t addr) {
 	PHYS_VARS;

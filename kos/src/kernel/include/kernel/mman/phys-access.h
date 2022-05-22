@@ -32,7 +32,7 @@
 #ifdef __CC__
 DECL_BEGIN
 
-/* Low-level physical memory acccess helpers. */
+/* Low-level physical memory access helpers. */
 
 #ifdef NO_PHYS_IDENTITY
 #define IF_HAVE_PHYS_IDENTITY(...)               /* nothing */
@@ -54,26 +54,38 @@ DECL_BEGIN
 	}	__WHILE0
 #endif /* !NO_PHYS_IDENTITY */
 
+/* Declare variables needed by macros below. */
 #define PHYS_VARS                           \
 	PAGEDIR_PAGEALIGNED byte_t *trampoline; \
 	pagedir_pushval_t _pp_oldval
 
-
+/* Save the calling thread's trampoline mapping and re-map it to `addr_of_page'
+ * @return: * : The base address of the calling thread's trampoline (== vaddr of `addr_of_page') */
 #define phys_pushpage(addr_of_page)                             \
 	(trampoline = THIS_TRAMPOLINE, COMPILER_BARRIER(),          \
 	 _pp_oldval = pagedir_push_mapone(trampoline, addr_of_page, \
 	                                  PAGEDIR_PROT_READ |       \
 	                                  PAGEDIR_PROT_WRITE),      \
 	 pagedir_syncone(trampoline), COMPILER_BARRIER(), trampoline)
+
+/* Re-map the calling thread's trampoline to `addr_of_page'
+ * @return: * : The base address of the calling thread's trampoline (== vaddr of `addr_of_page') */
 #define phys_loadpage(addr_of_page)                          \
 	(COMPILER_BARRIER(),                                     \
 	 pagedir_mapone(trampoline, addr_of_page,                \
 	                PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE), \
 	 pagedir_syncone(trampoline),                            \
 	 COMPILER_BARRIER(), trampoline)
+
+/* Same as `phys_pushpage' / `phys_loadpage', but map the page containing a given address
+ * @return: * : The  virtual address at which `addr' can be found. Not at the size of this
+ *              mapping spans until the next page-boundary (though at least 1 byte will be
+ *              available) */
 #define phys_pushaddr(addr) (phys_pushpage((addr) & ~PAGEMASK) + (uintptr_t)((addr) & PAGEMASK))
 #define phys_loadaddr(addr) (phys_loadpage((addr) & ~PAGEMASK) + (uintptr_t)((addr) & PAGEMASK))
-#define phys_pop()          pagedir_pop_mapone(trampoline, _pp_oldval)
+
+/* Re-map the calling thread's trampoline to `addr_of_page' */
+#define phys_pop() pagedir_pop_mapone(trampoline, _pp_oldval)
 
 DECL_END
 #endif /* __CC__ */

@@ -2224,7 +2224,7 @@ void psiginfo([[in]] siginfo_t const *pinfo,
 	} else {
 		fprintf(stderr, "Unknown signal %d (", pinfo->@si_signo@);
 	}
-	text = strsigcode_s(pinfo->@si_signo@, pinfo->@si_code@);
+	text = sigcodedesc_np(pinfo->@si_signo@, pinfo->@si_code@);
 	if (text) {
 		fprintf(stderr, "%s ", text);
 	} else {
@@ -2274,13 +2274,13 @@ void psiginfo([[in]] siginfo_t const *pinfo,
 }
 
 %#ifdef __USE_KOS
-@@>> strsigcode_s(3)
+@@>> sigcodedesc_np(3)
 @@Return a textual description of `code', as read from `siginfo_t::si_code',
 @@and used in conjunction with a given signal `signo'. This function is used
 @@for the implementation of `psiginfo(3)'
-[[const, wunused, decl_include("<bits/types.h>")]]
+[[kernel, const, wunused, decl_include("<bits/types.h>")]]
 [[impl_include("<asm/os/signal.h>", "<asm/os/siginfo.h>")]]
-char const *strsigcode_s($signo_t signo, int code) {
+char const *sigcodedesc_np($signo_t signo, int code) {
 	char const *result = NULL;
 /*[[[deemon
 import util;

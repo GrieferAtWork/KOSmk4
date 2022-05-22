@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea47f613 */
+/* HASH CRC-32:0x98a4ea76 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2128,6 +2128,7 @@ print("	};");
  * When the given  `signo' isn't recognized,  `NULL' is returned  instead. */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBDCALL libd_sigabbrev_np)(signo_t signo) { return libc_sigabbrev_np(libd_signo_dos2kos(signo)); }
+#endif /* !__KERNEL__ */
 #include <asm/os/signal.h>
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, _without_ the leading `SIG*' prefix.
@@ -2242,30 +2243,30 @@ for (local i: [:sigmax + 1].segments(16))
 print("	};");
 ]]]*/
 #define HAVE_KOS_SIGNO_VALUES
-#if __SIGHUP != 1 || __SIGINT != 2 || __SIGQUIT != 3 || __SIGILL != 4
+#if !defined(__SIGHUP) || __SIGHUP != 1 || !defined(__SIGINT) || __SIGINT != 2 || !defined(__SIGQUIT) || __SIGQUIT != 3 || !defined(__SIGILL) || __SIGILL != 4
 #undef HAVE_KOS_SIGNO_VALUES
-#endif /* __SIGHUP != 1 || __SIGINT != 2 || __SIGQUIT != 3 || __SIGILL != 4 */
-#if __SIGTRAP != 5 || __SIGABRT != 6 || __SIGBUS != 7 || __SIGFPE != 8
+#endif /* !__SIGHUP || __SIGHUP != 1 || !__SIGINT || __SIGINT != 2 || !__SIGQUIT || __SIGQUIT != 3 || !__SIGILL || __SIGILL != 4 */
+#if !defined(__SIGTRAP) || __SIGTRAP != 5 || !defined(__SIGABRT) || __SIGABRT != 6 || !defined(__SIGBUS) || __SIGBUS != 7 || !defined(__SIGFPE) || __SIGFPE != 8
 #undef HAVE_KOS_SIGNO_VALUES
-#endif /* __SIGTRAP != 5 || __SIGABRT != 6 || __SIGBUS != 7 || __SIGFPE != 8 */
-#if __SIGKILL != 9 || __SIGUSR1 != 10 || __SIGSEGV != 11 || __SIGUSR2 != 12
+#endif /* !__SIGTRAP || __SIGTRAP != 5 || !__SIGABRT || __SIGABRT != 6 || !__SIGBUS || __SIGBUS != 7 || !__SIGFPE || __SIGFPE != 8 */
+#if !defined(__SIGKILL) || __SIGKILL != 9 || !defined(__SIGUSR1) || __SIGUSR1 != 10 || !defined(__SIGSEGV) || __SIGSEGV != 11 || !defined(__SIGUSR2) || __SIGUSR2 != 12
 #undef HAVE_KOS_SIGNO_VALUES
-#endif /* __SIGKILL != 9 || __SIGUSR1 != 10 || __SIGSEGV != 11 || __SIGUSR2 != 12 */
-#if __SIGPIPE != 13 || __SIGALRM != 14 || __SIGTERM != 15 || __SIGSTKFLT != 16
+#endif /* !__SIGKILL || __SIGKILL != 9 || !__SIGUSR1 || __SIGUSR1 != 10 || !__SIGSEGV || __SIGSEGV != 11 || !__SIGUSR2 || __SIGUSR2 != 12 */
+#if !defined(__SIGPIPE) || __SIGPIPE != 13 || !defined(__SIGALRM) || __SIGALRM != 14 || !defined(__SIGTERM) || __SIGTERM != 15 || !defined(__SIGSTKFLT) || __SIGSTKFLT != 16
 #undef HAVE_KOS_SIGNO_VALUES
-#endif /* __SIGPIPE != 13 || __SIGALRM != 14 || __SIGTERM != 15 || __SIGSTKFLT != 16 */
-#if __SIGCHLD != 17 || __SIGCONT != 18 || __SIGSTOP != 19 || __SIGTSTP != 20
+#endif /* !__SIGPIPE || __SIGPIPE != 13 || !__SIGALRM || __SIGALRM != 14 || !__SIGTERM || __SIGTERM != 15 || !__SIGSTKFLT || __SIGSTKFLT != 16 */
+#if !defined(__SIGCHLD) || __SIGCHLD != 17 || !defined(__SIGCONT) || __SIGCONT != 18 || !defined(__SIGSTOP) || __SIGSTOP != 19 || !defined(__SIGTSTP) || __SIGTSTP != 20
 #undef HAVE_KOS_SIGNO_VALUES
-#endif /* __SIGCHLD != 17 || __SIGCONT != 18 || __SIGSTOP != 19 || __SIGTSTP != 20 */
-#if __SIGTTIN != 21 || __SIGTTOU != 22 || __SIGURG != 23 || __SIGXCPU != 24
+#endif /* !__SIGCHLD || __SIGCHLD != 17 || !__SIGCONT || __SIGCONT != 18 || !__SIGSTOP || __SIGSTOP != 19 || !__SIGTSTP || __SIGTSTP != 20 */
+#if !defined(__SIGTTIN) || __SIGTTIN != 21 || !defined(__SIGTTOU) || __SIGTTOU != 22 || !defined(__SIGURG) || __SIGURG != 23 || !defined(__SIGXCPU) || __SIGXCPU != 24
 #undef HAVE_KOS_SIGNO_VALUES
-#endif /* __SIGTTIN != 21 || __SIGTTOU != 22 || __SIGURG != 23 || __SIGXCPU != 24 */
-#if __SIGXFSZ != 25 || __SIGVTALRM != 26 || __SIGPROF != 27 || __SIGWINCH != 28
+#endif /* !__SIGTTIN || __SIGTTIN != 21 || !__SIGTTOU || __SIGTTOU != 22 || !__SIGURG || __SIGURG != 23 || !__SIGXCPU || __SIGXCPU != 24 */
+#if !defined(__SIGXFSZ) || __SIGXFSZ != 25 || !defined(__SIGVTALRM) || __SIGVTALRM != 26 || !defined(__SIGPROF) || __SIGPROF != 27 || !defined(__SIGWINCH) || __SIGWINCH != 28
 #undef HAVE_KOS_SIGNO_VALUES
-#endif /* __SIGXFSZ != 25 || __SIGVTALRM != 26 || __SIGPROF != 27 || __SIGWINCH != 28 */
-#if __SIGIO != 29 || __SIGPWR != 30 || __SIGSYS != 31
+#endif /* !__SIGXFSZ || __SIGXFSZ != 25 || !__SIGVTALRM || __SIGVTALRM != 26 || !__SIGPROF || __SIGPROF != 27 || !__SIGWINCH || __SIGWINCH != 28 */
+#if !defined(__SIGIO) || __SIGIO != 29 || !defined(__SIGPWR) || __SIGPWR != 30 || !defined(__SIGSYS) || __SIGSYS != 31
 #undef HAVE_KOS_SIGNO_VALUES
-#endif /* __SIGIO != 29 || __SIGPWR != 30 || __SIGSYS != 31 */
+#endif /* !__SIGIO || __SIGIO != 29 || !__SIGPWR || __SIGPWR != 30 || !__SIGSYS || __SIGSYS != 31 */
 #if __SIGRTMIN != 32 || __SIGRTMAX != 64
 #undef HAVE_KOS_SIGNO_VALUES
 #endif /* __SIGRTMIN != 32 || __SIGRTMAX != 64 */
@@ -2355,120 +2356,120 @@ print("	};");
 	char const *result;
 	switch (signo) {
 
-
+#ifdef SIGABRT_COMPAT
 	case SIGABRT_COMPAT: result = "ABRT_COMPAT\0Aborted"; break;
-
+#endif /* SIGABRT_COMPAT */
 #ifdef SIGBREAK
 	case SIGBREAK:       result = "BREAK\0Stopped (tty input)"; break;
 #endif /* SIGBREAK */
-
+#ifdef SIGHUP
 	case SIGHUP:         result = "HUP\0Hangup"; break;
-
-
+#endif /* SIGHUP */
+#ifdef SIGINT
 	case SIGINT:         result = "INT\0Interrupt"; break;
-
-
+#endif /* SIGINT */
+#ifdef SIGQUIT
 	case SIGQUIT:        result = "QUIT\0Quit"; break;
-
-
+#endif /* SIGQUIT */
+#ifdef SIGILL
 	case SIGILL:         result = "ILL\0Illegal instruction"; break;
-
-
+#endif /* SIGILL */
+#ifdef SIGTRAP
 	case SIGTRAP:        result = "TRAP\0Trace/breakpoint trap"; break;
-
-
+#endif /* SIGTRAP */
+#ifdef SIGABRT
 	case SIGABRT:        result = "ABRT\0Aborted"; break;
-
-
+#endif /* SIGABRT */
+#ifdef SIGBUS
 	case SIGBUS:         result = "BUS\0Bus error"; break;
-
-
+#endif /* SIGBUS */
+#ifdef SIGFPE
 	case SIGFPE:         result = "FPE\0Floating point exception"; break;
-
-
+#endif /* SIGFPE */
+#ifdef SIGKILL
 	case SIGKILL:        result = "KILL\0Killed"; break;
-
-
+#endif /* SIGKILL */
+#ifdef SIGUSR1
 	case SIGUSR1:        result = "USR1\0User defined signal 1"; break;
-
-
+#endif /* SIGUSR1 */
+#ifdef SIGSEGV
 	case SIGSEGV:        result = "SEGV\0Segmentation violation"; break;
-
-
+#endif /* SIGSEGV */
+#ifdef SIGUSR2
 	case SIGUSR2:        result = "USR2\0User defined signal 2"; break;
-
-
+#endif /* SIGUSR2 */
+#ifdef SIGPIPE
 	case SIGPIPE:        result = "PIPE\0Broken pipe"; break;
-
-
+#endif /* SIGPIPE */
+#ifdef SIGALRM
 	case SIGALRM:        result = "ALRM\0Alarm clock"; break;
-
-
+#endif /* SIGALRM */
+#ifdef SIGTERM
 	case SIGTERM:        result = "TERM\0Terminated"; break;
-
-
+#endif /* SIGTERM */
+#ifdef SIGSTKFLT
 	case SIGSTKFLT:      result = "STKFLT\0Stack fault"; break;
-
-
+#endif /* SIGSTKFLT */
+#ifdef SIGCHLD
 	case SIGCHLD:        result = "CHLD\0Child exited"; break;
-
-
+#endif /* SIGCHLD */
+#ifdef SIGCONT
 	case SIGCONT:        result = "CONT\0Continued"; break;
-
-
+#endif /* SIGCONT */
+#ifdef SIGSTOP
 	case SIGSTOP:        result = "STOP\0Stopped (signal)"; break;
-
-
+#endif /* SIGSTOP */
+#ifdef SIGTSTP
 	case SIGTSTP:        result = "TSTP\0Stopped"; break;
-
-
+#endif /* SIGTSTP */
+#ifdef SIGTTOU
 	case SIGTTOU:        result = "TTOU\0Stopped (tty output)"; break;
-
-
+#endif /* SIGTTOU */
+#ifdef SIGURG
 	case SIGURG:         result = "URG\0Urgent I/O condition"; break;
-
-
+#endif /* SIGURG */
+#ifdef SIGXCPU
 	case SIGXCPU:        result = "XCPU\0CPU time limit exceeded"; break;
-
-
+#endif /* SIGXCPU */
+#ifdef SIGXFSZ
 	case SIGXFSZ:        result = "XFSZ\0File size limit exceeded"; break;
-
-
+#endif /* SIGXFSZ */
+#ifdef SIGVTALRM
 	case SIGVTALRM:      result = "VTALRM\0Virtual timer expired"; break;
-
-
+#endif /* SIGVTALRM */
+#ifdef SIGPROF
 	case SIGPROF:        result = "PROF\0Profiling timer expired"; break;
-
-
+#endif /* SIGPROF */
+#ifdef SIGWINCH
 	case SIGWINCH:       result = "WINCH\0Window changed"; break;
-
-
+#endif /* SIGWINCH */
+#ifdef SIGIO
 	case SIGIO:          result = "IO\0I/O possible"; break;
-
-
+#endif /* SIGIO */
+#ifdef SIGSYS
 	case SIGSYS:         result = "SYS\0Bad system call"; break;
-
+#endif /* SIGSYS */
 #ifdef SIGEMT
 	case SIGEMT:         result = "EMT\0EMT instruction"; break;
 #endif /* SIGEMT */
 #ifdef SIGLOST
 	case SIGLOST:        result = "LOST\0Resource lost"; break;
 #endif /* SIGLOST */
-#if !defined(SIGBREAK) || SIGBREAK != SIGTTIN
+#if defined(SIGTTIN) && (!defined(SIGBREAK) || SIGBREAK != SIGTTIN)
 	case SIGTTIN:        result = "TTIN\0Stopped (tty input)"; break;
-#endif /* !SIGBREAK || SIGBREAK != SIGTTIN */
-#if SIGCLD != SIGCHLD
+#endif /* SIGTTIN && (!SIGBREAK || SIGBREAK != SIGTTIN) */
+#if defined(SIGCLD) && (!defined(SIGCHLD) || SIGCLD != SIGCHLD)
 	case SIGCLD:         result = "CLD\0Child exited"; break;
-#endif /* SIGCLD != SIGCHLD */
-#if SIGIOT != SIGABRT
+#endif /* SIGCLD && (!SIGCHLD || SIGCLD != SIGCHLD) */
+#if defined(SIGIOT) && (!defined(SIGABRT) || SIGIOT != SIGABRT)
 	case SIGIOT:         result = "IOT\0IOT trap"; break;
-#endif /* SIGIOT != SIGABRT */
-#if SIGPOLL != SIGIO
+#endif /* SIGIOT && (!SIGABRT || SIGIOT != SIGABRT) */
+#if defined(SIGPOLL) && (!defined(SIGIO) || SIGPOLL != SIGIO)
 	case SIGPOLL:        result = "POLL\0Pollable event occurred"; break;
-#endif /* SIGPOLL != SIGIO */
-#if !defined(SIGLOST) || SIGPWR != SIGLOST
+#endif /* SIGPOLL && (!SIGIO || SIGPOLL != SIGIO) */
+#if defined(SIGPWR) && (!defined(SIGLOST) || SIGPWR != SIGLOST)
 	case SIGPWR:         result = "PWR\0Power failure"; break;
-#endif /* !SIGLOST || SIGPWR != SIGLOST */
+#endif /* SIGPWR && (!SIGLOST || SIGPWR != SIGLOST) */
 
 	default:
 		result = NULL;
@@ -2477,12 +2478,13 @@ print("	};");
 	return result;
 #endif /* !HAVE_KOS_SIGNO_VALUES */
 }
+#ifndef __KERNEL__
 /* >> sigdescr_np(3)
  * Return a description for the given signal.
  * If the given `signo' isn't recognized, return `NULL' instead. */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBDCALL libd_sigdescr_np)(signo_t signo) { return libc_sigdescr_np(libd_signo_dos2kos(signo)); }
-#include <asm/os/signal.h>
+#endif /* !__KERNEL__ */
 #ifndef __BUILDING_LIBC
 #ifdef __CRT_HAVE__sys_siglist
 #ifndef _sys_siglist
@@ -2645,6 +2647,7 @@ NOTHROW(LIBCCALL libc_sigdescr_np)(signo_t signo) {
 
 
 }
+#ifndef __KERNEL__
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL NONNULL((2)) char *
 NOTHROW_NCX(LIBDCALL libd_strerror_r)(errno_t errnum,
                                       char *buf,
@@ -6526,7 +6529,6 @@ NOTHROW_NCX(LIBCCALL libc_timingsafe_memcmp)(void const *s1,
 	}
 	return result;
 }
-#include <asm/os/signal.h>
 /* >> strtosigno(3)
  * Return the signal number for a given name.
  * e.g.: `strtosigno("SIGINT") == SIGINT'
@@ -6845,9 +6847,13 @@ DEFINE_PUBLIC_ALIAS(DOS$strsigno, libd_sigabbrev_np);
 DEFINE_PUBLIC_ALIAS(DOS$sigabbrev_np, libd_sigabbrev_np);
 DEFINE_PUBLIC_ALIAS(signalname, libc_sigabbrev_np);
 DEFINE_PUBLIC_ALIAS(strsigno, libc_sigabbrev_np);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(sigabbrev_np, libc_sigabbrev_np);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$sigdescr_np, libd_sigdescr_np);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(sigdescr_np, libc_sigdescr_np);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$__strerror_r, libd_strerror_r);
 DEFINE_PUBLIC_ALIAS(DOS$strerror_r, libd_strerror_r);
 DEFINE_PUBLIC_ALIAS(__strerror_r, libc_strerror_r);

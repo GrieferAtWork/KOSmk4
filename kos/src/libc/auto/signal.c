@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87a2ba80 */
+/* HASH CRC-32:0x9407accd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -329,7 +329,7 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 	} else {
 		libc_fprintf(stderr, "Unknown signal %d (", pinfo->si_signo);
 	}
-	text = libc_strsigcode_s(pinfo->si_signo, pinfo->si_code);
+	text = libc_sigcodedesc_np(pinfo->si_signo, pinfo->si_code);
 	if (text) {
 		libc_fprintf(stderr, "%s ", text);
 	} else {
@@ -377,14 +377,15 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 		        (uid_t)pinfo->si_uid);
 	}
 }
+#endif /* !__KERNEL__ */
 #include <asm/os/siginfo.h>
-/* >> strsigcode_s(3)
+/* >> sigcodedesc_np(3)
  * Return a textual description of `code', as read from `siginfo_t::si_code',
  * and used in conjunction with a given signal `signo'. This function is used
  * for the implementation of `psiginfo(3)' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(LIBCCALL libc_strsigcode_s)(signo_t signo,
-                                        int code) {
+NOTHROW_NCX(LIBCCALL libc_sigcodedesc_np)(signo_t signo,
+                                          int code) {
 	char const *result = NULL;
 /*[[[deemon
 import util;
@@ -825,6 +826,7 @@ print("@@pp_endif@@");
 /*[[[end]]]*/
 	return result;
 }
+#ifndef __KERNEL__
 #include <bits/os/sigstack.h>
 /* >> sigstack(2)
  * Deprecated, and slightly different version of `sigaltstack(2)'
@@ -1080,7 +1082,9 @@ DEFINE_PUBLIC_ALIAS(signandset, libc_signandset);
 DEFINE_PUBLIC_ALIAS(killpg, libc_killpg);
 DEFINE_PUBLIC_ALIAS(psignal, libc_psignal);
 DEFINE_PUBLIC_ALIAS(psiginfo, libc_psiginfo);
-DEFINE_PUBLIC_ALIAS(strsigcode_s, libc_strsigcode_s);
+#endif /* !__KERNEL__ */
+DEFINE_PUBLIC_ALIAS(sigcodedesc_np, libc_sigcodedesc_np);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(sigstack, libc_sigstack);
 DEFINE_PUBLIC_ALIAS(sighold, libc_sighold);
 DEFINE_PUBLIC_ALIAS(sigrelse, libc_sigrelse);

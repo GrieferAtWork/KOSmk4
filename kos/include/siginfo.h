@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74bf33ef */
+/* HASH CRC-32:0xcecc0472 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,11 +57,11 @@ struct siginfolist {
 
 /* For compatibility with OpenSolaris
  *
- * Note  that on KOS,  these same strings  can (and should) instead
- * be accessed through `strsigcode_s(3)', as declared in <signal.h>
+ * Note that on KOS, these same strings can (and should) instead be
+ * accessed  through `sigcodedesc_np(3)', as declared in <signal.h>
  *
  * Portability notes:
- * >> _sys_siginfolist[signo-1].vsiginfo[code-1] == strsigcode_s(signo, code);
+ * >> _sys_siginfolist[signo-1].vsiginfo[code-1] == sigcodedesc_np(signo, code);
  * >> _sys_siginfolist[SIGILL-1].vsiginfo        == _sys_illlist;
  * >> _sys_siginfolist[SIGFPE-1].vsiginfo        == _sys_fpelist;
  * >> _sys_siginfolist[SIGSEGV-1].vsiginfo       == _sys_segvlist;

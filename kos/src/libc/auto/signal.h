@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe79087ab */
+/* HASH CRC-32:0x6eea71fc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -396,19 +396,17 @@ INTDEF ATTR_IN(1) ATTR_IN_OPT(2) void NOTHROW_NCX(LIBDCALL libd_psiginfo)(siginf
 INTDEF ATTR_IN(1) ATTR_IN_OPT(2) void NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo, char const *s);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> strsigcode_s(3)
+/* >> sigcodedesc_np(3)
  * Return a textual description of `code', as read from `siginfo_t::si_code',
  * and used in conjunction with a given signal `signo'. This function is used
  * for the implementation of `psiginfo(3)' */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_strsigcode_s)(signo_t signo, int code);
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_sigcodedesc_np)(signo_t signo, int code);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-/* >> strsigcode_s(3)
+/* >> sigcodedesc_np(3)
  * Return a textual description of `code', as read from `siginfo_t::si_code',
  * and used in conjunction with a given signal `signo'. This function is used
  * for the implementation of `psiginfo(3)' */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_strsigcode_s)(signo_t signo, int code);
-#endif /* !__KERNEL__ */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_sigcodedesc_np)(signo_t signo, int code);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> siginterrupt(3)
  * Set the `SA_RESTART' of the already-established signal handler for `signo',

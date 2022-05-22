@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7393c435 */
+/* HASH CRC-32:0x5189ff9a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_strsigcode_s_defined
-#define __local_strsigcode_s_defined
+#ifndef __local_sigcodedesc_np_defined
+#define __local_sigcodedesc_np_defined
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -38,8 +38,8 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/signal.h>
 #include <asm/os/siginfo.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strsigcode_s) __ATTR_CONST __ATTR_WUNUSED char const *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsigcode_s))(__signo_t __signo, int __code) {
+__LOCAL_LIBC(sigcodedesc_np) __ATTR_CONST __ATTR_WUNUSED char const *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigcodedesc_np))(__signo_t __signo, int __code) {
 	char const *__result = __NULLPTR;
 /*[[[deemon
 import util;
@@ -481,8 +481,8 @@ print("@@pp_endif@@");
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_strsigcode_s_defined
-#define __local___localdep_strsigcode_s_defined
-#define __localdep_strsigcode_s __LIBC_LOCAL_NAME(strsigcode_s)
-#endif /* !__local___localdep_strsigcode_s_defined */
-#endif /* !__local_strsigcode_s_defined */
+#ifndef __local___localdep_sigcodedesc_np_defined
+#define __local___localdep_sigcodedesc_np_defined
+#define __localdep_sigcodedesc_np __LIBC_LOCAL_NAME(sigcodedesc_np)
+#endif /* !__local___localdep_sigcodedesc_np_defined */
+#endif /* !__local_sigcodedesc_np_defined */

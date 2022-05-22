@@ -818,6 +818,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Check if we support `__STDC_WANT_IEC_60559_EXT__' in <float.h> */
 
+	/* TODO: `playground rtm' is broken */
+
 	/* TODO: Add support for dwarf-5 in `libdebuginfo' (currently, we need to
 	 *       compiled with `-gdwarf-4', and  that should go away  eventually) */
 

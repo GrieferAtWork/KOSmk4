@@ -22,8 +22,7 @@
 
 #include <hybrid/host.h> /* opt:__ARCH_PAGESIZE */
 
-
-/* Different architectures may override this function to define the preprocessor constants:
+/* Different architectures may override this header to define the preprocessor constants:
  *  - __ARCH_PAGEMASK
  *  - __ARCH_PAGESIZE
  *  - __ARCH_PAGESHIFT
@@ -46,13 +45,13 @@
 #elif defined(__ARCH_PAGEMASK)
 #define __ARCH_PAGESIZE (__ARCH_PAGEMASK + 1)
 #elif defined(__KERNEL__)
-#error "Missing macros `__ARCH_PAGESHIFT' and `__ARCH_PAGESIZE' in kernel-mode"
-#endif
+#error "Missing macros `__ARCH_PAGESHIFT,__ARCH_PAGEMASK,__ARCH_PAGESIZE' in kernel-mode"
+#endif /* ... */
 #endif /* __ARCH_PAGESIZE */
 
 #ifndef __ARCH_PAGEMASK
 #ifdef __ARCH_PAGESIZE
-#define __ARCH_PAGEMASK (__ARCH_PAGESIZE + 1)
+#define __ARCH_PAGEMASK (__ARCH_PAGESIZE - 1)
 #endif /* __ARCH_PAGESIZE */
 #endif /* !__ARCH_PAGEMASK */
 

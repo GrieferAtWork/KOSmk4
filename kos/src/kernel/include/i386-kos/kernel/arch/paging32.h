@@ -291,8 +291,8 @@ typedef pae_pagedir_pushval_t pagedir_pushval_t;
 
 /* Synchronize the entirety of the current page directory.
  * Note that this function may only sync all user-space mappings. If the
- * intent is  to  also  sync all  of  kernel-space,  `pagedir_syncall()'
- * must be used instead. */
+ * intent is to also sync all of kernel-space, `pagedir_syncall()'  must
+ * be used instead. */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW(FCALL pagedir_syncall_user)(void) {
 	__register u32 temp;

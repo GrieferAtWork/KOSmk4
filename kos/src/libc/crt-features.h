@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b18c142 */
+/* HASH CRC-32:0x1cbf30c8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3110,6 +3110,7 @@
 #define __CRT_HAVE_DOS$sigaltstack
 #define __CRT_HAVE_DOS$sigandset
 #define __CRT_HAVE_DOS$sigblock
+#define __CRT_HAVE_DOS$sigcodedesc_np
 #define __CRT_HAVE_DOS$sigdelset
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -3311,7 +3312,6 @@
 #define __CRT_HAVE_DOS$strrspn
 #define __CRT_HAVE_DOS$strsep
 #define __CRT_HAVE_DOS$strset
-#define __CRT_HAVE_DOS$strsigcode_s
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$strsignal
@@ -7405,7 +7405,9 @@
 #define __CRT_HAVE_shmget
 #define __CRT_HAVE_shutdown
 #define __CRT_HAVE_sig2str
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_sigabbrev_np
+#ifndef __KERNEL__
 #define __CRT_HAVE_sigaction
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_sigaddset
@@ -7416,10 +7418,9 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_sigblock
 #endif /* !__KERNEL__ */
+#define __CRT_HAVE_sigcodedesc_np
 #define __CRT_HAVE_sigdelset
-#ifndef __KERNEL__
 #define __CRT_HAVE_sigdescr_np
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_sigemptyset
 #define __CRT_HAVE_sigfillset
 #ifndef __KERNEL__
@@ -7618,7 +7619,6 @@
 #define __CRT_HAVE_strrspn
 #define __CRT_HAVE_strsep
 #define __CRT_HAVE_strset
-#define __CRT_HAVE_strsigcode_s
 #define __CRT_HAVE_strsignal
 #define __CRT_HAVE_strspn
 #endif /* !__KERNEL__ */

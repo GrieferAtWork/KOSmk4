@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3232b82f */
+/* HASH CRC-32:0xa16db13f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1975,7 +1975,7 @@ DEFINE_PUBLIC_ALIAS(DOS$tgsigqueueinfo, libd_tgsigqueueinfo);
 DEFINE_PUBLIC_ALIAS(DOS$killpg, libd_killpg);
 DEFINE_PUBLIC_ALIAS(DOS$psignal, libd_psignal);
 DEFINE_PUBLIC_ALIAS(DOS$psiginfo, libd_psiginfo);
-DEFINE_PUBLIC_ALIAS(DOS$strsigcode_s, libd_strsigcode_s);
+DEFINE_PUBLIC_ALIAS(DOS$sigcodedesc_np, libd_sigcodedesc_np);
 DEFINE_PUBLIC_ALIAS(DOS$siginterrupt, libd_siginterrupt);
 DEFINE_PUBLIC_ALIAS(DOS$sigstack, libd_sigstack);
 DEFINE_PUBLIC_ALIAS(DOS$sigaltstack, libd_sigaltstack);

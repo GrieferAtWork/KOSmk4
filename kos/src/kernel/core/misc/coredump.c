@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_MISC_COREDUMP_C
 #define GUARD_KERNEL_SRC_MISC_COREDUMP_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -59,6 +60,28 @@
 DECL_BEGIN
 
 #ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE void KCALL
+dbg_print_siginfo(siginfo_t const *__restrict info) {
+	dbg_printf(DBGSTR("signal %" PRIuN(__SIZEOF_SIGNO_T__)
+	                  " (" AC_CYAN("SIG%s") ": " AC_WHITE("%s") ")\n"),
+	           info->si_signo,
+	           sigabbrev_np(info->si_signo),
+	           sigdescr_np(info->si_signo));
+	if (info->si_code != 0) {
+		dbg_printf(DBGSTR("\tcode:  %u (" AC_WHITE("%s") ")\n"),
+		           (unsigned int)info->si_code,
+		           sigcodedesc_np(info->si_signo,
+		                          info->si_code));
+	}
+	if (info->si_errno != 0) {
+		dbg_printf(DBGSTR("\terrno: %" PRIuN(__SIZEOF_ERRNO_T__)
+		                  " (" AC_CYAN("%s") ": " AC_WHITE("%s") ")\n"),
+		           info->si_errno,
+		           strerrorname_np(info->si_errno),
+		           strerrordesc_np(info->si_errno));
+	}
+}
+
 PRIVATE NONNULL((3)) void KCALL
 dbg_coredump(void const *const *traceback_vector,
              size_t traceback_length,
@@ -116,50 +139,31 @@ dbg_coredump(void const *const *traceback_vector,
 			for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
 				if (!reason->ci_except.e_args.e_pointers[i])
 					continue;
-				dbg_printf(DBGSTR("\tpointer[%u] = %p (%" PRIuPTR ")\n"),
+				dbg_printf(DBGSTR("\tpointer[%u] = " AC_WHITE("%#p") " (" AC_WHITE("%" PRIuPTR) ")\n"),
 				           i, reason->ci_except.e_args.e_pointers[i],
 				           reason->ci_except.e_args.e_pointers[i]);
 			}
-			if (except_as_signal(&reason->ci_except, &siginfo)) {
-				dbg_printf(DBGSTR("signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n"),
-				           siginfo.si_signo);
-				if (siginfo.si_code != 0) {
-					dbg_printf(DBGSTR("\tcode:  %u\n"),
-					           (unsigned int)siginfo.si_code);
-				}
-				if (siginfo.si_errno != 0) {
-					dbg_printf(DBGSTR("\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) "\n"),
-					           siginfo.si_errno);
-				}
-			}
+			if (except_as_signal(&reason->ci_except, &siginfo))
+				dbg_print_siginfo(&siginfo);
 			dbg_addr2line_printf(reason->ci_except.e_faultaddr,
 			                     instruction_trysucc(reason->ci_except.e_faultaddr,
 			                                         instrlen_isa_from_kcpustate(orig_ustate)),
 			                     "faultaddr");
 		} else if (COREDUMP_INFO_ISSIGNAL(unwind_error)) {
-			dbg_printf(DBGSTR("signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n"),
-			           reason->ci_signal.si_signo);
-			if (reason->ci_signal.si_code != 0) {
-				dbg_printf(DBGSTR("\tcode:  %u\n"),
-				           (unsigned int)reason->ci_signal.si_code);
-			}
-			if (reason->ci_signal.si_errno != 0) {
-				dbg_printf(DBGSTR("\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) "\n"),
-				           reason->ci_signal.si_errno);
-			}
+			dbg_print_siginfo(&reason->ci_signal);
 		} else if (COREDUMP_INFO_ISDLERROR(unwind_error)) {
-			dbg_printf(DBGSTR("dlerror: %q\n"), reason->ci_dlerror);
+			dbg_printf(DBGSTR("dlerror: " AC_YELLOW("%q") "\n"), reason->ci_dlerror);
 		} else if (COREDUMP_INFO_ISASSERT(unwind_error)) {
 			if (reason->ci_assert.ca_expr)
-				dbg_printf(DBGSTR("assert.expr: %q\n"), reason->ci_assert.ca_expr);
+				dbg_printf(DBGSTR("assert.expr: " AC_YELLOW("%q") "\n"), reason->ci_assert.ca_expr);
 			if (reason->ci_assert.ca_file)
-				dbg_printf(DBGSTR("assert.file: %q\n"), reason->ci_assert.ca_file);
+				dbg_printf(DBGSTR("assert.file: " AC_YELLOW("%q") "\n"), reason->ci_assert.ca_file);
 			if (reason->ci_assert.ca_line)
-				dbg_printf(DBGSTR("assert.line: %" PRIuPTR "\n"), reason->ci_assert.ca_line);
+				dbg_printf(DBGSTR("assert.line: " AC_WHITE("%" PRIuPTR) "\n"), reason->ci_assert.ca_line);
 			if (reason->ci_assert.ca_func)
-				dbg_printf(DBGSTR("assert.func: %q\n"), reason->ci_assert.ca_func);
+				dbg_printf(DBGSTR("assert.func: " AC_YELLOW("%q") "\n"), reason->ci_assert.ca_func);
 			if (reason->ci_assert.ca_mesg)
-				dbg_printf(DBGSTR("assert.mesg: %q\n"), reason->ci_assert.ca_mesg);
+				dbg_printf(DBGSTR("assert.mesg: " AC_YELLOW("%q") "\n"), reason->ci_assert.ca_mesg);
 		}
 	}
 	isa = INSTRLEN_ISA_DEFAULT;
@@ -227,6 +231,28 @@ do_dbg_coredump(struct ucpustate const *curr_ustate,
 	return curr_ustate;
 }
 #endif /* CONFIG_HAVE_DEBUGGER */
+
+
+PRIVATE void KCALL
+printk_err_siginfo(siginfo_t const *__restrict info) {
+	printk(KERN_ERR "signal %" PRIuN(__SIZEOF_SIGNO_T__) " (SIG%s: %s)\n",
+	       info->si_signo,
+	       sigabbrev_np(info->si_signo),
+	       sigdescr_np(info->si_signo));
+	if (info->si_code != 0) {
+		printk(KERN_ERR "\tcode:  %u (%s)\n",
+		       (unsigned int)info->si_code,
+		       sigcodedesc_np(info->si_signo,
+		                      info->si_code));
+	}
+	if (info->si_errno != 0) {
+		printk(KERN_ERR "\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) " (%s: %s)\n",
+		       info->si_errno,
+		       strerrorname_np(info->si_errno),
+		       strerrordesc_np(info->si_errno));
+	}
+}
+
 
 
 /* Main entry point for creating coredumps of the calling process.
@@ -326,30 +352,11 @@ coredump_create(struct ucpustate const *curr_ustate,
 				       i, reason->ci_except.e_args.e_pointers[i],
 				       reason->ci_except.e_args.e_pointers[i]);
 			}
-			if (except_as_signal(&reason->ci_except, &siginfo)) {
-				printk(KERN_ERR "signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n",
-				       siginfo.si_signo);
-				if (siginfo.si_code != 0) {
-					printk(KERN_ERR "\tcode:  %u\n",
-					       (unsigned int)siginfo.si_code);
-				}
-				if (siginfo.si_errno != 0) {
-					printk(KERN_ERR "\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) "\n",
-					       siginfo.si_errno);
-				}
-			}
+			if (except_as_signal(&reason->ci_except, &siginfo))
+				printk_err_siginfo(&siginfo);
 			printk(KERN_RAW VINFO_FORMAT " faultaddr\n", reason->ci_except.e_faultaddr);
 		} else if (COREDUMP_INFO_ISSIGNAL(unwind_error)) {
-			printk(KERN_ERR "signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n",
-			       reason->ci_signal.si_signo);
-			if (reason->ci_signal.si_code != 0) {
-				printk(KERN_ERR "\tcode:  %u\n",
-				       (unsigned int)reason->ci_signal.si_code);
-			}
-			if (reason->ci_signal.si_errno != 0) {
-				printk(KERN_ERR "\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) "\n",
-				       reason->ci_signal.si_errno);
-			}
+			printk_err_siginfo(&reason->ci_signal);
 		} else if (COREDUMP_INFO_ISDLERROR(unwind_error)) {
 			printk(KERN_RAW "dlerror: %q\n", reason->ci_dlerror);
 		} else if (COREDUMP_INFO_ISASSERT(unwind_error)) {

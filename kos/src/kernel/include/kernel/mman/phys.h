@@ -66,13 +66,13 @@ typedef uintptr_t pagedir_pushval_t;
 
 /************************************************************************/
 /* Helper functions for accessing very small segments of physical memory.
- * WARNING: DON'T SPAM THESE FUNCTIONS! If you want to access consecutive physical memory,
- *          either    make    use   of    `copy(from|to)phys()'    or   `THIS_TRAMPOLINE'.
- *          These functions will try to make use arch-specific physical identity mappings,
- *          like can  be  found  on  `x86_64'  for the  first  1Gib  of  physical  memory.
- *          However  any  memory outside  that region  (or any  memory at  all if  no such
- *          region is  defined by  the arch  (as is  the case  for `i386'),  will need  to
- *          be accessed through use of `THIS_TRAMPOLINE'!) */
+ * WARNING: DON'T SPAM THESE FUNCTIONS! If you want to access consecutive physical
+ *          memory, either make use of `copy(from|to)phys()' or `THIS_TRAMPOLINE'.
+ * - These functions will try to make use arch-specific physical identity mappings,
+ *   like can  be  found  on `x86_64'  for  the  first 64TiB  of  physical  memory.
+ * - However any memory outside that region (or  any memory at all if no  such
+ *   region is defined by the arch -- as is the case for `i386'), will need to
+ *   be accessed through use of `THIS_TRAMPOLINE'! */
 FUNDEF NOBLOCK WUNUSED u8 NOTHROW(FCALL peekphysb)(PHYS physaddr_t addr);
 FUNDEF NOBLOCK WUNUSED u16 NOTHROW(FCALL peekphysw)(/*aligned(2)*/ PHYS physaddr_t addr);
 FUNDEF NOBLOCK WUNUSED u32 NOTHROW(FCALL peekphysl)(/*aligned(4)*/ PHYS physaddr_t addr);

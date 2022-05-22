@@ -26,6 +26,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/unistd.h>
 #include <sys/mman.h>
 
 #include <fcntl.h>
@@ -165,7 +166,7 @@ DEFINE_INTERN_ALIAS(libphys_pokephysq_unaligned, libphys_pokephysq);
 INTERN void CC
 libphys_copyfromphys(void *dst, PHYS physaddr_t src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	WITHMEM(pread64(dev_mem, dst, num_bytes, (pos64_t)src),
+	WITHMEM((size_t)pread64(dev_mem, dst, num_bytes, (pos64_t)src) == num_bytes,
 	        bzero(dst, num_bytes));
 }
 
@@ -192,7 +193,7 @@ touch_all_pages(void const *src, size_t num_bytes) {
 INTERN void CC
 libphys_copytophys(PHYS physaddr_t dst, void const *src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
-	WITHMEM(pwrite64(dev_mem, src, num_bytes, (pos64_t)dst),
+	WITHMEM(PWrite64(dev_mem, src, num_bytes, (pos64_t)dst) == num_bytes,
 	        touch_all_pages(src, num_bytes));
 }
 
@@ -204,7 +205,8 @@ NOTHROW(CC libphys_copyinphys)(PHYS physaddr_t dst,
 	temp = libphys_mmapphys(src, num_bytes);
 	if unlikely(temp == MAP_FAILED)
 		return;
-	WITHMEM(pwrite64(dev_mem, temp, num_bytes, (pos64_t)dst), (void)0);
+	WITHMEM((size_t)pwrite64(dev_mem, temp, num_bytes, (pos64_t)dst) == num_bytes,
+	        (void)0);
 	libphys_munmapphys(temp, num_bytes);
 }
 

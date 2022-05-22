@@ -525,8 +525,8 @@ NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
 #ifdef __CC__
 /* Synchronize the entirety of the current page directory.
  * Note that this function may only sync all user-space mappings. If the
- * intent is  to  also  sync all  of  kernel-space,  `pagedir_syncall()'
- * must be used instead. */
+ * intent is to also sync all of kernel-space, `pagedir_syncall()'  must
+ * be used instead. */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW(FCALL pagedir_syncall_user)(void) {
 	__register u64 temp;
