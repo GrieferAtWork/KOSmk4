@@ -101,8 +101,11 @@ NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
 	result_sstate = (struct scpustate *)(sp - (OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL));
 	/* Fill in most of `result_sstate' */
 	memcpy(&result_sstate->scs_gpregs, &rc_state->ics_gpregs, sizeof(struct gpregs32));
-	memcpy((byte_t *)&result_sstate->scs_sgregs + OFFSET_SGREGS32_FS,
-	       (byte_t *)&rc_state + OFFSET_ICPUSTATE32_FS, 3 * 4);
+	{
+		void *p = (byte_t *)&rc_state + OFFSET_ICPUSTATE32_FS;
+		COMPILER_DELETE_ASSUMPTIONS(p);
+		memcpy((byte_t *)&result_sstate->scs_sgregs + OFFSET_SGREGS32_FS, p, 3 * 4);
+	}
 	result_sstate->scs_sgregs.sg_gs = saved_gs;
 	result_sstate->scs_sgregs.sg_ds = SEGMENT_USER_DATA_RPL;
 	result_sstate->scs_sgregs.sg_es = SEGMENT_USER_DATA_RPL;

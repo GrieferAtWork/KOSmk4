@@ -181,6 +181,15 @@
 %(auto_source){
 #include "../libc/globals.h"
 #include "../libc/dos-compat.h"
+
+#ifdef __GNUC__
+/* Disable strict-overflow warnings (there's a couple, but we _just_ _don't_ _care_)
+ * The  reason we don't care is that all of those warnings are super-hard to get rid
+ * of, and they all trigger  because of code that's not  even ours (i.e. is part  of
+ * fdlibm) */
+#pragma GCC diagnostic ignored "-Wstrict-overflow"
+#endif /* __GNUC__ */
+
 }
 
 %(c, ccompat)#ifndef __NO_FPU

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8da4a629 */
+/* HASH CRC-32:0xd5f25120 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,15 @@ DECL_BEGIN
 
 #include "../libc/globals.h"
 #include "../libc/dos-compat.h"
+
+#ifdef __GNUC__
+/* Disable strict-overflow warnings (there's a couple, but we _just_ _don't_ _care_)
+ * The  reason we don't care is that all of those warnings are super-hard to get rid
+ * of, and they all trigger  because of code that's not  even ours (i.e. is part  of
+ * fdlibm) */
+#pragma GCC diagnostic ignored "-Wstrict-overflow"
+#endif /* __GNUC__ */
+
 #ifndef __KERNEL__
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
