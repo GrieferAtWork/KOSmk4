@@ -481,47 +481,47 @@ typedef __blksize_t blksize_t;
 /* Name format: `<N_TIME_BITS>i<N_FILE_BITS>' */
 [[ignore, nocrt, alias("_stat", "_stat32")]]
 [[decl_prefix(struct __dos_stat32;)]]
-int dos_stat32i32([[nonnull]] char const *__restrict filename,
-                  [[nonnull]] struct __dos_stat32 *__restrict buf);
+int dos_stat32i32([[in]] char const *__restrict filename,
+                  [[out]] struct __dos_stat32 *__restrict buf);
 
 [[ignore, nocrt, alias("_stati64", "_stat32i64")]]
 [[decl_prefix(struct __dos_stat32i64;)]]
-int dos_stat32i64([[nonnull]] char const *__restrict filename,
-                  [[nonnull]] struct __dos_stat32i64 *__restrict buf);
+int dos_stat32i64([[in]] char const *__restrict filename,
+                  [[out]] struct __dos_stat32i64 *__restrict buf);
 
 [[ignore, nocrt, alias("_stat64", "_stat64i32")]]
 [[decl_prefix(struct __dos_stat64i32;)]]
-int dos_stat64i32([[nonnull]] char const *__restrict filename,
-                  [[nonnull]] struct __dos_stat64i32 *__restrict buf);
+int dos_stat64i32([[in]] char const *__restrict filename,
+                  [[out]] struct __dos_stat64i32 *__restrict buf);
 
 [[ignore, nocrt, alias("_stat64", "_stat64i32")]]
 [[decl_prefix(struct __dos_stat64;)]]
-int dos_stat64i64([[nonnull]] char const *__restrict filename,
-                  [[nonnull]] struct __dos_stat64 *__restrict buf);
+int dos_stat64i64([[in]] char const *__restrict filename,
+                  [[out]] struct __dos_stat64 *__restrict buf);
 
 [[ignore, nocrt, alias("_fstat", "_fstat32")]]
 [[decl_prefix(struct __dos_stat32;), decl_include("<bits/types.h>")]]
-int dos_fstat32i32($fd_t fd, [[nonnull]] struct __dos_stat32 *__restrict buf);
+int dos_fstat32i32($fd_t fd, [[out]] struct __dos_stat32 *__restrict buf);
 
 [[ignore, nocrt, alias("_fstati64", "_fstat32i64")]]
 [[decl_prefix(struct __dos_stat32i64;), decl_include("<bits/types.h>")]]
-int dos_fstat32i64($fd_t fd, [[nonnull]] struct __dos_stat32i64 *__restrict buf);
+int dos_fstat32i64($fd_t fd, [[out]] struct __dos_stat32i64 *__restrict buf);
 
 [[ignore, nocrt, alias("_fstat64", "_fstat64i32")]]
 [[decl_prefix(struct __dos_stat64i32;), decl_include("<bits/types.h>")]]
-int dos_fstat64i32($fd_t fd, [[nonnull]] struct __dos_stat64i32 *__restrict buf);
+int dos_fstat64i32($fd_t fd, [[out]] struct __dos_stat64i32 *__restrict buf);
 
 [[ignore, nocrt, alias("_fstat64", "_fstat64i32")]]
 [[decl_prefix(struct __dos_stat64;), decl_include("<bits/types.h>")]]
-int dos_fstat64i64($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf);
+int dos_fstat64i64($fd_t fd, [[out]] struct __dos_stat64 *__restrict buf);
 
 
-//[[ignore, nocrt, alias("stat")]]    int glibc_stat([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat *__restrict buf);
-//[[ignore, nocrt, alias("stat64")]]  int glibc_stat64([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat64 *__restrict buf);
-//[[ignore, nocrt, alias("lstat")]]   int glibc_lstat([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat *__restrict buf);
-//[[ignore, nocrt, alias("lstat64")]] int glibc_lstat64([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat64 *__restrict buf);
-//[[ignore, nocrt, alias("fstat")]]   int glibc_fstat($fd_t fd, [[nonnull]] struct __glc_stat *__restrict buf);
-//[[ignore, nocrt, alias("fstat64")]] int glibc_fstat64($fd_t fd, [[nonnull]] struct __glc_stat64 *__restrict buf);
+//[[ignore, nocrt, alias("stat")]]    int glibc_stat([[in]] char const *__restrict filename, [[out]] struct __glc_stat *__restrict buf);
+//[[ignore, nocrt, alias("stat64")]]  int glibc_stat64([[in]] char const *__restrict filename, [[out]] struct __glc_stat64 *__restrict buf);
+//[[ignore, nocrt, alias("lstat")]]   int glibc_lstat([[in]] char const *__restrict filename, [[out]] struct __glc_stat *__restrict buf);
+//[[ignore, nocrt, alias("lstat64")]] int glibc_lstat64([[in]] char const *__restrict filename, [[out]] struct __glc_stat64 *__restrict buf);
+//[[ignore, nocrt, alias("fstat")]]   int glibc_fstat($fd_t fd, [[out]] struct __glc_stat *__restrict buf);
+//[[ignore, nocrt, alias("fstat64")]] int glibc_fstat64($fd_t fd, [[out]] struct __glc_stat64 *__restrict buf);
 
 
 /* TODO: Don't assume that kstat() and kstat64() are the same. -- Only do so when `defined(__STAT32_MATCHES_STAT64)'! */
@@ -534,8 +534,8 @@ int dos_fstat64i64($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf);
 [[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), alias("_stat", "_stat32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("stat")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("stat64")]]
-int stat([[nonnull]] char const *__restrict filename,
-         [[nonnull]] struct stat *__restrict buf);
+int stat([[in]] char const *__restrict filename,
+         [[out]] struct stat *__restrict buf);
 /* TODO: Emulate stat() for __USE_TIME_BITS64 compatibility! */
 
 
@@ -547,7 +547,7 @@ int stat([[nonnull]] char const *__restrict filename,
 [[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), alias("_fstat", "_fstat32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("fstat")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("fstat64")]]
-int fstat($fd_t fd, [[nonnull]] struct stat *__restrict buf);
+int fstat($fd_t fd, [[out]] struct stat *__restrict buf);
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
@@ -560,8 +560,8 @@ int fstat($fd_t fd, [[nonnull]] struct stat *__restrict buf);
 [[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), alias("_stat", "_stat32")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("lstat")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("lstat64")]]
-int lstat([[nonnull]] char const *__restrict filename,
-          [[nonnull]] struct stat *__restrict buf);
+int lstat([[in]] char const *__restrict filename,
+          [[out]] struct stat *__restrict buf);
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 %
@@ -573,8 +573,8 @@ int lstat([[nonnull]] char const *__restrict filename,
 [[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), alias("_stati64", "_stat32i64")]]
 [[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                     ), alias("stat")]]
 [[                                                                                                       alias("stat64")]]
-int stat64([[nonnull]] char const *__restrict filename,
-           [[nonnull]] struct stat64 *__restrict buf);
+int stat64([[in]] char const *__restrict filename,
+           [[out]] struct stat64 *__restrict buf);
 
 [[no_crt_impl, doc_alias("fstat"), decl_include("<bits/os/stat.h>"), no_crt_self_import]]
 [[if(                                        defined(__CRT_KOS_PRIMARY)                               ), alias("kfstat", "kfstat64")]]
@@ -582,7 +582,7 @@ int stat64([[nonnull]] char const *__restrict filename,
 [[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), alias("_fstati64", "_fstat32i64")]]
 [[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                     ), alias("fstat")]]
 [[                                                                                                       alias("fstat64")]]
-int fstat64($fd_t fd, [[nonnull]] struct stat64 *__restrict buf);
+int fstat64($fd_t fd, [[out]] struct stat64 *__restrict buf);
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
@@ -592,8 +592,8 @@ int fstat64($fd_t fd, [[nonnull]] struct stat64 *__restrict buf);
 [[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), alias("_stati64", "_stat32i64")]]
 [[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                     ), alias("lstat")]]
 [[                                                                                                       alias("lstat64")]]
-int lstat64([[nonnull]] char const *__restrict filename,
-            [[nonnull]] struct stat64 *__restrict buf);
+int lstat64([[in]] char const *__restrict filename,
+            [[out]] struct stat64 *__restrict buf);
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 %#endif /* __USE_LARGEFILE64 */
 
@@ -642,23 +642,23 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_dos_stat64)(char const *__r
 [[if(                                                             defined(__CRT_KOS_PRIMARY)                                      ), alias("kfstatat", "kfstatat64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)), alias("fstatat")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)), alias("fstatat64")]]
-int fstatat($fd_t dirfd, [[nonnull]] char const *__restrict filename,
-            [[nonnull]] struct stat *__restrict buf, $atflag_t flags);
+int fstatat($fd_t dirfd, [[in]] char const *__restrict filename,
+            [[out]] struct stat *__restrict buf, $atflag_t flags);
 
 %#ifdef __USE_LARGEFILE64
 [[no_crt_impl, doc_alias("fstatat"), decl_include("<bits/os/stat.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if(                                            defined(__CRT_KOS_PRIMARY)      ), alias("kfstatat", "kfstatat64")]]
 [[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)), alias("fstatat")]]
 [[                                                                                  alias("fstatat64")]]
-int fstatat64($fd_t dirfd, [[nonnull]] char const *__restrict filename,
-              [[nonnull]] struct stat64 *__restrict buf, $atflag_t flags);
+int fstatat64($fd_t dirfd, [[in]] char const *__restrict filename,
+              [[out]] struct stat64 *__restrict buf, $atflag_t flags);
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_ATFILE */
 
 %[default:section(".text.crt{|.dos}.fs.modify")];
 
 [[cp, ignore, nocrt, alias("_mkdir")]]
-int dos_mkdir([[nonnull]] char const *pathname);
+int dos_mkdir([[in]] char const *pathname);
 
 
 @@>> mkdir(2)
@@ -667,7 +667,7 @@ int dos_mkdir([[nonnull]] char const *pathname);
 [[requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__CRT_DOS_PRIMARY) && $has_function(dos_mkdir)) ||
            (defined(__AT_FDCWD) && $has_function(mkdirat)))]]
-int mkdir([[nonnull]] char const *pathname, $mode_t mode) {
+int mkdir([[in]] char const *pathname, $mode_t mode) {
 @@pp_if defined(__CRT_DOS_PRIMARY) && $has_function(dos_mkdir)@@
 	(void)mode;
 	return dos_mkdir(pathname);
@@ -682,7 +682,7 @@ int mkdir([[nonnull]] char const *pathname, $mode_t mode) {
 [[dos_export_alias("_chmod"), export_alias("__chmod", "__libc_chmod")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(fchmodat))]]
-int chmod([[nonnull]] char const *filename, $mode_t mode) {
+int chmod([[in]] char const *filename, $mode_t mode) {
 	return fchmodat(__AT_FDCWD, filename, mode, 0);
 }
 
@@ -695,7 +695,7 @@ int chmod([[nonnull]] char const *filename, $mode_t mode) {
 [[if(defined(__CRT_DOS_PRIMARY)), alias("_chmod", "chmod")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(fchmodat))]]
-int lchmod([[nonnull]] char const *filename, $mode_t mode) {
+int lchmod([[in]] char const *filename, $mode_t mode) {
 	return fchmodat(__AT_FDCWD, filename, mode, __AT_SYMLINK_NOFOLLOW);
 }
 
@@ -734,13 +734,13 @@ $mode_t getumask() {
 @@@param flags: Set of `0 | AT_DOSPATH'
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 int fmkdirat($fd_t dirfd,
-             [[nonnull]] char const *pathname,
+             [[in]] char const *pathname,
              $mode_t mode, $atflag_t flags);
 
 @@>> fmknodat(2)
 @@@param flags: Set of `0 | AT_DOSPATH'
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
-int fmknodat($fd_t dirfd, [[nonnull]] char const *nodename,
+int fmknodat($fd_t dirfd, [[in]] char const *nodename,
              $mode_t mode, $dev_t dev, $atflag_t flags);
 %#endif /* __USE_KOS && __USE_ATFILE */
 
@@ -749,7 +749,7 @@ int fmknodat($fd_t dirfd, [[nonnull]] char const *nodename,
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/stat.h>"), impl_include("<asm/os/stat.h>")]]
 [[requires($has_function(mknod) && defined(__S_IFIFO))]]
-int mkfifo([[nonnull]] char const *fifoname, $mode_t mode) {
+int mkfifo([[in]] char const *fifoname, $mode_t mode) {
 	return mknod(fifoname, mode | __S_IFIFO, 0);
 }
 
@@ -758,12 +758,12 @@ int mkfifo([[nonnull]] char const *fifoname, $mode_t mode) {
 @@>> fchmodat(2)
 @@@param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
-int fchmodat($fd_t dirfd, [[nonnull]] char const *filename, $mode_t mode, $atflag_t flags);
+int fchmodat($fd_t dirfd, [[in]] char const *filename, $mode_t mode, $atflag_t flags);
 
 @@>> mkdirat(2)
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 [[userimpl, requires_function(fmkdirat)]]
-int mkdirat($fd_t dirfd, [[nonnull]] char const *pathname, $mode_t mode) {
+int mkdirat($fd_t dirfd, [[in]] char const *pathname, $mode_t mode) {
 	return fmkdirat(dirfd, pathname, mode, 0);
 }
 
@@ -771,7 +771,7 @@ int mkdirat($fd_t dirfd, [[nonnull]] char const *pathname, $mode_t mode) {
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/stat.h>"), impl_include("<asm/os/stat.h>")]]
 [[requires($has_function(mknodat) && defined(__S_IFIFO))]]
-int mkfifoat($fd_t dirfd, [[nonnull]] char const *fifoname, $mode_t mode) {
+int mkfifoat($fd_t dirfd, [[in]] char const *fifoname, $mode_t mode) {
 	return mknodat(dirfd, fifoname, mode | __S_IFIFO, 0);
 }
 %#endif /* __USE_ATFILE */
@@ -793,7 +793,7 @@ int fchmod($fd_t fd, $mode_t mode);
 /* The following are libc4/5 aliases. -- We only export under these names.
  * We  don't import simply because these names feel really weird... °~°... */
 [[export_as("prev_mknod", "__prev_mknod", "__libc_prev_mknod")]]
-int mknod([[nonnull]] char const *nodename, $mode_t mode, $dev_t dev) {
+int mknod([[in]] char const *nodename, $mode_t mode, $dev_t dev) {
 	return mknodat(__AT_FDCWD, nodename, mode, dev);
 }
 
@@ -801,7 +801,7 @@ int mknod([[nonnull]] char const *nodename, $mode_t mode, $dev_t dev) {
 @@>> mknodat(2)
 [[crt_dos_variant, cp, decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(fmknodat))]]
-int mknodat($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t dev) {
+int mknodat($fd_t dirfd, [[in]] char const *nodename, $mode_t mode, $dev_t dev) {
 	return fmknodat(dirfd, nodename, mode, dev, 0);
 }
 %#endif /* __USE_ATFILE */
@@ -811,8 +811,8 @@ int mknodat($fd_t dirfd, [[nonnull]] char const *nodename, $mode_t mode, $dev_t 
 
 [[cp, ignore, doc_alias("utimensat"), nocrt, alias("utimensat")]]
 [[decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
-int utimensat32($fd_t dirfd, [[nonnull]] char const *filename,
-                [[nullable]] struct timespec const times[2 /*or:3*/],
+int utimensat32($fd_t dirfd, [[in]] char const *filename,
+                [[in_opt]] struct timespec const times[2 /*or:3*/],
                 $atflag_t flags);
 
 
@@ -825,8 +825,8 @@ int utimensat32($fd_t dirfd, [[nonnull]] char const *filename,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimensat64")]]
 [[userimpl, requires($has_function(utimensat32) || $has_function(utimensat64))]]
 [[crt_dos_variant, impl_include("<asm/os/fcntl.h>")]]
-int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
-              [[nullable]] struct timespec const times[2 /*or:3*/],
+int utimensat($fd_t dirfd, [[in]] char const *filename,
+              [[in_opt]] struct timespec const times[2 /*or:3*/],
               $atflag_t flags) {
 @@pp_if $has_function(utimensat64)@@
 @@pp_ifdef       __AT_CHANGE_BTIME@@
@@ -883,8 +883,8 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
 [[crt_dos_variant, preferred_time64_variant_of(utimensat), doc_alias("utimensat")]]
 [[userimpl, requires_function(utimensat32), impl_include("<asm/os/fcntl.h>")]]
-int utimensat64($fd_t dirfd, [[nonnull]] char const *filename,
-                [[nullable]] struct timespec64 const times[2 /*or:3*/],
+int utimensat64($fd_t dirfd, [[in]] char const *filename,
+                [[in_opt]] struct timespec64 const times[2 /*or:3*/],
                 $atflag_t flags) {
 @@pp_ifdef __AT_CHANGE_BTIME@@
 	struct timespec32 tms[3];
@@ -915,7 +915,7 @@ int utimensat64($fd_t dirfd, [[nonnull]] char const *filename,
 
 [[cp, ignore, nocrt, alias("futimens")]]
 [[decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
-int futimens32($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]);
+int futimens32($fd_t fd, [[in_opt]] struct timespec const times[2 /*or:3*/]);
 
 %
 %#ifdef __USE_XOPEN2K8
@@ -924,7 +924,7 @@ int futimens32($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]);
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimens64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimens")]]
 [[userimpl, requires($has_function(futimens32) || $has_function(futimens64))]]
-int futimens($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) {
+int futimens($fd_t fd, [[in_opt]] struct timespec const times[2 /*or:3*/]) {
 @@pp_if $has_function(futimens64)@@
 	struct timespec64 tms[2];
 	if (!times)
@@ -950,7 +950,7 @@ int futimens($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) {
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
 [[preferred_time64_variant_of(futimens), doc_alias("futimens")]]
 [[userimpl, requires_function(futimens32)]]
-int futimens64($fd_t fd, [[nullable]] struct timespec64 const times[2 /*or:3*/]) {
+int futimens64($fd_t fd, [[in_opt]] struct timespec64 const times[2 /*or:3*/]) {
 	struct timespec32 tms[2];
 	if (!times)
 		return futimens32(fd, NULL);
@@ -973,59 +973,59 @@ int futimens64($fd_t fd, [[nullable]] struct timespec64 const times[2 /*or:3*/])
 /* TODO: Emulate these functions when not running under DOS-CRT */
 [[nocrt, alias("_stat", "_stat32")]]
 [[decl_prefix(struct __dos_stat32;)]]
-int _stat32([[nonnull]] char const *__restrict filename,
-            [[nonnull]] struct __dos_stat32 *__restrict buf);
+int _stat32([[in]] char const *__restrict filename,
+            [[out]] struct __dos_stat32 *__restrict buf);
 
 [[nocrt, alias("_stati64", "_stat32i64")]]
 [[decl_prefix(struct __dos_stat32i64;)]]
-int _stat32i64([[nonnull]] char const *__restrict filename,
-               [[nonnull]] struct __dos_stat32i64 *__restrict buf);
+int _stat32i64([[in]] char const *__restrict filename,
+               [[out]] struct __dos_stat32i64 *__restrict buf);
 
 [[nocrt, alias("_stat64", "_stat64i32")]]
 [[decl_prefix(struct __dos_stat64i32;)]]
-int _stat64i32([[nonnull]] char const *__restrict filename,
-               [[nonnull]] struct __dos_stat64i32 *__restrict buf);
+int _stat64i32([[in]] char const *__restrict filename,
+               [[out]] struct __dos_stat64i32 *__restrict buf);
 
 [[nocrt, alias("_stat64", "_stat64i32")]]
 [[decl_prefix(struct __dos_stat64;)]]
-int _stat64([[nonnull]] char const *__restrict filename,
-            [[nonnull]] struct __dos_stat64 *__restrict buf);
+int _stat64([[in]] char const *__restrict filename,
+            [[out]] struct __dos_stat64 *__restrict buf);
 
 [[nocrt, alias("_fstat", "_fstat32")]]
 [[decl_prefix(struct __dos_stat32;), decl_include("<bits/types.h>")]]
-int _fstat32($fd_t fd, [[nonnull]] struct __dos_stat32 *__restrict buf);
+int _fstat32($fd_t fd, [[out]] struct __dos_stat32 *__restrict buf);
 
 [[nocrt, alias("_fstati64", "_fstat32i64")]]
 [[decl_prefix(struct __dos_stat32i64;), decl_include("<bits/types.h>")]]
-int _fstat32i64($fd_t fd, [[nonnull]] struct __dos_stat32i64 *__restrict buf);
+int _fstat32i64($fd_t fd, [[out]] struct __dos_stat32i64 *__restrict buf);
 
 [[nocrt, alias("_fstat64", "_fstat64i32")]]
 [[decl_prefix(struct __dos_stat64i32;), decl_include("<bits/types.h>")]]
-int _fstat64i32($fd_t fd, [[nonnull]] struct __dos_stat64i32 *__restrict buf);
+int _fstat64i32($fd_t fd, [[out]] struct __dos_stat64i32 *__restrict buf);
 
 [[nocrt, alias("_fstat64", "_fstat64i32")]]
 [[decl_prefix(struct __dos_stat64;), decl_include("<bits/types.h>")]]
-int _fstat64($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf);
+int _fstat64($fd_t fd, [[out]] struct __dos_stat64 *__restrict buf);
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, decl_prefix(struct __dos_stat32;), export_alias("_wstat")]]
-int _wstat32([[nonnull]] $wchar_t const *filename,
-             [[nonnull]] struct __dos_stat32 *buf);
+int _wstat32([[in]] $wchar_t const *filename,
+             [[out]] struct __dos_stat32 *buf);
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, decl_prefix(struct __dos_stat64;), alias("_wstat64i32")]]
-int _wstat64([[nonnull]] $wchar_t const *filename,
-             [[nonnull]] struct __dos_stat64 *buf);
+int _wstat64([[in]] $wchar_t const *filename,
+             [[out]] struct __dos_stat64 *buf);
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, decl_prefix(struct __dos_stat32i64;), export_alias("_wstati64")]]
-int _wstat32i64([[nonnull]] $wchar_t const *filename,
-                [[nonnull]] struct __dos_stat32i64 *buf);
+int _wstat32i64([[in]] $wchar_t const *filename,
+                [[out]] struct __dos_stat32i64 *buf);
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, decl_prefix(struct __dos_stat64i32;), alias("_wstat64")]]
-int _wstat64i32([[nonnull]] $wchar_t const *filename,
-                [[nonnull]] struct __dos_stat64i32 *buf);
+int _wstat64i32([[in]] $wchar_t const *filename,
+                [[out]] struct __dos_stat64i32 *buf);
 %#endif /* __USE_DOS */
 
 

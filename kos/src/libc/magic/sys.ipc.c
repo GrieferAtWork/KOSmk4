@@ -110,7 +110,7 @@ typedef __key_t key_t;
 }
 
 [[cp, decl_include("<features.h>", "<bits/types.h>")]]
-key_t ftok([[nonnull]] char const *pathname,
+key_t ftok([[in]] char const *pathname,
            __STDC_INT_AS_UINT_T proj_id);
 
 %{

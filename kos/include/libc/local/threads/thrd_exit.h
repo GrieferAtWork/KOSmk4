@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29243fd5 */
+/* HASH CRC-32:0x510f6f81 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_exit_defined
 #define __local___localdep_pthread_exit_defined
 #ifdef __CRT_HAVE_pthread_exit
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_pthread_exit,(void *__retval),pthread_exit,(__retval))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,__localdep_pthread_exit,(void *__retval),pthread_exit,(__retval))
 #elif defined(__CRT_HAVE_thr_exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_pthread_exit,(void *__retval),thr_exit,(__retval))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,__localdep_pthread_exit,(void *__retval),thr_exit,(__retval))
 #else /* ... */
 #undef __local___localdep_pthread_exit_defined
 #endif /* !... */

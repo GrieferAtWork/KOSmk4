@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e8970be */
+/* HASH CRC-32:0x45095d33 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,9 +45,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_c16tombsn_defined
 #define __local___localdep_convert_c16tombsn_defined
 #if defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c16tombsn,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR_OPT(3),char *,__NOTHROW_NCX,__localdep_convert_c16tombsn,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
 #elif defined(__CRT_HAVE_DOS$convert_wcstombsn)
-__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c16tombsn,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR_OPT(3),char *,__NOTHROW_NCX,__localdep_convert_c16tombsn,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
 #elif (defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombsn.h>
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(convert_c16tombs) __ATTR_MALLOC __ATTR_WUNUSED char *
+__LOCAL_LIBC(convert_c16tombs) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) char *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(convert_c16tombs))(__CHAR16_TYPE__ const *__str) {
 	if __unlikely(!__str) {
 #ifdef __EINVAL

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd445b569 */
+/* HASH CRC-32:0x505f4cff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strdup __LIBC_LOCAL_NAME(strdup)
 #endif /* !... */
 #endif /* !__local___localdep_strdup_defined */
-__LOCAL_LIBC(posix_spawn_file_actions_addchdir_np) __ATTR_NONNULL((1, 2)) __errno_t
+__LOCAL_LIBC(posix_spawn_file_actions_addchdir_np) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_addchdir_np))(struct __posix_spawn_file_actions *__restrict __file_actions, const char *__restrict __path) {
 	struct __spawn_action *__action;
 	if __unlikely((__path = (__NAMESPACE_LOCAL_SYM __localdep_strdup)(__path)) == __NULLPTR)

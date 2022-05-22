@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2c03591 */
+/* HASH CRC-32:0xf3fec361 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #ifndef __LC_MESSAGES
 #define __LC_MESSAGES 0
 #endif /* !__LC_MESSAGES */
-INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) char *
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) __ATTR_FORMAT_ARG(2) char *
 NOTHROW_NCX(LIBCCALL libc_dcgettext)(char const *domainname,
                                      char const *msgid,
                                      int category) {
@@ -43,7 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_dcgettext)(char const *domainname,
 #ifndef __LC_MESSAGES
 #define __LC_MESSAGES 0
 #endif /* !__LC_MESSAGES */
-INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) char *
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) __ATTR_FORMAT_ARG(2) char *
 NOTHROW_NCX(LIBCCALL libc_dgettext)(char const *domainname,
                                     char const *msgid) {
 	return libc_dcngettext(domainname, msgid, NULL, 1, __LC_MESSAGES);
@@ -52,7 +52,7 @@ NOTHROW_NCX(LIBCCALL libc_dgettext)(char const *domainname,
 #ifndef __LC_MESSAGES
 #define __LC_MESSAGES 0
 #endif /* !__LC_MESSAGES */
-INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(1) char *
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) __ATTR_FORMAT_ARG(1) char *
 NOTHROW_NCX(LIBCCALL libc_gettext)(char const *msgid) {
 	return libc_dcngettext(NULL, msgid, NULL, 1, __LC_MESSAGES);
 }
@@ -60,7 +60,7 @@ NOTHROW_NCX(LIBCCALL libc_gettext)(char const *msgid) {
 #ifndef __LC_MESSAGES
 #define __LC_MESSAGES 0
 #endif /* !__LC_MESSAGES */
-INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2) char *
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2) char *
 NOTHROW_NCX(LIBCCALL libc_ngettext)(char const *msgid_singular,
                                     char const *msgid_plural,
                                     ulongptr_t n) {
@@ -70,7 +70,7 @@ NOTHROW_NCX(LIBCCALL libc_ngettext)(char const *msgid_singular,
 #ifndef __LC_MESSAGES
 #define __LC_MESSAGES 0
 #endif /* !__LC_MESSAGES */
-INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RO_OPT(3) __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
 NOTHROW_NCX(LIBCCALL libc_dngettext)(char const *domainname,
                                      char const *msgid_singular,
                                      char const *msgid_plural,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fd2ec78 */
+/* HASH CRC-32:0xc35121fd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ struct format_waprintf_data {
 };
 #endif /* !__format_waprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_format_c32aprintf_alloc,(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RW(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_format_c32aprintf_alloc,(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
 #elif defined(__CRT_HAVE_KOS$format_waprintf_alloc)
 __NAMESPACE_LOCAL_END
 #ifndef __format_waprintf_data_defined
@@ -50,7 +50,7 @@ struct format_waprintf_data {
 };
 #endif /* !__format_waprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_format_c32aprintf_alloc,(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RW(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_format_c32aprintf_alloc,(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
 #elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.format-printer/format_waprintf_alloc.h>
@@ -80,7 +80,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyl __LIBC_LOCAL_NAME(memcpyl)
 #endif /* !... */
 #endif /* !__local___localdep_memcpyl_defined */
-__LOCAL_LIBC(format_c32aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_c32aprintf_printer) __ATTR_WUNUSED __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__C32FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_c32aprintf_printer))(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	__CHAR32_TYPE__ *__buf;
 	__buf = (__NAMESPACE_LOCAL_SYM __localdep_format_c32aprintf_alloc)((struct format_c32aprintf_data *)__arg, __datalen);

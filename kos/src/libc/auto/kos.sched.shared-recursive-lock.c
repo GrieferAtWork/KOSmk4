@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6338d49e */
+/* HASH CRC-32:0x13d03358 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #include <hybrid/__atomic.h>
 /* >> shared_recursive_lock_tryacquire(3)
  * Try to acquire a recursive lock to `self' */
-INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __NOBLOCK NONNULL((1)) bool
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __NOBLOCK ATTR_ACCESS_RW(1) bool
 NOTHROW(__FCALL libc_shared_recursive_lock_tryacquire)(struct shared_recursive_lock *__restrict self) {
 	if (__hybrid_atomic_xch(self->sr_lock.sl_lock, 1, __ATOMIC_ACQUIRE) == 0) {
 		__shared_recursive_lock_setown(self);
@@ -52,7 +52,7 @@ NOTHROW(__FCALL libc_shared_recursive_lock_tryacquire)(struct shared_recursive_l
  * Release a recursive lock from `self'
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
-INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK NONNULL((1)) bool
+INTERN ATTR_SECTION(".text.crt.sched.futex") __NOBLOCK ATTR_ACCESS_RW(1) bool
 NOTHROW(__FCALL libc_shared_recursive_lock_release)(struct shared_recursive_lock *__restrict self) {
 	__COMPILER_BARRIER();
 	__hybrid_assertf(self->sr_lock.sl_lock != 0, "Lock isn't acquired");
@@ -69,7 +69,7 @@ NOTHROW(__FCALL libc_shared_recursive_lock_release)(struct shared_recursive_lock
 }
 /* >> shared_recursive_lock_acquire(3)
  * Acquire a recursive lock to the given shared_recursive_lock. */
-INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
 (__FCALL libc_shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	if (__shared_recursive_lock_isown(self)) {
 		++self->sr_rcnt;
@@ -82,7 +82,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING NONNULL((1)) void
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) bool
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_lock_acquire_with_timeout)(struct shared_recursive_lock *__restrict self,
                                                           __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	bool result;
@@ -97,7 +97,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) boo
 }
 /* >> shared_recursive_lock_waitfor(3)
  * Wait until acquiring a recursive lock to `self' no longer blocks */
-INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_ACCESS_RW(1) void
 (__FCALL libc_shared_recursive_lock_waitfor)(struct shared_recursive_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	if (__shared_recursive_lock_isown(self))
 		return;
@@ -107,7 +107,7 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING NONNULL((1)) void
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) bool
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_lock_waitfor_with_timeout)(struct shared_recursive_lock *__restrict self,
                                                           __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	if (__shared_recursive_lock_isown(self))
@@ -122,7 +122,7 @@ DEFINE_INTERN_ALIAS(libc_shared_recursive_lock_acquire_with_timeout64, libc_shar
  * Acquire a recursive lock to the given shared_recursive_lock.
  * @return: true:  Successfully acquired a recursive lock.
  * @return: false: The given `abs_timeout' has expired. */
-INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) bool
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_lock_acquire_with_timeout64)(struct shared_recursive_lock *__restrict self,
                                                             struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	bool result;
@@ -144,7 +144,7 @@ DEFINE_INTERN_ALIAS(libc_shared_recursive_lock_waitfor_with_timeout64, libc_shar
  * Wait until acquiring a recursive lock to `self' no longer blocks
  * @return: true:  A lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING NONNULL((1)) bool
+INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RW(1) bool
 (__FCALL libc_shared_recursive_lock_waitfor_with_timeout64)(struct shared_recursive_lock *__restrict self,
                                                             struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
 	if (__shared_recursive_lock_isown(self))

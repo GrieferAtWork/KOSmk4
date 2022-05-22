@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53ea4aa7 */
+/* HASH CRC-32:0x62f36f5e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_utime64_defined
 #define __local___localdep_crt_utime64_defined
 #ifdef __CRT_HAVE_utime64
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),utime64,(__filename,__file_times))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_crt_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),utime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__utime64)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),_utime64,(__filename,__file_times))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_crt_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),_utime64,(__filename,__file_times))
 #else /* ... */
 #undef __local___localdep_crt_utime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_utime64_defined */
-__LOCAL_LIBC(_utime32) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(_utime32) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_utime32))(char const *__filename, struct __utimbuf32 __KOS_FIXED_CONST *__file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("actime")

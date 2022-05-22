@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4265f9de */
+/* HASH CRC-32:0x4e3019e8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_wcstombs_defined
 #define __local___localdep_convert_wcstombs_defined
 #ifdef __CRT_HAVE_convert_wcstombs
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -55,11 +55,11 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_link_defined
 #define __local___localdep_link_defined
 #ifdef __CRT_HAVE_link
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),link,(__from,__to))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),link,(__from,__to))
 #elif defined(__CRT_HAVE___link)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),__link,(__from,__to))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),__link,(__from,__to))
 #elif defined(__CRT_HAVE___libc_link)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),__libc_link,(__from,__to))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),__libc_link,(__from,__to))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_linkat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/link.h>
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_wlinkat,(__fd_t __fromfd, __WCHAR_TYPE__ const *__from, __fd_t __tofd, __WCHAR_TYPE__ const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(4),int,__NOTHROW_RPC,__localdep_wlinkat,(__fd_t __fromfd, __WCHAR_TYPE__ const *__from, __fd_t __tofd, __WCHAR_TYPE__ const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))
 #elif (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && defined(__CRT_HAVE_linkat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.unistd/wlinkat.h>
@@ -85,7 +85,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_wlinkat_defined
 #endif /* !... */
 #endif /* !__local___localdep_wlinkat_defined */
-__LOCAL_LIBC(wlink) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(wlink) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wlink))(__WCHAR_TYPE__ const *__from, __WCHAR_TYPE__ const *__to) {
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_wlinkat) || ((defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && defined(__CRT_HAVE_linkat)))
 	return (__NAMESPACE_LOCAL_SYM __localdep_wlinkat)(__AT_FDCWD, __from, __AT_FDCWD, __to, 0);

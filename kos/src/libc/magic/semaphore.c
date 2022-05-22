@@ -81,13 +81,13 @@ typedef __sem_t sem_t;
 @@@return: -1:     [errno=ENOSYS] `pshared != 0', but inter-process semaphores aren't supported
 @@                 HINT: Never returned `#ifdef __ARCH_HAVE_INTERPROCESS_SEMAPHORES'
 [[decl_include("<bits/crt/semaphore.h>")]]
-int sem_init([[nonnull]] sem_t *self, int pshared, unsigned int value);
+int sem_init([[out]] sem_t *self, int pshared, unsigned int value);
 
 @@>> sem_destroy(3)
 @@Destroy a semaphore previously initialized by `sem_init(3)'
 @@@return: 0: Success
 [[decl_include("<bits/crt/semaphore.h>")]]
-int sem_destroy([[nonnull]] sem_t *self);
+int sem_destroy([[inout]] sem_t *self);
 
 @@>> sem_open(3)
 @@Open a named semaphore `name', which must be string that starts with `/'
@@ -110,7 +110,7 @@ int sem_destroy([[nonnull]] sem_t *self);
 @@@return: SEM_FAILED: Error (s.a. `errno')
 [[cp_kos, vartypes($mode_t, unsigned int)]]
 [[decl_include("<bits/crt/semaphore.h>", "<bits/types.h>")]]
-sem_t *sem_open([[nonnull]] char const *name, $oflag_t oflags,
+sem_t *sem_open([[in]] char const *name, $oflag_t oflags,
                 ... /*mode_t mode, unsigned int value*/);
 
 @@>> sem_close(3)
@@ -119,7 +119,7 @@ sem_t *sem_open([[nonnull]] char const *name, $oflag_t oflags,
 @@described by in `sem_open(3)' and by `__ARCH_HAVE_NON_UNIQUE_SEM_OPEN'->
 @@@return: 0: Success
 [[decl_include("<bits/crt/semaphore.h>")]]
-int sem_close([[nonnull]] sem_t *self);
+int sem_close([[inout]] sem_t *self);
 
 @@>> sem_unlink(3)
 @@Unlink (delete) a named semaphore `name' that was
@@ -128,7 +128,7 @@ int sem_close([[nonnull]] sem_t *self);
 @@@return: -1: [errno=EINVAL] The given `name' contains no characters after the initial `/'
 @@@return: -1: Error (s.a. `errno')
 [[cp_kos]]
-int sem_unlink([[nonnull]] const char *name);
+int sem_unlink([[in]] const char *name);
 
 
 @@>> sem_wait(3)
@@ -142,8 +142,8 @@ int sem_wait([[nonnull]] sem_t *self);
 
 [[cp, doc_alias("sem_timedwait"), ignore, nocrt, alias("sem_timedwait")]]
 [[decl_include("<bits/crt/semaphore.h>", "<bits/os/timespec.h>")]]
-int sem_timedwait32([[nonnull]] sem_t *__restrict self,
-                    [[nonnull]] struct $timespec32 const *__restrict abstime);
+int sem_timedwait32([[inout]] sem_t *__restrict self,
+                    [[in]] struct $timespec32 const *__restrict abstime);
 
 
 %
@@ -159,8 +159,8 @@ int sem_timedwait32([[nonnull]] sem_t *__restrict self,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sem_timedwait")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sem_timedwait64")]]
 [[userimpl, requires($has_function(sem_timedwait32) || $has_function(sem_timedwait64))]]
-int sem_timedwait([[nonnull]] sem_t *__restrict self,
-                  [[nonnull]] struct timespec const *__restrict abstime) {
+int sem_timedwait([[inout]] sem_t *__restrict self,
+                  [[in]] struct timespec const *__restrict abstime) {
 @@pp_if $has_function(sem_timedwait32)@@
 	struct timespec32 ts32;
 	ts32.tv_sec = (time32_t)abstime->tv_sec;
@@ -179,8 +179,8 @@ int sem_timedwait([[nonnull]] sem_t *__restrict self,
 [[cp, decl_include("<bits/crt/semaphore.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(sem_timedwait), doc_alias("sem_timedwait")]]
 [[userimpl, requires_function(sem_timedwait32)]]
-int sem_timedwait64([[nonnull]] sem_t *__restrict self,
-                    [[nonnull]] struct timespec64 const *__restrict abstime) {
+int sem_timedwait64([[inout]] sem_t *__restrict self,
+                    [[in]] struct timespec64 const *__restrict abstime) {
 	struct timespec32 ts32;
 	ts32.tv_sec  = (time32_t)abstime->tv_sec;
 	ts32.tv_nsec = abstime->tv_nsec;
@@ -196,7 +196,7 @@ int sem_timedwait64([[nonnull]] sem_t *__restrict self,
 @@@return: 0:  Success
 @@@return: -1: [errno=EAGAIN] A ticket could not be acquired without blocking.
 [[decl_include("<bits/crt/semaphore.h>")]]
-int sem_trywait([[nonnull]] sem_t *self);
+int sem_trywait([[inout]] sem_t *self);
 
 @@>> sem_post(3)
 @@Post a ticket to the given semaphore `self', waking up to 1 other thread
@@ -204,14 +204,14 @@ int sem_trywait([[nonnull]] sem_t *self);
 @@@return: 0:  Success
 @@@return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted.
 [[decl_include("<bits/crt/semaphore.h>")]]
-int sem_post([[nonnull]] sem_t *self);
+int sem_post([[inout]] sem_t *self);
 
 @@>> sem_getvalue(3)
 @@Capture a snapshot of how may tickets are available storing that number in `*sval'
 @@@return: 0: Success
 [[decl_include("<features.h>", "<bits/crt/semaphore.h>")]]
-int sem_getvalue([[nonnull]] sem_t *__restrict self,
-                 [[nonnull]] __STDC_INT_AS_UINT_T *__restrict sval);
+int sem_getvalue([[inout]] sem_t *__restrict self,
+                 [[out]] __STDC_INT_AS_UINT_T *__restrict sval);
 
 
 %{

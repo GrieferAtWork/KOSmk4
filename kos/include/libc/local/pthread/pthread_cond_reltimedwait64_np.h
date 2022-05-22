@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x950e5d15 */
+/* HASH CRC-32:0x13a8e304 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_pthread_cond_reltimedwait32_np_defined
 #define __local___localdep_crt_pthread_cond_reltimedwait32_np_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_cond_reltimedwait32_np,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__cond,__mutex,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_cond_reltimedwait32_np,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__cond,__mutex,__reltime))
 #endif /* !__local___localdep_crt_pthread_cond_reltimedwait32_np_defined */
-__LOCAL_LIBC(pthread_cond_reltimedwait64_np) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t
+__LOCAL_LIBC(pthread_cond_reltimedwait64_np) __ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_cond_reltimedwait64_np))(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime) {
 	__errno_t __result;
 	struct __timespec32 __reltime32;

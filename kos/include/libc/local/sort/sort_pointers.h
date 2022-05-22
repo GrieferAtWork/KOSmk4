@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbb33aa1 */
+/* HASH CRC-32:0xfc3eed90 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NONNULL((1, 4)),__THROWING,__localdep_qsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),qsort,(__pbase,__item_count,__item_size,__compar))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW_OPT(1) __ATTR_NONNULL((4)),__THROWING,__localdep_qsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),qsort,(__pbase,__item_count,__item_size,__compar))
 #else /* __CRT_HAVE_qsort */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/qsort.h>
@@ -55,7 +55,7 @@ __LOCAL_LIBC(sort_pointers_compar) __ATTR_PURE int
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(sort_pointers) __ATTR_NONNULL((2, 3)) void
+__LOCAL_LIBC(sort_pointers) __ATTR_ACCESS_RWS(2, 1) __ATTR_ACCESS_WRS(3, 1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sort_pointers))(__SIZE_TYPE__ __count, void **__sortme, void **__work) {
 	(void)__work; /* unused by this implementation */
 	(__NAMESPACE_LOCAL_SYM __localdep_qsort)(__sortme, __count, sizeof(void *), &__NAMESPACE_LOCAL_SYM __sort_pointers_compar);

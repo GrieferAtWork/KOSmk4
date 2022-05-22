@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd80d2db8 */
+/* HASH CRC-32:0x422089b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_chdir_defined
 #define __local___localdep_chdir_defined
 #ifdef __CRT_HAVE_chdir
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),chdir,(__path))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),chdir,(__path))
 #elif defined(__CRT_HAVE__chdir)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),_chdir,(__path))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),_chdir,(__path))
 #elif defined(__CRT_HAVE___chdir)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),__chdir,(__path))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),__chdir,(__path))
 #elif defined(__CRT_HAVE___libc_chdir)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),__libc_chdir,(__path))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),__libc_chdir,(__path))
 #else /* ... */
 #undef __local___localdep_chdir_defined
 #endif /* !... */
@@ -41,9 +41,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *
 #ifndef __local___localdep_convert_c16tombs_defined
 #define __local___localdep_convert_c16tombs_defined
 #if defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_DOS$convert_wcstombs)
-__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif (defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -72,7 +72,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-__LOCAL_LIBC(c16chdir) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(c16chdir) __ATTR_ACCESS_RO(1) int
 __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16chdir))(__CHAR16_TYPE__ const *__path) {
 	__LONGPTR_TYPE__ __result;
 	char *__utf8_path;

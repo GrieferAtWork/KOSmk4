@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f3c2634 */
+/* HASH CRC-32:0xffc5e0f4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_itoa_s,(__val,__buf,__buflen,__radix))
+__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_itoa_s,(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__itoa_s */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -37,12 +37,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ltoa_s,(__val,__buf,__buflen,__radix))
+__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ltoa_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE__i64toa_s) && __SIZEOF_INT__ == 8
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64toa_s,(__val,__buf,__buflen,__radix))
+__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64toa_s,(__val,__buf,__buflen,__radix))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/_itoa_s.h>
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(itoa) __ATTR_NONNULL((2)) char *
+__LOCAL_LIBC(itoa) __ATTR_ACCESS_WR(2) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(itoa))(int __val, char *__buf, int __radix) {
 	(__NAMESPACE_LOCAL_SYM __localdep__itoa_s)(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;

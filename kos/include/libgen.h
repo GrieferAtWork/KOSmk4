@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x551783e7 */
+/* HASH CRC-32:0xd2aa44ec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __SYSDECL_BEGIN
  * >> dirname(NULL);              // Returns "."
  * Note  that for this purpose, `path' may be modified in-place, meaning
  * that you should really always pass an strdup()'d, or writable string. */
-__CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,dirname,(char *__path),(__path))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,dirname,(char *__path),(__path))
 #else /* __CRT_HAVE_dirname */
 #include <libc/local/libgen/dirname.h>
 /* Return the directory, that is everything leading up to, but not
@@ -93,7 +93,7 @@ __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,dirname,(char *__path),(__path
  * >> dirname(NULL);              // Returns "."
  * Note  that for this purpose, `path' may be modified in-place, meaning
  * that you should really always pass an strdup()'d, or writable string. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL dirname)(char *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dirname))(__path); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RO_OPT(1) char *__NOTHROW_NCX(__LIBCCALL dirname)(char *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dirname))(__path); })
 #endif /* !__CRT_HAVE_dirname */
 #ifdef __CRT_HAVE___xpg_basename
 /* Return the filename-part, that is everything following
@@ -121,7 +121,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_R
  * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
  * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
-__CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filename),(__filename))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RW_OPT(1),char *,__NOTHROW_NCX,__xpg_basename,(char *__filename),(__filename))
 #elif defined(__CRT_HAVE___gnu_basename)
 /* Return the filename-part, that is everything following
  * the last slash of `filename'. If no such part exists, "."
@@ -148,7 +148,7 @@ __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filena
  * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
  * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
-__CREDIRECT(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filename),__gnu_basename,(__filename))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_RW_OPT(1),char *,__NOTHROW_NCX,__xpg_basename,(char *__filename),__gnu_basename,(__filename))
 #else /* ... */
 #include <libc/local/libgen/__xpg_basename.h>
 /* Return the filename-part, that is everything following
@@ -176,7 +176,7 @@ __CREDIRECT(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filen
  * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
  * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(__xpg_basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL __xpg_basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__xpg_basename))(__filename); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__xpg_basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RW_OPT(1) char *__NOTHROW_NCX(__LIBCCALL __xpg_basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__xpg_basename))(__filename); })
 #endif /* !... */
 #define basename(path) __xpg_basename(path)
 
@@ -222,7 +222,7 @@ typedef __FILE FILE;
  * @return: * :   Returns a pointer to the trailing NUL written to `buf'
  *                There is no true error  case; read errors are  treated
  *                the same way as end-of-file. */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,bgets,(char *__buf, size_t __buflen_minus_one, FILE *__fp, char __KOS_FIXED_CONST *__stop_chars),(__buf,__buflen_minus_one,__fp,__stop_chars))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WR(1),char *,__NOTHROW_NCX,bgets,(char *__buf, size_t __buflen_minus_one, FILE *__fp, char __KOS_FIXED_CONST *__stop_chars),(__buf,__buflen_minus_one,__fp,__stop_chars))
 #elif defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 #include <libc/local/libgen/bgets.h>
 /* >> bgets(3)
@@ -241,7 +241,7 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)),char *,__NO
  * @return: * :   Returns a pointer to the trailing NUL written to `buf'
  *                There is no true error  case; read errors are  treated
  *                the same way as end-of-file. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(bgets, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL bgets)(char *__buf, size_t __buflen_minus_one, FILE *__fp, char __KOS_FIXED_CONST *__stop_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bgets))(__buf, __buflen_minus_one, __fp, __stop_chars); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(bgets, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WR(1) char *__NOTHROW_NCX(__LIBCCALL bgets)(char *__buf, size_t __buflen_minus_one, FILE *__fp, char __KOS_FIXED_CONST *__stop_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bgets))(__buf, __buflen_minus_one, __fp, __stop_chars); })
 #endif /* ... */
 #ifdef __CRT_HAVE_bufsplit
 /* >> bufsplit(3)
@@ -264,7 +264,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bgets, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RET
  *              stored in `result_v'. All remaining pointers in `result_v'
  *              beyond `return' (and  before `result_c')  are filled  with
  *              the empty string found at `strend(IN:string)'. */
-__CDECLARE(,size_t,__NOTHROW_NCX,bufsplit,(char *__string, size_t __result_c, char **__result_v),(__string,__result_c,__result_v))
+__CDECLARE(__ATTR_ACCESS_RW_OPT(1) __ATTR_ACCESS_WR_OPT(3),size_t,__NOTHROW_NCX,bufsplit,(char *__string, size_t __result_c, char **__result_v),(__string,__result_c,__result_v))
 #else /* __CRT_HAVE_bufsplit */
 #include <libc/local/libgen/bufsplit.h>
 /* >> bufsplit(3)
@@ -287,7 +287,7 @@ __CDECLARE(,size_t,__NOTHROW_NCX,bufsplit,(char *__string, size_t __result_c, ch
  *              stored in `result_v'. All remaining pointers in `result_v'
  *              beyond `return' (and  before `result_c')  are filled  with
  *              the empty string found at `strend(IN:string)'. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(bufsplit, __FORCELOCAL __ATTR_ARTIFICIAL size_t __NOTHROW_NCX(__LIBCCALL bufsplit)(char *__string, size_t __result_c, char **__result_v) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bufsplit))(__string, __result_c, __result_v); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(bufsplit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW_OPT(1) __ATTR_ACCESS_WR_OPT(3) size_t __NOTHROW_NCX(__LIBCCALL bufsplit)(char *__string, size_t __result_c, char **__result_v) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bufsplit))(__string, __result_c, __result_v); })
 #endif /* !__CRT_HAVE_bufsplit */
 #if defined(__CRT_HAVE_copylist) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> copylist(3), copylist64(3)
@@ -326,7 +326,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bufsplit, __FORCELOCAL __ATTR_ARTIFICIAL size_t 
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_RPC,copylist,(char const *__filename, __PIO_OFFSET *__p_filesize),(__filename,__p_filesize))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),char *,__NOTHROW_RPC,copylist,(char const *__filename, __PIO_OFFSET *__p_filesize),(__filename,__p_filesize))
 #elif defined(__CRT_HAVE_copylist64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> copylist(3), copylist64(3)
  * Load a given file `filename' into memory (via `malloc(3)'), and return
@@ -364,7 +364,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_RPC,copylist,(
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_RPC,copylist,(char const *__filename, __PIO_OFFSET *__p_filesize),copylist64,(__filename,__p_filesize))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),char *,__NOTHROW_RPC,copylist,(char const *__filename, __PIO_OFFSET *__p_filesize),copylist64,(__filename,__p_filesize))
 #else /* ... */
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
@@ -406,7 +406,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_RPC,copylist,
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(copylist, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_RPC(__LIBCCALL copylist)(char const *__filename, __PIO_OFFSET *__p_filesize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copylist))(__filename, __p_filesize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(copylist, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) char *__NOTHROW_RPC(__LIBCCALL copylist)(char const *__filename, __PIO_OFFSET *__p_filesize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copylist))(__filename, __p_filesize); })
 #endif /* (__CRT_HAVE_copylist64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc)) */
 #endif /* !... */
 
@@ -448,7 +448,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(copylist, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_RPC,copylist64,(char const *__filename, __PIO_OFFSET64 *__p_filesize),copylist,(__filename,__p_filesize))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),char *,__NOTHROW_RPC,copylist64,(char const *__filename, __PIO_OFFSET64 *__p_filesize),copylist,(__filename,__p_filesize))
 #elif defined(__CRT_HAVE_copylist64)
 /* >> copylist(3), copylist64(3)
  * Load a given file `filename' into memory (via `malloc(3)'), and return
@@ -486,7 +486,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_RPC,copylist6
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_RPC,copylist64,(char const *__filename, __PIO_OFFSET64 *__p_filesize),(__filename,__p_filesize))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),char *,__NOTHROW_RPC,copylist64,(char const *__filename, __PIO_OFFSET64 *__p_filesize),(__filename,__p_filesize))
 #else /* ... */
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
@@ -528,7 +528,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_RPC,copylist64
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(copylist64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_RPC(__LIBCCALL copylist64)(char const *__filename, __PIO_OFFSET64 *__p_filesize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copylist64))(__filename, __p_filesize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(copylist64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) char *__NOTHROW_RPC(__LIBCCALL copylist64)(char const *__filename, __PIO_OFFSET64 *__p_filesize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copylist64))(__filename, __p_filesize); })
 #endif /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
 #endif /* !... */
 #endif /* __USE_LARGEFILE64 */
@@ -538,17 +538,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(copylist64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 /* >> eaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),euidaccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),euidaccess,(__file,__type))
 #elif defined(__CRT_HAVE_eaccess)
 /* >> eaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
 #elif defined(__CRT_HAVE__access) && defined(__CRT_DOS)
 /* >> eaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_faccessat)
@@ -556,7 +556,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,eaccess,(char c
 /* >> eaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL eaccess)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(euidaccess))(__file, __type); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL eaccess)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(euidaccess))(__file, __type); }
 #else /* __AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
 #undef __eaccess_defined
 #endif /* !__AT_FDCWD || !__AT_EACCESS || !__CRT_HAVE_faccessat */
@@ -568,7 +568,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_
  * To prevent a buffer overflow, `dstbuf' should be at least `strlen(string) + 1'
  * bytes long (the +1 because this function appends a trailing '\0')
  * @return: * : A pointer to the trailing '\0' appended to `dstbuf' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strcadd,(char *__dstbuf, char const *__string),(__dstbuf,__string))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),char *,__NOTHROW_NCX,strcadd,(char *__dstbuf, char const *__string),(__dstbuf,__string))
 #else /* __CRT_HAVE_strcadd */
 #include <libc/local/libgen/strcadd.h>
 /* >> strcadd(3)
@@ -576,19 +576,19 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strcadd
  * To prevent a buffer overflow, `dstbuf' should be at least `strlen(string) + 1'
  * bytes long (the +1 because this function appends a trailing '\0')
  * @return: * : A pointer to the trailing '\0' appended to `dstbuf' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strcadd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strcadd)(char *__dstbuf, char const *__string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcadd))(__dstbuf, __string); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strcadd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) char *__NOTHROW_NCX(__LIBCCALL strcadd)(char *__dstbuf, char const *__string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcadd))(__dstbuf, __string); })
 #endif /* !__CRT_HAVE_strcadd */
 #ifdef __CRT_HAVE_strccpy
 /* >> strccpy(3)
  * Same as `strcadd()', but re-returns `dstbuf' rather than `strend(dstbuf)'
  * @return: dstbuf: Always re-returns `dstbuf' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strccpy,(char *__dstbuf, char const *__string),(__dstbuf,__string))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),char *,__NOTHROW_NCX,strccpy,(char *__dstbuf, char const *__string),(__dstbuf,__string))
 #else /* __CRT_HAVE_strccpy */
 #include <libc/local/libgen/strccpy.h>
 /* >> strccpy(3)
  * Same as `strcadd()', but re-returns `dstbuf' rather than `strend(dstbuf)'
  * @return: dstbuf: Always re-returns `dstbuf' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strccpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strccpy)(char *__dstbuf, char const *__string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strccpy))(__dstbuf, __string); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strccpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) char *__NOTHROW_NCX(__LIBCCALL strccpy)(char *__dstbuf, char const *__string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strccpy))(__dstbuf, __string); })
 #endif /* !__CRT_HAVE_strccpy */
 #ifdef __CRT_HAVE_streadd
 /* >> strcadd(3)
@@ -597,7 +597,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strccpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_R
  * long (the +1 because this function appends a trailing '\0')
  * When non-NULL, characters from `dont_encode' are not encoded, but instead kept as-is.
  * @return: * : A pointer to the trailing '\0' appended to `dstbuf' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,streadd,(char *__dstbuf, char const *__string, char const *__dont_encode),(__dstbuf,__string,__dont_encode))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_WR(1),char *,__NOTHROW_NCX,streadd,(char *__dstbuf, char const *__string, char const *__dont_encode),(__dstbuf,__string,__dont_encode))
 #else /* __CRT_HAVE_streadd */
 #include <libc/local/libgen/streadd.h>
 /* >> strcadd(3)
@@ -606,47 +606,47 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,streadd
  * long (the +1 because this function appends a trailing '\0')
  * When non-NULL, characters from `dont_encode' are not encoded, but instead kept as-is.
  * @return: * : A pointer to the trailing '\0' appended to `dstbuf' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(streadd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL streadd)(char *__dstbuf, char const *__string, char const *__dont_encode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(streadd))(__dstbuf, __string, __dont_encode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(streadd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_WR(1) char *__NOTHROW_NCX(__LIBCCALL streadd)(char *__dstbuf, char const *__string, char const *__dont_encode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(streadd))(__dstbuf, __string, __dont_encode); })
 #endif /* !__CRT_HAVE_streadd */
 #ifdef __CRT_HAVE_strecpy
 /* >> strecpy(3)
  * Same as `streadd()', but re-returns `dstbuf' rather than `strend(dstbuf)'
  * @return: dstbuf: Always re-returns `dstbuf' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strecpy,(char *__dstbuf, char const *__string, char const *__dont_encode),(__dstbuf,__string,__dont_encode))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_WR(1),char *,__NOTHROW_NCX,strecpy,(char *__dstbuf, char const *__string, char const *__dont_encode),(__dstbuf,__string,__dont_encode))
 #else /* __CRT_HAVE_strecpy */
 #include <libc/local/libgen/strecpy.h>
 /* >> strecpy(3)
  * Same as `streadd()', but re-returns `dstbuf' rather than `strend(dstbuf)'
  * @return: dstbuf: Always re-returns `dstbuf' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strecpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strecpy)(char *__dstbuf, char const *__string, char const *__dont_encode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strecpy))(__dstbuf, __string, __dont_encode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strecpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_WR(1) char *__NOTHROW_NCX(__LIBCCALL strecpy)(char *__dstbuf, char const *__string, char const *__dont_encode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strecpy))(__dstbuf, __string, __dont_encode); })
 #endif /* !__CRT_HAVE_strecpy */
 #ifdef __CRT_HAVE_strfind
 /* >> strfind(3)
  * Same as `p = strstr(haystack, needle); p ? p - haystack : -1'
  * @return: * : `needle' found at `haystack + return'
  * @return: -1: `needle' not found in `haystack' */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,strfind,(char const *__haystack, char const *__needle),(__haystack,__needle))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,strfind,(char const *__haystack, char const *__needle),(__haystack,__needle))
 #else /* __CRT_HAVE_strfind */
 #include <libc/local/libgen/strfind.h>
 /* >> strfind(3)
  * Same as `p = strstr(haystack, needle); p ? p - haystack : -1'
  * @return: * : `needle' found at `haystack + return'
  * @return: -1: `needle' not found in `haystack' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL strfind)(char const *__haystack, char const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strfind))(__haystack, __needle); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL strfind)(char const *__haystack, char const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strfind))(__haystack, __needle); })
 #endif /* !__CRT_HAVE_strfind */
 #ifdef __CRT_HAVE_strrspn
 /* >> strrspn(3)
  * Scanning from the right, return a pointer to last character in  `haystack'
  * for which `strchr(accept, ch) != NULL'. If `haystack' consists entirely of
  * characters from `accept', re-returns `haystack'. */
-__CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strrspn,(char const *__haystack, char const *__accept),(__haystack,__accept))
+__CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_NCX,strrspn,(char const *__haystack, char const *__accept),(__haystack,__accept))
 #else /* __CRT_HAVE_strrspn */
 #include <libc/local/libgen/strrspn.h>
 /* >> strrspn(3)
  * Scanning from the right, return a pointer to last character in  `haystack'
  * for which `strchr(accept, ch) != NULL'. If `haystack' consists entirely of
  * characters from `accept', re-returns `haystack'. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strrspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strrspn)(char const *__haystack, char const *__accept) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strrspn))(__haystack, __accept); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strrspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) char *__NOTHROW_NCX(__LIBCCALL strrspn)(char const *__haystack, char const *__accept) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strrspn))(__haystack, __accept); })
 #endif /* !__CRT_HAVE_strrspn */
 #ifdef __CRT_HAVE_strtrns
 /* >> strtrns(3)
@@ -657,7 +657,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strrspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
  * of `repl_map' can be accessed,  and that the `result'  buffer
  * has space for at least `strlen(string) + 1' characters.
  * @return: result: Always re-returns `result' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3, 4)),char *,__NOTHROW_NCX,strtrns,(char const *__string, char const *__find_map, char const *__repl_map, char *__result),(__string,__find_map,__repl_map,__result))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(4),char *,__NOTHROW_NCX,strtrns,(char const *__string, char const *__find_map, char const *__repl_map, char *__result),(__string,__find_map,__repl_map,__result))
 #else /* __CRT_HAVE_strtrns */
 #include <libc/local/libgen/strtrns.h>
 /* >> strtrns(3)
@@ -668,7 +668,7 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3, 4)),char *,__NOTHROW_NCX,s
  * of `repl_map' can be accessed,  and that the `result'  buffer
  * has space for at least `strlen(string) + 1' characters.
  * @return: result: Always re-returns `result' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtrns, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3, 4)) char *__NOTHROW_NCX(__LIBCCALL strtrns)(char const *__string, char const *__find_map, char const *__repl_map, char *__result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtrns))(__string, __find_map, __repl_map, __result); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtrns, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(4) char *__NOTHROW_NCX(__LIBCCALL strtrns)(char const *__string, char const *__find_map, char const *__repl_map, char *__result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtrns))(__string, __find_map, __repl_map, __result); })
 #endif /* !__CRT_HAVE_strtrns */
 #endif /* __USE_SOLARIS */
 

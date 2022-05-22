@@ -100,7 +100,7 @@ typedef __SIZE_TYPE__ size_t;
 void *realloc_in_place(void *__restrict mallptr, size_t n_bytes);
 
 [[ignore, nocrt, alias("posix_memalign"), decl_include("<hybrid/typecore.h>")]]
-int crt_posix_memalign([[nonnull]] void **__restrict pp,
+int crt_posix_memalign([[out]] void **__restrict pp,
                        size_t alignment, size_t n_bytes);
 
 %
@@ -133,7 +133,7 @@ void *valloc($size_t n_bytes) {
 [[guard, crtbuiltin, decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), impl_include("<libc/errno.h>")]]
 [[userimpl, requires_function(memalign)]]
-$errno_t posix_memalign([[nonnull]] void **__restrict pp,
+$errno_t posix_memalign([[out]] void **__restrict pp,
                         $size_t alignment, $size_t n_bytes) {
 	void *result;
 	size_t d = alignment / sizeof(void *);
@@ -214,7 +214,7 @@ int mallopt(int parameter_number, int parameter_value) {
 [[export_alias("__memdup"), decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl, requires_function(malloc)]]
-void *memdup([[nonnull]] void const *__restrict ptr, size_t n_bytes) {
+void *memdup([[in(n_bytes)]] void const *__restrict ptr, size_t n_bytes) {
 	void *result;
 	result = malloc(n_bytes);
 	if likely(result)
@@ -225,7 +225,7 @@ void *memdup([[nonnull]] void const *__restrict ptr, size_t n_bytes) {
 [[export_alias("__memcdup"), decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), userimpl, requires_function(memdup)]]
-void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes) {
+void *memcdup([[in(? <= n_bytes)]] void const *__restrict ptr, int needle, size_t n_bytes) {
 	if likely(n_bytes) {
 		void const *endaddr;
 		endaddr = memchr(ptr, needle, n_bytes - 1);

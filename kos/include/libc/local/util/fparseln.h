@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7c4dad8 */
+/* HASH CRC-32:0x21eaa25 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,27 +111,27 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline_unlocked,(__lineptr,__pcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW(3),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline_unlocked,(__lineptr,__pcount,__stream))
 #elif defined(__CRT_HAVE_getline)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline,(__lineptr,__pcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW(3),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline,(__lineptr,__pcount,__stream))
 #elif defined(__CRT_HAVE_getline_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline_unlocked,(__lineptr,__pcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW(3),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline_unlocked,(__lineptr,__pcount,__stream))
 #elif defined(__CRT_HAVE___getline)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),__getline,(__lineptr,__pcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW(3),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),__getline,(__lineptr,__pcount,__stream))
 #elif defined(__CRT_HAVE__IO_getline)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),_IO_getline,(__lineptr,__pcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW(3),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),_IO_getline,(__lineptr,__pcount,__stream))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/getline.h>
@@ -211,7 +211,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/stdio.h>
 #include <asm/crt/util.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fparseln) __ATTR_WUNUSED __ATTR_ACCESS_RW(1) char *
+__LOCAL_LIBC(fparseln) __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(3) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fparseln))(__FILE *__stream, __SIZE_TYPE__ *__plen, __SIZE_TYPE__ *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags) {
 	char *__result;
 	__SIZE_TYPE__ __result_alloc;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9f1052a */
+/* HASH CRC-32:0x7b6c64a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_mq_timedreceive32_defined) && defined(__CRT_HAVE_mq_timedreceive)
 #define __local___localdep_mq_timedreceive32_defined
-__CREDIRECT(__ATTR_NONNULL((2, 5)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive32,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec32 const *__restrict __abs_timeout),mq_timedreceive,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+__CREDIRECT(__ATTR_ACCESS_RO(5) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive32,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec32 const *__restrict __abs_timeout),mq_timedreceive,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #endif /* !__local___localdep_mq_timedreceive32_defined && __CRT_HAVE_mq_timedreceive */
 #ifndef __local___localdep_mq_timedreceive64_defined
 #define __local___localdep_mq_timedreceive64_defined
 #if defined(__CRT_HAVE_mq_timedreceive) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((2, 5)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive64,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec64 const *__restrict __abs_timeout),mq_timedreceive,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+__CREDIRECT(__ATTR_ACCESS_RO(5) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive64,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec64 const *__restrict __abs_timeout),mq_timedreceive,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedreceive64)
-__CREDIRECT(__ATTR_NONNULL((2, 5)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive64,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec64 const *__restrict __abs_timeout),mq_timedreceive64,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+__CREDIRECT(__ATTR_ACCESS_RO(5) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive64,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec64 const *__restrict __abs_timeout),mq_timedreceive64,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedreceive)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mqueue/mq_timedreceive64.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_mq_timedreceive64_defined
 #endif /* !... */
 #endif /* !__local___localdep_mq_timedreceive64_defined */
-__LOCAL_LIBC(mq_timedreceive) __ATTR_NONNULL((2, 5)) __SSIZE_TYPE__
+__LOCAL_LIBC(mq_timedreceive) __ATTR_ACCESS_RO(5) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WR_OPT(4) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mq_timedreceive))(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec const *__restrict __abs_timeout) {
 #ifdef __CRT_HAVE_mq_timedreceive
 	struct __timespec32 __abs_timeout32;

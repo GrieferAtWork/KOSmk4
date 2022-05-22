@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee4b8601 */
+/* HASH CRC-32:0x107fb3b3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,9 +40,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_putenv_defined
 #define __local___localdep_putenv_defined
 #ifdef __CRT_HAVE_putenv
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_putenv,(char *__string),putenv,(__string))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_putenv,(char *__string),putenv,(__string))
 #elif defined(__CRT_HAVE__putenv)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_putenv,(char *__string),_putenv,(__string))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_putenv,(char *__string),_putenv,(__string))
 #else /* ... */
 #undef __local___localdep_putenv_defined
 #endif /* !... */
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(unsetenv) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(unsetenv) __ATTR_ACCESS_RO(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unsetenv))(char const *__varname) {
 	int __result;
 	char *__copy;

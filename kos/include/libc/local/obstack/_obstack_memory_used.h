@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2fee632 */
+/* HASH CRC-32:0x2e397c4e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <features.h>
 #include <bits/crt/obstack.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_obstack_memory_used) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(_obstack_memory_used) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_obstack_memory_used))(struct obstack __KOS_FIXED_CONST *__self) {
 	__SIZE_TYPE__ __result = 0;
 	struct _obstack_chunk *__iter;

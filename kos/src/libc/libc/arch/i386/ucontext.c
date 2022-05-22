@@ -113,7 +113,11 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 	sp = (byte_t *)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size;
 	sp -= argc * 4;
 	/* Copy arguments onto the target stack. */
-	sp = (byte_t *)memcpyl(sp, &argc + 1, argc);
+	{
+		void const *p = &argc + 1;
+		COMPILER_DELETE_ASSUMPTIONS(p); /* We're not supposed to do this, so /hush/ */
+		sp = (byte_t *)memcpyl(sp, p, argc);
+	}
 	sp -= 4;
 	*(u32 *)sp = (u32)libc_makecontext_exit_thread;
 	if (ucp->uc_link) {

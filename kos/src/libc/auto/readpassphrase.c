@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb3eaed8 */
+/* HASH CRC-32:0x61b6df79 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,7 +95,7 @@ __NAMESPACE_LOCAL_END
  * @param: flags: Set of `RPP_*' (from `<readpassphrase.h>')
  * @return: buf:  Success
  * @return: NULL: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((2)) char *
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_WRS(2, 3) char *
 NOTHROW_NCX(LIBCCALL libc_readpassphrase)(char const *prompt,
                                           char *buf,
                                           size_t bufsize,

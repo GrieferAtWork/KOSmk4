@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x315f90e7 */
+/* HASH CRC-32:0x87000da1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,22 +42,22 @@ __CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep__filbuf,(__FILE *__res
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_NONNULL((1)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__THROWING,__localdep_crt_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE__IO_fread)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_NONNULL((1)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fread,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__THROWING,__localdep_crt_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_IO_fread,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE_fread_unlocked)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_NONNULL((1)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__THROWING,__localdep_crt_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream))
 #elif defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_NONNULL((1)),__SIZE_TYPE__,__THROWING,__localdep_crt_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__THROWING,__localdep_crt_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream))
 #else /* ... */
 #undef __local___localdep_crt_fread_unlocked_defined
 #endif /* !... */

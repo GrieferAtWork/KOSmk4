@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1b575c0 */
+/* HASH CRC-32:0xcd8e5a05 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(format_c32aprintf_pack) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
+__LOCAL_LIBC(format_c32aprintf_pack) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR_OPT(2) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_c32aprintf_pack))(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) {
 	/* Free unused buffer memory. */
 	__CHAR32_TYPE__ *__result;

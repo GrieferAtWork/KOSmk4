@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f56153f */
+/* HASH CRC-32:0x8121d54b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -58,11 +58,11 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_symlink_defined
 #define __local___localdep_symlink_defined
 #ifdef __CRT_HAVE_symlink
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_symlink,(char const *__link_text, char const *__target_path),symlink,(__link_text,__target_path))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_symlink,(char const *__link_text, char const *__target_path),symlink,(__link_text,__target_path))
 #elif defined(__CRT_HAVE___symlink)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_symlink,(char const *__link_text, char const *__target_path),__symlink,(__link_text,__target_path))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_symlink,(char const *__link_text, char const *__target_path),__symlink,(__link_text,__target_path))
 #elif defined(__CRT_HAVE___libc_symlink)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_symlink,(char const *__link_text, char const *__target_path),__libc_symlink,(__link_text,__target_path))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_symlink,(char const *__link_text, char const *__target_path),__libc_symlink,(__link_text,__target_path))
 #elif defined(__AT_FDCWD) && (defined(__CRT_HAVE_symlinkat) || defined(__CRT_HAVE_fsymlinkat))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/symlink.h>
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wfsymlinkat_defined
 #define __local___localdep_wfsymlinkat_defined
 #ifdef __CRT_HAVE_wfsymlinkat
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_wfsymlinkat,(__WCHAR_TYPE__ const *__link_text, __fd_t __tofd, __WCHAR_TYPE__ const *__target_path, __atflag_t __flags),wfsymlinkat,(__link_text,__tofd,__target_path,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,__localdep_wfsymlinkat,(__WCHAR_TYPE__ const *__link_text, __fd_t __tofd, __WCHAR_TYPE__ const *__target_path, __atflag_t __flags),wfsymlinkat,(__link_text,__tofd,__target_path,__flags))
 #elif defined(__CRT_HAVE_fsymlinkat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.unistd/wfsymlinkat.h>
@@ -88,7 +88,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wsymlinkat_defined
 #define __local___localdep_wsymlinkat_defined
 #ifdef __CRT_HAVE_wsymlinkat
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_wsymlinkat,(__WCHAR_TYPE__ const *__link_text, __fd_t __tofd, __WCHAR_TYPE__ const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,__localdep_wsymlinkat,(__WCHAR_TYPE__ const *__link_text, __fd_t __tofd, __WCHAR_TYPE__ const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
 #elif defined(__CRT_HAVE_wfsymlinkat) || (defined(__CRT_HAVE_fsymlinkat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || ((defined(__CRT_HAVE_symlinkat) || defined(__CRT_HAVE_fsymlinkat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.unistd/wsymlinkat.h>
@@ -98,7 +98,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_wsymlinkat_defined
 #endif /* !... */
 #endif /* !__local___localdep_wsymlinkat_defined */
-__LOCAL_LIBC(wsymlink) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(wsymlink) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wsymlink))(__WCHAR_TYPE__ const *__link_text, __WCHAR_TYPE__ const *__target_path) {
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_wfsymlinkat) || (defined(__CRT_HAVE_fsymlinkat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
 	return (__NAMESPACE_LOCAL_SYM __localdep_wfsymlinkat)(__link_text, __AT_FDCWD, __target_path, 0);

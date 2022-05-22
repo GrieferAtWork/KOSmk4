@@ -48,7 +48,7 @@ __SYSDECL_BEGIN
 [[guard, decl_include("<linux/sysinfo.h>")]]
 [[no_crt_self_import, if(!defined(__solaris__)), alias("sysinfo")]]
 [[export_alias("__sysinfo", "__libc_sysinfo")]]
-int sysinfo([[nonnull]] struct sysinfo *info);
+int sysinfo([[out]] struct sysinfo *info);
 
 @@>> get_nprocs_conf(3)
 @@Return the # of configured online processors

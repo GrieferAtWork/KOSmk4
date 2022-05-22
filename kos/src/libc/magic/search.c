@@ -147,7 +147,7 @@ struct qelem {
 
 @@>> insque(3)
 @@Insert ELEM into a doubly-linked list, after PREV
-void insque([[nonnull]] void *__restrict elem, void *prev) {
+void insque([[out]] void *__restrict elem, [[inout_opt]] void *prev) {
 	struct __queue_link {
 		struct __queue_link *l_forw; /* [0..1] Forward link */
 		struct __queue_link *l_back; /* [0..1] Backward link */
@@ -168,7 +168,7 @@ void insque([[nonnull]] void *__restrict elem, void *prev) {
 
 @@>> remque(3)
 @@Unlink ELEM from the doubly-linked list that it is in
-void remque([[nonnull]] void *__restrict elem) {
+void remque([[inout]] void *__restrict elem) {
 	struct __queue_link {
 		struct __queue_link *l_forw; /* [0..1] Forward link */
 		struct __queue_link *l_back; /* [0..1] Backward link */
@@ -300,8 +300,8 @@ struct hsearch_data {
 [[impl_prefix(DEFINE_SEARCH_ENTRY)]]
 [[impl_include("<libc/errno.h>")]]
 int hsearch_r(ENTRY item, ACTION action,
-              [[nonnull]] ENTRY **retval,
-              [[nonnull]] struct hsearch_data *htab) {
+              [[out]] ENTRY **retval,
+              [[inout]] struct hsearch_data *htab) {
 	typedef struct {
 		unsigned int used;
 		ENTRY        entry;
@@ -520,7 +520,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(maybe_split_for_insert))(void **rootp
 	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(a, b, c->arg); },
 	impl: tsearch_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, &$cook),
 ))]]
-void *tsearch_r([[nullable]] void const *key, [[nullable]] void **vrootp,
+void *tsearch_r([[in_opt]] void const *key, [[inout_opt]] void **vrootp,
                 [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
                 void *arg) {
 	typedef struct __node_struct {
@@ -584,7 +584,7 @@ void *tsearch_r([[nullable]] void const *key, [[nullable]] void **vrootp,
 	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(a, b, c->arg); },
 	impl: tfind_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, &$cook),
 ))]]
-void *tfind_r([[nullable]] void const *key, [[nullable]] void *const *vrootp,
+void *tfind_r([[in_opt]] void const *key, [[in_opt]] void *const *vrootp,
               [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
               void *arg) {
 	typedef struct __node_struct {
@@ -614,7 +614,7 @@ void *tfind_r([[nullable]] void const *key, [[nullable]] void *const *vrootp,
 	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(a, b, c->arg); },
 	impl: tdelete_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, &$cook),
 ))]]
-void *tdelete_r([[nullable]] void const *__restrict key, [[nullable]] void **__restrict vrootp,
+void *tdelete_r([[in_opt]] void const *__restrict key, [[inout_opt]] void **__restrict vrootp,
                 [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
                 void *arg) {
 	typedef struct __node_struct {
@@ -825,7 +825,7 @@ __LOCAL_LIBC(trecurse) NONNULL((1, 2)) void
 	wrap: (void const *nodep, VISIT value, int level, $cook *c) { (*c->action)(nodep, value, level, c->arg); },
 	impl: twalk_r(root, (void (LIBCCALL *)(void const *, VISIT, int, void *))&$wrap, &$cook),
 ))]]
-void twalk_r([[nullable]] void const *root,
+void twalk_r([[in_opt]] void const *root,
              [[nullable]] void (LIBCCALL *action)(void const *nodep, VISIT value, int level, void *arg),
              void *arg) {
 	if (root && action)
@@ -839,7 +839,7 @@ void twalk_r([[nullable]] void const *root,
 	wrap: (void *nodep, $cook *c) { (*c->freefct)(nodep, c->arg); },
 	impl: tdestroy_r(root, (void (LIBCCALL *)(void *, void *))&$wrap, &$cook),
 ))]]
-void tdestroy_r([[nullable]] void *root,
+void tdestroy_r([[inout_opt]] void *root,
                 [[nonnull]] void (LIBCCALL *freefct)(void *nodep, void *arg),
                 void *arg) {
 	if (root) {
@@ -876,7 +876,7 @@ again:
 	wrap: (void const *a, void const *b, $cook c): int { return (*c)(a, b); },
 	impl: tsearch_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, (void *)$cook),
 ))]]
-void *tsearch(void const *key, [[nullable]] void **vrootp,
+void *tsearch([[in_opt]] void const *key, [[inout_opt]] void **vrootp,
               [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)) {
 @@pp_ifdef __LIBCCALL_CALLER_CLEANUP@@
 	return tsearch_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))(void *)compar, NULL);
@@ -892,7 +892,7 @@ void *tsearch(void const *key, [[nullable]] void **vrootp,
 	wrap: (void const *a, void const *b, $cook c): int { return (*c)(a, b); },
 	impl: tfind_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, (void *)$cook),
 ))]]
-void *tfind([[nullable]] void const *key, [[nullable]] void *const *vrootp,
+void *tfind([[in_opt]] void const *key, [[in_opt]] void *const *vrootp,
             [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)) {
 @@pp_ifdef __LIBCCALL_CALLER_CLEANUP@@
 	return tfind_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))(void *)compar, NULL);
@@ -908,7 +908,7 @@ void *tfind([[nullable]] void const *key, [[nullable]] void *const *vrootp,
 	wrap: (void const *a, void const *b, $cook c): int { return (*c)(a, b); },
 	impl: tdelete_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, (void *)$cook),
 ))]]
-void *tdelete([[nullable]] void const *__restrict key, [[nullable]] void **__restrict vrootp,
+void *tdelete([[in_opt]] void const *__restrict key, [[inout_opt]] void **__restrict vrootp,
               [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)) {
 @@pp_ifdef __LIBCCALL_CALLER_CLEANUP@@
 	return tdelete_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))(void *)compar, NULL);
@@ -947,7 +947,7 @@ __LOCAL_LIBC(__invoke_twalk_action_helper) void
 	wrap: (void const *nodep, VISIT value, int level, $cook c) { (*c)(nodep, value, level); },
 	impl: twalk_r(root, (void (LIBCCALL *)(void const *, VISIT, int, void *))&$wrap, (void *)$cook),
 ))]]
-void twalk([[nullable]] void const *root,
+void twalk([[in_opt]] void const *root,
            [[nullable]] void (LIBCCALL *action)(void const *nodep, VISIT value, int level)) {
 @@pp_ifdef __LIBCCALL_CALLER_CLEANUP@@
 	twalk_r(root, (void (LIBCCALL *)(void const *, VISIT, int, void *))(void *)action, NULL);
@@ -987,7 +987,7 @@ __LOCAL_LIBC(__invoke_free_fn_helper) void
 	wrap: (void *nodep, $cook c) { (*c)(nodep); },
 	impl: tdestroy_r(root, (void (LIBCCALL *)(void *, void *))&$wrap, (void *)$cook),
 )), impl_prefix(DEFINE_INVOKE_FREE_FN_HELPER)]]
-void tdestroy([[nullable]] void *root,
+void tdestroy([[inout_opt]] void *root,
               [[nonnull]] void (LIBCCALL *freefct)(void *nodep)) {
 @@pp_ifdef __LIBCCALL_CALLER_CLEANUP@@
 	tdestroy_r(root, (void (LIBCCALL *)(void *, void *))(void *)freefct, NULL);
@@ -1009,9 +1009,9 @@ void tdestroy([[nullable]] void *root,
 	wrap: ($cook c, void const *a, void const *b): int { return (*c)(a, b); },
 	impl: _lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, (void *)$cook),
 ))]]
-void *lfind(void const *key, [[nonnull]] void const *pbase, [[nonnull]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] __compar_fn_t compar)
-	[(void const *key, [[nonnull]] void *pbase, [[nonnull]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] __compar_fn_t compar): void *]
-	[(void const *key, [[nonnull]] void const *pbase, [[nonnull]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] __compar_fn_t compar): void const *]
+void *lfind([[in_opt]] void const *key, [[nonnull]] void const *pbase, [[in]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] __compar_fn_t compar)
+	[([[in_opt]] void const *key, [[nonnull]] void *pbase, [[in]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] __compar_fn_t compar): void *]
+	[([[in_opt]] void const *key, [[nonnull]] void const *pbase, [[in]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] __compar_fn_t compar): void const *]
 {
 	size_t i, count = *pitem_count;
 	void const *result = pbase;
@@ -1032,8 +1032,8 @@ void *lfind(void const *key, [[nonnull]] void const *pbase, [[nonnull]] size_t _
 	wrap: ($cook c, void const *a, void const *b): int { return (*c)(a, b); },
 	impl: _lsearch_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, (void *)$cook),
 ))]]
-void *lsearch(void const *key, [[nonnull]] void *pbase,
-              [[nonnull]] size_t *pitem_count, size_t item_size,
+void *lsearch([[in_opt]] void const *key, [[nonnull]] void *pbase,
+              [[inout]] size_t *pitem_count, size_t item_size,
               [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)) {
 	void *result;
 	result = lfind(key, pbase, pitem_count, item_size, compar);
@@ -1066,9 +1066,9 @@ typedef __compar_fn_t _CoreCrtMgdNonSecureSearchSortCompareFunction;
 	wrap: ($cook *c, void const *a, void const *b): int { return (*c->compar)(c->arg, a, b); },
 	impl: _lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, &$cook),
 ))]]
-void *_lfind_s(void const *key, [[nonnull]] void const *pbase, [[nonnull]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg)
-	[(void const *key, [[nonnull]] void *pbase, [[nonnull]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg): void *]
-	[(void const *key, [[nonnull]] void const *pbase, [[nonnull]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg): void const *]
+void *_lfind_s([[in_opt]] void const *key, [[nonnull]] void const *pbase, [[in]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg)
+	[([[in_opt]] void const *key, [[nonnull]] void *pbase, [[in]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg): void *]
+	[([[in_opt]] void const *key, [[nonnull]] void const *pbase, [[in]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg): void const *]
 {
 	size_t i, count = *pitem_count;
 	void const *result = pbase;
@@ -1086,8 +1086,8 @@ void *_lfind_s(void const *key, [[nonnull]] void const *pbase, [[nonnull]] size_
 	wrap: ($cook *c, void const *a, void const *b): int { return (*c->compar)(c->arg, a, b); },
 	impl: _lsearch_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, &$cook),
 ))]]
-void *_lsearch_s(void const *key, [[nonnull]] void *pbase,
-                 [[nonnull]] size_t *pitem_count, size_t item_size,
+void *_lsearch_s([[in_opt]] void const *key, [[nonnull]] void *pbase,
+                 [[inout]] size_t *pitem_count, size_t item_size,
                  [[nonnull]] int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
                  void *arg) {
 	void *result;

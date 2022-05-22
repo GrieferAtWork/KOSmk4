@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35dd43b4 */
+/* HASH CRC-32:0xb3b2d471 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -219,12 +219,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/os/pollfd.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_poll,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, int __timeout),poll,(__fds,__nfds,__timeout))
+__CREDIRECT(__ATTR_ACCESS_RWS(1, 2),int,__NOTHROW_RPC,__localdep_poll,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, int __timeout),poll,(__fds,__nfds,__timeout))
 #elif defined(__CRT_HAVE___poll)
 __NAMESPACE_LOCAL_END
 #include <bits/os/pollfd.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_poll,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, int __timeout),__poll,(__fds,__nfds,__timeout))
+__CREDIRECT(__ATTR_ACCESS_RWS(1, 2),int,__NOTHROW_RPC,__localdep_poll,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, int __timeout),__poll,(__fds,__nfds,__timeout))
 #else /* ... */
 #undef __local___localdep_poll_defined
 #endif /* !... */
@@ -276,12 +276,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),tcgetattr,(__fd,__termios_p))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),tcgetattr,(__fd,__termios_p))
 #elif defined(__CRT_HAVE___tcgetattr)
 __NAMESPACE_LOCAL_END
 #include <bits/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),__tcgetattr,(__fd,__termios_p))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),__tcgetattr,(__fd,__termios_p))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <asm/os/tty.h>
@@ -302,7 +302,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_tcsetattr,(__fd_t __fd, __STDC_INT_AS_UINT_T __optional_actions, struct termios const *__restrict __termios_p),tcsetattr,(__fd,__optional_actions,__termios_p))
+__CREDIRECT(__ATTR_ACCESS_RO(3),int,__NOTHROW_NCX,__localdep_tcsetattr,(__fd_t __fd, __STDC_INT_AS_UINT_T __optional_actions, struct termios const *__restrict __termios_p),tcsetattr,(__fd,__optional_actions,__termios_p))
 #elif defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)
 __NAMESPACE_LOCAL_END
 #include <libc/local/termios/tcsetattr.h>
@@ -379,7 +379,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/poll.h>
 #include <libc/strings.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getpassfd) __ATTR_WUNUSED char *
+__LOCAL_LIBC(getpassfd) __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_WR_OPT(2) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, char *__buf, __SIZE_TYPE__ __buflen, __fd_t __fds[3], __STDC_INT_AS_UINT_T __flags, int __timeout_in_seconds) {
 #ifndef __STDIN_FILENO
 #define __STDIN_FILENO 0

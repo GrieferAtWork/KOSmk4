@@ -224,8 +224,8 @@ NOTHROW(LIBCCALL libc_rand)(void)
 }
 /*[[[end:libc_rand]]]*/
 
-/*[[[head:libc_strfromd,hash:CRC-32=0xb6e8d74]]]*/
-INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((3)) __STDC_INT32_AS_SIZE_T
+/*[[[head:libc_strfromd,hash:CRC-32=0x9e91291c]]]*/
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) __STDC_INT32_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_strfromd)(char *__restrict buf,
                                     size_t buflen,
                                     char const *__restrict format,
@@ -242,8 +242,8 @@ NOTHROW_NCX(LIBCCALL libc_strfromd)(char *__restrict buf,
 }
 /*[[[end:libc_strfromd]]]*/
 
-/*[[[head:libc_strfromf,hash:CRC-32=0x78dd512c]]]*/
-INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((3)) __STDC_INT32_AS_SIZE_T
+/*[[[head:libc_strfromf,hash:CRC-32=0x3833bbe4]]]*/
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) __STDC_INT32_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_strfromf)(char *__restrict buf,
                                     size_t buflen,
                                     char const *__restrict format,
@@ -260,8 +260,8 @@ NOTHROW_NCX(LIBCCALL libc_strfromf)(char *__restrict buf,
 }
 /*[[[end:libc_strfromf]]]*/
 
-/*[[[head:libc_strfroml,hash:CRC-32=0xedf4516d]]]*/
-INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((3)) __STDC_INT32_AS_SIZE_T
+/*[[[head:libc_strfroml,hash:CRC-32=0xa92999e6]]]*/
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) __STDC_INT32_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_strfroml)(char *__restrict buf,
                                     size_t buflen,
                                     char const *__restrict format,
@@ -278,8 +278,8 @@ NOTHROW_NCX(LIBCCALL libc_strfroml)(char *__restrict buf,
 }
 /*[[[end:libc_strfroml]]]*/
 
-/*[[[head:libc_rand_r,hash:CRC-32=0x50bd9f7e]]]*/
-INTERN ATTR_SECTION(".text.crt.random") NONNULL((1)) int
+/*[[[head:libc_rand_r,hash:CRC-32=0x3fb27ea5]]]*/
+INTERN ATTR_SECTION(".text.crt.random") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed)
 /*[[[body:libc_rand_r]]]*/
 {
@@ -320,8 +320,8 @@ NOTHROW_NCX(LIBCCALL libc_srandom)(unsigned int seed) {
 
 
 
-/*[[[head:libc_getenv,hash:CRC-32=0x5a7650b6]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.environ") WUNUSED NONNULL((1)) char *
+/*[[[head:libc_getenv,hash:CRC-32=0x9ff2ae63]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.environ") WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 /*[[[body:libc_getenv]]]*/
 {
@@ -402,8 +402,8 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 
 
 
-/*[[[head:libc_setenv,hash:CRC-32=0x4507caac]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.environ") NONNULL((1, 2)) int
+/*[[[head:libc_setenv,hash:CRC-32=0x68a3ab29]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.environ") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname,
                                   char const *val,
                                   int replace)
@@ -521,8 +521,8 @@ do_fill_environ:
 }
 /*[[[end:libc_setenv]]]*/
 
-/*[[[head:libc_unsetenv,hash:CRC-32=0x823d2ab5]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.environ") NONNULL((1)) int
+/*[[[head:libc_unsetenv,hash:CRC-32=0xdbf6f985]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.environ") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
 /*[[[body:libc_unsetenv]]]*/
 {
@@ -606,8 +606,8 @@ NOTHROW_NCX(LIBCCALL libc_clearenv)(void)
 }
 /*[[[end:libc_clearenv]]]*/
 
-/*[[[head:libc_putenv,hash:CRC-32=0x9816a81b]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.environ") NONNULL((1)) int
+/*[[[head:libc_putenv,hash:CRC-32=0x4a963084]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.environ") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_putenv)(char *string)
 /*[[[body:libc_putenv]]]*/
 {
@@ -999,8 +999,8 @@ NOTHROW(LIBDCALL libd_p_environ)(void) {
 	return &libd_environ;
 }
 
-/*[[[head:libd_getenv,hash:CRC-32=0x9ccb4c39]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
+/*[[[head:libd_getenv,hash:CRC-32=0xb497e3e3]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_NCX(LIBDCALL libd_getenv)(char const *varname)
 /*[[[body:libd_getenv]]]*/
 {
@@ -1228,8 +1228,8 @@ err:
 }
 
 
-/*[[[head:libd_setenv,hash:CRC-32=0xe34b5b1f]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1, 2)) int
+/*[[[head:libd_setenv,hash:CRC-32=0x5c498fc6]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname,
                                   char const *val,
                                   int replace)
@@ -1317,8 +1317,8 @@ did_update_dos_environ:
 
 
 
-/*[[[head:libd_unsetenv,hash:CRC-32=0x5d3ac3ab]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1)) int
+/*[[[head:libd_unsetenv,hash:CRC-32=0x2e6bba06]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname)
 /*[[[body:libd_unsetenv]]]*/
 {
@@ -1426,8 +1426,8 @@ NOTHROW_NCX(LIBKCALL libc___p__wenviron)(void)
 /*[[[end:libc___p__wenviron]]]*/
 
 
-/*[[[head:libc__wgetenv,hash:CRC-32=0x47d36374]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") WUNUSED NONNULL((1)) char32_t *
+/*[[[head:libc__wgetenv,hash:CRC-32=0xd27efa6f]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") WUNUSED ATTR_ACCESS_RO(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wgetenv)(char32_t const *varname)
 /*[[[body:libc__wgetenv]]]*/
 {
@@ -1463,8 +1463,8 @@ NOTHROW_NCX(LIBKCALL libc__wgetenv)(char32_t const *varname)
 }
 /*[[[end:libc__wgetenv]]]*/
 
-/*[[[head:libd__wgetenv,hash:CRC-32=0xa6f08241]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") WUNUSED NONNULL((1)) char16_t *
+/*[[[head:libd__wgetenv,hash:CRC-32=0x6ac2d7db]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") WUNUSED ATTR_ACCESS_RO(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname)
 /*[[[body:libd__wgetenv]]]*/
 {
@@ -1500,8 +1500,8 @@ NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname)
 }
 /*[[[end:libd__wgetenv]]]*/
 
-/*[[[head:libd_putenv,hash:CRC-32=0x501d62dd]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1)) int
+/*[[[head:libd_putenv,hash:CRC-32=0x6fbea005]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBDCALL libd_putenv)(char *string)
 /*[[[body:libd_putenv]]]*/
 {
@@ -1520,8 +1520,8 @@ NOTHROW_NCX(LIBDCALL libd_putenv)(char *string)
 }
 /*[[[end:libd_putenv]]]*/
 
-/*[[[head:libd__wputenv,hash:CRC-32=0xe7d19ea2]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) int
+/*[[[head:libd__wputenv,hash:CRC-32=0x87e05a27]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBDCALL libd__wputenv)(char16_t *string)
 /*[[[body:libd__wputenv]]]*/
 {
@@ -1539,8 +1539,8 @@ NOTHROW_NCX(LIBDCALL libd__wputenv)(char16_t *string)
 }
 /*[[[end:libd__wputenv]]]*/
 
-/*[[[head:libc__wputenv,hash:CRC-32=0x913e79b2]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) int
+/*[[[head:libc__wputenv,hash:CRC-32=0xe82e496c]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBKCALL libc__wputenv)(char32_t *string)
 /*[[[body:libc__wputenv]]]*/
 {
@@ -1638,19 +1638,19 @@ err:
 
 
 
-/*[[[head:libc__searchenv_s,hash:CRC-32=0x46622a54]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1, 2, 3)) errno_t
+/*[[[head:libc__searchenv_s,hash:CRC-32=0x89547e75]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) errno_t
 NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file,
                                         char const *envvar,
                                         char *__restrict resultpath,
-                                        size_t buflen)
+                                        size_t resultpath_len)
 /*[[[body:libc__searchenv_s]]]*/
 /*AUTO*/{
 	(void)file;
 	(void)envvar;
 	(void)resultpath;
-	(void)buflen;
-	CRT_UNIMPLEMENTEDF("_searchenv_s(%q, %q, %q, %Ix)", file, envvar, resultpath, buflen); /* TODO */
+	(void)resultpath_len;
+	CRT_UNIMPLEMENTEDF("_searchenv_s(%q, %q, %q, %Ix)", file, envvar, resultpath, resultpath_len); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc__searchenv_s]]]*/
@@ -2210,8 +2210,8 @@ NOTHROW_NCX(LIBCCALL libc_lcong48)(unsigned short param[7])
 }
 /*[[[end:libc_lcong48]]]*/
 
-/*[[[head:libc_initstate,hash:CRC-32=0x3f377d70]]]*/
-INTERN ATTR_SECTION(".text.crt.random") NONNULL((2)) char *
+/*[[[head:libc_initstate,hash:CRC-32=0x5e23c03b]]]*/
+INTERN ATTR_SECTION(".text.crt.random") ATTR_ACCESS_WRS(2, 3) char *
 NOTHROW_NCX(LIBCCALL libc_initstate)(unsigned int seed,
                                      char *statebuf,
                                      size_t statelen)
@@ -2238,7 +2238,7 @@ NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf)
 }
 /*[[[end:libc_setstate]]]*/
 
-/*[[[head:libd_frealpath4,hash:CRC-32=0x78fb4c2b]]]*/
+/*[[[head:libd_frealpath4,hash:CRC-32=0xfa556020]]]*/
 /* >> frealpath4(2)
  * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
@@ -2250,7 +2250,7 @@ NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf)
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED ATTR_ACCESS_WR_OPT(2) char *
 NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd,
                                       char *resolved,
                                       size_t buflen,
@@ -2261,7 +2261,7 @@ NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd,
 }
 /*[[[end:libd_frealpath4]]]*/
 
-/*[[[head:libc_frealpath4,hash:CRC-32=0x6096b810]]]*/
+/*[[[head:libc_frealpath4,hash:CRC-32=0x3b7d7f1a]]]*/
 /* >> frealpath4(2)
  * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
@@ -2273,7 +2273,7 @@ NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd,
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED ATTR_ACCESS_WR_OPT(2) char *
 NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd,
                                       char *resolved,
                                       size_t buflen,
@@ -2343,7 +2343,7 @@ done:
 }
 /*[[[end:libc_frealpath4]]]*/
 
-/*[[[head:libd_frealpathat,hash:CRC-32=0xae20a84f]]]*/
+/*[[[head:libd_frealpathat,hash:CRC-32=0xa2b2ddf0]]]*/
 /* >> frealpathat(2)
  * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
@@ -2358,7 +2358,7 @@ done:
  *       pass `0' for `buflen' to automatically determine the required buffer size.
  * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
  * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((2)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WR_OPT(3) char *
 NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd,
                                        char const *filename,
                                        char *resolved,
@@ -2370,7 +2370,7 @@ NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd,
 }
 /*[[[end:libd_frealpathat]]]*/
 
-/*[[[head:libc_frealpathat,hash:CRC-32=0x680c6a42]]]*/
+/*[[[head:libc_frealpathat,hash:CRC-32=0xc15c2497]]]*/
 /* >> frealpathat(2)
  * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
@@ -2385,7 +2385,7 @@ NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd,
  *       pass `0' for `buflen' to automatically determine the required buffer size.
  * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
  * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
-INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((2)) char *
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WR_OPT(3) char *
 NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd,
                                        char const *filename,
                                        char *resolved,
@@ -2484,10 +2484,10 @@ NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags)
 }
 /*[[[end:libc_posix_openpt]]]*/
 
-/*[[[head:libd_ptsname_r,hash:CRC-32=0x135cd6a8]]]*/
+/*[[[head:libd_ptsname_r,hash:CRC-32=0x6a711c13]]]*/
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.tty") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.tty") ATTR_ACCESS_WRS(2, 3) int
 NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd,
                                      char *buf,
                                      size_t buflen)
@@ -2502,10 +2502,10 @@ NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd,
 }
 /*[[[end:libd_ptsname_r]]]*/
 
-/*[[[head:libc_ptsname_r,hash:CRC-32=0xfab75b90]]]*/
+/*[[[head:libc_ptsname_r,hash:CRC-32=0x816b6bc3]]]*/
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_WRS(2, 3) int
 NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd,
                                      char *buf,
                                      size_t buflen)
@@ -2531,11 +2531,11 @@ NOTHROW_RPC(LIBCCALL libc_getpt)(void)
 }
 /*[[[end:libc_getpt]]]*/
 
-/*[[[head:libd_canonicalize_file_name,hash:CRC-32=0x95307a1f]]]*/
+/*[[[head:libd_canonicalize_file_name,hash:CRC-32=0x5916929]]]*/
 /* >> canonicalize_file_name(3)
  * Return the result of `realpath(filename)' as a `malloc()'-
  * allocated  buffer. Upon error, `NULL' is returned instead. */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_MALLOC WUNUSED NONNULL((1)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_MALLOC WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_RPC(LIBDCALL libd_canonicalize_file_name)(char const *filename)
 /*[[[body:libd_canonicalize_file_name]]]*/
 {
@@ -2543,11 +2543,11 @@ NOTHROW_RPC(LIBDCALL libd_canonicalize_file_name)(char const *filename)
 }
 /*[[[end:libd_canonicalize_file_name]]]*/
 
-/*[[[head:libc_canonicalize_file_name,hash:CRC-32=0xec883933]]]*/
+/*[[[head:libc_canonicalize_file_name,hash:CRC-32=0x512b3294]]]*/
 /* >> canonicalize_file_name(3)
  * Return the result of `realpath(filename)' as a `malloc()'-
  * allocated  buffer. Upon error, `NULL' is returned instead. */
-INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_MALLOC WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_MALLOC WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_RPC(LIBCCALL libc_canonicalize_file_name)(char const *filename)
 /*[[[body:libc_canonicalize_file_name]]]*/
 {
@@ -2958,36 +2958,36 @@ NOTHROW_NCX(LIBCCALL libc__set_abort_behavior)(unsigned int flags,
 
 
 
-/*[[[head:libd__wsearchenv_s,hash:CRC-32=0xac90f019]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
+/*[[[head:libd__wsearchenv_s,hash:CRC-32=0x96335f6d]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) errno_t
 NOTHROW_RPC(LIBDCALL libd__wsearchenv_s)(char16_t const *file,
                                          char16_t const *envvar,
                                          char16_t *__restrict resultpath,
-                                         size_t buflen)
+                                         size_t resultpath_len)
 /*[[[body:libd__wsearchenv_s]]]*/
 /*AUTO*/{
 	(void)file;
 	(void)envvar;
 	(void)resultpath;
-	(void)buflen;
-	CRT_UNIMPLEMENTEDF("DOS$_wsearchenv_s(%p, %p, %p, %Ix)", file, envvar, resultpath, buflen); /* TODO */
+	(void)resultpath_len;
+	CRT_UNIMPLEMENTEDF("DOS$_wsearchenv_s(%p, %p, %p, %Ix)", file, envvar, resultpath, resultpath_len); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libd__wsearchenv_s]]]*/
 
-/*[[[head:libc__wsearchenv_s,hash:CRC-32=0x3e9d5b1]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
+/*[[[head:libc__wsearchenv_s,hash:CRC-32=0x14bd98d2]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) errno_t
 NOTHROW_RPC(LIBKCALL libc__wsearchenv_s)(char32_t const *file,
                                          char32_t const *envvar,
                                          char32_t *__restrict resultpath,
-                                         size_t buflen)
+                                         size_t resultpath_len)
 /*[[[body:libc__wsearchenv_s]]]*/
 /*AUTO*/{
 	(void)file;
 	(void)envvar;
 	(void)resultpath;
-	(void)buflen;
-	CRT_UNIMPLEMENTEDF("_wsearchenv_s(%p, %p, %p, %Ix)", file, envvar, resultpath, buflen); /* TODO */
+	(void)resultpath_len;
+	CRT_UNIMPLEMENTEDF("_wsearchenv_s(%p, %p, %p, %Ix)", file, envvar, resultpath, resultpath_len); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc__wsearchenv_s]]]*/
@@ -2996,8 +2996,8 @@ NOTHROW_RPC(LIBKCALL libc__wsearchenv_s)(char32_t const *file,
 
 
 
-/*[[[head:libc_radixsort,hash:CRC-32=0xfedeeb47]]]*/
-INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1)) int
+/*[[[head:libc_radixsort,hash:CRC-32=0xee7f8cfa]]]*/
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RWS(1, 2) int
 NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base,
                                      int item_count,
                                      unsigned char const *table,
@@ -3014,8 +3014,8 @@ NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base,
 }
 /*[[[end:libc_radixsort]]]*/
 
-/*[[[head:libc_sradixsort,hash:CRC-32=0xd2fec85]]]*/
-INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1)) int
+/*[[[head:libc_sradixsort,hash:CRC-32=0x5043aab]]]*/
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RWS(1, 2) int
 NOTHROW_NCX(LIBCCALL libc_sradixsort)(unsigned char const **base,
                                       int item_count,
                                       unsigned char const *table,
@@ -3032,8 +3032,8 @@ NOTHROW_NCX(LIBCCALL libc_sradixsort)(unsigned char const **base,
 }
 /*[[[end:libc_sradixsort]]]*/
 
-/*[[[head:libc_getbsize,hash:CRC-32=0x7815d4f]]]*/
-INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1, 2)) char *
+/*[[[head:libc_getbsize,hash:CRC-32=0x6167505]]]*/
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc_getbsize)(int *headerlenp,
                                     __LONGPTR_TYPE__ *blocksizep)
 /*[[[body:libc_getbsize]]]*/
@@ -3046,9 +3046,9 @@ NOTHROW_NCX(LIBCCALL libc_getbsize)(int *headerlenp,
 }
 /*[[[end:libc_getbsize]]]*/
 
-/*[[[head:libc_devname_r,hash:CRC-32=0x4bcc89ac]]]*/
+/*[[[head:libc_devname_r,hash:CRC-32=0x642eb214]]]*/
 /* >> devname(3), devname_r(3) */
-INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((3)) int
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_ACCESS_WRS(3, 4) int
 NOTHROW_NCX(LIBCCALL libc_devname_r)(dev_t dev,
                                      mode_t type,
                                      char *buf,

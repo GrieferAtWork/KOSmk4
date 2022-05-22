@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7ac7185 */
+/* HASH CRC-32:0x3b4fc534 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_wcstombs_defined
 #define __local___localdep_convert_wcstombs_defined
 #ifdef __CRT_HAVE_convert_wcstombs
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -55,13 +55,13 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_unlink_defined
 #define __local___localdep_unlink_defined
 #ifdef __CRT_HAVE_unlink
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
 #elif defined(__CRT_HAVE__unlink)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),_unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),_unlink,(__file))
 #elif defined(__CRT_HAVE___unlink)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__unlink,(__file))
 #elif defined(__CRT_HAVE___libc_unlink)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__libc_unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__libc_unlink,(__file))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/unlink.h>
@@ -77,7 +77,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __atflag_t __flags),wunlinkat,(__dfd,__file,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __atflag_t __flags),wunlinkat,(__dfd,__file,__flags))
 #elif defined(__CRT_HAVE_unlinkat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.unistd/wunlinkat.h>
@@ -87,7 +87,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_wunlinkat_defined
 #endif /* !... */
 #endif /* !__local___localdep_wunlinkat_defined */
-__LOCAL_LIBC(wunlink) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(wunlink) __ATTR_ACCESS_RO(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wunlink))(__WCHAR_TYPE__ const *__file) {
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_wunlinkat) || (defined(__CRT_HAVE_unlinkat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
 	return (__NAMESPACE_LOCAL_SYM __localdep_wunlinkat)(__AT_FDCWD, __file, 0);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d3c3ec */
+/* HASH CRC-32:0x283efbf8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_timerfd_gettime32_defined
 #define __local___localdep_timerfd_gettime32_defined
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
 #endif /* !__local___localdep_timerfd_gettime32_defined */
-__LOCAL_LIBC(timerfd_gettime64) __ATTR_NONNULL((2)) int
+__LOCAL_LIBC(timerfd_gettime64) __ATTR_ACCESS_WR(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime64))(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr) {
 	int __result;
 	struct __itimerspec32 __otmr32;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_timerfd_gettime32)(__timerid, &__otmr32);
-	if (!__result) {
+	if (__result == 0) {
 		__otmr->__it_interval.tv_sec  = (__time64_t)__otmr32.__it_interval.tv_sec;
 		__otmr->__it_interval.tv_nsec = __otmr32.__it_interval.tv_nsec;
 		__otmr->__it_value.tv_sec     = (__time64_t)__otmr32.__it_value.tv_sec;

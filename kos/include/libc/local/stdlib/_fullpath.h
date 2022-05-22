@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1257449 */
+/* HASH CRC-32:0x4fe32cfe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,__localdep_frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpathat,(__dirfd,__filename,__resolved,__buflen,__flags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),char *,__NOTHROW_RPC,__localdep_frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpathat,(__dirfd,__filename,__resolved,__buflen,__flags))
 #endif /* !__local___localdep_frealpathat_defined */
-__LOCAL_LIBC(_fullpath) __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
+__LOCAL_LIBC(_fullpath) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_fullpath))(char *__buf, char const *__path, __SIZE_TYPE__ __buflen) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_frealpathat)(__AT_FDCWD, __path, __buf, __buflen, 0);
 }

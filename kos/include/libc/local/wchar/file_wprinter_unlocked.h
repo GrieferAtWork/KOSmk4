@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdec2b0bc */
+/* HASH CRC-32:0xf181f902 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __CREDIRECT(__ATTR_ACCESS_RW(2),__WINT_TYPE__,__THROWING,__localdep_fputwc_unloc
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(file_wprinter_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
+__LOCAL_LIBC(file_wprinter_unlocked) __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(file_wprinter_unlocked))(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) {
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {

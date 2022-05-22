@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22b4807 */
+/* HASH CRC-32:0x90656cec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/frexp.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(frexp) __ATTR_NONNULL((2)) double
+__LOCAL_LIBC(frexp) __ATTR_ACCESS_WR(2) double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexp))(double __x, int *__pexponent) {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)__x, __pexponent);

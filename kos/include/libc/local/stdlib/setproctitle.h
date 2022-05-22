@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa425c3ba */
+/* HASH CRC-32:0xef57a2a1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_vsetproctitle __LIBC_LOCAL_NAME(vsetproctitle)
 #endif /* !__local___localdep_vsetproctitle_defined */
-__LOCAL_LIBC(setproctitle) __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(setproctitle) __ATTR_ACCESS_RO(1) __ATTR_LIBC_PRINTF(1, 2) void
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(setproctitle))(char const *__format, ...) {
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

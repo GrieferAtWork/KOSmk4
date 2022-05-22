@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3379f6f5 */
+/* HASH CRC-32:0x98cb36b5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ NOTHROW_NCX(LIBCCALL libc_objalloc_create)(void) {
  * Allocate `num_bytes' of memory from `self'
  * @return: * :   The `num_bytes'-large data-blob
  * @return: NULL: Out of memory */
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RW(1) ATTR_ALLOC_SIZE((2)) void *
 NOTHROW_NCX(LIBCCALL libc__objalloc_alloc)(struct objalloc *self,
                                            __ULONGPTR_TYPE__ num_bytes) {
 	struct __objalloc_chunk *newchunk;
@@ -107,7 +107,7 @@ steal_from_current_chunk:
 }
 /* >> objalloc_free(3)
  * Free all memory allocated by `self', before also freeing `self' */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RW(1) void
 NOTHROW_NCX(LIBCCALL libc_objalloc_free)(struct objalloc *self) {
 	struct __objalloc_chunk *iter;
 	/* Simply free all chunks, then free `self' */
@@ -123,7 +123,7 @@ NOTHROW_NCX(LIBCCALL libc_objalloc_free)(struct objalloc *self) {
 #include <hybrid/__assert.h>
 /* >> objalloc_free_block(3)
  * Free a given `ptr', as well as everything allocated since. */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) void
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RW(1) NONNULL((2)) void
 NOTHROW_NCX(LIBCCALL libc_objalloc_free_block)(struct objalloc *self,
                                                void *ptr) {
 	struct __objalloc_chunk *iter;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf607d6ad */
+/* HASH CRC-32:0x1fb608bd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ INTDEF WUNUSED struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwuid)(uid_t uid);
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `name' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-INTDEF WUNUSED NONNULL((1)) struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwnam)(const char *name);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwnam)(const char *name);
 /* >> fgetpwent(3)
  * Read an entry from `stream'
  * return: * :                         A pointer to the read password entry
@@ -68,20 +68,20 @@ INTDEF WUNUSED ATTR_ACCESS_RW(1) struct passwd *NOTHROW_RPC(LIBCCALL libc_fgetpw
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `uid'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF NONNULL((2, 3, 5)) errno_t NOTHROW_RPC(LIBCCALL libc_getpwuid_r)(uid_t uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) errno_t NOTHROW_RPC(LIBCCALL libc_getpwuid_r)(uid_t uid, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 /* >> getpwnam_r(3)
  * Search for an entry with a matching username
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBCCALL libc_getpwnam_r)(const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) errno_t NOTHROW_RPC(LIBCCALL libc_getpwnam_r)(const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 /* >> getpwent_r(3)
  * Read an entry from the password-file stream, opening it if necessary.
  * @return: 0 :     Success (`*result' is made to point at `resultbuf')
  * @return: ENOENT: The last entry has already been read (use `setpwent()' to rewind the database)
  * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
  * @return: * :     Error (one of `E*' from `<errno.h>') */
-INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(4) ATTR_ACCESS_WRS(2, 3) errno_t NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 #endif /* !__KERNEL__ */
 
 DECL_END

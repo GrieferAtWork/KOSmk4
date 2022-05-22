@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ad9c0d0 */
+/* HASH CRC-32:0x9d2af131 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(bufsplit) __SIZE_TYPE__
+__LOCAL_LIBC(bufsplit) __ATTR_ACCESS_RW_OPT(1) __ATTR_ACCESS_WR_OPT(3) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bufsplit))(char *__string, __SIZE_TYPE__ __result_c, char **__result_v) {
 	__SIZE_TYPE__ __count;
 	char const *__splitchar;
@@ -64,12 +64,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bufsplit))(char *__string, __SIZE_TYP
 #endif /* !__pic__ */
 	if __unlikely(!__string)
 		return 0;
-	if (__result_c == 0 && __result_v == 0) {
+	if (__result_c == 0 && __result_v == __NULLPTR) {
 		__saved_splitchar = (char const *)__string;
 		return 1;
 	} else {
-		if __unlikely((__result_c != 0 && __result_v == 0) ||
-		            (__result_c == 0 && __result_v != 0))
+		if __unlikely((__result_c != 0 && __result_v == __NULLPTR) ||
+		            (__result_c == 0 && __result_v != __NULLPTR))
 			return 0;
 	}
 	__splitchar = __saved_splitchar;

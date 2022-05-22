@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa880e81e */
+/* HASH CRC-32:0x765dba70 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,13 +56,13 @@ typedef __clock_t clock_t;
 
 #ifdef __CRT_HAVE_times
 /* >> times(2) */
-__CDECLARE(,clock_t,__NOTHROW_NCX,times,(struct tms *__buffer),(__buffer))
+__CDECLARE(__ATTR_ACCESS_WR_OPT(1),clock_t,__NOTHROW_NCX,times,(struct tms *__buffer),(__buffer))
 #elif defined(__CRT_HAVE___times)
 /* >> times(2) */
-__CREDIRECT(,clock_t,__NOTHROW_NCX,times,(struct tms *__buffer),__times,(__buffer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),clock_t,__NOTHROW_NCX,times,(struct tms *__buffer),__times,(__buffer))
 #elif defined(__CRT_HAVE___libc_times)
 /* >> times(2) */
-__CREDIRECT(,clock_t,__NOTHROW_NCX,times,(struct tms *__buffer),__libc_times,(__buffer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),clock_t,__NOTHROW_NCX,times,(struct tms *__buffer),__libc_times,(__buffer))
 #endif /* ... */
 
 __SYSDECL_END

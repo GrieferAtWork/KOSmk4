@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5947a2cf */
+/* HASH CRC-32:0x5010b41e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,13 +74,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unlink_defined
 #define __local___localdep_unlink_defined
 #ifdef __CRT_HAVE_unlink
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
 #elif defined(__CRT_HAVE__unlink)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),_unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),_unlink,(__file))
 #elif defined(__CRT_HAVE___unlink)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__unlink,(__file))
 #elif defined(__CRT_HAVE___libc_unlink)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__libc_unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__libc_unlink,(__file))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/unlink.h>
@@ -95,7 +95,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shm_unlink) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(shm_unlink) __ATTR_ACCESS_RO(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shm_unlink))(char const *__name) {
 	int __result;
 	char *__fullname;

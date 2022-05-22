@@ -69,7 +69,7 @@ __SYSDECL_BEGIN
 @@>> dirname(NULL);              // Returns "."
 @@Note  that for this purpose, `path' may be modified in-place, meaning
 @@that you should really always pass an strdup()'d, or writable string.
-[[nonnull]] char *dirname([[nullable]] char *path) {
+[[nonnull]] char *dirname([[in_opt]] char *path) {
 	char *iter;
 	/* Handle the empty-path case. */
 	if (!path || !*path)
@@ -135,7 +135,7 @@ fallback:
 @@alternate function from <string.h>  by `#undef basename', or calling  the
 @@function as `(basename)(...)' (as opposed to `basename(...)')
 [[nonnull, export_alias("__gnu_basename")]]
-char *__xpg_basename(char *filename) {
+char *__xpg_basename([[inout_opt]] char *filename) {
 	char *iter;
 	/* Handle the empty-path case. */
 	if (!filename || !*filename)
@@ -216,15 +216,15 @@ typedef __FILE FILE;
 
 // TODO: int isencrypt(char const *textbuf, size_t buflen);
 
-// TODO: int p2open([[nullable]] char const *cmdline, [[inout]] FILE *files[2]);
+// TODO: int p2open([[in_opt]] char const *cmdline, [[out]] FILE *files[2]);
 
-// TODO: int p2close([[inout]] FILE *files[2]);
+// TODO: int p2close([[in]] FILE *files[2]);
 
-// TODO: int mkdirp([[nonnull]] char const *pathname, mode_t mode);
+// TODO: int mkdirp([[in]] char const *pathname, mode_t mode);
 
-// TODO: int rmdirp([[nonnull]] char *pathname, [[nonnull]] char *remaining);
+// TODO: int rmdirp([[in]] char *pathname, [[out]] char *remaining);
 
-// TODO: char *pathfind([[nullable]] char const *path, [[nonnull]] char const *name, [[nullable]] char const *mode);
+// TODO: char *pathfind([[nullable]] char const *path, [[in]] char const *name, [[in_opt]] char const *mode);
 
 %[define_c_language_keyword("__KOS_FIXED_CONST")]
 
@@ -246,9 +246,9 @@ typedef __FILE FILE;
 @@               the same way as end-of-file.
 [[nonnull, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[requires_function(fgetc), impl_include("<asm/crt/stdio.h>")]]
-char *bgets([[nonnull]] char *buf, size_t buflen_minus_one,
+char *bgets([[out/*(? <= buflen_minus_one+1)*/]] char *buf, size_t buflen_minus_one,
             [[inout]] FILE *fp,
-            [[nullable]] char __KOS_FIXED_CONST *stop_chars) {
+            [[in_opt]] char __KOS_FIXED_CONST *stop_chars) {
 	char *iter = buf;
 	if (stop_chars == NULL)
 		stop_chars = (char __KOS_FIXED_CONST *)"";
@@ -289,7 +289,8 @@ char *bgets([[nonnull]] char *buf, size_t buflen_minus_one,
 @@             the empty string found at `strend(IN:string)'.
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<hybrid/host.h>")]] /* __pic__ */
-size_t bufsplit(char *string, size_t result_c, char **result_v) {
+size_t bufsplit([[inout_opt]] char *string, size_t result_c,
+                [[out_opt/*(result_c)*/]] char **result_v) {
 	size_t count;
 	char const *splitchar;
 	static char const default_splitchar[] = "\t\n";
@@ -302,12 +303,12 @@ size_t bufsplit(char *string, size_t result_c, char **result_v) {
 @@pp_endif@@
 	if unlikely(!string)
 		return 0;
-	if (result_c == 0 && result_v == 0) {
+	if (result_c == 0 && result_v == NULL) {
 		saved_splitchar = (char const *)string;
 		return 1;
 	} else {
-		if unlikely((result_c != 0 && result_v == 0) ||
-		            (result_c == 0 && result_v != 0))
+		if unlikely((result_c != 0 && result_v == NULL) ||
+		            (result_c == 0 && result_v != NULL))
 			return 0;
 	}
 	splitchar = saved_splitchar;
@@ -340,7 +341,7 @@ size_t bufsplit(char *string, size_t result_c, char **result_v) {
 [[static, requires_function(read, malloc, realloc)]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<asm/crt/malloc.h>")]] /* __REALLOC_ZERO_IS_NONNULL */
-char *fcopylist_sz(fd_t fd, [[nonnull]] size_t *p_filesize) {
+char *fcopylist_sz(fd_t fd, [[out]] size_t *p_filesize) {
 	size_t reslen  = 0;
 	size_t buflen  = 1024;
 	byte_t *result = (byte_t *)malloc(buflen);
@@ -433,8 +434,8 @@ err:
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[static, requires_function(open, fcopylist_sz), crt_dos_variant]]
-char *copylist_sz([[nonnull]] char const *filename,
-                  [[nonnull]] size_t *p_filesize) {
+char *copylist_sz([[in]] char const *filename,
+                  [[out]] size_t *p_filesize) {
 	char *result;
 	fd_t fd = open(filename, O_RDONLY);
 	if unlikely(fd < 0)
@@ -490,7 +491,8 @@ char *copylist_sz([[nonnull]] char const *filename,
 [[requires_include("<bits/types.h>"), impl_include("<bits/types.h>")]]
 [[requires(($has_function(copylist64) && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) || $has_function(copylist_sz))]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_SIZE_T__), crt_intern_kos_alias("libc_copylist_sz")]]
-char *copylist([[nonnull]] char const *filename, [[nonnull]] __PIO_OFFSET *p_filesize) {
+char *copylist([[in]] char const *filename,
+               [[out]] __PIO_OFFSET *p_filesize) {
 @@pp_if $has_function(copylist64) && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__@@
 	__PIO_OFFSET64 filesize64;
 	char *result = copylist64(filename, &filesize64);
@@ -515,7 +517,8 @@ char *copylist([[nonnull]] char const *filename, [[nonnull]] __PIO_OFFSET *p_fil
 [[requires_function(copylist_sz)]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), crt_intern_alias("copylist")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF64_T__ == __SIZEOF_SIZE_T__), crt_intern_kos_alias("libc_copylist_sz")]]
-char *copylist64([[nonnull]] char const *filename, [[nonnull]] __PIO_OFFSET64 *p_filesize) {
+char *copylist64([[in]] char const *filename,
+                 [[out]] __PIO_OFFSET64 *p_filesize) {
 @@pp_if __SIZEOF_OFF64_T__ == __SIZEOF_SIZE_T__@@
 	return copylist_sz(filename, (size_t *)p_filesize);
 @@pp_else@@
@@ -537,7 +540,7 @@ char *copylist64([[nonnull]] char const *filename, [[nonnull]] __PIO_OFFSET64 *p
 @@bytes long (the +1 because this function appends a trailing '\0')
 @@@return: * : A pointer to the trailing '\0' appended to `dstbuf'
 [[nonnull]]
-char *strcadd([[nonnull]] char *dstbuf, [[nonnull]] char const *string) {
+char *strcadd([[out]] char *dstbuf, [[in]] char const *string) {
 	for (;;) {
 		char ch = *string++;
 		if (ch == '\0')
@@ -591,7 +594,7 @@ done:
 @@Same as `strcadd()', but re-returns `dstbuf' rather than `strend(dstbuf)'
 @@@return: dstbuf: Always re-returns `dstbuf'
 [[nonnull, requires_function(strcadd)]]
-char *strccpy([[nonnull]] char *dstbuf, [[nonnull]] char const *string) {
+char *strccpy([[out]] char *dstbuf, [[in]] char const *string) {
 	strcadd(dstbuf, string);
 	return dstbuf;
 }
@@ -603,9 +606,9 @@ char *strccpy([[nonnull]] char *dstbuf, [[nonnull]] char const *string) {
 @@When non-NULL, characters from `dont_encode' are not encoded, but instead kept as-is.
 @@@return: * : A pointer to the trailing '\0' appended to `dstbuf'
 [[nonnull]]
-char *streadd([[nonnull]] char *dstbuf,
-              [[nonnull]] char const *string,
-              [[nullable]] char const *dont_encode) {
+char *streadd([[out]] char *dstbuf,
+              [[in]] char const *string,
+              [[in_opt]] char const *dont_encode) {
 	if (dont_encode == NULL)
 		dont_encode = "";
 	for (;;) {
@@ -649,9 +652,9 @@ char *streadd([[nonnull]] char *dstbuf,
 @@Same as `streadd()', but re-returns `dstbuf' rather than `strend(dstbuf)'
 @@@return: dstbuf: Always re-returns `dstbuf'
 [[nonnull, requires_function(streadd)]]
-char *strecpy([[nonnull]] char *dstbuf,
-              [[nonnull]] char const *string,
-              [[nullable]] char const *dont_encode) {
+char *strecpy([[out]] char *dstbuf,
+              [[in]] char const *string,
+              [[in_opt]] char const *dont_encode) {
 	streadd(dstbuf, string, dont_encode);
 	return dstbuf;
 }
@@ -661,8 +664,8 @@ char *strecpy([[nonnull]] char *dstbuf,
 @@@return: * : `needle' found at `haystack + return'
 @@@return: -1: `needle' not found in `haystack'
 [[wunused, pure, decl_include("<features.h>"), impl_include("<features.h>")]]
-__STDC_INT_AS_SSIZE_T strfind([[nonnull]] char const *haystack,
-                              [[nonnull]] char const *needle) {
+__STDC_INT_AS_SSIZE_T strfind([[in]] char const *haystack,
+                              [[in]] char const *needle) {
 	char const *ptr = strstr(haystack, needle);
 	return ptr ? (__STDC_INT_AS_SSIZE_T)(ptr - haystack) : -1;
 }
@@ -672,8 +675,8 @@ __STDC_INT_AS_SSIZE_T strfind([[nonnull]] char const *haystack,
 @@for which `strchr(accept, ch) != NULL'. If `haystack' consists entirely of
 @@characters from `accept', re-returns `haystack'.
 [[wunused, pure, nonnull]]
-char *strrspn([[nonnull]] char const *haystack,
-              [[nonnull]] char const *accept) {
+char *strrspn([[in]] char const *haystack,
+              [[in]] char const *accept) {
 	char const *iter = strend(haystack);
 	while (iter > haystack && strchr(accept, iter[-1]))
 		--iter;
@@ -689,10 +692,10 @@ char *strrspn([[nonnull]] char const *haystack,
 @@has space for at least `strlen(string) + 1' characters.
 @@@return: result: Always re-returns `result'
 [[nonnull, impl_include("<bits/types.h>")]]
-char *strtrns([[nonnull]] char const *string,
-              [[nonnull]] char const *find_map,
-              [[nonnull]] char const *repl_map,
-              [[nonnull]] char *result) {
+char *strtrns([[in]] char const *string,
+              [[in]] char const *find_map,
+              [[in]] char const *repl_map,
+              [[out]] char *result) {
 	char *dst = result;
 	for (;;) {
 		char ch = *string++;

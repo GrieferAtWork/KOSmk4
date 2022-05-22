@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc65dcbc7 */
+/* HASH CRC-32:0x4ba7e862 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,7 +94,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_detach,(__pid_t __pid),detach,(__pid))
 #ifndef __local___localdep_fexecve_defined
 #define __local___localdep_fexecve_defined
 #ifdef __CRT_HAVE_fexecve
-__CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_fexecve,(__fd_t __execfd, __TARGV, __TENVP),fexecve,(__execfd,___argv,___envp))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,__localdep_fexecve,(__fd_t __execfd, __TARGV, __TENVP),fexecve,(__execfd,___argv,___envp))
 #elif defined(__OS_HAVE_PROCFS_SELF_FD) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/fexecve.h>
@@ -121,7 +121,7 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),__libc_f
 #ifndef __local___localdep_pipe2_defined
 #define __local___localdep_pipe2_defined
 #ifdef __CRT_HAVE_pipe2
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pipe2,(__fd_t __pipedes[2], __oflag_t __flags),pipe2,(__pipedes,__flags))
+__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_pipe2,(__fd_t __pipedes[2], __oflag_t __flags),pipe2,(__pipedes,__flags))
 #elif defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE___libc_pipe) || defined(__CRT_HAVE__pipe)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/pipe2.h>
@@ -191,7 +191,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/process.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fspawnve) __ATTR_NONNULL((3, 4)) __pid_t
+__LOCAL_LIBC(fspawnve) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RO(4) __pid_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fspawnve))(__STDC_INT_AS_UINT_T __mode, __fd_t __execfd, __TARGV, __TENVP) {
 	int __status;
 #if !defined(__ARCH_HAVE_SHARED_VM_VFORK) || (!defined(__CRT_HAVE_vfork) && !defined(__CRT_HAVE___vfork) && !defined(__CRT_HAVE___libc_vfork))

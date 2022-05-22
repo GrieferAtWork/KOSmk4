@@ -32,13 +32,13 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_thrd_sleep,hash:CRC-32=0x41e37e97]]]*/
+/*[[[head:libc_thrd_sleep,hash:CRC-32=0x9cd378f9]]]*/
 /* >> thrd_sleep(3), thrd_sleep64(3)
  * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) int
 NOTHROW_RPC(LIBCCALL libc_thrd_sleep)(struct timespec const *time_point,
                                       struct timespec *remaining)
 /*[[[body:libc_thrd_sleep]]]*/
@@ -53,7 +53,7 @@ NOTHROW_RPC(LIBCCALL libc_thrd_sleep)(struct timespec const *time_point,
 }
 /*[[[end:libc_thrd_sleep]]]*/
 
-/*[[[head:libc_thrd_sleep64,hash:CRC-32=0x929e449d]]]*/
+/*[[[head:libc_thrd_sleep64,hash:CRC-32=0x9a6a415f]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_thrd_sleep64, libc_thrd_sleep);
 #else /* MAGIC:alias */
@@ -62,7 +62,7 @@ DEFINE_INTERN_ALIAS(libc_thrd_sleep64, libc_thrd_sleep);
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) int
 NOTHROW_RPC(LIBCCALL libc_thrd_sleep64)(struct timespec64 const *time_point,
                                         struct timespec64 *remaining)
 /*[[[body:libc_thrd_sleep64]]]*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c3a1a41 */
+/* HASH CRC-32:0xe71b6874 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wmakepath_s) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(_wmakepath_s) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_WRS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wmakepath_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__drive, __WCHAR_TYPE__ const *__dir, __WCHAR_TYPE__ const *__file, __WCHAR_TYPE__ const *__ext) {
 #define __path_putn(__p, __n)                                  \
 	do {                                                 \

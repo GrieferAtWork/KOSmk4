@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x271ef861 */
+/* HASH CRC-32:0x2cdc7f8a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -158,7 +158,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_whexdump, __FORCELOCAL __ATTR_ARTIFICIAL 
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__CDECLARE(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,format_vwprintf,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args),(__printer,__arg,__format,__args))
+__CDECLARE(__ATTR_ACCESS_RO(3) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_vwprintf,(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args),(__printer,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vwprintf */
 #include <libc/local/parts.wchar.format-printer/format_vwprintf.h>
 /* >> format_printf(3), format_vprintf(3)
@@ -173,7 +173,7 @@ __CDECLARE(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THR
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_vwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_vwprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwprintf))(__printer, __arg, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_vwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(3) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_vwprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwprintf))(__printer, __arg, __format, __args); })
 #endif /* !__CRT_HAVE_format_vwprintf */
 #ifdef __CRT_HAVE_format_wprintf
 /* >> format_printf(3), format_vprintf(3)
@@ -188,7 +188,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_vwprintf, __FORCELOCAL __ATTR_ARTIFICIAL 
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("format_wprintf");
+__LIBC __ATTR_ACCESS_RO(3) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("format_wprintf");
 #else /* __CRT_HAVE_format_wprintf */
 #include <libc/local/parts.wchar.format-printer/format_wprintf.h>
 /* >> format_printf(3), format_vprintf(3)
@@ -204,7 +204,7 @@ __LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCA
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf))(__printer, __arg, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(3) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf))(__printer, __arg, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define format_wprintf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -234,7 +234,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_wprintf, __FORCELOCAL __ATTR_ARTIFICIAL _
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-__CDECLARE(__ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,format_vwscanf,(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args),(__pgetc,__pungetc,__arg,__format,__args))
+__CDECLARE(__ATTR_ACCESS_RO(4) __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,format_vwscanf,(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args),(__pgetc,__pungetc,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vwscanf */
 #include <libc/local/parts.wchar.format-printer/format_vwscanf.h>
 /* >> format_scanf(3), format_vscanf(3)
@@ -261,7 +261,7 @@ __CDECLARE(__ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__T
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_vwscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBCCALL format_vwscanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwscanf))(__pgetc, __pungetc, __arg, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_vwscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(4) __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ (__LIBCCALL format_vwscanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwscanf))(__pgetc, __pungetc, __arg, __format, __args); })
 #endif /* !__CRT_HAVE_format_vwscanf */
 #ifdef __CRT_HAVE_format_wscanf
 /* >> format_scanf(3), format_vscanf(3)
@@ -288,7 +288,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_vwscanf, __FORCELOCAL __ATTR_ARTIFICIAL _
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-__LIBC __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBCCALL format_wscanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("format_wscanf");
+__LIBC __ATTR_ACCESS_RO(4) __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ (__LIBCCALL format_wscanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("format_wscanf");
 #else /* __CRT_HAVE_format_wscanf */
 #include <libc/local/parts.wchar.format-printer/format_wscanf.h>
 /* >> format_scanf(3), format_vscanf(3)
@@ -316,7 +316,7 @@ __LIBC __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBC
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBCCALL format_wscanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wscanf))(__pgetc, __pungetc, __arg, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(4) __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ (__LIBCCALL format_wscanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wscanf))(__pgetc, __pungetc, __arg, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define format_wscanf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wscanf))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -327,12 +327,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_wscanf, __FORCELOCAL __ATTR_ARTIFICIAL __
 #ifdef __CRT_HAVE_format_wsprintf_printer
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-__LIBC __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wsprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_wsprintf_printer");
+__LIBC __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wsprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_wsprintf_printer");
 #else /* __CRT_HAVE_format_wsprintf_printer */
 #include <libc/local/parts.wchar.format-printer/format_wsprintf_printer.h>
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wsprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wsprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wsprintf_printer))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wsprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wsprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wsprintf_printer))(__arg, __data, __datalen); })
 #endif /* !__CRT_HAVE_format_wsprintf_printer */
 
 
@@ -356,7 +356,7 @@ struct format_wsnprintf_data {
  * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
  * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
  *       alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)' */
-__LIBC __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wsnprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_wsnprintf_printer");
+__LIBC __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wsnprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_wsnprintf_printer");
 #else /* __CRT_HAVE_format_wsnprintf_printer */
 #include <libc/local/parts.wchar.format-printer/format_wsnprintf_printer.h>
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
@@ -364,25 +364,25 @@ __LIBC __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC f
  * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
  * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
  *       alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wsnprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wsnprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wsnprintf_printer))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wsnprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wsnprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wsnprintf_printer))(__arg, __data, __datalen); })
 #endif /* !__CRT_HAVE_format_wsnprintf_printer */
 #include <hybrid/typecore.h>
 #if defined(__CRT_HAVE_format_length) && __SIZEOF_WCHAR_T__ == 4
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string
  * The  `arg'   argument   is   ignored,   and  you   may   safely   pass   `NULL' */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__WFORMATPRINTER_CC,format_wwidth,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_PURE __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__WFORMATPRINTER_CC,format_wwidth,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_format_wwidth)
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string
  * The  `arg'   argument   is   ignored,   and  you   may   safely   pass   `NULL' */
-__LIBC __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wwidth)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_wwidth");
+__LIBC __ATTR_PURE __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wwidth)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_wwidth");
 #else /* ... */
 #include <libc/local/parts.wchar.format-printer/format_wwidth.h>
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string
  * The  `arg'   argument   is   ignored,   and  you   may   safely   pass   `NULL' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wwidth, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wwidth)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wwidth))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wwidth, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wwidth)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wwidth))(__arg, __data, __datalen); })
 #endif /* !... */
 #ifdef __CRT_HAVE_format_length
 /* >> format_length(3)
@@ -460,7 +460,7 @@ struct format_waprintf_data {
  *                  but may differ from `wcslen(return)' when NUL characters  were
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
-__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,format_waprintf_pack,(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),(__self,__pstrlen))
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR_OPT(2),wchar_t *,__NOTHROW_NCX,format_waprintf_pack,(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),(__self,__pstrlen))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/parts.wchar.format-printer/format_waprintf_pack.h>
 /* Pack  and  finalize  a  given  aprintf  format printer
@@ -484,7 +484,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
  *                  but may differ from `wcslen(return)' when NUL characters  were
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_pack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL format_waprintf_pack)(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_pack))(__self, __pstrlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_pack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR_OPT(2) wchar_t *__NOTHROW_NCX(__LIBCCALL format_waprintf_pack)(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_pack))(__self, __pstrlen); })
 #endif /* ... */
 #ifdef __CRT_HAVE_format_waprintf_alloc
 /* >> format_waprintf_alloc(3)
@@ -493,7 +493,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_pack, __FORCELOCAL __ATTR_ARTIFI
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
-__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,format_waprintf_alloc,(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),(__self,__num_wchars))
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RW(1),wchar_t *,__NOTHROW_NCX,format_waprintf_alloc,(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),(__self,__num_wchars))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/parts.wchar.format-printer/format_waprintf_alloc.h>
 /* >> format_waprintf_alloc(3)
@@ -502,7 +502,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_alloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL format_waprintf_alloc)(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_alloc))(__self, __num_wchars); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_alloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RW(1) wchar_t *__NOTHROW_NCX(__LIBCCALL format_waprintf_alloc)(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_alloc))(__self, __num_wchars); })
 #endif /* ... */
 #ifdef __CRT_HAVE_format_waprintf_printer
 /* >> format_waprintf_printer(3)
@@ -510,7 +510,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_alloc, __FORCELOCAL __ATTR_ARTIF
  * This function is intended to be used as a pwformatprinter-compatible printer sink
  * @return: datalen: Success.
  * @return: -1: [errno=ENOMEM] Insufficient memory. */
-__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_waprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_waprintf_printer");
+__LIBC __ATTR_WUNUSED __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_waprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_waprintf_printer");
 #elif defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/parts.wchar.format-printer/format_waprintf_printer.h>
 /* >> format_waprintf_printer(3)
@@ -518,7 +518,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFOR
  * This function is intended to be used as a pwformatprinter-compatible printer sink
  * @return: datalen: Success.
  * @return: -1: [errno=ENOMEM] Insufficient memory. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_waprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_printer))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_waprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_printer))(__arg, __data, __datalen); })
 #endif /* ... */
 
 __SYSDECL_END

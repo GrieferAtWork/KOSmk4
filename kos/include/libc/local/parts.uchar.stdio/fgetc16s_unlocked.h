@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c95b453 */
+/* HASH CRC-32:0xf575179e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,7 +92,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fgetc16s_unlocked) __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
+__LOCAL_LIBC(fgetc16s_unlocked) __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WRS(1, 2) __CHAR16_TYPE__ *
 (__LIBDCALL __LIBC_LOCAL_NAME(fgetc16s_unlocked))(__CHAR16_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) __THROWS(...) {
 	__SIZE_TYPE__ __n;
 	if __unlikely(!__buf || !__bufsize) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cc53ec8 */
+/* HASH CRC-32:0xaccb92a4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __CREDIRECT_KOS(__ATTR_ACCESS_RW(2),__WINT32_TYPE__,__THROWING,__localdep_fputc3
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(file_c32printer_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
+__LOCAL_LIBC(file_c32printer_unlocked) __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBKCALL __LIBC_LOCAL_NAME(file_c32printer_unlocked))(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) {
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {

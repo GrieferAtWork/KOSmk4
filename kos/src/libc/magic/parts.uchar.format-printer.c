@@ -151,10 +151,10 @@ format_c16width(*) %{uchar16("format_wwidth")}
 format_c32width(*) %{uchar32("format_wwidth")}
 
 [[const, cc(__C16FORMATPRINTER_CC), decl_include("<bits/crt/uformat-printer.h>")]]
-$ssize_t format_c16length(void *arg, char16_t const *__restrict data, $size_t datalen) = format_length;
+$ssize_t format_c16length(void *arg, [[in(datalen)]] char16_t const *__restrict data, $size_t datalen) = format_length;
 
 [[const, cc(__C32FORMATPRINTER_CC), decl_include("<bits/crt/uformat-printer.h>")]]
-$ssize_t format_c32length(void *arg, char32_t const *__restrict data, $size_t datalen) = format_length;
+$ssize_t format_c32length(void *arg, [[in(datalen)]] char32_t const *__restrict data, $size_t datalen) = format_length;
 
 
 %[define_wchar_replacement(__format_waprintf_data_defined = __format_c16aprintf_data_defined, __format_c32aprintf_data_defined)]

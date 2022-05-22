@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cf8c86e */
+/* HASH CRC-32:0x2ca35c4f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_readutf8_n_defined
 #define __local___localdep_unicode_readutf8_n_defined
 #ifdef __CRT_HAVE_unicode_readutf8_n
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
 #else /* __CRT_HAVE_unicode_readutf8_n */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf8_n.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_unicode_readutf8_n __LIBC_LOCAL_NAME(unicode_readutf8_n)
 #endif /* !__CRT_HAVE_unicode_readutf8_n */
 #endif /* !__local___localdep_unicode_readutf8_n_defined */
-__LOCAL_LIBC(_mbstrnlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(_mbstrnlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstrnlen))(char const *__str, __SIZE_TYPE__ __maxlen) {
 	__SIZE_TYPE__ __result = 0;
 	char const *__endptr = __str + __maxlen;

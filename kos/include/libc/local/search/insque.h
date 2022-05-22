@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3e9ccc4 */
+/* HASH CRC-32:0x5823f890 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_insque_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(insque) __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(insque) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(insque))(void *__restrict __elem, void *__prev) {
 	struct __queue_link {
 		struct __queue_link *__l_forw; /* [0..1] Forward link */

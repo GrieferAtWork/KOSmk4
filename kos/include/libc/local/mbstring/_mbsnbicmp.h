@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc130b317 */
+/* HASH CRC-32:0xc6fb87c1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsnbicmp_l_defined
 #define __local___localdep__mbsnbicmp_l_defined
 #ifdef __CRT_HAVE__mbsnbicmp_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep__mbsnbicmp_l,(unsigned char const *__lhs, unsigned char const *__rhs, __SIZE_TYPE__ __max_bytes, __locale_t __locale),_mbsnbicmp_l,(__lhs,__rhs,__max_bytes,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 3) __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep__mbsnbicmp_l,(unsigned char const *__lhs, unsigned char const *__rhs, __SIZE_TYPE__ __max_bytes, __locale_t __locale),_mbsnbicmp_l,(__lhs,__rhs,__max_bytes,__locale))
 #elif (defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbctolower_l) || (defined(__CRT_HAVE__mbctouni_l) && defined(__CRT_HAVE__unitombc_l) && defined(__CRT_HAVE___unicode_descriptor)) || ((defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbcasemap) || defined(__CRT_HAVE___p__mbcasemap))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsnbicmp_l.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__mbsnbicmp_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__mbsnbicmp_l_defined */
-__LOCAL_LIBC(_mbsnbicmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(_mbsnbicmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 3) __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnbicmp))(unsigned char const *__lhs, unsigned char const *__rhs, __SIZE_TYPE__ __max_bytes) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbsnbicmp_l)(__lhs, __rhs, __max_bytes, __NULLPTR);
 }

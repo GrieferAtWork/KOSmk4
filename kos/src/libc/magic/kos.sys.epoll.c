@@ -60,14 +60,14 @@ void EPollCtl($fd_t epfd, __epoll_ctl_t op,
 
 [[cp, throws, doc_alias("epoll_wait")]]
 [[decl_include("<features.h>", "<bits/os/epoll.h>")]]
-__STDC_UINT_AS_SIZE_T EPollWait($fd_t epfd, [[nonnull]] struct epoll_event *events,
+__STDC_UINT_AS_SIZE_T EPollWait($fd_t epfd, [[inout(maxevents)]] struct epoll_event *events,
                                 __STDC_UINT_AS_SIZE_T maxevents, int timeout);
 
 [[cp, throws, doc_alias("epoll_pwait")]]
 [[decl_include("<features.h>", "<bits/os/epoll.h>")]]
-__STDC_UINT_AS_SIZE_T EPollPWait($fd_t epfd, [[nonnull]] struct epoll_event *events,
+__STDC_UINT_AS_SIZE_T EPollPWait($fd_t epfd, [[inout(maxevents)]] struct epoll_event *events,
                                  __STDC_UINT_AS_SIZE_T maxevents, int timeout,
-                                 sigset_t const *ss);
+                                 [[in_opt]] sigset_t const *ss);
 
 %
 %#ifdef __USE_KOS
@@ -93,7 +93,7 @@ typedef __ATTR_NONNULL_T((1)) void
 [[throws, doc_alias("epoll_rpc_exec")]]
 [[decl_include("<bits/os/epoll.h>")]]
 void EPollRpcExec($fd_t epfd, $fd_t fd,
-                  [[nonnull]] struct epoll_event *event,
+                  [[in]] struct epoll_event const *event,
                   $pid_t target_tid, unsigned int mode,
                   [[nonnull]] prpc_exec_callback_t func);
 %#endif /* __USE_KOS */

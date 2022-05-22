@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfab92318 */
+/* HASH CRC-32:0x8c70fc0b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -157,7 +157,7 @@ NOTHROW_NCX(LIBCCALL libc_dos_lbasename)(char const *filename) {
 	return result;
 
 }
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_NCX(LIBCCALL libc_lrealpath)(char const *path) {
 	char *result = libc_canonicalize_file_name(path);
 	if (result == NULL)
@@ -316,7 +316,7 @@ NOTHROW_NCX(LIBCCALL libc_xcalloc)(size_t elem_count,
 	return result;
 
 }
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_NCX(LIBCCALL libc_xstrdup)(char const *__restrict string) {
 	size_t copysize = (libc_strlen(string) + 1) * sizeof(char);
 	return (char *)libc_memcpy(libc_xmalloc(copysize), string, copysize);
@@ -329,7 +329,7 @@ NOTHROW_NCX(LIBCCALL libc_xstrndup)(char const *string,
 	*(char *)libc_mempcpyc(result, string, copylen, sizeof(char)) = '\0';
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((3)) NONNULL((1)) void *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ALLOC_SIZE((3)) void *
 NOTHROW_NCX(LIBCCALL libc_xmemdup)(void const *src,
                                    size_t src_bytes,
                                    size_t alloc_size) {
@@ -341,7 +341,7 @@ NOTHROW_NCX(LIBCCALL libc_xmemdup)(void const *src,
 }
 /* >> strdupf(3), vstrdupf(3)
  * Print the given `format' into a newly allocated, heap-allocated string */
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) char *
 NOTHROW_NCX(LIBCCALL libc_xvasprintf)(char const *format,
                                       va_list args) {
 	va_list args2;
@@ -355,7 +355,7 @@ NOTHROW_NCX(LIBCCALL libc_xvasprintf)(char const *format,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) char *
 NOTHROW_NCX(VLIBDCALL libd_xasprintf)(char const *__restrict format,
                                       ...) {
 	char * result;
@@ -367,7 +367,7 @@ NOTHROW_NCX(VLIBDCALL libd_xasprintf)(char const *__restrict format,
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) char *
 NOTHROW_NCX(VLIBCCALL libc_xasprintf)(char const *__restrict format,
                                       ...) {
 	char * result;
@@ -378,8 +378,8 @@ NOTHROW_NCX(VLIBCCALL libc_xasprintf)(char const *__restrict format,
 	return result;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char **
-NOTHROW_NCX(LIBCCALL libc_dupargv)(char **argv) {
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RO_OPT(1) char **
+NOTHROW_NCX(LIBCCALL libc_dupargv)(char *__KOS_FIXED_CONST *argv) {
 	char **result;
 	size_t i, argc;
 	if (!argv)
@@ -393,7 +393,7 @@ NOTHROW_NCX(LIBCCALL libc_dupargv)(char **argv) {
 	return result;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.libiberty") void
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO_OPT(1) void
 NOTHROW_NCX(LIBCCALL libc_freeargv)(char **argv) {
 	size_t i;
 	if (!argv)
@@ -402,7 +402,7 @@ NOTHROW_NCX(LIBCCALL libc_freeargv)(char **argv) {
 		libc_free(argv[i]);
 	libc_free(argv);
 }
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE WUNUSED __STDC_INT_AS_SIZE_T
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_countargv)(char *const *argv) {
 	__STDC_INT_AS_SIZE_T result = 0;
 	if (argv != NULL) {
@@ -412,7 +412,7 @@ NOTHROW_NCX(LIBCCALL libc_countargv)(char *const *argv) {
 	return result;
 }
 #include <hybrid/__assert.h>
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char **
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RO_OPT(1) char **
 NOTHROW_NCX(LIBCCALL libc_buildargv)(char const *cmdline) {
 	char **argv = NULL;
 	size_t argc = 0;
@@ -503,7 +503,7 @@ end_of_argument:
 #include <bits/crt/mapfile.h>
 /* >> expandargv(3)
  * Expand special `@file' arguments passed on the commandline */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1, 2)) void
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void
 NOTHROW_NCX(LIBCCALL libc_expandargv)(int *p_argc,
                                       char ***p_argv) {
 	size_t i, argc = (size_t)*p_argc;
@@ -566,7 +566,7 @@ NOTHROW_NCX(LIBCCALL libc_expandargv)(int *p_argc,
 #include <asm/crt/stdio.h>
 /* @return: 0 : Success
  * @return: 1 : Error */
-INTERN ATTR_SECTION(".text.crt.libiberty") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(1) ATTR_ACCESS_RW_OPT(2) int
 NOTHROW_NCX(LIBCCALL libc_writeargv)(char *const *argv,
                                      FILE *fp) {
 	if unlikely(!fp)
@@ -590,7 +590,7 @@ err:
 	return 1;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO_OPT(1) char *
 NOTHROW_NCX(LIBCCALL libc_vconcat)(char const *first,
                                    va_list args) {
 	char *result, *ptr;
@@ -608,7 +608,7 @@ NOTHROW_NCX(LIBCCALL libc_vconcat)(char const *first,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_ACCESS_RO_OPT(1) char *
 NOTHROW_NCX(VLIBDCALL libd_concat)(char const *first,
                                    ...) {
 	char *result;
@@ -620,7 +620,7 @@ NOTHROW_NCX(VLIBDCALL libd_concat)(char const *first,
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_ACCESS_RO_OPT(1) char *
 NOTHROW_NCX(VLIBCCALL libc_concat)(char const *first,
                                    ...) {
 	char *result;
@@ -632,7 +632,7 @@ NOTHROW_NCX(VLIBCCALL libc_concat)(char const *first,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) char *
 NOTHROW_NCX(VLIBDCALL libd_reconcat)(char *old_ptr,
                                      char const *first,
                                      ...) {
@@ -648,7 +648,7 @@ NOTHROW_NCX(VLIBDCALL libd_reconcat)(char *old_ptr,
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) char *
 NOTHROW_NCX(VLIBCCALL libc_reconcat)(char *old_ptr,
                                      char const *first,
                                      ...) {
@@ -665,7 +665,7 @@ NOTHROW_NCX(VLIBCCALL libc_reconcat)(char *old_ptr,
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #include <hybrid/typecore.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ulongptr_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ATTR_ACCESS_RO_OPT(1) ulongptr_t
 NOTHROW_NCX(VLIBDCALL libd_concat_length)(char const *first,
                                           ...) {
 	va_list args;
@@ -679,7 +679,7 @@ NOTHROW_NCX(VLIBDCALL libd_concat_length)(char const *first,
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.libiberty") ulongptr_t
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO_OPT(1) ulongptr_t
 NOTHROW_NCX(VLIBCCALL libc_concat_length)(char const *first,
                                           ...) {
 	va_list args;
@@ -690,7 +690,7 @@ NOTHROW_NCX(VLIBCCALL libc_concat_length)(char const *first,
 	va_end(args);
 	return (ulongptr_t)totlen;
 }
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_RETNONNULL NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_WR(1) char *
 NOTHROW_NCX(LIBCCALL libc_concat_vcopy)(char *dst,
                                         char const *first,
                                         va_list args) {
@@ -702,7 +702,7 @@ NOTHROW_NCX(LIBCCALL libc_concat_vcopy)(char *dst,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ATTR_RETNONNULL NONNULL((1)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_WR(1) char *
 NOTHROW_NCX(VLIBDCALL libd_concat_copy)(char *dst,
                                         char const *first,
                                         ...) {
@@ -715,7 +715,7 @@ NOTHROW_NCX(VLIBDCALL libd_concat_copy)(char *dst,
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_RETNONNULL NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_WR(1) char *
 NOTHROW_NCX(VLIBCCALL libc_concat_copy)(char *dst,
                                         char const *first,
                                         ...) {
@@ -728,7 +728,7 @@ NOTHROW_NCX(VLIBCCALL libc_concat_copy)(char *dst,
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ATTR_ACCESS_RO_OPT(1) char *
 NOTHROW_NCX(VLIBDCALL libd_concat_copy2)(char const *first,
                                          ...) {
 	char *result;
@@ -740,7 +740,7 @@ NOTHROW_NCX(VLIBDCALL libd_concat_copy2)(char const *first,
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.libiberty") char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO_OPT(1) char *
 NOTHROW_NCX(VLIBCCALL libc_concat_copy2)(char const *first,
                                          ...) {
 	char *result;
@@ -857,7 +857,7 @@ got_tmppath:
 }
 #include <parts/printf-config.h>
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) char *
 NOTHROW_NCX(LIBCCALL libc_make_temp_file_with_prefix)(char const *prefix,
                                                       char const *suffix) {
 	fd_t tempfd;
@@ -898,7 +898,7 @@ NOTHROW_NCX(LIBCCALL libc_make_temp_file_with_prefix)(char const *prefix,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO_OPT(1) char *
 NOTHROW_NCX(LIBCCALL libc_make_temp_file)(char const *suffix) {
 	return libc_make_temp_file_with_prefix(NULL, suffix);
 }
@@ -909,7 +909,7 @@ NOTHROW_NCX(LIBCCALL libc_make_temp_file)(char const *suffix) {
  * @return:  0: File was deleted
  * @return:  1: File doesn't exist, isn't accessible, or not a "regular" file.
  * @return: -1: Unlink failed (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.libiberty") int
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBCCALL libc_unlink_if_ordinary)(char const *filename) {
 	struct stat st;
 	if (lstat(filename, &st) != 0)
@@ -932,7 +932,7 @@ NOTHROW_NCX(LIBCCALL libc_physmem_available)(void) {
 	size_t pagesize = libc_getpagesize();
 	return (double)pages * (double)pagesize;
 }
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE WUNUSED __UINT32_TYPE__
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 2) NONNULL((1)) __UINT32_TYPE__
 NOTHROW_NCX(LIBCCALL libc_xcrc32)(__BYTE_TYPE__ const *buf,
                                   __STDC_INT_AS_SIZE_T len,
                                   __UINT32_TYPE__ crc) {

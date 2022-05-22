@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfad6b3dc */
+/* HASH CRC-32:0xeabea7d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_mbschr_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned char *
+__LOCAL_LIBC(_mbschr_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) unsigned char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbschr_l))(unsigned char const *__restrict __haystack, unsigned int __needle, __locale_t __locale) {
 	for (;;) {
 		unsigned char const *__temp;

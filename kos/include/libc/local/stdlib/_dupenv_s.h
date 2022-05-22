@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7407654 */
+/* HASH CRC-32:0xd8f9fdb9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined
 #ifdef __CRT_HAVE_getenv
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #elif defined(__LOCAL_environ)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/getenv.h>
@@ -76,7 +76,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_dupenv_s) __ATTR_NONNULL((1, 2, 3)) __errno_t
+__LOCAL_LIBC(_dupenv_s) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) __ATTR_ACCESS_WR(2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_dupenv_s))(char **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, char const *__varname) {
 	char *__name = (__NAMESPACE_LOCAL_SYM __localdep_getenv)(__varname);
 	if (!__name) {

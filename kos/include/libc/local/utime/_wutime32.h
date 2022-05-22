@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c7c228b */
+/* HASH CRC-32:0x65e5c9ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,14 +29,14 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_wutime64_defined
 #define __local___localdep_crt_wutime64_defined
 #ifdef __CRT_HAVE_wutime64
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__file, struct __utimbuf64 const *__file_times),wutime64,(__file,__file_times))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__file, struct __utimbuf64 const *__file_times),wutime64,(__file,__file_times))
 #elif defined(__CRT_HAVE__wutime64)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__file, struct __utimbuf64 const *__file_times),_wutime64,(__file,__file_times))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_crt_wutime64,(__WCHAR_TYPE__ const *__file, struct __utimbuf64 const *__file_times),_wutime64,(__file,__file_times))
 #else /* ... */
 #undef __local___localdep_crt_wutime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_wutime64_defined */
-__LOCAL_LIBC(_wutime32) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(_wutime32) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_wutime32))(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 __KOS_FIXED_CONST *__file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("actime")

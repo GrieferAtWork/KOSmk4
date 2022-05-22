@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf93f9a2f */
+/* HASH CRC-32:0xe5497a02 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strpbrk __LIBC_LOCAL_NAME(strpbrk)
 #endif /* !... */
 #endif /* !__local___localdep_strpbrk_defined */
-__LOCAL_LIBC(nss_checkfieldlist) __ATTR_PURE __ATTR_WUNUSED __BOOL
+__LOCAL_LIBC(nss_checkfieldlist) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __BOOL
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(nss_checkfieldlist))(char *const *__list) {
 	if (!__list)
 		return 1;

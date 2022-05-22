@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec4f32a5 */
+/* HASH CRC-32:0xaa3f0da4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_mempcpyw __LIBC_LOCAL_NAME(mempcpyw)
 #endif /* !... */
 #endif /* !__local___localdep_mempcpyw_defined */
-__LOCAL_LIBC(c16mempcpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR16_TYPE__ *
+__LOCAL_LIBC(c16mempcpy) __ATTR_RETNONNULL __ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_WRS(1, 3) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16mempcpy))(__CHAR16_TYPE__ *__restrict __dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars) {
 
 	return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyw)(__dst, __src, __num_chars);

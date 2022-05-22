@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x511203d1 */
+/* HASH CRC-32:0x1e3f8cd9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strstr __LIBC_LOCAL_NAME(strstr)
 #endif /* !... */
 #endif /* !__local___localdep_strstr_defined */
-__LOCAL_LIBC(strfind) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(strfind) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strfind))(char const *__haystack, char const *__needle) {
 	char const *__ptr = (__NAMESPACE_LOCAL_SYM __localdep_strstr)(__haystack, __needle);
 	return __ptr ? (__STDC_INT_AS_SSIZE_T)(__ptr - __haystack) : -1;

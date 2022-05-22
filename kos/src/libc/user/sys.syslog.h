@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba51608b */
+/* HASH CRC-32:0x81d8acac */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_closelog)(void);
 INTDEF void NOTHROW_RPC(LIBCCALL libc_openlog)(char const *ident, __STDC_INT_AS_UINT_T option, __STDC_INT_AS_UINT_T facility);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setlogmask)(__STDC_INT_AS_UINT_T mask);
 /* Helper functions for printing to the system log */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_syslog_printer)(void *arg, char const *__restrict data, size_t datalen);
+INTDEF ATTR_ACCESS_ROS(2, 3) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_syslog_printer)(void *arg, char const *__restrict data, size_t datalen);
 #endif /* !__KERNEL__ */
 
 DECL_END

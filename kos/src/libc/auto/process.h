@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7517c52a */
+/* HASH CRC-32:0xc20cfdd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,10 +49,10 @@ INTDEF int (LIBDCALL libd__unloaddll)(intptr_t hnd) THROWS(...);
 INTDEF int (LIBCCALL libc__unloaddll)(intptr_t hnd) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF __procfun (LIBDCALL libd__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) THROWS(...);
+INTDEF ATTR_ACCESS_RO_OPT(2) __procfun (LIBDCALL libd__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF __procfun (LIBCCALL libc__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) THROWS(...);
+INTDEF ATTR_ACCESS_RO_OPT(2) __procfun (LIBCCALL libc__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> cwait(3)
@@ -60,7 +60,7 @@ INTDEF __procfun (LIBCCALL libc__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_
  * this function together with the `spawn(3)' family of functions.
  * @return: pid: Child process exited.
  * @return: -1:  Error (s.a. `errno') */
-INTDEF pid_t NOTHROW_RPC(LIBDCALL libd_cwait)(int *tstat, pid_t pid, __STDC_INT_AS_UINT_T action);
+INTDEF ATTR_ACCESS_WR_OPT(1) pid_t NOTHROW_RPC(LIBDCALL libd_cwait)(int *tstat, pid_t pid, __STDC_INT_AS_UINT_T action);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> cwait(3)
@@ -68,29 +68,29 @@ INTDEF pid_t NOTHROW_RPC(LIBDCALL libd_cwait)(int *tstat, pid_t pid, __STDC_INT_
  * this function together with the `spawn(3)' family of functions.
  * @return: pid: Child process exited.
  * @return: -1:  Error (s.a. `errno') */
-INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat, pid_t pid, __STDC_INT_AS_UINT_T action);
-INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnv)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, __TARGV);
-INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnv)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, __TARGV);
-INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnvp)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, __TARGV);
-INTDEF NONNULL((2, 3)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnvp)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, __TARGV);
-INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnve)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, __TARGV, __TENVP);
-INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnve)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, __TARGV, __TENVP);
-INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBDCALL libd_spawnvpe)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, __TARGV, __TENVP);
-INTDEF NONNULL((2, 3, 4)) pid_t NOTHROW_RPC(LIBCCALL libc_spawnvpe)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, __TARGV, __TENVP);
-INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnl)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, char const *args, ...);
-INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnl)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, char const *args, ...);
-INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnlp)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, char const *args, ...);
-INTDEF ATTR_SENTINEL NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlp)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, char const *args, ...);
-INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnle)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, char const *args, ...);
-INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnle)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, char const *args, ...);
-INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnlpe)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, char const *args, ...);
-INTDEF ATTR_SENTINEL_O(1) NONNULL((2)) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, char const *args, ...);
+INTDEF ATTR_ACCESS_WR_OPT(1) pid_t NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat, pid_t pid, __STDC_INT_AS_UINT_T action);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) pid_t NOTHROW_RPC(LIBDCALL libd_spawnv)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, __TARGV);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) pid_t NOTHROW_RPC(LIBCCALL libc_spawnv)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, __TARGV);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) pid_t NOTHROW_RPC(LIBDCALL libd_spawnvp)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, __TARGV);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) pid_t NOTHROW_RPC(LIBCCALL libc_spawnvp)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, __TARGV);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) pid_t NOTHROW_RPC(LIBDCALL libd_spawnve)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, __TARGV, __TENVP);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) pid_t NOTHROW_RPC(LIBCCALL libc_spawnve)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, __TARGV, __TENVP);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) pid_t NOTHROW_RPC(LIBDCALL libd_spawnvpe)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, __TARGV, __TENVP);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) pid_t NOTHROW_RPC(LIBCCALL libc_spawnvpe)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, __TARGV, __TENVP);
+INTDEF ATTR_SENTINEL ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnl)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, char const *args, ...);
+INTDEF ATTR_SENTINEL ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnl)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, char const *args, ...);
+INTDEF ATTR_SENTINEL ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnlp)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, char const *args, ...);
+INTDEF ATTR_SENTINEL ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlp)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, char const *args, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) ATTR_SENTINEL_O(1) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnle)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, char const *args, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) ATTR_SENTINEL_O(1) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnle)(__STDC_INT_AS_UINT_T mode, char const *__restrict path, char const *args, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) ATTR_SENTINEL_O(1) pid_t NOTHROW_RPC(VLIBDCALL libd_spawnlpe)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, char const *args, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) ATTR_SENTINEL_O(1) pid_t NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(__STDC_INT_AS_UINT_T mode, char const *__restrict file, char const *args, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((3, 4)) pid_t NOTHROW_RPC(LIBDCALL libd_fspawnve)(__STDC_INT_AS_UINT_T mode, fd_t execfd, __TARGV, __TENVP);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) pid_t NOTHROW_RPC(LIBDCALL libd_fspawnve)(__STDC_INT_AS_UINT_T mode, fd_t execfd, __TARGV, __TENVP);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF NONNULL((3, 4)) pid_t NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode, fd_t execfd, __TARGV, __TENVP);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) pid_t NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode, fd_t execfd, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 
 DECL_END

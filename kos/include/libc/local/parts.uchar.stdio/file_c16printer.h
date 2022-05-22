@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeeaa5590 */
+/* HASH CRC-32:0xb7913f5f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __CREDIRECT_DOS(__ATTR_ACCESS_RW(2),__WINT16_TYPE__,__THROWING,__localdep_fputc1
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(file_c16printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
+__LOCAL_LIBC(file_c16printer) __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(file_c16printer))(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) {
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {

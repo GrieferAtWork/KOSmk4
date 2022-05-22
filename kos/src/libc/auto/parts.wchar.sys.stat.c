@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3addb1a8 */
+/* HASH CRC-32:0xbec21159 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <asm/os/fcntl.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_wmkdir)(char16_t const *pathname,
                                   mode_t mode) {
 
@@ -55,7 +55,7 @@ NOTHROW_RPC(LIBDCALL libd_wmkdir)(char16_t const *pathname,
 
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_wmkdir)(char32_t const *pathname,
                                   mode_t mode) {
 
@@ -77,7 +77,7 @@ NOTHROW_RPC(LIBKCALL libc_wmkdir)(char32_t const *pathname,
 
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_wchmod)(char16_t const *filename,
                                   mode_t mode) {
 
@@ -96,7 +96,7 @@ NOTHROW_RPC(LIBDCALL libd_wchmod)(char16_t const *filename,
 
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_wchmod)(char32_t const *filename,
                                   mode_t mode) {
 
@@ -115,7 +115,7 @@ NOTHROW_RPC(LIBKCALL libc_wchmod)(char32_t const *filename,
 
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_wlchmod)(char16_t const *filename,
                                    mode_t mode) {
 
@@ -134,7 +134,7 @@ NOTHROW_RPC(LIBDCALL libd_wlchmod)(char16_t const *filename,
 
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_wlchmod)(char32_t const *filename,
                                    mode_t mode) {
 
@@ -152,7 +152,7 @@ NOTHROW_RPC(LIBKCALL libc_wlchmod)(char32_t const *filename,
 
 
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_wfmkdirat)(fd_t dirfd,
                                      char16_t const *pathname,
                                      mode_t mode,
@@ -168,7 +168,7 @@ NOTHROW_RPC(LIBDCALL libd_wfmkdirat)(fd_t dirfd,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBKCALL libc_wfmkdirat)(fd_t dirfd,
                                      char32_t const *pathname,
                                      mode_t mode,
@@ -184,7 +184,7 @@ NOTHROW_RPC(LIBKCALL libc_wfmkdirat)(fd_t dirfd,
 
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_wfmknodat)(fd_t dirfd,
                                      char16_t const *nodename,
                                      mode_t mode,
@@ -201,7 +201,7 @@ NOTHROW_RPC(LIBDCALL libd_wfmknodat)(fd_t dirfd,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBKCALL libc_wfmknodat)(fd_t dirfd,
                                      char32_t const *nodename,
                                      mode_t mode,
@@ -219,7 +219,7 @@ NOTHROW_RPC(LIBKCALL libc_wfmknodat)(fd_t dirfd,
 	return result;
 }
 #include <asm/os/stat.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_wmkfifo)(char16_t const *fifoname,
                                    mode_t mode) {
 
@@ -238,7 +238,7 @@ NOTHROW_RPC(LIBDCALL libd_wmkfifo)(char16_t const *fifoname,
 
 }
 #include <asm/os/stat.h>
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_wmkfifo)(char32_t const *fifoname,
                                    mode_t mode) {
 
@@ -256,7 +256,7 @@ NOTHROW_RPC(LIBKCALL libc_wmkfifo)(char32_t const *fifoname,
 
 
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_wfchmodat)(fd_t dirfd,
                                      char16_t const *filename,
                                      mode_t mode,
@@ -272,7 +272,7 @@ NOTHROW_RPC(LIBDCALL libd_wfchmodat)(fd_t dirfd,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBKCALL libc_wfchmodat)(fd_t dirfd,
                                      char32_t const *filename,
                                      mode_t mode,
@@ -288,7 +288,7 @@ NOTHROW_RPC(LIBKCALL libc_wfchmodat)(fd_t dirfd,
 
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_wmkdirat)(fd_t dirfd,
                                     char16_t const *pathname,
                                     mode_t mode) {
@@ -307,7 +307,7 @@ NOTHROW_RPC(LIBDCALL libd_wmkdirat)(fd_t dirfd,
 
 
 }
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBKCALL libc_wmkdirat)(fd_t dirfd,
                                     char32_t const *pathname,
                                     mode_t mode) {
@@ -327,7 +327,7 @@ NOTHROW_RPC(LIBKCALL libc_wmkdirat)(fd_t dirfd,
 
 }
 #include <asm/os/stat.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_wmkfifoat)(fd_t dirfd,
                                      char16_t const *fifoname,
                                      mode_t mode) {
@@ -347,7 +347,7 @@ NOTHROW_RPC(LIBDCALL libd_wmkfifoat)(fd_t dirfd,
 
 }
 #include <asm/os/stat.h>
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBKCALL libc_wmkfifoat)(fd_t dirfd,
                                      char32_t const *fifoname,
                                      mode_t mode) {
@@ -367,7 +367,7 @@ NOTHROW_RPC(LIBKCALL libc_wmkfifoat)(fd_t dirfd,
 
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_wmknod)(char16_t const *nodename,
                                   mode_t mode,
                                   dev_t dev) {
@@ -387,7 +387,7 @@ NOTHROW_RPC(LIBDCALL libd_wmknod)(char16_t const *nodename,
 
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_wmknod)(char32_t const *nodename,
                                   mode_t mode,
                                   dev_t dev) {
@@ -406,7 +406,7 @@ NOTHROW_RPC(LIBKCALL libc_wmknod)(char32_t const *nodename,
 
 
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_wmknodat)(fd_t dirfd,
                                     char16_t const *nodename,
                                     mode_t mode,
@@ -426,7 +426,7 @@ NOTHROW_RPC(LIBDCALL libd_wmknodat)(fd_t dirfd,
 
 
 }
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBKCALL libc_wmknodat)(fd_t dirfd,
                                     char32_t const *nodename,
                                     mode_t mode,
@@ -447,7 +447,7 @@ NOTHROW_RPC(LIBKCALL libc_wmknodat)(fd_t dirfd,
 
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify_time") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify_time") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) int
 NOTHROW_RPC(LIBDCALL libd_wutimensat)(fd_t dirfd,
                                       char16_t const *filename,
                                       struct timespec const times[2 /*or:3*/],
@@ -514,7 +514,7 @@ NOTHROW_RPC(LIBDCALL libd_wutimensat)(fd_t dirfd,
 #endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) int
 NOTHROW_RPC(LIBKCALL libc_wutimensat)(fd_t dirfd,
                                       char32_t const *filename,
                                       struct timespec const times[2 /*or:3*/],
@@ -581,7 +581,7 @@ NOTHROW_RPC(LIBKCALL libc_wutimensat)(fd_t dirfd,
 #endif /* !__LIBCCALL_IS_LIBKCALL || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify_time") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify_time") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) int
 NOTHROW_RPC(LIBDCALL libd_wutimensat64)(fd_t dirfd,
                                         char16_t const *filename,
                                         struct timespec64 const times[2 /*or:3*/],
@@ -628,7 +628,7 @@ NOTHROW_RPC(LIBDCALL libd_wutimensat64)(fd_t dirfd,
 DEFINE_INTERN_ALIAS(libc_wutimensat64, libc_wutimensat);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <asm/os/fcntl.h>
-INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) int
 NOTHROW_RPC(LIBKCALL libc_wutimensat64)(fd_t dirfd,
                                         char32_t const *filename,
                                         struct timespec64 const times[2 /*or:3*/],

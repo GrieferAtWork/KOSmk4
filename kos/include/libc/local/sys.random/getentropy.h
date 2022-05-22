@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x249ad04b */
+/* HASH CRC-32:0xfc7d62c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,12 +27,12 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getrandom_defined
 #define __local___localdep_getrandom_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_getrandom,(void *__buf, __SIZE_TYPE__ __num_bytes, unsigned int __flags),getrandom,(__buf,__num_bytes,__flags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_getrandom,(void *__buf, __SIZE_TYPE__ __num_bytes, unsigned int __flags),getrandom,(__buf,__num_bytes,__flags))
 #endif /* !__local___localdep_getrandom_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getentropy) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(getentropy) __ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getentropy))(void *__buf, __SIZE_TYPE__ __num_bytes) {
 	__SIZE_TYPE__ __result = 0;
 	__SSIZE_TYPE__ __temp;

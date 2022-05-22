@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c68ecf6 */
+/* HASH CRC-32:0xac9a2f0f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_streadd_defined
 #define __local___localdep_streadd_defined
 #ifdef __CRT_HAVE_streadd
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_streadd,(char *__dstbuf, char const *__string, char const *__dont_encode),streadd,(__dstbuf,__string,__dont_encode))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_WR(1),char *,__NOTHROW_NCX,__localdep_streadd,(char *__dstbuf, char const *__string, char const *__dont_encode),streadd,(__dstbuf,__string,__dont_encode))
 #else /* __CRT_HAVE_streadd */
 __NAMESPACE_LOCAL_END
 #include <libc/local/libgen/streadd.h>
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_streadd __LIBC_LOCAL_NAME(streadd)
 #endif /* !__CRT_HAVE_streadd */
 #endif /* !__local___localdep_streadd_defined */
-__LOCAL_LIBC(strecpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
+__LOCAL_LIBC(strecpy) __ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_WR(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strecpy))(char *__dstbuf, char const *__string, char const *__dont_encode) {
 	(__NAMESPACE_LOCAL_SYM __localdep_streadd)(__dstbuf, __string, __dont_encode);
 	return __dstbuf;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22dc91e */
+/* HASH CRC-32:0x361e1141 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_mempcpyc __LIBC_LOCAL_NAME(mempcpyc)
 #endif /* !__CRT_HAVE_mempcpyc */
 #endif /* !__local___localdep_mempcpyc_defined */
-__LOCAL_LIBC(format_c32sprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_c32sprintf_printer) __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__C32FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_c32sprintf_printer))(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	*(__CHAR32_TYPE__ **)__arg = (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyc)(*(__CHAR32_TYPE__ **)__arg, __data, __datalen, sizeof(__CHAR32_TYPE__));
 	return (__SSIZE_TYPE__)__datalen;

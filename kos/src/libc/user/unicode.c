@@ -178,10 +178,10 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digitld)(uint8_t digit_idx)
 }
 /*[[[end:libc___unicode_descriptor_digitld]]]*/
 
-/*[[[head:libc_unicode_fold,hash:CRC-32=0x8b4f54d3]]]*/
+/*[[[head:libc_unicode_fold,hash:CRC-32=0x21de75bb]]]*/
 /* >> unicode_fold(3)
  * Fold the given unicode character `ch' */
-INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((2)) char32_t *
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL ATTR_ACCESS_WR(2) char32_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_fold)(char32_t ch,
                                         char32_t buf[3])
 /*[[[body:libc_unicode_fold]]]*/

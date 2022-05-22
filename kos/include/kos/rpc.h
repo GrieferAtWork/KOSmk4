@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7232402 */
+/* HASH CRC-32:0x7af5eeb8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -156,7 +156,7 @@ typedef __ATTR_NONNULL_T((1)) void
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_OPT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,rpc_schedule,(__pid_t __target_tid, unsigned int __mode, void const *__program, void const *const *__params, __SIZE_TYPE__ __max_param_count),(__target_tid,__mode,__program,__params,__max_param_count))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_ROS(4, 5),int,__NOTHROW_RPC,rpc_schedule,(__pid_t __target_tid, unsigned int __mode, void const *__program, void const *const *__params, __SIZE_TYPE__ __max_param_count),(__target_tid,__mode,__program,__params,__max_param_count))
 /* >> rpc_serve(2)
  * Check for  pending RPCs.  This function  is basically  a cancellation  point in  disguise,
  * in  that it literally _is_ a regular, old cancellation point, with the only addition being
@@ -250,7 +250,7 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,rpc_interrupt,(__pid_t __target_tid, unsigned 
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((3)),__THROWING,RpcSchedule,(__pid_t __target_tid, unsigned int __mode, void const *__program, void const *const *__params, __SIZE_TYPE__ __max_param_count),(__target_tid,__mode,__program,__params,__max_param_count))
+__CDECLARE_VOID_OPT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_ROS(4, 5),__THROWING,RpcSchedule,(__pid_t __target_tid, unsigned int __mode, void const *__program, void const *const *__params, __SIZE_TYPE__ __max_param_count),(__target_tid,__mode,__program,__params,__max_param_count))
 /* >> rpc_exec(3)
  * Send an RPC to `target_tid' (which must be a thread within the  current
  * process). The RPC will modify  the target thread's register state  such

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc244dfd */
+/* HASH CRC-32:0xea70fb9d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,21 +38,21 @@ INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_inotify_init)(void);
 INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_inotify_init1)(__STDC_INT_AS_UINT_T flags);
 /* >> inotify_add_watch(2)
  * @param: mask: Set of `IN_ALL_EVENTS | ...' */
-INTDEF __watchfd_t NOTHROW_NCX(LIBDCALL libd_inotify_add_watch)(fd_t notify_fd, char const *pathname, uint32_t mask);
+INTDEF ATTR_ACCESS_RO(2) __watchfd_t NOTHROW_NCX(LIBDCALL libd_inotify_add_watch)(fd_t notify_fd, char const *pathname, uint32_t mask);
 /* >> inotify_add_watch(2)
  * @param: mask: Set of `IN_ALL_EVENTS | ...' */
-INTDEF __watchfd_t NOTHROW_NCX(LIBCCALL libc_inotify_add_watch)(fd_t notify_fd, char const *pathname, uint32_t mask);
+INTDEF ATTR_ACCESS_RO(2) __watchfd_t NOTHROW_NCX(LIBCCALL libc_inotify_add_watch)(fd_t notify_fd, char const *pathname, uint32_t mask);
 /* >> inotify_rm_watch(2)
  * @param: wd: Watch fd (as returned by `inotify_add_watch{_at}') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_inotify_rm_watch)(fd_t notify_fd, __watchfd_t wd);
 /* >> inotify_add_watch_at(2)
  * @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH | AT_EMPTY_PATH'
  * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
-INTDEF __watchfd_t NOTHROW_NCX(LIBDCALL libd_inotify_add_watch_at)(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask);
+INTDEF ATTR_ACCESS_RO(3) __watchfd_t NOTHROW_NCX(LIBDCALL libd_inotify_add_watch_at)(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask);
 /* >> inotify_add_watch_at(2)
  * @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH | AT_EMPTY_PATH'
  * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
-INTDEF __watchfd_t NOTHROW_NCX(LIBCCALL libc_inotify_add_watch_at)(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask);
+INTDEF ATTR_ACCESS_RO(3) __watchfd_t NOTHROW_NCX(LIBCCALL libc_inotify_add_watch_at)(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask);
 #endif /* !__KERNEL__ */
 
 DECL_END

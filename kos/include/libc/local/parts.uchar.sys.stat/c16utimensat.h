@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97d06f97 */
+/* HASH CRC-32:0x561cdb6a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16utimensat64_defined
 #define __local___localdep_c16utimensat64_defined
 #if defined(__CRT_HAVE_wutimensat) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16utimensat64,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3),int,__NOTHROW_RPC,__localdep_c16utimensat64,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_DOS$wutimensat) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16utimensat64,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
+__CREDIRECT_DOS(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3),int,__NOTHROW_RPC,__localdep_c16utimensat64,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_wutimensat64) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16utimensat64,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat64,(__dirfd,__filename,__times,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3),int,__NOTHROW_RPC,__localdep_c16utimensat64,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat64,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_DOS$wutimensat64)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16utimensat64,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat64,(__dirfd,__filename,__times,__flags))
+__CREDIRECT_DOS(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3),int,__NOTHROW_RPC,__localdep_c16utimensat64,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat64,(__dirfd,__filename,__times,__flags))
 #elif ((defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE_utimensat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || (defined(__CRT_HAVE_wutimensat) && __SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.sys.stat/wutimensat64.h>
@@ -56,12 +56,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_DOS$convert_wcstombs)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif (defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -79,9 +79,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_c16utimensat32_defined
 #define __local___localdep_crt_c16utimensat32_defined
 #if defined(__CRT_HAVE_wutimensat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_crt_c16utimensat32,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3),int,__NOTHROW_RPC,__localdep_crt_c16utimensat32,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_DOS$wutimensat)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_crt_c16utimensat32,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
+__CREDIRECT_DOS(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3),int,__NOTHROW_RPC,__localdep_crt_c16utimensat32,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
 #else /* ... */
 #undef __local___localdep_crt_c16utimensat32_defined
 #endif /* !... */
@@ -103,9 +103,9 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_utimensat_defined
 #define __local___localdep_utimensat_defined
 #if defined(__CRT_HAVE_utimensat) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3),int,__NOTHROW_RPC,__localdep_utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat64,(__dirfd,__filename,__times,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3),int,__NOTHROW_RPC,__localdep_utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat64,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE_utimensat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.stat/utimensat.h>
@@ -118,7 +118,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c16utimensat) __ATTR_NONNULL((2)) int
+__LOCAL_LIBC(c16utimensat) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3) int
 __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16utimensat))(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags) {
 #if (defined(__CRT_HAVE_wutimensat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wutimensat)
 #ifdef __AT_CHANGE_BTIME

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cdbd2f7 */
+/* HASH CRC-32:0x1a6570ec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <bits/crt/pthreadtypes.h>
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(pthread_spin_init) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(pthread_spin_init) __ATTR_ACCESS_WR(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_init))(__pthread_spinlock_t *__lock, int __pshared) {
 	(void)__pshared;
 	__hybrid_atomic_store(*__lock, 0, __ATOMIC_RELAXED);

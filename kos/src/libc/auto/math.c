@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x583da7d7 */
+/* HASH CRC-32:0x5a7e2512 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -728,7 +728,7 @@ NOTHROW(LIBCCALL libc_exp)(double x) {
 #include <libm/frexp.h>
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
-INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((2)) double
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_ACCESS_WR(2) double
 NOTHROW_NCX(LIBCCALL libc_frexp)(double x,
                                  int *pexponent) {
 
@@ -806,7 +806,7 @@ NOTHROW(LIBCCALL libc_log10)(double x) {
 #include <libm/modf.h>
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) double
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED ATTR_ACCESS_WR(2) double
 NOTHROW_NCX(LIBCCALL libc_modf)(double x,
                                 double *iptr) {
 
@@ -846,7 +846,7 @@ NOTHROW(LIBCCALL libc_expf)(float x) {
 #include <libm/frexp.h>
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
-INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((2)) float
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_ACCESS_WR(2) float
 NOTHROW_NCX(LIBCCALL libc_frexpf)(float x,
                                   int *pexponent) {
 
@@ -950,7 +950,7 @@ NOTHROW(LIBCCALL libc_log10f)(float x) {
 #include <libm/modf.h>
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) float
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED ATTR_ACCESS_WR(2) float
 NOTHROW_NCX(LIBCCALL libc_modff)(float x,
                                  float *iptr) {
 
@@ -996,7 +996,7 @@ NOTHROW(LIBCCALL libc_expl)(__LONGDOUBLE x) {
 #include <libm/frexp.h>
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
-INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((2)) __LONGDOUBLE
+INTERN ATTR_SECTION(".text.crt.math.math") ATTR_ACCESS_WR(2) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x,
                                   int *pexponent) {
 
@@ -1100,7 +1100,7 @@ NOTHROW(LIBCCALL libc_log10l)(__LONGDOUBLE x) {
 #include <libm/modf.h>
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) __LONGDOUBLE
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED ATTR_ACCESS_WR(2) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_modfl)(__LONGDOUBLE x,
                                  __LONGDOUBLE *iptr) {
 
@@ -2450,7 +2450,7 @@ NOTHROW(LIBCCALL libc_trunc)(double x) {
  * Compute remainder of `x' and `p' and put in `*pquo' a value with
  * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/p, with n >= 3 */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((3)) double
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED ATTR_ACCESS_WR(3) double
 NOTHROW(LIBCCALL libc_remquo)(double x,
                               double p,
                               int *pquo) {
@@ -2667,7 +2667,7 @@ NOTHROW(LIBCCALL libc_truncf)(float x) {
  * Compute remainder of `x' and `p' and put in `*pquo' a value with
  * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/p, with n >= 3 */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((3)) float
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED ATTR_ACCESS_WR(3) float
 NOTHROW(LIBCCALL libc_remquof)(float x,
                                float p,
                                int *pquo) {
@@ -2875,7 +2875,7 @@ NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x) {
  * Compute remainder of `x' and `p' and put in `*pquo' a value with
  * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/p, with n >= 3 */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((3)) __LONGDOUBLE
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED ATTR_ACCESS_WR(3) __LONGDOUBLE
 NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x,
                                __LONGDOUBLE p,
                                int *pquo) {
@@ -3001,7 +3001,7 @@ NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x) {
 #include <libm/sincos.h>
 /* >> sincosf(3), sincos(3), sincosl(3)
  * Calculate both sine (*psinx) and cosine (*pcosx) of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincos NONNULL((2, 3)) void
+INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincos ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void
 NOTHROW(LIBCCALL libc_sincos)(double x,
                               double *psinx,
                               double *pcosx) {
@@ -3042,7 +3042,7 @@ NOTHROW(LIBCCALL libc_pow10)(double x) {
 #include <libm/sincos.h>
 /* >> sincosf(3), sincos(3), sincosl(3)
  * Calculate both sine (*psinx) and cosine (*pcosx) of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincosf NONNULL((2, 3)) void
+INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincosf ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void
 NOTHROW(LIBCCALL libc_sincosf)(float x,
                                float *psinx,
                                float *pcosx) {
@@ -3088,7 +3088,7 @@ NOTHROW(LIBCCALL libc_pow10f)(float x) {
 #include <libm/sincos.h>
 /* >> sincosf(3), sincos(3), sincosl(3)
  * Calculate both sine (*psinx) and cosine (*pcosx) of `x' */
-INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincosl NONNULL((2, 3)) void
+INTERN ATTR_SECTION(".text.crt.math.math") __DECL_SIMD_sincosl ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void
 NOTHROW(LIBCCALL libc_sincosl)(__LONGDOUBLE x,
                                __LONGDOUBLE *psinx,
                                __LONGDOUBLE *pcosx) {
@@ -3697,7 +3697,7 @@ NOTHROW(LIBCCALL libc_ynl)(int n,
 #include <libm/floor.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant    version    of     `lgamma(3)' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) double
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED ATTR_ACCESS_WR(2) double
 NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
                                     int *signgamp) {
 	double result = __LIBM_MATHFUN2I(lgamma, x, signgamp);
@@ -3716,7 +3716,7 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 #include <libm/floor.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant    version    of     `lgamma(3)' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) float
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED ATTR_ACCESS_WR(2) float
 NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x,
                                      int *signgamp) {
 
@@ -3741,7 +3741,7 @@ NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x,
 #include <libm/floor.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant    version    of     `lgamma(3)' */
-INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED NONNULL((2)) __LONGDOUBLE
+INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED ATTR_ACCESS_WR(2) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_lgammal_r)(__LONGDOUBLE x,
                                      int *signgamp) {
 
@@ -4121,7 +4121,7 @@ NOTHROW(LIBCCALL libc_roundeven)(double x) {
  * @param: cx: Store the canonicalized value of `*x' here.
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
-INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.math.math") int
 NOTHROW_NCX(LIBCCALL libc_canonicalize)(double *cx,
                                         double const *x) {
 	double value = *x;
@@ -4199,7 +4199,7 @@ NOTHROW_NCX(LIBCCALL libc_fminmagf)(float x,
  * @param: cx: Store the canonicalized value of `*x' here.
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
-INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.math.math") int
 NOTHROW_NCX(LIBCCALL libc_canonicalizef)(float *cx,
                                          float const *x) {
 	float value = *x;
@@ -4277,7 +4277,7 @@ NOTHROW_NCX(LIBCCALL libc_fminmagl)(__LONGDOUBLE x,
  * @param: cx: Store the canonicalized value of `*x' here.
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
-INTERN ATTR_SECTION(".text.crt.math.math") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.math.math") int
 NOTHROW_NCX(LIBCCALL libc_canonicalizel)(__LONGDOUBLE *cx,
                                          __LONGDOUBLE const *x) {
 	__LONGDOUBLE value = *x;
@@ -4380,32 +4380,32 @@ NOTHROW(LIBCCALL libc___signgam)(void) {
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) short
 NOTHROW_NCX(LIBDCALL libd__dtest)(double __KOS_FIXED_CONST *px) {
 	return libd___fpclassify(*px);
 }
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
+INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) short
 NOTHROW_NCX(LIBCCALL libc__dtest)(double __KOS_FIXED_CONST *px) {
 	return libc___fpclassify(*px);
 }
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) short
 NOTHROW_NCX(LIBDCALL libd__fdtest)(float __KOS_FIXED_CONST *px) {
 	return libd___fpclassifyf(*px);
 }
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
+INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) short
 NOTHROW_NCX(LIBCCALL libc__fdtest)(float __KOS_FIXED_CONST *px) {
 	return libc___fpclassifyf(*px);
 }
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) short
 NOTHROW_NCX(LIBDCALL libd__ldtest)(__LONGDOUBLE __KOS_FIXED_CONST *px) {
 	return libd___fpclassifyl(*px);
 }
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED NONNULL((1)) short
+INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) short
 NOTHROW_NCX(LIBCCALL libc__ldtest)(__LONGDOUBLE __KOS_FIXED_CONST *px) {
 	return libc___fpclassifyl(*px);
 }

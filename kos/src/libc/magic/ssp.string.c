@@ -41,6 +41,10 @@ __SYSDECL_BEGIN
 
 }
 
+/* !!! DON'T ANNOTATE FUNCTIONS IN HERE WITH [[in]], [[out]], etc... !!!
+ *
+ * Functions in here are meant to do those sort of checks at runtime! */
+
 [[libc, fast, leaf, decl_include("<hybrid/typecore.h>")]]
 __memcpy_chk([[nonnull]] void *__restrict dst,
              [[nonnull]] void const *__restrict src,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa28450f5 */
+/* HASH CRC-32:0x9ab81756 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getsubopt) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int
+__LOCAL_LIBC(getsubopt) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep) {
 	unsigned int __i;
 	char *__option, *__nextopt;

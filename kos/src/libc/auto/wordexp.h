@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf13ec5e5 */
+/* HASH CRC-32:0x68d47602 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,15 +37,15 @@ DECL_BEGIN
  * @param: flags:  Expansion flags (set of `WRDE_*' from <wordexp.h>)
  * @return: 0 : Success
  * @return: * : Error (return value is one of `WRDE_*' from <wordexp.h>) */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wordexp)(char const *__restrict string, wordexp_t *__restrict self, __STDC_INT_AS_UINT_T flags);
+INTDEF ATTR_ACCESS_RO(1) NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_wordexp)(char const *__restrict string, wordexp_t *__restrict self, __STDC_INT_AS_UINT_T flags);
 /* >> wordfree(3)
  * Free dynamic allocations made by `wordexp(3)' */
-INTDEF void NOTHROW_NCX(LIBDCALL libd_wordfree)(wordexp_t *self);
+INTDEF ATTR_ACCESS_RW_OPT(1) void NOTHROW_NCX(LIBDCALL libd_wordfree)(wordexp_t *self);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> wordfree(3)
  * Free dynamic allocations made by `wordexp(3)' */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_wordfree)(wordexp_t *self);
+INTDEF ATTR_ACCESS_RW_OPT(1) void NOTHROW_NCX(LIBCCALL libc_wordfree)(wordexp_t *self);
 #endif /* !__KERNEL__ */
 
 DECL_END

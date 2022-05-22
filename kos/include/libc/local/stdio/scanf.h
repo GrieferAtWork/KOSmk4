@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5dfe4db1 */
+/* HASH CRC-32:0x9e58cf2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,15 +29,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vscanf_defined
 #define __local___localdep_vscanf_defined
 #if defined(__CRT_HAVE_vscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf_unlocked,(__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf_unlocked,(__format,__args))
 #elif __has_builtin(__builtin_vscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vscanf)
-__CEIREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf,{ return __builtin_vscanf(__format, __args); })
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf,{ return __builtin_vscanf(__format, __args); })
 #elif defined(__CRT_HAVE_vscanf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf,(__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf,(__format,__args))
 #elif defined(__CRT_HAVE__vscanf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),_vscanf,(__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),_vscanf,(__format,__args))
 #elif defined(__CRT_HAVE_vscanf_unlocked)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf_unlocked,(__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vscanf,(char const *__restrict __format, __builtin_va_list __args),vscanf_unlocked,(__format,__args))
 #elif defined(__LOCAL_stdin) && (defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE___vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE_vfscanf_unlocked) || ((defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/vscanf.h>
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_vscanf_defined
 #endif /* !... */
 #endif /* !__local___localdep_vscanf_defined */
-__LOCAL_LIBC(scanf) __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(scanf) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T
 (__VLIBCCALL __LIBC_LOCAL_NAME(scanf))(char const *__restrict __format, ...) __THROWS(...) {
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabf711cc */
+/* HASH CRC-32:0xad19ad9f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strend __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
-__LOCAL_LIBC(dirname) __ATTR_RETNONNULL char *
+__LOCAL_LIBC(dirname) __ATTR_RETNONNULL __ATTR_ACCESS_RO_OPT(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dirname))(char *__path) {
 	char *__iter;
 	/* Handle the empty-path case. */

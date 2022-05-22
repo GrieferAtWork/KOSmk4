@@ -211,15 +211,15 @@ __SYSDECL_BEGIN
 
 [[ignore, nocrt, alias("adjtimex", "__adjtimex")]]
 [[decl_include("<bits/os/timex.h>")]]
-int adjtimex32([[nonnull]] struct $timex32 *__restrict __ntx);
+int adjtimex32([[inout]] struct $timex32 *__restrict __ntx);
 
 [[ignore, nocrt, alias("ntp_gettimex")]]
 [[decl_include("<bits/crt/ntptimeval.h>")]]
-int ntp_gettime32([[nonnull]] struct $ntptimeval32 *__restrict ntv);
+int ntp_gettime32([[out]] struct $ntptimeval32 *__restrict ntv);
 
 [[ignore, nocrt, alias("ntp_adjtime")]]
 [[decl_include("<bits/os/timex.h>")]]
-int ntp_adjtime32([[nonnull]] struct $timex32 *__restrict tntx);
+int ntp_adjtime32([[inout]] struct $timex32 *__restrict tntx);
 
 
 
@@ -231,7 +231,7 @@ int ntp_adjtime32([[nonnull]] struct $timex32 *__restrict tntx);
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("adjtimex64", "__adjtimex64")]]
 [[userimpl, requires($has_function(adjtimex32) || $has_function(adjtimex64))]]
 [[export_as("__adjtimex", "__libc_adjtimex")]]
-int adjtimex([[nonnull]] struct timex *__restrict ntx) {
+int adjtimex([[inout]] struct timex *__restrict ntx) {
 	int result;
 @@pp_if $has_function(adjtimex32)@@
 	struct timex32 nxtalt;
@@ -337,7 +337,7 @@ int adjtimex([[nonnull]] struct timex *__restrict ntx) {
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ntp_gettimex")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ntp_gettimex64")]]
 [[userimpl, requires($has_function(ntp_gettime32) || $has_function(ntp_gettime64))]]
-int ntp_gettime([[nonnull]] struct ntptimeval *__restrict ntv) {
+int ntp_gettime([[out]] struct ntptimeval *__restrict ntv) {
 @@pp_if $has_function(ntp_gettime32)@@
 	struct ntptimeval32 ntv32;
 	int result = ntp_gettime32(&ntv32);
@@ -376,7 +376,7 @@ int ntp_gettime([[nonnull]] struct ntptimeval *__restrict ntv) {
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ntp_adjtime")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ntp_adjtime64")]]
 [[userimpl, requires($has_function(ntp_adjtime32) || $has_function(ntp_adjtime64))]]
-int ntp_adjtime([[nonnull]] struct timex *__restrict tntx) {
+int ntp_adjtime([[inout]] struct timex *__restrict tntx) {
 	int result;
 @@pp_if $has_function(ntp_adjtime32)@@
 	struct timex32 nxtalt;
@@ -482,7 +482,7 @@ int ntp_adjtime([[nonnull]] struct timex *__restrict tntx) {
 [[preferred_time64_variant_of(adjtimex), doc_alias("adjtimex")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__adjtimex", "__libc_adjtimex")]]
 [[export_alias("__adjtimex64"), userimpl, requires_function(adjtimex32)]]
-int adjtimex64([[nonnull]] struct timex64 *__restrict ntx) {
+int adjtimex64([[inout]] struct timex64 *__restrict ntx) {
 	int result;
 	struct timex32 nxtalt;
 	nxtalt.@time@.tv_sec  = (time32_t)ntx->@time@.tv_sec;
@@ -536,7 +536,7 @@ int adjtimex64([[nonnull]] struct timex64 *__restrict ntx) {
 [[preferred_time64_variant_of(ntp_adjtime), doc_alias("ntp_adjtime")]]
 [[userimpl, requires_function(ntp_adjtime32)]]
 [[decl_include("<bits/os/timex.h>")]]
-int ntp_adjtime64([[nonnull]] struct timex64 *__restrict tntx) {
+int ntp_adjtime64([[inout]] struct timex64 *__restrict tntx) {
 	int result;
 	struct timex32 nxtalt;
 	nxtalt.@time@.tv_sec  = (time32_t)tntx->@time@.tv_sec;
@@ -591,7 +591,7 @@ int ntp_adjtime64([[nonnull]] struct timex64 *__restrict tntx) {
 [[crt_name("ntp_gettimex64"), decl_include("<bits/crt/ntptimeval.h>")]]
 [[preferred_time64_variant_of(ntp_gettimex), doc_alias("ntp_gettime")]]
 [[userimpl, requires_function(ntp_gettime32)]]
-int ntp_gettime64([[nonnull]] struct ntptimeval64 *__restrict ntv) {
+int ntp_gettime64([[out]] struct ntptimeval64 *__restrict ntv) {
 	struct ntptimeval32 ntv32;
 	int result = ntp_gettime32(&ntv32);
 	if likely(result == 0) {

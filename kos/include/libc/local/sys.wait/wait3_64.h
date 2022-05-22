@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9635ba67 */
+/* HASH CRC-32:0x8fa2afce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wait3_32_defined
 #define __local___localdep_wait3_32_defined
 #ifdef __CRT_HAVE_wait3
-__CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),wait3,(__stat_loc,__options,__usage))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(3),__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),wait3,(__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE___wait3)
-__CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),__wait3,(__stat_loc,__options,__usage))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(3),__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),__wait3,(__stat_loc,__options,__usage))
 #else /* ... */
 #undef __local___localdep_wait3_32_defined
 #endif /* !... */
@@ -40,7 +40,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc
 __NAMESPACE_LOCAL_END
 #include <bits/os/rusage-convert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wait3_64) __pid_t
+__LOCAL_LIBC(wait3_64) __ATTR_ACCESS_WR_OPT(3) __pid_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wait3_64))(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage) {
 	__pid_t __result;
 	struct __rusage32 __ru32;

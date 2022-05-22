@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47f7fc12 */
+/* HASH CRC-32:0x149ed516 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,14 +29,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_ppoll32_defined) && defined(__CRT_HAVE_ppoll)
 #define __local___localdep_ppoll32_defined
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll32,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec32 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RWS(1, 2),int,__NOTHROW_RPC,__localdep_ppoll32,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec32 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
 #endif /* !__local___localdep_ppoll32_defined && __CRT_HAVE_ppoll */
 #ifndef __local___localdep_ppoll64_defined
 #define __local___localdep_ppoll64_defined
 #if defined(__CRT_HAVE_ppoll) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll64,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RWS(1, 2),int,__NOTHROW_RPC,__localdep_ppoll64,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
 #elif defined(__CRT_HAVE_ppoll64)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll64,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll64,(__fds,__nfds,__timeout,__ss))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RWS(1, 2),int,__NOTHROW_RPC,__localdep_ppoll64,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll64,(__fds,__nfds,__timeout,__ss))
 #elif defined(__CRT_HAVE_ppoll)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.poll/ppoll64.h>
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_ppoll64_defined
 #endif /* !... */
 #endif /* !__local___localdep_ppoll64_defined */
-__LOCAL_LIBC(ppoll) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(ppoll) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RWS(1, 2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ppoll))(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct timespec const *__timeout, struct __sigset_struct const *__ss) {
 #ifdef __CRT_HAVE_ppoll
 	struct __timespec32 __tmo32;

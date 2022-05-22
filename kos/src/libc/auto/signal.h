@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cde23e */
+/* HASH CRC-32:0x1e149c03 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,52 +111,52 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_kill)(pid_t pid, signo_t signo);
 /* >> sigemptyset(3)
  * Clear the given signal set of all contained signals
  * @return: 0: Always returns `0' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigemptyset)(sigset_t *set);
+INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_sigemptyset)(sigset_t *set);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigemptyset(3)
  * Clear the given signal set of all contained signals
  * @return: 0: Always returns `0' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigemptyset)(sigset_t *set);
+INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_sigemptyset)(sigset_t *set);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigfillset(3)
  * Add all possible signals (possibly even including undefined signals,
  * though these would be ignored by the kernel) to the given signal set
  * @return: 0: Always returns `0' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigfillset)(sigset_t *set);
+INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_sigfillset)(sigset_t *set);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigfillset(3)
  * Add all possible signals (possibly even including undefined signals,
  * though these would be ignored by the kernel) to the given signal set
  * @return: 0: Always returns `0' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set);
+INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
  * @return: 0:  Success (Always returned by the kernel-version)
  * @return: -1: [errno=EINVAL] invalid `signo'.
  *              Not returned by the kernel-version of this function! */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigaddset)(sigset_t *set, signo_t signo);
+INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd_sigaddset)(sigset_t *set, signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
  * @return: 0:  Success (Always returned by the kernel-version)
  * @return: -1: [errno=EINVAL] invalid `signo'.
  *              Not returned by the kernel-version of this function! */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set, signo_t signo);
+INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set, signo_t signo);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigdelset(3)
  * Remove only the given `signo' from the given signal set
  * @return: 0:  Success (Always returned by the kernel-version)
  * @return: -1: [errno=EINVAL] invalid `signo'.
  *              Not returned by the kernel-version of this function! */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigdelset)(sigset_t *set, signo_t signo);
+INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd_sigdelset)(sigset_t *set, signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigdelset(3)
  * Remove only the given `signo' from the given signal set
  * @return: 0:  Success (Always returned by the kernel-version)
  * @return: -1: [errno=EINVAL] invalid `signo'.
  *              Not returned by the kernel-version of this function! */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set, signo_t signo);
+INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set, signo_t signo);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
@@ -165,7 +165,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set, sign
  * @return:  0: The given `signo' isn't apart of `set'
  * @return: -1: [errno=EINVAL] invalid `signo'.
  *              Not returned by the kernel-version of this function! */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigismember)(sigset_t const *set, signo_t signo);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd_sigismember)(sigset_t const *set, signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
@@ -174,7 +174,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigismember)
  * @return:  0: The given `signo' isn't apart of `set'
  * @return: -1: [errno=EINVAL] invalid `signo'.
  *              Not returned by the kernel-version of this function! */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set, signo_t signo);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set, signo_t signo);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Change  the signal mask for the calling thread. Note that portable
  * programs that also make use of multithreading must instead use the
@@ -188,7 +188,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigismember)
  * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] Invalid `how' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sigprocmask)(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
+INTDEF ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_WR_OPT(3) int NOTHROW_NCX(LIBDCALL libd_sigprocmask)(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 /* >> setsigmaskptr(3)
  * Set  the  current  signal  mask  pointer  to `sigmaskptr'
  * This  is  a kos-specific  function  that can  be  used to
@@ -218,7 +218,7 @@ INTDEF ATTR_RETNONNULL NONNULL((1)) sigset_t *NOTHROW_NCX(LIBDCALL libd_setsigma
  * the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigsuspend)(sigset_t const *set);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_sigsuspend)(sigset_t const *set);
 /* >> sigaction(2)
  * Get/Set the  action that  shall  be performed  when  a
  * signal `signo' must be handled by the calling process.
@@ -226,57 +226,57 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigsuspend)(sigset_t const *se
  * who's shared/unshared behavior between threads is controlled by `CLONE_SIGHAND'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `signo' is invalid */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sigaction)(signo_t signo, struct sigaction const *act, struct sigaction *oact);
+INTDEF ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_WR_OPT(3) int NOTHROW_NCX(LIBDCALL libd_sigaction)(signo_t signo, struct sigaction const *act, struct sigaction *oact);
 /* >> sigpending(2)
  * Retrieve the set of signals that are pending
  * in  either  the calling  thread  and process
  * @return: 0: Success */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigpending)(sigset_t *__restrict set);
+INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_sigpending)(sigset_t *__restrict set);
 /* >> sigwait(3)
  * Same as `sigsuspend(2)', but write-back the actual signal that was raised to `*signo'
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_sigwait)(sigset_t const *__restrict set, signo_t *__restrict signo);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int NOTHROW_RPC(LIBDCALL libd_sigwait)(sigset_t const *__restrict set, signo_t *__restrict signo);
 /* >> sigisemptyset(3)
  * Check if the given signal set is empty
  * @return: != 0: Yes, it is empty
  * @return: == 0: No, at least 1 signal is contained */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigisemptyset)(sigset_t const *__restrict set);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd_sigisemptyset)(sigset_t const *__restrict set);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigisemptyset(3)
  * Check if the given signal set is empty
  * @return: != 0: Yes, it is empty
  * @return: == 0: No, at least 1 signal is contained */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *__restrict set);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *__restrict set);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigandset(3)
  * Set-up every signal `S' from `set' as the result of `set[S] = left[S] & right[S]'
  * @return: 0: Always returns `0' */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBDCALL libd_sigandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_sigandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigandset(3)
  * Set-up every signal `S' from `set' as the result of `set[S] = left[S] & right[S]'
  * @return: 0: Always returns `0' */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigorset(3)
  * Set-up every signal `S' from `set' as the result of `set[S] = left[S] | right[S]'
  * @return: 0: Always returns `0' */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBDCALL libd_sigorset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_sigorset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigorset(3)
  * Set-up every signal `S' from `set' as the result of `set[S] = left[S] | right[S]'
  * @return: 0: Always returns `0' */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> signandset(3)
  * Set-up every signal `S' from `set' as the result of `set[S] = left[S] & ~right[S]'
  * @return: 0: Always returns `0' */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBDCALL libd_signandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_signandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> signandset(3)
  * Set-up every signal `S' from `set' as the result of `set[S] = left[S] & ~right[S]'
  * @return: 0: Always returns `0' */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_signandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_signandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigwaitinfo(2)
  * Same as `sigsuspend(2)',  but write-back extended  information in the  signal,
@@ -284,7 +284,7 @@ INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_signandset)(sigset_t *se
  * @param: set:  The set of signals on which to wait
  * @param: info: Information about the signal on which to wait.
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigwaitinfo)(sigset_t const *__restrict set, siginfo_t *__restrict info);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) int NOTHROW_RPC(LIBDCALL libd_sigwaitinfo)(sigset_t const *__restrict set, siginfo_t *__restrict info);
 /* >> sigtimedwait(2), sigtimedwait64(2)
  * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
  * @param: set:         The set of signals on which to wait
@@ -292,7 +292,7 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigwaitinfo)(sigset_t const *_
  * @param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
  * @return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
  * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait)(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_WR_OPT(2) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait)(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec const *rel_timeout);
 /* >> sigqueue(2)
  * Similar to  `kill(2)',  but  `pid'  must  be positive  and  reference  a  process's  PID,
  * meaning that this function can only be used to send a signal to single, specific process.
@@ -316,7 +316,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_sigqueue)(pid_t pid, signo_t signo, union s
  * @param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
  * @return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
  * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait64)(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec64 const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_WR_OPT(2) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait64)(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec64 const *rel_timeout);
 /* >> sigqueueinfo(2)
  * Similar to  `sigqueue(2)',  but  instead  of  only being  able  to  specify  a  custom
  * signal  value, everything  about signal meta-data  can be specified  by this function.
@@ -334,7 +334,7 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait64)(sigset_t const
  * @return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
  * @return: -1:   [errno=EPERM]  `info->si_code' is invalid, and `pid' is a different process
  * @return: -1:   [errno=ESRCH]  No process is identified by `pid' */
-INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_sigqueueinfo)(pid_t pid, signo_t signo, siginfo_t const *uinfo);
+INTDEF ATTR_ACCESS_RO(3) int NOTHROW_NCX(LIBDCALL libd_sigqueueinfo)(pid_t pid, signo_t signo, siginfo_t const *uinfo);
 /* >> tgsigqueueinfo(2)
  * Similar  to `sigqueueinfo(2)', rather than sending a signal to a process
  * as a whole, only send the signal to a single thread within that process.
@@ -349,7 +349,7 @@ INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_sigqueueinfo)(pid_t pid, signo
  * @return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
  * @return: -1:   [errno=EPERM]  `info->si_code' is invalid, and `pid' is a different process
  * @return: -1:   [errno=ESRCH]  No process is identified by `pid' */
-INTDEF NONNULL((4)) int NOTHROW_NCX(LIBDCALL libd_tgsigqueueinfo)(pid_t pid, pid_t tid, signo_t signo, siginfo_t const *uinfo);
+INTDEF ATTR_ACCESS_RO(4) int NOTHROW_NCX(LIBDCALL libd_tgsigqueueinfo)(pid_t pid, pid_t tid, signo_t signo, siginfo_t const *uinfo);
 /* >> killpg(3)
  * Alias for `kill(-pgrp, signo)'
  * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
@@ -388,12 +388,12 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_psignal)(signo_t signo, char const *s);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> psiginfo(3)
  * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_psiginfo)(siginfo_t const *pinfo, char const *s);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) void NOTHROW_NCX(LIBDCALL libd_psiginfo)(siginfo_t const *pinfo, char const *s);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> psiginfo(3)
  * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo, char const *s);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) void NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo, char const *s);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strsigcode_s(3)
@@ -423,14 +423,14 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_siginterrupt)(signo_t signo, __STDC_INT_AS_
  * Deprecated, and slightly different version of `sigaltstack(2)'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sigstack)(struct sigstack *ss, struct sigstack *oss);
+INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_WR_OPT(2) int NOTHROW_NCX(LIBDCALL libd_sigstack)(struct sigstack const *ss, struct sigstack *oss);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sigstack(2)
  * Deprecated, and slightly different version of `sigaltstack(2)'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_sigstack)(struct sigstack *ss, struct sigstack *oss);
+INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_WR_OPT(2) int NOTHROW_NCX(LIBCCALL libc_sigstack)(struct sigstack const *ss, struct sigstack *oss);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigaltstack(2)
@@ -439,7 +439,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_sigstack)(struct sigstack *ss, struct sigst
  * have been established with the `SA_ONSTACK' flag in `sa_flags'.
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_sigaltstack)(struct sigaltstack const *ss, struct sigaltstack *oss);
+INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_WR_OPT(2) int NOTHROW_NCX(LIBDCALL libd_sigaltstack)(struct sigaltstack const *ss, struct sigaltstack *oss);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF int NOTHROW_NCX(LIBCCALL libc_set_single_signal_masked)(int sig, int how);
@@ -533,7 +533,7 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_sigqueue)(pthread_t pthread, si
  * the given `name', and the  signal's actual name. When  `name'
  * isn't recognized, return `0' instead.
  * This function also handles stuff like "SIGRTMIN+1" or "9" */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBDCALL libd_signalnumber)(const char *name);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) signo_t NOTHROW_NCX(LIBDCALL libd_signalnumber)(const char *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> signalnumber(3)
@@ -542,7 +542,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBDCALL libd_signalnu
  * the given `name', and the  signal's actual name. When  `name'
  * isn't recognized, return `0' instead.
  * This function also handles stuff like "SIGRTMIN+1" or "9" */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) signo_t NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> signalnext(3)
@@ -563,14 +563,14 @@ INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc_signalnext)(signo_t 
  * Wrapper around  `sigabbrev_np(3)', that  also adds  additional
  * handling for `SIGRTMIN...`SIGRTMAX' signals, which are encoded
  * in a way that is compatible with `str2sig(3)'. */
-INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_sig2str)(signo_t signo, char buf[32]);
+INTDEF ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBDCALL libd_sig2str)(signo_t signo, char buf[32]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sig2str(3)
  * Wrapper around  `sigabbrev_np(3)', that  also adds  additional
  * handling for `SIGRTMIN...`SIGRTMAX' signals, which are encoded
  * in a way that is compatible with `str2sig(3)'. */
-INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_sig2str)(signo_t signo, char buf[32]);
+INTDEF ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_sig2str)(signo_t signo, char buf[32]);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> str2sig(3)
@@ -579,7 +579,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_sig2str)(signo_t signo, char b
  *  - Doesn't automatically remove any "SIG" prefix.
  * @return: 0 : Success; `*p_signo' was filled
  * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_str2sig)(const char *name, signo_t *p_signo);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBDCALL libd_str2sig)(const char *name, signo_t *p_signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> str2sig(3)
@@ -588,7 +588,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_str2sig)(const char *name, 
  *  - Doesn't automatically remove any "SIG" prefix.
  * @return: 0 : Success; `*p_signo' was filled
  * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_str2sig)(const char *name, signo_t *p_signo);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_str2sig)(const char *name, signo_t *p_signo);
 #endif /* !__KERNEL__ */
 
 DECL_END

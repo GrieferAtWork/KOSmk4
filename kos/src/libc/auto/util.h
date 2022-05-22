@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1c90e32 */
+/* HASH CRC-32:0x4a31a25e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> opendev(3)
  * @param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK' */
-INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_opendev)(char const *path, oflag_t oflags, __STDC_INT_AS_UINT_T dflags, char **realpath);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(4) fd_t NOTHROW_RPC(LIBDCALL libd_opendev)(char const *path, oflag_t oflags, __STDC_INT_AS_UINT_T dflags, char **realpath);
 /* >> fparseln(3)
  * Parse one line of text from `stream', whilst accounting for
  * special character escapes, as well as custom line-comments.
@@ -50,7 +50,7 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_opendev)(char const *
  *                  return of this function, `strdup("")' will be returned. (i.e.  NULL
  *                  is only returned in case of an error; _NOT_ in case of end-of-file)
  * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) char *NOTHROW_RPC(LIBDCALL libd_fparseln)(FILE *stream, size_t *plen, size_t *plineno, char const delim[3], __STDC_INT_AS_UINT_T flags);
+INTDEF WUNUSED ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RW(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(3) char *NOTHROW_RPC(LIBDCALL libd_fparseln)(FILE *stream, size_t *plen, size_t *plineno, char const delim[3], __STDC_INT_AS_UINT_T flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fparseln(3)
@@ -70,7 +70,7 @@ INTDEF WUNUSED ATTR_ACCESS_RW(1) char *NOTHROW_RPC(LIBDCALL libd_fparseln)(FILE 
  *                  return of this function, `strdup("")' will be returned. (i.e.  NULL
  *                  is only returned in case of an error; _NOT_ in case of end-of-file)
  * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) char *NOTHROW_RPC(LIBCCALL libc_fparseln)(FILE *stream, size_t *plen, size_t *plineno, char const delim[3], __STDC_INT_AS_UINT_T flags);
+INTDEF WUNUSED ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RW(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(3) char *NOTHROW_RPC(LIBCCALL libc_fparseln)(FILE *stream, size_t *plen, size_t *plineno, char const delim[3], __STDC_INT_AS_UINT_T flags);
 #endif /* !__KERNEL__ */
 
 DECL_END

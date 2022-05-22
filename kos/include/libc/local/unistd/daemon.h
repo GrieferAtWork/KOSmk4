@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6471215 */
+/* HASH CRC-32:0xfd171852 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_chdir_defined
 #define __local___localdep_chdir_defined
 #ifdef __CRT_HAVE_chdir
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),chdir,(__path))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),chdir,(__path))
 #elif defined(__CRT_HAVE__chdir)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),_chdir,(__path))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),_chdir,(__path))
 #elif defined(__CRT_HAVE___chdir)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),__chdir,(__path))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),__chdir,(__path))
 #elif defined(__CRT_HAVE___libc_chdir)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),__libc_chdir,(__path))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),__libc_chdir,(__path))
 #else /* ... */
 #undef __local___localdep_chdir_defined
 #endif /* !... */

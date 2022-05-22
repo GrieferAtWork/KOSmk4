@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4892cfeb */
+/* HASH CRC-32:0x959f97b9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,14 +29,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_Open32_defined) && defined(__CRT_HAVE_Open)
 #define __local___localdep_Open32_defined
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open32,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__THROWING,__localdep_Open32,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
 #endif /* !__local___localdep_Open32_defined && __CRT_HAVE_Open */
 #ifndef __local___localdep_OpenAt64_defined
 #define __local___localdep_OpenAt64_defined
 #if defined(__CRT_HAVE_OpenAt) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,__localdep_OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2),__fd_t,__THROWING,__localdep_OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,__localdep_OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2),__fd_t,__THROWING,__localdep_OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_OpenAt)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.fcntl/OpenAt64.h>
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_OpenAt64_defined
 #endif /* !... */
 #endif /* !__local___localdep_OpenAt64_defined */
-__LOCAL_LIBC(Open64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
+__LOCAL_LIBC(Open64) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t
 (__VLIBCCALL __LIBC_LOCAL_NAME(Open64))(char const *__filename, __oflag_t __oflags, ...) __THROWS(...) {
 	__fd_t __result;
 	__builtin_va_list __args;

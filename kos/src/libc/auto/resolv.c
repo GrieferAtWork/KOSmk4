@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94133c9e */
+/* HASH CRC-32:0x2996ee14 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,26 +34,26 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <bits/crt/resolv.h>
-INTERN ATTR_SECTION(".text.crt.net.nameser") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WR_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_sym_ston)(struct res_sym const *symbols,
                                     char const *wanted_name,
                                     int *p_success) {
 	while (symbols->name != NULL) {
 		if (libc_strcasecmp(symbols->name, wanted_name) == 0) {
-			if (p_success != NULL)
+			if (p_success)
 				*p_success = 1;
 			goto done;
 		}
 		++symbols;
 	}
-	if (p_success != NULL)
+	if (p_success)
 		*p_success = 0;
 done:
 	return symbols->number;
 }
 #include <bits/crt/resolv.h>
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_RETNONNULL NONNULL((1)) char const *
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(3) char const *
 NOTHROW_NCX(LIBCCALL libc_sym_ntos)(struct res_sym const *symbols,
                                     int wanted_number,
                                     int *p_success) {
@@ -82,7 +82,7 @@ NOTHROW_NCX(LIBCCALL libc_sym_ntos)(struct res_sym const *symbols,
 	return fallback_namebuf;
 }
 #include <bits/crt/resolv.h>
-INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_RETNONNULL NONNULL((1)) char const *
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(3) char const *
 NOTHROW_NCX(LIBCCALL libc_sym_ntop)(struct res_sym const *symbols,
                                     int wanted_number,
                                     int *p_success) {
@@ -98,7 +98,7 @@ NOTHROW_NCX(LIBCCALL libc_sym_ntop)(struct res_sym const *symbols,
 	return libc_sym_ntos(symbols, wanted_number, p_success);
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.net.nameser") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_ACCESS_RO(1) NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_dn_skipname)(u_char const *msg_ptr,
                                        u_char const *end_of_msg) {
 	u_char const *orig_msg_ptr = msg_ptr;

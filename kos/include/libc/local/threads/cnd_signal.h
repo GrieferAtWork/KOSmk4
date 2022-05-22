@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa02607f */
+/* HASH CRC-32:0xdb2272c6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,13 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_cond_signal,(__pthread_cond_t *__cond),pthread_cond_signal,(__cond))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_cond_signal,(__pthread_cond_t *__cond),pthread_cond_signal,(__cond))
 #endif /* !__local___localdep_pthread_cond_signal_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(cnd_signal) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(cnd_signal) __ATTR_ACCESS_RW(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_signal))(__cnd_t *__restrict __cond) {
 	__errno_t __error;
 	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_cond_signal)((__pthread_cond_t *)__cond);

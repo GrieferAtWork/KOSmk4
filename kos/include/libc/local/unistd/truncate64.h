@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f54e95c */
+/* HASH CRC-32:0x5f71fa24 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,11 +42,11 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__libc_close,(__fd
 #ifndef __local___localdep_crt_truncate32_defined
 #define __local___localdep_crt_truncate32_defined
 #ifdef __CRT_HAVE_truncate
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_truncate32,(char const *__file, __pos32_t __length),truncate,(__file,__length))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_crt_truncate32,(char const *__file, __pos32_t __length),truncate,(__file,__length))
 #elif defined(__CRT_HAVE___truncate)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_truncate32,(char const *__file, __pos32_t __length),__truncate,(__file,__length))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_crt_truncate32,(char const *__file, __pos32_t __length),__truncate,(__file,__length))
 #elif defined(__CRT_HAVE___libc_truncate)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_truncate32,(char const *__file, __pos32_t __length),__libc_truncate,(__file,__length))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_crt_truncate32,(char const *__file, __pos32_t __length),__libc_truncate,(__file,__length))
 #else /* ... */
 #undef __local___localdep_crt_truncate32_defined
 #endif /* !... */
@@ -195,7 +195,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(truncate64) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(truncate64) __ATTR_ACCESS_RO(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(truncate64))(char const *__file, __PIO_OFFSET64 __length) {
 #if defined(__CRT_HAVE_truncate) || defined(__CRT_HAVE___truncate) || defined(__CRT_HAVE___libc_truncate)
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_truncate32)(__file, (__PIO_OFFSET)__length);

@@ -1262,8 +1262,8 @@ corrupt:
 
 
 
-/*[[[head:libc_dcngettext,hash:CRC-32=0x79ad7a07]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
+/*[[[head:libc_dcngettext,hash:CRC-32=0x775cdd4a]]]*/
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RO_OPT(3) __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
 NOTHROW_NCX(LIBCCALL libc_dcngettext)(char const *domainname,
                                       char const *msgid_singular,
                                       char const *msgid_plural,

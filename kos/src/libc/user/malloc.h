@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe06edbdb */
+/* HASH CRC-32:0xe3b31d4f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,12 +40,12 @@ INTDEF ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL
 INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_memalign)(size_t alignment, size_t n_bytes);
 INTDEF ATTR_MALLOC ATTR_MALL_PAGEALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_pvalloc)(size_t n_bytes);
 INTDEF ATTR_MALL_PAGEALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_valloc)(size_t n_bytes);
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_memalign)(void **__restrict pp, size_t alignment, size_t n_bytes);
+INTDEF ATTR_ACCESS_WR(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_memalign)(void **__restrict pp, size_t alignment, size_t n_bytes);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_malloc_trim)(size_t pad);
 INTDEF ATTR_PURE WUNUSED size_t NOTHROW_NCX(LIBCCALL libc_malloc_usable_size)(void *__restrict mallptr);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_mallopt)(int parameter_number, int parameter_value);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memdup)(void const *__restrict ptr, size_t n_bytes);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memcdup)(void const *__restrict ptr, int needle, size_t n_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_memdup)(void const *__restrict ptr, size_t n_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_ROS(1, 3) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_memcdup)(void const *__restrict ptr, int needle, size_t n_bytes);
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc_reallocarray)(void *ptr, size_t elem_count, size_t elem_size);
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_recalloc)(void *mallptr, size_t num_bytes);
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc_recallocv)(void *mallptr, size_t elem_count, size_t elem_size);

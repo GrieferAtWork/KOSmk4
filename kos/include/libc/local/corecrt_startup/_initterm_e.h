@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f26c175 */
+/* HASH CRC-32:0xf1c2e2a2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__VLIBCCALL __localdep_syslog)(__STDC_INT_AS_UINT_T __level, char const *__format, ...) __CASMNAME("syslog");
+__LIBC __ATTR_ACCESS_RO(2) __ATTR_LIBC_PRINTF(2, 3) void __NOTHROW_RPC(__VLIBCCALL __localdep_syslog)(__STDC_INT_AS_UINT_T __level, char const *__format, ...) __CASMNAME("syslog");
 #elif defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.syslog/syslog.h>

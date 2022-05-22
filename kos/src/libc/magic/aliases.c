@@ -94,9 +94,9 @@ struct aliasent *getaliasent();
 @@>> getaliasent_r(3)
 @@Reentrant variant of `getaliasent(3)' (s.a. similar functions such as `getpwent_r(3)')
 [[cp_kos, decl_include("<bits/types.h>", "<bits/crt/db/aliases.h>")]]
-$errno_t getaliasent_r([[nonnull]] struct aliasent *__restrict result_buf,
-                       [[nonnull]] char *__restrict buffer, size_t buflen,
-                       [[nonnull]] struct aliasent **__restrict result);
+$errno_t getaliasent_r([[out]] struct aliasent *__restrict result_buf,
+                       [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+                       [[out]] struct aliasent **__restrict result);
 
 @@>> getaliasbyname(3)
 @@Find a database entry associated with the given `name'
@@ -104,15 +104,15 @@ $errno_t getaliasent_r([[nonnull]] struct aliasent *__restrict result_buf,
 @@@return: NULL: [errno=ENOENT] No entry matching `name'
 @@@return: NULL: [errno=*]      Error
 [[wunused, cp_kos, decl_include("<bits/crt/db/aliases.h>")]]
-struct aliasent *getaliasbyname([[nonnull]] char const *name);
+struct aliasent *getaliasbyname([[in]] char const *name);
 
 @@>> getaliasbyname_r(3)
 @@Reentrant variant of `getaliasbyname(3)' (s.a. similar functions such as `getpwnam_r(3)')
 [[cp_kos, decl_include("<bits/types.h>", "<bits/crt/db/aliases.h>")]]
-$errno_t getaliasbyname_r([[nonnull]] char const *__restrict name,
-                          [[nonnull]] struct aliasent *__restrict result_buf,
-                          [[nonnull]] char *__restrict buffer, size_t buflen,
-                          [[nonnull]] struct aliasent **__restrict result);
+$errno_t getaliasbyname_r([[in]] char const *__restrict name,
+                          [[out]] struct aliasent *__restrict result_buf,
+                          [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+                          [[out]] struct aliasent **__restrict result);
 
 %{
 

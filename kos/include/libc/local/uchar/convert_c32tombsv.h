@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4d233d1 */
+/* HASH CRC-32:0xd74d840e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_c32tombsvn_defined
 #define __local___localdep_convert_c32tombsvn_defined
 #if defined(__CRT_HAVE_convert_wcstombsvn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char **,__NOTHROW_NCX,__localdep_convert_c32tombsvn,(__CHAR32_TYPE__ const *const *__restrict __vector, __SIZE_TYPE__ __count),convert_wcstombsvn,(__vector,__count))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2),char **,__NOTHROW_NCX,__localdep_convert_c32tombsvn,(__CHAR32_TYPE__ const *const *__restrict __vector, __SIZE_TYPE__ __count),convert_wcstombsvn,(__vector,__count))
 #elif defined(__CRT_HAVE_KOS$convert_wcstombsvn)
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,char **,__NOTHROW_NCX,__localdep_convert_c32tombsvn,(__CHAR32_TYPE__ const *const *__restrict __vector, __SIZE_TYPE__ __count),convert_wcstombsvn,(__vector,__count))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2),char **,__NOTHROW_NCX,__localdep_convert_c32tombsvn,(__CHAR32_TYPE__ const *const *__restrict __vector, __SIZE_TYPE__ __count),convert_wcstombsvn,(__vector,__count))
 #elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombsvn.h>
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(convert_c32tombsv) __ATTR_MALLOC __ATTR_WUNUSED char **
+__LOCAL_LIBC(convert_c32tombsv) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) char **
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(convert_c32tombsv))(__CHAR32_TYPE__ const *const *__restrict __vector) {
 	__SIZE_TYPE__ __count = 0;
 	if __unlikely(!__vector) {

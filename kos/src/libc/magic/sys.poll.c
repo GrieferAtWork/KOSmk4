@@ -159,23 +159,23 @@ typedef __UINTPTR_TYPE__ nfds_t;
 
 @@@param timeout: Timeout in milliseconds (or negative for infinity)
 [[cp, export_alias("__poll"), decl_include("<bits/os/pollfd.h>")]]
-int poll([[inp(nfds)]] struct pollfd *fds, nfds_t nfds, int timeout);
+int poll([[inout(nfds)]] struct pollfd *fds, nfds_t nfds, int timeout);
 
 %#ifdef __USE_GNU
 
 [[cp, doc_alias("ppoll"), ignore, nocrt, alias("ppoll")]]
 [[decl_include("<bits/os/pollfd.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>")]]
-int ppoll32([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,
-            [[nullable]] struct $timespec32 const *timeout,
-            [[nullable]] $sigset_t const *ss);
+int ppoll32([[inout(nfds)]] struct pollfd *fds, nfds_t nfds,
+            [[in_opt]] struct $timespec32 const *timeout,
+            [[in_opt]] $sigset_t const *ss);
 
 [[cp, decl_include("<bits/os/pollfd.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ppoll")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ppoll64")]]
 [[userimpl, requires($has_function(ppoll32) || $has_function(ppoll64))]]
-int ppoll([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,
-          [[nullable]] struct timespec const *timeout,
-          [[nullable]] $sigset_t const *ss) {
+int ppoll([[inout(nfds)]] struct pollfd *fds, nfds_t nfds,
+          [[in_opt]] struct timespec const *timeout,
+          [[in_opt]] $sigset_t const *ss) {
 @@pp_if $has_function(ppoll32)@@
 	struct timespec32 tmo32;
 	if (!timeout)
@@ -198,9 +198,9 @@ int ppoll([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,
 [[preferred_time64_variant_of(ppoll), doc_alias("ppoll")]]
 [[cp, userimpl, requires_function(ppoll32)]]
 [[decl_include("<bits/os/pollfd.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>")]]
-int ppoll64([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,
-            [[nullable]] struct timespec64 const *timeout,
-            [[nullable]] $sigset_t const *ss) {
+int ppoll64([[inout(nfds)]] struct pollfd *fds, nfds_t nfds,
+            [[in_opt]] struct timespec64 const *timeout,
+            [[in_opt]] $sigset_t const *ss) {
 	struct timespec32 tmo32;
 	if (!timeout)
 		return ppoll32(fds, nfds, NULL, ss);

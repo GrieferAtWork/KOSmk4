@@ -39,9 +39,9 @@ __SYSDECL_BEGIN
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timeval_add")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timeval_add64")]]
 [[impl_include("<bits/os/timeval.h>")]]
-void timeval_add([[nonnull]] struct timeval *result,
-                 [[nonnull]] struct timeval const *lhs,
-                 [[nonnull]] struct timeval const *rhs) {
+void timeval_add([[out]] struct timeval *result,
+                 [[in]] struct timeval const *lhs,
+                 [[in]] struct timeval const *rhs) {
 	result->@tv_sec@  = lhs->@tv_sec@  + rhs->@tv_sec@;
 	result->@tv_usec@ = lhs->@tv_usec@ + rhs->@tv_usec@;
 	if ((__suseconds_t)result->@tv_usec@ >= (__suseconds_t)USEC_PER_SEC) {
@@ -54,9 +54,9 @@ void timeval_add([[nonnull]] struct timeval *result,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timeval_sub")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timeval_sub64")]]
 [[impl_include("<bits/os/timeval.h>")]]
-void timeval_sub([[nonnull]] struct timeval *result,
-                 [[nonnull]] struct timeval const *lhs,
-                 [[nonnull]] struct timeval const *rhs) {
+void timeval_sub([[out]] struct timeval *result,
+                 [[in]] struct timeval const *lhs,
+                 [[in]] struct timeval const *rhs) {
 	result->@tv_sec@  = lhs->@tv_sec@  - rhs->@tv_sec@;
 	result->@tv_usec@ = lhs->@tv_usec@ - rhs->@tv_usec@;
 	if ((__suseconds_t)result->@tv_usec@ < (__suseconds_t)USEC_PER_SEC) {
@@ -72,9 +72,9 @@ void timeval_sub([[nonnull]] struct timeval *result,
 [[decl_include("<bits/os/timeval.h>")]]
 [[preferred_time64_variant_of(timeval_add), doc_alias("timeval_add")]]
 [[impl_include("<bits/os/timeval.h>")]]
-void timeval_add64([[nonnull]] struct timeval64 *result,
-                   [[nonnull]] struct timeval64 const *lhs,
-                   [[nonnull]] struct timeval64 const *rhs) {
+void timeval_add64([[out]] struct timeval64 *result,
+                   [[in]] struct timeval64 const *lhs,
+                   [[in]] struct timeval64 const *rhs) {
 	result->@tv_sec@  = lhs->@tv_sec@  + rhs->@tv_sec@;
 	result->@tv_usec@ = lhs->@tv_usec@ + rhs->@tv_usec@;
 	if ((__suseconds_t)result->@tv_usec@ >= (__suseconds_t)USEC_PER_SEC) {
@@ -86,9 +86,9 @@ void timeval_add64([[nonnull]] struct timeval64 *result,
 [[decl_include("<bits/os/timeval.h>")]]
 [[preferred_time64_variant_of(timeval_sub), doc_alias("timeval_sub")]]
 [[impl_include("<bits/os/timeval.h>")]]
-void timeval_sub64([[nonnull]] struct timeval64 *result,
-                   [[nonnull]] struct timeval64 const *lhs,
-                   [[nonnull]] struct timeval64 const *rhs) {
+void timeval_sub64([[out]] struct timeval64 *result,
+                   [[in]] struct timeval64 const *lhs,
+                   [[in]] struct timeval64 const *rhs) {
 	result->@tv_sec@  = lhs->@tv_sec@  - rhs->@tv_sec@;
 	result->@tv_usec@ = lhs->@tv_usec@ - rhs->@tv_usec@;
 	if ((__suseconds_t)result->@tv_usec@ < (__suseconds_t)USEC_PER_SEC) {

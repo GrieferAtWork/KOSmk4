@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff3be995 */
+/* HASH CRC-32:0xe71d9aca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,17 +46,17 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcasecmp __LIBC_LOCAL_NAME(strcasecmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcasecmp_defined */
-__LOCAL_LIBC(sym_ston) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(sym_ston) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sym_ston))(struct res_sym const *__symbols, char const *__wanted_name, int *__p_success) {
 	while (__symbols->name != __NULLPTR) {
 		if ((__NAMESPACE_LOCAL_SYM __localdep_strcasecmp)(__symbols->name, __wanted_name) == 0) {
-			if (__p_success != __NULLPTR)
+			if (__p_success)
 				*__p_success = 1;
 			goto __done;
 		}
 		++__symbols;
 	}
-	if (__p_success != __NULLPTR)
+	if (__p_success)
 		*__p_success = 0;
 __done:
 	return __symbols->number;

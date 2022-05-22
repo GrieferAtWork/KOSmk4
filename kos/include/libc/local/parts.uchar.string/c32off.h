@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x934ec467 */
+/* HASH CRC-32:0x3facd251 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32chrnul_defined
 #define __local___localdep_c32chrnul_defined
 #if defined(__CRT_HAVE_wcschrnul) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32chrnul,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ __needle),wcschrnul,(__haystack,__needle))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32chrnul,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ __needle),wcschrnul,(__haystack,__needle))
 #elif defined(__CRT_HAVE_KOS$wcschrnul)
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32chrnul,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ __needle),wcschrnul,(__haystack,__needle))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32chrnul,(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ __needle),wcschrnul,(__haystack,__needle))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcschrnul.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32chrnul __LIBC_LOCAL_NAME(c32chrnul)
 #endif /* !... */
 #endif /* !__local___localdep_c32chrnul_defined */
-__LOCAL_LIBC(c32off) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(c32off) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32off))(__CHAR32_TYPE__ const *__restrict __haystack, __CHAR32_TYPE__ __needle) {
 	return (__SIZE_TYPE__)((__NAMESPACE_LOCAL_SYM __localdep_c32chrnul)(__haystack, __needle) - __haystack);
 }

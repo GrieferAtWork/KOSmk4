@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x228c373d */
+/* HASH CRC-32:0xeafe67de */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,11 +37,11 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char ***NOTHROW(LIBCCALL libc_p_enviro
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_execve)(char const *__restrict path, __TARGV, __TENVP);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) int NOTHROW_RPC(LIBDCALL libd_execve)(char const *__restrict path, __TARGV, __TENVP);
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_execve)(char const *__restrict path, __TARGV, __TENVP);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) int NOTHROW_RPC(LIBCCALL libc_execve)(char const *__restrict path, __TARGV, __TENVP);
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
  * THIS_THREAD->LEADER->PID */
@@ -55,7 +55,7 @@ INTDEF ATTR_CONST WUNUSED pid_t NOTHROW(LIBCCALL libc_gettid)(void);
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pipe)(fd_t pipedes[2]);
+INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_pipe)(fd_t pipedes[2]);
 /* >> sleep(3)
  * Sleep for up to `seconds' seconds
  * @return: 0 : Timeout expired
@@ -106,7 +106,7 @@ INTDEF WUNUSED gid_t NOTHROW_NCX(LIBCCALL libc_getegid)(void);
  * @return: * : [count == 0] The required number of groups
  * @return: * : [count != 0] The number of groups that were actually returned
  * @return: -1: [errno == -EINVAL && count != 0] There are more than `count' groups */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_getgroups)(int size, gid_t list[]);
+INTDEF ATTR_ACCESS_WRS(2, 1) int NOTHROW_NCX(LIBCCALL libc_getgroups)(int size, gid_t list[]);
 /* >> setuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
@@ -157,30 +157,30 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chown)(char const *file, uid_t owner, gid_t group);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_chown)(char const *file, uid_t owner, gid_t group);
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chown)(char const *file, uid_t owner, gid_t group);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_chown)(char const *file, uid_t owner, gid_t group);
 /* >> pathconf(2)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `path'
  * return: * : The configuration limit associated with `name' for `path'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *path, __STDC_INT_AS_UINT_T name);
+INTDEF ATTR_ACCESS_RO(1) longptr_t NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *path, __STDC_INT_AS_UINT_T name);
 /* >> pathconf(2)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `path'
  * return: * : The configuration limit associated with `name' for `path'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path, __STDC_INT_AS_UINT_T name);
+INTDEF ATTR_ACCESS_RO(1) longptr_t NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path, __STDC_INT_AS_UINT_T name);
 /* >> link(2)
  * Create a hard link from `from', leading to `to' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_link)(char const *from, char const *to);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_link)(char const *from, char const *to);
 /* >> link(2)
  * Create a hard link from `from', leading to `to' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_link)(char const *from, char const *to);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBCCALL libc_link)(char const *from, char const *to);
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
@@ -231,71 +231,71 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd);
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type' */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_access)(char const *file, __STDC_INT_AS_UINT_T type);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_access)(char const *file, __STDC_INT_AS_UINT_T type);
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type' */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_access)(char const *file, __STDC_INT_AS_UINT_T type);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_access)(char const *file, __STDC_INT_AS_UINT_T type);
 /* >> chdir(2)
  * Change the current working directory to `path' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chdir)(char const *path);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_chdir)(char const *path);
 /* >> chdir(2)
  * Change the current working directory to `path' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chdir)(char const *path);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_chdir)(char const *path);
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-INTDEF char *NOTHROW_RPC(LIBDCALL libd_getcwd)(char *buf, size_t bufsize);
+INTDEF ATTR_ACCESS_WR_OPT(1) char *NOTHROW_RPC(LIBDCALL libd_getcwd)(char *buf, size_t bufsize);
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-INTDEF char *NOTHROW_RPC(LIBCCALL libc_getcwd)(char *buf, size_t bufsize);
+INTDEF ATTR_ACCESS_WR_OPT(1) char *NOTHROW_RPC(LIBCCALL libc_getcwd)(char *buf, size_t bufsize);
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_unlink)(char const *file);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_unlink)(char const *file);
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file);
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_rmdir)(char const *path);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_rmdir)(char const *path);
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path);
 /* >> euidaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_euidaccess)(char const *file, __STDC_INT_AS_UINT_T type);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_euidaccess)(char const *file, __STDC_INT_AS_UINT_T type);
 /* >> euidaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file, __STDC_INT_AS_UINT_T type);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file, __STDC_INT_AS_UINT_T type);
 /* >> faccessat(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `dfd:file', testing for `type' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_faccessat)(fd_t dfd, char const *file, __STDC_INT_AS_UINT_T type, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_faccessat)(fd_t dfd, char const *file, __STDC_INT_AS_UINT_T type, atflag_t flags);
 /* >> faccessat(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `dfd:file', testing for `type' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd, char const *file, __STDC_INT_AS_UINT_T type, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd, char const *file, __STDC_INT_AS_UINT_T type, atflag_t flags);
 /* >> fchownat(2)
  * Change the ownership of a given `dfd:file' to `group:owner' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_fchownat)(fd_t dfd, char const *file, uid_t owner, gid_t group, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_fchownat)(fd_t dfd, char const *file, uid_t owner, gid_t group, atflag_t flags);
 /* >> fchownat(2)
  * Change the ownership of a given `dfd:file' to `group:owner' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd, char const *file, uid_t owner, gid_t group, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd, char const *file, uid_t owner, gid_t group, atflag_t flags);
 /* >> linkat(2)
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
-INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_linkat)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(4) int NOTHROW_RPC(LIBDCALL libd_linkat)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags);
 /* >> linkat(2)
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
-INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(4) int NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags);
 /* >> symlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
-INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBDCALL libd_symlinkat)(char const *link_text, fd_t tofd, char const *target_path);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) int NOTHROW_RPC(LIBDCALL libd_symlinkat)(char const *link_text, fd_t tofd, char const *target_path);
 /* >> symlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
-INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text, fd_t tofd, char const *target_path);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) int NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text, fd_t tofd, char const *target_path);
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * WARNING: This  function is badly designed and will neither append a trailing
@@ -304,7 +304,7 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTDEF ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * WARNING: This  function is badly designed and will neither append a trailing
@@ -313,31 +313,31 @@ INTDEF ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_read
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTDEF ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
 /* >> fsymlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path'
  * @param flags: Set of `0 | AT_DOSPATH' */
-INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBDCALL libd_fsymlinkat)(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) int NOTHROW_RPC(LIBDCALL libd_fsymlinkat)(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags);
 /* >> fsymlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path'
  * @param flags: Set of `0 | AT_DOSPATH' */
-INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_fsymlinkat)(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) int NOTHROW_RPC(LIBCCALL libc_fsymlinkat)(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags);
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
-INTDEF ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t NOTHROW_RPC(LIBDCALL libd_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
-INTDEF ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF off64_t NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd, off64_t offset, __STDC_INT_AS_UINT_T whence);
@@ -377,18 +377,18 @@ INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flag
  * @param: flags:   Set of `O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2], oflag_t flags);
+INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2], oflag_t flags);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_syncfs)(fd_t fd);
 /* >> getresuid(2)
  * Get the real, effective, and saved UID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_getresuid)(uid_t *ruid, uid_t *euid, uid_t *suid);
+INTDEF ATTR_ACCESS_WR_OPT(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(3) int NOTHROW_NCX(LIBCCALL libc_getresuid)(uid_t *ruid, uid_t *euid, uid_t *suid);
 /* >> getresgid(2)
  * Get the real, effective, and saved GID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_getresgid)(gid_t *rgid, gid_t *egid, gid_t *sgid);
+INTDEF ATTR_ACCESS_WR_OPT(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(3) int NOTHROW_NCX(LIBCCALL libc_getresgid)(gid_t *rgid, gid_t *egid, gid_t *sgid);
 /* >> setresuid(2)
  * @return: 0 : Success
  * Set the real, effective, and saved UID of the calling thread.
@@ -446,28 +446,28 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_getsid)(pid_t pid);
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_lchown)(char const *file, uid_t owner, gid_t group);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_lchown)(char const *file, uid_t owner, gid_t group);
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file, uid_t owner, gid_t group);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file, uid_t owner, gid_t group);
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_truncate)(char const *file, __PIO_OFFSET length);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd_truncate)(char const *file, __PIO_OFFSET length);
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file, __PIO_OFFSET length);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file, __PIO_OFFSET length);
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file, __PIO_OFFSET64 length);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file, __PIO_OFFSET64 length);
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file, __PIO_OFFSET64 length);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file, __PIO_OFFSET64 length);
 /* >> fexecve(2)
  * Replace the calling process with the application image referred
  * to by `execfd'  and execute it's  `main()' method, passing  the
  * given `argv', and setting `environ' to `envp'. */
-INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t execfd, __TARGV, __TENVP);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) int NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t execfd, __TARGV, __TENVP);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_nice)(int inc);
 /* Retrieve a system configuration string specified by `name'
  * @param: name:   One of `_CS_*' from <asm/crt/confname.h>
@@ -476,7 +476,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_nice)(int inc);
  * @return: * :    Required buffer size (including a trailing \0-character)
  * @return: 1 :    Empty configuration string.
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
-INTDEF size_t NOTHROW_NCX(LIBCCALL libc_confstr)(__STDC_INT_AS_UINT_T name, char *buf, size_t buflen);
+INTDEF ATTR_ACCESS_WRS(2, 3) size_t NOTHROW_NCX(LIBCCALL libc_confstr)(__STDC_INT_AS_UINT_T name, char *buf, size_t buflen);
 /* >> sync(2)
  * Synchronize all disk  operations of  all mounted file  systems and  flush
  * unwritten buffers down to the hardware layer, ensuring that modifications
@@ -516,12 +516,12 @@ INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_ttyslot)(void);
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_symlink)(char const *link_text, char const *target_path);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_symlink)(char const *link_text, char const *target_path);
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text, char const *target_path);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text, char const *target_path);
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
@@ -531,7 +531,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_t
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTDEF ATTR_ACCESS_WRS(2, 3) NONNULL((1)) ssize_t NOTHROW_RPC(LIBDCALL libd_readlink)(char const *path, char *buf, size_t buflen);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_readlink)(char const *path, char *buf, size_t buflen);
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
@@ -541,7 +541,7 @@ INTDEF ATTR_ACCESS_WRS(2, 3) NONNULL((1)) ssize_t NOTHROW_RPC(LIBDCALL libd_read
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTDEF ATTR_ACCESS_WRS(2, 3) NONNULL((1)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlink)(char const *path, char *buf, size_t buflen);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_readlink)(char const *path, char *buf, size_t buflen);
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 INTDEF ATTR_ACCESS_WRS(1, 2) int NOTHROW_NCX(LIBCCALL libc_gethostname)(char *name, size_t buflen);
@@ -569,7 +569,7 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_endusershell)(void);
 /* >> setusershell(3) */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setusershell)(void);
 /* >> revoke(3) */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file);
 /* >> syscall(2), syscall64(2) */
 INTDEF longptr_t NOTHROW_RPC(VLIBCCALL libc_syscall)(longptr_t sysno, ...);
 /* >> syscall(2), syscall64(2) */
@@ -577,11 +577,11 @@ INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBCCALL libc_syscall64)(syscall_ulong_t sys
 /* >> chroot(2)
  * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path);
 /* >> chroot(2)
  * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path);
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd, __PIO_OFFSET length);
@@ -601,12 +601,12 @@ INTDEF void *NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta);
  * timestamps,  and its size),  meaning that changes  are written to disk */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd);
 /* >> setmode(3), getmode(3) */
-INTDEF WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_setmode)(char const *mode_str);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) void *NOTHROW_NCX(LIBCCALL libc_setmode)(char const *mode_str);
 /* >> setmode(3), getmode(3) */
-INTDEF WUNUSED NONNULL((1)) mode_t NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox, mode_t mode);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) mode_t NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox, mode_t mode);
 /* >> ctermid_r(3)
  * Same as `ctermid', but return `NULL' when `s' is `NULL' */
-INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
+INTDEF ATTR_ACCESS_WR_OPT(1) char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
 /* >> sysconf(2)
  * @param: name: One of `_SC_*' from <asm/crt/confname.h>
  * Return   a   system    configuration   value    `name'

@@ -39,9 +39,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getttyent)(void)
 }
 /*[[[end:libc_getttyent]]]*/
 
-/*[[[head:libc_getttynam,hash:CRC-32=0x1c3b518d]]]*/
+/*[[[head:libc_getttynam,hash:CRC-32=0x5945e58]]]*/
 /* >> getttynam(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmpx") NONNULL((1)) struct ttyent *
+INTERN ATTR_SECTION(".text.crt.database.utmpx") ATTR_ACCESS_RO(1) struct ttyent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getttynam)(char const *tty)
 /*[[[body:libc_getttynam]]]*/
 /*AUTO*/{

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9528123a */
+/* HASH CRC-32:0x1d1810cc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsset_l_defined
 #define __local___localdep__mbsset_l_defined
 #ifdef __CRT_HAVE__mbsset_l
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,__localdep__mbsset_l,(unsigned char *__buf, unsigned int __ch, __locale_t __locale),_mbsset_l,(__buf,__ch,__locale))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_RO(1),unsigned char *,__NOTHROW_NCX,__localdep__mbsset_l,(unsigned char *__buf, unsigned int __ch, __locale_t __locale),_mbsset_l,(__buf,__ch,__locale))
 #elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsset_l.h>
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__mbsset_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__mbsset_l_defined */
-__LOCAL_LIBC(_mbsset) __ATTR_RETNONNULL __ATTR_NONNULL((1)) unsigned char *
+__LOCAL_LIBC(_mbsset) __ATTR_RETNONNULL __ATTR_ACCESS_RW(1) unsigned char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsset))(unsigned char *__buf, unsigned int __ch) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbsset_l)(__buf, __ch, __NULLPTR);
 }

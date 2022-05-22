@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37a4fcc6 */
+/* HASH CRC-32:0x6e900e77 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tfind_r_defined
 #define __local___localdep_tfind_r_defined
 #ifdef __CRT_HAVE_tfind_r
-__CREDIRECT(__ATTR_NONNULL((3)),void *,__THROWING,__localdep_tfind_r,(void const *__key, void *const *__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),tfind_r,(__key,__vrootp,__compar,__arg))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_NONNULL((3)),void *,__THROWING,__localdep_tfind_r,(void const *__key, void *const *__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),tfind_r,(__key,__vrootp,__compar,__arg))
 #else /* __CRT_HAVE_tfind_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/tfind_r.h>
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_defined */
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(tfind) __ATTR_NONNULL((3)) void *
+__LOCAL_LIBC(tfind) __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_NONNULL((3)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(tfind))(void const *__key, void *const *__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	return (__NAMESPACE_LOCAL_SYM __localdep_tfind_r)(__key, __vrootp, (int (__LIBCCALL *)(void const *, void const *, void *))(void *)__compar, __NULLPTR);

@@ -44,8 +44,8 @@ DECL_BEGIN
 /*[[[skip:libc_mallopt]]]*/
 
 
-/*[[[head:libc_memcdup,hash:CRC-32=0x6fbec01a]]]*/
-INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *
+/*[[[head:libc_memcdup,hash:CRC-32=0xe8c7c815]]]*/
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_ROS(1, 3) ATTR_ALLOC_SIZE((2)) void *
 NOTHROW_NCX(LIBCCALL libc_memcdup)(void const *__restrict ptr,
                                    int needle,
                                    size_t n_bytes)
@@ -63,8 +63,8 @@ NOTHROW_NCX(LIBCCALL libc_memcdup)(void const *__restrict ptr,
 }
 /*[[[end:libc_memcdup]]]*/
 
-/*[[[head:libc_memdup,hash:CRC-32=0x52592fb8]]]*/
-INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *
+/*[[[head:libc_memdup,hash:CRC-32=0x666bc0d1]]]*/
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ALLOC_SIZE((2)) void *
 NOTHROW_NCX(LIBCCALL libc_memdup)(void const *__restrict ptr,
                                   size_t n_bytes)
 /*[[[body:libc_memdup]]]*/

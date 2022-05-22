@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cdf8b71 */
+/* HASH CRC-32:0x5a9e58d0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wctrans_defined
 #define __local___localdep_wctrans_defined
 #ifdef __CRT_HAVE_wctrans
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__wctrans_t,__NOTHROW_NCX,__localdep_wctrans,(char const *__prop),wctrans,(__prop))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__wctrans_t,__NOTHROW_NCX,__localdep_wctrans,(char const *__prop),wctrans,(__prop))
 #elif defined(__CRT_KOS)
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/wctrans.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_wctrans_defined
 #endif /* !... */
 #endif /* !__local___localdep_wctrans_defined */
-__LOCAL_LIBC(wctrans_l) __ATTR_WUNUSED __ATTR_NONNULL((1)) __wctrans_t
+__LOCAL_LIBC(wctrans_l) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __wctrans_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctrans_l))(char const *__prop, __locale_t __locale) {
 	__COMPILER_IMPURE();
 	(void)__locale;

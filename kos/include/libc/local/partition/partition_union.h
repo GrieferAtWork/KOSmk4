@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d4e5ffc */
+/* HASH CRC-32:0x106c69f6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <bits/crt/partition.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(partition_union) __ATTR_NONNULL((1)) __STDC_INT_AS_UINT_T
+__LOCAL_LIBC(partition_union) __ATTR_ACCESS_RW(1) __STDC_INT_AS_UINT_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(partition_union))(struct partition_def *__self, __STDC_INT_AS_UINT_T __a, __STDC_INT_AS_UINT_T __b) {
 	struct partition_elem *__a_elem, *__b_elem, *__iter;
 	__hybrid_assert((unsigned int)__a < (unsigned int)__self->num_elements);

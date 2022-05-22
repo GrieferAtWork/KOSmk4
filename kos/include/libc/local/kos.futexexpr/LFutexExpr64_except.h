@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b5ba686 */
+/* HASH CRC-32:0x7f9048da */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_LFutexExpr32_except_defined
 #define __local___localdep_crt_LFutexExpr32_except_defined
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_crt_LFutexExpr32_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec32 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_LFutexExpr32_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec32 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #endif /* !__local___localdep_crt_LFutexExpr32_except_defined */
-__LOCAL_LIBC(LFutexExpr64_except) __ATTR_NONNULL((1, 3)) int
+__LOCAL_LIBC(LFutexExpr64_except) __ATTR_ACCESS_RO_OPT(4) __ATTR_NONNULL((1, 3)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(LFutexExpr64_except))(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags) __THROWS(...) {
 	struct __timespec32 __tms32;
 	if (!__timeout)

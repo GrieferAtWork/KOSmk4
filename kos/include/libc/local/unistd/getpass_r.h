@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc08f89cc */
+/* HASH CRC-32:0xe7736e77 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,__localdep_getpassfd,(char const *__prompt, char *__buf, __SIZE_TYPE__ __buflen, __fd_t __fds[3], __STDC_INT_AS_UINT_T __flags, int __timeout_in_seconds),getpassfd,(__prompt,__buf,__buflen,__fds,__flags,__timeout_in_seconds))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_WR_OPT(2),char *,__NOTHROW_RPC,__localdep_getpassfd,(char const *__prompt, char *__buf, __SIZE_TYPE__ __buflen, __fd_t __fds[3], __STDC_INT_AS_UINT_T __flags, int __timeout_in_seconds),getpassfd,(__prompt,__buf,__buflen,__fds,__flags,__timeout_in_seconds))
 #elif defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/getpassfd.h>
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,__localdep_readpassphrase,(char const *__prompt, char *__buf, __SIZE_TYPE__ __bufsize, __STDC_INT_AS_UINT_T __flags),readpassphrase,(__prompt,__buf,__bufsize,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_WRS(2, 3),char *,__NOTHROW_NCX,__localdep_readpassphrase,(char const *__prompt, char *__buf, __SIZE_TYPE__ __bufsize, __STDC_INT_AS_UINT_T __flags),readpassphrase,(__prompt,__buf,__bufsize,__flags))
 #elif defined(__STDIN_FILENO) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read))
 __NAMESPACE_LOCAL_END
 #include <libc/local/readpassphrase/readpassphrase.h>
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/getpassfd.h>
 #include <asm/crt/readpassphrase.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getpass_r) __ATTR_WUNUSED char *
+__LOCAL_LIBC(getpass_r) __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_WR_OPT(2) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpass_r))(char const *__prompt, char *__buf, __SIZE_TYPE__ __bufsize) {
 #if defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)
 	/* Prefer using `getpassfd(3)' because I feel like that one's more

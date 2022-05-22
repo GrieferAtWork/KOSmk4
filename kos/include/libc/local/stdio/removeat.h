@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69e0b7b3 */
+/* HASH CRC-32:0xf698d920 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,12 +28,12 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unlinkat_defined
 #define __local___localdep_unlinkat_defined
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_unlinkat,(__fd_t __dfd, char const *__name, __atflag_t __flags),unlinkat,(__dfd,__name,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_unlinkat,(__fd_t __dfd, char const *__name, __atflag_t __flags),unlinkat,(__dfd,__name,__flags))
 #endif /* !__local___localdep_unlinkat_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(removeat) __ATTR_NONNULL((2)) int
+__LOCAL_LIBC(removeat) __ATTR_ACCESS_RO(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(removeat))(__fd_t __dirfd, char const *__filename) {
 #ifdef __AT_REMOVEREG
 	return (__NAMESPACE_LOCAL_SYM __localdep_unlinkat)(__dirfd, __filename, __AT_REMOVEREG | __AT_REMOVEDIR);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b668d76 */
+/* HASH CRC-32:0xf046da57 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_wcstombs_defined
 #define __local___localdep_convert_wcstombs_defined
 #ifdef __CRT_HAVE_convert_wcstombs
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -71,7 +71,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(convert_wcstombsvn) __ATTR_MALLOC __ATTR_WUNUSED char **
+__LOCAL_LIBC(convert_wcstombsvn) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) char **
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(convert_wcstombsvn))(__WCHAR_TYPE__ const *const *__restrict __vector, __SIZE_TYPE__ __count) {
 	__SIZE_TYPE__ __i;
 	char **__result;

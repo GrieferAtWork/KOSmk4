@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf84efc65 */
+/* HASH CRC-32:0x3d9ee3b5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_posix_spawn_file_actions_alloc __LIBC_LOCAL_NAME(posix_spawn_file_actions_alloc)
 #endif /* !__local___localdep_posix_spawn_file_actions_alloc_defined */
-__LOCAL_LIBC(posix_spawn_file_actions_addtcsetpgrp_np) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(posix_spawn_file_actions_addtcsetpgrp_np) __ATTR_ACCESS_RW(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_addtcsetpgrp_np))(struct __posix_spawn_file_actions *__restrict __file_actions, __fd_t __fd) {
 	struct __spawn_action *__action;
 	__action = (__NAMESPACE_LOCAL_SYM __localdep_posix_spawn_file_actions_alloc)(__file_actions);

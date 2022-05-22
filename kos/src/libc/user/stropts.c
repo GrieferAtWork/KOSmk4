@@ -121,8 +121,8 @@ NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fd,
 }
 /*[[[end:libc_putpmsg]]]*/
 
-/*[[[head:libc_fattach,hash:CRC-32=0x1af7818f]]]*/
-INTERN ATTR_SECTION(".text.crt.io.stropts") NONNULL((2)) int
+/*[[[head:libc_fattach,hash:CRC-32=0x95092c8c]]]*/
+INTERN ATTR_SECTION(".text.crt.io.stropts") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fd,
                                        char const *__restrict path)
 /*[[[body:libc_fattach]]]*/
@@ -135,8 +135,8 @@ NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fd,
 }
 /*[[[end:libc_fattach]]]*/
 
-/*[[[head:libc_fdetach,hash:CRC-32=0x44e4641f]]]*/
-INTERN ATTR_SECTION(".text.crt.io.stropts") NONNULL((1)) int
+/*[[[head:libc_fdetach,hash:CRC-32=0x23976622]]]*/
+INTERN ATTR_SECTION(".text.crt.io.stropts") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path)
 /*[[[body:libc_fdetach]]]*/
 /*AUTO*/{

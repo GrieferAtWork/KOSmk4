@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e8bddff */
+/* HASH CRC-32:0x8ac61949 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,22 +39,22 @@ __CREDIRECT(__ATTR_WUNUSED,__clock_t,__NOTHROW_NCX,__localdep_clock,(void),clock
 __NAMESPACE_LOCAL_END
 #include <bits/os/rusage.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getrusage64,(int __who, struct __rusage64 *__usage),getrusage,(__who,__usage))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_getrusage64,(int __who, struct __rusage64 *__usage),getrusage,(__who,__usage))
 #elif defined(__CRT_HAVE___getrusage) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/os/rusage.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getrusage64,(int __who, struct __rusage64 *__usage),__getrusage,(__who,__usage))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_getrusage64,(int __who, struct __rusage64 *__usage),__getrusage,(__who,__usage))
 #elif defined(__CRT_HAVE___libc_getrusage) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/os/rusage.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getrusage64,(int __who, struct __rusage64 *__usage),__libc_getrusage,(__who,__usage))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_getrusage64,(int __who, struct __rusage64 *__usage),__libc_getrusage,(__who,__usage))
 #elif defined(__CRT_HAVE_getrusage64)
 __NAMESPACE_LOCAL_END
 #include <bits/os/rusage.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getrusage64,(int __who, struct __rusage64 *__usage),getrusage64,(__who,__usage))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_getrusage64,(int __who, struct __rusage64 *__usage),getrusage64,(__who,__usage))
 #else /* ... */
 #undef __local___localdep_getrusage64_defined
 #endif /* !... */
@@ -81,17 +81,17 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_sysconf,(__
 __NAMESPACE_LOCAL_END
 #include <bits/os/tms.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__clock_t,__NOTHROW_NCX,__localdep_times,(struct tms *__buffer),times,(__buffer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__clock_t,__NOTHROW_NCX,__localdep_times,(struct tms *__buffer),times,(__buffer))
 #elif defined(__CRT_HAVE___times)
 __NAMESPACE_LOCAL_END
 #include <bits/os/tms.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__clock_t,__NOTHROW_NCX,__localdep_times,(struct tms *__buffer),__times,(__buffer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__clock_t,__NOTHROW_NCX,__localdep_times,(struct tms *__buffer),__times,(__buffer))
 #elif defined(__CRT_HAVE___libc_times)
 __NAMESPACE_LOCAL_END
 #include <bits/os/tms.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__clock_t,__NOTHROW_NCX,__localdep_times,(struct tms *__buffer),__libc_times,(__buffer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__clock_t,__NOTHROW_NCX,__localdep_times,(struct tms *__buffer),__libc_times,(__buffer))
 #else /* ... */
 #undef __local___localdep_times_defined
 #endif /* !... */
@@ -99,7 +99,7 @@ __CREDIRECT(,__clock_t,__NOTHROW_NCX,__localdep_times,(struct tms *__buffer),__l
 #ifndef __local___localdep_vtimes_defined
 #define __local___localdep_vtimes_defined
 #ifdef __CRT_HAVE_vtimes
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_vtimes,(struct vtimes *__current, struct vtimes *__child),vtimes,(__current,__child))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_vtimes,(struct vtimes *__current, struct vtimes *__child),vtimes,(__current,__child))
 #elif defined(__RUSAGE_SELF) && defined(__RUSAGE_CHILDREN) && ((defined(__CRT_HAVE_getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE___getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE___libc_getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_getrusage64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.vtimes/vtimes.h>

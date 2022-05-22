@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7aac6311 */
+/* HASH CRC-32:0x4acfbd74 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_timer_gettime32_defined) && defined(__CRT_HAVE_timer_gettime)
 #define __local___localdep_timer_gettime32_defined
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime32,(__timer_t __timerid, struct itimerspec *___value),timer_gettime,(__timerid,___value))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_timer_gettime32,(__timer_t __timerid, struct itimerspec *___value),timer_gettime,(__timerid,___value))
 #endif /* !__local___localdep_timer_gettime32_defined && __CRT_HAVE_timer_gettime */
 #ifndef __local___localdep_timer_gettime64_defined
 #define __local___localdep_timer_gettime64_defined
 #if defined(__CRT_HAVE_timer_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime64,(__timer_t __timerid, struct __itimerspec64 *___value),timer_gettime,(__timerid,___value))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_timer_gettime64,(__timer_t __timerid, struct __itimerspec64 *___value),timer_gettime,(__timerid,___value))
 #elif defined(__CRT_HAVE_timer_gettime64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timer_gettime64,(__timer_t __timerid, struct __itimerspec64 *___value),timer_gettime64,(__timerid,___value))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_timer_gettime64,(__timer_t __timerid, struct __itimerspec64 *___value),timer_gettime64,(__timerid,___value))
 #elif defined(__CRT_HAVE_timer_gettime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/timer_gettime64.h>
@@ -44,13 +44,13 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_timer_gettime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_timer_gettime64_defined */
-__LOCAL_LIBC(timer_gettime) __ATTR_NONNULL((2)) int
+__LOCAL_LIBC(timer_gettime) __ATTR_ACCESS_WR_OPT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_gettime))(__timer_t __timerid, struct itimerspec *___value) {
 #ifdef __CRT_HAVE_timer_gettime
 	int __result;
 	struct __itimerspec32 __value32;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_timer_gettime32)(__timerid, &__value32);
-	if (!__result) {
+	if (__result == 0) {
 		___value->__it_interval.tv_sec  = (__time64_t)__value32.__it_interval.tv_sec;
 		___value->__it_interval.tv_nsec = __value32.__it_interval.tv_nsec;
 		___value->__it_value.tv_sec     = (__time64_t)__value32.__it_value.tv_sec;
@@ -61,7 +61,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_gettime))(__timer_t __timerid, 
 	int __result;
 	struct __itimerspec64 __value64;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_timer_gettime64)(__timerid, &__value64);
-	if (!__result) {
+	if (__result == 0) {
 		___value->__it_interval.tv_sec  = (__time32_t)__value64.__it_interval.tv_sec;
 		___value->__it_interval.tv_nsec = __value64.__it_interval.tv_nsec;
 		___value->__it_value.tv_sec     = (__time32_t)__value64.__it_value.tv_sec;

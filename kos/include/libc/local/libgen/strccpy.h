@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20f4d210 */
+/* HASH CRC-32:0xecc6b8f9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcadd_defined
 #define __local___localdep_strcadd_defined
 #ifdef __CRT_HAVE_strcadd
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcadd,(char *__dstbuf, char const *__string),strcadd,(__dstbuf,__string))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),char *,__NOTHROW_NCX,__localdep_strcadd,(char *__dstbuf, char const *__string),strcadd,(__dstbuf,__string))
 #else /* __CRT_HAVE_strcadd */
 __NAMESPACE_LOCAL_END
 #include <libc/local/libgen/strcadd.h>
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcadd __LIBC_LOCAL_NAME(strcadd)
 #endif /* !__CRT_HAVE_strcadd */
 #endif /* !__local___localdep_strcadd_defined */
-__LOCAL_LIBC(strccpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
+__LOCAL_LIBC(strccpy) __ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strccpy))(char *__dstbuf, char const *__string) {
 	(__NAMESPACE_LOCAL_SYM __localdep_strcadd)(__dstbuf, __string);
 	return __dstbuf;

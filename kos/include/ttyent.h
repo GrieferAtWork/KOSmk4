@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x426c7c9e */
+/* HASH CRC-32:0x44f9261d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __SYSDECL_BEGIN
 /* >> getttyent(3) */
 __CDECLARE_OPT(,struct ttyent *,__NOTHROW_RPC_KOS,getttyent,(void),())
 /* >> getttynam(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),struct ttyent *,__NOTHROW_RPC_KOS,getttynam,(char const *__tty),(__tty))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1),struct ttyent *,__NOTHROW_RPC_KOS,getttynam,(char const *__tty),(__tty))
 /* >> setttyent(3) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,setttyent,(void),())
 /* >> endttyent(3) */

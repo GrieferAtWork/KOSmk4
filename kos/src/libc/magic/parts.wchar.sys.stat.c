@@ -40,7 +40,7 @@ __SYSDECL_BEGIN
 %[default:section(".text.crt{|.dos}.fs.modify")];
 
 [[wchar, cp, ignore, nocrt, alias("_wmkdir"), decl_include("<hybrid/typecore.h>")]]
-int dos_wmkdir([[nonnull]] wchar_t const *pathname);
+int dos_wmkdir([[in]] wchar_t const *pathname);
 
 [[ignore]] dos_c16mkdir(*) %{uchar16("dos_wmkdir")}
 [[ignore]] dos_c32mkdir(*) %{uchar32("dos_wmkdir")}
@@ -50,7 +50,7 @@ int dos_wmkdir([[nonnull]] wchar_t const *pathname);
 [[requires((defined(__CRT_DOS_PRIMARY) && $has_function(dos_wmkdir)) ||
            (defined(__AT_FDCWD) && $has_function(wmkdirat)) ||
            $has_function(mkdir, convert_wcstombs))]]
-int wmkdir([[nonnull]] wchar_t const *pathname, $mode_t mode) {
+int wmkdir([[in]] wchar_t const *pathname, $mode_t mode) {
 @@pp_if defined(__CRT_DOS_PRIMARY) && $has_function(dos_wmkdir)@@
 	(void)mode;
 	return dos_wmkdir(pathname);
@@ -75,7 +75,7 @@ int wmkdir([[nonnull]] wchar_t const *pathname, $mode_t mode) {
 [[requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wfchmodat)) ||
            $has_function(chmod, convert_wcstombs))]]
-int wchmod([[nonnull]] wchar_t const *filename, $mode_t mode) {
+int wchmod([[in]] wchar_t const *filename, $mode_t mode) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wfchmodat)@@
 	return wfchmodat(__AT_FDCWD, filename, mode, 0);
 @@pp_else@@
@@ -99,7 +99,7 @@ int wchmod([[nonnull]] wchar_t const *filename, $mode_t mode) {
 [[requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(wfchmodat)) ||
            $has_function(lchmod, convert_wcstombs))]]
-int wlchmod([[nonnull]] wchar_t const *filename, $mode_t mode) {
+int wlchmod([[in]] wchar_t const *filename, $mode_t mode) {
 @@pp_if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(wfchmodat)@@
 	return wfchmodat(__AT_FDCWD, filename, mode, __AT_SYMLINK_NOFOLLOW);
 @@pp_else@@
@@ -124,7 +124,7 @@ int wlchmod([[nonnull]] wchar_t const *filename, $mode_t mode) {
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(fmkdirat, convert_wcstombs)]]
 int wfmkdirat($fd_t dirfd,
-              [[nonnull]] wchar_t const *pathname,
+              [[in]] wchar_t const *pathname,
               $mode_t mode, $atflag_t flags) {
 	int result;
 	char *utf8_pathname;
@@ -140,7 +140,7 @@ int wfmkdirat($fd_t dirfd,
 
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(fmknodat, convert_wcstombs)]]
-int wfmknodat($fd_t dirfd, [[nonnull]] wchar_t const *nodename,
+int wfmknodat($fd_t dirfd, [[in]] wchar_t const *nodename,
               $mode_t mode, $dev_t dev, $atflag_t flags) {
 	int result;
 	char *utf8_nodename;
@@ -160,7 +160,7 @@ int wfmknodat($fd_t dirfd, [[nonnull]] wchar_t const *nodename,
 [[requires_include("<asm/os/stat.h>"), impl_include("<asm/os/stat.h>")]]
 [[requires(($has_function(wmknod) && defined(__S_IFIFO)) ||
            $has_function(mkfifo, convert_wcstombs))]]
-int wmkfifo([[nonnull]] wchar_t const *fifoname, $mode_t mode) {
+int wmkfifo([[in]] wchar_t const *fifoname, $mode_t mode) {
 @@pp_if $has_function(wmknod) && defined(__S_IFIFO)@@
 	return wmknod(fifoname, mode | __S_IFIFO, 0);
 @@pp_else@@
@@ -181,7 +181,7 @@ int wmkfifo([[nonnull]] wchar_t const *fifoname, $mode_t mode) {
 %#ifdef __USE_ATFILE
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(fchmodat, convert_wcstombs)]]
-int wfchmodat($fd_t dirfd, [[nonnull]] wchar_t const *filename,
+int wfchmodat($fd_t dirfd, [[in]] wchar_t const *filename,
               $mode_t mode, $atflag_t flags) {
 	int result;
 	char *utf8_filename;
@@ -198,7 +198,7 @@ int wfchmodat($fd_t dirfd, [[nonnull]] wchar_t const *filename,
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires($has_function(wfmkdirat) ||
            $has_function(mkdirat, convert_wcstombs))]]
-int wmkdirat($fd_t dirfd, [[nonnull]] wchar_t const *pathname, $mode_t mode) {
+int wmkdirat($fd_t dirfd, [[in]] wchar_t const *pathname, $mode_t mode) {
 @@pp_if $has_function(wfmkdirat)@@
 	return wfmkdirat(dirfd, pathname, mode, 0);
 @@pp_else@@
@@ -219,7 +219,7 @@ int wmkdirat($fd_t dirfd, [[nonnull]] wchar_t const *pathname, $mode_t mode) {
 [[requires_include("<asm/os/stat.h>"), impl_include("<asm/os/stat.h>")]]
 [[requires(($has_function(wmknodat) && defined(__S_IFIFO)) ||
            $has_function(mkfifoat, convert_wcstombs))]]
-int wmkfifoat($fd_t dirfd, [[nonnull]] wchar_t const *fifoname, $mode_t mode) {
+int wmkfifoat($fd_t dirfd, [[in]] wchar_t const *fifoname, $mode_t mode) {
 @@pp_if $has_function(wmknodat) && defined(__S_IFIFO)@@
 	return wmknodat(dirfd, fifoname, mode | __S_IFIFO, 0);
 @@pp_else@@
@@ -244,7 +244,7 @@ int wmkfifoat($fd_t dirfd, [[nonnull]] wchar_t const *fifoname, $mode_t mode) {
 [[requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[requires(($has_function(wmknodat) && defined(__AT_FDCWD)) ||
            $has_function(mknod, convert_wcstombs))]]
-int wmknod([[nonnull]] wchar_t const *nodename, $mode_t mode, $dev_t dev) {
+int wmknod([[in]] wchar_t const *nodename, $mode_t mode, $dev_t dev) {
 @@pp_if $has_function(wmknodat) && defined(__AT_FDCWD)@@
 	return wmknodat(__AT_FDCWD, nodename, mode, dev);
 @@pp_else@@
@@ -265,7 +265,8 @@ int wmknod([[nonnull]] wchar_t const *nodename, $mode_t mode, $dev_t dev) {
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires($has_function(wfmknodat) ||
            $has_function(mknodat, convert_wcstombs))]]
-int wmknodat($fd_t dirfd, [[nonnull]] wchar_t const *nodename, $mode_t mode, $dev_t dev) {
+int wmknodat($fd_t dirfd, [[in]] wchar_t const *nodename,
+             $mode_t mode, $dev_t dev) {
 @@pp_if $has_function(wfmknodat)@@
 	return wfmknodat(dirfd, nodename, mode, dev, 0);
 @@pp_else@@
@@ -288,13 +289,13 @@ int wmknodat($fd_t dirfd, [[nonnull]] wchar_t const *nodename, $mode_t mode, $de
 
 [[cp, ignore, doc_alias("wutimensat"), nocrt, alias("wutimensat")]]
 [[wchar, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
-int crt_wutimensat32($fd_t dirfd, [[nonnull]] wchar_t const *filename,
-                     [[nullable]] struct timespec const times[2 /*or:3*/],
+int crt_wutimensat32($fd_t dirfd, [[in]] wchar_t const *filename,
+                     [[in_opt]] struct timespec const times[2 /*or:3*/],
                      $atflag_t flags);
 [[cp, ignore, doc_alias("wutimensat"), nocrt, alias("wutimensat64")]]
 [[wchar, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
-int crt_wutimensat64($fd_t dirfd, [[nonnull]] wchar_t const *filename,
-                     [[nullable]] struct timespec64 const times[2 /*or:3*/],
+int crt_wutimensat64($fd_t dirfd, [[in]] wchar_t const *filename,
+                     [[in_opt]] struct timespec64 const times[2 /*or:3*/],
                      $atflag_t flags);
 
 [[ignore]] crt_c16utimensat32(*) %{uchar16("crt_wutimensat32")}
@@ -312,8 +313,8 @@ int crt_wutimensat64($fd_t dirfd, [[nonnull]] wchar_t const *filename,
            $has_function(crt_wutimensat32) ||
            $has_function(utimensat, convert_wcstombs))]]
 [[impl_include("<asm/os/fcntl.h>")]]
-int wutimensat($fd_t dirfd, [[nonnull]] wchar_t const *filename,
-               [[nullable]] struct timespec const times[2 /*or:3*/],
+int wutimensat($fd_t dirfd, [[in]] wchar_t const *filename,
+               [[in_opt]] struct timespec const times[2 /*or:3*/],
                $atflag_t flags) {
 @@pp_if $has_function(crt_wutimensat32) && !defined(__BUILDING_LIBC)@@
 @@pp_ifdef __AT_CHANGE_BTIME@@
@@ -383,8 +384,8 @@ int wutimensat($fd_t dirfd, [[nonnull]] wchar_t const *filename,
 [[requires($has_function(utimensat64, convert_wcstombs) ||
            $has_function(crt_wutimensat32))]]
 [[impl_include("<asm/os/fcntl.h>")]]
-int wutimensat64($fd_t dirfd, [[nonnull]] wchar_t const *filename,
-                 [[nullable]] struct timespec64 const times[2 /*or:3*/],
+int wutimensat64($fd_t dirfd, [[in]] wchar_t const *filename,
+                 [[in_opt]] struct timespec64 const times[2 /*or:3*/],
                  $atflag_t flags) {
 @@pp_if $has_function(utimensat64, convert_wcstombs)@@
 	int result;

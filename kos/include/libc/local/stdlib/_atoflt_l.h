@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9af10cbf */
+/* HASH CRC-32:0x23eb65d4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtof_l_defined
 #define __local___localdep_strtof_l_defined
 #ifdef __CRT_HAVE_strtof_l
-__CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtof_l,(__nptr,__endptr,__locale))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2),float,__NOTHROW_NCX,__localdep_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtof_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__strtof_l)
-__CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtof_l,(__nptr,__endptr,__locale))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2),float,__NOTHROW_NCX,__localdep_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtof_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE___strtof_l)
-__CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtof_l,(__nptr,__endptr,__locale))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2),float,__NOTHROW_NCX,__localdep_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtof_l,(__nptr,__endptr,__locale))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtof_l.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtof_l __LIBC_LOCAL_NAME(strtof_l)
 #endif /* !... */
 #endif /* !__local___localdep_strtof_l_defined */
-__LOCAL_LIBC(_atoflt_l) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(_atoflt_l) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atoflt_l))(float *__restrict __result, char const *__restrict __nptr, __locale_t __locale) {
 	*__result = (__NAMESPACE_LOCAL_SYM __localdep_strtof_l)(__nptr, __NULLPTR, __locale);
 	return 0;

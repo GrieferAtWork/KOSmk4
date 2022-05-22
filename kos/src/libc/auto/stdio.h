@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d2ec19b */
+/* HASH CRC-32:0xa08da597 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> remove(3)
  * Remove a file or directory `filename' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename);
 /* >> remove(3)
  * Remove a file or directory `filename' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fclose(3)
@@ -100,13 +100,13 @@ INTDEF WUNUSED ATTR_ACCESS_RW(3) NONNULL((1)) char *(LIBCCALL libc_fgets)(char *
 /* >> fputs(3)
  * Print a given string `string' to `stream'. This is identical to:
  * >> fwrite(string, sizeof(char), strlen(string), stream); */
-INTDEF ATTR_ACCESS_RW(2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_fputs)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RW(2) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_fputs)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fputs(3)
  * Print a given string `string' to `stream'. This is identical to:
  * >> fwrite(string, sizeof(char), strlen(string), stream); */
-INTDEF ATTR_ACCESS_RW(2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_fputs)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RW(2) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_fputs)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> puts(3)
@@ -114,7 +114,7 @@ INTDEF ATTR_ACCESS_RW(2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_fputs
  * >> fputs(string, stdout);
  * >> putchar('\n');
  * Return the number of written characters, or `EOF' on error */
-INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_puts)(char const *__restrict string) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_puts)(char const *__restrict string) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> puts(3)
@@ -122,7 +122,7 @@ INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_puts)(char const *__res
  * >> fputs(string, stdout);
  * >> putchar('\n');
  * Return the number of written characters, or `EOF' on error */
-INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_puts)(char const *__restrict string) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_puts)(char const *__restrict string) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ungetc(3)
@@ -130,10 +130,10 @@ INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_puts)(char const *__res
 INTDEF ATTR_ACCESS_RW(2) int NOTHROW_NCX(LIBDCALL libd_ungetc)(int ch, FILE *__restrict stream);
 /* >> fread(3)
  * Read up to `elemsize * elemcount' bytes of data from `stream' into `buf' */
-INTDEF WUNUSED ATTR_ACCESS_RW(4) NONNULL((1)) size_t (LIBDCALL libd_fread)(void *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RW(4) ATTR_ACCESS_WR_OPT(1) size_t (LIBDCALL libd_fread)(void *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
 /* >> fwrite(3)
  * Write up to `elemsize * elemcount' bytes of data from `buf' into `stream' */
-INTDEF ATTR_ACCESS_RW(4) NONNULL((1)) size_t (LIBDCALL libd_fwrite)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW(4) size_t (LIBDCALL libd_fwrite)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
 /* >> fseek(3)
  * Change the current in-file position of `stream' as a byte-offset from the start of the file */
 INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd_fseek)(FILE *__restrict stream, long int off, int whence) THROWS(...);
@@ -175,208 +175,208 @@ INTDEF void NOTHROW_RPC(LIBCCALL libc_perror)(char const *message);
 /* >> fgetpos(3), fgetpos64(3)
  * Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
  * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
-INTDEF ATTR_ACCESS_RW(1) NONNULL((2)) int (LIBDCALL libd_fgetpos)(FILE *__restrict stream, fpos_t *__restrict pos) THROWS(...);
+INTDEF ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) int (LIBDCALL libd_fgetpos)(FILE *__restrict stream, fpos_t *__restrict pos) THROWS(...);
 /* >> fsetpos(3), fsetpos64(3)
  * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
-INTDEF ATTR_ACCESS_RW(1) NONNULL((2)) int (LIBDCALL libd_fsetpos)(FILE *__restrict stream, fpos_t const *__restrict pos) THROWS(...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int (LIBDCALL libd_fsetpos)(FILE *__restrict stream, fpos_t const *__restrict pos) THROWS(...);
 /* >> fprintf(3), vfprintf(3)
  * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-/* >> fprintf(3), vfprintf(3)
- * Print  data  to  `stream',  following  `format'
- * Return the number of successfully printed bytes */
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> fprintf(3), vfprintf(3)
- * Print  data  to  `stream',  following  `format'
- * Return the number of successfully printed bytes */
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_fprintf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fprintf(3), vfprintf(3)
  * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_fprintf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> fprintf(3), vfprintf(3)
+ * Print  data  to  `stream',  following  `format'
+ * Return the number of successfully printed bytes */
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_fprintf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> fprintf(3), vfprintf(3)
+ * Print  data  to  `stream',  following  `format'
+ * Return the number of successfully printed bytes */
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_fprintf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> printf(3), vprintf(3)
  * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
-INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vprintf)(char const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vprintf)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> printf(3), vprintf(3)
  * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
-INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vprintf)(char const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vprintf)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> printf(3), vprintf(3)
  * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
-INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_printf)(char const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_printf)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> printf(3), vprintf(3)
  * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
-INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_printf)(char const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_printf)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fscanf(3), vfscanf(3)
  * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfscanf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfscanf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fscanf(3), vfscanf(3)
  * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfscanf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfscanf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> scanf(3), vscanf(3)
  * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vscanf)(char const *__restrict format, va_list args) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vscanf)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> scanf(3), vscanf(3)
  * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vscanf)(char const *__restrict format, va_list args) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vscanf)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fscanf(3), vfscanf(3)
  * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 3) NONNULL((2)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fscanf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fscanf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fscanf(3), vfscanf(3)
  * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 3) NONNULL((2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fscanf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fscanf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> scanf(3), vscanf(3)
  * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_scanf)(char const *__restrict format, ...) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_scanf)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> scanf(3), vscanf(3)
  * Scan data from `stdin', following `format'
  * Return the number of successfully scanned data items */
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf)(char const *__restrict format, ...) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") NONNULL((1)) char *(LIBDCALL libd_gets)(char *__restrict buf) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_WR(1) ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") char *(LIBDCALL libd_gets)(char *__restrict buf) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") NONNULL((1)) char *(LIBCCALL libc_gets)(char *__restrict buf) THROWS(...);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> sscanf(3), vsscanf(3)
- * Scan data from a given `input' string, following `format'
- * Return  the  number  of successfully  scanned  data items */
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_vsscanf)(char const *__restrict input, char const *__restrict format, va_list args);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-/* >> sscanf(3), vsscanf(3)
- * Scan data from a given `input' string, following `format'
- * Return  the  number  of successfully  scanned  data items */
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input, char const *__restrict format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_WR(1) ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") char *(LIBCCALL libc_gets)(char *__restrict buf) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sscanf(3), vsscanf(3)
  * Scan data from a given `input' string, following `format'
  * Return  the  number  of successfully  scanned  data items */
-INTDEF ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_sscanf)(char const *__restrict input, char const *__restrict format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_vsscanf)(char const *__restrict input, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sscanf(3), vsscanf(3)
  * Scan data from a given `input' string, following `format'
  * Return  the  number  of successfully  scanned  data items */
-INTDEF ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_sscanf)(char const *__restrict input, char const *__restrict format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input, char const *__restrict format, va_list args);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> sscanf(3), vsscanf(3)
+ * Scan data from a given `input' string, following `format'
+ * Return  the  number  of successfully  scanned  data items */
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_sscanf)(char const *__restrict input, char const *__restrict format, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> sscanf(3), vsscanf(3)
+ * Scan data from a given `input' string, following `format'
+ * Return  the  number  of successfully  scanned  data items */
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_sscanf)(char const *__restrict input, char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sprintf(3), vsprintf(3)
  * Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vsprintf)(char *__restrict dest, char const *__restrict format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vsprintf)(char *__restrict dest, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sprintf(3), vsprintf(3)
  * Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vsprintf)(char *__restrict dest, char const *__restrict format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vsprintf)(char *__restrict dest, char const *__restrict format, va_list args);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sprintf(3), vsprintf(3)
  * Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
-INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_sprintf)(char *__restrict buf, char const *__restrict format, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_sprintf)(char *__restrict buf, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sprintf(3), vsprintf(3)
  * Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
-INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_sprintf)(char *__restrict buf, char const *__restrict format, ...);
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> snprintf(3), vsnprintf(3)
- * Print  a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing  NUL-
- * character), and never write more than `buflen' characters to `buf' */
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_vsnprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, va_list args);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* >> snprintf(3), vsnprintf(3)
- * Print  a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing  NUL-
- * character), and never write more than `buflen' characters to `buf' */
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_sprintf)(char *__restrict buf, char const *__restrict format, ...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> snprintf(3), vsnprintf(3)
  * Print  a formatted string to a given in-member string buffer `buf'
  * Always return the REQUIRED buffer size (excluding a trailing  NUL-
  * character), and never write more than `buflen' characters to `buf' */
-INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_vsnprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> snprintf(3), vsnprintf(3)
  * Print  a formatted string to a given in-member string buffer `buf'
  * Always return the REQUIRED buffer size (excluding a trailing  NUL-
  * character), and never write more than `buflen' characters to `buf' */
-INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, va_list args);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> snprintf(3), vsnprintf(3)
+ * Print  a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing  NUL-
+ * character), and never write more than `buflen' characters to `buf' */
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> snprintf(3), vsnprintf(3)
+ * Print  a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing  NUL-
+ * character), and never write more than `buflen' characters to `buf' */
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> dprintf(3), vdprintf(3) */
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> dprintf(3), vdprintf(3) */
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd, char const *__restrict format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> dprintf(3), vdprintf(3) */
-INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBDCALL libd_dprintf)(fd_t fd, char const *__restrict format, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBDCALL libd_dprintf)(fd_t fd, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> dprintf(3), vdprintf(3) */
-INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd, char const *__restrict format, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd, char const *__restrict format, ...);
 /* >> removeat(3)
  * Remove a file or directory `filename' relative to a given base directory `dirfd' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd, char const *filename);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd, char const *filename);
 /* >> removeat(3)
  * Remove a file or directory `filename' relative to a given base directory `dirfd' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd, char const *filename);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd, char const *filename);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tmpnam(3), tmpnam_r(3) */
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_tmpnam_r)(char *buf);
+INTDEF WUNUSED ATTR_ACCESS_WR_OPT(1) char *NOTHROW_NCX(LIBDCALL libd_tmpnam_r)(char *buf);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tmpnam(3), tmpnam_r(3) */
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf);
+INTDEF WUNUSED ATTR_ACCESS_WR_OPT(1) char *NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> setbuffer(3)
@@ -404,10 +404,10 @@ INTDEF ATTR_ACCESS_RW(1) void NOTHROW_NCX(LIBCCALL libc_setlinebuf)(FILE *__rest
 INTDEF int (LIBDCALL libd_fflush_unlocked)(FILE *stream) THROWS(...);
 /* >> fread_unlocked(3)
  * Same as `fread()', but performs I/O without acquiring a lock to `stream' */
-INTDEF WUNUSED ATTR_ACCESS_RW(4) NONNULL((1)) size_t (LIBDCALL libd_fread_unlocked)(void *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RW(4) ATTR_ACCESS_WR_OPT(1) size_t (LIBDCALL libd_fread_unlocked)(void *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
 /* >> fwrite_unlocked(3)
  * Same as `fwrite()', but performs I/O without acquiring a lock to `stream' */
-INTDEF WUNUSED ATTR_ACCESS_RW(4) NONNULL((1)) size_t (LIBDCALL libd_fwrite_unlocked)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW(4) size_t (LIBDCALL libd_fwrite_unlocked)(void const *__restrict buf, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
 /* >> fgetc_unlocked(3)
  * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd_fgetc_unlocked)(FILE *__restrict stream) THROWS(...);
@@ -420,16 +420,16 @@ INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBDCALL libd_tempnam)(char const *
  * Open a new file stream by inheriting a given file descriptor `fd'
  * Note that upon success (`return != NULL'), the given `fd' will be
  * `close(2)'d once `fclose(return)' is called. */
-INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBDCALL libd_fdopen)(fd_t fd, char const *__restrict modes);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) FILE *NOTHROW_NCX(LIBDCALL libd_fdopen)(fd_t fd, char const *__restrict modes);
 /* >> fileno(3)
  * Return the underlying file descriptor number used by `stream' */
 INTDEF WUNUSED ATTR_ACCESS_RW(1) fd_t NOTHROW_NCX(LIBDCALL libd_fileno)(FILE *__restrict stream);
 /* >> fmemopen(3) */
-INTDEF WUNUSED NONNULL((1, 3)) FILE *NOTHROW_NCX(LIBDCALL libd_fmemopen)(void *mem, size_t len, char const *modes);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_RWS(1, 2) FILE *NOTHROW_NCX(LIBDCALL libd_fmemopen)(void *mem, size_t len, char const *modes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fmemopen(3) */
-INTDEF WUNUSED NONNULL((1, 3)) FILE *NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem, size_t len, char const *modes);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_RWS(1, 2) FILE *NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem, size_t len, char const *modes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> open_memstream(3) */
@@ -441,19 +441,19 @@ INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_open_memstream)(char **bufloc, si
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getdelim(3) */
-INTDEF WUNUSED ATTR_ACCESS_RW(4) NONNULL((1, 2)) ssize_t (LIBDCALL libd_getdelim)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(4) ssize_t (LIBDCALL libd_getdelim)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getdelim(3) */
-INTDEF WUNUSED ATTR_ACCESS_RW(4) NONNULL((1, 2)) ssize_t (LIBCCALL libc_getdelim)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(4) ssize_t (LIBCCALL libc_getdelim)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getline(3) */
-INTDEF WUNUSED ATTR_ACCESS_RW(3) NONNULL((1, 2)) ssize_t (LIBDCALL libd_getline)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(3) ssize_t (LIBDCALL libd_getline)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getline(3) */
-INTDEF WUNUSED ATTR_ACCESS_RW(3) NONNULL((1, 2)) ssize_t (LIBCCALL libc_getline)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(3) ssize_t (LIBCCALL libc_getline)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream) THROWS(...);
 /* >> getchar_unlocked(3)
  * Same as `getchar()', but performs I/O without acquiring a lock to `stdin' */
 INTDEF int (LIBCCALL libc_getchar_unlocked)(void) THROWS(...);
@@ -496,7 +496,7 @@ INTDEF ATTR_ACCESS_RW(1) int (LIBCCALL libc___overflow)(FILE *stream, int ch) TH
  * @param: modes:   One of "r", "w", "re" or "we" ('e' sets  O_CLOEXEC
  *                  for the internal file descriptor within the parent
  *                  process) */
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_popen)(char const *command, char const *modes);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(1) FILE *NOTHROW_RPC(LIBDCALL libd_popen)(char const *command, char const *modes);
 /* >> pclose(3)
  * Close a process I/O file `stream' (s.a. `popen(3)') */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_pclose)(FILE *stream);
@@ -504,7 +504,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_pclose)(FILE *stream);
  * Similar to `popen(3)', but rather than running `shexec(command)', this
  * function will `execve(path, argv, envp)'. The returned FILE must still
  * be closed using `pclose(3)', rather than `fclose(3)' */
-INTDEF WUNUSED NONNULL((1, 2, 3, 4)) FILE *NOTHROW_RPC(LIBDCALL libd_popenve)(char const *path, __TARGV, __TENVP, char const *modes);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) FILE *NOTHROW_RPC(LIBDCALL libd_popenve)(char const *path, __TARGV, __TENVP, char const *modes);
 /* >> getw(3)
  * Similar to `getc()', but read 2 bytes */
 INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd_getw)(FILE *__restrict stream) THROWS(...);
@@ -526,11 +526,11 @@ INTDEF ATTR_ACCESS_RW(2) int (LIBCCALL libc_putw)(int w, FILE *__restrict stream
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fopencookie(3) */
-INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBDCALL libd_fopencookie)(void *__restrict magic_cookie, char const *__restrict modes, cookie_io_functions_t io_funcs);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) FILE *NOTHROW_NCX(LIBDCALL libd_fopencookie)(void *__restrict magic_cookie, char const *__restrict modes, cookie_io_functions_t io_funcs);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fopencookie(3) */
-INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *__restrict magic_cookie, char const *__restrict modes, cookie_io_functions_t io_funcs);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) FILE *NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *__restrict magic_cookie, char const *__restrict modes, cookie_io_functions_t io_funcs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fgets_unlocked(3)
@@ -545,32 +545,32 @@ INTDEF WUNUSED ATTR_ACCESS_RW(3) NONNULL((1)) char *(LIBCCALL libc_fgets_unlocke
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fputs_unlocked(3)
  * Same as `fputs()', but performs I/O without acquiring a lock to `stream' */
-INTDEF ATTR_ACCESS_RW(2) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_fputs_unlocked)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RW(2) __STDC_INT_AS_SIZE_T (LIBDCALL libd_fputs_unlocked)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fputs_unlocked(3)
  * Same as `fputs()', but performs I/O without acquiring a lock to `stream' */
-INTDEF ATTR_ACCESS_RW(2) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_fputs_unlocked)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RW(2) __STDC_INT_AS_SIZE_T (LIBCCALL libc_fputs_unlocked)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> obstack_printf(3), obstack_vprintf(3)
  * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_obstack_vprintf)(struct obstack *__restrict self, char const *__restrict format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_obstack_vprintf)(struct obstack *__restrict self, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> obstack_printf(3), obstack_vprintf(3)
  * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict self, char const *__restrict format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict self, char const *__restrict format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> obstack_printf(3), obstack_vprintf(3)
  * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
-INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_obstack_printf)(struct obstack *__restrict self, char const *__restrict format, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_obstack_printf)(struct obstack *__restrict self, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> obstack_printf(3), obstack_vprintf(3)
  * Append formated strings to a given obstack. s.a. `obstack_printer(3)' */
-INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict self, char const *__restrict format, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict self, char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fseeko(3), fseeko64(3)
@@ -588,42 +588,42 @@ INTDEF WUNUSED ATTR_ACCESS_RW(1) off64_t (LIBDCALL libd_ftello64)(FILE *__restri
 /* >> fgetpos(3), fgetpos64(3)
  * Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
  * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
-INTDEF ATTR_ACCESS_RW(1) NONNULL((2)) int (LIBDCALL libd_fgetpos64)(FILE *__restrict stream, fpos64_t *__restrict pos) THROWS(...);
+INTDEF ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) int (LIBDCALL libd_fgetpos64)(FILE *__restrict stream, fpos64_t *__restrict pos) THROWS(...);
 /* >> fsetpos(3), fsetpos64(3)
  * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
-INTDEF ATTR_ACCESS_RW(1) NONNULL((2)) int (LIBDCALL libd_fsetpos64)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int (LIBDCALL libd_fsetpos64)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
 /* >> asprintf(3), vasprintf(3)
  * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> asprintf(3), vasprintf(3)
  * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> asprintf(3), vasprintf(3)
  * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
-INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_asprintf)(char **__restrict pstr, char const *__restrict format, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_asprintf)(char **__restrict pstr, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> asprintf(3), vasprintf(3)
  * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
-INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr, char const *__restrict format, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr, char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
-INTDEF ATTR_ACCESS_RW(3) NONNULL((2)) FILE *NOTHROW_RPC(LIBDCALL libd_fdreopen)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(3) FILE *NOTHROW_RPC(LIBDCALL libd_fdreopen)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
-INTDEF ATTR_ACCESS_RW(3) NONNULL((2)) FILE *NOTHROW_RPC(LIBDCALL libd_fdreopen_unlocked)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(3) FILE *NOTHROW_RPC(LIBDCALL libd_fdreopen_unlocked)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
 INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd_fseek_unlocked)(FILE *__restrict stream, long int off, int whence) THROWS(...);
 INTDEF WUNUSED ATTR_ACCESS_RW(1) long int (LIBDCALL libd_ftell_unlocked)(FILE *__restrict stream) THROWS(...);
 INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd_fseeko_unlocked)(FILE *__restrict stream, off_t off, int whence) THROWS(...);
 INTDEF WUNUSED ATTR_ACCESS_RW(1) off_t (LIBDCALL libd_ftello_unlocked)(FILE *__restrict stream) THROWS(...);
-INTDEF ATTR_ACCESS_RW(1) NONNULL((2)) int (LIBDCALL libd_fgetpos_unlocked)(FILE *__restrict stream, fpos_t *__restrict pos) THROWS(...);
-INTDEF ATTR_ACCESS_RW(1) NONNULL((2)) int (LIBDCALL libd_fsetpos_unlocked)(FILE *__restrict stream, fpos_t const *__restrict pos) THROWS(...);
+INTDEF ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) int (LIBDCALL libd_fgetpos_unlocked)(FILE *__restrict stream, fpos_t *__restrict pos) THROWS(...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int (LIBDCALL libd_fsetpos_unlocked)(FILE *__restrict stream, fpos_t const *__restrict pos) THROWS(...);
 INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd_getw_unlocked)(FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -639,17 +639,17 @@ INTDEF ATTR_ACCESS_RW(2) int (LIBCCALL libc_putw_unlocked)(int w, FILE *__restri
 INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd_setvbuf_unlocked)(FILE *__restrict stream, char *__restrict buf, __STDC_INT_AS_UINT_T modes, size_t bufsize);
 INTDEF ATTR_ACCESS_RW(2) int NOTHROW_NCX(LIBDCALL libd_ungetc_unlocked)(int ch, FILE *__restrict stream);
 /* >> getdelim(3) */
-INTDEF WUNUSED ATTR_ACCESS_RW(4) NONNULL((1, 2)) ssize_t (LIBDCALL libd_getdelim_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(4) ssize_t (LIBDCALL libd_getdelim_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getdelim(3) */
-INTDEF WUNUSED ATTR_ACCESS_RW(4) NONNULL((1, 2)) ssize_t (LIBCCALL libc_getdelim_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(4) ssize_t (LIBCCALL libc_getdelim_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, int delimiter, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_ACCESS_RW(3) NONNULL((1, 2)) ssize_t (LIBDCALL libd_getline_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(3) ssize_t (LIBDCALL libd_getline_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RW(3) NONNULL((1, 2)) ssize_t (LIBCCALL libc_getline_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(3) ssize_t (LIBCCALL libc_getline_unlocked)(char **__restrict lineptr, size_t *__restrict pcount, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_ACCESS_RW(1) void (LIBDCALL libd_rewind_unlocked)(FILE *__restrict stream) THROWS(...);
@@ -660,16 +660,16 @@ INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd_fftruncate)(FILE *__restrict stream,
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
 INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd_fftruncate_unlocked)(FILE *__restrict stream, __PIO_OFFSET length) THROWS(...);
-INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_puts_unlocked)(char const *__restrict string) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_puts_unlocked)(char const *__restrict string) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_puts_unlocked)(char const *__restrict string) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_puts_unlocked)(char const *__restrict string) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd_fseeko64_unlocked)(FILE *__restrict stream, off64_t off, int whence) THROWS(...);
 INTDEF WUNUSED ATTR_ACCESS_RW(1) off64_t (LIBDCALL libd_ftello64_unlocked)(FILE *__restrict stream) THROWS(...);
-INTDEF ATTR_ACCESS_RW(1) NONNULL((2)) int (LIBDCALL libd_fgetpos64_unlocked)(FILE *__restrict stream, fpos64_t *__restrict pos) THROWS(...);
-INTDEF ATTR_ACCESS_RW(1) NONNULL((2)) int (LIBDCALL libd_fsetpos64_unlocked)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
+INTDEF ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) int (LIBDCALL libd_fgetpos64_unlocked)(FILE *__restrict stream, fpos64_t *__restrict pos) THROWS(...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int (LIBDCALL libd_fsetpos64_unlocked)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
 /* >> fftruncate64(3)
  * Truncate the given file `stream' to a length of `length' */
 INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd_fftruncate64)(FILE *__restrict stream, __PIO_OFFSET64 length) THROWS(...);
@@ -677,67 +677,67 @@ INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd_fftruncate64)(FILE *__restrict strea
  * Truncate the given file `stream' to a length of `length' */
 INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd_fftruncate64_unlocked)(FILE *__restrict stream, __PIO_OFFSET64 length) THROWS(...);
 /* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vfprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vfprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_fprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_fprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_fprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_fprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> printf_unlocked(3), vprintf_unlocked(3) */
-INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vprintf_unlocked)(char const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vprintf_unlocked)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> printf_unlocked(3), vprintf_unlocked(3) */
-INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vprintf_unlocked)(char const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vprintf_unlocked)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> printf_unlocked(3), vprintf_unlocked(3) */
-INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_printf_unlocked)(char const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_printf_unlocked)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> printf_unlocked(3), vprintf_unlocked(3) */
-INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_printf_unlocked)(char const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_printf_unlocked)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> scanf_unlocked(3), vscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vscanf_unlocked)(char const *__restrict format, va_list args) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vscanf_unlocked)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> scanf_unlocked(3), vscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vscanf_unlocked)(char const *__restrict format, va_list args) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vscanf_unlocked)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 3) NONNULL((2)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 3) NONNULL((2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fscanf_unlocked)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> scanf_unlocked(3), vscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_scanf_unlocked)(char const *__restrict format, ...) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_scanf_unlocked)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> scanf_unlocked(3), vscanf_unlocked(3) */
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf_unlocked)(char const *__restrict format, ...) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf_unlocked)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fmtcheck(3)
@@ -750,7 +750,7 @@ INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T (VLIBCCAL
  * instead. This function is meant to  be used to validate user-provided  printf
  * format strings before actually using them, after they've been read from  lang
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *NOTHROW_NCX(LIBDCALL libd_fmtcheck)(char const *user_format, char const *good_format);
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(1) __ATTR_FORMAT_ARG(2) char const *NOTHROW_NCX(LIBDCALL libd_fmtcheck)(char const *user_format, char const *good_format);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fmtcheck(3)
@@ -763,7 +763,7 @@ INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *NOT
  * instead. This function is meant to  be used to validate user-provided  printf
  * format strings before actually using them, after they've been read from  lang
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *NOTHROW_NCX(LIBCCALL libc_fmtcheck)(char const *user_format, char const *good_format);
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(1) __ATTR_FORMAT_ARG(2) char const *NOTHROW_NCX(LIBCCALL libc_fmtcheck)(char const *user_format, char const *good_format);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fgetln(3)
@@ -781,7 +781,7 @@ INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *NOT
  *                of this function, and documentation states that it may also
  *                be invalidated during any  other I/O operation relating  to
  *                `stream', tough this isn't the case under KOS. */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) char *NOTHROW_NCX(LIBDCALL libd_fgetln)(FILE *__restrict stream, size_t *__restrict lenp);
+INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_WR_OPT(2) char *NOTHROW_NCX(LIBDCALL libd_fgetln)(FILE *__restrict stream, size_t *__restrict lenp);
 /* >> funopen(3), funopen64(3) */
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen)(void const *cookie, int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes), int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes), off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence), int (LIBKCALL *closefn)(void *cookie));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -804,8 +804,8 @@ INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen64)(void const *cookie, in
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen2_64)(void const *cookie, ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes), ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes), off64_t (LIBKCALL *seekfn)(void *cookie, off64_t off, int whence), int (LIBKCALL *flushfn)(void *cookie), int (LIBKCALL *closefn)(void *cookie));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd__fsopen)(char const *filename, char const *modes, __STDC_INT_AS_UINT_T sflag);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc__fsopen)(char const *filename, char const *modes, __STDC_INT_AS_UINT_T sflag);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) FILE *NOTHROW_RPC(LIBDCALL libd__fsopen)(char const *filename, char const *modes, __STDC_INT_AS_UINT_T sflag);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) FILE *NOTHROW_RPC(LIBCCALL libc__fsopen)(char const *filename, char const *modes, __STDC_INT_AS_UINT_T sflag);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_ACCESS_RW(1) int (LIBDCALL libd__filbuf)(FILE *__restrict stream) THROWS(...);
@@ -827,16 +827,16 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd__set_printf_count_output)(int val);
 INTDEF uint32_t NOTHROW_NCX(LIBDCALL libd__set_output_format)(uint32_t format);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(1) NONNULL((2, 3)) errno_t NOTHROW_RPC(LIBDCALL libd_fopen_s)(FILE **pstream, char const *filename, char const *modes);
-INTDEF ATTR_ACCESS_RW(1) NONNULL((2, 3)) errno_t NOTHROW_RPC(LIBCCALL libc_fopen_s)(FILE **pstream, char const *filename, char const *modes);
-INTDEF ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(4) NONNULL((2, 3)) errno_t NOTHROW_RPC(LIBDCALL libd_freopen_s)(FILE **pstream, char const *filename, char const *modes, FILE *oldstream);
-INTDEF ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(4) NONNULL((2, 3)) errno_t NOTHROW_RPC(LIBCCALL libc_freopen_s)(FILE **pstream, char const *filename, char const *modes, FILE *oldstream);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBDCALL libd_fopen_s)(FILE **pstream, char const *filename, char const *modes);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBCCALL libc_fopen_s)(FILE **pstream, char const *filename, char const *modes);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(4) ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBDCALL libd_freopen_s)(FILE **pstream, char const *filename, char const *modes, FILE *oldstream);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(4) ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBCCALL libc_freopen_s)(FILE **pstream, char const *filename, char const *modes, FILE *oldstream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_tmpnam_s)(char *__restrict buf, rsize_t bufsize);
+INTDEF ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd_tmpnam_s)(char *__restrict buf, rsize_t bufsize);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_tmpnam_s)(char *__restrict buf, rsize_t bufsize);
+INTDEF ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBCCALL libc_tmpnam_s)(char *__restrict buf, rsize_t bufsize);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_clearerr_s)(FILE *__restrict stream);
@@ -845,16 +845,16 @@ INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_clearerr_s)(FILE *__r
 INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_clearerr_s)(FILE *__restrict stream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_RPC(LIBDCALL libd_tmpfile_s)(FILE **pstream);
+INTDEF ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBDCALL libd_tmpfile_s)(FILE **pstream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_RPC(LIBCCALL libc_tmpfile_s)(FILE **pstream);
+INTDEF ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBCCALL libc_tmpfile_s)(FILE **pstream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_ACCESS_RW(5) NONNULL((1)) size_t NOTHROW_RPC(LIBDCALL libd_fread_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream);
+INTDEF WUNUSED ATTR_ACCESS_RW(5) ATTR_ACCESS_WR_OPT(1) size_t NOTHROW_RPC(LIBDCALL libd_fread_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RW(5) NONNULL((1)) size_t NOTHROW_RPC(LIBCCALL libc_fread_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream);
+INTDEF WUNUSED ATTR_ACCESS_RW(5) ATTR_ACCESS_WR_OPT(1) size_t NOTHROW_RPC(LIBCCALL libc_fread_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_gets_s)(char *__restrict buf, rsize_t bufsize);
@@ -863,528 +863,528 @@ INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_gets_s)(char *__rest
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_gets_s)(char *__restrict buf, rsize_t bufsize);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_ACCESS_RW(5) NONNULL((1)) size_t (LIBDCALL libd__fread_nolock_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW(5) size_t (LIBDCALL libd__fread_nolock_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RW(5) NONNULL((1)) size_t (LIBCCALL libc__fread_nolock_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
+INTDEF WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW(5) size_t (LIBCCALL libc__fread_nolock_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(2) ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vfprintf)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vfprintf)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(2) ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vfprintf)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vfprintf)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(2) ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vfprintf_s)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vfprintf_s)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(2) ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vfprintf_s)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vfprintf_s)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(2) ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vfprintf_p)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(2) ATTR_LIBC_PRINTF_P(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vfprintf_p)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(2) ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vfprintf_p)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(2) ATTR_LIBC_PRINTF_P(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vfprintf_p)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vsprintf)(uint64_t options, char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vsprintf)(uint64_t options, char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vsprintf)(uint64_t options, char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vsprintf)(uint64_t options, char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vsprintf_s)(uint64_t options, char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vsprintf_s)(uint64_t options, char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vsprintf_s)(uint64_t options, char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vsprintf_s)(uint64_t options, char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(5, 0) NONNULL((5)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vsnprintf_s)(uint64_t options, char *buf, size_t bufsize, size_t maxsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(5) ATTR_LIBC_PRINTF(5, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vsnprintf_s)(uint64_t options, char *buf, size_t bufsize, size_t maxsize, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(5, 0) NONNULL((5)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vsnprintf_s)(uint64_t options, char *buf, size_t bufsize, size_t maxsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(5) ATTR_LIBC_PRINTF(5, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vsnprintf_s)(uint64_t options, char *buf, size_t bufsize, size_t maxsize, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF_P(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vsprintf_p)(uint64_t options, char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_PRINTF_P(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vsprintf_p)(uint64_t options, char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF_P(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vsprintf_p)(uint64_t options, char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_PRINTF_P(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vsprintf_p)(uint64_t options, char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_ACCESS_RW(2) ATTR_LIBC_SCANF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vfscanf)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(2) ATTR_LIBC_SCANF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vfscanf)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RW(2) ATTR_LIBC_SCANF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vfscanf)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(2) ATTR_LIBC_SCANF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vfscanf)(uint64_t options, FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vsscanf)(uint64_t options, char const *input, size_t inputsize, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(4) ATTR_ACCESS_ROS(2, 3) ATTR_LIBC_SCANF(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd___stdio_common_vsscanf)(uint64_t options, char const *input, size_t inputsize, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vsscanf)(uint64_t options, char const *input, size_t inputsize, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(4) ATTR_ACCESS_ROS(2, 3) ATTR_LIBC_SCANF(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc___stdio_common_vsscanf)(uint64_t options, char const *input, size_t inputsize, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnprintf_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnprintf_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnprintf_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnprintf_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsprintf_s_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsprintf_s_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsprintf_s_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsprintf_s_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsprintf_p_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF_P(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsprintf_p_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsprintf_p_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF_P(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsprintf_p_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscprintf_l)(char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscprintf_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscprintf_l)(char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscprintf_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscprintf_p_l)(char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscprintf_p_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscprintf_p_l)(char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscprintf_p_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnprintf_c_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnprintf_c_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnprintf_c_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnprintf_c_l)(char *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnprintf_s_l)(char *buf, size_t bufsize, size_t maxsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnprintf_s_l)(char *buf, size_t bufsize, size_t maxsize, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnprintf_s_l)(char *buf, size_t bufsize, size_t maxsize, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnprintf_s_l)(char *buf, size_t bufsize, size_t maxsize, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfprintf_s_l)(FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfprintf_s_l)(FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vfprintf_s_l)(FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vfprintf_s_l)(FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfprintf_p_l)(FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfprintf_p_l)(FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vfprintf_p_l)(FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vfprintf_p_l)(FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfscanf_l)(FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfscanf_l)(FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vfscanf_l)(FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vfscanf_l)(FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfscanf_s_l)(FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfscanf_s_l)(FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vfscanf_s_l)(FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vfscanf_s_l)(FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnscanf_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnscanf_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnscanf_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnscanf_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnscanf_s_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnscanf_s_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnscanf_s_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnscanf_s_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vprintf_l)(char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vprintf_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vprintf_l)(char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vprintf_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfprintf_l)(FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfprintf_l)(FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vfprintf_l)(FILE *stream, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vfprintf_l)(FILE *stream, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscanf_l)(char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscanf_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscanf_l)(char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscanf_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsprintf_l)(char *buf, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsprintf_l)(char *buf, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsprintf_l)(char *buf, char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsprintf_l)(char *buf, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfprintf_p)(FILE *stream, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vfprintf_p)(FILE *stream, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vfprintf_p)(FILE *stream, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vfprintf_p)(FILE *stream, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vprintf_p)(char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vprintf_p)(char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vprintf_p)(char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vprintf_p)(char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* WARNING: This function returns the number of written character. - Not the required buffer size! */
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnprintf)(char *buf, size_t bufsize, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnprintf)(char *buf, size_t bufsize, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* WARNING: This function returns the number of written character. - Not the required buffer size! */
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnprintf)(char *buf, size_t bufsize, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnprintf)(char *buf, size_t bufsize, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsprintf_p)(char *buf, size_t bufsize, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF_P(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsprintf_p)(char *buf, size_t bufsize, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsprintf_p)(char *buf, size_t bufsize, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF_P(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsprintf_p)(char *buf, size_t bufsize, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnprintf_s)(char *buf, size_t bufsize, size_t maxsize, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnprintf_s)(char *buf, size_t bufsize, size_t maxsize, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnprintf_s)(char *buf, size_t bufsize, size_t maxsize, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnprintf_s)(char *buf, size_t bufsize, size_t maxsize, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscprintf)(char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscprintf)(char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscprintf)(char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscprintf)(char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscprintf_p)(char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscprintf_p)(char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscprintf_p)(char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscprintf_p)(char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnprintf_c)(char *buf, size_t bufsize, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnprintf_c)(char *buf, size_t bufsize, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnprintf_c)(char *buf, size_t bufsize, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnprintf_c)(char *buf, size_t bufsize, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsscanf_l)(char const *buf, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsscanf_l)(char const *buf, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsscanf_l)(char const *buf, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsscanf_l)(char const *buf, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsscanf_s_l)(char const *buf, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsscanf_s_l)(char const *buf, char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsscanf_s_l)(char const *buf, char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsscanf_s_l)(char const *buf, char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnscanf)(char const *buf, size_t bufsize, char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnscanf)(char const *buf, size_t bufsize, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnscanf)(char const *buf, size_t bufsize, char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnscanf)(char const *buf, size_t bufsize, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnscanf_s)(char const *buf, size_t bufsize, char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnscanf_s)(char const *buf, size_t bufsize, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnscanf_s)(char const *buf, size_t bufsize, char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnscanf_s)(char const *buf, size_t bufsize, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vprintf_s_l)(char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vprintf_s_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vprintf_s_l)(char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vprintf_s_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vprintf_p_l)(char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vprintf_p_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vprintf_p_l)(char const *format, locale_t locale, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vprintf_p_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscanf_s_l)(char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscanf_s_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscanf_s_l)(char const *format, locale_t locale, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscanf_s_l)(char const *format, locale_t locale, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 4) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fprintf_l)(FILE *stream, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fprintf_l)(FILE *stream, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 4) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__fprintf_l)(FILE *stream, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__fprintf_l)(FILE *stream, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 4) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fprintf_s_l)(FILE *stream, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fprintf_s_l)(FILE *stream, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 4) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__fprintf_s_l)(FILE *stream, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__fprintf_s_l)(FILE *stream, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fprintf_p)(FILE *stream, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fprintf_p)(FILE *stream, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__fprintf_p)(FILE *stream, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__fprintf_p)(FILE *stream, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 4) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fprintf_p_l)(FILE *stream, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fprintf_p_l)(FILE *stream, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 4) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__fprintf_p_l)(FILE *stream, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF_P(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__fprintf_p_l)(FILE *stream, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__printf_l)(char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__printf_l)(char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__printf_l)(char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__printf_l)(char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__printf_s_l)(char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__printf_s_l)(char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__printf_s_l)(char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__printf_s_l)(char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__printf_p)(char const *format, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__printf_p)(char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__printf_p)(char const *format, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__printf_p)(char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__printf_p_l)(char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__printf_p_l)(char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__printf_p_l)(char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__printf_p_l)(char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__sprintf_l)(char *buf, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) ATTR_LIBC_PRINTF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__sprintf_l)(char *buf, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sprintf_l)(char *buf, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) ATTR_LIBC_PRINTF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sprintf_l)(char *buf, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__sprintf_s_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__sprintf_s_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sprintf_s_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sprintf_s_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF_P(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__sprintf_p_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF_P(3, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__sprintf_p_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF_P(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sprintf_p_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF_P(3, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sprintf_p_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF_P(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__sprintf_p)(char *buf, size_t bufsize, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF_P(3, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__sprintf_p)(char *buf, size_t bufsize, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF_P(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sprintf_p)(char *buf, size_t bufsize, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF_P(3, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sprintf_p)(char *buf, size_t bufsize, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snprintf_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snprintf_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snprintf)(char *buf, size_t bufsize, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snprintf)(char *buf, size_t bufsize, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf)(char *buf, size_t bufsize, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf)(char *buf, size_t bufsize, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snprintf_c_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snprintf_c_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_c_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_c_l)(char *buf, size_t bufsize, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snprintf_c)(char *buf, size_t bufsize, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snprintf_c)(char *buf, size_t bufsize, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_c)(char *buf, size_t bufsize, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_c)(char *buf, size_t bufsize, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(4, 6) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snprintf_s_l)(char *buf, size_t bufsize, size_t maxsize, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(4, 6) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snprintf_s_l)(char *buf, size_t bufsize, size_t maxsize, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(4, 6) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_s_l)(char *buf, size_t bufsize, size_t maxsize, char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(4, 6) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_s_l)(char *buf, size_t bufsize, size_t maxsize, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(4, 5) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snprintf_s)(char *buf, size_t bufsize, size_t maxsize, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(4, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snprintf_s)(char *buf, size_t bufsize, size_t maxsize, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(4, 5) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_s)(char *buf, size_t bufsize, size_t maxsize, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(4, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_s)(char *buf, size_t bufsize, size_t maxsize, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scprintf_l)(char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scprintf_l)(char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__scprintf_l)(char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__scprintf_l)(char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scprintf)(char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scprintf)(char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__scprintf)(char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__scprintf)(char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scprintf_p_l)(char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scprintf_p_l)(char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__scprintf_p_l)(char const *format, locale_t locale, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__scprintf_p_l)(char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scprintf_p)(char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scprintf_p)(char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__scprintf_p)(char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF_P(1, 2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__scprintf_p)(char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 4) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fscanf_l)(FILE *stream, char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fscanf_l)(FILE *stream, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 4) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__fscanf_l)(FILE *stream, char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__fscanf_l)(FILE *stream, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 4) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fscanf_s_l)(FILE *stream, char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__fscanf_s_l)(FILE *stream, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 4) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__fscanf_s_l)(FILE *stream, char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__fscanf_s_l)(FILE *stream, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scanf_l)(char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scanf_l)(char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__scanf_l)(char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__scanf_l)(char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scanf_s_l)(char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scanf_s_l)(char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__scanf_s_l)(char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__scanf_s_l)(char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__sscanf_l)(char const *buf, char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__sscanf_l)(char const *buf, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sscanf_l)(char const *buf, char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sscanf_l)(char const *buf, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__sscanf_s_l)(char const *buf, char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__sscanf_s_l)(char const *buf, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sscanf_s_l)(char const *buf, char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sscanf_s_l)(char const *buf, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snscanf_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snscanf_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snscanf_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snscanf_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snscanf)(char const *buf, size_t bufsize, char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snscanf)(char const *buf, size_t bufsize, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snscanf)(char const *buf, size_t bufsize, char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snscanf)(char const *buf, size_t bufsize, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snscanf_s_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snscanf_s_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 5) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snscanf_s_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snscanf_s_l)(char const *buf, size_t bufsize, char const *format, locale_t locale, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snscanf_s)(char const *buf, size_t bufsize, char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snscanf_s)(char const *buf, size_t bufsize, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snscanf_s)(char const *buf, size_t bufsize, char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(1, 2) ATTR_LIBC_SCANF(3, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snscanf_s)(char const *buf, size_t bufsize, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vfprintf_s)(FILE *stream, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vfprintf_s)(FILE *stream, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vfprintf_s)(FILE *stream, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vfprintf_s)(FILE *stream, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vprintf_s)(char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vprintf_s)(char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vprintf_s)(char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vprintf_s)(char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vsprintf_s)(char *buf, size_t bufsize, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vsprintf_s)(char *buf, size_t bufsize, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vsprintf_s)(char *buf, size_t bufsize, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vsprintf_s)(char *buf, size_t bufsize, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vsnprintf_s)(char *buf, size_t bufsize, size_t maxsize, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vsnprintf_s)(char *buf, size_t bufsize, size_t maxsize, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *buf, size_t bufsize, size_t maxsize, char const *format, va_list args);
+INTDEF ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(4, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *buf, size_t bufsize, size_t maxsize, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vfscanf_s)(FILE *stream, char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vfscanf_s)(FILE *stream, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vfscanf_s)(FILE *stream, char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vfscanf_s)(FILE *stream, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vscanf_s)(char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vscanf_s)(char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vscanf_s)(char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vscanf_s)(char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vsscanf_s)(char const *buf, char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vsscanf_s)(char const *buf, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vsscanf_s)(char const *buf, char const *format, va_list args);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vsscanf_s)(char const *buf, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_fprintf_s)(FILE *stream, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_fprintf_s)(FILE *stream, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_fprintf_s)(FILE *stream, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_fprintf_s)(FILE *stream, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_printf_s)(char const *format, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_printf_s)(char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_printf_s)(char const *format, ...);
+INTDEF ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_printf_s)(char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_sprintf_s)(char *buf, size_t bufsize, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_sprintf_s)(char *buf, size_t bufsize, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_sprintf_s)(char *buf, size_t bufsize, char const *format, ...);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_sprintf_s)(char *buf, size_t bufsize, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_fscanf_s)(FILE *stream, char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_fscanf_s)(FILE *stream, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 3) NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_fscanf_s)(FILE *stream, char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_fscanf_s)(FILE *stream, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_scanf_s)(char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_scanf_s)(char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_scanf_s)(char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_scanf_s)(char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_sscanf_s)(char const *buf, char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_sscanf_s)(char const *buf, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_sscanf_s)(char const *buf, char const *format, ...);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_sscanf_s)(char const *buf, char const *format, ...);
 #endif /* !__KERNEL__ */
 
 DECL_END

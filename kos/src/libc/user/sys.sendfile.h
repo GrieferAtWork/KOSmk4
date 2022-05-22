@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd310384 */
+/* HASH CRC-32:0xf7e3fb74 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ssize_t NOTHROW_NCX(LIBCCALL libc_sendfile)(fd_t out_fd, fd_t in_fd, off_t *offset, size_t count);
-INTDEF ssize_t NOTHROW_NCX(LIBCCALL libc_sendfile64)(fd_t out_fd, fd_t in_fd, off64_t *offset, size_t count);
+INTDEF ATTR_ACCESS_RW_OPT(3) ssize_t NOTHROW_NCX(LIBCCALL libc_sendfile)(fd_t out_fd, fd_t in_fd, off_t *offset, size_t count);
+INTDEF ATTR_ACCESS_RW_OPT(3) ssize_t NOTHROW_NCX(LIBCCALL libc_sendfile64)(fd_t out_fd, fd_t in_fd, off64_t *offset, size_t count);
 #endif /* !__KERNEL__ */
 
 DECL_END

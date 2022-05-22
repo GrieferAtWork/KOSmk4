@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd050b635 */
+/* HASH CRC-32:0x62877a1f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mbsnrtowcs_defined
 #define __local___localdep_mbsnrtowcs_defined
 #ifdef __CRT_HAVE_mbsnrtowcs
-__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsnrtowcs,(__WCHAR_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __nmc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),mbsnrtowcs,(__dst,__psrc,__nmc,__dstlen,__mbs))
+__CREDIRECT(__ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW_OPT(5) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsnrtowcs,(__WCHAR_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __nmc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),mbsnrtowcs,(__dst,__psrc,__nmc,__dstlen,__mbs))
 #else /* __CRT_HAVE_mbsnrtowcs */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/mbsnrtowcs.h>
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_mbsnrtowcs __LIBC_LOCAL_NAME(mbsnrtowcs)
 #endif /* !__CRT_HAVE_mbsnrtowcs */
 #endif /* !__local___localdep_mbsnrtowcs_defined */
-__LOCAL_LIBC(mbsrtowcs) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
+__LOCAL_LIBC(mbsrtowcs) __ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_WR_OPT(1) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbsrtowcs))(__WCHAR_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_mbsnrtowcs)(__dst, __psrc, (__SIZE_TYPE__)-1, __dstlen, __mbs);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7252e885 */
+/* HASH CRC-32:0x3f31a2a5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-__LOCAL_LIBC(format_wsnprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_wsnprintf_printer) __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__WFORMATPRINTER_CC __LIBC_LOCAL_NAME(format_wsnprintf_printer))(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	struct __local_format_snprintf_data {
 		__WCHAR_TYPE__  *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */

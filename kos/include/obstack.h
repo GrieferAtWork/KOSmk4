@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x948cc397 */
+/* HASH CRC-32:0xedef16b7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,30 +86,30 @@ __CSDECLARE(,int,obstack_exit_failure)
 #endif /* !obstack_exit_failure */
 
 #ifdef __CRT_HAVE__obstack_begin
-__CDECLARE(__ATTR_NONNULL((1, 4, 5)),int,__NOTHROW_NCX,_obstack_begin,(struct obstack *__self, _OBSTACK_SIZE_T __min_chunk_size, _OBSTACK_SIZE_T __min_object_alignment, void *(__LIBCCALL *__ob_malloc)(size_t __num_bytes), void (__LIBCCALL *__ob_free)(void *__ptr)),(__self,__min_chunk_size,__min_object_alignment,__ob_malloc,__ob_free))
+__CDECLARE(__ATTR_ACCESS_WR(1) __ATTR_NONNULL((4, 5)),int,__NOTHROW_NCX,_obstack_begin,(struct obstack *__self, _OBSTACK_SIZE_T __min_chunk_size, _OBSTACK_SIZE_T __min_object_alignment, void *(__LIBCCALL *__ob_malloc)(size_t __num_bytes), void (__LIBCCALL *__ob_free)(void *__ptr)),(__self,__min_chunk_size,__min_object_alignment,__ob_malloc,__ob_free))
 #elif defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)
 #include <libc/local/obstack/_obstack_begin.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_obstack_begin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4, 5)) int __NOTHROW_NCX(__LIBCCALL _obstack_begin)(struct obstack *__self, _OBSTACK_SIZE_T __min_chunk_size, _OBSTACK_SIZE_T __min_object_alignment, void *(__LIBCCALL *__ob_malloc)(size_t __num_bytes), void (__LIBCCALL *__ob_free)(void *__ptr)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_obstack_begin))(__self, __min_chunk_size, __min_object_alignment, __ob_malloc, __ob_free); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_obstack_begin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(1) __ATTR_NONNULL((4, 5)) int __NOTHROW_NCX(__LIBCCALL _obstack_begin)(struct obstack *__self, _OBSTACK_SIZE_T __min_chunk_size, _OBSTACK_SIZE_T __min_object_alignment, void *(__LIBCCALL *__ob_malloc)(size_t __num_bytes), void (__LIBCCALL *__ob_free)(void *__ptr)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_obstack_begin))(__self, __min_chunk_size, __min_object_alignment, __ob_malloc, __ob_free); })
 #endif /* ... */
 #ifdef __CRT_HAVE__obstack_begin_1
-__CDECLARE(__ATTR_NONNULL((1, 4, 5)),int,__NOTHROW_NCX,_obstack_begin_1,(struct obstack *__self, _OBSTACK_SIZE_T __min_chunk_size, _OBSTACK_SIZE_T __min_object_alignment, void *(*__ob_malloc)(void *__arg, size_t __num_bytes), void (*__ob_free)(void *__arg, void *__ptr), void *__arg),(__self,__min_chunk_size,__min_object_alignment,__ob_malloc,__ob_free,__arg))
+__CDECLARE(__ATTR_ACCESS_WR(1) __ATTR_NONNULL((4, 5)),int,__NOTHROW_NCX,_obstack_begin_1,(struct obstack *__self, _OBSTACK_SIZE_T __min_chunk_size, _OBSTACK_SIZE_T __min_object_alignment, void *(*__ob_malloc)(void *__arg, size_t __num_bytes), void (*__ob_free)(void *__arg, void *__ptr), void *__arg),(__self,__min_chunk_size,__min_object_alignment,__ob_malloc,__ob_free,__arg))
 #elif defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)
 #include <libc/local/obstack/_obstack_begin_1.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_obstack_begin_1, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4, 5)) int __NOTHROW_NCX(__LIBCCALL _obstack_begin_1)(struct obstack *__self, _OBSTACK_SIZE_T __min_chunk_size, _OBSTACK_SIZE_T __min_object_alignment, void *(*__ob_malloc)(void *__arg, size_t __num_bytes), void (*__ob_free)(void *__arg, void *__ptr), void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_obstack_begin_1))(__self, __min_chunk_size, __min_object_alignment, __ob_malloc, __ob_free, __arg); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_obstack_begin_1, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(1) __ATTR_NONNULL((4, 5)) int __NOTHROW_NCX(__LIBCCALL _obstack_begin_1)(struct obstack *__self, _OBSTACK_SIZE_T __min_chunk_size, _OBSTACK_SIZE_T __min_object_alignment, void *(*__ob_malloc)(void *__arg, size_t __num_bytes), void (*__ob_free)(void *__arg, void *__ptr), void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_obstack_begin_1))(__self, __min_chunk_size, __min_object_alignment, __ob_malloc, __ob_free, __arg); })
 #endif /* ... */
 #ifdef __CRT_HAVE__obstack_newchunk
 /* >> _obstack_newchunk(3)
  * Allocate  a new chunk of at least `num_bytes' bytes. Also: allocate
  * enough additional space for the object currently being constructed,
  * and move it to the start of the new chunk. */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_obstack_newchunk,(struct obstack *__self, _OBSTACK_SIZE_T __num_bytes),(__self,__num_bytes))
+__CDECLARE_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,_obstack_newchunk,(struct obstack *__self, _OBSTACK_SIZE_T __num_bytes),(__self,__num_bytes))
 #elif defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)
 #include <libc/local/obstack/_obstack_newchunk.h>
 /* >> _obstack_newchunk(3)
  * Allocate  a new chunk of at least `num_bytes' bytes. Also: allocate
  * enough additional space for the object currently being constructed,
  * and move it to the start of the new chunk. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(_obstack_newchunk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL _obstack_newchunk)(struct obstack *__self, _OBSTACK_SIZE_T __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_obstack_newchunk))(__self, __num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_obstack_newchunk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) void __NOTHROW_NCX(__LIBCCALL _obstack_newchunk)(struct obstack *__self, _OBSTACK_SIZE_T __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_obstack_newchunk))(__self, __num_bytes); })
 #endif /* ... */
 #ifdef __CRT_HAVE_obstack_free
 /* >> obstack_free(3)
@@ -117,14 +117,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_obstack_newchunk, __FORCELOCAL __ATTR_ARTIFICIA
  * `obj', where `obj' *should* be a pointer previously returned by `obstack_finish()'
  * When `obj' is `NULL',  simply free everything allocated  by `self', in which  case
  * `self' must be re-initialized (via `_obstack_begin(3)') upon return. */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,obstack_free,(struct obstack *__self, void *__obj),(__self,__obj))
+__CDECLARE_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,obstack_free,(struct obstack *__self, void *__obj),(__self,__obj))
 #elif defined(__CRT_HAVE__obstack_free)
 /* >> obstack_free(3)
  * Unwind the  object-stack by  freeing everything  allocated after  (and  including)
  * `obj', where `obj' *should* be a pointer previously returned by `obstack_finish()'
  * When `obj' is `NULL',  simply free everything allocated  by `self', in which  case
  * `self' must be re-initialized (via `_obstack_begin(3)') upon return. */
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,obstack_free,(struct obstack *__self, void *__obj),_obstack_free,(__self,__obj))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,obstack_free,(struct obstack *__self, void *__obj),_obstack_free,(__self,__obj))
 #else /* ... */
 #include <libc/local/obstack/obstack_free.h>
 /* >> obstack_free(3)
@@ -132,17 +132,17 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,obstack_free,(struct obstack 
  * `obj', where `obj' *should* be a pointer previously returned by `obstack_finish()'
  * When `obj' is `NULL',  simply free everything allocated  by `self', in which  case
  * `self' must be re-initialized (via `_obstack_begin(3)') upon return. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(obstack_free, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL obstack_free)(struct obstack *__self, void *__obj) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(obstack_free))(__self, __obj); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(obstack_free, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) void __NOTHROW_NCX(__LIBCCALL obstack_free)(struct obstack *__self, void *__obj) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(obstack_free))(__self, __obj); })
 #endif /* !... */
 #ifdef __CRT_HAVE__obstack_memory_used
 /* >> _obstack_memory_used(3)
  * Return the total size of all chunks allocated by `self' */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),_OBSTACK_SIZE_T,__NOTHROW_NCX,_obstack_memory_used,(struct obstack __KOS_FIXED_CONST *__self),(__self))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),_OBSTACK_SIZE_T,__NOTHROW_NCX,_obstack_memory_used,(struct obstack __KOS_FIXED_CONST *__self),(__self))
 #else /* __CRT_HAVE__obstack_memory_used */
 #include <libc/local/obstack/_obstack_memory_used.h>
 /* >> _obstack_memory_used(3)
  * Return the total size of all chunks allocated by `self' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(_obstack_memory_used, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) _OBSTACK_SIZE_T __NOTHROW_NCX(__LIBCCALL _obstack_memory_used)(struct obstack __KOS_FIXED_CONST *__self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_obstack_memory_used))(__self); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_obstack_memory_used, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) _OBSTACK_SIZE_T __NOTHROW_NCX(__LIBCCALL _obstack_memory_used)(struct obstack __KOS_FIXED_CONST *__self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_obstack_memory_used))(__self); })
 #endif /* !__CRT_HAVE__obstack_memory_used */
 
 #if 0 /* To-be provided by the user (referenced by `obstack_init(3)') */
@@ -357,7 +357,7 @@ void obstack_chunk_free(void *ptr);
  * this function doesn't have an error return-value!
  * HINT: Ths function does the same as `obstack_grow(3)'!
  * @return: datalen: Success. */
-__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC obstack_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("obstack_printer");
+__LIBC __ATTR_WUNUSED __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC obstack_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("obstack_printer");
 #elif defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)
 #include <libc/local/obstack/obstack_printer.h>
 /* >> obstack_printer(3)
@@ -368,7 +368,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORM
  * this function doesn't have an error return-value!
  * HINT: Ths function does the same as `obstack_grow(3)'!
  * @return: datalen: Success. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(obstack_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC obstack_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(obstack_printer))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(obstack_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC obstack_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(obstack_printer))(__arg, __data, __datalen); })
 #endif /* ... */
 #endif /* __USE_KOS */
 

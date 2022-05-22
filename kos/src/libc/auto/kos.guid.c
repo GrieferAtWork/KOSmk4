@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc519f4fd */
+/* HASH CRC-32:0xb7d32ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
  * >> guid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
  * @return: string + GUID_STRLEN: Success
  * @return: NULL:                 `string' isn't a valid GUID. */
-INTERN ATTR_SECTION(".text.crt.sched.rpc") NONNULL((1, 2)) char const *
+INTERN ATTR_SECTION(".text.crt.sched.rpc") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char const *
 NOTHROW_NCX(LIBCCALL libc_guid_fromstr)(char const string[GUID_STRLEN],
                                         guid_t *__restrict result) {
 	unsigned int i;

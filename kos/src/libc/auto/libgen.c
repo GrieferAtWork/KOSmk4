@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cf83ff2 */
+/* HASH CRC-32:0x44629be6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ DECL_BEGIN
  * >> dirname(NULL);              // Returns "."
  * Note  that for this purpose, `path' may be modified in-place, meaning
  * that you should really always pass an strdup()'d, or writable string. */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_RETNONNULL char *
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(1) char *
 NOTHROW_NCX(LIBCCALL libc_dirname)(char *path) {
 	char *iter;
 	/* Handle the empty-path case. */
@@ -118,7 +118,7 @@ fallback:
  * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
  * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_RETNONNULL char *
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_RETNONNULL ATTR_ACCESS_RW_OPT(1) char *
 NOTHROW_NCX(LIBCCALL libc___xpg_basename)(char *filename) {
 	char *iter;
 	/* Handle the empty-path case. */
@@ -165,7 +165,7 @@ fallback:
  * @return: * :   Returns a pointer to the trailing NUL written to `buf'
  *                There is no true error  case; read errors are  treated
  *                the same way as end-of-file. */
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL ATTR_ACCESS_RW(3) NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RW(3) ATTR_ACCESS_WR(1) char *
 NOTHROW_NCX(LIBCCALL libc_bgets)(char *buf,
                                  size_t buflen_minus_one,
                                  FILE *fp,
@@ -208,7 +208,7 @@ NOTHROW_NCX(LIBCCALL libc_bgets)(char *buf,
  *              stored in `result_v'. All remaining pointers in `result_v'
  *              beyond `return' (and  before `result_c')  are filled  with
  *              the empty string found at `strend(IN:string)'. */
-INTERN ATTR_SECTION(".text.crt.solaris") size_t
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_ACCESS_RW_OPT(1) ATTR_ACCESS_WR_OPT(3) size_t
 NOTHROW_NCX(LIBCCALL libc_bufsplit)(char *string,
                                     size_t result_c,
                                     char **result_v) {
@@ -224,12 +224,12 @@ NOTHROW_NCX(LIBCCALL libc_bufsplit)(char *string,
 #endif /* !__pic__ */
 	if unlikely(!string)
 		return 0;
-	if (result_c == 0 && result_v == 0) {
+	if (result_c == 0 && result_v == NULL) {
 		saved_splitchar = (char const *)string;
 		return 1;
 	} else {
-		if unlikely((result_c != 0 && result_v == 0) ||
-		            (result_c == 0 && result_v != 0))
+		if unlikely((result_c != 0 && result_v == NULL) ||
+		            (result_c == 0 && result_v != NULL))
 			return 0;
 	}
 	splitchar = saved_splitchar;
@@ -259,7 +259,7 @@ NOTHROW_NCX(LIBCCALL libc_bufsplit)(char *string,
 	return count;
 }
 #include <asm/crt/malloc.h>
-INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((2)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc_fcopylist_sz)(fd_t fd,
                                         size_t *p_filesize) {
 	size_t reslen  = 0;
@@ -351,7 +351,7 @@ err_r:
 err:
 	return NULL;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1, 2)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBDCALL libd_copylist_sz)(char const *filename,
                                        size_t *p_filesize) {
 	char *result;
@@ -364,7 +364,7 @@ NOTHROW_NCX(LIBDCALL libd_copylist_sz)(char const *filename,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc_copylist_sz)(char const *filename,
                                        size_t *p_filesize) {
 	char *result;
@@ -423,7 +423,7 @@ NOTHROW_NCX(LIBCCALL libc_copylist_sz)(char const *filename,
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") WUNUSED NONNULL((1, 2)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *
 NOTHROW_RPC(LIBDCALL libd_copylist)(char const *filename,
                                     __PIO_OFFSET *p_filesize) {
 #if __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__
@@ -490,7 +490,7 @@ DEFINE_INTERN_ALIAS(libc_copylist, libc_copylist_sz);
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *
 NOTHROW_RPC(LIBCCALL libc_copylist)(char const *filename,
                                     __PIO_OFFSET *p_filesize) {
 #if __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__
@@ -558,7 +558,7 @@ DEFINE_INTERN_ALIAS(libd_copylist64, libd_copylist);
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") WUNUSED NONNULL((1, 2)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *
 NOTHROW_RPC(LIBDCALL libd_copylist64)(char const *filename,
                                       __PIO_OFFSET64 *p_filesize) {
 #if __SIZEOF_OFF64_T__ == __SIZEOF_SIZE_T__
@@ -625,7 +625,7 @@ DEFINE_INTERN_ALIAS(libc_copylist64, libc_copylist_sz);
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *
 NOTHROW_RPC(LIBCCALL libc_copylist64)(char const *filename,
                                       __PIO_OFFSET64 *p_filesize) {
 
@@ -644,7 +644,7 @@ NOTHROW_RPC(LIBCCALL libc_copylist64)(char const *filename,
  * To prevent a buffer overflow, `dstbuf' should be at least `strlen(string) + 1'
  * bytes long (the +1 because this function appends a trailing '\0')
  * @return: * : A pointer to the trailing '\0' appended to `dstbuf' */
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) char *
 NOTHROW_NCX(LIBCCALL libc_strcadd)(char *dstbuf,
                                    char const *string) {
 	for (;;) {
@@ -698,7 +698,7 @@ done:
 /* >> strccpy(3)
  * Same as `strcadd()', but re-returns `dstbuf' rather than `strend(dstbuf)'
  * @return: dstbuf: Always re-returns `dstbuf' */
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) char *
 NOTHROW_NCX(LIBCCALL libc_strccpy)(char *dstbuf,
                                    char const *string) {
 	libc_strcadd(dstbuf, string);
@@ -710,7 +710,7 @@ NOTHROW_NCX(LIBCCALL libc_strccpy)(char *dstbuf,
  * long (the +1 because this function appends a trailing '\0')
  * When non-NULL, characters from `dont_encode' are not encoded, but instead kept as-is.
  * @return: * : A pointer to the trailing '\0' appended to `dstbuf' */
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_WR(1) char *
 NOTHROW_NCX(LIBCCALL libc_streadd)(char *dstbuf,
                                    char const *string,
                                    char const *dont_encode) {
@@ -755,7 +755,7 @@ NOTHROW_NCX(LIBCCALL libc_streadd)(char *dstbuf,
 /* >> strecpy(3)
  * Same as `streadd()', but re-returns `dstbuf' rather than `strend(dstbuf)'
  * @return: dstbuf: Always re-returns `dstbuf' */
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_WR(1) char *
 NOTHROW_NCX(LIBCCALL libc_strecpy)(char *dstbuf,
                                    char const *string,
                                    char const *dont_encode) {
@@ -767,7 +767,7 @@ NOTHROW_NCX(LIBCCALL libc_strecpy)(char *dstbuf,
  * Same as `p = strstr(haystack, needle); p ? p - haystack : -1'
  * @return: * : `needle' found at `haystack + return'
  * @return: -1: `needle' not found in `haystack' */
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_PURE WUNUSED NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBCCALL libc_strfind)(char const *haystack,
                                    char const *needle) {
 	char const *ptr = libc_strstr(haystack, needle);
@@ -777,7 +777,7 @@ NOTHROW_NCX(LIBCCALL libc_strfind)(char const *haystack,
  * Scanning from the right, return a pointer to last character in  `haystack'
  * for which `strchr(accept, ch) != NULL'. If `haystack' consists entirely of
  * characters from `accept', re-returns `haystack'. */
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) char *
 NOTHROW_NCX(LIBCCALL libc_strrspn)(char const *haystack,
                                    char const *accept) {
 	char const *iter = libc_strend(haystack);
@@ -794,7 +794,7 @@ NOTHROW_NCX(LIBCCALL libc_strrspn)(char const *haystack,
  * of `repl_map' can be accessed,  and that the `result'  buffer
  * has space for at least `strlen(string) + 1' characters.
  * @return: result: Always re-returns `result' */
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL NONNULL((1, 2, 3, 4)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(4) char *
 NOTHROW_NCX(LIBCCALL libc_strtrns)(char const *string,
                                    char const *find_map,
                                    char const *repl_map,

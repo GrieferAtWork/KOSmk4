@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68d112dd */
+/* HASH CRC-32:0xafaecc5a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __SYSDECL_BEGIN
 #include <hybrid/typecore.h>
 /* >> unicode_readutf8(3)
  * Read a single Unicode character from a given UTF-8 string */
-__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8 */
 #include <libc/local/unicode/unicode_readutf8.h>
 /* >> unicode_readutf8(3)
@@ -46,7 +46,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicod
  * Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
  * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
-__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_rev,(char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_rev,(char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8_rev */
 #include <libc/local/unicode/unicode_readutf8_rev.h>
 /* >> unicode_readutf8_rev(3)
@@ -59,7 +59,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicod
 #include <hybrid/typecore.h>
 /* >> unicode_readutf8_n(3)
  * Same as `unicode_readutf8()', but don't read past `text_end' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
 #else /* __CRT_HAVE_unicode_readutf8_n */
 #include <libc/local/unicode/unicode_readutf8_n.h>
 /* >> unicode_readutf8_n(3)
@@ -70,7 +70,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_uni
 #include <hybrid/typecore.h>
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_rev_n,(char const **__restrict __ptext, char const *__text_start),unicode_readutf8_rev_n,(__ptext,__text_start))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_rev_n,(char const **__restrict __ptext, char const *__text_start),unicode_readutf8_rev_n,(__ptext,__text_start))
 #else /* __CRT_HAVE_unicode_readutf8_rev_n */
 #include <libc/local/unicode/unicode_readutf8_rev_n.h>
 /* >> unicode_readutf8_rev_n(3)
@@ -81,7 +81,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_uni
 #include <hybrid/typecore.h>
 /* >> unicode_readutf16(3)
  * Read a single Unicode character from a given UTF-16 string */
-__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf16,(__CHAR16_TYPE__ const **__restrict __ptext),unicode_readutf16,(__ptext))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf16,(__CHAR16_TYPE__ const **__restrict __ptext),unicode_readutf16,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf16 */
 #include <libc/local/unicode/unicode_readutf16.h>
 /* >> unicode_readutf16(3)
@@ -92,7 +92,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicod
 #include <hybrid/typecore.h>
 /* >> unicode_readutf16_n(3)
  * Same as `unicode_readutf16()', but don't read past `text_end' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf16_n,(__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_end),unicode_readutf16_n,(__ptext,__text_end))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf16_n,(__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_end),unicode_readutf16_n,(__ptext,__text_end))
 #else /* __CRT_HAVE_unicode_readutf16_n */
 #include <libc/local/unicode/unicode_readutf16_n.h>
 /* >> unicode_readutf16_n(3)
@@ -105,7 +105,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_uni
  * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
  * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
-__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf16_rev,(__CHAR16_TYPE__ const **__restrict __ptext),unicode_readutf16_rev,(__ptext))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf16_rev,(__CHAR16_TYPE__ const **__restrict __ptext),unicode_readutf16_rev,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf16_rev */
 #include <libc/local/unicode/unicode_readutf16_rev.h>
 /* >> unicode_readutf16_rev(3)
@@ -118,7 +118,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicod
 #include <hybrid/typecore.h>
 /* >> unicode_readutf16_rev_n(3)
  * Same as `unicode_readutf16_rev()', but don't read ahead of `text_start' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf16_rev_n,(__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_start),unicode_readutf16_rev_n,(__ptext,__text_start))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf16_rev_n,(__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_start),unicode_readutf16_rev_n,(__ptext,__text_start))
 #else /* __CRT_HAVE_unicode_readutf16_rev_n */
 #include <libc/local/unicode/unicode_readutf16_rev_n.h>
 /* >> unicode_readutf16_rev_n(3)
@@ -130,7 +130,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_uni
 /* >> unicode_writeutf8(3)
  * Write  a given Unicode character `ch' to `dst'  and return a pointer to its end
  * location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__libc_core_unicode_writeutf8,(char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_WR(1),char *,__NOTHROW_NCX,__libc_core_unicode_writeutf8,(char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf8 */
 #include <libc/local/unicode/unicode_writeutf8.h>
 /* >> unicode_writeutf8(3)
@@ -143,7 +143,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__libc_co
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
  * location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_unicode_writeutf16,(__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_WR(1),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_unicode_writeutf16,(__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf16 */
 #include <libc/local/unicode/unicode_writeutf16.h>
 /* >> unicode_writeutf16(3)
@@ -204,12 +204,12 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__libc_core___uni
 #include <hybrid/typecore.h>
 /* >> unicode_fold(3)
  * Fold the given unicode character `ch' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_unicode_fold,(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[3]),unicode_fold,(__ch,__buf))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_WR(2),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_unicode_fold,(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[3]),unicode_fold,(__ch,__buf))
 #else /* __CRT_HAVE_unicode_fold */
 #include <hybrid/typecore.h>
 /* >> unicode_fold(3)
  * Fold the given unicode character `ch' */
-__LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHAR32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __libc_core_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[3]) { __buf[0] = __ch; return __buf + 1; }
+__LOCAL __ATTR_RETNONNULL __ATTR_ACCESS_WR(2) __CHAR32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __libc_core_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[3]) { __buf[0] = __ch; return __buf + 1; }
 #endif /* !__CRT_HAVE_unicode_fold */
 
 __SYSDECL_END

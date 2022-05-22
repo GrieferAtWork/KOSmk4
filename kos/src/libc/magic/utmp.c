@@ -110,26 +110,26 @@ err:
 
 @@>> login(3)
 [[guard, cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
-void login([[nonnull]] struct utmp const *entry);
+void login([[in]] struct utmp const *entry);
 
 @@>> logout(3)
 [[guard, cp_kos]]
-int logout([[nonnull]] char const *ut_line);
+int logout([[in]] char const *ut_line);
 
 @@>> logwtmp(3)
 [[guard, cp_kos]]
-void logwtmp([[nonnull]] char const *ut_line,
-             [[nonnull]] char const *ut_name,
-             [[nonnull]] char const *ut_host);
+void logwtmp([[in]] char const *ut_line,
+             [[in]] char const *ut_name,
+             [[in]] char const *ut_host);
 
 @@>> updwtmp(3)
 [[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
-void updwtmp([[nonnull]] char const *wtmp_file,
-             [[nonnull]] struct utmp const *utmp);
+void updwtmp([[in]] char const *wtmp_file,
+             [[in]] struct utmp const *utmp);
 
 @@>> utmpname(3)
 [[cp_kos]]
-int utmpname([[nonnull]] char const *file);
+int utmpname([[in]] char const *file);
 
 @@>> getutent(3), getutent_r(3)
 [[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
@@ -144,34 +144,34 @@ void endutent();
 
 @@>> getutid(3), getutid_r(3)
 [[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
-struct utmp *getutid([[nonnull]] struct utmp const *id);
+struct utmp *getutid([[in]] struct utmp const *id);
 
 @@>> getutline(3), getutline_r(3)
 [[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
-struct utmp *getutline([[nonnull]] struct utmp const *line);
+struct utmp *getutline([[in]] struct utmp const *line);
 
 @@>> pututline(3)
 [[cp_kos, decl_include("<bits/crt/db/utmp.h>")]]
 /* NOTE: Historically, `_pututline()' returned `struct utmp *', and
  *       `pututline()' returned `void'  (in some  implementations). */
 [[export_alias("_pututline")]]
-struct utmp *pututline([[nonnull]] struct utmp const *utmp_ptr);
+struct utmp *pututline([[in]] struct utmp const *utmp_ptr);
 
 %
 %#ifdef __USE_MISC
 [[cp_kos, doc_alias("getutent"), decl_include("<bits/crt/db/utmp.h>")]]
-int getutent_r([[nonnull]] struct utmp *buffer,
-               [[nonnull]] struct utmp **result);
+int getutent_r([[out]] struct utmp *buffer,
+               [[out]] struct utmp **result);
 
 [[cp_kos, doc_alias("getutid"), decl_include("<bits/crt/db/utmp.h>")]]
-int getutid_r([[nonnull]] struct utmp const *id,
-              [[nonnull]] struct utmp *buffer,
-              [[nonnull]] struct utmp **result);
+int getutid_r([[in]] struct utmp const *id,
+              [[out]] struct utmp *buffer,
+              [[out]] struct utmp **result);
 
 [[cp_kos, doc_alias("getutline"), decl_include("<bits/crt/db/utmp.h>")]]
-int getutline_r([[nonnull]] struct utmp const *line,
-                [[nonnull]] struct utmp *buffer,
-                [[nonnull]] struct utmp **result);
+int getutline_r([[in]] struct utmp const *line,
+                [[out]] struct utmp *buffer,
+                [[out]] struct utmp **result);
 %#endif /* __USE_MISC */
 
 

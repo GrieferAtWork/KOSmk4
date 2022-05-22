@@ -244,11 +244,11 @@
 DECL_BEGIN
 
 
-/*[[[head:libd_execve,hash:CRC-32=0x7aa354ef]]]*/
+/*[[[head:libd_execve,hash:CRC-32=0x60ede18b]]]*/
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") NONNULL((1, 2, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBDCALL libd_execve)(char const *__restrict path,
                                   __TARGV,
                                   __TENVP)
@@ -263,11 +263,11 @@ NOTHROW_RPC(LIBDCALL libd_execve)(char const *__restrict path,
 }
 /*[[[end:libd_execve]]]*/
 
-/*[[[head:libc_execve,hash:CRC-32=0x8b7788fe]]]*/
+/*[[[head:libc_execve,hash:CRC-32=0x9d57a166]]]*/
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2, 3)) int
+INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBCCALL libc_execve)(char const *__restrict path,
                                   __TARGV,
                                   __TENVP)
@@ -294,13 +294,13 @@ NOTHROW(LIBCCALL libc_getpid)(void)
 }
 /*[[[end:libc_getpid]]]*/
 
-/*[[[head:libc_pipe,hash:CRC-32=0xc4e6a3cf]]]*/
+/*[[[head:libc_pipe,hash:CRC-32=0xae88ae47]]]*/
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer)
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.io.access") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.io.access") ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_pipe)(fd_t pipedes[2])
 /*[[[body:libc_pipe]]]*/
 {
@@ -437,12 +437,12 @@ NOTHROW_NCX(LIBCCALL libc_getegid)(void)
 }
 /*[[[end:libc_getegid]]]*/
 
-/*[[[head:libc_getgroups,hash:CRC-32=0x1550b567]]]*/
+/*[[[head:libc_getgroups,hash:CRC-32=0xf7e52447]]]*/
 /* >> getgroups(2)
  * @return: * : [count == 0] The required number of groups
  * @return: * : [count != 0] The number of groups that were actually returned
  * @return: -1: [errno == -EINVAL && count != 0] There are more than `count' groups */
-INTERN ATTR_SECTION(".text.crt.sched.user") int
+INTERN ATTR_SECTION(".text.crt.sched.user") ATTR_ACCESS_WRS(2, 1) int
 NOTHROW_NCX(LIBCCALL libc_getgroups)(int size,
                                      gid_t list[])
 /*[[[body:libc_getgroups]]]*/
@@ -660,10 +660,10 @@ NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd,
 }
 /*[[[end:libc_tcsetpgrp]]]*/
 
-/*[[[head:libd_chown,hash:CRC-32=0xff461cf1]]]*/
+/*[[[head:libd_chown,hash:CRC-32=0x189519b9]]]*/
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_chown)(char const *file,
                                  uid_t owner,
                                  gid_t group)
@@ -673,10 +673,10 @@ NOTHROW_RPC(LIBDCALL libd_chown)(char const *file,
 }
 /*[[[end:libd_chown]]]*/
 
-/*[[[head:libc_chown,hash:CRC-32=0xd604eb29]]]*/
+/*[[[head:libc_chown,hash:CRC-32=0x1eee03b8]]]*/
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBCCALL libc_chown)(char const *file,
                                  uid_t owner,
                                  gid_t group)
@@ -701,10 +701,10 @@ NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name)
 }
 /*[[[end:libc_setlogin]]]*/
 
-/*[[[head:libd_link,hash:CRC-32=0x80e9d05f]]]*/
+/*[[[head:libd_link,hash:CRC-32=0xece15470]]]*/
 /* >> link(2)
  * Create a hard link from `from', leading to `to' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_link)(char const *from,
                                 char const *to)
 /*[[[body:libd_link]]]*/
@@ -713,10 +713,10 @@ NOTHROW_RPC(LIBDCALL libd_link)(char const *from,
 }
 /*[[[end:libd_link]]]*/
 
-/*[[[head:libc_link,hash:CRC-32=0xf1911c10]]]*/
+/*[[[head:libc_link,hash:CRC-32=0xb8ab02a2]]]*/
 /* >> link(2)
  * Create a hard link from `from', leading to `to' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBCCALL libc_link)(char const *from,
                                 char const *to)
 /*[[[body:libc_link]]]*/
@@ -872,11 +872,11 @@ NOTHROW_NCX(LIBCCALL libc_close_range)(unsigned int minfd,
 }
 /*[[[end:libc_close_range]]]*/
 
-/*[[[head:libd_access,hash:CRC-32=0x45f8ea80]]]*/
+/*[[[head:libd_access,hash:CRC-32=0xf082c824]]]*/
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_access)(char const *file,
                                   __STDC_INT_AS_UINT_T type)
 /*[[[body:libd_access]]]*/
@@ -885,11 +885,11 @@ NOTHROW_RPC(LIBDCALL libd_access)(char const *file,
 }
 /*[[[end:libd_access]]]*/
 
-/*[[[head:libc_access,hash:CRC-32=0x262b886e]]]*/
+/*[[[head:libc_access,hash:CRC-32=0xc26ec834]]]*/
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type' */
-INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBCCALL libc_access)(char const *file,
                                   __STDC_INT_AS_UINT_T type)
 /*[[[body:libc_access]]]*/
@@ -899,10 +899,10 @@ NOTHROW_RPC(LIBCCALL libc_access)(char const *file,
 }
 /*[[[end:libc_access]]]*/
 
-/*[[[head:libd_chdir,hash:CRC-32=0x19817f5]]]*/
+/*[[[head:libd_chdir,hash:CRC-32=0x83430e3c]]]*/
 /* >> chdir(2)
  * Change the current working directory to `path' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.basic_property") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.basic_property") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_chdir)(char const *path)
 /*[[[body:libd_chdir]]]*/
 {
@@ -911,10 +911,10 @@ NOTHROW_RPC(LIBDCALL libd_chdir)(char const *path)
 }
 /*[[[end:libd_chdir]]]*/
 
-/*[[[head:libc_chdir,hash:CRC-32=0xae25299f]]]*/
+/*[[[head:libc_chdir,hash:CRC-32=0x6729adf9]]]*/
 /* >> chdir(2)
  * Change the current working directory to `path' */
-INTERN ATTR_SECTION(".text.crt.fs.basic_property") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBCCALL libc_chdir)(char const *path)
 /*[[[body:libc_chdir]]]*/
 {
@@ -923,10 +923,10 @@ NOTHROW_RPC(LIBCCALL libc_chdir)(char const *path)
 }
 /*[[[end:libc_chdir]]]*/
 
-/*[[[head:libd_getcwd,hash:CRC-32=0xa5dc1f15]]]*/
+/*[[[head:libd_getcwd,hash:CRC-32=0x2ac13a2a]]]*/
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.basic_property") char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.basic_property") ATTR_ACCESS_WR_OPT(1) char *
 NOTHROW_RPC(LIBDCALL libd_getcwd)(char *buf,
                                   size_t bufsize)
 /*[[[body:libd_getcwd]]]*/
@@ -935,10 +935,10 @@ NOTHROW_RPC(LIBDCALL libd_getcwd)(char *buf,
 }
 /*[[[end:libd_getcwd]]]*/
 
-/*[[[head:libc_getcwd,hash:CRC-32=0xf7aeb2ae]]]*/
+/*[[[head:libc_getcwd,hash:CRC-32=0x18cc737]]]*/
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-INTERN ATTR_SECTION(".text.crt.fs.basic_property") char *
+INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_ACCESS_WR_OPT(1) char *
 NOTHROW_RPC(LIBCCALL libc_getcwd)(char *buf,
                                   size_t bufsize)
 /*[[[body:libc_getcwd]]]*/
@@ -1000,10 +1000,10 @@ done:
 }
 /*[[[end:libc_getcwd]]]*/
 
-/*[[[head:libd_unlink,hash:CRC-32=0x25c05ab3]]]*/
+/*[[[head:libd_unlink,hash:CRC-32=0xaf4aef00]]]*/
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_unlink)(char const *file)
 /*[[[body:libd_unlink]]]*/
 {
@@ -1011,10 +1011,10 @@ NOTHROW_RPC(LIBDCALL libd_unlink)(char const *file)
 }
 /*[[[end:libd_unlink]]]*/
 
-/*[[[head:libc_unlink,hash:CRC-32=0xf2a3ec93]]]*/
+/*[[[head:libc_unlink,hash:CRC-32=0xb3d20dbe]]]*/
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file)
 /*[[[body:libc_unlink]]]*/
 {
@@ -1023,10 +1023,10 @@ NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file)
 }
 /*[[[end:libc_unlink]]]*/
 
-/*[[[head:libd_rmdir,hash:CRC-32=0x1be88e03]]]*/
+/*[[[head:libd_rmdir,hash:CRC-32=0xdf9bf83]]]*/
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_rmdir)(char const *path)
 /*[[[body:libd_rmdir]]]*/
 {
@@ -1034,10 +1034,10 @@ NOTHROW_RPC(LIBDCALL libd_rmdir)(char const *path)
 }
 /*[[[end:libd_rmdir]]]*/
 
-/*[[[head:libc_rmdir,hash:CRC-32=0x51e1f733]]]*/
+/*[[[head:libc_rmdir,hash:CRC-32=0x7cadfacd]]]*/
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path)
 /*[[[body:libc_rmdir]]]*/
 {
@@ -1046,11 +1046,11 @@ NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path)
 }
 /*[[[end:libc_rmdir]]]*/
 
-/*[[[head:libd_euidaccess,hash:CRC-32=0xdb06971a]]]*/
+/*[[[head:libd_euidaccess,hash:CRC-32=0x822af301]]]*/
 /* >> euidaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_euidaccess)(char const *file,
                                       __STDC_INT_AS_UINT_T type)
 /*[[[body:libd_euidaccess]]]*/
@@ -1059,11 +1059,11 @@ NOTHROW_RPC(LIBDCALL libd_euidaccess)(char const *file,
 }
 /*[[[end:libd_euidaccess]]]*/
 
-/*[[[head:libc_euidaccess,hash:CRC-32=0x10962284]]]*/
+/*[[[head:libc_euidaccess,hash:CRC-32=0xe90a533e]]]*/
 /* >> euidaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file,
                                       __STDC_INT_AS_UINT_T type)
 /*[[[body:libc_euidaccess]]]*/
@@ -1076,11 +1076,11 @@ NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file,
 }
 /*[[[end:libc_euidaccess]]]*/
 
-/*[[[head:libd_faccessat,hash:CRC-32=0xd3ddf3e5]]]*/
+/*[[[head:libd_faccessat,hash:CRC-32=0xbb4f4b2c]]]*/
 /* >> faccessat(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `dfd:file', testing for `type' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_faccessat)(fd_t dfd,
                                      char const *file,
                                      __STDC_INT_AS_UINT_T type,
@@ -1091,11 +1091,11 @@ NOTHROW_RPC(LIBDCALL libd_faccessat)(fd_t dfd,
 }
 /*[[[end:libd_faccessat]]]*/
 
-/*[[[head:libc_faccessat,hash:CRC-32=0xd99c78b0]]]*/
+/*[[[head:libc_faccessat,hash:CRC-32=0x2110a758]]]*/
 /* >> faccessat(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `dfd:file', testing for `type' */
-INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd,
                                      char const *file,
                                      __STDC_INT_AS_UINT_T type,
@@ -1108,10 +1108,10 @@ NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd,
 }
 /*[[[end:libc_faccessat]]]*/
 
-/*[[[head:libd_fchownat,hash:CRC-32=0x75158422]]]*/
+/*[[[head:libd_fchownat,hash:CRC-32=0x692f4329]]]*/
 /* >> fchownat(2)
  * Change the ownership of a given `dfd:file' to `group:owner' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_fchownat)(fd_t dfd,
                                     char const *file,
                                     uid_t owner,
@@ -1123,10 +1123,10 @@ NOTHROW_RPC(LIBDCALL libd_fchownat)(fd_t dfd,
 }
 /*[[[end:libd_fchownat]]]*/
 
-/*[[[head:libc_fchownat,hash:CRC-32=0xfdb7221f]]]*/
+/*[[[head:libc_fchownat,hash:CRC-32=0x518f6162]]]*/
 /* >> fchownat(2)
  * Change the ownership of a given `dfd:file' to `group:owner' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd,
                                     char const *file,
                                     uid_t owner,
@@ -1140,10 +1140,10 @@ NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd,
 }
 /*[[[end:libc_fchownat]]]*/
 
-/*[[[head:libd_linkat,hash:CRC-32=0x3d2acca4]]]*/
+/*[[[head:libd_linkat,hash:CRC-32=0x1eaaa3f6]]]*/
 /* >> linkat(2)
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2, 4)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(4) int
 NOTHROW_RPC(LIBDCALL libd_linkat)(fd_t fromfd,
                                   char const *from,
                                   fd_t tofd,
@@ -1155,10 +1155,10 @@ NOTHROW_RPC(LIBDCALL libd_linkat)(fd_t fromfd,
 }
 /*[[[end:libd_linkat]]]*/
 
-/*[[[head:libc_linkat,hash:CRC-32=0xc42322fe]]]*/
+/*[[[head:libc_linkat,hash:CRC-32=0xd14f8ec]]]*/
 /* >> linkat(2)
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2, 4)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(4) int
 NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd,
                                   char const *from,
                                   fd_t tofd,
@@ -1171,11 +1171,11 @@ NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd,
 }
 /*[[[end:libc_linkat]]]*/
 
-/*[[[head:libd_symlinkat,hash:CRC-32=0x80c5f674]]]*/
+/*[[[head:libd_symlinkat,hash:CRC-32=0x851418da]]]*/
 /* >> symlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBDCALL libd_symlinkat)(char const *link_text,
                                      fd_t tofd,
                                      char const *target_path)
@@ -1185,11 +1185,11 @@ NOTHROW_RPC(LIBDCALL libd_symlinkat)(char const *link_text,
 }
 /*[[[end:libd_symlinkat]]]*/
 
-/*[[[head:libc_symlinkat,hash:CRC-32=0x7633b480]]]*/
+/*[[[head:libc_symlinkat,hash:CRC-32=0xdb109038]]]*/
 /* >> symlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 3)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
                                      fd_t tofd,
                                      char const *target_path)
@@ -1204,7 +1204,7 @@ NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
 }
 /*[[[end:libc_symlinkat]]]*/
 
-/*[[[head:libd_readlinkat,hash:CRC-32=0x306132b4]]]*/
+/*[[[head:libd_readlinkat,hash:CRC-32=0xf43a0028]]]*/
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * WARNING: This  function is badly designed and will neither append a trailing
@@ -1213,7 +1213,7 @@ NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t
 NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd,
                                       char const *path,
                                       char *buf,
@@ -1224,7 +1224,7 @@ NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd,
 }
 /*[[[end:libd_readlinkat]]]*/
 
-/*[[[head:libc_readlinkat,hash:CRC-32=0x6baae5bf]]]*/
+/*[[[head:libc_readlinkat,hash:CRC-32=0x23f98262]]]*/
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * WARNING: This  function is badly designed and will neither append a trailing
@@ -1233,7 +1233,7 @@ NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd,
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t
 NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd,
                                       char const *path,
                                       char *buf,
@@ -1249,12 +1249,12 @@ NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd,
 }
 /*[[[end:libc_readlinkat]]]*/
 
-/*[[[head:libd_fsymlinkat,hash:CRC-32=0xfbd3e021]]]*/
+/*[[[head:libd_fsymlinkat,hash:CRC-32=0xaadc2040]]]*/
 /* >> fsymlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path'
  * @param flags: Set of `0 | AT_DOSPATH' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBDCALL libd_fsymlinkat)(char const *link_text,
                                       fd_t tofd,
                                       char const *target_path,
@@ -1265,12 +1265,12 @@ NOTHROW_RPC(LIBDCALL libd_fsymlinkat)(char const *link_text,
 }
 /*[[[end:libd_fsymlinkat]]]*/
 
-/*[[[head:libc_fsymlinkat,hash:CRC-32=0xc35abcfa]]]*/
+/*[[[head:libc_fsymlinkat,hash:CRC-32=0x157cd5d3]]]*/
 /* >> fsymlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path'
  * @param flags: Set of `0 | AT_DOSPATH' */
-INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((1, 3)) int
+INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBCCALL libc_fsymlinkat)(char const *link_text,
                                       fd_t tofd,
                                       char const *target_path,
@@ -1282,11 +1282,11 @@ NOTHROW_RPC(LIBCCALL libc_fsymlinkat)(char const *link_text,
 }
 /*[[[end:libc_fsymlinkat]]]*/
 
-/*[[[head:libd_freadlinkat,hash:CRC-32=0xe422b3de]]]*/
+/*[[[head:libd_freadlinkat,hash:CRC-32=0xd5af7c05]]]*/
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t
 NOTHROW_RPC(LIBDCALL libd_freadlinkat)(fd_t dfd,
                                        char const *path,
                                        char *buf,
@@ -1298,11 +1298,11 @@ NOTHROW_RPC(LIBDCALL libd_freadlinkat)(fd_t dfd,
 }
 /*[[[end:libd_freadlinkat]]]*/
 
-/*[[[head:libc_freadlinkat,hash:CRC-32=0xe7e9da3c]]]*/
+/*[[[head:libc_freadlinkat,hash:CRC-32=0x8931dc2f]]]*/
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
-INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_ACCESS_WRS(3, 4) NONNULL((2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t
 NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd,
                                        char const *path,
                                        char *buf,
@@ -1315,10 +1315,10 @@ NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd,
 }
 /*[[[end:libc_freadlinkat]]]*/
 
-/*[[[head:libd_unlinkat,hash:CRC-32=0x4722dc71]]]*/
+/*[[[head:libd_unlinkat,hash:CRC-32=0xa55a8d4f]]]*/
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_unlinkat)(fd_t dfd,
                                     char const *name,
                                     atflag_t flags)
@@ -1328,10 +1328,10 @@ NOTHROW_RPC(LIBDCALL libd_unlinkat)(fd_t dfd,
 }
 /*[[[end:libd_unlinkat]]]*/
 
-/*[[[head:libc_unlinkat,hash:CRC-32=0xbd33e56e]]]*/
+/*[[[head:libc_unlinkat,hash:CRC-32=0x2a0d5994]]]*/
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd,
                                     char const *name,
                                     atflag_t flags)
@@ -1461,14 +1461,14 @@ NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_pwrite64]]]*/
 
-/*[[[head:libc_pipe2,hash:CRC-32=0xaaff9933]]]*/
+/*[[[head:libc_pipe2,hash:CRC-32=0xd8ee085c]]]*/
 /* >> pipe2(2)
  * Construct a [reader,writer]-pair of pipes
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
  * @param: flags:   Set of `O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.io.access") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.io.access") ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2],
                                  oflag_t flags)
 /*[[[body:libc_pipe2]]]*/
@@ -1478,12 +1478,12 @@ NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2],
 }
 /*[[[end:libc_pipe2]]]*/
 
-/*[[[head:libc_getresuid,hash:CRC-32=0x5ba5736d]]]*/
+/*[[[head:libc_getresuid,hash:CRC-32=0x4774768]]]*/
 /* >> getresuid(2)
  * Get the real, effective, and saved UID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.sched.user") int
+INTERN ATTR_SECTION(".text.crt.sched.user") ATTR_ACCESS_WR_OPT(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_getresuid)(uid_t *ruid,
                                      uid_t *euid,
                                      uid_t *suid)
@@ -1495,12 +1495,12 @@ NOTHROW_NCX(LIBCCALL libc_getresuid)(uid_t *ruid,
 }
 /*[[[end:libc_getresuid]]]*/
 
-/*[[[head:libc_getresgid,hash:CRC-32=0xa6a58713]]]*/
+/*[[[head:libc_getresgid,hash:CRC-32=0x4c7df072]]]*/
 /* >> getresgid(2)
  * Get the real, effective, and saved GID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.sched.user") int
+INTERN ATTR_SECTION(".text.crt.sched.user") ATTR_ACCESS_WR_OPT(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_getresgid)(gid_t *rgid,
                                      gid_t *egid,
                                      gid_t *sgid)
@@ -1602,11 +1602,11 @@ NOTHROW_NCX(LIBCCALL libc_getsid)(pid_t pid)
 }
 /*[[[end:libc_getsid]]]*/
 
-/*[[[head:libd_lchown,hash:CRC-32=0x133bc058]]]*/
+/*[[[head:libd_lchown,hash:CRC-32=0x1e0ee9ba]]]*/
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_lchown)(char const *file,
                                   uid_t owner,
                                   gid_t group)
@@ -1616,11 +1616,11 @@ NOTHROW_RPC(LIBDCALL libd_lchown)(char const *file,
 }
 /*[[[end:libd_lchown]]]*/
 
-/*[[[head:libc_lchown,hash:CRC-32=0x97634942]]]*/
+/*[[[head:libc_lchown,hash:CRC-32=0x15170add]]]*/
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file,
                                   uid_t owner,
                                   gid_t group)
@@ -1636,10 +1636,10 @@ NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file,
 }
 /*[[[end:libc_lchown]]]*/
 
-/*[[[head:libd_truncate,hash:CRC-32=0xedb43047]]]*/
+/*[[[head:libd_truncate,hash:CRC-32=0xb1cd7ee2]]]*/
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBDCALL libd_truncate)(char const *file,
                                     __PIO_OFFSET length)
 /*[[[body:libd_truncate]]]*/
@@ -1654,10 +1654,10 @@ NOTHROW_NCX(LIBDCALL libd_truncate)(char const *file,
 }
 /*[[[end:libd_truncate]]]*/
 
-/*[[[head:libc_truncate,hash:CRC-32=0xb94025bd]]]*/
+/*[[[head:libc_truncate,hash:CRC-32=0x51d37504]]]*/
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
                                     __PIO_OFFSET length)
 /*[[[body:libc_truncate]]]*/
@@ -1667,13 +1667,13 @@ NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
 }
 /*[[[end:libc_truncate]]]*/
 
-/*[[[head:libd_truncate64,hash:CRC-32=0xd1f222f2]]]*/
+/*[[[head:libd_truncate64,hash:CRC-32=0xaa7e67d7]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libd_truncate64, libd_truncate);
 #else /* MAGIC:alias */
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file,
                                       __PIO_OFFSET64 length)
 /*[[[body:libd_truncate64]]]*/
@@ -1689,13 +1689,13 @@ NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file,
 #endif /* MAGIC:alias */
 /*[[[end:libd_truncate64]]]*/
 
-/*[[[head:libc_truncate64,hash:CRC-32=0xd349c447]]]*/
+/*[[[head:libc_truncate64,hash:CRC-32=0x6404ae48]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_truncate64, libc_truncate);
 #else /* MAGIC:alias */
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
                                       __PIO_OFFSET64 length)
 /*[[[body:libc_truncate64]]]*/
@@ -1706,12 +1706,12 @@ NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_truncate64]]]*/
 
-/*[[[head:libc_fexecve,hash:CRC-32=0xd0e40df3]]]*/
+/*[[[head:libc_fexecve,hash:CRC-32=0x9b8a7983]]]*/
 /* >> fexecve(2)
  * Replace the calling process with the application image referred
  * to by `execfd'  and execute it's  `main()' method, passing  the
  * given `argv', and setting `environ' to `envp'. */
-INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((2, 3)) int
+INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t execfd,
                                    __TARGV,
                                    __TENVP)
@@ -1886,12 +1886,12 @@ NOTHROW_NCX(LIBCCALL libc_ttyslot)(void)
 }
 /*[[[end:libc_ttyslot]]]*/
 
-/*[[[head:libd_symlink,hash:CRC-32=0x43c96b10]]]*/
+/*[[[head:libd_symlink,hash:CRC-32=0xe20c0993]]]*/
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_symlink)(char const *link_text,
                                    char const *target_path)
 /*[[[body:libd_symlink]]]*/
@@ -1900,12 +1900,12 @@ NOTHROW_RPC(LIBDCALL libd_symlink)(char const *link_text,
 }
 /*[[[end:libd_symlink]]]*/
 
-/*[[[head:libc_symlink,hash:CRC-32=0xfcf1d157]]]*/
+/*[[[head:libc_symlink,hash:CRC-32=0xab173d6]]]*/
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
                                    char const *target_path)
 /*[[[body:libc_symlink]]]*/
@@ -1919,7 +1919,7 @@ NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
 }
 /*[[[end:libc_symlink]]]*/
 
-/*[[[head:libd_readlink,hash:CRC-32=0x5ae89c4e]]]*/
+/*[[[head:libd_readlink,hash:CRC-32=0xcb5315c5]]]*/
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
@@ -1929,7 +1929,7 @@ NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_WRS(2, 3) NONNULL((1)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) ssize_t
 NOTHROW_RPC(LIBDCALL libd_readlink)(char const *path,
                                     char *buf,
                                     size_t buflen)
@@ -1939,7 +1939,7 @@ NOTHROW_RPC(LIBDCALL libd_readlink)(char const *path,
 }
 /*[[[end:libd_readlink]]]*/
 
-/*[[[head:libc_readlink,hash:CRC-32=0xbe2ee525]]]*/
+/*[[[head:libc_readlink,hash:CRC-32=0x8fc5c346]]]*/
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
@@ -1949,7 +1949,7 @@ NOTHROW_RPC(LIBDCALL libd_readlink)(char const *path,
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_ACCESS_WRS(2, 3) NONNULL((1)) ssize_t
+INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_readlink)(char const *path,
                                     char *buf,
                                     size_t buflen)
@@ -2108,9 +2108,9 @@ NOTHROW_RPC(LIBCCALL libc_setusershell)(void)
 }
 /*[[[end:libc_setusershell]]]*/
 
-/*[[[head:libc_revoke,hash:CRC-32=0x96b7f405]]]*/
+/*[[[head:libc_revoke,hash:CRC-32=0x788e88b3]]]*/
 /* >> revoke(3) */
-INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 /*[[[body:libc_revoke]]]*/
 /*AUTO*/{
@@ -2121,11 +2121,11 @@ NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 }
 /*[[[end:libc_revoke]]]*/
 
-/*[[[head:libd_chroot,hash:CRC-32=0x568ab51d]]]*/
+/*[[[head:libd_chroot,hash:CRC-32=0xb699bfde]]]*/
 /* >> chroot(2)
  * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path)
 /*[[[body:libd_chroot]]]*/
 {
@@ -2143,11 +2143,11 @@ NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path)
 }
 /*[[[end:libd_chroot]]]*/
 
-/*[[[head:libc_chroot,hash:CRC-32=0xe546b55e]]]*/
+/*[[[head:libc_chroot,hash:CRC-32=0x9ee03ba]]]*/
 /* >> chroot(2)
  * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
-INTERN ATTR_SECTION(".text.crt.fs.utility") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.utility") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path)
 /*[[[body:libc_chroot]]]*/
 {
@@ -2474,14 +2474,14 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 }
 /*[[[end:libc_fpathconf]]]*/
 
-/*[[[head:libd_pathconf,hash:CRC-32=0x6e2afd22]]]*/
+/*[[[head:libd_pathconf,hash:CRC-32=0xc258f263]]]*/
 /* >> pathconf(2)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `path'
  * return: * : The configuration limit associated with `name' for `path'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") NONNULL((1)) longptr_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_RO(1) longptr_t
 NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *path,
                                     __STDC_INT_AS_UINT_T name)
 /*[[[body:libd_pathconf]]]*/
@@ -2502,14 +2502,14 @@ NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *path,
 }
 /*[[[end:libd_pathconf]]]*/
 
-/*[[[head:libc_pathconf,hash:CRC-32=0x87341e12]]]*/
+/*[[[head:libc_pathconf,hash:CRC-32=0x20c34180]]]*/
 /* >> pathconf(2)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `path'
  * return: * : The configuration limit associated with `name' for `path'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-INTERN ATTR_SECTION(".text.crt.fs.property") NONNULL((1)) longptr_t
+INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_ACCESS_RO(1) longptr_t
 NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
                                     __STDC_INT_AS_UINT_T name)
 /*[[[body:libc_pathconf]]]*/
@@ -2532,7 +2532,7 @@ NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
 
 
 
-/*[[[head:libc_confstr,hash:CRC-32=0x6f69d415]]]*/
+/*[[[head:libc_confstr,hash:CRC-32=0xbefa3eaa]]]*/
 /* Retrieve a system configuration string specified by `name'
  * @param: name:   One of `_CS_*' from <asm/crt/confname.h>
  * @param: buf:    Target buffer
@@ -2540,7 +2540,7 @@ NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
  * @return: * :    Required buffer size (including a trailing \0-character)
  * @return: 1 :    Empty configuration string.
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
-INTERN ATTR_SECTION(".text.crt.system.configuration") size_t
+INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_ACCESS_WRS(2, 3) size_t
 NOTHROW_NCX(LIBCCALL libc_confstr)(__STDC_INT_AS_UINT_T name,
                                    char *buf,
                                    size_t buflen)
@@ -3927,9 +3927,9 @@ NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd)
 }
 /*[[[end:libc_fdatasync]]]*/
 
-/*[[[head:libc_setmode,hash:CRC-32=0x5440ef72]]]*/
+/*[[[head:libc_setmode,hash:CRC-32=0xd6212bfb]]]*/
 /* >> setmode(3), getmode(3) */
-INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED NONNULL((1)) void *
+INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED ATTR_ACCESS_RO(1) void *
 NOTHROW_NCX(LIBCCALL libc_setmode)(char const *mode_str)
 /*[[[body:libc_setmode]]]*/
 /*AUTO*/{
@@ -3940,9 +3940,9 @@ NOTHROW_NCX(LIBCCALL libc_setmode)(char const *mode_str)
 }
 /*[[[end:libc_setmode]]]*/
 
-/*[[[head:libc_getmode,hash:CRC-32=0xd63cf099]]]*/
+/*[[[head:libc_getmode,hash:CRC-32=0x908996bc]]]*/
 /* >> setmode(3), getmode(3) */
-INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED NONNULL((1)) mode_t
+INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED ATTR_ACCESS_RO(1) mode_t
 NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
                                    mode_t mode)
 /*[[[body:libc_getmode]]]*/
@@ -3955,10 +3955,10 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 }
 /*[[[end:libc_getmode]]]*/
 
-/*[[[head:libc_ctermid_r,hash:CRC-32=0x4e77dd5c]]]*/
+/*[[[head:libc_ctermid_r,hash:CRC-32=0x403b589a]]]*/
 /* >> ctermid_r(3)
  * Same as `ctermid', but return `NULL' when `s' is `NULL' */
-INTERN ATTR_SECTION(".text.crt.io.tty") char *
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_WR_OPT(1) char *
 NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 /*[[[body:libc_ctermid_r]]]*/
 /*AUTO*/{

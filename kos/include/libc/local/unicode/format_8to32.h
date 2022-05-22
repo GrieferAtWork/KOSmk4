@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x186306ca */
+/* HASH CRC-32:0x155d3b0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc16,(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc16,(__pc16,__s,__n,__mbs))
+__CREDIRECT(__ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc16,(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc16,(__pc16,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc16 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_c8toc16.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc32,(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc32,(__pc32,__s,__n,__mbs))
+__CREDIRECT(__ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc32,(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc32,(__pc32,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc32 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_c8toc32.h>
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(format_8to32) __SSIZE_TYPE__
+__LOCAL_LIBC(format_8to32) __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_8to32))(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) {
 	struct __local_format_8tow_data {
 		__pc32formatprinter __fd_printer;    /* [1..1] Inner printer */

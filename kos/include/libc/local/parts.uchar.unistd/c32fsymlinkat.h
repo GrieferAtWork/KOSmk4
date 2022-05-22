@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64874142 */
+/* HASH CRC-32:0xc834e065 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,12 +30,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_KOS$convert_wcstombs)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif (defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -66,9 +66,9 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #endif /* !__local___localdep_free_defined */
 #ifndef __local___localdep_fsymlinkat_defined
 #define __local___localdep_fsymlinkat_defined
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_fsymlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path, __atflag_t __flags),fsymlinkat,(__link_text,__tofd,__target_path,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,__localdep_fsymlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path, __atflag_t __flags),fsymlinkat,(__link_text,__tofd,__target_path,__flags))
 #endif /* !__local___localdep_fsymlinkat_defined */
-__LOCAL_LIBC(c32fsymlinkat) __ATTR_NONNULL((1, 3)) int
+__LOCAL_LIBC(c32fsymlinkat) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(3) int
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32fsymlinkat))(__CHAR32_TYPE__ const *__link_text, __fd_t __tofd, __CHAR32_TYPE__ const *__target_path, __atflag_t __flags) {
 	int __result = -1;
 	char *__utf8_link_text, *__utf8_target_path;

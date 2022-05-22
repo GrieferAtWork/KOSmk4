@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98e3fdf8 */
+/* HASH CRC-32:0xdf56902a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_obstack_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),obstack_printer,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_obstack_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),obstack_printer,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE__obstack_newchunk) || defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)
 __NAMESPACE_LOCAL_END
 #include <libc/local/obstack/obstack_printer.h>
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_obstack_printer_defined
 #endif /* !... */
 #endif /* !__local___localdep_obstack_printer_defined */
-__LOCAL_LIBC(obstack_vprintf) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(obstack_vprintf) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(obstack_vprintf))(struct obstack *__restrict __self, char const *__restrict __format, __builtin_va_list __args) {
 	return (__STDC_INT_AS_SIZE_T)(__NAMESPACE_LOCAL_SYM __localdep_format_vprintf)(&(__NAMESPACE_LOCAL_SYM __localdep_obstack_printer), __self, __format, __args);
 }

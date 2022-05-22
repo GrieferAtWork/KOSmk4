@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cc1a31c */
+/* HASH CRC-32:0x2b416509 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,34 +41,34 @@ INTDEF struct objalloc *NOTHROW_NCX(LIBCCALL libc_objalloc_create)(void);
  * Allocate `num_bytes' of memory from `self'
  * @return: * :   The `num_bytes'-large data-blob
  * @return: NULL: Out of memory */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *NOTHROW_NCX(LIBDCALL libd__objalloc_alloc)(struct objalloc *self, __ULONGPTR_TYPE__ num_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RW(1) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBDCALL libd__objalloc_alloc)(struct objalloc *self, __ULONGPTR_TYPE__ num_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> _objalloc_alloc(3)
  * Allocate `num_bytes' of memory from `self'
  * @return: * :   The `num_bytes'-large data-blob
  * @return: NULL: Out of memory */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc__objalloc_alloc)(struct objalloc *self, __ULONGPTR_TYPE__ num_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RW(1) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc__objalloc_alloc)(struct objalloc *self, __ULONGPTR_TYPE__ num_bytes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> objalloc_free(3)
  * Free all memory allocated by `self', before also freeing `self' */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_objalloc_free)(struct objalloc *self);
+INTDEF ATTR_ACCESS_RW(1) void NOTHROW_NCX(LIBDCALL libd_objalloc_free)(struct objalloc *self);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> objalloc_free(3)
  * Free all memory allocated by `self', before also freeing `self' */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_objalloc_free)(struct objalloc *self);
+INTDEF ATTR_ACCESS_RW(1) void NOTHROW_NCX(LIBCCALL libc_objalloc_free)(struct objalloc *self);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> objalloc_free_block(3)
  * Free a given `ptr', as well as everything allocated since. */
-INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBDCALL libd_objalloc_free_block)(struct objalloc *self, void *ptr);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((2)) void NOTHROW_NCX(LIBDCALL libd_objalloc_free_block)(struct objalloc *self, void *ptr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> objalloc_free_block(3)
  * Free a given `ptr', as well as everything allocated since. */
-INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBCCALL libc_objalloc_free_block)(struct objalloc *self, void *ptr);
+INTDEF ATTR_ACCESS_RW(1) NONNULL((2)) void NOTHROW_NCX(LIBCCALL libc_objalloc_free_block)(struct objalloc *self, void *ptr);
 #endif /* !__KERNEL__ */
 
 DECL_END

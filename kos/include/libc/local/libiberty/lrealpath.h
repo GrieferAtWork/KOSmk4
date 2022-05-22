@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x880a9371 */
+/* HASH CRC-32:0x1ad65658 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_canonicalize_file_name_defined
 #define __local___localdep_canonicalize_file_name_defined
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,__localdep_canonicalize_file_name,(char const *__filename),canonicalize_file_name,(__filename))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_RPC,__localdep_canonicalize_file_name,(char const *__filename),canonicalize_file_name,(__filename))
 #endif /* !__local___localdep_canonicalize_file_name_defined */
 #ifndef __local___localdep_strdup_defined
 #define __local___localdep_strdup_defined
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_strdup_defined
 #endif /* !... */
 #endif /* !__local___localdep_strdup_defined */
-__LOCAL_LIBC(lrealpath) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(lrealpath) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RO(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lrealpath))(char const *__path) {
 	char *__result = (__NAMESPACE_LOCAL_SYM __localdep_canonicalize_file_name)(__path);
 	if (__result == __NULLPTR)

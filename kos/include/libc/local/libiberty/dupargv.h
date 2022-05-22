@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7838eab */
+/* HASH CRC-32:0x1f35768e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_dupargv_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_xmalloc) || defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xcalloc) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_xmalloc_failed))
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_xmalloc_defined
 #define __local___localdep_xmalloc_defined
@@ -45,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_xstrdup,(char const *__restrict __string),xstrdup,(__string))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_xstrdup,(char const *__restrict __string),xstrdup,(__string))
 #else /* __CRT_HAVE_xstrdup */
 __NAMESPACE_LOCAL_END
 #include <libc/local/libiberty/xstrdup.h>
@@ -56,8 +57,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(dupargv) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED char **
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dupargv))(char **___argv) {
+__LOCAL_LIBC(dupargv) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) char **
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dupargv))(char *__KOS_FIXED_CONST *___argv) {
 	char **__result;
 	__SIZE_TYPE__ __i, ___argc;
 	if (!___argv)

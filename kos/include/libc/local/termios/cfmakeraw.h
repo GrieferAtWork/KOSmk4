@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72205f91 */
+/* HASH CRC-32:0x6be1a0e4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <bits/os/termios.h>
 #include <asm/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(cfmakeraw) __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(cfmakeraw) __ATTR_ACCESS_RW(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakeraw))(struct termios *__restrict __termios_p) {
 	/* As documented here: http://man7.org/linux/man-pages/man3/termios.3.html
 	 * Note that the following additions were made:

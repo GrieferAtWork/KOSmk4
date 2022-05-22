@@ -162,8 +162,8 @@ typedef __ATTR_NONNULL_T((1)) void
 @@                            the RPC program finished.
 [[cp, decl_include("<bits/types.h>")]]
 int rpc_schedule($pid_t target_tid, unsigned int mode,
-                 [[nonnull]] void const *program,
-                 [[inp_opt(max_param_count)]] void const *const *params,
+                 [[in]] void const *program,
+                 [[in(max_param_count)]] void const *const *params,
                  $size_t max_param_count);
 
 
@@ -246,8 +246,8 @@ int rpc_interrupt($pid_t target_tid, unsigned int mode);
 
 [[cp, throws, doc_alias("rpc_schedule"), decl_include("<bits/types.h>")]]
 void RpcSchedule($pid_t target_tid, unsigned int mode,
-                 [[nonnull]] void const *program,
-                 [[inp_opt(max_param_count)]] void const *const *params,
+                 [[in]] void const *program,
+                 [[in(max_param_count)]] void const *const *params,
                  $size_t max_param_count);
 
 [[cp, throws, doc_alias("rpc_exec"), decl_include("<bits/types.h>")]]

@@ -116,7 +116,7 @@ typedef __SIZE_TYPE__ size_t;
 [[decl_include("<hybrid/typecore.h>")]]
 [[libc, nocrt, no_crt_self_import, guard]]
 [[alias("bzero", "explicit_bzero", "__bzero")]]
-void explicit_bzero(void *dst, size_t n_bytes) {
+void explicit_bzero([[out(n_bytes)]] void *dst, size_t n_bytes) {
 	void *volatile vdst = dst;
 	bzero(vdst, n_bytes);
 }

@@ -25,11 +25,11 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_ether_ntohost,hash:CRC-32=0xd6af50d2]]]*/
+/*[[[head:libc_ether_ntohost,hash:CRC-32=0x345f2037]]]*/
 /* Map a given `addr' to its corresponding hostname from `/etc/ethers'
  * @return: 0 : Success
  * @return: * : No entry for `addr' found, or `/etc/ethers' doesn't exist. */
-INTERN ATTR_SECTION(".text.crt.net.ether") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) int
 NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname,
                                              struct ether_addr const *addr)
 /*[[[body:libc_ether_ntohost]]]*/
@@ -42,11 +42,11 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname,
 }
 /*[[[end:libc_ether_ntohost]]]*/
 
-/*[[[head:libc_ether_hostton,hash:CRC-32=0x3c7ff692]]]*/
+/*[[[head:libc_ether_hostton,hash:CRC-32=0xd949c74e]]]*/
 /* Map a given `hostname' into its corresponding address from `/etc/ethers'
  * @return: 0 : Success
  * @return: * : No entry for `hostname' found, or `/etc/ethers' doesn't exist. */
-INTERN ATTR_SECTION(".text.crt.net.ether") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int
 NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname,
                                              struct ether_addr *addr)
 /*[[[body:libc_ether_hostton]]]*/

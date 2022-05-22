@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95532187 */
+/* HASH CRC-32:0x24ba70c6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -74,9 +74,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wopenat64_defined
 #define __local___localdep_wopenat64_defined
 #if defined(__CRT_HAVE_wopenat) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_wopenat64,(__fd_t __dirfd, __WCHAR_TYPE__ const *__filename, __oflag_t __oflags),wopenat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2),__fd_t,__NOTHROW_RPC,__localdep_wopenat64,(__fd_t __dirfd, __WCHAR_TYPE__ const *__filename, __oflag_t __oflags),wopenat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_wopenat64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_wopenat64,(__fd_t __dirfd, __WCHAR_TYPE__ const *__filename, __oflag_t __oflags),wopenat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2),__fd_t,__NOTHROW_RPC,__localdep_wopenat64,(__fd_t __dirfd, __WCHAR_TYPE__ const *__filename, __oflag_t __oflags),wopenat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_wopenat) || ((defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.fcntl/wopenat64.h>
@@ -86,7 +86,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_wopenat64_defined
 #endif /* !... */
 #endif /* !__local___localdep_wopenat64_defined */
-__LOCAL_LIBC(wopenat) __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t
+__LOCAL_LIBC(wopenat) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __fd_t
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wopenat))(__fd_t __dirfd, __WCHAR_TYPE__ const *__filename, __oflag_t __oflags, ...) {
 	__fd_t __result;
 	__builtin_va_list __args;

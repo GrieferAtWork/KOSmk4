@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6020cc25 */
+/* HASH CRC-32:0xce074591 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strdup __LIBC_LOCAL_NAME(strdup)
 #endif /* !... */
 #endif /* !__local___localdep_strdup_defined */
-__LOCAL_LIBC(posix_spawn_file_actions_addopen) __ATTR_NONNULL((1, 3)) __errno_t
+__LOCAL_LIBC(posix_spawn_file_actions_addopen) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_addopen))(struct __posix_spawn_file_actions *__restrict __file_actions, __fd_t __fd, char const *__restrict __path, __oflag_t __oflags, __mode_t __mode) {
 	struct __spawn_action *__action;
 	/* Posix says:

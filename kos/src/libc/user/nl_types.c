@@ -27,8 +27,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_catopen,hash:CRC-32=0x52776525]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.malloc") NONNULL((1)) nl_catd
+/*[[[head:libc_catopen,hash:CRC-32=0x81dac797]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.heap.malloc") ATTR_ACCESS_RO(1) nl_catd
 NOTHROW_RPC(LIBCCALL libc_catopen)(char const *cat_name,
                                    int flag)
 /*[[[body:libc_catopen]]]*/
@@ -41,8 +41,8 @@ NOTHROW_RPC(LIBCCALL libc_catopen)(char const *cat_name,
 }
 /*[[[end:libc_catopen]]]*/
 
-/*[[[head:libc_catgets,hash:CRC-32=0x30a894a9]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.malloc") NONNULL((1)) char *
+/*[[[head:libc_catgets,hash:CRC-32=0xa542515b]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.heap.malloc") char *
 NOTHROW_NCX(LIBCCALL libc_catgets)(nl_catd catalog,
                                    int set,
                                    int number,
@@ -59,8 +59,8 @@ NOTHROW_NCX(LIBCCALL libc_catgets)(nl_catd catalog,
 }
 /*[[[end:libc_catgets]]]*/
 
-/*[[[head:libc_catclose,hash:CRC-32=0x8fa4ceea]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.malloc") NONNULL((1)) int
+/*[[[head:libc_catclose,hash:CRC-32=0xf00d726b]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.heap.malloc") int
 NOTHROW_NCX(LIBCCALL libc_catclose)(nl_catd catalog)
 /*[[[body:libc_catclose]]]*/
 /*AUTO*/{

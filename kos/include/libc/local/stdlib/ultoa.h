@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3902879 */
+/* HASH CRC-32:0x243d6d69 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultoa_s,(__val,__buf,__buflen,__radix))
+__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultoa_s,(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__ultoa_s */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ui64toa_s,(__val,__buf,__buflen,__radix))
+__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ui64toa_s,(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__ui64toa_s && __SIZEOF_LONG__ == 8 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/_ultoa_s.h>
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ultoa) __ATTR_NONNULL((2)) char *
+__LOCAL_LIBC(ultoa) __ATTR_ACCESS_WR(2) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ultoa))(unsigned long __val, char *__buf, int __radix) {
 	(__NAMESPACE_LOCAL_SYM __localdep__ultoa_s)(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;

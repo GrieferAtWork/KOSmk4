@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x995ae37b */
+/* HASH CRC-32:0xe01b75e7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,13 +36,13 @@ DECL_BEGIN
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_thrd_sleep)(struct timespec const *time_point, struct timespec *remaining);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) int NOTHROW_RPC(LIBCCALL libc_thrd_sleep)(struct timespec const *time_point, struct timespec *remaining);
 /* >> thrd_sleep(3), thrd_sleep64(3)
  * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_thrd_sleep64)(struct timespec64 const *time_point, struct timespec64 *remaining);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) int NOTHROW_RPC(LIBCCALL libc_thrd_sleep64)(struct timespec64 const *time_point, struct timespec64 *remaining);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cb52552 */
+/* HASH CRC-32:0x67cdae55 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_renameat2_defined
 #define __local___localdep_renameat2_defined
-__CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_renameat2,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),renameat2,(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(4),int,__NOTHROW_RPC,__localdep_renameat2,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),renameat2,(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
 #endif /* !__local___localdep_renameat2_defined */
-__LOCAL_LIBC(renameat) __ATTR_NONNULL((2, 4)) int
+__LOCAL_LIBC(renameat) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(4) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(renameat))(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_renameat2)(__oldfd, __oldname, __newfd, __newname_or_path, 0);
 }

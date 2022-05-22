@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd087be2d */
+/* HASH CRC-32:0x3348b278 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_setenv_defined
 #define __local___localdep_setenv_defined
 #ifdef __CRT_HAVE_setenv
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_setenv,(char const *__varname, char const *__val, int __replace),setenv,(__varname,__val,__replace))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,__localdep_setenv,(char const *__varname, char const *__val, int __replace),setenv,(__varname,__val,__replace))
 #elif (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && defined(__CRT_HAVE__putenv_s)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/setenv.h>

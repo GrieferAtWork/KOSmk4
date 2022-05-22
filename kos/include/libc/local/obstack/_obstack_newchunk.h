@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e89e54f */
+/* HASH CRC-32:0xc8c68768 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-__LOCAL_LIBC(_obstack_newchunk) __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(_obstack_newchunk) __ATTR_ACCESS_RW(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_obstack_newchunk))(struct obstack *__self, __SIZE_TYPE__ __num_bytes) {
 	void *__curobj;
 	struct _obstack_chunk *__ochunk;

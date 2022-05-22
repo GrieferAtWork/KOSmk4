@@ -170,7 +170,7 @@ struct passwd *getpwuid($uid_t uid) {
 [[cp, decl_include("<bits/crt/db/passwd.h>"), export_as("_getpwnam")]]
 [[wunused, requires_function(setpwent, getpwent)]]
 [[userimpl, impl_include("<bits/crt/db/passwd.h>")]]
-struct passwd *getpwnam([[nonnull]] const char *name) {
+struct passwd *getpwnam([[in]] const char *name) {
 	struct passwd *result;
 	setpwent();
 	while ((result = getpwent()) != NULL) {
@@ -192,7 +192,7 @@ struct passwd *getpwnam([[nonnull]] const char *name) {
 struct passwd *fgetpwent([[inout]] $FILE *__restrict stream);
 
 [[wunused, pure, static]]
-bool nss_checkfield([[nullable]] char const *field) {
+bool nss_checkfield([[in_opt]] char const *field) {
 	if (!field)
 		return true;
 	/* Since  ':'  and  '\n'  are  used  as field
@@ -203,7 +203,7 @@ bool nss_checkfield([[nullable]] char const *field) {
 }
 
 [[wunused, pure, static]]
-bool nss_checkfieldlist([[nullable]] char *const *list) {
+bool nss_checkfieldlist([[in_opt]] char *const *list) {
 	if (!list)
 		return true;
 	for (; *list; ++list) {
@@ -222,7 +222,7 @@ bool nss_checkfieldlist([[nullable]] char *const *list) {
 [[cp_stdio, decl_include("<bits/crt/db/passwd.h>")]]
 [[requires_function(fprintf_unlocked), impl_include("<bits/crt/inttypes.h>")]]
 [[impl_include("<libc/errno.h>")]]
-int putpwent([[nonnull]] struct passwd const *__restrict ent,
+int putpwent([[in]] struct passwd const *__restrict ent,
              [[inout]] $FILE *__restrict stream) {
 	__STDC_INT_AS_SSIZE_T error;
 @@pp_if __SIZEOF_GID_T__ == 1@@
@@ -306,9 +306,9 @@ err_inval:
 @@@return: * : Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
 $errno_t getpwuid_r($uid_t uid,
-                    [[nonnull]] struct passwd *__restrict resultbuf,
-                    [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                    [[nonnull]] struct passwd **__restrict result);
+                    [[out]] struct passwd *__restrict resultbuf,
+                    [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+                    [[out]] struct passwd **__restrict result);
 
 @@>> getpwnam_r(3)
 @@Search for an entry with a matching username
@@ -316,10 +316,10 @@ $errno_t getpwuid_r($uid_t uid,
 @@@return: 0 : (*result == NULL) No entry for `name'
 @@@return: * : Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
-$errno_t getpwnam_r([[nonnull]] const char *__restrict name,
-                    [[nonnull]] struct passwd *__restrict resultbuf,
-                    [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                    [[nonnull]] struct passwd **__restrict result);
+$errno_t getpwnam_r([[in]] const char *__restrict name,
+                    [[out]] struct passwd *__restrict resultbuf,
+                    [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+                    [[out]] struct passwd **__restrict result);
 
 %#ifdef __USE_MISC
 @@>> getpwent_r(3)
@@ -329,9 +329,9 @@ $errno_t getpwnam_r([[nonnull]] const char *__restrict name,
 @@@return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
 @@@return: * :     Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
-$errno_t getpwent_r([[nonnull]] struct passwd *__restrict resultbuf,
-                    [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                    [[nonnull]] struct passwd **__restrict result);
+$errno_t getpwent_r([[out]] struct passwd *__restrict resultbuf,
+                    [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+                    [[out]] struct passwd **__restrict result);
 
 @@>> fgetpwent_r(3)
 @@Read an entry from `stream'. This function is not standardized and probably never will be.
@@ -342,9 +342,9 @@ $errno_t getpwent_r([[nonnull]] struct passwd *__restrict resultbuf,
 [[cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
 [[requires_function(fgetpwfiltered_r)]]
 $errno_t fgetpwent_r([[inout]] $FILE *__restrict stream,
-                     [[nonnull]] struct passwd *__restrict resultbuf,
-                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                     [[nonnull]] struct passwd **__restrict result) {
+                     [[out]] struct passwd *__restrict resultbuf,
+                     [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+                     [[out]] struct passwd **__restrict result) {
 	return fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
 	                        result, (uid_t)-1, NULL);
 }
@@ -358,9 +358,9 @@ $errno_t fgetpwent_r([[inout]] $FILE *__restrict stream,
 [[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
 [[requires_function(fgetpwfiltered_r), impl_include("<libc/errno.h>")]]
 $errno_t fgetpwuid_r([[inout]] $FILE *__restrict stream, $uid_t uid,
-                     [[nonnull]] struct passwd *__restrict resultbuf,
-                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                     [[nonnull]] struct passwd **__restrict result) {
+                     [[out]] struct passwd *__restrict resultbuf,
+                     [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+                     [[out]] struct passwd **__restrict result) {
 	$errno_t error;
 	error = fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
 	                         result, uid, NULL);
@@ -379,10 +379,10 @@ $errno_t fgetpwuid_r([[inout]] $FILE *__restrict stream, $uid_t uid,
 [[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
 [[requires_function(fgetpwfiltered_r), impl_include("<libc/errno.h>")]]
 $errno_t fgetpwnam_r([[inout]] $FILE *__restrict stream,
-                     [[nonnull]] const char *__restrict name,
-                     [[nonnull]] struct passwd *__restrict resultbuf,
-                     [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                     [[nonnull]] struct passwd **__restrict result) {
+                     [[in]] const char *__restrict name,
+                     [[out]] struct passwd *__restrict resultbuf,
+                     [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+                     [[out]] struct passwd **__restrict result) {
 	$errno_t error;
 	error = fgetpwfiltered_r(stream, resultbuf, buffer, buflen,
 	                         result, (uid_t)-1, name);
@@ -408,9 +408,9 @@ $errno_t fgetpwnam_r([[inout]] $FILE *__restrict stream,
 [[impl_include("<libc/errno.h>", "<hybrid/typecore.h>", "<asm/os/syslog.h>")]]
 [[requires_function(fgetpos64, fsetpos64, fparseln, feof)]]
 $errno_t fgetpwfiltered_r([[inout]] $FILE *__restrict stream,
-                          [[nonnull]] struct passwd *__restrict resultbuf,
-                          [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-                          [[nonnull]] struct passwd **__restrict result,
+                          [[out]] struct passwd *__restrict resultbuf,
+                          [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+                          [[out]] struct passwd **__restrict result,
                           $uid_t filtered_uid, char const *filtered_name) {
 	$errno_t retval = 0;
 	char *dbline;
@@ -599,7 +599,7 @@ nextline:
 [[cp, decl_include("<bits/types.h>")]]
 [[impl_include("<bits/types.h>", "<bits/crt/inttypes.h>")]]
 [[requires_function(getpwuid)]]
-int getpw($uid_t uid, char *buffer) {
+int getpw($uid_t uid, [[out]] char *buffer) {
 	struct passwd *ent;
 	ent = getpwuid(uid);
 	if unlikely(!ent)
@@ -639,7 +639,7 @@ err:
  * still mustn't import `sgetpwent' as `_sgetpwent' because that would
  * break the ABI. */
 [[export_as("_sgetpwent")]]
-struct passwd *sgetpwent(char const *line) {
+struct passwd *sgetpwent([[in]] char const *line) {
 	struct passwd *result = NULL;
 	FILE *tempfp;
 	tempfp = fmemopen((void *)line, strlen(line) * sizeof(char), "r");

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0da563d */
+/* HASH CRC-32:0x65931a42 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mq_timedsend32_defined
 #define __local___localdep_mq_timedsend32_defined
-__CREDIRECT(__ATTR_NONNULL((2, 5)),int,__NOTHROW_RPC,__localdep_mq_timedsend32,(__mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct __timespec32 const *__abs_timeout),mq_timedsend,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
+__CREDIRECT(__ATTR_ACCESS_RO(5) __ATTR_ACCESS_WRS(2, 3),int,__NOTHROW_RPC,__localdep_mq_timedsend32,(__mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct __timespec32 const *__abs_timeout),mq_timedsend,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
 #endif /* !__local___localdep_mq_timedsend32_defined */
-__LOCAL_LIBC(mq_timedsend64) __ATTR_NONNULL((2, 5)) int
+__LOCAL_LIBC(mq_timedsend64) __ATTR_ACCESS_RO(5) __ATTR_ACCESS_ROS(2, 3) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mq_timedsend64))(__mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct __timespec64 const *__abs_timeout) {
 	struct __timespec32 __abs_timeout32;
 	__abs_timeout32.tv_sec  = (__time32_t)__abs_timeout->tv_sec;

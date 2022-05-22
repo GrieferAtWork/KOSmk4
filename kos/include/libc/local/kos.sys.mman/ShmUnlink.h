@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fe0b1cd */
+/* HASH CRC-32:0x34167523 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Unlink_defined
 #define __local___localdep_Unlink_defined
 #ifdef __CRT_HAVE_Unlink
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Unlink,(char const *__file),Unlink,(__file))
+__CREDIRECT_VOID(__ATTR_ACCESS_RO(1),__THROWING,__localdep_Unlink,(char const *__file),Unlink,(__file))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/Unlink.h>
@@ -90,7 +90,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <kos/parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ShmUnlink) __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(ShmUnlink) __ATTR_ACCESS_RO(1) void
 (__LIBCCALL __LIBC_LOCAL_NAME(ShmUnlink))(char const *__name) __THROWS(...) {
 	char *__fullname;
 	__SIZE_TYPE__ __namelen;

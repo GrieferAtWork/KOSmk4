@@ -163,7 +163,7 @@ NOTHROW(LIBCCALL libc_obstack_alloc_failed_handler_resolve)(void) {
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_include("<bits/crt/obstack.h>")]]
 [[requires(defined(__LOCAL_obstack_alloc_failed_handler) || $has_function(exit))]]
-int _obstack_begin([[nonnull]] struct obstack *self,
+int _obstack_begin([[out]] struct obstack *self,
                    _OBSTACK_SIZE_T min_chunk_size,
                    _OBSTACK_SIZE_T min_object_alignment,
                    [[nonnull]] void *(__LIBCCALL *ob_malloc)(size_t num_bytes),
@@ -213,7 +213,7 @@ int _obstack_begin([[nonnull]] struct obstack *self,
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_include("<bits/crt/obstack.h>")]]
 [[requires(defined(__LOCAL_obstack_alloc_failed_handler) || $has_function(exit))]]
-int _obstack_begin_1([[nonnull]] struct obstack *self,
+int _obstack_begin_1([[out]] struct obstack *self,
                      _OBSTACK_SIZE_T min_chunk_size,
                      _OBSTACK_SIZE_T min_object_alignment,
                      [[nonnull]] void *(*ob_malloc)(void *arg, size_t num_bytes),
@@ -269,7 +269,7 @@ int _obstack_begin_1([[nonnull]] struct obstack *self,
 [[impl_include("<bits/crt/obstack.h>")]]
 [[requires_include("<bits/crt/obstack.h>")]]
 [[requires(defined(__LOCAL_obstack_alloc_failed_handler) || $has_function(exit))]]
-void _obstack_newchunk([[nonnull]] struct obstack *self, _OBSTACK_SIZE_T num_bytes) {
+void _obstack_newchunk([[inout]] struct obstack *self, _OBSTACK_SIZE_T num_bytes) {
 	void *curobj;
 	struct _obstack_chunk *ochunk;
 	struct _obstack_chunk *nchunk;
@@ -329,7 +329,7 @@ void _obstack_newchunk([[nonnull]] struct obstack *self, _OBSTACK_SIZE_T num_byt
 [[decl_include("<bits/crt/obstack.h>")]]
 [[impl_include("<bits/crt/obstack.h>")]]
 [[impl_include("<hybrid/__assert.h>")]]
-void obstack_free([[nonnull]] struct obstack *self, void *obj) {
+void obstack_free([[inout]] struct obstack *self, void *obj) {
 	struct _obstack_chunk *iter;
 	for (iter = self->@chunk@; iter;) {
 		struct _obstack_chunk *prev;
@@ -361,7 +361,7 @@ void obstack_free([[nonnull]] struct obstack *self, void *obj) {
 [[pure, wunused, decl_include("<features.h>")]]
 [[decl_include("<bits/crt/obstack.h>")]]
 [[impl_include("<bits/crt/obstack.h>")]]
-_OBSTACK_SIZE_T _obstack_memory_used([[nonnull]] struct obstack __KOS_FIXED_CONST *self) {
+_OBSTACK_SIZE_T _obstack_memory_used([[in]] struct obstack __KOS_FIXED_CONST *self) {
 	_OBSTACK_SIZE_T result = 0;
 	struct _obstack_chunk *iter;
 	for (iter = self->@chunk@; iter; iter = iter->@prev@)
@@ -375,7 +375,7 @@ _OBSTACK_SIZE_T _obstack_memory_used([[nonnull]] struct obstack __KOS_FIXED_CONS
 [[hidden, pure, wunused]]
 [[decl_include("<bits/crt/obstack.h>")]]
 [[impl_include("<bits/crt/obstack.h>")]]
-int _obstack_allocated_p([[nonnull]] struct obstack const *self, void const *obj) {
+int _obstack_allocated_p([[in]] struct obstack const *self, void const *obj) {
 	struct _obstack_chunk *iter;
 	for (iter = self->@chunk@; iter; iter = iter->@prev@) {
 		if (obj >= (void *)iter && obj < (void *)iter->@limit@)
@@ -603,7 +603,7 @@ void obstack_chunk_free(void *ptr);
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<bits/crt/obstack.h>"), requires_function(_obstack_newchunk)]]
 $ssize_t obstack_printer([[nonnull]] /*struct obstack **/ void *arg,
-                         [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
+                         [[in(datalen)]] /*utf-8*/ char const *__restrict data, $size_t datalen) {
 	struct obstack *me = (struct obstack *)arg;
 	if ((size_t)(me->@chunk_limit@ - me->@next_free@) < datalen)
 		_obstack_newchunk(me, datalen);

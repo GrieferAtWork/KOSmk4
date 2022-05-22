@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f000e45 */
+/* HASH CRC-32:0x3340e9d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(freeargv) void
+__LOCAL_LIBC(freeargv) __ATTR_ACCESS_RO_OPT(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(freeargv))(char **___argv) {
 	__SIZE_TYPE__ __i;
 	if (!___argv)

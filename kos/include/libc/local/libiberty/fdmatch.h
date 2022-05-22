@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cb782cf */
+/* HASH CRC-32:0xc2c9a48b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,25 +29,25 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fstat_defined
 #define __local___localdep_fstat_defined
 #if defined(__CRT_HAVE_kfstat) && defined(__CRT_KOS_PRIMARY)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),kfstat,(__fd,__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),kfstat,(__fd,__buf))
 #elif defined(__CRT_HAVE_kfstat64) && defined(__CRT_KOS_PRIMARY)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),kfstat64,(__fd,__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),kfstat64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat64,(__fd,__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat64i32,(__fd,__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat64i32,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstati64,(__fd,__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstati64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat32i64,(__fd,__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat32i64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat,(__fd,__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat32,(__fd,__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat32,(__fd,__buf))
 #elif defined(__CRT_HAVE_fstat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),fstat,(__fd,__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),fstat,(__fd,__buf))
 #elif defined(__CRT_HAVE_fstat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),fstat64,(__fd,__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_fstat,(__fd_t __fd, struct stat *__restrict __buf),fstat64,(__fd,__buf))
 #else /* ... */
 #undef __local___localdep_fstat_defined
 #endif /* !... */

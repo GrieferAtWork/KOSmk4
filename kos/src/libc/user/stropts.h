@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66ebef1b */
+/* HASH CRC-32:0x9725d7a0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,8 +44,8 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fd, struct strbuf *__restrict
 INTDEF int NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fd, struct strbuf const *ctlptr, struct strbuf const *dataptr, __STDC_INT_AS_UINT_T flags);
 /* @param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND' */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fd, struct strbuf const *ctlptr, struct strbuf const *dataptr, __STDC_INT_AS_UINT_T band, __STDC_INT_AS_UINT_T flags);
-INTDEF NONNULL((2)) int NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fd, char const *__restrict path);
-INTDEF NONNULL((1)) int NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fd, char const *__restrict path);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path);
 #endif /* !__KERNEL__ */
 
 DECL_END

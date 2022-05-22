@@ -35,14 +35,14 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_mmap,hash:CRC-32=0xa206a637]]]*/
+/*[[[head:libc_mmap,hash:CRC-32=0xd655058c]]]*/
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-INTERN ATTR_SECTION(".text.crt.heap.mman") WUNUSED void *
+INTERN ATTR_SECTION(".text.crt.heap.mman") WUNUSED ATTR_ACCESS_NONE(1) void *
 NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr,
                                 size_t len,
                                 __STDC_INT_AS_UINT_T prot,
@@ -62,10 +62,10 @@ NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr,
 }
 /*[[[end:libc_mmap]]]*/
 
-/*[[[head:libc_munmap,hash:CRC-32=0x36b776a1]]]*/
+/*[[[head:libc_munmap,hash:CRC-32=0x14780db7]]]*/
 /* >> munmap(2)
  * Unmap memory from `addr...+=len' */
-INTERN ATTR_SECTION(".text.crt.heap.mman") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.heap.mman") ATTR_ACCESS_NONE(1) int
 NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr,
                                   size_t len)
 /*[[[body:libc_munmap]]]*/
@@ -76,11 +76,11 @@ NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr,
 }
 /*[[[end:libc_munmap]]]*/
 
-/*[[[head:libc_mprotect,hash:CRC-32=0x69e61441]]]*/
+/*[[[head:libc_mprotect,hash:CRC-32=0xcff487ca]]]*/
 /* >> mprotect(2)
  * @param prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE |
  *              PROT_READ | PROT_SEM | PROT_GROWSUP | PROT_GROWSDOWN' */
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) int
 NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr,
                                     size_t len,
                                     __STDC_INT_AS_UINT_T prot)
@@ -92,10 +92,10 @@ NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr,
 }
 /*[[[end:libc_mprotect]]]*/
 
-/*[[[head:libc_msync,hash:CRC-32=0x233e730b]]]*/
+/*[[[head:libc_msync,hash:CRC-32=0xdcb985b6]]]*/
 /* >> msync(2)
  * @param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC' */
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) int
 NOTHROW_RPC(LIBCCALL libc_msync)(void *addr,
                                  size_t len,
                                  __STDC_INT_AS_UINT_T flags)
@@ -107,9 +107,9 @@ NOTHROW_RPC(LIBCCALL libc_msync)(void *addr,
 }
 /*[[[end:libc_msync]]]*/
 
-/*[[[head:libc_mlock,hash:CRC-32=0xcadbb65c]]]*/
+/*[[[head:libc_mlock,hash:CRC-32=0xbf49e22c]]]*/
 /* >> mlock(2) */
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) int
 NOTHROW_NCX(LIBCCALL libc_mlock)(void const *addr,
                                  size_t len)
 /*[[[body:libc_mlock]]]*/
@@ -124,9 +124,9 @@ NOTHROW_NCX(LIBCCALL libc_mlock)(void const *addr,
 }
 /*[[[end:libc_mlock]]]*/
 
-/*[[[head:libc_munlock,hash:CRC-32=0xc5e033ae]]]*/
+/*[[[head:libc_munlock,hash:CRC-32=0x3c10149f]]]*/
 /* >> munlock(2) */
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) int
 NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr,
                                    size_t len)
 /*[[[body:libc_munlock]]]*/
@@ -162,8 +162,8 @@ NOTHROW_NCX(LIBCCALL libc_munlockall)(void)
 }
 /*[[[end:libc_munlockall]]]*/
 
-/*[[[head:libc_madvise,hash:CRC-32=0x6ab3bd0b]]]*/
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
+/*[[[head:libc_madvise,hash:CRC-32=0x51fa3378]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) int
 NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr,
                                    size_t len,
                                    __STDC_INT_AS_UINT_T advice)
@@ -177,8 +177,8 @@ NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr,
 }
 /*[[[end:libc_madvise]]]*/
 
-/*[[[head:libc_mincore,hash:CRC-32=0xb92dc176]]]*/
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
+/*[[[head:libc_mincore,hash:CRC-32=0x51c7c07]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) int
 NOTHROW_NCX(LIBCCALL libc_mincore)(void *start,
                                    size_t len,
                                    unsigned char *vec)
@@ -192,7 +192,7 @@ NOTHROW_NCX(LIBCCALL libc_mincore)(void *start,
 }
 /*[[[end:libc_mincore]]]*/
 
-/*[[[head:libc_mmap64,hash:CRC-32=0xce0cb5f9]]]*/
+/*[[[head:libc_mmap64,hash:CRC-32=0x3a12a633]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_mmap64, libc_mmap);
 #else /* MAGIC:alias */
@@ -202,7 +202,7 @@ DEFINE_INTERN_ALIAS(libc_mmap64, libc_mmap);
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-INTERN ATTR_SECTION(".text.crt.heap.mman") WUNUSED void *
+INTERN ATTR_SECTION(".text.crt.heap.mman") WUNUSED ATTR_ACCESS_NONE(1) void *
 NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr,
                                   size_t len,
                                   __STDC_INT_AS_UINT_T prot,
@@ -236,8 +236,8 @@ NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr,
 #endif /* MAGIC:alias */
 /*[[[end:libc_mmap64]]]*/
 
-/*[[[head:libc_posix_madvise,hash:CRC-32=0xb62b9980]]]*/
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
+/*[[[head:libc_posix_madvise,hash:CRC-32=0x8f3b1cdf]]]*/
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) int
 NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr,
                                          size_t len,
                                          __STDC_INT_AS_UINT_T advice)
@@ -253,10 +253,10 @@ NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr,
 /*[[[end:libc_posix_madvise]]]*/
 
 
-/*[[[head:libc_mremap,hash:CRC-32=0xb79d55d6]]]*/
+/*[[[head:libc_mremap,hash:CRC-32=0xc2629dd1]]]*/
 /* >> mremap(2)
  * @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
-INTERN ATTR_SECTION(".text.crt.heap.mman") void *
+INTERN ATTR_SECTION(".text.crt.heap.mman") ATTR_ACCESS_NONE(1) void *
 NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr,
                                    size_t old_len,
                                    size_t new_len,
@@ -275,9 +275,9 @@ NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr,
 }
 /*[[[end:libc_mremap]]]*/
 
-/*[[[head:libc_remap_file_pages,hash:CRC-32=0x3cf68988]]]*/
+/*[[[head:libc_remap_file_pages,hash:CRC-32=0x7304cb93]]]*/
 /* >> remap_file_pages(2) */
-INTERN ATTR_SECTION(".text.crt.system.mman") int
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) int
 NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start,
                                             size_t size,
                                             __STDC_INT_AS_UINT_T prot,
@@ -310,9 +310,9 @@ NOTHROW_NCX(LIBCCALL libc_memfd_create)(char const *name,
 }
 /*[[[end:libc_memfd_create]]]*/
 
-/*[[[head:libc_mlock2,hash:CRC-32=0x6759c12a]]]*/
+/*[[[head:libc_mlock2,hash:CRC-32=0x9355743]]]*/
 /* >> mlock2(2) */
-INTERN ATTR_SECTION(".text.crt.system.mman") int
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) int
 NOTHROW_NCX(LIBCCALL libc_mlock2)(void const *addr,
                                   size_t length,
                                   unsigned int flags)
@@ -356,10 +356,10 @@ NOTHROW_NCX(LIBCCALL libc_pkey_free)(int pkey)
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_pkey_free]]]*/
 
-/*[[[head:libc_pkey_mprotect,hash:CRC-32=0x9c144d9e]]]*/
+/*[[[head:libc_pkey_mprotect,hash:CRC-32=0x384fcc19]]]*/
 #ifdef __ARCH_HAVE_PKEY
 /* >> pkey_mprotect(2) */
-INTERN ATTR_SECTION(".text.crt.system.mman") int
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_NONE(1) int
 NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr,
                                          size_t len,
                                          __STDC_INT_AS_UINT_T prot,

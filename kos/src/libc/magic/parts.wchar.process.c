@@ -82,7 +82,7 @@ __SYSDECL_BEGIN
 [[decl_include("<features.h>", "<hybrid/typecore.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(path, ___argv), dos_export_alias("_wexecv")]]
 [[requires_function(execv, convert_wcstombs, convert_wcstombsv)]]
-int wexecv([[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV) {
+int wexecv([[in]] wchar_t const *__restrict path, [[in]] __TWARGV) {
 	int result = -1;
 	char *utf8_path, **utf8_argv;
 	utf8_path = convert_wcstombs(path);
@@ -106,7 +106,7 @@ done:
 [[decl_include("<features.h>", "<hybrid/typecore.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(path, ___argv, ___envp), dos_export_alias("_wexecve")]]
 [[requires_function(execve, convert_wcstombs, convert_wcstombsv)]]
-int wexecve([[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP) {
+int wexecve([[in]] wchar_t const *__restrict path, [[in]] __TWARGV, [[in]] __TWENVP) {
 	int result = -1;
 	char *utf8_path, **utf8_argv, **utf8_envp;
 	utf8_path = convert_wcstombs(path);
@@ -137,7 +137,7 @@ done:
 [[decl_include("<features.h>", "<hybrid/typecore.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(path, ___argv), dos_export_alias("_wexecvp")]]
 [[requires_function(execvp, convert_wcstombs, convert_wcstombsv)]]
-int wexecvp([[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV) {
+int wexecvp([[in]] wchar_t const *__restrict file, [[in]] __TWARGV) {
 	int result = -1;
 	char *utf8_file, **utf8_argv;
 	utf8_file = convert_wcstombs(file);
@@ -161,7 +161,7 @@ done:
 [[decl_include("<features.h>", "<hybrid/typecore.h>"), decl_prefix(DEFINE_TARGV)]]
 [[cp, guard, wchar, argument_names(path, ___argv, ___envp), dos_export_alias("_wexecvpe")]]
 [[requires_function(execvpe, convert_wcstombs, convert_wcstombsv)]]
-int wexecvpe([[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV, [[nonnull]] __TWENVP) {
+int wexecvpe([[in]] wchar_t const *__restrict file, [[in]] __TWARGV, [[in]] __TWENVP) {
 	int result = -1;
 	char *utf8_file, **utf8_argv, **utf8_envp;
 	utf8_file = convert_wcstombs(file);
@@ -192,25 +192,25 @@ done:
 
 [[cp, guard, wchar, impl_include("<parts/redirect-exec.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires_dependent_function(wexecv), ATTR_SENTINEL, dos_export_alias("_wexecl")]]
-int wexecl([[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
+int wexecl([[in]] wchar_t const *__restrict path, [[in_opt]] wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
 	__REDIRECT_EXECL(wchar_t, wexecv, path, args)
 }
 
 [[cp, guard, wchar, impl_include("<parts/redirect-exec.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires_dependent_function(wexecve), ATTR_SENTINEL_O(1), dos_export_alias("_wexecle")]]
-int wexecle([[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
+int wexecle([[in]] wchar_t const *__restrict path, [[in_opt]] wchar_t const *args, ... /*, (wchar_t *)NULL, [[in]] wchar_t **environ*/) {
 	__REDIRECT_EXECLE(wchar_t, wexecve, path, args)
 }
 
 [[cp, guard, wchar, impl_include("<parts/redirect-exec.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires_dependent_function(wexecvp), ATTR_SENTINEL, dos_export_alias("_wexeclp")]]
-int wexeclp([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
+int wexeclp([[in]] wchar_t const *__restrict file, [[in_opt]] wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
 	__REDIRECT_EXECL(wchar_t, wexecvp, file, args)
 }
 
 [[cp, guard, wchar, impl_include("<parts/redirect-exec.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires_dependent_function(wexecvpe), ATTR_SENTINEL_O(1), dos_export_alias("_wexeclpe")]]
-int wexeclpe([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
+int wexeclpe([[in]] wchar_t const *__restrict file, [[in_opt]] wchar_t const *args, ... /*, (wchar_t *)NULL, [[in]] wchar_t **environ*/) {
 	__REDIRECT_EXECLE(wchar_t, wexecvpe, file, args)
 }
 
@@ -220,7 +220,7 @@ int wexeclpe([[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ..
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV), decl_include("<bits/types.h>")]]
 [[cp, guard, wchar, argument_names(mode, path, ___argv), dos_export_alias("_wspawnv")]]
 [[requires_function(spawnv, convert_wcstombs, convert_wcstombsv)]]
-$pid_t wspawnv(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path, [[nonnull]] __TWARGV) {
+$pid_t wspawnv(__STDC_INT_AS_UINT_T mode, [[in]] wchar_t const *__restrict path, [[in]] __TWARGV) {
 	int result = -1;
 	char *utf8_path, **utf8_argv;
 	utf8_path = convert_wcstombs(path);
@@ -246,8 +246,8 @@ done:
 [[cp, guard, wchar, argument_names(mode, path, ___argv, ___envp), dos_export_alias("_wspawnve")]]
 [[requires_function(spawnve, convert_wcstombs, convert_wcstombsv)]]
 $pid_t wspawnve(__STDC_INT_AS_UINT_T mode,
-                [[nonnull]] wchar_t const *__restrict path,
-                [[nonnull]] __TWARGV, [[nonnull]] __TWENVP) {
+                [[in]] wchar_t const *__restrict path,
+                [[in]] __TWARGV, [[in]] __TWENVP) {
 	int result = -1;
 	char *utf8_path, **utf8_argv, **utf8_envp;
 	utf8_path = convert_wcstombs(path);
@@ -278,7 +278,7 @@ done:
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV), decl_include("<bits/types.h>")]]
 [[cp, guard, wchar, argument_names(mode, file, ___argv), dos_export_alias("_wspawnvp")]]
 [[requires_function(spawnvp, convert_wcstombs, convert_wcstombsv)]]
-$pid_t wspawnvp(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, [[nonnull]] __TWARGV) {
+$pid_t wspawnvp(__STDC_INT_AS_UINT_T mode, [[in]] wchar_t const *__restrict file, [[in]] __TWARGV) {
 	int result = -1;
 	char *utf8_file, **utf8_argv;
 	utf8_file = convert_wcstombs(file);
@@ -303,8 +303,8 @@ done:
 [[cp, guard, wchar, argument_names(mode, file, ___argv, ___envp), dos_export_alias("_wspawnvpe")]]
 [[requires_function(spawnvpe, convert_wcstombs, convert_wcstombsv)]]
 $pid_t wspawnvpe(__STDC_INT_AS_UINT_T mode,
-                 [[nonnull]] wchar_t const *__restrict file,
-                 [[nonnull]] __TWARGV, [[nonnull]] __TWENVP) {
+                 [[in]] wchar_t const *__restrict file,
+                 [[in]] __TWARGV, [[in]] __TWENVP) {
 	int result = -1;
 	char *utf8_file, **utf8_argv, **utf8_envp;
 	utf8_file = convert_wcstombs(file);
@@ -334,25 +334,25 @@ done:
 
 [[cp, guard, wchar, impl_include("<parts/redirect-exec.h>"), decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_dependent_function(wspawnv), ATTR_SENTINEL, dos_export_alias("_wspawnl")]]
-$pid_t wspawnl(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
+$pid_t wspawnl(__STDC_INT_AS_UINT_T mode, [[in]] wchar_t const *__restrict path, [[in_opt]] wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
 	__REDIRECT_SPAWNL(wchar_t, wspawnv, mode, path, args)
 }
 
 [[cp, guard, wchar, impl_include("<parts/redirect-exec.h>"), decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_dependent_function(wspawnve), ATTR_SENTINEL_O(1), dos_export_alias("_wspawnle")]]
-$pid_t wspawnle(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
+$pid_t wspawnle(__STDC_INT_AS_UINT_T mode, [[in]] wchar_t const *__restrict path, [[in_opt]] wchar_t const *args, ... /*, (wchar_t *)NULL, [[in]] wchar_t **environ*/) {
 	__REDIRECT_SPAWNLE(wchar_t, wspawnve, mode, path, args)
 }
 
 [[cp, guard, wchar, impl_include("<parts/redirect-exec.h>"), decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_dependent_function(wspawnvp), ATTR_SENTINEL, dos_export_alias("_wspawnlp")]]
-$pid_t wspawnlp(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
+$pid_t wspawnlp(__STDC_INT_AS_UINT_T mode, [[in]] wchar_t const *__restrict file, [[in_opt]] wchar_t const *args, ... /*, (wchar_t *)NULL*/) {
 	__REDIRECT_SPAWNL(wchar_t, wspawnvp, mode, file, args)
 }
 
 [[cp, guard, wchar, impl_include("<parts/redirect-exec.h>"), decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_dependent_function(wspawnvpe), ATTR_SENTINEL_O(1), dos_export_alias("_wspawnlpe")]]
-$pid_t wspawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] wchar_t const *__restrict file, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
+$pid_t wspawnlpe(__STDC_INT_AS_UINT_T mode, [[in]] wchar_t const *__restrict file, [[in_opt]] wchar_t const *args, ... /*, (wchar_t *)NULL, [[in]] wchar_t **environ*/) {
 	__REDIRECT_SPAWNLE(wchar_t, wspawnvpe, mode, file, args)
 }
 

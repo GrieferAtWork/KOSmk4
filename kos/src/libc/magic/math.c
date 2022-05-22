@@ -628,7 +628,7 @@ double exp(double x) {
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
-double frexp(double x, [[nonnull]] int *pexponent) {
+double frexp(double x, [[out]] int *pexponent) {
 @@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
 	return (double)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)x, pexponent);
 @@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
@@ -718,7 +718,7 @@ double log10(double x) {
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
-double modf(double x, [[nonnull]] double *iptr) {
+double modf(double x, [[out]] double *iptr) {
 @@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
 	return (double)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
 @@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
@@ -1456,7 +1456,7 @@ double trunc(double x) {
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
-double remquo(double x, double p, [[nonnull]] int *pquo) {
+double remquo(double x, double p, [[out]] int *pquo) {
 	return __LIBM_MATHFUN3I(@remquo@, x, p, pquo);
 }
 
@@ -1845,7 +1845,7 @@ __LONGLONG llroundl(__LONGDOUBLE x) %{generate(double2ldouble("llround"))}
            defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
-void sincos(double x, [[nonnull]] double *psinx, [[nonnull]] double *pcosx) {
+void sincos(double x, [[out]] double *psinx, [[out]] double *pcosx) {
 @@pp_if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)@@
 	__LIBM_MATHFUNX(@sincos@)(x, psinx, pcosx);
 @@pp_else@@
@@ -1891,7 +1891,7 @@ double pow10(double x) {
            defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__))]]
-void sincosf(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx) {
+void sincosf(float x, [[out]] float *psinx, [[out]] float *pcosx) {
 @@pp_if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)@@
 	__LIBM_MATHFUNXF(@sincos@)(x, psinx, pcosx);
 @@pp_elif $has_function(sincos)@@
@@ -1933,7 +1933,7 @@ float exp10f(float x) {
            defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__))]]
-void sincosl(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *psinx, [[nonnull]] __LONGDOUBLE *pcosx) {
+void sincosl(__LONGDOUBLE x, [[out]] __LONGDOUBLE *psinx, [[out]] __LONGDOUBLE *pcosx) {
 @@pp_if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)@@
 	__LIBM_MATHFUNXL(@sincos@)(x, psinx, pcosx);
 @@pp_elif $has_function(sincos)@@
@@ -2240,7 +2240,7 @@ gammal(*) = lgammal;
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
-double lgamma_r(double x, [[nonnull]] int *signgamp) {
+double lgamma_r(double x, [[out]] int *signgamp) {
 	double result = __LIBM_MATHFUN2I(@lgamma@, x, signgamp);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    !__LIBM_MATHFUNI(@finite@, result) && __LIBM_MATHFUNI(@finite@, x)) {
@@ -2838,8 +2838,8 @@ $uintmax_t ufromfpx(double x, int round, unsigned int width); /* TODO */
 @@@param: cx: Store the canonicalized value of `*x' here.
 @@@return: 0: Success
 @@@return: 1: Error (`!iscanonical(*x)')
-int canonicalize([[nonnull]] double *cx,
-                 [[nonnull]] double const *x) {
+int canonicalize([[out]] double *cx,
+                 [[in]] double const *x) {
 	double value = *x;
 @@pp_if __MAGIC_FLOAT_TYPE_IS_LONG_DOUBLE@@
 	if (!__iscanonicall(value))
@@ -3674,7 +3674,7 @@ __SYSDECL_BEGIN
 
 @@>> _fdtest(3), _dtest(3), _ldtest(3)
 [[pure, crt_dos_variant, wunused, decl_include("<features.h>")]]
-short _dtest([[nonnull]] double __KOS_FIXED_CONST *px) {
+short _dtest([[in]] double __KOS_FIXED_CONST *px) {
 	return __fpclassify(*px);
 }
 

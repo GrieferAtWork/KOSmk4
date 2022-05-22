@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7dfa28f */
+/* HASH CRC-32:0xe39838b1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -126,14 +126,14 @@ INTDEF ATTR_PURE ATTR_ACCESS_ROS(1, 2) NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL 
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-INTDEF ATTR_ACCESS_ROS(1, 2) NONNULL((3)) void NOTHROW_NCX(LIBDCALL libd_argz_extract)(char const *__restrict argz, size_t argz_len, char **__restrict argv);
+INTDEF ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_WR(3) void NOTHROW_NCX(LIBDCALL libd_argz_extract)(char const *__restrict argz, size_t argz_len, char **__restrict argv);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-INTDEF ATTR_ACCESS_ROS(1, 2) NONNULL((3)) void NOTHROW_NCX(LIBCCALL libc_argz_extract)(char const *__restrict argz, size_t argz_len, char **__restrict argv);
+INTDEF ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_WR(3) void NOTHROW_NCX(LIBCCALL libc_argz_extract)(char const *__restrict argz, size_t argz_len, char **__restrict argv);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> argz_stringify(3)

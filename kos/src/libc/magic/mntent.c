@@ -77,8 +77,8 @@ typedef __FILE FILE;
 @@>> setmntent(3)
 [[cp, nocrt, wunused]]
 [[alias("setmntent", "__setmntent", "fopen", "_IO_fopen", "fopen64")]]
-$FILE *setmntent([[nonnull]] char const *file,
-                 [[nonnull]] char const *mode);
+$FILE *setmntent([[in]] char const *file,
+                 [[in]] char const *mode);
 
 @@>> endmntent(3)
 [[cp_nokos, requires_function(fclose)]]
@@ -113,8 +113,8 @@ struct mntent *getmntent([[inout]] $FILE *stream) {
 [[cp, doc_alias("getmntent"), export_alias("__getmntent_r")]]
 [[requires_function(fgets)]]
 struct mntent *getmntent_r([[inout]] $FILE *__restrict stream,
-                           [[nonnull]] struct mntent *__restrict result,
-                           [[inp(bufsize)]] char *__restrict buffer,
+                           [[out]] struct mntent *__restrict result,
+                           [[out(? <= bufsize)]] char *__restrict buffer,
                            __STDC_INT_AS_SIZE_T bufsize) {
 	char *line;
 	do {
@@ -195,7 +195,7 @@ err:
 [[requires_include("<asm/os/stdio.h>")]]
 [[requires(defined(__SEEK_END) && $has_function(fseek) && $has_function(fprintf))]]
 int addmntent([[inout]] $FILE *__restrict stream,
-              [[nonnull]] struct mntent const *__restrict mnt) {
+              [[in]] struct mntent const *__restrict mnt) {
 	if unlikely(!mnt ||
 	            !mnt->@mnt_fsname@ || !mnt->@mnt_dir@ ||
 	            !mnt->@mnt_type@ || !mnt->@mnt_opts@)
@@ -217,8 +217,8 @@ int addmntent([[inout]] $FILE *__restrict stream,
 @@@return: * :   Address of the `opt'-string in `mnt->mnt_opts'
 @@@return: NULL: No option `opt' found in `mnt->mnt_opts'
 [[pure, wunused, decl_include("<bits/crt/db/mntent.h>")]]
-char *hasmntopt([[nullable]] struct mntent const *mnt,
-                [[nullable]] char const *opt) {
+char *hasmntopt([[in_opt]] struct mntent const *mnt,
+                [[in_opt]] char const *opt) {
 	char *str;
 	if likely(mnt && opt && (str = mnt->@mnt_opts@) != NULL) {
 		size_t optlen = strlen(opt);

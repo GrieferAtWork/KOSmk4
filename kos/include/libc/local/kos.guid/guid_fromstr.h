@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36c151f0 */
+/* HASH CRC-32:0xd4ed30d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(guid_fromstr) __ATTR_NONNULL((1, 2)) char const *
+__LOCAL_LIBC(guid_fromstr) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) char const *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(guid_fromstr))(char const __string[GUID_STRLEN], guid_t *__restrict __result) {
 	unsigned int __i;
 	for (__i = 0; __i < 16; ++__i) {

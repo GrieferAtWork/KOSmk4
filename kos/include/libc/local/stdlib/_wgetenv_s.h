@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa96f238 */
+/* HASH CRC-32:0xc3d69b60 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep__wgetenv,(__WCHAR_TYPE__ const *__varname),_wgetenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep__wgetenv,(__WCHAR_TYPE__ const *__varname),_wgetenv,(__varname))
 #endif /* !__local___localdep__wgetenv_defined */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wgetenv_s) __ATTR_NONNULL((1, 2, 4)) __errno_t
+__LOCAL_LIBC(_wgetenv_s) __ATTR_ACCESS_RO(4) __ATTR_ACCESS_WR(1) __ATTR_ACCESS_WRS(2, 3) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wgetenv_s))(__SIZE_TYPE__ *__preqsize, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__varname) {
 	__SIZE_TYPE__ __reqsize;
 	__WCHAR_TYPE__ *__name = (__NAMESPACE_LOCAL_SYM __localdep__wgetenv)(__varname);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3298e76b */
+/* HASH CRC-32:0xd942417b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,12 +30,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wto8)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),DOS$format_wto8,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__C16FORMATPRINTER_CC,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),DOS$format_wto8,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
@@ -97,7 +97,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(convert_c16tombsn) __ATTR_MALLOC __ATTR_WUNUSED char *
+__LOCAL_LIBC(convert_c16tombsn) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR_OPT(3) char *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(convert_c16tombsn))(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen) {
 	struct __local_format_wto8_data {
 		__pformatprinter __fd_printer;   /* [1..1] Inner printer */

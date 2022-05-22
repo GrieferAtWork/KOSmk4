@@ -226,9 +226,9 @@ size_t argz_count([[in(argz_len)]] char const *argz, size_t argz_len) {
 @@all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements)
 [[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__argz_extract")]]
-void argz_extract([[in(argz_len)]] char const *__restrict argz, size_t argz_len, [[nonnull]] char **__restrict argv)
-	[[([in(argz_len)] char *__restrict argz, size_t argz_len, [[nonnull]] char **__restrict argv)]]
-	[[([in(argz_len)] char const *__restrict argz, size_t argz_len, [[nonnull]] char const **__restrict argv)]]
+void argz_extract([[in(argz_len)]] char const *__restrict argz, size_t argz_len, [[out]] char **__restrict argv)
+	[[([in(argz_len)] char *__restrict argz, size_t argz_len, [[out]] char **__restrict argv)]]
+	[[([in(argz_len)] char const *__restrict argz, size_t argz_len, [[out]] char const **__restrict argv)]]
 {
 	size_t i;
 	if unlikely(!argz_len)

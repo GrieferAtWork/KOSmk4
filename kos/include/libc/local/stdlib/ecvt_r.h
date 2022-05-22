@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4873833 */
+/* HASH CRC-32:0x494fffe1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 5, 6)),__errno_t,__NOTHROW_NCX,__localdep_dos_ecvt_s,(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),_ecvt_s,(__buf,__buflen,__val,__ndigit,__decptr,__sign))
+__CREDIRECT(__ATTR_ACCESS_WR(5) __ATTR_ACCESS_WR(6) __ATTR_ACCESS_WRS(1, 2),__errno_t,__NOTHROW_NCX,__localdep_dos_ecvt_s,(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),_ecvt_s,(__buf,__buflen,__val,__ndigit,__decptr,__sign))
 #endif /* !__local___localdep_dos_ecvt_s_defined && __CRT_HAVE__ecvt_s */
-__LOCAL_LIBC(ecvt_r) __ATTR_NONNULL((3, 4, 5)) int
+__LOCAL_LIBC(ecvt_r) __ATTR_ACCESS_WR(3) __ATTR_ACCESS_WR(4) __ATTR_ACCESS_WRS(5, 6) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ecvt_r))(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len) {
 #if defined(__CRT_HAVE__ecvt_s) && !defined(__BUILDING_LIBC)
 	return (__NAMESPACE_LOCAL_SYM __localdep_dos_ecvt_s)(__buf, __len, __val, __ndigit, __decptr, __sign) ? -1 : 0;

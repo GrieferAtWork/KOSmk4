@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb19b2e5d */
+/* HASH CRC-32:0x485d9ea1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,10 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wutime)(char16_t const *file, struct utimbuf const *file_times);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wutime)(char32_t const *file, struct utimbuf const *file_times);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wutime64)(char16_t const *file, struct utimbuf64 const *file_times);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wutime64)(char32_t const *file, struct utimbuf64 const *file_times);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) int NOTHROW_RPC(LIBDCALL libd_wutime)(char16_t const *file, struct utimbuf const *file_times);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) int NOTHROW_RPC(LIBKCALL libc_wutime)(char32_t const *file, struct utimbuf const *file_times);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) int NOTHROW_RPC(LIBDCALL libd_wutime64)(char16_t const *file, struct utimbuf64 const *file_times);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) int NOTHROW_RPC(LIBKCALL libc_wutime64)(char32_t const *file, struct utimbuf64 const *file_times);
 #endif /* !__KERNEL__ */
 
 DECL_END

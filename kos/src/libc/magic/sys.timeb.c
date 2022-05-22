@@ -65,11 +65,11 @@ typedef __TM_TYPE(time) time_t;
 
 [[doc_alias("ftime"), ignore, nocrt, alias("ftime")]]
 [[decl_include("<bits/os/timeb.h>")]]
-int crt_ftime32([[nonnull]] struct $timeb32 *timebuf);
+int crt_ftime32([[out]] struct $timeb32 *timebuf);
 
 [[doc_alias("ftime"), ignore, nocrt, alias("ftime64")]]
 [[decl_include("<bits/os/timeb.h>")]]
-int crt_ftime64([[nonnull]] struct $timeb64 *timebuf);
+int crt_ftime64([[out]] struct $timeb64 *timebuf);
 
 %#ifdef __USE_DOS
 %{
@@ -81,19 +81,19 @@ typedef __errno_t errno_t;
 
 [[doc_alias("ftime"), ignore, nocrt, alias("_ftime32", "_ftime")]]
 [[decl_include("<bits/os/timeb.h>")]]
-void crt_dos_ftime32([[nonnull]] struct $timeb32 *timebuf);
+void crt_dos_ftime32([[out]] struct $timeb32 *timebuf);
 
 [[doc_alias("ftime"), ignore, nocrt, alias("_ftime64")]]
 [[decl_include("<bits/os/timeb.h>")]]
-void crt_dos_ftime64([[nonnull]] struct $timeb64 *timebuf);
+void crt_dos_ftime64([[out]] struct $timeb64 *timebuf);
 
 [[doc_alias("ftime"), ignore, nocrt, alias("_ftime32_s")]]
 [[decl_include("<bits/os/timeb.h>", "<bits/types.h>")]]
-$errno_t crt_ftime32_s([[nonnull]] struct $timeb32 *timebuf);
+$errno_t crt_ftime32_s([[out]] struct $timeb32 *timebuf);
 
 [[doc_alias("ftime"), ignore, nocrt, alias("_ftime64_s")]]
 [[decl_include("<bits/os/timeb.h>", "<bits/types.h>")]]
-$errno_t crt_ftime64_s([[nonnull]] struct $timeb64 *timebuf);
+$errno_t crt_ftime64_s([[out]] struct $timeb64 *timebuf);
 
 
 
@@ -103,7 +103,7 @@ $errno_t crt_ftime64_s([[nonnull]] struct $timeb64 *timebuf);
 [[requires($has_function(crt_ftime32_s) || $has_function(crt_ftime32) ||
            $has_function(crt_dos_ftime64) || $has_function(crt_ftime64_s) ||
            $has_function(crt_ftime64))]]
-void _ftime32([[nonnull]] struct $timeb32 *timebuf) {
+void _ftime32([[out]] struct $timeb32 *timebuf) {
 @@pp_if $has_function(crt_ftime32_s)@@
 	if unlikely(crt_ftime32_s(timebuf))
 		bzero(timebuf, sizeof(*timebuf));
@@ -140,7 +140,7 @@ void _ftime32([[nonnull]] struct $timeb32 *timebuf) {
 [[requires($has_function(crt_ftime64_s) || $has_function(crt_ftime64) ||
            $has_function(crt_dos_ftime32) || $has_function(crt_ftime32_s) ||
            $has_function(crt_ftime32))]]
-void _ftime64([[nonnull]] struct $timeb64 *timebuf) {
+void _ftime64([[out]] struct $timeb64 *timebuf) {
 @@pp_if $has_function(crt_ftime64_s)@@
 	if unlikely(crt_ftime64_s(timebuf))
 		bzero(timebuf, sizeof(*timebuf));
@@ -178,7 +178,7 @@ void _ftime64([[nonnull]] struct $timeb64 *timebuf) {
            $has_function(crt_ftime64) || $has_function(crt_dos_ftime32) ||
            $has_function(crt_dos_ftime64))]]
 [[userimpl, impl_include("<libc/errno.h>")]]
-errno_t _ftime32_s([[nonnull]] struct $timeb32 *timebuf) {
+errno_t _ftime32_s([[out]] struct $timeb32 *timebuf) {
 @@pp_if $has_function(crt_ftime32)@@
 	if likely(crt_ftime32(timebuf) == 0)
 		return 0;
@@ -227,7 +227,7 @@ errno_t _ftime32_s([[nonnull]] struct $timeb32 *timebuf) {
            $has_function(crt_ftime32) || $has_function(crt_dos_ftime64) ||
            $has_function(crt_dos_ftime32))]]
 [[userimpl, impl_include("<libc/errno.h>")]]
-errno_t _ftime64_s([[nonnull]] struct $timeb64 *timebuf) {
+errno_t _ftime64_s([[out]] struct $timeb64 *timebuf) {
 @@pp_if $has_function(crt_ftime64)@@
 	if likely(crt_ftime64(timebuf) == 0)
 		return 0;
@@ -287,7 +287,7 @@ errno_t _ftime64_s([[nonnull]] struct $timeb64 *timebuf) {
            $has_function(crt_dos_ftime32) || $has_function(crt_dos_ftime64) ||
            $has_function(crt_ftime32) || $has_function(crt_ftime64))]]
 [[userimpl, impl_include("<features.h>", "<libc/errno.h>")]]
-int ftime([[nonnull]] struct timeb *timebuf) {
+int ftime([[out]] struct timeb *timebuf) {
 @@pp_if $has_function(crt_ftime32_s) && !defined(__USE_TIME_BITS64)@@
 	errno_t error = crt_ftime32_s(timebuf);
 	if unlikely(error)
@@ -375,7 +375,7 @@ int ftime([[nonnull]] struct timeb *timebuf) {
            $has_function(crt_ftime32) || $has_function(crt_ftime32_s) ||
            $has_function(crt_dos_ftime32))]]
 [[userimpl, impl_include("<libc/errno.h>")]]
-int ftime64([[nonnull]] struct timeb64 *timebuf) {
+int ftime64([[out]] struct timeb64 *timebuf) {
 @@pp_if $has_function(crt_ftime64_s)@@
 	errno_t error = crt_ftime64_s(timebuf);
 	if unlikely(error) {

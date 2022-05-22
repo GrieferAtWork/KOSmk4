@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x538281ce */
+/* HASH CRC-32:0x84935a64 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mknodat_defined
 #define __local___localdep_mknodat_defined
 #ifdef __CRT_HAVE_mknodat
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_mknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),mknodat,(__dirfd,__nodename,__mode,__dev))
+__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_mknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),mknodat,(__dirfd,__nodename,__mode,__dev))
 #elif defined(__CRT_HAVE_fmknodat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.stat/mknodat.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_mknodat_defined
 #endif /* !... */
 #endif /* !__local___localdep_mknodat_defined */
-__LOCAL_LIBC(mknod) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(mknod) __ATTR_ACCESS_RO(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mknod))(char const *__nodename, __mode_t __mode, __dev_t __dev) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_mknodat)(__AT_FDCWD, __nodename, __mode, __dev);
 }

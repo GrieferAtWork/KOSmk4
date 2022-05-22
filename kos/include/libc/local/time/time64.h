@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5978b03 */
+/* HASH CRC-32:0xf75132db */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,18 +27,18 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_time32_defined
 #define __local___localdep_crt_time32_defined
 #ifdef __CRT_HAVE_time
-__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_crt_time32,(__time32_t *__timer),time,(__timer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__time32_t,__NOTHROW_NCX,__localdep_crt_time32,(__time32_t *__timer),time,(__timer))
 #elif defined(__CRT_HAVE___time)
-__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_crt_time32,(__time32_t *__timer),__time,(__timer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__time32_t,__NOTHROW_NCX,__localdep_crt_time32,(__time32_t *__timer),__time,(__timer))
 #elif defined(__CRT_HAVE___libc_time)
-__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_crt_time32,(__time32_t *__timer),__libc_time,(__timer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__time32_t,__NOTHROW_NCX,__localdep_crt_time32,(__time32_t *__timer),__libc_time,(__timer))
 #elif defined(__CRT_HAVE__time32)
-__CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_crt_time32,(__time32_t *__timer),_time32,(__timer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__time32_t,__NOTHROW_NCX,__localdep_crt_time32,(__time32_t *__timer),_time32,(__timer))
 #else /* ... */
 #undef __local___localdep_crt_time32_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_time32_defined */
-__LOCAL_LIBC(time64) __time64_t
+__LOCAL_LIBC(time64) __ATTR_ACCESS_WR_OPT(1) __time64_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(time64))(__time64_t *__timer) {
 	__time32_t __tm32 = (__NAMESPACE_LOCAL_SYM __localdep_crt_time32)(__NULLPTR);
 	if (__timer)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6a218d6 */
+/* HASH CRC-32:0x71cb230f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,193 +93,193 @@ INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBCCALL libc_futex_wakemask)(lfutex_t *
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile)(lfutex_t *uaddr, lfutex_t equal_to_value);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile)(lfutex_t *uaddr, lfutex_t equal_to_value);
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waituntil)(lfutex_t *uaddr, lfutex_t not_equal_to_value);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_futex_waituntil)(lfutex_t *uaddr, lfutex_t not_equal_to_value);
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_above)(lfutex_t *uaddr, lfutex_t above_value);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_above)(lfutex_t *uaddr, lfutex_t above_value);
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_below)(lfutex_t *uaddr, lfutex_t below_value);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_below)(lfutex_t *uaddr, lfutex_t below_value);
 /* Wait if `*uaddr >= above_or_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_aboveequal)(lfutex_t *uaddr, lfutex_t above_or_equal_value);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_aboveequal)(lfutex_t *uaddr, lfutex_t above_or_equal_value);
 /* Wait if `*uaddr <= below_or_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_belowequal)(lfutex_t *uaddr, lfutex_t below_or_equal_value);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_belowequal)(lfutex_t *uaddr, lfutex_t below_or_equal_value);
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_exactbits)(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_exactbits)(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask);
 /* Wait if `(*uaddr & bitmask) != setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waituntil_exactbits)(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_futex_waituntil_exactbits)(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask);
 /* Wait if `(*uaddr & bitmask) != 0'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_anybit)(lfutex_t *uaddr, lfutex_t bitmask);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_anybit)(lfutex_t *uaddr, lfutex_t bitmask);
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_allbits)(lfutex_t *uaddr, lfutex_t bitmask);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_futex_waitwhile_allbits)(lfutex_t *uaddr, lfutex_t bitmask);
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile)(lfutex_t *uaddr, lfutex_t equal_to_value, struct timespec const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile)(lfutex_t *uaddr, lfutex_t equal_to_value, struct timespec const *rel_timeout);
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil)(lfutex_t *uaddr, lfutex_t not_equal_to_value, struct timespec const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil)(lfutex_t *uaddr, lfutex_t not_equal_to_value, struct timespec const *rel_timeout);
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_above)(lfutex_t *uaddr, lfutex_t above_value, struct timespec const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_above)(lfutex_t *uaddr, lfutex_t above_value, struct timespec const *rel_timeout);
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_below)(lfutex_t *uaddr, lfutex_t below_value, struct timespec const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_below)(lfutex_t *uaddr, lfutex_t below_value, struct timespec const *rel_timeout);
 /* Wait if `*uaddr >= above_or_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequal)(lfutex_t *uaddr, lfutex_t above_or_equal_value, struct timespec const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequal)(lfutex_t *uaddr, lfutex_t above_or_equal_value, struct timespec const *rel_timeout);
 /* Wait if `*uaddr <= below_or_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal)(lfutex_t *uaddr, lfutex_t below_or_equal_value, struct timespec const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal)(lfutex_t *uaddr, lfutex_t below_or_equal_value, struct timespec const *rel_timeout);
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_exactbits)(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(4) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_exactbits)(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec const *rel_timeout);
 /* Wait if `(*uaddr & bitmask) != setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_exactbits)(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(4) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_exactbits)(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec const *rel_timeout);
 /* Wait if `(*uaddr & bitmask) != 0'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_anybit)(lfutex_t *uaddr, lfutex_t bitmask, struct timespec const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_anybit)(lfutex_t *uaddr, lfutex_t bitmask, struct timespec const *rel_timeout);
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits)(lfutex_t *uaddr, lfutex_t bitmask, struct timespec const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits)(lfutex_t *uaddr, lfutex_t bitmask, struct timespec const *rel_timeout);
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile64)(lfutex_t *uaddr, lfutex_t equal_to_value, struct timespec64 const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile64)(lfutex_t *uaddr, lfutex_t equal_to_value, struct timespec64 const *rel_timeout);
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil64)(lfutex_t *uaddr, lfutex_t not_equal_to_value, struct timespec64 const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil64)(lfutex_t *uaddr, lfutex_t not_equal_to_value, struct timespec64 const *rel_timeout);
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_above64)(lfutex_t *uaddr, lfutex_t above_value, struct timespec64 const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_above64)(lfutex_t *uaddr, lfutex_t above_value, struct timespec64 const *rel_timeout);
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_below64)(lfutex_t *uaddr, lfutex_t below_value, struct timespec64 const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_below64)(lfutex_t *uaddr, lfutex_t below_value, struct timespec64 const *rel_timeout);
 /* Wait if `*uaddr >= above_or_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequal64)(lfutex_t *uaddr, lfutex_t above_or_equal_value, struct timespec64 const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_aboveequal64)(lfutex_t *uaddr, lfutex_t above_or_equal_value, struct timespec64 const *rel_timeout);
 /* Wait if `*uaddr <= below_or_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT:    A faulty pointer was given
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal64)(lfutex_t *uaddr, lfutex_t below_or_equal_value, struct timespec64 const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_belowequal64)(lfutex_t *uaddr, lfutex_t below_or_equal_value, struct timespec64 const *rel_timeout);
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_exactbits64)(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec64 const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(4) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_exactbits64)(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec64 const *rel_timeout);
 /* Wait if `(*uaddr & bitmask) != setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_exactbits64)(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec64 const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(4) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaituntil_exactbits64)(lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask, struct timespec64 const *rel_timeout);
 /* Wait if `(*uaddr & bitmask) != 0'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_anybit64)(lfutex_t *uaddr, lfutex_t bitmask, struct timespec64 const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_anybit64)(lfutex_t *uaddr, lfutex_t bitmask, struct timespec64 const *rel_timeout);
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64)(lfutex_t *uaddr, lfutex_t bitmask, struct timespec64 const *rel_timeout);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64)(lfutex_t *uaddr, lfutex_t bitmask, struct timespec64 const *rel_timeout);
 /* Get/Set the number of times to spin the following futex operations without
  * entering  kernel-space,  setting  waiter-bits,  and  entering  sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });

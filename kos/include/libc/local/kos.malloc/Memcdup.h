@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73221215 */
+/* HASH CRC-32:0x91029a98 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Memdup_defined
 #define __local___localdep_Memdup_defined
 #ifdef __CRT_HAVE_Memdup
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),void *,__THROWING,__localdep_Memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes),Memdup,(__ptr,__num_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ALLOC_SIZE((2)),void *,__THROWING,__localdep_Memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes),Memdup,(__ptr,__num_bytes))
 #elif defined(__CRT_HAVE_Malloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.malloc/Memdup.h>
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memchr __LIBC_LOCAL_NAME(memchr)
 #endif /* !__CRT_HAVE_memchr */
 #endif /* !__local___localdep_memchr_defined */
-__LOCAL_LIBC(Memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+__LOCAL_LIBC(Memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 3) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(Memcdup))(void const *__restrict __ptr, int __needle, __SIZE_TYPE__ __num_bytes) __THROWS(__E_BADALLOC) {
 	if __likely(__num_bytes) {
 		void const *__endaddr;

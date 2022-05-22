@@ -213,18 +213,18 @@ int res_dnok(char const *a);
 [[export_alias("__sym_ston")]]
 [[decl_include("<bits/crt/resolv.h>")]]
 [[impl_include("<bits/crt/resolv.h>")]]
-int sym_ston([[nonnull]] struct res_sym const *symbols,
-             [[nonnull]] char const *wanted_name,
-             [[nullable]] int *p_success) {
+int sym_ston([[in]] struct res_sym const *symbols,
+             [[in]] char const *wanted_name,
+             [[out_opt]] int *p_success) {
 	while (symbols->@name@ != NULL) {
 		if (strcasecmp(symbols->@name@, wanted_name) == 0) {
-			if (p_success != NULL)
+			if (p_success)
 				*p_success = 1;
 			goto done;
 		}
 		++symbols;
 	}
-	if (p_success != NULL)
+	if (p_success)
 		*p_success = 0;
 done:
 	return symbols->@number@;
@@ -234,9 +234,9 @@ done:
 [[decl_include("<bits/crt/resolv.h>")]]
 [[impl_include("<bits/crt/resolv.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
-[[nonnull]] char const *sym_ntos([[nonnull]] struct res_sym const *symbols,
+[[nonnull]] char const *sym_ntos([[in]] struct res_sym const *symbols,
                                  int wanted_number,
-                                 [[nullable]] int *p_success) {
+                                 [[out_opt]] int *p_success) {
 @@pp_if __SIZEOF_INT__ == 4@@
 	static char fallback_namebuf[COMPILER_LENOF("-2147483648")];
 @@pp_elif __SIZEOF_INT__ == 8@@
@@ -265,9 +265,9 @@ done:
 [[export_alias("__sym_ntop")]]
 [[decl_include("<bits/crt/resolv.h>")]]
 [[impl_include("<bits/crt/resolv.h>")]]
-[[nonnull]] char const *sym_ntop([[nonnull]] struct res_sym const *symbols,
+[[nonnull]] char const *sym_ntop([[in]] struct res_sym const *symbols,
                                  int wanted_number,
-                                 [[nullable]] int *p_success) {
+                                 [[out_opt]] int *p_success) {
 	while (symbols->@name@ != NULL) {
 		if (symbols->@number@ == wanted_number) {
 			if (p_success)
@@ -298,7 +298,7 @@ char const *loc_ntoa($u_char const *a, char *b);
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[requires_function(ns_name_skip)]]
-int dn_skipname([[nonnull]] $u_char const *msg_ptr,
+int dn_skipname([[in]] $u_char const *msg_ptr,
                 [[nonnull]] $u_char const *end_of_msg) {
 	u_char const *orig_msg_ptr = msg_ptr;
 	if (ns_name_skip(&msg_ptr, end_of_msg) == -1)

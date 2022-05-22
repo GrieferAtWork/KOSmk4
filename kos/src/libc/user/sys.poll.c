@@ -31,9 +31,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_poll,hash:CRC-32=0xe87b09d0]]]*/
+/*[[[head:libc_poll,hash:CRC-32=0x2d4c0cfb]]]*/
 /* @param timeout: Timeout in milliseconds (or negative for infinity) */
-INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_ACCESS_RWS(1, 2) int
 NOTHROW_RPC(LIBCCALL libc_poll)(struct pollfd *fds,
                                 nfds_t nfds,
                                 int timeout)
@@ -48,8 +48,8 @@ NOTHROW_RPC(LIBCCALL libc_poll)(struct pollfd *fds,
 }
 /*[[[end:libc_poll]]]*/
 
-/*[[[head:libc_ppoll,hash:CRC-32=0x3a69f9fa]]]*/
-INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((1)) int
+/*[[[head:libc_ppoll,hash:CRC-32=0xf8cecd7a]]]*/
+INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RWS(1, 2) int
 NOTHROW_RPC(LIBCCALL libc_ppoll)(struct pollfd *fds,
                                  nfds_t nfds,
                                  struct timespec const *timeout,
@@ -62,11 +62,11 @@ NOTHROW_RPC(LIBCCALL libc_ppoll)(struct pollfd *fds,
 }
 /*[[[end:libc_ppoll]]]*/
 
-/*[[[head:libc_ppoll64,hash:CRC-32=0x4252ba72]]]*/
+/*[[[head:libc_ppoll64,hash:CRC-32=0x7b5f78e7]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ppoll64, libc_ppoll);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RWS(1, 2) int
 NOTHROW_RPC(LIBCCALL libc_ppoll64)(struct pollfd *fds,
                                    nfds_t nfds,
                                    struct timespec64 const *timeout,

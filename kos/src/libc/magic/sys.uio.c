@@ -84,8 +84,8 @@ typedef __SIZE_TYPE__ size_t;
 @@@return: * :   The actual number of read bytes
 [[cp, wunused, decl_include("<bits/os/iovec.h>", "<bits/types.h>")]]
 ssize_t process_vm_readv($pid_t pid,
-                         [[inp_opt(liovcnt)]] struct iovec const *local_iov, $ulongptr_t liovcnt,
-                         [[inp_opt(riovcnt)]] struct iovec const *remote_iov, $ulongptr_t riovcnt,
+                         [[in(? <= liovcnt)]] struct iovec const *local_iov, $ulongptr_t liovcnt,
+                         [[in(? <= riovcnt)]] struct iovec const *remote_iov, $ulongptr_t riovcnt,
                          $ulongptr_t flags);
 
 @@>> process_vm_writev(2)
@@ -94,8 +94,8 @@ ssize_t process_vm_readv($pid_t pid,
 @@@return: * :   The actual number of written bytes
 [[cp, decl_include("<bits/os/iovec.h>", "<bits/types.h>")]]
 ssize_t process_vm_writev($pid_t pid,
-                          [[inp_opt(liovcnt)]] struct iovec const *local_iov, $ulongptr_t liovcnt,
-                          [[inp_opt(riovcnt)]] struct iovec const *remote_iov, $ulongptr_t riovcnt,
+                          [[in(? <= liovcnt)]] struct iovec const *local_iov, $ulongptr_t liovcnt,
+                          [[in(? <= riovcnt)]] struct iovec const *remote_iov, $ulongptr_t riovcnt,
                           $ulongptr_t flags);
 %#endif /* __USE_GNU */
 
@@ -111,15 +111,15 @@ ssize_t process_vm_writev($pid_t pid,
 @@@return: 0                     : EOF
 [[cp, wunused, decl_include("<bits/os/iovec.h>", "<features.h>", "<bits/types.h>")]]
 [[export_alias("__readv")]]
-/* The following as libc4/5 aliases, though behave slightly different.
- * In libc4/5, `readv()' tries to emulate the system call if it's  not
- * supported by the kernel,  but `syscall_readv()' doesn't. Yet  since
- * on  KOS `readv(2)' always works as a  system call, we don't have to
- * worry about that. -- However, for the sake of consistency we  still
- * don't  import this function under these aliases. The same also goes
+/* The following are libc4/5 aliases, though behave slightly different.
+ * In libc4/5, `readv()' tries to emulate  the system call if it's  not
+ * supported by the  kernel, but `syscall_readv()'  doesn't. Yet  since
+ * on KOS `readv(2)' always  works as a system  call, we don't have  to
+ * worry about that. -- However, for  the sake of consistency we  still
+ * don't import this function under  these aliases. The same also  goes
  * for `writev()' below! */
 [[export_as("syscall_readv", "__syscall_readv", "__libc_syscall_readv")]]
-ssize_t readv($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
+ssize_t readv($fd_t fd, [[in(? <= count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
 @@>> writev(2)
 @@Same as `write(2)', but rather than specifying a single, continuous buffer,
@@ -133,7 +133,7 @@ ssize_t readv($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SI
 [[cp, decl_include("<bits/os/iovec.h>", "<features.h>", "<bits/types.h>")]]
 [[export_alias("__writev")]]
 [[export_as("syscall_writev", "__syscall_writev", "__libc_syscall_writev")]]
-ssize_t writev($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
+ssize_t writev($fd_t fd, [[in(? <= count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
 
 %
@@ -141,12 +141,12 @@ ssize_t writev($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_S
 
 [[cp, ignore, nocrt, alias("preadv"), doc_alias("preadv")]]
 [[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
-ssize_t preadv32($fd_t fd, [[inp(count)]] struct iovec const *iov,
+ssize_t preadv32($fd_t fd, [[in(? <= count)]] struct iovec const *iov,
                  __STDC_INT_AS_SIZE_T count, $off32_t offset);
 
 [[cp, ignore, nocrt, alias("pwritev"), doc_alias("pwritev")]]
 [[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
-ssize_t pwritev32($fd_t fd, [[inp(count)]] struct iovec const *iov,
+ssize_t pwritev32($fd_t fd, [[in(? <= count)]] struct iovec const *iov,
                   __STDC_INT_AS_SIZE_T count, $off32_t offset);
 
 @@>> preadv(2), preadv64(2)
@@ -157,7 +157,7 @@ ssize_t pwritev32($fd_t fd, [[inp(count)]] struct iovec const *iov,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("preadv")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("preadv64")]]
 [[userimpl, requires($has_function(preadv32) || $has_function(preadv64))]]
-ssize_t preadv($fd_t fd, [[inp(count)]] struct iovec const *iov,
+ssize_t preadv($fd_t fd, [[in(? <= count)]] struct iovec const *iov,
                __STDC_INT_AS_SIZE_T count, $off_t offset) {
 @@pp_if $has_function(preadv64)@@
 	return preadv64(fd, iov, count, (off64_t)offset);
@@ -174,7 +174,7 @@ ssize_t preadv($fd_t fd, [[inp(count)]] struct iovec const *iov,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("pwritev")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("pwritev64")]]
 [[userimpl, requires($has_function(pwritev32) || $has_function(pwritev64))]]
-ssize_t pwritev($fd_t fd, [[inp(count)]] struct iovec const *iov,
+ssize_t pwritev($fd_t fd, [[in(? <= count)]] struct iovec const *iov,
                 __STDC_INT_AS_SIZE_T count, $off_t offset) {
 @@pp_if $has_function(pwritev64)@@
 	return pwritev64(fd, iov, count, (off64_t)offset);
@@ -188,7 +188,7 @@ ssize_t pwritev($fd_t fd, [[inp(count)]] struct iovec const *iov,
 [[cp, wunused, decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
 [[preferred_off64_variant_of(preadv), doc_alias("preadv")]]
 [[userimpl, requires_function(preadv32)]]
-ssize_t preadv64($fd_t fd, [[inp(count)]] struct iovec const *iov,
+ssize_t preadv64($fd_t fd, [[in(? <= count)]] struct iovec const *iov,
                  __STDC_INT_AS_SIZE_T count, $off64_t offset) {
 	return preadv32(fd, iov, count, (off32_t)offset);
 }
@@ -196,7 +196,7 @@ ssize_t preadv64($fd_t fd, [[inp(count)]] struct iovec const *iov,
 [[cp, decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
 [[preferred_off64_variant_of(pwritev), doc_alias("pwritev")]]
 [[userimpl, requires_function(pwritev32)]]
-ssize_t pwritev64($fd_t fd, [[inp(count)]] struct iovec const *iov,
+ssize_t pwritev64($fd_t fd, [[in(? <= count)]] struct iovec const *iov,
                   __STDC_INT_AS_SIZE_T count, $off64_t offset) {
 	return pwritev32(fd, iov, count, (off32_t)offset);
 }

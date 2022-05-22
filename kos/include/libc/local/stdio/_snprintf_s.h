@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbde0a9a */
+/* HASH CRC-32:0x6804b60e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vsnprintf_s_defined
 #define __local___localdep__vsnprintf_s_defined
 #ifdef __CRT_HAVE__vsnprintf_s
-__CREDIRECT(__ATTR_LIBC_PRINTF(4, 0) __ATTR_NONNULL((4)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnprintf_s,(char *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __maxsize, char const *__format, __builtin_va_list __args),_vsnprintf_s,(__buf,__bufsize,__maxsize,__format,__args))
+__CREDIRECT(__ATTR_ACCESS_RO(4) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_PRINTF(4, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnprintf_s,(char *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __maxsize, char const *__format, __builtin_va_list __args),_vsnprintf_s,(__buf,__bufsize,__maxsize,__format,__args))
 #else /* __CRT_HAVE__vsnprintf_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/_vsnprintf_s.h>
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__vsnprintf_s __LIBC_LOCAL_NAME(_vsnprintf_s)
 #endif /* !__CRT_HAVE__vsnprintf_s */
 #endif /* !__local___localdep__vsnprintf_s_defined */
-__LOCAL_LIBC(_snprintf_s) __ATTR_LIBC_PRINTF(4, 5) __ATTR_NONNULL((4)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(_snprintf_s) __ATTR_ACCESS_RO(4) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_PRINTF(4, 5) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_snprintf_s))(char *__buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __maxsize, char const *__format, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;

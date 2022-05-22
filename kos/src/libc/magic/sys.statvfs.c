@@ -109,24 +109,24 @@ typedef __FS_TYPE(fsfilcnt) fsfilcnt_t; /* Type to count file system inodes.  */
 [[decl_include("<bits/os/statvfs.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("statvfs")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("statvfs64")]]
-int statvfs([[nonnull]] char const *file, [[nonnull]] struct statvfs *buf);
+int statvfs([[in]] char const *file, [[out]] struct statvfs *buf);
 
 [[decl_include("<bits/os/statvfs.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("fstatvfs")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("fstatvfs64")]]
-int fstatvfs($fd_t filedes, [[nonnull]] struct statvfs *buf);
+int fstatvfs($fd_t filedes, [[out]] struct statvfs *buf);
 
 %
 %#ifdef __USE_LARGEFILE64
 %#ifndef statvfs64
 [[decl_include("<bits/os/statvfs.h>")]]
 [[preferred_off64_variant_of(statvfs), doc_alias("statvfs")]]
-int statvfs64([[nonnull]] const char *file, [[nonnull]] struct statvfs64 *buf);
+int statvfs64([[in]] const char *file, [[out]] struct statvfs64 *buf);
 %#endif /* !statvfs64 */
 
 [[decl_include("<bits/os/statvfs.h>")]]
 [[preferred_off64_variant_of(fstatvfs), doc_alias("fstatvfs")]]
-int fstatvfs64($fd_t filedes, [[nonnull]] struct statvfs64 *buf);
+int fstatvfs64($fd_t filedes, [[out]] struct statvfs64 *buf);
 %#endif /* __USE_LARGEFILE64 */
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7669957f */
+/* HASH CRC-32:0x6ca49005 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ DECL_BEGIN
  *                  return of this function, `strdup("")' will be returned. (i.e.  NULL
  *                  is only returned in case of an error; _NOT_ in case of end-of-file)
  * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_ACCESS_RW(1) char *
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RW(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(3) char *
 NOTHROW_RPC(LIBCCALL libc_fparseln)(FILE *stream,
                                     size_t *plen,
                                     size_t *plineno,

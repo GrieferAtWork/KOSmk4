@@ -49,13 +49,13 @@ __SYSDECL_BEGIN
 
 [[decl_include("<hybrid/typecore.h>", "<bits/os/utimbuf.h>")]]
 [[cp, wchar, ignore, nocrt, alias("wutime", "_wutime", "_wutime32")]]
-int crt_wutime32([[nonnull]] $wchar_t const *file,
-                 [[nullable]] struct $utimbuf32 const *file_times);
+int crt_wutime32([[in]] $wchar_t const *file,
+                 [[in_opt]] struct $utimbuf32 const *file_times);
 
 [[decl_include("<hybrid/typecore.h>", "<bits/os/utimbuf.h>")]]
 [[cp, wchar, ignore, nocrt, alias("wutime64", "_wutime64")]]
-int crt_wutime64([[nonnull]] $wchar_t const *file,
-                 [[nullable]] struct $utimbuf64 const *file_times);
+int crt_wutime64([[in]] $wchar_t const *file,
+                 [[in_opt]] struct $utimbuf64 const *file_times);
 
 [[ignore]] crt_c16utime32(*) %{uchar16("crt_wutime32")}
 [[ignore]] crt_c32utime32(*) %{uchar32("crt_wutime32")}
@@ -70,8 +70,8 @@ int crt_wutime64([[nonnull]] $wchar_t const *file,
 [[requires($has_function(crt_wutime32) ||
            $has_function(crt_wutime64) ||
            $has_function(utime, convert_wcstombs))]]
-int wutime([[nonnull]] wchar_t const *file,
-           [[nullable]] struct utimbuf const *file_times) {
+int wutime([[in]] wchar_t const *file,
+           [[in_opt]] struct utimbuf const *file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("actime")
 #pragma @push_macro@("modtime")
@@ -119,8 +119,8 @@ int wutime([[nonnull]] wchar_t const *file,
 [[cp, wchar, dos_export_alias("_wutime64")]]
 [[requires($has_function(utime64, convert_wcstombs) ||
            $has_function(crt_wutime32))]]
-int wutime64([[nonnull]] $wchar_t const *file,
-             [[nullable]] struct utimbuf64 const *file_times) {
+int wutime64([[in]] $wchar_t const *file,
+             [[in_opt]] struct utimbuf64 const *file_times) {
 @@pp_if $has_function(utime64, convert_wcstombs)@@
 	int result;
 	char *utf8_file;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fd4ddee */
+/* HASH CRC-32:0xc1277b84 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ DECL_BEGIN
  * @param: child:   When non-NULL, fill with timings for child processes. (s.a. `RUSAGE_CHILDREN')
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_vtimes)(struct vtimes *current, struct vtimes *child);
+INTDEF ATTR_ACCESS_WR_OPT(1) ATTR_ACCESS_WR_OPT(2) int NOTHROW_NCX(LIBDCALL libd_vtimes)(struct vtimes *current, struct vtimes *child);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> vtimes(3)
@@ -53,7 +53,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_vtimes)(struct vtimes *current, struct vtim
  * @param: child:   When non-NULL, fill with timings for child processes. (s.a. `RUSAGE_CHILDREN')
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_vtimes)(struct vtimes *current, struct vtimes *child);
+INTDEF ATTR_ACCESS_WR_OPT(1) ATTR_ACCESS_WR_OPT(2) int NOTHROW_NCX(LIBCCALL libc_vtimes)(struct vtimes *current, struct vtimes *child);
 #endif /* !__KERNEL__ */
 
 DECL_END

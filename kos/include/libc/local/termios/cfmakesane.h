@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bbe2ed2 */
+/* HASH CRC-32:0x799ae168 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/posix_opt.h>
 #include <asm/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(cfmakesane) __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(cfmakesane) __ATTR_ACCESS_WR(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restrict __termios_p) {
 	/* Default everything to ZERO */
 	(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__termios_p, sizeof(*__termios_p));

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd456f282 */
+/* HASH CRC-32:0xbf82c99e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ NOTHROW_NCX(LIBCCALL libc_convert_freevn)(void *vector,
 	libc_free(vector);
 }
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char *
 NOTHROW_NCX(LIBDCALL libd_convert_wcstombs)(char16_t const *str) {
 	if unlikely(!str) {
 
@@ -66,7 +66,7 @@ NOTHROW_NCX(LIBDCALL libd_convert_wcstombs)(char16_t const *str) {
 	return libd_convert_wcstombsn(str, libd_wcslen(str), NULL);
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char *
 NOTHROW_NCX(LIBKCALL libc_convert_wcstombs)(char32_t const *str) {
 	if unlikely(!str) {
 
@@ -78,7 +78,7 @@ NOTHROW_NCX(LIBKCALL libc_convert_wcstombs)(char32_t const *str) {
 }
 #include <libc/errno.h>
 #include <bits/crt/format-printer.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_WR_OPT(3) char *
 NOTHROW_NCX(LIBDCALL libd_convert_wcstombsn)(char16_t const *__restrict str,
                                              size_t len,
                                              size_t *preslen) {
@@ -111,7 +111,7 @@ NOTHROW_NCX(LIBDCALL libd_convert_wcstombsn)(char16_t const *__restrict str,
 }
 #include <libc/errno.h>
 #include <bits/crt/format-printer.h>
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_WR_OPT(3) char *
 NOTHROW_NCX(LIBKCALL libc_convert_wcstombsn)(char32_t const *__restrict str,
                                              size_t len,
                                              size_t *preslen) {
@@ -143,7 +143,7 @@ NOTHROW_NCX(LIBKCALL libc_convert_wcstombsn)(char32_t const *__restrict str,
 	return libc_format_aprintf_pack((struct format_aprintf_data *)&printer_data, preslen);
 }
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED char **
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char **
 NOTHROW_NCX(LIBDCALL libd_convert_wcstombsv)(char16_t const *const *__restrict vector) {
 	size_t count = 0;
 	if unlikely(!vector) {
@@ -157,7 +157,7 @@ NOTHROW_NCX(LIBDCALL libd_convert_wcstombsv)(char16_t const *const *__restrict v
 	return libd_convert_wcstombsvn(vector, count);
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED char **
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char **
 NOTHROW_NCX(LIBKCALL libc_convert_wcstombsv)(char32_t const *const *__restrict vector) {
 	size_t count = 0;
 	if unlikely(!vector) {
@@ -171,7 +171,7 @@ NOTHROW_NCX(LIBKCALL libc_convert_wcstombsv)(char32_t const *const *__restrict v
 	return libc_convert_wcstombsvn(vector, count);
 }
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED char **
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) char **
 NOTHROW_NCX(LIBDCALL libd_convert_wcstombsvn)(char16_t const *const *__restrict vector,
                                               size_t count) {
 	size_t i;
@@ -197,7 +197,7 @@ err:
 	return NULL;
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED char **
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) char **
 NOTHROW_NCX(LIBKCALL libc_convert_wcstombsvn)(char32_t const *const *__restrict vector,
                                               size_t count) {
 	size_t i;
@@ -223,7 +223,7 @@ err:
 	return NULL;
 }
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd_convert_mbstowcs)(char const *__restrict str) {
 	if unlikely(!str) {
 
@@ -234,7 +234,7 @@ NOTHROW_NCX(LIBDCALL libd_convert_mbstowcs)(char const *__restrict str) {
 	return libd_convert_mbstowcsn(str, libc_strlen(str), NULL);
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED char32_t *
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc_convert_mbstowcs)(char const *__restrict str) {
 	if unlikely(!str) {
 
@@ -246,7 +246,7 @@ NOTHROW_NCX(LIBKCALL libc_convert_mbstowcs)(char const *__restrict str) {
 }
 #include <libc/errno.h>
 #include <bits/crt/uformat-printer.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_WR_OPT(3) char16_t *
 NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsn)(char const *__restrict str,
                                              size_t len,
                                              size_t *preslen) {
@@ -275,7 +275,7 @@ NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsn)(char const *__restrict str,
 }
 #include <libc/errno.h>
 #include <bits/crt/uformat-printer.h>
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED char32_t *
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_WR_OPT(3) char32_t *
 NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsn)(char const *__restrict str,
                                              size_t len,
                                              size_t *preslen) {
@@ -303,7 +303,7 @@ NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsn)(char const *__restrict str,
 	return libc_format_waprintf_pack((struct format_c32aprintf_data *)&printer_data, preslen);
 }
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED char16_t **
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char16_t **
 NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsv)(char const *const *__restrict vector) {
 	size_t count = 0;
 	if unlikely(!vector) {
@@ -317,7 +317,7 @@ NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsv)(char const *const *__restrict vecto
 	return libd_convert_mbstowcsvn(vector, count);
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED char32_t **
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char32_t **
 NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsv)(char const *const *__restrict vector) {
 	size_t count = 0;
 	if unlikely(!vector) {
@@ -331,7 +331,7 @@ NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsv)(char const *const *__restrict vecto
 	return libc_convert_mbstowcsvn(vector, count);
 }
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED char16_t **
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) char16_t **
 NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsvn)(char const *const *__restrict vector,
                                               size_t count) {
 	size_t i;
@@ -357,7 +357,7 @@ err:
 	return NULL;
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED char32_t **
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.convert") ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) char32_t **
 NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsvn)(char const *const *__restrict vector,
                                               size_t count) {
 	size_t i;

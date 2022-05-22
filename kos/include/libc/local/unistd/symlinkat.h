@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39d40810 */
+/* HASH CRC-32:0x789dab66 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fsymlinkat_defined
 #define __local___localdep_fsymlinkat_defined
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_fsymlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path, __atflag_t __flags),fsymlinkat,(__link_text,__tofd,__target_path,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,__localdep_fsymlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path, __atflag_t __flags),fsymlinkat,(__link_text,__tofd,__target_path,__flags))
 #endif /* !__local___localdep_fsymlinkat_defined */
-__LOCAL_LIBC(symlinkat) __ATTR_NONNULL((1, 3)) int
+__LOCAL_LIBC(symlinkat) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(3) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(symlinkat))(char const *__link_text, __fd_t __tofd, char const *__target_path) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fsymlinkat)(__link_text, __tofd, __target_path, 0);
 }

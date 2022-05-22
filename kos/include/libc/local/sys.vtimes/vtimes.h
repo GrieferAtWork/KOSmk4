@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9069fd9a */
+/* HASH CRC-32:0x7b8020a1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,22 +33,22 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/os/rusage.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getrusage,(int __who, struct rusage *__usage),getrusage,(__who,__usage))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_getrusage,(int __who, struct rusage *__usage),getrusage,(__who,__usage))
 #elif defined(__CRT_HAVE___getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __NAMESPACE_LOCAL_END
 #include <bits/os/rusage.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getrusage,(int __who, struct rusage *__usage),__getrusage,(__who,__usage))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_getrusage,(int __who, struct rusage *__usage),__getrusage,(__who,__usage))
 #elif defined(__CRT_HAVE___libc_getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __NAMESPACE_LOCAL_END
 #include <bits/os/rusage.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getrusage,(int __who, struct rusage *__usage),__libc_getrusage,(__who,__usage))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_getrusage,(int __who, struct rusage *__usage),__libc_getrusage,(__who,__usage))
 #elif defined(__CRT_HAVE_getrusage64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __NAMESPACE_LOCAL_END
 #include <bits/os/rusage.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getrusage,(int __who, struct rusage *__usage),getrusage64,(__who,__usage))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_getrusage,(int __who, struct rusage *__usage),getrusage64,(__who,__usage))
 #else /* ... */
 #undef __local___localdep_getrusage_defined
 #endif /* !... */
@@ -56,7 +56,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getrusage,(int __wh
 __NAMESPACE_LOCAL_END
 #include <bits/os/rusage.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vtimes) int
+__LOCAL_LIBC(vtimes) __ATTR_ACCESS_WR_OPT(1) __ATTR_ACCESS_WR_OPT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vtimes))(struct vtimes *__current, struct vtimes *__child) {
 	int __result = 0;
 	unsigned int __i;

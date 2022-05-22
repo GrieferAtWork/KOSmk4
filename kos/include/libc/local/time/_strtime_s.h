@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1be4065a */
+/* HASH CRC-32:0x2c3e43e4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__strtime_defined
 #define __local___localdep__strtime_defined
 #ifdef __CRT_HAVE__strtime
-__CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep__strtime,(char __buf[9]),_strtime,(__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(1),char *,__NOTHROW_NCX,__localdep__strtime,(char __buf[9]),_strtime,(__buf))
 #elif defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/_strtime.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_strtime_s) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(_strtime_s) __ATTR_ACCESS_WRS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strtime_s))(char *__buf, __SIZE_TYPE__ __bufsize) {
 	if __unlikely(__bufsize < 9)
 		return 34;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb7f850f */
+/* HASH CRC-32:0x6db91588 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,23 +28,23 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_nanosleep32_defined
 #define __local___localdep_nanosleep32_defined
 #ifdef __CRT_HAVE_nanosleep
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct __timespec32 const *__requested_time, struct __timespec32 *__remaining),nanosleep,(__requested_time,__remaining))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct __timespec32 const *__requested_time, struct __timespec32 *__remaining),nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___nanosleep)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct __timespec32 const *__requested_time, struct __timespec32 *__remaining),__nanosleep,(__requested_time,__remaining))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct __timespec32 const *__requested_time, struct __timespec32 *__remaining),__nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___libc_nanosleep)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct __timespec32 const *__requested_time, struct __timespec32 *__remaining),__libc_nanosleep,(__requested_time,__remaining))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct __timespec32 const *__requested_time, struct __timespec32 *__remaining),__libc_nanosleep,(__requested_time,__remaining))
 #else /* ... */
 #undef __local___localdep_nanosleep32_defined
 #endif /* !... */
 #endif /* !__local___localdep_nanosleep32_defined */
-__LOCAL_LIBC(nanosleep64) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(nanosleep64) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep64))(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining) {
 	int __result;
 	struct __timespec32 __req32, __rem32;
 	__req32.tv_sec  = (__time32_t)__requested_time->tv_sec;
 	__req32.tv_nsec = __requested_time->tv_nsec;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_nanosleep32)(&__req32, &__rem32);
-	if (!__result && __remaining) {
+	if (__result == 0 && __remaining) {
 		__remaining->tv_sec  = (__time64_t)__rem32.tv_sec;
 		__remaining->tv_nsec = __rem32.tv_nsec;
 	}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf85b0ca6 */
+/* HASH CRC-32:0xb8b8bcb8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_localtime32_defined
 #define __local___localdep_crt_localtime32_defined
 #ifdef __CRT_HAVE_localtime
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_crt_localtime32,(__time32_t const *__timer),localtime,(__timer))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_crt_localtime32,(__time32_t const *__timer),localtime,(__timer))
 #elif defined(__CRT_HAVE__localtime32)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_crt_localtime32,(__time32_t const *__timer),_localtime32,(__timer))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_crt_localtime32,(__time32_t const *__timer),_localtime32,(__timer))
 #else /* ... */
 #undef __local___localdep_crt_localtime32_defined
 #endif /* !... */
@@ -37,11 +37,11 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESP
 #ifndef __local___localdep_localtime64_defined
 #define __local___localdep_localtime64_defined
 #if defined(__CRT_HAVE_localtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime64,(__time64_t const *__timer),localtime,(__timer))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime64,(__time64_t const *__timer),localtime,(__timer))
 #elif defined(__CRT_HAVE_localtime64)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime64,(__time64_t const *__timer),localtime64,(__timer))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime64,(__time64_t const *__timer),localtime64,(__timer))
 #elif defined(__CRT_HAVE__localtime64)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime64,(__time64_t const *__timer),_localtime64,(__timer))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime64,(__time64_t const *__timer),_localtime64,(__timer))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/localtime64.h>
@@ -55,9 +55,9 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_localtime_r) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime_r,(__timer,__tp))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime_r,(__timer,__tp))
 #elif defined(__CRT_HAVE_localtime64_r) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime64_r,(__timer,__tp))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime64_r,(__timer,__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/localtime_r.h>
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(localtime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct __NAMESPACE_STD_SYM tm *
+__LOCAL_LIBC(localtime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(localtime))(__TM_TYPE(time) const *__timer) {
 
 	__time64_t __tm64 = (__time64_t)*__timer;

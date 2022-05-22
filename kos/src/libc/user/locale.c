@@ -70,7 +70,7 @@ struct lconv current_lconv = {
 
 
 
-/*[[[head:libc_setlocale,hash:CRC-32=0x5b88cabd]]]*/
+/*[[[head:libc_setlocale,hash:CRC-32=0x155e5c6e]]]*/
 /* >> setlocale(3)
  * Get or set the current locale
  * @param: category: One of `LC_*'
@@ -78,7 +78,7 @@ struct lconv current_lconv = {
  *                   When `NULL', don't change the locale.
  * @return: * :      The current locale set for `category'
  * @return: NULL:    Error */
-INTERN ATTR_SECTION(".text.crt.i18n") char *
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_ACCESS_RO_OPT(2) char *
 NOTHROW_NCX(LIBCCALL libc_setlocale)(int category,
                                      char const *locale)
 /*[[[body:libc_setlocale]]]*/
@@ -248,8 +248,8 @@ NOTHROW_NCX(LIBCCALL libc__free_locale)(locale_t locale)
 }
 /*[[[end:libc__free_locale]]]*/
 
-/*[[[head:libd__wsetlocale,hash:CRC-32=0x9856ab58]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.i18n") char16_t *
+/*[[[head:libd__wsetlocale,hash:CRC-32=0x6ee71bb6]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.i18n") ATTR_ACCESS_RO_OPT(2) char16_t *
 NOTHROW_NCX(LIBDCALL libd__wsetlocale)(int category,
                                        char16_t const *locale)
 /*[[[body:libd__wsetlocale]]]*/
@@ -262,8 +262,8 @@ NOTHROW_NCX(LIBDCALL libd__wsetlocale)(int category,
 }
 /*[[[end:libd__wsetlocale]]]*/
 
-/*[[[head:libc__wsetlocale,hash:CRC-32=0x49d9b5c7]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.i18n") char32_t *
+/*[[[head:libc__wsetlocale,hash:CRC-32=0xabde1d1f]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") ATTR_ACCESS_RO_OPT(2) char32_t *
 NOTHROW_NCX(LIBKCALL libc__wsetlocale)(int category,
                                        char32_t const *locale)
 /*[[[body:libc__wsetlocale]]]*/
@@ -276,8 +276,8 @@ NOTHROW_NCX(LIBKCALL libc__wsetlocale)(int category,
 }
 /*[[[end:libc__wsetlocale]]]*/
 
-/*[[[head:libd__wcreate_locale,hash:CRC-32=0xb7943948]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.i18n") locale_t
+/*[[[head:libd__wcreate_locale,hash:CRC-32=0x9f9a6d33]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.i18n") ATTR_ACCESS_RO_OPT(2) locale_t
 NOTHROW_NCX(LIBDCALL libd__wcreate_locale)(int category,
                                            char16_t const *locale)
 /*[[[body:libd__wcreate_locale]]]*/
@@ -290,8 +290,8 @@ NOTHROW_NCX(LIBDCALL libd__wcreate_locale)(int category,
 }
 /*[[[end:libd__wcreate_locale]]]*/
 
-/*[[[head:libc__wcreate_locale,hash:CRC-32=0xb94fc068]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.i18n") locale_t
+/*[[[head:libc__wcreate_locale,hash:CRC-32=0x30c4b60a]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") ATTR_ACCESS_RO_OPT(2) locale_t
 NOTHROW_NCX(LIBKCALL libc__wcreate_locale)(int category,
                                            char32_t const *locale)
 /*[[[body:libc__wcreate_locale]]]*/
@@ -378,8 +378,8 @@ NOTHROW_NCX(LIBKCALL libc__W_Gettnames)(void)
 }
 /*[[[end:libc__W_Gettnames]]]*/
 
-/*[[[head:libc__Strftime,hash:CRC-32=0x2cda4718]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.i18n") NONNULL((3, 4)) size_t
+/*[[[head:libc__Strftime,hash:CRC-32=0xeb4378c]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) size_t
 NOTHROW_NCX(LIBCCALL libc__Strftime)(char *buf,
                                      size_t bufsize,
                                      char const *format,
@@ -398,8 +398,8 @@ NOTHROW_NCX(LIBCCALL libc__Strftime)(char *buf,
 }
 /*[[[end:libc__Strftime]]]*/
 
-/*[[[head:libd__Wcsftime,hash:CRC-32=0x18347eaa]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.i18n") NONNULL((3, 4)) size_t
+/*[[[head:libd__Wcsftime,hash:CRC-32=0xebd2bfef]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.i18n") ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) size_t
 NOTHROW_NCX(LIBDCALL libd__Wcsftime)(char16_t *buf,
                                      size_t bufsize,
                                      char16_t const *format,
@@ -418,8 +418,8 @@ NOTHROW_NCX(LIBDCALL libd__Wcsftime)(char16_t *buf,
 }
 /*[[[end:libd__Wcsftime]]]*/
 
-/*[[[head:libc__Wcsftime,hash:CRC-32=0xbd6571cb]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.i18n") NONNULL((3, 4)) size_t
+/*[[[head:libc__Wcsftime,hash:CRC-32=0x733809a5]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.i18n") ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) size_t
 NOTHROW_NCX(LIBKCALL libc__Wcsftime)(char32_t *buf,
                                      size_t bufsize,
                                      char32_t const *format,

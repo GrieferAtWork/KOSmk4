@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fdbf814 */
+/* HASH CRC-32:0xef6f07e7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING,Socket,(__STDC_INT_AS_UINT_T __d
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
  * @return: 0 : Success (the sockets are stored in `fds[0]' and `fds[1]')
  * @return: -1: Failed to create the socket pair (s.a. `errno') */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((4)),__THROWING,SocketPair,(__STDC_INT_AS_UINT_T __domain, __STDC_INT_AS_UINT_T __type, __STDC_INT_AS_UINT_T __protocol, __fd_t __fds[2]),(__domain,__type,__protocol,__fds))
+__CDECLARE_VOID_OPT(__ATTR_ACCESS_WR(4),__THROWING,SocketPair,(__STDC_INT_AS_UINT_T __domain, __STDC_INT_AS_UINT_T __type, __STDC_INT_AS_UINT_T __protocol, __fd_t __fds[2]),(__domain,__type,__protocol,__fds))
 /* >> bind(2)
  * Bind the given socket `sockfd' to the specified local address.
  * @return: 0 : Success
@@ -71,7 +71,7 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((4)),__THROWING,SocketPair,(__STDC_INT_AS_UIN
  * @return: -1: [errno=EINVAL]        E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_BIND_ALREADY_BOUND
  * @return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
  * @return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (`addr_len' is incorrect) */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,Bind,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__addr,__addr_len))
+__CDECLARE_VOID_OPT(,__THROWING,Bind,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__addr,__addr_len))
 /* >> getsockname(2)
  * Determine the local address (aka. name) for the given socket `sockfd'.
  * This  is usually the  same address as was  previously set by `bind(2)'
@@ -85,7 +85,7 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,Bind,(__fd_t __sockfd, __CONS
  *                         the  address was truncated and may be invalid.
  * return: 0 : Success
  * return: -1: Error (s.a. `errno') */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((2, 3)),__THROWING,GetSockName,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
+__CDECLARE_VOID_OPT(__ATTR_ACCESS_RW(3),__THROWING,GetSockName,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
 /* >> connect(2)
  * Connect to the specified address.
  * If the given `sockfd' isn't connection-oriented, this will set the address
@@ -97,7 +97,7 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((2, 3)),__THROWING,GetSockName,(__fd_t __sock
  * @return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
  * @return: -1: [errno=ECONNREFUSED]  E_NET_CONNECTION_REFUSED
  * @return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (addr_len is incorrect) */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,Connect,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__addr,__addr_len))
+__CDECLARE_VOID_OPT(,__THROWING,Connect,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__addr,__addr_len))
 /* >> getpeername(2)
  * Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
  * @param: addr:     [out] Buffer where to store the sock address.
@@ -108,7 +108,7 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,Connect,(__fd_t __sockfd, __C
  * @return: 0 : Success
  * @return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((2, 3)),__THROWING,GetPeerName,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
+__CDECLARE_VOID_OPT(__ATTR_ACCESS_RW(3),__THROWING,GetPeerName,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
 /* >> send(2)
  * Send the contents of a given buffer over the given socket `sockfd'.
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
@@ -118,7 +118,7 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((2, 3)),__THROWING,GetPeerName,(__fd_t __sock
  * @return: -1: [errno=EMSGSIZE]     E_NET_MESSAGE_TOO_LONG
  * @return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
  * @return: -1: [errno=EPIPE]        E_NET_SHUTDOWN */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
+__CDECLARE_OPT(__ATTR_ACCESS_ROS(2, 3),size_t,__THROWING,Send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
 /* >> recv(2)
  * Receive data over the given socket `sockfd', and store the contents within the given buffer.
  * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
@@ -126,7 +126,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Send,(__fd_t __sockfd, void
  * @return: * : [<= bufsize] The actual # of received bytes
  * @return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),size_t,__THROWING,Recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3),size_t,__THROWING,Recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__buf,__bufsize,__msg_flags))
 /* >> sendto(2)
  * Send the contents of a given buffer over this socket to the specified address
  * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
@@ -143,7 +143,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),size_t,__THROWING,Recv,(__fd_t
  * @return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
  * @return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
  * @return: -1: [errno=ERANGE]       E_BUFFER_TOO_SMALL  (`addr_len' is incorrect) */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,SendTo,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
+__CDECLARE_OPT(__ATTR_ACCESS_ROS(2, 3),size_t,__THROWING,SendTo,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
 /* >> recvfrom(2)
  * Receive data over this socket, and store the contents within the given buffer.
  * @param: buf:       Buffer to-be filled with up to `bufsize' bytes of received data
@@ -160,7 +160,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,SendTo,(__fd_t __sockfd, vo
  * @return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
  * @return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
  * @return: -1: [errno=EAGAIN]       E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked) */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),size_t,__THROWING,RecvFrom,(__fd_t __sockfd, void *__restrict __buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_ACCESS_RW_OPT(6) __ATTR_ACCESS_WRS(2, 3),size_t,__THROWING,RecvFrom,(__fd_t __sockfd, void *__restrict __buf, size_t __bufsize, __STDC_INT_AS_UINT_T __msg_flags, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
 /* >> sendmsg(2)
  * Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
  * data as well as  for data buffers  to be represented  by an IOV  vector.
@@ -168,7 +168,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),size_t,__THROWING,RecvFrom,(__
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : [<= bufsize] The actual # of send payload bytes
  * @return: -1: ... Same as for `send(2)' and `sendto(2)' */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,SendMsg,(__fd_t __sockfd, struct msghdr const *__message, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__message,__msg_flags))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(2),size_t,__THROWING,SendMsg,(__fd_t __sockfd, struct msghdr const *__message, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__message,__msg_flags))
 /* >> recvmsg(2)
  * Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
  * data as  well as  for  data buffers  to be  represented  by an  IOV  vector.
@@ -177,7 +177,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,SendMsg,(__fd_t __sockfd, s
  *                            MSG_PEEK  |  MSG_TRUNC  |  MSG_WAITALL'
  * @return: * : [<= bufsize] The actual # of received payload bytes
  * @return: -1: ... Same as for `recv(2)' and `recvfrom(2)' */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),size_t,__THROWING,RecvMsg,(__fd_t __sockfd, struct msghdr *__message, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__message,__msg_flags))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_ACCESS_RW(2),size_t,__THROWING,RecvMsg,(__fd_t __sockfd, struct msghdr *__message, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__message,__msg_flags))
 /* >> getsockopt(2)
  * Get the value of the named socket option `level:optname' and store it in `optval'
  * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
@@ -189,7 +189,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),size_t,__THROWING,RecvMsg,(__f
  *                        the  contents  of   `optval'  are   undefined.
  * @return: 0 : Success
  * @return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((4, 5)),__THROWING,GetSockOpt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void *__restrict __optval, socklen_t *__restrict __optlen),(__sockfd,__level,__optname,__optval,__optlen))
+__CDECLARE_VOID_OPT(__ATTR_ACCESS_RW(5) __ATTR_ACCESS_WR(4),__THROWING,GetSockOpt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void *__restrict __optval, socklen_t *__restrict __optlen),(__sockfd,__level,__optname,__optval,__optlen))
 /* >> setsockopt(2)
  * Set the value of the named socket option `level:optname' from what is given in `optval'
  * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
@@ -199,7 +199,7 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((4, 5)),__THROWING,GetSockOpt,(__fd_t __sockf
  * @return: 0 : Success
  * @return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT
  * @return: -1: [errno=ERANGE]      E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option) */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((4)),__THROWING,SetSockOpt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void const *__optval, socklen_t __optlen),(__sockfd,__level,__optname,__optval,__optlen))
+__CDECLARE_VOID_OPT(__ATTR_ACCESS_ROS(4, 5),__THROWING,SetSockOpt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void const *__optval, socklen_t __optlen),(__sockfd,__level,__optname,__optval,__optlen))
 /* >> listen(2)
  * Begin to listen for incoming client (aka. peer) connection requests.
  * @param: max_backlog: The max number of clients  pending to be accept(2)-ed,  before
@@ -224,7 +224,7 @@ __CDECLARE_VOID_OPT(,__THROWING,Listen,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __
  * @return: -1: [errno=EINVAL]       E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
-__CDECLARE_OPT(,__fd_t,__THROWING,Accept,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
+__CDECLARE_OPT(__ATTR_ACCESS_RW_OPT(3),__fd_t,__THROWING,Accept,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
 /* >> shutdown(2)
  * Disallow further reception of data (causing `recv(2)' to return `0' as soon
  * as  all currently queued  data has been  read), and/or further transmission
@@ -250,7 +250,7 @@ __CDECLARE_VOID_OPT(,__THROWING,Shutdown,(__fd_t __sockfd, __STDC_INT_AS_UINT_T 
  * @return: -1: [errno=EINVAL]       E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_ACCEPT_NOT_LISTENING
  * @return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
  * @return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT */
-__CDECLARE_OPT(,__fd_t,__THROWING,Accept4,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len, __STDC_INT_AS_UINT_T __sock_flags),(__sockfd,__addr,__addr_len,__sock_flags))
+__CDECLARE_OPT(__ATTR_ACCESS_RW_OPT(3),__fd_t,__THROWING,Accept4,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len, __STDC_INT_AS_UINT_T __sock_flags),(__sockfd,__addr,__addr_len,__sock_flags))
 /* >> sendmmsg(2)
  * Same as `sendmsg(2)', but may be used to send many
  * messages (datagrams)  with a  single system  call.
@@ -258,7 +258,7 @@ __CDECLARE_OPT(,__fd_t,__THROWING,Accept4,(__fd_t __sockfd, __SOCKADDR_ARG __add
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : The # of datagrams successfully sent.
  * @return: -1: ... Same as `sendmsg(2)' */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,SendMMsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__vmessages,__vlen,__msg_flags))
+__CDECLARE_OPT(__ATTR_ACCESS_RW(2),size_t,__THROWING,SendMMsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags),(__sockfd,__vmessages,__vlen,__msg_flags))
 #include <bits/types.h>
 #if defined(__CRT_HAVE_RecvMMsg) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> recvmmsg(2)
@@ -270,7 +270,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,SendMMsg,(__fd_t __sockfd, 
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,RecvMMsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CDECLARE(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RWS(2, 3),size_t,__THROWING,RecvMMsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_RecvMMsg64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> recvmmsg(2)
  * Same as `recvmsg(2)', but may be used to receive many
@@ -281,7 +281,7 @@ __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,RecvMMsg,(__fd_t __sockfd, stru
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,RecvMMsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo),RecvMMsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RWS(2, 3),size_t,__THROWING,RecvMMsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo),RecvMMsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif (defined(__CRT_HAVE_RecvMMsg) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_RecvMMsg64) || defined(__CRT_HAVE_recvmmsg)
 #include <libc/local/kos.sys.socket/RecvMMsg.h>
 /* >> recvmmsg(2)
@@ -293,7 +293,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,RecvMMsg,(__fd_t __sockfd, str
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(RecvMMsg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL RecvMMsg)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(RecvMMsg))(__sockfd, __vmessages, __vlen, __msg_flags, __tmo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(RecvMMsg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RWS(2, 3) size_t (__LIBCCALL RecvMMsg)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(RecvMMsg))(__sockfd, __vmessages, __vlen, __msg_flags, __tmo); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_RecvMMsg) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -306,7 +306,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(RecvMMsg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,RecvMMsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo),RecvMMsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RWS(2, 3),size_t,__THROWING,RecvMMsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo),RecvMMsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_RecvMMsg64)
 /* >> recvmmsg(2)
  * Same as `recvmsg(2)', but may be used to receive many
@@ -317,7 +317,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,RecvMMsg64,(__fd_t __sockfd, s
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,RecvMMsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CDECLARE(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RWS(2, 3),size_t,__THROWING,RecvMMsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg)
 #include <libc/local/kos.sys.socket/RecvMMsg64.h>
 /* >> recvmmsg(2)
@@ -329,7 +329,7 @@ __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,RecvMMsg64,(__fd_t __sockfd, st
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(RecvMMsg64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL RecvMMsg64)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(RecvMMsg64))(__sockfd, __vmessages, __vlen, __msg_flags, __tmo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(RecvMMsg64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RWS(2, 3) size_t (__LIBCCALL RecvMMsg64)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec64 *__tmo) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(RecvMMsg64))(__sockfd, __vmessages, __vlen, __msg_flags, __tmo); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */

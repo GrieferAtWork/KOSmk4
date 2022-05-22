@@ -95,7 +95,7 @@ NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd,
 }
 /*[[[end:libc_epoll_ctl]]]*/
 
-/*[[[head:libc_epoll_wait,hash:CRC-32=0x59f00884]]]*/
+/*[[[head:libc_epoll_wait,hash:CRC-32=0xb9af67f6]]]*/
 /* >> epoll_wait(2)
  * Wait until at least one of the conditions monitored by `epfd' to be met.
  * @param: epfd:      The epoll controller on which to wait.
@@ -109,7 +109,7 @@ NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd,
  *                    items of `events')
  * @return: 0:        No events happened before `timeout' expired.
  * @return: -1:       Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_ACCESS_WRS(2, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_epoll_wait)(fd_t epfd,
                                       struct epoll_event *events,
                                       __STDC_INT_AS_SIZE_T maxevents,
@@ -125,7 +125,7 @@ NOTHROW_RPC(LIBCCALL libc_epoll_wait)(fd_t epfd,
 }
 /*[[[end:libc_epoll_wait]]]*/
 
-/*[[[head:libc_epoll_pwait,hash:CRC-32=0x40b776db]]]*/
+/*[[[head:libc_epoll_pwait,hash:CRC-32=0xad071613]]]*/
 /* >> epoll_pwait(2)
  * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
  * waiting.  Wait until at least one of the conditions monitored by `epfd' to be met.
@@ -141,7 +141,7 @@ NOTHROW_RPC(LIBCCALL libc_epoll_wait)(fd_t epfd,
  *                    items of `events')
  * @return: 0:        No events happened before `timeout' expired.
  * @return: -1:       Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((2)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_ACCESS_WRS(2, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
                                        struct epoll_event *events,
                                        __STDC_INT_AS_SIZE_T maxevents,
@@ -160,7 +160,7 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
 }
 /*[[[end:libc_epoll_pwait]]]*/
 
-/*[[[head:libc_epoll_rpc_exec,hash:CRC-32=0x465878d4]]]*/
+/*[[[head:libc_epoll_rpc_exec,hash:CRC-32=0xfb391b12]]]*/
 /* >> epoll_rpc_exec(3)
  * Helper wrapper for  `EPOLL_CTL_RPC_PROG' that  automatically provides  the
  * necessary arch-specific RPC program to invoke `func(..., event->data.ptr)'
@@ -191,10 +191,10 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
  *                             intact, and the  RPC will be  discarded as  soon
  *                             as an attempt to send it is made, or the monitor
  *                             is manually deleted via `EPOLL_CTL_DEL' */
-INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((3, 6)) int
+INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_ACCESS_RO(3) NONNULL((6)) int
 NOTHROW_NCX(LIBCCALL libc_epoll_rpc_exec)(fd_t epfd,
                                           fd_t fd,
-                                          struct epoll_event *event,
+                                          struct epoll_event const *event,
                                           pid_t target_tid,
                                           unsigned int mode,
                                           prpc_exec_callback_t func)

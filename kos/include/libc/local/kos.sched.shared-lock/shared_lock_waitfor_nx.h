@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bc55953 */
+/* HASH CRC-32:0x6ce3152c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include <hybrid/__assert.h>
 #include <sched/sig.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_lock_waitfor_nx) __ATTR_WUNUSED __BLOCKING __ATTR_NONNULL((1)) __BOOL
+__LOCAL_LIBC(shared_lock_waitfor_nx) __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1) __BOOL
 (__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor_nx))(struct shared_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
 	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {

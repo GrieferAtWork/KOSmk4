@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x898108b5 */
+/* HASH CRC-32:0x401d244 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -432,12 +432,12 @@ INTDEF WUNUSED __DECL_SIMD_exp double NOTHROW(LIBCCALL libc_exp)(double x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
-INTDEF NONNULL((2)) double NOTHROW_NCX(LIBDCALL libd_frexp)(double x, int *pexponent);
+INTDEF ATTR_ACCESS_WR(2) double NOTHROW_NCX(LIBDCALL libd_frexp)(double x, int *pexponent);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
-INTDEF NONNULL((2)) double NOTHROW_NCX(LIBCCALL libc_frexp)(double x, int *pexponent);
+INTDEF ATTR_ACCESS_WR(2) double NOTHROW_NCX(LIBCCALL libc_frexp)(double x, int *pexponent);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ldexpf(3), ldexp(3), ldexpl(3)
@@ -472,12 +472,12 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_log10)(double x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
-INTDEF WUNUSED NONNULL((2)) double NOTHROW_NCX(LIBDCALL libd_modf)(double x, double *iptr);
+INTDEF WUNUSED ATTR_ACCESS_WR(2) double NOTHROW_NCX(LIBDCALL libd_modf)(double x, double *iptr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
-INTDEF WUNUSED NONNULL((2)) double NOTHROW_NCX(LIBCCALL libc_modf)(double x, double *iptr);
+INTDEF WUNUSED ATTR_ACCESS_WR(2) double NOTHROW_NCX(LIBCCALL libc_modf)(double x, double *iptr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> expf(3), exp(3), expl(3)
@@ -492,12 +492,12 @@ INTDEF WUNUSED __DECL_SIMD_expf float NOTHROW(LIBCCALL libc_expf)(float x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
-INTDEF NONNULL((2)) float NOTHROW_NCX(LIBDCALL libd_frexpf)(float x, int *pexponent);
+INTDEF ATTR_ACCESS_WR(2) float NOTHROW_NCX(LIBDCALL libd_frexpf)(float x, int *pexponent);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
-INTDEF NONNULL((2)) float NOTHROW_NCX(LIBCCALL libc_frexpf)(float x, int *pexponent);
+INTDEF ATTR_ACCESS_WR(2) float NOTHROW_NCX(LIBCCALL libc_frexpf)(float x, int *pexponent);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ldexpf(3), ldexp(3), ldexpl(3)
@@ -532,12 +532,12 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_log10f)(float x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
-INTDEF WUNUSED NONNULL((2)) float NOTHROW_NCX(LIBDCALL libd_modff)(float x, float *iptr);
+INTDEF WUNUSED ATTR_ACCESS_WR(2) float NOTHROW_NCX(LIBDCALL libd_modff)(float x, float *iptr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
-INTDEF WUNUSED NONNULL((2)) float NOTHROW_NCX(LIBCCALL libc_modff)(float x, float *iptr);
+INTDEF WUNUSED ATTR_ACCESS_WR(2) float NOTHROW_NCX(LIBCCALL libc_modff)(float x, float *iptr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> expf(3), exp(3), expl(3)
@@ -552,12 +552,12 @@ INTDEF WUNUSED __DECL_SIMD_expl __LONGDOUBLE NOTHROW(LIBCCALL libc_expl)(__LONGD
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
-INTDEF NONNULL((2)) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_frexpl)(__LONGDOUBLE x, int *pexponent);
+INTDEF ATTR_ACCESS_WR(2) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_frexpl)(__LONGDOUBLE x, int *pexponent);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
-INTDEF NONNULL((2)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x, int *pexponent);
+INTDEF ATTR_ACCESS_WR(2) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x, int *pexponent);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ldexpf(3), ldexp(3), ldexpl(3)
@@ -592,12 +592,12 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_log10l)(__LONGDOUBLE x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
-INTDEF WUNUSED NONNULL((2)) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_modfl)(__LONGDOUBLE x, __LONGDOUBLE *iptr);
+INTDEF WUNUSED ATTR_ACCESS_WR(2) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_modfl)(__LONGDOUBLE x, __LONGDOUBLE *iptr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
-INTDEF WUNUSED NONNULL((2)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_modfl)(__LONGDOUBLE x, __LONGDOUBLE *iptr);
+INTDEF WUNUSED ATTR_ACCESS_WR(2) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_modfl)(__LONGDOUBLE x, __LONGDOUBLE *iptr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> expm1f(3), expm1(3), expm1l(3)
@@ -1326,14 +1326,14 @@ INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_trunc)(double x);
  * Compute remainder of `x' and `p' and put in `*pquo' a value with
  * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/p, with n >= 3 */
-INTDEF WUNUSED NONNULL((3)) double NOTHROW(LIBDCALL libd_remquo)(double x, double p, int *pquo);
+INTDEF WUNUSED ATTR_ACCESS_WR(3) double NOTHROW(LIBDCALL libd_remquo)(double x, double p, int *pquo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> remquof(3), remquo(3), remquol(3)
  * Compute remainder of `x' and `p' and put in `*pquo' a value with
  * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/p, with n >= 3 */
-INTDEF WUNUSED NONNULL((3)) double NOTHROW(LIBCCALL libc_remquo)(double x, double p, int *pquo);
+INTDEF WUNUSED ATTR_ACCESS_WR(3) double NOTHROW(LIBCCALL libc_remquo)(double x, double p, int *pquo);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lrintf(3), lrint(3), lrintl(3)
@@ -1470,14 +1470,14 @@ INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_truncf)(float x);
  * Compute remainder of `x' and `p' and put in `*pquo' a value with
  * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/p, with n >= 3 */
-INTDEF WUNUSED NONNULL((3)) float NOTHROW(LIBDCALL libd_remquof)(float x, float p, int *pquo);
+INTDEF WUNUSED ATTR_ACCESS_WR(3) float NOTHROW(LIBDCALL libd_remquof)(float x, float p, int *pquo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> remquof(3), remquo(3), remquol(3)
  * Compute remainder of `x' and `p' and put in `*pquo' a value with
  * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/p, with n >= 3 */
-INTDEF WUNUSED NONNULL((3)) float NOTHROW(LIBCCALL libc_remquof)(float x, float p, int *pquo);
+INTDEF WUNUSED ATTR_ACCESS_WR(3) float NOTHROW(LIBCCALL libc_remquof)(float x, float p, int *pquo);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lrintf(3), lrint(3), lrintl(3)
@@ -1606,14 +1606,14 @@ INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBL
  * Compute remainder of `x' and `p' and put in `*pquo' a value with
  * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/p, with n >= 3 */
-INTDEF WUNUSED NONNULL((3)) __LONGDOUBLE NOTHROW(LIBDCALL libd_remquol)(__LONGDOUBLE x, __LONGDOUBLE p, int *pquo);
+INTDEF WUNUSED ATTR_ACCESS_WR(3) __LONGDOUBLE NOTHROW(LIBDCALL libd_remquol)(__LONGDOUBLE x, __LONGDOUBLE p, int *pquo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> remquof(3), remquo(3), remquol(3)
  * Compute remainder of `x' and `p' and put in `*pquo' a value with
  * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/p, with n >= 3 */
-INTDEF WUNUSED NONNULL((3)) __LONGDOUBLE NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x, __LONGDOUBLE p, int *pquo);
+INTDEF WUNUSED ATTR_ACCESS_WR(3) __LONGDOUBLE NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x, __LONGDOUBLE p, int *pquo);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lrintf(3), lrint(3), lrintl(3)
@@ -1698,12 +1698,12 @@ INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBL
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sincosf(3), sincos(3), sincosl(3)
  * Calculate both sine (*psinx) and cosine (*pcosx) of `x' */
-INTDEF __DECL_SIMD_sincos NONNULL((2, 3)) void NOTHROW(LIBDCALL libd_sincos)(double x, double *psinx, double *pcosx);
+INTDEF __DECL_SIMD_sincos ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void NOTHROW(LIBDCALL libd_sincos)(double x, double *psinx, double *pcosx);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sincosf(3), sincos(3), sincosl(3)
  * Calculate both sine (*psinx) and cosine (*pcosx) of `x' */
-INTDEF __DECL_SIMD_sincos NONNULL((2, 3)) void NOTHROW(LIBCCALL libc_sincos)(double x, double *psinx, double *pcosx);
+INTDEF __DECL_SIMD_sincos ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void NOTHROW(LIBCCALL libc_sincos)(double x, double *psinx, double *pcosx);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> exp10f(3), exp10(3), exp10l(3)
@@ -1728,12 +1728,12 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_pow10)(double x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sincosf(3), sincos(3), sincosl(3)
  * Calculate both sine (*psinx) and cosine (*pcosx) of `x' */
-INTDEF __DECL_SIMD_sincosf NONNULL((2, 3)) void NOTHROW(LIBDCALL libd_sincosf)(float x, float *psinx, float *pcosx);
+INTDEF __DECL_SIMD_sincosf ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void NOTHROW(LIBDCALL libd_sincosf)(float x, float *psinx, float *pcosx);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sincosf(3), sincos(3), sincosl(3)
  * Calculate both sine (*psinx) and cosine (*pcosx) of `x' */
-INTDEF __DECL_SIMD_sincosf NONNULL((2, 3)) void NOTHROW(LIBCCALL libc_sincosf)(float x, float *psinx, float *pcosx);
+INTDEF __DECL_SIMD_sincosf ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void NOTHROW(LIBCCALL libc_sincosf)(float x, float *psinx, float *pcosx);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> exp10f(3), exp10(3), exp10l(3)
@@ -1758,12 +1758,12 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_pow10f)(float x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sincosf(3), sincos(3), sincosl(3)
  * Calculate both sine (*psinx) and cosine (*pcosx) of `x' */
-INTDEF __DECL_SIMD_sincosl NONNULL((2, 3)) void NOTHROW(LIBDCALL libd_sincosl)(__LONGDOUBLE x, __LONGDOUBLE *psinx, __LONGDOUBLE *pcosx);
+INTDEF __DECL_SIMD_sincosl ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void NOTHROW(LIBDCALL libd_sincosl)(__LONGDOUBLE x, __LONGDOUBLE *psinx, __LONGDOUBLE *pcosx);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sincosf(3), sincos(3), sincosl(3)
  * Calculate both sine (*psinx) and cosine (*pcosx) of `x' */
-INTDEF __DECL_SIMD_sincosl NONNULL((2, 3)) void NOTHROW(LIBCCALL libc_sincosl)(__LONGDOUBLE x, __LONGDOUBLE *psinx, __LONGDOUBLE *pcosx);
+INTDEF __DECL_SIMD_sincosl ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void NOTHROW(LIBCCALL libc_sincosl)(__LONGDOUBLE x, __LONGDOUBLE *psinx, __LONGDOUBLE *pcosx);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> exp10f(3), exp10(3), exp10l(3)
@@ -2052,32 +2052,32 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_ynl)(int n, __LONGDOUBLE x);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant    version    of     `lgamma(3)' */
-INTDEF WUNUSED NONNULL((2)) double NOTHROW_NCX(LIBDCALL libd_lgamma_r)(double x, int *signgamp);
+INTDEF WUNUSED ATTR_ACCESS_WR(2) double NOTHROW_NCX(LIBDCALL libd_lgamma_r)(double x, int *signgamp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant    version    of     `lgamma(3)' */
-INTDEF WUNUSED NONNULL((2)) double NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x, int *signgamp);
+INTDEF WUNUSED ATTR_ACCESS_WR(2) double NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x, int *signgamp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant    version    of     `lgamma(3)' */
-INTDEF WUNUSED NONNULL((2)) float NOTHROW_NCX(LIBDCALL libd_lgammaf_r)(float x, int *signgamp);
+INTDEF WUNUSED ATTR_ACCESS_WR(2) float NOTHROW_NCX(LIBDCALL libd_lgammaf_r)(float x, int *signgamp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant    version    of     `lgamma(3)' */
-INTDEF WUNUSED NONNULL((2)) float NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x, int *signgamp);
+INTDEF WUNUSED ATTR_ACCESS_WR(2) float NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x, int *signgamp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant    version    of     `lgamma(3)' */
-INTDEF WUNUSED NONNULL((2)) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_lgammal_r)(__LONGDOUBLE x, int *signgamp);
+INTDEF WUNUSED ATTR_ACCESS_WR(2) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_lgammal_r)(__LONGDOUBLE x, int *signgamp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant    version    of     `lgamma(3)' */
-INTDEF WUNUSED NONNULL((2)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_lgammal_r)(__LONGDOUBLE x, int *signgamp);
+INTDEF WUNUSED ATTR_ACCESS_WR(2) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_lgammal_r)(__LONGDOUBLE x, int *signgamp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> scalbf(3), scalb(3), scalbl(3)
@@ -2247,7 +2247,7 @@ INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBDCALL libd_fminmag)(double x, do
  * @param: cx: Store the canonicalized value of `*x' here.
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_canonicalize)(double *cx, double const *x);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_canonicalize)(double *cx, double const *x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
@@ -2255,7 +2255,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_canonicalize)(double *cx, d
  * @param: cx: Store the canonicalized value of `*x' here.
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_canonicalize)(double *cx, double const *x);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_canonicalize)(double *cx, double const *x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED long int NOTHROW(LIBDCALL libd_llogbf)(float x);
@@ -2311,7 +2311,7 @@ INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBCCALL libc_fminmagf)(float x, flo
  * @param: cx: Store the canonicalized value of `*x' here.
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_canonicalizef)(float *cx, float const *x);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_canonicalizef)(float *cx, float const *x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
@@ -2319,7 +2319,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_canonicalizef)(float *cx, f
  * @param: cx: Store the canonicalized value of `*x' here.
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_canonicalizef)(float *cx, float const *x);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_canonicalizef)(float *cx, float const *x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED long int NOTHROW(LIBDCALL libd_llogbl)(__LONGDOUBLE x);
@@ -2375,7 +2375,7 @@ INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_fminmagl)(__LON
  * @param: cx: Store the canonicalized value of `*x' here.
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_canonicalizel)(__LONGDOUBLE *cx, __LONGDOUBLE const *x);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_canonicalizel)(__LONGDOUBLE *cx, __LONGDOUBLE const *x);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
@@ -2383,7 +2383,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_canonicalizel)(__LONGDOUBLE
  * @param: cx: Store the canonicalized value of `*x' here.
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_canonicalizel)(__LONGDOUBLE *cx, __LONGDOUBLE const *x);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_canonicalizel)(__LONGDOUBLE *cx, __LONGDOUBLE const *x);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
@@ -2409,17 +2409,17 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd__ldpcomp)(__LONGDOUBLE x
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc__ldpcomp)(__LONGDOUBLE x, __LONGDOUBLE y);
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) short NOTHROW_NCX(LIBDCALL libd__dtest)(double __KOS_FIXED_CONST *px);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) short NOTHROW_NCX(LIBDCALL libd__dtest)(double __KOS_FIXED_CONST *px);
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) short NOTHROW_NCX(LIBCCALL libc__dtest)(double __KOS_FIXED_CONST *px);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) short NOTHROW_NCX(LIBCCALL libc__dtest)(double __KOS_FIXED_CONST *px);
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) short NOTHROW_NCX(LIBDCALL libd__fdtest)(float __KOS_FIXED_CONST *px);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) short NOTHROW_NCX(LIBDCALL libd__fdtest)(float __KOS_FIXED_CONST *px);
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) short NOTHROW_NCX(LIBCCALL libc__fdtest)(float __KOS_FIXED_CONST *px);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) short NOTHROW_NCX(LIBCCALL libc__fdtest)(float __KOS_FIXED_CONST *px);
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) short NOTHROW_NCX(LIBDCALL libd__ldtest)(__LONGDOUBLE __KOS_FIXED_CONST *px);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) short NOTHROW_NCX(LIBDCALL libd__ldtest)(__LONGDOUBLE __KOS_FIXED_CONST *px);
 /* >> _fdtest(3), _dtest(3), _ldtest(3) */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) short NOTHROW_NCX(LIBCCALL libc__ldtest)(__LONGDOUBLE __KOS_FIXED_CONST *px);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) short NOTHROW_NCX(LIBCCALL libc__ldtest)(__LONGDOUBLE __KOS_FIXED_CONST *px);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBDCALL libd__chgsignf)(float x);

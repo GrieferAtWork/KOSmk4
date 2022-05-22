@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x555f2e2b */
+/* HASH CRC-32:0xfc0b362e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,9 +45,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_mbstoc32_defined
 #define __local___localdep_convert_mbstoc32_defined
 #if defined(__CRT_HAVE_convert_mbstowcs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
 #elif defined(__CRT_HAVE_KOS$convert_mbstowcs)
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
 #elif (defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_mbstowcs.h>
@@ -79,9 +79,9 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_getcwd_defined
 #define __local___localdep_getcwd_defined
 #ifdef __CRT_HAVE_getcwd
-__CREDIRECT(,char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ __bufsize),getcwd,(__buf,__bufsize))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ __bufsize),getcwd,(__buf,__bufsize))
 #elif defined(__CRT_HAVE__getcwd)
-__CREDIRECT(,char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ __bufsize),_getcwd,(__buf,__bufsize))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ __bufsize),_getcwd,(__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_getcwd_defined
 #endif /* !... */
@@ -116,7 +116,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c32getcwd) __CHAR32_TYPE__ *
+__LOCAL_LIBC(c32getcwd) __ATTR_ACCESS_WRS(1, 2) __CHAR32_TYPE__ *
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32getcwd))(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __bufsize) {
 	char *__utf8_result;
 	__CHAR32_TYPE__ *__result;

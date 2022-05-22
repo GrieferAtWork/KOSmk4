@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a4abca9 */
+/* HASH CRC-32:0xc24e971 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__fullpath_defined
 #define __local___localdep__fullpath_defined
 #ifdef __CRT_HAVE__fullpath
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3),char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_frealpathat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/_fullpath.h>

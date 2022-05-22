@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4e5b660 */
+/* HASH CRC-32:0x70b5f034 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
-__LOCAL_LIBC(getpwnam) __ATTR_WUNUSED __ATTR_NONNULL((1)) struct passwd *
+__LOCAL_LIBC(getpwnam) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) struct passwd *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpwnam))(const char *__name) {
 	struct passwd *__result;
 	(__NAMESPACE_LOCAL_SYM __localdep_setpwent)();

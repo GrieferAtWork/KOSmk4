@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9bc668d */
+/* HASH CRC-32:0x8fe9a97c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifdef __POSIX_SPAWN_USE_KOS
 #include <bits/crt/posix_spawn.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(posix_spawnattr_setflags) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(posix_spawnattr_setflags) __ATTR_ACCESS_RW(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnattr_setflags))(struct __posix_spawnattr *__restrict __attr, short int __flags) {
 	__attr->__flags = (__UINT16_TYPE__)(unsigned short int)__flags;
 	return 0;

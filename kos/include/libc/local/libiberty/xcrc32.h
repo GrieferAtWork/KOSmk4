@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x419d3248 */
+/* HASH CRC-32:0x5e9172f8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(xcrc32) __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__
+__LOCAL_LIBC(xcrc32) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((1)) __UINT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(xcrc32))(__BYTE_TYPE__ const *__buf, __STDC_INT_AS_SIZE_T __len, __UINT32_TYPE__ __crc) {
 	/* Taken from `libiberty' (which is the  same library also used by  `gdbserver')
 	 * Note that even though `libiberty' is the origin of the contents of this file,

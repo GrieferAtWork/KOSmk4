@@ -309,10 +309,10 @@ int putpmsg($fd_t fd,
             __STDC_INT_AS_UINT_T flags);
 
 [[guard, cp_kos, decl_include("<bits/types.h>")]]
-int fattach($fd_t fd, [[nonnull]] char const *__restrict path);
+int fattach($fd_t fd, [[in]] char const *__restrict path);
 
 [[guard, cp_kos]]
-int fdetach([[nonnull]] char const *__restrict path);
+int fdetach([[in]] char const *__restrict path);
 
 %[insert:extern(ioctl)]
 

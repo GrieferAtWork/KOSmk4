@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6884da46 */
+/* HASH CRC-32:0xfc42dc7b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/os/cpu_set.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, struct __cpu_set_struct *__cpuset),sched_getaffinity,(__pid,__cpusetsize,__cpuset))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_sched_getaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, struct __cpu_set_struct *__cpuset),sched_getaffinity,(__pid,__cpusetsize,__cpuset))
 #endif /* !__local___localdep_sched_getaffinity_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/os/cpu_set.h>

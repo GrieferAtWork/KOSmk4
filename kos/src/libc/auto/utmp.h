@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d438f4 */
+/* HASH CRC-32:0x1f7f93c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,27 +47,27 @@ INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> login(3) */
-INTDEF NONNULL((1)) void NOTHROW_RPC_KOS(LIBDCALL libd_login)(struct utmp const *entry);
+INTDEF ATTR_ACCESS_RO(1) void NOTHROW_RPC_KOS(LIBDCALL libd_login)(struct utmp const *entry);
 /* >> logout(3) */
-INTDEF NONNULL((1)) int NOTHROW_RPC_KOS(LIBDCALL libd_logout)(char const *ut_line);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC_KOS(LIBDCALL libd_logout)(char const *ut_line);
 /* >> logwtmp(3) */
-INTDEF NONNULL((1, 2, 3)) void NOTHROW_RPC_KOS(LIBDCALL libd_logwtmp)(char const *ut_line, char const *ut_name, char const *ut_host);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) void NOTHROW_RPC_KOS(LIBDCALL libd_logwtmp)(char const *ut_line, char const *ut_name, char const *ut_host);
 /* >> updwtmp(3) */
-INTDEF NONNULL((1, 2)) void NOTHROW_RPC_KOS(LIBDCALL libd_updwtmp)(char const *wtmp_file, struct utmp const *utmp);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) void NOTHROW_RPC_KOS(LIBDCALL libd_updwtmp)(char const *wtmp_file, struct utmp const *utmp);
 /* >> utmpname(3) */
-INTDEF NONNULL((1)) int NOTHROW_RPC_KOS(LIBDCALL libd_utmpname)(char const *file);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC_KOS(LIBDCALL libd_utmpname)(char const *file);
 /* >> getutid(3), getutid_r(3) */
-INTDEF NONNULL((1)) struct utmp *NOTHROW_RPC_KOS(LIBDCALL libd_getutid)(struct utmp const *id);
+INTDEF ATTR_ACCESS_RO(1) struct utmp *NOTHROW_RPC_KOS(LIBDCALL libd_getutid)(struct utmp const *id);
 /* >> getutline(3), getutline_r(3) */
-INTDEF NONNULL((1)) struct utmp *NOTHROW_RPC_KOS(LIBDCALL libd_getutline)(struct utmp const *line);
+INTDEF ATTR_ACCESS_RO(1) struct utmp *NOTHROW_RPC_KOS(LIBDCALL libd_getutline)(struct utmp const *line);
 /* >> pututline(3) */
-INTDEF NONNULL((1)) struct utmp *NOTHROW_RPC_KOS(LIBDCALL libd_pututline)(struct utmp const *utmp_ptr);
+INTDEF ATTR_ACCESS_RO(1) struct utmp *NOTHROW_RPC_KOS(LIBDCALL libd_pututline)(struct utmp const *utmp_ptr);
 /* >> getutent(3), getutent_r(3) */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC_KOS(LIBDCALL libd_getutent_r)(struct utmp *buffer, struct utmp **result);
+INTDEF ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) int NOTHROW_RPC_KOS(LIBDCALL libd_getutent_r)(struct utmp *buffer, struct utmp **result);
 /* >> getutid(3), getutid_r(3) */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC_KOS(LIBDCALL libd_getutid_r)(struct utmp const *id, struct utmp *buffer, struct utmp **result);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) int NOTHROW_RPC_KOS(LIBDCALL libd_getutid_r)(struct utmp const *id, struct utmp *buffer, struct utmp **result);
 /* >> getutline(3), getutline_r(3) */
-INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC_KOS(LIBDCALL libd_getutline_r)(struct utmp const *line, struct utmp *buffer, struct utmp **result);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) int NOTHROW_RPC_KOS(LIBDCALL libd_getutline_r)(struct utmp const *line, struct utmp *buffer, struct utmp **result);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

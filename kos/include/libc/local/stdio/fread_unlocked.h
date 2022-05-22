@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef53b4ab */
+/* HASH CRC-32:0xd410faf3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fgetc_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetc_unlocked_defined */
-__LOCAL_LIBC(fread_unlocked) __ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(fread_unlocked) __ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR_OPT(1) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(fread_unlocked))(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) __THROWS(...) {
 	__SIZE_TYPE__ __i, __result = 0;
 	for (; __elemcount; --__elemcount, ++__result) {

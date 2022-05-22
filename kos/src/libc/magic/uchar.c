@@ -126,9 +126,9 @@ typedef __CHAR32_TYPE__ char32_t;
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$mbrtowc")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(mbrtowc)]]
 [[exposed_name("mbrtoc16"), bind_local_function(uchar_mbrtoc16)]]
-size_t stdc_mbrtoc16([[nullable]] char16_t *pc16,
-                     [[inp_opt(maxlen)]] char const *__restrict str,
-                     size_t maxlen, [[nullable]] mbstate_t *mbs);
+size_t stdc_mbrtoc16([[out_opt]] char16_t *pc16,
+                     [[in_opt/*(maxlen)*/]] char const *__restrict str,
+                     size_t maxlen, [[inout_opt]] mbstate_t *mbs);
 
 @@>> mbrtoc32(3)
 [[std, no_crt, preferred_alias("mbrtoc32")]]
@@ -137,9 +137,9 @@ size_t stdc_mbrtoc16([[nullable]] char16_t *pc16,
 [[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$mbrtowc")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(mbrtowc)]]
 [[exposed_name("mbrtoc32"), bind_local_function(uchar_mbrtoc32)]]
-size_t stdc_mbrtoc32([[nullable]] char32_t *pc32,
-                     [[inp_opt(maxlen)]] char const *__restrict str,
-                     size_t maxlen, [[nullable]] mbstate_t *mbs);
+size_t stdc_mbrtoc32([[out_opt]] char32_t *pc32,
+                     [[in_opt/*(maxlen)*/]] char const *__restrict str,
+                     size_t maxlen, [[inout_opt]] mbstate_t *mbs);
 
 @@>> c16rtomb(3)
 [[std, no_crt, preferred_alias("c16rtomb")]]
@@ -148,8 +148,8 @@ size_t stdc_mbrtoc32([[nullable]] char32_t *pc32,
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wcrtomb")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcrtomb)]]
 [[exposed_name("c16rtomb"), bind_local_function(uchar_c16rtomb)]]
-size_t stdc_c16rtomb(char *__restrict str, char16_t c16,
-                     [[nullable]] mbstate_t *mbs);
+size_t stdc_c16rtomb([[out_opt]] char *__restrict str, char16_t c16,
+                     [[inout_opt]] mbstate_t *mbs);
 
 @@>> c32rtomb(3)
 [[std, no_crt, preferred_alias("c32rtomb")]]
@@ -158,8 +158,8 @@ size_t stdc_c16rtomb(char *__restrict str, char16_t c16,
 [[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wcrtomb")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcrtomb)]]
 [[exposed_name("c32rtomb"), bind_local_function(uchar_c32rtomb)]]
-size_t stdc_c32rtomb(char *__restrict str, char32_t c32,
-                     [[nullable]] mbstate_t *mbs);
+size_t stdc_c32rtomb([[out_opt]] char *__restrict str, char32_t c32,
+                     [[inout_opt]] mbstate_t *mbs);
 
 
 
@@ -243,7 +243,7 @@ void convert_freevn(void *vector, $size_t count)
 
 [[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(convert_wcstombsn), impl_include("<libc/errno.h>")]]
-/*utf-8*/ char *convert_wcstombs($wchar_t const *str) {
+/*utf-8*/ char *convert_wcstombs([[in_opt]] $wchar_t const *str) {
 	if unlikely(!str) {
 @@pp_ifdef EINVAL@@
 		(void)libc_seterrno(EINVAL);
@@ -257,8 +257,8 @@ void convert_freevn(void *vector, $size_t count)
 [[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(format_aprintf_printer, format_aprintf_pack)]]
 [[impl_include("<libc/errno.h>", "<bits/crt/format-printer.h>")]]
-/*utf-8*/ char *convert_wcstombsn($wchar_t const *__restrict str,
-                                  $size_t len, $size_t *preslen) {
+/*utf-8*/ char *convert_wcstombsn([[in(len)]] $wchar_t const *__restrict str,
+                                  $size_t len, [[out_opt]] $size_t *preslen) {
 	struct __local_format_wto8_data {
 		__pformatprinter fd_printer;   /* [1..1] Inner printer */
 		void            *fd_arg;       /* Argument for `fd_printer' */
@@ -290,7 +290,7 @@ void convert_freevn(void *vector, $size_t count)
 [[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(convert_wcstombsvn)]]
 [[impl_include("<libc/errno.h>")]]
-/*utf-8*/ char **convert_wcstombsv($wchar_t const *const *__restrict vector) {
+/*utf-8*/ char **convert_wcstombsv([[in_opt]] $wchar_t const *const *__restrict vector) {
 	size_t count = 0;
 	if unlikely(!vector) {
 @@pp_ifdef EINVAL@@
@@ -306,7 +306,7 @@ void convert_freevn(void *vector, $size_t count)
 [[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(malloc, convert_wcstombs)]]
 [[impl_include("<libc/errno.h>")]]
-/*utf-8*/ char **convert_wcstombsvn($wchar_t const *const *__restrict vector, size_t count) {
+/*utf-8*/ char **convert_wcstombsvn([[in(count)]] $wchar_t const *const *__restrict vector, size_t count) {
 	size_t i;
 	char **result;
 	result = (char **)malloc((count + 1) * sizeof(char *));
@@ -334,7 +334,7 @@ err:
 [[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(convert_mbstowcsn)]]
 [[impl_include("<libc/errno.h>")]]
-$wchar_t *convert_mbstowcs(/*utf-8*/ char const *__restrict str) {
+$wchar_t *convert_mbstowcs([[in_opt]] /*utf-8*/ char const *__restrict str) {
 	if unlikely(!str) {
 @@pp_ifdef EINVAL@@
 		(void)libc_seterrno(EINVAL);
@@ -347,7 +347,8 @@ $wchar_t *convert_mbstowcs(/*utf-8*/ char const *__restrict str) {
 [[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(format_waprintf_printer, format_waprintf_pack)]]
 [[impl_include("<libc/errno.h>", "<bits/crt/wformat-printer.h>")]]
-$wchar_t *convert_mbstowcsn(/*utf-8*/ char const *__restrict str, size_t len, size_t *preslen) {
+$wchar_t *convert_mbstowcsn([[in(len)]] /*utf-8*/ char const *__restrict str,
+                            size_t len, [[out_opt]] size_t *preslen) {
 	struct __local_format_waprintf_data {
 		wchar_t      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 		__SIZE_TYPE__ ap_avail; /* Unused buffer size */
@@ -376,7 +377,7 @@ $wchar_t *convert_mbstowcsn(/*utf-8*/ char const *__restrict str, size_t len, si
 [[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(convert_mbstowcsvn)]]
 [[impl_include("<libc/errno.h>")]]
-$wchar_t **convert_mbstowcsv(/*utf-8*/ char const *const *__restrict vector) {
+$wchar_t **convert_mbstowcsv([[in_opt]] /*utf-8*/ char const *const *__restrict vector) {
 	size_t count = 0;
 	if unlikely(!vector) {
 @@pp_ifdef EINVAL@@
@@ -392,7 +393,7 @@ $wchar_t **convert_mbstowcsv(/*utf-8*/ char const *const *__restrict vector) {
 [[wchar, ATTR_MALLOC, wunused, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(malloc, convert_mbstowcs)]]
 [[impl_include("<libc/errno.h>")]]
-$wchar_t **convert_mbstowcsvn(/*utf-8*/ char const *const *__restrict vector, size_t count) {
+$wchar_t **convert_mbstowcsvn([[in(count)]] /*utf-8*/ char const *const *__restrict vector, size_t count) {
 	size_t i;
 	$wchar_t **result;
 	result = ($wchar_t **)malloc((count + 1) * sizeof($wchar_t *));

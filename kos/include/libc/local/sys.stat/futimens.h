@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x258f1a80 */
+/* HASH CRC-32:0x753b7fb0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_futimens32_defined) && defined(__CRT_HAVE_futimens)
 #define __local___localdep_futimens32_defined
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),futimens,(__fd,__times))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),futimens,(__fd,__times))
 #endif /* !__local___localdep_futimens32_defined && __CRT_HAVE_futimens */
 #ifndef __local___localdep_futimens64_defined
 #define __local___localdep_futimens64_defined
 #if defined(__CRT_HAVE_futimens) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens,(__fd,__times))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens,(__fd,__times))
 #elif defined(__CRT_HAVE_futimens64)
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens64,(__fd,__times))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens64,(__fd,__times))
 #elif defined(__CRT_HAVE_futimens)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.stat/futimens64.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_futimens64_defined
 #endif /* !... */
 #endif /* !__local___localdep_futimens64_defined */
-__LOCAL_LIBC(futimens) int
+__LOCAL_LIBC(futimens) __ATTR_ACCESS_RO_OPT(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futimens))(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) {
 
 	struct __timespec64 __tms[2];

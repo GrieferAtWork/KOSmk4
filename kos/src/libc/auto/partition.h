@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56f56510 */
+/* HASH CRC-32:0x7e2d53ed */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,28 +56,28 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_partition_delete)(struct partition_def *se
  * Join the classes containing elements `a' and `b' into the same class
  * For  this, choose one  of the class's canonical  elements as the new
  * canonical element of the total  class, which is then also  returned. */
-INTDEF NONNULL((1)) __STDC_INT_AS_UINT_T NOTHROW_NCX(LIBDCALL libd_partition_union)(struct partition_def *self, __STDC_INT_AS_UINT_T a, __STDC_INT_AS_UINT_T b);
+INTDEF ATTR_ACCESS_RW(1) __STDC_INT_AS_UINT_T NOTHROW_NCX(LIBDCALL libd_partition_union)(struct partition_def *self, __STDC_INT_AS_UINT_T a, __STDC_INT_AS_UINT_T b);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> partition_union(3)
  * Join the classes containing elements `a' and `b' into the same class
  * For  this, choose one  of the class's canonical  elements as the new
  * canonical element of the total  class, which is then also  returned. */
-INTDEF NONNULL((1)) __STDC_INT_AS_UINT_T NOTHROW_NCX(LIBCCALL libc_partition_union)(struct partition_def *self, __STDC_INT_AS_UINT_T a, __STDC_INT_AS_UINT_T b);
+INTDEF ATTR_ACCESS_RW(1) __STDC_INT_AS_UINT_T NOTHROW_NCX(LIBCCALL libc_partition_union)(struct partition_def *self, __STDC_INT_AS_UINT_T a, __STDC_INT_AS_UINT_T b);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> partition_print(3)
  * Print classes (and  their elements) of  `self' to  `fp'
  * The format used is: '[' ['(' [0 1 2 3 4]... ')']... ']'
  * Example: "[(0 1 2 4 8)(3 6)(5 7)]" */
-INTDEF ATTR_ACCESS_RW(2) NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_partition_print)(struct partition_def __KOS_FIXED_CONST *self, FILE *fp);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RW(2) void NOTHROW_NCX(LIBDCALL libd_partition_print)(struct partition_def __KOS_FIXED_CONST *self, FILE *fp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> partition_print(3)
  * Print classes (and  their elements) of  `self' to  `fp'
  * The format used is: '[' ['(' [0 1 2 3 4]... ')']... ']'
  * Example: "[(0 1 2 4 8)(3 6)(5 7)]" */
-INTDEF ATTR_ACCESS_RW(2) NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_partition_print)(struct partition_def __KOS_FIXED_CONST *self, FILE *fp);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RW(2) void NOTHROW_NCX(LIBCCALL libc_partition_print)(struct partition_def __KOS_FIXED_CONST *self, FILE *fp);
 #endif /* !__KERNEL__ */
 
 DECL_END

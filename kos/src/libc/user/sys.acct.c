@@ -26,9 +26,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_acct,hash:CRC-32=0xcd3ca374]]]*/
+/*[[[head:libc_acct,hash:CRC-32=0xaf17a0cb]]]*/
 /* Switch process accounting on and off */
-INTERN ATTR_SECTION(".text.crt.fs.modify") int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO_OPT(1) int
 NOTHROW_RPC(LIBCCALL libc_acct)(const char *filename)
 /*[[[body:libc_acct]]]*/
 {

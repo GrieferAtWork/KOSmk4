@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x378106fc */
+/* HASH CRC-32:0xf6d3efe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep__wgetenv,(__WCHAR_TYPE__ const *__varname),_wgetenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep__wgetenv,(__WCHAR_TYPE__ const *__varname),_wgetenv,(__varname))
 #endif /* !__local___localdep__wgetenv_defined */
 #ifndef __local___localdep_wcsdup_defined
 #define __local___localdep_wcsdup_defined
@@ -63,7 +63,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wdupenv_s) __ATTR_NONNULL((1, 2, 3)) __errno_t
+__LOCAL_LIBC(_wdupenv_s) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) __ATTR_ACCESS_WR(2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wdupenv_s))(__WCHAR_TYPE__ **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR_TYPE__ const *__varname) {
 	__WCHAR_TYPE__ *__name = (__NAMESPACE_LOCAL_SYM __localdep__wgetenv)(__varname);
 	if (!__name) {

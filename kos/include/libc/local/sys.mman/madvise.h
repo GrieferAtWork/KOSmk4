@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaef2962a */
+/* HASH CRC-32:0x1119a637 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(madvise) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(madvise) __ATTR_ACCESS_NONE(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(madvise))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __advice) {
 	/* Implement as a no-op, since this function is merely meant as a hint */
 	__COMPILER_IMPURE();

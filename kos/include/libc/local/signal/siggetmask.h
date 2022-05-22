@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc62c138d */
+/* HASH CRC-32:0x9b5a5057 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,31 +30,31 @@ __NAMESPACE_LOCAL_END
 struct __sigset_struct;
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),sigprocmask,(__how,__set,__oset))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),sigprocmask,(__how,__set,__oset))
 #elif defined(__CRT_HAVE___sigprocmask)
 __NAMESPACE_LOCAL_END
 struct __sigset_struct;
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),__sigprocmask,(__how,__set,__oset))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),__sigprocmask,(__how,__set,__oset))
 #elif defined(__CRT_HAVE___libc_sigprocmask)
 __NAMESPACE_LOCAL_END
 struct __sigset_struct;
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),__libc_sigprocmask,(__how,__set,__oset))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),__libc_sigprocmask,(__how,__set,__oset))
 #elif defined(__CRT_HAVE_pthread_sigmask)
 __NAMESPACE_LOCAL_END
 struct __sigset_struct;
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),pthread_sigmask,(__how,__set,__oset))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),pthread_sigmask,(__how,__set,__oset))
 #elif defined(__CRT_HAVE_thr_sigsetmask)
 __NAMESPACE_LOCAL_END
 struct __sigset_struct;
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),thr_sigsetmask,(__how,__set,__oset))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),thr_sigsetmask,(__how,__set,__oset))
 #else /* ... */
 #undef __local___localdep_sigprocmask_defined
 #endif /* !... */

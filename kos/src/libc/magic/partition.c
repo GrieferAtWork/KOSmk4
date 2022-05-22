@@ -99,7 +99,7 @@ void partition_delete([[nullable]] struct partition_def *self) {
 [[decl_include("<features.h>", "<bits/crt/partition.h>")]]
 [[impl_include("<bits/crt/partition.h>")]]
 [[impl_include("<hybrid/__assert.h>")]]
-__STDC_INT_AS_UINT_T partition_union([[nonnull]] struct partition_def *self,
+__STDC_INT_AS_UINT_T partition_union([[inout]] struct partition_def *self,
                                      __STDC_INT_AS_UINT_T a,
                                      __STDC_INT_AS_UINT_T b) {
 	struct partition_elem *a_elem, *b_elem, *iter;
@@ -160,7 +160,7 @@ __STDC_INT_AS_UINT_T partition_union([[nonnull]] struct partition_def *self,
 [[decl_include("<bits/crt/partition.h>")]]
 [[impl_include("<bits/crt/partition.h>")]]
 [[requires_function(fprintf, fputc)]]
-void partition_print([[nonnull]] struct partition_def __KOS_FIXED_CONST *self,
+void partition_print([[in]] struct partition_def __KOS_FIXED_CONST *self,
                      [[inout]] FILE *fp) {
 	unsigned int i;
 	fputc('[', fp);

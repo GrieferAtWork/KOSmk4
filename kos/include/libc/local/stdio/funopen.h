@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ca43433 */
+/* HASH CRC-32:0x79580025 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libio.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,__localdep_crt_fopencookie,(void *__restrict __magic_cookie, char const *__restrict __modes, _IO_cookie_io_functions_t __io_funcs),fopencookie,(__magic_cookie,__modes,__io_funcs))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2),__FILE *,__NOTHROW_NCX,__localdep_crt_fopencookie,(void *__restrict __magic_cookie, char const *__restrict __modes, _IO_cookie_io_functions_t __io_funcs),fopencookie,(__magic_cookie,__modes,__io_funcs))
 #endif /* !__local___localdep_crt_fopencookie_defined && __CRT_HAVE_fopencookie */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined

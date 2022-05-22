@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3b80afe */
+/* HASH CRC-32:0x1d11e2b9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16unlinkat_defined
 #define __local___localdep_c16unlinkat_defined
 #if defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16unlinkat,(__fd_t __dfd, __CHAR16_TYPE__ const *__file, __atflag_t __flags),wunlinkat,(__dfd,__file,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_c16unlinkat,(__fd_t __dfd, __CHAR16_TYPE__ const *__file, __atflag_t __flags),wunlinkat,(__dfd,__file,__flags))
 #elif defined(__CRT_HAVE_DOS$wunlinkat)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16unlinkat,(__fd_t __dfd, __CHAR16_TYPE__ const *__file, __atflag_t __flags),wunlinkat,(__dfd,__file,__flags))
+__CREDIRECT_DOS(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_c16unlinkat,(__fd_t __dfd, __CHAR16_TYPE__ const *__file, __atflag_t __flags),wunlinkat,(__dfd,__file,__flags))
 #elif defined(__CRT_HAVE_unlinkat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.unistd/wunlinkat.h>
@@ -52,12 +52,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_DOS$convert_wcstombs)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif (defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -89,7 +89,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_removeat_defined
 #define __local___localdep_removeat_defined
 #ifdef __CRT_HAVE_removeat
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_removeat,(__fd_t __dirfd, char const *__filename),removeat,(__dirfd,__filename))
+__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_removeat,(__fd_t __dirfd, char const *__filename),removeat,(__dirfd,__filename))
 #elif defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat) && (defined(__AT_REMOVEREG) || (defined(__EISDIR) && defined(__ENOTDIR)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/removeat.h>
@@ -99,7 +99,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_removeat_defined
 #endif /* !... */
 #endif /* !__local___localdep_removeat_defined */
-__LOCAL_LIBC(c16removeat) __ATTR_NONNULL((2)) int
+__LOCAL_LIBC(c16removeat) __ATTR_ACCESS_RO(2) int
 __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16removeat))(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename) {
 #if ((defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wunlinkat) || defined(__CRT_HAVE_unlinkat)) && defined(__AT_REMOVEREG) && defined(__AT_REMOVEDIR)
 	return (__NAMESPACE_LOCAL_SYM __localdep_c16unlinkat)(__dirfd, __filename, __AT_REMOVEREG | __AT_REMOVEDIR);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc76df0ab */
+/* HASH CRC-32:0xa516bbd4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,13 +28,13 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_crt_lfutexexpr32_defined) && defined(__CRT_HAVE_lfutexexpr)
 #define __local___localdep_crt_lfutexexpr32_defined
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_crt_lfutexexpr32,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec32 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_lfutexexpr32,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec32 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #endif /* !__local___localdep_crt_lfutexexpr32_defined && __CRT_HAVE_lfutexexpr */
 #if !defined(__local___localdep_crt_lfutexexpr64_defined) && defined(__CRT_HAVE_lfutexexpr64)
 #define __local___localdep_crt_lfutexexpr64_defined
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_crt_lfutexexpr64,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_lfutexexpr64,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #endif /* !__local___localdep_crt_lfutexexpr64_defined && __CRT_HAVE_lfutexexpr64 */
-__LOCAL_LIBC(lfutexexpr) __ATTR_NONNULL((1, 3)) int
+__LOCAL_LIBC(lfutexexpr) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexexpr))(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags) {
 #ifdef __CRT_HAVE_lfutexexpr
 	struct __timespec32 __tms32;

@@ -40,7 +40,7 @@ __SYSDECL_BEGIN
 
 [[wchar, ignore, vartypes($mode_t), decl_include("<bits/types.h>")]]
 [[nocrt, doc_alias("wopen"), alias("wopen", "_wopen"), cp, wunused]]
-$fd_t wopen32([[nonnull]] wchar_t const *filename, $oflag_t oflags, ...);
+$fd_t wopen32([[in]] wchar_t const *filename, $oflag_t oflags, ...);
 
 [[ignore]] c16open32(*) %{uchar16("wopen32")}
 [[ignore]] c32open32(*) %{uchar32("wopen32")}
@@ -53,7 +53,7 @@ $fd_t wopen32([[nonnull]] wchar_t const *filename, $oflag_t oflags, ...);
 [[dos_export_as("DOS$_wopen", /*"DOS$"*/ "?_wopen@@YAHPB_WHH@Z"), requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(wopen64) || (defined(__AT_FDCWD) && $has_function(wopenat)) ||
            $has_function(open, convert_wcstombs))]]
-$fd_t wopen([[nonnull]] wchar_t const *filename, $oflag_t oflags, ...) {
+$fd_t wopen([[in]] wchar_t const *filename, $oflag_t oflags, ...) {
 	fd_t result;
 	va_list args;
 	mode_t mode;
@@ -86,7 +86,7 @@ $fd_t wopen([[nonnull]] wchar_t const *filename, $oflag_t oflags, ...) {
 [[requires((defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && $has_function(wopen)) ||
            $has_function(creat, convert_wcstombs))]]
 [[impl_include("<asm/os/fcntl.h>"), decl_include("<bits/types.h>")]]
-$fd_t wcreat([[nonnull]] wchar_t const *filename, $mode_t mode) {
+$fd_t wcreat([[in]] wchar_t const *filename, $mode_t mode) {
 @@pp_if defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && $has_function(wopen)@@
 	return wopen(filename, __O_CREAT | __O_WRONLY | __O_TRUNC, mode);
 @@pp_else@@
@@ -109,7 +109,7 @@ $fd_t wcreat([[nonnull]] wchar_t const *filename, $mode_t mode) {
 [[if($extended_include_prefix("<asm/os/oflags.h>")!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), preferred_alias("_wopen")]]
 [[decl_include("<bits/types.h>"), impl_include("<asm/os/oflags.h>")]]
 [[cp, wunused, requires($has_function(wopen32) || $has_function(open64, convert_wcstombs))]]
-$fd_t wopen64([[nonnull]] wchar_t const *filename, $oflag_t oflags, ...) {
+$fd_t wopen64([[in]] wchar_t const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
 	mode_t mode;
@@ -145,7 +145,7 @@ $fd_t wopen64([[nonnull]] wchar_t const *filename, $oflag_t oflags, ...) {
 [[requires_include("<asm/os/oflags.h>")]]
 [[requires((defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && $has_function(wopen64)) ||
            $has_function(creat64, convert_wcstombs))]]
-$fd_t wcreat64([[nonnull]] wchar_t const *filename, $mode_t mode) {
+$fd_t wcreat64([[in]] wchar_t const *filename, $mode_t mode) {
 @@pp_if defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && $has_function(wopen64)@@
 	return wopen64(filename, __O_CREAT | __O_WRONLY | __O_TRUNC, mode);
 @@pp_else@@
@@ -167,7 +167,7 @@ $fd_t wcreat64([[nonnull]] wchar_t const *filename, $mode_t mode) {
 
 [[wchar, cp, ignore, nocrt, alias("wopenat"), doc_alias("wopenat")]]
 [[wunused, vartypes($mode_t), decl_include("<bits/types.h>")]]
-$fd_t wopenat32($fd_t dirfd, [[nonnull]] wchar_t const *filename, $oflag_t oflags, ...);
+$fd_t wopenat32($fd_t dirfd, [[in]] wchar_t const *filename, $oflag_t oflags, ...);
 
 [[ignore]] c16openat32(*) %{uchar16("wopenat32")}
 [[ignore]] c32openat32(*) %{uchar32("wopenat32")}
@@ -178,7 +178,7 @@ $fd_t wopenat32($fd_t dirfd, [[nonnull]] wchar_t const *filename, $oflag_t oflag
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("wopenat")]]
 [[                                                                                                                                                     alias("wopenat64")]]
 [[requires($has_function(wopenat64) || $has_function(openat, convert_wcstombs))]]
-$fd_t wopenat($fd_t dirfd, [[nonnull]] wchar_t const *filename, $oflag_t oflags, ...) {
+$fd_t wopenat($fd_t dirfd, [[in]] wchar_t const *filename, $oflag_t oflags, ...) {
 	fd_t result;
 	va_list args;
 	mode_t mode;
@@ -206,7 +206,7 @@ $fd_t wopenat($fd_t dirfd, [[nonnull]] wchar_t const *filename, $oflag_t oflags,
 [[wchar, cp, guard, wunused, vartypes($mode_t), doc_alias("wopenat")]]
 [[decl_include("<bits/types.h>"), preferred_largefile64_variant_of(wopenat)]]
 [[cp, wunused, requires($has_function(wopenat32) || $has_function(openat64, convert_wcstombs))]]
-$fd_t wopenat64($fd_t dirfd, [[nonnull]] wchar_t const *filename, $oflag_t oflags, ...) {
+$fd_t wopenat64($fd_t dirfd, [[in]] wchar_t const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;
 	mode_t mode;

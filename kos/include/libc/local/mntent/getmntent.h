@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0fc036e */
+/* HASH CRC-32:0xc24c8a25 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getmntent_r_defined
 #define __local___localdep_getmntent_r_defined
 #ifdef __CRT_HAVE_getmntent_r
-__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2, 3)),struct mntent *,__NOTHROW_RPC,__localdep_getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),getmntent_r,(__stream,__result,__buffer,__bufsize))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WRS(3, 4),struct mntent *,__NOTHROW_RPC,__localdep_getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),getmntent_r,(__stream,__result,__buffer,__bufsize))
 #elif defined(__CRT_HAVE___getmntent_r)
-__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2, 3)),struct mntent *,__NOTHROW_RPC,__localdep_getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),__getmntent_r,(__stream,__result,__buffer,__bufsize))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WRS(3, 4),struct mntent *,__NOTHROW_RPC,__localdep_getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),__getmntent_r,(__stream,__result,__buffer,__bufsize))
 #elif defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE__IO_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/mntent/getmntent_r.h>

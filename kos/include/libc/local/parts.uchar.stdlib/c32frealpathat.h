@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6bc2629 */
+/* HASH CRC-32:0x752691e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,12 +54,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_KOS$convert_wcstombs)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif (defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -80,12 +80,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
 #elif defined(__CRT_HAVE_KOS$convert_mbstowcs)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
 #elif (defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_mbstowcs.h>
@@ -102,7 +102,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_convert_mbstoc32_defined */
 #ifndef __local___localdep_frealpathat_defined
 #define __local___localdep_frealpathat_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,__localdep_frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpathat,(__dirfd,__filename,__resolved,__buflen,__flags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),char *,__NOTHROW_RPC,__localdep_frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpathat,(__dirfd,__filename,__resolved,__buflen,__flags))
 #endif /* !__local___localdep_frealpathat_defined */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined
@@ -142,7 +142,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyl __LIBC_LOCAL_NAME(memcpyl)
 #endif /* !... */
 #endif /* !__local___localdep_memcpyl_defined */
-__LOCAL_LIBC(c32frealpathat) __ATTR_WUNUSED __ATTR_NONNULL((2)) __CHAR32_TYPE__ *
+__LOCAL_LIBC(c32frealpathat) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(3, 4) __CHAR32_TYPE__ *
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32frealpathat))(__fd_t __dirfd, __CHAR32_TYPE__ const *__filename, __CHAR32_TYPE__ *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags) {
 	char *__utf8_filename, *__utf8_resolved;
 	__CHAR32_TYPE__ *__wcs_resolved;

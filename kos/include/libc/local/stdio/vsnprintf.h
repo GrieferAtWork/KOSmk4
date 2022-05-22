@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77abf8e4 */
+/* HASH CRC-32:0xcb9c1e8c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ struct __format_snprintf_data {
 };
 #endif /* !____format_snprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vsnprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(vsnprintf) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsnprintf))(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args) {
 	struct __format_snprintf_data __data;
 	__STDC_INT_AS_SSIZE_T __result;

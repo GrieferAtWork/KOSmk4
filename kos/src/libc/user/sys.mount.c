@@ -27,10 +27,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_mount,hash:CRC-32=0x1775d24a]]]*/
+/*[[[head:libc_mount,hash:CRC-32=0xe2a98681]]]*/
 /* >> mount(2)
  * @param: mountflags: Set of `MS_*' from <sys/mount.h> */
-INTERN ATTR_SECTION(".text.crt.fs.mount") int
+INTERN ATTR_SECTION(".text.crt.fs.mount") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(5) int
 NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file,
                                  char const *dir,
                                  char const *fstype,
@@ -48,9 +48,9 @@ NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file,
 }
 /*[[[end:libc_mount]]]*/
 
-/*[[[head:libc_umount,hash:CRC-32=0x2ab4c8c9]]]*/
+/*[[[head:libc_umount,hash:CRC-32=0x9baadafb]]]*/
 /* >> umount(2) */
-INTERN ATTR_SECTION(".text.crt.fs.mount") int
+INTERN ATTR_SECTION(".text.crt.fs.mount") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBCCALL libc_umount)(char const *special_file)
 /*[[[body:libc_umount]]]*/
 {
@@ -64,10 +64,10 @@ NOTHROW_RPC(LIBCCALL libc_umount)(char const *special_file)
 }
 /*[[[end:libc_umount]]]*/
 
-/*[[[head:libc_umount2,hash:CRC-32=0x8b1380b3]]]*/
+/*[[[head:libc_umount2,hash:CRC-32=0x74de08aa]]]*/
 /* >> umount2(2)
  * @param: flags: Set of `MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW' */
-INTERN ATTR_SECTION(".text.crt.fs.mount") int
+INTERN ATTR_SECTION(".text.crt.fs.mount") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBCCALL libc_umount2)(char const *special_file,
                                    __STDC_INT_AS_UINT_T flags)
 /*[[[body:libc_umount2]]]*/

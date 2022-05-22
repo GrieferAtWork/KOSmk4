@@ -57,13 +57,13 @@ __SYSDECL_BEGIN
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("statfs", "__statfs", "__libc_statfs")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("statfs64")]]
 [[export_as("__statfs", "__libc_statfs")]]
-int statfs([[nonnull]] char const *file, [[nonnull]] struct statfs *buf);
+int statfs([[in]] char const *file, [[out]] struct statfs *buf);
 
 [[decl_include("<bits/os/statfs.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("fstatfs", "__fstatfs", "__libc_fstatfs")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("fstatfs64")]]
 [[export_as("__fstatfs", "__libc_fstatfs")]]
-int fstatfs($fd_t filedes, [[nonnull]] struct statfs *buf);
+int fstatfs($fd_t filedes, [[out]] struct statfs *buf);
 
 %
 %#ifdef __USE_LARGEFILE64
@@ -71,13 +71,13 @@ int fstatfs($fd_t filedes, [[nonnull]] struct statfs *buf);
 [[decl_include("<bits/os/statfs.h>")]]
 [[preferred_statfs64_variant_of(statfs), doc_alias("statfs")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("statfs", "__statfs", "__libc_statfs")]]
-int statfs64([[nonnull]] const char *file, [[nonnull]] struct statfs64 *buf);
+int statfs64([[in]] const char *file, [[out]] struct statfs64 *buf);
 %#endif /* !statfs64 */
 
 [[decl_include("<bits/os/statfs.h>")]]
 [[preferred_statfs64_variant_of(fstatfs), doc_alias("fstatfs")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("fstatfs", "__fstatfs", "__libc_fstatfs")]]
-int fstatfs64($fd_t filedes, [[nonnull]] struct statfs64 *buf);
+int fstatfs64($fd_t filedes, [[out]] struct statfs64 *buf);
 %#endif /* __USE_LARGEFILE64 */
 
 

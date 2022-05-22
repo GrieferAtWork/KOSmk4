@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc7f5af0 */
+/* HASH CRC-32:0xa3cdf55d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ppoll32_defined
 #define __local___localdep_ppoll32_defined
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll32,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec32 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RWS(1, 2),int,__NOTHROW_RPC,__localdep_ppoll32,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec32 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
 #endif /* !__local___localdep_ppoll32_defined */
-__LOCAL_LIBC(ppoll64) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(ppoll64) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RWS(1, 2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ppoll64))(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss) {
 	struct __timespec32 __tmo32;
 	if (!__timeout)

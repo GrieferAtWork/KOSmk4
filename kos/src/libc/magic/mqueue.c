@@ -75,7 +75,7 @@ typedef __mqd_t mqd_t;
 @@>> mq_open(3)
 [[cp, wunused, vartypes($mode_t)]]
 [[decl_include("<bits/os/mqueue.h>")]]
-mqd_t mq_open([[nonnull]] char const *__restrict name,
+mqd_t mq_open([[in]] char const *__restrict name,
               $oflag_t oflags, ...);
 
 
@@ -86,17 +86,17 @@ int mq_close(mqd_t mqdes);
 @@>> mq_getattr(3)
 [[decl_include("<bits/os/mqueue.h>")]]
 int mq_getattr(mqd_t mqdes,
-               [[nonnull]] struct mq_attr *__restrict mqstat);
+               [[out]] struct mq_attr *__restrict mqstat);
 
 @@>> mq_setattr(3)
 [[decl_include("<bits/os/mqueue.h>")]]
 int mq_setattr(mqd_t mqdes,
-               [[nonnull]] struct mq_attr const *__restrict mqstat,
-               [[nullable]] struct mq_attr *__restrict old_mqstat);
+               [[in]] struct mq_attr const *__restrict mqstat,
+               [[out_opt]] struct mq_attr *__restrict old_mqstat);
 
 @@>> mq_unlink(3)
 [[decl_include("<bits/os/mqueue.h>")]]
-int mq_unlink([[nonnull]] char const *name);
+int mq_unlink([[in]] char const *name);
 
 @@>> mq_notify(3)
 [[decl_include("<bits/os/mqueue.h>", "<bits/os/sigevent.h>")]]
@@ -107,13 +107,13 @@ int mq_notify(mqd_t mqdes,
 @@>> mq_receive(3)
 [[cp, decl_include("<bits/os/mqueue.h>")]]
 $ssize_t mq_receive(mqd_t mqdes,
-                    [[nonnull]] char *__restrict msg_ptr,
+                    [[out(return <= msg_len)]] char *__restrict msg_ptr,
                     $size_t msg_len, unsigned int *pmsg_prio);
 
 @@>> mq_send(3)
 [[cp, decl_include("<bits/os/mqueue.h>")]]
 int mq_send(mqd_t mqdes,
-            [[nonnull]] char const *msg_ptr,
+            [[in(msg_len)]] char const *msg_ptr,
             $size_t msg_len, unsigned int msg_prio);
 
 
@@ -124,13 +124,13 @@ int mq_send(mqd_t mqdes,
 [[ignore, nocrt, alias("mq_timedreceive"), doc_alias("mq_timedreceive")]]
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/os/mqueue.h>")]]
 $ssize_t mq_timedreceive32(mqd_t mqdes,
-                           [[nonnull]] char *__restrict msg_ptr, $size_t msg_len, unsigned int *pmsg_prio,
-                           [[nonnull]] struct $timespec32 const *__restrict abs_timeout);
+                           [[out(return <= msg_len)]] char *__restrict msg_ptr, $size_t msg_len, unsigned int *pmsg_prio,
+                           [[in]] struct $timespec32 const *__restrict abs_timeout);
 [[ignore, nocrt, alias("mq_timedsend"), doc_alias("mq_timedsend")]]
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/os/mqueue.h>")]]
 int mq_timedsend32(mqd_t mqdes,
-                   [[nonnull]] char const *msg_ptr, $size_t msg_len, unsigned int msg_prio,
-                   [[nonnull]] struct $timespec32 const *abs_timeout);
+                   [[out(return <= msg_len)]] char const *msg_ptr, $size_t msg_len, unsigned int msg_prio,
+                   [[in]] struct $timespec32 const *abs_timeout);
 
 
 @@>> mq_timedreceive(3), mq_timedreceive64(3)
@@ -139,8 +139,9 @@ int mq_timedsend32(mqd_t mqdes,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mq_timedreceive64")]]
 [[userimpl, requires($has_function(mq_timedreceive32) || $has_function(mq_timedreceive64))]]
 $ssize_t mq_timedreceive(mqd_t mqdes,
-                         [[nonnull]] char *__restrict msg_ptr, $size_t msg_len, unsigned int *pmsg_prio,
-                         [[nonnull]] struct timespec const *__restrict abs_timeout) {
+                         [[out(return <= msg_len)]] char *__restrict msg_ptr, $size_t msg_len,
+                         [[out_opt]] unsigned int *pmsg_prio,
+                         [[in]] struct timespec const *__restrict abs_timeout) {
 @@pp_if $has_function(mq_timedreceive32)@@
 	struct timespec32 abs_timeout32;
 	abs_timeout32.tv_sec  = (time32_t)abs_timeout->tv_sec;
@@ -161,8 +162,8 @@ $ssize_t mq_timedreceive(mqd_t mqdes,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mq_timedsend64")]]
 [[userimpl, requires($has_function(mq_timedsend32) || $has_function(mq_timedsend64))]]
 int mq_timedsend(mqd_t mqdes,
-                 [[nonnull]] char const *msg_ptr, $size_t msg_len, unsigned int msg_prio,
-                 [[nonnull]] struct timespec const *abs_timeout) {
+                 [[in(msg_len)]] char const *msg_ptr, $size_t msg_len, unsigned int msg_prio,
+                 [[in]] struct timespec const *abs_timeout) {
 @@pp_if $has_function(mq_timedsend32)@@
 	struct timespec32 abs_timeout32;
 	abs_timeout32.tv_sec  = (time32_t)abs_timeout->tv_sec;
@@ -184,8 +185,9 @@ int mq_timedsend(mqd_t mqdes,
 [[preferred_time64_variant_of(mq_timedreceive), doc_alias("mq_timedreceive")]]
 [[userimpl, requires_function(mq_timedreceive32)]]
 $ssize_t mq_timedreceive64(mqd_t mqdes,
-                           [[nonnull]] char *__restrict msg_ptr, $size_t msg_len, unsigned int *pmsg_prio,
-                           [[nonnull]] struct timespec64 const *__restrict abs_timeout) {
+                           [[out(return <= msg_len)]] char *__restrict msg_ptr,
+                           $size_t msg_len, unsigned int *pmsg_prio,
+                           [[in]] struct timespec64 const *__restrict abs_timeout) {
 	struct timespec32 abs_timeout32;
 	abs_timeout32.tv_sec  = (time32_t)abs_timeout->tv_sec;
 	abs_timeout32.tv_nsec = abs_timeout->tv_nsec;
@@ -196,8 +198,9 @@ $ssize_t mq_timedreceive64(mqd_t mqdes,
 [[preferred_time64_variant_of(mq_timedsend), doc_alias("mq_timedsend")]]
 [[userimpl, requires_function(mq_timedsend32)]]
 int mq_timedsend64(mqd_t mqdes,
-                   [[nonnull]] char const *msg_ptr, $size_t msg_len, unsigned int msg_prio,
-                   [[nonnull]] struct timespec64 const *abs_timeout) {
+                   [[in(msg_len)]] char const *msg_ptr,
+                   $size_t msg_len, unsigned int msg_prio,
+                   [[in]] struct timespec64 const *abs_timeout) {
 	struct timespec32 abs_timeout32;
 	abs_timeout32.tv_sec  = (time32_t)abs_timeout->tv_sec;
 	abs_timeout32.tv_nsec = abs_timeout->tv_nsec;

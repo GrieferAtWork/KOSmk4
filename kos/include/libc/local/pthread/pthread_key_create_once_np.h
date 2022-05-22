@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8df50d6 */
+/* HASH CRC-32:0xc46d7d27 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_key_create_defined
 #define __local___localdep_pthread_key_create_defined
 #ifdef __CRT_HAVE_pthread_key_create
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *___value)),pthread_key_create,(__key,__destr_function))
+__CREDIRECT(__ATTR_ACCESS_WR(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *___value)),pthread_key_create,(__key,__destr_function))
 #elif defined(__CRT_HAVE_thr_keycreate)
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *___value)),thr_keycreate,(__key,__destr_function))
+__CREDIRECT(__ATTR_ACCESS_WR(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *___value)),thr_keycreate,(__key,__destr_function))
 #else /* ... */
 #undef __local___localdep_pthread_key_create_defined
 #endif /* !... */
@@ -48,7 +48,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_key_delete,(__pthread_ke
 __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(pthread_key_create_once_np) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(pthread_key_create_once_np) __ATTR_ACCESS_WR(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_key_create_once_np))(__pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)) {
 	__pthread_key_t __kv;
 	__errno_t __error;

@@ -159,8 +159,8 @@ NOTHROW_NCX(LIBCCALL libc_exit_thread)(int exit_code)
 }
 /*[[[end:libc_exit_thread]]]*/
 
-/*[[[head:libc_sched_setparam,hash:CRC-32=0xcfb2c3b7]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.param") int
+/*[[[head:libc_sched_setparam,hash:CRC-32=0x7f01360c]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.param") ATTR_ACCESS_RO(2) int
 NOTHROW_NCX(LIBCCALL libc_sched_setparam)(pid_t pid,
                                           struct sched_param const *param)
 /*[[[body:libc_sched_setparam]]]*/
@@ -171,8 +171,8 @@ NOTHROW_NCX(LIBCCALL libc_sched_setparam)(pid_t pid,
 }
 /*[[[end:libc_sched_setparam]]]*/
 
-/*[[[head:libc_sched_getparam,hash:CRC-32=0xb62a1dfb]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.param") int
+/*[[[head:libc_sched_getparam,hash:CRC-32=0xdfbe7995]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.param") ATTR_ACCESS_WR(2) int
 NOTHROW_NCX(LIBCCALL libc_sched_getparam)(pid_t pid,
                                           struct sched_param *param)
 /*[[[body:libc_sched_getparam]]]*/
@@ -183,8 +183,8 @@ NOTHROW_NCX(LIBCCALL libc_sched_getparam)(pid_t pid,
 }
 /*[[[end:libc_sched_getparam]]]*/
 
-/*[[[head:libc_sched_setscheduler,hash:CRC-32=0xb5266c22]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.param") int
+/*[[[head:libc_sched_setscheduler,hash:CRC-32=0xf5a7836a]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.param") ATTR_ACCESS_RO(3) int
 NOTHROW_NCX(LIBCCALL libc_sched_setscheduler)(pid_t pid,
                                               int policy,
                                               struct sched_param const *param)
@@ -198,8 +198,8 @@ NOTHROW_NCX(LIBCCALL libc_sched_setscheduler)(pid_t pid,
 }
 /*[[[end:libc_sched_setscheduler]]]*/
 
-/*[[[head:libc_sched_getscheduler,hash:CRC-32=0x73b26a5e]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.param") int
+/*[[[head:libc_sched_getscheduler,hash:CRC-32=0xef7d02fd]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.param") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_sched_getscheduler)(pid_t pid)
 /*[[[body:libc_sched_getscheduler]]]*/
 {
@@ -224,8 +224,8 @@ NOTHROW(LIBCCALL libc_sched_yield)(void)
 }
 /*[[[end:libc_sched_yield]]]*/
 
-/*[[[head:libc_sched_get_priority_max,hash:CRC-32=0xcfb90dd3]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.param") int
+/*[[[head:libc_sched_get_priority_max,hash:CRC-32=0x96f1b2c8]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.param") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_sched_get_priority_max)(__STDC_INT_AS_UINT_T algorithm)
 /*[[[body:libc_sched_get_priority_max]]]*/
 {
@@ -235,8 +235,8 @@ NOTHROW_NCX(LIBCCALL libc_sched_get_priority_max)(__STDC_INT_AS_UINT_T algorithm
 }
 /*[[[end:libc_sched_get_priority_max]]]*/
 
-/*[[[head:libc_sched_get_priority_min,hash:CRC-32=0x3c3482c5]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.param") int
+/*[[[head:libc_sched_get_priority_min,hash:CRC-32=0x657c3dde]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.param") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_sched_get_priority_min)(__STDC_INT_AS_UINT_T algorithm)
 /*[[[body:libc_sched_get_priority_min]]]*/
 {
@@ -246,8 +246,8 @@ NOTHROW_NCX(LIBCCALL libc_sched_get_priority_min)(__STDC_INT_AS_UINT_T algorithm
 }
 /*[[[end:libc_sched_get_priority_min]]]*/
 
-/*[[[head:libc_sched_setaffinity,hash:CRC-32=0x29051901]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.param") int
+/*[[[head:libc_sched_setaffinity,hash:CRC-32=0xc7abcd80]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.param") ATTR_ACCESS_RO_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_sched_setaffinity)(pid_t pid,
                                              size_t cpusetsize,
                                              cpu_set_t const *cpuset)
@@ -259,8 +259,8 @@ NOTHROW_NCX(LIBCCALL libc_sched_setaffinity)(pid_t pid,
 }
 /*[[[end:libc_sched_setaffinity]]]*/
 
-/*[[[head:libc_sched_getaffinity,hash:CRC-32=0xf881fa30]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.param") int
+/*[[[head:libc_sched_getaffinity,hash:CRC-32=0xceaad2a6]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.param") ATTR_ACCESS_WR_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_sched_getaffinity)(pid_t pid,
                                              size_t cpusetsize,
                                              cpu_set_t *cpuset)
@@ -272,8 +272,8 @@ NOTHROW_NCX(LIBCCALL libc_sched_getaffinity)(pid_t pid,
 }
 /*[[[end:libc_sched_getaffinity]]]*/
 
-/*[[[head:libc_sched_rr_get_interval,hash:CRC-32=0x6fe03650]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.param") int
+/*[[[head:libc_sched_rr_get_interval,hash:CRC-32=0x36e9e55e]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.param") ATTR_ACCESS_WR_OPT(2) int
 NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval)(pid_t pid,
                                                  struct timespec *tms)
 /*[[[body:libc_sched_rr_get_interval]]]*/
@@ -284,11 +284,11 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval)(pid_t pid,
 }
 /*[[[end:libc_sched_rr_get_interval]]]*/
 
-/*[[[head:libc_sched_rr_get_interval64,hash:CRC-32=0xf43b85ed]]]*/
+/*[[[head:libc_sched_rr_get_interval64,hash:CRC-32=0xb9071c67]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_sched_rr_get_interval64, libc_sched_rr_get_interval);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.sched.param") int
+INTERN ATTR_SECTION(".text.crt.sched.param") ATTR_ACCESS_WR_OPT(2) int
 NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid,
                                                    struct timespec64 *tms)
 /*[[[body:libc_sched_rr_get_interval64]]]*/

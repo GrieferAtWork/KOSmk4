@@ -58,44 +58,44 @@ typedef __pos64_t pos64_t; /* File/device position */
 
 [[cp, throws, noreturn, doc_alias("execv"), argument_names(path, ___argv)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
-void Execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV);
+void Execv([[in]] char const *__restrict path, [[in]] __TARGV);
 
 [[cp, throws, noreturn, doc_alias("execve"), argument_names(path, ___argv, ___envp)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
-void Execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
+void Execve([[in]] char const *__restrict path, [[in]] __TARGV, [[in]] __TENVP);
 
 [[cp, throws, noreturn, doc_alias("execvp"), argument_names(file, ___argv)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
-void Execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV);
+void Execvp([[in]] char const *__restrict file, [[in]] __TARGV);
 
 [[cp, throws, impl_include("<parts/redirect-exec.h>"), doc_alias("execl")]]
 [[requires_dependent_function(Execv), ATTR_SENTINEL, noreturn]]
-void Execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
+void Execl([[in]] char const *__restrict path, [[in_opt]] char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_XEXECL(char, Execv, path, args)
 }
 
 [[cp, throws, impl_include("<parts/redirect-exec.h>"), doc_alias("execle")]]
 [[requires_dependent_function(Execve), ATTR_SENTINEL_O(1), noreturn]]
-void Execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
+void Execle([[in]] char const *__restrict path, [[in_opt]] char const *args, ... /*, (char *)NULL, [[in]] (char **)environ*/) {
 	__REDIRECT_XEXECLE(char, Execve, path, args)
 }
 
 [[cp, throws, impl_include("<parts/redirect-exec.h>"), doc_alias("execlp")]]
 [[requires_dependent_function(Execvp), ATTR_SENTINEL, noreturn]]
-void Execpl([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
+void Execpl([[in]] char const *__restrict file, [[in_opt]] char const *args, ... /*, (char *)NULL*/) {
 	__REDIRECT_XEXECL(char, Execvp, file, args)
 }
 
 [[cp, throws, impl_include("<parts/redirect-exec.h>"), doc_alias("execle")]]
 [[requires_dependent_function(Execvpe), ATTR_SENTINEL_O(1), noreturn]]
-void Execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
+void Execlpe([[in]] char const *__restrict file, [[in_opt]] char const *args, ... /*, (char *)NULL, [[in]] (char **)environ*/) {
 	__REDIRECT_XEXECLE(char, Execvpe, file, args)
 }
 
 
 [[throws, doc_alias("pipe"), decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.except.io.access")]]
-void Pipe([[nonnull]] $fd_t pipedes[2]);
+void Pipe([[out]] $fd_t pipedes[2]);
 
 
 [[cp, throws, decl_include("<bits/types.h>"), doc_alias("fsync"), userimpl]]
@@ -130,31 +130,31 @@ $pid_t Fork();
 [[cp, throws, decl_include("<bits/types.h>"), doc_alias("chown")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(FChownAt))]]
-void Chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
+void Chown([[in]] char const *file, $uid_t owner, $gid_t group) {
 	FChownAt(__AT_FDCWD, file, owner, group, 0);
 }
 
 [[cp, throws, doc_alias("link")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(LinkAt))]]
-void Link([[nonnull]] char const *from, [[nonnull]] char const *to) {
+void Link([[in]] char const *from, [[in]] char const *to) {
 	LinkAt(__AT_FDCWD, from, __AT_FDCWD, to, 0);
 }
 
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("read"), section(".text.crt{|.dos}.except.io.read")]]
-size_t Read($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize);
+size_t Read($fd_t fd, [[out(return <= bufsize)]] void *buf, size_t bufsize);
 
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("write"), section(".text.crt{|.dos}.except.io.write")]]
-size_t Write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
+size_t Write($fd_t fd, [[in(return <= bufsize)]] void const *buf, size_t bufsize);
 
 %#ifdef __USE_KOS
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("readall"), section(".text.crt{|.dos}.except.io.read")]]
 [[userimpl, requires_function(Read, lseek)]]
 [[impl_include("<libc/errno.h>", "<kos/except.h>")]]
-size_t ReadAll($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
+size_t ReadAll($fd_t fd, [[out(bufsize)]] void *buf, size_t bufsize) {
 	size_t result, temp;
 	result = Read(fd, buf, bufsize);
 	if (result != 0 && result < bufsize) {
@@ -216,25 +216,25 @@ $fd_t Dup($fd_t fd);
 
 [[cp, throws, doc_alias("chdir")]]
 [[section(".text.crt{|.dos}.except.fs.basic_property")]]
-void Chdir([[nonnull]] char const *path);
+void Chdir([[in]] char const *path);
 
 [[cp, throws, doc_alias("getcwd"), decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.except.fs.basic_property")]]
-char *GetCwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
+char *GetCwd([[out(? <= bufsize)]] char *buf, size_t bufsize);
 
 %[default:section(".text.crt{|.dos}.fs.modify")]
 
 [[cp, throws, doc_alias("unlink")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(UnlinkAt))]]
-void Unlink([[nonnull]] char const *file) {
+void Unlink([[in]] char const *file) {
 	UnlinkAt(__AT_FDCWD, file, 0);
 }
 
 [[cp, throws, doc_alias("rmdir")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(UnlinkAt))]]
-void Rmdir([[nonnull]] char const *path) {
+void Rmdir([[in]] char const *path) {
 	UnlinkAt(__AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
 }
 
@@ -242,34 +242,36 @@ void Rmdir([[nonnull]] char const *path) {
 %[default:section(".text.crt{|.dos}.except.fs.modify")]
 
 [[cp, throws, doc_alias("fchownat"), decl_include("<bits/types.h>")]]
-void FChownAt($fd_t dfd, [[nonnull]] char const *file,
+void FChownAt($fd_t dfd, [[in]] char const *file,
               $uid_t owner, $gid_t group, $atflag_t flags);
 
 [[cp, throws, doc_alias("linkat"), decl_include("<bits/types.h>")]]
-void LinkAt($fd_t fromfd, [[nonnull]] char const *from,
-            $fd_t tofd, [[nonnull]] char const *to,
+void LinkAt($fd_t fromfd, [[in]] char const *from,
+            $fd_t tofd, [[in]] char const *to,
             $atflag_t flags);
 
 [[cp, throws, doc_alias("symlinkat"), decl_include("<bits/types.h>")]]
-void SymlinkAt([[nonnull]] char const *link_text, $fd_t tofd,
-               [[nonnull]] char const *target_path);
+void SymlinkAt([[in]] char const *link_text, $fd_t tofd,
+               [[in]] char const *target_path);
 
 %[default:section(".text.crt{|.dos}.except.fs.property")]
 
 [[cp, throws, doc_alias("readlinkat"), decl_include("<bits/types.h>")]]
-size_t ReadlinkAt($fd_t dfd, [[nonnull]] char const *__restrict path,
-                  [[outp(buflen)]] char *__restrict buf, size_t buflen);
+size_t ReadlinkAt($fd_t dfd, [[in]] char const *__restrict path,
+                  [[out(return <= buflen)]] char *__restrict buf,
+                  size_t buflen);
 
 %#ifdef __USE_KOS
 [[cp, throws, doc_alias("freadlinkat"), decl_include("<bits/types.h>")]]
-size_t FReadlinkAt($fd_t dfd, [[nonnull]] char const *__restrict path,
-                   [[outp(buflen)]] char *__restrict buf, size_t buflen, $atflag_t flags);
+size_t FReadlinkAt($fd_t dfd, [[in]] char const *__restrict path,
+                   [[out(return<= buflen)]] char *__restrict buf,
+                   size_t buflen, $atflag_t flags);
 %#endif /* __USE_KOS */
 
 %[default:section(".text.crt{|.dos}.except.fs.modify")]
 
 [[cp, throws, doc_alias("unlinkat"), decl_include("<bits/types.h>")]]
-void UnlinkAt($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
+void UnlinkAt($fd_t dfd, [[in]] char const *name, $atflag_t flags);
 %#endif /* __USE_ATFILE */
 
 
@@ -295,7 +297,7 @@ $pos64_t LSeek64($fd_t fd, $off64_t offset, int whence) {
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("PRead64")]]
 [[section(".text.crt{|.dos}.except.io.read")]]
 [[userimpl, requires($has_function(PRead32) || $has_function(PRead64))]]
-size_t PRead($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t offset) {
+size_t PRead($fd_t fd, [[out(return <= bufsize)]] void *buf, size_t bufsize, pos_t offset) {
 @@pp_if $has_function(PRead32)@@
 	return PRead32(fd, buf, bufsize, (pos32_t)offset);
 @@pp_else@@
@@ -308,7 +310,7 @@ size_t PRead($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t offset
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("PWrite64")]]
 [[userimpl, requires($has_function(PWrite32) || $has_function(PWrite64))]]
 [[section(".text.crt{|.dos}.except.io.write")]]
-size_t PWrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, pos_t offset) {
+size_t PWrite($fd_t fd, [[in(return <= bufsize)]] void const *buf, size_t bufsize, pos_t offset) {
 @@pp_if $has_function(PWrite32)@@
 	return PWrite32(fd, buf, bufsize, (pos32_t)offset);
 @@pp_else@@
@@ -323,7 +325,7 @@ size_t PWrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, pos_t 
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("PReadAll64")]]
 [[userimpl, requires($has_function(PReadAll32) || $has_function(PReadAll64))]]
 [[section(".text.crt{|.dos}.except.io.read")]]
-size_t PReadAll($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t offset) {
+size_t PReadAll($fd_t fd, [[out(bufsize)]] void *buf, size_t bufsize, pos_t offset) {
 @@pp_if $has_function(PReadAll32)@@
 	return PReadAll32(fd, buf, bufsize, (pos32_t)offset);
 @@pp_else@@
@@ -335,40 +337,40 @@ size_t PReadAll($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t off
 %#ifdef __USE_LARGEFILE64
 
 [[cp, throws, ignore, nocrt, alias("PRead"), decl_include("<bits/types.h>")]]
-size_t PRead32($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, $pos32_t offset);
+size_t PRead32($fd_t fd, [[out(return <= bufsize)]] void *buf, size_t bufsize, $pos32_t offset);
 
 [[cp, throws, ignore, nocrt, alias("PWrite"), decl_include("<bits/types.h>")]]
-size_t PWrite32($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, $pos32_t offset);
+size_t PWrite32($fd_t fd, [[in(return <= bufsize)]] void const *buf, size_t bufsize, $pos32_t offset);
 
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[preferred_off64_variant_of(PRead), doc_alias("pread64")]]
 [[userimpl, requires_function(PRead32), section(".text.crt{|.dos}.except.io.large.read")]]
-size_t PRead64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos64_t offset) {
+size_t PRead64($fd_t fd, [[out(return <= bufsize)]] void *buf, size_t bufsize, pos64_t offset) {
 	return PRead32(fd, buf, bufsize, (pos32_t)offset);
 }
 
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[preferred_off64_variant_of(PWrite), doc_alias("pwrite64")]]
 [[userimpl, requires_function(PWrite32), section(".text.crt{|.dos}.except.io.large.write")]]
-size_t PWrite64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos64_t offset) {
+size_t PWrite64($fd_t fd, [[in(return <= bufsize)]] void const *buf, size_t bufsize, pos64_t offset) {
 	return PWrite32(fd, buf, bufsize, (pos32_t)offset);
 }
 
 %#ifdef __USE_KOS
 [[cp, throws, decl_include("<bits/types.h>"), ignore, nocrt, alias("PReadAll")]]
-size_t PReadAll32($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, $pos32_t offset);
+size_t PReadAll32($fd_t fd, [[out(return <= bufsize)]] void *buf, size_t bufsize, $pos32_t offset);
 
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[preferred_off64_variant_of(PReadAll), doc_alias("preadall64")]]
 [[userimpl, requires_function(PRead64), section(".text.crt{|.dos}.except.io.large.read")]]
-size_t PReadAll64($fd_t fd, [[inp(bufsize)]] void *buf, size_t bufsize, pos64_t offset) {
+size_t PReadAll64($fd_t fd, [[out(bufsize)]] void *buf, size_t bufsize, pos64_t offset) {
 	size_t result, temp;
 	result = PRead64(fd, buf, bufsize, offset);
 	if (result != 0 && (size_t)result < bufsize) {
 		/* Keep on reading */
 		for (;;) {
 			temp = PRead64(fd,
-			              (byte_t *)buf + result,
+			               (byte_t *)buf + result,
 			               bufsize - result,
 			               offset + result);
 			if (!temp) {
@@ -393,7 +395,7 @@ size_t PReadAll64($fd_t fd, [[inp(bufsize)]] void *buf, size_t bufsize, pos64_t 
 
 [[throws, decl_include("<bits/types.h>")]]
 [[doc_alias("pipe2"), section(".text.crt{|.dos}.except.io.access")]]
-void Pipe2([[nonnull]] $fd_t pipedes[2], $oflag_t flags);
+void Pipe2([[out]] $fd_t pipedes[2], $oflag_t flags);
 
 [[throws, decl_include("<bits/types.h>")]]
 [[doc_alias("dup3"), section(".text.crt{|.dos}.except.io.access")]]
@@ -415,10 +417,14 @@ void SyncFs($fd_t fd) {
 %[default:section(".text.crt{|.dos}.except.sched.user")];
 
 [[throws, decl_include("<bits/types.h>")]]
-void GetResUid($uid_t *ruid, $uid_t *euid, $uid_t *suid);
+void GetResUid([[out_opt]] $uid_t *ruid,
+               [[out_opt]] $uid_t *euid,
+               [[out_opt]] $uid_t *suid);
 
 [[throws, decl_include("<bits/types.h>")]]
-void GetResGid($gid_t *rgid, $gid_t *egid, $gid_t *sgid);
+void GetResGid([[out_opt]] $gid_t *rgid,
+               [[out_opt]] $gid_t *egid,
+               [[out_opt]] $gid_t *sgid);
 
 [[throws, decl_include("<bits/types.h>")]]
 void SetResUid($uid_t ruid, $uid_t euid, $uid_t suid);
@@ -455,7 +461,7 @@ $pid_t GetSid($pid_t pid);
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(FChownAt))]]
 [[section(".text.crt{|.dos}.except.fs.modify")]]
-void LChown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
+void LChown([[in]] char const *file, $uid_t owner, $gid_t group) {
 	FChownAt(__AT_FDCWD, file, owner, group, __AT_SYMLINK_NOFOLLOW);
 }
 
@@ -468,7 +474,7 @@ void LChown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("Truncate64")]]
 [[userimpl, requires($has_function(Truncate32) || $has_function(Truncate64))]]
 [[section(".text.crt{|.dos}.except.fs.modify")]]
-void Truncate([[nonnull]] char const *file, pos_t length) {
+void Truncate([[in]] char const *file, pos_t length) {
 @@pp_if $has_function(Truncate32)@@
 	Truncate64(file, (__pos64_t)length);
 @@pp_else@@
@@ -478,13 +484,13 @@ void Truncate([[nonnull]] char const *file, pos_t length) {
 
 [[throws, decl_include("<bits/types.h>")]]
 [[doc_alias("Truncate"), ignore, nocrt, alias("Truncate")]]
-vodi Truncate32([[nonnull]] char const *file, $pos32_t length);
+vodi Truncate32([[in]] char const *file, $pos32_t length);
 
 %#ifdef __USE_LARGEFILE64
 [[throws, decl_include("<bits/types.h>")]]
 [[preferred_off64_variant_of(Truncate), doc_alias("truncate64")]]
 [[userimpl, requires_function(Truncate32), section(".text.crt{|.dos}.except.fs.modify")]]
-void Truncate64([[nonnull]] char const *file, pos64_t length) {
+void Truncate64([[in]] char const *file, pos64_t length) {
 	Truncate32(file, (__pos32_t)length);
 }
 %#endif /* __USE_LARGEFILE64 */
@@ -498,7 +504,7 @@ void Truncate64([[nonnull]] char const *file, pos64_t length) {
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[argument_names(fd, ___argv, ___envp), section(".text.crt{|.dos}.except.fs.exec.exec")]]
-void FExecve($fd_t fd, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
+void FExecve($fd_t fd, [[in]] __TARGV, [[in]] __TENVP);
 
 %#endif /* __USE_XOPEN2K8 */
 
@@ -509,7 +515,7 @@ void FExecve($fd_t fd, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 [[cp, throws, noreturn, doc_alias("execvpe")]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[argument_names(file, ___argv, ___envp), section(".text.crt{|.dos}.except.fs.exec.exec")]]
-void Execvpe([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
+void Execvpe([[in]] char const *__restrict file, [[in]] __TARGV, [[in]] __TENVP);
 
 %#endif /* __USE_GNU */
 
@@ -566,8 +572,8 @@ void SetEGid($gid_t egid);
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(SymlinkAt))]]
 [[section(".text.crt{|.dos}.except.fs.modify")]]
-void Symlink([[nonnull]] char const *link_text,
-             [[nonnull]] char const *target_path) {
+void Symlink([[in]] char const *link_text,
+             [[in]] char const *target_path) {
 	SymlinkAt(link_text, __AT_FDCWD, target_path);
 }
 
@@ -575,8 +581,9 @@ void Symlink([[nonnull]] char const *link_text,
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(ReadlinkAt))]]
 [[section(".text.crt{|.dos}.except.fs.property")]]
-size_t Readlink([[nonnull]] char const *__restrict path,
-                [[outp(buflen)]] char *__restrict buf, size_t buflen) {
+size_t Readlink([[in]] char const *__restrict path,
+                [[out(return <= buflen)]] char *__restrict buf,
+                size_t buflen) {
 	ReadlinkAt(__AT_FDCWD, path, buf, buflen);
 }
 
@@ -588,7 +595,7 @@ size_t Readlink([[nonnull]] char const *__restrict path,
 
 [[throws, decl_include("<hybrid/typecore.h>"), doc_alias("gethostname")]]
 [[section(".text.crt{|.dos}.except.system.configuration")]]
-void GetHostName([[outp(buflen)]] char *name, size_t buflen);
+void GetHostName([[out(? <= buflen)]] char *name, size_t buflen);
 
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
@@ -598,15 +605,15 @@ void GetHostName([[outp(buflen)]] char *name, size_t buflen);
 
 [[throws, decl_include("<hybrid/typecore.h>"), doc_alias("sethostname")]]
 [[section(".text.crt{|.dos}.except.system.configuration")]]
-void SetHostName([[inp(len)]] char const *name, size_t len);
+void SetHostName([[in(? <= len)]] char const *name, size_t len);
 
 [[throws, decl_include("<hybrid/typecore.h>"), doc_alias("getdomainname")]]
 [[section(".text.crt{|.dos}.except.system.configuration")]]
-void GetDomainName([[outp(buflen)]] char *name, size_t buflen);
+void GetDomainName([[out(? <= buflen)]] char *name, size_t buflen);
 
 [[throws, decl_include("<hybrid/typecore.h>"), doc_alias("setdomainname")]]
 [[section(".text.crt{|.dos}.except.system.configuration")]]
-void SetDomainName([[inp(len)]] char const *name, size_t len);
+void SetDomainName([[in(? <= len)]] char const *name, size_t len);
 
 [[cp, throws, section(".text.crt{|.dos}.except.system.utility")]]
 [[vartypes($syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t,
@@ -630,7 +637,7 @@ __LONG64_TYPE__ Syscall64($syscall_ulong_t sysno, ...);
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 
 [[cp, throws, doc_alias("chroot"), section(".text.crt{|.dos}.except.fs.utility")]]
-void ChRoot([[nonnull]] char const *__restrict path);
+void ChRoot([[in]] char const *__restrict path);
 
 %#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3cd6df3 */
+/* HASH CRC-32:0xbc0b67a7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32frealpath4_defined
 #define __local___localdep_c32frealpath4_defined
 #if defined(__CRT_HAVE_wfrealpath4) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_WUNUSED,__CHAR32_TYPE__ *,__NOTHROW_RPC,__localdep_c32frealpath4,(__fd_t __fd, __CHAR32_TYPE__ *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),wfrealpath4,(__fd,__resolved,__buflen,__flags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3),__CHAR32_TYPE__ *,__NOTHROW_RPC,__localdep_c32frealpath4,(__fd_t __fd, __CHAR32_TYPE__ *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),wfrealpath4,(__fd,__resolved,__buflen,__flags))
 #elif defined(__CRT_HAVE_KOS$wfrealpath4)
-__CREDIRECT_KOS(__ATTR_WUNUSED,__CHAR32_TYPE__ *,__NOTHROW_RPC,__localdep_c32frealpath4,(__fd_t __fd, __CHAR32_TYPE__ *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),wfrealpath4,(__fd,__resolved,__buflen,__flags))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3),__CHAR32_TYPE__ *,__NOTHROW_RPC,__localdep_c32frealpath4,(__fd_t __fd, __CHAR32_TYPE__ *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),wfrealpath4,(__fd,__resolved,__buflen,__flags))
 #elif defined(__CRT_HAVE_frealpath4) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.stdlib/wfrealpath4.h>
@@ -74,12 +74,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
 #elif defined(__CRT_HAVE_KOS$convert_mbstowcs)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32,(char const *__restrict __str),convert_mbstowcs,(__str))
 #elif (defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_mbstowcs.h>
@@ -97,7 +97,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_frealpath_defined
 #define __local___localdep_frealpath_defined
 #ifdef __CRT_HAVE_frealpath
-__CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,__localdep_frealpath,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen),frealpath,(__fd,__resolved,__buflen))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WR_OPT(2),char *,__NOTHROW_RPC,__localdep_frealpath,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen),frealpath,(__fd,__resolved,__buflen))
 #elif defined(__CRT_HAVE_frealpath4)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/frealpath.h>
@@ -145,7 +145,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyl __LIBC_LOCAL_NAME(memcpyl)
 #endif /* !... */
 #endif /* !__local___localdep_memcpyl_defined */
-__LOCAL_LIBC(c32frealpath) __ATTR_WUNUSED __CHAR32_TYPE__ *
+__LOCAL_LIBC(c32frealpath) __ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3) __CHAR32_TYPE__ *
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32frealpath))(__fd_t __fd, __CHAR32_TYPE__ *__resolved, __SIZE_TYPE__ __buflen) {
 #if (defined(__CRT_HAVE_wfrealpath4) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wfrealpath4) || (defined(__CRT_HAVE_frealpath4) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_frealpath4) && ((defined(__CRT_HAVE_convert_mbstowcs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_mbstowcs) || ((defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_convert_mbstowcsn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4) || (((defined(__CRT_HAVE_format_waprintf_printer) && __SIZEOF_WCHAR_T__ == 4 && defined(__C32FORMATPRINTER_CC_IS_WFORMATPRINTER_CC)) || defined(__CRT_HAVE_KOS$format_waprintf_printer) || (defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && ((defined(__CRT_HAVE_format_waprintf_pack) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))))
 	return (__NAMESPACE_LOCAL_SYM __localdep_c32frealpath4)(__fd, __resolved, __buflen, 0);

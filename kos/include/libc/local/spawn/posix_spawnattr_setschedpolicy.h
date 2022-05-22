@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab153601 */
+/* HASH CRC-32:0x5e510fb1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifdef __POSIX_SPAWN_USE_KOS
 #include <bits/crt/posix_spawn.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(posix_spawnattr_setschedpolicy) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(posix_spawnattr_setschedpolicy) __ATTR_ACCESS_RW(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnattr_setschedpolicy))(struct __posix_spawnattr *__restrict __attr, int __schedpolicy) {
 	__attr->__policy = __schedpolicy;
 	return 0;

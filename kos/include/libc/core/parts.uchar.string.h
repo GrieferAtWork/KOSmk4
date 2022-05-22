@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcc10da3 */
+/* HASH CRC-32:0x3338f973 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,12 +33,12 @@ __SYSDECL_BEGIN
 #include <hybrid/typecore.h>
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16end,(__CHAR16_TYPE__ const *__restrict __str),wcsend,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16end,(__CHAR16_TYPE__ const *__restrict __str),wcsend,(__str))
 #elif defined(__CRT_HAVE_DOS$wcsend)
 #include <hybrid/typecore.h>
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16end,(__CHAR16_TYPE__ const *__restrict __str),wcsend,(__str))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16end,(__CHAR16_TYPE__ const *__restrict __str),wcsend,(__str))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcsend.h>
 /* >> wcsend(3)
@@ -54,12 +54,12 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1))
 #include <hybrid/typecore.h>
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32end,(__CHAR32_TYPE__ const *__restrict __str),wcsend,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32end,(__CHAR32_TYPE__ const *__restrict __str),wcsend,(__str))
 #elif defined(__CRT_HAVE_KOS$wcsend)
 #include <hybrid/typecore.h>
 /* >> wcsend(3)
  * Same as `str + wcslen(str)' */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32end,(__CHAR32_TYPE__ const *__restrict __str),wcsend,(__str))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32end,(__CHAR32_TYPE__ const *__restrict __str),wcsend,(__str))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcsend.h>
 /* >> wcsend(3)
@@ -75,12 +75,12 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1))
 #include <hybrid/typecore.h>
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16nend,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16nend,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
 #elif defined(__CRT_HAVE_DOS$wcsnend)
 #include <hybrid/typecore.h>
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16nend,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__libc_core_c16nend,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcsnend.h>
 /* >> wcsnend(3)
@@ -96,12 +96,12 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1))
 #include <hybrid/typecore.h>
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32nend,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32nend,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
 #elif defined(__CRT_HAVE_KOS$wcsnend)
 #include <hybrid/typecore.h>
 /* >> wcsnend(3)
  * Same as `str + wcsnlen(str, max_chars)' */
-__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32nend,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_c32nend,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcsnend.h>
 /* >> wcsnend(3)

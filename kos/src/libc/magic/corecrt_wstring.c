@@ -184,7 +184,7 @@ wcscpy_s(*) %{generate(str2wcs("strcpy_s"))}
 @@>> wcsnlen_s(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[inline, nocrt, pure, wunused]]
-$size_t wcsnlen_s([[in_opt(strnlen(., maxlen))]] wchar_t const *str, $size_t maxlen) {
+$size_t wcsnlen_s([[in_opt(wcsnlen(., maxlen))]] wchar_t const *str, $size_t maxlen) {
 	return str ? wcsnlen(str, maxlen) : 0;
 }
 

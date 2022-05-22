@@ -194,9 +194,9 @@ typedef __CHAR32_TYPE__ char32_t;
 @@Read a single Unicode character from a given UTF-8 string
 [[libc, kernel, impl_include("<libc/template/unicode_utf8seqlen.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf8([[nonnull]] /*utf-8*/ char const **__restrict ptext)
-	[([[nonnull]] /*utf-8*/ char const **__restrict ptext): char32_t]
-	[([[nonnull]] /*utf-8*/ char **__restrict ptext): char32_t]
+char32_t unicode_readutf8([[inout]] /*utf-8*/ char const **__restrict ptext)
+	[([[inout]] /*utf-8*/ char const **__restrict ptext): char32_t]
+	[([[inout]] /*utf-8*/ char **__restrict ptext): char32_t]
 {
 	char32_t result;
 	char const *iter = *ptext;
@@ -282,9 +282,9 @@ char32_t unicode_readutf8([[nonnull]] /*utf-8*/ char const **__restrict ptext)
 @@starting out as a pointer after  the character to be read,  before
 @@being updated to point to the start of the character that was read
 [[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf8_rev([[nonnull]] /*utf-8*/ char const **__restrict ptext)
-	[([[nonnull]] /*utf-8*/ char const **__restrict ptext): char32_t]
-	[([[nonnull]] /*utf-8*/ char **__restrict ptext): char32_t]
+char32_t unicode_readutf8_rev([[inout]] /*utf-8*/ char const **__restrict ptext)
+	[([[inout]] /*utf-8*/ char const **__restrict ptext): char32_t]
+	[([[inout]] /*utf-8*/ char **__restrict ptext): char32_t]
 {
 	char32_t result;
 	char const *iter = *ptext;
@@ -370,9 +370,9 @@ char32_t unicode_readutf8_rev([[nonnull]] /*utf-8*/ char const **__restrict ptex
 @@Same as `unicode_readutf8()', but don't read past `text_end'
 [[kernel, libc, impl_include("<libc/template/unicode_utf8seqlen.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf8_n([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end)
-	[([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end): char32_t]
-	[([[nonnull]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_end): char32_t]
+char32_t unicode_readutf8_n([[inout]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end)
+	[([[inout]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end): char32_t]
+	[([[inout]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_end): char32_t]
 {
 	char32_t result;
 	char const *iter = *ptext;
@@ -462,9 +462,9 @@ char32_t unicode_readutf8_n([[nonnull]] /*utf-8*/ char const **__restrict ptext,
 @@>> unicode_readutf8_rev_n(3)
 @@Same as `unicode_readutf8_rev()', but don't read ahead of `text_start'
 [[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf8_rev_n([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_start)
-	[([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_start): char32_t]
-	[([[nonnull]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_start): char32_t]
+char32_t unicode_readutf8_rev_n([[inout]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_start)
+	[([[inout]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_start): char32_t]
+	[([[inout]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_start): char32_t]
 {
 	char32_t result;
 	char const *iter = *ptext;
@@ -553,9 +553,9 @@ char32_t unicode_readutf8_rev_n([[nonnull]] /*utf-8*/ char const **__restrict pt
 @@>> unicode_readutf16(3)
 @@Read a single Unicode character from a given UTF-16 string
 [[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf16([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext)
-	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext): char32_t]
-	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext): char32_t]
+char32_t unicode_readutf16([[inout]] /*utf-16*/ char16_t const **__restrict ptext)
+	[([[inout]] /*utf-16*/ char16_t const **__restrict ptext): char32_t]
+	[([[inout]] /*utf-16*/ char16_t **__restrict ptext): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -574,9 +574,9 @@ char32_t unicode_readutf16([[nonnull]] /*utf-16*/ char16_t const **__restrict pt
 @@>> unicode_readutf16_n(3)
 @@Same as `unicode_readutf16()', but don't read past `text_end'
 [[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf16_n([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end)
-	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
-	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
+char32_t unicode_readutf16_n([[inout]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end)
+	[([[inout]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
+	[([[inout]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -600,9 +600,9 @@ char32_t unicode_readutf16_n([[nonnull]] /*utf-16*/ char16_t const **__restrict 
 @@Same as `unicode_readutf16()', but read in reverse endian as that of the host CPU
 [[kernel, impl_include("<hybrid/__byteswap.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf16_swap([[nonnull]] /*utf-16-swap*/ char16_t const **__restrict ptext)
-	[([[nonnull]] /*utf-16-swap*/ char16_t const **__restrict ptext): char32_t]
-	[([[nonnull]] /*utf-16-swap*/ char16_t **__restrict ptext): char32_t]
+char32_t unicode_readutf16_swap([[inout]] /*utf-16-swap*/ char16_t const **__restrict ptext)
+	[([[inout]] /*utf-16-swap*/ char16_t const **__restrict ptext): char32_t]
+	[([[inout]] /*utf-16-swap*/ char16_t **__restrict ptext): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -624,9 +624,9 @@ char32_t unicode_readutf16_swap([[nonnull]] /*utf-16-swap*/ char16_t const **__r
 @@Same as `unicode_readutf16_n()', but read in reverse endian as that of the host CPU
 [[kernel, impl_include("<hybrid/__byteswap.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf16_swap_n([[nonnull]] /*utf-16-swap*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end)
-	[([[nonnull]] /*utf-16-swap*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
-	[([[nonnull]] /*utf-16-swap*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
+char32_t unicode_readutf16_swap_n([[inout]] /*utf-16-swap*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end)
+	[([[inout]] /*utf-16-swap*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
+	[([[inout]] /*utf-16-swap*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -652,9 +652,9 @@ char32_t unicode_readutf16_swap_n([[nonnull]] /*utf-16-swap*/ char16_t const **_
 @@starting out as a pointer after  the character to be read,  before
 @@being updated to point to the start of the character that was read
 [[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf16_rev([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext)
-	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext): char32_t]
-	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext): char32_t]
+char32_t unicode_readutf16_rev([[inout]] /*utf-16*/ char16_t const **__restrict ptext)
+	[([[inout]] /*utf-16*/ char16_t const **__restrict ptext): char32_t]
+	[([[inout]] /*utf-16*/ char16_t **__restrict ptext): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -675,9 +675,9 @@ char32_t unicode_readutf16_rev([[nonnull]] /*utf-16*/ char16_t const **__restric
 @@Same as `unicode_readutf16_rev()', but read in reverse endian as that of the host CPU
 [[kernel, impl_include("<hybrid/__byteswap.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf16_swap_rev([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext)
-	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext): char32_t]
-	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext): char32_t]
+char32_t unicode_readutf16_swap_rev([[inout]] /*utf-16*/ char16_t const **__restrict ptext)
+	[([[inout]] /*utf-16*/ char16_t const **__restrict ptext): char32_t]
+	[([[inout]] /*utf-16*/ char16_t **__restrict ptext): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -698,9 +698,9 @@ char32_t unicode_readutf16_swap_rev([[nonnull]] /*utf-16*/ char16_t const **__re
 @@>> unicode_readutf16_rev_n(3)
 @@Same as `unicode_readutf16_rev()', but don't read ahead of `text_start'
 [[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf16_rev_n([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start)
-	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
-	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
+char32_t unicode_readutf16_rev_n([[inout]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start)
+	[([[inout]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
+	[([[inout]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -723,9 +723,9 @@ char32_t unicode_readutf16_rev_n([[nonnull]] /*utf-16*/ char16_t const **__restr
 @@Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU
 [[kernel, impl_include("<hybrid/__byteswap.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf16_swap_rev_n([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start)
-	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
-	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
+char32_t unicode_readutf16_swap_rev_n([[inout]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start)
+	[([[inout]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
+	[([[inout]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -760,7 +760,7 @@ char32_t unicode_readutf16_swap_rev_n([[nonnull]] /*utf-16*/ char16_t const **__
 @@location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst'
 [[kernel, libc, nonnull]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, char32_t ch) {
+char *unicode_writeutf8([[out]] /*utf-8*/ char *__restrict dst, char32_t ch) {
 	if likely(ch <= UTF8_1BYTE_MAX) {
 		*dst++ = (char)(unsigned char)ch;
 	} else if (ch <= UTF8_2BYTE_MAX) {
@@ -805,7 +805,7 @@ char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, char32_t ch)
 @@location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst'
 [[kernel, libc, nonnull]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ char16_t *__restrict dst, char32_t ch) {
+char16_t *unicode_writeutf16([[out]] /*utf-16*/ char16_t *__restrict dst, char32_t ch) {
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
 		*dst++ = (char16_t)ch;
 	} else {
@@ -820,7 +820,7 @@ char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ char16_t *__restrict dst, ch
 @@Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false
 [[kernel, wunused]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char16_t *unicode_writeutf16_chk([[nonnull]] /*utf-16*/ char16_t *__restrict dst, char32_t ch) {
+char16_t *unicode_writeutf16_chk([[out]] /*utf-16*/ char16_t *__restrict dst, char32_t ch) {
 	if unlikely(ch > UNICODE_MAXCHAR)
 		return NULL;
 	if likely(ch <= 0xffff) {
@@ -841,35 +841,35 @@ char16_t *unicode_writeutf16_chk([[nonnull]] /*utf-16*/ char16_t *__restrict dst
 extern "C++" {
 /* >> unicode_readutf32(3)
  * Read a single Unicode character from a given UTF-32 string. */
-__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t const **__restrict __ptext) { return *(*__ptext)++; }
+__LOCAL __ATTR_ACCESS_RW(1) char32_t (__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t const **__restrict __ptext) { return *(*__ptext)++; }
 /* >> unicode_readutf32(3)
  * Read a single Unicode character from a given UTF-32 string. */
-__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t **__restrict __ptext) { return *(*__ptext)++; }
+__LOCAL __ATTR_ACCESS_RW(1) char32_t (__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t **__restrict __ptext) { return *(*__ptext)++; }
 /* >> unicode_readutf32_swap(3)
  * Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t const **__restrict __ptext) { char32_t __res = *(*__ptext++); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_ACCESS_RW(1) char32_t (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t const **__restrict __ptext) { char32_t __res = *(*__ptext++); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_swap(3)
  * Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t **__restrict __ptext) { char32_t __res = *(*__ptext++); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_ACCESS_RW(1) char32_t (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t **__restrict __ptext) { char32_t __res = *(*__ptext++); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_rev(3)
  * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
  * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
-__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t const **__restrict __ptext) { return *(--*__ptext); }
+__LOCAL __ATTR_ACCESS_RW(1) char32_t (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t const **__restrict __ptext) { return *(--*__ptext); }
 /* >> unicode_readutf32_rev(3)
  * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
  * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
-__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t **__restrict __ptext) { return *(--*__ptext); }
+__LOCAL __ATTR_ACCESS_RW(1) char32_t (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t **__restrict __ptext) { return *(--*__ptext); }
 /* >> unicode_readutf32_swap_rev(3)
  * Same as `unicode_readutf32_rev()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t const **__restrict __ptext) { char32_t __res = *(--*__ptext); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_ACCESS_RW(1) char32_t (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t const **__restrict __ptext) { char32_t __res = *(--*__ptext); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_swap_rev(3)
  * Same as `unicode_readutf32_rev()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t **__restrict __ptext) { char32_t __res = *(--*__ptext); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_ACCESS_RW(1) char32_t (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t **__restrict __ptext) { char32_t __res = *(--*__ptext); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_n(3)
  * Same as `unicode_readutf32()', but don't read past `text_end'. */
-__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) char32_t
 (__LIBCCALL unicode_readutf32_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
@@ -881,13 +881,13 @@ __LOCAL __ATTR_NONNULL((1, 2)) char32_t
 }
 /* >> unicode_readutf32_n(3)
  * Same as `unicode_readutf32()', but don't read past `text_end'. */
-__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) char32_t
 (__LIBCCALL unicode_readutf32_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_end) {
 	return unicode_readutf32_n((char32_t const **)__ptext, __text_end);
 }
 /* >> unicode_readutf32_rev_n(3)
  * Same as `unicode_readutf32()', but don't read before `text_start'. */
-__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) char32_t
 (__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
@@ -899,13 +899,13 @@ __LOCAL __ATTR_NONNULL((1, 2)) char32_t
 }
 /* >> unicode_readutf32_rev_n(3)
  * Same as `unicode_readutf32()', but don't read before `text_start'. */
-__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) char32_t
 (__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_start) {
 	return unicode_readutf32_rev_n((char32_t const **)__ptext, __text_start);
 }
 /* >> unicode_readutf32_swap_n(3)
  * Same as `unicode_readutf32_n()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) char32_t
 (__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
@@ -917,13 +917,13 @@ __LOCAL __ATTR_NONNULL((1, 2)) char32_t
 }
 /* >> unicode_readutf32_swap_n(3)
  * Same as `unicode_readutf32_n()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) char32_t
 (__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_end) {
 	return unicode_readutf32_swap_n((char32_t const **)__ptext, __text_end);
 }
 /* >> unicode_readutf32_swap_rev_n(3)
  * Same as `unicode_readutf32_rev_n()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) char32_t
 (__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
@@ -935,7 +935,7 @@ __LOCAL __ATTR_NONNULL((1, 2)) char32_t
 }
 /* >> unicode_readutf32_swap_rev_n(3)
  * Same as `unicode_readutf32_rev_n()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) char32_t
 (__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_start) {
 	return unicode_readutf32_swap_rev_n((char32_t const **)__ptext, __text_start);
 }
@@ -943,13 +943,13 @@ __LOCAL __ATTR_NONNULL((1, 2)) char32_t
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* >> unicode_readutf32(3)
  * Read a single Unicode character from a given UTF-32 string. */
-__LOCAL __ATTR_NONNULL((1)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) char32_t
 (__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t const **__restrict __ptext) {
 	return *(*__ptext)++;
 }
 /* >> unicode_readutf32_swap(3)
  * Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) char32_t
 (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t const **__restrict __ptext) {
 	char32_t __res = *(*__ptext++);
 	return __hybrid_bswap32(__res);
@@ -958,20 +958,20 @@ __LOCAL __ATTR_NONNULL((1)) char32_t
  * Same  as  `unicode_readutf32', but  read backwards,  with `*ptext'
  * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
-__LOCAL __ATTR_NONNULL((1)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) char32_t
 (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t const **__restrict __ptext) {
 	return *(--*__ptext);
 }
 /* >> unicode_readutf32_swap_rev(3)
  * Same as `unicode_readutf32_rev()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) char32_t
 (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t const **__restrict __ptext) {
 	char32_t __res = *(--*__ptext);
 	return __hybrid_bswap32(__res);
 }
 /* >> unicode_readutf32_n(3)
  * Same as `unicode_readutf32()', but don't read past `text_end'. */
-__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) char32_t
 (__LIBCCALL unicode_readutf32_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
@@ -983,7 +983,7 @@ __LOCAL __ATTR_NONNULL((1, 2)) char32_t
 }
 /* >> unicode_readutf32_rev_n(3)
  * Same as `unicode_readutf32()', but don't read before `text_start'. */
-__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) char32_t
 (__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
@@ -995,7 +995,7 @@ __LOCAL __ATTR_NONNULL((1, 2)) char32_t
 }
 /* >> unicode_readutf32_swap_n(3)
  * Same as `unicode_readutf32_n()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) char32_t
 (__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
@@ -1007,7 +1007,7 @@ __LOCAL __ATTR_NONNULL((1, 2)) char32_t
 }
 /* >> unicode_readutf32_swap_rev_n(3)
  * Same as `unicode_readutf32_rev_n()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+__LOCAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) char32_t
 (__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
 	char32_t __result;
 	char32_t const *__text = *__ptext;
@@ -1058,7 +1058,7 @@ __LOCAL __ATTR_NONNULL((1, 2)) char32_t
 /* >> unicode_writeutf32(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This  function   will   write   at  most   `UNICODE_UTF32_CURLEN'   dwords   to   `dst' */
-__LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char32_t *
+__LOCAL __ATTR_RETNONNULL __ATTR_ACCESS_WR(1) char32_t *
 (__LIBCCALL unicode_writeutf32)(/*utf-32*/ char32_t *__restrict __dst, char32_t __ch) {
 	*__dst++ = __ch;
 	return __dst;
@@ -1074,9 +1074,9 @@ __LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char32_t *
 @@@return: * : A pointer after the last written UTF-16 character
 [[kernel, nonnull]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char16_t *unicode_8to16([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
-                         [[inp(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
-                         $size_t utf8_characters) {
+char16_t *unicode_8to16([[out]] /*utf-16*/ char16_t *__restrict utf16_dst,
+                        [[in(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
+                        $size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
@@ -1096,9 +1096,9 @@ char16_t *unicode_8to16([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
 @@@return: NULL: Attempted to write an invalid character
 [[wunused]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char16_t *unicode_8to16_chk([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
-                             [[inp(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
-                             $size_t utf8_characters) {
+char16_t *unicode_8to16_chk([[out]] /*utf-16*/ char16_t *__restrict utf16_dst,
+                            [[in(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
+                            $size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
@@ -1118,9 +1118,9 @@ char16_t *unicode_8to16_chk([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_ds
 @@@return: * : A pointer after the last written UTF-32 character.
 [[kernel, nonnull]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t *unicode_8to32([[nonnull]] /*utf-32*/ char32_t *__restrict utf32_dst,
-                         [[inp(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
-                         $size_t utf8_characters) {
+char32_t *unicode_8to32([[out]] /*utf-32*/ char32_t *__restrict utf32_dst,
+                        [[in(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
+                        $size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end)
 		*utf32_dst++ = unicode_readutf8_n((char const **)&utf8_text, utf8_end);
@@ -1136,8 +1136,8 @@ char32_t *unicode_8to32([[nonnull]] /*utf-32*/ char32_t *__restrict utf32_dst,
 @@@return: * : A pointer after the last written UTF-8 character
 [[kernel, nonnull]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char *unicode_16to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
-                    [[inp(utf16_characters)]] /*utf-16*/ char16_t const *__restrict utf16_text,
+char *unicode_16to8([[out]] /*utf-8*/ char *__restrict utf8_dst,
+                    [[in(utf16_characters)]] /*utf-16*/ char16_t const *__restrict utf16_text,
                     $size_t utf16_characters) {
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end) {
@@ -1165,9 +1165,9 @@ char *unicode_16to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
 @@@return: * : A pointer after the last written UTF-32 character
 [[kernel, nonnull]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t *unicode_16to32([[nonnull]] /*utf-32*/ char32_t *__restrict utf32_dst,
-                          [[inp(utf16_characters)]] /*utf-16*/ char16_t const *__restrict utf16_text,
-                          $size_t utf16_characters) {
+char32_t *unicode_16to32([[out]] /*utf-32*/ char32_t *__restrict utf32_dst,
+                         [[in(utf16_characters)]] /*utf-16*/ char16_t const *__restrict utf16_text,
+                         $size_t utf16_characters) {
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end)
 		*utf32_dst++ = unicode_readutf16_n((char16_t const **)&utf16_text, utf16_end);
@@ -1182,8 +1182,8 @@ char32_t *unicode_16to32([[nonnull]] /*utf-32*/ char32_t *__restrict utf32_dst,
 @@@return: * : A pointer after the last written UTF-8 character
 [[kernel, nonnull]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char *unicode_32to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
-                    [[inp(utf32_characters)]] /*utf-32*/ char32_t const *__restrict utf32_text,
+char *unicode_32to8([[out]] /*utf-8*/ char *__restrict utf8_dst,
+                    [[in(utf32_characters)]] /*utf-32*/ char32_t const *__restrict utf32_text,
                     $size_t utf32_characters) {
 	while (utf32_characters--)
 		utf8_dst = unicode_writeutf8(utf8_dst, *utf32_text++);
@@ -1199,9 +1199,9 @@ char *unicode_32to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
 @@@return: * : A pointer after the last written UTF-16 character
 [[kernel, nonnull]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char16_t *unicode_32to16([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
-                          [[inp(utf32_characters)]] /*utf-32*/ char32_t const *__restrict utf32_text,
-                          $size_t utf32_characters) {
+char16_t *unicode_32to16([[out]] /*utf-16*/ char16_t *__restrict utf16_dst,
+                         [[in(utf32_characters)]] /*utf-32*/ char32_t const *__restrict utf32_text,
+                         $size_t utf32_characters) {
 	while (utf32_characters--)
 		utf16_dst = unicode_writeutf16(utf16_dst, *utf32_text++);
 	return utf16_dst;
@@ -1223,9 +1223,9 @@ char16_t *unicode_32to16([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
 @@                     a full  character, but  `mbs' was  updated)
 [[decl_include("<bits/crt/mbstate.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-$size_t unicode_c8toc16([[nonnull]] char16_t *__restrict pc16,
-                        [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
-                        [[nonnull]] mbstate_t *__restrict mbs) {
+$size_t unicode_c8toc16([[out]] char16_t *__restrict pc16,
+                        [[in(return <= n)]] /*utf-8*/ char const *__restrict s, $size_t n,
+                        [[inout]] mbstate_t *__restrict mbs) {
 	char32_t resch;
 	size_t i;
 	if ((mbs->@__mb_word@ & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
@@ -1363,9 +1363,9 @@ done:
 @@                     a full  character, but  `mbs' was  updated)
 [[decl_include("<bits/crt/mbstate.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-$size_t unicode_c8toc32([[nonnull]] char32_t *__restrict pc32,
-                        [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
-                        [[nonnull]] mbstate_t *__restrict mbs) {
+$size_t unicode_c8toc32([[out]] char32_t *__restrict pc32,
+                        [[in(return <= n)]] /*utf-8*/ char const *__restrict s, $size_t n,
+                        [[inout]] mbstate_t *__restrict mbs) {
 	size_t i;
 	for (i = 0; i < n; ++i) {
 		uint32_t state;
@@ -1484,8 +1484,8 @@ done:
 @@                     isn't  a   valid  unicode   sequence)
 [[decl_include("<bits/crt/mbstate.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-$size_t unicode_c16toc8([[nonnull]] char pc8[3], char16_t c16,
-                        [[nonnull]] mbstate_t *__restrict mbs) {
+$size_t unicode_c16toc8([[out/*(return <= 3)*/]] char pc8[3], char16_t c16,
+                        [[inout]] mbstate_t *__restrict mbs) {
 	char32_t ch32;
 	if ((mbs->@__mb_word@ & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
 		if unlikely(!(c16 >= UTF16_LOW_SURROGATE_MIN &&
@@ -1532,8 +1532,8 @@ $size_t unicode_c16toc8([[nonnull]] char pc8[3], char16_t c16,
 [[wchar, hidden, decl_include("<bits/crt/format-printer.h>"), cc(__FORMATPRINTER_CC)]]
 [[impl_include("<bits/crt/mbstate.h>", "<bits/crt/wformat-printer.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-$ssize_t format_8tow(/*struct format_8tow_data **/ void *arg,
-                     /*utf-8*/ char const *data, $size_t datalen) {
+$ssize_t format_8tow([[nonnull]] /*struct format_8tow_data **/ void *arg,
+                     [[in(datalen)]] /*utf-8*/ char const *data, $size_t datalen) {
 	struct __local_format_8tow_data {
 		$pwformatprinter fd_printer;    /* [1..1] Inner printer */
 		void            *fd_arg;        /* Argument for `fd_printer' */
@@ -1591,8 +1591,8 @@ struct format_8to16_data {
 @@converting UTF-8 unicode input data into a UTF-16 output
 [[decl_include("<bits/crt/format-printer.h>"), cc(__FORMATPRINTER_CC)]]
 [[decl_include("<hybrid/typecore.h>")]]
-$ssize_t format_8to16(/*struct format_8to16_data **/ void *arg,
-                      /*utf-8*/ char const *data, $size_t datalen)
+$ssize_t format_8to16([[nonnull]] /*struct format_8to16_data **/ void *arg,
+                      [[in(datalen)]] /*utf-8*/ char const *data, $size_t datalen)
 	%{uchar16("format_8tow")}
 
 %{
@@ -1609,8 +1609,8 @@ struct format_8to32_data {
 @@converting UTF-8 unicode input data into a UTF-32 output
 [[decl_include("<bits/crt/format-printer.h>"), cc(__FORMATPRINTER_CC)]]
 [[decl_include("<hybrid/typecore.h>")]]
-$ssize_t format_8to32(/*struct format_8to32_data **/ void *arg,
-                      /*utf-8*/ char const *data, $size_t datalen)
+$ssize_t format_8to32([[nonnull]] /*struct format_8to32_data **/ void *arg,
+                      [[in(datalen)]] /*utf-8*/ char const *data, $size_t datalen)
 	%{uchar32("format_8tow")}
 
 
@@ -1628,8 +1628,8 @@ $ssize_t format_8to32(/*struct format_8to32_data **/ void *arg,
 [[wchar, hidden, decl_include("<bits/crt/wformat-printer.h>"), cc(__WFORMATPRINTER_CC)]]
 [[impl_include("<bits/crt/format-printer.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-$ssize_t format_wto8(/*struct format_wto8_data **/ void *arg,
-                     $wchar_t const *data, $size_t datalen) {
+$ssize_t format_wto8([[nonnull]] /*struct format_wto8_data **/ void *arg,
+                     [[in(datalen)]] $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	struct __local_format_16to8_data {
 		$pformatprinter fd_printer;   /* [1..1] Inner printer */
@@ -1721,8 +1721,8 @@ struct format_16to8_data {
 @@converting UTF-16 unicode input data into a UTF-8 output
 [[decl_include("<bits/crt/uformat-printer.h>"), cc(__C16FORMATPRINTER_CC)]]
 [[decl_include("<hybrid/typecore.h>")]]
-$ssize_t format_16to8(/*struct format_16to8_data **/ void *arg,
-                      char16_t const *data, $size_t datalen)
+$ssize_t format_16to8([[nonnull]] /*struct format_16to8_data **/ void *arg,
+                      [[in(datalen)]] char16_t const *data, $size_t datalen)
 	%{uchar16("format_wto8")}
 
 
@@ -1739,8 +1739,8 @@ struct format_32to8_data {
 @@converting UTF-32 unicode input data into a UTF-8 output
 [[decl_include("<bits/crt/uformat-printer.h>"), cc(__C32FORMATPRINTER_CC)]]
 [[decl_include("<hybrid/typecore.h>")]]
-$ssize_t format_32to8(/*struct format_32to8_data **/ void *arg,
-                      char32_t const *data, $size_t datalen)
+$ssize_t format_32to8([[nonnull]] /*struct format_32to8_data **/ void *arg,
+                      [[in(datalen)]] char32_t const *data, $size_t datalen)
 	%{uchar32("format_wto8")}
 
 
@@ -1759,8 +1759,8 @@ $ssize_t format_32to8(/*struct format_32to8_data **/ void *arg,
 [[hidden, impl_include("<bits/crt/uformat-printer.h>"), wchar]]
 [[decl_include("<bits/crt/wformat-printer.h>"), cc(__WFORMATPRINTER_CC)]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-$ssize_t format_wto32(/*struct format_wto32_data **/ void *arg,
-                      $wchar_t const *data, $size_t datalen) {
+$ssize_t format_wto32([[nonnull]] /*struct format_wto32_data **/ void *arg,
+                      [[in(datalen)]] $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	struct __local_format_16to32_data {
 		$pc32formatprinter fd_printer;   /* [1..1] Inner printer */
@@ -1837,8 +1837,8 @@ struct format_16to32_data {
 @@converting UTF-16 unicode input data into a UTF-32 output
 [[decl_include("<bits/crt/uformat-printer.h>"), cc(__C16FORMATPRINTER_CC)]]
 [[decl_include("<hybrid/typecore.h>")]]
-$ssize_t format_16to32(/*struct format_16to32_data **/ void *arg,
-                       char16_t const *data, $size_t datalen)
+$ssize_t format_16to32([[nonnull]] /*struct format_16to32_data **/ void *arg,
+                       [[in(datalen)]] char16_t const *data, $size_t datalen)
 	%{uchar16("format_wto32")}
 
 
@@ -1853,8 +1853,8 @@ $ssize_t format_16to32(/*struct format_16to32_data **/ void *arg,
 [[hidden, wchar, decl_include("<bits/crt/wformat-printer.h>"), cc(__WFORMATPRINTER_CC)]]
 [[impl_include("<bits/crt/format-printer.h>", "<bits/crt/uformat-printer.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-$ssize_t format_wto16(/*struct format_wto16_data **/ void *arg,
-                      $wchar_t const *data, $size_t datalen) {
+$ssize_t format_wto16([[nonnull]] /*struct format_wto16_data **/ void *arg,
+                      [[in(datalen)]] $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 4@@
 	struct __local_format_32to16_data {
 		$pc16formatprinter fd_printer; /* [1..1] Inner printer */
@@ -1903,8 +1903,8 @@ struct format_32to16_data {
 @@converting UTF-32 unicode input data into a UTF-16  output
 [[decl_include("<bits/crt/uformat-printer.h>"), cc(__C32FORMATPRINTER_CC)]]
 [[decl_include("<hybrid/typecore.h>")]]
-$ssize_t format_32to16(/*struct format_32to16_data **/ void *arg,
-                       char32_t const *data, $size_t datalen)
+$ssize_t format_32to16([[nonnull]] /*struct format_32to16_data **/ void *arg,
+                       [[in(datalen)]] char32_t const *data, $size_t datalen)
 	%{uchar32("format_wto16")}
 
 
@@ -1965,7 +1965,7 @@ __LONGDOUBLE __unicode_descriptor_digitld($uint8_t digit_idx);
 @@Fold the given unicode character `ch'
 [[libc, inline, no_extern_inline, nonnull, userimpl]]
 [[decl_include("<hybrid/typecore.h>")]]
-char32_t *unicode_fold(char32_t ch, [[nonnull]] char32_t buf[3]) {
+char32_t *unicode_fold(char32_t ch, [[out]] char32_t buf[3]) {
 	buf[0] = ch;
 	return buf + 1;
 }
@@ -2012,7 +2012,7 @@ char32_t *unicode_fold(char32_t ch, [[nonnull]] char32_t buf[3]) {
  * If digit characters which equate to values greater than 16 should be
  * supported, then `unicode_getnumeric(64|dbl|ldbl)' should be used! */
 #ifdef __INTELLISENSE__
-__ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
+__ATTR_WUNUSED __ATTR_ACCESS_WR(3) __BOOL
 __NOTHROW_NCX(unicode_asdigit)(char32_t ch, __UINT8_TYPE__ radix,
                                __UINT8_TYPE__ * __restrict presult);
 #else /* __INTELLISENSE__ */
@@ -2269,7 +2269,7 @@ __DECL_BEGIN
  * If digit characters which equate to values greater than 16 should be
  * supported, then `unicode_getnumeric(64|dbl|ldbl)' should be used! */
 #ifdef __INTELLISENSE__
-__ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
+__ATTR_WUNUSED __ATTR_ACCESS_WR(3) __BOOL
 __NOTHROW_NCX(__libc_unicode_asdigit)(__CHAR32_TYPE__ ch, __UINT8_TYPE__ radix,
                                       __UINT8_TYPE__ * __restrict presult);
 #else /* __INTELLISENSE__ */
@@ -2404,7 +2404,7 @@ __DECL_END
  * If digit characters which equate to values greater than 16 should be
  * supported, then `unicode_getnumeric(64|dbl|ldbl)' should be used! */
 #ifdef __INTELLISENSE__
-__ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
+__ATTR_WUNUSED __ATTR_ACCESS_WR(3) __BOOL
 __NOTHROW_NCX(__libc_unicode_asdigit)(__CHAR32_TYPE__ ch, __UINT8_TYPE__ radix,
                                       __UINT8_TYPE__ *__restrict presult);
 #else /* __INTELLISENSE__ */

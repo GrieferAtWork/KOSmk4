@@ -67,7 +67,7 @@ __SYSDECL_BEGIN
 @@         calling function has returned, then the behavior is undefined.
 [[no_crt_dos_wrapper, decl_include("<sys/ucontext.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_GETCONTEXT))]]
-int getcontext([[nonnull]] ucontext_t *__restrict ucp);
+int getcontext([[out]] ucontext_t *__restrict ucp);
 
 @@>> setcontext(3)
 @@Populate the current machine register state with values from `ucp',
@@ -93,7 +93,7 @@ int getcontext([[nonnull]] ucontext_t *__restrict ucp);
 @@      function.
 [[no_crt_dos_wrapper, decl_include("<sys/ucontext.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_SETCONTEXT))]]
-int setcontext([[nonnull]] ucontext_t const *__restrict ucp);
+int setcontext([[in]] ucontext_t const *__restrict ucp);
 
 @@>> swapcontext(3)
 @@Atomically perform both a `getcontext(oucp)',  as well as a  `setcontext(ucp)',
@@ -112,8 +112,8 @@ int setcontext([[nonnull]] ucontext_t const *__restrict ucp);
 @@      function.
 [[no_crt_dos_wrapper, decl_include("<sys/ucontext.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_SWAPCONTEXT))]]
-int swapcontext([[nonnull]] ucontext_t *__restrict oucp,
-                [[nonnull]] ucontext_t const *__restrict ucp);
+int swapcontext([[out]] ucontext_t *__restrict oucp,
+                [[in]] ucontext_t const *__restrict ucp);
 
 @@>> makecontext(3)
 @@Initialize  a  user-context  `ucp'  to  perform  a  call  to  `func',  which
@@ -136,7 +136,7 @@ int swapcontext([[nonnull]] ucontext_t *__restrict oucp,
 @@    `func' should be handled as a call to `pthread_exit(NULL)'
 [[no_crt_dos_wrapper, decl_include("<features.h>", "<sys/ucontext.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MAKECONTEXT))]]
-void makecontext([[nonnull]] ucontext_t *ucp,
+void makecontext([[out]] ucontext_t *ucp,
                  [[nonnull]] void (LIBKCALL *func)(void),
                  __STDC_INT_AS_SIZE_T argc, ...);
 

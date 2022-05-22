@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb83cdf84 */
+/* HASH CRC-32:0x594428c3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__libc_core_raise,(__signo_t __signo),raise,(__si
  * Add all possible signals (possibly even including undefined signals,
  * though these would be ignored by the kernel) to the given signal set
  * @return: 0: Always returns `0' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__libc_core_sigfillset,(struct __sigset_struct *__set),sigfillset,(__set))
+__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__libc_core_sigfillset,(struct __sigset_struct *__set),sigfillset,(__set))
 #else /* __CRT_HAVE_sigfillset */
 #include <libc/local/signal/sigfillset.h>
 /* >> sigfillset(3)
@@ -87,7 +87,7 @@ struct __sigset_struct;
  * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] Invalid `how' */
-__CREDIRECT(,int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),sigprocmask,(__how,__set,__oset))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),sigprocmask,(__how,__set,__oset))
 #elif defined(__CRT_HAVE___sigprocmask)
 struct __sigset_struct;
 #include <features.h>
@@ -103,7 +103,7 @@ struct __sigset_struct;
  * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] Invalid `how' */
-__CREDIRECT(,int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),__sigprocmask,(__how,__set,__oset))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),__sigprocmask,(__how,__set,__oset))
 #elif defined(__CRT_HAVE___libc_sigprocmask)
 struct __sigset_struct;
 #include <features.h>
@@ -119,7 +119,7 @@ struct __sigset_struct;
  * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] Invalid `how' */
-__CREDIRECT(,int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),__libc_sigprocmask,(__how,__set,__oset))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),__libc_sigprocmask,(__how,__set,__oset))
 #elif defined(__CRT_HAVE_pthread_sigmask)
 struct __sigset_struct;
 #include <features.h>
@@ -135,7 +135,7 @@ struct __sigset_struct;
  * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] Invalid `how' */
-__CREDIRECT(,int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),pthread_sigmask,(__how,__set,__oset))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),pthread_sigmask,(__how,__set,__oset))
 #elif defined(__CRT_HAVE_thr_sigsetmask)
 struct __sigset_struct;
 #include <features.h>
@@ -151,7 +151,7 @@ struct __sigset_struct;
  * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] Invalid `how' */
-__CREDIRECT(,int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),thr_sigsetmask,(__how,__set,__oset))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),thr_sigsetmask,(__how,__set,__oset))
 #else /* ... */
 #undef ____libc_core_sigprocmask_defined
 #endif /* !... */
@@ -235,7 +235,7 @@ __CREDIRECT(__ATTR_RETNONNULL,struct __sigset_struct *,__NOTHROW_NCX,__libc_core
  * Check if the given signal set is empty
  * @return: != 0: Yes, it is empty
  * @return: == 0: No, at least 1 signal is contained */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__libc_core_sigisemptyset,(struct __sigset_struct const *__restrict __set),sigisemptyset,(__set))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__libc_core_sigisemptyset,(struct __sigset_struct const *__restrict __set),sigisemptyset,(__set))
 #else /* __CRT_HAVE_sigisemptyset */
 #include <libc/local/signal/sigisemptyset.h>
 /* >> sigisemptyset(3)

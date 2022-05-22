@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5d13d33 */
+/* HASH CRC-32:0x22f2e839 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ustat(2) */
-INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ustat)(dev_t dev, struct ustat *ubuf);
+INTDEF ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBDCALL libd_ustat)(dev_t dev, struct ustat *ubuf);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

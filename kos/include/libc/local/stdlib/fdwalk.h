@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85e08604 */
+/* HASH CRC-32:0x148f6df5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,15 +33,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_atoi_defined
 #define __local___localdep_atoi_defined
 #ifdef __CRT_HAVE_atoi
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_atoi,(char const *__restrict __nptr),atoi,(__nptr))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_atoi,(char const *__restrict __nptr),atoi,(__nptr))
 #else /* __CRT_HAVE_atoi */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_atol) && __SIZEOF_INT__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_atoi,(char const *__restrict __nptr),atol,(__nptr))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_atoi,(char const *__restrict __nptr),atol,(__nptr))
 #elif defined(__CRT_HAVE_atoll) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_atoi,(char const *__restrict __nptr),atoll,(__nptr))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_atoi,(char const *__restrict __nptr),atoll,(__nptr))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/atoi.h>

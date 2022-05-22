@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x717e1b37 */
+/* HASH CRC-32:0x1ab90698 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,22 +30,22 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),access,(__file,__type))
 #elif defined(__CRT_HAVE__access)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
 #elif defined(__CRT_HAVE___access)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),__access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),__access,(__file,__type))
 #elif defined(__CRT_HAVE___libc_access)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),__libc_access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),__libc_access,(__file,__type))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/access.h>
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined
 #ifdef __CRT_HAVE_getenv
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #else /* __CRT_HAVE_getenv */
 __NAMESPACE_LOCAL_END
 #include <libc/template/environ.h>

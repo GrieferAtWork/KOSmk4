@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf13da2f9 */
+/* HASH CRC-32:0x9d95e2b3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-__LOCAL_LIBC(posix_spawnattr_getsigmask) __ATTR_NONNULL((1, 2)) __errno_t
+__LOCAL_LIBC(posix_spawnattr_getsigmask) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnattr_getsigmask))(struct __posix_spawnattr const *__restrict __attr, struct __sigset_struct *__restrict __sigmask) {
 	(__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__sigmask, &__attr->__ss, sizeof(struct __sigset_struct));
 	return 0;

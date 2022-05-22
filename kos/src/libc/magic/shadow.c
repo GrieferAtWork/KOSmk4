@@ -79,42 +79,42 @@ void endspent();
 struct spwd *getspent();
 
 [[cp, decl_include("<bits/crt/db/spwd.h>"), export_alias("__getspnam")]]
-struct spwd *getspnam([[nonnull]] char const *__restrict name);
+struct spwd *getspnam([[in]] char const *__restrict name);
 
 [[cp, decl_include("<bits/crt/db/spwd.h>")]]
-struct spwd *sgetspent([[nonnull]] char const *__restrict string);
+struct spwd *sgetspent([[in]] char const *__restrict string);
 
 [[cp, decl_include("<bits/crt/db/spwd.h>")]]
 struct spwd *fgetspent([[inout]] $FILE *__restrict stream);
 
 [[cp, decl_include("<bits/crt/db/spwd.h>")]]
-int putspent([[nonnull]] struct spwd const *__restrict p,
+int putspent([[in]] struct spwd const *__restrict p,
              [[inout]] $FILE *__restrict stream);
 
 %
 %#ifdef __USE_MISC
 [[cp, decl_include("<bits/crt/db/spwd.h>", "<hybrid/typecore.h>")]]
-int getspent_r([[nonnull]] struct spwd *__restrict result_buf,
-               [[outp(buflen)]] char *__restrict buffer, size_t buflen,
-               [[nonnull]] struct spwd **__restrict result);
+int getspent_r([[out]] struct spwd *__restrict result_buf,
+               [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+               [[out]] struct spwd **__restrict result);
 
 [[cp, doc_alias("getspent_r"), decl_include("<bits/crt/db/spwd.h>", "<hybrid/typecore.h>")]]
-int getspnam_r([[nonnull]] char const *__restrict name,
-               [[nonnull]] struct spwd *__restrict result_buf,
-               [[nonnull]] char *__restrict buffer, size_t buflen,
-               [[nonnull]] struct spwd **__restrict result);
+int getspnam_r([[in]] char const *__restrict name,
+               [[out]] struct spwd *__restrict result_buf,
+               [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+               [[out]] struct spwd **__restrict result);
 
 [[cp, doc_alias("getspent_r"), decl_include("<bits/crt/db/spwd.h>", "<hybrid/typecore.h>")]]
-int sgetspent_r([[nonnull]] char const *__restrict string,
-                [[nonnull]] struct spwd *__restrict result_buf,
-                [[nonnull]] char *__restrict buffer, size_t buflen,
-                [[nonnull]] struct spwd **__restrict result);
+int sgetspent_r([[in]] char const *__restrict string,
+                [[out]] struct spwd *__restrict result_buf,
+                [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+                [[out]] struct spwd **__restrict result);
 
 [[cp, doc_alias("getspent_r"), decl_include("<bits/crt/db/spwd.h>", "<hybrid/typecore.h>")]]
 int fgetspent_r([[inout]] $FILE *__restrict stream,
-                [[nonnull]] struct spwd *__restrict result_buf,
-                [[nonnull]] char *__restrict buffer, size_t buflen,
-                [[nonnull]] struct spwd **__restrict result);
+                [[out]] struct spwd *__restrict result_buf,
+                [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
+                [[out]] struct spwd **__restrict result);
 %#endif /* __USE_MISC */
 
 [[cp_kos, export_alias("__lckpwdf")]]

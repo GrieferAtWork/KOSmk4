@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34092cea */
+/* HASH CRC-32:0x2a372128 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,14 +29,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_recvmmsg32_defined) && defined(__CRT_HAVE_recvmmsg)
 #define __local___localdep_recvmmsg32_defined
-__CREDIRECT(__ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec32 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RWS(2, 3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec32 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* !__local___localdep_recvmmsg32_defined && __CRT_HAVE_recvmmsg */
 #ifndef __local___localdep_recvmmsg64_defined
 #define __local___localdep_recvmmsg64_defined
 #if defined(__CRT_HAVE_recvmmsg) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RWS(2, 3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg64)
-__CREDIRECT(__ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RWS(2, 3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.socket/recvmmsg64.h>
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_recvmmsg64_defined
 #endif /* !... */
 #endif /* !__local___localdep_recvmmsg64_defined */
-__LOCAL_LIBC(recvmmsg) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(recvmmsg) __ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RWS(2, 3) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(recvmmsg))(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo) {
 
 	struct __timespec64 __tmo64;

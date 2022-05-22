@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x194b32a2 */
+/* HASH CRC-32:0xa10472b5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,11 +27,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_execl_defined
 #define __local___localdep_execl_defined
 #if __has_builtin(__builtin_execl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execl) && __has_builtin(__builtin_va_arg_pack)
-__CEIREDIRECT(__ATTR_SENTINEL __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_execl,(char const *__restrict __path, char const *__args, ...),execl,{ return __builtin_execl(__path, __args, __builtin_va_arg_pack()); })
+__CEIREDIRECT(__ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_execl,(char const *__restrict __path, char const *__args, ...),execl,{ return __builtin_execl(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execl)
-__LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL __localdep_execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME("execl");
+__LIBC __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int __NOTHROW_RPC(__VLIBCCALL __localdep_execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME("execl");
 #elif defined(__CRT_HAVE__execl)
-__LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL __localdep_execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME("_execl");
+__LIBC __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int __NOTHROW_RPC(__VLIBCCALL __localdep_execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME("_execl");
 #elif defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__LOCAL_environ))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/execl.h>
@@ -44,17 +44,17 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_secure_getenv_defined
 #define __local___localdep_secure_getenv_defined
 #ifdef __CRT_HAVE_secure_getenv
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),secure_getenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),secure_getenv,(__varname))
 #elif defined(__CRT_HAVE___secure_getenv)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),__secure_getenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),__secure_getenv,(__varname))
 #elif defined(__CRT_HAVE___libc_secure_getenv)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),__libc_secure_getenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),__libc_secure_getenv,(__varname))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/template/__libc_enable_secure.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_getenv) && !defined(__LOCAL___libc_enable_secure)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),getenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_secure_getenv,(char const *__varname),getenv,(__varname))
 #elif defined(__LOCAL_environ) && !defined(__LOCAL___libc_enable_secure)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/getenv.h>
@@ -81,7 +81,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strrchrnul __LIBC_LOCAL_NAME(strrchrnul)
 #endif /* !__CRT_HAVE_strrchrnul */
 #endif /* !__local___localdep_strrchrnul_defined */
-__LOCAL_LIBC(shexec) int
+__LOCAL_LIBC(shexec) __ATTR_ACCESS_RO_OPT(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shexec))(char const *__command) {
 	static char const __arg_sh[] = "sh";
 	static char const __arg__c[] = "-c";

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba6ff13b */
+/* HASH CRC-32:0xe1e2ff93 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,9 +32,9 @@ DECL_BEGIN
 #include <signal.h> /* sigset_t */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* @param timeout: Timeout in milliseconds (or negative for infinity) */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_poll)(struct pollfd *fds, nfds_t nfds, int timeout);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_ppoll)(struct pollfd *fds, nfds_t nfds, struct timespec const *timeout, sigset_t const *ss);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_ppoll64)(struct pollfd *fds, nfds_t nfds, struct timespec64 const *timeout, sigset_t const *ss);
+INTDEF ATTR_ACCESS_RWS(1, 2) int NOTHROW_RPC(LIBDCALL libd_poll)(struct pollfd *fds, nfds_t nfds, int timeout);
+INTDEF ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RWS(1, 2) int NOTHROW_RPC(LIBDCALL libd_ppoll)(struct pollfd *fds, nfds_t nfds, struct timespec const *timeout, sigset_t const *ss);
+INTDEF ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RWS(1, 2) int NOTHROW_RPC(LIBDCALL libd_ppoll64)(struct pollfd *fds, nfds_t nfds, struct timespec64 const *timeout, sigset_t const *ss);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

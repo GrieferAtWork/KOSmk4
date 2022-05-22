@@ -646,26 +646,26 @@ typedef __pid_t pid_t;
 
 @@>> cfgetospeed(3)
 [[pure, wunused, decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
-speed_t cfgetospeed([[nonnull]] struct termios const *__restrict termios_p) {
+speed_t cfgetospeed([[in]] struct termios const *__restrict termios_p) {
 	return termios_p->@c_ospeed@;
 }
 
 @@>> cfgetispeed(3)
 [[pure, wunused, decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
-speed_t cfgetispeed([[nonnull]] struct termios const *__restrict termios_p) {
+speed_t cfgetispeed([[in]] struct termios const *__restrict termios_p) {
 	return termios_p->@c_ispeed@;
 }
 
 @@>> cfsetospeed(3)
 [[decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
-int cfsetospeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) {
+int cfsetospeed([[inout]] struct termios *__restrict termios_p, speed_t speed) {
 	termios_p->@c_ospeed@ = speed;
 	return 0;
 }
 
 @@>> cfsetispeed(3)
 [[decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
-int cfsetispeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) {
+int cfsetispeed([[inout]] struct termios *__restrict termios_p, speed_t speed) {
 	termios_p->@c_ispeed@ = speed;
 	return 0;
 }
@@ -680,7 +680,7 @@ int cfsetispeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed)
 [[decl_include("<bits/os/termios.h>", "<bits/types.h>"), export_alias("__tcgetattr")]]
 [[requires_include("<asm/os/tty.h>")]] /* __TCGETA */
 [[requires($has_function(ioctl) && defined(__TCGETA))]]
-int tcgetattr($fd_t fd, [[nonnull]] struct termios *__restrict termios_p) {
+int tcgetattr($fd_t fd, [[out]] struct termios *__restrict termios_p) {
 	return (int)ioctl(fd, __TCGETA, termios_p);
 }
 
@@ -691,7 +691,7 @@ int tcgetattr($fd_t fd, [[nonnull]] struct termios *__restrict termios_p) {
 [[decl_include("<features.h>", "<bits/os/termios.h>", "<bits/types.h>")]]
 [[requires_function(ioctl)]]
 int tcsetattr($fd_t fd, __STDC_INT_AS_UINT_T optional_actions,
-              [[nonnull]] struct termios const *__restrict termios_p) {
+              [[in]] struct termios const *__restrict termios_p) {
 	int cmd;
 	switch (optional_actions) {
 
@@ -806,7 +806,7 @@ int tcsetsid($fd_t fd, $pid_t pid) {
 %#ifdef __USE_MISC
 @@>> cfsetspeed(3)
 [[decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
-int cfsetspeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) {
+int cfsetspeed([[inout]] struct termios *__restrict termios_p, speed_t speed) {
 	termios_p->@c_ospeed@ = speed;
 	termios_p->@c_ispeed@ = speed;
 	return 0;
@@ -817,7 +817,7 @@ int cfsetspeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) 
 @@This entails the CANON and all control characters being disabled, as well as
 @@any sort of input/output text processing no longer taking place.
 [[impl_include("<asm/os/termios.h>"), decl_include("<bits/os/termios.h>")]]
-void cfmakeraw([[nonnull]] struct termios *__restrict termios_p) {
+void cfmakeraw([[inout]] struct termios *__restrict termios_p) {
 	/* As documented here: http://man7.org/linux/man-pages/man3/termios.3.html
 	 * Note that the following additions were made:
 	 *  - Clear `IXOFF' (ensuring that TTY output can be streamed)
@@ -963,7 +963,7 @@ for (local field, add, flags: ops) {
 @@Sane here  refers  to  setting  all values  to  their  defaults,  as they  are  defined  in  <sys/ttydefaults.h>
 [[kernel, impl_include("<bits/posix_opt.h>")]]
 [[impl_include("<asm/os/termios.h>"), decl_include("<bits/os/termios.h>")]]
-void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {
+void cfmakesane([[out]] struct termios *__restrict termios_p) {
 	/* Default everything to ZERO */
 	bzero(termios_p, sizeof(*termios_p));
 

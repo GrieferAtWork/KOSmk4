@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x928bd302 */
+/* HASH CRC-32:0x774291de */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #include <net/ethernet.h>
 #include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ether_paton_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct ether_addr *
+__LOCAL_LIBC(ether_paton_r) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) struct ether_addr *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_paton_r))(char const **__restrict __pasc, struct ether_addr *__restrict __addr) {
 	unsigned int __i;
 	char const *__asc = *__pasc;

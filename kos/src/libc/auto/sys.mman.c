@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13718921 */
+/* HASH CRC-32:0x7f9ddf4c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ DECL_BEGIN
 #include <libc/errno.h>
 #include <bits/types.h>
 /* >> shm_open(3) */
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_RO(1) fd_t
 NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
                                     oflag_t oflags,
                                     mode_t mode) {
@@ -90,7 +90,7 @@ NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
 #include <hybrid/typecore.h>
 #include <parts/malloca.h>
 /* >> shm_unlink(3) */
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name) {
 	int result;
 	char *fullname;
@@ -195,7 +195,7 @@ badkey:
  * @return: -1: [errno=ENOMEM] Out of memory
  * @return: -1: [errno=EBADF]  Invalid `fd'
  * @return: -1: [errno=*]      Read error */
-INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping,
                                     fd_t fd,
                                     pos64_t offset,
@@ -428,7 +428,7 @@ err_buf:
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
-INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED NONNULL((1, 3)) int
+INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_fmapfileat)(struct mapfile *__restrict mapping,
                                       fd_t dirfd,
                                       char const *filename,
@@ -478,7 +478,7 @@ NOTHROW_NCX(LIBCCALL libc_fmapfileat)(struct mapfile *__restrict mapping,
 }
 /* >> mapfile(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)' */
-INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.system.mman") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_mapfile)(struct mapfile *__restrict mapping,
                                    char const *filename,
                                    pos64_t offset,
@@ -507,7 +507,7 @@ NOTHROW_NCX(LIBCCALL libc_mapfile)(struct mapfile *__restrict mapping,
 }
 /* >> unmapfile(3)
  * Delete a file mapping previously created by `mapfile(3)' */
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.system.mman") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_unmapfile)(struct mapfile *__restrict mapping) {
 	if (mapping->__mf_mapsize) {
 

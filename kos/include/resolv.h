@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46446de */
+/* HASH CRC-32:0x7d370215 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -217,28 +217,28 @@ __CDECLARE(,int,__NOTHROW_NCX,res_dnok,(char const *__a),(__a))
 __CREDIRECT(,int,__NOTHROW_NCX,res_dnok,(char const *__a),__res_dnok,(__a))
 #endif /* ... */
 #ifdef __CRT_HAVE_sym_ston
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sym_ston,(struct res_sym const *__symbols, char const *__wanted_name, int *__p_success),(__symbols,__wanted_name,__p_success))
+__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,sym_ston,(struct res_sym const *__symbols, char const *__wanted_name, int *__p_success),(__symbols,__wanted_name,__p_success))
 #elif defined(__CRT_HAVE___sym_ston)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sym_ston,(struct res_sym const *__symbols, char const *__wanted_name, int *__p_success),__sym_ston,(__symbols,__wanted_name,__p_success))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,sym_ston,(struct res_sym const *__symbols, char const *__wanted_name, int *__p_success),__sym_ston,(__symbols,__wanted_name,__p_success))
 #else /* ... */
 #include <libc/local/resolv/sym_ston.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sym_ston, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL sym_ston)(struct res_sym const *__symbols, char const *__wanted_name, int *__p_success) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sym_ston))(__symbols, __wanted_name, __p_success); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sym_ston, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3) int __NOTHROW_NCX(__LIBCCALL sym_ston)(struct res_sym const *__symbols, char const *__wanted_name, int *__p_success) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sym_ston))(__symbols, __wanted_name, __p_success); })
 #endif /* !... */
 #ifdef __CRT_HAVE_sym_ntos
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,sym_ntos,(struct res_sym const *__symbols, int __wanted_number, int *__p_success),(__symbols,__wanted_number,__p_success))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(3),char const *,__NOTHROW_NCX,sym_ntos,(struct res_sym const *__symbols, int __wanted_number, int *__p_success),(__symbols,__wanted_number,__p_success))
 #elif defined(__CRT_HAVE___sym_ntos)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,sym_ntos,(struct res_sym const *__symbols, int __wanted_number, int *__p_success),__sym_ntos,(__symbols,__wanted_number,__p_success))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(3),char const *,__NOTHROW_NCX,sym_ntos,(struct res_sym const *__symbols, int __wanted_number, int *__p_success),__sym_ntos,(__symbols,__wanted_number,__p_success))
 #else /* ... */
 #include <libc/local/resolv/sym_ntos.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sym_ntos, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL sym_ntos)(struct res_sym const *__symbols, int __wanted_number, int *__p_success) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sym_ntos))(__symbols, __wanted_number, __p_success); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sym_ntos, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(3) char const *__NOTHROW_NCX(__LIBCCALL sym_ntos)(struct res_sym const *__symbols, int __wanted_number, int *__p_success) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sym_ntos))(__symbols, __wanted_number, __p_success); })
 #endif /* !... */
 #ifdef __CRT_HAVE_sym_ntop
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,sym_ntop,(struct res_sym const *__symbols, int __wanted_number, int *__p_success),(__symbols,__wanted_number,__p_success))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(3),char const *,__NOTHROW_NCX,sym_ntop,(struct res_sym const *__symbols, int __wanted_number, int *__p_success),(__symbols,__wanted_number,__p_success))
 #elif defined(__CRT_HAVE___sym_ntop)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,sym_ntop,(struct res_sym const *__symbols, int __wanted_number, int *__p_success),__sym_ntop,(__symbols,__wanted_number,__p_success))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(3),char const *,__NOTHROW_NCX,sym_ntop,(struct res_sym const *__symbols, int __wanted_number, int *__p_success),__sym_ntop,(__symbols,__wanted_number,__p_success))
 #else /* ... */
 #include <libc/local/resolv/sym_ntop.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sym_ntop, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL sym_ntop)(struct res_sym const *__symbols, int __wanted_number, int *__p_success) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sym_ntop))(__symbols, __wanted_number, __p_success); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sym_ntop, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(3) char const *__NOTHROW_NCX(__LIBCCALL sym_ntop)(struct res_sym const *__symbols, int __wanted_number, int *__p_success) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sym_ntop))(__symbols, __wanted_number, __p_success); })
 #endif /* !... */
 #ifdef __CRT_HAVE_b64_ntop
 __CDECLARE(,int,__NOTHROW_NCX,b64_ntop,(unsigned char const *__a, size_t __b, char *__c, size_t __d),(__a,__b,__c,__d))
@@ -261,12 +261,12 @@ __CDECLARE(,char const *,__NOTHROW_NCX,loc_ntoa,(unsigned char const *__a, char 
 __CREDIRECT(,char const *,__NOTHROW_NCX,loc_ntoa,(unsigned char const *__a, char *__b),__loc_ntoa,(__a,__b))
 #endif /* ... */
 #ifdef __CRT_HAVE_dn_skipname
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,dn_skipname,(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg),(__msg_ptr,__end_of_msg))
+__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_NONNULL((2)),int,__NOTHROW_NCX,dn_skipname,(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg),(__msg_ptr,__end_of_msg))
 #elif defined(__CRT_HAVE___dn_skipname)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,dn_skipname,(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg),__dn_skipname,(__msg_ptr,__end_of_msg))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_NONNULL((2)),int,__NOTHROW_NCX,dn_skipname,(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg),__dn_skipname,(__msg_ptr,__end_of_msg))
 #elif defined(__CRT_HAVE_ns_name_skip)
 #include <libc/local/resolv/dn_skipname.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(dn_skipname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL dn_skipname)(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dn_skipname))(__msg_ptr, __end_of_msg); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dn_skipname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL dn_skipname)(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dn_skipname))(__msg_ptr, __end_of_msg); })
 #endif /* ... */
 #ifdef __CRT_HAVE_ns_put32
 __CREDIRECT_VOID(,__NOTHROW_NCX,putlong,(__UINT32_TYPE__ __a, unsigned char *__b),ns_put32,(__a,__b))

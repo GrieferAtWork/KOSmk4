@@ -117,7 +117,7 @@ typedef struct __sigset_struct sigset_t;
 @@@param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK'
 @@               Meaningless,  but  still  validated  when  `fd != -1'
 [[wunused, decl_include("<features.h>", "<bits/os/sigset.h>", "<bits/types.h>")]]
-$fd_t signalfd($fd_t fd, [[nonnull]] sigset_t const *sigmask,
+$fd_t signalfd($fd_t fd, [[in]] sigset_t const *sigmask,
                __STDC_INT_AS_UINT_T flags);
 
 %{

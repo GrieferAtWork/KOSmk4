@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf03a3484 */
+/* HASH CRC-32:0xe914b74a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_waitpid,(__pid_t __pid, __WAIT_STA
 #undef __local___localdep_waitpid_defined
 #endif /* !... */
 #endif /* !__local___localdep_waitpid_defined */
-__LOCAL_LIBC(cwait) __pid_t
+__LOCAL_LIBC(cwait) __ATTR_ACCESS_WR_OPT(1) __pid_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cwait))(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action) {
 	/* This one's pretty simple, because it's literally just a waitpid() system call...
 	 * (It even returns the same  thing, that being the  PID of the joined  process...) */

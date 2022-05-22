@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7d7b9dd */
+/* HASH CRC-32:0xf6cb90a0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,11 +56,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputs_unlocked_defined
 #define __local___localdep_fputs_unlocked_defined
 #if __has_builtin(__builtin_fputs_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputs_unlocked)
-__CEIREDIRECT(__ATTR_ACCESS_RW(2) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs_unlocked,{ return __builtin_fputs_unlocked(__string, __stream); })
+__CEIREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(2),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs_unlocked,{ return __builtin_fputs_unlocked(__string, __stream); })
 #elif defined(__CRT_HAVE_fputs_unlocked)
-__CREDIRECT(__ATTR_ACCESS_RW(2) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs_unlocked,(__string,__stream))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(2),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs_unlocked,(__string,__stream))
 #elif defined(__CRT_HAVE_fputs)
-__CREDIRECT(__ATTR_ACCESS_RW(2) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs,(__string,__stream))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(2),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs,(__string,__stream))
 #elif defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fputs_unlocked.h>
@@ -70,7 +70,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fputs_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fputs_unlocked_defined */
-__LOCAL_LIBC(puts_unlocked) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(puts_unlocked) __ATTR_ACCESS_RO(1) __STDC_INT_AS_SSIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(puts_unlocked))(char const *__restrict __string) __THROWS(...) {
 	__STDC_INT_AS_SSIZE_T __result, __temp;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_fputs_unlocked)(__string, __LOCAL_stdout);

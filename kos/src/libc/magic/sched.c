@@ -388,18 +388,18 @@ typedef struct __cpu_set_struct cpu_set_t;
 
 [[decl_include("<bits/types.h>", "<bits/os/sched.h>")]]
 [[export_alias("__sched_setparam", "__libc_sched_setparam")]]
-int sched_setparam($pid_t pid, struct sched_param const *param);
+int sched_setparam($pid_t pid, [[in]] struct sched_param const *param);
 
 [[export_alias("__sched_getparam", "__libc_sched_getparam")]]
 [[decl_include("<bits/types.h>", "<bits/os/sched.h>")]]
-int sched_getparam($pid_t pid, struct sched_param *param);
+int sched_getparam($pid_t pid, [[out]] struct sched_param *param);
 
 [[export_alias("__sched_setscheduler", "__libc_sched_setscheduler")]]
 [[decl_include("<bits/types.h>", "<bits/os/sched.h>")]]
-int sched_setscheduler($pid_t pid, int policy, struct sched_param const *param);
+int sched_setscheduler($pid_t pid, int policy, [[in]] struct sched_param const *param);
 
 [[export_alias("__sched_getscheduler", "__libc_sched_getscheduler")]]
-[[decl_include("<bits/types.h>")]]
+[[wunused, decl_include("<bits/types.h>")]]
 int sched_getscheduler($pid_t pid);
 
 %
@@ -415,29 +415,29 @@ int sched_yield();
 
 %[default:section(".text.crt{|.dos}.sched.param")];
 
-[[decl_include("<features.h>")]]
+[[wunused, decl_include("<features.h>")]]
 [[export_alias("__sched_get_priority_max", "__libc_sched_get_priority_max")]]
 int sched_get_priority_max(__STDC_INT_AS_UINT_T algorithm);
 
-[[decl_include("<features.h>")]]
+[[wunused, decl_include("<features.h>")]]
 [[export_alias("__sched_get_priority_min", "__libc_sched_get_priority_min")]]
 int sched_get_priority_min(__STDC_INT_AS_UINT_T algorithm);
 
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>")]]
-int sched_setaffinity($pid_t pid, $size_t cpusetsize, cpu_set_t const *cpuset);
+int sched_setaffinity($pid_t pid, $size_t cpusetsize, [[in_opt]] cpu_set_t const *cpuset);
 
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>")]]
-int sched_getaffinity($pid_t pid, $size_t cpusetsize, cpu_set_t *cpuset);
+int sched_getaffinity($pid_t pid, $size_t cpusetsize, [[out_opt]] cpu_set_t *cpuset);
 
 [[ignore, nocrt, alias("sched_rr_get_interval", "__sched_rr_get_interval", "__libc_sched_rr_get_interval")]]
 [[decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
-int sched_rr_get_interval32($pid_t pid, struct $timespec32 *tms);
+int sched_rr_get_interval32($pid_t pid, [[out_opt]] struct $timespec32 *tms);
 
 [[decl_include("<bits/types.h>", "<bits/os/timespec.h>"), no_crt_self_import, export_as("__sched_rr_get_interval", "__libc_sched_rr_get_interval")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sched_rr_get_interval", "__sched_rr_get_interval", "__libc_sched_rr_get_interval")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sched_rr_get_interval64")]]
 [[userimpl, requires($has_function(sched_rr_get_interval32) || $has_function(sched_rr_get_interval64))]]
-int sched_rr_get_interval($pid_t pid, struct timespec *tms) {
+int sched_rr_get_interval($pid_t pid, [[out_opt]] struct timespec *tms) {
 @@pp_if $has_function(sched_rr_get_interval32)@@
 	struct timespec32 tms32;
 	if (!tms)
@@ -460,7 +460,7 @@ int sched_rr_get_interval($pid_t pid, struct timespec *tms) {
 [[preferred_time64_variant_of(sched_rr_get_interval), doc_alias("sched_rr_get_interval")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__sched_rr_get_interval", "__libc_sched_rr_get_interval")]]
 [[userimpl, requires_function(sched_rr_get_interval32)]]
-int sched_rr_get_interval64($pid_t pid, struct timespec64 *tms) {
+int sched_rr_get_interval64($pid_t pid, [[out_opt]] struct timespec64 *tms) {
 	struct timespec32 tms32;
 	if (!tms)
 		return sched_rr_get_interval32(pid, NULL);

@@ -81,7 +81,7 @@ typedef __SSIZE_TYPE__ ssize_t;
 @@               if no  random data  had already  been retrieved  from
 @@               the kernel's random data sink.
 [[wunused, decl_include("<hybrid/typecore.h>")]]
-ssize_t getrandom([[outp(num_bytes)]] void *buf,
+ssize_t getrandom([[out(return <= num_bytes)]] void *buf,
                   size_t num_bytes, unsigned int flags);
 
 
@@ -101,7 +101,7 @@ ssize_t getrandom([[outp(num_bytes)]] void *buf,
 [[guard, wunused, impl_include("<libc/errno.h>")]]
 [[requires_include("<asm/os/random.h>")]]
 [[userimpl, requires(defined(__GRND_RANDOM) && $has_function(getrandom))]]
-int getentropy([[outp(num_bytes)]] void *buf, size_t num_bytes) {
+int getentropy([[out(num_bytes)]] void *buf, size_t num_bytes) {
 	size_t result = 0;
 	ssize_t temp;
 	while (result < num_bytes) {

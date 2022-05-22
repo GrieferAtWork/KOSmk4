@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa05be19b */
+/* HASH CRC-32:0x565e5535 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -188,7 +188,7 @@ __memopen_close(void *__cookie) {
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fmemopen) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __FILE *
+__LOCAL_LIBC(fmemopen) __ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RWS(1, 2) __FILE *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmemopen))(void *__mem, __SIZE_TYPE__ __len, char const *__modes) {
 	__FILE *__result;
 	struct __NAMESPACE_LOCAL_SYM __memopen_cookie *__magic;

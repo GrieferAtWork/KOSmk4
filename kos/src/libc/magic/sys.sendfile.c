@@ -61,7 +61,7 @@ typedef __SIZE_TYPE__ size_t;
 [[decl_include("<bits/types.h>")]]
 [[doc_alias("sendfile"), ignore, nocrt, alias("sendfile")]]
 ssize_t sendfile32($fd_t out_fd, $fd_t in_fd,
-                   [[nullable]] $off32_t *offset,
+                   [[inout_opt]] $off32_t *offset,
                    size_t count);
 
 
@@ -70,7 +70,7 @@ ssize_t sendfile32($fd_t out_fd, $fd_t in_fd,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("sendfile64")]]
 [[userimpl, requires($has_function(sendfile32) || $has_function(sendfile64))]]
 ssize_t sendfile($fd_t out_fd, $fd_t in_fd,
-                 [[nullable]] $off_t *offset, size_t count) {
+                 [[inout_opt]] $off_t *offset, size_t count) {
 @@pp_if $has_function(sendfile64)@@
 	ssize_t result;
 	if (offset) {
@@ -99,7 +99,7 @@ ssize_t sendfile($fd_t out_fd, $fd_t in_fd,
 [[preferred_off64_variant_of(sendfile), doc_alias("sendfile")]]
 [[userimpl, requires_function(sendfile32)]]
 ssize_t sendfile64($fd_t out_fd, $fd_t in_fd,
-                   [[nullable]] $off64_t *offset, size_t count) {
+                   [[inout_opt]] $off64_t *offset, size_t count) {
 	ssize_t result;
 	if (offset) {
 		off32_t temp = (off32_t)*offset;

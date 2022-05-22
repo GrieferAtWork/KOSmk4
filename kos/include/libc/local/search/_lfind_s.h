@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72d8014d */
+/* HASH CRC-32:0xba85a2c4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_lfind_s) __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *
+__LOCAL_LIBC(_lfind_s) __ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RO_OPT(1) __ATTR_NONNULL((2, 5)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(_lfind_s))(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) {
 	__SIZE_TYPE__ __i, __count = *__pitem_count;
 	void const *__result = __pbase;

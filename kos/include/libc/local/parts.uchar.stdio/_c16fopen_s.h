@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadfd1f46 */
+/* HASH CRC-32:0xff99d768 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,12 +31,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_DOS$convert_wcstombs)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c16tombs,(__CHAR16_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif (defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fopen_s_defined
 #define __local___localdep_fopen_s_defined
 #ifdef __CRT_HAVE_fopen_s
-__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2, 3)),__errno_t,__NOTHROW_RPC,__localdep_fopen_s,(__FILE **__pstream, char const *__filename, char const *__modes),fopen_s,(__pstream,__filename,__modes))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1),__errno_t,__NOTHROW_RPC,__localdep_fopen_s,(__FILE **__pstream, char const *__filename, char const *__modes),fopen_s,(__pstream,__filename,__modes))
 #elif (defined(__CRT_HAVE_fopen) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_fopen64)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fopen_s.h>

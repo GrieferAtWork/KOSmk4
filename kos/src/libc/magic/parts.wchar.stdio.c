@@ -46,7 +46,7 @@ __SYSDECL_BEGIN
 [[requires_include("<asm/os/fcntl.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wremoveat)) ||
            $has_function(remove, convert_wcstombs))]]
-int wremove([[nonnull]] wchar_t const *filename) {
+int wremove([[in]] wchar_t const *filename) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wremoveat)@@
 	return wremoveat(__AT_FDCWD, filename);
 @@pp_else@@
@@ -67,8 +67,8 @@ int wremove([[nonnull]] wchar_t const *filename) {
 [[requires_include("<asm/os/fcntl.h>"), decl_include("<hybrid/typecore.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wrenameat)) ||
            $has_function(renameat, convert_wcstombs))]]
-int wrename([[nonnull]] wchar_t const *oldname,
-            [[nonnull]] wchar_t const *newname_or_path) {
+int wrename([[in]] wchar_t const *oldname,
+            [[in]] wchar_t const *newname_or_path) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wrenameat)@@
 	return wrenameat(__AT_FDCWD, oldname, __AT_FDCWD, newname_or_path);
 @@pp_else@@
@@ -99,8 +99,8 @@ int wrename([[nonnull]] wchar_t const *oldname,
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires($has_function(wrenameat2) ||
            $has_function(renameat, convert_wcstombs))]]
-int wrenameat($fd_t oldfd, [[nonnull]] wchar_t const *oldname,
-              $fd_t newfd, [[nonnull]] wchar_t const *newname_or_path) {
+int wrenameat($fd_t oldfd, [[in]] wchar_t const *oldname,
+              $fd_t newfd, [[in]] wchar_t const *newname_or_path) {
 @@pp_if $has_function(wrenameat2)@@
 	return wrenameat2(oldfd, oldname, newfd, newname_or_path, 0);
 @@pp_else@@
@@ -130,7 +130,7 @@ int wrenameat($fd_t oldfd, [[nonnull]] wchar_t const *oldname,
 %#ifdef __USE_KOS
 [[wchar, cp, requires_function(removeat, convert_wcstombs)]]
 [[impl_include("<asm/os/fcntl.h>"), decl_include("<bits/types.h>")]]
-int wremoveat($fd_t dirfd, [[nonnull]] wchar_t const *filename) {
+int wremoveat($fd_t dirfd, [[in]] wchar_t const *filename) {
 @@pp_if $has_function(wunlinkat) && defined(__AT_REMOVEREG) && defined(__AT_REMOVEDIR)@@
 	return wunlinkat(dirfd, filename, __AT_REMOVEREG | __AT_REMOVEDIR);
 @@pp_else@@
@@ -153,8 +153,8 @@ int wremoveat($fd_t dirfd, [[nonnull]] wchar_t const *filename) {
 %#ifdef __USE_GNU
 [[decl_include("<bits/types.h>")]]
 [[wchar, cp, requires_function(renameat2, convert_wcstombs)]]
-int wrenameat2($fd_t oldfd, [[nonnull]] wchar_t const *oldname,
-               $fd_t newfd, [[nonnull]] wchar_t const *newname_or_path,
+int wrenameat2($fd_t oldfd, [[in]] wchar_t const *oldname,
+               $fd_t newfd, [[in]] wchar_t const *newname_or_path,
                $atflag_t flags) {
 	char *utf8_oldname;
 	char *utf8_newname_or_path;
@@ -184,8 +184,8 @@ int wrenameat2($fd_t oldfd, [[nonnull]] wchar_t const *oldname,
 [[wchar, wunused, dos_export_alias("_wfopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
 [[requires_function(fopen, convert_wcstombs)]]
-$FILE *wfopen([[nonnull]] wchar_t const *filename,
-              [[nonnull]] wchar_t const *mode) {
+$FILE *wfopen([[in]] wchar_t const *filename,
+              [[in]] wchar_t const *mode) {
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_filename;
 	/*utf-8*/ char *utf8_mode;
@@ -211,9 +211,9 @@ done:
 [[wchar, wunused, dos_export_alias("_wfreopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
 [[requires_function(freopen, convert_wcstombs)]]
-$FILE *wfreopen([[nonnull]] wchar_t const *filename,
-                [[nonnull]] wchar_t const *mode,
-                $FILE *stream) {
+$FILE *wfreopen([[in]] wchar_t const *filename,
+                [[in]] wchar_t const *mode,
+                [[inout]] $FILE *stream) {
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_filename;
 	/*utf-8*/ char *utf8_mode;
@@ -239,8 +239,8 @@ done:
 [[guard, wchar, wunused, dos_export_alias("_wpopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
 [[requires_function(popen, convert_wcstombs)]]
-$FILE *wpopen([[nonnull]] wchar_t const *command,
-              [[nonnull]] wchar_t const *mode) {
+$FILE *wpopen([[in]] wchar_t const *command,
+              [[in]] wchar_t const *mode) {
 	FILE *result = NULL;
 	/*utf-8*/ char *utf8_command;
 	/*utf-8*/ char *utf8_mode;

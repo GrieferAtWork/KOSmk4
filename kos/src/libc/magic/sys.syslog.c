@@ -172,7 +172,7 @@ int setlogmask(__STDC_INT_AS_UINT_T mask);
 
 [[cp, decl_include("<features.h>")]]
 void syslog(__STDC_INT_AS_UINT_T level,
-            [[nonnull, format("printf")]] char const *format, ...)
+            [[in, format("printf")]] char const *format, ...)
 	%{printf("vsyslog")}
 
 %
@@ -180,7 +180,7 @@ void syslog(__STDC_INT_AS_UINT_T level,
 [[cp, decl_include("<features.h>")]]
 [[requires_dependent_function(syslog_printer)]]
 void vsyslog(__STDC_INT_AS_UINT_T level,
-             [[nonnull, format("printf")]] char const *format,
+             [[in, format("printf")]] char const *format,
              $va_list args) {
 	format_vprintf(&syslog_printer,
 	               (void *)(uintptr_t)(unsigned int)level,
@@ -195,7 +195,7 @@ void vsyslog(__STDC_INT_AS_UINT_T level,
 [[cp, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[decl_include("<bits/crt/format-printer.h>")]]
 $ssize_t syslog_printer(void *arg,
-                        [[nonnull]] char const *__restrict data,
+                        [[in(datalen)]] char const *__restrict data,
                         $size_t datalen);
 
 %#define SYSLOG_PRINTER_CLOSURE(level) ((void *)(__uintptr_t)(__STDC_INT_AS_UINT_T)(level))

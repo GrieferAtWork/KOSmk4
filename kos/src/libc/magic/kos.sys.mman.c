@@ -47,7 +47,7 @@ __SYSDECL_BEGIN
 
 [[throws, decl_include("<features.h>", "<bits/types.h>")]]
 [[doc_alias("mmap"), ignore, nocrt, alias("MMap")]]
-void *MMap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
+void *MMap32([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
              __STDC_INT_AS_UINT_T flags, $fd_t fd, $pos32_t offset);
 
 [[throws, wunused, doc_alias("mmap"), decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
@@ -55,7 +55,7 @@ void *MMap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("MMap64")]]
 [[userimpl, requires($has_function(MMap32) || $has_function(MMap64))]]
 [[section(".text.crt.except.heap.mman")]]
-void *MMap(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
+void *MMap([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
            __STDC_INT_AS_UINT_T flags, $fd_t fd, $pos_t offset) {
 @@pp_if $has_function(MMap64)@@
 	return MMap64(addr, len, prot, flags, fd, (pos64_t)offset);
@@ -66,19 +66,19 @@ void *MMap(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 
 [[throws, doc_alias("munmap"), decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.except.heap.mman")]]
-void MUnmap([[nonnull]] void *addr, size_t len);
+void MUnmap([[access(none)]] void *addr, size_t len);
 
 [[throws, doc_alias("mprotect"), decl_include("<features.h>", "<hybrid/typecore.h>")]]
-void MProtect([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot);
+void MProtect([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot);
 
 [[cp, throws, doc_alias("msync"), decl_include("<features.h>", "<hybrid/typecore.h>")]]
-void MSync([[nonnull]] void *addr, size_t len, __STDC_INT_AS_UINT_T flags);
+void MSync([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T flags);
 
 [[throws, doc_alias("mlock"), decl_include("<hybrid/typecore.h>")]]
-void MLock([[nonnull]] void const *addr, size_t len);
+void MLock([[access(none)]] void const *addr, size_t len);
 
 [[throws, doc_alias("munlock"), decl_include("<hybrid/typecore.h>")]]
-void MUnlock([[nonnull]] void const *addr, size_t len);
+void MUnlock([[access(none)]] void const *addr, size_t len);
 
 [[throws, doc_alias("mlockall"), decl_include("<features.h>")]]
 void MLockAll(__STDC_INT_AS_UINT_T flags);
@@ -90,7 +90,7 @@ void MUnlockAll();
 [[impl_include("<asm/os/paths.h>", "<asm/os/oflags.h>")]]
 [[impl_include("<kos/parts/malloca.h>", "<libc/errno.h>")]]
 [[impl_include("<bits/types.h>")]]
-$fd_t ShmOpen([[nonnull]] char const *name,
+$fd_t ShmOpen([[in]] char const *name,
               $oflag_t oflags, mode_t mode) {
 	fd_t result;
 	char *fullname;
@@ -137,7 +137,7 @@ $fd_t ShmOpen([[nonnull]] char const *name,
 [[impl_include("<asm/os/paths.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_include("<kos/parts/malloca.h>")]]
-void ShmUnlink([[nonnull]] char const *name) {
+void ShmUnlink([[in]] char const *name) {
 	char *fullname;
 	size_t namelen;
 @@pp_ifdef _WIN32@@
@@ -168,7 +168,7 @@ void ShmUnlink([[nonnull]] char const *name) {
 [[throws, doc_alias("madvise")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[userimpl]]
-void MAdvise([[nonnull]] void *addr, size_t len,
+void MAdvise([[access(none)]] void *addr, size_t len,
              __STDC_INT_AS_UINT_T advice) {
 	/* Implement as a no-op, since this function is merely meant as a hint */
 	COMPILER_IMPURE();
@@ -179,7 +179,7 @@ void MAdvise([[nonnull]] void *addr, size_t len,
 
 [[throws, doc_alias("mincore")]]
 [[decl_include("<hybrid/typecore.h>")]]
-void MInCore([[nonnull]] void *start, size_t len, unsigned char *vec);
+void MInCore([[access(none)]] void *start, size_t len, unsigned char *vec);
 
 %#endif /* __USE_MISC */
 
@@ -190,7 +190,7 @@ void MInCore([[nonnull]] void *start, size_t len, unsigned char *vec);
 [[wunused, section(".text.crt.except.heap.mman")]]
 [[doc_alias("mmap"), preferred_off64_variant_of(MMap)]]
 [[userimpl, requires_function(MMap32)]]
-void *MMap64(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
+void *MMap64([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
              __STDC_INT_AS_UINT_T flags, $fd_t fd, $pos64_t offset) {
 	return MMap32(addr, len, prot, flags, fd, (pos32_t)offset);
 }
@@ -202,8 +202,8 @@ void *MMap64(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 
 [[throws, doc_alias("posix_madvise")]]
 [[userimpl, decl_include("<features.h>", "<hybrid/typecore.h>")]]
-void PosixMAdvise([[nonnull]] void *addr, size_t len,
-                 __STDC_INT_AS_UINT_T advice) {
+void PosixMAdvise([[access(none)]] void *addr, size_t len,
+                  __STDC_INT_AS_UINT_T advice) {
 	/* Implement as a no-op, since this function is merely meant as a hint */
 	COMPILER_IMPURE();
 	(void)addr;
@@ -219,12 +219,12 @@ void PosixMAdvise([[nonnull]] void *addr, size_t len,
 [[throws, doc_alias("mremap"), vartypes(void *)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt.except.heap.mman")]]
-void *MRemap(void *addr, size_t old_len, size_t new_len,
+void *MRemap([[access(none)]] void *addr, size_t old_len, size_t new_len,
              __STDC_INT_AS_UINT_T flags, ... /* void *new_address */);
 
 [[throws, doc_alias("remap_file_pages")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-void RemapFilePages(void *start, size_t size,
+void RemapFilePages([[access(none)]] void *start, size_t size,
                     __STDC_INT_AS_UINT_T prot, size_t pgoff,
                     __STDC_INT_AS_UINT_T flags);
 
@@ -233,7 +233,7 @@ $fd_t MemFdCreate(char const *name, unsigned int flags);
 
 [[throws, doc_alias("mlock2")]]
 [[decl_include("<hybrid/typecore.h>")]]
-void MLock2(void const *addr, size_t length, unsigned int flags);
+void MLock2([[access(none)]] void const *addr, size_t length, unsigned int flags);
 
 [[throws, doc_alias("pkey_alloc")]]
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
@@ -269,7 +269,7 @@ void PKeyFree(int pkey);
 
 [[throws, doc_alias("pkey_mprotect"), decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
-void PKeyMprotect(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
+void PKeyMprotect([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 
 %#endif /* __USE_GNU */
 

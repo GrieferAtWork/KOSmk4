@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19ac7838 */
+/* HASH CRC-32:0x27bef7c7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,13 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_wait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex),pthread_cond_wait,(__cond,__mutex))
+__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_wait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex),pthread_cond_wait,(__cond,__mutex))
 #endif /* !__local___localdep_pthread_cond_wait_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(cnd_wait) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(cnd_wait) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_wait))(__cnd_t *__restrict __cond, __mtx_t *__restrict __mutex) {
 	__errno_t __error;
 	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_cond_wait)((__pthread_cond_t *)__cond,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33d530c7 */
+/* HASH CRC-32:0x91e67ea6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_linkat,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),linkat,(__fromfd,__from,__tofd,__to,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(4),int,__NOTHROW_RPC,__localdep_linkat,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),linkat,(__fromfd,__from,__tofd,__to,__flags))
 #endif /* !__local___localdep_linkat_defined */
-__LOCAL_LIBC(link) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(link) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(link))(char const *__from, char const *__to) {
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */
 	return (__NAMESPACE_LOCAL_SYM __localdep_linkat)(__AT_FDCWD, __from, __AT_FDCWD, __to, 0);

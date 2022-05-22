@@ -34,7 +34,7 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void const *LIBCCALL libc_get_rpc_exec
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void const *LIBCCALL libc_get_rpc_interrupt_program(void);
 
 
-/*[[[head:libc_rpc_schedule,hash:CRC-32=0x1ab714b4]]]*/
+/*[[[head:libc_rpc_schedule,hash:CRC-32=0x1e9254ea]]]*/
 /* >> rpc_schedule(2)
  * Schedule an RPC program to-be executed by some other thread. This  function
  * cannot guaranty that  the RPC  program is  always executed,  as the  target
@@ -67,7 +67,7 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void const *LIBCCALL libc_get_rpc_inte
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-INTERN ATTR_SECTION(".text.crt.sched.rpc") NONNULL((3)) int
+INTERN ATTR_SECTION(".text.crt.sched.rpc") ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(4, 5) int
 NOTHROW_RPC(LIBCCALL libc_rpc_schedule)(pid_t target_tid,
                                         unsigned int mode,
                                         void const *program,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c084f8a */
+/* HASH CRC-32:0x6156d6a4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_preadv32_defined) && defined(__CRT_HAVE_preadv)
 #define __local___localdep_preadv32_defined
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),preadv,(__fd,__iov,__count,__offset))
+__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),preadv,(__fd,__iov,__count,__offset))
 #endif /* !__local___localdep_preadv32_defined && __CRT_HAVE_preadv */
 #ifndef __local___localdep_preadv64_defined
 #define __local___localdep_preadv64_defined
 #if defined(__CRT_HAVE_preadv) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv,(__fd,__iov,__count,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_ROS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv64,(__fd,__iov,__count,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_ROS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv64,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.uio/preadv64.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_preadv64_defined
 #endif /* !... */
 #endif /* !__local___localdep_preadv64_defined */
-__LOCAL_LIBC(preadv) __ATTR_WUNUSED __ATTR_NONNULL((2)) __SSIZE_TYPE__
+__LOCAL_LIBC(preadv) __ATTR_WUNUSED __ATTR_ACCESS_ROS(2, 3) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadv))(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset) {
 
 	return (__NAMESPACE_LOCAL_SYM __localdep_preadv64)(__fd, __iov, __count, (__off64_t)__offset);

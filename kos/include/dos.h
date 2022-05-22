@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea7bfe7f */
+/* HASH CRC-32:0x469968e3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -125,26 +125,26 @@ __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL sleep)(unsigned int
 #ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),(__file))
+__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,unlink,(char const *__file),(__file))
 #elif defined(__CRT_HAVE__unlink)
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
 #elif defined(__CRT_HAVE___unlink)
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),__unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,unlink,(char const *__file),__unlink,(__file))
 #elif defined(__CRT_HAVE___libc_unlink)
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),__libc_unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,unlink,(char const *__file),__libc_unlink,(__file))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
 #else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef __unlink_defined
 #endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */

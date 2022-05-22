@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3480f8fb */
+/* HASH CRC-32:0xe02dd8e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include <libm/finite.h>
 #include <libm/floor.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(lgamma_r) __ATTR_WUNUSED __ATTR_NONNULL((2)) double
+__LOCAL_LIBC(lgamma_r) __ATTR_WUNUSED __ATTR_ACCESS_WR(2) double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lgamma_r))(double __x, int *__signgamp) {
 	double __result = __LIBM_MATHFUN2I(lgamma, __x, __signgamp);
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&

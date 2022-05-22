@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7438dd38 */
+/* HASH CRC-32:0xe3192683 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,10 +227,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ismbbtrail, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #ifndef ___ismbslead_defined
 #define ___ismbslead_defined
 #ifdef __CRT_HAVE__ismbslead
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_ismbslead,(unsigned char const *__str, unsigned char const *__pos),(__str,__pos))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,_ismbslead,(unsigned char const *__str, unsigned char const *__pos),(__str,__pos))
 #elif defined(__CRT_HAVE__ismbslead_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 #include <libc/local/mbstring/_ismbslead.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ismbslead, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _ismbslead)(unsigned char const *__str, unsigned char const *__pos) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ismbslead))(__str, __pos); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ismbslead, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_NCX(__LIBCCALL _ismbslead)(unsigned char const *__str, unsigned char const *__pos) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ismbslead))(__str, __pos); })
 #else /* ... */
 #undef ___ismbslead_defined
 #endif /* !... */
@@ -238,10 +238,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ismbslead, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #ifndef ___ismbstrail_defined
 #define ___ismbstrail_defined
 #ifdef __CRT_HAVE__ismbstrail
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_ismbstrail,(unsigned char const *__str, unsigned char const *__pos),(__str,__pos))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,_ismbstrail,(unsigned char const *__str, unsigned char const *__pos),(__str,__pos))
 #elif defined(__CRT_HAVE__ismbstrail_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 #include <libc/local/mbstring/_ismbstrail.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ismbstrail, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _ismbstrail)(unsigned char const *__str, unsigned char const *__pos) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ismbstrail))(__str, __pos); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ismbstrail, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_NCX(__LIBCCALL _ismbstrail)(unsigned char const *__str, unsigned char const *__pos) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ismbstrail))(__str, __pos); })
 #else /* ... */
 #undef ___ismbstrail_defined
 #endif /* !... */
@@ -387,10 +387,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ismbbtrail_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #ifndef ___ismbslead_l_defined
 #define ___ismbslead_l_defined
 #ifdef __CRT_HAVE__ismbslead_l
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_ismbslead_l,(unsigned char const *__str, unsigned char const *__pos, __locale_t __locale),(__str,__pos,__locale))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,_ismbslead_l,(unsigned char const *__str, unsigned char const *__pos, __locale_t __locale),(__str,__pos,__locale))
 #elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 #include <libc/local/mbstring/_ismbslead_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ismbslead_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _ismbslead_l)(unsigned char const *__str, unsigned char const *__pos, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ismbslead_l))(__str, __pos, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ismbslead_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_NCX(__LIBCCALL _ismbslead_l)(unsigned char const *__str, unsigned char const *__pos, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ismbslead_l))(__str, __pos, __locale); })
 #else /* ... */
 #undef ___ismbslead_l_defined
 #endif /* !... */
@@ -398,10 +398,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ismbslead_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #ifndef ___ismbstrail_l_defined
 #define ___ismbstrail_l_defined
 #ifdef __CRT_HAVE__ismbstrail_l
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_ismbstrail_l,(unsigned char const *__str, unsigned char const *__pos, __locale_t __locale),(__str,__pos,__locale))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,_ismbstrail_l,(unsigned char const *__str, unsigned char const *__pos, __locale_t __locale),(__str,__pos,__locale))
 #elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 #include <libc/local/mbstring/_ismbstrail_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ismbstrail_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _ismbstrail_l)(unsigned char const *__str, unsigned char const *__pos, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ismbstrail_l))(__str, __pos, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ismbstrail_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_NCX(__LIBCCALL _ismbstrail_l)(unsigned char const *__str, unsigned char const *__pos, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ismbstrail_l))(__str, __pos, __locale); })
 #else /* ... */
 #undef ___ismbstrail_l_defined
 #endif /* !... */

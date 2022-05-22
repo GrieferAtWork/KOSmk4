@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x334034b4 */
+/* HASH CRC-32:0xbda1393c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -178,7 +178,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_count)(char const *argz,
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_ACCESS_ROS(1, 2) NONNULL((3)) void
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_WR(3) void
 NOTHROW_NCX(LIBCCALL libc_argz_extract)(char const *__restrict argz,
                                         size_t argz_len,
                                         char **__restrict argv) {

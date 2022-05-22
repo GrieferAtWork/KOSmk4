@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cec8bef */
+/* HASH CRC-32:0x8074a21 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,22 +88,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(login_tty, __FORCELOCAL __ATTR_ARTIFICIAL int __
 #if !defined(__login_defined) && defined(__CRT_HAVE_login)
 #define __login_defined
 /* >> login(3) */
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC_KOS,login,(struct utmp const *__entry),(__entry))
+__CDECLARE_VOID(__ATTR_ACCESS_RO(1),__NOTHROW_RPC_KOS,login,(struct utmp const *__entry),(__entry))
 #endif /* !__login_defined && __CRT_HAVE_login */
 #if !defined(__logout_defined) && defined(__CRT_HAVE_logout)
 #define __logout_defined
 /* >> logout(3) */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,logout,(char const *__ut_line),(__ut_line))
+__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC_KOS,logout,(char const *__ut_line),(__ut_line))
 #endif /* !__logout_defined && __CRT_HAVE_logout */
 #if !defined(__logwtmp_defined) && defined(__CRT_HAVE_logwtmp)
 #define __logwtmp_defined
 /* >> logwtmp(3) */
-__CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC_KOS,logwtmp,(char const *__ut_line, char const *__ut_name, char const *__ut_host),(__ut_line,__ut_name,__ut_host))
+__CDECLARE_VOID(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),__NOTHROW_RPC_KOS,logwtmp,(char const *__ut_line, char const *__ut_name, char const *__ut_host),(__ut_line,__ut_name,__ut_host))
 #endif /* !__logwtmp_defined && __CRT_HAVE_logwtmp */
 /* >> updwtmp(3) */
-__CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 2)),__NOTHROW_RPC_KOS,updwtmp,(char const *__wtmp_file, struct utmp const *__utmp),(__wtmp_file,__utmp))
+__CDECLARE_VOID_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),__NOTHROW_RPC_KOS,updwtmp,(char const *__wtmp_file, struct utmp const *__utmp),(__wtmp_file,__utmp))
 /* >> utmpname(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,utmpname,(char const *__file),(__file))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC_KOS,utmpname,(char const *__file),(__file))
 /* >> getutent(3), getutent_r(3) */
 __CDECLARE_OPT(,struct utmp *,__NOTHROW_RPC_KOS,getutent,(void),())
 /* >> setutent(3) */
@@ -111,24 +111,24 @@ __CDECLARE_VOID_OPT(,__NOTHROW_RPC_KOS,setutent,(void),())
 /* >> endutent(3) */
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,endutent,(void),())
 /* >> getutid(3), getutid_r(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,getutid,(struct utmp const *__id),(__id))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1),struct utmp *,__NOTHROW_RPC_KOS,getutid,(struct utmp const *__id),(__id))
 /* >> getutline(3), getutline_r(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,getutline,(struct utmp const *__line),(__line))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1),struct utmp *,__NOTHROW_RPC_KOS,getutline,(struct utmp const *__line),(__line))
 #ifdef __CRT_HAVE_pututline
 /* >> pututline(3) */
-__CDECLARE(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,pututline,(struct utmp const *__utmp_ptr),(__utmp_ptr))
+__CDECLARE(__ATTR_ACCESS_RO(1),struct utmp *,__NOTHROW_RPC_KOS,pututline,(struct utmp const *__utmp_ptr),(__utmp_ptr))
 #elif defined(__CRT_HAVE__pututline)
 /* >> pututline(3) */
-__CREDIRECT(__ATTR_NONNULL((1)),struct utmp *,__NOTHROW_RPC_KOS,pututline,(struct utmp const *__utmp_ptr),_pututline,(__utmp_ptr))
+__CREDIRECT(__ATTR_ACCESS_RO(1),struct utmp *,__NOTHROW_RPC_KOS,pututline,(struct utmp const *__utmp_ptr),_pututline,(__utmp_ptr))
 #endif /* ... */
 
 #ifdef __USE_MISC
 /* >> getutent(3), getutent_r(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC_KOS,getutent_r,(struct utmp *__buffer, struct utmp **__result),(__buffer,__result))
+__CDECLARE_OPT(__ATTR_ACCESS_WR(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_RPC_KOS,getutent_r,(struct utmp *__buffer, struct utmp **__result),(__buffer,__result))
 /* >> getutid(3), getutid_r(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC_KOS,getutid_r,(struct utmp const *__id, struct utmp *__buffer, struct utmp **__result),(__id,__buffer,__result))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_RPC_KOS,getutid_r,(struct utmp const *__id, struct utmp *__buffer, struct utmp **__result),(__id,__buffer,__result))
 /* >> getutline(3), getutline_r(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC_KOS,getutline_r,(struct utmp const *__line, struct utmp *__buffer, struct utmp **__result),(__line,__buffer,__result))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_RPC_KOS,getutline_r,(struct utmp const *__line, struct utmp *__buffer, struct utmp **__result),(__line,__buffer,__result))
 #endif /* __USE_MISC */
 
 __SYSDECL_END

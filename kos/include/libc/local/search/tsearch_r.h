@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48d19f0b */
+/* HASH CRC-32:0xdba5cb97 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,7 +116,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__maybe_split_for_insert))(void **__r
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(tsearch_r) __ATTR_NONNULL((3)) void *
+__LOCAL_LIBC(tsearch_r) __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RW_OPT(2) __ATTR_NONNULL((3)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(tsearch_r))(void const *__key, void **__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) {
 	typedef struct __node_struct {
 		void const           *__key;

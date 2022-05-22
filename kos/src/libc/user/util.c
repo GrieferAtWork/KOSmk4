@@ -25,10 +25,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_opendev,hash:CRC-32=0xb9c10740]]]*/
+/*[[[head:libc_opendev,hash:CRC-32=0xbfd164d3]]]*/
 /* >> opendev(3)
  * @param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK' */
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(4) fd_t
 NOTHROW_RPC(LIBCCALL libc_opendev)(char const *path,
                                    oflag_t oflags,
                                    __STDC_INT_AS_UINT_T dflags,

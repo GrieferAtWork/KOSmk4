@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59e62d5e */
+/* HASH CRC-32:0xdcb9f499 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,17 +28,17 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_time_defined
 #define __local___localdep_time_defined
 #if defined(__CRT_HAVE_time) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(,__TM_TYPE(time),__NOTHROW_NCX,__localdep_time,(__TM_TYPE(time) *__timer),time,(__timer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_time,(__TM_TYPE(time) *__timer),time,(__timer))
 #elif defined(__CRT_HAVE___time) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(,__TM_TYPE(time),__NOTHROW_NCX,__localdep_time,(__TM_TYPE(time) *__timer),__time,(__timer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_time,(__TM_TYPE(time) *__timer),__time,(__timer))
 #elif defined(__CRT_HAVE___libc_time) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(,__TM_TYPE(time),__NOTHROW_NCX,__localdep_time,(__TM_TYPE(time) *__timer),__libc_time,(__timer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_time,(__TM_TYPE(time) *__timer),__libc_time,(__timer))
 #elif defined(__CRT_HAVE__time32) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(,__TM_TYPE(time),__NOTHROW_NCX,__localdep_time,(__TM_TYPE(time) *__timer),_time32,(__timer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_time,(__TM_TYPE(time) *__timer),_time32,(__timer))
 #elif defined(__CRT_HAVE_time64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(,__TM_TYPE(time),__NOTHROW_NCX,__localdep_time,(__TM_TYPE(time) *__timer),time64,(__timer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_time,(__TM_TYPE(time) *__timer),time64,(__timer))
 #elif defined(__CRT_HAVE__time64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(,__TM_TYPE(time),__NOTHROW_NCX,__localdep_time,(__TM_TYPE(time) *__timer),_time64,(__timer))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_time,(__TM_TYPE(time) *__timer),_time64,(__timer))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/time.h>

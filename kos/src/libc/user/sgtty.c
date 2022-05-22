@@ -25,8 +25,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_gtty,hash:CRC-32=0x4249e775]]]*/
-INTERN ATTR_SECTION(".text.crt.database.utmpx") NONNULL((2)) int
+/*[[[head:libc_gtty,hash:CRC-32=0xb8937ee0]]]*/
+INTERN ATTR_SECTION(".text.crt.database.utmpx") ATTR_ACCESS_WR(2) int
 NOTHROW_NCX(LIBCCALL libc_gtty)(fd_t fd,
                                 struct sgttyb *params)
 /*[[[body:libc_gtty]]]*/
@@ -39,8 +39,8 @@ NOTHROW_NCX(LIBCCALL libc_gtty)(fd_t fd,
 }
 /*[[[end:libc_gtty]]]*/
 
-/*[[[head:libc_stty,hash:CRC-32=0x78327b10]]]*/
-INTERN ATTR_SECTION(".text.crt.database.utmpx") NONNULL((2)) int
+/*[[[head:libc_stty,hash:CRC-32=0xfc8acf76]]]*/
+INTERN ATTR_SECTION(".text.crt.database.utmpx") ATTR_ACCESS_RO(2) int
 NOTHROW_NCX(LIBCCALL libc_stty)(fd_t fd,
                                 struct sgttyb const *params)
 /*[[[body:libc_stty]]]*/

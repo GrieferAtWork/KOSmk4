@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9ab3c92 */
+/* HASH CRC-32:0xad8ef39f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_exit,(int __status),xexit
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_obstack_begin_1) __ATTR_NONNULL((1, 4, 5)) int
+__LOCAL_LIBC(_obstack_begin_1) __ATTR_ACCESS_WR(1) __ATTR_NONNULL((4, 5)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_obstack_begin_1))(struct obstack *__self, __SIZE_TYPE__ __min_chunk_size, __SIZE_TYPE__ __min_object_alignment, void *(*__ob_malloc)(void *__arg, __SIZE_TYPE__ __num_bytes), void (*__ob_free)(void *__arg, void *__ptr), void *__arg) {
 	struct _obstack_chunk *__nchunk;
 	if (__min_object_alignment < __ALIGNOF_MAX_ALIGN_T__)

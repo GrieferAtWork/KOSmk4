@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5591e78d */
+/* HASH CRC-32:0xe13d2b20 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,12 +52,12 @@ typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
 #ifdef __CRT_HAVE_wgetcwd
-__CREDIRECT(,wchar_t *,__NOTHROW_RPC,_wgetcwd,(wchar_t *__buf, size_t __bufsize),wgetcwd,(__buf,__bufsize))
+__CREDIRECT(__ATTR_ACCESS_WRS(1, 2),wchar_t *,__NOTHROW_RPC,_wgetcwd,(wchar_t *__buf, size_t __bufsize),wgetcwd,(__buf,__bufsize))
 #elif defined(__CRT_HAVE__wgetcwd)
-__CDECLARE(,wchar_t *,__NOTHROW_RPC,_wgetcwd,(wchar_t *__buf, size_t __bufsize),(__buf,__bufsize))
+__CDECLARE(__ATTR_ACCESS_WRS(1, 2),wchar_t *,__NOTHROW_RPC,_wgetcwd,(wchar_t *__buf, size_t __bufsize),(__buf,__bufsize))
 #elif (defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
 #include <libc/local/parts.wchar.unistd/wgetcwd.h>
-__FORCELOCAL __ATTR_ARTIFICIAL wchar_t *__NOTHROW_RPC(__LIBCCALL _wgetcwd)(wchar_t *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wgetcwd))(__buf, __bufsize); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WRS(1, 2) wchar_t *__NOTHROW_RPC(__LIBCCALL _wgetcwd)(wchar_t *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wgetcwd))(__buf, __bufsize); }
 #endif /* ... */
 #ifdef __CRT_HAVE__wgetdcwd
 __CDECLARE(__ATTR_ACCESS_WRS(2, 3),wchar_t *,__NOTHROW_RPC,_wgetdcwd,(int __drive, wchar_t *__buf, size_t __size),(__drive,__buf,__size))
@@ -75,20 +75,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wgetdcwd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #define _wgetdcwd_nolock(drive, buf, size) _wgetdcwd(drive, buf, size)
 #endif /* __CRT_HAVE__wgetdcwd || __CRT_HAVE__wgetdcwd_nolock || ((__CRT_HAVE_wfrealpath4 || (__CRT_HAVE_frealpath4 && (__CRT_HAVE_convert_mbstowcs || __CRT_HAVE_convert_mbstowcsn || ((__CRT_HAVE_format_waprintf_printer || __CRT_HAVE_format_waprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_format_waprintf_pack || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))))) && __AT_FDDRIVE_CWD) */
 #ifdef __CRT_HAVE_wchdir
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wchdir,(wchar_t const *__path),wchdir,(__path))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,_wchdir,(wchar_t const *__path),wchdir,(__path))
 #elif defined(__CRT_HAVE__wchdir)
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wchdir,(wchar_t const *__path),(__path))
+__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,_wchdir,(wchar_t const *__path),(__path))
 #elif (defined(__CRT_HAVE_chdir) || defined(__CRT_HAVE__chdir) || defined(__CRT_HAVE___chdir) || defined(__CRT_HAVE___libc_chdir)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/parts.wchar.unistd/wchdir.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _wchdir)(wchar_t const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wchdir))(__path); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL _wchdir)(wchar_t const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wchdir))(__path); }
 #endif /* ... */
 #ifdef __CRT_HAVE_wrmdir
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wrmdir,(wchar_t const *__path),wrmdir,(__path))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,_wrmdir,(wchar_t const *__path),wrmdir,(__path))
 #elif defined(__CRT_HAVE__wrmdir)
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wrmdir,(wchar_t const *__path),(__path))
+__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,_wrmdir,(wchar_t const *__path),(__path))
 #elif (defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && (defined(__CRT_HAVE_wunlinkat) || (defined(__CRT_HAVE_unlinkat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_rmdir) || defined(__CRT_HAVE__rmdir) || defined(__CRT_HAVE___rmdir) || defined(__CRT_HAVE___libc_rmdir) || (defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <libc/local/parts.wchar.unistd/wrmdir.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _wrmdir)(wchar_t const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wrmdir))(__path); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL _wrmdir)(wchar_t const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wrmdir))(__path); }
 #endif /* ... */
 #ifdef __CRT_HAVE__wmkdir
 __CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,_wmkdir,(wchar_t const *__path),(__path))

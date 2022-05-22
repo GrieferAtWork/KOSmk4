@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73047702 */
+/* HASH CRC-32:0xb8528c77 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -58,11 +58,11 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_lchmod_defined
 #define __local___localdep_lchmod_defined
 #ifdef __CRT_HAVE_lchmod
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_lchmod,(char const *__filename, __mode_t __mode),lchmod,(__filename,__mode))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_lchmod,(char const *__filename, __mode_t __mode),lchmod,(__filename,__mode))
 #elif defined(__CRT_HAVE__chmod) && defined(__CRT_DOS_PRIMARY)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_lchmod,(char const *__filename, __mode_t __mode),_chmod,(__filename,__mode))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_lchmod,(char const *__filename, __mode_t __mode),_chmod,(__filename,__mode))
 #elif defined(__CRT_HAVE_chmod) && defined(__CRT_DOS_PRIMARY)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_lchmod,(char const *__filename, __mode_t __mode),chmod,(__filename,__mode))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_lchmod,(char const *__filename, __mode_t __mode),chmod,(__filename,__mode))
 #elif defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && defined(__CRT_HAVE_fchmodat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.stat/lchmod.h>
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wfchmodat_defined
 #define __local___localdep_wfchmodat_defined
 #ifdef __CRT_HAVE_wfchmodat
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfchmodat,(__fd_t __dirfd, __WCHAR_TYPE__ const *__filename, __mode_t __mode, __atflag_t __flags),wfchmodat,(__dirfd,__filename,__mode,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_wfchmodat,(__fd_t __dirfd, __WCHAR_TYPE__ const *__filename, __mode_t __mode, __atflag_t __flags),wfchmodat,(__dirfd,__filename,__mode,__flags))
 #elif defined(__CRT_HAVE_fchmodat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.sys.stat/wfchmodat.h>
@@ -85,7 +85,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_wfchmodat_defined
 #endif /* !... */
 #endif /* !__local___localdep_wfchmodat_defined */
-__LOCAL_LIBC(wlchmod) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(wlchmod) __ATTR_ACCESS_RO(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wlchmod))(__WCHAR_TYPE__ const *__filename, __mode_t __mode) {
 #if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && (defined(__CRT_HAVE_wfchmodat) || (defined(__CRT_HAVE_fchmodat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
 	return (__NAMESPACE_LOCAL_SYM __localdep_wfchmodat)(__AT_FDCWD, __filename, __mode, __AT_SYMLINK_NOFOLLOW);

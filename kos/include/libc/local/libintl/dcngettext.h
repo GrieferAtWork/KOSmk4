@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45b75e9a */
+/* HASH CRC-32:0x18f4aa42 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(dcngettext) __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
+__LOCAL_LIBC(dcngettext) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RO_OPT(3) __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dcngettext))(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category) {
 	/* Generic no-op that works, but doesn't actually support languages */
 	__COMPILER_IMPURE();

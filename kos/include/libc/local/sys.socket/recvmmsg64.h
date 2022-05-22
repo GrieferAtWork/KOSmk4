@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x769fed87 */
+/* HASH CRC-32:0x5d1d4ba8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_recvmmsg32_defined
 #define __local___localdep_recvmmsg32_defined
-__CREDIRECT(__ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec32 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RWS(2, 3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec32 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* !__local___localdep_recvmmsg32_defined */
-__LOCAL_LIBC(recvmmsg64) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(recvmmsg64) __ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RWS(2, 3) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(recvmmsg64))(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo) {
 	struct __timespec32 __tmo32;
 	if (!__tmo)

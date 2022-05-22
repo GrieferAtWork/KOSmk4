@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96d18adc */
+/* HASH CRC-32:0x5a3cc0e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ DECL_BEGIN
  * @param: flags:  Expansion flags (set of `WRDE_*' from <wordexp.h>)
  * @return: 0 : Success
  * @return: * : Error (return value is one of `WRDE_*' from <wordexp.h>) */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_wordexp)(char const *__restrict string, wordexp_t *__restrict self, __STDC_INT_AS_UINT_T flags);
+INTDEF ATTR_ACCESS_RO(1) NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_wordexp)(char const *__restrict string, wordexp_t *__restrict self, __STDC_INT_AS_UINT_T flags);
 #endif /* !__KERNEL__ */
 
 DECL_END

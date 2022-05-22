@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7431e46b */
+/* HASH CRC-32:0xff239967 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strsuftollx_defined
 #define __local___localdep_strsuftollx_defined
 #ifdef __CRT_HAVE_strsuftollx
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__LONGLONG,__NOTHROW_NCX,__localdep_strsuftollx,(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi, char *__errbuf, __SIZE_TYPE__ __errbuflen),strsuftollx,(__desc,__val,__lo,__hi,__errbuf,__errbuflen))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),__LONGLONG,__NOTHROW_NCX,__localdep_strsuftollx,(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi, char *__errbuf, __SIZE_TYPE__ __errbuflen),strsuftollx,(__desc,__val,__lo,__hi,__errbuf,__errbuflen))
 #else /* __CRT_HAVE_strsuftollx */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strsuftollx.h>
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/os/stdlib.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strsuftoll) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __LONGLONG
+__LOCAL_LIBC(strsuftoll) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __LONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsuftoll))(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi) {
 	__LONGLONG __result;
 	char __error_message[128];

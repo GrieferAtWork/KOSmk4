@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35224608 */
+/* HASH CRC-32:0xa489e70f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_system_mktemp __LIBC_LOCAL_NAME(system_mktemp)
 #endif /* !__local___localdep_system_mktemp_defined */
-__LOCAL_LIBC(mkostemps) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
+__LOCAL_LIBC(mkostemps) __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __fd_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mkostemps))(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_system_mktemp)(0, __template_, __suffixlen, __flags);
 }

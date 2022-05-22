@@ -110,7 +110,7 @@ __SYSDECL_BEGIN
 [[extern_inline, wunused, nothrow, kernel, cc(__FCALL), attribute(__NOBLOCK)]]
 [[decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>")]]
-$bool shared_rwlock_tryread([[nonnull]] struct shared_rwlock *__restrict self) {
+$bool shared_rwlock_tryread([[inout]] struct shared_rwlock *__restrict self) {
 	$uintptr_t temp;
 	do {
 		temp = __hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE);
@@ -128,7 +128,7 @@ $bool shared_rwlock_tryread([[nonnull]] struct shared_rwlock *__restrict self) {
 [[extern_inline, wunused, nothrow, kernel, cc(__FCALL), attribute(__NOBLOCK)]]
 [[decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>")]]
-$bool shared_rwlock_trywrite([[nonnull]] struct shared_rwlock *__restrict self) {
+$bool shared_rwlock_trywrite([[inout]] struct shared_rwlock *__restrict self) {
 	if (!__hybrid_atomic_cmpxch(self->@sl_lock@, 0, ($uintptr_t)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return $false;
@@ -143,7 +143,7 @@ $bool shared_rwlock_trywrite([[nonnull]] struct shared_rwlock *__restrict self) 
 [[decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
-void shared_rwlock_endwrite([[nonnull]] struct shared_rwlock *__restrict self) {
+void shared_rwlock_endwrite([[inout]] struct shared_rwlock *__restrict self) {
 	__COMPILER_BARRIER();
 	__hybrid_assertf(self->@sl_lock@ == ($uintptr_t)-1, "Lock isn't in write-mode (%x)", self->@sl_lock@);
 	__hybrid_atomic_store(self->@sl_lock@, 0, __ATOMIC_RELEASE);
@@ -160,7 +160,7 @@ void shared_rwlock_endwrite([[nonnull]] struct shared_rwlock *__restrict self) {
 [[decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
-$bool shared_rwlock_endread([[nonnull]] struct shared_rwlock *__restrict self) {
+$bool shared_rwlock_endread([[inout]] struct shared_rwlock *__restrict self) {
 	$uintptr_t __result;
 	__COMPILER_READ_BARRIER();
 	__hybrid_assertf(self->@sl_lock@ != ($uintptr_t)-1, "Lock is in write-mode (%x)", self->@sl_lock@);
@@ -180,7 +180,7 @@ $bool shared_rwlock_endread([[nonnull]] struct shared_rwlock *__restrict self) {
 [[decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
-$bool shared_rwlock_end([[nonnull]] struct shared_rwlock *__restrict self) {
+$bool shared_rwlock_end([[inout]] struct shared_rwlock *__restrict self) {
 	__COMPILER_BARRIER();
 	if (self->@sl_lock@ != ($uintptr_t)-1) {
 		/* Read-lock */
@@ -206,7 +206,7 @@ $bool shared_rwlock_end([[nonnull]] struct shared_rwlock *__restrict self) {
 [[decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
-void shared_rwlock_downgrade([[nonnull]] struct shared_rwlock *__restrict self) {
+void shared_rwlock_downgrade([[inout]] struct shared_rwlock *__restrict self) {
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(self->@sl_lock@ == ($uintptr_t)-1, "Lock isn't in write-mode (%x)", self->@sl_lock@);
 	__hybrid_atomic_store(self->@sl_lock@, 1, __ATOMIC_RELEASE);
@@ -229,7 +229,7 @@ void shared_rwlock_downgrade([[nonnull]] struct shared_rwlock *__restrict self) 
 [[extern_inline, kernel, decl_include("<kos/bits/shared-rwlock.h>", "<kos/anno.h>")]]
 [[requires_function(shared_rwlock_endread, shared_rwlock_write)]]
 [[impl_include("<hybrid/__atomic.h>")]]
-$bool shared_rwlock_upgrade([[nonnull]] struct shared_rwlock *__restrict self) {
+$bool shared_rwlock_upgrade([[inout]] struct shared_rwlock *__restrict self) {
 	if (__hybrid_atomic_cmpxch(self->@sl_lock@, 1, ($uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
 		return $true; /* Lock wasn't lost */
 	shared_rwlock_endread(self);
@@ -302,7 +302,7 @@ DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
-void shared_rwlock_read([[nonnull]] struct shared_rwlock *__restrict self) {
+void shared_rwlock_read([[inout]] struct shared_rwlock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
 	while (!shared_rwlock_tryread(self)) {
@@ -336,7 +336,7 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
-void shared_rwlock_write([[nonnull]] struct shared_rwlock *__restrict self) {
+void shared_rwlock_write([[inout]] struct shared_rwlock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
 	while (!shared_rwlock_trywrite(self)) {
@@ -374,7 +374,7 @@ success:
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_read_with_timeout64")]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExprI_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
-$bool shared_rwlock_read_with_timeout([[nonnull]] struct shared_rwlock *__restrict self,
+$bool shared_rwlock_read_with_timeout([[inout]] struct shared_rwlock *__restrict self,
                                       __shared_rwlock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
@@ -416,7 +416,7 @@ success:
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_write_with_timeout64")]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExprI_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
-$bool shared_rwlock_write_with_timeout([[nonnull]] struct shared_rwlock *__restrict self,
+$bool shared_rwlock_write_with_timeout([[inout]] struct shared_rwlock *__restrict self,
                                        __shared_rwlock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
@@ -462,7 +462,7 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
-void shared_rwlock_waitread([[nonnull]] struct shared_rwlock *__restrict self) {
+void shared_rwlock_waitread([[inout]] struct shared_rwlock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
@@ -495,7 +495,7 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
-void shared_rwlock_waitwrite([[nonnull]] struct shared_rwlock *__restrict self) {
+void shared_rwlock_waitwrite([[inout]] struct shared_rwlock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
@@ -532,8 +532,8 @@ success:
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_waitread_with_timeout64")]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExprI_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_PREFIX)]]
-$bool shared_rwlock_waitread_with_timeout([[nonnull]] struct shared_rwlock *__restrict self,
-                                      __shared_rwlock_timespec abs_timeout) {
+$bool shared_rwlock_waitread_with_timeout([[inout]] struct shared_rwlock *__restrict self,
+                                          __shared_rwlock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
@@ -576,8 +576,8 @@ success:
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_rwlock_waitwrite_with_timeout64")]]
 [[requires(defined(__KERNEL__) || $has_function(LFutexExprI_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_PREFIX)]]
-$bool shared_rwlock_waitwrite_with_timeout([[nonnull]] struct shared_rwlock *__restrict self,
-                                       __shared_rwlock_timespec abs_timeout) {
+$bool shared_rwlock_waitwrite_with_timeout([[inout]] struct shared_rwlock *__restrict self,
+                                           __shared_rwlock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
@@ -620,8 +620,8 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires($has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_USER_PREFIX)]]
-$bool shared_rwlock_read_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
-                                        struct timespec64 const *abs_timeout) {
+$bool shared_rwlock_read_with_timeout64([[inout]] struct shared_rwlock *__restrict self,
+                                        [[in_opt]] struct timespec64 const *abs_timeout) {
 	while (!shared_rwlock_tryread(self)) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
 		if (LFutexExprI64_except(&self->@sl_rdwait@, self,
@@ -638,8 +638,8 @@ $bool shared_rwlock_read_with_timeout64([[nonnull]] struct shared_rwlock *__rest
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires($has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX)]]
-$bool shared_rwlock_write_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
-                                         struct timespec64 const *abs_timeout) {
+$bool shared_rwlock_write_with_timeout64([[inout]] struct shared_rwlock *__restrict self,
+                                         [[in_opt]] struct timespec64 const *abs_timeout) {
 	while (!shared_rwlock_trywrite(self)) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
 		if (LFutexExprI64_except(&self->@sl_wrwait@, self,
@@ -656,8 +656,8 @@ $bool shared_rwlock_write_with_timeout64([[nonnull]] struct shared_rwlock *__res
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires($has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_READ_USER_PREFIX)]]
-$bool shared_rwlock_waitread_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
-                                        struct timespec64 const *abs_timeout) {
+$bool shared_rwlock_waitread_with_timeout64([[inout]] struct shared_rwlock *__restrict self,
+                                            [[in_opt]] struct timespec64 const *abs_timeout) {
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
 		__hybrid_atomic_store(self->@sl_rdwait@, 1, __ATOMIC_SEQ_CST);
 		if (LFutexExprI64_except(&self->@sl_rdwait@, self,
@@ -676,8 +676,8 @@ $bool shared_rwlock_waitread_with_timeout64([[nonnull]] struct shared_rwlock *__
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires($has_function(LFutexExprI64_except))]]
 [[impl_prefix(DEFINE_SHARED_RWLOCK_WRITE_USER_PREFIX)]]
-$bool shared_rwlock_waitwrite_with_timeout64([[nonnull]] struct shared_rwlock *__restrict self,
-                                         struct timespec64 const *abs_timeout) {
+$bool shared_rwlock_waitwrite_with_timeout64([[inout]] struct shared_rwlock *__restrict self,
+                                             [[in_opt]] struct timespec64 const *abs_timeout) {
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		__hybrid_atomic_store(self->@sl_wrwait@, 1, __ATOMIC_SEQ_CST);
 		if (LFutexExprI64_except(&self->@sl_wrwait@, self,
@@ -710,7 +710,7 @@ $bool shared_rwlock_waitwrite_with_timeout64([[nonnull]] struct shared_rwlock *_
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
-$bool shared_rwlock_read_nx([[nonnull]] struct shared_rwlock *__restrict self) {
+$bool shared_rwlock_read_nx([[inout]] struct shared_rwlock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (!shared_rwlock_tryread(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
@@ -741,7 +741,7 @@ success:
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
-$bool shared_rwlock_write_nx([[nonnull]] struct shared_rwlock *__restrict self) {
+$bool shared_rwlock_write_nx([[inout]] struct shared_rwlock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (!shared_rwlock_trywrite(self)) {
 		@TASK_POLL_BEFORE_CONNECT@({
@@ -772,7 +772,7 @@ success:
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
-$bool shared_rwlock_read_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
+$bool shared_rwlock_read_with_timeout_nx([[inout]] struct shared_rwlock *__restrict self,
                                          __shared_rwlock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (!shared_rwlock_tryread(self)) {
@@ -804,7 +804,7 @@ success:
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
-$bool shared_rwlock_write_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
+$bool shared_rwlock_write_with_timeout_nx([[inout]] struct shared_rwlock *__restrict self,
                                           __shared_rwlock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (!shared_rwlock_trywrite(self)) {
@@ -834,7 +834,7 @@ success:
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
-$bool shared_rwlock_waitread_nx([[nonnull]] struct shared_rwlock *__restrict self) {
+$bool shared_rwlock_waitread_nx([[inout]] struct shared_rwlock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
 		@TASK_POLL_BEFORE_CONNECT@({
@@ -865,7 +865,7 @@ success:
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
-$bool shared_rwlock_waitwrite_nx([[nonnull]] struct shared_rwlock *__restrict self) {
+$bool shared_rwlock_waitwrite_nx([[inout]] struct shared_rwlock *__restrict self) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
 		@TASK_POLL_BEFORE_CONNECT@({
@@ -896,7 +896,7 @@ success:
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
-$bool shared_rwlock_waitread_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
+$bool shared_rwlock_waitread_with_timeout_nx([[inout]] struct shared_rwlock *__restrict self,
                                              __shared_rwlock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) == ($uintptr_t)-1) {
@@ -928,7 +928,7 @@ success:
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-rwlock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[impl_include("<hybrid/__assert.h>", "<sched/sig.h>")]]
-$bool shared_rwlock_waitwrite_with_timeout_nx([[nonnull]] struct shared_rwlock *__restrict self,
+$bool shared_rwlock_waitwrite_with_timeout_nx([[inout]] struct shared_rwlock *__restrict self,
                                               __shared_rwlock_timespec abs_timeout) {
 	__hybrid_assert(!@task_wasconnected@());
 	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {

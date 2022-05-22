@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f94e548 */
+/* HASH CRC-32:0x3adfa778 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,13 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_lock,(__pthread_mutex_t *__mutex),pthread_mutex_lock,(__mutex))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_lock,(__pthread_mutex_t *__mutex),pthread_mutex_lock,(__mutex))
 #endif /* !__local___localdep_pthread_mutex_lock_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(mtx_lock) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(mtx_lock) __ATTR_ACCESS_RW(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_lock))(__mtx_t *__restrict __mutex) {
 	__errno_t __error;
 	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_mutex_lock)((__pthread_mutex_t *)__mutex);

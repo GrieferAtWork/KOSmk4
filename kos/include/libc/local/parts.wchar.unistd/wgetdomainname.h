@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26f88d9b */
+/* HASH CRC-32:0xff92706d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_CREDIRECT(__LIBC,,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_8tow,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_8tow,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),format_8tow,(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_8tow */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_8tow.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_CREDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__WFORMATPRINTER_CC,__localdep_format_wsnprintf_printer,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsnprintf_printer,(__arg,__data,__datalen))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__WFORMATPRINTER_CC,__localdep_format_wsnprintf_printer,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wsnprintf_printer,(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_wsnprintf_printer */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.format-printer/format_wsnprintf_printer.h>
@@ -73,17 +73,17 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/os/utsname.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_uname,(struct utsname *__name),uname,(__name))
+__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_uname,(struct utsname *__name),uname,(__name))
 #elif defined(__CRT_HAVE___uname)
 __NAMESPACE_LOCAL_END
 #include <bits/os/utsname.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_uname,(struct utsname *__name),__uname,(__name))
+__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_uname,(struct utsname *__name),__uname,(__name))
 #elif defined(__CRT_HAVE___libc_uname)
 __NAMESPACE_LOCAL_END
 #include <bits/os/utsname.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_uname,(struct utsname *__name),__libc_uname,(__name))
+__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_uname,(struct utsname *__name),__libc_uname,(__name))
 #else /* ... */
 #undef __local___localdep_uname_defined
 #endif /* !... */
@@ -93,7 +93,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wgetdomainname) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(wgetdomainname) __ATTR_ACCESS_WRS(1, 2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wgetdomainname))(__WCHAR_TYPE__ *__name, __SIZE_TYPE__ __buflen) {
 	struct __LOCAL_format_wsnprintf_data {
 		__WCHAR_TYPE__      *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */

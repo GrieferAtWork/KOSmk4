@@ -430,7 +430,7 @@ int epoll_ctl($fd_t epfd, __epoll_ctl_t op,
 @@@return: 0:        No events happened before `timeout' expired.
 @@@return: -1:       Error (s.a. `errno')
 [[cp, decl_include("<features.h>", "<bits/os/epoll.h>")]]
-__STDC_INT_AS_SSIZE_T epoll_wait($fd_t epfd, [[nonnull]] struct epoll_event *events,
+__STDC_INT_AS_SSIZE_T epoll_wait($fd_t epfd, [[out(return <= maxevents)]] struct epoll_event *events,
                                  __STDC_INT_AS_SIZE_T maxevents, int timeout);
 
 @@>> epoll_pwait(2)
@@ -449,7 +449,7 @@ __STDC_INT_AS_SSIZE_T epoll_wait($fd_t epfd, [[nonnull]] struct epoll_event *eve
 @@@return: 0:        No events happened before `timeout' expired.
 @@@return: -1:       Error (s.a. `errno')
 [[cp, decl_include("<features.h>", "<bits/os/epoll.h>")]]
-__STDC_INT_AS_SSIZE_T epoll_pwait($fd_t epfd, [[nonnull]] struct epoll_event *events,
+__STDC_INT_AS_SSIZE_T epoll_pwait($fd_t epfd, [[out(return <= maxevents)]] struct epoll_event *events,
                                   __STDC_INT_AS_SIZE_T maxevents, int timeout,
                                   sigset_t const *ss);
 
@@ -506,7 +506,7 @@ typedef __ATTR_NONNULL_T((1)) void
 @@                            is manually deleted via `EPOLL_CTL_DEL'
 [[decl_include("<bits/os/epoll.h>")]]
 int epoll_rpc_exec($fd_t epfd, $fd_t fd,
-                   [[nonnull]] struct epoll_event *event,
+                   [[in]] struct epoll_event const *event,
                    $pid_t target_tid, unsigned int mode,
                    [[nonnull]] prpc_exec_callback_t func);
 %#endif /* __USE_KOS */

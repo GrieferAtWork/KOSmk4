@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x563492c3 */
+/* HASH CRC-32:0x7651b6f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,22 +30,22 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wremove)(char16_t const *filename);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wremove)(char32_t const *filename);
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_wrename)(char16_t const *oldname, char16_t const *newname_or_path);
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBKCALL libc_wrename)(char32_t const *oldname, char32_t const *newname_or_path);
-INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_wrenameat)(fd_t oldfd, char16_t const *oldname, fd_t newfd, char16_t const *newname_or_path);
-INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBKCALL libc_wrenameat)(fd_t oldfd, char32_t const *oldname, fd_t newfd, char32_t const *newname_or_path);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wremoveat)(fd_t dirfd, char16_t const *filename);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wremoveat)(fd_t dirfd, char32_t const *filename);
-INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_wrenameat2)(fd_t oldfd, char16_t const *oldname, fd_t newfd, char16_t const *newname_or_path, atflag_t flags);
-INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBKCALL libc_wrenameat2)(fd_t oldfd, char32_t const *oldname, fd_t newfd, char32_t const *newname_or_path, atflag_t flags);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd_wfopen)(char16_t const *filename, char16_t const *mode);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBKCALL libc_wfopen)(char32_t const *filename, char32_t const *mode);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd_wfreopen)(char16_t const *filename, char16_t const *mode, FILE *stream);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBKCALL libc_wfreopen)(char32_t const *filename, char32_t const *mode, FILE *stream);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd_wpopen)(char16_t const *command, char16_t const *mode);
-INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBKCALL libc_wpopen)(char32_t const *command, char32_t const *mode);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_wremove)(char16_t const *filename);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBKCALL libc_wremove)(char32_t const *filename);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_wrename)(char16_t const *oldname, char16_t const *newname_or_path);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBKCALL libc_wrename)(char32_t const *oldname, char32_t const *newname_or_path);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(4) int NOTHROW_RPC(LIBDCALL libd_wrenameat)(fd_t oldfd, char16_t const *oldname, fd_t newfd, char16_t const *newname_or_path);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(4) int NOTHROW_RPC(LIBKCALL libc_wrenameat)(fd_t oldfd, char32_t const *oldname, fd_t newfd, char32_t const *newname_or_path);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_wremoveat)(fd_t dirfd, char16_t const *filename);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBKCALL libc_wremoveat)(fd_t dirfd, char32_t const *filename);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(4) int NOTHROW_RPC(LIBDCALL libd_wrenameat2)(fd_t oldfd, char16_t const *oldname, fd_t newfd, char16_t const *newname_or_path, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(4) int NOTHROW_RPC(LIBKCALL libc_wrenameat2)(fd_t oldfd, char32_t const *oldname, fd_t newfd, char32_t const *newname_or_path, atflag_t flags);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) FILE *NOTHROW_NCX(LIBDCALL libd_wfopen)(char16_t const *filename, char16_t const *mode);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) FILE *NOTHROW_NCX(LIBKCALL libc_wfopen)(char32_t const *filename, char32_t const *mode);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(3) FILE *NOTHROW_NCX(LIBDCALL libd_wfreopen)(char16_t const *filename, char16_t const *mode, FILE *stream);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(3) FILE *NOTHROW_NCX(LIBKCALL libc_wfreopen)(char32_t const *filename, char32_t const *mode, FILE *stream);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) FILE *NOTHROW_NCX(LIBDCALL libd_wpopen)(char16_t const *command, char16_t const *mode);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) FILE *NOTHROW_NCX(LIBKCALL libc_wpopen)(char32_t const *command, char32_t const *mode);
 #endif /* !__KERNEL__ */
 
 DECL_END

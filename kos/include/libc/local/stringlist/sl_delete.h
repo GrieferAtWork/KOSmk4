@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5072bbb6 */
+/* HASH CRC-32:0x85a2c6be */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
-__LOCAL_LIBC(sl_delete) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(sl_delete) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_delete))(struct _stringlist *__sl, char const *__name, int __freeit) {
 	__SIZE_TYPE__ __i, __count = __sl->sl_cur;
 	for (__i = 0; __i < __count; ++__i) {

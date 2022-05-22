@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc4f38c2 */
+/* HASH CRC-32:0x94c164c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,19 +28,19 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clock_gettime32_defined
 #define __local___localdep_clock_gettime32_defined
 #ifdef __CRT_HAVE_clock_gettime
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime32,(__clockid_t __clock_id, struct __timespec32 *__tp),clock_gettime,(__clock_id,__tp))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_clock_gettime32,(__clockid_t __clock_id, struct __timespec32 *__tp),clock_gettime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE___clock_gettime)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime32,(__clockid_t __clock_id, struct __timespec32 *__tp),__clock_gettime,(__clock_id,__tp))
+__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_clock_gettime32,(__clockid_t __clock_id, struct __timespec32 *__tp),__clock_gettime,(__clock_id,__tp))
 #else /* ... */
 #undef __local___localdep_clock_gettime32_defined
 #endif /* !... */
 #endif /* !__local___localdep_clock_gettime32_defined */
-__LOCAL_LIBC(clock_gettime64) __ATTR_NONNULL((2)) int
+__LOCAL_LIBC(clock_gettime64) __ATTR_ACCESS_WR(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_gettime64))(__clockid_t __clock_id, struct __timespec64 *__tp) {
 	int __result;
 	struct __timespec32 __res32;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_clock_gettime32)(__clock_id, &__res32);
-	if (!__result) {
+	if (__result == 0) {
 		__tp->tv_sec  = (__time64_t)__res32.tv_sec;
 		__tp->tv_nsec = __res32.tv_nsec;
 	}

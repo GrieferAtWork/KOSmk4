@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d7e80dc */
+/* HASH CRC-32:0x319041a2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_adjtimex32_defined
 #define __local___localdep_adjtimex32_defined
 #ifdef __CRT_HAVE_adjtimex
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict __ntx),adjtimex,(__ntx))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict __ntx),adjtimex,(__ntx))
 #elif defined(__CRT_HAVE___adjtimex)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict __ntx),__adjtimex,(__ntx))
+__CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict __ntx),__adjtimex,(__ntx))
 #else /* ... */
 #undef __local___localdep_adjtimex32_defined
 #endif /* !... */
 #endif /* !__local___localdep_adjtimex32_defined */
-__LOCAL_LIBC(adjtimex64) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(adjtimex64) __ATTR_ACCESS_RW(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtimex64))(struct __timex64 *__restrict __ntx) {
 	int __result;
 	struct __timex32 __nxtalt;

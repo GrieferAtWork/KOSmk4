@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe096f106 */
+/* HASH CRC-32:0x362845e9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,52 +32,52 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WRS(1, 2),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_KOS$fgetws_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WRS(1, 2),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE__fgetws_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WRS(1, 2),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_KOS$_fgetws_nolock) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WRS(1, 2),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgetws) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WRS(1, 2),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_KOS$fgetws)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WRS(1, 2),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgetws_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WRS(1, 2),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_KOS$fgetws_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WRS(1, 2),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE__fgetws_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WRS(1, 2),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_KOS$_fgetws_nolock)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RW(3) __ATTR_ACCESS_WRS(1, 2),__CHAR32_TYPE__ *,__THROWING,__localdep_fgetc32s,(__CHAR32_TYPE__ *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc) || defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/fgetws.h>

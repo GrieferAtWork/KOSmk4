@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc762668f */
+/* HASH CRC-32:0x38978f34 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> insque(3)
  * Insert ELEM into a doubly-linked list, after PREV */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.utility.search") void
 NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem,
                                   void *prev) {
 	struct __queue_link {
@@ -55,7 +55,7 @@ NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem,
 }
 /* >> remque(3)
  * Unlink ELEM from the doubly-linked list that it is in */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.utility.search") void
 NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem) {
 	struct __queue_link {
 		struct __queue_link *l_forw; /* [0..1] Forward link */
@@ -156,7 +156,7 @@ typedef struct entry {
 #include <libc/errno.h>
 /* >> hsearch_r(3)
  * Reentrant versions which can handle multiple hashing tables at the same time */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3, 4)) int
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_ACCESS_RW(4) ATTR_ACCESS_WR(3) int
 NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
                                      ACTION action,
                                      ENTRY **retval,
@@ -329,7 +329,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 /* >> tsearch(3), tsearch_r(3)
  * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *
 (LIBDCALL libd_tsearch_r)(void const *key,
                           void **vrootp,
                           int (LIBDCALL *compar)(void const *a, void const *b, void *arg),
@@ -408,7 +408,7 @@ __NAMESPACE_LOCAL_END
 /* >> tsearch(3), tsearch_r(3)
  * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *
 (LIBCCALL libc_tsearch_r)(void const *key,
                           void **vrootp,
                           int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
@@ -483,7 +483,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 /* >> tfind(3), tfind_r(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) NONNULL((3)) void *
 (LIBDCALL libd_tfind_r)(void const *key,
                         void *const *vrootp,
                         int (LIBDCALL *compar)(void const *a, void const *b, void *arg),
@@ -498,7 +498,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((
 /* >> tfind(3), tfind_r(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) NONNULL((3)) void *
 (LIBCCALL libc_tfind_r)(void const *key,
                         void *const *vrootp,
                         int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
@@ -538,7 +538,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
 /* >> tdelete(3), tdelete_r(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *
 (LIBDCALL libd_tdelete_r)(void const *__restrict key,
                           void **__restrict vrootp,
                           int (LIBDCALL *compar)(void const *a, void const *b, void *arg),
@@ -554,7 +554,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((
 #include <parts/malloca.h>
 /* >> tdelete(3), tdelete_r(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *
 (LIBCCALL libc_tdelete_r)(void const *__restrict key,
                           void **__restrict vrootp,
                           int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
@@ -752,7 +752,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") void
 #endif /* !__dwrap_sTPTP_TVTPTDTDTP_c0A0A1A2c1_defined */
 /* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_ACCESS_RO_OPT(1) void
 (LIBDCALL libd_twalk_r)(void const *root,
                         void (LIBDCALL *action)(void const *nodep, VISIT value, int level, void *arg),
                         void *arg) THROWS(...) {
@@ -789,7 +789,7 @@ __LOCAL_LIBC(trecurse) NONNULL((1, 2)) void
 __NAMESPACE_LOCAL_END
 /* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
-INTERN ATTR_SECTION(".text.crt.utility.search") void
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_ACCESS_RO_OPT(1) void
 (LIBCCALL libc_twalk_r)(void const *root,
                         void (LIBCCALL *action)(void const *nodep, VISIT value, int level, void *arg),
                         void *arg) THROWS(...) {
@@ -812,7 +812,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") void
 #endif /* !__dwrap_sTPTP_TVTPTP_c0A0c1_defined */
 /* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((2)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_ACCESS_RW_OPT(1) NONNULL((2)) void
 (LIBDCALL libd_tdestroy_r)(void *root,
                            void (LIBDCALL *freefct)(void *nodep, void *arg),
                            void *arg) THROWS(...) {
@@ -825,7 +825,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((
 #ifndef __KERNEL__
 /* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2)) void
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_ACCESS_RW_OPT(1) NONNULL((2)) void
 (LIBCCALL libc_tdestroy_r)(void *root,
                            void (LIBCCALL *freefct)(void *nodep, void *arg),
                            void *arg) THROWS(...) {
@@ -863,7 +863,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 /* >> tsearch(3), tsearch_r(3)
  * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *
 (LIBDCALL libd_tsearch)(void const *key,
                         void **vrootp,
                         int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
@@ -885,7 +885,7 @@ __NAMESPACE_LOCAL_END
 /* >> tsearch(3), tsearch_r(3)
  * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *
 (LIBCCALL libc_tsearch)(void const *key,
                         void **vrootp,
                         int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
@@ -909,7 +909,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 /* >> tfind(3), tfind_r(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) NONNULL((3)) void *
 (LIBDCALL libd_tfind)(void const *key,
                       void *const *vrootp,
                       int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
@@ -931,7 +931,7 @@ __NAMESPACE_LOCAL_END
 /* >> tfind(3), tfind_r(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) NONNULL((3)) void *
 (LIBCCALL libc_tfind)(void const *key,
                       void *const *vrootp,
                       int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
@@ -954,7 +954,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 #endif /* !__dwrap_cTP_TDTPTPTP_CA0A1_defined */
 /* >> tdelete(3), tdelete_r(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *
 (LIBDCALL libd_tdelete)(void const *__restrict key,
                         void **__restrict vrootp,
                         int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
@@ -975,7 +975,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 /* >> tdelete(3), tdelete_r(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *
 (LIBCCALL libc_tdelete)(void const *__restrict key,
                         void **__restrict vrootp,
                         int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
@@ -999,7 +999,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") void
 #endif /* !__dwrap_cTP_TVTPTDTDTP_CA0A1A2_defined */
 /* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_ACCESS_RO_OPT(1) void
 (LIBDCALL libd_twalk)(void const *root,
                       void (LIBDCALL *action)(void const *nodep, VISIT value, int level)) THROWS(...) {
 	libc_twalk_r(root, (void (LIBCCALL *)(void const *, VISIT, int, void *))&_dwrap_cTP_TVTPTDTDTP_CA0A1A2, (void *)action);
@@ -1019,7 +1019,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 /* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
-INTERN ATTR_SECTION(".text.crt.utility.search") void
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_ACCESS_RO_OPT(1) void
 (LIBCCALL libc_twalk)(void const *root,
                       void (LIBCCALL *action)(void const *nodep, VISIT value, int level)) THROWS(...) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
@@ -1040,7 +1040,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") void
 #endif /* !__dwrap_cTP_TVTPTP_CA0_defined */
 /* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((2)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_ACCESS_RW_OPT(1) NONNULL((2)) void
 (LIBDCALL libd_tdestroy)(void *root,
                          void (LIBDCALL *freefct)(void *nodep)) THROWS(...) {
 	libc_tdestroy_r(root, (void (LIBCCALL *)(void *, void *))&_dwrap_cTP_TVTPTP_CA0, (void *)freefct);
@@ -1060,7 +1060,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 /* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2)) void
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_ACCESS_RW_OPT(1) NONNULL((2)) void
 (LIBCCALL libc_tdestroy)(void *root,
                          void (LIBCCALL *freefct)(void *nodep)) THROWS(...) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
@@ -1082,7 +1082,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 #endif /* !__dwrap_cTP_TDTPTPTP_CA1A2_defined */
 /* >> lfind(3)
  * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(1) NONNULL((2, 5)) void *
 (LIBDCALL libd_lfind)(void const *key,
                       void const *pbase,
                       size_t __KOS_FIXED_CONST *pitem_count,
@@ -1094,7 +1094,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED N
 #ifndef __KERNEL__
 /* >> lfind(3)
  * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
-INTERN ATTR_SECTION(".text.crt.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+INTERN ATTR_SECTION(".text.crt.utility.search") WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(1) NONNULL((2, 5)) void *
 (LIBCCALL libc_lfind)(void const *key,
                       void const *pbase,
                       size_t __KOS_FIXED_CONST *pitem_count,
@@ -1123,7 +1123,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 /* >> lsearch(3)
  * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
  * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((2, 3, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW(3) NONNULL((2, 5)) void *
 (LIBDCALL libd_lsearch)(void const *key,
                         void *pbase,
                         size_t *pitem_count,
@@ -1136,7 +1136,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((
 /* >> lsearch(3)
  * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
  * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2, 3, 5)) void *
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW(3) NONNULL((2, 5)) void *
 (LIBCCALL libc_lsearch)(void const *key,
                         void *pbase,
                         size_t *pitem_count,
@@ -1165,7 +1165,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 	return (*c->compar)(c->arg, a, b);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(1) NONNULL((2, 5)) void *
 (LIBDCALL libd__lfind_s)(void const *key,
                          void const *pbase,
                          size_t __KOS_FIXED_CONST *pitem_count,
@@ -1179,7 +1179,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED N
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(1) NONNULL((2, 5)) void *
 (LIBCCALL libc__lfind_s)(void const *key,
                          void const *pbase,
                          size_t __KOS_FIXED_CONST *pitem_count,
@@ -1210,7 +1210,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 	return (*c->compar)(c->arg, a, b);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW(3) NONNULL((2, 5)) void *
 (LIBDCALL libd__lsearch_s)(void const *key,
                            void *pbase,
                            size_t *pitem_count,
@@ -1224,7 +1224,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED N
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW(3) NONNULL((2, 5)) void *
 (LIBCCALL libc__lsearch_s)(void const *key,
                            void *pbase,
                            size_t *pitem_count,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde0a60ea */
+/* HASH CRC-32:0x8ca530dd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbsspn_l,(unsigned char const *__haystack, unsigned char const *__accept, __locale_t __locale),_mbsspn_l,(__haystack,__accept,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbsspn_l,(unsigned char const *__haystack, unsigned char const *__accept, __locale_t __locale),_mbsspn_l,(__haystack,__accept,__locale))
 #elif (defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbschr_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype))
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsspn_l.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__mbsspn_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__mbsspn_l_defined */
-__LOCAL_LIBC(_mbsspnp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) unsigned char *
+__LOCAL_LIBC(_mbsspnp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) unsigned char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsspnp_l))(unsigned char const *__haystack, unsigned char const *__accept, __locale_t __locale) {
 	__haystack += (__NAMESPACE_LOCAL_SYM __localdep__mbsspn_l)(__haystack, __accept, __locale);
 	if (*__haystack == 0)

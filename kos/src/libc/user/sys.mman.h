@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67012ee9 */
+/* HASH CRC-32:0x4ab0f74f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,47 +37,47 @@ DECL_BEGIN
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-INTDEF WUNUSED void *NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, __PIO_OFFSET offset);
+INTDEF WUNUSED ATTR_ACCESS_NONE(1) void *NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, __PIO_OFFSET offset);
 /* >> munmap(2)
  * Unmap memory from `addr...+=len' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr, size_t len);
+INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr, size_t len);
 /* >> mprotect(2)
  * @param prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE |
  *              PROT_READ | PROT_SEM | PROT_GROWSUP | PROT_GROWSDOWN' */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot);
+INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot);
 /* >> msync(2)
  * @param flags: Set of `MS_ASYNC | MS_INVALIDATE | MS_SYNC' */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_msync)(void *addr, size_t len, __STDC_INT_AS_UINT_T flags);
+INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_RPC(LIBCCALL libc_msync)(void *addr, size_t len, __STDC_INT_AS_UINT_T flags);
 /* >> mlock(2) */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mlock)(void const *addr, size_t len);
+INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_mlock)(void const *addr, size_t len);
 /* >> munlock(2) */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr, size_t len);
+INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr, size_t len);
 /* >> mlockall(2)
  * @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_mlockall)(__STDC_INT_AS_UINT_T flags);
 /* >> munlockall(2) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_munlockall)(void);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mincore)(void *start, size_t len, unsigned char *vec);
+INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
+INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_mincore)(void *start, size_t len, unsigned char *vec);
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-INTDEF WUNUSED void *NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, __PIO_OFFSET64 offset);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
+INTDEF WUNUSED ATTR_ACCESS_NONE(1) void *NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, __STDC_INT_AS_UINT_T flags, fd_t fd, __PIO_OFFSET64 offset);
+INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
 /* >> mremap(2)
  * @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
-INTDEF void *NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr, size_t old_len, size_t new_len, __STDC_INT_AS_UINT_T flags, ...);
+INTDEF ATTR_ACCESS_NONE(1) void *NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr, size_t old_len, size_t new_len, __STDC_INT_AS_UINT_T flags, ...);
 /* >> remap_file_pages(2) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start, size_t size, __STDC_INT_AS_UINT_T prot, size_t pgoff, __STDC_INT_AS_UINT_T flags);
+INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start, size_t size, __STDC_INT_AS_UINT_T prot, size_t pgoff, __STDC_INT_AS_UINT_T flags);
 /* >> memfd_create(2)
  * @param: name:  Set `/proc/[pid]/fd/[return]' = "memfd:${name}"
  * @param: flags: Set of `MFD_CLOEXEC | MFD_CLOFORK | MFD_ALLOW_SEALING | MFD_HUGETLB' */
 INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_memfd_create)(char const *name, unsigned int flags);
 /* >> mlock2(2) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_mlock2)(void const *addr, size_t length, unsigned int flags);
+INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_mlock2)(void const *addr, size_t length, unsigned int flags);
 #endif /* !__KERNEL__ */
 #include <asm/pkey.h>
 #if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
@@ -86,7 +86,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_alloc)(unsigned int flags, unsigned in
 /* >> pkey_free(2) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_free)(int pkey);
 /* >> pkey_mprotect(2) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
+INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 #endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 
 DECL_END

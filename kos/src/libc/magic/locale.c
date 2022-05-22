@@ -223,7 +223,7 @@ __SYSDECL_BEGIN
 @@@return: * :      The current locale set for `category'
 @@@return: NULL:    Error
 [[std]]
-char *setlocale(int category, char const *locale);
+char *setlocale(int category, [[in_opt]] char const *locale);
 
 @@>> localeconv(3)
 @@Return numeric and monetary information for the current locale
@@ -236,7 +236,7 @@ char *setlocale(int category, char const *locale);
 @@>> newlocale(3)
 @@@param: category_mask: Set of `LC_*_MASK'
 [[export_alias("__newlocale")]]
-$locale_t newlocale(int category_mask, char const *locale, $locale_t base);
+$locale_t newlocale(int category_mask, [[in_opt]] char const *locale, $locale_t base);
 
 @@>> duplocale(3)
 @@Duplicate the given locale `dataset'
@@ -281,13 +281,13 @@ int _configthreadlocale(int flag);
 $locale_t _get_current_locale(void);
 
 [[export_alias("__create_locale")]]
-$locale_t _create_locale(int category, char const *locale);
+$locale_t _create_locale(int category, [[in_opt]] char const *locale);
 
 [[export_alias("__free_locale")]]
 void _free_locale($locale_t locale);
 
-[[wchar, decl_include("<hybrid/typecore.h>")]] $wchar_t *_wsetlocale(int category, $wchar_t const *locale);
-[[wchar, decl_include("<hybrid/typecore.h>")]] $locale_t _wcreate_locale(int category, $wchar_t const *locale);
+[[wchar, decl_include("<hybrid/typecore.h>")]] $wchar_t *_wsetlocale(int category, [[in_opt]] $wchar_t const *locale);
+[[wchar, decl_include("<hybrid/typecore.h>")]] $locale_t _wcreate_locale(int category, [[in_opt]] $wchar_t const *locale);
 [[wchar, decl_include("<hybrid/typecore.h>"), wunused]] $wchar_t **___lc_locale_name_func(void);
 [[wunused]] unsigned int ___lc_codepage_func(void);
 [[wunused]] unsigned int ___lc_collate_cp_func(void);
@@ -435,11 +435,13 @@ $wchar_t *_W_Getmonths(void) {
 [[wchar, wunused]] void *_W_Gettnames(void);
 
 [[decl_include("<bits/crt/tm.h>", "<hybrid/typecore.h>")]]
-$size_t _Strftime(char *buf, $size_t bufsize, [[nonnull]] char const *format,
-                  [[nonnull]] struct tm const *tms, void *lc_time_arg);
+$size_t _Strftime([[out(? <= bufsize)]] char *buf, $size_t bufsize,
+                  [[in]] char const *format,
+                  [[in]] struct tm const *tms, void *lc_time_arg);
 [[wchar, decl_include("<bits/crt/tm.h>", "<hybrid/typecore.h>")]]
-$size_t _Wcsftime($wchar_t *buf, $size_t bufsize, [[nonnull]] $wchar_t const *format,
-                  [[nonnull]] struct tm const *tms, void *lc_time_arg);
+$size_t _Wcsftime([[out(? <= bufsize)]] $wchar_t *buf, $size_t bufsize,
+                  [[in]] $wchar_t const *format,
+                  [[in]] struct tm const *tms, void *lc_time_arg);
 
 %#endif /* __USE_DOS */
 

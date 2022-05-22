@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ccb43e0 */
+/* HASH CRC-32:0x8cc342a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),__libc_f
 #ifndef __local___localdep_shexec_defined
 #define __local___localdep_shexec_defined
 #ifdef __CRT_HAVE_shexec
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_shexec,(char const *__command),shexec,(__command))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(1),int,__NOTHROW_RPC,__localdep_shexec,(char const *__command),shexec,(__command))
 #elif defined(__CRT_HAVE_execl) || defined(__CRT_HAVE__execl) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__LOCAL_environ))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/shexec.h>
@@ -143,7 +143,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_waitpid,(__pid_t __pid, __WAIT_STA
 __NAMESPACE_LOCAL_END
 #include <asm/os/wait.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(system) int
+__LOCAL_LIBC(system) __ATTR_ACCESS_RO_OPT(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(system))(char const *__command) {
 	int __status;
 	__pid_t __cpid, __error;

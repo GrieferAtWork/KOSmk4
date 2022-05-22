@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd87e6f16 */
+/* HASH CRC-32:0x8ce7f0ac */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fchownat_defined
 #define __local___localdep_fchownat_defined
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_fchownat,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),fchownat,(__dfd,__file,__owner,__group,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_fchownat,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),fchownat,(__dfd,__file,__owner,__group,__flags))
 #endif /* !__local___localdep_fchownat_defined */
-__LOCAL_LIBC(lchown) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(lchown) __ATTR_ACCESS_RO(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lchown))(char const *__file, __uid_t __owner, __gid_t __group) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fchownat)(__AT_FDCWD, __file, __owner, __group, __AT_SYMLINK_NOFOLLOW);
 }

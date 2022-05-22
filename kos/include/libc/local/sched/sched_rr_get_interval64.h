@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9db4cda */
+/* HASH CRC-32:0x59dc96ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sched_rr_get_interval32_defined
 #define __local___localdep_sched_rr_get_interval32_defined
 #ifdef __CRT_HAVE_sched_rr_get_interval
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),sched_rr_get_interval,(__pid,__tms))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),sched_rr_get_interval,(__pid,__tms))
 #elif defined(__CRT_HAVE___sched_rr_get_interval)
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),__sched_rr_get_interval,(__pid,__tms))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),__sched_rr_get_interval,(__pid,__tms))
 #elif defined(__CRT_HAVE___libc_sched_rr_get_interval)
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),__libc_sched_rr_get_interval,(__pid,__tms))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),__libc_sched_rr_get_interval,(__pid,__tms))
 #else /* ... */
 #undef __local___localdep_sched_rr_get_interval32_defined
 #endif /* !... */
 #endif /* !__local___localdep_sched_rr_get_interval32_defined */
-__LOCAL_LIBC(sched_rr_get_interval64) int
+__LOCAL_LIBC(sched_rr_get_interval64) __ATTR_ACCESS_WR_OPT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sched_rr_get_interval64))(__pid_t __pid, struct __timespec64 *__tms) {
 	struct __timespec32 __tms32;
 	if (!__tms)

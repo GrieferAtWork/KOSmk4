@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x987ee1bf */
+/* HASH CRC-32:0x40053bc0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_mbstowcsn_defined
 #define __local___localdep_convert_mbstowcsn_defined
 #ifdef __CRT_HAVE_convert_mbstowcsn
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstowcsn,(char const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_mbstowcsn,(__str,__len,__preslen))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR_OPT(3),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstowcsn,(char const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_mbstowcsn,(__str,__len,__preslen))
 #elif (defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_mbstowcsn.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(convert_mbstowcs) __ATTR_MALLOC __ATTR_WUNUSED __WCHAR_TYPE__ *
+__LOCAL_LIBC(convert_mbstowcs) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(convert_mbstowcs))(char const *__restrict __str) {
 	if __unlikely(!__str) {
 #ifdef __EINVAL

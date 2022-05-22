@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x797f6270 */
+/* HASH CRC-32:0xdee237a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -216,7 +216,7 @@ __NAMESPACE_STD_BEGIN
  *                   When `NULL', don't change the locale.
  * @return: * :      The current locale set for `category'
  * @return: NULL:    Error */
-__CDECLARE_OPT(,char *,__NOTHROW_NCX,setlocale,(int __category, char const *__locale),(__category,__locale))
+__CDECLARE_OPT(__ATTR_ACCESS_RO_OPT(2),char *,__NOTHROW_NCX,setlocale,(int __category, char const *__locale),(__category,__locale))
 /* >> localeconv(3)
  * Return numeric and monetary information for the current locale */
 __CDECLARE_OPT(__ATTR_RETNONNULL __ATTR_WUNUSED,struct lconv *,__NOTHROW_NCX,localeconv,(void),())
@@ -304,8 +304,8 @@ __CDECLARE_VOID(,__NOTHROW_NCX,_free_locale,(__locale_t __locale),(__locale))
 #elif defined(__CRT_HAVE___free_locale)
 __CREDIRECT_VOID(,__NOTHROW_NCX,_free_locale,(__locale_t __locale),__free_locale,(__locale))
 #endif /* ... */
-__CDECLARE_OPT(,__WCHAR_TYPE__ *,__NOTHROW_NCX,_wsetlocale,(int __category, __WCHAR_TYPE__ const *__locale),(__category,__locale))
-__CDECLARE_OPT(,__locale_t,__NOTHROW_NCX,_wcreate_locale,(int __category, __WCHAR_TYPE__ const *__locale),(__category,__locale))
+__CDECLARE_OPT(__ATTR_ACCESS_RO_OPT(2),__WCHAR_TYPE__ *,__NOTHROW_NCX,_wsetlocale,(int __category, __WCHAR_TYPE__ const *__locale),(__category,__locale))
+__CDECLARE_OPT(__ATTR_ACCESS_RO_OPT(2),__locale_t,__NOTHROW_NCX,_wcreate_locale,(int __category, __WCHAR_TYPE__ const *__locale),(__category,__locale))
 __CDECLARE_OPT(__ATTR_WUNUSED,__WCHAR_TYPE__ **,__NOTHROW_NCX,___lc_locale_name_func,(void),())
 __CDECLARE_OPT(__ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,___lc_codepage_func,(void),())
 __CDECLARE_OPT(__ATTR_WUNUSED,unsigned int,__NOTHROW_NCX,___lc_collate_cp_func,(void),())
@@ -335,8 +335,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_W_Getmonths, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* ... */
 __CDECLARE_OPT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,_Gettnames,(void),())
 __CDECLARE_OPT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,_W_Gettnames,(void),())
-__CDECLARE_OPT(__ATTR_NONNULL((3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_Strftime,(char *__buf, __SIZE_TYPE__ __bufsize, char const *__format, struct tm const *__tms, void *__lc_time_arg),(__buf,__bufsize,__format,__tms,__lc_time_arg))
-__CDECLARE_OPT(__ATTR_NONNULL((3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,_Wcsftime,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, struct tm const *__tms, void *__lc_time_arg),(__buf,__bufsize,__format,__tms,__lc_time_arg))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_RO(4) __ATTR_ACCESS_WRS(1, 2),__SIZE_TYPE__,__NOTHROW_NCX,_Strftime,(char *__buf, __SIZE_TYPE__ __bufsize, char const *__format, struct tm const *__tms, void *__lc_time_arg),(__buf,__bufsize,__format,__tms,__lc_time_arg))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_RO(4) __ATTR_ACCESS_WRS(1, 2),__SIZE_TYPE__,__NOTHROW_NCX,_Wcsftime,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, struct tm const *__tms, void *__lc_time_arg),(__buf,__bufsize,__format,__tms,__lc_time_arg))
 #endif /* __USE_DOS */
 
 __SYSDECL_END

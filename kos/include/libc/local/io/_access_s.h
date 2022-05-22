@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79284ef4 */
+/* HASH CRC-32:0xf818a2ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_access_defined
 #define __local___localdep_access_defined
 #ifdef __CRT_HAVE_access
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),access,(__file,__type))
 #elif defined(__CRT_HAVE__access)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
 #elif defined(__CRT_HAVE___access)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),__access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),__access,(__file,__type))
 #elif defined(__CRT_HAVE___libc_access)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),__libc_access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_access,(char const *__file, __STDC_INT_AS_UINT_T __type),__libc_access,(__file,__type))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/access.h>

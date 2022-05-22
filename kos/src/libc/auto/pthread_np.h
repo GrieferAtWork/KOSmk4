@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd103efc */
+/* HASH CRC-32:0x2e438c55 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,12 +32,12 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pthread_stackseg_np(3)
  * Convenience wrapper for `pthread_getattr_np(3)' + `pthread_attr_getstack()' */
-INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_stackseg_np)(pthread_t pthread, stack_t *sinfo);
+INTDEF ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_stackseg_np)(pthread_t pthread, stack_t *sinfo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> pthread_stackseg_np(3)
  * Convenience wrapper for `pthread_getattr_np(3)' + `pthread_attr_getstack()' */
-INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_stackseg_np)(pthread_t pthread, stack_t *sinfo);
+INTDEF ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_stackseg_np)(pthread_t pthread, stack_t *sinfo);
 #endif /* !__KERNEL__ */
 
 DECL_END

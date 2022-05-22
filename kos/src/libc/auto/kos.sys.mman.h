@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20ea4641 */
+/* HASH CRC-32:0x77d46962 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,8 +30,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF NONNULL((1)) fd_t (LIBCCALL libc_ShmOpen)(char const *name, oflag_t oflags, mode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void (LIBCCALL libc_ShmUnlink)(char const *name) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) fd_t (LIBCCALL libc_ShmOpen)(char const *name, oflag_t oflags, mode_t mode) THROWS(...);
+INTDEF ATTR_ACCESS_RO(1) void (LIBCCALL libc_ShmUnlink)(char const *name) THROWS(...);
 #endif /* !__KERNEL__ */
 #include <asm/pkey.h>
 #if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)

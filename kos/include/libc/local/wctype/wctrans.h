@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6f733f3 */
+/* HASH CRC-32:0xda5dfe52 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/unicode.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wctrans) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __wctrans_t
+__LOCAL_LIBC(wctrans) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __wctrans_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctrans))(char const *__prop) {
 	struct wctrans_entry {
 		char     __we_name[8]; /* Name (including the leading "to") */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1fc8cda */
+/* HASH CRC-32:0xff558961 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_rpmatch_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(rpmatch) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(rpmatch) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rpmatch))(char const *__response) {
 	char __c = __response[0];
 	if (__c == 'n' || __c == 'N')

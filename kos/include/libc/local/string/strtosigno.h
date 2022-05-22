@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8f24ac4 */
+/* HASH CRC-32:0x5c9c6261 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_signalnumber_defined
 #define __local___localdep_signalnumber_defined
 #ifdef __CRT_HAVE_signalnumber
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__signo_t,__NOTHROW_NCX,__localdep_signalnumber,(const char *__name),signalnumber,(__name))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__signo_t,__NOTHROW_NCX,__localdep_signalnumber,(const char *__name),signalnumber,(__name))
 #else /* __CRT_HAVE_signalnumber */
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/signalnumber.h>

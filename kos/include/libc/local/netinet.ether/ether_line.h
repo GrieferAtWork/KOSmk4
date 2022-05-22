@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb53c582d */
+/* HASH CRC-32:0x2216dc22 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ether_paton_r_defined
 #define __local___localdep_ether_paton_r_defined
 #ifdef __CRT_HAVE_ether_paton_r
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_paton_r,(char const **__restrict __pasc, struct ether_addr *__restrict __addr),ether_paton_r,(__pasc,__addr))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_paton_r,(char const **__restrict __pasc, struct ether_addr *__restrict __addr),ether_paton_r,(__pasc,__addr))
 #else /* __CRT_HAVE_ether_paton_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/netinet.ether/ether_paton_r.h>
@@ -76,7 +76,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <net/ethernet.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ether_line) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int
+__LOCAL_LIBC(ether_line) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_line))(char const *__line, struct ether_addr *__addr, char *__hostname) {
 	__SIZE_TYPE__ __hnlen;
 	while ((__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line) && *__line != '\r' && *__line != '\n')

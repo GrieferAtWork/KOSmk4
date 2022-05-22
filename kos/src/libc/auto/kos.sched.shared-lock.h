@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c06336 */
+/* HASH CRC-32:0x2a4968e4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,31 +31,31 @@ DECL_BEGIN
 
 /* >> shared_lock_acquire(3)
  * Acquire a lock to the given shared_lock. */
-INTDEF __BLOCKING NONNULL((1)) void (__FCALL libc_shared_lock_acquire)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...);
+INTDEF __BLOCKING ATTR_ACCESS_RW(1) void (__FCALL libc_shared_lock_acquire)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_acquire_with_timeout)(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_lock_acquire_with_timeout)(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_lock_waitfor(3)
  * Wait for `self' to become available. */
-INTDEF __BLOCKING NONNULL((1)) void (__FCALL libc_shared_lock_waitfor)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...);
+INTDEF __BLOCKING ATTR_ACCESS_RW(1) void (__FCALL libc_shared_lock_waitfor)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_waitfor_with_timeout)(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_lock_waitfor_with_timeout)(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
 #ifndef __KERNEL__
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_acquire_with_timeout64)(struct shared_lock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_lock_acquire_with_timeout64)(struct shared_lock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_waitfor_with_timeout64)(struct shared_lock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_lock_waitfor_with_timeout64)(struct shared_lock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
 #endif /* !__KERNEL__ */
 #ifdef __KERNEL__
 /* >> shared_lock_acquire_nx(3)
@@ -63,27 +63,27 @@ INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_waitfor_wi
  * @return: true:  Successfully acquired a lock.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_acquire_nx)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_lock_acquire_nx)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_lock_acquire_with_timeout_nx(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_acquire_with_timeout_nx)(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_lock_acquire_with_timeout_nx)(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_lock_waitfor_nx(3)
  * Wait that `self' becomes available.
  * @return: true:  The lock became available.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_waitfor_nx)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_lock_waitfor_nx)(struct shared_lock *__restrict self) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_lock_waitfor_with_timeout_nx(3)
  * Wait that `self' becomes available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
  * @return: false: The given `abs_timeout' has expired.
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_lock_waitfor_with_timeout_nx)(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_lock_waitfor_with_timeout_nx)(struct shared_lock *__restrict self, __shared_lock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
 #endif /* __KERNEL__ */
 
 DECL_END

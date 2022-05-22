@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6466ade5 */
+/* HASH CRC-32:0x80973c2c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,24 +32,24 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> shared_recursive_rwlock_tryread(3)
  * Try  to acquire a read-lock to `self' */
-INTDEF WUNUSED __NOBLOCK NONNULL((1)) bool NOTHROW(__FCALL libc_shared_recursive_rwlock_tryread)(struct shared_recursive_rwlock *__restrict self);
+INTDEF WUNUSED __NOBLOCK ATTR_ACCESS_RW(1) bool NOTHROW(__FCALL libc_shared_recursive_rwlock_tryread)(struct shared_recursive_rwlock *__restrict self);
 /* >> shared_recursive_rwlock_trywrite(3)
  * Try to acquire a recursive write-lock to `self' */
-INTDEF WUNUSED __NOBLOCK NONNULL((1)) bool NOTHROW(__FCALL libc_shared_recursive_rwlock_trywrite)(struct shared_recursive_rwlock *__restrict self);
+INTDEF WUNUSED __NOBLOCK ATTR_ACCESS_RW(1) bool NOTHROW(__FCALL libc_shared_recursive_rwlock_trywrite)(struct shared_recursive_rwlock *__restrict self);
 /* >> shared_recursive_rwlock_endwrite(3)
  * Release a recursive write-lock from `self'
  * @return: true:  The lock has become free.
  * @return: false: You're still holding the lock */
-INTDEF __NOBLOCK NONNULL((1)) bool NOTHROW(__FCALL libc_shared_recursive_rwlock_endwrite)(struct shared_recursive_rwlock *__restrict self);
+INTDEF __NOBLOCK ATTR_ACCESS_RW(1) bool NOTHROW(__FCALL libc_shared_recursive_rwlock_endwrite)(struct shared_recursive_rwlock *__restrict self);
 /* >> shared_recursive_rwlock_endread(3)
  * Release  a   read-lock  from   `self'
  * @return: true:  The lock has become free.
  * @return: false: The lock is still held by something. */
-INTDEF __NOBLOCK NONNULL((1)) bool NOTHROW(__FCALL libc_shared_recursive_rwlock_endread)(struct shared_recursive_rwlock *__restrict self);
+INTDEF __NOBLOCK ATTR_ACCESS_RW(1) bool NOTHROW(__FCALL libc_shared_recursive_rwlock_endread)(struct shared_recursive_rwlock *__restrict self);
 /* >> shared_recursive_rwlock_downgrade(3)
  * Downgrade a recursive write-lock to a read-lock (Always succeeds, but you have
  * to ensure  that  you're only  holding  a  single write-lock  at  the  moment). */
-INTDEF __NOBLOCK NONNULL((1)) void NOTHROW(__FCALL libc_shared_recursive_rwlock_downgrade)(struct shared_recursive_rwlock *__restrict self);
+INTDEF __NOBLOCK ATTR_ACCESS_RW(1) void NOTHROW(__FCALL libc_shared_recursive_rwlock_downgrade)(struct shared_recursive_rwlock *__restrict self);
 /* >> shared_recursive_rwlock_upgrade(3)
  * Blocking-upgrade a read-lock into a recursive write-lock
  * NOTE: The lock is always upgraded, but when `false' is returned, no lock
@@ -57,59 +57,59 @@ INTDEF __NOBLOCK NONNULL((1)) void NOTHROW(__FCALL libc_shared_recursive_rwlock_
  *       re-load local copies of affected resources.
  * @return: true:  Upgrade was performed without the read-lock being lost
  * @return: false: The read-lock had to be released before a recursive write-lock was acquired */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_recursive_rwlock_upgrade)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_recursive_rwlock_upgrade)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_recursive_rwlock_read(3)
  * Acquire a read-lock to the given shared_recursive_rwlock. */
-INTDEF __BLOCKING NONNULL((1)) void (__FCALL libc_shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...);
+INTDEF __BLOCKING ATTR_ACCESS_RW(1) void (__FCALL libc_shared_recursive_rwlock_read)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_recursive_rwlock_write(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock. */
-INTDEF __BLOCKING NONNULL((1)) void (__FCALL libc_shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...);
+INTDEF __BLOCKING ATTR_ACCESS_RW(1) void (__FCALL libc_shared_recursive_rwlock_write)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_recursive_rwlock_read_with_timeout(3), shared_recursive_rwlock_read_with_timeout64(3)
  * Acquire a read-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_recursive_rwlock_read_with_timeout)(struct shared_recursive_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_recursive_rwlock_read_with_timeout)(struct shared_recursive_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_recursive_rwlock_write_with_timeout(3), shared_recursive_rwlock_write_with_timeout64(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a recursive write-lock.
  * @return: false: The given `abs_timeout' has expired. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_recursive_rwlock_write_with_timeout)(struct shared_recursive_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_recursive_rwlock_write_with_timeout)(struct shared_recursive_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_recursive_rwlock_waitread(3)
  * Wait until acquiring a read-lock to `self' no longer blocks */
-INTDEF __BLOCKING NONNULL((1)) void (__FCALL libc_shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...);
+INTDEF __BLOCKING ATTR_ACCESS_RW(1) void (__FCALL libc_shared_recursive_rwlock_waitread)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_recursive_rwlock_waitwrite(3)
  * Wait until acquiring a recursive write-lock to `self' no longer blocks */
-INTDEF __BLOCKING NONNULL((1)) void (__FCALL libc_shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...);
+INTDEF __BLOCKING ATTR_ACCESS_RW(1) void (__FCALL libc_shared_recursive_rwlock_waitwrite)(struct shared_recursive_rwlock *__restrict self) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_recursive_rwlock_waitread_with_timeout(3), shared_recursive_rwlock_waitread_with_timeout64(3)
  * Wait until acquiring a read-lock to `self' no longer blocks
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_recursive_rwlock_waitread_with_timeout)(struct shared_recursive_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_recursive_rwlock_waitread_with_timeout)(struct shared_recursive_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_recursive_rwlock_waitwrite_with_timeout(3), shared_recursive_rwlock_waitwrite_with_timeout64(3)
  * Wait until acquiring a recursive write-lock to `self' no longer blocks
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_recursive_rwlock_waitwrite_with_timeout)(struct shared_recursive_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_recursive_rwlock_waitwrite_with_timeout)(struct shared_recursive_rwlock *__restrict self, __shared_rwlock_timespec abs_timeout) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_recursive_rwlock_read_with_timeout(3), shared_recursive_rwlock_read_with_timeout64(3)
  * Acquire a read-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a read-lock.
  * @return: false: The given `abs_timeout' has expired. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_recursive_rwlock_read_with_timeout64)(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_recursive_rwlock_read_with_timeout64)(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_recursive_rwlock_write_with_timeout(3), shared_recursive_rwlock_write_with_timeout64(3)
  * Acquire a recursive write-lock to the given shared_recursive_rwlock.
  * @return: true:  Successfully acquired a recursive write-lock.
  * @return: false: The given `abs_timeout' has expired. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_recursive_rwlock_write_with_timeout64)(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_recursive_rwlock_write_with_timeout64)(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_recursive_rwlock_waitread_with_timeout(3), shared_recursive_rwlock_waitread_with_timeout64(3)
  * Wait until acquiring a read-lock to `self' no longer blocks
  * @return: true:  A read-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_recursive_rwlock_waitread_with_timeout64)(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_recursive_rwlock_waitread_with_timeout64)(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
 /* >> shared_recursive_rwlock_waitwrite_with_timeout(3), shared_recursive_rwlock_waitwrite_with_timeout64(3)
  * Wait until acquiring a recursive write-lock to `self' no longer blocks
  * @return: true:  A write-lock became available.
  * @return: false: The given `abs_timeout' has expired. */
-INTDEF WUNUSED __BLOCKING NONNULL((1)) bool (__FCALL libc_shared_recursive_rwlock_waitwrite_with_timeout64)(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
+INTDEF WUNUSED __BLOCKING ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RW(1) bool (__FCALL libc_shared_recursive_rwlock_waitwrite_with_timeout64)(struct shared_recursive_rwlock *__restrict self, struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...);
 #endif /* !__KERNEL__ */
 
 DECL_END

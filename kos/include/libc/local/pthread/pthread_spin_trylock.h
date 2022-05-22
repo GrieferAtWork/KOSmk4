@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81f9d014 */
+/* HASH CRC-32:0x5b9b1e0d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <hybrid/__atomic.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(pthread_spin_trylock) __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(pthread_spin_trylock) __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_trylock))(__pthread_spinlock_t *__lock) {
 	if (__hybrid_atomic_xch(*__lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;

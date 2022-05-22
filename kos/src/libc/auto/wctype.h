@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ac4581f */
+/* HASH CRC-32:0xf6c34f85 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,18 +120,18 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswblank)(wint16_t wc);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswblank)(wint32_t wc);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBDCALL libd_wctrans)(char const *prop);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) wctrans_t NOTHROW_NCX(LIBDCALL libd_wctrans)(char const *prop);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans)(char const *prop);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans)(char const *prop);
 INTDEF ATTR_CONST WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd_towctrans)(wint16_t wc, wctrans_t desc);
 INTDEF ATTR_CONST WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc_towctrans)(wint32_t wc, wctrans_t desc);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBDCALL libd_wctype)(char const *prop);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) wctype_t NOTHROW_NCX(LIBDCALL libd_wctype)(char const *prop);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBCCALL libc_wctype)(char const *prop);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) wctype_t NOTHROW_NCX(LIBCCALL libc_wctype)(char const *prop);
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswctype)(wint16_t wc, wctype_t desc);
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswctype)(wint32_t wc, wctype_t desc);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswascii)(wint16_t wc);
@@ -196,18 +196,18 @@ INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswctype_l)(wint16_t wc, 
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswctype_l)(wint32_t wc, wctype_t type, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBDCALL libd_wctype_l)(char const *prop, locale_t locale);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) wctype_t NOTHROW_NCX(LIBDCALL libd_wctype_l)(char const *prop, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBCCALL libc_wctype_l)(char const *prop, locale_t locale);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) wctype_t NOTHROW_NCX(LIBCCALL libc_wctype_l)(char const *prop, locale_t locale);
 INTDEF WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd_towctrans_l)(wint16_t wc, wctrans_t desc, locale_t locale);
 INTDEF WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc_towctrans_l)(wint32_t wc, wctrans_t desc, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBDCALL libd_wctrans_l)(char const *prop, locale_t locale);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) wctrans_t NOTHROW_NCX(LIBDCALL libd_wctrans_l)(char const *prop, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop, locale_t locale);
+INTDEF WUNUSED ATTR_ACCESS_RO(1) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop, locale_t locale);
 /* >> iswsymstrt(3), iswsymstrt_l(3)
  * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iswcsymf)(wint16_t wc);

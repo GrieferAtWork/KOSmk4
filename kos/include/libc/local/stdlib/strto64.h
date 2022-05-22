@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cc99691 */
+/* HASH CRC-32:0x850acc86 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto64_r,(__nptr,__endptr,__base,__error))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto64_r,(__nptr,__endptr,__base,__error))
 #else /* __CRT_HAVE_strto64_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strto64_r.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strto64) __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__
+__LOCAL_LIBC(strto64) __ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __INT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strto64))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) {
 #if defined(__libc_geterrno) && defined(__ERANGE)
 	__INT64_TYPE__ __result;

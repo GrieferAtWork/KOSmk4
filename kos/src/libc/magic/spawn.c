@@ -168,11 +168,11 @@ typedef struct __posix_spawn_file_actions posix_spawn_file_actions_t;
 [[ignore, nocrt, alias("posix_spawn")]]
 [[argument_names(pid, path, file_actions, attrp, ___argv, ___envp)]]
 [[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
-$errno_t crt_posix_spawn([[nonnull]] pid_t *__restrict pid,
-                         [[nonnull]] char const *__restrict path,
-                         [[nullable]] posix_spawn_file_actions_t const *file_actions,
-                         [[nullable]] posix_spawnattr_t const *attrp,
-                         [[nonnull]] __TARGV, [[nonnull]] __TENVP);
+$errno_t crt_posix_spawn([[out]] pid_t *__restrict pid,
+                         [[in]] char const *__restrict path,
+                         [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                         [[in_opt]] posix_spawnattr_t const *attrp,
+                         [[in]] __TARGV, [[in]] __TENVP);
 
 
 %#ifdef __USE_KOS
@@ -211,10 +211,10 @@ $errno_t crt_posix_spawn([[nonnull]] pid_t *__restrict pid,
               $has_function(read) && $has_function(write) && $has_function(close))) &&
             $has_function(crt_fexecve) && $has_function(waitpid)) ||
            (defined(__OS_HAVE_PROCFS_SELF_FD) && $has_function(crt_posix_spawn)))]]
-$errno_t posix_fspawn_np([[nonnull]] pid_t *__restrict pid, $fd_t execfd,
-                         [[nullable]] posix_spawn_file_actions_t const *file_actions,
-                         [[nullable]] posix_spawnattr_t const *attrp,
-                         [[nonnull]] __TARGV, [[nonnull]] __TENVP) {
+$errno_t posix_fspawn_np([[out]] pid_t *__restrict pid, $fd_t execfd,
+                         [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                         [[in_opt]] posix_spawnattr_t const *attrp,
+                         [[in]] __TARGV, [[in]] __TENVP) {
 @@pp_if defined(__POSIX_SPAWN_USE_KOS) &&
         ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
          ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
@@ -604,11 +604,11 @@ child_error:
 [[requires_function(open, posix_fspawn_np), impl_include("<asm/os/oflags.h>")]]
 [[argument_names(pid, path, file_actions, attrp, ___argv, ___envp)]]
 [[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
-$errno_t posix_spawn([[nonnull]] pid_t *__restrict pid,
-                     [[nonnull]] char const *__restrict path,
-                     [[nullable]] posix_spawn_file_actions_t const *file_actions,
-                     [[nullable]] posix_spawnattr_t const *attrp,
-                     [[nonnull]] __TARGV, [[nonnull]] __TENVP) {
+$errno_t posix_spawn([[out]] pid_t *__restrict pid,
+                     [[in]] char const *__restrict path,
+                     [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                     [[in_opt]] posix_spawnattr_t const *attrp,
+                     [[in]] __TARGV, [[in]] __TENVP) {
 	fd_t fd;
 	pid_t result = -1;
 @@pp_if defined(O_RDONLY) && defined(O_CLOEXEC)@@
@@ -668,11 +668,11 @@ __LOCAL_LIBC(__posix_spawnp_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 2, 4, 8, 9)
 }
 @@pop_namespace@@
 )]]
-$errno_t posix_spawnp([[nonnull]] pid_t *__restrict pid,
-                      [[nonnull]] const char *__restrict file,
-                      [[nullable]] posix_spawn_file_actions_t const *file_actions,
-                      [[nullable]] posix_spawnattr_t const *attrp,
-                      [[nonnull]] __TARGV, [[nonnull]] __TENVP) {
+$errno_t posix_spawnp([[out]] pid_t *__restrict pid,
+                      [[in]] const char *__restrict file,
+                      [[in_opt]] posix_spawn_file_actions_t const *file_actions,
+                      [[in_opt]] posix_spawnattr_t const *attrp,
+                      [[in]] __TARGV, [[in]] __TENVP) {
 	errno_t result;
 	char *env_path;
 	/* [...]
@@ -722,7 +722,7 @@ $errno_t posix_spawnp([[nonnull]] pid_t *__restrict pid,
 @@Initialize a given set of spawn attributes to all zero
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
-$errno_t posix_spawnattr_init([[nonnull]] posix_spawnattr_t *__restrict attr) {
+$errno_t posix_spawnattr_init([[out]] posix_spawnattr_t *__restrict attr) {
 	bzero(attr, sizeof(*attr));
 	return 0;
 }
@@ -734,7 +734,7 @@ $errno_t posix_spawnattr_init([[nonnull]] posix_spawnattr_t *__restrict attr) {
 @@Destroy a given set of spawn attributes
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>")]]
-$errno_t posix_spawnattr_destroy([[nonnull]] posix_spawnattr_t *__restrict attr) {
+$errno_t posix_spawnattr_destroy([[inout]] posix_spawnattr_t *__restrict attr) {
 @@pp_if !defined(NDEBUG) && !defined(NDEBUG_FINI)@@
 	memset(attr, 0xcc, sizeof(*attr));
 @@pp_endif@@
@@ -748,8 +748,8 @@ $errno_t posix_spawnattr_destroy([[nonnull]] posix_spawnattr_t *__restrict attr)
 [[decl_include("<bits/crt/posix_spawn.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawnattr_getflags([[nonnull]] posix_spawnattr_t const *__restrict attr,
-                                  [[nonnull]] short int *__restrict pflags) {
+$errno_t posix_spawnattr_getflags([[in]] posix_spawnattr_t const *__restrict attr,
+                                  [[out]] short int *__restrict pflags) {
 	*pflags = (short int)(unsigned short int)attr->@__flags@;
 	return 0;
 }
@@ -767,7 +767,7 @@ $errno_t posix_spawnattr_getflags([[nonnull]] posix_spawnattr_t const *__restric
 [[decl_include("<bits/crt/posix_spawn.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawnattr_setflags([[nonnull]] posix_spawnattr_t *__restrict attr,
+$errno_t posix_spawnattr_setflags([[inout]] posix_spawnattr_t *__restrict attr,
                                   short int flags) {
 	attr->@__flags@ = (uint16_t)(unsigned short int)flags;
 	return 0;
@@ -781,8 +781,8 @@ $errno_t posix_spawnattr_setflags([[nonnull]] posix_spawnattr_t *__restrict attr
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sigset.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawnattr_getsigdefault([[nonnull]] posix_spawnattr_t const *__restrict attr,
-                                       [[nonnull]] sigset_t *__restrict sigdefault) {
+$errno_t posix_spawnattr_getsigdefault([[in]] posix_spawnattr_t const *__restrict attr,
+                                       [[out]] sigset_t *__restrict sigdefault) {
 	memcpy(sigdefault, &attr->@__sd@, sizeof(sigset_t));
 	return 0;
 }
@@ -794,8 +794,8 @@ $errno_t posix_spawnattr_getsigdefault([[nonnull]] posix_spawnattr_t const *__re
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sigset.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawnattr_setsigdefault([[nonnull]] posix_spawnattr_t *__restrict attr,
-                                       [[nonnull]] sigset_t const *__restrict sigdefault) {
+$errno_t posix_spawnattr_setsigdefault([[inout]] posix_spawnattr_t *__restrict attr,
+                                       [[in]] sigset_t const *__restrict sigdefault) {
 	memcpy(&attr->@__sd@, sigdefault, sizeof(sigset_t));
 	return 0;
 }
@@ -807,8 +807,8 @@ $errno_t posix_spawnattr_setsigdefault([[nonnull]] posix_spawnattr_t *__restrict
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sigset.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawnattr_getsigmask([[nonnull]] posix_spawnattr_t const *__restrict attr,
-                                    [[nonnull]] sigset_t *__restrict sigmask) {
+$errno_t posix_spawnattr_getsigmask([[in]] posix_spawnattr_t const *__restrict attr,
+                                    [[out]] sigset_t *__restrict sigmask) {
 	memcpy(sigmask, &attr->@__ss@, sizeof(sigset_t));
 	return 0;
 }
@@ -820,8 +820,8 @@ $errno_t posix_spawnattr_getsigmask([[nonnull]] posix_spawnattr_t const *__restr
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sigset.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawnattr_setsigmask([[nonnull]] posix_spawnattr_t *__restrict attr,
-                                    [[nonnull]] sigset_t const *__restrict sigmask) {
+$errno_t posix_spawnattr_setsigmask([[inout]] posix_spawnattr_t *__restrict attr,
+                                    [[in]] sigset_t const *__restrict sigmask) {
 	memcpy(&attr->@__ss@, sigmask, sizeof(sigset_t));
 	return 0;
 }
@@ -833,8 +833,8 @@ $errno_t posix_spawnattr_setsigmask([[nonnull]] posix_spawnattr_t *__restrict at
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawnattr_getpgroup([[nonnull]] posix_spawnattr_t const *__restrict attr,
-                                   [[nonnull]] pid_t *__restrict pgroup) {
+$errno_t posix_spawnattr_getpgroup([[in]] posix_spawnattr_t const *__restrict attr,
+                                   [[out]] pid_t *__restrict pgroup) {
 	*pgroup = attr->@__pgrp@;
 	return 0;
 }
@@ -847,7 +847,7 @@ $errno_t posix_spawnattr_getpgroup([[nonnull]] posix_spawnattr_t const *__restri
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawnattr_setpgroup([[nonnull]] posix_spawnattr_t *__restrict attr, pid_t pgroup) {
+$errno_t posix_spawnattr_setpgroup([[inout]] posix_spawnattr_t *__restrict attr, pid_t pgroup) {
 	attr->@__pgrp@ = pgroup;
 	return 0;
 }
@@ -859,8 +859,8 @@ $errno_t posix_spawnattr_setpgroup([[nonnull]] posix_spawnattr_t *__restrict att
 [[decl_include("<bits/crt/posix_spawn.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawnattr_getschedpolicy([[nonnull]] posix_spawnattr_t const *__restrict attr,
-                                        [[nonnull]] int *__restrict schedpolicy) {
+$errno_t posix_spawnattr_getschedpolicy([[in]] posix_spawnattr_t const *__restrict attr,
+                                        [[out]] int *__restrict schedpolicy) {
 	*schedpolicy = attr->@__policy@;
 	return 0;
 }
@@ -872,7 +872,7 @@ $errno_t posix_spawnattr_getschedpolicy([[nonnull]] posix_spawnattr_t const *__r
 [[decl_include("<bits/crt/posix_spawn.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawnattr_setschedpolicy([[nonnull]] posix_spawnattr_t *__restrict attr,
+$errno_t posix_spawnattr_setschedpolicy([[inout]] posix_spawnattr_t *__restrict attr,
                                         int schedpolicy) {
 	attr->@__policy@ = schedpolicy;
 	return 0;
@@ -885,8 +885,8 @@ $errno_t posix_spawnattr_setschedpolicy([[nonnull]] posix_spawnattr_t *__restric
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sched.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawnattr_getschedparam([[nonnull]] posix_spawnattr_t const *__restrict attr,
-                                       [[nonnull]] struct sched_param *__restrict schedparam) {
+$errno_t posix_spawnattr_getschedparam([[in]] posix_spawnattr_t const *__restrict attr,
+                                       [[out]] struct sched_param *__restrict schedparam) {
 	memcpy(schedparam, &attr->__sp, sizeof(struct sched_param));
 	return 0;
 }
@@ -898,8 +898,8 @@ $errno_t posix_spawnattr_getschedparam([[nonnull]] posix_spawnattr_t const *__re
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sched.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawnattr_setschedparam([[nonnull]] posix_spawnattr_t *__restrict attr,
-                                       [[nonnull]] struct sched_param const *__restrict schedparam) {
+$errno_t posix_spawnattr_setschedparam([[inout]] posix_spawnattr_t *__restrict attr,
+                                       [[in]] struct sched_param const *__restrict schedparam) {
 	memcpy(&attr->__sp, schedparam, sizeof(struct sched_param));
 	return 0;
 }
@@ -912,7 +912,7 @@ $errno_t posix_spawnattr_setschedparam([[nonnull]] posix_spawnattr_t *__restrict
 @@Initialize the given spawn-file-actions object `file_actions'
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>")]]
-$errno_t posix_spawn_file_actions_init([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions) {
+$errno_t posix_spawn_file_actions_init([[out]] posix_spawn_file_actions_t *__restrict file_actions) {
 	bzero(file_actions, sizeof(*file_actions));
 	return 0;
 }
@@ -923,7 +923,7 @@ $errno_t posix_spawn_file_actions_init([[nonnull]] posix_spawn_file_actions_t *_
 [[decl_include("<bits/crt/posix_spawn.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
-$errno_t posix_spawn_file_actions_destroy([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions) {
+$errno_t posix_spawn_file_actions_destroy([[inout]] posix_spawn_file_actions_t *__restrict file_actions) {
 @@pp_if $has_function(free)@@
 	unsigned int i;
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -963,7 +963,7 @@ $errno_t posix_spawn_file_actions_destroy([[nonnull]] posix_spawn_file_actions_t
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(realloc))]]
-struct __spawn_action *posix_spawn_file_actions_alloc([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions) {
+struct __spawn_action *posix_spawn_file_actions_alloc([[inout]] posix_spawn_file_actions_t *__restrict file_actions) {
 	struct __spawn_action *result;
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma @push_macro@("__used")
@@ -1006,8 +1006,8 @@ struct __spawn_action *posix_spawn_file_actions_alloc([[nonnull]] posix_spawn_fi
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<libc/errno.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(strdup) && $has_function(posix_spawn_file_actions_alloc))]]
-$errno_t posix_spawn_file_actions_addopen([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
-                                          $fd_t fd, [[nonnull]] char const *__restrict path,
+$errno_t posix_spawn_file_actions_addopen([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
+                                          $fd_t fd, [[in]] char const *__restrict path,
                                           $oflag_t oflags, mode_t mode) {
 	struct __spawn_action *action;
 	/* Posix says:
@@ -1047,7 +1047,7 @@ err:
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(posix_spawn_file_actions_alloc))]]
-$errno_t posix_spawn_file_actions_addclose([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
+$errno_t posix_spawn_file_actions_addclose([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
                                            $fd_t fd) {
 	struct __spawn_action *action;
 	action = posix_spawn_file_actions_alloc(file_actions);
@@ -1072,7 +1072,7 @@ err:
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(posix_spawn_file_actions_alloc))]]
-$errno_t posix_spawn_file_actions_adddup2([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
+$errno_t posix_spawn_file_actions_adddup2([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
                                           $fd_t oldfd, $fd_t newfd) {
 	struct __spawn_action *action;
 	action = posix_spawn_file_actions_alloc(file_actions);
@@ -1101,7 +1101,7 @@ err:
 [[requires_include("<asm/crt/posix_spawn.h>", "<bits/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && defined(__POSIX_SPAWN_ACTION_TCSETPGRP) &&
            $has_function(posix_spawn_file_actions_alloc))]]
-$errno_t posix_spawn_file_actions_addtcsetpgrp_np([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
+$errno_t posix_spawn_file_actions_addtcsetpgrp_np([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
                                                   $fd_t fd) {
 	struct __spawn_action *action;
 	action = posix_spawn_file_actions_alloc(file_actions);
@@ -1130,7 +1130,7 @@ err:
 [[requires_include("<asm/crt/posix_spawn.h>", "<bits/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && defined(__POSIX_SPAWN_ACTION_CLOSEFROM) &&
            $has_function(posix_spawn_file_actions_alloc))]]
-$errno_t posix_spawn_file_actions_addclosefrom_np([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
+$errno_t posix_spawn_file_actions_addclosefrom_np([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
                                                   $fd_t lowfd) {
 	struct __spawn_action *action;
 	action = posix_spawn_file_actions_alloc(file_actions);
@@ -1159,8 +1159,8 @@ err:
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(posix_spawn_file_actions_alloc))]]
-$errno_t posix_spawn_file_actions_addchdir_np([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
-                                              [[nonnull]] const char *__restrict path) {
+$errno_t posix_spawn_file_actions_addchdir_np([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
+                                              [[in]] const char *__restrict path) {
 	struct __spawn_action *action;
 	if unlikely((path = strdup(path)) == NULL)
 		goto err;
@@ -1190,7 +1190,7 @@ err:
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(posix_spawn_file_actions_alloc))]]
-$errno_t posix_spawn_file_actions_addfchdir_np([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
+$errno_t posix_spawn_file_actions_addfchdir_np([[inout]] posix_spawn_file_actions_t *__restrict file_actions,
                                                $fd_t dfd) {
 	struct __spawn_action *action;
 	action = posix_spawn_file_actions_alloc(file_actions);

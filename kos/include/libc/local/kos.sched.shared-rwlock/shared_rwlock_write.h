@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa2227c */
+/* HASH CRC-32:0xfbdf850b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,13 +33,13 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__THROWING,__localdep_LFutexExprI64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExprI,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,__localdep_LFutexExprI64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExprI,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExprI64)
 __NAMESPACE_LOCAL_END
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__THROWING,__localdep_LFutexExprI64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExprI64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,__localdep_LFutexExprI64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExprI64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.futexexpr/LFutexExprI64_except.h>
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_trywrite,(struct shared_rwlock *__restrict __self),shared_rwlock_trywrite,{
+__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_trywrite,(struct shared_rwlock *__restrict __self),shared_rwlock_trywrite,{
 	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
@@ -66,7 +66,7 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)),__BOOL,__NOT
 __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_NONNULL((1)) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_trywrite)(struct shared_rwlock *__restrict __self) {
+__LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_trywrite)(struct shared_rwlock *__restrict __self) {
 	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
 		return 0;
@@ -96,7 +96,7 @@ __NAMESPACE_LOCAL_END
 
 #endif /* !__KERNEL__ */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_rwlock_write) __BLOCKING __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(shared_rwlock_write) __BLOCKING __ATTR_ACCESS_RW(1) void
 (__FCALL __LIBC_LOCAL_NAME(shared_rwlock_write))(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());

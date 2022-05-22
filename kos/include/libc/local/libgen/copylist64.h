@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e03f017 */
+/* HASH CRC-32:0xe48d6a09 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_copylist_sz __LIBC_LOCAL_NAME(copylist_sz)
 #endif /* !__local___localdep_copylist_sz_defined */
-__LOCAL_LIBC(copylist64) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *
+__LOCAL_LIBC(copylist64) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(copylist64))(char const *__filename, __PIO_OFFSET64 *__p_filesize) {
 #if __SIZEOF_OFF64_T__ == __SIZEOF_SIZE_T__
 	return (__NAMESPACE_LOCAL_SYM __localdep_copylist_sz)(__filename, (__SIZE_TYPE__ *)__p_filesize);

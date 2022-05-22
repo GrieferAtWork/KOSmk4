@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74978e15 */
+/* HASH CRC-32:0x3d03f828 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ INTDEF ATTR_CONST WUNUSED longptr_t NOTHROW_NCX(LIBCCALL libc___fdelt_chk)(longp
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_select)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval *__restrict timeout);
+INTDEF ATTR_ACCESS_RW_OPT(2) ATTR_ACCESS_RW_OPT(3) ATTR_ACCESS_RW_OPT(4) ATTR_ACCESS_RW_OPT(5) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_select)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval *__restrict timeout);
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
@@ -100,7 +100,7 @@ INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_select)(__STDC_INT_AS_SIZ
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_pselect)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec const *__restrict timeout, sigset_t const *__restrict sigmask);
+INTDEF ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_RO_OPT(6) ATTR_ACCESS_RW_OPT(2) ATTR_ACCESS_RW_OPT(3) ATTR_ACCESS_RW_OPT(4) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_pselect)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec const *__restrict timeout, sigset_t const *__restrict sigmask);
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
@@ -132,7 +132,7 @@ INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_pselect)(__STDC_INT_AS_SI
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_select64)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval64 *__restrict timeout);
+INTDEF ATTR_ACCESS_RW_OPT(2) ATTR_ACCESS_RW_OPT(3) ATTR_ACCESS_RW_OPT(4) ATTR_ACCESS_RW_OPT(5) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_select64)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval64 *__restrict timeout);
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
@@ -164,7 +164,7 @@ INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_select64)(__STDC_INT_AS_S
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_pselect64)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec64 const *__restrict timeout, sigset_t const *__restrict sigmask);
+INTDEF ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_RO_OPT(6) ATTR_ACCESS_RW_OPT(2) ATTR_ACCESS_RW_OPT(3) ATTR_ACCESS_RW_OPT(4) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_pselect64)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec64 const *__restrict timeout, sigset_t const *__restrict sigmask);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

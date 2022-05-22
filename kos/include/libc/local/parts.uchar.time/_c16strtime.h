@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf003a407 */
+/* HASH CRC-32:0xd6266cbe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__strtime_defined
 #define __local___localdep__strtime_defined
 #ifdef __CRT_HAVE__strtime
-__CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep__strtime,(char __buf[9]),_strtime,(__buf))
+__CREDIRECT(__ATTR_ACCESS_WR(1),char *,__NOTHROW_NCX,__localdep__strtime,(char __buf[9]),_strtime,(__buf))
 #elif defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/_strtime.h>

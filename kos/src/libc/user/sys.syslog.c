@@ -65,9 +65,9 @@ NOTHROW_NCX(LIBCCALL libc_setlogmask)(__STDC_INT_AS_UINT_T mask)
 }
 /*[[[end:libc_setlogmask]]]*/
 
-/*[[[head:libc_syslog_printer,hash:CRC-32=0x987998f0]]]*/
+/*[[[head:libc_syslog_printer,hash:CRC-32=0x8e30a73c]]]*/
 /* Helper functions for printing to the system log */
-INTERN ATTR_SECTION(".text.crt.system.syslog") NONNULL((2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.system.syslog") ATTR_ACCESS_ROS(2, 3) ssize_t
 NOTHROW_RPC(__FORMATPRINTER_CC libc_syslog_printer)(void *arg,
                                                     char const *__restrict data,
                                                     size_t datalen)

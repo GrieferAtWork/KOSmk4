@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4a91651 */
+/* HASH CRC-32:0x3ef34577 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_utimes32_defined
 #define __local___localdep_utimes32_defined
 #ifdef __CRT_HAVE_utimes
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_utimes32,(char const *__file, struct __timeval32 const __tvp[2]),utimes,(__file,__tvp))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__localdep_utimes32,(char const *__file, struct __timeval32 const __tvp[2]),utimes,(__file,__tvp))
 #elif defined(__CRT_HAVE___utimes)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_utimes32,(char const *__file, struct __timeval32 const __tvp[2]),__utimes,(__file,__tvp))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__localdep_utimes32,(char const *__file, struct __timeval32 const __tvp[2]),__utimes,(__file,__tvp))
 #else /* ... */
 #undef __local___localdep_utimes32_defined
 #endif /* !... */
 #endif /* !__local___localdep_utimes32_defined */
-__LOCAL_LIBC(utimes64) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(utimes64) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(utimes64))(char const *__file, struct __timeval64 const __tvp[2]) {
 	struct __timeval32 __tv32[2];
 	if (!__tvp)

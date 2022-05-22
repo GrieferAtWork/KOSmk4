@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1217760e */
+/* HASH CRC-32:0xfda68b1e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,30 +30,30 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((1, 4, 5)) int NOTHROW_NCX(LIBDCALL libd__obstack_begin)(struct obstack *self, _OBSTACK_SIZE_T min_chunk_size, _OBSTACK_SIZE_T min_object_alignment, void *(__LIBDCALL *ob_malloc)(size_t num_bytes), void (__LIBDCALL *ob_free)(void *ptr));
+INTDEF ATTR_ACCESS_WR(1) NONNULL((4, 5)) int NOTHROW_NCX(LIBDCALL libd__obstack_begin)(struct obstack *self, _OBSTACK_SIZE_T min_chunk_size, _OBSTACK_SIZE_T min_object_alignment, void *(__LIBDCALL *ob_malloc)(size_t num_bytes), void (__LIBDCALL *ob_free)(void *ptr));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF NONNULL((1, 4, 5)) int NOTHROW_NCX(LIBCCALL libc__obstack_begin)(struct obstack *self, _OBSTACK_SIZE_T min_chunk_size, _OBSTACK_SIZE_T min_object_alignment, void *(__LIBCCALL *ob_malloc)(size_t num_bytes), void (__LIBCCALL *ob_free)(void *ptr));
+INTDEF ATTR_ACCESS_WR(1) NONNULL((4, 5)) int NOTHROW_NCX(LIBCCALL libc__obstack_begin)(struct obstack *self, _OBSTACK_SIZE_T min_chunk_size, _OBSTACK_SIZE_T min_object_alignment, void *(__LIBCCALL *ob_malloc)(size_t num_bytes), void (__LIBCCALL *ob_free)(void *ptr));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((1, 4, 5)) int NOTHROW_NCX(LIBDCALL libd__obstack_begin_1)(struct obstack *self, _OBSTACK_SIZE_T min_chunk_size, _OBSTACK_SIZE_T min_object_alignment, void *(*ob_malloc)(void *arg, size_t num_bytes), void (*ob_free)(void *arg, void *ptr), void *arg);
+INTDEF ATTR_ACCESS_WR(1) NONNULL((4, 5)) int NOTHROW_NCX(LIBDCALL libd__obstack_begin_1)(struct obstack *self, _OBSTACK_SIZE_T min_chunk_size, _OBSTACK_SIZE_T min_object_alignment, void *(*ob_malloc)(void *arg, size_t num_bytes), void (*ob_free)(void *arg, void *ptr), void *arg);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF NONNULL((1, 4, 5)) int NOTHROW_NCX(LIBCCALL libc__obstack_begin_1)(struct obstack *self, _OBSTACK_SIZE_T min_chunk_size, _OBSTACK_SIZE_T min_object_alignment, void *(*ob_malloc)(void *arg, size_t num_bytes), void (*ob_free)(void *arg, void *ptr), void *arg);
+INTDEF ATTR_ACCESS_WR(1) NONNULL((4, 5)) int NOTHROW_NCX(LIBCCALL libc__obstack_begin_1)(struct obstack *self, _OBSTACK_SIZE_T min_chunk_size, _OBSTACK_SIZE_T min_object_alignment, void *(*ob_malloc)(void *arg, size_t num_bytes), void (*ob_free)(void *arg, void *ptr), void *arg);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> _obstack_newchunk(3)
  * Allocate  a new chunk of at least `num_bytes' bytes. Also: allocate
  * enough additional space for the object currently being constructed,
  * and move it to the start of the new chunk. */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd__obstack_newchunk)(struct obstack *self, _OBSTACK_SIZE_T num_bytes);
+INTDEF ATTR_ACCESS_RW(1) void NOTHROW_NCX(LIBDCALL libd__obstack_newchunk)(struct obstack *self, _OBSTACK_SIZE_T num_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> _obstack_newchunk(3)
  * Allocate  a new chunk of at least `num_bytes' bytes. Also: allocate
  * enough additional space for the object currently being constructed,
  * and move it to the start of the new chunk. */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc__obstack_newchunk)(struct obstack *self, _OBSTACK_SIZE_T num_bytes);
+INTDEF ATTR_ACCESS_RW(1) void NOTHROW_NCX(LIBCCALL libc__obstack_newchunk)(struct obstack *self, _OBSTACK_SIZE_T num_bytes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> obstack_free(3)
@@ -61,7 +61,7 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc__obstack_newchunk)(struct obs
  * `obj', where `obj' *should* be a pointer previously returned by `obstack_finish()'
  * When `obj' is `NULL',  simply free everything allocated  by `self', in which  case
  * `self' must be re-initialized (via `_obstack_begin(3)') upon return. */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_obstack_free)(struct obstack *self, void *obj);
+INTDEF ATTR_ACCESS_RW(1) void NOTHROW_NCX(LIBDCALL libd_obstack_free)(struct obstack *self, void *obj);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> obstack_free(3)
@@ -69,27 +69,27 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_obstack_free)(struct obstack 
  * `obj', where `obj' *should* be a pointer previously returned by `obstack_finish()'
  * When `obj' is `NULL',  simply free everything allocated  by `self', in which  case
  * `self' must be re-initialized (via `_obstack_begin(3)') upon return. */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_obstack_free)(struct obstack *self, void *obj);
+INTDEF ATTR_ACCESS_RW(1) void NOTHROW_NCX(LIBCCALL libc_obstack_free)(struct obstack *self, void *obj);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> _obstack_memory_used(3)
  * Return the total size of all chunks allocated by `self' */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) _OBSTACK_SIZE_T NOTHROW_NCX(LIBDCALL libd__obstack_memory_used)(struct obstack __KOS_FIXED_CONST *self);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) _OBSTACK_SIZE_T NOTHROW_NCX(LIBDCALL libd__obstack_memory_used)(struct obstack __KOS_FIXED_CONST *self);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> _obstack_memory_used(3)
  * Return the total size of all chunks allocated by `self' */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) _OBSTACK_SIZE_T NOTHROW_NCX(LIBCCALL libc__obstack_memory_used)(struct obstack __KOS_FIXED_CONST *self);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) _OBSTACK_SIZE_T NOTHROW_NCX(LIBCCALL libc__obstack_memory_used)(struct obstack __KOS_FIXED_CONST *self);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> _obstack_allocated_p(3)
  * Returns non-zero if `obj' was allocated by `self' */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd__obstack_allocated_p)(struct obstack const *self, void const *obj);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd__obstack_allocated_p)(struct obstack const *self, void const *obj);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> _obstack_allocated_p(3)
  * Returns non-zero if `obj' was allocated by `self' */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc__obstack_allocated_p)(struct obstack const *self, void const *obj);
+INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBCCALL libc__obstack_allocated_p)(struct obstack const *self, void const *obj);
 /* >> obstack_printer(3)
  * A pformatprinter-compatible printer  sink that appends  data to  the
  * object currently being constructed by a given `struct obstack *arg'.
@@ -98,7 +98,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc__obstack_all
  * this function doesn't have an error return-value!
  * HINT: Ths function does the same as `obstack_grow(3)'!
  * @return: datalen: Success. */
-INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_obstack_printer)(void *arg, char const *__restrict data, size_t datalen);
+INTDEF WUNUSED ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_obstack_printer)(void *arg, char const *__restrict data, size_t datalen);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c2d0581 */
+/* HASH CRC-32:0xc731e572 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,7 +93,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getdelim) __ATTR_WUNUSED __ATTR_ACCESS_RW(4) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
+__LOCAL_LIBC(getdelim) __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW(4) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(getdelim))(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream) __THROWS(...) {
 	int __ch;
 	char *__buffer;

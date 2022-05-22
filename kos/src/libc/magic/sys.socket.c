@@ -863,8 +863,8 @@ struct osockaddr {
 [[decl_include("<bits/os/cmsghdr.h>", "<bits/os/msghdr.h>")]]
 [[pure, wunused, nullable, no_inline_truncate, extern_inline]]
 [[impl_include("<bits/types.h>")]]
-struct cmsghdr *__cmsg_nxthdr([[nonnull]] struct msghdr *mhdr,
-                              [[nonnull]] struct cmsghdr *cmsg) {
+struct cmsghdr *__cmsg_nxthdr([[in]] struct msghdr *mhdr,
+                              [[in]] struct cmsghdr *cmsg) {
 	$byte_t *ctrl_end;
 	/* If the current header is incomplete, then there is no next header.
 	 * XXX: This should really never happen, since `CMSG_FIRSTHDR()' already
@@ -956,7 +956,7 @@ $fd_t socket(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
 @@@return: -1: Failed to create the socket pair (s.a. `errno')
 [[decl_include("<features.h>", "<bits/types.h>")]]
 int socketpair(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
-               __STDC_INT_AS_UINT_T protocol, [[nonnull]] $fd_t fds[2]);
+               __STDC_INT_AS_UINT_T protocol, [[out]] $fd_t fds[2]);
 
 @@>> bind(2)
 @@Bind the given socket `sockfd' to the specified local address.
@@ -967,7 +967,7 @@ int socketpair(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
 @@@return: -1: [errno=EADDRNOTAVAIL] E_NET_ADDRESS_NOT_AVAILABLE
 @@@return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (`addr_len' is incorrect)
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
-int bind($fd_t sockfd, [[inp(addr_len)]] __CONST_SOCKADDR_ARG addr,
+int bind($fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
          socklen_t addr_len);
 
 @@>> getsockname(2)
@@ -984,8 +984,8 @@ int bind($fd_t sockfd, [[inp(addr_len)]] __CONST_SOCKADDR_ARG addr,
 @@return: 0 : Success
 @@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
-int getsockname($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
-                [[nonnull]] socklen_t *__restrict addr_len);
+int getsockname($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
+                [[inout]] socklen_t *__restrict addr_len);
 
 @@>> connect(2)
 @@Connect to the specified address.
@@ -999,7 +999,7 @@ int getsockname($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
 @@@return: -1: [errno=ECONNREFUSED]  E_NET_CONNECTION_REFUSED
 @@@return: -1: [errno=ERANGE]        E_BUFFER_TOO_SMALL   (addr_len is incorrect)
 [[cp, export_alias("__connect"), decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
-int connect($fd_t sockfd, [[inp(addr_len)]] __CONST_SOCKADDR_ARG addr,
+int connect($fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
             socklen_t addr_len);
 
 @@>> getpeername(2)
@@ -1013,8 +1013,8 @@ int connect($fd_t sockfd, [[inp(addr_len)]] __CONST_SOCKADDR_ARG addr,
 @@@return: -1: [errno=ENOTCONN] E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_GETPEERNAME_NOT_CONNECTED
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
-int getpeername($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
-                [[nonnull]] socklen_t *__restrict addr_len);
+int getpeername($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
+                [[inout]] socklen_t *__restrict addr_len);
 
 @@>> send(2)
 @@Send the contents of a given buffer over the given socket `sockfd'.
@@ -1026,7 +1026,7 @@ int getpeername($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
 @@@return: -1: [errno=ECONNRESET]   E_NET_CONNECTION_RESET
 @@@return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
 [[cp, export_alias("__send"), decl_include("<features.h>", "<bits/types.h>")]]
-ssize_t send($fd_t sockfd, [[inp(bufsize)]] void const *buf,
+ssize_t send($fd_t sockfd, [[in(return <= bufsize)]] void const *buf,
              size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 
 @@>> recv(2)
@@ -1037,7 +1037,7 @@ ssize_t send($fd_t sockfd, [[inp(bufsize)]] void const *buf,
 @@@return: -1: [errno=ENOTCONN]     E_ILLEGAL_BECAUSE_NOT_READY:E_ILLEGAL_OPERATION_CONTEXT_SOCKET_RECV_NOT_CONNECTED
 @@@return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
 [[cp, wunused, export_alias("__recv"), decl_include("<features.h>", "<bits/types.h>")]]
-ssize_t recv($fd_t sockfd, [[outp(bufsize)]] void *buf,
+ssize_t recv($fd_t sockfd, [[out(return <= bufsize)]] void *buf,
              size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 
 @@>> sendto(2)
@@ -1057,9 +1057,9 @@ ssize_t recv($fd_t sockfd, [[outp(bufsize)]] void *buf,
 @@@return: -1: [errno=EPIPE]        E_NET_SHUTDOWN
 @@@return: -1: [errno=ERANGE]       E_BUFFER_TOO_SMALL  (`addr_len' is incorrect)
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]
-ssize_t sendto($fd_t sockfd, [[inp(bufsize)]] void const *buf,
+ssize_t sendto($fd_t sockfd, [[in(return <= bufsize)]] void const *buf,
                size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
-               [[inp_opt(addr_len)]] __CONST_SOCKADDR_ARG addr,
+               /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
                socklen_t addr_len);
 
 @@>> recvfrom(2)
@@ -1079,10 +1079,10 @@ ssize_t sendto($fd_t sockfd, [[inp(bufsize)]] void const *buf,
 @@@return: -1: [errno=ECONNREFUSED] E_NET_CONNECTION_REFUSED
 @@@return: -1: [errno=EAGAIN]       E_WOULDBLOCK (`MSG_DONTWAIT' was given, and the operation would have blocked)
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]
-ssize_t recvfrom($fd_t sockfd, [[outp(bufsize)]] void *__restrict buf,
+ssize_t recvfrom($fd_t sockfd, [[out(return <= bufsize)]] void *__restrict buf,
                  size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
-                 [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
-                 [[nullable]] socklen_t *__restrict addr_len);
+                 /*[[out_opt/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
+                 [[inout_opt]] socklen_t *__restrict addr_len);
 
 @@>> sendmsg(2)
 @@Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
@@ -1092,7 +1092,7 @@ ssize_t recvfrom($fd_t sockfd, [[outp(bufsize)]] void *__restrict buf,
 @@@return: * : [<= bufsize] The actual # of send payload bytes
 @@@return: -1: ... Same as for `send(2)' and `sendto(2)'
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/msghdr.h>")]]
-ssize_t sendmsg($fd_t sockfd, [[nonnull]] struct msghdr const *message,
+ssize_t sendmsg($fd_t sockfd, [[in]] struct msghdr const *message,
                 __STDC_INT_AS_UINT_T msg_flags);
 
 @@>> recvmsg(2)
@@ -1104,7 +1104,7 @@ ssize_t sendmsg($fd_t sockfd, [[nonnull]] struct msghdr const *message,
 @@@return: * : [<= bufsize] The actual # of received payload bytes
 @@@return: -1: ... Same as for `recv(2)' and `recvfrom(2)'
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>", "<bits/os/msghdr.h>")]]
-ssize_t recvmsg($fd_t sockfd, [[nonnull]] struct msghdr *message,
+ssize_t recvmsg($fd_t sockfd, [[inout]] struct msghdr *message,
                 __STDC_INT_AS_UINT_T msg_flags);
 
 @@>> getsockopt(2)
@@ -1120,7 +1120,7 @@ ssize_t recvmsg($fd_t sockfd, [[nonnull]] struct msghdr *message,
 @@@return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
 [[decl_include("<features.h>", "<bits/types.h>")]]
 int getsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
-               [[outp(*optlen)]] void *__restrict optval, [[nonnull]] socklen_t *__restrict optlen);
+               [[out/*(*optlen <= *optlen)*/]] void *__restrict optval, [[inout]] socklen_t *__restrict optlen);
 
 @@>> setsockopt(2)
 @@Set the value of the named socket option `level:optname' from what is given in `optval'
@@ -1133,7 +1133,7 @@ int getsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T op
 @@@return: -1: [errno=ERANGE]      E_BUFFER_TOO_SMALL  (The specified `optlen' is invalid for the given option)
 [[decl_include("<features.h>", "<bits/types.h>")]]
 int setsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
-               [[inp(optlen)]] void const *optval, socklen_t optlen);
+               [[in(optlen)]] void const *optval, socklen_t optlen);
 
 @@>> listen(2)
 @@Begin to listen for incoming client (aka. peer) connection requests.
@@ -1162,8 +1162,8 @@ int listen($fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 @@@return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
 @@@return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT
 [[cp, decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
-$fd_t accept($fd_t sockfd, [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
-             socklen_t *__restrict addr_len);
+$fd_t accept($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
+             [[inout_opt]] socklen_t *__restrict addr_len);
 
 @@>> shutdown(2)
 @@Disallow further reception of data (causing `recv(2)' to return `0' as soon
@@ -1193,8 +1193,8 @@ int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
 @@@return: -1: [errno=EOPNOTSUPP]   E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_ACCEPT
 @@@return: -1: [errno=ECONNABORTED] E_NET_CONNECTION_ABORT
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/sockaddr.h>")]]
-$fd_t accept4($fd_t sockfd, [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
-              socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags);
+$fd_t accept4($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKADDR_ARG addr,
+              [[inout_opt]] socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags);
 %#endif /* __USE_GNU || __USE_BSD */
 
 
@@ -1209,14 +1209,14 @@ $fd_t accept4($fd_t sockfd, [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
 @@@return: -1: ... Same as `sendmsg(2)'
 [[cp, export_alias("__sendmmsg")]]
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>")]]
-__STDC_INT_AS_SSIZE_T sendmmsg($fd_t sockfd, [[nonnull]] struct mmsghdr *vmessages,
+__STDC_INT_AS_SSIZE_T sendmmsg($fd_t sockfd, [[inout]] struct mmsghdr *vmessages,
                                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags);
 
 [[cp, doc_alias("recvmmsg"), ignore, nocrt, alias("recvmmsg")]]
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>", "<bits/os/timespec.h>")]]
-__STDC_INT_AS_SSIZE_T recvmmsg32($fd_t sockfd, [[inp(vlen)]] struct mmsghdr *vmessages,
+__STDC_INT_AS_SSIZE_T recvmmsg32($fd_t sockfd, [[inout(vlen)]] struct mmsghdr *vmessages,
                                  __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
-                                 [[nullable]] struct $timespec32 *tmo);
+                                 [[in_opt]] struct $timespec32 *tmo);
 
 @@>> recvmmsg(2)
 @@Same as `recvmsg(2)', but may be used to receive many
@@ -1231,9 +1231,9 @@ __STDC_INT_AS_SSIZE_T recvmmsg32($fd_t sockfd, [[inp(vlen)]] struct mmsghdr *vme
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("recvmmsg")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("recvmmsg64")]]
 [[userimpl, requires($has_function(recvmmsg32) || $has_function(recvmmsg64))]]
-__STDC_INT_AS_SSIZE_T recvmmsg($fd_t sockfd, [[inp(vlen)]] struct mmsghdr *vmessages,
+__STDC_INT_AS_SSIZE_T recvmmsg($fd_t sockfd, [[inout(vlen)]] struct mmsghdr *vmessages,
                                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
-                               [[nullable]] struct timespec *tmo) {
+                               [[in_opt]] struct timespec *tmo) {
 @@pp_if $has_function(recvmmsg64)@@
 	struct timespec64 tmo64;
 	if (!tmo)
@@ -1255,9 +1255,9 @@ __STDC_INT_AS_SSIZE_T recvmmsg($fd_t sockfd, [[inp(vlen)]] struct mmsghdr *vmess
 [[cp, preferred_time64_variant_of(recvmmsg), doc_alias("recvmmsg")]]
 [[userimpl, requires_function(recvmmsg32)]]
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>", "<bits/os/timespec.h>")]]
-__STDC_INT_AS_SSIZE_T recvmmsg64($fd_t sockfd, [[inp(vlen)]] struct mmsghdr *vmessages,
+__STDC_INT_AS_SSIZE_T recvmmsg64($fd_t sockfd, [[inout(vlen)]] struct mmsghdr *vmessages,
                                  __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
-                                 [[nullable]] struct timespec64 *tmo) {
+                                 [[in_opt]] struct timespec64 *tmo) {
 	struct timespec32 tmo32;
 	if (!tmo)
 		return recvmmsg32(sockfd, vmessages, vlen, msg_flags, NULL);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x742fc412 */
+/* HASH CRC-32:0xc6371e4e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbslwr_l_defined
 #define __local___localdep__mbslwr_l_defined
 #ifdef __CRT_HAVE__mbslwr_l
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,__localdep__mbslwr_l,(unsigned char *__buf, __locale_t __locale),_mbslwr_l,(__buf,__locale))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_RW(1),unsigned char *,__NOTHROW_NCX,__localdep__mbslwr_l,(unsigned char *__buf, __locale_t __locale),_mbslwr_l,(__buf,__locale))
 #elif (defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbctolower_l) || (defined(__CRT_HAVE__mbctouni_l) && defined(__CRT_HAVE__unitombc_l) && defined(__CRT_HAVE___unicode_descriptor)) || ((defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__mbcasemap) || defined(__CRT_HAVE___p__mbcasemap))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbslwr_l.h>
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-__LOCAL_LIBC(_mbslwr_s_l) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(_mbslwr_s_l) __ATTR_ACCESS_RWS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbslwr_s_l))(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, __locale_t __locale) {
 	if (!__buf || (__NAMESPACE_LOCAL_SYM __localdep_strlen)((char const *)__buf) >= __true_bufsize)
 		return 22;

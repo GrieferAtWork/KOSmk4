@@ -126,8 +126,8 @@ static void __LIBCCALL rpp_handler(int signo) {
 @@pop_namespace@@
 @@pp_endif@@
 )]]
-char *readpassphrase([[nullable]] char const *prompt,
-                     [[nonnull]] char *buf, $size_t bufsize,
+char *readpassphrase([[in_opt]] char const *prompt,
+                     [[out(? <= bufsize)]] char *buf, $size_t bufsize,
                      __STDC_INT_AS_UINT_T flags) {
 @@pp_if $has_function(sigaction)@@
 	bool must_restart;

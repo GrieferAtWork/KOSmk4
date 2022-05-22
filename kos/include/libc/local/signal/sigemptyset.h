@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa57731c9 */
+/* HASH CRC-32:0x394421ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_bzeroc __LIBC_LOCAL_NAME(bzeroc)
 #endif /* !__CRT_HAVE_bzeroc */
 #endif /* !__local___localdep_bzeroc_defined */
-__LOCAL_LIBC(sigemptyset) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(sigemptyset) __ATTR_ACCESS_WR(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigemptyset))(struct __sigset_struct *__set) {
 	(__NAMESPACE_LOCAL_SYM __localdep_bzeroc)(__set->__val, __COMPILER_LENOF(__set->__val), __SIZEOF_POINTER__);
 	return 0;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31c239f6 */
+/* HASH CRC-32:0xb7ba00ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vsyslog_defined
 #define __local___localdep_vsyslog_defined
 #ifdef __CRT_HAVE_vsyslog
-__CREDIRECT_VOID(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)),__NOTHROW_RPC,__localdep_vsyslog,(__STDC_INT_AS_UINT_T __level, char const *__format, __builtin_va_list __args),vsyslog,(__level,__format,__args))
+__CREDIRECT_VOID(__ATTR_ACCESS_RO(2) __ATTR_LIBC_PRINTF(2, 0),__NOTHROW_RPC,__localdep_vsyslog,(__STDC_INT_AS_UINT_T __level, char const *__format, __builtin_va_list __args),vsyslog,(__level,__format,__args))
 #elif defined(__CRT_HAVE_syslog_printer)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.syslog/vsyslog.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_vsyslog_defined
 #endif /* !... */
 #endif /* !__local___localdep_vsyslog_defined */
-__LOCAL_LIBC(syslog) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) void
+__LOCAL_LIBC(syslog) __ATTR_ACCESS_RO(2) __ATTR_LIBC_PRINTF(2, 3) void
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(syslog))(__STDC_INT_AS_UINT_T __level, char const *__format, ...) {
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3413ed7a */
+/* HASH CRC-32:0x89feb71a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-__LOCAL_LIBC(Memdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) void *
+__LOCAL_LIBC(Memdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ALLOC_SIZE((2)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(Memdup))(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes) __THROWS(__E_BADALLOC) {
 	void *__result;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_Malloc)(__num_bytes);

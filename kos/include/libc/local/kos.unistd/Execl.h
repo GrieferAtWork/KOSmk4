@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x684ca016 */
+/* HASH CRC-32:0xb0b529d7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,12 +38,12 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,__localdep_Execv,(char const *__restrict __path, __TARGV),Execv,(__path,___argv))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),__THROWING,__localdep_Execv,(char const *__restrict __path, __TARGV),Execv,(__path,___argv))
 #endif /* !__local___localdep_Execv_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(Execl) __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(Execl) __ATTR_NORETURN __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) void
 (__VLIBCCALL __LIBC_LOCAL_NAME(Execl))(char const *__restrict __path, char const *__args, ...) __THROWS(...) {
 	__REDIRECT_XEXECL(char, (__NAMESPACE_LOCAL_SYM __localdep_Execv), __path, __args)
 }

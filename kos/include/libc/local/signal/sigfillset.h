@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdb54ba9 */
+/* HASH CRC-32:0x27a57da6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memsetw __LIBC_LOCAL_NAME(memsetw)
 #endif /* !... */
 #endif /* !__local___localdep_memsetw_defined */
-__LOCAL_LIBC(sigfillset) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(sigfillset) __ATTR_ACCESS_WR(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigfillset))(struct __sigset_struct *__set) {
 #if __SIZEOF_POINTER__ == 8
 	(__NAMESPACE_LOCAL_SYM __localdep_memsetq)(__set->__val, __UINT64_C(0xffffffffffffffff), __COMPILER_LENOF(__set->__val));

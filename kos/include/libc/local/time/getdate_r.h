@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x722daa2e */
+/* HASH CRC-32:0x936cfebf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getdate_r) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(getdate_r) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getdate_r))(char const *__restrict __string, struct __NAMESPACE_STD_SYM tm *__restrict __resbufp) {
 	/* TODO */
 	(void)__string;

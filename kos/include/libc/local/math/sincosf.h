@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x262bf6b5 */
+/* HASH CRC-32:0xf9dc7e0a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,11 +45,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sincos_defined
 #define __local___localdep_sincos_defined
 #if __has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)
-__CEIREDIRECT(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),void,__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),sincos,{ __builtin_sincos(__x, __psinx, __pcosx); })
+__CEIREDIRECT(__DECL_SIMD_sincos __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),void,__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),sincos,{ __builtin_sincos(__x, __psinx, __pcosx); })
 #elif defined(__CRT_HAVE_sincos)
-__CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),sincos,(__x,__psinx,__pcosx))
+__CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),sincos,(__x,__psinx,__pcosx))
 #elif defined(__CRT_HAVE___sincos)
-__CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),__sincos,(__x,__psinx,__pcosx))
+__CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),__sincos,(__x,__psinx,__pcosx))
 #elif ((defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/sincos.h>
@@ -79,7 +79,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/sincos.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(sincosf) __DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)) void
+__LOCAL_LIBC(sincosf) __DECL_SIMD_sincosf __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3) void
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sincosf))(float __x, float *__psinx, float *__pcosx) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 	__LIBM_MATHFUNXF(sincos)(__x, __psinx, __pcosx);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa61fcace */
+/* HASH CRC-32:0x676b8c21 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),UnlinkAt,(__dfd,__name,__flags))
+__CREDIRECT_VOID(__ATTR_ACCESS_RO(2),__THROWING,__localdep_UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),UnlinkAt,(__dfd,__name,__flags))
 #endif /* !__local___localdep_UnlinkAt_defined */
-__LOCAL_LIBC(Rmdir) __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(Rmdir) __ATTR_ACCESS_RO(1) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Rmdir))(char const *__path) __THROWS(...) {
 	(__NAMESPACE_LOCAL_SYM __localdep_UnlinkAt)(__AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */
 }

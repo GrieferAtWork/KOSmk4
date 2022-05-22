@@ -41,11 +41,11 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_Execv,hash:CRC-32=0x8d22d342]]]*/
+/*[[[head:libc_Execv,hash:CRC-32=0x5f11a0eb]]]*/
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2)) void
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) void
 (LIBCCALL libc_Execv)(char const *__restrict path,
                       __TARGV) THROWS(...)
 /*[[[body:libc_Execv]]]*/
@@ -55,11 +55,11 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2
 }
 /*[[[end:libc_Execv]]]*/
 
-/*[[[head:libc_Execvp,hash:CRC-32=0x6574024f]]]*/
+/*[[[head:libc_Execvp,hash:CRC-32=0xf3c7bdf8]]]*/
 /* >> execvp(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2)) void
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) void
 (LIBCCALL libc_Execvp)(char const *__restrict file,
                        __TARGV) THROWS(...)
 /*[[[body:libc_Execvp]]]*/
@@ -68,11 +68,11 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2
 }
 /*[[[end:libc_Execvp]]]*/
 
-/*[[[head:libc_Execvpe,hash:CRC-32=0x6e9667a2]]]*/
+/*[[[head:libc_Execvpe,hash:CRC-32=0xdd90150]]]*/
 /* >> execvpe(3)
  * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2, 3)) void
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) void
 (LIBCCALL libc_Execvpe)(char const *__restrict file,
                         __TARGV,
                         __TENVP) THROWS(...)
@@ -121,7 +121,7 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2
 /*[[[end:libc_Execvpe]]]*/
 
 
-/*[[[head:libc_ReadAll,hash:CRC-32=0x115bba12]]]*/
+/*[[[head:libc_ReadAll,hash:CRC-32=0x97d0588d]]]*/
 /* >> readall(3)
  * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
@@ -129,7 +129,7 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
+INTERN ATTR_SECTION(".text.crt.except.io.read") ATTR_ACCESS_WRS(2, 3) size_t
 (LIBCCALL libc_ReadAll)(fd_t fd,
                         void *buf,
                         size_t bufsize) THROWS(...)
@@ -165,10 +165,10 @@ INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
 /*[[[end:libc_ReadAll]]]*/
 
 
-/*[[[head:libc_GetCwd,hash:CRC-32=0xa34d7bfa]]]*/
+/*[[[head:libc_GetCwd,hash:CRC-32=0xb20ab3fa]]]*/
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") char *
+INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") ATTR_ACCESS_WRS(1, 2) char *
 (LIBCCALL libc_GetCwd)(char *buf,
                        size_t bufsize) THROWS(...)
 /*[[[body:libc_GetCwd]]]*/
@@ -220,11 +220,11 @@ INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") char *
 }
 /*[[[end:libc_GetCwd]]]*/
 
-/*[[[head:libc_PRead,hash:CRC-32=0xbd57a03a]]]*/
+/*[[[head:libc_PRead,hash:CRC-32=0xfae235f6]]]*/
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
+INTERN ATTR_SECTION(".text.crt.except.io.read") ATTR_ACCESS_WRS(2, 3) size_t
 (LIBCCALL libc_PRead)(fd_t fd,
                       void *buf,
                       size_t bufsize,
@@ -235,11 +235,11 @@ INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
 }
 /*[[[end:libc_PRead]]]*/
 
-/*[[[head:libc_PWrite,hash:CRC-32=0xaad8526b]]]*/
+/*[[[head:libc_PWrite,hash:CRC-32=0xad38c277]]]*/
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTERN ATTR_SECTION(".text.crt.except.io.write") NONNULL((2)) size_t
+INTERN ATTR_SECTION(".text.crt.except.io.write") ATTR_ACCESS_ROS(2, 3) size_t
 (LIBCCALL libc_PWrite)(fd_t fd,
                        void const *buf,
                        size_t bufsize,
@@ -250,10 +250,10 @@ INTERN ATTR_SECTION(".text.crt.except.io.write") NONNULL((2)) size_t
 }
 /*[[[end:libc_PWrite]]]*/
 
-/*[[[head:libc_PReadAll,hash:CRC-32=0x82133a57]]]*/
+/*[[[head:libc_PReadAll,hash:CRC-32=0x1aed0de8]]]*/
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
+INTERN ATTR_SECTION(".text.crt.except.io.read") ATTR_ACCESS_WRS(2, 3) size_t
 (LIBCCALL libc_PReadAll)(fd_t fd,
                          void *buf,
                          size_t bufsize,
@@ -286,13 +286,13 @@ INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
 }
 /*[[[end:libc_PReadAll]]]*/
 
-/*[[[head:libc_PReadAll64,hash:CRC-32=0xa05b7398]]]*/
+/*[[[head:libc_PReadAll64,hash:CRC-32=0x36c1056]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_PReadAll64, libc_PReadAll);
 #else /* MAGIC:alias */
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTERN ATTR_SECTION(".text.crt.except.io.large.read") NONNULL((2)) size_t
+INTERN ATTR_SECTION(".text.crt.except.io.large.read") ATTR_ACCESS_WRS(2, 3) size_t
 (LIBCCALL libc_PReadAll64)(fd_t fd,
                            void *buf,
                            size_t bufsize,
@@ -339,12 +339,12 @@ INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") ATTR_MALLOC ATTR_MALL_
 }
 /*[[[end:libc_GetCurrentDirName]]]*/
 
-/*[[[head:libc_FExecve,hash:CRC-32=0x1578a52]]]*/
+/*[[[head:libc_FExecve,hash:CRC-32=0xbb59ed6d]]]*/
 /* >> fexecve(2)
  * Replace the calling process with the application image referred
  * to by `execfd'  and execute it's  `main()' method, passing  the
  * given `argv', and setting `environ' to `envp'. */
-INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((2, 3)) void
+INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) void
 (LIBCCALL libc_FExecve)(fd_t fd,
                         __TARGV,
                         __TENVP) THROWS(...)
@@ -434,10 +434,10 @@ INTERN ATTR_SECTION(".text.crt.except.sched.user") void
 }
 /*[[[end:libc_SetEGid]]]*/
 
-/*[[[head:libc_GetHostName,hash:CRC-32=0x76a2aaf6]]]*/
+/*[[[head:libc_GetHostName,hash:CRC-32=0x9dbb04f2]]]*/
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-INTERN ATTR_SECTION(".text.crt.except.system.configuration") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.except.system.configuration") ATTR_ACCESS_WRS(1, 2) void
 (LIBCCALL libc_GetHostName)(char *name,
                             size_t buflen) THROWS(...)
 /*[[[body:libc_GetHostName]]]*/
@@ -453,10 +453,10 @@ INTERN ATTR_SECTION(".text.crt.except.system.configuration") NONNULL((1)) void
 }
 /*[[[end:libc_GetHostName]]]*/
 
-/*[[[head:libc_GetDomainName,hash:CRC-32=0x39d964ef]]]*/
+/*[[[head:libc_GetDomainName,hash:CRC-32=0xf140e319]]]*/
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-INTERN ATTR_SECTION(".text.crt.except.system.configuration") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.except.system.configuration") ATTR_ACCESS_WRS(1, 2) void
 (LIBCCALL libc_GetDomainName)(char *name,
                               size_t buflen) THROWS(...)
 /*[[[body:libc_GetDomainName]]]*/

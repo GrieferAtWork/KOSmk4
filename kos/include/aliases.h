@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65e8602e */
+/* HASH CRC-32:0xa6e62b3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,16 +59,16 @@ __CDECLARE_VOID_OPT(,__NOTHROW_NCX,endaliasent,(void),())
 __CDECLARE_OPT(__ATTR_WUNUSED,struct aliasent *,__NOTHROW_RPC_KOS,getaliasent,(void),())
 /* >> getaliasent_r(3)
  * Reentrant variant of `getaliasent(3)' (s.a. similar functions such as `getpwent_r(3)') */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 4)),__errno_t,__NOTHROW_RPC_KOS,getaliasent_r,(struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__result_buf,__buffer,__buflen,__result))
+__CDECLARE_OPT(__ATTR_ACCESS_WR(1) __ATTR_ACCESS_WR(4) __ATTR_ACCESS_WRS(2, 3),__errno_t,__NOTHROW_RPC_KOS,getaliasent_r,(struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__result_buf,__buffer,__buflen,__result))
 /* >> getaliasbyname(3)
  * Find a database entry associated with the given `name'
  * @return: * :   A pointer to an internal, statically allocated structure
  * @return: NULL: [errno=ENOENT] No entry matching `name'
  * @return: NULL: [errno=*]      Error */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),struct aliasent *,__NOTHROW_RPC_KOS,getaliasbyname,(char const *__name),(__name))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct aliasent *,__NOTHROW_RPC_KOS,getaliasbyname,(char const *__name),(__name))
 /* >> getaliasbyname_r(3)
  * Reentrant variant of `getaliasbyname(3)' (s.a. similar functions such as `getpwnam_r(3)') */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),__errno_t,__NOTHROW_RPC_KOS,getaliasbyname_r,(char const *__restrict __name, struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__name,__result_buf,__buffer,__buflen,__result))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(5) __ATTR_ACCESS_WRS(3, 4),__errno_t,__NOTHROW_RPC_KOS,getaliasbyname_r,(char const *__restrict __name, struct aliasent *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct aliasent **__restrict __result),(__name,__result_buf,__buffer,__buflen,__result))
 
 __SYSDECL_END
 #endif /* __CC__ */

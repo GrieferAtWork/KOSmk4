@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x257e67d6 */
+/* HASH CRC-32:0x8757b17f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,13 +34,13 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__THROWING,__localdep_LFutexExprI_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExprI,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,__localdep_LFutexExprI_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExprI,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExprI64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __NAMESPACE_LOCAL_END
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__THROWING,__localdep_LFutexExprI_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExprI64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,__localdep_LFutexExprI_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExprI64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExprI) || defined(__CRT_HAVE_LFutexExprI64) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr) || defined(__CRT_HAVE_LFutexExpr64)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.futexexpr/LFutexExprI_except.h>
@@ -71,7 +71,7 @@ __NAMESPACE_LOCAL_END
 
 #endif /* !__KERNEL__ */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_rwlock_waitwrite_with_timeout) __ATTR_WUNUSED __BLOCKING __ATTR_NONNULL((1)) __BOOL
+__LOCAL_LIBC(shared_rwlock_waitwrite_with_timeout) __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1) __BOOL
 (__FCALL __LIBC_LOCAL_NAME(shared_rwlock_waitwrite_with_timeout))(struct shared_rwlock *__restrict __self, __shared_rwlock_timespec __abs_timeout) __THROWS(__E_WOULDBLOCK, ...) {
 #ifdef __KERNEL__
 	__hybrid_assert(!task_wasconnected());

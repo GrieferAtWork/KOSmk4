@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x551b0060 */
+/* HASH CRC-32:0x5c1c2efc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ DECL_BEGIN
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_execv)(char const *__restrict path,
                                  __TARGV) {
 	return libd_execve(path, ___argv, __LOCAL_environ);
@@ -56,7 +56,7 @@ NOTHROW_RPC(LIBDCALL libd_execv)(char const *__restrict path,
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBCCALL libc_execv)(char const *__restrict path,
                                  __TARGV) {
 	return libc_execve(path, ___argv, __LOCAL_environ);
@@ -65,7 +65,7 @@ NOTHROW_RPC(LIBCCALL libc_execv)(char const *__restrict path,
 /* >> execvp(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_execvp)(char const *__restrict file,
                                   __TARGV) {
 	return libd_execvpe(file, ___argv, __LOCAL_environ);
@@ -74,7 +74,7 @@ NOTHROW_RPC(LIBDCALL libd_execvp)(char const *__restrict file,
 /* >> execvp(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restrict file,
                                   __TARGV) {
 	return libc_execvpe(file, ___argv, __LOCAL_environ);
@@ -83,7 +83,7 @@ NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restrict file,
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) int
 NOTHROW_RPC(VLIBDCALL libd_execl)(char const *__restrict path,
                                   char const *args,
                                   ...) {
@@ -93,7 +93,7 @@ NOTHROW_RPC(VLIBDCALL libd_execl)(char const *__restrict path,
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) int
 NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path,
                                   char const *args,
                                   ...) {
@@ -104,7 +104,7 @@ NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path,
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) ATTR_SENTINEL_O(1) int
 NOTHROW_RPC(VLIBDCALL libd_execle)(char const *__restrict path,
                                    char const *args,
                                    ...) {
@@ -115,7 +115,7 @@ NOTHROW_RPC(VLIBDCALL libd_execle)(char const *__restrict path,
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) ATTR_SENTINEL_O(1) int
 NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
                                    char const *args,
                                    ...) {
@@ -125,7 +125,7 @@ NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) int
 NOTHROW_RPC(VLIBDCALL libd_execlp)(char const *__restrict file,
                                    char const *args,
                                    ...) {
@@ -135,7 +135,7 @@ NOTHROW_RPC(VLIBDCALL libd_execlp)(char const *__restrict file,
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) int
 NOTHROW_RPC(VLIBCCALL libc_execlp)(char const *__restrict file,
                                    char const *args,
                                    ...) {
@@ -162,7 +162,7 @@ __NAMESPACE_LOCAL_END
 /* >> execvpe(3)
  * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") NONNULL((1, 2, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBDCALL libd_execvpe)(char const *__restrict file,
                                    __TARGV,
                                    __TENVP) {
@@ -222,7 +222,7 @@ __NAMESPACE_LOCAL_END
 /* >> execvpe(3)
  * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2, 3)) int
+INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
                                    __TARGV,
                                    __TENVP) {
@@ -268,7 +268,7 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) ATTR_SENTINEL_O(1) int
 NOTHROW_RPC(VLIBDCALL libd_execlpe)(char const *__restrict file,
                                     char const *args,
                                     ...) {
@@ -279,7 +279,7 @@ NOTHROW_RPC(VLIBDCALL libd_execlpe)(char const *__restrict file,
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) ATTR_SENTINEL_O(1) int
 NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
                                     char const *args,
                                     ...) {
@@ -460,7 +460,7 @@ NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds) {
  * should be obvious why you shouldn't use this one.
  * And  if it isn't, take a look at the arguments of
  * this function, compared to `getcwd()' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.basic_property") ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.basic_property") ATTR_ACCESS_WR(1) ATTR_DEPRECATED("Use getcwd()") char *
 NOTHROW_RPC(LIBDCALL libd_getwd)(char *buf) {
 	return libd_getcwd(buf, (size_t)-1);
 }
@@ -469,7 +469,7 @@ NOTHROW_RPC(LIBDCALL libd_getwd)(char *buf) {
  * should be obvious why you shouldn't use this one.
  * And  if it isn't, take a look at the arguments of
  * this function, compared to `getcwd()' */
-INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_ACCESS_WR(1) ATTR_DEPRECATED("Use getcwd()") char *
 NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf) {
 	return libc_getcwd(buf, (size_t)-1);
 }
@@ -627,7 +627,7 @@ NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt) {
  * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
-INTERN ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 2)) void
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_ACCESS_ROS(1, 3) ATTR_ACCESS_WRS(2, 3) void
 NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
                                 void *__restrict to,
                                 __STDC_INT_AS_SSIZE_T n_bytes) {
@@ -665,7 +665,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s) {
  * If the actual  username is longer  than this,  it may be  truncated, and  programs
  * that wish to support longer usernames  should make use of `getlogin_r()'  instead.
  * s.a. `getlogin()' and `getlogin_r()' */
-INTERN ATTR_SECTION(".text.crt.io.tty") char *
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_WR_OPT(1) char *
 NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s) {
 #ifdef __L_cuserid
 	static char cuserid_buffer[__L_cuserid];
@@ -731,7 +731,7 @@ NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s) {
  * @return: NULL: [ENOMEM]      Insufficient memory
  * @return: NULL: [ENODATA]     End-of-file while reading, and `GETPASS_FAIL_EOF' was set.
  * @return: NULL: [*]           Error */
-INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_WR_OPT(2) char *
 NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
                                      char *buf,
                                      size_t buflen,
@@ -1277,7 +1277,7 @@ out:
 #include <asm/crt/getpassfd.h>
 #include <asm/crt/readpassphrase.h>
 /* >> getpass_r(3) */
-INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_WR_OPT(2) char *
 NOTHROW_RPC(LIBCCALL libc_getpass_r)(char const *prompt,
                                      char *buf,
                                      size_t bufsize) {
@@ -1302,7 +1302,7 @@ NOTHROW_RPC(LIBCCALL libc_getpass_r)(char const *prompt,
 #include <libc/errno.h>
 /* >> getpeereid(3)
  * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
-INTERN ATTR_SECTION(".text.crt.sched.user") NONNULL((2, 3)) int
+INTERN ATTR_SECTION(".text.crt.sched.user") ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) int
 NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd,
                                       uid_t *euid,
                                       gid_t *egid) {
@@ -1372,7 +1372,7 @@ NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd) {
  * the function will set errno=ERANGE and return -1
  * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
  * @return: -1: Error. (s.a. `errno') */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd_resolvepath)(char const *filename,
                                        char *resolved,
                                        size_t buflen) {
@@ -1400,7 +1400,7 @@ NOTHROW_NCX(LIBDCALL libd_resolvepath)(char const *filename,
  * the function will set errno=ERANGE and return -1
  * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
  * @return: -1: Error. (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBCCALL libc_resolvepath)(char const *filename,
                                        char *resolved,
                                        size_t buflen) {

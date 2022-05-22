@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d53b7e2 */
+/* HASH CRC-32:0x71c485ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strtrns) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2, 3, 4)) char *
+__LOCAL_LIBC(strtrns) __ATTR_RETNONNULL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(4) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtrns))(char const *__string, char const *__find_map, char const *__repl_map, char *__result) {
 	char *__dst = __result;
 	for (;;) {

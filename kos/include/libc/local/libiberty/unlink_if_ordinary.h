@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb29db6b8 */
+/* HASH CRC-32:0xd37b5a73 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,25 +29,25 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lstat_defined
 #define __local___localdep_lstat_defined
 #if defined(__CRT_HAVE_klstat) && defined(__CRT_KOS_PRIMARY)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),klstat,(__filename,__buf))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),klstat,(__filename,__buf))
 #elif defined(__CRT_HAVE_klstat64) && defined(__CRT_KOS_PRIMARY)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),klstat64,(__filename,__buf))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),klstat64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat64,(__filename,__buf))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat64i32,(__filename,__buf))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat64i32,(__filename,__buf))
 #elif defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stati64,(__filename,__buf))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stati64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32i64,(__filename,__buf))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32i64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat,(__filename,__buf))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32,(__filename,__buf))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32,(__filename,__buf))
 #elif defined(__CRT_HAVE_lstat) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),lstat,(__filename,__buf))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),lstat,(__filename,__buf))
 #elif defined(__CRT_HAVE_lstat64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),lstat64,(__filename,__buf))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_lstat,(char const *__restrict __filename, struct stat *__restrict __buf),lstat64,(__filename,__buf))
 #else /* ... */
 #undef __local___localdep_lstat_defined
 #endif /* !... */
@@ -55,13 +55,13 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_lstat,(char cons
 #ifndef __local___localdep_unlink_defined
 #define __local___localdep_unlink_defined
 #ifdef __CRT_HAVE_unlink
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
 #elif defined(__CRT_HAVE__unlink)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),_unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),_unlink,(__file))
 #elif defined(__CRT_HAVE___unlink)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__unlink,(__file))
 #elif defined(__CRT_HAVE___libc_unlink)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__libc_unlink,(__file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__libc_unlink,(__file))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/unlink.h>
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(unlink_if_ordinary) int
+__LOCAL_LIBC(unlink_if_ordinary) __ATTR_ACCESS_RO(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unlink_if_ordinary))(char const *__filename) {
 	struct stat __st;
 	if ((__NAMESPACE_LOCAL_SYM __localdep_lstat)(__filename, &__st) != 0)

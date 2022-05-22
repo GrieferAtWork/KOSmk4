@@ -45,25 +45,25 @@ __SYSDECL_BEGIN
 @@@return:  0: The contents of the 2 buffers are identical.
 @@@return: <0: At least one of the 2 buffers is faulty.
 [[noblock, wunused, nothrow, decl_include("<bits/types.h>")]]
-$ssize_t memeq_nopf([[user, checked]] void const *lhs,
-                    [[user, checked]] void const *rhs,
+$ssize_t memeq_nopf([[user, checked, in_opt(num_bytes)]] void const *lhs,
+                    [[user, checked, in_opt(num_bytes)]] void const *rhs,
                     $size_t num_bytes);
 
 @@>> read[bwlq]_nopf(3)
 @@Try to read from a possibly faulty `addr' into `*presult'
 @@Return `true' on success, `false' on fault
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool readb_nopf([[user, checked]] void const *addr, [[nonnull]] $uint8_t *presult);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("readb_nopf")]] bool readw_nopf([[user, checked]] void const *addr, [[nonnull]] $uint16_t *presult);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("readb_nopf")]] bool readl_nopf([[user, checked]] void const *addr, [[nonnull]] $uint32_t *presult);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("readb_nopf")]] bool readq_nopf([[user, checked]] void const *addr, [[nonnull]] $uint64_t *presult);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool readb_nopf([[user, checked, in_opt]] void const *addr, [[nonnull]] $uint8_t *presult);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("readb_nopf")]] bool readw_nopf([[user, checked, in_opt]] void const *addr, [[nonnull]] $uint16_t *presult);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("readb_nopf")]] bool readl_nopf([[user, checked, in_opt]] void const *addr, [[nonnull]] $uint32_t *presult);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("readb_nopf")]] bool readq_nopf([[user, checked, in_opt]] void const *addr, [[nonnull]] $uint64_t *presult);
 
 @@>> write[bwlq]_nopf(3)
 @@Try to write `val' into a possibly faulty `addr'
 @@Return  `true'  on  success,  `false'  on  error
-[[no_crt_impl, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool writeb_nopf([[user, checked]] void *addr, $uint8_t val);
-[[no_crt_impl, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("writeb_nopf")]] bool writew_nopf([[user, checked]] void *addr, $uint16_t val);
-[[no_crt_impl, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("writeb_nopf")]] bool writel_nopf([[user, checked]] void *addr, $uint32_t val);
-[[no_crt_impl, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("writeb_nopf")]] bool writeq_nopf([[user, checked]] void *addr, $uint64_t val);
+[[no_crt_impl, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool writeb_nopf([[user, checked, out_opt]] void *addr, $uint8_t val);
+[[no_crt_impl, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("writeb_nopf")]] bool writew_nopf([[user, checked, out_opt]] void *addr, $uint16_t val);
+[[no_crt_impl, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("writeb_nopf")]] bool writel_nopf([[user, checked, out_opt]] void *addr, $uint32_t val);
+[[no_crt_impl, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("writeb_nopf")]] bool writeq_nopf([[user, checked, out_opt]] void *addr, $uint64_t val);
 
 
 @@>> memcpy_nopf(3)
@@ -82,14 +82,14 @@ $ssize_t memeq_nopf([[user, checked]] void const *lhs,
 @@              - `dst + num_bytes - return ... dst + num_bytes - 1'
 @@              - `src + num_bytes - return ... src + num_bytes - 1'
 [[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]]
-$size_t memcpy_nopf([[user, checked]] void *dst,
-                    [[user, checked]] void const *src,
+$size_t memcpy_nopf([[user, checked, out_opt(num_bytes)]] void *dst,
+                    [[user, checked, in_opt(num_bytes)]] void const *src,
                     $size_t num_bytes);
 
 @@>> memset_nopf(3)
 @@@return: * : The # of bytes that could not be accessed
 [[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]]
-$size_t memset_nopf([[user, checked]] void *dst,
+$size_t memset_nopf([[user, checked, out_opt(num_bytes)]] void *dst,
                     int byte, $size_t num_bytes);
 
 
@@ -97,51 +97,51 @@ $size_t memset_nopf([[user, checked]] void *dst,
 @@Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
 @@old value in `*poldval', and loading a new value from `newval'
 @@Return `true' on success, `false' on fault
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool atomic_xchb_nopf([[user, checked]] void const *addr, $uint8_t newval, [[nonnull]] $uint8_t *poldval);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xchb_nopf")]] bool atomic_xchw_nopf([[user, checked]] void const *addr, $uint16_t newval, [[nonnull]] $uint16_t *poldval);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xchb_nopf")]] bool atomic_xchl_nopf([[user, checked]] void const *addr, $uint32_t newval, [[nonnull]] $uint32_t *poldval);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xchb_nopf")]] bool atomic_xchq_nopf([[user, checked]] void const *addr, $uint64_t newval, [[nonnull]] $uint64_t *poldval);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool atomic_xchb_nopf([[user, checked, inout_opt]] void const *addr, $uint8_t newval, [[nonnull]] $uint8_t *poldval);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xchb_nopf")]] bool atomic_xchw_nopf([[user, checked, inout_opt]] void const *addr, $uint16_t newval, [[nonnull]] $uint16_t *poldval);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xchb_nopf")]] bool atomic_xchl_nopf([[user, checked, inout_opt]] void const *addr, $uint32_t newval, [[nonnull]] $uint32_t *poldval);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xchb_nopf")]] bool atomic_xchq_nopf([[user, checked, inout_opt]] void const *addr, $uint64_t newval, [[nonnull]] $uint64_t *poldval);
 
 @@>> atomic_fetchadd[bwlq]_nopf(3)
 @@Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
 @@old value in `*poldval', and adding `newval' onto the stored val
 @@Return `true' on success, `false' on fault
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool atomic_fetchaddb_nopf([[user, checked]] void const *addr, $uint8_t addend, [[nonnull]] $uint8_t *poldval);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_fetchaddb_nopf")]] bool atomic_fetchaddw_nopf([[user, checked]] void const *addr, $uint16_t addend, [[nonnull]] $uint16_t *poldval);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_fetchaddb_nopf")]] bool atomic_fetchaddl_nopf([[user, checked]] void const *addr, $uint32_t addend, [[nonnull]] $uint32_t *poldval);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_fetchaddb_nopf")]] bool atomic_fetchaddq_nopf([[user, checked]] void const *addr, $uint64_t addend, [[nonnull]] $uint64_t *poldval);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool atomic_fetchaddb_nopf([[user, checked, inout_opt]] void const *addr, $uint8_t addend, [[nonnull]] $uint8_t *poldval);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_fetchaddb_nopf")]] bool atomic_fetchaddw_nopf([[user, checked, inout_opt]] void const *addr, $uint16_t addend, [[nonnull]] $uint16_t *poldval);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_fetchaddb_nopf")]] bool atomic_fetchaddl_nopf([[user, checked, inout_opt]] void const *addr, $uint32_t addend, [[nonnull]] $uint32_t *poldval);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_fetchaddb_nopf")]] bool atomic_fetchaddq_nopf([[user, checked, inout_opt]] void const *addr, $uint64_t addend, [[nonnull]] $uint64_t *poldval);
 
 @@>> atomic_or[bwlq]_nopf(3)
 @@Try to atomically turn on all bits from `mask' at the possibly faulty `addr'
 @@Return `true' on success, `false' on fault
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool atomic_orb_nopf([[user, checked]] void *addr, $uint8_t mask);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_orb_nopf")]] bool atomic_orw_nopf([[user, checked]] void *addr, $uint16_t mask);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_orb_nopf")]] bool atomic_orl_nopf([[user, checked]] void *addr, $uint32_t mask);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_orb_nopf")]] bool atomic_orq_nopf([[user, checked]] void *addr, $uint64_t mask);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool atomic_orb_nopf([[user, checked, inout_opt]] void *addr, $uint8_t mask);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_orb_nopf")]] bool atomic_orw_nopf([[user, checked, inout_opt]] void *addr, $uint16_t mask);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_orb_nopf")]] bool atomic_orl_nopf([[user, checked, inout_opt]] void *addr, $uint32_t mask);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_orb_nopf")]] bool atomic_orq_nopf([[user, checked, inout_opt]] void *addr, $uint64_t mask);
 
 @@>> atomic_and[bwlq]_nopf(3)
 @@Try to atomically mask all bits with `mask' at the possibly faulty `addr'
 @@Return `true' on success, `false' on fault
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool atomic_andb_nopf([[user, checked]] void *addr, $uint8_t mask);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_andb_nopf")]] bool atomic_andw_nopf([[user, checked]] void *addr, $uint16_t mask);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_andb_nopf")]] bool atomic_andl_nopf([[user, checked]] void *addr, $uint32_t mask);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_andb_nopf")]] bool atomic_andq_nopf([[user, checked]] void *addr, $uint64_t mask);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool atomic_andb_nopf([[user, checked, inout_opt]] void *addr, $uint8_t mask);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_andb_nopf")]] bool atomic_andw_nopf([[user, checked, inout_opt]] void *addr, $uint16_t mask);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_andb_nopf")]] bool atomic_andl_nopf([[user, checked, inout_opt]] void *addr, $uint32_t mask);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_andb_nopf")]] bool atomic_andq_nopf([[user, checked, inout_opt]] void *addr, $uint64_t mask);
 
 @@>> atomic_xor[bwlq]_nopf(3)
 @@Try to atomically flip all bits from `mask' at the possibly faulty `addr'
 @@Return `true' on success, `false' on fault
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool atomic_xorb_nopf([[user, checked]] void *addr, $uint8_t mask);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xorb_nopf")]] bool atomic_xorw_nopf([[user, checked]] void *addr, $uint16_t mask);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xorb_nopf")]] bool atomic_xorl_nopf([[user, checked]] void *addr, $uint32_t mask);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xorb_nopf")]] bool atomic_xorq_nopf([[user, checked]] void *addr, $uint64_t mask);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool atomic_xorb_nopf([[user, checked, inout_opt]] void *addr, $uint8_t mask);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xorb_nopf")]] bool atomic_xorw_nopf([[user, checked, inout_opt]] void *addr, $uint16_t mask);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xorb_nopf")]] bool atomic_xorl_nopf([[user, checked, inout_opt]] void *addr, $uint32_t mask);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xorb_nopf")]] bool atomic_xorq_nopf([[user, checked, inout_opt]] void *addr, $uint64_t mask);
 
 @@>> atomic_cmpxch[bwlq]_nopf(3)
 @@Try to do an atomic-compare-exchange at the possibly faulty `addr'
 @@Return `true' on success, `false' on fault
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool atomic_cmpxchb_nopf([[user, checked]] void *addr, $uint8_t oldval, $uint8_t newval, [[nonnull]] $uint8_t *preal_oldval);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_cmpxchb_nopf")]] bool atomic_cmpxchw_nopf([[user, checked]] void *addr, $uint16_t oldval, $uint16_t newval, [[nonnull]] $uint16_t *preal_oldval);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_cmpxchb_nopf")]] bool atomic_cmpxchl_nopf([[user, checked]] void *addr, $uint32_t oldval, $uint32_t newval, [[nonnull]] $uint32_t *preal_oldval);
-[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_cmpxchb_nopf")]] bool atomic_cmpxchq_nopf([[user, checked]] void *addr, $uint64_t oldval, $uint64_t newval, [[nonnull]] $uint64_t *preal_oldval);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]] bool atomic_cmpxchb_nopf([[user, checked, inout_opt]] void *addr, $uint8_t oldval, $uint8_t newval, [[nonnull]] $uint8_t *preal_oldval);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_cmpxchb_nopf")]] bool atomic_cmpxchw_nopf([[user, checked, inout_opt]] void *addr, $uint16_t oldval, $uint16_t newval, [[nonnull]] $uint16_t *preal_oldval);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_cmpxchb_nopf")]] bool atomic_cmpxchl_nopf([[user, checked, inout_opt]] void *addr, $uint32_t oldval, $uint32_t newval, [[nonnull]] $uint32_t *preal_oldval);
+[[noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_cmpxchb_nopf")]] bool atomic_cmpxchq_nopf([[user, checked, inout_opt]] void *addr, $uint64_t oldval, $uint64_t newval, [[nonnull]] $uint64_t *preal_oldval);
 
 
 %{
@@ -166,28 +166,28 @@ $size_t memset_nopf([[user, checked]] void *dst,
 #ifdef __NO_XBLOCK
 #ifndef __writeb_nopf_defined
 #define __writeb_nopf_defined 1
-__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WR_OPT(1) __BOOL
 __NOTHROW(writeb_nopf)(__USER __CHECKED void *__addr, __uint8_t __val) {
 	return memcpy_nopf(__addr, &__val, 1) == 0;
 }
 #endif /* !__writeb_nopf_defined */
 #ifndef __writew_nopf_defined
 #define __writew_nopf_defined 1
-__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WR_OPT(1) __BOOL
 __NOTHROW(writew_nopf)(__USER __CHECKED void *__addr, __uint16_t __val) {
 	return memcpy_nopf(__addr, &__val, 2) == 0;
 }
 #endif /* !__writew_nopf_defined */
 #ifndef __writel_nopf_defined
 #define __writel_nopf_defined 1
-__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WR_OPT(1) __BOOL
 __NOTHROW(writel_nopf)(__USER __CHECKED void *__addr, __uint32_t __val) {
 	return memcpy_nopf(__addr, &__val, 4) == 0;
 }
 #endif /* !__writel_nopf_defined */
 #ifndef __writeq_nopf_defined
 #define __writeq_nopf_defined 1
-__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WR_OPT(1) __BOOL
 __NOTHROW(writeq_nopf)(__USER __CHECKED void *__addr, __uint64_t __val) {
 	return memcpy_nopf(__addr, &__val, 8) == 0;
 }

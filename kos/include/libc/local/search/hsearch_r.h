@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dae3487 */
+/* HASH CRC-32:0x535c25a8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,7 +77,7 @@ typedef struct entry {
 #endif /* !__ENTRY_defined */
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(hsearch_r) __ATTR_NONNULL((3, 4)) int
+__LOCAL_LIBC(hsearch_r) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, ACTION __action, struct entry **__retval, struct hsearch_data *__htab) {
 	typedef struct {
 		unsigned int ___used;

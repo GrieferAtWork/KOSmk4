@@ -54,7 +54,8 @@ __SYSDECL_BEGIN
 [[requires(defined(__RUSAGE_SELF) && defined(__RUSAGE_CHILDREN) && $has_function(getrusage))]]
 [[impl_include("<asm/os/resource.h>", "<bits/os/rusage.h>", "<bits/crt/vtimes.h>")]]
 [[section(".text.crt.compat.glibc")]]
-int vtimes(struct vtimes *current, struct vtimes *child) {
+int vtimes([[out_opt]] struct vtimes *current,
+           [[out_opt]] struct vtimes *child) {
 	int result = 0;
 	unsigned int i;
 	for (i = 0; i < 2; ++i) {

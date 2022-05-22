@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeef29351 */
+/* HASH CRC-32:0x294fcb23 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(obstack_free) __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(obstack_free) __ATTR_ACCESS_RW(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(obstack_free))(struct obstack *__self, void *__obj) {
 	struct _obstack_chunk *__iter;
 	for (__iter = __self->chunk; __iter;) {

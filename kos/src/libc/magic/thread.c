@@ -94,7 +94,7 @@ typedef __pthread_key_t thread_key_t;
 [[requires($has_function(pthread_create))]]
 $errno_t thr_create(void *stack_base, size_t stack_size,
                     [[nonnull]] void *(LIBCCALL *start_routine)(void *arg),
-                    void *arg, long flags, thread_t *newthread) {
+                    void *arg, long flags, [[out]] thread_t *newthread) {
 	errno_t result;
 	if (flags || stack_base || stack_size) {
 @@pp_if !$has_function(pthread_attr_init)@@
@@ -180,7 +180,8 @@ done_attr:;
 
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_join)]]
-$errno_t thr_join(thread_t thr, thread_t *p_departed, void **thread_return) {
+$errno_t thr_join(thread_t thr, [[out]] thread_t *p_departed,
+                  [[out_opt]] void **thread_return) {
 	errno_t result;
 	result = pthread_join(thr, thread_return);
 	if (result == 0)
@@ -230,22 +231,22 @@ $errno_t thr_getprio(thread_t thr, [[nonnull]] int *p_priority) {
 }
 
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t thr_keycreate([[nonnull]] thread_key_t *key,
+$errno_t thr_keycreate([[out]] thread_key_t *key,
                        [[nullable]] void (LIBKCALL *destr_function)(void *))
 	= pthread_key_create;
 
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t thr_keycreate_once([[nonnull]] thread_key_t *key,
+$errno_t thr_keycreate_once([[out]] thread_key_t *key,
                             [[nullable]] void (LIBKCALL *destr_function)(void *))
 	= pthread_key_create_once_np;
 
 
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t thr_setspecific(thread_key_t key, void *val) = pthread_setspecific;
+$errno_t thr_setspecific(thread_key_t key, [[access(none)]] void *val) = pthread_setspecific;
 
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_getspecific, pthread_setspecific)]]
-$errno_t thr_getspecific(thread_key_t key, void **p_val) {
+$errno_t thr_getspecific(thread_key_t key, [[out]] void **p_val) {
 	void *val;
 	*p_val = val = pthread_getspecific(key);
 	if (val != NULL)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3555a6b2 */
+/* HASH CRC-32:0x5f304607 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,17 +29,17 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, struct __mbstate *__mbs),wcrtomb,(__str,__wc,__mbs))
+__CREDIRECT(__ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, struct __mbstate *__mbs),wcrtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_c16rtomb) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, struct __mbstate *__mbs),c16rtomb,(__str,__wc,__mbs))
+__CREDIRECT(__ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, struct __mbstate *__mbs),c16rtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_c32rtomb) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, struct __mbstate *__mbs),c32rtomb,(__str,__wc,__mbs))
+__CREDIRECT(__ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcrtomb,(char *__restrict __str, __WCHAR_TYPE__ __wc, struct __mbstate *__mbs),c32rtomb,(__str,__wc,__mbs))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcrtomb.h>
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcrtomb __LIBC_LOCAL_NAME(wcrtomb)
 #endif /* !... */
 #endif /* !__local___localdep_wcrtomb_defined */
-__LOCAL_LIBC(wctomb) int
+__LOCAL_LIBC(wctomb) __ATTR_ACCESS_WR_OPT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb))(char *__str, __WCHAR_TYPE__ __wc) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_wcrtomb)(__str, __wc, __NULLPTR);
 }

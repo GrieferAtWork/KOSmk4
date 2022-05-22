@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb385a464 */
+/* HASH CRC-32:0xc8cae8b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ulltostr_defined
 #define __local___localdep_ulltostr_defined
 #ifdef __CRT_HAVE_ulltostr
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,__localdep_ulltostr,(__ULONGLONG ___value, char *__buf),ulltostr,(___value,__buf))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_WR(2),char *,__NOTHROW_NCX,__localdep_ulltostr,(__ULONGLONG ___value, char *__buf),ulltostr,(___value,__buf))
 #else /* __CRT_HAVE_ulltostr */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/ulltostr.h>
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_ulltostr __LIBC_LOCAL_NAME(ulltostr)
 #endif /* !__CRT_HAVE_ulltostr */
 #endif /* !__local___localdep_ulltostr_defined */
-__LOCAL_LIBC(lltostr) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
+__LOCAL_LIBC(lltostr) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_WR(2) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lltostr))(__LONGLONG ___value, char *__buf) {
 	char *__result;
 	if (___value < 0) {

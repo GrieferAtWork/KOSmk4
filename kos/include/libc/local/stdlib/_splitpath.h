@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4eb2f51 */
+/* HASH CRC-32:0xb434064 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep__splitpath_s,(char const *__restrict __abspath, char *__drive, __SIZE_TYPE__ __drivelen, char *__dir, __SIZE_TYPE__ __dirlen, char *__file, __SIZE_TYPE__ __filelen, char *__ext, __SIZE_TYPE__ __extlen),_splitpath_s,(__abspath,__drive,__drivelen,__dir,__dirlen,__file,__filelen,__ext,__extlen))
+__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WRS(4, 5) __ATTR_ACCESS_WRS(6, 7) __ATTR_ACCESS_WRS(8, 9),__errno_t,__NOTHROW_NCX,__localdep__splitpath_s,(char const *__restrict __abspath, char *__drive, __SIZE_TYPE__ __drivelen, char *__dir, __SIZE_TYPE__ __dirlen, char *__file, __SIZE_TYPE__ __filelen, char *__ext, __SIZE_TYPE__ __extlen),_splitpath_s,(__abspath,__drive,__drivelen,__dir,__dirlen,__file,__filelen,__ext,__extlen))
 #else /* __CRT_HAVE__splitpath_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/_splitpath_s.h>
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__splitpath_s __LIBC_LOCAL_NAME(_splitpath_s)
 #endif /* !__CRT_HAVE__splitpath_s */
 #endif /* !__local___localdep__splitpath_s_defined */
-__LOCAL_LIBC(_splitpath) __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(_splitpath) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(3) __ATTR_ACCESS_WR_OPT(4) __ATTR_ACCESS_WR_OPT(5) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath))(char const *__restrict __abspath, char *__drive, char *__dir, char *__file, char *__ext) {
 	(__NAMESPACE_LOCAL_SYM __localdep__splitpath_s)(__abspath,
 	             __drive, __drive ? 3 : 0,

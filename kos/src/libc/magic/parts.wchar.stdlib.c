@@ -71,7 +71,7 @@ int wsystem([[nullable]] wchar_t const *cmd) {
            $has_function(realpath, convert_wcstombs, convert_mbstowcs))]]
 [[impl_include("<asm/os/fcntl.h>", "<asm/os/limits.h>", "<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
-wchar_t *wrealpath([[nonnull]] wchar_t const *filename, wchar_t *resolved) {
+wchar_t *wrealpath([[in]] wchar_t const *filename, [[out_opt]] wchar_t *resolved) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wfrealpathat)@@
 @@pp_if   defined(__PATH_MAX)   &&   __PATH_MAX   !=    -1@@
 	return wfrealpathat(__AT_FDCWD, filename, resolved, resolved ? __PATH_MAX : 0, 0);
@@ -133,7 +133,7 @@ wchar_t *wrealpath([[nonnull]] wchar_t const *filename, wchar_t *resolved) {
 [[decl_include("<bits/types.h>")]]
 [[requires($has_function(wfrealpath4) ||
            $has_function(frealpath, convert_mbstowcs))]]
-wchar_t *wfrealpath($fd_t fd, wchar_t *resolved, $size_t buflen) {
+wchar_t *wfrealpath($fd_t fd, [[out(? <= buflen)]] wchar_t *resolved, $size_t buflen) {
 @@pp_if $has_function(wfrealpath4)@@
 	return wfrealpath4(fd, resolved, buflen, 0);
 @@pp_else@@
@@ -178,7 +178,8 @@ wchar_t *wfrealpath($fd_t fd, wchar_t *resolved, $size_t buflen) {
 
 [[wchar, cp, wunused, section(".text.crt{|.dos}.wchar.fs.property")]]
 [[decl_include("<bits/types.h>"), requires_function(frealpath4, convert_mbstowcs)]]
-wchar_t *wfrealpath4($fd_t fd, wchar_t *resolved, $size_t buflen, $atflag_t flags) {
+wchar_t *wfrealpath4($fd_t fd, [[out(? <= buflen)]] wchar_t *resolved,
+                     $size_t buflen, $atflag_t flags) {
 	char *utf8_resolved;
 	wchar_t *wcs_resolved;
 	size_t resolved_length;
@@ -216,8 +217,9 @@ wchar_t *wfrealpath4($fd_t fd, wchar_t *resolved, $size_t buflen, $atflag_t flag
 
 [[wchar, cp, wunused, section(".text.crt{|.dos}.wchar.fs.property")]]
 [[decl_include("<bits/types.h>"), requires_function(frealpathat, convert_wcstombs, convert_mbstowcs)]]
-wchar_t *wfrealpathat($fd_t dirfd, [[nonnull]] wchar_t const *filename,
-                      wchar_t *resolved, $size_t buflen, $atflag_t flags) {
+wchar_t *wfrealpathat($fd_t dirfd, [[in]] wchar_t const *filename,
+                      [[out(? <= buflen)]] wchar_t *resolved,
+                      $size_t buflen, $atflag_t flags) {
 	char *utf8_filename, *utf8_resolved;
 	wchar_t *wcs_resolved;
 	size_t resolved_length;
@@ -262,14 +264,14 @@ wchar_t *wfrealpathat($fd_t dirfd, [[nonnull]] wchar_t const *filename,
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("wtol", "_wtol")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_wtoi64")]]
-int wtoi([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atoi"))}
+int wtoi([[in]] wchar_t const *nptr) %{generate(str2wcs("atoi"))}
 
 [[wchar, pure, wunused, dos_export_alias("_wtol"), decl_include("<hybrid/typecore.h>")]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, wtoi)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_wtoi")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("wtoll", "_wtoll")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_wtoi64")]]
-long wtol([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atol"))}
+long wtol([[in]] wchar_t const *nptr) %{generate(str2wcs("atol"))}
 
 %#ifdef __LONGLONG
 [[wchar, pure, wunused, dos_export_alias("_wtoll"), decl_include("<hybrid/typecore.h>")]]
@@ -278,7 +280,7 @@ long wtol([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atol"))}
 [[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, "wtol")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("_wtol")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("_wtoi64")]]
-__LONGLONG wtoll([[nonnull]] wchar_t const *nptr) %{generate(str2wcs("atoll"))}
+__LONGLONG wtoll([[in]] wchar_t const *nptr) %{generate(str2wcs("atoll"))}
 %#endif /* __LONGLONG */
 %#endif /* __USE_KOS */
 

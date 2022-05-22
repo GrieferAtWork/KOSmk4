@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cf95e87 */
+/* HASH CRC-32:0x8cb4a802 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32renameat2_defined
 #define __local___localdep_c32renameat2_defined
 #if defined(__CRT_HAVE_wrenameat2) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_c32renameat2,(__fd_t __oldfd, __CHAR32_TYPE__ const *__oldname, __fd_t __newfd, __CHAR32_TYPE__ const *__newname_or_path, __atflag_t __flags),wrenameat2,(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(4),int,__NOTHROW_RPC,__localdep_c32renameat2,(__fd_t __oldfd, __CHAR32_TYPE__ const *__oldname, __fd_t __newfd, __CHAR32_TYPE__ const *__newname_or_path, __atflag_t __flags),wrenameat2,(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
 #elif defined(__CRT_HAVE_KOS$wrenameat2)
-__CREDIRECT_KOS(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_c32renameat2,(__fd_t __oldfd, __CHAR32_TYPE__ const *__oldname, __fd_t __newfd, __CHAR32_TYPE__ const *__newname_or_path, __atflag_t __flags),wrenameat2,(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
+__CREDIRECT_KOS(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(4),int,__NOTHROW_RPC,__localdep_c32renameat2,(__fd_t __oldfd, __CHAR32_TYPE__ const *__oldname, __fd_t __newfd, __CHAR32_TYPE__ const *__newname_or_path, __atflag_t __flags),wrenameat2,(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
 #elif defined(__CRT_HAVE_renameat2) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.stdio/wrenameat2.h>
@@ -50,12 +50,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_KOS$convert_wcstombs)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif (defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -87,7 +87,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_renameat_defined
 #define __local___localdep_renameat_defined
 #ifdef __CRT_HAVE_renameat
-__CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_renameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path),renameat,(__oldfd,__oldname,__newfd,__newname_or_path))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(4),int,__NOTHROW_RPC,__localdep_renameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path),renameat,(__oldfd,__oldname,__newfd,__newname_or_path))
 #elif defined(__CRT_HAVE_renameat2)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/renameat.h>
@@ -97,7 +97,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_renameat_defined
 #endif /* !... */
 #endif /* !__local___localdep_renameat_defined */
-__LOCAL_LIBC(c32renameat) __ATTR_NONNULL((2, 4)) int
+__LOCAL_LIBC(c32renameat) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(4) int
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32renameat))(__fd_t __oldfd, __CHAR32_TYPE__ const *__oldname, __fd_t __newfd, __CHAR32_TYPE__ const *__newname_or_path) {
 #if (defined(__CRT_HAVE_wrenameat2) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wrenameat2) || (defined(__CRT_HAVE_renameat2) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE_renameat2) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 	return (__NAMESPACE_LOCAL_SYM __localdep_c32renameat2)(__oldfd, __oldname, __newfd, __newname_or_path, 0);

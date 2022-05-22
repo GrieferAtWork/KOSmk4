@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x498a2527 */
+/* HASH CRC-32:0x4f15f3af */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tsearch_r_defined
 #define __local___localdep_tsearch_r_defined
 #ifdef __CRT_HAVE_tsearch_r
-__CREDIRECT(__ATTR_NONNULL((3)),void *,__THROWING,__localdep_tsearch_r,(void const *__key, void **__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),tsearch_r,(__key,__vrootp,__compar,__arg))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RW_OPT(2) __ATTR_NONNULL((3)),void *,__THROWING,__localdep_tsearch_r,(void const *__key, void **__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),tsearch_r,(__key,__vrootp,__compar,__arg))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/tsearch_r.h>
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_defined */
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(tsearch) __ATTR_NONNULL((3)) void *
+__LOCAL_LIBC(tsearch) __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RW_OPT(2) __ATTR_NONNULL((3)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(tsearch))(void const *__key, void **__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	return (__NAMESPACE_LOCAL_SYM __localdep_tsearch_r)(__key, __vrootp, (int (__LIBCCALL *)(void const *, void const *, void *))(void *)__compar, __NULLPTR);

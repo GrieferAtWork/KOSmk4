@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a9277df */
+/* HASH CRC-32:0xb1a590e2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32stof_defined
 #define __local___localdep_c32stof_defined
 #if defined(__CRT_HAVE_wcstof) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_c32stof,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
+__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2),float,__NOTHROW_NCX,__localdep_c32stof,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
 #elif defined(__CRT_HAVE_KOS$wcstof)
-__CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_c32stof,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
+__CREDIRECT_KOS(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2),float,__NOTHROW_NCX,__localdep_c32stof,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr),wcstof,(__nptr,__endptr))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcstof.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32stof __LIBC_LOCAL_NAME(c32stof)
 #endif /* !... */
 #endif /* !__local___localdep_c32stof_defined */
-__LOCAL_LIBC(c32stof_l) __ATTR_NONNULL((1)) float
+__LOCAL_LIBC(c32stof_l) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) float
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32stof_l))(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, __locale_t __locale) {
 	(void)__locale;
 	return (__NAMESPACE_LOCAL_SYM __localdep_c32stof)(__nptr, __endptr);

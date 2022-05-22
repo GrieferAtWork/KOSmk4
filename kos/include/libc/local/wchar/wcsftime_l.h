@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf804453a */
+/* HASH CRC-32:0x37110 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsftime_defined
 #define __local___localdep_wcsftime_defined
 #ifdef __CRT_HAVE_wcsftime
-__CREDIRECT(__ATTR_LIBC_WCSFTIME(3, 0) __ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsftime,(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
+__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_RO(4) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_WCSFTIME(3, 0),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsftime,(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
 #else /* __CRT_HAVE_wcsftime */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsftime.h>
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcsftime __LIBC_LOCAL_NAME(wcsftime)
 #endif /* !__CRT_HAVE_wcsftime */
 #endif /* !__local___localdep_wcsftime_defined */
-__LOCAL_LIBC(wcsftime_l) __ATTR_LIBC_WCSFTIME(3, 0) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
+__LOCAL_LIBC(wcsftime_l) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RO(4) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_WCSFTIME(3, 0) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsftime_l))(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __maxsize, __WCHAR_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp, __locale_t __locale) {
 	(void)__locale;
 	return (__NAMESPACE_LOCAL_SYM __localdep_wcsftime)(__buf, __maxsize, __format, __tp);

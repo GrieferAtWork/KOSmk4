@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x269d32ad */
+/* HASH CRC-32:0xb65ae5b6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,10 +27,10 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_PWrite32_defined
 #define __local___localdep_PWrite32_defined
-__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PWrite32,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PWrite32,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
 #endif /* !__local___localdep_PWrite32_defined */
-__LOCAL_LIBC(PWrite64) __ATTR_NONNULL((2)) __SIZE_TYPE__
-(__LIBCCALL __LIBC_LOCAL_NAME(PWrite64))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset) __THROWS(...) {
+__LOCAL_LIBC(PWrite64) __ATTR_ACCESS_ROS(2, 3) __SIZE_TYPE__
+(__LIBCCALL __LIBC_LOCAL_NAME(PWrite64))(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset) __THROWS(...) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_PWrite32)(__fd, __buf, __bufsize, (__pos32_t)__offset);
 }
 __NAMESPACE_LOCAL_END

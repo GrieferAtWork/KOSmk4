@@ -162,7 +162,7 @@ $ssize_t format_wrepeat([[nonnull]] pwformatprinter printer, void *arg,
 @@pp_endif@@
 )]]
 $ssize_t format_vwprintf([[nonnull]] pwformatprinter printer, void *arg,
-                         [[nonnull, format]] wchar_t const *__restrict format,
+                         [[in, format]] wchar_t const *__restrict format,
                          $va_list args) {
 #ifndef __INTELLISENSE__
 #define __FORMAT_PRINTER            printer
@@ -207,7 +207,7 @@ format_wprintf(*) %{printf("format_vwprintf")}
 [[impl_include("<bits/math-constants.h>")]]
 $ssize_t format_vwscanf([[nonnull]] pformatgetc pgetc,
                         [[nonnull]] pformatungetc pungetc, void *arg,
-                        [[nonnull, format]] wchar_t const *__restrict format, $va_list args) {
+                        [[in, format]] wchar_t const *__restrict format, $va_list args) {
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE      wchar_t
 #define __CHAR_SIZE      __SIZEOF_WCHAR_T__
@@ -232,7 +232,7 @@ format_wscanf(*) %{printf("format_vwscanf")}
 [[wchar]]
 [[decl_include("<bits/crt/wformat-printer.h>", "<hybrid/typecore.h>"), cc(__WFORMATPRINTER_CC)]]
 $ssize_t format_wsprintf_printer([[nonnull]] /*wchar_t ***/ void *arg,
-                                 [[nonnull]] wchar_t const *__restrict data,
+                                 [[in(datalen)]] wchar_t const *__restrict data,
                                  $size_t datalen)
 	%{generate(str2wcs("format_sprintf_printer"))}
 
@@ -264,7 +264,7 @@ struct format_wsnprintf_data {
 [[wchar]]
 [[decl_include("<bits/crt/wformat-printer.h>", "<hybrid/typecore.h>"), cc(__WFORMATPRINTER_CC)]]
 $ssize_t format_wsnprintf_printer([[nonnull]] /*struct format_wsnprintf_data**/ void *arg,
-                                  [[nonnull]] wchar_t const *__restrict data,
+                                  [[in(datalen)]] wchar_t const *__restrict data,
                                   $size_t datalen)
 	%{generate(str2wcs("format_snprintf_printer"))}
 
@@ -273,7 +273,7 @@ $ssize_t format_wsnprintf_printer([[nonnull]] /*struct format_wsnprintf_data**/ 
 /* Don't export in KOS-mode (in that mode, we're an alias for `libc_format_length') */
 [[crt_kos_impl_if(0), crt_dos_impl_if(!defined(__KERNEL__))]]
 [[decl_include("<bits/crt/wformat-printer.h>", "<hybrid/typecore.h>"), cc(__WFORMATPRINTER_CC)]]
-$ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $size_t datalen) {
+$ssize_t format_wwidth(void *arg, [[in(datalen)]] wchar_t const *__restrict data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	size_t result = 0;
 	wchar_t const *iter, *end;
@@ -305,8 +305,7 @@ $ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $s
 
 
 [[const, cc(__WFORMATPRINTER_CC), decl_include("<bits/crt/wformat-printer.h>")]]
-$ssize_t format_wlength(void *arg, wchar_t const *__restrict data,
-                        $size_t datalen) = format_length;
+$ssize_t format_wlength(void *arg, wchar_t const *__restrict data, $size_t datalen) = format_length;
 
 
 
@@ -389,8 +388,8 @@ struct format_waprintf_data {
 [[decl_include("<hybrid/typecore.h>")]]
 [[decl_prefix(DEFINE_FORMAT_WAPRINTF_DATA)]]
 [[requires_function(realloc)]]
-wchar_t *format_waprintf_pack([[nonnull]] struct format_waprintf_data *__restrict self,
-                              [[nullable]] $size_t *pstrlen) {
+wchar_t *format_waprintf_pack([[inout]] struct format_waprintf_data *__restrict self,
+                              [[out_opt]] $size_t *pstrlen) {
 	/* Free unused buffer memory. */
 	wchar_t *result;
 	if (self->@ap_avail@ != 0) {
@@ -441,8 +440,9 @@ wchar_t *format_waprintf_pack([[nonnull]] struct format_waprintf_data *__restric
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, wunused, impl_include("<hybrid/__assert.h>")]]
 [[decl_prefix(DEFINE_FORMAT_WAPRINTF_DATA), requires_function(realloc)]]
-format_waprintf_alloc:([[nonnull]] struct format_waprintf_data *__restrict self,
-                       $size_t num_wchars) -> [[malloc /*(num_wchars * sizeof(wchar_t))*/]] wchar_t * {
+format_waprintf_alloc:([[inout]] struct format_waprintf_data *__restrict self,
+                       $size_t num_wchars)
+		-> [[malloc /*(num_wchars * sizeof(wchar_t))*/]] wchar_t * {
 	wchar_t *result;
 	if (self->@ap_avail@ < num_wchars) {
 		wchar_t *newbuf;
@@ -479,7 +479,7 @@ err:
 [[wchar, wunused, requires_function(format_waprintf_alloc), cc(__WFORMATPRINTER_CC)]]
 [[decl_include("<bits/crt/wformat-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_waprintf_printer([[nonnull]] /*struct format_waprintf_data **/ void *arg,
-                                 [[nonnull]] wchar_t const *__restrict data, $size_t datalen) {
+                                 [[in(datalen)]] wchar_t const *__restrict data, $size_t datalen) {
 	wchar_t *buf;
 	buf = format_waprintf_alloc((struct $format_waprintf_data *)arg, datalen);
 	if unlikely(!buf)

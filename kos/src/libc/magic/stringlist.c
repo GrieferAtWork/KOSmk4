@@ -82,7 +82,7 @@ struct _stringlist *sl_init() {
 @@inherited if the StringList is destroyed with `freeit=1'
 [[decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
 [[requires_function(realloc)]]
-int sl_add([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) {
+int sl_add([[inout]] struct _stringlist *sl, [[in]] char *name) {
 	if unlikely(sl->@sl_cur@ >= sl->@sl_max@) {
 		char **new_vector;
 		size_t new_alloc;
@@ -104,7 +104,7 @@ int sl_add([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) {
 @@`free(3)'d.
 [[decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
 [[requires_function(free)]]
-void sl_free([[nullable]] struct _stringlist *sl, int freeit) {
+void sl_free([[inout_opt]] struct _stringlist *sl, int freeit) {
 	if unlikely(!sl)
 		return;
 	if likely(sl->@sl_str@) {
@@ -127,8 +127,8 @@ void sl_free([[nullable]] struct _stringlist *sl, int freeit) {
 @@If `sl' doesn't contain an equivalent string, return `NULL' instead.
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[pure, decl_prefix(DEFINE_STRINGLIST)]]
-[[nullable]] char *sl_find([[nonnull]] struct _stringlist __KOS_FIXED_CONST *sl,
-                           [[nonnull]] char const *name) {
+[[nullable]] char *sl_find([[in]] struct _stringlist __KOS_FIXED_CONST *sl,
+                           [[in]] char const *name) {
 	size_t i, count = sl->@sl_cur@;
 	for (i = 0; i < count; ++i) {
 		char *s = sl->@sl_str@[i];
@@ -144,8 +144,8 @@ void sl_free([[nullable]] struct _stringlist *sl, int freeit) {
 @@@return: 0:  Successfully removed a string equal to `name'
 @@@return: -1: No string equal to `name' was found in `sl'
 [[guard, wunused, decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
-int sl_delete([[nonnull]] struct _stringlist *sl,
-              [[nonnull]] char const *name,
+int sl_delete([[inout]] struct _stringlist *sl,
+              [[in]] char const *name,
               int freeit) {
 	size_t i, count = sl->@sl_cur@;
 	for (i = 0; i < count; ++i) {

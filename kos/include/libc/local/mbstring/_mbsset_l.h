@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab8382f5 */
+/* HASH CRC-32:0x5929b50 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strset __LIBC_LOCAL_NAME(strset)
 #endif /* !... */
 #endif /* !__local___localdep_strset_defined */
-__LOCAL_LIBC(_mbsset_l) __ATTR_RETNONNULL __ATTR_NONNULL((1)) unsigned char *
+__LOCAL_LIBC(_mbsset_l) __ATTR_RETNONNULL __ATTR_ACCESS_RO(1) unsigned char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsset_l))(unsigned char *__buf, unsigned int __ch, __locale_t __locale) {
 	unsigned char *__iter, __lob, __hib;
 	__lob = (__ch & 0xff);

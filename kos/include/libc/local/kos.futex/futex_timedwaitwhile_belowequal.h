@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fbcc3f */
+/* HASH CRC-32:0x5fe51013 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/asm/futex.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(futex_timedwaitwhile_belowequal) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(futex_timedwaitwhile_belowequal) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(3) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal))(__uintptr_t *__uaddr, __uintptr_t __below_or_equal_value, struct timespec const *__rel_timeout) {
 	__hybrid_assert(__above_or_equal_value != (__uintptr_t)-1);
 	return (__NAMESPACE_LOCAL_SYM __localdep_lfutex)(__uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_or_equal_value + 1, __rel_timeout);

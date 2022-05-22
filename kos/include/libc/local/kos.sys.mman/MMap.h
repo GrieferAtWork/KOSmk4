@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94eb780f */
+/* HASH CRC-32:0xe6b46152 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_MMap32_defined) && defined(__CRT_HAVE_MMap)
 #define __local___localdep_MMap32_defined
-__CREDIRECT(,void *,__THROWING,__localdep_MMap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos32_t __offset),MMap,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_ACCESS_NONE(1),void *,__THROWING,__localdep_MMap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos32_t __offset),MMap,(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* !__local___localdep_MMap32_defined && __CRT_HAVE_MMap */
 #ifndef __local___localdep_MMap64_defined
 #define __local___localdep_MMap64_defined
 #if defined(__CRT_HAVE_MMap) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_WUNUSED,void *,__THROWING,__localdep_MMap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos64_t __offset),MMap,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING,__localdep_MMap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos64_t __offset),MMap,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_MMap64)
-__CREDIRECT(__ATTR_WUNUSED,void *,__THROWING,__localdep_MMap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos64_t __offset),MMap64,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING,__localdep_MMap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos64_t __offset),MMap64,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_MMap)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sys.mman/MMap64.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_MMap64_defined
 #endif /* !... */
 #endif /* !__local___localdep_MMap64_defined */
-__LOCAL_LIBC(MMap) __ATTR_WUNUSED void *
+__LOCAL_LIBC(MMap) __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(MMap))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __FS_TYPE(pos) __offset) __THROWS(...) {
 
 	return (__NAMESPACE_LOCAL_SYM __localdep_MMap64)(__addr, __len, __prot, __flags, __fd, (__pos64_t)__offset);

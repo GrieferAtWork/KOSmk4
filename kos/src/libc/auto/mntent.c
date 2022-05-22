@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe78b922b */
+/* HASH CRC-32:0x412b69be */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream) {
 	return libc_getmntent_r(stream, ent, buf, 512);
 }
 /* >> getmntent(3), getmntent_r(3) */
-INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_ACCESS_RW(1) NONNULL((2, 3)) struct mntent *
+INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WRS(3, 4) struct mntent *
 NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
                                        struct mntent *__restrict result,
                                        char *__restrict buffer,
@@ -133,7 +133,7 @@ err:
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
-INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_ACCESS_RW(1) NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int
 (LIBCCALL libc_addmntent)(FILE *__restrict stream,
                           struct mntent const *__restrict mnt) THROWS(...) {
 	if unlikely(!mnt ||
@@ -155,7 +155,7 @@ INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_ACCESS_RW(1) NONNULL((2)) 
  * Check if `mnt->mnt_opts' contains an option matching `opt'.
  * @return: * :   Address of the `opt'-string in `mnt->mnt_opts'
  * @return: NULL: No option `opt' found in `mnt->mnt_opts' */
-INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_PURE WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.database.mntent") ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) char *
 NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt,
                                      char const *opt) {
 	char *str;

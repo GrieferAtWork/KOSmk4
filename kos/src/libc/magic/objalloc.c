@@ -79,7 +79,7 @@ struct objalloc *objalloc_create(void) {
 [[decl_include("<bits/crt/objalloc.h>", "<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_ALLOC_SIZE((2))]]
 [[requires_function(malloc)]]
-void *_objalloc_alloc([[nonnull]] struct objalloc *self,
+void *_objalloc_alloc([[inout]] struct objalloc *self,
                       __ULONGPTR_TYPE__ num_bytes) {
 	struct __objalloc_chunk *newchunk;
 	size_t size = (size_t)num_bytes;
@@ -130,7 +130,7 @@ steal_from_current_chunk:
 @@Free all memory allocated by `self', before also freeing `self'
 [[decl_include("<bits/crt/objalloc.h>"), requires_function(free)]]
 [[decl_include("<bits/crt/objalloc.h>")]]
-void objalloc_free([[nonnull]] struct objalloc *self) {
+void objalloc_free([[inout]] struct objalloc *self) {
 	struct __objalloc_chunk *iter;
 	/* Simply free all chunks, then free `self' */
 	for (iter = (struct __objalloc_chunk *)self->@chunks@; iter;) {
@@ -147,7 +147,7 @@ void objalloc_free([[nonnull]] struct objalloc *self) {
 [[decl_include("<bits/crt/objalloc.h>")]]
 [[impl_include("<bits/crt/objalloc.h>", "<hybrid/__assert.h>")]]
 [[requires_function(free)]]
-void objalloc_free_block([[nonnull]] struct objalloc *self,
+void objalloc_free_block([[inout]] struct objalloc *self,
                          [[nonnull]] void *ptr) {
 	struct __objalloc_chunk *iter;
 	for (;;) {

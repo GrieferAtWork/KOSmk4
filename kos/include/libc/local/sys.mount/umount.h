@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8ba5b6e */
+/* HASH CRC-32:0xc304c269 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_umount2,(char const *__special_file, __STDC_INT_AS_UINT_T __flags),umount2,(__special_file,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_umount2,(char const *__special_file, __STDC_INT_AS_UINT_T __flags),umount2,(__special_file,__flags))
 #endif /* !__local___localdep_umount2_defined */
-__LOCAL_LIBC(umount) int
+__LOCAL_LIBC(umount) __ATTR_ACCESS_RO(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(umount))(char const *__special_file) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_umount2)(__special_file, 0);
 }

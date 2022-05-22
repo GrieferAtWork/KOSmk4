@@ -440,7 +440,7 @@ int iswblank(wint_t wc) {
 [[std, guard, pure, wunused, requires(defined(__CRT_KOS))]]
 [[decl_include("<bits/crt/wctype.h>")]]
 [[impl_include("<bits/crt/unicode.h>")]]
-wctrans_t wctrans([[nonnull]] char const *prop) {
+wctrans_t wctrans([[in]] char const *prop) {
 	struct wctrans_entry {
 		char     we_name[8]; /* Name (including the leading "to") */
 		uint16_t we_offset;  /* Offset to `int32_t' field in `struct __unitraits' */
@@ -472,7 +472,7 @@ wint_t towctrans(wint_t wc, wctrans_t desc) {
 [[decl_include("<bits/crt/wctype.h>")]]
 [[requires(defined(__CRT_KOS) && $has_function(__unicode_descriptor))]]
 [[impl_include("<bits/crt/unicode.h>")]]
-wctype_t wctype([[nonnull]] char const *prop) {
+wctype_t wctype([[in]] char const *prop) {
 	struct wctype_entry {
 		char     we_name[8]; /* Name (with leading "is" stripped) */
 		uint16_t we_flags;   /* Flags that must be set. */
@@ -803,7 +803,7 @@ int iswctype_l($wint_t wc, $wctype_t type, $locale_t locale) {
 [[requires_function(wctype)]]
 [[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_wctype")]]
 [[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_wctype")]]
-$wctype_t wctype_l([[nonnull]] char const *prop, $locale_t locale) {
+$wctype_t wctype_l([[in]] char const *prop, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
 	return wctype(prop);
@@ -825,7 +825,7 @@ $wint_t towctrans_l($wint_t wc, $wctrans_t desc, $locale_t locale) {
 [[requires_function(wctrans)]]
 [[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc_wctrans")]]
 [[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd_wctrans")]]
-$wctrans_t wctrans_l([[nonnull]] char const *prop, $locale_t locale) {
+$wctrans_t wctrans_l([[in]] char const *prop, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
 	return wctrans(prop);

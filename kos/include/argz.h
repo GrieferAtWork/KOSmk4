@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7e1dae */
+/* HASH CRC-32:0x8aacc3e6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -339,19 +339,19 @@ extern "C++" {
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)),__NOTHROW_NCX,argz_extract,(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
+__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3),__NOTHROW_NCX,argz_extract,(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)),__NOTHROW_NCX,argz_extract,(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
+__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3),__NOTHROW_NCX,argz_extract,(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__CDECLARE_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)),__NOTHROW_NCX,argz_extract,(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv),(__argz,__argz_len,___argv))
+__CDECLARE_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3),__NOTHROW_NCX,argz_extract,(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv),(__argz,__argz_len,___argv))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #elif defined(__CRT_HAVE___argz_extract)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
@@ -360,19 +360,19 @@ extern "C++" {
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)),__NOTHROW_NCX,argz_extract,(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
+__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3),__NOTHROW_NCX,argz_extract,(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)),__NOTHROW_NCX,argz_extract,(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
+__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3),__NOTHROW_NCX,argz_extract,(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)),__NOTHROW_NCX,argz_extract,(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
+__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3),__NOTHROW_NCX,argz_extract,(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #else /* ... */
 #include <libc/local/argz/argz_extract.h>
@@ -382,19 +382,19 @@ extern "C++" {
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, (char **)___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, (char **)___argv); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(argz_extract, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(argz_extract, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3) void __NOTHROW_NCX(__LIBCCALL argz_extract)(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_extract
@@ -404,19 +404,19 @@ extern "C++" {
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)),__NOTHROW_NCX,__argz_extract,(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
+__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3),__NOTHROW_NCX,__argz_extract,(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)),__NOTHROW_NCX,__argz_extract,(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
+__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3),__NOTHROW_NCX,__argz_extract,(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)),__NOTHROW_NCX,__argz_extract,(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
+__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3),__NOTHROW_NCX,__argz_extract,(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv),argz_extract,(__argz,__argz_len,___argv))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #elif defined(__CRT_HAVE___argz_extract)
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ARGZ_H_PROTO)
@@ -425,19 +425,19 @@ extern "C++" {
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)),__NOTHROW_NCX,__argz_extract,(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
+__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3),__NOTHROW_NCX,__argz_extract,(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)),__NOTHROW_NCX,__argz_extract,(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
+__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3),__NOTHROW_NCX,__argz_extract,(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv),__argz_extract,(__argz,__argz_len,___argv))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__CDECLARE_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)),__NOTHROW_NCX,__argz_extract,(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv),(__argz,__argz_len,___argv))
+__CDECLARE_VOID(__ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3),__NOTHROW_NCX,__argz_extract,(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv),(__argz,__argz_len,___argv))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #else /* ... */
 #include <libc/local/argz/argz_extract.h>
@@ -447,19 +447,19 @@ extern "C++" {
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, (char **)___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char const *__restrict __argz, size_t __argz_len, char const **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, (char **)___argv); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ARGZ_H_PROTO */
 /* >> argz_extract(3)
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((3)) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3) void __NOTHROW_NCX(__LIBCCALL __argz_extract)(char const *__restrict __argz, size_t __argz_len, char **__restrict ___argv) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_extract))(__argz, __argz_len, ___argv); }
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ARGZ_H_PROTO */
 #endif /* !... */
 #ifdef __CRT_HAVE_argz_stringify

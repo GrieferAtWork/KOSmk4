@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28bcbd9f */
+/* HASH CRC-32:0xe59d5a86 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,19 +82,19 @@ __CDECLARE(,struct spwd *,__NOTHROW_RPC,getspent,(void),())
 __CREDIRECT(,struct spwd *,__NOTHROW_RPC,getspent,(void),__getspent,())
 #endif /* ... */
 #ifdef __CRT_HAVE_getspnam
-__CDECLARE(__ATTR_NONNULL((1)),struct spwd *,__NOTHROW_RPC,getspnam,(char const *__restrict __name),(__name))
+__CDECLARE(__ATTR_ACCESS_RO(1),struct spwd *,__NOTHROW_RPC,getspnam,(char const *__restrict __name),(__name))
 #elif defined(__CRT_HAVE___getspnam)
-__CREDIRECT(__ATTR_NONNULL((1)),struct spwd *,__NOTHROW_RPC,getspnam,(char const *__restrict __name),__getspnam,(__name))
+__CREDIRECT(__ATTR_ACCESS_RO(1),struct spwd *,__NOTHROW_RPC,getspnam,(char const *__restrict __name),__getspnam,(__name))
 #endif /* ... */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),struct spwd *,__NOTHROW_RPC,sgetspent,(char const *__restrict __string),(__string))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1),struct spwd *,__NOTHROW_RPC,sgetspent,(char const *__restrict __string),(__string))
 __CDECLARE_OPT(__ATTR_ACCESS_RW(1),struct spwd *,__NOTHROW_RPC,fgetspent,(__FILE *__restrict __stream),(__stream))
-__CDECLARE_OPT(__ATTR_ACCESS_RW(2) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,putspent,(struct spwd const *__restrict __p, __FILE *__restrict __stream),(__p,__stream))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(2),int,__NOTHROW_RPC,putspent,(struct spwd const *__restrict __p, __FILE *__restrict __stream),(__p,__stream))
 
 #ifdef __USE_MISC
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 4)),int,__NOTHROW_RPC,getspent_r,(struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__result_buf,__buffer,__buflen,__result))
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,getspnam_r,(char const *__restrict __name, struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__name,__result_buf,__buffer,__buflen,__result))
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,sgetspent_r,(char const *__restrict __string, struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__string,__result_buf,__buffer,__buflen,__result))
-__CDECLARE_OPT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2, 3, 5)),int,__NOTHROW_RPC,fgetspent_r,(__FILE *__restrict __stream, struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__stream,__result_buf,__buffer,__buflen,__result))
+__CDECLARE_OPT(__ATTR_ACCESS_WR(1) __ATTR_ACCESS_WR(4) __ATTR_ACCESS_WRS(2, 3),int,__NOTHROW_RPC,getspent_r,(struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__result_buf,__buffer,__buflen,__result))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(5) __ATTR_ACCESS_WRS(3, 4),int,__NOTHROW_RPC,getspnam_r,(char const *__restrict __name, struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__name,__result_buf,__buffer,__buflen,__result))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(5) __ATTR_ACCESS_WRS(3, 4),int,__NOTHROW_RPC,sgetspent_r,(char const *__restrict __string, struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__string,__result_buf,__buffer,__buflen,__result))
+__CDECLARE_OPT(__ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(5) __ATTR_ACCESS_WRS(3, 4),int,__NOTHROW_RPC,fgetspent_r,(__FILE *__restrict __stream, struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__stream,__result_buf,__buffer,__buflen,__result))
 #endif /* __USE_MISC */
 #ifdef __CRT_HAVE_lckpwdf
 __CDECLARE(,int,__NOTHROW_RPC_KOS,lckpwdf,(void),())

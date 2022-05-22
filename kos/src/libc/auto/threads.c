@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26035fea */
+/* HASH CRC-32:0x795ee433 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ STATIC_ASSERT(sizeof(int) <= sizeof(void *));
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.threads") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.sched.threads") ATTR_ACCESS_WR(1) NONNULL((2)) int
 NOTHROW_NCX(LIBDCALL libd_thrd_create)(thrd_t *thr,
                                        int (LIBDCALL *func)(void *arg),
                                        void *arg) {
@@ -59,7 +59,7 @@ NOTHROW_NCX(LIBDCALL libd_thrd_create)(thrd_t *thr,
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_WR(1) NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr,
                                        int (LIBCCALL *func)(void *arg),
                                        void *arg) {
@@ -100,7 +100,7 @@ NOTHROW_NCX(LIBCCALL libc_thrd_detach)(thrd_t thr) {
  * Wait for the given thread to finish (s.a. `pthread_join(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_WR_OPT(2) int
 NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr,
                                      int *res) {
 	errno_t error;
@@ -126,7 +126,7 @@ NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr,
  * Initialize a mutex object (s.a. `pthread_mutex_init(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex,
                                     __STDC_INT_AS_UINT_T type) {
 	errno_t error;
@@ -155,7 +155,7 @@ NOTHROW_NCX(LIBCCALL libc_mtx_init)(mtx_t *__restrict mutex,
  * Acquire a lock to a given mutex (s.a. `pthread_mutex_lock(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_RW(1) int
 NOTHROW_RPC(LIBCCALL libc_mtx_lock)(mtx_t *__restrict mutex) {
 	errno_t error;
 	error = libc_pthread_mutex_lock((pthread_mutex_t *)mutex);
@@ -171,7 +171,7 @@ NOTHROW_RPC(LIBCCALL libc_mtx_lock)(mtx_t *__restrict mutex) {
  * @return: thrd_success:  Success
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int
 NOTHROW_RPC(LIBCCALL libc_mtx_timedlock)(mtx_t *__restrict mutex,
                                          struct timespec const *__restrict time_point) {
 	errno_t error;
@@ -196,7 +196,7 @@ DEFINE_INTERN_ALIAS(libc_mtx_timedlock64, libc_mtx_timedlock);
  * @return: thrd_success:  Success
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int
 NOTHROW_RPC(LIBCCALL libc_mtx_timedlock64)(mtx_t *__restrict mutex,
                                            struct timespec64 const *__restrict time_point) {
 	errno_t error;
@@ -218,7 +218,7 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock64)(mtx_t *__restrict mutex,
  * @return: thrd_success: Success
  * @return: thrd_busy:    Cannot lock without blocking right now
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_mtx_trylock)(mtx_t *__restrict mutex) {
 	errno_t error;
 	error = libc_pthread_mutex_trylock((pthread_mutex_t *)mutex);
@@ -236,7 +236,7 @@ NOTHROW_NCX(LIBCCALL libc_mtx_trylock)(mtx_t *__restrict mutex) {
  * Release a lock from a given mutex (s.a. `pthread_mutex_unlock(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_mtx_unlock)(mtx_t *__restrict mutex) {
 	errno_t error;
 	error = libc_pthread_mutex_unlock((pthread_mutex_t *)mutex);
@@ -250,7 +250,7 @@ NOTHROW_NCX(LIBCCALL libc_mtx_unlock)(mtx_t *__restrict mutex) {
  * Initialize the given condition variable (s.a. `pthread_cond_init(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_cnd_init)(cnd_t *__restrict cond) {
 	errno_t error;
 	error = libc_pthread_cond_init((pthread_cond_t *)cond, NULL);
@@ -265,7 +265,7 @@ NOTHROW_NCX(LIBCCALL libc_cnd_init)(cnd_t *__restrict cond) {
  * condition variable (s.a. `pthread_cond_signal(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_cnd_signal)(cnd_t *__restrict cond) {
 	errno_t error;
 	error = libc_pthread_cond_signal((pthread_cond_t *)cond);
@@ -280,7 +280,7 @@ NOTHROW_NCX(LIBCCALL libc_cnd_signal)(cnd_t *__restrict cond) {
  * condition variable (s.a. `pthread_cond_broadcast(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_RW(1) int
 NOTHROW_NCX(LIBCCALL libc_cnd_broadcast)(cnd_t *__restrict cond) {
 	errno_t error;
 	error = libc_pthread_cond_broadcast((pthread_cond_t *)cond);
@@ -294,7 +294,7 @@ NOTHROW_NCX(LIBCCALL libc_cnd_broadcast)(cnd_t *__restrict cond) {
  * Wait on the given condition variable (s.a. `pthread_cond_wait(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) int
 NOTHROW_RPC(LIBCCALL libc_cnd_wait)(cnd_t *__restrict cond,
                                     mtx_t *__restrict mutex) {
 	errno_t error;
@@ -312,7 +312,7 @@ NOTHROW_RPC(LIBCCALL libc_cnd_wait)(cnd_t *__restrict cond,
  * @return: thrd_success:  Success
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2, 3)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) int
 NOTHROW_RPC(LIBCCALL libc_cnd_timedwait)(cnd_t *__restrict cond,
                                          mtx_t *__restrict mutex,
                                          struct timespec const *__restrict time_point) {
@@ -340,7 +340,7 @@ DEFINE_INTERN_ALIAS(libc_cnd_timedwait64, libc_cnd_timedwait);
  * @return: thrd_success:  Success
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((1, 2, 3)) int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) int
 NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *__restrict cond,
                                            mtx_t *__restrict mutex,
                                            struct timespec64 const *__restrict time_point) {
@@ -363,7 +363,7 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *__restrict cond,
  * Create a new TLS key (s.a. `pthread_key_create(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id,
                                       void (LIBKCALL *destructor)(void *arg)) {
 	errno_t error;
@@ -378,7 +378,7 @@ NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id,
  * Set the calling thread's value for the given TLS key (s.a. `pthread_setspecific(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTERN ATTR_SECTION(".text.crt.sched.threads") int
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_NONE(2) int
 NOTHROW_NCX(LIBCCALL libc_tss_set)(tss_t tss_id,
                                    void *val) {
 	errno_t error;

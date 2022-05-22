@@ -29,8 +29,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_statfs,hash:CRC-32=0xa91fc4b1]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") NONNULL((1, 2)) int
+/*[[[head:libc_statfs,hash:CRC-32=0xcdc36985]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int
 NOTHROW_NCX(LIBCCALL libc_statfs)(char const *file,
                                   struct statfs *buf)
 /*[[[body:libc_statfs]]]*/
@@ -41,8 +41,8 @@ NOTHROW_NCX(LIBCCALL libc_statfs)(char const *file,
 }
 /*[[[end:libc_statfs]]]*/
 
-/*[[[head:libc_fstatfs,hash:CRC-32=0x35e5856c]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") NONNULL((2)) int
+/*[[[head:libc_fstatfs,hash:CRC-32=0x2c65ffd9]]]*/
+INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_ACCESS_WR(2) int
 NOTHROW_NCX(LIBCCALL libc_fstatfs)(fd_t filedes,
                                    struct statfs *buf)
 /*[[[body:libc_fstatfs]]]*/
@@ -54,11 +54,11 @@ NOTHROW_NCX(LIBCCALL libc_fstatfs)(fd_t filedes,
 /*[[[end:libc_fstatfs]]]*/
 
 
-/*[[[head:libc_statfs64,hash:CRC-32=0x13993b28]]]*/
+/*[[[head:libc_statfs64,hash:CRC-32=0x66aa9a32]]]*/
 #ifdef _STATFS_MATCHES_STATFS64
 DEFINE_INTERN_ALIAS(libc_statfs64, libc_statfs);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int
 NOTHROW_NCX(LIBCCALL libc_statfs64)(const char *file,
                                     struct statfs64 *buf)
 /*[[[body:libc_statfs64]]]*/
@@ -70,11 +70,11 @@ NOTHROW_NCX(LIBCCALL libc_statfs64)(const char *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_statfs64]]]*/
 
-/*[[[head:libc_fstatfs64,hash:CRC-32=0x87d6a320]]]*/
+/*[[[head:libc_fstatfs64,hash:CRC-32=0x75a30933]]]*/
 #ifdef _STATFS_MATCHES_STATFS64
 DEFINE_INTERN_ALIAS(libc_fstatfs64, libc_fstatfs);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") ATTR_ACCESS_WR(2) int
 NOTHROW_NCX(LIBCCALL libc_fstatfs64)(fd_t filedes,
                                      struct statfs64 *buf)
 /*[[[body:libc_fstatfs64]]]*/

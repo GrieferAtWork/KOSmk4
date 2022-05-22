@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37423d97 */
+/* HASH CRC-32:0xec54516b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mblen_defined
 #define __local___localdep_mblen_defined
 #ifdef __CRT_HAVE_mblen
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_mblen,(char const *__str, __SIZE_TYPE__ __maxlen),mblen,(__str,__maxlen))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(1),int,__NOTHROW_NCX,__localdep_mblen,(char const *__str, __SIZE_TYPE__ __maxlen),mblen,(__str,__maxlen))
 #else /* __CRT_HAVE_mblen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/mblen.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_mblen __LIBC_LOCAL_NAME(mblen)
 #endif /* !__CRT_HAVE_mblen */
 #endif /* !__local___localdep_mblen_defined */
-__LOCAL_LIBC(_mblen_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(_mblen_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mblen_l))(char const *__str, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
 	(void)__locale;
 	return (__NAMESPACE_LOCAL_SYM __localdep_mblen)(__str, __maxlen);

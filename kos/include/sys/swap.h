@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b177655 */
+/* HASH CRC-32:0x2f96a08b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,25 +60,25 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_swapon
 /* >> swapon(2)
  * @param swapflags: Set of `SWAP_FLAG_*' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapon,(char const *__path, __STDC_INT_AS_UINT_T __swapflags),(__path,__swapflags))
+__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,swapon,(char const *__path, __STDC_INT_AS_UINT_T __swapflags),(__path,__swapflags))
 #elif defined(__CRT_HAVE___swapon)
 /* >> swapon(2)
  * @param swapflags: Set of `SWAP_FLAG_*' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapon,(char const *__path, __STDC_INT_AS_UINT_T __swapflags),__swapon,(__path,__swapflags))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,swapon,(char const *__path, __STDC_INT_AS_UINT_T __swapflags),__swapon,(__path,__swapflags))
 #elif defined(__CRT_HAVE___libc_swapon)
 /* >> swapon(2)
  * @param swapflags: Set of `SWAP_FLAG_*' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapon,(char const *__path, __STDC_INT_AS_UINT_T __swapflags),__libc_swapon,(__path,__swapflags))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,swapon,(char const *__path, __STDC_INT_AS_UINT_T __swapflags),__libc_swapon,(__path,__swapflags))
 #endif /* ... */
 #ifdef __CRT_HAVE_swapoff
 /* >> swapoff(2) */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapoff,(char const *__path),(__path))
+__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,swapoff,(char const *__path),(__path))
 #elif defined(__CRT_HAVE___swapoff)
 /* >> swapoff(2) */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapoff,(char const *__path),__swapoff,(__path))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,swapoff,(char const *__path),__swapoff,(__path))
 #elif defined(__CRT_HAVE___libc_swapoff)
 /* >> swapoff(2) */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapoff,(char const *__path),__libc_swapoff,(__path))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,swapoff,(char const *__path),__libc_swapoff,(__path))
 #endif /* ... */
 
 __SYSDECL_END

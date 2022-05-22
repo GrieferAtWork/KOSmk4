@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36d65e17 */
+/* HASH CRC-32:0x850b2e84 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strtonum) __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __LONGLONG
+__LOCAL_LIBC(strtonum) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(4) __LONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtonum))(char const *__nptr, __LONGLONG __lo, __LONGLONG __hi, char const **__p_errstr) {
 	__errno_t __error;
 	__LONGLONG __result;

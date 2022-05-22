@@ -46,15 +46,15 @@ __SYSDECL_BEGIN
 @@uses the the standard `AA:BB:CC:DD:EE:FF' notation.
 [[decl_prefix(struct ether_addr;)]]
 [[nonnull, wunused, impl_include("<net/ethernet.h>")]]
-char *ether_ntoa([[nonnull]] struct ether_addr const *__restrict addr) {
+char *ether_ntoa([[in]] struct ether_addr const *__restrict addr) {
 	static char buf[21];
 	return ether_ntoa_r(addr, buf);
 }
 
 [[decl_prefix(struct ether_addr;)]]
 [[doc_alias("ether_ntoa"), impl_include("<net/ethernet.h>")]]
-[[nonnull]] char *ether_ntoa_r([[nonnull]] struct ether_addr const *__restrict addr,
-                               [[nonnull]] char *__restrict buf) {
+[[nonnull]] char *ether_ntoa_r([[in]] struct ether_addr const *__restrict addr,
+                               [[out]] char *__restrict buf) {
 	sprintf(buf, "%x:%x:%x:%x:%x:%x",
 	        addr->@ether_addr_octet@[0], addr->@ether_addr_octet@[1],
 	        addr->@ether_addr_octet@[2], addr->@ether_addr_octet@[3],
@@ -66,15 +66,15 @@ char *ether_ntoa([[nonnull]] struct ether_addr const *__restrict addr) {
 @@a `AA:BB:CC:DD:EE:FF'-string into an ethernet address.
 [[decl_prefix(struct ether_addr;)]]
 [[wunused, nonnull, impl_include("<net/ethernet.h>")]]
-struct ether_addr *ether_aton([[nonnull]] char const *__restrict asc) {
+struct ether_addr *ether_aton([[in]] char const *__restrict asc) {
 	static struct @ether_addr@ addr;
 	return ether_aton_r(asc, &addr);
 }
 
 [[decl_prefix(struct ether_addr;)]]
 [[wunused, doc_alias("ether_aton"), impl_include("<net/ethernet.h>")]]
-struct ether_addr *ether_aton_r([[nonnull]] char const *__restrict asc,
-                                [[nonnull]] struct ether_addr *__restrict addr) {
+struct ether_addr *ether_aton_r([[in]] char const *__restrict asc,
+                                [[out]] struct ether_addr *__restrict addr) {
 	return ether_paton_r((char const **)&asc, addr);
 }
 
@@ -82,8 +82,8 @@ struct ether_addr *ether_aton_r([[nonnull]] char const *__restrict asc,
 [[decl_prefix(struct ether_addr;)]]
 [[wunused, doc_alias("ether_aton")]]
 [[impl_include("<net/ethernet.h>", "<libc/template/hex.h>")]]
-struct ether_addr *ether_paton_r([[nonnull]] char const **__restrict pasc,
-                                 [[nonnull]] struct ether_addr *__restrict addr) {
+struct ether_addr *ether_paton_r([[inout]] char const **__restrict pasc,
+                                 [[in]] struct ether_addr *__restrict addr) {
 	unsigned int i;
 	char const *asc = *pasc;
 	for (i = 0; i < 6; ++i) {
@@ -122,9 +122,9 @@ struct ether_addr *ether_paton_r([[nonnull]] char const **__restrict pasc,
 @@             (`ether_paton_r()' returned `NULL')
 [[decl_prefix(struct ether_addr;)]]
 [[wunused, impl_include("<net/ethernet.h>")]]
-int ether_line([[nonnull]] char const *line,
-               [[nonnull]] struct ether_addr *addr,
-               [[nonnull]] char *hostname) {
+int ether_line([[in]] char const *line,
+               [[out]] struct ether_addr *addr,
+               [[out]] char *hostname) {
 	size_t hnlen;
 	while (isspace(*line) && *line != '\r' && *line != '\n')
 		++line;
@@ -152,8 +152,8 @@ int ether_line([[nonnull]] char const *line,
 @@@return: 0 : Success
 @@@return: * : No entry for `addr' found, or `/etc/ethers' doesn't exist.
 [[cp_kos, decl_prefix(struct ether_addr;)]]
-int ether_ntohost([[nonnull]] char *hostname,
-                  [[nonnull]] struct ether_addr const *addr);
+int ether_ntohost([[out]] char *hostname,
+                  [[in]] struct ether_addr const *addr);
 /* TODO: Implement `ether_ntohost()' inline */
 
 
@@ -161,8 +161,8 @@ int ether_ntohost([[nonnull]] char *hostname,
 @@@return: 0 : Success
 @@@return: * : No entry for `hostname' found, or `/etc/ethers' doesn't exist.
 [[cp_kos, decl_prefix(struct ether_addr;)]]
-int ether_hostton([[nonnull]] char const *hostname,
-                  [[nonnull]] struct ether_addr *addr);
+int ether_hostton([[in]] char const *hostname,
+                  [[out]] struct ether_addr *addr);
 /* TODO: Implement `ether_hostton()' inline */
 
 

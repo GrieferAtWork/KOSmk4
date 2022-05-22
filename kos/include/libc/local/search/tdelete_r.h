@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x682fdb34 */
+/* HASH CRC-32:0x61669344 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(tdelete_r) __ATTR_NONNULL((3)) void *
+__LOCAL_LIBC(tdelete_r) __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RW_OPT(2) __ATTR_NONNULL((3)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(tdelete_r))(void const *__restrict __key, void **__restrict __vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) {
 	typedef struct __node_struct {
 		void const           *__key;

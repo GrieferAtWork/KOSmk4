@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc56d4ebf */
+/* HASH CRC-32:0x2629b11e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(format_wto32) __SSIZE_TYPE__
+__LOCAL_LIBC(format_wto32) __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__WFORMATPRINTER_CC __LIBC_LOCAL_NAME(format_wto32))(void *__arg, __WCHAR_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
 #if __SIZEOF_WCHAR_T__ == 2
 	struct __local_format_16to32_data {

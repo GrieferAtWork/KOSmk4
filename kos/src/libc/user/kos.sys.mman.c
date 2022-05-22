@@ -80,8 +80,8 @@ INTERN ATTR_SECTION(".text.crt.except.heap.mman") WUNUSED void *
 #endif /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 
 
-/*[[[head:libc_PosixMAdvise,hash:CRC-32=0x95c0ac63]]]*/
-INTERN ATTR_SECTION(".text.crt.except.system.mman") NONNULL((1)) void
+/*[[[head:libc_PosixMAdvise,hash:CRC-32=0x16f83196]]]*/
+INTERN ATTR_SECTION(".text.crt.except.system.mman") ATTR_ACCESS_NONE(1) void
 (LIBCCALL libc_PosixMAdvise)(void *addr,
                              size_t len,
                              __STDC_INT_AS_UINT_T advice) THROWS(...)

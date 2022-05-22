@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4de2fc36 */
+/* HASH CRC-32:0x97b9791d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined
 #ifdef __CRT_HAVE_getenv
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #elif defined(__LOCAL_environ)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/getenv.h>
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/db/passwd.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2, 3, 5)),__errno_t,__NOTHROW_RPC,__localdep_getpwuid_r,(__uid_t __uid, struct passwd *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct passwd **__restrict __result),getpwuid_r,(__uid,__resultbuf,__buffer,__buflen,__result))
+__CREDIRECT(__ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(5) __ATTR_ACCESS_WRS(3, 4),__errno_t,__NOTHROW_RPC,__localdep_getpwuid_r,(__uid_t __uid, struct passwd *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct passwd **__restrict __result),getpwuid_r,(__uid,__resultbuf,__buffer,__buflen,__result))
 #endif /* !__local___localdep_getpwuid_r_defined && __CRT_HAVE_getpwuid_r */
 #ifndef __local___localdep_strncpy_defined
 #define __local___localdep_strncpy_defined

@@ -57,7 +57,7 @@ typedef __clock_t clock_t;
 @@>> times(2)
 [[decl_include("<bits/types.h>", "<bits/os/tms.h>")]]
 [[export_alias("__times", "__libc_times")]]
-clock_t times(struct tms *buffer);
+clock_t times([[out_opt]] struct tms *buffer);
 
 %{
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ea3de37 */
+/* HASH CRC-32:0x145330e6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pselect32_defined
 #define __local___localdep_pselect32_defined
-__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect32,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timespec32 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect32,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timespec32 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #endif /* !__local___localdep_pselect32_defined */
-__LOCAL_LIBC(pselect64) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(pselect64) __ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pselect64))(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask) {
 	struct __timespec32 __tms;
 	if (!__timeout)

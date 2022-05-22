@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb025bbb */
+/* HASH CRC-32:0x2a2dbd04 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,14 +30,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_Mkdir_defined) && defined(__CRT_HAVE_Mkdir)
 #define __local___localdep_Mkdir_defined
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Mkdir,(char const *__pathname, __mode_t __mode),Mkdir,(__pathname,__mode))
+__CREDIRECT_VOID(__ATTR_ACCESS_RO(1),__THROWING,__localdep_Mkdir,(char const *__pathname, __mode_t __mode),Mkdir,(__pathname,__mode))
 #endif /* !__local___localdep_Mkdir_defined && __CRT_HAVE_Mkdir */
 #ifndef __local___localdep_Open_defined
 #define __local___localdep_Open_defined
 #if defined(__CRT_HAVE_Open) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__THROWING,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_Open64) && (defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__THROWING,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__THROWING,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.fcntl/Open.h>
@@ -97,7 +97,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/parts/malloca.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ShmOpen) __ATTR_NONNULL((1)) __fd_t
+__LOCAL_LIBC(ShmOpen) __ATTR_ACCESS_RO(1) __fd_t
 (__LIBCCALL __LIBC_LOCAL_NAME(ShmOpen))(char const *__name, __oflag_t __oflags, __mode_t __mode) __THROWS(...) {
 	__fd_t __result;
 	char *__fullname;

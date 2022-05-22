@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ca803fe */
+/* HASH CRC-32:0x9a8007fb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ DECL_BEGIN
  * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(4) NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags);
 /* >> lfutexexpr(2), lfutexexpr64(2)
  * The lfutexexpr(2) system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
@@ -70,7 +70,7 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *ulock
  * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(4) NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags);
 /* >> LFutexExpr(2), LFutexExpr64(2)
  * Excetion-enabled version of `lfutexexpr(2)'
  * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
@@ -83,7 +83,7 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(lfutex_t *ulo
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @throws: E_INTERRUPT:        A blocking futex-wait operation was interrupted */
-INTDEF NONNULL((1, 3)) int (LIBCCALL libc_LFutexExpr)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags) THROWS(...);
+INTDEF ATTR_ACCESS_RO_OPT(4) NONNULL((1, 3)) int (LIBCCALL libc_LFutexExpr)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags) THROWS(...);
 /* >> LFutexExpr(2), LFutexExpr64(2)
  * Excetion-enabled version of `lfutexexpr(2)'
  * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
@@ -96,7 +96,7 @@ INTDEF NONNULL((1, 3)) int (LIBCCALL libc_LFutexExpr)(lfutex_t *ulockaddr, void 
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @throws: E_INTERRUPT:        A blocking futex-wait operation was interrupted */
-INTDEF NONNULL((1, 3)) int (LIBCCALL libc_LFutexExpr64)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags) THROWS(...);
+INTDEF ATTR_ACCESS_RO_OPT(4) NONNULL((1, 3)) int (LIBCCALL libc_LFutexExpr64)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags) THROWS(...);
 #endif /* !__KERNEL__ */
 
 DECL_END

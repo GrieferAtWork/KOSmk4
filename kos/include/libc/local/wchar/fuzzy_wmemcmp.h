@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50bae142 */
+/* HASH CRC-32:0x61e1ff21 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,7 +85,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* __NO_MALLOCA */
 #endif /* !... */
 #endif /* !__local___localdep_fuzzy_memcmpw_defined */
-__LOCAL_LIBC(fuzzy_wmemcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
+__LOCAL_LIBC(fuzzy_wmemcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wmemcmp))(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_chars, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_chars) {
 #if __SIZEOF_WCHAR_T__ == 2
 	return (__NAMESPACE_LOCAL_SYM __localdep_fuzzy_memcmpw)(__s1, __s1_chars, __s2, __s2_chars);

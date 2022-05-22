@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeeb3989f */
+/* HASH CRC-32:0xb176570d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __WCHAR_TYPE__ __wc),wctomb,(__str,__wc))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __WCHAR_TYPE__ __wc),wctomb,(__str,__wc))
 #else /* __CRT_HAVE_wctomb */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/wctomb.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wctomb_s) __ATTR_NONNULL((1, 2)) __errno_t
+__LOCAL_LIBC(wctomb_s) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WR_OPT(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb_s))(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ __wc) {
 	if (!__presult || !__buf) {
 #ifdef __EINVAL

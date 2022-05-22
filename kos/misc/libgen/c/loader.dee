@@ -718,6 +718,12 @@ do_add_nonnull_annotation:
 							self.parseCStringOrKeyword();
 							goto access_annotation_expected_le;
 						case "return":
+							self.next();
+							if (self.tok == "*") {
+								self.next();
+								self.parseCStringOrKeywordOrNumber();
+							}
+							goto access_annotation_expected_le;
 						case "?":
 							self.next();
 access_annotation_expected_le:
@@ -742,7 +748,13 @@ access_annotation_expected_le:
 						}	break;
 
 						case "strlen":
-						case "strnlen": {
+						case "wcslen":
+						case "c16len":
+						case "c32len":
+						case "strnlen":
+						case "wcsnlen":
+						case "c16nlen":
+						case "c32nlen": {
 							local strlen_tok = self.tok;
 							self.next();
 							self.skip("(");
@@ -760,7 +772,7 @@ access_annotation_expected_le:
 									}
 								});
 							}
-							if (strlen_tok == "strlen") {
+							if (!strlen_tok.endswith("nlen")) {
 								shouldMarkAsNonNull = true;
 								self.skip(")");
 								self.skip(")");

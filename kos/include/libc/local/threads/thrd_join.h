@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc804f98e */
+/* HASH CRC-32:0x159ceb2e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,12 +30,12 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __pthread, void **__thread_return),pthread_join,(__pthread,__thread_return))
+__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),__errno_t,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __pthread, void **__thread_return),pthread_join,(__pthread,__thread_return))
 #endif /* !__local___localdep_pthread_join_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(thrd_join) int
+__LOCAL_LIBC(thrd_join) __ATTR_ACCESS_WR_OPT(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr, int *__res) {
 	__errno_t __error;
 #if __SIZEOF_POINTER__ != __SIZEOF_INT__

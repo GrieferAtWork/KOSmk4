@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf204b5c1 */
+/* HASH CRC-32:0x5a612ff9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,7 +77,7 @@ typedef __SSIZE_TYPE__ ssize_t;
  *                calling thread being interrupted, `EINTR' is only set
  *                if no  random data  had already  been retrieved  from
  *                the kernel's random data sink. */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),ssize_t,__NOTHROW_NCX,getrandom,(void *__buf, size_t __num_bytes, unsigned int __flags),(__buf,__num_bytes,__flags))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2),ssize_t,__NOTHROW_NCX,getrandom,(void *__buf, size_t __num_bytes, unsigned int __flags),(__buf,__num_bytes,__flags))
 #ifndef __getentropy_defined
 #define __getentropy_defined
 #ifdef __CRT_HAVE_getentropy
@@ -93,7 +93,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),ssize_t,__NOTHROW_NCX,getrando
  * and `ENOSYS'  may be  translated into  `EIO'
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,getentropy,(void *__buf, size_t __num_bytes),(__buf,__num_bytes))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2),int,__NOTHROW_NCX,getentropy,(void *__buf, size_t __num_bytes),(__buf,__num_bytes))
 #elif defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
 #include <libc/local/sys.random/getentropy.h>
 /* >> getentropy(3)
@@ -108,7 +108,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,getentropy,(void
  * and `ENOSYS'  may be  translated into  `EIO'
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL getentropy)(void *__buf, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getentropy))(__buf, __num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2) int __NOTHROW_NCX(__LIBCCALL getentropy)(void *__buf, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getentropy))(__buf, __num_bytes); })
 #else /* ... */
 #undef __getentropy_defined
 #endif /* !... */

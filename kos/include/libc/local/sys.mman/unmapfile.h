@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a1aa533 */
+/* HASH CRC-32:0x5325c600 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,22 +44,22 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_munmap,(void *__addr, __SIZE_TYPE__ __len),munmap,(__addr,__len))
+__CREDIRECT(__ATTR_ACCESS_NONE(1),int,__NOTHROW_NCX,__localdep_munmap,(void *__addr, __SIZE_TYPE__ __len),munmap,(__addr,__len))
 #elif defined(__CRT_HAVE___munmap)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_munmap,(void *__addr, __SIZE_TYPE__ __len),__munmap,(__addr,__len))
+__CREDIRECT(__ATTR_ACCESS_NONE(1),int,__NOTHROW_NCX,__localdep_munmap,(void *__addr, __SIZE_TYPE__ __len),__munmap,(__addr,__len))
 #elif defined(__CRT_HAVE___libc_munmap)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_munmap,(void *__addr, __SIZE_TYPE__ __len),__libc_munmap,(__addr,__len))
+__CREDIRECT(__ATTR_ACCESS_NONE(1),int,__NOTHROW_NCX,__localdep_munmap,(void *__addr, __SIZE_TYPE__ __len),__libc_munmap,(__addr,__len))
 #else /* ... */
 #undef __local___localdep_munmap_defined
 #endif /* !... */
 #endif /* !__local___localdep_munmap_defined */
-__LOCAL_LIBC(unmapfile) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(unmapfile) __ATTR_ACCESS_RW(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unmapfile))(struct mapfile *__restrict __mapping) {
 	if (__mapping->__mf_mapsize) {
 #if defined(__CRT_HAVE_munmap) || defined(__CRT_HAVE___munmap) || defined(__CRT_HAVE___libc_munmap)

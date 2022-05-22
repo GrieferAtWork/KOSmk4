@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2959ffd */
+/* HASH CRC-32:0x792af74b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clock_settime32_defined
 #define __local___localdep_clock_settime32_defined
 #ifdef __CRT_HAVE_clock_settime
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),clock_settime,(__clock_id,__tp))
+__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),clock_settime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE___clock_settime)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),__clock_settime,(__clock_id,__tp))
+__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),__clock_settime,(__clock_id,__tp))
 #else /* ... */
 #undef __local___localdep_clock_settime32_defined
 #endif /* !... */
 #endif /* !__local___localdep_clock_settime32_defined */
-__LOCAL_LIBC(clock_settime64) __ATTR_NONNULL((2)) int
+__LOCAL_LIBC(clock_settime64) __ATTR_ACCESS_RO(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_settime64))(__clockid_t __clock_id, struct __timespec64 const *__tp) {
 	struct __timespec32 __tp32;
 	__tp32.tv_sec  = (__time32_t)__tp->tv_sec;

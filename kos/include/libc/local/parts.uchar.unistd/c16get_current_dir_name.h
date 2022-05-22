@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8e0a792 */
+/* HASH CRC-32:0x26070f79 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_mbstoc16_defined
 #define __local___localdep_convert_mbstoc16_defined
 #if defined(__CRT_HAVE_convert_mbstowcs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc16,(char const *__restrict __str),convert_mbstowcs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc16,(char const *__restrict __str),convert_mbstowcs,(__str))
 #elif defined(__CRT_HAVE_DOS$convert_mbstowcs)
-__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc16,(char const *__restrict __str),convert_mbstowcs,(__str))
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc16,(char const *__restrict __str),convert_mbstowcs,(__str))
 #elif (defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_mbstowcs.h>

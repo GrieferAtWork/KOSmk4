@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dc1ccb0 */
+/* HASH CRC-32:0x3c38b237 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_bzero __LIBC_LOCAL_NAME(bzero)
 #endif /* !... */
 #endif /* !__local___localdep_bzero_defined */
-__LOCAL_LIBC(explicit_bzero) void
+__LOCAL_LIBC(explicit_bzero) __ATTR_ACCESS_WRS(1, 2) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(explicit_bzero))(void *__dst, __SIZE_TYPE__ __n_bytes) {
 	void *volatile __vdst = __dst;
 	(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__vdst, __n_bytes);

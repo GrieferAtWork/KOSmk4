@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82b506a7 */
+/* HASH CRC-32:0x5720b6ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,13 +40,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_uchar_c16rtomb_defined
 #define __local___localdep_uchar_c16rtomb_defined
 #if defined(__CRT_HAVE_wcrtomb) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, struct __mbstate *__mbs),wcrtomb,(__str,__wc,__mbs))
+__CREDIRECT(__ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, struct __mbstate *__mbs),wcrtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_DOS$wcrtomb)
-__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, struct __mbstate *__mbs),wcrtomb,(__str,__wc,__mbs))
+__CREDIRECT_DOS(__ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, struct __mbstate *__mbs),wcrtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_c16rtomb) && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, struct __mbstate *__mbs),c16rtomb,(__str,__wc,__mbs))
+__CREDIRECT(__ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, struct __mbstate *__mbs),c16rtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_DOS$c16rtomb)
-__CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, struct __mbstate *__mbs),c16rtomb,(__str,__wc,__mbs))
+__CREDIRECT_DOS(__ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__restrict __str, __CHAR16_TYPE__ __wc, struct __mbstate *__mbs),c16rtomb,(__str,__wc,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcrtomb.h>
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_uchar_c16rtomb __LIBC_LOCAL_NAME(uchar_c16rtomb)
 #endif /* !... */
 #endif /* !__local___localdep_uchar_c16rtomb_defined */
-__LOCAL_LIBC(c16nrtombs) __ATTR_NONNULL((2)) __SIZE_TYPE__
+__LOCAL_LIBC(c16nrtombs) __ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW_OPT(5) __ATTR_ACCESS_WR_OPT(1) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16nrtombs))(char *__dst, __CHAR16_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __nwc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs) {
 	__SIZE_TYPE__ __result = 0;
 	__CHAR16_TYPE__ const *__src = *__psrc;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd7eac49 */
+/* HASH CRC-32:0xd47224e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,7 +119,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 __NAMESPACE_LOCAL_END
 #include <asm/crt/malloc.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fcopylist_sz) __ATTR_NONNULL((2)) char *
+__LOCAL_LIBC(fcopylist_sz) __ATTR_ACCESS_WR(2) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fcopylist_sz))(__fd_t __fd, __SIZE_TYPE__ *__p_filesize) {
 	__SIZE_TYPE__ __reslen  = 0;
 	__SIZE_TYPE__ __buflen  = 1024;

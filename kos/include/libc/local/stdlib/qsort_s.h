@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf72d7020 */
+/* HASH CRC-32:0xf6cdcf87 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_qsort_r_defined
 #define __local___localdep_qsort_r_defined
 #ifdef __CRT_HAVE_qsort_r
-__CREDIRECT_VOID(__ATTR_NONNULL((1, 4)),__THROWING,__localdep_qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),qsort_r,(__pbase,__item_count,__item_size,__compar,__arg))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW_OPT(1) __ATTR_NONNULL((4)),__THROWING,__localdep_qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),qsort_r,(__pbase,__item_count,__item_size,__compar,__arg))
 #elif defined(__CRT_HAVE__quicksort)
-__CREDIRECT_VOID(__ATTR_NONNULL((1, 4)),__THROWING,__localdep_qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),_quicksort,(__pbase,__item_count,__item_size,__compar,__arg))
+__CREDIRECT_VOID(__ATTR_ACCESS_RW_OPT(1) __ATTR_NONNULL((4)),__THROWING,__localdep_qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),_quicksort,(__pbase,__item_count,__item_size,__compar,__arg))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/qsort_r.h>
@@ -53,7 +53,7 @@ __LOCAL_LIBC(__invoke_compare_helper_s) int
 __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_s_defined */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(qsort_s) __ATTR_NONNULL((1, 4)) void
+__LOCAL_LIBC(qsort_s) __ATTR_ACCESS_RW_OPT(1) __ATTR_NONNULL((4)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(qsort_s))(void *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) {
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data __data;
 	__data.__fun = __compar;

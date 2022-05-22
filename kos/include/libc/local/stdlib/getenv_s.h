@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffdcf922 */
+/* HASH CRC-32:0x200df0e5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined
 #ifdef __CRT_HAVE_getenv
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #elif defined(__LOCAL_environ)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/getenv.h>
@@ -69,7 +69,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getenv_s) __ATTR_NONNULL((1, 2, 4)) __errno_t
+__LOCAL_LIBC(getenv_s) __ATTR_ACCESS_RO(4) __ATTR_ACCESS_WR(1) __ATTR_ACCESS_WRS(2, 3) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getenv_s))(__SIZE_TYPE__ *__preqsize, char *__buf, __SIZE_TYPE__ __bufsize, char const *__varname) {
 	__SIZE_TYPE__ __reqsize;
 	char *__name = (__NAMESPACE_LOCAL_SYM __localdep_getenv)(__varname);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc07db47 */
+/* HASH CRC-32:0x98c9aa88 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mbstowcs_defined
 #define __local___localdep_mbstowcs_defined
 #ifdef __CRT_HAVE_mbstowcs
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbstowcs,(__WCHAR_TYPE__ *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dstlen),mbstowcs,(__dst,__src,__dstlen))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbstowcs,(__WCHAR_TYPE__ *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dstlen),mbstowcs,(__dst,__src,__dstlen))
 #else /* __CRT_HAVE_mbstowcs */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/mbstowcs.h>

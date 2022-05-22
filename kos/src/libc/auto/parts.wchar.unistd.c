@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11d66a2 */
+/* HASH CRC-32:0xf93db39a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd) {
 		return buf;
 	return NULL;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file,
                                   uid_t owner,
                                   gid_t group) {
@@ -74,7 +74,7 @@ NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file,
 
 
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_wchown)(char32_t const *file,
                                   uid_t owner,
                                   gid_t group) {
@@ -93,7 +93,7 @@ NOTHROW_RPC(LIBKCALL libc_wchown)(char32_t const *file,
 
 
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") NONNULL((1)) longptr_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_ACCESS_RO(1) longptr_t
 NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path,
                                      __STDC_INT_AS_UINT_T name) {
 	longptr_t result;
@@ -107,7 +107,7 @@ NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.property") NONNULL((1)) longptr_t
+INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_ACCESS_RO(1) longptr_t
 NOTHROW_RPC(LIBKCALL libc_wpathconf)(char32_t const *path,
                                      __STDC_INT_AS_UINT_T name) {
 	longptr_t result;
@@ -122,7 +122,7 @@ NOTHROW_RPC(LIBKCALL libc_wpathconf)(char32_t const *path,
 	return result;
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_wlink)(char16_t const *from,
                                  char16_t const *to) {
 
@@ -149,7 +149,7 @@ NOTHROW_RPC(LIBDCALL libd_wlink)(char16_t const *from,
 
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBKCALL libc_wlink)(char32_t const *from,
                                  char32_t const *to) {
 
@@ -175,7 +175,7 @@ NOTHROW_RPC(LIBKCALL libc_wlink)(char32_t const *from,
 
 
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_waccess)(char16_t const *file,
                                    __STDC_INT_AS_UINT_T type) {
 
@@ -193,7 +193,7 @@ NOTHROW_RPC(LIBDCALL libd_waccess)(char16_t const *file,
 
 
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.property") WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.property") WUNUSED ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_waccess)(char32_t const *file,
                                    __STDC_INT_AS_UINT_T type) {
 
@@ -211,7 +211,7 @@ NOTHROW_RPC(LIBKCALL libc_waccess)(char32_t const *file,
 
 
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.basic_property") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.basic_property") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_wchdir)(char16_t const *path) {
 	longptr_t result;
 	char *utf8_path;
@@ -224,7 +224,7 @@ NOTHROW_RPC(LIBDCALL libd_wchdir)(char16_t const *path) {
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.basic_property") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.basic_property") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_wchdir)(char32_t const *path) {
 	longptr_t result;
 	char *utf8_path;
@@ -239,7 +239,7 @@ NOTHROW_RPC(LIBKCALL libc_wchdir)(char32_t const *path) {
 }
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.basic_property") char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.basic_property") ATTR_ACCESS_WRS(1, 2) char16_t *
 NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
                                    size_t bufsize) {
 	char *utf8_result;
@@ -295,7 +295,7 @@ done:
 }
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.wchar.fs.basic_property") char32_t *
+INTERN ATTR_SECTION(".text.crt.wchar.fs.basic_property") ATTR_ACCESS_WRS(1, 2) char32_t *
 NOTHROW_RPC(LIBKCALL libc_wgetcwd)(char32_t *buf,
                                    size_t bufsize) {
 	char *utf8_result;
@@ -349,7 +349,7 @@ done:
 
 	return buf;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_wunlink)(char16_t const *file) {
 
 	return libd_wunlinkat(__AT_FDCWD, file, 0);
@@ -366,7 +366,7 @@ NOTHROW_RPC(LIBDCALL libd_wunlink)(char16_t const *file) {
 
 
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_wunlink)(char32_t const *file) {
 
 	return libc_wunlinkat(__AT_FDCWD, file, 0);
@@ -383,7 +383,7 @@ NOTHROW_RPC(LIBKCALL libc_wunlink)(char32_t const *file) {
 
 
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_wrmdir)(char16_t const *path) {
 
 	return libd_wunlinkat(__AT_FDCWD, path, __AT_REMOVEDIR);
@@ -400,7 +400,7 @@ NOTHROW_RPC(LIBDCALL libd_wrmdir)(char16_t const *path) {
 
 
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_wrmdir)(char32_t const *path) {
 
 	return libc_wunlinkat(__AT_FDCWD, path, __AT_REMOVEDIR);
@@ -417,7 +417,7 @@ NOTHROW_RPC(LIBKCALL libc_wrmdir)(char32_t const *path) {
 
 
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") WUNUSED ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_weuidaccess)(char16_t const *file,
                                        __STDC_INT_AS_UINT_T type) {
 
@@ -435,7 +435,7 @@ NOTHROW_RPC(LIBDCALL libd_weuidaccess)(char16_t const *file,
 
 
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.property") WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.property") WUNUSED ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_weuidaccess)(char32_t const *file,
                                        __STDC_INT_AS_UINT_T type) {
 
@@ -479,7 +479,7 @@ NOTHROW_RPC(LIBKCALL libc_wget_current_dir_name)(void) {
 
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_wfaccessat)(fd_t dfd,
                                       char16_t const *file,
                                       __STDC_INT_AS_UINT_T type,
@@ -495,7 +495,7 @@ NOTHROW_RPC(LIBDCALL libd_wfaccessat)(fd_t dfd,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.property") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBKCALL libc_wfaccessat)(fd_t dfd,
                                       char32_t const *file,
                                       __STDC_INT_AS_UINT_T type,
@@ -511,7 +511,7 @@ NOTHROW_RPC(LIBKCALL libc_wfaccessat)(fd_t dfd,
 
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_wfchownat)(fd_t dfd,
                                      char16_t const *file,
                                      uid_t owner,
@@ -528,7 +528,7 @@ NOTHROW_RPC(LIBDCALL libd_wfchownat)(fd_t dfd,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBKCALL libc_wfchownat)(fd_t dfd,
                                      char32_t const *file,
                                      uid_t owner,
@@ -545,7 +545,7 @@ NOTHROW_RPC(LIBKCALL libc_wfchownat)(fd_t dfd,
 
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((2, 4)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(4) int
 NOTHROW_RPC(LIBDCALL libd_wlinkat)(fd_t fromfd,
                                    char16_t const *from,
                                    fd_t tofd,
@@ -570,7 +570,7 @@ done_from:
 done:
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((2, 4)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(4) int
 NOTHROW_RPC(LIBKCALL libc_wlinkat)(fd_t fromfd,
                                    char32_t const *from,
                                    fd_t tofd,
@@ -595,7 +595,7 @@ done_from:
 done:
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *link_text,
                                       fd_t tofd,
                                       char16_t const *target_path) {
@@ -622,7 +622,7 @@ NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *link_text,
 
 
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1, 3)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBKCALL libc_wsymlinkat)(char32_t const *link_text,
                                       fd_t tofd,
                                       char32_t const *target_path) {
@@ -649,7 +649,7 @@ NOTHROW_RPC(LIBKCALL libc_wsymlinkat)(char32_t const *link_text,
 
 
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1, 3)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBDCALL libd_wfsymlinkat)(char16_t const *link_text,
                                        fd_t tofd,
                                        char16_t const *target_path,
@@ -673,7 +673,7 @@ done_from:
 done:
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1, 3)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) int
 NOTHROW_RPC(LIBKCALL libc_wfsymlinkat)(char32_t const *link_text,
                                        fd_t tofd,
                                        char32_t const *target_path,
@@ -697,7 +697,7 @@ done_from:
 done:
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd,
                                      char16_t const *file,
                                      atflag_t flags) {
@@ -712,7 +712,7 @@ NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBKCALL libc_wunlinkat)(fd_t dfd,
                                      char32_t const *file,
                                      atflag_t flags) {
@@ -728,7 +728,7 @@ NOTHROW_RPC(LIBKCALL libc_wunlinkat)(fd_t dfd,
 	return result;
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_wlchown)(char16_t const *file,
                                    uid_t owner,
                                    gid_t group) {
@@ -748,7 +748,7 @@ NOTHROW_RPC(LIBDCALL libd_wlchown)(char16_t const *file,
 
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_wlchown)(char32_t const *file,
                                    uid_t owner,
                                    gid_t group) {
@@ -767,7 +767,7 @@ NOTHROW_RPC(LIBKCALL libc_wlchown)(char32_t const *file,
 
 
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBDCALL libd_wtruncate)(char16_t const *file,
                                      __PIO_OFFSET length) {
 
@@ -787,7 +787,7 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate)(char16_t const *file,
 	return result;
 #endif /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBKCALL libc_wtruncate)(char32_t const *file,
                                      __PIO_OFFSET length) {
 
@@ -821,7 +821,7 @@ DEFINE_INTERN_ALIAS(libd_wtruncate64, libd_wtruncate);
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file,
                                        __PIO_OFFSET64 length) {
 
@@ -854,7 +854,7 @@ DEFINE_INTERN_ALIAS(libc_wtruncate64, libc_wtruncate);
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBKCALL libc_wtruncate64)(char32_t const *file,
                                        __PIO_OFFSET64 length) {
 
@@ -873,7 +873,7 @@ NOTHROW_NCX(LIBKCALL libc_wtruncate64)(char32_t const *file,
 
 }
 #endif /* __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *link_text,
                                     char16_t const *target_path) {
 
@@ -901,7 +901,7 @@ NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *link_text,
 
 
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.modify") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
 NOTHROW_RPC(LIBKCALL libc_wsymlink)(char32_t const *link_text,
                                     char32_t const *target_path) {
 
@@ -932,7 +932,7 @@ NOTHROW_RPC(LIBKCALL libc_wsymlink)(char32_t const *link_text,
 #include <bits/crt/uformat-printer.h>
 #include <bits/crt/mbstate.h>
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.system.configuration") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.system.configuration") ATTR_ACCESS_WRS(1, 2) int
 NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name,
                                         size_t buflen) {
 	struct __LOCAL_format_wsnprintf_data {
@@ -973,7 +973,7 @@ NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name,
 #include <bits/crt/uformat-printer.h>
 #include <bits/crt/mbstate.h>
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.wchar.system.configuration") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.system.configuration") ATTR_ACCESS_WRS(1, 2) int
 NOTHROW_NCX(LIBKCALL libc_wgethostname)(char32_t *name,
                                         size_t buflen) {
 	struct __LOCAL_format_wsnprintf_data {
@@ -1011,7 +1011,7 @@ NOTHROW_NCX(LIBKCALL libc_wgethostname)(char32_t *name,
 	}
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.tty") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.tty") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBDCALL libd_wsetlogin)(char16_t const *name) {
 	int result;
 	char *utf8_name;
@@ -1024,7 +1024,7 @@ NOTHROW_NCX(LIBDCALL libd_wsetlogin)(char16_t const *name) {
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.io.tty") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.io.tty") ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBKCALL libc_wsetlogin)(char32_t const *name) {
 	int result;
 	char *utf8_name;
@@ -1037,7 +1037,7 @@ NOTHROW_NCX(LIBKCALL libc_wsetlogin)(char32_t const *name) {
 
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.system.configuration") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.system.configuration") ATTR_ACCESS_ROS(1, 2) int
 NOTHROW_NCX(LIBDCALL libd_wsethostname)(char16_t const *name,
                                         size_t len) {
 	int result;
@@ -1052,7 +1052,7 @@ NOTHROW_NCX(LIBDCALL libd_wsethostname)(char16_t const *name,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.system.configuration") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.system.configuration") ATTR_ACCESS_ROS(1, 2) int
 NOTHROW_NCX(LIBKCALL libc_wsethostname)(char32_t const *name,
                                         size_t len) {
 	int result;
@@ -1070,7 +1070,7 @@ NOTHROW_NCX(LIBKCALL libc_wsethostname)(char32_t const *name,
 #include <bits/crt/uformat-printer.h>
 #include <bits/crt/mbstate.h>
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.system.configuration") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.system.configuration") ATTR_ACCESS_WRS(1, 2) int
 NOTHROW_NCX(LIBDCALL libd_wgetdomainname)(char16_t *name,
                                           size_t buflen) {
 	struct __LOCAL_format_wsnprintf_data {
@@ -1111,7 +1111,7 @@ NOTHROW_NCX(LIBDCALL libd_wgetdomainname)(char16_t *name,
 #include <bits/crt/uformat-printer.h>
 #include <bits/crt/mbstate.h>
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.wchar.system.configuration") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.system.configuration") ATTR_ACCESS_WRS(1, 2) int
 NOTHROW_NCX(LIBKCALL libc_wgetdomainname)(char32_t *name,
                                           size_t buflen) {
 	struct __LOCAL_format_wsnprintf_data {
@@ -1149,7 +1149,7 @@ NOTHROW_NCX(LIBKCALL libc_wgetdomainname)(char32_t *name,
 	}
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.system.configuration") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.system.configuration") ATTR_ACCESS_ROS(1, 2) int
 NOTHROW_NCX(LIBDCALL libd_wsetdomainname)(char16_t const *name,
                                           size_t len) {
 	int result;
@@ -1164,7 +1164,7 @@ NOTHROW_NCX(LIBDCALL libd_wsetdomainname)(char16_t const *name,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.system.configuration") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.system.configuration") ATTR_ACCESS_ROS(1, 2) int
 NOTHROW_NCX(LIBKCALL libc_wsetdomainname)(char32_t const *name,
                                           size_t len) {
 	int result;
@@ -1179,7 +1179,7 @@ NOTHROW_NCX(LIBKCALL libc_wsetdomainname)(char32_t const *name,
 
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBDCALL libd_wchroot)(char16_t const *path) {
 	longptr_t result;
 	char *utf8_path;
@@ -1192,7 +1192,7 @@ NOTHROW_RPC(LIBDCALL libd_wchroot)(char16_t const *path) {
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.fs.utility") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.utility") ATTR_ACCESS_RO(1) int
 NOTHROW_RPC(LIBKCALL libc_wchroot)(char32_t const *path) {
 	longptr_t result;
 	char *utf8_path;

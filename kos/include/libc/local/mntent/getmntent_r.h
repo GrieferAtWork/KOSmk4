@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe916a6ec */
+/* HASH CRC-32:0xf0661d55 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,7 +96,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_isspace __LIBC_LOCAL_NAME(isspace)
 #endif /* !... */
 #endif /* !__local___localdep_isspace_defined */
-__LOCAL_LIBC(getmntent_r) __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2, 3)) struct mntent *
+__LOCAL_LIBC(getmntent_r) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WRS(3, 4) struct mntent *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getmntent_r))(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize) {
 	char *__line;
 	do {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43d57411 */
+/* HASH CRC-32:0xd8e78642 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_futimens32_defined
 #define __local___localdep_futimens32_defined
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),futimens,(__fd,__times))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),futimens,(__fd,__times))
 #endif /* !__local___localdep_futimens32_defined */
-__LOCAL_LIBC(futimens64) int
+__LOCAL_LIBC(futimens64) __ATTR_ACCESS_RO_OPT(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futimens64))(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]) {
 	struct __timespec32 __tms[2];
 	if (!__times)

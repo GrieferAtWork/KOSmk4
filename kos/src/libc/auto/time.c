@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c8ca646 */
+/* HASH CRC-32:0x8676d617 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #define __yearstodays(n_years) (((146097 * (n_years)) / 400) /*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 #include <bits/crt/tm.h>
-INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL NONNULL((1)) struct tm *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL ATTR_ACCESS_RW(1) struct tm *
 NOTHROW_NCX(LIBCCALL libc_normalize_struct_tm)(struct tm *__restrict tp) {
 	/* Normalize seconds. */
 	if (tp->tm_sec < 0) {
@@ -187,7 +187,7 @@ NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1,
 }
 /* >> mktime(3), mktime64(3)
  * Return the `time_t' representation of `tp' and normalize `tp' */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED ATTR_ACCESS_RW(1) time_t
 NOTHROW_NCX(LIBCCALL libc_mktime)(struct tm *tp) {
 	/* TODO: Support for localtime? */
 	return libc_timegm(tp);
@@ -203,7 +203,7 @@ __NAMESPACE_LOCAL_END
 #endif /* __BUILDING_LIBC */
 /* >> ctime(3), ctime64(3)
  * Equivalent to `asctime(localtime(timer))' */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_NCX(LIBCCALL libc_ctime)(time_t const *timer) {
 
 
@@ -226,7 +226,7 @@ __NAMESPACE_LOCAL_END
 /* >> gmtime(3), gmtime64(3)
  * Return  the  `struct tm'  representation  of   `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime)(time_t const *timer) {
 
 
@@ -248,7 +248,7 @@ __NAMESPACE_LOCAL_END
 #endif /* __BUILDING_LIBC */
 /* >> localtime(3), localtime64(3)
  * Return the `struct tm' representation of `*timer' in the local timezone */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) struct tm *
 NOTHROW_NCX(LIBCCALL libc_localtime)(time_t const *timer) {
 
 
@@ -264,7 +264,7 @@ NOTHROW_NCX(LIBCCALL libc_localtime)(time_t const *timer) {
  * Format `tp' into `s' according to `format'.
  * Write no more than `maxsize' characters and return the number
  * of characters  written, or  0 if  it would  exceed  `maxsize' */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 3, 4)) size_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_STRFTIME(3, 0) size_t
 NOTHROW_NCX(LIBCCALL libc_strftime)(char *__restrict buf,
                                     size_t bufsize,
                                     char const *__restrict format,
@@ -290,13 +290,13 @@ __NAMESPACE_LOCAL_END
 /* >> asctime(3)
  * Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is  the  representation  of  `tp'  in  this  format */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_NCX(LIBCCALL libc_asctime)(struct tm const *tp) {
 	return libc_asctime_r(tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
 }
 #include <libc/errno.h>
 /* >> asctime_s(3) */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 3)) errno_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc_asctime_s)(char *__restrict buf,
                                      size_t buflen,
                                      struct tm const *__restrict tp) {
@@ -327,7 +327,7 @@ DEFINE_INTERN_ALIAS(libc_mktime64, libc_mktime);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> mktime(3), mktime64(3)
  * Return the `time_t' representation of `tp' and normalize `tp' */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time64_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED ATTR_ACCESS_RW(1) time64_t
 NOTHROW_NCX(LIBCCALL libc_mktime64)(struct tm *tp) {
 	/* TODO: Support for localtime? */
 	return libc_timegm64(tp);
@@ -348,7 +348,7 @@ __NAMESPACE_LOCAL_END
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_ctime && !__CRT_HAVE__ctime32) */
 /* >> ctime(3), ctime64(3)
  * Equivalent to `asctime(localtime(timer))' */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_NCX(LIBCCALL libc_ctime64)(time64_t const *timer) {
 
 
@@ -373,7 +373,7 @@ __NAMESPACE_LOCAL_END
 /* >> gmtime(3), gmtime64(3)
  * Return  the  `struct tm'  representation  of   `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime64)(time64_t const *timer) {
 
 
@@ -397,7 +397,7 @@ __NAMESPACE_LOCAL_END
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_localtime && !__CRT_HAVE__localtime32) */
 /* >> localtime(3), localtime64(3)
  * Return the `struct tm' representation of `*timer' in the local timezone */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) struct tm *
 NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer) {
 
 
@@ -413,7 +413,7 @@ NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer) {
 #include <libc/errno.h>
 /* >> timegm(3), timegm64(3)
  * Like `mktime', but `tp' represents Universal Time (UTC), not local time */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED ATTR_ACCESS_RW(1) time_t
 NOTHROW_NCX(LIBCCALL libc_timegm)(struct tm *tp) {
 	time64_t result;
 #if __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
@@ -461,7 +461,7 @@ DEFINE_INTERN_ALIAS(libc_timegm64, libc_timegm);
 #endif /* !__yearstodays */
 /* >> timegm(3), timegm64(3)
  * Like `mktime', but `tp' represents Universal Time (UTC), not local time */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time64_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED ATTR_ACCESS_RW(1) time64_t
 NOTHROW_NCX(LIBCCALL libc_timegm64)(struct tm *tp) {
 
 
@@ -482,7 +482,7 @@ NOTHROW_NCX(LIBCCALL libc_timegm64)(struct tm *tp) {
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts,
                                         __STDC_INT_AS_UINT_T base) {
 	if (base == __TIME_UTC) {
@@ -498,7 +498,7 @@ DEFINE_INTERN_ALIAS(libc_timespec_get64, libc_timespec_get);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_timespec_get64)(struct timespec64 *ts,
                                           __STDC_INT_AS_UINT_T base) {
 	if (base == __TIME_UTC) {
@@ -512,7 +512,7 @@ NOTHROW_NCX(LIBCCALL libc_timespec_get64)(struct timespec64 *ts,
 /* >> strftime_l(3)
  * Similar to `strftime(3)' but take the information from
  * the   provided  locale  and   not  the  global  locale */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 3, 4)) size_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_STRFTIME(3, 0) size_t
 NOTHROW_NCX(LIBCCALL libc_strftime_l)(char *__restrict buf,
                                       size_t bufsize,
                                       char const *__restrict format,
@@ -524,7 +524,7 @@ NOTHROW_NCX(LIBCCALL libc_strftime_l)(char *__restrict buf,
 /* >> strptime(3)
  * Parse `s' according to `format' and store binary time information in `tp'.
  * The return  value is  a pointer  to the  first unparsed  character in  `s' */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2, 3)) char *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(3) char *
 NOTHROW_NCX(LIBCCALL libc_strptime)(char const *__restrict s,
                                     char const *__restrict format,
                                     struct tm *__restrict tp) {
@@ -542,7 +542,7 @@ NOTHROW_NCX(LIBCCALL libc_strptime)(char const *__restrict s,
 /* >> strptime_l(3)
  * Similar to `strptime' but take the information from
  * the  provided  locale  and  not  the  global locale */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2, 3)) char *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(3) char *
 NOTHROW_NCX(LIBCCALL libc_strptime_l)(char const *__restrict s,
                                       char const *__restrict format,
                                       struct tm *__restrict tp,
@@ -556,7 +556,7 @@ NOTHROW_NCX(LIBCCALL libc_strptime_l)(char const *__restrict s,
  * variant.  The  functionality is  the same.  The  result is  returned in
  * the  buffer pointed to by `resbufp' and in case of an error, the return
  * value is != 0  with the same values  as given above for  `getdate_err'. */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int
 NOTHROW_NCX(LIBCCALL libc_getdate_r)(char const *__restrict string,
                                      struct tm *__restrict resbufp) {
 	/* TODO */
@@ -592,7 +592,7 @@ __NAMESPACE_LOCAL_END
 #endif /* __BUILDING_LIBC && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> gmtime_r(3), gmtime64_r(3)
  * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) struct tm *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer,
                                     struct tm *__restrict tp) {
 
@@ -650,7 +650,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer,
 }
 /* >> localtime_r(3), localtime64_r(3)
  * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) struct tm *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) struct tm *
 NOTHROW_NCX(LIBCCALL libc_localtime_r)(time_t const *__restrict timer,
                                        struct tm *__restrict tp) {
 
@@ -670,7 +670,7 @@ NOTHROW_NCX(LIBCCALL libc_localtime_r)(time_t const *__restrict timer,
 }
 /* >> ctime_r(3), ctime64_r(3)
  * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc_ctime_r)(time_t const *__restrict timer,
                                    char buf[26]) {
 
@@ -719,7 +719,7 @@ __NAMESPACE_LOCAL_END
 #endif /* __BUILDING_LIBC || !__CRT_HAVE__gmtime64_s */
 /* >> gmtime_r(3), gmtime64_r(3)
  * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) struct tm *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
                                       struct tm *__restrict tp) {
 
@@ -775,7 +775,7 @@ DEFINE_INTERN_ALIAS(libc_localtime64_r, libc_localtime_r);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> localtime_r(3), localtime64_r(3)
  * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) struct tm *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) struct tm *
 NOTHROW_NCX(LIBCCALL libc_localtime64_r)(time64_t const *__restrict timer,
                                          struct tm *__restrict tp) {
 
@@ -792,7 +792,7 @@ DEFINE_INTERN_ALIAS(libc_ctime64_r, libc_ctime_r);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> ctime_r(3), ctime64_r(3)
  * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc_ctime64_r)(time64_t const *__restrict timer,
                                      char buf[26]) {
 
@@ -824,7 +824,7 @@ __NAMESPACE_LOCAL_END
 /* >> asctime_r(3)
  * Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that   is   the   representation   of   `tp'   in   this   format */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc_asctime_r)(struct tm const *__restrict tp,
                                      char buf[26]) {
 
@@ -884,7 +884,7 @@ NOTHROW_NCX(LIBCCALL libc__get_dstbias)(__LONG32_TYPE__ *p_result) {
 #include <libc/errno.h>
 /* >> gmtime_r(3), gmtime64_r(3)
  * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) errno_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) errno_t
 NOTHROW_NCX(LIBCCALL libc__gmtime32_s)(struct tm *__restrict tp,
                                        time32_t const *__restrict timer) {
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -912,7 +912,7 @@ DEFINE_INTERN_ALIAS(libc__gmtime64_s, libc__gmtime32_s);
 #include <libc/errno.h>
 /* >> gmtime_r(3), gmtime64_r(3)
  * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) errno_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) errno_t
 NOTHROW_NCX(LIBCCALL libc__gmtime64_s)(struct tm *__restrict tp,
                                        time64_t const *__restrict timer) {
 
@@ -927,7 +927,7 @@ NOTHROW_NCX(LIBCCALL libc__gmtime64_s)(struct tm *__restrict tp,
 #include <libc/errno.h>
 /* >> localtime_r(3), localtime64_r(3)
  * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) errno_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) errno_t
 NOTHROW_NCX(LIBCCALL libc__localtime32_s)(struct tm *__restrict tp,
                                           time32_t const *__restrict timer) {
 #if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -954,7 +954,7 @@ DEFINE_INTERN_ALIAS(libc__localtime64_s, libc__localtime32_s);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 /* >> localtime_r(3), localtime64_r(3)
  * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) errno_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) errno_t
 NOTHROW_NCX(LIBCCALL libc__localtime64_s)(struct tm *__restrict tp,
                                           time64_t const *__restrict timer) {
 	libc_localtime64_r(timer, tp);
@@ -964,7 +964,7 @@ NOTHROW_NCX(LIBCCALL libc__localtime64_s)(struct tm *__restrict tp,
 #include <libc/errno.h>
 /* >> ctime_r(3), ctime64_r(3)
  * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 3)) errno_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__ctime32_s)(char buf[26],
                                       size_t bufsize,
                                       time32_t const *__restrict timer) {
@@ -997,7 +997,7 @@ DEFINE_INTERN_ALIAS(libc__ctime64_s, libc__ctime32_s);
 #include <libc/errno.h>
 /* >> ctime_r(3), ctime64_r(3)
  * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 3)) errno_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__ctime64_s)(char buf[26],
                                       size_t bufsize,
                                       time64_t const *__restrict timer) {
@@ -1014,7 +1014,7 @@ NOTHROW_NCX(LIBCCALL libc__ctime64_s)(char buf[26],
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 #include <bits/crt/tm.h>
 #include <libc/template/itoa_digits.h>
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_WR(1) char *
 NOTHROW_NCX(LIBCCALL libc__strtime)(char buf[9]) {
 	time64_t now = libc_time64(NULL);
 	struct tm now_tm, *tp;
@@ -1032,7 +1032,7 @@ NOTHROW_NCX(LIBCCALL libc__strtime)(char buf[9]) {
 }
 #include <bits/crt/tm.h>
 #include <libc/template/itoa_digits.h>
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_WR(1) char *
 NOTHROW_NCX(LIBCCALL libc__strdate)(char buf[9]) {
 	time64_t now = libc_time64(NULL);
 	struct tm now_tm, *tp;
@@ -1049,7 +1049,7 @@ NOTHROW_NCX(LIBCCALL libc__strdate)(char buf[9]) {
 	return buf;
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__strtime_s)(char *buf,
                                       size_t bufsize) {
 	if unlikely(bufsize < 9)
@@ -1063,7 +1063,7 @@ NOTHROW_NCX(LIBCCALL libc__strtime_s)(char *buf,
 	return 0;
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__strdate_s)(char *buf,
                                       size_t bufsize) {
 	if unlikely(bufsize < 9)
@@ -1077,7 +1077,7 @@ NOTHROW_NCX(LIBCCALL libc__strdate_s)(char *buf,
 	return 0;
 }
 #include <bits/os/timeval.h>
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) unsigned int
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_WR(1) unsigned int
 NOTHROW_NCX(LIBCCALL libc__getsystime)(struct tm *tp) {
 	struct timeval64 tv;
 	if unlikely(libc_gettimeofday64(&tv, NULL) != 0) {
@@ -1088,7 +1088,7 @@ NOTHROW_NCX(LIBCCALL libc__getsystime)(struct tm *tp) {
 	return tv.tv_usec / 1000;
 }
 #include <bits/os/timeval.h>
-INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) unsigned int
+INTERN ATTR_SECTION(".text.crt.time") ATTR_ACCESS_RW(1) unsigned int
 NOTHROW_NCX(LIBCCALL libc__setsystime)(struct tm *tp,
                                        unsigned int milliseconds) {
 	struct timeval64 tv;

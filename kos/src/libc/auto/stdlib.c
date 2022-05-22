@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7031cc5a */
+/* HASH CRC-32:0xf41be5bf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 	return (*c->compar)(a, b, c->arg);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) NONNULL((5)) void *
 (LIBDCALL libd_bsearch_r)(void const *pkey,
                           void const *pbase,
                           size_t item_count,
@@ -77,7 +77,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED N
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
+INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) NONNULL((5)) void *
 (LIBCCALL libc_bsearch_r)(void const *pkey,
                           void const *pbase,
                           size_t item_count,
@@ -130,7 +130,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 	return (*c)(a, b);
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA0A1_defined */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") ATTR_ACCESS_RW_OPT(1) NONNULL((4)) void
 (LIBDCALL libd_qsort)(void *pbase,
                       size_t item_count,
                       size_t item_size,
@@ -149,7 +149,7 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_defined */
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
-INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
+INTERN ATTR_SECTION(".text.crt.utility.stdlib") ATTR_ACCESS_RW_OPT(1) NONNULL((4)) void
 (LIBCCALL libc_qsort)(void *pbase,
                       size_t item_count,
                       size_t item_size,
@@ -174,7 +174,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 	return (*c)(a, b);
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA0A1_defined */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) NONNULL((5)) void *
 (LIBDCALL libd_bsearch)(void const *pkey,
                         void const *pbase,
                         size_t item_count,
@@ -184,7 +184,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED N
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
+INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) NONNULL((5)) void *
 (LIBCCALL libc_bsearch)(void const *pkey,
                         void const *pbase,
                         size_t item_count,
@@ -260,52 +260,52 @@ NOTHROW_NCX(LIBCCALL libc_div)(int numer,
 	result.rem  = numer % denom;
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") int
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_ACCESS_RO_OPT(1) int
 NOTHROW_NCX(LIBCCALL libc_mblen)(char const *str,
                                  size_t maxlen) {
 	return libc_mbrlen(str, maxlen, NULL);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_WR_OPT(1) int
 NOTHROW_NCX(LIBDCALL libd_mbtowc)(char16_t *__restrict pwc,
                                   char const *__restrict str,
                                   size_t maxlen) {
 	return libd_mbrtowc(pwc, str, maxlen, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") int
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_WR_OPT(1) int
 NOTHROW_NCX(LIBKCALL libc_mbtowc)(char32_t *__restrict pwc,
                                   char const *__restrict str,
                                   size_t maxlen) {
 	return libc_mbrtowc(pwc, str, maxlen, NULL);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_ACCESS_WR_OPT(1) int
 NOTHROW_NCX(LIBDCALL libd_wctomb)(char *str,
                                   char16_t wc) {
 	return libd_wcrtomb(str, wc, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") int
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_ACCESS_WR_OPT(1) int
 NOTHROW_NCX(LIBKCALL libc_wctomb)(char *str,
                                   char32_t wc) {
 	return libc_wcrtomb(str, wc, NULL);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) size_t
 NOTHROW_NCX(LIBDCALL libd_mbstowcs)(char16_t *__restrict dst,
                                     char const *__restrict src,
                                     size_t dstlen) {
 	return libd_mbsrtowcs(dst, (char const **)&src, dstlen, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) size_t
 NOTHROW_NCX(LIBKCALL libc_mbstowcs)(char32_t *__restrict dst,
                                     char const *__restrict src,
                                     size_t dstlen) {
 	return libc_mbsrtowcs(dst, (char const **)&src, dstlen, NULL);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) size_t
 NOTHROW_NCX(LIBDCALL libd_wcstombs)(char *__restrict dst,
                                     char16_t const *__restrict src,
                                     size_t dstlen) {
 	return libd_wcsrtombs(dst, (char16_t const **)&src, dstlen, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) size_t
 NOTHROW_NCX(LIBKCALL libc_wcstombs)(char *__restrict dst,
                                     char32_t const *__restrict src,
                                     size_t dstlen) {
@@ -317,7 +317,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstombs)(char *__restrict dst,
  * The   return   value   is   the   exit   status   after   running  `command'
  * When `command' is `NULL' only check if a system interpreter is available.
  * When  no   system   interpreter   is  available,   `127'   is   returned. */
-INTERN ATTR_SECTION(".text.crt.fs.exec.system") int
+INTERN ATTR_SECTION(".text.crt.fs.exec.system") ATTR_ACCESS_RO_OPT(1) int
 NOTHROW_RPC(LIBCCALL libc_system)(char const *command) {
 	int status;
 	pid_t cpid, error;
@@ -364,7 +364,7 @@ INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
 }
 #endif /* !LIBC_ARCH_HAVE_ABORT */
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBCCALL libc_atoi)(char const *__restrict nptr) {
 #if __SIZEOF_INT__ <= 4
 	return (int)libc_strto32(nptr, NULL, 10);
@@ -376,7 +376,7 @@ NOTHROW_NCX(LIBCCALL libc_atoi)(char const *__restrict nptr) {
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_atol, libc_atoi);
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) long
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) long
 NOTHROW_NCX(LIBCCALL libc_atol)(char const *__restrict nptr) {
 #if __SIZEOF_LONG__ <= 4
 	return (long)libc_strto32(nptr, NULL, 10);
@@ -391,7 +391,7 @@ DEFINE_INTERN_ALIAS(libc_atoll, libc_atoi);
 #elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_atoll, libc_atol);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) __LONGLONG
 NOTHROW_NCX(LIBCCALL libc_atoll)(char const *__restrict nptr) {
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__LONGLONG)libc_strto32(nptr, NULL, 10);
@@ -406,7 +406,7 @@ DEFINE_INTERN_ALIAS(libc_strtoul, libc_strtou32);
 DEFINE_INTERN_ALIAS(libc_strtoul, libc_strtou64);
 #else /* ... */
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) unsigned long
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) unsigned long
 NOTHROW_NCX(LIBCCALL libc_strtoul)(char const *__restrict nptr,
                                    char **endptr,
                                    __STDC_INT_AS_UINT_T base) {
@@ -423,7 +423,7 @@ DEFINE_INTERN_ALIAS(libc_strtol, libc_strto32);
 #elif __SIZEOF_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc_strtol, libc_strto64);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) long
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) long
 NOTHROW_NCX(LIBCCALL libc_strtol)(char const *__restrict nptr,
                                   char **endptr,
                                   __STDC_INT_AS_UINT_T base) {
@@ -440,7 +440,7 @@ DEFINE_INTERN_ALIAS(libc_strtoull, libc_strtou64);
 #elif __SIZEOF_LONG_LONG__ == 4
 DEFINE_INTERN_ALIAS(libc_strtoull, libc_strtou32);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) __ULONGLONG
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) __ULONGLONG
 NOTHROW_NCX(LIBCCALL libc_strtoull)(char const *__restrict nptr,
                                     char **endptr,
                                     __STDC_INT_AS_UINT_T base) {
@@ -457,7 +457,7 @@ DEFINE_INTERN_ALIAS(libc_strtoll, libc_strto64);
 #elif __SIZEOF_LONG_LONG__ == 4
 DEFINE_INTERN_ALIAS(libc_strtoll, libc_strto32);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGLONG
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) __LONGLONG
 NOTHROW_NCX(LIBCCALL libc_strtoll)(char const *__restrict nptr,
                                    char **endptr,
                                    __STDC_INT_AS_UINT_T base) {
@@ -468,7 +468,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoll)(char const *__restrict nptr,
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 #endif /* !... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF WUNUSED NONNULL((1)) double
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF WUNUSED ATTR_ACCESS_RO(1) double
 NOTHROW_NCX(LIBCCALL libc_atof)(char const *__restrict nptr) {
 	return libc_strtod(nptr, NULL);
 }
@@ -541,7 +541,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !____vsc32scanf_getc_defined */
 
 #endif /* !... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) double
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) double
 NOTHROW_NCX(LIBCCALL libc_strtod)(char const *__restrict nptr,
                                   char **endptr) {
 	double result;
@@ -632,7 +632,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !____vsc32scanf_getc_defined */
 
 #endif /* !... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) float
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) float
 NOTHROW_NCX(LIBCCALL libc_strtof)(char const *__restrict nptr,
                                   char **endptr) {
 	float result;
@@ -726,7 +726,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !____vsc32scanf_getc_defined */
 
 #endif /* !... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGDOUBLE
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr,
                                    char **endptr) {
 	__LONGDOUBLE result;
@@ -771,7 +771,7 @@ NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr,
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(4) uint32_t
 NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
                                       char **endptr,
                                       __STDC_INT_AS_UINT_T base,
@@ -917,7 +917,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(4) int32_t
 NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr,
                                      char **endptr,
                                      __STDC_INT_AS_UINT_T base,
@@ -1074,7 +1074,7 @@ handle_overflow:
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(4) uint64_t
 NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
                                       char **endptr,
                                       __STDC_INT_AS_UINT_T base,
@@ -1219,7 +1219,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
  *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(4) int64_t
 NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr,
                                      char **endptr,
                                      __STDC_INT_AS_UINT_T base,
@@ -1379,7 +1379,7 @@ handle_overflow:
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
  * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) uint32_t
 NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr,
                                     char **endptr,
                                     __STDC_INT_AS_UINT_T base) {
@@ -1412,7 +1412,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr,
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
  * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) int32_t
 NOTHROW_NCX(LIBCCALL libc_strto32)(char const *__restrict nptr,
                                    char **endptr,
                                    __STDC_INT_AS_UINT_T base) {
@@ -1445,7 +1445,7 @@ NOTHROW_NCX(LIBCCALL libc_strto32)(char const *__restrict nptr,
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
  * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) uint64_t
 NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
                                     char **endptr,
                                     __STDC_INT_AS_UINT_T base) {
@@ -1478,7 +1478,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
  * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
  * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) int64_t
 NOTHROW_NCX(LIBCCALL libc_strto64)(char const *__restrict nptr,
                                    char **endptr,
                                    __STDC_INT_AS_UINT_T base) {
@@ -1494,7 +1494,7 @@ NOTHROW_NCX(LIBCCALL libc_strto64)(char const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) uint32_t
 NOTHROW_NCX(LIBCCALL libc_strtou32_l)(char const *__restrict nptr,
                                       char **endptr,
                                       __STDC_INT_AS_UINT_T base,
@@ -1502,7 +1502,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_l)(char const *__restrict nptr,
 	(void)locale;
 	return libc_strtou32(nptr, endptr, base);
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) int32_t
 NOTHROW_NCX(LIBCCALL libc_strto32_l)(char const *__restrict nptr,
                                      char **endptr,
                                      __STDC_INT_AS_UINT_T base,
@@ -1510,7 +1510,7 @@ NOTHROW_NCX(LIBCCALL libc_strto32_l)(char const *__restrict nptr,
 	(void)locale;
 	return libc_strto32(nptr, endptr, base);
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) uint64_t
 NOTHROW_NCX(LIBCCALL libc_strtou64_l)(char const *__restrict nptr,
                                       char **endptr,
                                       __STDC_INT_AS_UINT_T base,
@@ -1518,7 +1518,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_l)(char const *__restrict nptr,
 	(void)locale;
 	return libc_strtou64(nptr, endptr, base);
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) int64_t
 NOTHROW_NCX(LIBCCALL libc_strto64_l)(char const *__restrict nptr,
                                      char **endptr,
                                      __STDC_INT_AS_UINT_T base,
@@ -1557,7 +1557,7 @@ DEFINE_PUBLIC_ALIAS(_itoa_upper_digits, libc__itoa_upper_digits);
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #include <hybrid/floatcore.h>
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3)) char *
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED ATTR_ACCESS_WR(3) char *
 NOTHROW_NCX(LIBCCALL libc_gcvt)(double val,
                                 int ndigit,
                                 char *buf) {
@@ -1578,7 +1578,7 @@ NOTHROW_NCX(LIBCCALL libc_gcvt)(double val,
 	libc_sprintf(buf, "%.*g", ndigit, val);
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((3, 4, 5)) int
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_WR(3) ATTR_ACCESS_WR(4) ATTR_ACCESS_WRS(5, 6) int
 NOTHROW_NCX(LIBCCALL libc_ecvt_r)(double val,
                                   int ndigit,
                                   int *__restrict decptr,
@@ -1599,7 +1599,7 @@ NOTHROW_NCX(LIBCCALL libc_ecvt_r)(double val,
 	return 0;
 #endif
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((3, 4, 5)) int
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_WR(3) ATTR_ACCESS_WR(4) ATTR_ACCESS_WRS(5, 6) int
 NOTHROW_NCX(LIBCCALL libc_fcvt_r)(double val,
                                   int ndigit,
                                   int *__restrict decptr,
@@ -1621,7 +1621,7 @@ NOTHROW_NCX(LIBCCALL libc_fcvt_r)(double val,
 #endif
 }
 #include <hybrid/floatcore.h>
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((3)) char *
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_WR(3) char *
 NOTHROW_NCX(LIBCCALL libc_qgcvt)(__LONGDOUBLE val,
                                  int ndigit,
                                  char *buf) {
@@ -1642,7 +1642,7 @@ NOTHROW_NCX(LIBCCALL libc_qgcvt)(__LONGDOUBLE val,
 	libc_sprintf(buf, "%.*Lg", ndigit, val);
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((3, 4, 5)) int
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_WR(3) ATTR_ACCESS_WR(4) ATTR_ACCESS_WRS(5, 6) int
 NOTHROW_NCX(LIBCCALL libc_qecvt_r)(__LONGDOUBLE val,
                                    int ndigit,
                                    int *__restrict decptr,
@@ -1663,7 +1663,7 @@ NOTHROW_NCX(LIBCCALL libc_qecvt_r)(__LONGDOUBLE val,
 	return 0;
 #endif
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((3, 4, 5)) int
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_WR(3) ATTR_ACCESS_WR(4) ATTR_ACCESS_WRS(5, 6) int
 NOTHROW_NCX(LIBCCALL libc_qfcvt_r)(__LONGDOUBLE val,
                                    int ndigit,
                                    int *__restrict decptr,
@@ -1689,7 +1689,7 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt_r)(__LONGDOUBLE val,
 static char qcvt_buffer[32];
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED ATTR_ACCESS_WR(3) ATTR_ACCESS_WR(4) char *
 NOTHROW_NCX(LIBCCALL libc_qecvt)(__LONGDOUBLE val,
                                  int ndigit,
                                  int *__restrict decptr,
@@ -1701,7 +1701,7 @@ NOTHROW_NCX(LIBCCALL libc_qecvt)(__LONGDOUBLE val,
 		return NULL;
 	return qcvt_buffer;
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED ATTR_ACCESS_WR(3) ATTR_ACCESS_WR(4) char *
 NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
                                  int ndigit,
                                  int *__restrict decptr,
@@ -1722,12 +1722,12 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
  * descriptor of that file.
  * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED ATTR_ACCESS_RW(1) fd_t
 NOTHROW_RPC(LIBCCALL libc_mkstemps)(char *template_,
                                     __STDC_INT_AS_SIZE_T suffixlen) {
 	return libc_mkostemps(template_, suffixlen, 0);
 }
-INTERN ATTR_SECTION(".text.crt.utility.locale") ATTR_PURE WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.utility.locale") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response) {
 	char c = response[0];
 	if (c == 'n' || c == 'N')
@@ -1749,7 +1749,7 @@ DEFINE_INTERN_ALIAS(libc_mkstemps64, libc_mkstemps);
  * descriptor of that file.
  * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
-INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED ATTR_ACCESS_RW(1) fd_t
 NOTHROW_RPC(LIBCCALL libc_mkstemps64)(char *template_,
                                       __STDC_INT_AS_SIZE_T suffixlen) {
 	return libc_mkostemps64(template_, suffixlen, 0);
@@ -1770,7 +1770,7 @@ NOTHROW_NCX(LIBCCALL libc_l64a)(long n) {
 #include <hybrid/typecore.h>
 /* >> l64a(3), a64l(3)
  * Convert between `long' and base-64 encoded integer strings. */
-INTERN ATTR_SECTION(".text.crt.bsd") ATTR_PURE WUNUSED NONNULL((1)) long
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) long
 NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s) {
 	unsigned long digit, result = 0;
 	shift_t shift = 0;
@@ -1802,7 +1802,7 @@ NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s) {
  * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
  *                   path, or NULL  to automatically `malloc()'ate  and return  a
  *                   buffer of sufficient size. */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED NONNULL((1)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_RPC(LIBDCALL libd_realpath)(char const *filename,
                                     char *resolved) {
 
@@ -1820,7 +1820,7 @@ NOTHROW_RPC(LIBDCALL libd_realpath)(char const *filename,
  * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
  *                   path, or NULL  to automatically `malloc()'ate  and return  a
  *                   buffer of sufficient size. */
-INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_RPC(LIBCCALL libc_realpath)(char const *filename,
                                     char *resolved) {
 
@@ -1835,7 +1835,7 @@ NOTHROW_RPC(LIBCCALL libc_realpath)(char const *filename,
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED ATTR_ACCESS_WR_OPT(2) char *
 NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd,
                                      char *resolved,
                                      size_t buflen) {
@@ -1847,7 +1847,7 @@ NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd,
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED char *
+INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED ATTR_ACCESS_WR_OPT(2) char *
 NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd,
                                      char *resolved,
                                      size_t buflen) {
@@ -1862,13 +1862,13 @@ NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd,
  *       returning something  sensible like  `NULL', this  function
  *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
-INTERN ATTR_SECTION(".text.crt.fs.utility") ATTR_RETNONNULL NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.fs.utility") ATTR_RETNONNULL ATTR_ACCESS_RW(1) char *
 NOTHROW_NCX(LIBCCALL libc_mktemp)(char *template_) {
 	if (libc_system_mktemp(2, template_, 0, 0))
 		*template_ = 0;
 	return template_;
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED ATTR_ACCESS_WR(3) ATTR_ACCESS_WR(4) char *
 NOTHROW_NCX(LIBCCALL libc_ecvt)(double val,
                                 int ndigit,
                                 int *__restrict decptr,
@@ -1880,7 +1880,7 @@ NOTHROW_NCX(LIBCCALL libc_ecvt)(double val,
 		return NULL;
 	return qcvt_buffer;
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED ATTR_ACCESS_WR(3) ATTR_ACCESS_WR(4) char *
 NOTHROW_NCX(LIBCCALL libc_fcvt)(double val,
                                 int ndigit,
                                 int *__restrict decptr,
@@ -1893,7 +1893,7 @@ NOTHROW_NCX(LIBCCALL libc_fcvt)(double val,
 	return qcvt_buffer;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.application.options") WUNUSED NONNULL((1, 2, 3)) int
+INTERN ATTR_SECTION(".text.crt.application.options") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(3) int
 NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
                                      char *const *__restrict tokens,
                                      char **__restrict valuep) {
@@ -1941,7 +1941,7 @@ NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
  * with random characters  such that the  filename described by  `template_'
  * will not already exists. Then, create a new file with `O_RDWR' and return
  * the file descriptor of that file. */
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED ATTR_ACCESS_RW(1) fd_t
 NOTHROW_RPC(LIBCCALL libc_mkstemp)(char *template_) {
 	return libc_mkstemps(template_, 0);
 }
@@ -1955,7 +1955,7 @@ DEFINE_INTERN_ALIAS(libc_mkstemp64, libc_mkstemp);
  * with random characters  such that the  filename described by  `template_'
  * will not already exists. Then, create a new file with `O_RDWR' and return
  * the file descriptor of that file. */
-INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED ATTR_ACCESS_RW(1) fd_t
 NOTHROW_RPC(LIBCCALL libc_mkstemp64)(char *template_) {
 	return libc_mkstemps64(template_, 0);
 }
@@ -1967,7 +1967,7 @@ NOTHROW_RPC(LIBCCALL libc_mkstemp64)(char *template_) {
  * will not already exists. Then, create a new directory with `mode=0700',
  * and re-return `template_' to indicate success.
  * On error, `NULL' will be returned, and the contents of `template_' are undefined. */
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED ATTR_ACCESS_RW(1) char *
 NOTHROW_RPC(LIBCCALL libc_mkdtemp)(char *template_) {
 	if (libc_system_mktemp(1, template_, 0, 0) )
 		template_ = NULL;
@@ -2006,7 +2006,7 @@ DEFINE_INTERN_ALIAS(libc_strtol_l, libc_strto32_l);
 #elif __SIZEOF_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc_strtol_l, libc_strto64_l);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1)) long
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) long
 NOTHROW_NCX(LIBCCALL libc_strtol_l)(char const *__restrict nptr,
                                     char **endptr,
                                     __STDC_INT_AS_UINT_T base,
@@ -2021,7 +2021,7 @@ DEFINE_INTERN_ALIAS(libc_strtoul_l, libc_strtou32_l);
 #elif __SIZEOF_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc_strtoul_l, libc_strtou64_l);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1)) unsigned long
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) unsigned long
 NOTHROW_NCX(LIBCCALL libc_strtoul_l)(char const *__restrict nptr,
                                      char **endptr,
                                      __STDC_INT_AS_UINT_T base,
@@ -2036,7 +2036,7 @@ DEFINE_INTERN_ALIAS(libc_strtoll_l, libc_strto64_l);
 #elif __SIZEOF_LONG_LONG__ == 4
 DEFINE_INTERN_ALIAS(libc_strtoll_l, libc_strto32_l);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1)) __LONGLONG
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) __LONGLONG
 NOTHROW_NCX(LIBCCALL libc_strtoll_l)(char const *__restrict nptr,
                                      char **endptr,
                                      __STDC_INT_AS_UINT_T base,
@@ -2051,7 +2051,7 @@ DEFINE_INTERN_ALIAS(libc_strtoull_l, libc_strtou64_l);
 #elif __SIZEOF_LONG_LONG__ == 4
 DEFINE_INTERN_ALIAS(libc_strtoull_l, libc_strtou32_l);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1)) __ULONGLONG
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) __ULONGLONG
 NOTHROW_NCX(LIBCCALL libc_strtoull_l)(char const *__restrict nptr,
                                       char **endptr,
                                       __STDC_INT_AS_UINT_T base,
@@ -2060,14 +2060,14 @@ NOTHROW_NCX(LIBCCALL libc_strtoull_l)(char const *__restrict nptr,
 	return libc_strtoull(nptr, endptr, base);
 }
 #endif /* !... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1)) double
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) double
 NOTHROW_NCX(LIBCCALL libc_strtod_l)(char const *__restrict nptr,
                                     char **endptr,
                                     locale_t locale) {
 	(void)locale;
 	return libc_strtod(nptr, endptr);
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1)) float
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) float
 NOTHROW_NCX(LIBCCALL libc_strtof_l)(char const *__restrict nptr,
                                     char **endptr,
                                     locale_t locale) {
@@ -2078,7 +2078,7 @@ NOTHROW_NCX(LIBCCALL libc_strtof_l)(char const *__restrict nptr,
 #if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 DEFINE_INTERN_ALIAS(libc_strtold_l, libc_strtod_l);
 #else /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1)) __LONGDOUBLE
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr,
                                      char **endptr,
                                      locale_t locale) {
@@ -2090,7 +2090,7 @@ NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr,
 /* >> secure_getenv(3)
  * Same as `getenv(3)', but always  return `NULL' if the  caller
  * is running in set-ugid mode (s.a. `__libc_enable_secure(3)'). */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED NONNULL((1)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.environ") WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char const *varname) {
 #ifdef __LOCAL___libc_enable_secure
 	if (__LOCAL___libc_enable_secure)
@@ -2102,7 +2102,7 @@ NOTHROW_NCX(LIBDCALL libd_secure_getenv)(char const *varname) {
 /* >> secure_getenv(3)
  * Same as `getenv(3)', but always  return `NULL' if the  caller
  * is running in set-ugid mode (s.a. `__libc_enable_secure(3)'). */
-INTERN ATTR_SECTION(".text.crt.fs.environ") WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.fs.environ") WUNUSED ATTR_ACCESS_RO(1) char *
 NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname) {
 #ifdef __LOCAL___libc_enable_secure
 	if (__LOCAL___libc_enable_secure)
@@ -2128,7 +2128,7 @@ NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname) {
  *                       file. Instead, return `0' on success
  *                       This mode is only recognized when `$has_function(open) || $has_function(stat)'
  *                       NOTE: `flags' is ignored in this mode */
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((2)) fd_t
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED ATTR_ACCESS_RW(2) fd_t
 NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsigned int what,
                                          char *template_,
                                          __STDC_INT_AS_SIZE_T suffixlen,
@@ -2334,7 +2334,7 @@ do_try_again:
  * The shell paths attempted by this function are system-dependent, but before any
  * of them are tested, this function will try to use `secure_getenv("SHELL")',  if
  * and only if that variable is defined and starts with a '/'-character. */
-INTERN ATTR_SECTION(".text.crt.fs.exec.system") int
+INTERN ATTR_SECTION(".text.crt.fs.exec.system") ATTR_ACCESS_RO_OPT(1) int
 NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
 	static char const arg_sh[] = "sh";
 	static char const arg__c[] = "-c";
@@ -2459,7 +2459,7 @@ INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) int
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL WUNUSED NONNULL((2)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL WUNUSED ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc_lltostr)(__LONGLONG value,
                                    char *buf) {
 	char *result;
@@ -2472,7 +2472,7 @@ NOTHROW_NCX(LIBCCALL libc_lltostr)(__LONGLONG value,
 	return result;
 }
 #include <libc/template/itoa_digits.h>
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL WUNUSED NONNULL((2)) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL WUNUSED ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc_ulltostr)(__ULONGLONG value,
                                     char *buf) {
 	do {
@@ -2620,7 +2620,7 @@ INTERN ATTR_SECTION(".text.crt.bsd") void
 NOTHROW_NCX(LIBCCALL libc_setprogname)(char const *name) {
 	__LOCAL_program_invocation_short_name_p = (char *)name;
 }
-INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_ACCESS_RW_OPT(1) NONNULL((4)) int
 (LIBCCALL libc_heapsort)(void *pbase,
                          size_t item_count,
                          size_t item_size,
@@ -2629,7 +2629,7 @@ INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
 	libc_qsort(pbase, item_count, item_size, compar);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_ACCESS_RW_OPT(1) NONNULL((4)) int
 (LIBCCALL libc_mergesort)(void *pbase,
                           size_t item_count,
                           size_t item_size,
@@ -2650,7 +2650,7 @@ INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
  * @return: 0 : [*p_errstr != NULL] Error
  * @return: 0 : [*p_errstr == NULL] Success
  * @return: * : [*p_errstr == NULL] Success */
-INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1, 4)) __LONGLONG
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(4) __LONGLONG
 NOTHROW_NCX(LIBCCALL libc_strtonum)(char const *nptr,
                                     __LONGLONG lo,
                                     __LONGLONG hi,
@@ -2691,7 +2691,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
 /* >> qsort_r(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") ATTR_ACCESS_RW_OPT(1) NONNULL((4)) void
 (LIBDCALL libd_qsort_r)(void *pbase,
                         size_t item_count,
                         size_t item_size,
@@ -2705,7 +2705,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #include <hybrid/typecore.h>
 /* >> qsort_r(3) */
-INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
+INTERN ATTR_SECTION(".text.crt.utility.stdlib") ATTR_ACCESS_RW_OPT(1) NONNULL((4)) void
 (LIBCCALL libc_qsort_r)(void *pbase,
                         size_t item_count,
                         size_t item_size,
@@ -2772,12 +2772,12 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
  * descriptor of that file.
  * @param: flags: Additional  flags  to pass  to `open(2)',
  *                but `O_ACCMODE' is always set to `O_RDWR' */
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED ATTR_ACCESS_RW(1) fd_t
 NOTHROW_NCX(LIBCCALL libc_mkostemp)(char *template_,
                                     oflag_t flags) {
 	return libc_mkostemps(template_, 0, flags);
 }
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED ATTR_ACCESS_RW(1) fd_t
 NOTHROW_NCX(LIBCCALL libc_mkostemps)(char *template_,
                                      __STDC_INT_AS_SIZE_T suffixlen,
                                      oflag_t flags) {
@@ -2796,7 +2796,7 @@ DEFINE_INTERN_ALIAS(libc_mkostemp64, libc_mkostemp);
  * descriptor of that file.
  * @param: flags: Additional  flags  to pass  to `open(2)',
  *                but `O_ACCMODE' is always set to `O_RDWR' */
-INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED ATTR_ACCESS_RW(1) fd_t
 NOTHROW_NCX(LIBCCALL libc_mkostemp64)(char *template_,
                                       oflag_t flags) {
 	return libc_mkostemps64(template_, 0, flags);
@@ -2806,7 +2806,7 @@ NOTHROW_NCX(LIBCCALL libc_mkostemp64)(char *template_,
 #if !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_mkostemps64, libc_mkostemps);
 #else /* !__O_LARGEFILE */
-INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1)) fd_t
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED ATTR_ACCESS_RW(1) fd_t
 NOTHROW_NCX(LIBCCALL libc_mkostemps64)(char *template_,
                                        __STDC_INT_AS_SIZE_T suffixlen,
                                        oflag_t flags) {
@@ -2825,7 +2825,7 @@ NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev,
 	return libc_devname_r(dev, type, buf, sizeof(buf)) ? NULL : buf;
 }
 #include <linux/prctl.h>
-INTERN ATTR_SECTION(".text.crt.bsd") ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) void
 NOTHROW_NCX(LIBCCALL libc_vsetproctitle)(char const *format,
                                          va_list args) {
 	/* Load+fill a buffer for the fully qualified program name. */
@@ -2858,7 +2858,7 @@ NOTHROW_NCX(LIBCCALL libc_vsetproctitle)(char const *format,
  *  - pthread_setname_np(3)
  *  - prctl(PR_SET_NAME)
  *  - "/proc/self/comm" */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.bsd") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.bsd") ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) void
 NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format,
                                          ...) {
 	va_list args;
@@ -2873,7 +2873,7 @@ NOTHROW_NCX(VLIBDCALL libd_setproctitle)(char const *format,
  *  - pthread_setname_np(3)
  *  - prctl(PR_SET_NAME)
  *  - "/proc/self/comm" */
-INTERN ATTR_SECTION(".text.crt.bsd") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) void
 NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
                                          ...) {
 	va_list args;
@@ -2886,7 +2886,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
  * Same as `strsuftollx(3)', but if an error happens, make
  * use of `errx(3)' to terminate the program, rather  than
  * return to the caller. */
-INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1, 2)) __LONGLONG
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) __LONGLONG
 NOTHROW_NCX(LIBCCALL libc_strsuftoll)(char const *desc,
                                       char const *val,
                                       __LONGLONG lo,
@@ -2906,7 +2906,7 @@ NOTHROW_NCX(LIBCCALL libc_strsuftoll)(char const *desc,
 	return result;
 }
 /* >> strsuftollx(3) */
-INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1, 2)) __LONGLONG
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) __LONGLONG
 NOTHROW_NCX(LIBCCALL libc_strsuftollx)(char const *desc,
                                        char const *val,
                                        __LONGLONG lo,
@@ -2953,12 +2953,12 @@ NOTHROW(LIBCCALL libc__abs64)(__INT64_TYPE__ x) {
 	return x < 0 ? -x : x;
 }
 #endif /* !... */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.convert") ATTR_PURE WUNUSED NONNULL((1)) double
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) double
 NOTHROW_NCX(LIBCCALL libc__atof_l)(char const *__restrict nptr,
                                    locale_t locale) {
 	return libc_strtod_l(nptr, NULL, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.convert") ATTR_PURE WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBCCALL libc__atoi_l)(char const *__restrict nptr,
                                    locale_t locale) {
 	return (int)libc_strtol_l(nptr, NULL, 10, locale);
@@ -2966,7 +2966,7 @@ NOTHROW_NCX(LIBCCALL libc__atoi_l)(char const *__restrict nptr,
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc__atol_l, libc__atoi_l);
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.convert") ATTR_PURE WUNUSED NONNULL((1)) long int
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) long int
 NOTHROW_NCX(LIBCCALL libc__atol_l)(char const *__restrict nptr,
                                    locale_t locale) {
 	return libc_strtol_l(nptr, NULL, 10, locale);
@@ -2977,7 +2977,7 @@ DEFINE_INTERN_ALIAS(libc__atoll_l, libc__atol_l);
 #elif __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc__atoll_l, libc__atoi_l);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.convert") ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG
+INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) __LONGLONG
 NOTHROW_NCX(LIBCCALL libc__atoll_l)(char const *__restrict nptr,
                                     locale_t locale) {
 	return libc_strtoll_l(nptr, NULL, 10, locale);
@@ -3013,7 +3013,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") int
 	return (*c->compar)(c->arg, a, b);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") WUNUSED NONNULL((1, 2, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) NONNULL((5)) void *
 (LIBDCALL libd_bsearch_s)(void const *key,
                           void const *base,
                           size_t elem_count,
@@ -3041,7 +3041,7 @@ __LOCAL_LIBC(__invoke_compare_helper_s) int
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_s_defined */
-INTERN ATTR_SECTION(".text.crt.dos.utility") WUNUSED NONNULL((1, 2, 5)) void *
+INTERN ATTR_SECTION(".text.crt.dos.utility") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) NONNULL((5)) void *
 (LIBCCALL libc_bsearch_s)(void const *key,
                           void const *base,
                           size_t elem_count,
@@ -3070,7 +3070,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") int
 	return (*c->compar)(c->arg, a, b);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 4)) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") ATTR_ACCESS_RW_OPT(1) NONNULL((4)) void
 (LIBDCALL libd_qsort_s)(void *base,
                         size_t elem_count,
                         size_t elem_size,
@@ -3097,7 +3097,7 @@ __LOCAL_LIBC(__invoke_compare_helper_s) int
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_s_defined */
-INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 4)) void
+INTERN ATTR_SECTION(".text.crt.dos.utility") ATTR_ACCESS_RW_OPT(1) NONNULL((4)) void
 (LIBCCALL libc_qsort_s)(void *base,
                         size_t elem_count,
                         size_t elem_size,
@@ -3110,7 +3110,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 4)) void
 	               &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
 	               &data);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 2, 4)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") ATTR_ACCESS_RO(4) ATTR_ACCESS_WR(1) ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBDCALL libd_getenv_s)(size_t *preqsize,
                                     char *buf,
                                     rsize_t bufsize,
@@ -3135,7 +3135,7 @@ NOTHROW_NCX(LIBDCALL libd_getenv_s)(size_t *preqsize,
 	libc_memcpy(buf, name, reqsize);
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 2, 4)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.utility") ATTR_ACCESS_RO(4) ATTR_ACCESS_WR(1) ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *preqsize,
                                     char *buf,
                                     rsize_t bufsize,
@@ -3160,7 +3160,7 @@ NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *preqsize,
 	libc_memcpy(buf, name, reqsize);
 	return EOK;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 2, 3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility") ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) errno_t
 NOTHROW_NCX(LIBDCALL libd__dupenv_s)(char **__restrict pbuf,
                                      size_t *pbuflen,
                                      char const *varname) {
@@ -3182,7 +3182,7 @@ NOTHROW_NCX(LIBDCALL libd__dupenv_s)(char **__restrict pbuf,
 	*pbuflen = (libc_strlen(name) + 1) * sizeof(char);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 2, 3)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.utility") ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) errno_t
 NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf,
                                      size_t *pbuflen,
                                      char const *varname) {
@@ -3204,7 +3204,7 @@ NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf,
 	*pbuflen = (libc_strlen(name) + 1) * sizeof(char);
 	return EOK;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBDCALL libd__itoa_s)(int val,
                                    char *buf,
                                    size_t buflen,
@@ -3212,7 +3212,7 @@ NOTHROW_NCX(LIBDCALL libd__itoa_s)(int val,
 	return libd_errno_kos2dos(libc__itoa_s(val, buf, buflen, radix));
 }
 #include <libc/template/itoa_digits.h>
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBCCALL libc__itoa_s)(int val,
                                    char *buf,
                                    size_t buflen,
@@ -3257,7 +3257,7 @@ NOTHROW_NCX(LIBCCALL libc__itoa_s)(int val,
 DEFINE_INTERN_ALIAS(libc__ltoa_s, libc__itoa_s);
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
 #include <libc/template/itoa_digits.h>
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBCCALL libc__ltoa_s)(long val,
                                    char *buf,
                                    size_t buflen,
@@ -3299,7 +3299,7 @@ NOTHROW_NCX(LIBCCALL libc__ltoa_s)(long val,
 	return EOK;
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBDCALL libd__ultoa_s)(unsigned long val,
                                     char *buf,
                                     size_t buflen,
@@ -3307,7 +3307,7 @@ NOTHROW_NCX(LIBDCALL libd__ultoa_s)(unsigned long val,
 	return libd_errno_kos2dos(libc__ultoa_s(val, buf, buflen, radix));
 }
 #include <libc/template/itoa_digits.h>
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBCCALL libc__ultoa_s)(unsigned long val,
                                     char *buf,
                                     size_t buflen,
@@ -3342,7 +3342,7 @@ DEFINE_INTERN_ALIAS(libc__i64toa, libc_itoa);
 #elif __SIZEOF_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc__i64toa, libc_ltoa);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) char *
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc__i64toa)(s64 val,
                                    char *buf,
                                    int radix) {
@@ -3353,7 +3353,7 @@ NOTHROW_NCX(LIBCCALL libc__i64toa)(s64 val,
 #if __SIZEOF_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc__ui64toa, libc_ultoa);
 #else /* __SIZEOF_LONG__ == 8 */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) char *
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc__ui64toa)(u64 val,
                                     char *buf,
                                     int radix) {
@@ -3361,7 +3361,7 @@ NOTHROW_NCX(LIBCCALL libc__ui64toa)(u64 val,
 	return buf;
 }
 #endif /* __SIZEOF_LONG__ != 8 */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBDCALL libd__i64toa_s)(s64 val,
                                      char *buf,
                                      size_t buflen,
@@ -3375,7 +3375,7 @@ DEFINE_INTERN_ALIAS(libc__i64toa_s, libc__itoa_s);
 #else /* ... */
 #include <bits/types.h>
 #include <libc/template/itoa_digits.h>
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
                                      char *buf,
                                      size_t buflen,
@@ -3417,7 +3417,7 @@ NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
 	return EOK;
 }
 #endif /* !... */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBDCALL libd__ui64toa_s)(u64 val,
                                       char *buf,
                                       size_t buflen,
@@ -3429,7 +3429,7 @@ DEFINE_INTERN_ALIAS(libc__ui64toa_s, libc__ultoa_s);
 #else /* __SIZEOF_LONG__ == 8 */
 #include <bits/types.h>
 #include <libc/template/itoa_digits.h>
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((2)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBCCALL libc__ui64toa_s)(u64 val,
                                       char *buf,
                                       size_t buflen,
@@ -3467,7 +3467,7 @@ DEFINE_INTERN_ALIAS(libc__atoi64, libc_atol);
 #elif __SIZEOF_LONG_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc__atoi64, libc_atoll);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) s64
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) s64
 NOTHROW_NCX(LIBCCALL libc__atoi64)(char const *__restrict nptr) {
 	return libc_strto64(nptr, NULL, 10);
 }
@@ -3479,20 +3479,20 @@ DEFINE_INTERN_ALIAS(libc__atoi64_l, libc__atol_l);
 #elif __SIZEOF_LONG_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc__atoi64_l, libc__atoll_l);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) s64
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) s64
 NOTHROW_NCX(LIBCCALL libc__atoi64_l)(char const *__restrict nptr,
                                      locale_t locale) {
 	return libc_strto64_l(nptr, NULL, 10, locale);
 }
 #endif /* !... */
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) size_t
 NOTHROW_NCX(LIBCCALL libc__mbstrlen)(char const *str) {
 	size_t result = 0;
 	while (libc_unicode_readutf8((char const **)&str))
 		++result;
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 2) NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbstrnlen)(char const *str,
                                       size_t maxlen) {
 	size_t result = 0;
@@ -3501,20 +3501,20 @@ NOTHROW_NCX(LIBCCALL libc__mbstrnlen)(char const *str,
 		++result;
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) size_t
 NOTHROW_NCX(LIBCCALL libc__mbstrlen_l)(char const *str,
                                        locale_t locale) {
 	(void)locale;
 	return libc__mbstrlen(str);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 2) NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbstrnlen_l)(char const *str,
                                         size_t maxlen,
                                         locale_t locale) {
 	(void)locale;
 	return libc__mbstrnlen(str, maxlen);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 2) NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc__mblen_l)(char const *str,
                                     size_t maxlen,
                                     locale_t locale) {
@@ -3643,11 +3643,11 @@ NOTHROW_NCX(LIBKCALL libc__mbstowcs_s_l)(size_t *presult,
 
 	return EOK;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.random") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.random") ATTR_ACCESS_WR(1) errno_t
 NOTHROW_NCX(LIBDCALL libd_rand_s)(unsigned int *__restrict randval) {
 	return libd_errno_kos2dos(libc_rand_s(randval));
 }
-INTERN ATTR_SECTION(".text.crt.dos.random") NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.random") ATTR_ACCESS_WR(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval) {
 	if (!randval) {
 
@@ -3673,7 +3673,7 @@ NOTHROW_NCX(LIBKCALL libc__wctomb_l)(char *buf,
 	(void)locale;
 	return libc_wctomb(buf, wc);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_ACCESS_WRS(2, 3) ATTR_ACCESS_WR_OPT(1) errno_t
 NOTHROW_NCX(LIBDCALL libd_wctomb_s)(int *presult,
                                     char *buf,
                                     rsize_t buflen,
@@ -3695,7 +3695,7 @@ NOTHROW_NCX(LIBDCALL libd_wctomb_s)(int *presult,
 	*presult = libd_wctomb(buf, wc);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((1, 2)) errno_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_ACCESS_WRS(2, 3) ATTR_ACCESS_WR_OPT(1) errno_t
 NOTHROW_NCX(LIBKCALL libc_wctomb_s)(int *presult,
                                     char *buf,
                                     rsize_t buflen,
@@ -3717,7 +3717,7 @@ NOTHROW_NCX(LIBKCALL libc_wctomb_s)(int *presult,
 	*presult = libc_wctomb(buf, wc);
 	return EOK;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_ACCESS_WRS(2, 3) ATTR_ACCESS_WR_OPT(1) errno_t
 NOTHROW_NCX(LIBDCALL libd__wctomb_s_l)(int *presult,
                                        char *buf,
                                        size_t buflen,
@@ -3726,7 +3726,7 @@ NOTHROW_NCX(LIBDCALL libd__wctomb_s_l)(int *presult,
 	(void)locale;
 	return libd_wctomb_s(presult, buf, buflen, wc);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((1, 2)) errno_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_ACCESS_WRS(2, 3) ATTR_ACCESS_WR_OPT(1) errno_t
 NOTHROW_NCX(LIBKCALL libc__wctomb_s_l)(int *presult,
                                        char *buf,
                                        size_t buflen,
@@ -3735,7 +3735,7 @@ NOTHROW_NCX(LIBKCALL libc__wctomb_s_l)(int *presult,
 	(void)locale;
 	return libc_wctomb_s(presult, buf, buflen, wc);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2, 4)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_ACCESS_ROS(4, 5) ATTR_ACCESS_WRS(2, 3) ATTR_ACCESS_WR_OPT(1) errno_t
 NOTHROW_NCX(LIBDCALL libd__wcstombs_s_l)(size_t *presult,
                                          char *buf,
                                          size_t buflen,
@@ -3745,7 +3745,7 @@ NOTHROW_NCX(LIBDCALL libd__wcstombs_s_l)(size_t *presult,
 	(void)locale;
 	return libd_wcstombs_s(presult, buf, buflen, src, maxlen);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((1, 2, 4)) errno_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_ACCESS_ROS(4, 5) ATTR_ACCESS_WRS(2, 3) ATTR_ACCESS_WR_OPT(1) errno_t
 NOTHROW_NCX(LIBKCALL libc__wcstombs_s_l)(size_t *presult,
                                          char *buf,
                                          size_t buflen,
@@ -3755,23 +3755,23 @@ NOTHROW_NCX(LIBKCALL libc__wcstombs_s_l)(size_t *presult,
 	(void)locale;
 	return libc_wcstombs_s(presult, buf, buflen, src, maxlen);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) size_t
 NOTHROW_NCX(LIBDCALL libd__wcstombs_l)(char *dst,
                                        char16_t const *src,
-                                       size_t maxlen,
+                                       size_t dstlen,
                                        locale_t locale) {
 	(void)locale;
-	return libd_wcstombs(dst, src, maxlen);
+	return libd_wcstombs(dst, src, dstlen);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) size_t
 NOTHROW_NCX(LIBKCALL libc__wcstombs_l)(char *dst,
                                        char32_t const *src,
-                                       size_t maxlen,
+                                       size_t dstlen,
                                        locale_t locale) {
 	(void)locale;
-	return libc_wcstombs(dst, src, maxlen);
+	return libc_wcstombs(dst, src, dstlen);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2, 4)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_ACCESS_ROS(4, 5) ATTR_ACCESS_WRS(2, 3) ATTR_ACCESS_WR_OPT(1) errno_t
 NOTHROW_NCX(LIBDCALL libd_wcstombs_s)(size_t *presult,
                                       char *buf,
                                       size_t buflen,
@@ -3790,7 +3790,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstombs_s)(size_t *presult,
 	/* TODO: if (buflen < *presult) return ERANGE; */
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((1, 2, 4)) errno_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_ACCESS_ROS(4, 5) ATTR_ACCESS_WRS(2, 3) ATTR_ACCESS_WR_OPT(1) errno_t
 NOTHROW_NCX(LIBKCALL libc_wcstombs_s)(size_t *presult,
                                       char *buf,
                                       size_t buflen,
@@ -3812,7 +3812,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstombs_s)(size_t *presult,
 #include <asm/os/fcntl.h>
 /* >> _fullpath(3)
  * s.a. `realpath(3)', `frealpathat(3)' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED NONNULL((2)) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) char *
 NOTHROW_RPC(LIBDCALL libd__fullpath)(char *buf,
                                      char const *path,
                                      size_t buflen) {
@@ -3821,13 +3821,13 @@ NOTHROW_RPC(LIBDCALL libd__fullpath)(char *buf,
 #include <asm/os/fcntl.h>
 /* >> _fullpath(3)
  * s.a. `realpath(3)', `frealpathat(3)' */
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED NONNULL((2)) char *
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) char *
 NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf,
                                      char const *path,
                                      size_t buflen) {
 	return libc_frealpathat(__AT_FDCWD, path, buf, buflen, 0);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((1, 5, 6)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WR(5) ATTR_ACCESS_WR(6) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__ecvt_s)(char *buf,
                                    size_t buflen,
                                    double val,
@@ -3836,7 +3836,7 @@ NOTHROW_NCX(LIBDCALL libd__ecvt_s)(char *buf,
                                    int *__restrict sign) {
 	return libd_errno_kos2dos(libc__ecvt_s(buf, buflen, val, ndigit, decptr, sign));
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1, 5, 6)) errno_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_WR(5) ATTR_ACCESS_WR(6) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__ecvt_s)(char *buf,
                                    size_t buflen,
                                    double val,
@@ -3853,7 +3853,7 @@ NOTHROW_NCX(LIBCCALL libc__ecvt_s)(char *buf,
 	libc_ecvt_r(val, ndigit, decptr, sign, buf, buflen);
 	return EOK;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((1, 5, 6)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WR(5) ATTR_ACCESS_WR(6) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__fcvt_s)(char *buf,
                                    size_t buflen,
                                    double val,
@@ -3862,7 +3862,7 @@ NOTHROW_NCX(LIBDCALL libd__fcvt_s)(char *buf,
                                    int *__restrict sign) {
 	return libd_errno_kos2dos(libc__fcvt_s(buf, buflen, val, ndigit, decptr, sign));
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1, 5, 6)) errno_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_WR(5) ATTR_ACCESS_WR(6) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__fcvt_s)(char *buf,
                                    size_t buflen,
                                    double val,
@@ -3879,14 +3879,14 @@ NOTHROW_NCX(LIBCCALL libc__fcvt_s)(char *buf,
 	libc_fcvt_r(val, ndigit, decptr, sign, buf, buflen);
 	return EOK;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__gcvt_s)(char *buf,
                                    size_t buflen,
                                    double val,
                                    int ndigit) {
 	return libd_errno_kos2dos(libc__gcvt_s(buf, buflen, val, ndigit));
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__gcvt_s)(char *buf,
                                    size_t buflen,
                                    double val,
@@ -3902,39 +3902,39 @@ NOTHROW_NCX(LIBCCALL libc__gcvt_s)(char *buf,
 	libc_ecvt_r(val, ndigit, &a, &b, buf, buflen);
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc__atoflt)(float *__restrict result,
                                    char const *__restrict nptr) {
 	*result = libc_strtof(nptr, NULL);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc__atoflt_l)(float *__restrict result,
                                      char const *__restrict nptr,
                                      locale_t locale) {
 	*result = libc_strtof_l(nptr, NULL, locale);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc__atodbl)(double *__restrict result,
                                    char __KOS_FIXED_CONST *__restrict nptr) {
 	*result = libc_strtod(nptr, NULL);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc__atodbl_l)(double *__restrict result,
                                      char __KOS_FIXED_CONST *__restrict nptr,
                                      locale_t locale) {
 	*result = libc_strtod_l(nptr, NULL, locale);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc__atoldbl)(__LONGDOUBLE *__restrict result,
                                     char __KOS_FIXED_CONST *__restrict nptr) {
 	*result = libc_strtold(nptr, NULL);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc__atoldbl_l)(__LONGDOUBLE *__restrict result,
                                       char __KOS_FIXED_CONST *__restrict nptr,
                                       locale_t locale) {
@@ -4019,13 +4019,13 @@ NOTHROW_NCX(LIBCCALL libc__putenv_s)(char const *varname,
 
 	       : 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1, 2, 3)) void
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(3) void
 NOTHROW_RPC(LIBCCALL libc__searchenv)(char const *file,
                                       char const *envvar,
                                       char *__restrict resultpath) {
 	libc__searchenv_s(file, envvar, resultpath, (size_t)-1);
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_WR(1) void
 NOTHROW_NCX(LIBCCALL libc__makepath)(char *__restrict buf,
                                      char const *drive,
                                      char const *dir,
@@ -4033,7 +4033,7 @@ NOTHROW_NCX(LIBCCALL libc__makepath)(char *__restrict buf,
                                      char const *ext) {
 	libc__makepath_s(buf, (size_t)-1, drive, dir, file, ext);
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(3) ATTR_ACCESS_WR_OPT(4) ATTR_ACCESS_WR_OPT(5) void
 NOTHROW_NCX(LIBCCALL libc__splitpath)(char const *__restrict abspath,
                                       char *drive,
                                       char *dir,
@@ -4045,7 +4045,7 @@ NOTHROW_NCX(LIBCCALL libc__splitpath)(char const *__restrict abspath,
 	             file, file ? 256 : 0,
 	             ext, ext ? 256 : 0);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_RO_OPT(6) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__makepath_s)(char *buf,
                                        size_t buflen,
                                        char const *drive,
@@ -4054,7 +4054,7 @@ NOTHROW_NCX(LIBDCALL libd__makepath_s)(char *buf,
                                        char const *ext) {
 	return libd_errno_kos2dos(libc__makepath_s(buf, buflen, drive, dir, file, ext));
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_RO_OPT(6) ATTR_ACCESS_WRS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__makepath_s)(char *buf,
                                        size_t buflen,
                                        char const *drive,
@@ -4104,7 +4104,7 @@ err_buflen:
 #undef path_putn
 #undef path_putc
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) ATTR_ACCESS_WRS(4, 5) ATTR_ACCESS_WRS(6, 7) ATTR_ACCESS_WRS(8, 9) errno_t
 NOTHROW_NCX(LIBDCALL libd__splitpath_s)(char const *__restrict abspath,
                                         char *drive,
                                         size_t drivelen,
@@ -4116,7 +4116,7 @@ NOTHROW_NCX(LIBDCALL libd__splitpath_s)(char const *__restrict abspath,
                                         size_t extlen) {
 	return libd_errno_kos2dos(libc__splitpath_s(abspath, drive, drivelen, dir, dirlen, file, filelen, ext, extlen));
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.utility") NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.fs.utility") ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) ATTR_ACCESS_WRS(4, 5) ATTR_ACCESS_WRS(6, 7) ATTR_ACCESS_WRS(8, 9) errno_t
 NOTHROW_NCX(LIBCCALL libc__splitpath_s)(char const *__restrict abspath,
                                         char *drive,
                                         size_t drivelen,
@@ -4235,7 +4235,7 @@ NOTHROW_RPC(LIBCCALL libc__sleep)(uint32_t milli) {
 
 
 }
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((2)) char *
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc_itoa)(int val,
                                 char *buf,
                                 int radix) {
@@ -4245,7 +4245,7 @@ NOTHROW_NCX(LIBCCALL libc_itoa)(int val,
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_ltoa, libc_itoa);
 #else /* __SIZEOF_LONG__ == __SIZEOF_INT__ */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((2)) char *
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc_ltoa)(long val,
                                 char *buf,
                                 int radix) {
@@ -4253,14 +4253,14 @@ NOTHROW_NCX(LIBCCALL libc_ltoa)(long val,
 	return buf;
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") NONNULL((2)) char *
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_ACCESS_WR(2) char *
 NOTHROW_NCX(LIBCCALL libc_ultoa)(unsigned long val,
                                  char *buf,
                                  int radix) {
 	libc__ultoa_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 4)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_ACCESS_RO(4) ATTR_ACCESS_WR(1) ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *preqsize,
                                       char16_t *buf,
                                       rsize_t bufsize,
@@ -4285,7 +4285,7 @@ NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *preqsize,
 	libc_memcpy(buf, name, reqsize);
 	return EOK;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 4)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_ACCESS_RO(4) ATTR_ACCESS_WR(1) ATTR_ACCESS_WRS(2, 3) errno_t
 NOTHROW_NCX(LIBKCALL libc__wgetenv_s)(size_t *preqsize,
                                       char32_t *buf,
                                       rsize_t bufsize,
@@ -4310,7 +4310,7 @@ NOTHROW_NCX(LIBKCALL libc__wgetenv_s)(size_t *preqsize,
 	libc_memcpy(buf, name, reqsize);
 	return EOK;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **__restrict pbuf,
                                       size_t *pbuflen,
                                       char16_t const *varname) {
@@ -4332,7 +4332,7 @@ NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **__restrict pbuf,
 	*pbuflen = (libd_wcslen(name) + 1) * sizeof(char16_t);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1, 2, 3)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) errno_t
 NOTHROW_NCX(LIBKCALL libc__wdupenv_s)(char32_t **__restrict pbuf,
                                       size_t *pbuflen,
                                       char32_t const *varname) {
@@ -4355,17 +4355,17 @@ NOTHROW_NCX(LIBKCALL libc__wdupenv_s)(char32_t **__restrict pbuf,
 	return EOK;
 }
 #include <libc/template/environ.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.fs.environ") ATTR_ACCESS_WR(1) errno_t
 NOTHROW_RPC(LIBCCALL libc__get_environ)(char ***p_environ) {
 	*p_environ = __LOCAL_environ;
 	return 0;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_ACCESS_WR(1) errno_t
 NOTHROW_RPC(LIBDCALL libd__get_wenviron)(char16_t ***p_wenviron) {
 	*p_wenviron = *libd___p__wenviron();
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.environ") ATTR_ACCESS_WR(1) errno_t
 NOTHROW_RPC(LIBKCALL libc__get_wenviron)(char32_t ***p_wenviron) {
 	*p_wenviron = *libc___p__wenviron();
 	return 0;

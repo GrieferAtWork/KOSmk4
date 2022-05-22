@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x671a46b3 */
+/* HASH CRC-32:0x84ab2fc7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_set
 #undef __local___localdep_pthread_setspecific_defined
 #endif /* !... */
 #endif /* !__local___localdep_pthread_setspecific_defined */
-__LOCAL_LIBC(thr_getspecific) __errno_t
+__LOCAL_LIBC(thr_getspecific) __ATTR_ACCESS_WR(2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thr_getspecific))(__pthread_key_t __key, void **__p_val) {
 	void *__val;
 	*__p_val = __val = (__NAMESPACE_LOCAL_SYM __localdep_pthread_getspecific)(__key);

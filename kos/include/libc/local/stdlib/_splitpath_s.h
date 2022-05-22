@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbeaede2c */
+/* HASH CRC-32:0x423b11f5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_splitpath_s) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(_splitpath_s) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WRS(4, 5) __ATTR_ACCESS_WRS(6, 7) __ATTR_ACCESS_WRS(8, 9) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath_s))(char const *__restrict __abspath, char *__drive, __SIZE_TYPE__ __drivelen, char *__dir, __SIZE_TYPE__ __dirlen, char *__file, __SIZE_TYPE__ __filelen, char *__ext, __SIZE_TYPE__ __extlen) {
 	__SIZE_TYPE__ __len, __last_slash, __last_dot;
 	if __unlikely(!__abspath)

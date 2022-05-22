@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x173148f */
+/* HASH CRC-32:0xe558f239 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_strcadd_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strcadd) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
+__LOCAL_LIBC(strcadd) __ATTR_RETNONNULL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcadd))(char *__dstbuf, char const *__string) {
 	for (;;) {
 		char __ch = *__string++;

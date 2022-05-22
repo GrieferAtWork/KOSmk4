@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41ec91c0 */
+/* HASH CRC-32:0x2dda4671 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c16nset) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
+__LOCAL_LIBC(c16nset) __ATTR_RETNONNULL __ATTR_ACCESS_RWS(1, 3) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16nset))(__CHAR16_TYPE__ *__restrict __str, __CHAR16_TYPE__ __ch, __SIZE_TYPE__ __maxlen) {
 	__CHAR16_TYPE__ *__iter;
 	for (__iter = __str; __maxlen-- && *__iter; ++__iter)

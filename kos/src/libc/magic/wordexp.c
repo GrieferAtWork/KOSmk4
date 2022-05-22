@@ -110,8 +110,8 @@ typedef struct __wordexp_struct wordexp_t;
 @@@return: 0 : Success
 @@@return: * : Error (return value is one of `WRDE_*' from <wordexp.h>)
 [[decl_include("<features.h>", "<bits/crt/wordexp.h>")]]
-int wordexp([[nonnull]] char const *__restrict string,
-            [[nonnull]] wordexp_t *__restrict self,
+int wordexp([[in]] char const *__restrict string,
+            [[/*in|inout*/nonnull]] wordexp_t *__restrict self,
             __STDC_INT_AS_UINT_T flags);
 
 @@>> wordfree(3)
@@ -119,7 +119,7 @@ int wordexp([[nonnull]] char const *__restrict string,
 [[decl_include("<bits/crt/wordexp.h>")]]
 [[impl_include("<bits/crt/wordexp.h>")]]
 [[requires_function(free)]]
-void wordfree([[nullable]] wordexp_t *self) {
+void wordfree([[inout_opt]] wordexp_t *self) {
 	size_t i, end;
 	char **words;
 	if unlikely(!self)

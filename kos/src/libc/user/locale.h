@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfaea4fa5 */
+/* HASH CRC-32:0x4f1432c0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ DECL_BEGIN
  *                   When `NULL', don't change the locale.
  * @return: * :      The current locale set for `category'
  * @return: NULL:    Error */
-INTDEF char *NOTHROW_NCX(LIBCCALL libc_setlocale)(int category, char const *locale);
+INTDEF ATTR_ACCESS_RO_OPT(2) char *NOTHROW_NCX(LIBCCALL libc_setlocale)(int category, char const *locale);
 /* >> localeconv(3)
  * Return numeric and monetary information for the current locale */
 INTDEF ATTR_RETNONNULL WUNUSED struct lconv *NOTHROW_NCX(LIBCCALL libc_localeconv)(void);
@@ -65,10 +65,10 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc__configthreadlocale)(int flag);
 INTDEF locale_t NOTHROW_NCX(LIBCCALL libc__get_current_locale)(void);
 INTDEF locale_t NOTHROW_NCX(LIBCCALL libc__create_locale)(int category, char const *locale);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__free_locale)(locale_t locale);
-INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd__wsetlocale)(int category, char16_t const *locale);
-INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc__wsetlocale)(int category, char32_t const *locale);
-INTDEF locale_t NOTHROW_NCX(LIBDCALL libd__wcreate_locale)(int category, char16_t const *locale);
-INTDEF locale_t NOTHROW_NCX(LIBKCALL libc__wcreate_locale)(int category, char32_t const *locale);
+INTDEF ATTR_ACCESS_RO_OPT(2) char16_t *NOTHROW_NCX(LIBDCALL libd__wsetlocale)(int category, char16_t const *locale);
+INTDEF ATTR_ACCESS_RO_OPT(2) char32_t *NOTHROW_NCX(LIBKCALL libc__wsetlocale)(int category, char32_t const *locale);
+INTDEF ATTR_ACCESS_RO_OPT(2) locale_t NOTHROW_NCX(LIBDCALL libd__wcreate_locale)(int category, char16_t const *locale);
+INTDEF ATTR_ACCESS_RO_OPT(2) locale_t NOTHROW_NCX(LIBKCALL libc__wcreate_locale)(int category, char32_t const *locale);
 INTDEF WUNUSED char16_t **NOTHROW_NCX(LIBDCALL libd____lc_locale_name_func)(void);
 INTDEF WUNUSED char32_t **NOTHROW_NCX(LIBKCALL libc____lc_locale_name_func)(void);
 INTDEF WUNUSED unsigned int NOTHROW_NCX(LIBCCALL libc____lc_codepage_func)(void);
@@ -76,9 +76,9 @@ INTDEF WUNUSED unsigned int NOTHROW_NCX(LIBCCALL libc____lc_collate_cp_func)(voi
 INTDEF WUNUSED void *NOTHROW_NCX(LIBCCALL libc__Gettnames)(void);
 INTDEF WUNUSED void *NOTHROW_NCX(LIBDCALL libd__W_Gettnames)(void);
 INTDEF WUNUSED void *NOTHROW_NCX(LIBKCALL libc__W_Gettnames)(void);
-INTDEF NONNULL((3, 4)) size_t NOTHROW_NCX(LIBCCALL libc__Strftime)(char *buf, size_t bufsize, char const *format, struct tm const *tms, void *lc_time_arg);
-INTDEF NONNULL((3, 4)) size_t NOTHROW_NCX(LIBDCALL libd__Wcsftime)(char16_t *buf, size_t bufsize, char16_t const *format, struct tm const *tms, void *lc_time_arg);
-INTDEF NONNULL((3, 4)) size_t NOTHROW_NCX(LIBKCALL libc__Wcsftime)(char32_t *buf, size_t bufsize, char32_t const *format, struct tm const *tms, void *lc_time_arg);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) size_t NOTHROW_NCX(LIBCCALL libc__Strftime)(char *buf, size_t bufsize, char const *format, struct tm const *tms, void *lc_time_arg);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) size_t NOTHROW_NCX(LIBDCALL libd__Wcsftime)(char16_t *buf, size_t bufsize, char16_t const *format, struct tm const *tms, void *lc_time_arg);
+INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) size_t NOTHROW_NCX(LIBKCALL libc__Wcsftime)(char32_t *buf, size_t bufsize, char32_t const *format, struct tm const *tms, void *lc_time_arg);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53dc1ad2 */
+/* HASH CRC-32:0x5ee96cb4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,__localdep__mbsnbset_l,(unsigned char *__buf, unsigned int __ch, __SIZE_TYPE__ __max_bytes, __locale_t __locale),_mbsnbset_l,(__buf,__ch,__max_bytes,__locale))
+__CREDIRECT(__ATTR_ACCESS_RWS(1, 3),unsigned char *,__NOTHROW_NCX,__localdep__mbsnbset_l,(unsigned char *__buf, unsigned int __ch, __SIZE_TYPE__ __max_bytes, __locale_t __locale),_mbsnbset_l,(__buf,__ch,__max_bytes,__locale))
 #elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsnbset_l.h>
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/__minmax.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_mbsnbset_s_l) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(_mbsnbset_s_l) __ATTR_ACCESS_RWS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnbset_s_l))(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned int __ch, __SIZE_TYPE__ __max_bytes, __locale_t __locale) {
 	if (__max_bytes && (!__buf || __true_bufsize <= (__NAMESPACE_LOCAL_SYM __localdep_strnlen)((char const *)__buf, __hybrid_min2(__true_bufsize, __max_bytes))))
 		return 22;

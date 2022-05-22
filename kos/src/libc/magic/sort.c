@@ -66,7 +66,9 @@ __LOCAL_LIBC(@sort_pointers_compar@) __ATTR_PURE int
 }
 @@pop_namespace@@
 )]]
-void sort_pointers(size_t count, [[nonnull]] void **sortme, [[nonnull]] void **work) {
+void sort_pointers(size_t count,
+                   [[inout(count)]] void **sortme,
+                   [[out(count)]] void **work) {
 	(void)work; /* unused by this implementation */
 	qsort(sortme, count, sizeof(void *), &__NAMESPACE_LOCAL_SYM sort_pointers_compar);
 }

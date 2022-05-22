@@ -444,9 +444,9 @@ NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc,
 
 
 
-/*[[[head:libd_fgetwln,hash:CRC-32=0x3df46054]]]*/
+/*[[[head:libd_fgetwln,hash:CRC-32=0xd10ff6e6]]]*/
 /* >> fgetwln(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") WUNUSED ATTR_ACCESS_RW(1) NONNULL((2)) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_WR_OPT(2) char16_t *
 NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict fp,
                                    size_t *__restrict lenp)
 /*[[[body:libd_fgetwln]]]*/
@@ -459,9 +459,9 @@ NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict fp,
 }
 /*[[[end:libd_fgetwln]]]*/
 
-/*[[[head:libc_fgetwln,hash:CRC-32=0xd79dfa2]]]*/
+/*[[[head:libc_fgetwln,hash:CRC-32=0x257c0349]]]*/
 /* >> fgetwln(3) */
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") WUNUSED ATTR_ACCESS_RW(1) NONNULL((2)) char32_t *
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_WR_OPT(2) char32_t *
 NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict fp,
                                    size_t *__restrict lenp)
 /*[[[body:libc_fgetwln]]]*/
@@ -478,10 +478,10 @@ NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict fp,
 
 
 
-/*[[[head:libc_file_wprinter,hash:CRC-32=0x3280fe5]]]*/
+/*[[[head:libc_file_wprinter,hash:CRC-32=0x327e9bd1]]]*/
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
-INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write") NONNULL((1, 2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write") ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t
 (LIBKCALL libc_file_wprinter)(void *arg,
                               char32_t const *__restrict data,
                               size_t datalen) THROWS(...)
@@ -500,10 +500,10 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write") NONNULL((1, 2)) s
 }
 /*[[[end:libc_file_wprinter]]]*/
 
-/*[[[head:libc_file_wprinter_unlocked,hash:CRC-32=0x8d352e68]]]*/
+/*[[[head:libc_file_wprinter_unlocked,hash:CRC-32=0x3b5626b6]]]*/
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
-INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write") NONNULL((1, 2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write") ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t
 (LIBKCALL libc_file_wprinter_unlocked)(void *arg,
                                        char32_t const *__restrict data,
                                        size_t datalen) THROWS(...)
@@ -516,10 +516,10 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write") NONNULL((1, 2))
 }
 /*[[[end:libc_file_wprinter_unlocked]]]*/
 
-/*[[[head:libd_file_wprinter,hash:CRC-32=0xc9cd4c53]]]*/
+/*[[[head:libd_file_wprinter,hash:CRC-32=0x7221fd69]]]*/
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") NONNULL((1, 2)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t
 (LIBDCALL libd_file_wprinter)(void *arg,
                               char16_t const *__restrict data,
                               size_t datalen) THROWS(...)
@@ -538,10 +538,10 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.wr
 }
 /*[[[end:libd_file_wprinter]]]*/
 
-/*[[[head:libd_file_wprinter_unlocked,hash:CRC-32=0x1e1bb3d0]]]*/
+/*[[[head:libd_file_wprinter_unlocked,hash:CRC-32=0xd78fe7b4]]]*/
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.write") NONNULL((1, 2)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.write") ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t
 (LIBDCALL libd_file_wprinter_unlocked)(void *arg,
                                        char16_t const *__restrict data,
                                        size_t datalen) THROWS(...)

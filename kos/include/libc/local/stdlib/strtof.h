@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fe9179e */
+/* HASH CRC-32:0x16c5fff8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf8.h>
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_rev,(char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_rev,(char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8_rev */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf8_rev.h>
@@ -133,7 +133,7 @@ __NAMESPACE_LOCAL_END
 
 #endif /* !... */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strtof) __ATTR_LEAF __ATTR_NONNULL((1)) float
+__LOCAL_LIBC(strtof) __ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtof))(char const *__restrict __nptr, char **__endptr) {
 	float __result;
 	char const *__text_pointer = __nptr;

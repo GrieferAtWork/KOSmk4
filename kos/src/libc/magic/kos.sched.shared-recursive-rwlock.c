@@ -115,7 +115,7 @@ __SYSDECL_BEGIN
 [[extern_inline, wunused, nothrow, cc(__FCALL), attribute(__NOBLOCK)]]
 [[decl_include("<kos/bits/shared-recursive-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>"), requires_function(shared_rwlock_tryread)]]
-$bool shared_recursive_rwlock_tryread([[nonnull]] struct shared_recursive_rwlock *__restrict self) {
+$bool shared_recursive_rwlock_tryread([[inout]] struct shared_recursive_rwlock *__restrict self) {
 	if (shared_rwlock_tryread(&self->@srr_lock@))
 		return $true;
 	if (__shared_recursive_rwlock_isown(self)) {
@@ -130,7 +130,7 @@ $bool shared_recursive_rwlock_tryread([[nonnull]] struct shared_recursive_rwlock
 [[extern_inline, wunused, nothrow, cc(__FCALL), attribute(__NOBLOCK)]]
 [[decl_include("<kos/bits/shared-recursive-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>"), requires_function(shared_rwlock_trywrite)]]
-$bool shared_recursive_rwlock_trywrite([[nonnull]] struct shared_recursive_rwlock *__restrict self) {
+$bool shared_recursive_rwlock_trywrite([[inout]] struct shared_recursive_rwlock *__restrict self) {
 	if (shared_rwlock_trywrite(&self->@srr_lock@)) {
 		__shared_recursive_rwlock_setown(self);
 		return $true;
@@ -151,7 +151,7 @@ $bool shared_recursive_rwlock_trywrite([[nonnull]] struct shared_recursive_rwloc
 [[decl_include("<kos/bits/shared-recursive-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-recursive-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
-$bool shared_recursive_rwlock_endwrite([[nonnull]] struct shared_recursive_rwlock *__restrict self) {
+$bool shared_recursive_rwlock_endwrite([[inout]] struct shared_recursive_rwlock *__restrict self) {
 	__COMPILER_BARRIER();
 	__hybrid_assertf(self->@srr_lock@.@sl_lock@ == ($uintptr_t)-1,
 	                 "Lock isn't in write-mode (%x)",
@@ -179,7 +179,7 @@ $bool shared_recursive_rwlock_endwrite([[nonnull]] struct shared_recursive_rwloc
 [[decl_include("<kos/bits/shared-recursive-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/__assert.h>", "<kos/asm/futex.h>")]]
 [[requires_include("<kos/bits/shared-recursive-rwlock.h>"), requires(defined(__shared_rwlock_wrwait_send))]]
-$bool shared_recursive_rwlock_endread([[nonnull]] struct shared_recursive_rwlock *__restrict self) {
+$bool shared_recursive_rwlock_endread([[inout]] struct shared_recursive_rwlock *__restrict self) {
 	$uintptr_t result;
 	COMPILER_READ_BARRIER();
 	if (self->@srr_lock@.@sl_lock@ == ($uintptr_t)-1)
@@ -206,7 +206,7 @@ $bool shared_recursive_rwlock_endread([[nonnull]] struct shared_recursive_rwlock
 [[decl_include("<kos/bits/shared-recursive-rwlock.h>", "<kos/anno.h>")]]
 [[impl_include("<kos/bits/shared-recursive-rwlock.h>", "<hybrid/__assert.h>")]]
 [[requires_function(shared_rwlock_downgrade)]]
-void shared_recursive_rwlock_downgrade([[nonnull]] struct shared_recursive_rwlock *__restrict self) {
+void shared_recursive_rwlock_downgrade([[inout]] struct shared_recursive_rwlock *__restrict self) {
 	__hybrid_assertf(__shared_recursive_rwlock_isown(self), "You're not holding this lock");
 	__hybrid_assertf(self->@srr_wrcnt@ > 0, "You're holding more than 1 write-lock");
 	self->@srr_writer@ = __SHARED_RECURSIVE_RWLOCK_BADTID;
@@ -230,7 +230,7 @@ void shared_recursive_rwlock_downgrade([[nonnull]] struct shared_recursive_rwloc
 [[decl_include("<kos/bits/shared-recursive-rwlock.h>", "<kos/anno.h>")]]
 [[requires_function(shared_recursive_rwlock_endread, shared_recursive_rwlock_write)]]
 [[impl_include("<hybrid/__atomic.h>")]]
-$bool shared_recursive_rwlock_upgrade([[nonnull]] struct shared_recursive_rwlock *__restrict self) {
+$bool shared_recursive_rwlock_upgrade([[inout]] struct shared_recursive_rwlock *__restrict self) {
 	if (__hybrid_atomic_cmpxch(self->@srr_lock@.@sl_lock@, 1, ($uintptr_t)-1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED)) {
 		__shared_recursive_rwlock_setown(self);
 		return $true; /* Lock wasn't lost */
@@ -253,7 +253,7 @@ $bool shared_recursive_rwlock_upgrade([[nonnull]] struct shared_recursive_rwlock
 [[decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-rwlock.h>")]]
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_rwlock_read)]]
-void shared_recursive_rwlock_read([[nonnull]] struct shared_recursive_rwlock *__restrict self) {
+void shared_recursive_rwlock_read([[inout]] struct shared_recursive_rwlock *__restrict self) {
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->@srr_wrcnt@;
 		return;
@@ -267,7 +267,7 @@ void shared_recursive_rwlock_read([[nonnull]] struct shared_recursive_rwlock *__
 [[decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-rwlock.h>")]]
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_rwlock_write)]]
-void shared_recursive_rwlock_write([[nonnull]] struct shared_recursive_rwlock *__restrict self) {
+void shared_recursive_rwlock_write([[inout]] struct shared_recursive_rwlock *__restrict self) {
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->@srr_wrcnt@;
 		return;
@@ -286,7 +286,7 @@ void shared_recursive_rwlock_write([[nonnull]] struct shared_recursive_rwlock *_
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_recursive_rwlock_read_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")(defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_recursive_rwlock_read_with_timeout64")]]
 [[requires_function(shared_rwlock_read_with_timeout)]]
-$bool shared_recursive_rwlock_read_with_timeout([[nonnull]] struct shared_recursive_rwlock *__restrict self,
+$bool shared_recursive_rwlock_read_with_timeout([[inout]] struct shared_recursive_rwlock *__restrict self,
                                                 __shared_rwlock_timespec abs_timeout) {
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->@srr_wrcnt@;
@@ -305,7 +305,7 @@ $bool shared_recursive_rwlock_read_with_timeout([[nonnull]] struct shared_recurs
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_recursive_rwlock_write_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")(defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_recursive_rwlock_write_with_timeout64")]]
 [[requires_function(shared_rwlock_write_with_timeout)]]
-$bool shared_recursive_rwlock_write_with_timeout([[nonnull]] struct shared_recursive_rwlock *__restrict self,
+$bool shared_recursive_rwlock_write_with_timeout([[inout]] struct shared_recursive_rwlock *__restrict self,
                                                  __shared_rwlock_timespec abs_timeout) {
 	bool result;
 	if (__shared_recursive_rwlock_isown(self)) {
@@ -332,7 +332,7 @@ $bool shared_recursive_rwlock_write_with_timeout([[nonnull]] struct shared_recur
 [[decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-rwlock.h>")]]
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_rwlock_waitread)]]
-void shared_recursive_rwlock_waitread([[nonnull]] struct shared_recursive_rwlock *__restrict self) {
+void shared_recursive_rwlock_waitread([[inout]] struct shared_recursive_rwlock *__restrict self) {
 	if (__shared_recursive_rwlock_isown(self))
 		return;
 	shared_rwlock_waitread(&self->@srr_lock@);
@@ -344,7 +344,7 @@ void shared_recursive_rwlock_waitread([[nonnull]] struct shared_recursive_rwlock
 [[decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-rwlock.h>")]]
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_rwlock_waitwrite)]]
-void shared_recursive_rwlock_waitwrite([[nonnull]] struct shared_recursive_rwlock *__restrict self) {
+void shared_recursive_rwlock_waitwrite([[inout]] struct shared_recursive_rwlock *__restrict self) {
 	if (__shared_recursive_rwlock_isown(self))
 		return;
 	shared_rwlock_waitwrite(&self->@srr_lock@);
@@ -360,7 +360,7 @@ void shared_recursive_rwlock_waitwrite([[nonnull]] struct shared_recursive_rwloc
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_recursive_rwlock_waitread_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")(defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_recursive_rwlock_waitread_with_timeout64")]]
 [[requires_function(shared_rwlock_waitread_with_timeout)]]
-$bool shared_recursive_rwlock_waitread_with_timeout([[nonnull]] struct shared_recursive_rwlock *__restrict self,
+$bool shared_recursive_rwlock_waitread_with_timeout([[inout]] struct shared_recursive_rwlock *__restrict self,
                                                     __shared_rwlock_timespec abs_timeout) {
 	if (__shared_recursive_rwlock_isown(self))
 		return $true;
@@ -377,7 +377,7 @@ $bool shared_recursive_rwlock_waitread_with_timeout([[nonnull]] struct shared_re
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_recursive_rwlock_waitwrite_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")(defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_recursive_rwlock_waitwrite_with_timeout64")]]
 [[requires_function(shared_rwlock_waitwrite_with_timeout)]]
-$bool shared_recursive_rwlock_waitwrite_with_timeout([[nonnull]] struct shared_recursive_rwlock *__restrict self,
+$bool shared_recursive_rwlock_waitwrite_with_timeout([[inout]] struct shared_recursive_rwlock *__restrict self,
                                                      __shared_rwlock_timespec abs_timeout) {
 	if (__shared_recursive_rwlock_isown(self))
 		return $true;
@@ -394,8 +394,8 @@ $bool shared_recursive_rwlock_waitwrite_with_timeout([[nonnull]] struct shared_r
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-rwlock.h>", "<bits/os/timespec.h>")]]
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_rwlock_read_with_timeout64)]]
-$bool shared_recursive_rwlock_read_with_timeout64([[nonnull]] struct shared_recursive_rwlock *__restrict self,
-                                                  struct timespec64 const *abs_timeout) {
+$bool shared_recursive_rwlock_read_with_timeout64([[inout]] struct shared_recursive_rwlock *__restrict self,
+                                                  [[in_opt]] struct timespec64 const *abs_timeout) {
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->@srr_wrcnt@;
 		return $true;
@@ -407,8 +407,8 @@ $bool shared_recursive_rwlock_read_with_timeout64([[nonnull]] struct shared_recu
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-rwlock.h>", "<bits/os/timespec.h>")]]
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_rwlock_write_with_timeout64)]]
-$bool shared_recursive_rwlock_write_with_timeout64([[nonnull]] struct shared_recursive_rwlock *__restrict self,
-                                                   struct timespec64 const *abs_timeout) {
+$bool shared_recursive_rwlock_write_with_timeout64([[inout]] struct shared_recursive_rwlock *__restrict self,
+                                                   [[in_opt]] struct timespec64 const *abs_timeout) {
 	bool result;
 	if (__shared_recursive_rwlock_isown(self)) {
 		++self->@srr_wrcnt@;
@@ -424,8 +424,8 @@ $bool shared_recursive_rwlock_write_with_timeout64([[nonnull]] struct shared_rec
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-rwlock.h>", "<bits/os/timespec.h>")]]
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_rwlock_waitread_with_timeout64)]]
-$bool shared_recursive_rwlock_waitread_with_timeout64([[nonnull]] struct shared_recursive_rwlock *__restrict self,
-                                                      struct timespec64 const *abs_timeout) {
+$bool shared_recursive_rwlock_waitread_with_timeout64([[inout]] struct shared_recursive_rwlock *__restrict self,
+                                                      [[in_opt]] struct timespec64 const *abs_timeout) {
 	if (__shared_recursive_rwlock_isown(self))
 		return $true;
 	return shared_rwlock_waitread_with_timeout64(&self->@srr_lock@, abs_timeout);
@@ -435,8 +435,8 @@ $bool shared_recursive_rwlock_waitread_with_timeout64([[nonnull]] struct shared_
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-recursive-rwlock.h>", "<bits/os/timespec.h>")]]
 [[extern_inline, attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
 [[requires_function(shared_rwlock_waitwrite_with_timeout64)]]
-$bool shared_recursive_rwlock_waitwrite_with_timeout64([[nonnull]] struct shared_recursive_rwlock *__restrict self,
-                                                       struct timespec64 const *abs_timeout) {
+$bool shared_recursive_rwlock_waitwrite_with_timeout64([[inout]] struct shared_recursive_rwlock *__restrict self,
+                                                       [[in_opt]] struct timespec64 const *abs_timeout) {
 	if (__shared_recursive_rwlock_isown(self))
 		return $true;
 	return shared_rwlock_waitwrite_with_timeout64(&self->@srr_lock@, abs_timeout);

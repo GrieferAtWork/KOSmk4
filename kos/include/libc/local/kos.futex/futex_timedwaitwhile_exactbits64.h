@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f34f410 */
+/* HASH CRC-32:0xbeb9fbfb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/asm/futex.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(futex_timedwaitwhile_exactbits64) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(futex_timedwaitwhile_exactbits64) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(4) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile_exactbits64))(__uintptr_t *__uaddr, __uintptr_t __bitmask, __uintptr_t __setmask, struct __timespec64 const *__rel_timeout) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_lfutex64)(__uaddr, LFUTEX_WAIT_WHILE_BITMASK, __bitmask, __rel_timeout, __setmask);
 }

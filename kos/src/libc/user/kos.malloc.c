@@ -114,8 +114,8 @@ INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_RETNO
 }
 /*[[[end:libc_Valloc]]]*/
 
-/*[[[head:libc_Memdup,hash:CRC-32=0x6692dc85]]]*/
-INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *
+/*[[[head:libc_Memdup,hash:CRC-32=0x9998285b]]]*/
+INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ALLOC_SIZE((2)) void *
 (LIBCCALL libc_Memdup)(void const *__restrict ptr,
                        size_t num_bytes) THROWS(E_BADALLOC)
 /*[[[body:libc_Memdup]]]*/
@@ -128,9 +128,9 @@ INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_
 }
 /*[[[end:libc_Memdup]]]*/
 
-/*[[[head:libc_Memcdup,hash:CRC-32=0x61260375]]]*/
+/*[[[head:libc_Memcdup,hash:CRC-32=0x6b3fff10]]]*/
 /* @throws: E_BADALLOC: ... */
-INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
+INTERN ATTR_SECTION(".text.crt.except.heap.rare_helpers") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_ROS(1, 3) void *
 (LIBCCALL libc_Memcdup)(void const *__restrict ptr,
                         int needle,
                         size_t num_bytes) THROWS(E_BADALLOC)

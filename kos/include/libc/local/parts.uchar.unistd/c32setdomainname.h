@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c89f206 */
+/* HASH CRC-32:0xf37875c7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_c32tombsn_defined
 #define __local___localdep_convert_c32tombsn_defined
 #if defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c32tombsn,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR_OPT(3),char *,__NOTHROW_NCX,__localdep_convert_c32tombsn,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
 #elif defined(__CRT_HAVE_KOS$convert_wcstombsn)
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_convert_c32tombsn,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR_OPT(3),char *,__NOTHROW_NCX,__localdep_convert_c32tombsn,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
 #elif (defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombsn.h>
@@ -70,7 +70,7 @@ __CREDIRECT(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,__localdep_setdomainname,(
 #undef __local___localdep_setdomainname_defined
 #endif /* !... */
 #endif /* !__local___localdep_setdomainname_defined */
-__LOCAL_LIBC(c32setdomainname) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(c32setdomainname) __ATTR_ACCESS_ROS(1, 2) int
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32setdomainname))(__CHAR32_TYPE__ const *__name, __SIZE_TYPE__ __len) {
 	int __result;
 	char *__utf8_name;

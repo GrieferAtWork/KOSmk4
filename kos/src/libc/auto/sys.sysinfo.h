@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8496514 */
+/* HASH CRC-32:0xc48b7cce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sysinfo(2)
  * Return current system information */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sysinfo)(struct sysinfo *info);
+INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_sysinfo)(struct sysinfo *info);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> get_phys_pages(3)

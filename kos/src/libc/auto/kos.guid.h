@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x333c6eda */
+/* HASH CRC-32:0x333e0f8c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ DECL_BEGIN
  * >> guid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
  * @return: string + GUID_STRLEN: Success
  * @return: NULL:                 `string' isn't a valid GUID. */
-INTDEF NONNULL((1, 2)) char const *NOTHROW_NCX(LIBDCALL libd_guid_fromstr)(char const string[GUID_STRLEN], guid_t *__restrict result);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char const *NOTHROW_NCX(LIBDCALL libd_guid_fromstr)(char const string[GUID_STRLEN], guid_t *__restrict result);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> guid_fromstr(3)
  * Convert a given `string' into a GUID
@@ -44,7 +44,7 @@ INTDEF NONNULL((1, 2)) char const *NOTHROW_NCX(LIBDCALL libd_guid_fromstr)(char 
  * >> guid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
  * @return: string + GUID_STRLEN: Success
  * @return: NULL:                 `string' isn't a valid GUID. */
-INTDEF NONNULL((1, 2)) char const *NOTHROW_NCX(LIBCCALL libc_guid_fromstr)(char const string[GUID_STRLEN], guid_t *__restrict result);
+INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char const *NOTHROW_NCX(LIBCCALL libc_guid_fromstr)(char const string[GUID_STRLEN], guid_t *__restrict result);
 
 DECL_END
 

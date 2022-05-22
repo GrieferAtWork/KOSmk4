@@ -105,9 +105,9 @@ typedef __SIZE_TYPE__ size_t;
 @@>> opendev(3)
 @@@param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK'
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>")]]
-$fd_t opendev([[nonnull]] char const *path, $oflag_t oflags,
+$fd_t opendev([[in]] char const *path, $oflag_t oflags,
               __STDC_INT_AS_UINT_T dflags,
-              [[nullable]] char **realpath);
+              [[out_opt]] char **realpath);
 
 %[insert:extern(openpty)]
 %[insert:extern(forkpty)]
@@ -135,9 +135,9 @@ $fd_t opendev([[nonnull]] char const *path, $oflag_t oflags,
 [[guard, requires_function(getline, fgetc, ungetc, realloc)]]
 [[section(".text.crt{|.dos}.FILE.locked.read.read")]]
 char *fparseln([[inout]] $FILE *stream,
-               [[nullable]] size_t *plen,
-               [[nullable]] size_t *plineno,
-               [[nullable]] char const delim[3],
+               [[out_opt]] size_t *plen,
+               [[out_opt]] size_t *plineno,
+               [[in_opt]] char const delim[3],
                __STDC_INT_AS_UINT_T flags) {
 	char *result;
 	size_t result_alloc;

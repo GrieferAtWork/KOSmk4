@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa59148dc */
+/* HASH CRC-32:0x9452782f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,32 +30,32 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wmkdir)(char16_t const *pathname, mode_t mode);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wmkdir)(char32_t const *pathname, mode_t mode);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wchmod)(char16_t const *filename, mode_t mode);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wchmod)(char32_t const *filename, mode_t mode);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wlchmod)(char16_t const *filename, mode_t mode);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wlchmod)(char32_t const *filename, mode_t mode);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wfmkdirat)(fd_t dirfd, char16_t const *pathname, mode_t mode, atflag_t flags);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wfmkdirat)(fd_t dirfd, char32_t const *pathname, mode_t mode, atflag_t flags);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wfmknodat)(fd_t dirfd, char16_t const *nodename, mode_t mode, dev_t dev, atflag_t flags);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wfmknodat)(fd_t dirfd, char32_t const *nodename, mode_t mode, dev_t dev, atflag_t flags);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wmkfifo)(char16_t const *fifoname, mode_t mode);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wmkfifo)(char32_t const *fifoname, mode_t mode);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wfchmodat)(fd_t dirfd, char16_t const *filename, mode_t mode, atflag_t flags);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wfchmodat)(fd_t dirfd, char32_t const *filename, mode_t mode, atflag_t flags);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wmkdirat)(fd_t dirfd, char16_t const *pathname, mode_t mode);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wmkdirat)(fd_t dirfd, char32_t const *pathname, mode_t mode);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wmkfifoat)(fd_t dirfd, char16_t const *fifoname, mode_t mode);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wmkfifoat)(fd_t dirfd, char32_t const *fifoname, mode_t mode);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wmknod)(char16_t const *nodename, mode_t mode, dev_t dev);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wmknod)(char32_t const *nodename, mode_t mode, dev_t dev);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wmknodat)(fd_t dirfd, char16_t const *nodename, mode_t mode, dev_t dev);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wmknodat)(fd_t dirfd, char32_t const *nodename, mode_t mode, dev_t dev);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wutimensat)(fd_t dirfd, char16_t const *filename, struct timespec const times[2 /*or:3*/], atflag_t flags);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wutimensat)(fd_t dirfd, char32_t const *filename, struct timespec const times[2 /*or:3*/], atflag_t flags);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wutimensat64)(fd_t dirfd, char16_t const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags);
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wutimensat64)(fd_t dirfd, char32_t const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_wmkdir)(char16_t const *pathname, mode_t mode);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBKCALL libc_wmkdir)(char32_t const *pathname, mode_t mode);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_wchmod)(char16_t const *filename, mode_t mode);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBKCALL libc_wchmod)(char32_t const *filename, mode_t mode);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_wlchmod)(char16_t const *filename, mode_t mode);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBKCALL libc_wlchmod)(char32_t const *filename, mode_t mode);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_wfmkdirat)(fd_t dirfd, char16_t const *pathname, mode_t mode, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBKCALL libc_wfmkdirat)(fd_t dirfd, char32_t const *pathname, mode_t mode, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_wfmknodat)(fd_t dirfd, char16_t const *nodename, mode_t mode, dev_t dev, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBKCALL libc_wfmknodat)(fd_t dirfd, char32_t const *nodename, mode_t mode, dev_t dev, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_wmkfifo)(char16_t const *fifoname, mode_t mode);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBKCALL libc_wmkfifo)(char32_t const *fifoname, mode_t mode);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_wfchmodat)(fd_t dirfd, char16_t const *filename, mode_t mode, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBKCALL libc_wfchmodat)(fd_t dirfd, char32_t const *filename, mode_t mode, atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_wmkdirat)(fd_t dirfd, char16_t const *pathname, mode_t mode);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBKCALL libc_wmkdirat)(fd_t dirfd, char32_t const *pathname, mode_t mode);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_wmkfifoat)(fd_t dirfd, char16_t const *fifoname, mode_t mode);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBKCALL libc_wmkfifoat)(fd_t dirfd, char32_t const *fifoname, mode_t mode);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_wmknod)(char16_t const *nodename, mode_t mode, dev_t dev);
+INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBKCALL libc_wmknod)(char32_t const *nodename, mode_t mode, dev_t dev);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_wmknodat)(fd_t dirfd, char16_t const *nodename, mode_t mode, dev_t dev);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBKCALL libc_wmknodat)(fd_t dirfd, char32_t const *nodename, mode_t mode, dev_t dev);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBDCALL libd_wutimensat)(fd_t dirfd, char16_t const *filename, struct timespec const times[2 /*or:3*/], atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBKCALL libc_wutimensat)(fd_t dirfd, char32_t const *filename, struct timespec const times[2 /*or:3*/], atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBDCALL libd_wutimensat64)(fd_t dirfd, char16_t const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags);
+INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) int NOTHROW_RPC(LIBKCALL libc_wutimensat64)(fd_t dirfd, char32_t const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags);
 #endif /* !__KERNEL__ */
 
 DECL_END

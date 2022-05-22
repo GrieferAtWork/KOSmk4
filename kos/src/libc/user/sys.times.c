@@ -29,9 +29,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_times,hash:CRC-32=0x42e5a958]]]*/
+/*[[[head:libc_times,hash:CRC-32=0xad6ad326]]]*/
 /* >> times(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") clock_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WR_OPT(1) clock_t
 NOTHROW_NCX(LIBCCALL libc_times)(struct tms *buffer)
 /*[[[body:libc_times]]]*/
 {

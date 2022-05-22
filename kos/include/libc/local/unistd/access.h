@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8a11391 */
+/* HASH CRC-32:0xcd3e8d2a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_faccessat,(__fd_t __dfd, char const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),faccessat,(__dfd,__file,__type,__flags))
+__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_faccessat,(__fd_t __dfd, char const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),faccessat,(__dfd,__file,__type,__flags))
 #endif /* !__local___localdep_faccessat_defined */
-__LOCAL_LIBC(access) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(access) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(access))(char const *__file, __STDC_INT_AS_UINT_T __type) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_faccessat)(__AT_FDCWD, __file, __type, 0);
 }

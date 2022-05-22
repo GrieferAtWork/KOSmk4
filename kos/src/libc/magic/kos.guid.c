@@ -163,8 +163,8 @@ typedef union __ATTR_PACKED {
 @@@return: string + GUID_STRLEN: Success
 @@@return: NULL:                 `string' isn't a valid GUID.
 [[kernel, impl_include("<libc/template/hex.h>")]]
-char const *guid_fromstr([[nonnull]] char const string[@GUID_STRLEN@],
-                         [[nonnull]] guid_t *__restrict result) {
+char const *guid_fromstr([[in]] char const string[@GUID_STRLEN@],
+                         [[out]] guid_t *__restrict result) {
 	unsigned int i;
 	for (i = 0; i < 16; ++i) {
 		byte_t nibbles[2];

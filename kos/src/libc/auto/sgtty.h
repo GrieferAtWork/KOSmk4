@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f61857c */
+/* HASH CRC-32:0x2e3074d6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,8 +30,8 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_gtty)(fd_t fd, struct sgttyb *params);
-INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_stty)(fd_t fd, struct sgttyb const *params);
+INTDEF ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBDCALL libd_gtty)(fd_t fd, struct sgttyb *params);
+INTDEF ATTR_ACCESS_RO(2) int NOTHROW_NCX(LIBDCALL libd_stty)(fd_t fd, struct sgttyb const *params);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

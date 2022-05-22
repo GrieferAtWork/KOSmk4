@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f1933a8 */
+/* HASH CRC-32:0xf8861d9c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_adjtime32_defined
 #define __local___localdep_adjtime32_defined
 #ifdef __CRT_HAVE_adjtime
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *__delta, struct __timeval32 *__olddelta),adjtime,(__delta,__olddelta))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *__delta, struct __timeval32 *__olddelta),adjtime,(__delta,__olddelta))
 #elif defined(__CRT_HAVE___adjtime)
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *__delta, struct __timeval32 *__olddelta),__adjtime,(__delta,__olddelta))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *__delta, struct __timeval32 *__olddelta),__adjtime,(__delta,__olddelta))
 #else /* ... */
 #undef __local___localdep_adjtime32_defined
 #endif /* !... */
 #endif /* !__local___localdep_adjtime32_defined */
-__LOCAL_LIBC(adjtime64) int
+__LOCAL_LIBC(adjtime64) __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_WR_OPT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime64))(struct __timeval64 const *__delta, struct __timeval64 *__olddelta) {
 	int __result;
 	struct __timeval32 __delta32, __olddelta32;

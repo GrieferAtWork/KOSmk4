@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b3b994e */
+/* HASH CRC-32:0x4f93cdd6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,27 +74,27 @@ typedef __pthread_t thread_t;
 typedef __pthread_key_t thread_key_t;
 
 #ifdef __CRT_HAVE_thr_create
-__CDECLARE(__ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,thr_create,(void *__stack_base, size_t __stack_size, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg, long __flags, thread_t *__newthread),(__stack_base,__stack_size,__start_routine,__arg,__flags,__newthread))
+__CDECLARE(__ATTR_ACCESS_WR(6) __ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,thr_create,(void *__stack_base, size_t __stack_size, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg, long __flags, thread_t *__newthread),(__stack_base,__stack_size,__start_routine,__arg,__flags,__newthread))
 #elif defined(__CRT_HAVE_pthread_create)
 #include <libc/local/thread/thr_create.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(thr_create, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) __errno_t __NOTHROW_NCX(__LIBCCALL thr_create)(void *__stack_base, size_t __stack_size, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg, long __flags, thread_t *__newthread) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_create))(__stack_base, __stack_size, __start_routine, __arg, __flags, __newthread); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thr_create, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(6) __ATTR_NONNULL((3)) __errno_t __NOTHROW_NCX(__LIBCCALL thr_create)(void *__stack_base, size_t __stack_size, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg, long __flags, thread_t *__newthread) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_create))(__stack_base, __stack_size, __start_routine, __arg, __flags, __newthread); })
 #endif /* ... */
 #ifdef __CRT_HAVE_thr_join
-__CDECLARE(,__errno_t,__NOTHROW_RPC,thr_join,(thread_t __thr, thread_t *__p_departed, void **__thread_return),(__thr,__p_departed,__thread_return))
+__CDECLARE(__ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR_OPT(3),__errno_t,__NOTHROW_RPC,thr_join,(thread_t __thr, thread_t *__p_departed, void **__thread_return),(__thr,__p_departed,__thread_return))
 #elif defined(__CRT_HAVE_pthread_join)
 #include <libc/local/thread/thr_join.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(thr_join, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_RPC(__LIBCCALL thr_join)(thread_t __thr, thread_t *__p_departed, void **__thread_return) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_join))(__thr, __p_departed, __thread_return); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thr_join, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR_OPT(3) __errno_t __NOTHROW_RPC(__LIBCCALL thr_join)(thread_t __thr, thread_t *__p_departed, void **__thread_return) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_join))(__thr, __p_departed, __thread_return); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_exit
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-__CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,thr_exit,(void *__retval),pthread_exit,(__retval))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,thr_exit,(void *__retval),pthread_exit,(__retval))
 #elif defined(__CRT_HAVE_thr_exit)
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
-__CDECLARE_VOID(__ATTR_NORETURN,__THROWING,thr_exit,(void *__retval),(__retval))
+__CDECLARE_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,thr_exit,(void *__retval),(__retval))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_self
 /* >> pthread_self(3)
@@ -187,7 +187,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thr_getprio, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * when the key is destroyed
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,thr_keycreate,(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),pthread_key_create,(__key,__destr_function))
+__CREDIRECT(__ATTR_ACCESS_WR(1),__errno_t,__NOTHROW_NCX,thr_keycreate,(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),pthread_key_create,(__key,__destr_function))
 #elif defined(__CRT_HAVE_thr_keycreate)
 /* >> pthread_key_create(3)
  * Create a key value identifying a location in the thread-specific
@@ -198,7 +198,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,thr_keycreate,(thread_ke
  * when the key is destroyed
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,thr_keycreate,(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),(__key,__destr_function))
+__CDECLARE(__ATTR_ACCESS_WR(1),__errno_t,__NOTHROW_NCX,thr_keycreate,(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),(__key,__destr_function))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_key_create_once_np
 /* >> pthread_key_create_once_np(3)
@@ -210,7 +210,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,thr_keycreate,(thread_key
  * function will no longer block, but simply return immediately.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,thr_keycreate_once,(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),pthread_key_create_once_np,(__key,__destr_function))
+__CREDIRECT(__ATTR_ACCESS_WR(1),__errno_t,__NOTHROW_NCX,thr_keycreate_once,(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),pthread_key_create_once_np,(__key,__destr_function))
 #elif defined(__CRT_HAVE_thr_keycreate_once)
 /* >> pthread_key_create_once_np(3)
  * Same as `pthread_key_create()', but the  given `key' must be  pre-initialized
@@ -221,7 +221,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,thr_keycreate_once,(thre
  * function will no longer block, but simply return immediately.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,thr_keycreate_once,(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),(__key,__destr_function))
+__CDECLARE(__ATTR_ACCESS_WR(1),__errno_t,__NOTHROW_NCX,thr_keycreate_once,(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),(__key,__destr_function))
 #elif defined(__CRT_HAVE_pthread_key_create) || defined(__CRT_HAVE_thr_keycreate)
 #include <libc/local/pthread/pthread_key_create_once_np.h>
 /* >> pthread_key_create_once_np(3)
@@ -233,7 +233,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,thr_keycreate_once,(threa
  * function will no longer block, but simply return immediately.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL thr_keycreate_once)(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_key_create_once_np))((__pthread_key_t *)__key, __destr_function); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(1) __errno_t __NOTHROW_NCX(__LIBCCALL thr_keycreate_once)(thread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_key_create_once_np))((__pthread_key_t *)__key, __destr_function); }
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_setspecific
 /* >> pthread_setspecific(3)
@@ -242,7 +242,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIB
  * @return: EINVAL: Invalid `key'
  * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
  *                  calling  thread, and an attempt to allocate it just now failed */
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,thr_setspecific,(thread_key_t __key, void *__val),pthread_setspecific,(__key,__val))
+__CREDIRECT(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,thr_setspecific,(thread_key_t __key, void *__val),pthread_setspecific,(__key,__val))
 #elif defined(__CRT_HAVE_thr_setspecific)
 /* >> pthread_setspecific(3)
  * Store POINTER in the thread-specific data slot identified by `key'
@@ -250,13 +250,13 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,thr_setspecific,(thread_key_t __key, void *
  * @return: EINVAL: Invalid `key'
  * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allocated for the
  *                  calling  thread, and an attempt to allocate it just now failed */
-__CDECLARE(,__errno_t,__NOTHROW_NCX,thr_setspecific,(thread_key_t __key, void *__val),(__key,__val))
+__CDECLARE(__ATTR_ACCESS_NONE(2),__errno_t,__NOTHROW_NCX,thr_setspecific,(thread_key_t __key, void *__val),(__key,__val))
 #endif /* ... */
 #ifdef __CRT_HAVE_thr_getspecific
-__CDECLARE(,__errno_t,__NOTHROW_NCX,thr_getspecific,(thread_key_t __key, void **__p_val),(__key,__p_val))
+__CDECLARE(__ATTR_ACCESS_WR(2),__errno_t,__NOTHROW_NCX,thr_getspecific,(thread_key_t __key, void **__p_val),(__key,__p_val))
 #elif (defined(__CRT_HAVE_pthread_getspecific) || defined(__CRT_HAVE_tss_get) || defined(__CRT_HAVE_pthread_getspecificptr_np)) && (defined(__CRT_HAVE_pthread_setspecific) || defined(__CRT_HAVE_thr_setspecific))
 #include <libc/local/thread/thr_getspecific.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(thr_getspecific, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_NCX(__LIBCCALL thr_getspecific)(thread_key_t __key, void **__p_val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_getspecific))(__key, __p_val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thr_getspecific, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(2) __errno_t __NOTHROW_NCX(__LIBCCALL thr_getspecific)(thread_key_t __key, void **__p_val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_getspecific))(__key, __p_val); })
 #endif /* ... */
 #ifndef __thr_min_stack_defined
 #define __thr_min_stack_defined
@@ -357,7 +357,7 @@ typedef struct sigaltstack stack_t;
  * this function if they intend to use multiple threads.
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `how' */
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,thr_sigsetmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__newmask, struct __sigset_struct *__oldmask),pthread_sigmask,(__how,__newmask,__oldmask))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),__errno_t,__NOTHROW_NCX,thr_sigsetmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__newmask, struct __sigset_struct *__oldmask),pthread_sigmask,(__how,__newmask,__oldmask))
 #elif defined(__CRT_HAVE_thr_sigsetmask)
 /* >> pthread_sigmask(3)
  * Thread-safe version of `sigprocmask(2)'. Note though, that on
@@ -366,7 +366,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,thr_sigsetmask,(__STDC_INT_AS_UINT_T __how,
  * this function if they intend to use multiple threads.
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `how' */
-__CDECLARE(,__errno_t,__NOTHROW_NCX,thr_sigsetmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__newmask, struct __sigset_struct *__oldmask),(__how,__newmask,__oldmask))
+__CDECLARE(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),__errno_t,__NOTHROW_NCX,thr_sigsetmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__newmask, struct __sigset_struct *__oldmask),(__how,__newmask,__oldmask))
 #elif defined(__CRT_HAVE_sigprocmask)
 /* >> pthread_sigmask(3)
  * Thread-safe version of `sigprocmask(2)'. Note though, that on
@@ -375,7 +375,7 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,thr_sigsetmask,(__STDC_INT_AS_UINT_T __how, 
  * this function if they intend to use multiple threads.
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `how' */
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,thr_sigsetmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__newmask, struct __sigset_struct *__oldmask),sigprocmask,(__how,__newmask,__oldmask))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR_OPT(3),__errno_t,__NOTHROW_NCX,thr_sigsetmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__newmask, struct __sigset_struct *__oldmask),sigprocmask,(__how,__newmask,__oldmask))
 #endif /* ... */
 #ifdef __CRT_HAVE_thr_stksegment
 /* >> thr_stksegment(3)

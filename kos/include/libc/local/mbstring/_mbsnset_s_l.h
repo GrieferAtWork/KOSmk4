@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfeb3141 */
+/* HASH CRC-32:0x49f73b0f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsnset_l_defined
 #define __local___localdep__mbsnset_l_defined
 #ifdef __CRT_HAVE__mbsnset_l
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),unsigned char *,__NOTHROW_NCX,__localdep__mbsnset_l,(unsigned char *__buf, unsigned int __ch, __SIZE_TYPE__ __max_chars, __locale_t __locale),_mbsnset_l,(__buf,__ch,__max_chars,__locale))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_RW(1),unsigned char *,__NOTHROW_NCX,__localdep__mbsnset_l,(unsigned char *__buf, unsigned int __ch, __SIZE_TYPE__ __max_chars, __locale_t __locale),_mbsnset_l,(__buf,__ch,__max_chars,__locale))
 #elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsnset_l.h>
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strnlen __LIBC_LOCAL_NAME(strnlen)
 #endif /* !... */
 #endif /* !__local___localdep_strnlen_defined */
-__LOCAL_LIBC(_mbsnset_s_l) __ATTR_NONNULL((1)) __errno_t
+__LOCAL_LIBC(_mbsnset_s_l) __ATTR_ACCESS_RWS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnset_s_l))(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned int __ch, __SIZE_TYPE__ __max_chars, __locale_t __locale) {
 	if (__max_chars && !__buf)
 		return 22;

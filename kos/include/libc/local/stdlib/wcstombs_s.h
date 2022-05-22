@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46055d9e */
+/* HASH CRC-32:0xcfc4a751 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcstombs,(char *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __dstlen),wcstombs,(__dst,__src,__dstlen))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcstombs,(char *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __dstlen),wcstombs,(__dst,__src,__dstlen))
 #else /* __CRT_HAVE_wcstombs */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/wcstombs.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcstombs_s) __ATTR_NONNULL((1, 2, 4)) __errno_t
+__LOCAL_LIBC(wcstombs_s) __ATTR_ACCESS_ROS(4, 5) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WR_OPT(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstombs_s))(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __maxlen) {
 	if (!__presult || !__buf || !__src) {
 #ifdef __EINVAL

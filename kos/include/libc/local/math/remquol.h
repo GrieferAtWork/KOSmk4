@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4701a7c */
+/* HASH CRC-32:0x270cc6a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,11 +27,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_remquo_defined
 #define __local___localdep_remquo_defined
 #if __has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)
-__CEIREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,__localdep_remquo,(double __x, double __p, int *__pquo),remquo,{ return __builtin_remquo(__x, __p, __pquo); })
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WR(3),double,__NOTHROW,__localdep_remquo,(double __x, double __p, int *__pquo),remquo,{ return __builtin_remquo(__x, __p, __pquo); })
 #elif defined(__CRT_HAVE_remquo)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,__localdep_remquo,(double __x, double __p, int *__pquo),remquo,(__x,__p,__pquo))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WR(3),double,__NOTHROW,__localdep_remquo,(double __x, double __p, int *__pquo),remquo,(__x,__p,__pquo))
 #elif defined(__CRT_HAVE___remquo)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((3)),double,__NOTHROW,__localdep_remquo,(double __x, double __p, int *__pquo),__remquo,(__x,__p,__pquo))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WR(3),double,__NOTHROW,__localdep_remquo,(double __x, double __p, int *__pquo),__remquo,(__x,__p,__pquo))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/remquo.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/remquo.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(remquol) __ATTR_WUNUSED __ATTR_NONNULL((3)) __LONGDOUBLE
+__LOCAL_LIBC(remquol) __ATTR_WUNUSED __ATTR_ACCESS_WR(3) __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remquol))(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 

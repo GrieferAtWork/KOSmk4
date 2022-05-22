@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48c45886 */
+/* HASH CRC-32:0xb8873271 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,9 +31,9 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__SIZE_TYPE__,__THROWING,__localdep_ReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, __SIZE_TYPE__ __buflen),ReadlinkAt,(__dfd,__path,__buf,__buflen))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(3, 4),__SIZE_TYPE__,__THROWING,__localdep_ReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, __SIZE_TYPE__ __buflen),ReadlinkAt,(__dfd,__path,__buf,__buflen))
 #endif /* !__local___localdep_ReadlinkAt_defined */
-__LOCAL_LIBC(Readlink) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
+__LOCAL_LIBC(Readlink) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(Readlink))(char const *__restrict __path, char *__restrict __buf, __SIZE_TYPE__ __buflen) __THROWS(...) {
 	(__NAMESPACE_LOCAL_SYM __localdep_ReadlinkAt)(__AT_FDCWD, __path, __buf, __buflen);
 }

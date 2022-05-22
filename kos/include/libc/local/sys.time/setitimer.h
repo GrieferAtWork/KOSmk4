@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa854f92 */
+/* HASH CRC-32:0x64778d20 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_setitimer32_defined
 #define __local___localdep_setitimer32_defined
 #ifdef __CRT_HAVE_setitimer
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),setitimer,(__which,__newval,__oldval))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),setitimer,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE___setitimer)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),__setitimer,(__which,__newval,__oldval))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),__setitimer,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE___libc_setitimer)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),__libc_setitimer,(__which,__newval,__oldval))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),__libc_setitimer,(__which,__newval,__oldval))
 #else /* ... */
 #undef __local___localdep_setitimer32_defined
 #endif /* !... */
@@ -40,13 +40,13 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(int __
 #ifndef __local___localdep_setitimer64_defined
 #define __local___localdep_setitimer64_defined
 #if defined(__CRT_HAVE_setitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),setitimer,(__which,__newval,__oldval))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),setitimer,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE___setitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),__setitimer,(__which,__newval,__oldval))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),__setitimer,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE___libc_setitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),__libc_setitimer,(__which,__newval,__oldval))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),__libc_setitimer,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE_setitimer64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),setitimer64,(__which,__newval,__oldval))
+__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),setitimer64,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/setitimer64.h>
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_setitimer64_defined
 #endif /* !... */
 #endif /* !__local___localdep_setitimer64_defined */
-__LOCAL_LIBC(setitimer) __ATTR_NONNULL((2)) int
+__LOCAL_LIBC(setitimer) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setitimer))(int __which, struct itimerval const *__newval, struct itimerval *__oldval) {
 #if defined(__CRT_HAVE_setitimer) || defined(__CRT_HAVE___setitimer) || defined(__CRT_HAVE___libc_setitimer)
 	int __result;

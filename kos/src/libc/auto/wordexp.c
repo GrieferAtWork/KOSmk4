@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ae410f */
+/* HASH CRC-32:0x39db8508 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #include <bits/crt/wordexp.h>
 /* >> wordfree(3)
  * Free dynamic allocations made by `wordexp(3)' */
-INTERN ATTR_SECTION(".text.crt.wordexp") void
+INTERN ATTR_SECTION(".text.crt.wordexp") ATTR_ACCESS_RW_OPT(1) void
 NOTHROW_NCX(LIBCCALL libc_wordfree)(wordexp_t *self) {
 	size_t i, end;
 	char **words;

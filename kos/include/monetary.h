@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c60c658 */
+/* HASH CRC-32:0xd5760269 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,16 +60,16 @@ typedef __ssize_t ssize_t;
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
-__LIBC __ATTR_LIBC_STRFMON(3, 4) __ATTR_NONNULL((1, 3)) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon)(char *__restrict __s, size_t __maxsize, char const *__restrict __format, ...) __CASMNAME_SAME_GCCNCX("strfmon");
+__LIBC __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_STRFMON(3, 4) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon)(char *__restrict __s, size_t __maxsize, char const *__restrict __format, ...) __CASMNAME_SAME_GCCNCX("strfmon");
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
 #endif /* __CRT_HAVE_strfmon */
 #ifdef __USE_XOPEN2K8
 #ifdef __CRT_HAVE_strfmon_l
-__LIBC __ATTR_LIBC_STRFMON(4, 5) __ATTR_NONNULL((1, 4)) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon_l)(char *__restrict __s, size_t __maxsize, __locale_t __loc, const char *__restrict __format, ...) __CASMNAME_SAME("strfmon_l");
+__LIBC __ATTR_ACCESS_RO(4) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_STRFMON(4, 5) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon_l)(char *__restrict __s, size_t __maxsize, __locale_t __loc, const char *__restrict __format, ...) __CASMNAME_SAME("strfmon_l");
 #elif defined(__CRT_HAVE___strfmon_l)
-__LIBC __ATTR_LIBC_STRFMON(4, 5) __ATTR_NONNULL((1, 4)) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon_l)(char *__restrict __s, size_t __maxsize, __locale_t __loc, const char *__restrict __format, ...) __CASMNAME("__strfmon_l");
+__LIBC __ATTR_ACCESS_RO(4) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_STRFMON(4, 5) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon_l)(char *__restrict __s, size_t __maxsize, __locale_t __loc, const char *__restrict __format, ...) __CASMNAME("__strfmon_l");
 #endif /* ... */
 #endif /* __USE_XOPEN2K8 */
 

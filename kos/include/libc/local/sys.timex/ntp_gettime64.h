@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x338e6a1f */
+/* HASH CRC-32:0xe11b8f01 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ntp_gettime32_defined
 #define __local___localdep_ntp_gettime32_defined
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime32,(struct __ntptimeval32 *__restrict __ntv),ntp_gettimex,(__ntv))
+__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_ntp_gettime32,(struct __ntptimeval32 *__restrict __ntv),ntp_gettimex,(__ntv))
 #endif /* !__local___localdep_ntp_gettime32_defined */
-__LOCAL_LIBC(ntp_gettime64) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(ntp_gettime64) __ATTR_ACCESS_WR(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_gettime64))(struct __ntptimeval64 *__restrict __ntv) {
 	struct __ntptimeval32 __ntv32;
 	int __result = (__NAMESPACE_LOCAL_SYM __localdep_ntp_gettime32)(&__ntv32);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8649463b */
+/* HASH CRC-32:0x7dce08b7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,9 +36,9 @@ INTDEF ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)) vo
 INTDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_ALLOC_SIZE((2)) void *(LIBCCALL libc_Memalign)(size_t alignment, size_t num_bytes) THROWS(E_BADALLOC);
 INTDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED __ATTR_MALL_PAGEALIGNED ATTR_ALLOC_SIZE((1)) void *(LIBCCALL libc_PValloc)(size_t num_bytes) THROWS(E_BADALLOC);
 INTDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED __ATTR_MALL_PAGEALIGNED ATTR_ALLOC_SIZE((1)) void *(LIBCCALL libc_Valloc)(size_t num_bytes) THROWS(E_BADALLOC);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *(LIBCCALL libc_Memdup)(void const *__restrict ptr, size_t num_bytes) THROWS(E_BADALLOC);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ALLOC_SIZE((2)) void *(LIBCCALL libc_Memdup)(void const *__restrict ptr, size_t num_bytes) THROWS(E_BADALLOC);
 /* @throws: E_BADALLOC: ... */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED NONNULL((1)) void *(LIBCCALL libc_Memcdup)(void const *__restrict ptr, int needle, size_t num_bytes) THROWS(E_BADALLOC);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_ROS(1, 3) void *(LIBCCALL libc_Memcdup)(void const *__restrict ptr, int needle, size_t num_bytes) THROWS(E_BADALLOC);
 #endif /* !__KERNEL__ */
 
 DECL_END

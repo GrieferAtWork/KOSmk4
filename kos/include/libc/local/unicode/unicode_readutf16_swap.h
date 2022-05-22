@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c79db29 */
+/* HASH CRC-32:0xe826fe92 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <hybrid/typecore.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(unicode_readutf16_swap) __ATTR_NONNULL((1)) __CHAR32_TYPE__
+__LOCAL_LIBC(unicode_readutf16_swap) __ATTR_ACCESS_RW(1) __CHAR32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf16_swap))(__CHAR16_TYPE__ const **__restrict __ptext) {
 	__CHAR32_TYPE__ __result;
 	__CHAR16_TYPE__ const *__text = *__ptext;

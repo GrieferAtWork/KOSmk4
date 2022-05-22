@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb21254a2 */
+/* HASH CRC-32:0xd946870d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mbsnrtoc16_defined
 #define __local___localdep_mbsnrtoc16_defined
 #if defined(__CRT_HAVE_mbsnrtowcs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsnrtoc16,(__CHAR16_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __nmc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),mbsnrtowcs,(__dst,__psrc,__nmc,__dstlen,__mbs))
+__CREDIRECT(__ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW_OPT(5) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsnrtoc16,(__CHAR16_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __nmc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),mbsnrtowcs,(__dst,__psrc,__nmc,__dstlen,__mbs))
 #elif defined(__CRT_HAVE_DOS$mbsnrtowcs)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsnrtoc16,(__CHAR16_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __nmc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),mbsnrtowcs,(__dst,__psrc,__nmc,__dstlen,__mbs))
+__CREDIRECT_DOS(__ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW_OPT(5) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsnrtoc16,(__CHAR16_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __nmc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),mbsnrtowcs,(__dst,__psrc,__nmc,__dstlen,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/mbsnrtowcs.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_mbsnrtoc16 __LIBC_LOCAL_NAME(mbsnrtoc16)
 #endif /* !... */
 #endif /* !__local___localdep_mbsnrtoc16_defined */
-__LOCAL_LIBC(mbsrtoc16) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
+__LOCAL_LIBC(mbsrtoc16) __ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_WR_OPT(1) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(mbsrtoc16))(__CHAR16_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_mbsnrtoc16)(__dst, __psrc, (__SIZE_TYPE__)-1, __dstlen, __mbs);
 }

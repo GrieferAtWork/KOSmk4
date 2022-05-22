@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c75725 */
+/* HASH CRC-32:0xfa9112cc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !... */
 #endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
 __NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigaddset,(struct __sigset_struct *__set, __signo_t __signo),sigaddset,{ __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; })
+__CEIREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_sigaddset,(struct __sigset_struct *__set, __signo_t __signo),sigaddset,{ __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; })
 #elif defined(__CRT_HAVE___sigaddset)
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -101,7 +101,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !... */
 #endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
 __NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigaddset,(struct __sigset_struct *__set, __signo_t __signo),__sigaddset,{ __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; })
+__CEIREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_sigaddset,(struct __sigset_struct *__set, __signo_t __signo),__sigaddset,{ __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; })
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
@@ -139,7 +139,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !... */
 #endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __localdep_sigaddset)(struct __sigset_struct *__set, __signo_t __signo) { __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; }
+__LOCAL __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL __localdep_sigaddset)(struct __sigset_struct *__set, __signo_t __signo) { __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; }
 #endif /* !... */
 #endif /* !__local___localdep_sigaddset_defined */
 #ifndef __local___localdep_sigemptyset_defined
@@ -148,7 +148,7 @@ __LOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __localdep_sigaddset)(s
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigemptyset,(struct __sigset_struct *__set),sigemptyset,(__set))
+__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_sigemptyset,(struct __sigset_struct *__set),sigemptyset,(__set))
 #else /* __CRT_HAVE_sigemptyset */
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/sigemptyset.h>
@@ -162,12 +162,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigsuspend,(struct __sigset_struct const *__set),sigsuspend,(__set))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_sigsuspend,(struct __sigset_struct const *__set),sigsuspend,(__set))
 #elif defined(__CRT_HAVE___sigsuspend)
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigsuspend,(struct __sigset_struct const *__set),__sigsuspend,(__set))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_sigsuspend,(struct __sigset_struct const *__set),__sigsuspend,(__set))
 #else /* ... */
 #undef __local___localdep_sigsuspend_defined
 #endif /* !... */

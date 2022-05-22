@@ -227,7 +227,7 @@ __CSDECLARE(,char const *,libiberty_optr)
 %[insert:function(xexit = exit)]
 
 [[pure, wunused, nonnull]]
-char const *lbasename([[nonnull]] char const *filename) = basename;
+char const *lbasename([[in]] char const *filename) = basename;
 
 
 [[decl_include("<hybrid/typecore.h>")]]
@@ -307,7 +307,7 @@ char const *unix_lbasename(char const *filename) {
 
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[requires_function(canonicalize_file_name, strdup)]]
-char *lrealpath([[nonnull]] char const *path) {
+char *lrealpath([[in]] char const *path) {
 	char *result = canonicalize_file_name(path);
 	if (result == NULL)
 		result = strdup(path);
@@ -526,7 +526,7 @@ void *xcalloc(size_t elem_count, size_t elem_size) {
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[requires_function(xmalloc)]]
-xstrdup([[nonnull]] char const *__restrict string)
+xstrdup([[in(strlen(.))]] char const *__restrict string)
 	-> [[nonnull, malloc/*((strlen(string) + 1) * sizeof(char))*/]] char *
 {
 	size_t copysize = (strlen(string) + 1) * sizeof(char);
@@ -545,7 +545,7 @@ xstrndup(char const *string, size_t max_chars)
 }
 
 [[decl_include("<hybrid/typecore.h>"), requires_function(xmalloc)]]
-xmemdup([[inp(src_bytes)]] void const *src, size_t src_bytes, size_t alloc_size)
+xmemdup([[in(src_bytes)]] void const *src, size_t src_bytes, size_t alloc_size)
 	-> [[nonnull, malloc(alloc_size)]] void *
 {
 	void *result = xmalloc(alloc_size);
@@ -557,7 +557,7 @@ xmemdup([[inp(src_bytes)]] void const *src, size_t src_bytes, size_t alloc_size)
 
 [[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[doc_alias("strdupf"), requires_function(vstrdupf, xmalloc_failed)]]
-char *xvasprintf([[nonnull, format("printf")]] char const *format, $va_list args) {
+char *xvasprintf([[in, format("printf")]] char const *format, $va_list args) {
 	va_list args2;
 	char *result;
 	va_copy(args2, args);
@@ -569,7 +569,7 @@ char *xvasprintf([[nonnull, format("printf")]] char const *format, $va_list args
 }
 
 [[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
-char *xasprintf([[nonnull, format("printf")]] char const *__restrict format, ...)
+char *xasprintf([[in, format("printf")]] char const *__restrict format, ...)
 	%{printf(xvasprintf)}
 
 
@@ -601,8 +601,9 @@ char *xasprintf([[nonnull, format("printf")]] char const *__restrict format, ...
 
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[requires_function(xmalloc, xstrdup)]]
+[[decl_include("<features.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
-char **dupargv(char **argv) {
+char **dupargv([[in_opt]] char *__KOS_FIXED_CONST *argv) {
 	char **result;
 	size_t i, argc;
 	if (!argv)
@@ -618,7 +619,7 @@ char **dupargv(char **argv) {
 
 [[requires_function(free)]]
 [[impl_include("<hybrid/typecore.h>")]]
-void freeargv(char **argv) {
+void freeargv([[in_opt]] char **argv) {
 	size_t i;
 	if (!argv)
 		return;
@@ -628,7 +629,7 @@ void freeargv(char **argv) {
 }
 
 [[pure, wunused, decl_include("<features.h>")]]
-__STDC_INT_AS_SIZE_T countargv(char *const *argv) {
+__STDC_INT_AS_SIZE_T countargv([[in_opt]] char *const *argv) {
 	__STDC_INT_AS_SIZE_T result = 0;
 	if (argv != NULL) {
 		for (; argv[result]; ++result)
@@ -654,7 +655,7 @@ int fdmatch($fd_t fd1, $fd_t fd2) {
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[requires_function(xrealloc)]]
 [[impl_include("<hybrid/__assert.h>")]]
-char **buildargv(char const *cmdline) {
+char **buildargv([[in_opt]] char const *cmdline) {
 	char **argv = NULL;
 	size_t argc = 0;
 	if (!cmdline)
@@ -746,7 +747,8 @@ end_of_argument:
 [[requires_function(mapfile, xrealloc, xmalloc)]]
 [[impl_include("<libc/errno.h>", "<hybrid/__assert.h>")]]
 [[impl_include("<bits/crt/mapfile.h>")]]
-void expandargv([[nonnull]] int *p_argc, [[nonnull]] char ***p_argv) {
+void expandargv([[inout]] int *p_argc,
+                [[inout]] char ***p_argv) {
 	size_t i, argc = (size_t)*p_argc;
 	char **argv = *p_argv;
 	for (i = 0; i < argc; ++i) {
@@ -809,7 +811,7 @@ void expandargv([[nonnull]] int *p_argc, [[nonnull]] char ***p_argv) {
 @@@return: 0 : Success
 @@@return: 1 : Error
 [[requires_function(fputc), impl_include("<asm/crt/stdio.h>")]]
-int writeargv([[nonnull]] char *const *argv, FILE *fp) {
+int writeargv([[in]] char *const *argv, [[inout_opt]] FILE *fp) {
 	if unlikely(!fp)
 		goto err;
 	for (; *argv; ++argv) {
@@ -834,7 +836,7 @@ err:
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[nonnull, static, requires_function(xmalloc)]]
 [[impl_include("<hybrid/typecore.h>")]]
-char *vconcat(char const *first, va_list args) {
+char *vconcat([[in_opt]] char const *first, va_list args) {
 	char *result, *ptr;
 	size_t totlen = 0;
 	va_list copy;
@@ -852,7 +854,7 @@ char *vconcat(char const *first, va_list args) {
 
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_SENTINEL]]
 [[nonnull, requires_function(vconcat)]]
-char *concat([[nullable]] char const *first, ...) {
+char *concat([[in_opt]] char const *first, ...) {
 	char *result;
 	va_list args;
 	va_start(args, first);
@@ -863,7 +865,7 @@ char *concat([[nullable]] char const *first, ...) {
 
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_SENTINEL]]
 [[nonnull, requires_function(vconcat)]]
-char *reconcat([[nullable]] char *old_ptr, char const *first, ...) {
+char *reconcat([[in_opt]] char *old_ptr, [[in_opt]] char const *first, ...) {
 	char *result;
 	va_list args;
 	va_start(args, first);
@@ -877,7 +879,7 @@ char *reconcat([[nullable]] char *old_ptr, char const *first, ...) {
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
-$ulongptr_t concat_length(char const *first, ...) {
+$ulongptr_t concat_length([[in_opt]] char const *first, ...) {
 	va_list args;
 	size_t totlen = 0;
 	va_start(args, first);
@@ -888,7 +890,7 @@ $ulongptr_t concat_length(char const *first, ...) {
 }
 
 [[static, nonnull]]
-char *concat_vcopy([[nonnull]] char *dst, char const *first, va_list args) {
+char *concat_vcopy([[out]] char *dst, [[in_opt]] char const *first, va_list args) {
 	char *ptr = dst;
 	for (; first; first = va_arg(args, char *))
 		ptr = (char *)mempcpyc(ptr, first, strlen(first), sizeof(char));
@@ -897,7 +899,7 @@ char *concat_vcopy([[nonnull]] char *dst, char const *first, va_list args) {
 }
 
 [[nonnull, requires_function(concat_vcopy)]]
-char *concat_copy([[nonnull]] char *dst, char const *first, ...) {
+char *concat_copy([[out]] char *dst, [[in_opt]] char const *first, ...) {
 	char *result;
 	va_list args;
 	va_start(args, first);
@@ -910,7 +912,7 @@ char *concat_copy([[nonnull]] char *dst, char const *first, ...) {
 
 [[requires_include("<libc/template/libiberty_concat_ptr.h>")]]
 [[requires($has_function(concat_copy) && defined(__LOCAL_libiberty_concat_ptr))]]
-char *concat_copy2(char const *first, ...) {
+char *concat_copy2([[in_opt]] char const *first, ...) {
 	char *result;
 	va_list args;
 	va_start(args, first);
@@ -1066,8 +1068,8 @@ got_tmppath:
 [[requires($has_function(choose_tmpdir, xmalloc, mkstemps, open, fprintf, abort) &&
            defined(__LOCAL_stderr))]]
 [[impl_include("<parts/printf-config.h>", "<libc/errno.h>")]]
-char *make_temp_file_with_prefix([[nullable]] char const *prefix,
-                                 [[nullable]] char const *suffix) {
+char *make_temp_file_with_prefix([[in_opt]] char const *prefix,
+                                 [[in_opt]] char const *suffix) {
 	fd_t tempfd;
 	char *result, *p;
 	const char *tmpdir = choose_tmpdir();
@@ -1109,7 +1111,7 @@ char *make_temp_file_with_prefix([[nullable]] char const *prefix,
 
 [[nonnull, wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC]]
 [[requires_function(make_temp_file_with_prefix)]]
-char *make_temp_file([[nullable]] char const *suffix) {
+char *make_temp_file([[in_opt]] char const *suffix) {
 	return make_temp_file_with_prefix(NULL, suffix);
 }
 
@@ -1121,7 +1123,7 @@ char *make_temp_file([[nullable]] char const *suffix) {
 [[impl_include("<bits/os/stat.h>")]]
 [[impl_include("<asm/os/stat.h>")]]
 [[requires_function(lstat, unlink)]]
-int unlink_if_ordinary(char const *filename) {
+int unlink_if_ordinary([[in]] char const *filename) {
 	@struct stat@ st;
 	if (lstat(filename, &st) != 0)
 		return 1;
@@ -1149,7 +1151,7 @@ double physmem_available(void) {
 }
 
 [[wunused, pure, decl_include("<features.h>", "<hybrid/typecore.h>")]]
-__UINT32_TYPE__ xcrc32(__BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UINT32_TYPE__ crc) {
+__UINT32_TYPE__ xcrc32([[in(len)]] __BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UINT32_TYPE__ crc) {
 	/* Taken from `libiberty' (which is the  same library also used by  `gdbserver')
 	 * Note that even though `libiberty' is the origin of the contents of this file,
 	 * heavy  changes  have been  made to  better incorporate  the system  into KOS.

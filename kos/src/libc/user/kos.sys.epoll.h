@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa374e6ca */
+/* HASH CRC-32:0x374dc9b7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,7 +71,7 @@ INTDEF void (LIBCCALL libc_EPollCtl)(fd_t epfd, __epoll_ctl_t op, fd_t fd, struc
  *                    items of `events')
  * @return: 0:        No events happened before `timeout' expired.
  * @return: -1:       Error (s.a. `errno') */
-INTDEF NONNULL((2)) __STDC_UINT_AS_SIZE_T (LIBCCALL libc_EPollWait)(fd_t epfd, struct epoll_event *events, __STDC_UINT_AS_SIZE_T maxevents, int timeout) THROWS(...);
+INTDEF ATTR_ACCESS_RWS(2, 3) __STDC_UINT_AS_SIZE_T (LIBCCALL libc_EPollWait)(fd_t epfd, struct epoll_event *events, __STDC_UINT_AS_SIZE_T maxevents, int timeout) THROWS(...);
 /* >> epoll_pwait(2)
  * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
  * waiting.  Wait until at least one of the conditions monitored by `epfd' to be met.
@@ -87,7 +87,7 @@ INTDEF NONNULL((2)) __STDC_UINT_AS_SIZE_T (LIBCCALL libc_EPollWait)(fd_t epfd, s
  *                    items of `events')
  * @return: 0:        No events happened before `timeout' expired.
  * @return: -1:       Error (s.a. `errno') */
-INTDEF NONNULL((2)) __STDC_UINT_AS_SIZE_T (LIBCCALL libc_EPollPWait)(fd_t epfd, struct epoll_event *events, __STDC_UINT_AS_SIZE_T maxevents, int timeout, sigset_t const *ss) THROWS(...);
+INTDEF ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_RWS(2, 3) __STDC_UINT_AS_SIZE_T (LIBCCALL libc_EPollPWait)(fd_t epfd, struct epoll_event *events, __STDC_UINT_AS_SIZE_T maxevents, int timeout, sigset_t const *ss) THROWS(...);
 /* >> epoll_rpc_exec(3)
  * Helper wrapper for  `EPOLL_CTL_RPC_PROG' that  automatically provides  the
  * necessary arch-specific RPC program to invoke `func(..., event->data.ptr)'
@@ -118,7 +118,7 @@ INTDEF NONNULL((2)) __STDC_UINT_AS_SIZE_T (LIBCCALL libc_EPollPWait)(fd_t epfd, 
  *                             intact, and the  RPC will be  discarded as  soon
  *                             as an attempt to send it is made, or the monitor
  *                             is manually deleted via `EPOLL_CTL_DEL' */
-INTDEF NONNULL((3, 6)) void (LIBCCALL libc_EPollRpcExec)(fd_t epfd, fd_t fd, struct epoll_event *event, pid_t target_tid, unsigned int mode, prpc_exec_callback_t func) THROWS(...);
+INTDEF ATTR_ACCESS_RO(3) NONNULL((6)) void (LIBCCALL libc_EPollRpcExec)(fd_t epfd, fd_t fd, struct epoll_event const *event, pid_t target_tid, unsigned int mode, prpc_exec_callback_t func) THROWS(...);
 #endif /* !__KERNEL__ */
 
 DECL_END

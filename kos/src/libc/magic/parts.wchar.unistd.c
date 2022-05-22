@@ -47,7 +47,7 @@ __SYSDECL_BEGIN
 [[wchar, cp, decl_include("<bits/types.h>"), section(".text.crt{|.dos}.wchar.fs.modify")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wfchownat)) ||
            $has_function(chown, convert_wcstombs))]]
-int wchown([[nonnull]] wchar_t const *file, $uid_t owner, $gid_t group) {
+int wchown([[in]] wchar_t const *file, $uid_t owner, $gid_t group) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wfchownat)@@
 	return wfchownat(__AT_FDCWD, file, owner, group, 0);
 @@pp_else@@
@@ -68,7 +68,7 @@ int wchown([[nonnull]] wchar_t const *file, $uid_t owner, $gid_t group) {
 [[requires_function(pathconf, convert_wcstombs)]]
 [[wchar, cp, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
-$longptr_t wpathconf([[nonnull]] wchar_t const *path, __STDC_INT_AS_UINT_T name) {
+$longptr_t wpathconf([[in]] wchar_t const *path, __STDC_INT_AS_UINT_T name) {
 	longptr_t result;
 	char *utf8_path;
 	utf8_path = convert_wcstombs(path);
@@ -87,7 +87,7 @@ $longptr_t wpathconf([[nonnull]] wchar_t const *path, __STDC_INT_AS_UINT_T name)
 [[requires((defined(__AT_FDCWD) && $has_function(wlinkat)) ||
            $has_function(link, convert_wcstombs))]]
 [[wchar, cp, section(".text.crt{|.dos}.wchar.fs.modify")]]
-int wlink([[nonnull]] wchar_t const *from, [[nonnull]] wchar_t const *to) {
+int wlink([[in]] wchar_t const *from, [[in]] wchar_t const *to) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wlinkat)@@
 	return wlinkat(__AT_FDCWD, from, __AT_FDCWD, to, 0);
 @@pp_else@@
@@ -117,7 +117,7 @@ done:
 [[requires((defined(__AT_FDCWD) && $has_function(wfaccessat)) ||
            $has_function(access, convert_wcstombs))]]
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
-int waccess([[nonnull]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
+int waccess([[in]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wfaccessat)@@
 	return wfaccessat(__AT_FDCWD, file, type, 0);
 @@pp_else@@
@@ -138,7 +138,7 @@ int waccess([[nonnull]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
 [[wchar, cp, dos_export_alias("_wchdir")]]
 [[requires($has_function(chdir, convert_wcstombs))]]
 [[section(".text.crt{|.dos}.wchar.fs.basic_property")]]
-int wchdir([[nonnull]] wchar_t const *path) {
+int wchdir([[in]] wchar_t const *path) {
 	longptr_t result;
 	char *utf8_path;
 	utf8_path = convert_wcstombs(path);
@@ -157,7 +157,7 @@ int wchdir([[nonnull]] wchar_t const *path) {
 [[requires($has_function(getcwd, convert_mbstowcs))]]
 [[impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.wchar.fs.basic_property")]]
-wchar_t *wgetcwd([[outp_opt(bufsize)]] wchar_t *buf, size_t bufsize) {
+wchar_t *wgetcwd([[out(? <= bufsize)]] wchar_t *buf, size_t bufsize) {
 	char *utf8_result;
 	wchar_t *result;
 	size_t result_len;
@@ -217,7 +217,7 @@ done:
 [[requires((defined(__AT_FDCWD) && $has_function(wunlinkat)) ||
            $has_function(unlink, convert_wcstombs))]]
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
-int wunlink([[nonnull]] wchar_t const *file) {
+int wunlink([[in]] wchar_t const *file) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wunlinkat)@@
 	return wunlinkat(__AT_FDCWD, file, 0);
 @@pp_else@@
@@ -239,7 +239,7 @@ int wunlink([[nonnull]] wchar_t const *file) {
 [[requires((defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && $has_function(wunlinkat)) ||
            $has_function(rmdir, convert_wcstombs))]]
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
-int wrmdir([[nonnull]] wchar_t const *path) {
+int wrmdir([[in]] wchar_t const *path) {
 @@pp_if defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && $has_function(wunlinkat)@@
 	return wunlinkat(__AT_FDCWD, path, __AT_REMOVEDIR);
 @@pp_else@@
@@ -263,7 +263,7 @@ int wrmdir([[nonnull]] wchar_t const *path) {
 [[requires((defined(__AT_FDCWD) && defined(__AT_EACCESS) && $has_function(wfaccessat)) ||
            $has_function(euidaccess, convert_wcstombs))]]
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
-int weuidaccess([[nonnull]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
+int weuidaccess([[in]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
 @@pp_if defined(__AT_FDCWD) && defined(__AT_EACCESS) && $has_function(wfaccessat)@@
 	return wfaccessat(__AT_FDCWD, file, type, __AT_EACCESS);
 @@pp_else@@
@@ -305,7 +305,7 @@ wchar_t *wget_current_dir_name(void) {
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
 [[wchar, cp, decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_function(faccessat, convert_wcstombs)]]
-int wfaccessat($fd_t dfd, [[nonnull]] wchar_t const *file,
+int wfaccessat($fd_t dfd, [[in]] wchar_t const *file,
                __STDC_INT_AS_UINT_T type, $atflag_t flags) {
 	int result;
 	char *utf8_file;
@@ -323,7 +323,7 @@ int wfaccessat($fd_t dfd, [[nonnull]] wchar_t const *file,
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(fchownat, convert_wcstombs)]]
-int wfchownat($fd_t dfd, [[nonnull]] wchar_t const *file,
+int wfchownat($fd_t dfd, [[in]] wchar_t const *file,
               $uid_t owner, $gid_t group, $atflag_t flags) {
 	int result;
 	char *utf8_file;
@@ -341,8 +341,8 @@ int wfchownat($fd_t dfd, [[nonnull]] wchar_t const *file,
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(convert_wcstombs, linkat)]]
-int wlinkat($fd_t fromfd, [[nonnull]] wchar_t const *from,
-            $fd_t tofd, [[nonnull]] wchar_t const *to, $atflag_t flags) {
+int wlinkat($fd_t fromfd, [[in]] wchar_t const *from,
+            $fd_t tofd, [[in]] wchar_t const *to, $atflag_t flags) {
 	int result = -1;
 	char *utf8_from, *utf8_to;
 	utf8_from = convert_wcstombs(from);
@@ -367,8 +367,8 @@ done:
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires($has_function(wfsymlinkat) ||
            $has_function(symlinkat, convert_wcstombs))]]
-int wsymlinkat([[nonnull]] wchar_t const *link_text, $fd_t tofd,
-               [[nonnull]] wchar_t const *target_path) {
+int wsymlinkat([[in]] wchar_t const *link_text, $fd_t tofd,
+               [[in]] wchar_t const *target_path) {
 @@pp_if $has_function(wfsymlinkat)@@
 	return wfsymlinkat(link_text, tofd, target_path, 0);
 @@pp_else@@
@@ -395,16 +395,17 @@ done:
 
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
-ssize_t wreadlinkat($fd_t dfd, [[nonnull]] wchar_t const *path,
-                    [[outp(buflen)]] wchar_t *buf, size_t buflen); /* TODO */
+ssize_t wreadlinkat($fd_t dfd, [[in]] wchar_t const *path,
+                    [[out(return <= buflen)]] wchar_t *buf,
+                    size_t buflen); /* TODO */
 
 
 %#ifdef __USE_KOS
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires($has_function(fsymlinkat, convert_wcstombs))]]
-int wfsymlinkat([[nonnull]] wchar_t const *link_text, $fd_t tofd,
-                [[nonnull]] wchar_t const *target_path, $atflag_t flags) {
+int wfsymlinkat([[in]] wchar_t const *link_text, $fd_t tofd,
+                [[in]] wchar_t const *target_path, $atflag_t flags) {
 	int result = -1;
 	char *utf8_link_text, *utf8_target_path;
 	utf8_link_text = convert_wcstombs(link_text);
@@ -427,8 +428,8 @@ done:
 
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
-ssize_t wfreadlinkat($fd_t dfd, [[nonnull]] wchar_t const *path,
-                     [[outp(buflen)]] wchar_t *buf, size_t buflen,
+ssize_t wfreadlinkat($fd_t dfd, [[in]] wchar_t const *path,
+                     [[out(return <= buflen)]] wchar_t *buf, size_t buflen,
                      $atflag_t flags); /* TODO */
 
 %#endif /* __USE_KOS */
@@ -436,7 +437,7 @@ ssize_t wfreadlinkat($fd_t dfd, [[nonnull]] wchar_t const *path,
 [[section(".text.crt{|.dos}.wchar.fs.modify")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires($has_function(unlinkat, convert_wcstombs))]]
-int wunlinkat($fd_t dfd, [[nonnull]] wchar_t const *file, $atflag_t flags) {
+int wunlinkat($fd_t dfd, [[in]] wchar_t const *file, $atflag_t flags) {
 	int result;
 	char *utf8_file;
 	utf8_file = convert_wcstombs(file);
@@ -457,7 +458,7 @@ int wunlinkat($fd_t dfd, [[nonnull]] wchar_t const *file, $atflag_t flags) {
 [[wchar, requires_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(wfchownat)) ||
            $has_function(lchown, convert_wcstombs))]]
-int wlchown([[nonnull]] wchar_t const *file, $uid_t owner, $gid_t group) {
+int wlchown([[in]] wchar_t const *file, $uid_t owner, $gid_t group) {
 @@pp_if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(wfchownat)@@
 	return wfchownat(__AT_FDCWD, file, owner, group, __AT_SYMLINK_NOFOLLOW);
 @@pp_else@@
@@ -488,9 +489,9 @@ int wlchown([[nonnull]] wchar_t const *file, $uid_t owner, $gid_t group) {
 }
 
 [[wchar, ignore, nocrt, alias("wtruncate"), decl_include("<bits/types.h>")]]
-int crt_wtruncate32([[nonnull]] wchar_t const *file, $pos32_t length);
+int crt_wtruncate32([[in]] wchar_t const *file, $pos32_t length);
 [[wchar, ignore, nocrt, alias("wtruncate64"), decl_include("<bits/types.h>")]]
-int crt_wtruncate64([[nonnull]] wchar_t const *file, $pos32_t length);
+int crt_wtruncate64([[in]] wchar_t const *file, $pos32_t length);
 
 [[ignore]] crt_c16truncate32(*) %{uchar16("crt_wtruncate32")}
 [[ignore]] crt_c32truncate32(*) %{uchar32("crt_wtruncate32")}
@@ -505,7 +506,7 @@ int crt_wtruncate64([[nonnull]] wchar_t const *file, $pos32_t length);
 [[requires($has_function(crt_wtruncate64) ||
            $has_function(crt_wtruncate32) ||
            $has_function(truncate, convert_wcstombs))]]
-int wtruncate([[nonnull]] wchar_t const *file, __PIO_OFFSET length) {
+int wtruncate([[in]] wchar_t const *file, __PIO_OFFSET length) {
 @@pp_if $has_function(crt_wtruncate32) && !defined(__BUILDING_LIBC)@@
 	return crt_wtruncate32(file, (pos32_t)length);
 @@pp_elif $has_function(crt_wtruncate64) && (!defined(__BUILDING_LIBC) || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__)@@
@@ -530,7 +531,7 @@ int wtruncate([[nonnull]] wchar_t const *file, __PIO_OFFSET length) {
 [[impl_include("<features.h>"), impl_prefix(DEFINE_PIO_OFFSET)]]
 [[requires($has_function(truncate64, convert_wcstombs) ||
            $has_function(crt_wtruncate32))]]
-int wtruncate64([[nonnull]] wchar_t const *file, __PIO_OFFSET64 length) {
+int wtruncate64([[in]] wchar_t const *file, __PIO_OFFSET64 length) {
 @@pp_if $has_function(truncate64, convert_wcstombs)@@
 	int result;
 	char *utf8_file;
@@ -557,8 +558,8 @@ int wtruncate64([[nonnull]] wchar_t const *file, __PIO_OFFSET64 length) {
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wsymlinkat)) ||
            $has_function(symlink, convert_wcstombs))]]
-int wsymlink([[nonnull]] wchar_t const *link_text,
-             [[nonnull]] wchar_t const *target_path) {
+int wsymlink([[in]] wchar_t const *link_text,
+             [[in]] wchar_t const *target_path) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wfsymlinkat)@@
 	return wfsymlinkat(link_text, __AT_FDCWD, target_path, 0);
 @@pp_elif defined(__AT_FDCWD) && $has_function(wsymlinkat)@@
@@ -587,8 +588,8 @@ done:
 
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
-ssize_t wreadlink([[nonnull]] wchar_t const *path,
-                  [[outp(buflen)]] wchar_t *buf,
+ssize_t wreadlink([[in]] wchar_t const *path,
+                  [[out(return <= buflen)]] wchar_t *buf,
                   size_t buflen); /* TODO */
 
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
@@ -604,7 +605,7 @@ ssize_t wreadlink([[nonnull]] wchar_t const *path,
 [[impl_include("<bits/crt/wformat-printer.h>", "<bits/crt/mbstate.h>", "<libc/errno.h>")]]
 [[requires($has_function(uname))]]
 [[section(".text.crt{|.dos}.wchar.system.configuration")]]
-int wgethostname([[outp(buflen)]] wchar_t *name, size_t buflen) {
+int wgethostname([[out(? <= buflen)]] wchar_t *name, size_t buflen) {
 	struct __LOCAL_format_wsnprintf_data {
 		wchar_t      *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -648,7 +649,7 @@ int wgethostname([[outp(buflen)]] wchar_t *name, size_t buflen) {
 [[wchar, decl_include("<hybrid/typecore.h>")]]
 [[requires($has_function(setlogin, convert_wcstombs))]]
 [[section(".text.crt{|.dos}.wchar.io.tty")]]
-int wsetlogin([[nonnull]] wchar_t const *name) {
+int wsetlogin([[in]] wchar_t const *name) {
 	int result;
 	char *utf8_name;
 	utf8_name = convert_wcstombs(name);
@@ -664,7 +665,7 @@ int wsetlogin([[nonnull]] wchar_t const *name) {
 [[section(".text.crt{|.dos}.wchar.system.configuration")]]
 [[wchar, decl_include("<hybrid/typecore.h>")]]
 [[requires($has_function(sethostname, convert_wcstombsn))]]
-int wsethostname([[inp(len)]] wchar_t const *name, size_t len) {
+int wsethostname([[in(? <= len)]] wchar_t const *name, size_t len) {
 	int result;
 	char *utf8_name;
 	size_t utf8_len;
@@ -682,7 +683,7 @@ int wsethostname([[inp(len)]] wchar_t const *name, size_t len) {
 [[requires($has_function(uname))]]
 [[impl_include("<bits/crt/wformat-printer.h>", "<bits/crt/mbstate.h>", "<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.wchar.system.configuration")]]
-int wgetdomainname([[outp(buflen)]] wchar_t *name, size_t buflen) {
+int wgetdomainname([[out(? <= buflen)]] wchar_t *name, size_t buflen) {
 	struct __LOCAL_format_wsnprintf_data {
 		wchar_t      *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -722,7 +723,7 @@ int wgetdomainname([[outp(buflen)]] wchar_t *name, size_t buflen) {
 [[section(".text.crt{|.dos}.wchar.system.configuration")]]
 [[wchar, decl_include("<hybrid/typecore.h>")]]
 [[requires($has_function(setdomainname, convert_wcstombsn))]]
-int wsetdomainname([[inp(len)]] wchar_t const *name, size_t len) {
+int wsetdomainname([[in(? <= len)]] wchar_t const *name, size_t len) {
 	int result;
 	char *utf8_name;
 	size_t utf8_len;
@@ -744,7 +745,7 @@ int wsetdomainname([[inp(len)]] wchar_t const *name, size_t len) {
 [[wchar, cp, decl_include("<hybrid/typecore.h>")]]
 [[requires($has_function(chroot, convert_wcstombs))]]
 [[section(".text.crt{|.dos}.wchar.fs.utility")]]
-int wchroot([[nonnull]] wchar_t const *path) {
+int wchroot([[in]] wchar_t const *path) {
 	longptr_t result;
 	char *utf8_path;
 	utf8_path = convert_wcstombs(path);

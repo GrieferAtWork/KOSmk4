@@ -59,21 +59,23 @@ __SYSDECL_BEGIN
 [[pure, wunused, export_alias("__dcgettext")]]
 [[extern_inline, impl_include("<asm/crt/locale.h>")]]
 [[impl_prefix(DEFINE_FALLBACK___LC_MESSAGES)]]
-char *dcgettext(char const *domainname, [[format_arg]] char const *msgid, int category) {
+char *dcgettext([[in_opt]] char const *domainname,
+                [[in_opt, format_arg]] char const *msgid, int category) {
 	return dcngettext(domainname, msgid, NULL, 1, category);
 }
 
 [[pure, wunused, export_alias("__dgettext")]]
 [[extern_inline, impl_include("<asm/crt/locale.h>")]]
 [[impl_prefix(DEFINE_FALLBACK___LC_MESSAGES)]]
-char *dgettext(char const *domainname, [[format_arg]] char const *msgid) {
+char *dgettext([[in_opt]] char const *domainname,
+               [[in_opt, format_arg]] char const *msgid) {
 	return dcngettext(domainname, msgid, NULL, 1, __LC_MESSAGES);
 }
 
 [[pure, wunused]]
 [[extern_inline, impl_include("<asm/crt/locale.h>")]]
 [[impl_prefix(DEFINE_FALLBACK___LC_MESSAGES)]]
-char *gettext([[format_arg]] char const *msgid) {
+char *gettext([[in_opt, format_arg]] char const *msgid) {
 	return dcngettext(NULL, msgid, NULL, 1, __LC_MESSAGES);
 }
 
@@ -81,8 +83,8 @@ char *gettext([[format_arg]] char const *msgid) {
 [[pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[extern_inline, impl_include("<asm/crt/locale.h>")]]
 [[impl_prefix(DEFINE_FALLBACK___LC_MESSAGES)]]
-char *ngettext([[format_arg]] char const *msgid_singular,
-               [[format_arg]] char const *msgid_plural,
+char *ngettext([[in_opt, format_arg]] char const *msgid_singular,
+               [[in_opt, format_arg]] char const *msgid_plural,
                $ulongptr_t n) {
 	return dcngettext(NULL, msgid_singular, msgid_plural, n, __LC_MESSAGES);
 }
@@ -90,18 +92,18 @@ char *ngettext([[format_arg]] char const *msgid_singular,
 [[pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[extern_inline, impl_include("<asm/crt/locale.h>")]]
 [[impl_prefix(DEFINE_FALLBACK___LC_MESSAGES)]]
-char *dngettext(char const *domainname,
-                [[format_arg]] char const *msgid_singular,
-                [[format_arg]] char const *msgid_plural,
+char *dngettext([[in_opt]] char const *domainname,
+                [[in_opt, format_arg]] char const *msgid_singular,
+                [[in_opt, format_arg]] char const *msgid_plural,
                 $ulongptr_t n) {
 	return dcngettext(domainname, msgid_singular, msgid_plural, n, __LC_MESSAGES);
 }
 
 
 [[pure, wunused, userimpl, decl_include("<hybrid/typecore.h>")]]
-char *dcngettext(char const *domainname,
-                 [[format_arg]] char const *msgid_singular,
-                 [[format_arg]] char const *msgid_plural,
+char *dcngettext([[in_opt]] char const *domainname,
+                 [[in_opt, format_arg]] char const *msgid_singular,
+                 [[in_opt, format_arg]] char const *msgid_plural,
                  $ulongptr_t n, int category) {
 	/* Generic no-op that works, but doesn't actually support languages */
 	COMPILER_IMPURE();
@@ -112,9 +114,9 @@ char *dcngettext(char const *domainname,
 }
 
 
-char *textdomain(char const *domainname);
-char *bindtextdomain(char const *domainname, char const *dirname);
-char *bind_textdomain_codeset(char const *domainname, char const *codeset);
+char *textdomain([[in_opt]] char const *domainname);
+char *bindtextdomain([[in_opt]] char const *domainname, [[in_opt]] char const *dirname);
+char *bind_textdomain_codeset([[in_opt]] char const *domainname, [[in_opt]] char const *codeset);
 
 %[insert:function(__dgettext = dgettext)]
 %[insert:function(__dcgettext = dcgettext)]

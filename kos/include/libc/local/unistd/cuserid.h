@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd1f1199 */
+/* HASH CRC-32:0x74fba2df */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(cuserid) char *
+__LOCAL_LIBC(cuserid) __ATTR_ACCESS_WR_OPT(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cuserid))(char *__s) {
 #ifdef __L_cuserid
 	static char __cuserid_buffer[__L_cuserid];

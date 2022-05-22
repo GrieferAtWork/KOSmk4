@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9753fe1d */
+/* HASH CRC-32:0xeed32c4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -299,33 +299,33 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_mount
 /* >> mount(2)
  * @param: mountflags: Set of `MS_*' from <sys/mount.h> */
-__CDECLARE(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
+__CDECLARE(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RO_OPT(5),int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
 #elif defined(__CRT_HAVE___mount)
 /* >> mount(2)
  * @param: mountflags: Set of `MS_*' from <sys/mount.h> */
-__CREDIRECT(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),__mount,(__special_file,__dir,__fstype,__mountflags,__data))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RO_OPT(5),int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),__mount,(__special_file,__dir,__fstype,__mountflags,__data))
 #elif defined(__CRT_HAVE___libc_mount)
 /* >> mount(2)
  * @param: mountflags: Set of `MS_*' from <sys/mount.h> */
-__CREDIRECT(,int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),__libc_mount,(__special_file,__dir,__fstype,__mountflags,__data))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RO_OPT(5),int,__NOTHROW_RPC,mount,(char const *__special_file, char const *__dir, char const *__fstype, __ULONGPTR_TYPE__ __mountflags, void const *__data),__libc_mount,(__special_file,__dir,__fstype,__mountflags,__data))
 #endif /* ... */
 #ifdef __CRT_HAVE_umount
 /* >> umount(2) */
-__CDECLARE(,int,__NOTHROW_RPC,umount,(char const *__special_file),(__special_file))
+__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,umount,(char const *__special_file),(__special_file))
 #elif defined(__CRT_HAVE___umount)
 /* >> umount(2) */
-__CREDIRECT(,int,__NOTHROW_RPC,umount,(char const *__special_file),__umount,(__special_file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,umount,(char const *__special_file),__umount,(__special_file))
 #elif defined(__CRT_HAVE___libc_umount)
 /* >> umount(2) */
-__CREDIRECT(,int,__NOTHROW_RPC,umount,(char const *__special_file),__libc_umount,(__special_file))
+__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,umount,(char const *__special_file),__libc_umount,(__special_file))
 #elif defined(__CRT_HAVE_umount2)
 #include <libc/local/sys.mount/umount.h>
 /* >> umount(2) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(umount, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL umount)(char const *__special_file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(umount))(__special_file); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(umount, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL umount)(char const *__special_file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(umount))(__special_file); })
 #endif /* ... */
 /* >> umount2(2)
  * @param: flags: Set of `MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW' */
-__CDECLARE_OPT(,int,__NOTHROW_RPC,umount2,(char const *__special_file, __STDC_INT_AS_UINT_T __flags),(__special_file,__flags))
+__CDECLARE_OPT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,umount2,(char const *__special_file, __STDC_INT_AS_UINT_T __flags),(__special_file,__flags))
 
 __SYSDECL_END
 #endif /* __CC__ */

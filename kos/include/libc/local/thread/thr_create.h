@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcaf7efe */
+/* HASH CRC-32:0xff619a47 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,24 +27,24 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_pthread_attr_destroy_defined) && defined(__CRT_HAVE_pthread_attr_destroy)
 #define __local___localdep_pthread_attr_destroy_defined
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_destroy,(__pthread_attr_t *__attr),pthread_attr_destroy,(__attr))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_destroy,(__pthread_attr_t *__attr),pthread_attr_destroy,(__attr))
 #endif /* !__local___localdep_pthread_attr_destroy_defined && __CRT_HAVE_pthread_attr_destroy */
 #if !defined(__local___localdep_pthread_attr_init_defined) && defined(__CRT_HAVE_pthread_attr_init)
 #define __local___localdep_pthread_attr_init_defined
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_init,(__pthread_attr_t *__attr),pthread_attr_init,(__attr))
+__CREDIRECT(__ATTR_ACCESS_WR(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_init,(__pthread_attr_t *__attr),pthread_attr_init,(__attr))
 #endif /* !__local___localdep_pthread_attr_init_defined && __CRT_HAVE_pthread_attr_init */
 #if !defined(__local___localdep_pthread_attr_setdetachstate_defined) && defined(__CRT_HAVE_pthread_attr_setdetachstate)
 #define __local___localdep_pthread_attr_setdetachstate_defined
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_setdetachstate,(__pthread_attr_t *__attr, int __detachstate),pthread_attr_setdetachstate,(__attr,__detachstate))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_setdetachstate,(__pthread_attr_t *__attr, int __detachstate),pthread_attr_setdetachstate,(__attr,__detachstate))
 #endif /* !__local___localdep_pthread_attr_setdetachstate_defined && __CRT_HAVE_pthread_attr_setdetachstate */
 #if !defined(__local___localdep_pthread_attr_setscope_defined) && defined(__CRT_HAVE_pthread_attr_setscope)
 #define __local___localdep_pthread_attr_setscope_defined
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_setscope,(__pthread_attr_t *__attr, int __scope),pthread_attr_setscope,(__attr,__scope))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_setscope,(__pthread_attr_t *__attr, int __scope),pthread_attr_setscope,(__attr,__scope))
 #endif /* !__local___localdep_pthread_attr_setscope_defined && __CRT_HAVE_pthread_attr_setscope */
 #ifndef __local___localdep_pthread_attr_setstack_defined
 #define __local___localdep_pthread_attr_setstack_defined
 #ifdef __CRT_HAVE_pthread_attr_setstack
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_setstack,(__pthread_attr_t *__attr, void *__stackaddr, __SIZE_TYPE__ __stacksize),pthread_attr_setstack,(__attr,__stackaddr,__stacksize))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_setstack,(__pthread_attr_t *__attr, void *__stackaddr, __SIZE_TYPE__ __stacksize),pthread_attr_setstack,(__attr,__stackaddr,__stacksize))
 #elif defined(__CRT_HAVE_pthread_attr_setstackaddr) && defined(__CRT_HAVE_pthread_attr_setstacksize)
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_attr_setstack.h>
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_attr_setstacksize_defined
 #define __local___localdep_pthread_attr_setstacksize_defined
 #ifdef __CRT_HAVE_pthread_attr_setstacksize
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_setstacksize,(__pthread_attr_t *__attr, __SIZE_TYPE__ __stacksize),pthread_attr_setstacksize,(__attr,__stacksize))
+__CREDIRECT(__ATTR_ACCESS_RW(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_attr_setstacksize,(__pthread_attr_t *__attr, __SIZE_TYPE__ __stacksize),pthread_attr_setstacksize,(__attr,__stacksize))
 #elif (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize))) && defined(__CRT_HAVE_pthread_attr_setstack)
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_attr_setstacksize.h>
@@ -69,13 +69,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_pthread_attr_setstacksize_defined */
 #ifndef __local___localdep_pthread_create_defined
 #define __local___localdep_pthread_create_defined
-__CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __newthread, __pthread_attr_t const *__restrict __attr, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg),pthread_create,(__newthread,__attr,__start_routine,__arg))
+__CREDIRECT(__ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_WR(1) __ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __newthread, __pthread_attr_t const *__restrict __attr, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg),pthread_create,(__newthread,__attr,__start_routine,__arg))
 #endif /* !__local___localdep_pthread_create_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/pthreadvalues.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(thr_create) __ATTR_NONNULL((3)) __errno_t
+__LOCAL_LIBC(thr_create) __ATTR_ACCESS_WR(6) __ATTR_NONNULL((3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thr_create))(void *__stack_base, __SIZE_TYPE__ __stack_size, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg, long __flags, __pthread_t *__newthread) {
 	__errno_t __result;
 	if (__flags || __stack_base || __stack_size) {

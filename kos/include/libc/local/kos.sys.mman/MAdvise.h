@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc09a34f */
+/* HASH CRC-32:0xf6d94c54 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(MAdvise) __ATTR_NONNULL((1)) void
+__LOCAL_LIBC(MAdvise) __ATTR_ACCESS_NONE(1) void
 (__LIBCCALL __LIBC_LOCAL_NAME(MAdvise))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __advice) __THROWS(...) {
 	/* Implement as a no-op, since this function is merely meant as a hint */
 	__COMPILER_IMPURE();

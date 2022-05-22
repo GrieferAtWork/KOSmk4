@@ -29,12 +29,12 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_uname,hash:CRC-32=0x89815ceb]]]*/
+/*[[[head:libc_uname,hash:CRC-32=0x2c32cc56]]]*/
 /* >> uname(2)
  * Put information about the system in `name'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WR(1) int
 NOTHROW_NCX(LIBCCALL libc_uname)(struct utsname *name)
 /*[[[body:libc_uname]]]*/
 {

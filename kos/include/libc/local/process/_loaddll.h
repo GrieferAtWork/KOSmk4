@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x508e4738 */
+/* HASH CRC-32:0x25aa0a97 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include <bits/types.h>
 #include <dlfcn.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_loaddll) __INTPTR_TYPE__
+__LOCAL_LIBC(_loaddll) __ATTR_ACCESS_RO_OPT(1) __INTPTR_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(_loaddll))(char __KOS_FIXED_CONST *__file) __THROWS(...) {
 #ifdef RTLD_LOCAL
 	return (__INTPTR_TYPE__)(__UINTPTR_TYPE__)dlopen(__file, RTLD_LOCAL);

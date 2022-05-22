@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x293bde59 */
+/* HASH CRC-32:0xe337e8a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,19 +62,19 @@ __SYSDECL_BEGIN
  * Put information about the system in `name'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,uname,(struct utsname *__name),(__name))
+__CDECLARE(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,uname,(struct utsname *__name),(__name))
 #elif defined(__CRT_HAVE___uname)
 /* >> uname(2)
  * Put information about the system in `name'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,uname,(struct utsname *__name),__uname,(__name))
+__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,uname,(struct utsname *__name),__uname,(__name))
 #elif defined(__CRT_HAVE___libc_uname)
 /* >> uname(2)
  * Put information about the system in `name'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,uname,(struct utsname *__name),__libc_uname,(__name))
+__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,uname,(struct utsname *__name),__libc_uname,(__name))
 #endif /* ... */
 
 __SYSDECL_END

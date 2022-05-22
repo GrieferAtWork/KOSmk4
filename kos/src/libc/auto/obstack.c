@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8ba211 */
+/* HASH CRC-32:0x4b3d714e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,7 @@ NOTHROW(LIBCCALL libc_obstack_alloc_failed_handler_resolve)(void) {
 #ifndef __KERNEL__
 #include <bits/crt/obstack.h>
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.heap.obstack") NONNULL((1, 4, 5)) int
+INTERN ATTR_SECTION(".text.crt.heap.obstack") ATTR_ACCESS_WR(1) NONNULL((4, 5)) int
 NOTHROW_NCX(LIBCCALL libc__obstack_begin)(struct obstack *self,
                                           _OBSTACK_SIZE_T min_chunk_size,
                                           _OBSTACK_SIZE_T min_object_alignment,
@@ -130,7 +130,7 @@ NOTHROW_NCX(LIBCCALL libc__obstack_begin)(struct obstack *self,
 }
 #include <bits/crt/obstack.h>
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.heap.obstack") NONNULL((1, 4, 5)) int
+INTERN ATTR_SECTION(".text.crt.heap.obstack") ATTR_ACCESS_WR(1) NONNULL((4, 5)) int
 NOTHROW_NCX(LIBCCALL libc__obstack_begin_1)(struct obstack *self,
                                             _OBSTACK_SIZE_T min_chunk_size,
                                             _OBSTACK_SIZE_T min_object_alignment,
@@ -182,7 +182,7 @@ NOTHROW_NCX(LIBCCALL libc__obstack_begin_1)(struct obstack *self,
  * Allocate  a new chunk of at least `num_bytes' bytes. Also: allocate
  * enough additional space for the object currently being constructed,
  * and move it to the start of the new chunk. */
-INTERN ATTR_SECTION(".text.crt.heap.obstack") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.heap.obstack") ATTR_ACCESS_RW(1) void
 NOTHROW_NCX(LIBCCALL libc__obstack_newchunk)(struct obstack *self,
                                              _OBSTACK_SIZE_T num_bytes) {
 	void *curobj;
@@ -241,7 +241,7 @@ NOTHROW_NCX(LIBCCALL libc__obstack_newchunk)(struct obstack *self,
  * `obj', where `obj' *should* be a pointer previously returned by `obstack_finish()'
  * When `obj' is `NULL',  simply free everything allocated  by `self', in which  case
  * `self' must be re-initialized (via `_obstack_begin(3)') upon return. */
-INTERN ATTR_SECTION(".text.crt.heap.obstack") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.heap.obstack") ATTR_ACCESS_RW(1) void
 NOTHROW_NCX(LIBCCALL libc_obstack_free)(struct obstack *self,
                                         void *obj) {
 	struct _obstack_chunk *iter;
@@ -272,7 +272,7 @@ NOTHROW_NCX(LIBCCALL libc_obstack_free)(struct obstack *self,
 #include <bits/crt/obstack.h>
 /* >> _obstack_memory_used(3)
  * Return the total size of all chunks allocated by `self' */
-INTERN ATTR_SECTION(".text.crt.heap.obstack") ATTR_PURE WUNUSED NONNULL((1)) _OBSTACK_SIZE_T
+INTERN ATTR_SECTION(".text.crt.heap.obstack") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) _OBSTACK_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__obstack_memory_used)(struct obstack __KOS_FIXED_CONST *self) {
 	_OBSTACK_SIZE_T result = 0;
 	struct _obstack_chunk *iter;
@@ -283,7 +283,7 @@ NOTHROW_NCX(LIBCCALL libc__obstack_memory_used)(struct obstack __KOS_FIXED_CONST
 #include <bits/crt/obstack.h>
 /* >> _obstack_allocated_p(3)
  * Returns non-zero if `obj' was allocated by `self' */
-INTERN ATTR_SECTION(".text.crt.heap.obstack") ATTR_PURE WUNUSED NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.heap.obstack") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int
 NOTHROW_NCX(LIBCCALL libc__obstack_allocated_p)(struct obstack const *self,
                                                 void const *obj) {
 	struct _obstack_chunk *iter;
@@ -302,7 +302,7 @@ NOTHROW_NCX(LIBCCALL libc__obstack_allocated_p)(struct obstack const *self,
  * this function doesn't have an error return-value!
  * HINT: Ths function does the same as `obstack_grow(3)'!
  * @return: datalen: Success. */
-INTERN ATTR_SECTION(".text.crt.heap.obstack") WUNUSED NONNULL((1, 2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.heap.obstack") WUNUSED ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_obstack_printer)(void *arg,
                                                      char const *__restrict data,
                                                      size_t datalen) {

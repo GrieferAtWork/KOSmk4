@@ -1745,7 +1745,7 @@ int kill($pid_t pid, $signo_t signo);
 @@@return: 0: Always returns `0'
 [[kernel, decl_include("<bits/os/sigset.h>")]]
 [[impl_include("<bits/os/sigset.h>")]]
-int sigemptyset([[nonnull]] $sigset_t *set) {
+int sigemptyset([[out]] $sigset_t *set) {
 	bzeroc(set->__val, COMPILER_LENOF(set->__val), __SIZEOF_POINTER__);
 	return 0;
 }
@@ -1756,7 +1756,7 @@ int sigemptyset([[nonnull]] $sigset_t *set) {
 @@@return: 0: Always returns `0'
 [[kernel, decl_include("<bits/os/sigset.h>")]]
 [[libc, impl_include("<bits/os/sigset.h>")]]
-int sigfillset([[nonnull]] $sigset_t *set) {
+int sigfillset([[out]] $sigset_t *set) {
 @@pp_if __SIZEOF_POINTER__ == 8@@
 	memsetq(set->__val, __UINT64_C(0xffffffffffffffff), COMPILER_LENOF(set->__val));
 @@pp_elif __SIZEOF_POINTER__ == 4@@
@@ -1781,7 +1781,7 @@ int sigfillset([[nonnull]] $sigset_t *set) {
 [[impl_include("<libc/errno.h>", "<asm/os/signal.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
-int sigaddset([[nonnull]] $sigset_t *set, $signo_t signo) {
+int sigaddset([[inout]] $sigset_t *set, $signo_t signo) {
 	$ulongptr_t mask, word;
 	__PRIVATE_SIGSET_VALIDATE_SIGNO(signo)
 	mask = __sigset_mask(signo);
@@ -1801,7 +1801,7 @@ int sigaddset([[nonnull]] $sigset_t *set, $signo_t signo) {
 [[impl_include("<libc/errno.h>", "<asm/os/signal.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
-int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
+int sigdelset([[inout]] $sigset_t *set, $signo_t signo) {
 	$ulongptr_t mask, word;
 	__PRIVATE_SIGSET_VALIDATE_SIGNO(signo)
 	mask = __sigset_mask(signo);
@@ -1822,7 +1822,7 @@ int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
 [[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
-int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
+int sigismember([[in]] $sigset_t const *set, $signo_t signo) {
 	$ulongptr_t mask, word;
 	__PRIVATE_SIGSET_VALIDATE_SIGNO(signo)
 	mask = __sigset_mask(signo);
@@ -1844,7 +1844,9 @@ int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 @@@return: -1: [errno=EINVAL] Invalid `how'
 [[libc, decl_prefix(struct __sigset_struct;), decl_include("<features.h>")]]
 [[export_alias("__sigprocmask", "__libc_sigprocmask", "pthread_sigmask", "thr_sigsetmask")]]
-int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
+int sigprocmask(__STDC_INT_AS_UINT_T how,
+                [[in_opt]] sigset_t const *set,
+                [[out_opt]] sigset_t *oset);
 
 %#ifdef __USE_KOS
 
@@ -1887,7 +1889,7 @@ sigset_t *getsigmaskptr(void);
 @@@param: sigmaskptr: Address of the signal mask to use from now on.
 @@@return: * : Address of the previously used signal mask.
 [[libc, nonnull, decl_include("<bits/os/sigset.h>")]]
-sigset_t *setsigmaskptr([[nonnull]] sigset_t *sigmaskptr);
+sigset_t *setsigmaskptr([[/*async_inout*/nonnull]] sigset_t *sigmaskptr);
 
 @@>> setsigmaskfullptr(3)
 @@Same as  `setsigmaskptr()',  but  set a  statically  allocated,  fully
@@ -1937,7 +1939,7 @@ void chkuserprocmask(void);
 @@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
 [[cp, export_alias("__sigsuspend")]]
 [[decl_include("<bits/os/sigset.h>")]]
-int sigsuspend([[nonnull]] sigset_t const *set);
+int sigsuspend([[in]] sigset_t const *set);
 
 @@>> sigaction(2)
 @@Get/Set the  action that  shall  be performed  when  a
@@ -1948,7 +1950,9 @@ int sigsuspend([[nonnull]] sigset_t const *set);
 @@@return: -1: [errno=EINVAL] The given `signo' is invalid
 [[decl_include("<bits/types.h>")]]
 [[export_alias("__sigaction"), decl_prefix(struct sigaction;)]]
-int sigaction($signo_t signo, struct sigaction const *act, struct sigaction *oact);
+int sigaction($signo_t signo,
+              [[in_opt]] struct sigaction const *act,
+              [[out_opt]] struct sigaction *oact);
 
 @@>> sigpending(2)
 @@Retrieve the set of signals that are pending
@@ -1956,14 +1960,14 @@ int sigaction($signo_t signo, struct sigaction const *act, struct sigaction *oac
 @@@return: 0: Success
 [[decl_include("<bits/os/sigset.h>")]]
 [[export_alias("__sigpending", "__libc_sigpending")]]
-int sigpending([[nonnull]] sigset_t *__restrict set);
+int sigpending([[out]] sigset_t *__restrict set);
 
 @@>> sigwait(3)
 @@Same as `sigsuspend(2)', but write-back the actual signal that was raised to `*signo'
 @@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
 [[cp, decl_include("<bits/os/sigset.h>", "<bits/types.h>")]]
-int sigwait([[nonnull]] sigset_t const *__restrict set,
-            [[nonnull]] $signo_t *__restrict signo);
+int sigwait([[in]] sigset_t const *__restrict set,
+            [[out]] $signo_t *__restrict signo);
 
 %#ifdef __USE_GNU
 @@>> sigisemptyset(3)
@@ -1971,7 +1975,7 @@ int sigwait([[nonnull]] sigset_t const *__restrict set,
 @@@return: != 0: Yes, it is empty
 @@@return: == 0: No, at least 1 signal is contained
 [[kernel, libc, pure, wunused, decl_include("<bits/os/sigset.h>")]]
-int sigisemptyset([[nonnull]] $sigset_t const *__restrict set) {
+int sigisemptyset([[in]] $sigset_t const *__restrict set) {
 	size_t i;
 	for (i = 0; i < COMPILER_LENOF(set->__val); ++i) {
 		if (set->__val[i] != 0)
@@ -1985,9 +1989,9 @@ int sigisemptyset([[nonnull]] $sigset_t const *__restrict set) {
 @@Set-up every signal `S' from `set' as the result of `set[S] = left[S] & right[S]'
 @@@return: 0: Always returns `0'
 [[kernel, decl_include("<bits/os/sigset.h>")]]
-int sigandset([[nonnull]] $sigset_t *set,
-              [[nonnull]] $sigset_t const *left,
-              [[nonnull]] $sigset_t const *right) {
+int sigandset([[out]] $sigset_t *set,
+              [[in]] $sigset_t const *left,
+              [[in]] $sigset_t const *right) {
 	size_t i;
 	for (i = 0; i < COMPILER_LENOF(set->__val); ++i)
 		set->__val[i] = left->__val[i] & right->__val[i];
@@ -1998,9 +2002,9 @@ int sigandset([[nonnull]] $sigset_t *set,
 @@Set-up every signal `S' from `set' as the result of `set[S] = left[S] | right[S]'
 @@@return: 0: Always returns `0'
 [[kernel, decl_include("<bits/os/sigset.h>")]]
-int sigorset([[nonnull]] $sigset_t *set,
-             [[nonnull]] $sigset_t const *left,
-             [[nonnull]] $sigset_t const *right) {
+int sigorset([[out]] $sigset_t *set,
+             [[in]] $sigset_t const *left,
+             [[in]] $sigset_t const *right) {
 	size_t i;
 	for (i = 0; i < COMPILER_LENOF(set->__val); ++i)
 		set->__val[i] = left->__val[i] | right->__val[i];
@@ -2014,9 +2018,9 @@ int sigorset([[nonnull]] $sigset_t *set,
 @@Set-up every signal `S' from `set' as the result of `set[S] = left[S] & ~right[S]'
 @@@return: 0: Always returns `0'
 [[kernel, decl_include("<bits/os/sigset.h>")]]
-int signandset([[nonnull]] $sigset_t *set,
-               [[nonnull]] $sigset_t const *left,
-               [[nonnull]] $sigset_t const *right) {
+int signandset([[out]] $sigset_t *set,
+               [[in]] $sigset_t const *left,
+               [[in]] $sigset_t const *right) {
 	size_t i;
 	for (i = 0; i < COMPILER_LENOF(set->__val); ++i)
 		set->__val[i] = left->__val[i] & ~right->__val[i];
@@ -2034,14 +2038,14 @@ int signandset([[nonnull]] $sigset_t *set,
 @@@param: info: Information about the signal on which to wait.
 @@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
 [[cp, decl_include("<bits/os/siginfo.h>", "<bits/os/sigset.h>")]]
-int sigwaitinfo([[nonnull]] $sigset_t const *__restrict set,
-                [[nullable]] siginfo_t *__restrict info);
+int sigwaitinfo([[in]] $sigset_t const *__restrict set,
+                [[out_opt]] siginfo_t *__restrict info);
 
 [[cp, ignore, nocrt, alias("sigtimedwait"), doc_alias("sigtimedwait")]]
 [[decl_include("<bits/os/siginfo.h>", "<bits/os/sigset.h>", "<bits/os/timespec.h>")]]
-int sigtimedwait32([[nonnull]] $sigset_t const *__restrict set,
-                   [[nullable]] siginfo_t *__restrict info,
-                   [[nullable]] struct $timespec32 const *rel_timeout);
+int sigtimedwait32([[in]] $sigset_t const *__restrict set,
+                   [[out_opt]] siginfo_t *__restrict info,
+                   [[in_opt]] struct $timespec32 const *rel_timeout);
 
 @@>> sigtimedwait(2), sigtimedwait64(2)
 @@Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
@@ -2054,9 +2058,9 @@ int sigtimedwait32([[nonnull]] $sigset_t const *__restrict set,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sigtimedwait")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sigtimedwait64")]]
 [[userimpl, requires($has_function(sigtimedwait32) || $has_function(sigtimedwait64))]]
-int sigtimedwait([[nonnull]] $sigset_t const *__restrict set,
-                 [[nullable]] siginfo_t *__restrict info,
-                 [[nullable]] struct timespec const *rel_timeout) {
+int sigtimedwait([[in]] $sigset_t const *__restrict set,
+                 [[out_opt]] siginfo_t *__restrict info,
+                 [[in_opt]] struct timespec const *rel_timeout) {
 @@pp_if $has_function(sigtimedwait64)@@
 	struct timespec64 tmv;
 	if (!rel_timeout)
@@ -2097,9 +2101,9 @@ int sigqueue($pid_t pid, $signo_t signo, union sigval const val);
 [[preferred_time64_variant_of(sigtimedwait), doc_alias("sigtimedwait")]]
 [[cp, userimpl, requires_function(sigtimedwait32)]]
 [[decl_include("<bits/os/siginfo.h>", "<bits/os/timespec.h>")]]
-int sigtimedwait64([[nonnull]] $sigset_t const *__restrict set,
-                   [[nullable]] siginfo_t *__restrict info,
-                   [[nullable]] struct timespec64 const *rel_timeout) {
+int sigtimedwait64([[in]] $sigset_t const *__restrict set,
+                   [[out_opt]] siginfo_t *__restrict info,
+                   [[in_opt]] struct timespec64 const *rel_timeout) {
 	struct timespec32 tmv;
 	if (!rel_timeout)
 		return sigtimedwait32(set, info, NULL);
@@ -2133,7 +2137,7 @@ int sigtimedwait64([[nonnull]] $sigset_t const *__restrict set,
 @@@return: -1:   [errno=ESRCH]  No process is identified by `pid'
 [[decl_include("<bits/types.h>", "<bits/os/siginfo.h>")]]
 int sigqueueinfo($pid_t pid, $signo_t signo,
-                 [[nonnull]] siginfo_t const *uinfo);
+                 [[in]] siginfo_t const *uinfo);
 
 @@>> tgsigqueueinfo(2)
 @@Similar  to `sigqueueinfo(2)', rather than sending a signal to a process
@@ -2151,7 +2155,7 @@ int sigqueueinfo($pid_t pid, $signo_t signo,
 @@@return: -1:   [errno=ESRCH]  No process is identified by `pid'
 [[decl_include("<bits/types.h>", "<bits/os/siginfo.h>")]]
 int tgsigqueueinfo($pid_t pid, $pid_t tid, $signo_t signo,
-                   [[nonnull]] siginfo_t const *uinfo);
+                   [[in]] siginfo_t const *uinfo);
 %#endif /* __USE_KOS */
 
 %
@@ -2198,8 +2202,8 @@ void psignal($signo_t signo, [[nullable]] char const *s) {
 [[impl_include("<bits/types.h>")]]
 [[guard, requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stderr) && $has_function(fprintf))]]
-void psiginfo([[nonnull]] siginfo_t const *pinfo,
-              [[nullable]] char const *s) {
+void psiginfo([[in]] siginfo_t const *pinfo,
+              [[in_opt]] char const *s) {
 	char const *text;
 	text = sigabbrev_np(pinfo->@si_signo@);
 	if (s && *s)
@@ -2743,8 +2747,8 @@ int siginterrupt($signo_t signo, __STDC_INT_AS_UINT_T interrupt);
 [[requires_include("<asm/os/signal.h>")]]
 [[requires(defined(@__SS_ONSTACK@) && defined(@__SS_DISABLE@) &&
            $has_function(sigaltstack))]]
-int sigstack([[nullable]] struct sigstack *ss,
-             [[nullable]] struct sigstack *oss) {
+int sigstack([[in_opt]] struct sigstack const *ss,
+             [[out_opt]] struct sigstack *oss) {
 	struct @sigaltstack@ ass, aoss;
 	int result;
 	if (ss) {
@@ -2771,8 +2775,8 @@ int sigstack([[nullable]] struct sigstack *ss,
 @@@return: 0:  Success
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/os/sigstack.h>")]]
-int sigaltstack([[nullable]] struct sigaltstack const *ss,
-                [[nullable]] struct sigaltstack *oss);
+int sigaltstack([[in_opt]] struct sigaltstack const *ss,
+                [[out_opt]] struct sigaltstack *oss);
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 %
@@ -2911,8 +2915,8 @@ $signo_t __libc_current_sigrtmax() {
  *       will almost always simply have a fixed, constant value. */
 [[nocrt, alias("pthread_sigmask", "thr_sigsetmask", "sigprocmask")]]
 $errno_t pthread_sigmask(__STDC_INT_AS_UINT_T how,
-                         [[nullable]] $sigset_t const *newmask,
-                         [[nullable]] $sigset_t *oldmask);
+                         [[in_opt]] $sigset_t const *newmask,
+                         [[out_opt]] $sigset_t *oldmask);
 
 
 @@>> pthread_kill(3)
@@ -3004,7 +3008,7 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 @@This function also handles stuff like "SIGRTMIN+1" or "9"
 [[pure, wunused, impl_include("<asm/os/signal.h>")]]
 [[decl_include("<bits/types.h>")]]
-$signo_t signalnumber([[nonnull]] const char *name) {
+$signo_t signalnumber([[in]] const char *name) {
 	$signo_t result;
 
 	/* Skip "SIG" prefix. */
@@ -3085,7 +3089,7 @@ $signo_t signalnext($signo_t signo) {
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<asm/os/signal.h>")]]
 [[section(".text.crt{|.dos}.solaris")]]
-int sig2str($signo_t signo, [[nonnull]] char buf[SIG2STR_MAX]) {
+int sig2str($signo_t signo, [[out]] char buf[SIG2STR_MAX]) {
 	char const *name = sigabbrev_np(signo);
 	if (name) {
 		/* Predefined name. */
@@ -3111,7 +3115,7 @@ int sig2str($signo_t signo, [[nonnull]] char buf[SIG2STR_MAX]) {
 [[decl_include("<bits/types.h>")]]
 [[requires_function(signalnumber)]]
 [[section(".text.crt{|.dos}.solaris")]]
-int str2sig([[nonnull]] const char *name, [[nonnull]] $signo_t *p_signo) {
+int str2sig([[in]] const char *name, [[out]] $signo_t *p_signo) {
 	$signo_t result;
 	size_t i;
 	if (name[0] == 'S' && name[1] == 'I' && name[2] == 'G')

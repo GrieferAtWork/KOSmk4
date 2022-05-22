@@ -53,9 +53,9 @@ typedef int nl_item;
 %[define_replacement(nl_catd = "void *")]
 %[define_replacement(nl_item = "int")]
 
-[[cp]] nl_catd catopen([[nonnull]] char const *cat_name, int flag);
-char *catgets([[nonnull]] nl_catd catalog, int set, int number, char const *string);
-int catclose([[nonnull]] nl_catd catalog);
+[[cp]] nl_catd catopen([[in]] char const *cat_name, int flag);
+char *catgets([[inout]] nl_catd catalog, int set, int number, char const *string);
+int catclose([[inout]] nl_catd catalog);
 
 %{
 

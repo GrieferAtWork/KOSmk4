@@ -29,9 +29,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_ustat,hash:CRC-32=0x733bd28b]]]*/
+/*[[[head:libc_ustat,hash:CRC-32=0x13ab98c7]]]*/
 /* >> ustat(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WR(2) int
 NOTHROW_NCX(LIBCCALL libc_ustat)(dev_t dev,
                                  struct ustat *ubuf)
 /*[[[body:libc_ustat]]]*/

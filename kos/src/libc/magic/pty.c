@@ -66,11 +66,11 @@ struct winsize;
 [[guard, decl_prefix(struct termios;)]]
 [[decl_prefix(struct winsize;)]]
 [[decl_include("<bits/types.h>")]]
-int openpty([[nonnull]] $fd_t *amaster,
-            [[nonnull]] $fd_t *aslave,
-            [[nullable]] char *name,
-            [[nullable]] struct termios const *termp,
-            [[nullable]] struct winsize const *winp);
+int openpty([[out]] $fd_t *amaster,
+            [[out]] $fd_t *aslave,
+            [[out_opt]] char *name,
+            [[in_opt]] struct termios const *termp,
+            [[in_opt]] struct winsize const *winp);
 
 @@>> forkpty(3)
 @@A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',
@@ -84,10 +84,10 @@ int openpty([[nonnull]] $fd_t *amaster,
 [[decl_prefix(struct winsize;)]]
 [[decl_include("<bits/types.h>")]]
 [[requires_function(openpty, fork, close, login_tty, _Exit)]]
-$pid_t forkpty([[nonnull]] $fd_t *amaster,
-               [[nullable]] char *name,
-               [[nullable]] struct termios const *termp,
-               [[nullable]] struct winsize const *winp) {
+$pid_t forkpty([[out]] $fd_t *amaster,
+               [[out_opt]] char *name,
+               [[in]] struct termios const *termp,
+               [[in]] struct winsize const *winp) {
 	int error;
 	fd_t master, slave;
 	pid_t pid;
