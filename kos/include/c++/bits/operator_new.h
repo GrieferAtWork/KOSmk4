@@ -46,11 +46,11 @@ struct nothrow_t {};
 __NAMESPACE_STD_END
 
 #if defined(__KOS__) && defined(__KERNEL__)
-__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_ALLOC_SIZE((1)) void *
+__CXX_FORCEINLINE __ATTR_MALLOC __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_ALLOC_SIZE((1)) void *
 __KCALL operator new(__size_t __num_bytes) __THROWS(E_BADALLOC) {
 	return kmalloc(__num_bytes, GFP_NORMAL);
 }
-__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_ALLOC_SIZE((1)) void *
+__CXX_FORCEINLINE __ATTR_MALLOC __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_ALLOC_SIZE((1)) void *
 __KCALL operator new[](__size_t __num_bytes) __THROWS(E_BADALLOC) {
 	return kmalloc(__num_bytes, GFP_NORMAL);
 }
@@ -62,11 +62,11 @@ __CXX_FORCEINLINE __NOBLOCK void __KCALL
 operator delete[](void *__heap_ptr) __CXX_NOEXCEPT {
 	kfree(__heap_ptr);
 }
-__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1))
+__CXX_FORCEINLINE __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1))
 void *__KCALL operator new(__size_t __num_bytes, std::nothrow_t const &) __CXX_NOEXCEPT {
 	return kmalloc_nx(__num_bytes, GFP_NORMAL);
 }
-__CXX_FORCEINLINE __ATTR_WUNUSED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1))
+__CXX_FORCEINLINE __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1))
 void *__KCALL operator new[](__size_t __num_bytes, std::nothrow_t const &) __CXX_NOEXCEPT {
 	return kmalloc_nx(__num_bytes, GFP_NORMAL);
 }

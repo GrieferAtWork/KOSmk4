@@ -55,7 +55,7 @@ DECL_BEGIN
  *                  the given `pointer'  isn't a valid  instance of  the
  *                  expected object.
  * @return: * :     The usual pformatprinter return value. */
-typedef NONNULL((1, 3, 4)) ssize_t
+typedef NONNULL_T((1, 3, 4)) ssize_t
 (KCALL *obnote_callback_t)(__pformatprinter printer, void *arg,
                            KERNEL CHECKED void const *pointer,
                            unsigned int *__restrict pstatus);

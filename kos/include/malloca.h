@@ -52,18 +52,18 @@ __ATTR_NONNULL((1)) void (freea)(void *__restrict __ptr);
 extern "C++" {
 
 /* Allocate a malloca-like data block with `num_bytes' bytes */
-__ATTR_WUNUSED __ATTR_MALLOC void *(malloca)(__SIZE_TYPE__ __num_bytes);
-__ATTR_WUNUSED __ATTR_MALLOC void *(malloca)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
-__ATTR_WUNUSED __ATTR_MALLOC void *(calloca)(__SIZE_TYPE__ __num_bytes);
-__ATTR_WUNUSED __ATTR_MALLOC void *(calloca)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
-__ATTR_WUNUSED __ATTR_MALLOC void *(malloca_heap)(__SIZE_TYPE__ __num_bytes);
-__ATTR_WUNUSED __ATTR_MALLOC void *(malloca_heap)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
-__ATTR_WUNUSED __ATTR_MALLOC void *(calloca_heap)(__SIZE_TYPE__ __num_bytes);
-__ATTR_WUNUSED __ATTR_MALLOC void *(calloca_heap)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
-__ATTR_WUNUSED __ATTR_MALLOC void *(malloca_stack)(__SIZE_TYPE__ __num_bytes);
-__ATTR_WUNUSED __ATTR_MALLOC void *(malloca_stack)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
-__ATTR_WUNUSED __ATTR_MALLOC void *(calloca_stack)(__SIZE_TYPE__ __num_bytes);
-__ATTR_WUNUSED __ATTR_MALLOC void *(calloca_stack)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
+__ATTR_MALLOC __ATTR_WUNUSED void *(malloca)(__SIZE_TYPE__ __num_bytes);
+__ATTR_MALLOC __ATTR_WUNUSED void *(malloca)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
+__ATTR_MALLOC __ATTR_WUNUSED void *(calloca)(__SIZE_TYPE__ __num_bytes);
+__ATTR_MALLOC __ATTR_WUNUSED void *(calloca)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
+__ATTR_MALLOC __ATTR_WUNUSED void *(malloca_heap)(__SIZE_TYPE__ __num_bytes);
+__ATTR_MALLOC __ATTR_WUNUSED void *(malloca_heap)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
+__ATTR_MALLOC __ATTR_WUNUSED void *(calloca_heap)(__SIZE_TYPE__ __num_bytes);
+__ATTR_MALLOC __ATTR_WUNUSED void *(calloca_heap)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
+__ATTR_MALLOC __ATTR_WUNUSED void *(malloca_stack)(__SIZE_TYPE__ __num_bytes);
+__ATTR_MALLOC __ATTR_WUNUSED void *(malloca_stack)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
+__ATTR_MALLOC __ATTR_WUNUSED void *(calloca_stack)(__SIZE_TYPE__ __num_bytes);
+__ATTR_MALLOC __ATTR_WUNUSED void *(calloca_stack)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
 
 /* Try hard to allocate memory, always using stack memory when heap allocation fails. */
 template<class __T> void (malloca_tryhard)(__T *&__result, __SIZE_TYPE__ __num_bytes);

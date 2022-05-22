@@ -38,10 +38,10 @@ __DECL_BEGIN
  * @return: NULL: The given symbol table is empty, too small, or corrupted.
  * @return: NULL: The given `symtab_entsize' is neither `sizeof(Elf32_Sym)', nor `sizeof(Elf64_Sym)' */
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2)) __byte_t const *
-(LIBDEBUGINFO_CC *PSYMTAB_SCANTABLE)(__byte_t const *__restrict symtab_start,
-                                     __byte_t const *__restrict symtab_end,
-                                     __size_t symtab_entsize,
-                                     __uintptr_t module_relative_pc);
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PSYMTAB_SCANTABLE)(__byte_t const *__restrict symtab_start,
+                                                    __byte_t const *__restrict symtab_end,
+                                                    __size_t symtab_entsize,
+                                                    __uintptr_t module_relative_pc);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __byte_t const *
 __NOTHROW_NCX(LIBDEBUGINFO_CC symtab_scantable)(__byte_t const *__restrict symtab_start,

@@ -94,7 +94,7 @@ typedef __ATTR_NONNULL_T((2, 3)) __ssize_t
 struct svga_chipset_ops {
 
 	/* [1..1][const] Chipset-specific finalization. */
-	__NOBLOCK __ATTR_NONNULL((1)) void
+	__NOBLOCK __ATTR_NONNULL_T((1)) void
 	__NOTHROW_T(LIBSVGADRV_CC *sco_fini)(struct svga_chipset *__restrict self);
 
 	/* [const][== sizeof(struct MYCHIPSET_svga_modeinfo)] */
@@ -102,7 +102,7 @@ struct svga_chipset_ops {
 
 	/* [0..1][const][lock(EXTERNAL)]
 	 * Enumerate chipset-specific identification strings. */
-	__ATTR_NONNULL((1, 2)) __ssize_t
+	__ATTR_NONNULL_T((1, 2)) __ssize_t
 	(LIBSVGADRV_CC *sco_strings)(struct svga_chipset *__restrict self,
 	                             svga_chipset_enumstring_t cb, void *arg);
 
@@ -117,7 +117,7 @@ struct svga_chipset_ops {
 	 *   was  written  back to  that  variable during  a  preceding call.
 	 * @return: true:  Another mode was retrieved.
 	 * @return: false: All modes enumerated. */
-	__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __BOOL
+	__ATTR_WUNUSED __ATTR_NONNULL_T((1, 2, 3)) __BOOL
 	(LIBSVGADRV_CC *sco_getmode)(struct svga_chipset *__restrict self,
 	                             struct svga_modeinfo *__restrict result,
 	                             __uintptr_t *__restrict p_index)
@@ -129,7 +129,7 @@ struct svga_chipset_ops {
 	 * - Prior to this function being called for the first time, any  function
 	 *   that documents making use of `CURRENT_VIDEO_MODE' must not be called;
 	 *   iow: be considered `[valid_if(WAS_CALLED(sco_setmode))]' */
-	__ATTR_NONNULL((1, 2)) void
+	__ATTR_NONNULL_T((1, 2)) void
 	(LIBSVGADRV_CC *sco_setmode)(struct svga_chipset *__restrict self,
 	                             struct svga_modeinfo const *__restrict mode);
 
@@ -139,9 +139,9 @@ struct svga_chipset_ops {
 	 *   even before `sco_setmode' was called for the first time. They should
 	 *   also  be used before  exclusive display control is  handed to a user
 	 *   application, and after that application relinquishes control. */
-	__ATTR_NONNULL((1, 2)) void
+	__ATTR_NONNULL_T((1, 2)) void
 	(LIBSVGADRV_CC *sco_getregs)(struct svga_chipset *__restrict self, __byte_t regbuf[]);
-	__ATTR_NONNULL((1, 2)) void
+	__ATTR_NONNULL_T((1, 2)) void
 	(LIBSVGADRV_CC *sco_setregs)(struct svga_chipset *__restrict self, __byte_t const regbuf[]);
 
 	/* [const] Required buffer size for `sco_getregs' / `sco_setregs'. */
@@ -165,15 +165,15 @@ struct svga_chipset_ops {
 	 * @assume(WAS_CALLED(sco_setmode));
 	 * @assume(window < CEILDIV(self->sc_vmemsize, 64 * 1024));
 	 * @assume(!(CURRENT_VIDEO_MODE.smi_flags & SVGA_MODEINFO_F_LFB)); */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBSVGADRV_CC *sco_setwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 	/* [1..1][lock(EXTERNAL)] Same as `sco_setwindow', but *may* only update `sc_rdwindow' */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBSVGADRV_CC *sco_setrdwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 	/* [1..1][lock(EXTERNAL)] Same as `sco_setwindow', but *may* only update `sc_wrwindow' */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBSVGADRV_CC *sco_setwrwindow)(struct svga_chipset *__restrict self, __size_t window)
 			__THROWS(E_IOERROR);
 
@@ -191,7 +191,7 @@ struct svga_chipset_ops {
 	 * @assume(WAS_CALLED(sco_setmode));
 	 * @assume(offset <= self->sc_vmemsize * 8 / CURRENT_VIDEO_MODE.smi_bits_per_pixel);
 	 * @assume(!(CURRENT_VIDEO_MODE.smi_flags & SVGA_MODEINFO_F_TXT)); */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBSVGADRV_CC *sco_setdisplaystart)(struct svga_chipset *__restrict self, __size_t offset)
 			__THROWS(E_IOERROR);
 
@@ -208,7 +208,7 @@ struct svga_chipset_ops {
 	 * @assume(IS_ALIGNED(width, self->sc_logicalwidth_align));
 	 * @assume(width <= sc_logicalwidth_max);
 	 * @assume(!(CURRENT_VIDEO_MODE.smi_flags & SVGA_MODEINFO_F_TXT)); */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBSVGADRV_CC *sco_setlogicalwidth)(struct svga_chipset *__restrict self, __uint32_t width)
 			__THROWS(E_IOERROR);
 };
@@ -242,7 +242,7 @@ struct svga_chipset_driver {
 	 *        For this, `self' must point to a `scd_cssize'-byte long buffer.
 	 * @return: true:  Chipset found.
 	 * @return: false: Chipset isn't present. */
-	__ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+	__ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __BOOL
 	(LIBSVGADRV_CC *scd_probe)(struct svga_chipset *__restrict self);
 
 	/* Chipset name. */
@@ -259,7 +259,7 @@ struct svga_chipset_driver {
  * As such, when probing for devices you should simply iterate this list until you
  * find a driver  for which probing  succeeds. Once that  happens, simply keep  on
  * using that driver. */
-typedef __ATTR_PURE_T __ATTR_RETNONNULL __ATTR_WUNUSED struct svga_chipset_driver const *
+typedef __ATTR_PURE_T __ATTR_RETNONNULL_T __ATTR_WUNUSED_T struct svga_chipset_driver const *
 __NOTHROW_T(LIBSVGADRV_CC *PSVGA_CHIPSET_GETDRIVERS)(void);
 #ifdef LIBSVGADRV_WANT_PROTOTYPES
 LIBSVGADRV_DECL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED struct svga_chipset_driver const *

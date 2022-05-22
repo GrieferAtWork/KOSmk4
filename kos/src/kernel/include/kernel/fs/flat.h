@@ -119,7 +119,7 @@ struct flatdirnode_xops {
 	 *                                          # names are automatically corrected by deleting duplicate files)
 	 * @return: * :   Newly allocated, partially initialized dirent. (see above)
 	 * @return: NULL: No more entries exist past `pos'; end-of-directory */
-	BLOCKING WUNUSED struct flatdirent *
+	BLOCKING WUNUSED_T NONNULL_T((1)) struct flatdirent *
 	(KCALL *fdnx_readdir)(struct flatdirnode *__restrict self, pos_t pos)
 			THROWS(E_BADALLOC, E_IOERROR, ...);
 
@@ -174,7 +174,7 @@ struct flatdirnode_xops {
 	 *                 The requires space was saved in `ent->fde_size'.
 	 * @throw: E_FSERROR_ILLEGAL_PATH: `ent->fde_ent.fd_name' contains illegal characters.
 	 * @throw: E_FSERROR_DISK_FULL:    Unable to write many more data: disk is full. */
-	BLOCKING WUNUSED NONNULL((1, 2, 3)) __BOOL
+	BLOCKING WUNUSED_T NONNULL_T((1, 2, 3)) __BOOL
 	(KCALL *fdnx_writedir)(struct flatdirnode *__restrict self,
 	                       struct flatdirent *__restrict ent,
 	                       struct fnode *__restrict file,
@@ -195,7 +195,7 @@ struct flatdirnode_xops {
 	 *   some point after the  write-lock to `self->fdn_data.fdd_lock' was  acquired.
 	 * @param: at_end_of_dir: When `true', the delete is happening such that `ent'
 	 *                        scrapes against the far end of the directory stream. */
-	BLOCKING NONNULL((1, 2, 3)) void
+	BLOCKING NONNULL_T((1, 2, 3)) void
 	(KCALL *fdnx_deleteent)(struct flatdirnode *__restrict self,
 	                        struct flatdirent *__restrict ent,
 	                        struct fnode *__restrict file,
@@ -248,7 +248,7 @@ struct flatdirnode_xops {
 	 *  - return->fn_allnodes                = ...;    # via `fnode_init_addtoall()'
 	 * @return: * : The newly allocated (and partially initialized) file.
 	 * @throw: E_FSERROR_UNSUPPORTED_OPERATION: Filesystem doesn't support `info->mkf_fmode & S_IFMT' */
-	BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fnode *
+	BLOCKING ATTR_RETNONNULL_T WUNUSED_T NONNULL_T((1, 2)) struct fnode *
 	(KCALL *fdnx_mkfile)(struct flatdirnode *__restrict self,
 	                     struct fmkfile_info const *__restrict info)
 			THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_UNSUPPORTED_OPERATION, ...);
@@ -275,7 +275,7 @@ struct flatdirnode_xops {
 	 *  - return->fde_ent.fd_hash    = info->mkf_hash;     # or `fdirent_hash(return->fde_ent.fd_name, return->fde_ent.fd_namelen)'
 	 *  - ...;                               # Caller will insert into hash-vector after successful `fdnx_writedir()'
 	 * @return: * : The newly allocated (and partially initialized) directory entry. */
-	BLOCKING ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct flatdirent *
+	BLOCKING ATTR_RETNONNULL_T WUNUSED_T NONNULL_T((1, 2, 3)) struct flatdirent *
 	(KCALL *fdnx_mkent)(struct flatdirnode *__restrict self,
 	                    struct fmkfile_info const *__restrict info,
 	                    struct fnode *__restrict file)
@@ -297,7 +297,7 @@ struct flatdirnode_xops {
 	 *
 	 * If this operator returns with an exception, the directory entry previously
 	 * written by `fdnx_writedir()' will be marked as deleted (`fdnx_deleteent'). */
-	BLOCKING NONNULL((1, 2, 3, 4)) void
+	BLOCKING NONNULL_T((1, 2, 3, 4)) void
 	(KCALL *fdnx_allocfile)(struct flatdirnode *__restrict self,
 	                        struct flatdirent *__restrict ent,
 	                        struct fnode *__restrict file,
@@ -325,7 +325,7 @@ struct flatdirnode_xops {
 	 * Note that unlike `fdnx_allocfile()', this operator is _NOT_ invoked  while
 	 * holding any sort of lock to `self'! Instead, it can be invoked as a stand-
 	 * alone function. */
-	BLOCKING NONNULL((1, 2, 3)) void
+	BLOCKING NONNULL_T((1, 2, 3)) void
 	(KCALL *fdnx_deletefile)(struct flatdirnode *__restrict self,
 	                         struct flatdirent *__restrict last_deleted_ent,
 	                         struct fnode *__restrict file)
@@ -339,7 +339,7 @@ struct flatdirnode_xops {
 	 * data for special directory entries present on some filesystems.
 	 *
 	 * Even if this operator returns with an exception, a rename is not aborted. */
-	BLOCKING NONNULL((1, 2, 3, 4, 5)) void
+	BLOCKING NONNULL_T((1, 2, 3, 4, 5)) void
 	(KCALL *fdnx_direntchanged)(struct fnode *__restrict self,
 	                            struct flatdirnode *oldparent,
 	                            struct flatdirnode *newparent,
@@ -721,7 +721,7 @@ struct flatsuper_ops {
 	 *  - return->fn_supent                  = ...;    # By adding to the superblock's node-tree (or marking as unbound)
 	 *  - return->fn_allnodes                = ...;    # via `fnode_init_addtoall()'
 	 * @return: * : The newly allocated (and partially initialized) node. */
-	ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fnode *
+	BLOCKING ATTR_RETNONNULL_T WUNUSED_T NONNULL_T((1)) struct fnode *
 	(KCALL *ffso_makenode)(struct flatsuper *__restrict self,
 	                       struct flatdirent *__restrict ent,
 	                       struct flatdirnode *__restrict dir)

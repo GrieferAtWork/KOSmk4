@@ -65,9 +65,9 @@ STATIC_ASSERT((MPART_BLOCK_ST_CHNG & MPART_BLOCK_ST_MASK) == MPART_BLOCK_ST_CHNG
  * successfully. In the event of an I/O error, this function will re-throw said error. */
 PUBLIC BLOCKING NONNULL((1, 2)) void KCALL
 mfile_dosyncio(struct mfile *__restrict self,
-               NONNULL((1, 5)) void (KCALL *io)(struct mfile *__restrict self, pos_t addr,
-                                                physaddr_t buf, size_t num_bytes,
-                                                struct aio_multihandle *__restrict aio),
+               NONNULL_T((1, 5)) void (KCALL *io)(struct mfile *__restrict self, pos_t addr,
+                                                  physaddr_t buf, size_t num_bytes,
+                                                  struct aio_multihandle *__restrict aio),
                pos_t addr, physaddr_t buf, size_t num_bytes) {
 	struct aio_multihandle_generic hand;
 	aio_multihandle_generic_init(&hand);

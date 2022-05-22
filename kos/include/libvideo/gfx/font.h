@@ -45,12 +45,12 @@ struct video_font_ops {
 	/* All operators within this structure are [1..1] */
 
 	/* Destroy the given video font object. */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *vfo_destroy)(struct video_font *__restrict __self);
 
 	/* Draw a single glyph at the given coords and return its width.
 	 * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-	__ATTR_NONNULL((1, 2)) __size_t
+	__ATTR_NONNULL_T((1, 2)) __size_t
 	(LIBVIDEO_GFX_CC *vfo_drawglyph)(struct video_font *__restrict __self,
 	                                 struct video_gfx *__restrict __gfx,
 	                                 __intptr_t __x, __intptr_t __y,
@@ -59,7 +59,7 @@ struct video_font_ops {
 	                                 video_color_t __color);
 
 	/* Return the width (in pixels) of a glyph, given its height (in pixels). */
-	__ATTR_NONNULL((1)) __size_t
+	__ATTR_NONNULL_T((1)) __size_t
 	(LIBVIDEO_GFX_CC *vfo_glyphsize)(struct video_font *__restrict __self,
 	                                 __size_t __height,
 	                                 __CHAR32_TYPE__ __ord);

@@ -40,8 +40,8 @@ __DECL_BEGIN
 struct video_palette_cache;
 struct video_palette {
 	/* [1..1][const] Destruction callback (invoked when `vp_refcnt' reaches `0') */
-	__ATTR_NONNULL((1)) void
-	(LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
+	__ATTR_NONNULL_T((1)) void
+	__NOTHROW_T(LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
 	__uintptr_t                            vp_refcnt; /* Reference counter. */
 	struct video_palette_cache            *vp_cache;  /* [0..1][owned(malloc)][lock(WRITE_ONCE)] Color->pixel converter cache */
 	__size_t                               vp_cnt;    /* [const] # of colors (== VIDEO_CODEC_PALSIZ(...)). */

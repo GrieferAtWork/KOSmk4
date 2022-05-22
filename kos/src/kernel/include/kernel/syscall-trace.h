@@ -66,7 +66,7 @@ syscall_trace(struct rpc_syscall_info const *__restrict info);
 /* Prototype for dynamically defined system call tracing callbacks.
  * @param: self: A temporary  reference  to  the  object  registered
  *               in `syscall_trace_start()' alongside this callback. */
-typedef NONNULL((1, 2)) void
+typedef NONNULL_T((1, 2)) void
 (FCALL *syscall_trace_callback_t)(void *__restrict self,
                                   struct rpc_syscall_info const *__restrict info);
 #define _SYSCALL_TRACE_CALLBACK_T(name, Tself) \

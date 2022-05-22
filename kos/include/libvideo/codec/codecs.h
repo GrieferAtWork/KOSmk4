@@ -109,42 +109,42 @@ struct video_codec {
 
 	/* Calculate minimal ram-buffer requirements for a graphic with the given dimensions.
 	 * Note that in addition, a ram-buffer needs a minimal alignment of `vc_align' bytes. */
-	__ATTR_NONNULL((3)) void
+	__ATTR_NONNULL_T((3)) void
 	(LIBVIDEO_CODEC_CC *vc_rambuffer_requirements)(__size_t size_x, __size_t size_y,
 	                                               struct video_rambuffer_requirements *__restrict result);
 
 	/* Get a pixel (The caller must ensure that the given x is in-bounds) */
-	__ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel_t
-	(__ATTR_PURE_T LIBVIDEO_CODEC_CC *vc_getpixel)(__byte_t const *__restrict line, __uintptr_t x);
+	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
+	(LIBVIDEO_CODEC_CC *vc_getpixel)(__byte_t const *__restrict line, __uintptr_t x);
 
 	/* Set a pixel (The caller must ensure that the given x is in-bounds) */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_CODEC_CC *vc_setpixel)(__byte_t *__restrict line,
 	                                 __uintptr_t x, video_pixel_t pixel);
 
 	/* Copy `num_pixels' neighboring (the caller must ensure that all coords are in-bounds) */
-	__ATTR_NONNULL((1, 3)) void
+	__ATTR_NONNULL_T((1, 3)) void
 	(LIBVIDEO_CODEC_CC *vc_linecopy)(__byte_t *__restrict dst_line, __uintptr_t dst_x,
 	                                 __byte_t const *__restrict src_line, __uintptr_t src_x,
 	                                 __size_t num_pixels);
 
 	/* Fill `num_pixels' neighboring (the caller must ensure that all coords are in-bounds) */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_CODEC_CC *vc_linefill)(__byte_t *__restrict line, __uintptr_t dst_x,
 	                                 video_pixel_t pixel, __size_t num_pixels);
 
 	/* Convert between color and pixel values. */
-	__ATTR_WUNUSED __ATTR_NONNULL((1)) video_color_t
-	(__ATTR_PURE_T LIBVIDEO_CODEC_CC *vc_pixel2color)(struct video_format const *__restrict self,
-	                                                  video_pixel_t pixel);
-	__ATTR_WUNUSED __ATTR_NONNULL((1)) video_pixel_t
-	(__ATTR_PURE_T LIBVIDEO_CODEC_CC *vc_color2pixel)(struct video_format const *__restrict self,
-	                                                  video_color_t color);
+	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_color_t
+	(LIBVIDEO_CODEC_CC *vc_pixel2color)(struct video_format const *__restrict self,
+	                                    video_pixel_t pixel);
+	__ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) video_pixel_t
+	(LIBVIDEO_CODEC_CC *vc_color2pixel)(struct video_format const *__restrict self,
+	                                    video_color_t color);
 };
 
 
 /* Lookup the interface for a given codec, or return NULL if the codec isn't supported. */
-typedef __ATTR_WUNUSED_T __ATTR_CONST struct video_codec const *
+typedef __ATTR_CONST_T __ATTR_WUNUSED_T struct video_codec const *
 (LIBVIDEO_CODEC_CC *PVIDEO_CODEC_LOOKUP)(video_codec_t codec);
 #ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES
 LIBVIDEO_CODEC_DECL __ATTR_WUNUSED __ATTR_CONST struct video_codec const *

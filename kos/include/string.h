@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44dcde91 */
+/* HASH CRC-32:0xfe98fc49 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7196,14 +7196,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strdupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_M
 #ifdef __INTELLISENSE__
 #define mstrdupa  mstrdupa
 #define mstrndupa mstrndupa
-extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
+extern __ATTR_MALLOC __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(mstrdupa)(char const *__restrict __string);
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
-extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
+extern __ATTR_MALLOC __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(mstrndupa)(char const *__restrict __string, __size_t __maxlen);
 #endif /* __USE_XOPEN2K8 || __USE_DOS */
 #elif defined(__NO_XBLOCK)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_NONNULL((2)) char *
+__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__mstrdupa_init)(void *__buf, char const *__restrict __string) {
 #ifdef __malloca_mayfail
 	if __likely(__buf)
@@ -7214,7 +7214,7 @@ __NOTHROW_NCX(__mstrdupa_init)(void *__buf, char const *__restrict __string) {
 	return (char *)__buf;
 }
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_NONNULL((2)) char *
+__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__mstrndupa_init)(void *__buf, char const *__restrict __string, __size_t __maxlen) {
 #ifdef __malloca_mayfail
 	if __likely(__buf)
@@ -8208,13 +8208,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATT
 #ifdef __INTELLISENSE__
 #define strdupa  strdupa
 #define strndupa strndupa
-extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(strdupa)(char const *__restrict __string);
+extern __ATTR_MALLOC __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(strdupa)(char const *__restrict __string);
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
-extern __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(strndupa)(char const *__restrict __string, __size_t __maxlen);
+extern __ATTR_MALLOC __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(strndupa)(char const *__restrict __string, __size_t __maxlen);
 #endif /* __USE_XOPEN2K8 || __USE_DOS */
 #elif defined(__NO_XBLOCK)
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
+__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__strndupa_init)(void *__restrict __buf, char const *__restrict __string, __size_t __maxlen) {
 	__size_t __buflen = strnlen(__string, __maxlen) * sizeof(char);
 #ifdef __mempcpy_defined

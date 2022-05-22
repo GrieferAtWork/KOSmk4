@@ -100,7 +100,7 @@ struct branch_stat {
  * @param: annotated: `true' if the branch was annotated with `likely()' or `unlikely()'.
  * @return: >= 0: Add all positive return values together and re-return from `branchstat()'
  * @return: < 0:  Immediatly propagate a negative return value */
-typedef NONNULL((2, 3)) ssize_t
+typedef NONNULL_T((2, 3)) ssize_t
 (KCALL *branchstat_callback_t)(void *arg,
                                struct driver *__restrict mod,
                                struct branch_prediction const *__restrict pred,

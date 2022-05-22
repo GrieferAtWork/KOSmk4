@@ -41,14 +41,14 @@ __DECL_BEGIN
 
 extern "C++" {
 /* Allocate a malloca-like data block with `num_bytes' bytes */
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *(Malloca)(__SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC);
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *(Malloca)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) __THROWS(E_BADALLOC);
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *(Calloca)(__SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC);
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *(Calloca)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) __THROWS(E_BADALLOC);
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *(MallocaHeap)(__SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC);
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *(MallocaHeap)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) __THROWS(E_BADALLOC);
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *(CallocaHeap)(__SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC);
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *(CallocaHeap)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) __THROWS(E_BADALLOC);
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *(Malloca)(__SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC);
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *(Malloca)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) __THROWS(E_BADALLOC);
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *(Calloca)(__SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC);
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *(Calloca)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) __THROWS(E_BADALLOC);
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *(MallocaHeap)(__SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC);
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *(MallocaHeap)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) __THROWS(E_BADALLOC);
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *(CallocaHeap)(__SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC);
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *(CallocaHeap)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) __THROWS(E_BADALLOC);
 } /* extern "C++" */
 
 __DECL_END

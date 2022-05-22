@@ -940,7 +940,7 @@ INTERN BLOCKING NONNULL((1)) syscall_slong_t KCALL
 handle_mfile_ioctl(struct mfile *__restrict self, ioctl_t cmd,
                    USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
-	BLOCKING NONNULL((1)) syscall_slong_t
+	BLOCKING NONNULL_T((1)) syscall_slong_t
 	(KCALL *mso_ioctl)(struct mfile *__restrict self, ioctl_t cmd,
 	                   USER UNCHECKED void *arg, iomode_t mode);
 	struct mfile_stream_ops const *stream;

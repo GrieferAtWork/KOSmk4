@@ -2101,7 +2101,7 @@ DEFINE_SYSCALL3(ssize_t, readlink,
 /************************************************************************/
 /* execveat(), execve()                                                 */
 /************************************************************************/
-typedef void(KCALL *kernel_permman_onexec_t)(void);
+typedef void (KCALL *kernel_permman_onexec_t)(void);
 INTDEF kernel_permman_onexec_t __kernel_permman_onexec_start[];
 INTDEF kernel_permman_onexec_t __kernel_permman_onexec_end[];
 

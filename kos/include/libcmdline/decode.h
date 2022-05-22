@@ -48,10 +48,10 @@ typedef unsigned int gfp_t;
  * When `pargc' is non-NULL, store the number of arguments leading
  * up  to  (but   not  including)   the  terminating   NULL-entry.
  * Upon error, NULL is returned. */
-typedef __ATTR_WUNUSED_T __ATTR_MALLOC_T __ATTR_NONNULL((1)) char **
+typedef __ATTR_MALLOC_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) char **
 (LIBCMDLINE_CC *PCMDLINE_DECODE_ARGV)(char *cmdline, __size_t *pargc _os_heap_gfparg(gfp));
 #ifdef LIBCMDLINE_WANT_PROTOTYPES
-LIBCMDLINE_DECL __ATTR_WUNUSED __ATTR_MALLOC __ATTR_NONNULL((1)) char **LIBCMDLINE_CC
+LIBCMDLINE_DECL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((1)) char **LIBCMDLINE_CC
 cmdline_decode_argv(char *cmdline, __size_t *pargc _os_heap_gfparg(gfp __DFL(0)));
 #endif /* LIBCMDLINE_WANT_PROTOTYPES */
 

@@ -33,9 +33,9 @@ __DECL_BEGIN
  * Upon success, `self->vea_args.va_state' will point to the updated CPU state,
  * which may  be  placed  at  a  different address  than  it  was  upon  entry.
  * This function is intended to be called from a page fault handler. */
-typedef void (LIBVIOCORE_CC *PVIOCORE_EMULATE)(struct vio_emulate_args *__restrict self);
+typedef __ATTR_NONNULL_T((1)) void (LIBVIOCORE_CC *PVIOCORE_EMULATE)(struct vio_emulate_args *__restrict self);
 #ifdef LIBVIOCORE_WANT_PROTOTYPES
-LIBVIOCORE_DECL void LIBVIOCORE_CC viocore_emulate(struct vio_emulate_args *__restrict self);
+LIBVIOCORE_DECL __ATTR_NONNULL((1)) void LIBVIOCORE_CC viocore_emulate(struct vio_emulate_args *__restrict self);
 #endif /* LIBVIOCORE_WANT_PROTOTYPES */
 
 

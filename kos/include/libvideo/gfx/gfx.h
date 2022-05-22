@@ -134,12 +134,12 @@ struct video_gfx_pxops {
 	 *          as well as always assume that the given coords are in-bounds of the
 	 *          underlying buffer. */
 	/* Get the color of a pixel */
-	__ATTR_NONNULL((1)) video_color_t
+	__ATTR_NONNULL_T((1)) video_color_t
 	(LIBVIDEO_GFX_CC *fxo_getcolor)(struct video_gfx const *__restrict __self,
 	                                __uintptr_t __abs_x, __uintptr_t __abs_y);
 
 	/* Place a colored pixel ontop of the graphic */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *fxo_putcolor)(struct video_gfx *__restrict __self,
 	                                __uintptr_t __abs_x, __uintptr_t __abs_y,
 	                                video_color_t __color);
@@ -149,40 +149,40 @@ struct video_gfx_ops {
 	/* All of the following callbacks are [1..1] */
 
 	/* Draw a line */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *fxo_line)(struct video_gfx *__restrict __self,
 	                            __intptr_t __x1, __intptr_t __y1,
 	                            __intptr_t __x2, __intptr_t __y2,
 	                            video_color_t __color);
 
 	/* Vertical line */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *fxo_vline)(struct video_gfx *__restrict __self,
 	                             __intptr_t __x, __intptr_t __y,
 	                             __size_t __length, video_color_t __color);
 
 	/* Horizontal line */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *fxo_hline)(struct video_gfx *__restrict __self,
 	                             __intptr_t __x, __intptr_t __y,
 	                             __size_t __length, video_color_t __color);
 
 	/* Fill an area with a solid __color. */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *fxo_fill)(struct video_gfx *__restrict __self,
 	                            __intptr_t __x, __intptr_t __y,
 	                            __size_t __size_x, __size_t __size_y,
 	                            video_color_t __color);
 
 	/* Outline an area with a rectangle. */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *fxo_rect)(struct video_gfx *__restrict __self,
 	                            __intptr_t __x, __intptr_t __y,
 	                            __size_t __size_x, __size_t __size_y,
 	                            video_color_t __color);
 
 	/* Blit the contents of another video buffer into this one. */
-	__ATTR_NONNULL((1, 4)) void
+	__ATTR_NONNULL_T((1, 4)) void
 	(LIBVIDEO_GFX_CC *fxo_blit)(struct video_gfx *__self,
 	                            __intptr_t __dst_x, __intptr_t __dst_y,
 	                            struct video_gfx const *__src,
@@ -190,7 +190,7 @@ struct video_gfx_ops {
 	                            __size_t __size_x, __size_t __size_y);
 
 	/* Same as `fxo_blit', but stretch the contents */
-	__ATTR_NONNULL((1, 6)) void
+	__ATTR_NONNULL_T((1, 6)) void
 	(LIBVIDEO_GFX_CC *fxo_stretch)(struct video_gfx *__self,
 	                               __intptr_t __dst_x, __intptr_t __dst_y,
 	                               __size_t __dst_size_x, __size_t __dst_size_y,
@@ -206,7 +206,7 @@ struct video_gfx_ops {
 	 * @param: bitskip: Number of leading bits to skip
 	 * @param: bitscan: Length of a scanline within `bitmask' (in bits)
 	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
-	__ATTR_NONNULL((1, 7)) void
+	__ATTR_NONNULL_T((1, 7)) void
 	(LIBVIDEO_GFX_CC *fxo_bitfill)(struct video_gfx *__restrict __self,
 	                               __intptr_t __x, __intptr_t __y,
 	                               video_color_t __color,
@@ -215,7 +215,7 @@ struct video_gfx_ops {
 	                               __uintptr_t __bitskip, __size_t __bitscan);
 
 	/* Same as `fxo_bitfill()', but take source colors from `src' */
-	__ATTR_NONNULL((1, 4, 9)) void
+	__ATTR_NONNULL_T((1, 4, 9)) void
 	(LIBVIDEO_GFX_CC *fxo_bitblit)(struct video_gfx *__self,
 	                               __intptr_t __dst_x, __intptr_t __dst_y,
 	                               struct video_gfx const *__src,
@@ -236,7 +236,7 @@ struct video_gfx_ops {
 	 * >> // NOTE: Pixels that aren't masked by `bitmask' may not necessary get blended during this call!
 	 * >> self->stretch(dst_x, dst_y, dst_size_x, dst_size_y, &temp_gfx, 0, 0, src_size_x, src_size_y);
 	 * >> destroy(temp); */
-	__ATTR_NONNULL((1, 9)) void
+	__ATTR_NONNULL_T((1, 9)) void
 	(LIBVIDEO_GFX_CC *fxo_bitstretchfill)(struct video_gfx *__restrict __self,
 	                                      __intptr_t __dst_x, __intptr_t __dst_y,
 	                                      __size_t __dst_size_x, __size_t __dst_size_y,
@@ -246,7 +246,7 @@ struct video_gfx_ops {
 	                                      __uintptr_t __bitskip, __size_t __bitscan);
 
 	/* Same as `fxo_bitstretchfill()' is for `fxo_bitfill()', but instead here for `fxo_bitblit()' */
-	__ATTR_NONNULL((1, 6, 11)) void
+	__ATTR_NONNULL_T((1, 6, 11)) void
 	(LIBVIDEO_GFX_CC *fxo_bitstretchblit)(struct video_gfx *__self,
 	                                      __intptr_t __dst_x, __intptr_t __dst_y,
 	                                      __size_t __dst_size_x, __size_t __dst_size_y,

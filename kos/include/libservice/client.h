@@ -142,7 +142,7 @@ __NOTHROW_RPC(LIBSERVICE_CC service_open)(char const *filename);
  * time of it being closed.
  * Services not closed when the calling process exits, or makes a call
  * to one  of the  `exec()' functions  will be  closed  automatically. */
-typedef __NOBLOCK __ATTR_NONNULL((1)) void
+typedef __NOBLOCK __ATTR_NONNULL_T((1)) void
 __NOTHROW_T(LIBSERVICE_CC *PSERVICE_CLOSE)(struct service *__restrict self);
 #ifdef LIBSERVICE_WANT_PROTOTYPES
 LIBSERVICE_DECL __NOBLOCK __ATTR_NONNULL((1)) void
@@ -205,7 +205,7 @@ __NOTHROW_T(LIBSERVICE_CC *PSERVICE_BUFFER_CALLOC)(struct service *__restrict se
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) void *
 __NOTHROW_T(LIBSERVICE_CC *PSERVICE_BUFFER_REALLOC)(struct service *__restrict self,
                                                     void *ptr, __size_t num_bytes);
-typedef __NOBLOCK __ATTR_NONNULL((1)) void
+typedef __NOBLOCK __ATTR_NONNULL_T((1)) void
 __NOTHROW_T(LIBSERVICE_CC *PSERVICE_BUFFER_FREE)(struct service *__restrict self,
                                                  void *ptr);
 #ifdef LIBSERVICE_WANT_PROTOTYPES

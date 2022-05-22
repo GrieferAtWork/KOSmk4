@@ -45,7 +45,7 @@ typedef REF struct mpart *mdma_lock_t;
  *                    The function is responsible to _always_ release
  *                    this lock  via `mdma_lock_release()',  possibly
  *                    asynchronously at a later point in time. */
-typedef BLOCKING NONNULL((4)) ssize_t
+typedef BLOCKING NONNULL_T((4)) ssize_t
 (KCALL *mdma_range_callback_t)(void *cookie, physaddr_t paddr, size_t num_bytes,
                                /*inherit(always)*/ mdma_lock_t lock);
 

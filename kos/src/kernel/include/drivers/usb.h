@@ -279,7 +279,7 @@ struct usb_controller_ops {
 	 *               obviously not the buffers themself), as well as later transfer
 	 *               descriptors even before the given  `aio' handle is invoked  to
 	 *               indicate completion. */
-	NONNULL((1, 2, 3)) void
+	NONNULL_T((1, 2, 3)) void
 	(KCALL *uco_transfer)(struct usb_controller *__restrict self,
 	                      struct usb_transfer const *__restrict tx,
 	                      /*out*/ struct aio_handle *__restrict aio);
@@ -298,7 +298,7 @@ struct usb_controller_ops {
 	 * @param: flags:   Set of `USB_INTERRUPT_FLAG_*'
 	 * @param: poll_interval_in_milliseconds: A   hint  for  how  often  the  USB  device  should  be  polled.
 	 *                                        When set to `0', the device will be polled as often as possible. */
-	ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *
+	ATTR_RETNONNULL_T WUNUSED_T NONNULL_T((1, 2, 3, 4)) REF struct usb_interrupt *
 	(KCALL *uco_interrupt)(struct usb_controller *__restrict self, struct usb_endpoint *__restrict endp,
 	                       PUSB_INTERRUPT_HANDLER handler, struct device *__restrict dev,
 	                       size_t buflen, uintptr_t flags, unsigned int poll_interval_in_milliseconds);

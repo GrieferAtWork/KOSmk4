@@ -105,11 +105,11 @@ struct terminal {
 	 sched_signal_broadcast_for_fini(&(self)->t_ioschange))
 
 /* Initialize/Finalize the given terminal controller. */
-typedef __NOBLOCK __ATTR_NONNULL((1, 2)) void
-(LIBTERM_CC *PTERMINAL_INIT)(struct terminal *__restrict self,
-                             pterminal_oprinter_t oprinter,
-                             pterminal_raise_t raisefunc,
-                             pterminal_check_sigttou_t chk_sigttou);
+typedef __NOBLOCK __ATTR_NONNULL_T((1, 2)) void
+__NOTHROW_NCX_T(LIBTERM_CC *PTERMINAL_INIT)(struct terminal *__restrict self,
+                                            pterminal_oprinter_t oprinter,
+                                            pterminal_raise_t raisefunc,
+                                            pterminal_check_sigttou_t chk_sigttou);
 #ifdef LIBTERM_WANT_PROTOTYPES
 LIBTERM_DECL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(LIBTERM_CC terminal_init)(struct terminal *__restrict self,

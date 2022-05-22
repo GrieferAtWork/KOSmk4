@@ -143,8 +143,8 @@ struct ata_drive: blkdev {
 #define ATADRIVE_HAVE_PIO_IOSECTORS
 
 	/* [1..1][const] Fallback operators for situations where DMA can't be used. */
-	NONNULL((1, 5)) void (KCALL *ad_pio_rdsectors)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
-	NONNULL((1, 5)) void (KCALL *ad_pio_wrsectors)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
+	NONNULL_T((1, 5)) void (KCALL *ad_pio_rdsectors)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
+	NONNULL_T((1, 5)) void (KCALL *ad_pio_wrsectors)(struct mfile *__restrict self, pos_t addr, physaddr_t buf, size_t num_bytes, struct aio_multihandle *__restrict aio);
 #endif /* __SIZEOF_PHYSADDR_T__ > 4 */
 };
 

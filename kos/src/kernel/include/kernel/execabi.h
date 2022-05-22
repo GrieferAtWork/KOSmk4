@@ -223,8 +223,8 @@ struct execabi {
 	 * @param: args: Exec arguments
 	 * @return: * :  One of `EXECABI_EXEC_*'
 	 * @throw: E_NOT_EXECUTABLE_NOT_A_BINARY: Same as returning `NULL'. */
-	BLOCKING WUNUSED unsigned int
-	(NONNULL((1)) FCALL *ea_exec)(/*in|out*/ struct execargs *__restrict args)
+	BLOCKING WUNUSED_T NONNULL_T((1)) unsigned int
+	(FCALL *ea_exec)(/*in|out*/ struct execargs *__restrict args)
 			THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR, ...);
 
 	/* TODO: Add callbacks to implement to implement

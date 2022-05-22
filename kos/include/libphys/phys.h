@@ -55,19 +55,19 @@ typedef __size_t size_t;
 
 /************************************************************************/
 /* Low-level physical memory read/write primitives.                     */
-typedef __NOBLOCK __ATTR_WUNUSED __uint8_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSB)(__PHYS physaddr_t addr);
-typedef __NOBLOCK __ATTR_WUNUSED __uint16_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSW)(/*aligned(2)*/ __PHYS physaddr_t addr);
-typedef __NOBLOCK __ATTR_WUNUSED __uint32_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSL)(/*aligned(4)*/ __PHYS physaddr_t addr);
-typedef __NOBLOCK __ATTR_WUNUSED __uint16_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSW_UNALIGNED)(__PHYS physaddr_t addr);
-typedef __NOBLOCK __ATTR_WUNUSED __uint32_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSL_UNALIGNED)(__PHYS physaddr_t addr);
+typedef __NOBLOCK __ATTR_WUNUSED_T __uint8_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSB)(__PHYS physaddr_t addr);
+typedef __NOBLOCK __ATTR_WUNUSED_T __uint16_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSW)(/*aligned(2)*/ __PHYS physaddr_t addr);
+typedef __NOBLOCK __ATTR_WUNUSED_T __uint32_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSL)(/*aligned(4)*/ __PHYS physaddr_t addr);
+typedef __NOBLOCK __ATTR_WUNUSED_T __uint16_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSW_UNALIGNED)(__PHYS physaddr_t addr);
+typedef __NOBLOCK __ATTR_WUNUSED_T __uint32_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSL_UNALIGNED)(__PHYS physaddr_t addr);
 typedef __NOBLOCK void __NOTHROW_T(LIBPHYS_CC *PPOKEPHYSB)(__PHYS physaddr_t addr, __uint8_t value);
 typedef __NOBLOCK void __NOTHROW_T(LIBPHYS_CC *PPOKEPHYSW)(/*aligned(2)*/ __PHYS physaddr_t addr, __uint16_t value);
 typedef __NOBLOCK void __NOTHROW_T(LIBPHYS_CC *PPOKEPHYSL)(/*aligned(4)*/ __PHYS physaddr_t addr, __uint32_t value);
 typedef __NOBLOCK void __NOTHROW_T(LIBPHYS_CC *PPOKEPHYSW_UNALIGNED)(__PHYS physaddr_t addr, __uint16_t value);
 typedef __NOBLOCK void __NOTHROW_T(LIBPHYS_CC *PPOKEPHYSL_UNALIGNED)(__PHYS physaddr_t addr, __uint32_t value);
 #ifdef __UINT64_TYPE__
-typedef __NOBLOCK __ATTR_WUNUSED __uint64_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSQ)(/*aligned(8)*/ __PHYS physaddr_t addr);
-typedef __NOBLOCK __ATTR_WUNUSED __uint64_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSQ_UNALIGNED)(__PHYS physaddr_t addr);
+typedef __NOBLOCK __ATTR_WUNUSED_T __uint64_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSQ)(/*aligned(8)*/ __PHYS physaddr_t addr);
+typedef __NOBLOCK __ATTR_WUNUSED_T __uint64_t __NOTHROW_T(LIBPHYS_CC *PPEEKPHYSQ_UNALIGNED)(__PHYS physaddr_t addr);
 typedef __NOBLOCK void __NOTHROW_T(LIBPHYS_CC *PPOKEPHYSQ)(/*aligned(8)*/ __PHYS physaddr_t addr, __uint64_t value);
 typedef __NOBLOCK void __NOTHROW_T(LIBPHYS_CC *PPOKEPHYSQ_UNALIGNED)(__PHYS physaddr_t addr, __uint64_t value);
 #endif /* __UINT64_TYPE__ */
@@ -124,7 +124,7 @@ LIBPHYS_DECL __NOBLOCK void __NOTHROW(LIBPHYS_CC memsetphys)(__PHYS physaddr_t d
  *
  * @return: * :         Base address of the newly created memory mapping.
  * @return: MAP_FAILED: Operation failed (s.a. `errno') */
-typedef __NOBLOCK __ATTR_WUNUSED void * __NOTHROW_T(LIBPHYS_CC *PMMAPPHYS)(__PHYS physaddr_t addr, size_t num_bytes);
+typedef __NOBLOCK __ATTR_WUNUSED_T void *__NOTHROW_T(LIBPHYS_CC *PMMAPPHYS)(__PHYS physaddr_t addr, size_t num_bytes);
 typedef __NOBLOCK void __NOTHROW_T(LIBPHYS_CC *PMUNMAPPHYS)(void *base, size_t num_bytes);
 #ifdef LIBPHYS_WANT_PROTOTYPES
 LIBPHYS_DECL __NOBLOCK __ATTR_WUNUSED void *__NOTHROW(LIBPHYS_CC mmapphys)(__PHYS physaddr_t addr, size_t num_bytes);
@@ -137,7 +137,7 @@ LIBPHYS_DECL __NOBLOCK void __NOTHROW(LIBPHYS_CC munmapphys)(void *base, size_t 
  * NOTE: Don't try to dup() or close() the file descriptor. - Just  use
  *       it as-is. It will be close()'d automatically once libphys gets
  *       unloaded. */
-typedef __NOBLOCK __ATTR_WUNUSED __fd_t __NOTHROW_T(LIBPHYS_CC PGETDEVMEM)(void);
+typedef __NOBLOCK __ATTR_WUNUSED_T __fd_t __NOTHROW_T(LIBPHYS_CC PGETDEVMEM)(void);
 #ifdef LIBPHYS_WANT_PROTOTYPES
 LIBPHYS_DECL __NOBLOCK __ATTR_WUNUSED __fd_t __NOTHROW(LIBPHYS_CC getdevmem)(void);
 #endif /* LIBPHYS_WANT_PROTOTYPES */

@@ -817,9 +817,9 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_write)(unwind_ste_t const *__restrict __se
  * @param: addrsize: Size of a target address.
  * @param: ptrsize:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
  * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __ATTR_NONNULL((1)) __byte_t const *
-(LIBUNWIND_CC *PUNWIND_INSTRUCTION_SUCC)(__byte_t const *__restrict __unwind_pc,
-                                         __uint8_t __addrsize, __uint8_t __ptrsize);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __byte_t const *
+__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_INSTRUCTION_SUCC)(__byte_t const *__restrict __unwind_pc,
+                                                        __uint8_t __addrsize, __uint8_t __ptrsize);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __byte_t const *
 __NOTHROW_NCX(LIBUNWIND_CC unwind_instruction_succ)(__byte_t const *__restrict __unwind_pc,
@@ -828,12 +828,12 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_instruction_succ)(__byte_t const *__restrict _
 
 /* Return a pointer to a CFI expression that is applicable for `cu_base + module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __byte_t *
-(LIBUNWIND_CC *PDEBUGINFO_LOCATION_SELECT)(di_debuginfo_location_t const *__restrict __self,
-                                           __uintptr_t __cu_base,
-                                           __uintptr_t __module_relative_pc,
-                                           __uint8_t __addrsize,
-                                           __size_t *__restrict __pexpr_length);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 5)) __byte_t *
+__NOTHROW_NCX_T(LIBUNWIND_CC *PDEBUGINFO_LOCATION_SELECT)(di_debuginfo_location_t const *__restrict __self,
+                                                          __uintptr_t __cu_base,
+                                                          __uintptr_t __module_relative_pc,
+                                                          __uint8_t __addrsize,
+                                                          __size_t *__restrict __pexpr_length);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __byte_t *
 __NOTHROW_NCX(LIBUNWIND_CC debuginfo_location_select)(di_debuginfo_location_t const *__restrict __self,

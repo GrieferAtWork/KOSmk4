@@ -179,7 +179,7 @@ DEFINE_CMDLINE_PARAM_STRING_VAR(opt_timeout, "timeout");
 DEFINE_CMDLINE_PARAM_STRING_VAR(opt_transport, "transport");
 DEFINE_CMDLINE_PARAM_STRING_VAR(opt_retry, "retry");
 
-INTERN NONNULL((1)) void (FCALL *PGDBRemote_PutData)(void const *buf, size_t bufsize) = NULL;
+INTERN NONNULL_T((1)) void (FCALL *PGDBRemote_PutData)(void const *buf, size_t bufsize) = NULL;
 INTERN void (FCALL *PGDBRemote_Fini)(void) = NULL;
 
 

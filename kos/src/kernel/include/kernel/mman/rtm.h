@@ -37,7 +37,7 @@ DECL_BEGIN
 struct icpustate;
 struct mrtm_hooks_struct {
 	/* [1..1] Begin transactional execution. */
-	BLOCKING ATTR_RETNONNULL NONNULL((1)) struct icpustate *
+	BLOCKING ATTR_RETNONNULL_T NONNULL_T((1)) struct icpustate *
 	(FCALL *rh_rtm_begin)(struct icpustate *__restrict state);
 };
 

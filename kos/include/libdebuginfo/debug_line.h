@@ -130,9 +130,9 @@ typedef struct {
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 typedef __ATTR_NONNULL_T((1, 2, 3)) unsigned int
-(LIBDEBUGINFO_CC *PDEBUGLINE_LOADUNIT)(__byte_t const **__restrict preader,
-                                       __byte_t const *__restrict text_end,
-                                       di_debugline_unit_t *__restrict result);
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGLINE_LOADUNIT)(__byte_t const **__restrict preader,
+                                                      __byte_t const *__restrict text_end,
+                                                      di_debugline_unit_t *__restrict result);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3)) unsigned int
 __NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadunit)(__byte_t const **__restrict preader,
@@ -148,9 +148,9 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadunit)(__byte_t const **__restrict pr
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 typedef __ATTR_NONNULL_T((1, 2)) unsigned int
-(LIBDEBUGINFO_CC *PDEBUGLINE_SCANUNIT)(di_debugline_unit_t const *__restrict self,
-                                       di_debugline_info_t *__restrict result,
-                                       __uintptr_t module_relative_pc);
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGLINE_SCANUNIT)(di_debugline_unit_t const *__restrict self,
+                                                      di_debugline_info_t *__restrict result,
+                                                      __uintptr_t module_relative_pc);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2)) unsigned int
 __NOTHROW_NCX(LIBDEBUGINFO_CC debugline_scanunit)(di_debugline_unit_t const *__restrict self,

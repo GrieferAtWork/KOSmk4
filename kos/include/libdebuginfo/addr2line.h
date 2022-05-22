@@ -205,10 +205,10 @@ typedef struct {
  *                                    initialized)
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted (`*result' was NULL-initialized). */
 typedef __ATTR_NONNULL_T((1, 2)) unsigned int
-(LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE)(di_addr2line_sections_t const *__restrict sections,
-                                    di_debug_addr2line_t *__restrict result,
-                                    __uintptr_t module_relative_pc,
-                                    __uintptr_t level, __uintptr_t flags);
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE)(di_addr2line_sections_t const *__restrict sections,
+                                                   di_debug_addr2line_t *__restrict result,
+                                                   __uintptr_t module_relative_pc,
+                                                   __uintptr_t level, __uintptr_t flags);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2)) unsigned int
 __NOTHROW_NCX(LIBDEBUGINFO_CC debug_addr2line)(di_addr2line_sections_t const *__restrict sections,
@@ -247,11 +247,11 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
  *                                    In this case, `sections' and `dl_sections' will have both
  *                                    been initialized to all NULL-values. */
 typedef __ATTR_NONNULL_T((2, 3)) unsigned int
-(LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_SECTIONS_LOCK)(module_t *dl_handle,
-                                                  di_addr2line_sections_t *__restrict sections,
-                                                  di_addr2line_dl_sections_t *__restrict dl_sections);
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_SECTIONS_LOCK)(module_t *dl_handle,
+                                                                 di_addr2line_sections_t *__restrict sections,
+                                                                 di_addr2line_dl_sections_t *__restrict dl_sections);
 typedef __ATTR_NONNULL_T((1)) void
-(LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_SECTIONS_UNLOCK)(di_addr2line_dl_sections_t *__restrict dl_sections);
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUG_ADDR2LINE_SECTIONS_UNLOCK)(di_addr2line_dl_sections_t *__restrict dl_sections);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((2, 3)) unsigned int
 __NOTHROW_NCX(LIBDEBUGINFO_CC debug_addr2line_sections_lock)(module_t *dl_handle,

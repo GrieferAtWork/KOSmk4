@@ -79,16 +79,16 @@ __DECL_BEGIN
  * When `num_bytes' is `0', allocate a minimal-size heap block that may
  * not actually contain any usable bytes, though is still distinct from
  * NULL, and must still be `os_heap_free()'d once no longer in use. */
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *
 (os_heap_malloc)(__size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *
 (os_heap_calloc)(__size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
 
 /* Same as `os_heap_malloc()', but return `NULL' on error instead of throwing an exception.
  * In   user-space,  a  `NULL'  return  value  is  also  accompanied  by  `errno == ENOMEM' */
-__ATTR_WUNUSED __ATTR_MALLOC void *
+__ATTR_MALLOC __ATTR_WUNUSED void *
 __NOTHROW(os_heap_malloc_nx)(__size_t __num_bytes, int __gfp);
-__ATTR_WUNUSED __ATTR_MALLOC void *
+__ATTR_MALLOC __ATTR_WUNUSED void *
 __NOTHROW(os_heap_calloc_nx)(__size_t __num_bytes, int __gfp);
 
 /* Re-allocate  `ptr:os_heap_usable_size(ptr)'  into a  `num_bytes'-large heap
@@ -116,12 +116,12 @@ __NOTHROW(os_heap_realloc_in_place_nx)(/*nullable*/ void *__ptr, __size_t __num_
 
 /* Same as `os_heap_malloc()', but ensure that the returned heap block is aligned
  * by  at least `min_alignment' bytes, where `min_alignment' must be a power-of-2 */
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *
 (os_heap_memalign)(__size_t __min_alignment, __size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
 
 /* Same as `os_heap_memalign()', but return `NULL' on error instead of throwing an exception.
  * In   user-space,  a  `NULL'   return  value  is   also  accompanied  by  `errno == ENOMEM' */
-__ATTR_WUNUSED __ATTR_MALLOC void *
+__ATTR_MALLOC __ATTR_WUNUSED void *
 __NOTHROW(os_heap_memalign_nx)(__size_t __min_alignment, __size_t __num_bytes, int __gfp);
 
 /* Returns  the # of usable bytes of memory  within the heap block indicated by `ptr'
@@ -154,17 +154,17 @@ void __NOTHROW(os_heap_free)(/*nullable*/ void *__ptr);
  * expectation for user-space API functions is to return NULL/errno=ENOMEM,
  * while the general expectation for kernel-space is to throw an exception) */
 #ifdef __KERNEL__
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *(os_heap_malloc_unx)(__size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *(os_heap_calloc_unx)(__size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *(os_heap_malloc_unx)(__size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *(os_heap_calloc_unx)(__size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
 __ATTR_RETNONNULL __ATTR_WUNUSED void *(os_heap_realloc_unx)(/*nullable*/ void *__ptr, __size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
 __ATTR_RETNONNULL __ATTR_WUNUSED void *(os_heap_realloc_in_place_unx)(/*nullable*/ void *__ptr, __size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
-__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALLOC void *(os_heap_memalign_unx)(__size_t __min_alignment, __size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
+__ATTR_RETNONNULL __ATTR_MALLOC __ATTR_WUNUSED void *(os_heap_memalign_unx)(__size_t __min_alignment, __size_t __num_bytes, int __gfp) __THROWS(E_BADALLOC);
 #else /* __KERNEL__ */
-__ATTR_WUNUSED __ATTR_MALLOC void *__NOTHROW(os_heap_malloc_unx)(__size_t __num_bytes, int __gfp);
-__ATTR_WUNUSED __ATTR_MALLOC void *__NOTHROW(os_heap_calloc_unx)(__size_t __num_bytes, int __gfp);
+__ATTR_MALLOC __ATTR_WUNUSED void *__NOTHROW(os_heap_malloc_unx)(__size_t __num_bytes, int __gfp);
+__ATTR_MALLOC __ATTR_WUNUSED void *__NOTHROW(os_heap_calloc_unx)(__size_t __num_bytes, int __gfp);
 __ATTR_WUNUSED void *__NOTHROW(os_heap_realloc_unx)(/*nullable*/ void *__ptr, __size_t __num_bytes, int __gfp);
 __ATTR_WUNUSED void *__NOTHROW(os_heap_realloc_in_place_unx)(/*nullable*/ void *__ptr, __size_t __num_bytes, int __gfp);
-__ATTR_WUNUSED __ATTR_MALLOC void *__NOTHROW(os_heap_memalign_unx)(__size_t __min_alignment, __size_t __num_bytes, int __gfp);
+__ATTR_MALLOC __ATTR_WUNUSED void *__NOTHROW(os_heap_memalign_unx)(__size_t __min_alignment, __size_t __num_bytes, int __gfp);
 #endif /* !__KERNEL__ */
 #elif defined(__KERNEL__)
 #define os_heap_malloc(num_bytes, gfp)                      kmalloc(num_bytes, gfp)

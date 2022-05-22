@@ -38,12 +38,12 @@ struct fcpustate;
 
 struct kernel_debugtraps {
 	/* NOTE: Either all callbacks from this structure are defined, or none of them are. */
-	ATTR_RETNONNULL NONNULL((1, 2)) struct icpustate *(FCALL *dt_trap_icpustate)(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-	ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *(FCALL *dt_trap_scpustate)(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-	ATTR_RETNONNULL NONNULL((1, 2)) struct ucpustate *(FCALL *dt_trap_ucpustate)(struct ucpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-	ATTR_RETNONNULL NONNULL((1, 2)) struct kcpustate *(FCALL *dt_trap_kcpustate)(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-	ATTR_RETNONNULL NONNULL((1, 2)) struct lcpustate *(FCALL *dt_trap_lcpustate)(struct lcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-	ATTR_RETNONNULL NONNULL((1, 2)) struct fcpustate *(FCALL *dt_trap_fcpustate)(struct fcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct icpustate *(FCALL *dt_trap_icpustate)(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct scpustate *(FCALL *dt_trap_scpustate)(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct ucpustate *(FCALL *dt_trap_ucpustate)(struct ucpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct kcpustate *(FCALL *dt_trap_kcpustate)(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct lcpustate *(FCALL *dt_trap_lcpustate)(struct lcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct fcpustate *(FCALL *dt_trap_fcpustate)(struct fcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
 };
 
 

@@ -44,7 +44,7 @@ typedef unsigned char bitstr_t;
 /* Allocate  a  zero-initialized   bitstring  on  the   heap.
  * If the allocation fails, then this function returns `NULL' */
 #ifdef __INTELLISENSE__
-__ATTR_WUNUSED __ATTR_MALLOC bitstr_t *(bit_alloc)(int nbits);
+__ATTR_MALLOC __ATTR_WUNUSED bitstr_t *(bit_alloc)(int nbits);
 #else /* __INTELLISENSE__ */
 #define bit_alloc(nbits) (bitstr_t *)__libc_calloc((__size_t)bitstr_size(nbits), sizeof(bitstr_t))
 #endif /* !__INTELLISENSE__ */

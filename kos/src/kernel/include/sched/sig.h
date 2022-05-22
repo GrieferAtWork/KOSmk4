@@ -363,7 +363,8 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_nopr)(struct sig *__restrict self,
 struct sig_cleanup_callback;
 struct sig_cleanup_callback {
 	/* [1..1] Cleanup callback. */
-	NOBLOCK NOPREEMPT void NOTHROW_T(FCALL *scc_cb)(struct sig_cleanup_callback *self);
+	NOBLOCK NOPREEMPT NONNULL_T((1)) void
+	NOTHROW_T(FCALL *scc_cb)(struct sig_cleanup_callback *self);
 	/* User-data goes here. */
 };
 

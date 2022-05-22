@@ -430,9 +430,9 @@ struct aio_multihandle;
  * successfully. In the event of an I/O error, this function will re-throw said error. */
 FUNDEF BLOCKING NONNULL((1, 2)) void KCALL
 mfile_dosyncio(struct mfile *__restrict self,
-               NONNULL((1, 5)) void (KCALL *io)(struct mfile *__restrict self, pos_t addr,
-                                                physaddr_t buf, size_t num_bytes,
-                                                struct aio_multihandle *__restrict aio),
+               NONNULL_T((1, 5)) void (KCALL *io)(struct mfile *__restrict self, pos_t addr,
+                                                  physaddr_t buf, size_t num_bytes,
+                                                  struct aio_multihandle *__restrict aio),
                pos_t addr, physaddr_t buf, size_t num_bytes);
 
 /* Read/Write whole file blocks using direct I/O
@@ -478,7 +478,7 @@ struct mfile_ops {
 	 * The caller will  have already finalized  all mfile-fields,  and
 	 * this operator is now supposed to finalize any sub-class fields,
 	 * as well as kfree(self). */
-	NOBLOCK NONNULL((1)) void
+	NOBLOCK NONNULL_T((1)) void
 	NOTHROW_T(KCALL *mo_destroy)(struct mfile *__restrict self);
 
 	/* [0..1] Construct a new given mem-part. When not implemented, use the default
@@ -511,7 +511,7 @@ struct mfile_ops {
 	 *  - mp_blkst_ptr / mp_blkst_inl    (Containing the fully initialized initial block-status bitset)
 	 *  - mp_mem / mp_mem_sc / ...       (Containing the initial backing storage location; s.a. `mp_state')
 	 *  - mp_meta                        (usually `NULL') */
-	ATTR_RETNONNULL NONNULL((1)) REF struct mpart *
+	ATTR_RETNONNULL_T NONNULL_T((1)) REF struct mpart *
 	(KCALL *mo_newpart)(struct mfile *__restrict self,
 	                    PAGEDIR_PAGEALIGNED pos_t minaddr,
 	                    PAGEDIR_PAGEALIGNED size_t num_bytes)
@@ -539,7 +539,7 @@ struct mfile_ops {
 	 *       indefinitely,  as it may be called in the context of async workers, which may
 	 *       otherwise become locked-up. The intend is to use `aio' if the operation would
 	 *       need to block for an unspecified amount of time. */
-	BLOCKING NONNULL((1, 5)) void
+	BLOCKING NONNULL_T((1, 5)) void
 	(KCALL *mo_loadblocks)(struct mfile *__restrict self, pos_t addr,
 	                       physaddr_t buf, size_t num_bytes,
 	                       struct aio_multihandle *__restrict aio);
@@ -557,7 +557,7 @@ struct mfile_ops {
 	 *       indefinitely,  as it may be called in the context of async workers, which may
 	 *       otherwise become locked-up. The intend is to use `aio' if the operation would
 	 *       need to block for an unspecified amount of time. */
-	BLOCKING NONNULL((1, 5)) void
+	BLOCKING NONNULL_T((1, 5)) void
 	(KCALL *mo_saveblocks)(struct mfile *__restrict self, pos_t addr,
 	                       physaddr_t buf, size_t num_bytes,
 	                       struct aio_multihandle *__restrict aio);
@@ -567,7 +567,7 @@ struct mfile_ops {
 	 * @param: newflags: New file flags. (set of `MFILE_F_*')
 	 *                   Contains at least one of `MFILE_F_CHANGED | MFILE_F_ATTRCHANGED'
 	 *                   that wasn't already contained in `oldflags' */
-	NOBLOCK NONNULL((1)) void
+	NOBLOCK NONNULL_T((1)) void
 	NOTHROW_T(KCALL *mo_changed)(struct mfile *__restrict self,
 	                             uintptr_t oldflags, uintptr_t newflags);
 

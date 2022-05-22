@@ -435,7 +435,7 @@ INTDEF void FCALL GDBRemote_Fini(void);
 INTDEF void (FCALL *PGDBRemote_Fini)(void);
 
 /* Send data to the GDB remote. */
-INTDEF NONNULL((1)) void (FCALL *PGDBRemote_PutData)(void const *buf, size_t bufsize);
+INTDEF NONNULL_T((1)) void (FCALL *PGDBRemote_PutData)(void const *buf, size_t bufsize);
 #define GDBRemote_PutData(buf, bufsize) (*PGDBRemote_PutData)(buf, bufsize)
 
 

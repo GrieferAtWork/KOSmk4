@@ -82,7 +82,7 @@ struct printnode_ops {
 	 *       the return value after  every call) In this  regard, this function can  be
 	 *       implemented a little more relaxed when compared to "normal" pformatprinter
 	 *       conventions. */
-	BLOCKING NONNULL((1, 2)) void
+	BLOCKING NONNULL_T((1, 2)) void
 	(KCALL *pno_print)(struct printnode *__restrict self,
 	                   pformatprinter printer, void *arg,
 	                   pos_t offset_hint)

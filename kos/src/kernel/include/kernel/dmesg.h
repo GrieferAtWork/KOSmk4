@@ -123,7 +123,7 @@ dmesg_getmessage(USER CHECKED char *buffer,
  *                 messages that may have been skipped due to `offset'
  * @return: >= 0:  Success (continue enumeration)
  * @return: < 0:   Error (stop enumeration and have `dmesg_enum()' return this same value) */
-typedef NONNULL((2)) ssize_t
+typedef NONNULL_T((2)) ssize_t
 (KCALL *dmesg_enum_t)(void *arg, struct syslog_packet *__restrict packet,
                       unsigned int level, unsigned int nth);
 

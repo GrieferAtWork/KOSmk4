@@ -56,7 +56,7 @@ struct mrtm_hooks_struct {
 	 * When invoked, `state' will point to the first instruction to-be executed
 	 * in transactional  execution mode,  whilst  `fallback_ip' points  to  the
 	 * instruction  to which to  jump in the event  of the transaction failing. */
-	ATTR_RETNONNULL NONNULL((1)) struct icpustate *
+	ATTR_RETNONNULL_T NONNULL_T((1)) struct icpustate *
 	(FCALL *rh_xbegin)(struct icpustate *__restrict state,
 	                   void const *fallback_ip);
 };

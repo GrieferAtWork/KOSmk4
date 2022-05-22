@@ -143,7 +143,7 @@ struct ffilesys {
 		 * @param: dev: [0..0][FFILESYS_F_NODEV] Always NULL
 		 * @return: * : A new instance of a superblock for `dev'
 		 * @return: NULL: `dev' cannot be mounted using this filesystem. */
-		BLOCKING WUNUSED NONNULL((1)) struct fsuper *
+		BLOCKING WUNUSED_T NONNULL_T((1)) struct fsuper *
 		(KCALL *ffs_open)(struct ffilesys *__restrict filesys,
 		                  struct mfile *dev, UNCHECKED USER char *args)
 				THROWS(E_BADALLOC, E_IOERROR, E_FSERROR_CORRUPTED_FILE_SYSTEM, ...);

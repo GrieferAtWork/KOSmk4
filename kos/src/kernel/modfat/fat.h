@@ -385,8 +385,8 @@ struct fatlnknode: flnknode {
 #define mfile_asfatsup(self) FatDirNode_AsSuper(mfile_asfatdir(self))
 
 
-typedef NOBLOCK NONNULL((1)) FatClusterIndex (FCALL *PFatGetFatIndirection)(FatSuperblock const *__restrict self, FatClusterIndex index);
-typedef NOBLOCK NONNULL((1)) void (FCALL *PFatSetFatIndirection)(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target);
+typedef NOBLOCK NONNULL_T((1)) FatClusterIndex (FCALL *PFatGetFatIndirection)(FatSuperblock const *__restrict self, FatClusterIndex index);
+typedef NOBLOCK NONNULL_T((1)) void (FCALL *PFatSetFatIndirection)(FatSuperblock *__restrict self, FatClusterIndex index, FatClusterIndex indirection_target);
 
 struct fatsuper {
 	mode_t                  ft_mode;        /* [valid_if(!(ft_features & FAT_FEATURE_ARB))] Default permissions for every file on this filesystem (Defaults to 0777). */

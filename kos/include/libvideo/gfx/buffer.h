@@ -62,20 +62,20 @@ struct video_buffer_ops {
 	/* NOTE: _ALL_ Callbacks are always [1..1] */
 
 	/* Buffer finalization. */
-	__ATTR_NONNULL((1)) void
+	__ATTR_NONNULL_T((1)) void
 	(LIBVIDEO_GFX_CC *vi_destroy)(struct video_buffer *__restrict __self);
 
 	/* Lock the video buffer into memory.
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
-	__ATTR_NONNULL((1, 2))
-	int (LIBVIDEO_GFX_CC *vi_lock)(struct video_buffer *__restrict __self,
-	                               struct video_lock *__restrict __result);
+	__ATTR_NONNULL_T((1, 2)) int
+	(LIBVIDEO_GFX_CC *vi_lock)(struct video_buffer *__restrict __self,
+	                           struct video_lock *__restrict __result);
 
 	/* Unlock a video buffer that had previously been mapped into memory. */
-	__ATTR_NONNULL((1, 2))
-	void (LIBVIDEO_GFX_CC *vi_unlock)(struct video_buffer *__restrict __self,
-	                                  struct video_lock const *__restrict __lock);
+	__ATTR_NONNULL_T((1, 2)) void
+	__NOTHROW_T(LIBVIDEO_GFX_CC *vi_unlock)(struct video_buffer *__restrict __self,
+	                                        struct video_lock const *__restrict __lock);
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: blendmode: Pixel blending mode  for graphics operations  targeting this  buffer.
@@ -92,7 +92,7 @@ struct video_buffer_ops {
 	 * @param: clip:      When non-NULL, specify  a clip-rect  to which drawing  should be  restricted.
 	 *                    All canvas coords  will be  relative to this  rectangle, and  and attempt  to
 	 *                    access a pixel outside this rect will be a no-op / appear to be fully opaque. */
-	__ATTR_NONNULL((1, 2)) void
+	__ATTR_NONNULL_T((1, 2)) void
 	(LIBVIDEO_GFX_CC *vi_getgfx)(struct video_buffer *__restrict __self,
 	                             struct video_gfx *__restrict __result,
 	                             gfx_blendmode_t __blendmode, __uintptr_t __flags,
@@ -102,7 +102,7 @@ struct video_buffer_ops {
 	/* Clip the given `gfx', given a set of coords relative to the current clip state `gfx',
 	 * and store the newly created  GFX context in `*result'  (note that `gfx' and  `result'
 	 * may be identical for this purpose!) */
-	__ATTR_NONNULL((1, 2)) void
+	__ATTR_NONNULL_T((1, 2)) void
 	(LIBVIDEO_GFX_CC *vi_clipgfx)(struct video_gfx const *__gfx,
 	                              struct video_gfx *__result,
 	                              __intptr_t __start_x, __intptr_t __start_y,

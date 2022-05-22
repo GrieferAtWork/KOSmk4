@@ -41,7 +41,7 @@ struct devdiskruledir;
 
 /* Lookup a block-device for this rule, given its name (Used to implement `dno_lookup')
  * @return: NULL: No known block device is being named. */
-typedef WUNUSED NONNULL((1, 2)) REF struct blkdev *
+typedef WUNUSED_T NONNULL_T((1, 2)) REF struct blkdev *
 (KCALL *devdiskruledir_byname_t)(struct devdiskruledir *__restrict self,
                                  struct flookup_info *__restrict info);
 
@@ -51,7 +51,7 @@ typedef WUNUSED NONNULL((1, 2)) REF struct blkdev *
  *                  `variant' number (which  starts at  `0') is  used
  *                  to enumerate the different names. Enumation stops
  *                  on the first variant that returns `0'. */
-typedef WUNUSED NONNULL((1, 2, 4)) ssize_t
+typedef WUNUSED_T NONNULL_T((1, 2, 4)) ssize_t
 (KCALL *devdiskruledir_toname_t)(struct devdiskruledir *__restrict self,
                                  __pformatprinter printer, void *arg,
                                  struct blkdev *__restrict dev,

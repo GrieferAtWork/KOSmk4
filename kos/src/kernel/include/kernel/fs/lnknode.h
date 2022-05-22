@@ -44,7 +44,7 @@ struct flnknode_ops {
 	 * @return: * : The required buffer size. (EXCLUDING a terminating NUL-character)
 	 * @throw: E_SEGFAULT: The given user-buffer is faulty.
 	 * @throw: E_IOERROR:  Failed to read data from disk. */
-	BLOCKING WUNUSED NONNULL((1)) size_t
+	BLOCKING WUNUSED_T NONNULL_T((1)) size_t
 	(KCALL *lno_readlink)(struct flnknode *__restrict self,
 	                      USER CHECKED /*utf-8*/ char *buf,
 	                      size_t bufsize)
@@ -71,7 +71,7 @@ struct flnknode_ops {
 	 *
 	 * This operator is optional and need not necessarily be implemented, but
 	 * if implemented, it must never return `NULL'! */
-	BLOCKING /*ATTR_PURE*/ ATTR_RETNONNULL NONNULL((1)) char const *
+	BLOCKING ATTR_PURE_T ATTR_RETNONNULL_T NONNULL_T((1)) char const *
 	(KCALL *lno_linkstr)(struct flnknode *__restrict self)
 			THROWS(E_IOERROR, E_BADALLOC, ...);
 
@@ -91,7 +91,7 @@ struct flnknode_ops {
 	 *
 	 * This operator is mainly needed to implement the special dup()-behavior
 	 * of `open("/proc/[pid]/fd/[no]")' */
-	BLOCKING WUNUSED NONNULL((1, 2, 3, 4)) __BOOL
+	BLOCKING WUNUSED_T NONNULL_T((1, 2, 3, 4)) __BOOL
 	(KCALL *lno_openlink)(struct flnknode *__restrict self,
 	                      struct handle *__restrict result,
 	                      struct path *__restrict access_path,
@@ -112,7 +112,7 @@ struct flnknode_ops {
 	 *       check  that `*presult_path' is reachable from `fs_getroot(THIS_FS)'!
 	 *
 	 * @return: NULL: Same as not implementing this operator (use normal semantics) */
-	BLOCKING WUNUSED NONNULL((1, 2, 3, 4)) REF struct fnode *
+	BLOCKING WUNUSED_T NONNULL_T((1, 2, 3, 4)) REF struct fnode *
 	(KCALL *lno_expandlink)(struct flnknode *__restrict self,
 	                        /*out[1..1]*/ REF struct path **__restrict presult_path,
 	                        /*out[1..1]*/ REF struct fdirent **__restrict presult_dirent,
@@ -129,7 +129,7 @@ struct flnknode_ops {
 	 *       directory!
 	 *
 	 * @return: NULL: Same as not implementing this operator (use normal semantics) */
-	BLOCKING WUNUSED NONNULL((1, 2)) REF struct path *
+	BLOCKING WUNUSED_T NONNULL_T((1, 2)) REF struct path *
 	(KCALL *lno_walklink)(struct flnknode *__restrict self,
 	                      /*in|out*/ u32 *__restrict premaining_symlinks)
 			THROWS(E_IOERROR, E_BADALLOC, ...);

@@ -65,14 +65,14 @@ typedef __pos64_t vio_addr_t;
 /* Argument structure passed to VIO callbacks. */
 struct vioargs {
 	struct vio_ops const *va_ops;          /* [1..1][== va_file->mf_ops->dt_vio] */
-	void                       *va_acmap_page;   /* Page-aligned virtual base address of the accessed mapping (== mmap:return). */
-	vio_addr_t                  va_acmap_offset; /* VIO file offset at `va_acmap_page' (== mmap:offset). */
-	vio_cpustate_t             *va_state;        /* [0..1][in|out] The CPU  state at the  time of the  access
-	                                              * being made (or `NULL' when accessed through other means). */
+	void                 *va_acmap_page;   /* Page-aligned virtual base address of the accessed mapping (== mmap:return). */
+	vio_addr_t            va_acmap_offset; /* VIO file offset at `va_acmap_page' (== mmap:offset). */
+	vio_cpustate_t       *va_state;        /* [0..1][in|out] The CPU  state at the  time of the  access
+	                                        * being made (or `NULL' when accessed through other means). */
 #ifdef __KERNEL__
-	struct mfile               *va_file;         /* [1..1] The mem-file that is being accessed. */
+	struct mfile         *va_file;         /* [1..1] The mem-file that is being accessed. */
 #else /* __KERNEL__ */
-	void                       *va_cookie;       /* [?..?] The cookie registered alongside the VIO mapping. */
+	void                 *va_cookie;       /* [?..?] The cookie registered alongside the VIO mapping. */
 #endif /* !__KERNEL__ */
 };
 
@@ -122,94 +122,94 @@ struct vio_ops {
 	 */
 	struct {
 		/* [0..1] Read memory */
-		__ATTR_NONNULL((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr);
-		__ATTR_NONNULL((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr);
-		__ATTR_NONNULL((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr);
+		__ATTR_NONNULL_T((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr);
+		__ATTR_NONNULL_T((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr);
+		__ATTR_NONNULL_T((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr);
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-		__ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr);
+		__ATTR_NONNULL_T((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} vo_read;
 
 	struct {
 		/* [0..1] Write memory */
-		__ATTR_NONNULL((1)) void (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t value);
-		__ATTR_NONNULL((1)) void (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t value);
-		__ATTR_NONNULL((1)) void (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t value);
+		__ATTR_NONNULL_T((1)) void (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t value);
+		__ATTR_NONNULL_T((1)) void (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t value);
+		__ATTR_NONNULL_T((1)) void (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t value);
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-		__ATTR_NONNULL((1)) void (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t value);
+		__ATTR_NONNULL_T((1)) void (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t value);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} vo_write;
 
 	struct {
 		/* [0..1] Return the old value (regardless of the compare-exchange having been successful) */
-		__ATTR_NONNULL((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t oldvalue, __uint8_t newvalue, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t oldvalue, __uint16_t newvalue, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t oldvalue, __uint32_t newvalue, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t oldvalue, __uint8_t newvalue, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t oldvalue, __uint16_t newvalue, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t oldvalue, __uint32_t newvalue, __BOOL atomic);
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)
-		__ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t oldvalue, __uint64_t newvalue, __BOOL atomic);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD || LIBVIO_CONFIG_HAVE_QWORD_CMPXCH */
 #ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
-		__ATTR_NONNULL((1)) __hybrid_uint128_t (LIBVIO_CC *f_xword)(struct vioargs *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __hybrid_uint128_t (LIBVIO_CC *f_xword)(struct vioargs *__restrict args, vio_addr_t addr, __hybrid_uint128_t oldvalue, __hybrid_uint128_t newvalue, __BOOL atomic);
 #endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
 	} vo_cmpxch;
 
 	struct {
 		/* [0..1] Return the old value */
-		__ATTR_NONNULL((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t newvalue, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t newvalue, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t newvalue, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t newvalue, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t newvalue, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t newvalue, __BOOL atomic);
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-		__ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t newvalue, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t newvalue, __BOOL atomic);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} vo_xch;
 
 	struct {
 		/* [0..1] Return the old value (prior to be `value' being added) */
-		__ATTR_NONNULL((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t value, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t value, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t value, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t value, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t value, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t value, __BOOL atomic);
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-		__ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t value, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t value, __BOOL atomic);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} vo_add;
 
 	struct {
 		/* [0..1] Return the old value (prior to be `value' being subtracted) */
-		__ATTR_NONNULL((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t value, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t value, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t value, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t value, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t value, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t value, __BOOL atomic);
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-		__ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t value, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t value, __BOOL atomic);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} vo_sub;
 
 	struct {
 		/* [0..1] Return the old value (prior to be `mask' being anded) */
-		__ATTR_NONNULL((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t mask, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t mask, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t mask, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t mask, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t mask, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t mask, __BOOL atomic);
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-		__ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t mask, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t mask, __BOOL atomic);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} vo_and;
 
 	struct {
 		/* [0..1] Return the old value (prior to be `mask' being or'd) */
-		__ATTR_NONNULL((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t mask, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t mask, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t mask, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t mask, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t mask, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t mask, __BOOL atomic);
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-		__ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t mask, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t mask, __BOOL atomic);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} vo_or;
 
 	struct {
 		/* [0..1] Return the old value (prior to be `mask' being xor'd) */
-		__ATTR_NONNULL((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t mask, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t mask, __BOOL atomic);
-		__ATTR_NONNULL((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t mask, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint8_t  (LIBVIO_CC *f_byte)(struct vioargs *__restrict args, vio_addr_t addr, __uint8_t mask, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint16_t (LIBVIO_CC *f_word)(struct vioargs *__restrict args, vio_addr_t addr, __uint16_t mask, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint32_t (LIBVIO_CC *f_dword)(struct vioargs *__restrict args, vio_addr_t addr, __uint32_t mask, __BOOL atomic);
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
-		__ATTR_NONNULL((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t mask, __BOOL atomic);
+		__ATTR_NONNULL_T((1)) __uint64_t (LIBVIO_CC *f_qword)(struct vioargs *__restrict args, vio_addr_t addr, __uint64_t mask, __BOOL atomic);
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 	} vo_xor;
 
@@ -235,6 +235,7 @@ struct vio_ops {
 	 * >> int x = (*vio_function)(10, 20);
 	 * >>
 	 * >> printf("x = %d\n", x); */
+	__ATTR_NONNULL_T((1))
 	void (LIBVIO_CC *vo_call)(struct vioargs *__restrict args, vio_addr_t addr);
 };
 
@@ -348,7 +349,7 @@ __NOTHROW_NCX(LIBVIO_CC vio_create)(struct vio_ops const *ops, void *cookie,
 /* vio_destroy(3):
  * >> int vio_destroy(fd_t fd);
  * Destroy a VIO file descriptor previously created by `vio_create(3)' */
-typedef int /*__NOTHROW_NCX*/ (LIBVIO_CC *PVIO_DESTROY)(__fd_t fd);
+typedef int __NOTHROW_NCX_T(LIBVIO_CC *PVIO_DESTROY)(__fd_t fd);
 #ifdef LIBVIO_WANT_PROTOTYPES
 LIBVIO_DECL int __NOTHROW_NCX(LIBVIO_CC vio_destroy)(__fd_t fd);
 #endif /* LIBVIO_WANT_PROTOTYPES */
