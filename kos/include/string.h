@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73eb5d37 */
+/* HASH CRC-32:0x44dcde91 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -701,14 +701,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
  * space  for doing so is available, up to the `strlen(src)' of
  * the first characters  are copied from  `src'. All  remaining
  * characters are always set  to '\0'. Always re-returns  `buf' */
-__CEIDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strncpy,(char *__restrict __buf, char const *__restrict __src, size_t __buflen),{ return __builtin_strncpy(__buf, __src, __buflen); })
+__CEIDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strncpy,(char *__restrict __buf, char const *__restrict __src, size_t __buflen),{ return __builtin_strncpy(__buf, __src, __buflen); })
 #elif defined(__CRT_HAVE_strncpy)
 /* >> strncpy(3)
  * Always write exactly `buflen' characters to `buf'. As far as
  * space  for doing so is available, up to the `strlen(src)' of
  * the first characters  are copied from  `src'. All  remaining
  * characters are always set  to '\0'. Always re-returns  `buf' */
-__CDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strncpy,(char *__restrict __buf, char const *__restrict __src, size_t __buflen),(__buf,__src,__buflen))
+__CDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strncpy,(char *__restrict __buf, char const *__restrict __src, size_t __buflen),(__buf,__src,__buflen))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/string/strncpy.h>
@@ -718,7 +718,7 @@ __NAMESPACE_STD_BEGIN
  * space  for doing so is available, up to the `strlen(src)' of
  * the first characters  are copied from  `src'. All  remaining
  * characters are always set  to '\0'. Always re-returns  `buf' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strncpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strncpy)(char *__restrict __buf, char const *__restrict __src, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncpy))(__buf, __src, __buflen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strncpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strncpy)(char *__restrict __buf, char const *__restrict __src, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncpy))(__buf, __src, __buflen); })
 #endif /* !... */
 #if __has_builtin(__builtin_strcat) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcat)
 /* >> strcat(3)

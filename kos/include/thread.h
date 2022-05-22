@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf41ed618 */
+/* HASH CRC-32:0x8cdbbe9f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -172,10 +172,10 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,thr_setprio,(thread_t __thr, int __priority)
 __NAMESPACE_LOCAL_USING_OR_IMPL(thr_setprio, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_NCX(__LIBCCALL thr_setprio)(thread_t __thr, int __priority) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_setprio))(__thr, __priority); })
 #endif /* ... */
 #ifdef __CRT_HAVE_thr_getprio
-__CDECLARE(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,thr_getprio,(thread_t __thr, int *__p_priority),(__thr,__p_priority))
+__CDECLARE(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,thr_getprio,(thread_t __thr, int *__p_priority),(__thr,__p_priority))
 #elif defined(__CRT_HAVE_pthread_getschedparam)
 #include <libc/local/thread/thr_getprio.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(thr_getprio, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) __errno_t __NOTHROW_NCX(__LIBCCALL thr_getprio)(thread_t __thr, int *__p_priority) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_getprio))(__thr, __p_priority); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thr_getprio, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(2) __errno_t __NOTHROW_NCX(__LIBCCALL thr_getprio)(thread_t __thr, int *__p_priority) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thr_getprio))(__thr, __p_priority); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_key_create
 /* >> pthread_key_create(3)

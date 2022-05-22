@@ -26,7 +26,7 @@ BEGIN
 		"-Os", "-fno-rtti", "-ffreestanding",
 
 		/* Don't make  assumptions  based  on  __attribute__((nonnull))
-		 * We use the attribut on  API functions for stuff like  module
+		 * We  use the attribute on API functions for stuff like module
 		 * handles, but user-code of the library might still pass NULL,
 		 * which we need to handle via `dlerror()'
 		 *

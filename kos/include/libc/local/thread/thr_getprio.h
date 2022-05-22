@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8c3adc1 */
+/* HASH CRC-32:0xc092585 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_OUT(2) __ATTR_OUT(3),__errno_t,__NOTHROW_NCX,__localdep_pthre
 __NAMESPACE_LOCAL_END
 #include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(thr_getprio) __ATTR_NONNULL((2)) __errno_t
+__LOCAL_LIBC(thr_getprio) __ATTR_OUT(2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thr_getprio))(__pthread_t __thr, int *__p_priority) {
 	__errno_t __result;
 	struct sched_param __param;

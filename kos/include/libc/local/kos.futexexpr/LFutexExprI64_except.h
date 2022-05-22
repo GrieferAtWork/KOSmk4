@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44dbd4c6 */
+/* HASH CRC-32:0xd7a40845 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_LFutexExpr64_except_defined
 #define __local___localdep_LFutexExpr64_except_defined
 #if defined(__CRT_HAVE_LFutexExpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,__localdep_LFutexExpr64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__THROWING,__localdep_LFutexExpr64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExpr64)
-__CREDIRECT(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,__localdep_LFutexExpr64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__THROWING,__localdep_LFutexExpr64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExpr)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.futexexpr/LFutexExpr64_except.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/except.h>
 #endif /* __BUILDING_LIBC || !__CRT_HAVE_LFutexExprI */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(LFutexExprI64_except) __ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)) int
+__LOCAL_LIBC(LFutexExprI64_except) __ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(LFutexExprI64_except))(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags) __THROWS(...) {
 #ifdef __CRT_HAVE_LFutexExprI
 	struct __timespec32 __tms32;

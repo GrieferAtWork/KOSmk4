@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac129817 */
+/* HASH CRC-32:0xa266ce96 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,9 +39,9 @@ DECL_BEGIN
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
-INTDEF NONNULL((1, 4)) int NOTHROW_NCX(LIBCCALL libc_glob)(char const *__restrict pattern, __STDC_INT_AS_UINT_T flags, int (LIBKCALL *errfunc)(char const *path, int flags), glob_t *__restrict pglob);
+INTDEF ATTR_IN(1) ATTR_OUT(4) int NOTHROW_NCX(LIBCCALL libc_glob)(char const *__restrict pattern, __STDC_INT_AS_UINT_T flags, int (LIBKCALL *errfunc)(char const *path, int flags), glob_t *__restrict pglob);
 /* >> globfree(3), globfree64(3) */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob);
+INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob);
 /* >> glob(3), glob64(3)
  * @param: flags: Set of `GLOB_ERR | GLOB_MARK  | GLOB_NOSORT | GLOB_DOOFFS  |
  *                GLOB_NOCHECK  | GLOB_APPEND |  GLOB_NOESCAPE | GLOB_PERIOD |
@@ -51,9 +51,9 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob);
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
-INTDEF NONNULL((1, 4)) int NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern, __STDC_INT_AS_UINT_T flags, int (LIBKCALL *errfunc)(char const *path, int flags), struct __glob64_struct *__restrict pglob);
+INTDEF ATTR_IN(1) ATTR_OUT(4) int NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern, __STDC_INT_AS_UINT_T flags, int (LIBKCALL *errfunc)(char const *path, int flags), struct __glob64_struct *__restrict pglob);
 /* >> globfree(3), globfree64(3) */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob);
+INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob);
 #endif /* !__KERNEL__ */
 
 DECL_END

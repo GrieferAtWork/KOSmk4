@@ -138,7 +138,7 @@ int sem_unlink([[in]] const char *name);
 @@@return: 0:  Success
 @@@return: -1: [errno=EINTR] Interrupted.
 [[cp, decl_include("<bits/crt/semaphore.h>")]]
-int sem_wait([[nonnull]] sem_t *self);
+int sem_wait([[inout]] sem_t *self);
 
 [[cp, doc_alias("sem_timedwait"), ignore, nocrt, alias("sem_timedwait")]]
 [[decl_include("<bits/crt/semaphore.h>", "<bits/os/timespec.h>")]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5234e82c */
+/* HASH CRC-32:0xda985144 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,7 +146,7 @@ NOTHROW_NCX(LIBCCALL libc_thr_setprio)(thread_t thr,
 	return result;
 }
 #include <bits/os/sched.h>
-INTERN ATTR_SECTION(".text.crt.sched.threads") NONNULL((2)) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_thr_getprio)(thread_t thr,
                                        int *p_priority) {
 	errno_t result;

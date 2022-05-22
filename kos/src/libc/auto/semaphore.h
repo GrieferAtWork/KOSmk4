@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fb7bb49 */
+/* HASH CRC-32:0xf8251f09 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,7 +87,7 @@ INTDEF ATTR_IN(1) int NOTHROW_RPC_KOS(LIBDCALL libd_sem_unlink)(const char *name
  * point in time, keep on blocking.
  * @return: 0:  Success
  * @return: -1: [errno=EINTR] Interrupted. */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sem_wait)(sem_t *self);
+INTDEF ATTR_INOUT(1) int NOTHROW_RPC(LIBDCALL libd_sem_wait)(sem_t *self);
 /* >> sem_timedwait(3), sem_timedwait64(3)
  * Wait  for a  ticket to become  available to the  given semaphore `self'
  * Once a ticket has become available, consume it and return. If no ticket

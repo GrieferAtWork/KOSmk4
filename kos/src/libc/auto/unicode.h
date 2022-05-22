@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81325f13 */
+/* HASH CRC-32:0x71cc44c0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,11 +69,11 @@ INTDEF ATTR_INOUT(1) NONNULL((2)) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_rea
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-INTDEF ATTR_INOUT(1) NONNULL((2)) char32_t NOTHROW_NCX(LIBDCALL libd_unicode_readutf8_rev_n)(char const **__restrict ptext, char const *text_start);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) char32_t NOTHROW_NCX(LIBDCALL libd_unicode_readutf8_rev_n)(char const **__restrict ptext, char const *text_start);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-INTDEF ATTR_INOUT(1) NONNULL((2)) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev_n)(char const **__restrict ptext, char const *text_start);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev_n)(char const **__restrict ptext, char const *text_start);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_readutf16(3)
  * Read a single Unicode character from a given UTF-16 string */
@@ -137,11 +137,11 @@ INTDEF ATTR_INOUT(1) NONNULL((2)) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_rea
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_readutf16_swap_rev_n(3)
  * Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
-INTDEF ATTR_INOUT(1) NONNULL((2)) char32_t NOTHROW_NCX(LIBDCALL libd_unicode_readutf16_swap_rev_n)(char16_t const **__restrict ptext, char16_t const *text_start);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) char32_t NOTHROW_NCX(LIBDCALL libd_unicode_readutf16_swap_rev_n)(char16_t const **__restrict ptext, char16_t const *text_start);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> unicode_readutf16_swap_rev_n(3)
  * Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
-INTDEF ATTR_INOUT(1) NONNULL((2)) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(char16_t const **__restrict ptext, char16_t const *text_start);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(char16_t const **__restrict ptext, char16_t const *text_start);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_writeutf8(3)
  * Write  a given Unicode character `ch' to `dst'  and return a pointer to its end

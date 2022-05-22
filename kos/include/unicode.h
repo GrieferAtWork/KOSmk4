@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb01865b9 */
+/* HASH CRC-32:0xdf5b8b0a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -253,15 +253,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf8_n, __FORCELOCAL __ATTR_ARTIFICI
 extern "C++" {
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),char32_t,__NOTHROW_NCX,unicode_readutf8_rev_n,(char const **__restrict __ptext, char const *__text_start),unicode_readutf8_rev_n,(__ptext,__text_start))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),char32_t,__NOTHROW_NCX,unicode_readutf8_rev_n,(char const **__restrict __ptext, char const *__text_start),unicode_readutf8_rev_n,(__ptext,__text_start))
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),char32_t,__NOTHROW_NCX,unicode_readutf8_rev_n,(char **__restrict __ptext, char const *__text_start),unicode_readutf8_rev_n,(__ptext,__text_start))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),char32_t,__NOTHROW_NCX,unicode_readutf8_rev_n,(char **__restrict __ptext, char const *__text_start),unicode_readutf8_rev_n,(__ptext,__text_start))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-__CDECLARE(__ATTR_INOUT(1) __ATTR_NONNULL((2)),char32_t,__NOTHROW_NCX,unicode_readutf8_rev_n,(char const **__restrict __ptext, char const *__text_start),(__ptext,__text_start))
+__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),char32_t,__NOTHROW_NCX,unicode_readutf8_rev_n,(char const **__restrict __ptext, char const *__text_start),(__ptext,__text_start))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_UNICODE_H_PROTO */
 #else /* __CRT_HAVE_unicode_readutf8_rev_n */
 #include <libc/local/unicode/unicode_readutf8_rev_n.h>
@@ -269,15 +269,15 @@ __CDECLARE(__ATTR_INOUT(1) __ATTR_NONNULL((2)),char32_t,__NOTHROW_NCX,unicode_re
 extern "C++" {
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf8_rev_n)(char const **__restrict __ptext, char const *__text_start) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))(__ptext, __text_start); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf8_rev_n)(char const **__restrict __ptext, char const *__text_start) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))(__ptext, __text_start); }
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf8_rev_n)(char **__restrict __ptext, char const *__text_start) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))((char const **)__ptext, __text_start); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf8_rev_n)(char **__restrict __ptext, char const *__text_start) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))((char const **)__ptext, __text_start); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf8_rev_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf8_rev_n)(char const **__restrict __ptext, char const *__text_start) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))(__ptext, __text_start); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf8_rev_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf8_rev_n)(char const **__restrict __ptext, char const *__text_start) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))(__ptext, __text_start); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_UNICODE_H_PROTO */
 #endif /* !__CRT_HAVE_unicode_readutf8_rev_n */
 #ifdef __CRT_HAVE_unicode_readutf16
@@ -521,15 +521,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf16_rev_n, __FORCELOCAL __ATTR_ART
 extern "C++" {
 /* >> unicode_readutf16_swap_rev_n(3)
  * Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),char32_t,__NOTHROW_NCX,unicode_readutf16_swap_rev_n,(char16_t const **__restrict __ptext, char16_t const *__text_start),unicode_readutf16_swap_rev_n,(__ptext,__text_start))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),char32_t,__NOTHROW_NCX,unicode_readutf16_swap_rev_n,(char16_t const **__restrict __ptext, char16_t const *__text_start),unicode_readutf16_swap_rev_n,(__ptext,__text_start))
 /* >> unicode_readutf16_swap_rev_n(3)
  * Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),char32_t,__NOTHROW_NCX,unicode_readutf16_swap_rev_n,(char16_t **__restrict __ptext, char16_t const *__text_start),unicode_readutf16_swap_rev_n,(__ptext,__text_start))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),char32_t,__NOTHROW_NCX,unicode_readutf16_swap_rev_n,(char16_t **__restrict __ptext, char16_t const *__text_start),unicode_readutf16_swap_rev_n,(__ptext,__text_start))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* >> unicode_readutf16_swap_rev_n(3)
  * Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
-__CDECLARE(__ATTR_INOUT(1) __ATTR_NONNULL((2)),char32_t,__NOTHROW_NCX,unicode_readutf16_swap_rev_n,(char16_t const **__restrict __ptext, char16_t const *__text_start),(__ptext,__text_start))
+__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),char32_t,__NOTHROW_NCX,unicode_readutf16_swap_rev_n,(char16_t const **__restrict __ptext, char16_t const *__text_start),(__ptext,__text_start))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_UNICODE_H_PROTO */
 #else /* __CRT_HAVE_unicode_readutf16_swap_rev_n */
 #include <libc/local/unicode/unicode_readutf16_swap_rev_n.h>
@@ -537,15 +537,15 @@ __CDECLARE(__ATTR_INOUT(1) __ATTR_NONNULL((2)),char32_t,__NOTHROW_NCX,unicode_re
 extern "C++" {
 /* >> unicode_readutf16_swap_rev_n(3)
  * Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf16_swap_rev_n)(char16_t const **__restrict __ptext, char16_t const *__text_start) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16_swap_rev_n))(__ptext, __text_start); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf16_swap_rev_n)(char16_t const **__restrict __ptext, char16_t const *__text_start) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16_swap_rev_n))(__ptext, __text_start); }
 /* >> unicode_readutf16_swap_rev_n(3)
  * Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf16_swap_rev_n)(char16_t **__restrict __ptext, char16_t const *__text_start) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16_swap_rev_n))((__CHAR16_TYPE__ const **)__ptext, __text_start); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf16_swap_rev_n)(char16_t **__restrict __ptext, char16_t const *__text_start) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16_swap_rev_n))((__CHAR16_TYPE__ const **)__ptext, __text_start); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* >> unicode_readutf16_swap_rev_n(3)
  * Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf16_swap_rev_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf16_swap_rev_n)(char16_t const **__restrict __ptext, char16_t const *__text_start) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16_swap_rev_n))(__ptext, __text_start); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf16_swap_rev_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf16_swap_rev_n)(char16_t const **__restrict __ptext, char16_t const *__text_start) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16_swap_rev_n))(__ptext, __text_start); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_UNICODE_H_PROTO */
 #endif /* !__CRT_HAVE_unicode_readutf16_swap_rev_n */
 #ifdef __CRT_HAVE_unicode_writeutf8

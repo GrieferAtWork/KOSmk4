@@ -243,9 +243,9 @@ typedef struct __glob64_struct glob64_t;
 [[if($extended_include_prefix("<features.h>", "<bits/crt/glob.h>")!defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64)), alias("glob")]]
 [[if($extended_include_prefix("<features.h>", "<bits/crt/glob.h>") defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64)), alias("glob64")]]
 [[userimpl, impl_include("<asm/crt/glob.h>")]]
-int glob([[nonnull]] char const *__restrict pattern, __STDC_INT_AS_UINT_T flags,
+int glob([[in]] char const *__restrict pattern, __STDC_INT_AS_UINT_T flags,
          [[nullable]] int (LIBKCALL *errfunc)(char const *path, int flags),
-         [[nonnull]] glob_t *__restrict pglob) {
+         [[out]] glob_t *__restrict pglob) {
 	(void)pattern;
 	(void)flags;
 	(void)errfunc;
@@ -259,7 +259,7 @@ int glob([[nonnull]] char const *__restrict pattern, __STDC_INT_AS_UINT_T flags,
 [[if($extended_include_prefix("<features.h>", "<bits/crt/glob.h>")!defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64)), alias("globfree")]]
 [[if($extended_include_prefix("<features.h>", "<bits/crt/glob.h>") defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64)), alias("globfree64")]]
 [[userimpl]]
-void globfree([[nonnull]] glob_t *pglob) {
+void globfree([[inout]] glob_t *pglob) {
 	COMPILER_IMPURE();
 	(void)pglob;
 }
@@ -269,9 +269,9 @@ void globfree([[nonnull]] glob_t *pglob) {
 [[decl_include("<features.h>", "<bits/crt/glob.h>")]]
 [[preferred_glob64_variant_of(glob), doc_alias("glob")]]
 [[userimpl, impl_include("<asm/crt/glob.h>")]]
-int glob64([[nonnull]] const char *__restrict pattern, __STDC_INT_AS_UINT_T flags,
+int glob64([[in]] const char *__restrict pattern, __STDC_INT_AS_UINT_T flags,
            [[nullable]] int (LIBKCALL *errfunc)(char const *path, int flags),
-           [[nonnull]] struct __glob64_struct *__restrict pglob) {
+           [[out]] struct __glob64_struct *__restrict pglob) {
 	(void)pattern;
 	(void)flags;
 	(void)errfunc;
@@ -283,7 +283,7 @@ int glob64([[nonnull]] const char *__restrict pattern, __STDC_INT_AS_UINT_T flag
 [[decl_include("<bits/crt/glob.h>")]]
 [[preferred_glob64_variant_of(globfree), doc_alias("globfree")]]
 [[userimpl]]
-void globfree64([[nonnull]] struct __glob64_struct *pglob) {
+void globfree64([[inout]] struct __glob64_struct *pglob) {
 	(void)pglob;
 }
 

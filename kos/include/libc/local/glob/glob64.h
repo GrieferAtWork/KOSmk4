@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46837ff9 */
+/* HASH CRC-32:0xd33d4707 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <bits/crt/glob.h>
 #include <asm/crt/glob.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(glob64) __ATTR_NONNULL((1, 4)) int
+__LOCAL_LIBC(glob64) __ATTR_IN(1) __ATTR_OUT(4) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(glob64))(const char *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), struct __glob64_struct *__restrict __pglob) {
 	(void)__pattern;
 	(void)__flags;

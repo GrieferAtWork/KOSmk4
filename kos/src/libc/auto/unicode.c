@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cf61368 */
+/* HASH CRC-32:0x591df26a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -288,7 +288,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_n)(char const **__restrict ptext,
 }
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_INOUT(1) NONNULL((2)) char32_t
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_IN(2) ATTR_INOUT(1) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev_n)(char const **__restrict ptext,
                                                   char const *text_start) {
 	char32_t result;
@@ -517,7 +517,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev_n)(char16_t const **__restrict p
 }
 /* >> unicode_readutf16_swap_rev_n(3)
  * Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU */
-INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_INOUT(1) NONNULL((2)) char32_t
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_IN(2) ATTR_INOUT(1) char32_t
 NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(char16_t const **__restrict ptext,
                                                         char16_t const *text_start) {
 	char32_t result;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9d86bdf */
+/* HASH CRC-32:0xbdad73cb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__
 #include <hybrid/typecore.h>
 /* >> unicode_readutf8_rev_n(3)
  * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_rev_n,(char const **__restrict __ptext, char const *__text_start),unicode_readutf8_rev_n,(__ptext,__text_start))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_rev_n,(char const **__restrict __ptext, char const *__text_start),unicode_readutf8_rev_n,(__ptext,__text_start))
 #else /* __CRT_HAVE_unicode_readutf8_rev_n */
 #include <libc/local/unicode/unicode_readutf8_rev_n.h>
 /* >> unicode_readutf8_rev_n(3)

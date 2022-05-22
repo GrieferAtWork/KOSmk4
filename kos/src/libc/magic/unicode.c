@@ -462,9 +462,9 @@ char32_t unicode_readutf8_n([[inout]] /*utf-8*/ char const **__restrict ptext, [
 @@>> unicode_readutf8_rev_n(3)
 @@Same as `unicode_readutf8_rev()', but don't read ahead of `text_start'
 [[kernel, libc, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf8_rev_n([[inout]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_start)
-	[([[inout]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_start): char32_t]
-	[([[inout]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_start): char32_t]
+char32_t unicode_readutf8_rev_n([[inout]] /*utf-8*/ char const **__restrict ptext, [[in]] char const *text_start)
+	[([[inout]] /*utf-8*/ char const **__restrict ptext, [[in]] char const *text_start): char32_t]
+	[([[inout]] /*utf-8*/ char **__restrict ptext, [[in]] char const *text_start): char32_t]
 {
 	char32_t result;
 	char const *iter = *ptext;
@@ -723,9 +723,9 @@ char32_t unicode_readutf16_rev_n([[inout]] /*utf-16*/ char16_t const **__restric
 @@Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU
 [[kernel, impl_include("<hybrid/__byteswap.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
-char32_t unicode_readutf16_swap_rev_n([[inout]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start)
-	[([[inout]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
-	[([[inout]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
+char32_t unicode_readutf16_swap_rev_n([[inout]] /*utf-16*/ char16_t const **__restrict ptext, [[in]] char16_t const *text_start)
+	[([[inout]] /*utf-16*/ char16_t const **__restrict ptext, [[in]] char16_t const *text_start): char32_t]
+	[([[inout]] /*utf-16*/ char16_t **__restrict ptext, [[in]] char16_t const *text_start): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;

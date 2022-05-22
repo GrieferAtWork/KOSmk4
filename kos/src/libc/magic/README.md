@@ -435,8 +435,8 @@ Note on bindings:
       wrap: ($cook *c, void const *a, void const *b): int { return (*c->compar)(c->arg, a, b); },
       impl: _lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, &$cook),
   ))]]
-  void *_lfind_s(void const *key, [[nonnull]] void const *pbase,
-                 [[nonnull]] size_t *pitem_count, size_t item_size,
+  void *_lfind_s(void const *key, [[in(*pitem_count * item_size)]] void const *pbase,
+                 [[inout]] size_t *pitem_count, size_t item_size,
                  [[nonnull]] int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
                  void *arg);
   ```

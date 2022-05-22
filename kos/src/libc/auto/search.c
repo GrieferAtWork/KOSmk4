@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd25dee33 */
+/* HASH CRC-32:0x901d1873 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1082,7 +1082,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 #endif /* !__dwrap_cTP_TDTPTPTP_CA1A2_defined */
 /* >> lfind(3)
  * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)) void *
 (LIBDCALL libd_lfind)(void const *key,
                       void const *pbase,
                       size_t __KOS_FIXED_CONST *pitem_count,
@@ -1094,7 +1094,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED A
 #ifndef __KERNEL__
 /* >> lfind(3)
  * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
-INTERN ATTR_SECTION(".text.crt.utility.search") WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *
+INTERN ATTR_SECTION(".text.crt.utility.search") WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)) void *
 (LIBCCALL libc_lfind)(void const *key,
                       void const *pbase,
                       size_t __KOS_FIXED_CONST *pitem_count,
@@ -1123,7 +1123,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 /* >> lsearch(3)
  * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
  * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)) void *
 (LIBDCALL libd_lsearch)(void const *key,
                         void *pbase,
                         size_t *pitem_count,
@@ -1136,7 +1136,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") ATTR_INOU
 /* >> lsearch(3)
  * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
  * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
-INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *
+INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)) void *
 (LIBCCALL libc_lsearch)(void const *key,
                         void *pbase,
                         size_t *pitem_count,
@@ -1165,7 +1165,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 	return (*c->compar)(c->arg, a, b);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)) void *
 (LIBDCALL libd__lfind_s)(void const *key,
                          void const *pbase,
                          size_t __KOS_FIXED_CONST *pitem_count,
@@ -1179,7 +1179,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED A
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)) void *
 (LIBCCALL libc__lfind_s)(void const *key,
                          void const *pbase,
                          size_t __KOS_FIXED_CONST *pitem_count,
@@ -1210,7 +1210,7 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
 	return (*c->compar)(c->arg, a, b);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)) void *
 (LIBDCALL libd__lsearch_s)(void const *key,
                            void *pbase,
                            size_t *pitem_count,
@@ -1224,7 +1224,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED A
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)) void *
 (LIBCCALL libc__lsearch_s)(void const *key,
                            void *pbase,
                            size_t *pitem_count,

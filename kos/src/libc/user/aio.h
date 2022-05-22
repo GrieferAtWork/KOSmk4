@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f827ed2 */
+/* HASH CRC-32:0x22144793 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,7 +92,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_aio_fsync)(oflag_t operation, 
  *                             for every entry.
  * @return: -1: [errno=EIO]    When `mode == LIO_WAIT': At least one of the operations
  *                             failed (s.a. `aio_error(3)') */
-INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_lio_listio)(int mode, struct aiocb *const list[__restrict_arr], __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sigev);
+INTDEF ATTR_INS(2, 3) int NOTHROW_NCX(LIBCCALL libc_lio_listio)(int mode, struct aiocb *const list[__restrict_arr], __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sigev);
 /* >> aio_error(3), aio_error64(3)
  * @return: 0 :          Operation completed
  * @return: EINPROGRESS: Async operation is still in progress (or pending)
@@ -100,13 +100,13 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_lio_listio)(int mode, struct a
  * @return: EINVAL:      `self' is invalid, or its return value has already been read.
  * @return: * :          The   `errno'  with  which   the  async  operation  failed.
  *                       s.a. `pread(2)', `pwrite(2)', `fsync(2)' and `fdatasync(2)' */
-INTDEF WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_aio_error)(struct aiocb const *self);
+INTDEF WUNUSED ATTR_IN(1) errno_t NOTHROW_NCX(LIBCCALL libc_aio_error)(struct aiocb const *self);
 /* >> aio_return(3), aio_return64(3)
  * @return: * : Return value of async `pread(2)', `pwrite(2)', `fsync(2)' or `fdatasync(2)'
  * @return: -1: [errno=<unchanged>] AIO operation failed (s.a. `aio_error(3)')
  * @return: -1: [errno=EINVAL]      `self' is invalid (including the case where `self' is still
  *                                  in progress), or  its return value  has already been  read. */
-INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBCCALL libc_aio_return)(struct aiocb *self);
+INTDEF ATTR_INOUT(1) ssize_t NOTHROW_NCX(LIBCCALL libc_aio_return)(struct aiocb *self);
 /* >> aio_cancel(3), aio_cancel64(3)
  * Cancel  a specific AIO  operation (self != NULL),  or all operations currently
  * operating on a given `fd' (self !=  NULL && fd == self->aio_fildes). For  this
@@ -138,7 +138,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_aio_cancel)(fd_t fd, struct aiocb *self);
  * @return: 0:  Success (At least one of the given AIO operations has completed)
  * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_aio_suspend)(struct aiocb const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec const *__restrict rel_timeout);
+INTDEF ATTR_INS(1, 2) int NOTHROW_RPC(LIBCCALL libc_aio_suspend)(struct aiocb const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec const *__restrict rel_timeout);
 /* >> aio_read(3), aio_read64(3)
  * Begin an async `pread(2)' operation:
  * >> pread(self->aio_fildes, self->aio_buf, self->aio_nbytes, self->aio_offset);
@@ -200,7 +200,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_aio_fsync64)(int operation, st
  *                             for every entry.
  * @return: -1: [errno=EIO]    When `mode == LIO_WAIT': At least one of the operations
  *                             failed (s.a. `aio_error(3)') */
-INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_lio_listio64)(int mode, struct aiocb64 *const list[__restrict_arr], __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sigev);
+INTDEF ATTR_INS(2, 3) int NOTHROW_NCX(LIBCCALL libc_lio_listio64)(int mode, struct aiocb64 *const list[__restrict_arr], __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sigev);
 /* >> aio_error(3), aio_error64(3)
  * @return: 0 :          Operation completed
  * @return: EINPROGRESS: Async operation is still in progress (or pending)
@@ -208,13 +208,13 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_lio_listio64)(int mode, struct
  * @return: EINVAL:      `self' is invalid, or its return value has already been read.
  * @return: * :          The   `errno'  with  which   the  async  operation  failed.
  *                       s.a. `pread(2)', `pwrite(2)', `fsync(2)' and `fdatasync(2)' */
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_aio_error64)(struct aiocb64 const *self);
+INTDEF WUNUSED ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_aio_error64)(struct aiocb64 const *self);
 /* >> aio_return(3), aio_return64(3)
  * @return: * : Return value of async `pread(2)', `pwrite(2)', `fsync(2)' or `fdatasync(2)'
  * @return: -1: [errno=<unchanged>] AIO operation failed (s.a. `aio_error(3)')
  * @return: -1: [errno=EINVAL]      `self' is invalid (including the case where `self' is still
  *                                  in progress), or  its return value  has already been  read. */
-INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBCCALL libc_aio_return64)(struct aiocb64 *self);
+INTDEF ATTR_INOUT(1) ssize_t NOTHROW_NCX(LIBCCALL libc_aio_return64)(struct aiocb64 *self);
 /* >> aio_cancel(3), aio_cancel64(3)
  * Cancel  a specific AIO  operation (self != NULL),  or all operations currently
  * operating on a given `fd' (self !=  NULL && fd == self->aio_fildes). For  this
@@ -246,7 +246,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_aio_cancel64)(fd_t fildes, struct aiocb64 *
  * @return: 0:  Success (At least one of the given AIO operations has completed)
  * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_aio_suspend64)(struct aiocb64 const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec const *__restrict rel_timeout);
+INTDEF ATTR_INS(1, 2) int NOTHROW_NCX(LIBCCALL libc_aio_suspend64)(struct aiocb64 const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec const *__restrict rel_timeout);
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
@@ -255,7 +255,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_aio_suspend64)(struct aiocb64 
  * @return: 0:  Success (At least one of the given AIO operations has completed)
  * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_aio_suspendt64)(struct aiocb const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec64 const *__restrict rel_timeout);
+INTDEF ATTR_INS(1, 2) int NOTHROW_NCX(LIBCCALL libc_aio_suspendt64)(struct aiocb const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec64 const *__restrict rel_timeout);
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
@@ -264,9 +264,9 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_aio_suspendt64)(struct aiocb c
  * @return: 0:  Success (At least one of the given AIO operations has completed)
  * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_aio_suspend64t64)(struct aiocb64 const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec64 const *__restrict rel_timeout);
+INTDEF ATTR_INS(1, 2) int NOTHROW_NCX(LIBCCALL libc_aio_suspend64t64)(struct aiocb64 const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec64 const *__restrict rel_timeout);
 /* >> aio_init(3) */
-INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_aio_init)(struct aioinit const *init);
+INTDEF ATTR_IN(1) void NOTHROW_NCX(LIBCCALL libc_aio_init)(struct aioinit const *init);
 #endif /* !__KERNEL__ */
 
 DECL_END

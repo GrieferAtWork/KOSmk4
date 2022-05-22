@@ -381,14 +381,14 @@ struct lfutexexpr const sem_waitexpr[] = {
 	LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
 };
 
-/*[[[head:libc_sem_wait,hash:CRC-32=0xfd20df8b]]]*/
+/*[[[head:libc_sem_wait,hash:CRC-32=0xdcb374bb]]]*/
 /* >> sem_wait(3)
  * Wait for a ticket to become  available to the given semaphore  `self'
  * Once a ticket has become available, consume it and return. Until that
  * point in time, keep on blocking.
  * @return: 0:  Success
  * @return: -1: [errno=EINTR] Interrupted. */
-INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_INOUT(1) int
 NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *self)
 /*[[[body:libc_sem_wait]]]*/
 {

@@ -383,7 +383,7 @@ void *_recalloc_dbg([[nullable]] void *ptr, $size_t count, $size_t num_bytes,
 [[guard, wunused, ATTR_ALLOC_SIZE((2))]]
 [[crt_dos_only, requires_function(realloc_in_place)]]
 [[decl_include("<hybrid/typecore.h>")]]
-void *_expand_dbg([[nonnull]] void *ptr, $size_t num_bytes,
+void *_expand_dbg([[nullable]] void *ptr, $size_t num_bytes,
                   int block_type, char const *filename, int line) {
 	(void)block_type;
 	(void)filename;
@@ -400,7 +400,7 @@ void _free_dbg([[nullable]] void *ptr, int block_type) {
 [[guard, pure, wunused]]
 [[crt_dos_only, requires_function(malloc_usable_size)]]
 [[decl_include("<hybrid/typecore.h>")]]
-$size_t _msize_dbg([[nonnull]] void *ptr, int block_type) {
+$size_t _msize_dbg([[nullable]] void *ptr, int block_type) {
 	(void)block_type;
 	return malloc_usable_size(ptr);
 }
@@ -408,7 +408,7 @@ $size_t _msize_dbg([[nonnull]] void *ptr, int block_type) {
 [[guard, pure, wunused]]
 [[crt_dos_only, requires_function(_aligned_msize)]]
 [[decl_include("<hybrid/typecore.h>")]]
-$size_t _aligned_msize_dbg([[nonnull]] void *ptr, $size_t min_alignment, $size_t offset) {
+$size_t _aligned_msize_dbg([[nullable]] void *ptr, $size_t min_alignment, $size_t offset) {
 	return _aligned_msize(ptr, min_alignment, offset);
 }
 

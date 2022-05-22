@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb906fbe */
+/* HASH CRC-32:0xea47f613 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -336,7 +336,7 @@ NOTHROW_NCX(LIBCCALL libc_strcpy)(char *__restrict dst,
  * space  for doing so is available, up to the `strlen(src)' of
  * the first characters  are copied from  `src'. All  remaining
  * characters are always set  to '\0'. Always re-returns  `buf' */
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUTS(1, 3) NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_strncpy)(char *__restrict buf,
                                    char const *__restrict src,
                                    size_t buflen) {

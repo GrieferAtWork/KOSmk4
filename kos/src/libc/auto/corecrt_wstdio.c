@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76ab23f7 */
+/* HASH CRC-32:0x78f8fc5e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -679,7 +679,7 @@ NOTHROW_NCX(LIBKCALL libc__vfwprintf_l)(FILE *stream,
 	(void)locale;
 	return libc_vfwprintf(stream, format, args);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_IN(2) ATTR_LIBC_C16PRINTF(2, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_IN(2) ATTR_LIBC_C16PRINTF(2, 0) ATTR_OUT(1) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd___vswprintf_l)(char16_t *buf,
                                          char16_t const *format,
                                          locale_t locale,
@@ -687,7 +687,7 @@ NOTHROW_NCX(LIBDCALL libd___vswprintf_l)(char16_t *buf,
 	(void)locale;
 	return libd_vswprintf(buf, (size_t)-1, format, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_IN(2) ATTR_LIBC_C32PRINTF(2, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_IN(2) ATTR_LIBC_C32PRINTF(2, 0) ATTR_OUT(1) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc___vswprintf_l)(char32_t *buf,
                                          char32_t const *format,
                                          locale_t locale,
@@ -753,13 +753,13 @@ NOTHROW_NCX(LIBKCALL libc__vswprintf_c)(char32_t *buf,
                                         va_list args) {
 	return libc__vswprintf_c_l(buf, bufsize, format, NULL, args);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_IN(2) ATTR_LIBC_C16PRINTF(2, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_IN(2) ATTR_LIBC_C16PRINTF(2, 0) ATTR_OUT(1) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vswprintf)(char16_t *buf,
                                       char16_t const *format,
                                       va_list args) {
 	return libd__vswprintf_c_l(buf, (size_t)-1, format, NULL, args); /* _vswprintf_l */
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_IN(2) ATTR_LIBC_C32PRINTF(2, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_IN(2) ATTR_LIBC_C32PRINTF(2, 0) ATTR_OUT(1) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vswprintf)(char32_t *buf,
                                       char32_t const *format,
                                       va_list args) {
@@ -777,28 +777,28 @@ NOTHROW_NCX(LIBKCALL libc__vscwprintf)(char32_t const *format,
 }
 DEFINE_INTERN_ALIAS(libd__vscwprintf_p, libd__vscwprintf);
 DEFINE_INTERN_ALIAS(libc__vscwprintf_p, libc__vscwprintf);
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vswscanf_l)(char16_t const *buf,
                                        char16_t const *format,
                                        locale_t locale,
                                        va_list args) {
 	return libd__vsnwscanf_l(buf, (size_t)-1, format, locale, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_IN(2) ATTR_LIBC_C32SCANF(2, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C32SCANF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vswscanf_l)(char32_t const *buf,
                                        char32_t const *format,
                                        locale_t locale,
                                        va_list args) {
 	return libc__vsnwscanf_l(buf, (size_t)-1, format, locale, args);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd__vswscanf_s_l)(char16_t const *buf,
                                          char16_t const *format,
                                          locale_t locale,
                                          va_list args) {
 	return libd__vsnwscanf_s_l(buf, (size_t)-1, format, locale, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_IN(2) ATTR_LIBC_C32SCANF(2, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C32SCANF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc__vswscanf_s_l)(char32_t const *buf,
                                          char32_t const *format,
                                          locale_t locale,
@@ -959,7 +959,7 @@ NOTHROW_NCX(VLIBKCALL libc__wprintf_s_l)(char32_t const *format,
 }
 DEFINE_INTERN_ALIAS(libd__wprintf_p_l, libd__wprintf_l);
 DEFINE_INTERN_ALIAS(libc__wprintf_p_l, libc__wprintf_l);
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_IN(2) ATTR_LIBC_C16PRINTF(2, 4) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_IN(2) ATTR_LIBC_C16PRINTF(2, 4) ATTR_OUT(1) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd___swprintf_l)(char16_t *buf,
                                          char16_t const *format,
                                          locale_t locale,
@@ -971,7 +971,7 @@ NOTHROW_NCX(VLIBDCALL libd___swprintf_l)(char16_t *buf,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_IN(2) ATTR_LIBC_C32PRINTF(2, 4) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.printf") ATTR_IN(2) ATTR_LIBC_C32PRINTF(2, 4) ATTR_OUT(1) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc___swprintf_l)(char32_t *buf,
                                          char32_t const *format,
                                          locale_t locale,
@@ -983,7 +983,7 @@ NOTHROW_NCX(VLIBKCALL libc___swprintf_l)(char32_t *buf,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_IN(2) ATTR_LIBC_C16PRINTF(2, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_IN(2) ATTR_LIBC_C16PRINTF(2, 3) ATTR_OUT(1) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__swprintf)(char16_t *buf,
                                       char16_t const *format,
                                       ...) {
@@ -994,7 +994,7 @@ NOTHROW_NCX(VLIBDCALL libd__swprintf)(char16_t *buf,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_IN(2) ATTR_LIBC_C32PRINTF(2, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_IN(2) ATTR_LIBC_C32PRINTF(2, 3) ATTR_OUT(1) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__swprintf)(char32_t *buf,
                                       char32_t const *format,
                                       ...) {
@@ -1325,7 +1325,7 @@ NOTHROW_NCX(VLIBKCALL libc__wscanf_s_l)(char32_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 4) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 4) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__swscanf_l)(char16_t const *buf,
                                        char16_t const *format,
                                        locale_t locale,
@@ -1337,7 +1337,7 @@ NOTHROW_NCX(VLIBDCALL libd__swscanf_l)(char16_t const *buf,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_LIBC_C32SCANF(2, 4) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C32SCANF(2, 4) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__swscanf_l)(char32_t const *buf,
                                        char32_t const *format,
                                        locale_t locale,
@@ -1349,7 +1349,7 @@ NOTHROW_NCX(VLIBKCALL libc__swscanf_l)(char32_t const *buf,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 4) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 4) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd__swscanf_s_l)(char16_t const *buf,
                                          char16_t const *format,
                                          locale_t locale,
@@ -1361,7 +1361,7 @@ NOTHROW_NCX(VLIBDCALL libd__swscanf_s_l)(char16_t const *buf,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_LIBC_C32SCANF(2, 4) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C32SCANF(2, 4) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc__swscanf_s_l)(char32_t const *buf,
                                          char32_t const *format,
                                          locale_t locale,
@@ -1531,13 +1531,13 @@ NOTHROW_NCX(LIBKCALL libc_vwscanf_s)(char32_t const *format,
                                      va_list args) {
 	return libc__vfwscanf_s_l(stdin, format, NULL, args);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd_vswscanf_s)(char16_t const *buf,
                                       char16_t const *format,
                                       va_list args) {
 	return libd__vswscanf_s_l(buf, format, NULL, args);
 }
-INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_LIBC_C32SCANF(2, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C32SCANF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc_vswscanf_s)(char32_t const *buf,
                                       char32_t const *format,
                                       va_list args) {
@@ -1651,7 +1651,7 @@ NOTHROW_NCX(VLIBKCALL libc_wscanf_s)(char32_t const *format,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C16SCANF(2, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBDCALL libd_swscanf_s)(char16_t const *buf,
                                       char16_t const *format,
                                       ...) {
@@ -1662,7 +1662,7 @@ NOTHROW_NCX(VLIBDCALL libd_swscanf_s)(char16_t const *buf,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(2) ATTR_LIBC_C32SCANF(2, 3) NONNULL((1)) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_C32SCANF(2, 3) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBKCALL libc_swscanf_s)(char32_t const *buf,
                                       char32_t const *format,
                                       ...) {

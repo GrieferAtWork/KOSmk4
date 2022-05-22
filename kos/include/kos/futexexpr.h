@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6cd5cbf */
+/* HASH CRC-32:0x30698170 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -317,7 +317,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr64, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @throws: E_INTERRUPT:        A blocking futex-wait operation was interrupted */
-__CDECLARE(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CDECLARE(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__THROWING,LFutexExpr,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> LFutexExpr(2), LFutexExpr64(2)
  * Excetion-enabled version of `lfutexexpr(2)'
@@ -331,7 +331,7 @@ __CDECLARE(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr,(lf
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @throws: E_INTERRUPT:        A blocking futex-wait operation was interrupted */
-__CREDIRECT(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__THROWING,LFutexExpr,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExpr) || defined(__CRT_HAVE_LFutexExpr64)
 #include <libc/local/kos.futexexpr/LFutexExpr_except.h>
 /* >> LFutexExpr(2), LFutexExpr64(2)
@@ -346,7 +346,7 @@ __CREDIRECT(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr,(l
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @throws: E_INTERRUPT:        A blocking futex-wait operation was interrupted */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)) int (__LIBCCALL LFutexExpr)(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExpr_except))(__ulockaddr, __base, __expr, __timeout, __timeout_flags); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)) int (__LIBCCALL LFutexExpr)(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExpr_except))(__ulockaddr, __base, __expr, __timeout, __timeout_flags); }
 #endif /* ... */
 
 #ifdef __USE_TIME64
@@ -363,7 +363,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)) int (__LI
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @throws: E_INTERRUPT:        A blocking futex-wait operation was interrupted */
-__CREDIRECT(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr64,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__THROWING,LFutexExpr64,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExpr64)
 /* >> LFutexExpr(2), LFutexExpr64(2)
  * Excetion-enabled version of `lfutexexpr(2)'
@@ -377,7 +377,7 @@ __CREDIRECT(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr64,
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @throws: E_INTERRUPT:        A blocking futex-wait operation was interrupted */
-__CDECLARE(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr64,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CDECLARE(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__THROWING,LFutexExpr64,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExpr)
 #include <libc/local/kos.futexexpr/LFutexExpr64_except.h>
 /* >> LFutexExpr(2), LFutexExpr64(2)
@@ -392,7 +392,7 @@ __CDECLARE(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExpr64,(
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @throws: E_INTERRUPT:        A blocking futex-wait operation was interrupted */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)) int (__LIBCCALL LFutexExpr64)(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExpr64_except))(__ulockaddr, __base, __expr, __timeout, __timeout_flags); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)) int (__LIBCCALL LFutexExpr64)(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExpr64_except))(__ulockaddr, __base, __expr, __timeout, __timeout_flags); }
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #if defined(__CRT_HAVE_LFutexExprI) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
@@ -407,7 +407,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)) int (__LI
  * @return: < 0: Timeout expired
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND' */
-__CDECLARE(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExprI,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CDECLARE(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__THROWING,LFutexExprI,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExprI64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> LFutexExprI(2), LFutexExprI64(2)
  * Same as `LFutexExpr()', but implicitly handle `E_INTERRUPT' exceptions by re-starting the system call.
@@ -420,7 +420,7 @@ __CDECLARE(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExprI,(l
  * @return: < 0: Timeout expired
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND' */
-__CREDIRECT(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExprI,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExprI64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__THROWING,LFutexExprI,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags),LFutexExprI64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExprI) || defined(__CRT_HAVE_LFutexExprI64) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr) || defined(__CRT_HAVE_LFutexExpr64)))
 #include <libc/local/kos.futexexpr/LFutexExprI_except.h>
 /* >> LFutexExprI(2), LFutexExprI64(2)
@@ -434,7 +434,7 @@ __CREDIRECT(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExprI,(
  * @return: < 0: Timeout expired
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)) int (__LIBCCALL LFutexExprI)(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExprI_except))(__ulockaddr, __base, __expr, __timeout, __timeout_flags); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)) int (__LIBCCALL LFutexExprI)(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExprI_except))(__ulockaddr, __base, __expr, __timeout, __timeout_flags); }
 #endif /* ... */
 
 #ifdef __USE_TIME64
@@ -450,7 +450,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)) int (__LI
  * @return: < 0: Timeout expired
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND' */
-__CREDIRECT(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExprI64,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExprI,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__THROWING,LFutexExprI64,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExprI,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExprI64)
 /* >> LFutexExprI(2), LFutexExprI64(2)
  * Same as `LFutexExpr()', but implicitly handle `E_INTERRUPT' exceptions by re-starting the system call.
@@ -463,7 +463,7 @@ __CREDIRECT(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExprI64
  * @return: < 0: Timeout expired
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND' */
-__CDECLARE(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExprI64,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
+__CDECLARE(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__THROWING,LFutexExprI64,(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)))
 #include <libc/local/kos.futexexpr/LFutexExprI64_except.h>
 /* >> LFutexExprI(2), LFutexExprI64(2)
@@ -477,7 +477,7 @@ __CDECLARE(__ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)),int,__THROWING,LFutexExprI64,
  * @return: < 0: Timeout expired
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)) int (__LIBCCALL LFutexExprI64)(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExprI64_except))(__ulockaddr, __base, __expr, __timeout, __timeout_flags); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)) int (__LIBCCALL LFutexExprI64)(lfutex_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec64 const *__timeout, unsigned int __timeout_flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LFutexExprI64_except))(__ulockaddr, __base, __expr, __timeout, __timeout_flags); }
 #endif /* ... */
 #endif /* __USE_TIME64 */
 

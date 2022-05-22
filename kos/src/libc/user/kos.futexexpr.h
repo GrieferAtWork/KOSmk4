@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x369ed0a7 */
+/* HASH CRC-32:0xebca25b2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,7 @@ INTDEF ATTR_IN(3) ATTR_IN_OPT(4) NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_lfut
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @throws: E_INTERRUPT:        A blocking futex-wait operation was interrupted */
-INTDEF ATTR_IN_OPT(4) NONNULL((1, 3)) int (LIBCCALL libc_LFutexExpr)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_IN_OPT(4) NONNULL((1)) int (LIBCCALL libc_LFutexExpr)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags) THROWS(...);
 /* >> LFutexExpr(2), LFutexExpr64(2)
  * Excetion-enabled version of `lfutexexpr(2)'
  * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
@@ -96,7 +96,7 @@ INTDEF ATTR_IN_OPT(4) NONNULL((1, 3)) int (LIBCCALL libc_LFutexExpr)(lfutex_t *u
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @throws: E_INTERRUPT:        A blocking futex-wait operation was interrupted */
-INTDEF ATTR_IN_OPT(4) NONNULL((1, 3)) int (LIBCCALL libc_LFutexExpr64)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_IN_OPT(4) NONNULL((1)) int (LIBCCALL libc_LFutexExpr64)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags) THROWS(...);
 #endif /* !__KERNEL__ */
 
 DECL_END

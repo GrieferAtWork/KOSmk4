@@ -25,7 +25,7 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_glob,hash:CRC-32=0xa86f422f]]]*/
+/*[[[head:libc_glob,hash:CRC-32=0x615d184b]]]*/
 /* >> glob(3), glob64(3)
  * @param: flags: Set of `GLOB_ERR | GLOB_MARK  | GLOB_NOSORT | GLOB_DOOFFS  |
  *                GLOB_NOCHECK  | GLOB_APPEND |  GLOB_NOESCAPE | GLOB_PERIOD |
@@ -35,7 +35,7 @@ DECL_BEGIN
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
-INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1, 4)) int
+INTERN ATTR_SECTION(".text.crt.utility.glob") ATTR_IN(1) ATTR_OUT(4) int
 NOTHROW_NCX(LIBCCALL libc_glob)(char const *__restrict pattern,
                                 __STDC_INT_AS_UINT_T flags,
                                 int (LIBKCALL *errfunc)(char const *path, int flags),
@@ -52,9 +52,9 @@ NOTHROW_NCX(LIBCCALL libc_glob)(char const *__restrict pattern,
 }
 /*[[[end:libc_glob]]]*/
 
-/*[[[head:libc_globfree,hash:CRC-32=0x20e2c836]]]*/
+/*[[[head:libc_globfree,hash:CRC-32=0x4d4ba756]]]*/
 /* >> globfree(3), globfree64(3) */
-INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.utility.glob") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob)
 /*[[[body:libc_globfree]]]*/
 {
@@ -64,7 +64,7 @@ NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob)
 }
 /*[[[end:libc_globfree]]]*/
 
-/*[[[head:libc_glob64,hash:CRC-32=0xc44a16c0]]]*/
+/*[[[head:libc_glob64,hash:CRC-32=0x8bc0a868]]]*/
 #ifdef __GLOB32_MATCHES_GLOB64
 DEFINE_INTERN_ALIAS(libc_glob64, libc_glob);
 #else /* MAGIC:alias */
@@ -77,7 +77,7 @@ DEFINE_INTERN_ALIAS(libc_glob64, libc_glob);
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
-INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1, 4)) int
+INTERN ATTR_SECTION(".text.crt.utility.glob") ATTR_IN(1) ATTR_OUT(4) int
 NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern,
                                   __STDC_INT_AS_UINT_T flags,
                                   int (LIBKCALL *errfunc)(char const *path, int flags),
@@ -95,12 +95,12 @@ NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern,
 #endif /* MAGIC:alias */
 /*[[[end:libc_glob64]]]*/
 
-/*[[[head:libc_globfree64,hash:CRC-32=0x73c7f23a]]]*/
+/*[[[head:libc_globfree64,hash:CRC-32=0x68408de3]]]*/
 #ifdef __GLOB32_MATCHES_GLOB64
 DEFINE_INTERN_ALIAS(libc_globfree64, libc_globfree);
 #else /* MAGIC:alias */
 /* >> globfree(3), globfree64(3) */
-INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.utility.glob") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob)
 /*[[[body:libc_globfree64]]]*/
 {

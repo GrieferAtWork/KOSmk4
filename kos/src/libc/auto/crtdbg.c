@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3082f48 */
+/* HASH CRC-32:0x5b162bdb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,7 +90,7 @@ NOTHROW_NCX(LIBDCALL libc__recalloc_dbg)(void *ptr,
 	(void)line;
 	return libc_recallocv(ptr, count, num_bytes);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) void *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") WUNUSED ATTR_ALLOC_SIZE((2)) void *
 NOTHROW_NCX(LIBDCALL libc__expand_dbg)(void *ptr,
                                        size_t num_bytes,
                                        int block_type,
@@ -107,13 +107,13 @@ NOTHROW_NCX(LIBDCALL libc__free_dbg)(void *ptr,
 	(void)block_type;
 	libc_free(ptr);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_PURE WUNUSED NONNULL((1)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_PURE WUNUSED size_t
 NOTHROW_NCX(LIBDCALL libc__msize_dbg)(void *ptr,
                                       int block_type) {
 	(void)block_type;
 	return libc_malloc_usable_size(ptr);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_PURE WUNUSED NONNULL((1)) size_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_PURE WUNUSED size_t
 NOTHROW_NCX(LIBDCALL libc__aligned_msize_dbg)(void *ptr,
                                               size_t min_alignment,
                                               size_t offset) {

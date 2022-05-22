@@ -862,8 +862,8 @@ miss:
 [[std, crtbuiltin, leaf]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRNCPY))]]
-[[nonnull]] char *strncpy([[nonnull]] char *__restrict buf,
-                          [[nonnull]] char const *__restrict src, size_t buflen) {
+[[nonnull]] char *strncpy([[out(buflen)]] char *__restrict buf,
+                          [[in(strnlen(src, buflen))]] char const *__restrict src, size_t buflen) {
 	size_t srclen = strnlen(src, buflen);
 	memcpy(buf, src, srclen * sizeof(char));
 	bzero(buf + srclen, (buflen - srclen) * sizeof(char));

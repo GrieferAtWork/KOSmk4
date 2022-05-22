@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e98d261 */
+/* HASH CRC-32:0x69d8de66 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_aio_suspend64t32_defined
 #define __local___localdep_aio_suspend64t32_defined
 #if defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t32,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __rel_timeout),aio_suspend,(__list,__nent,__rel_timeout))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,__localdep_aio_suspend64t32,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __rel_timeout),aio_suspend,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspend64)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t32,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __rel_timeout),aio_suspend64,(__list,__nent,__rel_timeout))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,__localdep_aio_suspend64t32,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __rel_timeout),aio_suspend64,(__list,__nent,__rel_timeout))
 #else /* ... */
 #undef __local___localdep_aio_suspend64t32_defined
 #endif /* !... */
@@ -40,13 +40,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t32,(s
 #ifndef __local___localdep_aio_suspend64t64_defined
 #define __local___localdep_aio_suspend64t64_defined
 #if defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t64,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __rel_timeout),aio_suspend,(__list,__nent,__rel_timeout))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,__localdep_aio_suspend64t64,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __rel_timeout),aio_suspend,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspend64) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t64,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __rel_timeout),aio_suspend64,(__list,__nent,__rel_timeout))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,__localdep_aio_suspend64t64,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __rel_timeout),aio_suspend64,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t64,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __rel_timeout),aio_suspendt64,(__list,__nent,__rel_timeout))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,__localdep_aio_suspend64t64,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __rel_timeout),aio_suspendt64,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspend64t64)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t64,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __rel_timeout),aio_suspend64t64,(__list,__nent,__rel_timeout))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,__localdep_aio_suspend64t64,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __rel_timeout),aio_suspend64t64,(__list,__nent,__rel_timeout))
 #elif (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64)
 __NAMESPACE_LOCAL_END
 #include <libc/local/aio/aio_suspend64t64.h>
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_aio_suspend64t64_defined
 #endif /* !... */
 #endif /* !__local___localdep_aio_suspend64t64_defined */
-__LOCAL_LIBC(aio_suspend64) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(aio_suspend64) __ATTR_INS(1, 2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(aio_suspend64))(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __rel_timeout) {
 #if (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64)
 	struct __timespec32 __rel_timeout32;

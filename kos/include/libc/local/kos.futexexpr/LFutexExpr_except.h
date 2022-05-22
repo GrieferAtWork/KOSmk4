@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x822e35d9 */
+/* HASH CRC-32:0x620bcb7d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,
 #define __local___localdep_crt_LFutexExpr64_except_defined
 __CREDIRECT(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_LFutexExpr64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExpr64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
 #endif /* !__local___localdep_crt_LFutexExpr64_except_defined && __CRT_HAVE_LFutexExpr64 */
-__LOCAL_LIBC(LFutexExpr_except) __ATTR_IN_OPT(4) __ATTR_NONNULL((1, 3)) int
+__LOCAL_LIBC(LFutexExpr_except) __ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(LFutexExpr_except))(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, unsigned int __timeout_flags) __THROWS(...) {
 #ifdef __CRT_HAVE_LFutexExpr
 	struct __timespec32 __tms32;

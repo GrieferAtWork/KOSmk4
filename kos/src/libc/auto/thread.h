@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2abfe2 */
+/* HASH CRC-32:0xee3a3a03 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,10 +48,10 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_thr_setprio)(thread_t thr, int priority
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_thr_setprio)(thread_t thr, int priority);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBDCALL libd_thr_getprio)(thread_t thr, int *p_priority);
+INTDEF ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_thr_getprio)(thread_t thr, int *p_priority);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc_thr_getprio)(thread_t thr, int *p_priority);
+INTDEF ATTR_OUT(2) errno_t NOTHROW_NCX(LIBCCALL libc_thr_getprio)(thread_t thr, int *p_priority);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_thr_getspecific)(thread_key_t key, void **p_val);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32496076 */
+/* HASH CRC-32:0x23943cb9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ typedef __pformatprinter pformatprinter;
 /* >> except_as_errno(3)
  * Transform the  given exception  into  a posix  errno  value.
  * When no special errno is defined for `data', return `EPERM'. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc_except_as_errno)(struct exception_data const *__restrict self);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) errno_t NOTHROW_NCX(LIBKCALL libc_except_as_errno)(struct exception_data const *__restrict self);
 /* >> except_as_signal(3)
  * Transform the given exception into a posix signal.
  * If doing this is possible, fill in `*result' and return `true'.

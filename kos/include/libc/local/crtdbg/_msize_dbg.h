@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c5a73bc */
+/* HASH CRC-32:0x5c8815d5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_ma
 #undef __local___localdep_malloc_usable_size_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_usable_size_defined */
-__LOCAL_LIBC(_msize_dbg) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(_msize_dbg) __ATTR_PURE __ATTR_WUNUSED __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_msize_dbg))(void *__ptr, int __block_type) {
 	(void)__block_type;
 	return (__NAMESPACE_LOCAL_SYM __localdep_malloc_usable_size)(__ptr);

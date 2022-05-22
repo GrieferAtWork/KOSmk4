@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbdd75c0 */
+/* HASH CRC-32:0x25e1c31 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -176,13 +176,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(except_register_state, __FORCELOCAL __ATTR_ARTIF
 /* >> except_as_errno(3)
  * Transform the  given exception  into  a posix  errno  value.
  * When no special errno is defined for `data', return `EPERM'. */
-__LIBC __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBKCALL except_as_errno)(struct exception_data const *__restrict __self) __CASMNAME_SAME("except_as_errno");
+__LIBC __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __errno_t __NOTHROW_NCX(__LIBKCALL except_as_errno)(struct exception_data const *__restrict __self) __CASMNAME_SAME("except_as_errno");
 #else /* __CRT_HAVE_except_as_errno */
 #include <libc/local/kos.except/except_as_errno.h>
 /* >> except_as_errno(3)
  * Transform the  given exception  into  a posix  errno  value.
  * When no special errno is defined for `data', return `EPERM'. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(except_as_errno, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBKCALL except_as_errno)(struct exception_data const *__restrict __self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_as_errno))(__self); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(except_as_errno, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __errno_t __NOTHROW_NCX(__LIBKCALL except_as_errno)(struct exception_data const *__restrict __self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(except_as_errno))(__self); })
 #endif /* !__CRT_HAVE_except_as_errno */
 struct __siginfo_struct;
 #ifdef __CRT_HAVE_except_as_signal

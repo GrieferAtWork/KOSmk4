@@ -196,14 +196,14 @@ typedef int (__LIBKCALL *__nftw64_func_t)(char const *__fpath, struct stat64 con
 [[cp, nodos, decl_include("<features.h>"), decl_prefix(DEFINE_FTW_FUNC_T), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)), alias("ftw")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)), alias("ftw64")]]
-int ftw([[nonnull]] char const *dir, [[nonnull]] __ftw_func_t func, __STDC_INT_AS_UINT_T nopenfd);
+int ftw([[in]] char const *dir, [[nonnull]] __ftw_func_t func, __STDC_INT_AS_UINT_T nopenfd);
 
 %
 %#ifdef __USE_LARGEFILE64
 
 [[cp, nodos, decl_include("<features.h>"), decl_prefix(DEFINE_FTW64_FUNC_T)]]
 [[preferred_stat64_variant_of(ftw), doc_alias("ftw")]]
-int ftw64([[nonnull]] char const *dir, [[nonnull]] __ftw64_func_t func, __STDC_INT_AS_UINT_T nopenfd);
+int ftw64([[in]] char const *dir, [[nonnull]] __ftw64_func_t func, __STDC_INT_AS_UINT_T nopenfd);
 
 %#endif /* __USE_LARGEFILE64 */
 
@@ -216,7 +216,7 @@ int ftw64([[nonnull]] char const *dir, [[nonnull]] __ftw64_func_t func, __STDC_I
 [[cp, nodos, decl_include("<features.h>"), decl_prefix(DEFINE_NFTW_FUNC_T), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)), alias("nftw")]]
 [[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)), alias("nftw64")]]
-int nftw([[nonnull]] char const *dir, [[nonnull]] __nftw_func_t func,
+int nftw([[in]] char const *dir, [[nonnull]] __nftw_func_t func,
          __STDC_INT_AS_UINT_T descriptors, __STDC_INT_AS_UINT_T flags);
 
 %
@@ -224,7 +224,7 @@ int nftw([[nonnull]] char const *dir, [[nonnull]] __nftw_func_t func,
 
 [[cp, nodos, decl_include("<features.h>"), decl_prefix(DEFINE_NFTW64_FUNC_T)]]
 [[preferred_stat64_variant_of(nftw), doc_alias("nftw")]]
-int nftw64([[nonnull]] char const *dir, [[nonnull]] __nftw64_func_t func,
+int nftw64([[in]] char const *dir, [[nonnull]] __nftw64_func_t func,
            __STDC_INT_AS_UINT_T descriptors, __STDC_INT_AS_UINT_T flags);
 
 %#endif /* __USE_LARGEFILE64 */

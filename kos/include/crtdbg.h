@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1325c83c */
+/* HASH CRC-32:0x213b8e0b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -391,10 +391,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_recalloc_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __
 #ifndef ___expand_dbg_defined
 #define ___expand_dbg_defined
 #ifdef __CRT_HAVE__expand_dbg
-__LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBDCALL _expand_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_expand_dbg");
+__LIBC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _expand_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_expand_dbg");
 #elif defined(__CRT_HAVE_realloc_in_place) || defined(__CRT_HAVE__expand)
 #include <libc/local/crtdbg/_expand_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_expand_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBDCALL _expand_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_expand_dbg))(__ptr, __num_bytes, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_expand_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBDCALL _expand_dbg)(void *__ptr, __SIZE_TYPE__ __num_bytes, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_expand_dbg))(__ptr, __num_bytes, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___expand_dbg_defined
 #endif /* !... */
@@ -413,10 +413,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_free_dbg, __FORCELOCAL __ATTR_ARTIFICIAL void _
 #ifndef ___msize_dbg_defined
 #define ___msize_dbg_defined
 #ifdef __CRT_HAVE__msize_dbg
-__LIBC __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _msize_dbg)(void *__ptr, int __block_type) __CASMNAME_SAME("_msize_dbg");
+__LIBC __ATTR_PURE __ATTR_WUNUSED __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _msize_dbg)(void *__ptr, int __block_type) __CASMNAME_SAME("_msize_dbg");
 #elif defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
 #include <libc/local/crtdbg/_msize_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_msize_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _msize_dbg)(void *__ptr, int __block_type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_msize_dbg))(__ptr, __block_type); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_msize_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _msize_dbg)(void *__ptr, int __block_type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_msize_dbg))(__ptr, __block_type); })
 #else /* ... */
 #undef ___msize_dbg_defined
 #endif /* !... */
@@ -424,10 +424,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_msize_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #ifndef ___aligned_msize_dbg_defined
 #define ___aligned_msize_dbg_defined
 #ifdef __CRT_HAVE__aligned_msize_dbg
-__LIBC __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _aligned_msize_dbg)(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) __CASMNAME_SAME("_aligned_msize_dbg");
+__LIBC __ATTR_PURE __ATTR_WUNUSED __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _aligned_msize_dbg)(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) __CASMNAME_SAME("_aligned_msize_dbg");
 #else /* __CRT_HAVE__aligned_msize_dbg */
 #include <libc/local/crtdbg/_aligned_msize_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_msize_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _aligned_msize_dbg)(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize_dbg))(__ptr, __min_alignment, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_msize_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _aligned_msize_dbg)(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize_dbg))(__ptr, __min_alignment, __offset); })
 #endif /* !__CRT_HAVE__aligned_msize_dbg */
 #endif /* !___aligned_msize_dbg_defined */
 #ifndef ___aligned_malloc_dbg_defined

@@ -220,7 +220,7 @@ $errno_t thr_setprio(thread_t thr, int priority) {
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_getschedparam)]]
 [[impl_include("<bits/os/sched.h>")]]
-$errno_t thr_getprio(thread_t thr, [[nonnull]] int *p_priority) {
+$errno_t thr_getprio(thread_t thr, [[out]] int *p_priority) {
 	errno_t result;
 	struct sched_param param;
 	int policy;

@@ -27,9 +27,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_ftw,hash:CRC-32=0xcbdb4ce9]]]*/
+/*[[[head:libc_ftw,hash:CRC-32=0xa00de196]]]*/
 /* >> ftw(3), ftw64(3) */
-INTERN ATTR_SECTION(".text.crt.fs.ftw") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.ftw") ATTR_IN(1) NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_ftw)(char const *dir,
                                __ftw_func_t func,
                                __STDC_INT_AS_UINT_T nopenfd)
@@ -44,12 +44,12 @@ NOTHROW_RPC(LIBCCALL libc_ftw)(char const *dir,
 }
 /*[[[end:libc_ftw]]]*/
 
-/*[[[head:libc_ftw64,hash:CRC-32=0xdc0dc693]]]*/
+/*[[[head:libc_ftw64,hash:CRC-32=0x4e81456f]]]*/
 #ifdef __STAT32_MATCHES_STAT64
 DEFINE_INTERN_ALIAS(libc_ftw64, libc_ftw);
 #else /* MAGIC:alias */
 /* >> ftw(3), ftw64(3) */
-INTERN ATTR_SECTION(".text.crt.fs.ftw") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.ftw") ATTR_IN(1) NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_ftw64)(char const *dir,
                                  __ftw64_func_t func,
                                  __STDC_INT_AS_UINT_T nopenfd)
@@ -65,10 +65,10 @@ NOTHROW_RPC(LIBCCALL libc_ftw64)(char const *dir,
 #endif /* MAGIC:alias */
 /*[[[end:libc_ftw64]]]*/
 
-/*[[[head:libc_nftw,hash:CRC-32=0x7178914]]]*/
+/*[[[head:libc_nftw,hash:CRC-32=0xf2a136a5]]]*/
 /* >> nftw(3), nftw64(3)
  * @param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
-INTERN ATTR_SECTION(".text.crt.fs.ftw") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.ftw") ATTR_IN(1) NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_nftw)(char const *dir,
                                 __nftw_func_t func,
                                 __STDC_INT_AS_UINT_T descriptors,
@@ -85,13 +85,13 @@ NOTHROW_RPC(LIBCCALL libc_nftw)(char const *dir,
 }
 /*[[[end:libc_nftw]]]*/
 
-/*[[[head:libc_nftw64,hash:CRC-32=0x7de46ca3]]]*/
+/*[[[head:libc_nftw64,hash:CRC-32=0x13d08eda]]]*/
 #ifdef __STAT32_MATCHES_STAT64
 DEFINE_INTERN_ALIAS(libc_nftw64, libc_nftw);
 #else /* MAGIC:alias */
 /* >> nftw(3), nftw64(3)
  * @param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
-INTERN ATTR_SECTION(".text.crt.fs.ftw") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.fs.ftw") ATTR_IN(1) NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_nftw64)(char const *dir,
                                   __nftw64_func_t func,
                                   __STDC_INT_AS_UINT_T descriptors,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc59b797 */
+/* HASH CRC-32:0x5260c35b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -490,7 +490,7 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_IN(2) ATTR_OUT(1) char *NOTHROW_NCX(LIBCCA
  * space  for doing so is available, up to the `strlen(src)' of
  * the first characters  are copied from  `src'. All  remaining
  * characters are always set  to '\0'. Always re-returns  `buf' */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_strncpy)(char *__restrict buf, char const *__restrict src, size_t buflen);
+INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUTS(1, 3) NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_strncpy)(char *__restrict buf, char const *__restrict src, size_t buflen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strncpy(3)
@@ -498,7 +498,7 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd
  * space  for doing so is available, up to the `strlen(src)' of
  * the first characters  are copied from  `src'. All  remaining
  * characters are always set  to '\0'. Always re-returns  `buf' */
-INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strncpy)(char *__restrict buf, char const *__restrict src, size_t buflen);
+INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUTS(1, 3) NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strncpy)(char *__restrict buf, char const *__restrict src, size_t buflen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strcat(3)

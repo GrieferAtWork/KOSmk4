@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5e0070 */
+/* HASH CRC-32:0x13f4bdcd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -935,10 +935,10 @@ __CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1) __ATTR_LIBC_WPRINTF(2, 0),__STDC_INT_AS_
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vfwprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) __ATTR_LIBC_WPRINTF(2, 0) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vfwprintf_l)(FILE *__stream, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vfwprintf_l))(__stream, __format, __locale, __args); })
 #endif /* ... */
 #ifdef __CRT_HAVE___vswprintf_l
-__CDECLARE(__ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__vswprintf_l,(wchar_t *__buf, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__buf,__format,__locale,__args))
+__CDECLARE(__ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_OUT(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__vswprintf_l,(wchar_t *__buf, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__buf,__format,__locale,__args))
 #else /* __CRT_HAVE___vswprintf_l */
 #include <libc/local/corecrt_wstdio/__vswprintf_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__vswprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL __vswprintf_l)(wchar_t *__buf, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__vswprintf_l))(__buf, __format, __locale, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__vswprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_OUT(1) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL __vswprintf_l)(wchar_t *__buf, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__vswprintf_l))(__buf, __format, __locale, __args); })
 #endif /* !__CRT_HAVE___vswprintf_l */
 #ifdef __CRT_HAVE__vwscanf_l
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_WSCANF(1, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vwscanf_l,(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args))
@@ -982,10 +982,10 @@ __CDECLARE(__ATTR_IN(3) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_OUTS(1, 2),__STDC_INT_A
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vswprintf_c, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_OUTS(1, 2) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vswprintf_c)(wchar_t *__buf, size_t __bufsize, wchar_t const *__format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vswprintf_c))(__buf, __bufsize, __format, __args); })
 #endif /* !__CRT_HAVE__vswprintf_c */
 #ifdef __CRT_HAVE__vswprintf
-__CDECLARE(__ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vswprintf,(wchar_t *__buf, wchar_t const *__format, __builtin_va_list __args),(__buf,__format,__args))
+__CDECLARE(__ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_OUT(1),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vswprintf,(wchar_t *__buf, wchar_t const *__format, __builtin_va_list __args),(__buf,__format,__args))
 #else /* __CRT_HAVE__vswprintf */
 #include <libc/local/corecrt_wstdio/_vswprintf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_vswprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vswprintf)(wchar_t *__buf, wchar_t const *__format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vswprintf))(__buf, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_vswprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_OUT(1) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vswprintf)(wchar_t *__buf, wchar_t const *__format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vswprintf))(__buf, __format, __args); })
 #endif /* !__CRT_HAVE__vswprintf */
 #ifdef __CRT_HAVE__vwprintf_p
 __CDECLARE(__ATTR_IN(1) __ATTR_LIBC_WPRINTF_P(1, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vwprintf_p,(wchar_t const *__format, __builtin_va_list __args),(__format,__args))
@@ -1015,16 +1015,16 @@ __CDECLARE(__ATTR_IN(1) __ATTR_LIBC_WPRINTF_P(1, 0),__STDC_INT_AS_SSIZE_T,__NOTH
 __NAMESPACE_LOCAL_USING_OR_IMPL(_vscwprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_LIBC_WPRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vscwprintf_p)(wchar_t const *__format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vscwprintf_p))(__format, __args); })
 #endif /* !__CRT_HAVE__vscwprintf_p */
 #ifdef __CRT_HAVE__vswscanf_l
-__CDECLARE(__ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vswscanf_l,(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__buf,__format,__locale,__args))
+__CDECLARE(__ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vswscanf_l,(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__buf,__format,__locale,__args))
 #else /* __CRT_HAVE__vswscanf_l */
 #include <libc/local/corecrt_wstdio/_vswscanf_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_vswscanf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vswscanf_l)(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vswscanf_l))(__buf, __format, __locale, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_vswscanf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vswscanf_l)(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vswscanf_l))(__buf, __format, __locale, __args); })
 #endif /* !__CRT_HAVE__vswscanf_l */
 #ifdef __CRT_HAVE__vswscanf_s_l
-__CDECLARE(__ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vswscanf_s_l,(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__buf,__format,__locale,__args))
+__CDECLARE(__ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vswscanf_s_l,(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__buf,__format,__locale,__args))
 #else /* __CRT_HAVE__vswscanf_s_l */
 #include <libc/local/corecrt_wstdio/_vswscanf_s_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_vswscanf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vswscanf_s_l)(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vswscanf_s_l))(__buf, __format, __locale, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_vswscanf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL _vswscanf_s_l)(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vswscanf_s_l))(__buf, __format, __locale, __args); })
 #endif /* !__CRT_HAVE__vswscanf_s_l */
 #ifdef __CRT_HAVE__vwprintf_s_l
 __CDECLARE(__ATTR_IN(1) __ATTR_LIBC_WPRINTF(1, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,_vwprintf_s_l,(wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__format,__locale,__args))
@@ -1123,11 +1123,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wprintf_p_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* __CRT_HAVE__vwprintf_p_l || (__LOCAL_stdout && (__CRT_HAVE__vfwprintf_p_l || __CRT_HAVE___stdio_common_vfwprintf_p || __CRT_HAVE_vfwprintf || __CRT_HAVE_vfwprintf_unlocked || __CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputwc || __CRT_HAVE_putwc || __CRT_HAVE_fputwc_unlocked || __CRT_HAVE_putwc_unlocked)) */
 #endif /* !__CRT_HAVE__wprintf_p_l */
 #ifdef __CRT_HAVE___swprintf_l
-__LIBC __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 4) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL __swprintf_l)(wchar_t *__buf, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("__swprintf_l");
+__LIBC __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 4) __ATTR_OUT(1) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL __swprintf_l)(wchar_t *__buf, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("__swprintf_l");
 #else /* __CRT_HAVE___swprintf_l */
 #include <libc/local/corecrt_wstdio/__swprintf_l.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(__swprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 4) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL __swprintf_l)(wchar_t *__buf, wchar_t const *__format, __locale_t __locale, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__swprintf_l))(__buf, __format, __locale, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__swprintf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 4) __ATTR_OUT(1) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL __swprintf_l)(wchar_t *__buf, wchar_t const *__format, __locale_t __locale, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__swprintf_l))(__buf, __format, __locale, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define __swprintf_l(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__swprintf_l))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -1156,11 +1156,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wprintf_p, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* __CRT_HAVE__vwprintf_p || __CRT_HAVE__vwprintf_p_l || (__LOCAL_stdout && (__CRT_HAVE__vfwprintf_p_l || __CRT_HAVE___stdio_common_vfwprintf_p || __CRT_HAVE_vfwprintf || __CRT_HAVE_vfwprintf_unlocked || __CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputwc || __CRT_HAVE_putwc || __CRT_HAVE_fputwc_unlocked || __CRT_HAVE_putwc_unlocked)) */
 #endif /* !__CRT_HAVE__wprintf_p */
 #ifdef __CRT_HAVE__swprintf
-__LIBC __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swprintf)(wchar_t *__buf, wchar_t const *__format, ...) __CASMNAME_SAME("_swprintf");
+__LIBC __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 3) __ATTR_OUT(1) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swprintf)(wchar_t *__buf, wchar_t const *__format, ...) __CASMNAME_SAME("_swprintf");
 #else /* __CRT_HAVE__swprintf */
 #include <libc/local/corecrt_wstdio/_swprintf.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(_swprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swprintf)(wchar_t *__buf, wchar_t const *__format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_swprintf))(__buf, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_swprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_LIBC_WPRINTF(2, 3) __ATTR_OUT(1) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swprintf)(wchar_t *__buf, wchar_t const *__format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_swprintf))(__buf, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define _swprintf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_swprintf))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -1352,21 +1352,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wscanf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* __CRT_HAVE__vwscanf_s_l || (__LOCAL_stdin && (__CRT_HAVE__vfwscanf_s_l || __CRT_HAVE___stdio_common_vfscanf || __CRT_HAVE_vfscanf || __CRT_HAVE__IO_vfscanf || __CRT_HAVE___vfscanf || __CRT_HAVE__vfscanf || __CRT_HAVE__vfscanf_s || __CRT_HAVE_vfscanf_unlocked || ((__CRT_HAVE_getc || __CRT_HAVE_fgetc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || __CRT_HAVE__getc_nolock || __CRT_HAVE__fgetc_nolock || (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow || __CRT_HAVE___underflow)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock)))) */
 #endif /* !__CRT_HAVE__wscanf_s_l */
 #ifdef __CRT_HAVE__swscanf_l
-__LIBC __ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 4) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_l)(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_swscanf_l");
+__LIBC __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 4) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_l)(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_swscanf_l");
 #else /* __CRT_HAVE__swscanf_l */
 #include <libc/local/corecrt_wstdio/_swscanf_l.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(_swscanf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 4) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_l)(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_swscanf_l))(__buf, __format, __locale, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_swscanf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 4) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_l)(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_swscanf_l))(__buf, __format, __locale, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define _swscanf_l(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_swscanf_l))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* !__CRT_HAVE__swscanf_l */
 #ifdef __CRT_HAVE__swscanf_s_l
-__LIBC __ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 4) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_s_l)(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_swscanf_s_l");
+__LIBC __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 4) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_s_l)(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_swscanf_s_l");
 #else /* __CRT_HAVE__swscanf_s_l */
 #include <libc/local/corecrt_wstdio/_swscanf_s_l.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(_swscanf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 4) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_s_l)(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_swscanf_s_l))(__buf, __format, __locale, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_swscanf_s_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 4) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_s_l)(wchar_t const *__buf, wchar_t const *__format, __locale_t __locale, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_swscanf_s_l))(__buf, __format, __locale, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define _swscanf_s_l(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_swscanf_s_l))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -1443,10 +1443,10 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_WSCANF(1, 0),__STDC_INT_AS_SS
 __NAMESPACE_LOCAL_USING_OR_IMPL(vwscanf_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_WSCANF(1, 0) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL vwscanf_s)(wchar_t const *__format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwscanf_s))(__format, __args); })
 #endif /* ... */
 #ifdef __CRT_HAVE_vswscanf_s
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,vswscanf_s,(wchar_t const *__buf, wchar_t const *__format, __builtin_va_list __args),(__buf,__format,__args))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,vswscanf_s,(wchar_t const *__buf, wchar_t const *__format, __builtin_va_list __args),(__buf,__format,__args))
 #else /* __CRT_HAVE_vswscanf_s */
 #include <libc/local/corecrt_wstdio/vswscanf_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(vswscanf_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL vswscanf_s)(wchar_t const *__buf, wchar_t const *__format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswscanf_s))(__buf, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(vswscanf_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 0) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL vswscanf_s)(wchar_t const *__buf, wchar_t const *__format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswscanf_s))(__buf, __format, __args); })
 #endif /* !__CRT_HAVE_vswscanf_s */
 #ifdef __CRT_HAVE_fwprintf_s
 __LIBC __ATTR_IN(2) __ATTR_INOUT(1) __ATTR_LIBC_WPRINTF(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL fwprintf_s)(FILE *__stream, wchar_t const *__format, ...) __CASMNAME_SAME("fwprintf_s");
@@ -1499,11 +1499,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wscanf_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* ... */
 #ifdef __CRT_HAVE_swscanf_s
-__LIBC __ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL swscanf_s)(wchar_t const *__buf, wchar_t const *__format, ...) __CASMNAME_SAME("swscanf_s");
+__LIBC __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL swscanf_s)(wchar_t const *__buf, wchar_t const *__format, ...) __CASMNAME_SAME("swscanf_s");
 #else /* __CRT_HAVE_swscanf_s */
 #include <libc/local/corecrt_wstdio/swscanf_s.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(swscanf_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL swscanf_s)(wchar_t const *__buf, wchar_t const *__format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swscanf_s))(__buf, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(swscanf_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_WSCANF(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL swscanf_s)(wchar_t const *__buf, wchar_t const *__format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swscanf_s))(__buf, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define swscanf_s(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swscanf_s))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */

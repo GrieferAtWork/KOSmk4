@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b1d6960 */
+/* HASH CRC-32:0x8dcd2a57 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -213,36 +213,36 @@ INTDEF ATTR_INOUT_OPT(1) NONNULL((2)) void (LIBCCALL libc_tdestroy)(void *root, 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lfind(3)
  * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
-INTDEF WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBDCALL libd_lfind)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, __compar_fn_t compar) THROWS(...);
+INTDEF WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)) void *(LIBDCALL libd_lfind)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, __compar_fn_t compar) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lfind(3)
  * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
-INTDEF WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBCCALL libc_lfind)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, __compar_fn_t compar) THROWS(...);
+INTDEF WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)) void *(LIBCCALL libc_lfind)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, __compar_fn_t compar) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lsearch(3)
  * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
  * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
-INTDEF ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBDCALL libd_lsearch)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
+INTDEF ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)) void *(LIBDCALL libd_lsearch)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lsearch(3)
  * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
  * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
-INTDEF ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBCCALL libc_lsearch)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
+INTDEF ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)) void *(LIBCCALL libc_lsearch)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBDCALL libd__lfind_s)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
+INTDEF WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)) void *(LIBDCALL libd__lfind_s)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBCCALL libc__lfind_s)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
+INTDEF WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((5)) void *(LIBCCALL libc__lfind_s)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBDCALL libd__lsearch_s)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
+INTDEF WUNUSED ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)) void *(LIBDCALL libd__lsearch_s)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBCCALL libc__lsearch_s)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
+INTDEF WUNUSED ATTR_INOUT(2) ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((5)) void *(LIBCCALL libc__lsearch_s)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
 
 DECL_END

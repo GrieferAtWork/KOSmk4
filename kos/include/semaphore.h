@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6e133f5 */
+/* HASH CRC-32:0x856b87ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,7 +120,7 @@ __CDECLARE_OPT(__ATTR_IN(1),int,__NOTHROW_RPC_KOS,sem_unlink,(const char *__name
  * point in time, keep on blocking.
  * @return: 0:  Success
  * @return: -1: [errno=EINTR] Interrupted. */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sem_wait,(sem_t *__self),(__self))
+__CDECLARE_OPT(__ATTR_INOUT(1),int,__NOTHROW_RPC,sem_wait,(sem_t *__self),(__self))
 
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_sem_timedwait) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

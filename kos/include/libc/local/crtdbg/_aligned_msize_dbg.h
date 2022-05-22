@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b75c243 */
+/* HASH CRC-32:0x7825ab8c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__aligned_msize __LIBC_LOCAL_NAME(_aligned_msize)
 #endif /* !__CRT_HAVE__aligned_msize */
 #endif /* !__local___localdep__aligned_msize_defined */
-__LOCAL_LIBC(_aligned_msize_dbg) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(_aligned_msize_dbg) __ATTR_PURE __ATTR_WUNUSED __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_aligned_msize_dbg))(void *__ptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__aligned_msize)(__ptr, __min_alignment, __offset);
 }

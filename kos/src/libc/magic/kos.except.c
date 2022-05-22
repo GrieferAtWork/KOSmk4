@@ -276,7 +276,7 @@ except_register_state_t *except_register_state(void) {
 [[impl_include("<kos/except/reason/noexec.h>")]]
 [[impl_include("<kos/except/codes.h>")]]
 [[impl_include("<kos/kernel/handle.h>")]]
-$errno_t except_as_errno([[nonnull]] struct exception_data const *__restrict self) {
+$errno_t except_as_errno([[in]] struct exception_data const *__restrict self) {
 @@pp_ifdef EPERM@@
 	errno_t result = EPERM;
 @@pp_else@@

@@ -711,7 +711,9 @@ again_parse_arg_annotations:
 						switch (self.tok) {
 						case "*":
 							self.next();
-							self.parseCStringOrKeyword();
+							sizeArgumentName = self.parseCStringOrKeyword();
+							if (self.tok == "*")
+								goto access_annotation_parse_multiply_rhs;
 							goto access_annotation_expected_le;
 						case "return":
 							self.next();
@@ -726,8 +728,9 @@ access_annotation_expected_le:
 							self.skip("<=");
 							/* FALLTHRU */
 						default: {
-							sizeArgumentName = str self.parseCStringOrKeywordOrNumber();
+							sizeArgumentName = self.parseCStringOrKeywordOrNumber();
 							if (self.tok == "*") {
+access_annotation_parse_multiply_rhs:
 								self.next();
 								local mul = self.parseCStringOrKeywordOrNumber();
 								if (mul == "1") {
@@ -772,14 +775,14 @@ access_annotation_expected_le:
 								goto annotate_generic_access;
 							}
 							self.skip(",");
-							sizeArgumentName = str self.parseCStringOrKeyword();
+							sizeArgumentName = self.parseCStringOrKeyword();
 							self.skip(")");
 						}	break;
 
 						}
 						self.skip(")");
 						extraAttributes.append([]{
-							local sizeArg = result.argsByName[sizeArgumentName];
+							local sizeArg = result.argsByName[str sizeArgumentName];
 							local sizeIndex = str(result.argv.index(sizeArg) + 1);
 							result.attributes.append("{}S({}, {})"
 								.format({ mode, argIndex, sizeIndex }));

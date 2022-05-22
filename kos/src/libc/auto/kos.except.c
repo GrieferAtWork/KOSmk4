@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2dfa5caf */
+/* HASH CRC-32:0x7f22895a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ DECL_BEGIN
 /* >> except_as_errno(3)
  * Transform the  given exception  into  a posix  errno  value.
  * When no special errno is defined for `data', return `EPERM'. */
-INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_PURE WUNUSED NONNULL((1)) errno_t
+INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_PURE WUNUSED ATTR_IN(1) errno_t
 NOTHROW_NCX(LIBKCALL libc_except_as_errno)(struct exception_data const *__restrict self) {
 #ifdef EPERM
 	errno_t result = EPERM;

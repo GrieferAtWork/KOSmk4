@@ -308,7 +308,7 @@ int lfutexexpr64([[nonnull]] lfutex_t *ulockaddr, void *base,
 [[section(".text.crt{|.dos}.sched.futexlockexpr")]]
 [[exposed_name("LFutexExpr"), crt_name("LFutexExpr")]]
 int LFutexExpr_except([[nonnull]] lfutex_t *ulockaddr, void *base,
-                      [[nonnull]] struct lfutexexpr const *expr,
+                      [[in]] struct lfutexexpr const *expr,
                       [[in_opt]] struct timespec const *timeout,
                       unsigned int timeout_flags) {
 @@pp_if $has_function(crt_LFutexExpr32_except)@@
@@ -335,7 +335,7 @@ int LFutexExpr_except([[nonnull]] lfutex_t *ulockaddr, void *base,
 [[userimpl, requires_function(crt_LFutexExpr32_except), section(".text.crt{|.dos}.sched.futexlockexpr")]]
 [[exposed_name("LFutexExpr64"), crt_name("LFutexExpr64")]]
 int LFutexExpr64_except([[nonnull]] lfutex_t *ulockaddr, void *base,
-                        [[nonnull]] struct lfutexexpr const *expr,
+                        [[in]] struct lfutexexpr const *expr,
                         [[in_opt]] struct timespec64 const *timeout,
                         unsigned int timeout_flags) {
 	struct timespec32 tms32;
@@ -373,7 +373,7 @@ int LFutexExpr64_except([[nonnull]] lfutex_t *ulockaddr, void *base,
 @@pp_endif@@
 )]]
 int LFutexExprI_except([[nonnull]] lfutex_t *ulockaddr, void *base,
-                       [[nonnull]] struct lfutexexpr const *expr,
+                       [[in]] struct lfutexexpr const *expr,
                        [[in_opt]] struct timespec const *timeout,
                        unsigned int timeout_flags) {
 @@pp_if !defined(__BUILDING_LIBC) && $has_function(crt_LFutexExprI32_except)@@
@@ -416,7 +416,7 @@ int LFutexExprI_except([[nonnull]] lfutex_t *ulockaddr, void *base,
 @@pp_endif@@
 )]]
 int LFutexExprI64_except([[nonnull]] lfutex_t *ulockaddr, void *base,
-                         [[nonnull]] struct lfutexexpr const *expr,
+                         [[in]] struct lfutexexpr const *expr,
                          [[in_opt]] struct timespec64 const *timeout,
                          unsigned int timeout_flags) {
 @@pp_if !defined(__BUILDING_LIBC) && $has_function(crt_LFutexExprI32_except)@@
