@@ -315,7 +315,7 @@ wchar_t *_wtempnam([[in_opt]] wchar_t const *directory,
 
 [[decl_include("<bits/types.h>")]]
 [[wchar, section(".text.crt.dos.wchar.fs.utility")]]
-$errno_t _wtmpnam_s([[outp(wchar_count)]] wchar_t *dst, size_t wchar_count);
+$errno_t _wtmpnam_s([[out(? <= wchar_count)]] wchar_t *dst, size_t wchar_count);
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, section(".text.crt.dos.wchar.fs.utility")]]

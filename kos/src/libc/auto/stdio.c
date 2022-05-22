@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda3b84db */
+/* HASH CRC-32:0xe167a2ec */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,7 +110,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") int
  * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when the
  * buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf').
  * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' on error. */
-INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_INOUT(3) NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_INOUT(3) ATTR_OUTS(1, 2) char *
 (LIBCCALL libc_fgets)(char *__restrict buf,
                       __STDC_INT_AS_SIZE_T bufsize,
                       FILE *__restrict stream) THROWS(...) {
@@ -1515,7 +1515,7 @@ NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *__restrict magic_cookie,
 #include <libc/errno.h>
 /* >> fgets_unlocked(3)
  * Same as `fgets()', but performs I/O without acquiring a lock to `stream' */
-INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED ATTR_INOUT(3) NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED ATTR_INOUT(3) ATTR_OUTS(1, 2) char *
 (LIBCCALL libc_fgets_unlocked)(char *__restrict buf,
                                __STDC_INT_AS_SIZE_T bufsize,
                                FILE *__restrict stream) THROWS(...) {
@@ -2776,7 +2776,7 @@ NOTHROW_RPC(LIBCCALL libc_fread_s)(void *__restrict buf,
 }
 #include <libc/template/stdstreams.h>
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.read") WUNUSED NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.read") WUNUSED ATTR_OUTS(1, 2) char *
 NOTHROW_RPC(LIBCCALL libc_gets_s)(char *__restrict buf,
                                   rsize_t bufsize) {
 	if unlikely(!buf) {

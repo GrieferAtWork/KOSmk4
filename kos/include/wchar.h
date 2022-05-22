@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d474bb4 */
+/* HASH CRC-32:0xe38af4e2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -563,31 +563,31 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mbsinit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #endif /* !__CRT_HAVE_mbsinit */
 #ifdef __CRT_HAVE_wmemcmp
 /* >> wmemcmp(3) */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wmemcmp,(wchar_t const *__s1, wchar_t const *__s2, size_t __num_chars),(__s1,__s2,__num_chars))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wmemcmp,(wchar_t const *__s1, wchar_t const *__s2, size_t __num_chars),(__s1,__s2,__num_chars))
 #elif defined(__CRT_HAVE_memcmpw) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INT__ <= 2
 /* >> wmemcmp(3) */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wmemcmp,(wchar_t const *__s1, wchar_t const *__s2, size_t __num_chars),memcmpw,(__s1,__s2,__num_chars))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wmemcmp,(wchar_t const *__s1, wchar_t const *__s2, size_t __num_chars),memcmpw,(__s1,__s2,__num_chars))
 #elif defined(__CRT_HAVE_memcmpl) && __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INT__ <= 4
 /* >> wmemcmp(3) */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wmemcmp,(wchar_t const *__s1, wchar_t const *__s2, size_t __num_chars),memcmpl,(__s1,__s2,__num_chars))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wmemcmp,(wchar_t const *__s1, wchar_t const *__s2, size_t __num_chars),memcmpl,(__s1,__s2,__num_chars))
 #elif __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INT__ <= 2
 __NAMESPACE_STD_END
 #include <libc/local/string/memcmpw.h>
 __NAMESPACE_STD_BEGIN
 /* >> wmemcmp(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL wmemcmp)(wchar_t const *__s1, wchar_t const *__s2, size_t __num_chars) { return (int)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpw))((void const *)__s1, (void const *)__s2, (__SIZE_TYPE__)__num_chars); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL wmemcmp)(wchar_t const *__s1, wchar_t const *__s2, size_t __num_chars) { return (int)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpw))((void const *)__s1, (void const *)__s2, (__SIZE_TYPE__)__num_chars); }
 #elif __SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INT__ <= 4
 __NAMESPACE_STD_END
 #include <libc/local/string/memcmpl.h>
 __NAMESPACE_STD_BEGIN
 /* >> wmemcmp(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL wmemcmp)(wchar_t const *__s1, wchar_t const *__s2, size_t __num_chars) { return (int)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpl))((void const *)__s1, (void const *)__s2, (__SIZE_TYPE__)__num_chars); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL wmemcmp)(wchar_t const *__s1, wchar_t const *__s2, size_t __num_chars) { return (int)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpl))((void const *)__s1, (void const *)__s2, (__SIZE_TYPE__)__num_chars); }
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/wchar/wmemcmp.h>
 __NAMESPACE_STD_BEGIN
 /* >> wmemcmp(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(wmemcmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL wmemcmp)(wchar_t const *__s1, wchar_t const *__s2, size_t __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcmp))(__s1, __s2, __num_chars); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wmemcmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL wmemcmp)(wchar_t const *__s1, wchar_t const *__s2, size_t __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcmp))(__s1, __s2, __num_chars); })
 #endif /* !... */
 #ifdef __CRT_HAVE_wmemcpy
 /* >> wmemcpy(3) */
@@ -2356,14 +2356,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcwidth, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_C
  * Returns the number of columns needed to display `str...+=wcslen(str, num_chars)'
  * in a system terminal. If any of the contained characters cannot be printed, then
  * `-1' is returned. (s.a. `wcwidth(3)') */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT32_AS_SSIZE_T,__NOTHROW_NCX,wcswidth,(wchar_t const *__restrict __str, __SIZE_TYPE__ __num_chars),(__str,__num_chars))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_NONNULL((1)),__STDC_INT32_AS_SSIZE_T,__NOTHROW_NCX,wcswidth,(wchar_t const *__restrict __str, __SIZE_TYPE__ __num_chars),(__str,__num_chars))
 #else /* __CRT_HAVE_wcswidth */
 #include <libc/local/wchar/wcswidth.h>
 /* >> wcswidth(3)
  * Returns the number of columns needed to display `str...+=wcslen(str, num_chars)'
  * in a system terminal. If any of the contained characters cannot be printed, then
  * `-1' is returned. (s.a. `wcwidth(3)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcswidth, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT32_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL wcswidth)(wchar_t const *__restrict __str, __SIZE_TYPE__ __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcswidth))(__str, __num_chars); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcswidth, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_NONNULL((1)) __STDC_INT32_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL wcswidth)(wchar_t const *__restrict __str, __SIZE_TYPE__ __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcswidth))(__str, __num_chars); })
 #endif /* !__CRT_HAVE_wcswidth */
 #endif /* __USE_XOPEN */
 

@@ -120,22 +120,36 @@ TODO: Incomplete
 
 | Annotation               | Description                                               |
 | ------------------------ | --------------------------------------------------------- |
-| `[format_arg]`           | Add attribute `__ATTR_FORMAT_ARG(<argumentIndex>)`        |
+| `[format_arg]`           | Add attribute `__ATTR_FORMAT_ARG(<I>)`                    |
 | `[nullable]`             | no-op                                                     |
 | `[null]`                 | no-op                                                     |
-| `[nonnull]`              | Add arg index to `ATTR_NONNULL((...))`                    |
-| `[in]`                   | `__ATTR_`                                       |
-| `[inpb(...)]`            | Same as `[nonnull]`                                       |
-| `[inp_opt(...)]`         | no-op                                                     |
-| `[inpb_opt(...)]`        | no-op                                                     |
-| `[outp(...)]`            | Same as `[nonnull]`                                       |
-| `[outpb(...)]`           | Same as `[nonnull]`                                       |
-| `[outp_opt(...)]`        | no-op                                                     |
-| `[outpb_opt(...)]`       | no-op                                                     |
-| `[inoutp(...)]`          | Same as `[nonnull]`                                       |
-| `[inoutpb(...)]`         | Same as `[nonnull]`                                       |
-| `[inoutp_opt(...)]`      | no-op                                                     |
-| `[inoutpb_opt(...)]`     | no-op                                                     |
+| `[nonnull]`              | Add arg index to `ATTR_NONNULL((<I>))`                    |
+| `[in]`                   | `__ATTR_IN(<I>)`                                          |
+| `[in_opt]`               | `__ATTR_IN_OPT(<I>)`                                      |
+| `[out]`                  | `__ATTR_OUT(<I>)`                                         |
+| `[out_opt]`              | `__ATTR_OUT_OPT(<I>)`                                     |
+| `[inout]`                | `__ATTR_INOUT(<I>)`                                       |
+| `[inout_opt]`            | `__ATTR_INOUT_OPT(<I>)`                                   |
+| `[in(sizearg)]`          | `__ATTR_INS(<I>, <SIZEARG>)`                              |
+| `[out(sizearg)]`         | `__ATTR_OUTS(<I>, <SIZEARG>)`                             |
+| `[inout(sizearg)]`       | `__ATTR_INOUTS(<I>, <SIZEARG>)`                           |
+
+Additionally, `in,out,inout` also accept the following:
+
+| Annotation                  | Description                                               |
+| --------------------------- | --------------------------------------------------------- |
+| `[in(sizearg)]`             | Access exactly `sizearg` elements/bytes                   |
+| `[in(? <= sizearg)]`        | Access up to `sizearg` elements/bytes                     |
+| `[in(? <= *pavail)]`        | Access up to `*pavail` elements/bytes                     |
+| `[in(return <= sizearg)]`   | Access up to `sizearg` elements/bytes (exact: `return')   |
+| `[in(return <= *pavail)]`   | Access up to `*pavail` elements/bytes (exact: `return')   |
+| `[in(*pused <= sizearg)]`   | Access up to `sizearg` elements/bytes (exact: `*pused')   |
+| `[in(*pused <= *pavail)]`   | Access up to `*pavail` elements/bytes (exact: `*pused')   |
+| `[in(sizearg * N)]`         | Access exactly `sizearg * N` elements/bytes               |
+| `[in(N * sizearg)]`         | Access exactly `sizearg * N` elements/bytes               |
+| `[in(strlen(.))]`           | Same as `[in]` when attached to `char const *`            |
+| `[in(strnlen(., sizearg))]` | Same as `[in(? <= sizearg)]`, but slightly more specific  |
+
 
 ### Annotations (return types)
 

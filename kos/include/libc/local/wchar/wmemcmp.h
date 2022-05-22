@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fec12c */
+/* HASH CRC-32:0x8d939869 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcmpw __LIBC_LOCAL_NAME(memcmpw)
 #endif /* !... */
 #endif /* !__local___localdep_memcmpw_defined */
-__LOCAL_LIBC(wmemcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(wmemcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmemcmp))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __num_chars) {
 #if __SIZEOF_WCHAR_T__ == 2
 	return (int)(__NAMESPACE_LOCAL_SYM __localdep_memcmpw)(__s1, __s2, __num_chars);

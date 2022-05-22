@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d5e0e7a */
+/* HASH CRC-32:0xef1ab7fb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fwrite_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fwrite_unlocked_defined */
-__LOCAL_LIBC(file_printer_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
+__LOCAL_LIBC(file_printer_unlocked) __ATTR_INS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __LIBC_LOCAL_NAME(file_printer_unlocked))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) {
 	return (__SSIZE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_fwrite_unlocked)(__data, sizeof(char), __datalen, (__FILE *)__arg);
 }

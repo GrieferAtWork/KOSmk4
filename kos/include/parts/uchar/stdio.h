@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9975e443 */
+/* HASH CRC-32:0x561b9146 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3486,14 +3486,14 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN_OPT(1) __ATTR_IN_OPT(2),char32_t *,__NOTHRO
 __CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_IN_OPT(1) __ATTR_IN_OPT(2),char32_t *,__NOTHROW_NCX,_c32tempnam,(char32_t const *__directory, char32_t const *__file_prefix),_wtempnam,(__directory,__file_prefix))
 #endif /* ... */
 #if defined(__CRT_HAVE__wtmpnam_s) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,_c16tmpnam_s,(char16_t *__dst, size_t __wchar_count),_wtmpnam_s,(__dst,__wchar_count))
+__CREDIRECT(__ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,_c16tmpnam_s,(char16_t *__dst, size_t __wchar_count),_wtmpnam_s,(__dst,__wchar_count))
 #elif defined(__CRT_HAVE_DOS$_wtmpnam_s)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,_c16tmpnam_s,(char16_t *__dst, size_t __wchar_count),_wtmpnam_s,(__dst,__wchar_count))
+__CREDIRECT_DOS(__ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,_c16tmpnam_s,(char16_t *__dst, size_t __wchar_count),_wtmpnam_s,(__dst,__wchar_count))
 #endif /* ... */
 #if defined(__CRT_HAVE__wtmpnam_s) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,_c32tmpnam_s,(char32_t *__dst, size_t __wchar_count),_wtmpnam_s,(__dst,__wchar_count))
+__CREDIRECT(__ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,_c32tmpnam_s,(char32_t *__dst, size_t __wchar_count),_wtmpnam_s,(__dst,__wchar_count))
 #elif defined(__CRT_HAVE_KOS$_wtmpnam_s)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,_c32tmpnam_s,(char32_t *__dst, size_t __wchar_count),_wtmpnam_s,(__dst,__wchar_count))
+__CREDIRECT_KOS(__ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,_c32tmpnam_s,(char32_t *__dst, size_t __wchar_count),_wtmpnam_s,(__dst,__wchar_count))
 #endif /* ... */
 #if defined(__CRT_HAVE__wtmpnam) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(,char16_t *,__NOTHROW_NCX,_c16tmpnam,(char16_t *__buf),_wtmpnam,(__buf))

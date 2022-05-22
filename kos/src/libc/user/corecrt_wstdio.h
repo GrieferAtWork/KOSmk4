@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d79b936 */
+/* HASH CRC-32:0x88c341fe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,8 +33,8 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTDEF WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) char16_t *NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory, char16_t const *file_prefix);
 INTDEF WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) char32_t *NOTHROW_NCX(LIBKCALL libc__wtempnam)(char32_t const *directory, char32_t const *file_prefix);
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst, size_t wchar_count);
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc__wtmpnam_s)(char32_t *dst, size_t wchar_count);
+INTDEF ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst, size_t wchar_count);
+INTDEF ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wtmpnam_s)(char32_t *dst, size_t wchar_count);
 INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd__wtmpnam)(char16_t *buf);
 INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc__wtmpnam)(char32_t *buf);
 #endif /* !__KERNEL__ */

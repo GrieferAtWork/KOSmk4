@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2afae5e3 */
+/* HASH CRC-32:0xe5e0070 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -795,7 +795,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_putws, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN
 #endif /* __LOCAL_stdout && (__CRT_HAVE_fputws || __CRT_HAVE_fputws_unlocked || __CRT_HAVE__fputws_nolock || __CRT_HAVE_file_wprinter || __CRT_HAVE_file_wprinter_unlocked || __CRT_HAVE_fputwc || __CRT_HAVE_putwc || __CRT_HAVE_fputwc_unlocked || __CRT_HAVE_putwc_unlocked) */
 #endif /* !__CRT_HAVE__putws */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_IN_OPT(1) __ATTR_IN_OPT(2),wchar_t *,__NOTHROW_NCX,_wtempnam,(wchar_t const *__directory, wchar_t const *__file_prefix),(__directory,__file_prefix))
-__CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,_wtmpnam_s,(wchar_t *__dst, size_t __wchar_count),(__dst,__wchar_count))
+__CDECLARE_OPT(__ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,_wtmpnam_s,(wchar_t *__dst, size_t __wchar_count),(__dst,__wchar_count))
 __CDECLARE_OPT(,wchar_t *,__NOTHROW_NCX,_wtmpnam,(wchar_t *__buf),(__buf))
 #ifdef __CRT_HAVE___stdio_common_vfwprintf
 __CDECLARE(__ATTR_IN(3) __ATTR_INOUT(2) __ATTR_LIBC_WPRINTF(3, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__stdio_common_vfwprintf,(__UINT64_TYPE__ __options, FILE *__stream, wchar_t const *__format, __locale_t __locale, __builtin_va_list __args),(__options,__stream,__format,__locale,__args))

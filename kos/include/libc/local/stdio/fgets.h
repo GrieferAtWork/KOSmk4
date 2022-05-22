@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94cc445 */
+/* HASH CRC-32:0x4f9f041e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,7 +94,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fgets) __ATTR_WUNUSED __ATTR_INOUT(3) __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(fgets) __ATTR_WUNUSED __ATTR_INOUT(3) __ATTR_OUTS(1, 2) char *
 (__LIBCCALL __LIBC_LOCAL_NAME(fgets))(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) __THROWS(...) {
 	__SIZE_TYPE__ __n;
 	if __unlikely(!__buf || !__bufsize) {

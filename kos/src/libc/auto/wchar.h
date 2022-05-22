@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc69c537b */
+/* HASH CRC-32:0x88f9d3da */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,9 +94,9 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN_OPT(1) int NOTHROW_NCX(LIBDCALL libd_mbsinit)(m
 /* >> mbsinit(3) */
 INTDEF ATTR_PURE WUNUSED ATTR_IN_OPT(1) int NOTHROW_NCX(LIBCCALL libc_mbsinit)(mbstate_t const *mbs);
 /* >> wmemcmp(3) */
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1, char16_t const *s2, size_t num_chars);
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1, char16_t const *s2, size_t num_chars);
 /* >> wmemcmp(3) */
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBKCALL libc_wmemcmp)(char32_t const *s1, char32_t const *s2, size_t num_chars);
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBKCALL libc_wmemcmp)(char32_t const *s1, char32_t const *s2, size_t num_chars);
 /* >> wcscpy(3) */
 INTDEF ATTR_RETNONNULL ATTR_IN(2) ATTR_OUT(1) char16_t *NOTHROW_NCX(LIBDCALL libd_wcscpy)(char16_t *__restrict buf, char16_t const *__restrict src);
 /* >> wcscpy(3) */
@@ -319,12 +319,12 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc_wcwidth)(char32_t ch);
  * Returns the number of columns needed to display `str...+=wcslen(str, num_chars)'
  * in a system terminal. If any of the contained characters cannot be printed, then
  * `-1' is returned. (s.a. `wcwidth(3)') */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) __STDC_INT32_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_wcswidth)(char16_t const *__restrict str, size_t num_chars);
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) NONNULL((1)) __STDC_INT32_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_wcswidth)(char16_t const *__restrict str, size_t num_chars);
 /* >> wcswidth(3)
  * Returns the number of columns needed to display `str...+=wcslen(str, num_chars)'
  * in a system terminal. If any of the contained characters cannot be printed, then
  * `-1' is returned. (s.a. `wcwidth(3)') */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) __STDC_INT32_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc_wcswidth)(char32_t const *__restrict str, size_t num_chars);
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) NONNULL((1)) __STDC_INT32_AS_SSIZE_T NOTHROW_NCX(LIBKCALL libc_wcswidth)(char32_t const *__restrict str, size_t num_chars);
 /* >> wcschrnul(3)
  * Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) char16_t *NOTHROW_NCX(LIBDCALL libd_wcschrnul)(char16_t const *haystack, char16_t needle);

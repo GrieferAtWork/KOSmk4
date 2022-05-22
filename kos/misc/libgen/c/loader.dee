@@ -589,7 +589,6 @@ again_parse_arg_annotations:
 
 				case "nonnull":
 					tok = self.next();
-do_add_nonnull_annotation:
 					if (nonNullArguments is none)
 						nonNullArguments = HashSet();
 					nonNullArguments.insert(#result.argv + 1);
@@ -693,10 +692,9 @@ do_add_nonnull_annotation:
 						 * It therefor stands to reason to disallow NULL. */
 						if (shouldMarkAsNonNull)
 							shouldMarkAsNonNull = result.isPureOrLeaf;
-						/* We recognize the following expressions:
+						/* We recognize the following extended expressions:
 						 * >> void   foo([[in]]                         void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1)))
 						 * >> void   foo([[in(sizearg)]]                void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
-						 * >> void   foo([[in(<= sizearg)]]             void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
 						 * >> void   foo([[in(? <= sizearg)]]           void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
 						 * >> size_t foo([[in(return <= sizearg)]]      void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
 						 * >> void   foo([[in(*p_retsize <= sizearg)]]  void const *p, size_t sizearg,
@@ -707,11 +705,6 @@ do_add_nonnull_annotation:
 						 * >> void   foo([[in(strlen(p))]]              char const *p, size_t sizearg);   -->   __attribute__((nonnull(1), access(read_only, 1)))
 						 * >> void   foo([[in(strnlen(., sizearg))]]    char const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
 						 * >> void   foo([[in(strnlen(p, sizearg))]]    char const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
-						 *
-						 * Guarantied equivalencies:
-						 *  - [[in(strlen(.))]]           <===>   [[in]]
-						 *  - [[in(strnlen(., maxlen))]]  <===>   [[in(? <= maxlen)]]
-						 *
 						 */
 						self.next();
 						local sizeArgumentName;
@@ -730,10 +723,7 @@ do_add_nonnull_annotation:
 						case "?":
 							self.next();
 access_annotation_expected_le:
-							self.expect("<=");
-							/* FALLTHRU */
-						case "<=":
-							self.next();
+							self.skip("<=");
 							/* FALLTHRU */
 						default: {
 							sizeArgumentName = str self.parseCStringOrKeywordOrNumber();
@@ -811,28 +801,6 @@ annotate_generic_access:
 					}
 					tok = self.tok;
 				}	break;
-
-
-					/* (Mostly) ignored annotations */
-				case "inp":
-				case "inpb":
-				case "inp_opt":
-				case "inpb_opt":
-				case "outp":
-				case "outpb":
-				case "outp_opt":
-				case "outpb_opt":
-				case "inoutp":
-				case "inoutpb":
-				case "inoutp_opt":
-				case "inoutpb_opt":
-					self.next();
-					self.skip("(");
-					self.skipPair("(", ")");
-					self.skip(")");
-					if (!tok.endswith("_opt"))
-						goto do_add_nonnull_annotation;
-					break;
 
 				default:
 					self.err("Unknown argument annotation {!r}"

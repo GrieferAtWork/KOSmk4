@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56580a5a */
+/* HASH CRC-32:0x2f7704d4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -433,7 +433,7 @@ NOTHROW_NCX(LIBCCALL libc_mbsinit)(mbstate_t const *mbs) {
 }
 #if !defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2
 /* >> wmemcmp(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1,
                                    char16_t const *s2,
                                    size_t num_chars) {
@@ -448,7 +448,7 @@ NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1,
 #endif /* !LIBC_ARCH_HAVE_C16MEMCMP && __SIZEOF_INT__ > 2 */
 #if !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
 /* >> wmemcmp(3) */
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wmemcmp)(char32_t const *s1,
                                    char32_t const *s2,
                                    size_t num_chars) {
@@ -2362,7 +2362,7 @@ NOTHROW_NCX(LIBKCALL libc_wcwidth)(char32_t ch) {
  * Returns the number of columns needed to display `str...+=wcslen(str, num_chars)'
  * in a system terminal. If any of the contained characters cannot be printed, then
  * `-1' is returned. (s.a. `wcwidth(3)') */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) __STDC_INT32_AS_SSIZE_T
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_INS(1, 2) NONNULL((1)) __STDC_INT32_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd_wcswidth)(char16_t const *__restrict str,
                                     size_t num_chars) {
 	int temp;
@@ -2382,7 +2382,7 @@ NOTHROW_NCX(LIBDCALL libd_wcswidth)(char16_t const *__restrict str,
  * Returns the number of columns needed to display `str...+=wcslen(str, num_chars)'
  * in a system terminal. If any of the contained characters cannot be printed, then
  * `-1' is returned. (s.a. `wcwidth(3)') */
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) __STDC_INT32_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_INS(1, 2) NONNULL((1)) __STDC_INT32_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc_wcswidth)(char32_t const *__restrict str,
                                     size_t num_chars) {
 	int temp;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93192f2c */
+/* HASH CRC-32:0xfb9d1b8e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -220,10 +220,10 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(2) int (LIBCCALL libc_fgetpos64)(FILE *__restrict 
 INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBCCALL libc_fsetpos64)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
 /* >> file_printer(3)
  * For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
-INTDEF NONNULL((1, 2)) ssize_t (__FORMATPRINTER_CC libc_file_printer)(void *arg, char const *__restrict data, size_t datalen) THROWS(...);
+INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t (__FORMATPRINTER_CC libc_file_printer)(void *arg, char const *__restrict data, size_t datalen) THROWS(...);
 /* >> file_printer_unlocked(3)
  * Same as `file_printer()', but performs I/O without acquiring a lock to `(FILE *)arg' */
-INTDEF NONNULL((1, 2)) ssize_t (__FORMATPRINTER_CC libc_file_printer_unlocked)(void *arg, char const *__restrict data, size_t datalen) THROWS(...);
+INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t (__FORMATPRINTER_CC libc_file_printer_unlocked)(void *arg, char const *__restrict data, size_t datalen) THROWS(...);
 /* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
 INTDEF ATTR_IN(2) ATTR_INOUT(3) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5da7cab5 */
+/* HASH CRC-32:0x87584429 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcwidth __LIBC_LOCAL_NAME(wcwidth)
 #endif /* !__CRT_HAVE_wcwidth */
 #endif /* !__local___localdep_wcwidth_defined */
-__LOCAL_LIBC(wcswidth) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT32_AS_SSIZE_T
+__LOCAL_LIBC(wcswidth) __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_NONNULL((1)) __STDC_INT32_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcswidth))(__WCHAR_TYPE__ const *__restrict __str, __SIZE_TYPE__ __num_chars) {
 	int __temp;
 	__STDC_INT32_AS_SSIZE_T __result = 0;

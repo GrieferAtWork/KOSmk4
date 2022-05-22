@@ -777,7 +777,7 @@ DEFINE_GMTIME_BUFFER
 
 [[decl_include("<bits/crt/tm.h>", "<hybrid/typecore.h>"), doc_alias("strftime_l")]]
 [[ignore, nocrt, alias("strftime_l", "_strftime_l", "__strftime_l")]]
-$size_t crt_strftime_l([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
+$size_t crt_strftime_l([[out(return <= bufsize)]] char *__restrict buf, $size_t bufsize,
                        [[in, format("strftime")]] char const *__restrict format,
                        [[in]] struct $tm const *__restrict tp,
                        $locale_t locale);

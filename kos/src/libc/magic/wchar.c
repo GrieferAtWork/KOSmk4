@@ -486,8 +486,8 @@ int mbsinit([[in_opt]] mbstate_t const *mbs) {
 [[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2)]]
 /* When sizeof(int) <= 4: export int wmemcmp(...) = int32_t memcmpl(...); */
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4)]]
-int wmemcmp([[inp(num_chars)]] wchar_t const *s1,
-            [[inp(num_chars)]] wchar_t const *s2,
+int wmemcmp([[in(num_chars)]] wchar_t const *s1,
+            [[in(num_chars)]] wchar_t const *s2,
             size_t num_chars) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	return (int)memcmpw(s1, s2, num_chars);
@@ -1399,7 +1399,7 @@ int wcwidth(wchar_t ch) {
 @@`-1' is returned. (s.a. `wcwidth(3)')
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 [[wchar, pure, wunused, decl_include("<hybrid/typecore.h>", "<features.h>")]]
-__STDC_INT32_AS_SSIZE_T wcswidth([[inp(num_chars)]] wchar_t const *__restrict str,
+__STDC_INT32_AS_SSIZE_T wcswidth([[in(wcsnlen(str, num_chars))]] wchar_t const *__restrict str,
                                  $size_t num_chars) {
 	int temp;
 	__STDC_INT32_AS_SSIZE_T result = 0;

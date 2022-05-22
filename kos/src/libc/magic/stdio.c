@@ -954,7 +954,7 @@ int putchar(int ch) {
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgets_unlocked")]]
 [[export_alias("_IO_fgets"), alias("fgets_unlocked"), impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
 [[requires($has_function(fgetc) && $has_function(ungetc) && $has_function(ferror))]]
-char *fgets([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
+char *fgets([[out(? <= bufsize)]] char *__restrict buf,
             __STDC_INT_AS_SIZE_T bufsize, [[inout]] FILE *__restrict stream) {
 	size_t n;
 	if unlikely(!buf || !bufsize) {
@@ -2727,7 +2727,7 @@ $FILE *fopencookie(void *__restrict magic_cookie,
 [[cp_stdio, alias("fgets"), wunused, decl_include("<features.h>")]]
 [[impl_include("<hybrid/typecore.h>", "<asm/crt/stdio.h>", "<libc/errno.h>")]]
 [[requires($has_function(fgetc_unlocked) && $has_function(ungetc_unlocked) && $has_function(ferror_unlocked))]]
-char *fgets_unlocked([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
+char *fgets_unlocked([[out(? <= bufsize)]] char *__restrict buf,
                      __STDC_INT_AS_SIZE_T bufsize, [[inout]] $FILE *__restrict stream) {
 	$size_t n;
 	if unlikely(!buf || !bufsize) {
@@ -3033,7 +3033,7 @@ int fsetpos64([[inout]] $FILE *__restrict stream,
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("file_printer_unlocked")]]
 [[alias("file_printer_unlocked"), userimpl, requires_function(fwrite)]]
 $ssize_t file_printer([[nonnull]] /*FILE*/ void *arg,
-                      [[inp(datalen)]] char const *__restrict data,
+                      [[in(datalen)]] char const *__restrict data,
                       $size_t datalen) {
 	return (ssize_t)fwrite(data, sizeof(char), datalen, ($FILE *)arg);
 }
@@ -3046,7 +3046,7 @@ $ssize_t file_printer([[nonnull]] /*FILE*/ void *arg,
 [[cp_stdio, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[alias("file_printer"), userimpl, requires_function(fwrite_unlocked)]]
 $ssize_t file_printer_unlocked([[nonnull]] /*FILE*/ void *arg,
-                               [[inp(datalen)]] char const *__restrict data,
+                               [[in(datalen)]] char const *__restrict data,
                                $size_t datalen) {
 	return (ssize_t)fwrite_unlocked(data, sizeof(char), datalen, ($FILE *)arg);
 }
@@ -4851,7 +4851,7 @@ $size_t fread_s([[out(return * elemsize <= elemcount * elemsize)]] void *__restr
 [[requires(defined(__LOCAL_stdin) && $has_function(fgets))]]
 [[impl_include("<libc/template/stdstreams.h>", "<libc/errno.h>")]]
 [[section(".text.crt.dos.FILE.locked.read.read")]]
-char *gets_s([[outp(min(strlen(return), bufsize))]] char *__restrict buf, rsize_t bufsize) {
+char *gets_s([[out(? <= bufsize)]] char *__restrict buf, rsize_t bufsize) {
 	if unlikely(!buf) {
 @@pp_ifdef EINVAL@@
 		(void)libc_seterrno(EINVAL);

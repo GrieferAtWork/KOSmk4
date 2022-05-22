@@ -55,8 +55,8 @@ NOTHROW_NCX(LIBKCALL libc__wtempnam)(char32_t const *directory,
 }
 /*[[[end:libc__wtempnam]]]*/
 
-/*[[[head:libd__wtmpnam_s,hash:CRC-32=0x43df0b35]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
+/*[[[head:libd__wtmpnam_s,hash:CRC-32=0x206448b]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
                                       size_t wchar_count)
 /*[[[body:libd__wtmpnam_s]]]*/
@@ -68,8 +68,8 @@ NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
 }
 /*[[[end:libd__wtmpnam_s]]]*/
 
-/*[[[head:libc__wtmpnam_s,hash:CRC-32=0xf4219000]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") NONNULL((1)) errno_t
+/*[[[head:libc__wtmpnam_s,hash:CRC-32=0xe3585487]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc__wtmpnam_s)(char32_t *dst,
                                       size_t wchar_count)
 /*[[[body:libc__wtmpnam_s]]]*/
