@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d0a9877 */
+/* HASH CRC-32:0x8dfe14ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_strstr_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strstr) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) char *
+__LOCAL_LIBC(strstr) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strstr))(char const *__haystack, char const *__needle) {
 	char __ch, __needle_start = *__needle++;
 	while ((__ch = *__haystack++) != '\0') {

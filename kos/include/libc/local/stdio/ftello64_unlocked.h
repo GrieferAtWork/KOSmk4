@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x752ee842 */
+/* HASH CRC-32:0xc0673d2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,41 +29,41 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ftello64_defined
 #define __local___localdep_ftello64_defined
 #if defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
 #elif defined(__CRT_HAVE__ftell_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
 #elif defined(__CRT_HAVE_ftello_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ftello64_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ftell64_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell64_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell64_unlocked,(__stream))
 #elif defined(__CRT_HAVE__ftelli64_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
 #elif defined(__CRT_HAVE_ftell) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell,(__stream))
 #elif defined(__CRT_HAVE__IO_ftell) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_IO_ftell,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_IO_ftell,(__stream))
 #elif defined(__CRT_HAVE_ftello) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello,(__stream))
 #elif defined(__CRT_HAVE_ftello64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello64,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello64,(__stream))
 #elif defined(__CRT_HAVE_ftell64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell64,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell64,(__stream))
 #elif defined(__CRT_HAVE__ftelli64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_ftelli64,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_ftelli64,(__stream))
 #elif defined(__CRT_HAVE_ftell_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
 #elif defined(__CRT_HAVE__ftell_nolock) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
 #elif defined(__CRT_HAVE_ftello_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ftello64_unlocked)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ftell64_unlocked)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell64_unlocked,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),ftell64_unlocked,(__stream))
 #elif defined(__CRT_HAVE__ftelli64_nolock)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off64_t,__THROWING,__localdep_ftello64,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
 #elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/ftello64.h>
@@ -73,7 +73,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_ftello64_defined
 #endif /* !... */
 #endif /* !__local___localdep_ftello64_defined */
-__LOCAL_LIBC(ftello64_unlocked) __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __off64_t
+__LOCAL_LIBC(ftello64_unlocked) __ATTR_WUNUSED __ATTR_INOUT(1) __off64_t
 (__LIBCCALL __LIBC_LOCAL_NAME(ftello64_unlocked))(__FILE *__restrict __stream) __THROWS(...) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_ftello64)(__stream);
 }

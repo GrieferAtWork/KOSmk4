@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b80ca1b */
+/* HASH CRC-32:0xa2201aac */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(tfind_r) __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_NONNULL((3)) void *
+__LOCAL_LIBC(tfind_r) __ATTR_IN_OPT(1) __ATTR_IN_OPT(2) __ATTR_NONNULL((3)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(tfind_r))(void const *__key, void *const *__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) {
 	typedef struct __node_struct {
 		void const           *__key;

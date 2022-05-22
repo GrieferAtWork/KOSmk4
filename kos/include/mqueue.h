@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc56cbd9e */
+/* HASH CRC-32:0x44192e1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,69 +61,69 @@ typedef __mqd_t mqd_t;
 
 #ifdef __CRT_HAVE_mq_open
 /* >> mq_open(3) */
-__LIBC __ATTR_WUNUSED __ATTR_ACCESS_RO(1) mqd_t __NOTHROW_RPC(__VLIBCCALL mq_open)(char const *__restrict __name, __oflag_t __oflags, ...) __CASMNAME_SAME("mq_open");
+__LIBC __ATTR_WUNUSED __ATTR_IN(1) mqd_t __NOTHROW_RPC(__VLIBCCALL mq_open)(char const *__restrict __name, __oflag_t __oflags, ...) __CASMNAME_SAME("mq_open");
 #endif /* __CRT_HAVE_mq_open */
 /* >> mq_close(3) */
 __CDECLARE_OPT(,int,__NOTHROW,mq_close,(mqd_t __mqdes),(__mqdes))
 /* >> mq_getattr(3) */
-__CDECLARE_OPT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,mq_getattr,(mqd_t __mqdes, struct mq_attr *__restrict __mqstat),(__mqdes,__mqstat))
+__CDECLARE_OPT(__ATTR_OUT(2),int,__NOTHROW_NCX,mq_getattr,(mqd_t __mqdes, struct mq_attr *__restrict __mqstat),(__mqdes,__mqstat))
 /* >> mq_setattr(3) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,mq_setattr,(mqd_t __mqdes, struct mq_attr const *__restrict __mqstat, struct mq_attr *__restrict __old_mqstat),(__mqdes,__mqstat,__old_mqstat))
+__CDECLARE_OPT(__ATTR_IN(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,mq_setattr,(mqd_t __mqdes, struct mq_attr const *__restrict __mqstat, struct mq_attr *__restrict __old_mqstat),(__mqdes,__mqstat,__old_mqstat))
 /* >> mq_unlink(3) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,mq_unlink,(char const *__name),(__name))
+__CDECLARE_OPT(__ATTR_IN(1),int,__NOTHROW_NCX,mq_unlink,(char const *__name),(__name))
 /* >> mq_notify(3) */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,mq_notify,(mqd_t __mqdes, struct sigevent const *__notification),(__mqdes,__notification))
 /* >> mq_receive(3) */
-__CDECLARE_OPT(__ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,mq_receive,(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio))
+__CDECLARE_OPT(__ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,mq_receive,(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio))
 /* >> mq_send(3) */
-__CDECLARE_OPT(__ATTR_ACCESS_ROS(2, 3),int,__NOTHROW_RPC,mq_send,(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio),(__mqdes,__msg_ptr,__msg_len,__msg_prio))
+__CDECLARE_OPT(__ATTR_INS(2, 3),int,__NOTHROW_RPC,mq_send,(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio),(__mqdes,__msg_ptr,__msg_len,__msg_prio))
 
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_mq_timedreceive) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> mq_timedreceive(3), mq_timedreceive64(3) */
-__CDECLARE(__ATTR_ACCESS_RO(5) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WR_OPT(4),__SSIZE_TYPE__,__NOTHROW_RPC,mq_timedreceive,(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec const *__restrict __abs_timeout),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+__CDECLARE(__ATTR_IN(5) __ATTR_OUTS(2, 3) __ATTR_OUT_OPT(4),__SSIZE_TYPE__,__NOTHROW_RPC,mq_timedreceive,(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec const *__restrict __abs_timeout),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedreceive64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> mq_timedreceive(3), mq_timedreceive64(3) */
-__CREDIRECT(__ATTR_ACCESS_RO(5) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WR_OPT(4),__SSIZE_TYPE__,__NOTHROW_RPC,mq_timedreceive,(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec const *__restrict __abs_timeout),mq_timedreceive64,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+__CREDIRECT(__ATTR_IN(5) __ATTR_OUTS(2, 3) __ATTR_OUT_OPT(4),__SSIZE_TYPE__,__NOTHROW_RPC,mq_timedreceive,(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec const *__restrict __abs_timeout),mq_timedreceive64,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedreceive64) || defined(__CRT_HAVE_mq_timedreceive)
 #include <libc/local/mqueue/mq_timedreceive.h>
 /* >> mq_timedreceive(3), mq_timedreceive64(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mq_timedreceive, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(5) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WR_OPT(4) __SSIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL mq_timedreceive)(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec const *__restrict __abs_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mq_timedreceive))(__mqdes, __msg_ptr, __msg_len, __pmsg_prio, __abs_timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mq_timedreceive, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(5) __ATTR_OUTS(2, 3) __ATTR_OUT_OPT(4) __SSIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL mq_timedreceive)(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec const *__restrict __abs_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mq_timedreceive))(__mqdes, __msg_ptr, __msg_len, __pmsg_prio, __abs_timeout); })
 #endif /* ... */
 #if defined(__CRT_HAVE_mq_timedsend) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> mq_timedsend(3), mq_timedsend64(3) */
-__CDECLARE(__ATTR_ACCESS_RO(5) __ATTR_ACCESS_ROS(2, 3),int,__NOTHROW_RPC,mq_timedsend,(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct timespec const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
+__CDECLARE(__ATTR_IN(5) __ATTR_INS(2, 3),int,__NOTHROW_RPC,mq_timedsend,(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct timespec const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedsend64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> mq_timedsend(3), mq_timedsend64(3) */
-__CREDIRECT(__ATTR_ACCESS_RO(5) __ATTR_ACCESS_ROS(2, 3),int,__NOTHROW_RPC,mq_timedsend,(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct timespec const *__abs_timeout),mq_timedsend64,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
+__CREDIRECT(__ATTR_IN(5) __ATTR_INS(2, 3),int,__NOTHROW_RPC,mq_timedsend,(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct timespec const *__abs_timeout),mq_timedsend64,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedsend64) || defined(__CRT_HAVE_mq_timedsend)
 #include <libc/local/mqueue/mq_timedsend.h>
 /* >> mq_timedsend(3), mq_timedsend64(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mq_timedsend, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(5) __ATTR_ACCESS_ROS(2, 3) int __NOTHROW_RPC(__LIBCCALL mq_timedsend)(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct timespec const *__abs_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mq_timedsend))(__mqdes, __msg_ptr, __msg_len, __msg_prio, __abs_timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mq_timedsend, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(5) __ATTR_INS(2, 3) int __NOTHROW_RPC(__LIBCCALL mq_timedsend)(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct timespec const *__abs_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mq_timedsend))(__mqdes, __msg_ptr, __msg_len, __msg_prio, __abs_timeout); })
 #endif /* ... */
 
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_mq_timedreceive) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> mq_timedreceive(3), mq_timedreceive64(3) */
-__CREDIRECT(__ATTR_ACCESS_RO(5) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,mq_timedreceive64,(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec64 const *__restrict __abs_timeout),mq_timedreceive,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+__CREDIRECT(__ATTR_IN(5) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,mq_timedreceive64,(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec64 const *__restrict __abs_timeout),mq_timedreceive,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedreceive64)
 /* >> mq_timedreceive(3), mq_timedreceive64(3) */
-__CDECLARE(__ATTR_ACCESS_RO(5) __ATTR_ACCESS_WRS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,mq_timedreceive64,(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec64 const *__restrict __abs_timeout),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+__CDECLARE(__ATTR_IN(5) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,mq_timedreceive64,(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec64 const *__restrict __abs_timeout),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedreceive)
 #include <libc/local/mqueue/mq_timedreceive64.h>
 /* >> mq_timedreceive(3), mq_timedreceive64(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mq_timedreceive64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(5) __ATTR_ACCESS_WRS(2, 3) __SSIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL mq_timedreceive64)(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec64 const *__restrict __abs_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mq_timedreceive64))(__mqdes, __msg_ptr, __msg_len, __pmsg_prio, __abs_timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mq_timedreceive64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(5) __ATTR_OUTS(2, 3) __SSIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL mq_timedreceive64)(mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct timespec64 const *__restrict __abs_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mq_timedreceive64))(__mqdes, __msg_ptr, __msg_len, __pmsg_prio, __abs_timeout); })
 #endif /* ... */
 #if defined(__CRT_HAVE_mq_timedsend) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> mq_timedsend(3), mq_timedsend64(3) */
-__CREDIRECT(__ATTR_ACCESS_RO(5) __ATTR_ACCESS_ROS(2, 3),int,__NOTHROW_RPC,mq_timedsend64,(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct timespec64 const *__abs_timeout),mq_timedsend,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
+__CREDIRECT(__ATTR_IN(5) __ATTR_INS(2, 3),int,__NOTHROW_RPC,mq_timedsend64,(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct timespec64 const *__abs_timeout),mq_timedsend,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedsend64)
 /* >> mq_timedsend(3), mq_timedsend64(3) */
-__CDECLARE(__ATTR_ACCESS_RO(5) __ATTR_ACCESS_ROS(2, 3),int,__NOTHROW_RPC,mq_timedsend64,(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct timespec64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
+__CDECLARE(__ATTR_IN(5) __ATTR_INS(2, 3),int,__NOTHROW_RPC,mq_timedsend64,(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct timespec64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedsend)
 #include <libc/local/mqueue/mq_timedsend64.h>
 /* >> mq_timedsend(3), mq_timedsend64(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mq_timedsend64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(5) __ATTR_ACCESS_ROS(2, 3) int __NOTHROW_RPC(__LIBCCALL mq_timedsend64)(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct timespec64 const *__abs_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mq_timedsend64))(__mqdes, __msg_ptr, __msg_len, __msg_prio, __abs_timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mq_timedsend64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(5) __ATTR_INS(2, 3) int __NOTHROW_RPC(__LIBCCALL mq_timedsend64)(mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct timespec64 const *__abs_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mq_timedsend64))(__mqdes, __msg_ptr, __msg_len, __msg_prio, __abs_timeout); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */

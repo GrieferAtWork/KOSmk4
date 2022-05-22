@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b73f31b */
+/* HASH CRC-32:0x2ede74af */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vwscanf_unlocked_defined
 #define __local___localdep_vwscanf_unlocked_defined
 #ifdef __CRT_HAVE_vwscanf_unlocked
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_LIBC_WSCANF(1, 0),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vwscanf_unlocked,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf_unlocked,(__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_WSCANF(1, 0),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vwscanf_unlocked,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf_unlocked,(__format,__args))
 #elif defined(__CRT_HAVE_vwscanf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_LIBC_WSCANF(1, 0),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vwscanf_unlocked,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf,(__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_WSCANF(1, 0),__STDC_INT_AS_SIZE_T,__THROWING,__localdep_vwscanf_unlocked,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf,(__format,__args))
 #elif defined(__LOCAL_stdin) && (defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf) || ((defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE__getwc_nolock) || defined(__CRT_HAVE__fgetwc_nolock) || defined(__CRT_HAVE_getwc) || defined(__CRT_HAVE_fgetwc)) && (defined(__CRT_HAVE_ungetwc_unlocked) || defined(__CRT_HAVE__ungetwc_nolock) || defined(__CRT_HAVE_ungetwc))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/vwscanf_unlocked.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_vwscanf_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_vwscanf_unlocked_defined */
-__LOCAL_LIBC(wscanf_unlocked) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_LIBC_WSCANF(1, 2) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(wscanf_unlocked) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_WSCANF(1, 2) __STDC_INT_AS_SIZE_T
 (__VLIBCCALL __LIBC_LOCAL_NAME(wscanf_unlocked))(__WCHAR_TYPE__ const *__restrict __format, ...) __THROWS(...) {
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;

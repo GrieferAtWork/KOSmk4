@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ce9ac06 */
+/* HASH CRC-32:0x9f2d0f5c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,9 +41,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strnset_defined
 #define __local___localdep_strnset_defined
 #ifdef __CRT_HAVE_strnset
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_ACCESS_RWS(1, 3) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnset,(char *__restrict __str, int __ch, __SIZE_TYPE__ __maxlen),strnset,(__str,__ch,__maxlen))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUTS(1, 3) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnset,(char *__restrict __str, int __ch, __SIZE_TYPE__ __maxlen),strnset,(__str,__ch,__maxlen))
 #elif defined(__CRT_HAVE__strnset)
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_ACCESS_RWS(1, 3) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnset,(char *__restrict __str, int __ch, __SIZE_TYPE__ __maxlen),_strnset,(__str,__ch,__maxlen))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUTS(1, 3) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnset,(char *__restrict __str, int __ch, __SIZE_TYPE__ __maxlen),_strnset,(__str,__ch,__maxlen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strnset.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strnset __LIBC_LOCAL_NAME(strnset)
 #endif /* !... */
 #endif /* !__local___localdep_strnset_defined */
-__LOCAL_LIBC(_mbsnbset_l) __ATTR_ACCESS_RWS(1, 3) unsigned char *
+__LOCAL_LIBC(_mbsnbset_l) __ATTR_INOUTS(1, 3) unsigned char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnbset_l))(unsigned char *__buf, unsigned int __ch, __SIZE_TYPE__ __max_bytes, __locale_t __locale) {
 	unsigned char *__iter, __lob, __hib;
 	__lob = (__ch & 0xff);

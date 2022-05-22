@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa550b0de */
+/* HASH CRC-32:0x95068f6c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <bits/os/termios.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(cfgetispeed) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __UINT32_TYPE__
+__LOCAL_LIBC(cfgetispeed) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __UINT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfgetispeed))(struct termios const *__restrict __termios_p) {
 	return __termios_p->c_ispeed;
 }

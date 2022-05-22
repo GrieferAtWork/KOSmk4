@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f4feb69 */
+/* HASH CRC-32:0xfe2ea1b7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(4) __ATTR_LIBC_PRINTF_P(4, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vsprintf_p,(__UINT64_TYPE__ __options, char *__buf, __SIZE_TYPE__ __bufsize, char const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vsprintf_p,(__options,__buf,__bufsize,__format,__locale,__args))
+__CREDIRECT(__ATTR_IN(4) __ATTR_LIBC_PRINTF_P(4, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep___stdio_common_vsprintf_p,(__UINT64_TYPE__ __options, char *__buf, __SIZE_TYPE__ __bufsize, char const *__format, __locale_t __locale, __builtin_va_list __args),__stdio_common_vsprintf_p,(__options,__buf,__bufsize,__format,__locale,__args))
 #else /* __CRT_HAVE___stdio_common_vsprintf_p */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/__stdio_common_vsprintf_p.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <corecrt_stdio_config.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_vscprintf_p_l) __ATTR_ACCESS_RO(1) __ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(_vscprintf_p_l) __ATTR_IN(1) __ATTR_LIBC_PRINTF_P(1, 0) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vscprintf_p_l))(char const *__format, __locale_t __locale, __builtin_va_list __args) {
 	__STDC_INT_AS_SSIZE_T __result = (__NAMESPACE_LOCAL_SYM __localdep___stdio_common_vsprintf_p)(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS | 2, __NULLPTR, 0, __format, __locale, __args);
 	return __result < 0 ? -1 : __result;

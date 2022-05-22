@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x517ff161 */
+/* HASH CRC-32:0x12370a03 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,27 +38,27 @@ INTDEF WUNUSED struct _stringlist *NOTHROW_NCX(LIBCCALL libc_sl_init)(void);
 /* >> sl_add(3)
  * Append a  given `name'  to  `sl'. `name'  is  considered
  * inherited if the StringList is destroyed with `freeit=1' */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd_sl_add)(struct _stringlist *sl, char *name);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_sl_add)(struct _stringlist *sl, char *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sl_add(3)
  * Append a  given `name'  to  `sl'. `name'  is  considered
  * inherited if the StringList is destroyed with `freeit=1' */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBCCALL libc_sl_add)(struct _stringlist *sl, char *name);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_sl_add)(struct _stringlist *sl, char *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sl_free(3)
  * Free a given string list. When `freeit' is non-zero, all contained
  * string pointers (as previously added with `sl_add()') will also be
  * `free(3)'d. */
-INTDEF ATTR_ACCESS_RW_OPT(1) void NOTHROW_NCX(LIBDCALL libd_sl_free)(struct _stringlist *sl, int freeit);
+INTDEF ATTR_INOUT_OPT(1) void NOTHROW_NCX(LIBDCALL libd_sl_free)(struct _stringlist *sl, int freeit);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sl_free(3)
  * Free a given string list. When `freeit' is non-zero, all contained
  * string pointers (as previously added with `sl_add()') will also be
  * `free(3)'d. */
-INTDEF ATTR_ACCESS_RW_OPT(1) void NOTHROW_NCX(LIBCCALL libc_sl_free)(struct _stringlist *sl, int freeit);
+INTDEF ATTR_INOUT_OPT(1) void NOTHROW_NCX(LIBCCALL libc_sl_free)(struct _stringlist *sl, int freeit);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sl_find(3)
@@ -66,7 +66,7 @@ INTDEF ATTR_ACCESS_RW_OPT(1) void NOTHROW_NCX(LIBCCALL libc_sl_free)(struct _str
  * return a  pointer to  the equivalent  string within  `sl' (i.e.  the
  * pointer originally  passed to  `sl_add()'  to insert  that  string).
  * If `sl' doesn't contain an equivalent string, return `NULL' instead. */
-INTDEF ATTR_PURE ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) char *NOTHROW_NCX(LIBDCALL libd_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl, char const *name);
+INTDEF ATTR_PURE ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBDCALL libd_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl, char const *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sl_find(3)
@@ -74,7 +74,7 @@ INTDEF ATTR_PURE ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) char *NOTHROW_NCX(LIBDCALL 
  * return a  pointer to  the equivalent  string within  `sl' (i.e.  the
  * pointer originally  passed to  `sl_add()'  to insert  that  string).
  * If `sl' doesn't contain an equivalent string, return `NULL' instead. */
-INTDEF ATTR_PURE ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) char *NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl, char const *name);
+INTDEF ATTR_PURE ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl, char const *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sl_delete(3) [NetBSD]
@@ -82,7 +82,7 @@ INTDEF ATTR_PURE ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) char *NOTHROW_NCX(LIBCCALL 
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'
  * @return: -1: No string equal to `name' was found in `sl' */
-INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd_sl_delete)(struct _stringlist *sl, char const *name, int freeit);
+INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_sl_delete)(struct _stringlist *sl, char const *name, int freeit);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sl_delete(3) [NetBSD]
@@ -90,7 +90,7 @@ INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'
  * @return: -1: No string equal to `name' was found in `sl' */
-INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBCCALL libc_sl_delete)(struct _stringlist *sl, char const *name, int freeit);
+INTDEF WUNUSED ATTR_IN(2) ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_sl_delete)(struct _stringlist *sl, char const *name, int freeit);
 #endif /* !__KERNEL__ */
 
 DECL_END

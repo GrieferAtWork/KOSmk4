@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc731e572 */
+/* HASH CRC-32:0x930fd644 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,27 +29,27 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetc_defined
 #define __local___localdep_fgetc_defined
 #if defined(__CRT_HAVE_fgetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__getc_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_getc_nolock,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_getc_nolock,(__stream))
 #elif defined(__CRT_HAVE__fgetc_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_fgetc_nolock,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_fgetc_nolock,(__stream))
 #elif defined(__CRT_HAVE_getc)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc,(__stream))
 #elif defined(__CRT_HAVE_fgetc)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc,(__stream))
 #elif defined(__CRT_HAVE__IO_getc)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_IO_getc,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_IO_getc,(__stream))
 #elif defined(__CRT_HAVE_fgetc_unlocked)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__getc_nolock)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_getc_nolock,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_getc_nolock,(__stream))
 #elif defined(__CRT_HAVE__fgetc_nolock)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_fgetc_nolock,(__stream))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_fgetc_nolock,(__stream))
 #elif (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgetc.h>
@@ -74,17 +74,17 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #ifndef __local___localdep_ungetc_defined
 #define __local___localdep_ungetc_defined
 #if defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_ACCESS_RW(2),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__ungetc_nolock) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_ACCESS_RW(2),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetc)
-__CREDIRECT(__ATTR_ACCESS_RW(2),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_ungetc)
-__CREDIRECT(__ATTR_ACCESS_RW(2),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetc_unlocked)
-__CREDIRECT(__ATTR_ACCESS_RW(2),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__ungetc_nolock)
-__CREDIRECT(__ATTR_ACCESS_RW(2),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_INOUT(2),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
 #else /* ... */
 #undef __local___localdep_ungetc_defined
 #endif /* !... */
@@ -93,7 +93,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getdelim) __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW(4) __SSIZE_TYPE__
+__LOCAL_LIBC(getdelim) __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT(4) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(getdelim))(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, int __delimiter, __FILE *__restrict __stream) __THROWS(...) {
 	int __ch;
 	char *__buffer;

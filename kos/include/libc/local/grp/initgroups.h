@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x385f6919 */
+/* HASH CRC-32:0xfd9a945e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups),getgrouplist,(__user,__group,__groups,__ngroups))
+__CREDIRECT(__ATTR_IN(1) __ATTR_INOUT(4) __ATTR_OUT(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups),getgrouplist,(__user,__group,__groups,__ngroups))
 #elif defined(__CRT_HAVE_setgrent) && defined(__CRT_HAVE_getgrent)
 __NAMESPACE_LOCAL_END
 #include <libc/local/grp/getgrouplist.h>
@@ -79,16 +79,16 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #ifndef __local___localdep_setgroups_defined
 #define __local___localdep_setgroups_defined
 #ifdef __CRT_HAVE_setgroups
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 1),int,__NOTHROW_RPC,__localdep_setgroups,(__SIZE_TYPE__ __count, __gid_t const *__groups),setgroups,(__count,__groups))
+__CREDIRECT(__ATTR_INS(2, 1),int,__NOTHROW_RPC,__localdep_setgroups,(__SIZE_TYPE__ __count, __gid_t const *__groups),setgroups,(__count,__groups))
 #elif defined(__CRT_HAVE___setgroups)
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 1),int,__NOTHROW_RPC,__localdep_setgroups,(__SIZE_TYPE__ __count, __gid_t const *__groups),__setgroups,(__count,__groups))
+__CREDIRECT(__ATTR_INS(2, 1),int,__NOTHROW_RPC,__localdep_setgroups,(__SIZE_TYPE__ __count, __gid_t const *__groups),__setgroups,(__count,__groups))
 #elif defined(__CRT_HAVE___libc_setgroups)
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 1),int,__NOTHROW_RPC,__localdep_setgroups,(__SIZE_TYPE__ __count, __gid_t const *__groups),__libc_setgroups,(__count,__groups))
+__CREDIRECT(__ATTR_INS(2, 1),int,__NOTHROW_RPC,__localdep_setgroups,(__SIZE_TYPE__ __count, __gid_t const *__groups),__libc_setgroups,(__count,__groups))
 #else /* ... */
 #undef __local___localdep_setgroups_defined
 #endif /* !... */
 #endif /* !__local___localdep_setgroups_defined */
-__LOCAL_LIBC(initgroups) __ATTR_ACCESS_RO(1) int
+__LOCAL_LIBC(initgroups) __ATTR_IN(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(initgroups))(char const *__user, __gid_t __group) {
 	int __result = 0;
 	__gid_t __initbuf[32], *__buf = __initbuf;

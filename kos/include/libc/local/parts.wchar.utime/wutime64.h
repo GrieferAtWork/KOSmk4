@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3de67b2 */
+/* HASH CRC-32:0x88a330 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_wcstombs_defined
 #define __local___localdep_convert_wcstombs_defined
 #ifdef __CRT_HAVE_convert_wcstombs
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -42,11 +42,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_wutime32_defined
 #define __local___localdep_crt_wutime32_defined
 #ifdef __CRT_HAVE_wutime
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__file, struct __utimbuf32 const *__file_times),wutime,(__file,__file_times))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__file, struct __utimbuf32 const *__file_times),wutime,(__file,__file_times))
 #elif defined(__CRT_HAVE__wutime)
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__file, struct __utimbuf32 const *__file_times),_wutime,(__file,__file_times))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__file, struct __utimbuf32 const *__file_times),_wutime,(__file,__file_times))
 #elif defined(__CRT_HAVE__wutime32)
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__file, struct __utimbuf32 const *__file_times),_wutime32,(__file,__file_times))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__file, struct __utimbuf32 const *__file_times),_wutime32,(__file,__file_times))
 #else /* ... */
 #undef __local___localdep_crt_wutime32_defined
 #endif /* !... */
@@ -68,19 +68,19 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_utime64_defined
 #define __local___localdep_utime64_defined
 #if defined(__CRT_HAVE_utime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),utime,(__filename,__file_times))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),utime,(__filename,__file_times))
 #elif defined(__CRT_HAVE___utime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),__utime,(__filename,__file_times))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),__utime,(__filename,__file_times))
 #elif defined(__CRT_HAVE___libc_utime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),__libc_utime,(__filename,__file_times))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),__libc_utime,(__filename,__file_times))
 #elif defined(__CRT_HAVE__utime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),_utime,(__filename,__file_times))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),_utime,(__filename,__file_times))
 #elif defined(__CRT_HAVE__utime32) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),_utime32,(__filename,__file_times))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),_utime32,(__filename,__file_times))
 #elif defined(__CRT_HAVE_utime64)
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),utime64,(__filename,__file_times))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),utime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__utime64)
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),_utime64,(__filename,__file_times))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct __utimbuf64 const *__file_times),_utime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_utime) || defined(__CRT_HAVE___utime) || defined(__CRT_HAVE___libc_utime) || defined(__CRT_HAVE__utime) || defined(__CRT_HAVE__utime32)
 __NAMESPACE_LOCAL_END
 #include <libc/local/utime/utime64.h>
@@ -90,7 +90,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_utime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_utime64_defined */
-__LOCAL_LIBC(wutime64) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int
+__LOCAL_LIBC(wutime64) __ATTR_IN(1) __ATTR_IN_OPT(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wutime64))(__WCHAR_TYPE__ const *__file, struct __utimbuf64 const *__file_times) {
 #if (defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64) || defined(__CRT_HAVE_utime) || defined(__CRT_HAVE___utime) || defined(__CRT_HAVE___libc_utime) || defined(__CRT_HAVE__utime) || defined(__CRT_HAVE__utime32)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 	int __result;

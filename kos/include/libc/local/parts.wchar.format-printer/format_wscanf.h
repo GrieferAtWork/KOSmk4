@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb014c062 */
+/* HASH CRC-32:0xeceefba2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_vwscanf_defined
 #define __local___localdep_format_vwscanf_defined
 #ifdef __CRT_HAVE_format_vwscanf
-__CREDIRECT(__ATTR_ACCESS_RO(4) __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_format_vwscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwscanf,(__pgetc,__pungetc,__arg,__format,__args))
+__CREDIRECT(__ATTR_IN(4) __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_format_vwscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwscanf,(__pgetc,__pungetc,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vwscanf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.format-printer/format_vwscanf.h>
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_vwscanf __LIBC_LOCAL_NAME(format_vwscanf)
 #endif /* !__CRT_HAVE_format_vwscanf */
 #endif /* !__local___localdep_format_vwscanf_defined */
-__LOCAL_LIBC(format_wscanf) __ATTR_ACCESS_RO(4) __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_wscanf) __ATTR_IN(4) __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_wscanf))(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, __WCHAR_TYPE__ const *__restrict __format, ...) __THROWS(...) {
 	__SSIZE_TYPE__ __result;
 	__builtin_va_list __args;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26781c3a */
+/* HASH CRC-32:0x2c6e0636 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <bits/os/timeval.h>
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) void
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc_timeval_add)(struct timeval *result,
                                        struct timeval const *lhs,
                                        struct timeval const *rhs) {
@@ -42,7 +42,7 @@ NOTHROW_NCX(LIBCCALL libc_timeval_add)(struct timeval *result,
 	}
 }
 #include <bits/os/timeval.h>
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) void
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc_timeval_sub)(struct timeval *result,
                                        struct timeval const *lhs,
                                        struct timeval const *rhs) {
@@ -58,7 +58,7 @@ NOTHROW_NCX(LIBCCALL libc_timeval_sub)(struct timeval *result,
 DEFINE_INTERN_ALIAS(libc_timeval_add64, libc_timeval_add);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <bits/os/timeval.h>
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) void
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc_timeval_add64)(struct timeval64 *result,
                                          struct timeval64 const *lhs,
                                          struct timeval64 const *rhs) {
@@ -75,7 +75,7 @@ NOTHROW_NCX(LIBCCALL libc_timeval_add64)(struct timeval64 *result,
 DEFINE_INTERN_ALIAS(libc_timeval_sub64, libc_timeval_sub);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #include <bits/os/timeval.h>
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) void
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc_timeval_sub64)(struct timeval64 *result,
                                          struct timeval64 const *lhs,
                                          struct timeval64 const *rhs) {

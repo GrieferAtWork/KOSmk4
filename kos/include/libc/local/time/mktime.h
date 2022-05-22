@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc501089c */
+/* HASH CRC-32:0x80a458f4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,15 +28,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_timegm_defined
 #define __local___localdep_timegm_defined
 #if defined(__CRT_HAVE_timegm) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RW(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),timegm,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),timegm,(__tp))
 #elif defined(__CRT_HAVE__mkgmtime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RW(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),_mkgmtime,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),_mkgmtime,(__tp))
 #elif defined(__CRT_HAVE__mkgmtime32) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RW(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),_mkgmtime32,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),_mkgmtime32,(__tp))
 #elif defined(__CRT_HAVE_timegm64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RW(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),timegm64,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),timegm64,(__tp))
 #elif defined(__CRT_HAVE__mkgmtime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RW(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),_mkgmtime64,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1),__TM_TYPE(time),__NOTHROW_NCX,__localdep_timegm,(struct __NAMESPACE_STD_SYM tm *__tp),_mkgmtime64,(__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/timegm.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_timegm __LIBC_LOCAL_NAME(timegm)
 #endif /* !... */
 #endif /* !__local___localdep_timegm_defined */
-__LOCAL_LIBC(mktime) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __TM_TYPE(time)
+__LOCAL_LIBC(mktime) __ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1) __TM_TYPE(time)
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime))(struct __NAMESPACE_STD_SYM tm *__tp) {
 	/* TODO: Support for localtime? */
 	return (__NAMESPACE_LOCAL_SYM __localdep_timegm)(__tp);

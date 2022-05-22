@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbda1393c */
+/* HASH CRC-32:0xbdc5df16 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ DECL_BEGIN
  * many other functions in this header) to `free(3)'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) error_t
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3) error_t
 NOTHROW_NCX(LIBCCALL libc_argz_create)(char *const argv[],
                                        char **__restrict pargz,
                                        size_t *__restrict pargz_len) {
@@ -98,7 +98,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_create)(char *const argv[],
  * documentation of `argz_create()'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(3) ATTR_ACCESS_WR(4) error_t
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_IN(1) ATTR_OUT(3) ATTR_OUT(4) error_t
 NOTHROW_NCX(LIBCCALL libc_argz_create_sep)(char const *__restrict string,
                                            int sep,
                                            char **__restrict pargz,
@@ -157,7 +157,7 @@ again_check_ch:
 /* >> argz_count(3)
  * Count and return the # of strings in `argz'
  * Simply count the number of`NUL-characters within `argz...+=argz_len' */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_PURE ATTR_ACCESS_ROS(1, 2) NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_PURE ATTR_INS(1, 2) NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_argz_count)(char const *argz,
                                       size_t argz_len) {
 	size_t result = 0;
@@ -178,7 +178,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_count)(char const *argz,
  * Extend pointers to  individual string  from `argz',  and sequentially  write them  to
  * `argv',  for which the caller is responsivle to provide sufficient space to hold them
  * all (i.e. `argv' must be able to hold AT least `argz_count(argz, argz_len)' elements) */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_WR(3) void
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_INS(1, 2) ATTR_OUT(3) void
 NOTHROW_NCX(LIBCCALL libc_argz_extract)(char const *__restrict argz,
                                         size_t argz_len,
                                         char **__restrict argv) {
@@ -200,7 +200,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_extract)(char const *__restrict argz,
  * with a total `strlen(argz) == len - 1', by replacing all of
  * the NUL-characters separating  the individual  argz-strings
  * with `sep'. */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_ACCESS_RWS(1, 2) void
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_INOUTS(1, 2) void
 NOTHROW_NCX(LIBCCALL libc_argz_stringify)(char *argz,
                                           size_t len,
                                           int sep) {
@@ -222,7 +222,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_stringify)(char *argz,
  * Increase allocated memory of `*pargz' and append `buf...+=buf_len'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_ACCESS_ROS(3, 4) ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) error_t
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INS(3, 4) error_t
 NOTHROW_NCX(LIBCCALL libc_argz_append)(char **__restrict pargz,
                                        size_t *__restrict pargz_len,
                                        char const *__restrict buf,
@@ -247,7 +247,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_append)(char **__restrict pargz,
  * This    is    the   same    as   `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) error_t
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) error_t
 NOTHROW_NCX(LIBCCALL libc_argz_add)(char **__restrict pargz,
                                     size_t *__restrict pargz_len,
                                     char const *__restrict str) {
@@ -263,7 +263,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_add)(char **__restrict pargz,
  * strings will be present in the resulting argz-string.
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) error_t
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) error_t
 NOTHROW_NCX(LIBCCALL libc_argz_add_sep)(char **__restrict pargz,
                                         size_t *__restrict pargz_len,
                                         char const *__restrict string,
@@ -338,7 +338,7 @@ again_check_ch:
  * Note that `entry' must  be the actual pointer  to one of the  elements
  * of the given `pargz...+=pargz_len', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_INOUT(1) ATTR_INOUT(2) ATTR_IN_OPT(3) void
 NOTHROW_NCX(LIBCCALL libc_argz_delete)(char **__restrict pargz,
                                        size_t *__restrict pargz_len,
                                        char *entry) {
@@ -369,7 +369,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_delete)(char **__restrict pargz,
  * @return: 0 :     Success
  * @return: ENOMEM: Insufficient heap memory
  * @return: EINVAL: The given `before' is either `NULL', or apart of `*pargz' */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_ACCESS_RO(4) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) error_t
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_IN_OPT(3) error_t
 NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
                                        size_t *__restrict pargz_len,
                                        char *before,
@@ -437,7 +437,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
  * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
  *                  but  note  that  the GLibc  implementation  of this  function  is completely
  *                  unreadable and may be able to return this for other cases as well...) */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_ACCESS_RO(4) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) ATTR_ACCESS_RW_OPT(5) error_t
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT_OPT(5) ATTR_IN_OPT(3) error_t
 NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
                                         size_t *__restrict pargz_len,
                                         char const *__restrict str,
@@ -546,7 +546,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
  *  - If `entry' points at, or past the end of `argz', return `NULL'
  *  - If the successor of `entry' points at, or past the end of `argz', return `NULL'
  *  - Return the successor of `entry' (i.e. `strend(entry) + 1') */
-INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_RO_OPT(3) NONNULL((1)) char *
+INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_IN_OPT(3) NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_argz_next)(char const *__restrict argz,
                                      size_t argz_len,
                                      char const *__restrict entry) {

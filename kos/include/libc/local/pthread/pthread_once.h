@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10c237ed */
+/* HASH CRC-32:0x3d29be0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __COMPILER_CREDIRECT_VOID(__LIBC,__ATTR_COLD __ATTR_NORETURN,__THROWING,__LIBKCA
 #ifndef __local___localdep_futex_waitwhile_defined
 #define __local___localdep_futex_waitwhile_defined
 #ifdef __CRT_HAVE_futex_waitwhile
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_futex_waitwhile,(__uintptr_t *__uaddr, __uintptr_t __equal_to_value),futex_waitwhile,(__uaddr,__equal_to_value))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_futex_waitwhile,(__uintptr_t *__uaddr, __uintptr_t __equal_to_value),futex_waitwhile,(__uaddr,__equal_to_value))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.futex/futex_waitwhile.h>
@@ -77,7 +77,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/errno.h>
 #include <kos/asm/futex.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(pthread_once) __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) __errno_t
+__LOCAL_LIBC(pthread_once) __ATTR_INOUT(1) __ATTR_NONNULL((2)) __errno_t
 (__LIBCCALL __LIBC_LOCAL_NAME(pthread_once))(__pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)) __THROWS(...) {
 #undef __PRIVATE_PTHREAD_ONCE_USES_FUTEX
 #if defined(__CRT_HAVE_futex_wakeall) || defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)

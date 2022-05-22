@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e89c873 */
+/* HASH CRC-32:0xa178b01c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,22 +40,22 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_convert_freevn)(void *vector, size_t count
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF void NOTHROW_NCX(LIBCCALL libc_convert_freevn)(void *vector, size_t count);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(LIBDCALL libd_convert_wcstombs)(char16_t const *str);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(LIBKCALL libc_convert_wcstombs)(char32_t const *str);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_WR_OPT(3) char *NOTHROW_NCX(LIBDCALL libd_convert_wcstombsn)(char16_t const *__restrict str, size_t len, size_t *preslen);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_WR_OPT(3) char *NOTHROW_NCX(LIBKCALL libc_convert_wcstombsn)(char32_t const *__restrict str, size_t len, size_t *preslen);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char **NOTHROW_NCX(LIBDCALL libd_convert_wcstombsv)(char16_t const *const *__restrict vector);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char **NOTHROW_NCX(LIBKCALL libc_convert_wcstombsv)(char32_t const *const *__restrict vector);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) char **NOTHROW_NCX(LIBDCALL libd_convert_wcstombsvn)(char16_t const *const *__restrict vector, size_t count);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) char **NOTHROW_NCX(LIBKCALL libc_convert_wcstombsvn)(char32_t const *const *__restrict vector, size_t count);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char16_t *NOTHROW_NCX(LIBDCALL libd_convert_mbstowcs)(char const *__restrict str);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char32_t *NOTHROW_NCX(LIBKCALL libc_convert_mbstowcs)(char const *__restrict str);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_WR_OPT(3) char16_t *NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsn)(char const *__restrict str, size_t len, size_t *preslen);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ACCESS_WR_OPT(3) char32_t *NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsn)(char const *__restrict str, size_t len, size_t *preslen);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char16_t **NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsv)(char const *const *__restrict vector);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_RO_OPT(1) char32_t **NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsv)(char const *const *__restrict vector);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) char16_t **NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsvn)(char const *const *__restrict vector, size_t count);
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_ROS(1, 2) char32_t **NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsvn)(char const *const *__restrict vector, size_t count);
+INTDEF ATTR_MALLOC WUNUSED ATTR_IN_OPT(1) char *NOTHROW_NCX(LIBDCALL libd_convert_wcstombs)(char16_t const *str);
+INTDEF ATTR_MALLOC WUNUSED ATTR_IN_OPT(1) char *NOTHROW_NCX(LIBKCALL libc_convert_wcstombs)(char32_t const *str);
+INTDEF ATTR_MALLOC WUNUSED ATTR_INS(1, 2) ATTR_OUT_OPT(3) char *NOTHROW_NCX(LIBDCALL libd_convert_wcstombsn)(char16_t const *__restrict str, size_t len, size_t *preslen);
+INTDEF ATTR_MALLOC WUNUSED ATTR_INS(1, 2) ATTR_OUT_OPT(3) char *NOTHROW_NCX(LIBKCALL libc_convert_wcstombsn)(char32_t const *__restrict str, size_t len, size_t *preslen);
+INTDEF ATTR_MALLOC WUNUSED ATTR_IN_OPT(1) char **NOTHROW_NCX(LIBDCALL libd_convert_wcstombsv)(char16_t const *const *__restrict vector);
+INTDEF ATTR_MALLOC WUNUSED ATTR_IN_OPT(1) char **NOTHROW_NCX(LIBKCALL libc_convert_wcstombsv)(char32_t const *const *__restrict vector);
+INTDEF ATTR_MALLOC WUNUSED ATTR_INS(1, 2) char **NOTHROW_NCX(LIBDCALL libd_convert_wcstombsvn)(char16_t const *const *__restrict vector, size_t count);
+INTDEF ATTR_MALLOC WUNUSED ATTR_INS(1, 2) char **NOTHROW_NCX(LIBKCALL libc_convert_wcstombsvn)(char32_t const *const *__restrict vector, size_t count);
+INTDEF ATTR_MALLOC WUNUSED ATTR_IN_OPT(1) char16_t *NOTHROW_NCX(LIBDCALL libd_convert_mbstowcs)(char const *__restrict str);
+INTDEF ATTR_MALLOC WUNUSED ATTR_IN_OPT(1) char32_t *NOTHROW_NCX(LIBKCALL libc_convert_mbstowcs)(char const *__restrict str);
+INTDEF ATTR_MALLOC WUNUSED ATTR_INS(1, 2) ATTR_OUT_OPT(3) char16_t *NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsn)(char const *__restrict str, size_t len, size_t *preslen);
+INTDEF ATTR_MALLOC WUNUSED ATTR_INS(1, 2) ATTR_OUT_OPT(3) char32_t *NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsn)(char const *__restrict str, size_t len, size_t *preslen);
+INTDEF ATTR_MALLOC WUNUSED ATTR_IN_OPT(1) char16_t **NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsv)(char const *const *__restrict vector);
+INTDEF ATTR_MALLOC WUNUSED ATTR_IN_OPT(1) char32_t **NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsv)(char const *const *__restrict vector);
+INTDEF ATTR_MALLOC WUNUSED ATTR_INS(1, 2) char16_t **NOTHROW_NCX(LIBDCALL libd_convert_mbstowcsvn)(char const *const *__restrict vector, size_t count);
+INTDEF ATTR_MALLOC WUNUSED ATTR_INS(1, 2) char32_t **NOTHROW_NCX(LIBKCALL libc_convert_mbstowcsvn)(char const *const *__restrict vector, size_t count);
 #endif /* !__KERNEL__ */
 
 DECL_END

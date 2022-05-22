@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf231351 */
+/* HASH CRC-32:0x6c813121 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_c8toc16_defined
 #define __local___localdep_unicode_c8toc16_defined
 #ifdef __CRT_HAVE_unicode_c8toc16
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc16,(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc16,(__pc16,__s,__n,__mbs))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_INS(2, 3) __ATTR_OUT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc16,(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc16,(__pc16,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc16 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_c8toc16.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_c8toc32_defined
 #define __local___localdep_unicode_c8toc32_defined
 #ifdef __CRT_HAVE_unicode_c8toc32
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc32,(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc32,(__pc32,__s,__n,__mbs))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_INS(2, 3) __ATTR_OUT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc32,(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc32,(__pc32,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc32 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_c8toc32.h>
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(uchar_mbrtoc32) __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_WR_OPT(1) __SIZE_TYPE__
+__LOCAL_LIBC(uchar_mbrtoc32) __ATTR_INOUT_OPT(4) __ATTR_IN_OPT(2) __ATTR_OUT_OPT(1) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(uchar_mbrtoc32))(__CHAR32_TYPE__ *__pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen, struct __mbstate *__mbs) {
 	__SIZE_TYPE__ __error;
 	__CHAR32_TYPE__ __fallback_wc;

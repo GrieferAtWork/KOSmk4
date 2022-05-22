@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf51f6594 */
+/* HASH CRC-32:0x2d0e3664 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ DECL_BEGIN
  *                calling thread being interrupted, `EINTR' is only set
  *                if no  random data  had already  been retrieved  from
  *                the kernel's random data sink. */
-INTDEF WUNUSED ATTR_ACCESS_WRS(1, 2) ssize_t NOTHROW_NCX(LIBDCALL libd_getrandom)(void *buf, size_t num_bytes, unsigned int flags);
+INTDEF WUNUSED ATTR_OUTS(1, 2) ssize_t NOTHROW_NCX(LIBDCALL libd_getrandom)(void *buf, size_t num_bytes, unsigned int flags);
 /* >> getentropy(3)
  * Similar   to   `getrandom(buf, num_bytes, GRND_RANDOM)',  however
  * the  case  where  the  calling  thread  is  interrupted,  causing
@@ -54,7 +54,7 @@ INTDEF WUNUSED ATTR_ACCESS_WRS(1, 2) ssize_t NOTHROW_NCX(LIBDCALL libd_getrandom
  * and `ENOSYS'  may be  translated into  `EIO'
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
-INTDEF WUNUSED ATTR_ACCESS_WRS(1, 2) int NOTHROW_NCX(LIBDCALL libd_getentropy)(void *buf, size_t num_bytes);
+INTDEF WUNUSED ATTR_OUTS(1, 2) int NOTHROW_NCX(LIBDCALL libd_getentropy)(void *buf, size_t num_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

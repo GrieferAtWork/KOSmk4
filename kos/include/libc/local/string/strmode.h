@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6976ebf4 */
+/* HASH CRC-32:0xdffa1c49 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <bits/types.h>
 #include <asm/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strmode) __ATTR_ACCESS_WR(2) void
+__LOCAL_LIBC(strmode) __ATTR_OUT(2) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode, char __p[12]) {
 	char __ch;
 

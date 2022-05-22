@@ -555,14 +555,17 @@ again_parse_arg_annotations:
 					local mode = str self.parseCStringOrKeyword();
 					local attrib = {
 						"none"       : "ATTR_ACCESS_NONE",
-						"rd"         : "ATTR_ACCESS_RO",
-						"ro"         : "ATTR_ACCESS_RO",
-						"read_only"  : "ATTR_ACCESS_RO",
-						"wr"         : "ATTR_ACCESS_WR",
-						"write_only" : "ATTR_ACCESS_WR",
-						"rw"         : "ATTR_ACCESS_RW",
-						"rdwr"       : "ATTR_ACCESS_RW",
-						"read_write" : "ATTR_ACCESS_RW",
+						"in"         : "ATTR_IN",
+						"rd"         : "ATTR_IN",
+						"ro"         : "ATTR_IN",
+						"read_only"  : "ATTR_IN",
+						"out"        : "ATTR_OUT",
+						"wr"         : "ATTR_OUT",
+						"write_only" : "ATTR_OUT",
+						"inout"      : "ATTR_INOUT",
+						"rw"         : "ATTR_INOUT",
+						"rdwr"       : "ATTR_INOUT",
+						"read_write" : "ATTR_INOUT",
 					}.get(mode);
 					if (attrib is none)
 						self.err("Invalid access-mode: {!r}".format({ mode }));
@@ -674,9 +677,9 @@ do_add_nonnull_annotation:
 				case "inout":
 				case "inout_opt": {
 					local mode = {
-						"in"    : "ATTR_ACCESS_RO",
-						"out"   : "ATTR_ACCESS_WR",
-						"inout" : "ATTR_ACCESS_RW",
+						"in"    : "ATTR_IN",
+						"out"   : "ATTR_OUT",
+						"inout" : "ATTR_INOUT",
 					}[tok.rsstrip("_opt")];
 					local argIndex = #result.argv + 1;
 					local shouldMarkAsNonNull = !tok.endswith("_opt");

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbacd97a2 */
+/* HASH CRC-32:0x73de1f7e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,7 +98,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net,
  *     123      (decimal)
  *     0x123 (hex)
  *     0123  (oct) */
-INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE ATTR_ACCESS_RO(1) in_addr_t
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE ATTR_IN(1) in_addr_t
 NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp) {
 	struct in_addr addr;
 	if (!libc_inet_paton((char const **)&cp, &addr, 0) || *cp)
@@ -119,7 +119,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr) {
 #include <hybrid/__byteswap.h>
 /* >> inet_ntoa_r(3)
  * Re-entrant version of `inet_ntoa()' */
-INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL ATTR_ACCESS_WR(2) char *
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL ATTR_OUT(2) char *
 NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr,
                                        char buf[16]) {
 	uint32_t addr = __hybrid_betoh32(inaddr.s_addr);
@@ -135,7 +135,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr,
 /* >> inet_network(3)
  * This function is  the same as  `inet_addr()', except  that
  * the return value is in host-endian, rather than net-endian */
-INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE ATTR_ACCESS_RO(1) uint32_t
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE ATTR_IN(1) uint32_t
 NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
 	struct in_addr addr;
 	if (!libc_inet_paton((char const **)&cp, &addr, 1) || *cp)
@@ -157,7 +157,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
  *     0123  (oct)
  * @return: 0: Bad input format
  * @return: 1: Success */
-INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_IN(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp,
                                      struct in_addr *__restrict inp) {
 	return libc_inet_paton((char const **)&cp, inp, 0) && !*cp;
@@ -178,7 +178,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp,
  * @param: network_addr: When non-zero, `*pcp' is a network address
  * @return: 0: Bad input format
  * @return: 1: Success */
-INTERN ATTR_SECTION(".text.crt.net.inet") WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) int
+INTERN ATTR_SECTION(".text.crt.net.inet") WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp,
                                       struct in_addr *__restrict inp,
                                       int network_addr) {
@@ -325,7 +325,7 @@ err:
  *     %u.%u.%u.%u  For everything else
  * @return: buf:  Success
  * @return: NULL: [errno=EMSGSIZE]: The given `len' is too small */
-INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_ACCESS_WRS(2, 3) char *
+INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_OUTS(2, 3) char *
 NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net,
                                      char *buf,
                                      size_t len) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd3f7a0d */
+/* HASH CRC-32:0x88623164 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RW(2) int NOTHROW_NCX(LIBDCALL libc__seh_filter_dll)(__ULONG32_TYPE__ xno, struct _EXCEPTION_POINTERS *infp_ptrs);
-INTDEF ATTR_ACCESS_RW(2) int NOTHROW_NCX(LIBDCALL libc__seh_filter_exe)(__ULONG32_TYPE__ xno, struct _EXCEPTION_POINTERS *infp_ptrs);
+INTDEF ATTR_INOUT(2) int NOTHROW_NCX(LIBDCALL libc__seh_filter_dll)(__ULONG32_TYPE__ xno, struct _EXCEPTION_POINTERS *infp_ptrs);
+INTDEF ATTR_INOUT(2) int NOTHROW_NCX(LIBDCALL libc__seh_filter_exe)(__ULONG32_TYPE__ xno, struct _EXCEPTION_POINTERS *infp_ptrs);
 INTDEF void NOTHROW_NCX(LIBDCALL libc__set_app_type)(_crt_app_type type);
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd___setusermatherr)(int (__LIBDCALL *fptr)(struct _exception *));
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___setusermatherr)(int (__LIBCCALL *fptr)(struct _exception *));

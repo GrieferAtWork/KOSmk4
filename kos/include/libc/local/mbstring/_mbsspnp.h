@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28929b6 */
+/* HASH CRC-32:0x9133a83 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsspnp_l_defined
 #define __local___localdep__mbsspnp_l_defined
 #ifdef __CRT_HAVE__mbsspnp_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),unsigned char *,__NOTHROW_NCX,__localdep__mbsspnp_l,(unsigned char const *__haystack, unsigned char const *__accept, __locale_t __locale),_mbsspnp_l,(__haystack,__accept,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),unsigned char *,__NOTHROW_NCX,__localdep__mbsspnp_l,(unsigned char const *__haystack, unsigned char const *__accept, __locale_t __locale),_mbsspnp_l,(__haystack,__accept,__locale))
 #elif defined(__CRT_HAVE__mbsspn_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsspnp_l.h>
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__mbsspnp_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__mbsspnp_l_defined */
-__LOCAL_LIBC(_mbsspnp) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) unsigned char *
+__LOCAL_LIBC(_mbsspnp) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) unsigned char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsspnp))(unsigned char const *__haystack, unsigned char const *__accept) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbsspnp_l)(__haystack, __accept, __NULLPTR);
 }

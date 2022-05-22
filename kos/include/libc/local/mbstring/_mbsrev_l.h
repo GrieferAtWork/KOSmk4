@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1833a1ca */
+/* HASH CRC-32:0xf89b02b5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
@@ -53,9 +53,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strrev_defined
 #define __local___localdep_strrev_defined
 #ifdef __CRT_HAVE_strrev
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RW(1),char *,__NOTHROW_NCX,__localdep_strrev,(char *__restrict __str),strrev,(__str))
+__CREDIRECT(__ATTR_LEAF __ATTR_INOUT(1),char *,__NOTHROW_NCX,__localdep_strrev,(char *__restrict __str),strrev,(__str))
 #elif defined(__CRT_HAVE__strrev)
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RW(1),char *,__NOTHROW_NCX,__localdep_strrev,(char *__restrict __str),_strrev,(__str))
+__CREDIRECT(__ATTR_LEAF __ATTR_INOUT(1),char *,__NOTHROW_NCX,__localdep_strrev,(char *__restrict __str),_strrev,(__str))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strrev.h>
@@ -63,7 +63,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strrev __LIBC_LOCAL_NAME(strrev)
 #endif /* !... */
 #endif /* !__local___localdep_strrev_defined */
-__LOCAL_LIBC(_mbsrev_l) __ATTR_RETNONNULL __ATTR_ACCESS_RW(1) unsigned char *
+__LOCAL_LIBC(_mbsrev_l) __ATTR_RETNONNULL __ATTR_INOUT(1) unsigned char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsrev_l))(unsigned char *__buf, __locale_t __locale) {
 	__SIZE_TYPE__ __bytes;
 	__bytes = (__NAMESPACE_LOCAL_SYM __localdep_strlen)((__NAMESPACE_LOCAL_SYM __localdep_strrev)((char *)__buf));

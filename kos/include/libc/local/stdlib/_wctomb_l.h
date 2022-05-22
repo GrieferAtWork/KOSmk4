@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1337a0c */
+/* HASH CRC-32:0x742cf066 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wctomb_defined
 #define __local___localdep_wctomb_defined
 #ifdef __CRT_HAVE_wctomb
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __WCHAR_TYPE__ __wc),wctomb,(__str,__wc))
+__CREDIRECT(__ATTR_OUT_OPT(1),int,__NOTHROW_NCX,__localdep_wctomb,(char *__str, __WCHAR_TYPE__ __wc),wctomb,(__str,__wc))
 #else /* __CRT_HAVE_wctomb */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/wctomb.h>

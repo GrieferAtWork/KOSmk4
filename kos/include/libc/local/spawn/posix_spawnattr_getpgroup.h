@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16bb5c3f */
+/* HASH CRC-32:0x774cb3c4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <bits/crt/posix_spawn.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(posix_spawnattr_getpgroup) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __errno_t
+__LOCAL_LIBC(posix_spawnattr_getpgroup) __ATTR_IN(1) __ATTR_OUT(2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnattr_getpgroup))(struct __posix_spawnattr const *__restrict __attr, __pid_t *__restrict __pgroup) {
 	*__pgroup = __attr->__pgrp;
 	return 0;

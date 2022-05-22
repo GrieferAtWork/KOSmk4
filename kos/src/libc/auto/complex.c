@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f8ecdb8 */
+/* HASH CRC-32:0x601319a0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* calculate cosh and sinh */
-INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void
+INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_OUT(2) ATTR_OUT(3) void
 NOTHROW_NCX(LIBCCALL libc__cchshf)(float x,
                                    float *c,
                                    float *s) {
@@ -81,7 +81,7 @@ NOTHROW_NCX(LIBCCALL libc__cchshf)(float x,
 
 }
 /* calculate cosh and sinh */
-INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void
+INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_OUT(2) ATTR_OUT(3) void
 NOTHROW_NCX(LIBCCALL libc__cchshl)(__LONGDOUBLE x,
                                    __LONGDOUBLE *c,
                                    __LONGDOUBLE *s) {
@@ -131,7 +131,7 @@ NOTHROW_NCX(LIBCCALL libc__cchshl)(__LONGDOUBLE x,
 
 }
 /* calculate cosh and sinh */
-INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void
+INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_OUT(2) ATTR_OUT(3) void
 NOTHROW_NCX(LIBCCALL libc__cchsh)(double x,
                                   double *c,
                                   double *s) {

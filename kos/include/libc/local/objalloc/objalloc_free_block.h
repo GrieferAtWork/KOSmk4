@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb24b5c30 */
+/* HASH CRC-32:0x8751d1f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(objalloc_free_block) __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) void
+__LOCAL_LIBC(objalloc_free_block) __ATTR_INOUT(1) __ATTR_NONNULL((2)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(objalloc_free_block))(struct objalloc *__self, void *__ptr) {
 	struct __objalloc_chunk *__iter;
 	for (;;) {

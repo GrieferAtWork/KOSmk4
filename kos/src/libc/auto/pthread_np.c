@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99989fa2 */
+/* HASH CRC-32:0xf94a6d4a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> pthread_stackseg_np(3)
  * Convenience wrapper for `pthread_getattr_np(3)' + `pthread_attr_getstack()' */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_ACCESS_WR(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_stackseg_np)(pthread_t pthread,
                                                stack_t *sinfo) {
 	errno_t result;

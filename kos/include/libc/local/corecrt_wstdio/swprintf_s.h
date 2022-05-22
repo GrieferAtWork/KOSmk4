@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf5774ca */
+/* HASH CRC-32:0x78edc34a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vswprintf_s_defined
 #define __local___localdep_vswprintf_s_defined
 #ifdef __CRT_HAVE_vswprintf_s
-__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_WPRINTF(3, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vswprintf_s,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),vswprintf_s,(__buf,__bufsize,__format,__args))
+__CREDIRECT(__ATTR_IN(3) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_OUTS(1, 2),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vswprintf_s,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),vswprintf_s,(__buf,__bufsize,__format,__args))
 #else /* __CRT_HAVE_vswprintf_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/vswprintf_s.h>
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_vswprintf_s __LIBC_LOCAL_NAME(vswprintf_s)
 #endif /* !__CRT_HAVE_vswprintf_s */
 #endif /* !__local___localdep_vswprintf_s_defined */
-__LOCAL_LIBC(swprintf_s) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_WPRINTF(3, 4) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(swprintf_s) __ATTR_IN(3) __ATTR_LIBC_WPRINTF(3, 4) __ATTR_OUTS(1, 2) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(swprintf_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;

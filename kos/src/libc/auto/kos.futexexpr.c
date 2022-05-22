@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15991a1e */
+/* HASH CRC-32:0x28c1b001 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ DECL_BEGIN
  * @return: < 0: Timeout expired
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND' */
-INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") ATTR_ACCESS_RO_OPT(4) NONNULL((1, 3)) int
+INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") ATTR_IN_OPT(4) NONNULL((1, 3)) int
 (LIBCCALL libc_LFutexExprI)(lfutex_t *ulockaddr,
                             void *base,
                             struct lfutexexpr const *expr,
@@ -92,7 +92,7 @@ DEFINE_INTERN_ALIAS(libc_LFutexExprI64, libc_LFutexExprI);
  * @return: < 0: Timeout expired
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND' */
-INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") ATTR_ACCESS_RO_OPT(4) NONNULL((1, 3)) int
+INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") ATTR_IN_OPT(4) NONNULL((1, 3)) int
 (LIBCCALL libc_LFutexExprI64)(lfutex_t *ulockaddr,
                               void *base,
                               struct lfutexexpr const *expr,

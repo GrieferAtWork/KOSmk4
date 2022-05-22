@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c61b5f7 */
+/* HASH CRC-32:0xfbd71b61 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/termios.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(tcsetattr) __ATTR_ACCESS_RO(3) int
+__LOCAL_LIBC(tcsetattr) __ATTR_IN(3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcsetattr))(__fd_t __fd, __STDC_INT_AS_UINT_T __optional_actions, struct termios const *__restrict __termios_p) {
 	int __cmd;
 	switch (__optional_actions) {

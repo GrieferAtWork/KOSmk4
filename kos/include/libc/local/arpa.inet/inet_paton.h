@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e66e6b9 */
+/* HASH CRC-32:0x84c9714c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/__byteswap.h>
 #include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(inet_paton) __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR(2) int
+__LOCAL_LIBC(inet_paton) __ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_paton))(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr) {
 	__UINT32_TYPE__ __result;
 	__UINT32_TYPE__ __parts[4];

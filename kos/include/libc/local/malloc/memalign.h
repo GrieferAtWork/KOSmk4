@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3502b393 */
+/* HASH CRC-32:0xd32b2c4c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_posix_memalign_defined
 #define __local___localdep_crt_posix_memalign_defined
-__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_crt_posix_memalign,(void **__restrict __pp, __SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),posix_memalign,(__pp,__alignment,__n_bytes))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_crt_posix_memalign,(void **__restrict __pp, __SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),posix_memalign,(__pp,__alignment,__n_bytes))
 #endif /* !__local___localdep_crt_posix_memalign_defined */
 __LOCAL_LIBC(memalign) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memalign))(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b8273b6 */
+/* HASH CRC-32:0x3c04726c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_timerfd_settime32_defined
 #define __local___localdep_timerfd_settime32_defined
-__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR_OPT(4),int,__NOTHROW_NCX,__localdep_timerfd_settime32,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec32 const *__utmr, struct __itimerspec32 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,__localdep_timerfd_settime32,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec32 const *__utmr, struct __itimerspec32 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
 #endif /* !__local___localdep_timerfd_settime32_defined */
-__LOCAL_LIBC(timerfd_settime64) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR_OPT(4) int
+__LOCAL_LIBC(timerfd_settime64) __ATTR_IN(3) __ATTR_OUT_OPT(4) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_settime64))(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__utmr, struct __itimerspec64 *__otmr) {
 	int __result;
 	struct __itimerspec32 __utmr32, __otmr32;

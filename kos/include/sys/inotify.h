@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56c41712 */
+/* HASH CRC-32:0xc772ba11 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,14 +62,14 @@ __CDECLARE_OPT(,__fd_t,__NOTHROW_NCX,inotify_init1,(__STDC_INT_AS_UINT_T __flags
 #ifdef __CRT_HAVE_inotify_add_watch
 /* >> inotify_add_watch(2)
  * @param: mask: Set of `IN_ALL_EVENTS | ...' */
-__CDECLARE(__ATTR_ACCESS_RO(2),__watchfd_t,__NOTHROW_NCX,inotify_add_watch,(__fd_t __notify_fd, char const *__pathname, __UINT32_TYPE__ __mask),(__notify_fd,__pathname,__mask))
+__CDECLARE(__ATTR_IN(2),__watchfd_t,__NOTHROW_NCX,inotify_add_watch,(__fd_t __notify_fd, char const *__pathname, __UINT32_TYPE__ __mask),(__notify_fd,__pathname,__mask))
 #else /* __CRT_HAVE_inotify_add_watch */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_inotify_add_watch_at)
 #include <libc/local/sys.inotify/inotify_add_watch.h>
 /* >> inotify_add_watch(2)
  * @param: mask: Set of `IN_ALL_EVENTS | ...' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(inotify_add_watch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __watchfd_t __NOTHROW_NCX(__LIBCCALL inotify_add_watch)(__fd_t __notify_fd, char const *__pathname, __UINT32_TYPE__ __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inotify_add_watch))(__notify_fd, __pathname, __mask); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(inotify_add_watch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __watchfd_t __NOTHROW_NCX(__LIBCCALL inotify_add_watch)(__fd_t __notify_fd, char const *__pathname, __UINT32_TYPE__ __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inotify_add_watch))(__notify_fd, __pathname, __mask); })
 #endif /* __AT_FDCWD && __CRT_HAVE_inotify_add_watch_at */
 #endif /* !__CRT_HAVE_inotify_add_watch */
 /* >> inotify_rm_watch(2)
@@ -80,7 +80,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,inotify_rm_watch,(__fd_t __notify_fd, __watchf
 /* >> inotify_add_watch_at(2)
  * @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH | AT_EMPTY_PATH'
  * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(3),__watchfd_t,__NOTHROW_NCX,inotify_add_watch_at,(__fd_t __notify_fd, __fd_t __dirfd, char const *__pathname, __atflag_t __atflags, __UINT32_TYPE__ __mask),(__notify_fd,__dirfd,__pathname,__atflags,__mask))
+__CDECLARE_OPT(__ATTR_IN(3),__watchfd_t,__NOTHROW_NCX,inotify_add_watch_at,(__fd_t __notify_fd, __fd_t __dirfd, char const *__pathname, __atflag_t __atflags, __UINT32_TYPE__ __mask),(__notify_fd,__dirfd,__pathname,__atflags,__mask))
 #endif /* __USE_KOS */
 
 __SYSDECL_END

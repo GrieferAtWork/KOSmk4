@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8345104 */
+/* HASH CRC-32:0x1d285fda */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ DEFINE_INTERN_ALIAS(libc_lockop_reap_ex, libc_oblockop_reap_ex);
 #include <kos/lockop.h>
 #endif /* !_KOS_LOCKOP_H */
 #include <hybrid/__atomic.h>
-INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_ACCESS_RW(1) NONNULL((2, 3)) void
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) NONNULL((2, 3)) void
 NOTHROW(__LOCKOP_CC libc_lockop_reap_ex)(struct lockop_slist *__restrict self,
                                          __BOOL (__LOCKOP_CC *trylock)(void *cookie),
                                          void (__LOCKOP_CC *unlock)(void *cookie),
@@ -55,7 +55,7 @@ NOTHROW(__LOCKOP_CC libc_lockop_reap_ex)(struct lockop_slist *__restrict self,
 #include <kos/lockop.h>
 #endif /* !_KOS_LOCKOP_H */
 #include <hybrid/__atomic.h>
-INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_ACCESS_RW(1) NONNULL((2, 3, 5)) void
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) NONNULL((2, 3, 5)) void
 NOTHROW(__LOCKOP_CC libc_oblockop_reap_ex)(struct oblockop_slist *__restrict self,
                                            __BOOL (__LOCKOP_CC *trylock)(void *cookie),
                                            void (__LOCKOP_CC *unlock)(void *cookie),
@@ -73,7 +73,7 @@ NOTHROW(__LOCKOP_CC libc_oblockop_reap_ex)(struct oblockop_slist *__restrict sel
 DEFINE_INTERN_ALIAS(libc_lockop_reap_atomic_lock, libc_oblockop_reap_atomic_lock);
 #else /* __OPTIMIZE_SIZE__ && __x86_64__ */
 #include <hybrid/sync/atomic-lock.h>
-INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void
 NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_lock)(struct lockop_slist *__restrict self,
                                                   struct atomic_lock *__restrict lock) {
 #ifndef __INTELLISENSE__
@@ -86,7 +86,7 @@ NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_lock)(struct lockop_slist *__restric
 }
 #endif /* !__OPTIMIZE_SIZE__ || !__x86_64__ */
 #include <hybrid/sync/atomic-lock.h>
-INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) NONNULL((3)) void
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)) void
 NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock)(struct oblockop_slist *__restrict self,
                                                     struct atomic_lock *__restrict lock,
                                                     void *__restrict obj) {
@@ -102,7 +102,7 @@ NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock)(struct oblockop_slist *__res
 DEFINE_INTERN_ALIAS(libc_lockop_reap_atomic_rwlock, libc_oblockop_reap_atomic_rwlock);
 #else /* __OPTIMIZE_SIZE__ && __x86_64__ */
 #include <hybrid/sync/atomic-rwlock.h>
-INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void
 NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_rwlock)(struct lockop_slist *__restrict self,
                                                     struct atomic_rwlock *__restrict lock) {
 #ifndef __INTELLISENSE__
@@ -115,7 +115,7 @@ NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_rwlock)(struct lockop_slist *__restr
 }
 #endif /* !__OPTIMIZE_SIZE__ || !__x86_64__ */
 #include <hybrid/sync/atomic-rwlock.h>
-INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) NONNULL((3)) void
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)) void
 NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock)(struct oblockop_slist *__restrict self,
                                                       struct atomic_rwlock *__restrict lock,
                                                       void *__restrict obj) {
@@ -131,7 +131,7 @@ NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock)(struct oblockop_slist *__r
 DEFINE_INTERN_ALIAS(libc_lockop_reap_shared_lock, libc_oblockop_reap_shared_lock);
 #else /* __OPTIMIZE_SIZE__ && __x86_64__ */
 #include <kos/sched/shared-lock.h>
-INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void
 NOTHROW(__LOCKOP_CC libc_lockop_reap_shared_lock)(struct lockop_slist *__restrict self,
                                                   struct shared_lock *__restrict lock) {
 #ifndef __INTELLISENSE__
@@ -144,7 +144,7 @@ NOTHROW(__LOCKOP_CC libc_lockop_reap_shared_lock)(struct lockop_slist *__restric
 }
 #endif /* !__OPTIMIZE_SIZE__ || !__x86_64__ */
 #include <kos/sched/shared-lock.h>
-INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) NONNULL((3)) void
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)) void
 NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_lock)(struct oblockop_slist *__restrict self,
                                                     struct shared_lock *__restrict lock,
                                                     void *__restrict obj) {
@@ -159,7 +159,7 @@ NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_lock)(struct oblockop_slist *__res
 #if defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)
 DEFINE_INTERN_ALIAS(libc_lockop_reap_shared_rwlock, libc_oblockop_reap_shared_rwlock);
 #else /* __OPTIMIZE_SIZE__ && __x86_64__ */
-INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void
 NOTHROW(__LOCKOP_CC libc_lockop_reap_shared_rwlock)(struct lockop_slist *__restrict self,
                                                     struct shared_rwlock *__restrict lock) {
 #ifndef __INTELLISENSE__
@@ -171,7 +171,7 @@ NOTHROW(__LOCKOP_CC libc_lockop_reap_shared_rwlock)(struct lockop_slist *__restr
 #endif /* !__INTELLISENSE__ */
 }
 #endif /* !__OPTIMIZE_SIZE__ || !__x86_64__ */
-INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) NONNULL((3)) void
+INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)) void
 NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_rwlock)(struct oblockop_slist *__restrict self,
                                                       struct shared_rwlock *__restrict lock,
                                                       void *__restrict obj) {

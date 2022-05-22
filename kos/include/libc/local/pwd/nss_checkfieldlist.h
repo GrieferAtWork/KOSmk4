@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5497a02 */
+/* HASH CRC-32:0x3548f59d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strpbrk_defined
 #define __local___localdep_strpbrk_defined
 #if __has_builtin(__builtin_strpbrk) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strpbrk)
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_NCX,__localdep_strpbrk,(char const *__haystack, char const *__accept),strpbrk,{ return __builtin_strpbrk(__haystack, __accept); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),char *,__NOTHROW_NCX,__localdep_strpbrk,(char const *__haystack, char const *__accept),strpbrk,{ return __builtin_strpbrk(__haystack, __accept); })
 #elif defined(__CRT_HAVE_strpbrk)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_NCX,__localdep_strpbrk,(char const *__haystack, char const *__accept),strpbrk,(__haystack,__accept))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),char *,__NOTHROW_NCX,__localdep_strpbrk,(char const *__haystack, char const *__accept),strpbrk,(__haystack,__accept))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strpbrk.h>
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strpbrk __LIBC_LOCAL_NAME(strpbrk)
 #endif /* !... */
 #endif /* !__local___localdep_strpbrk_defined */
-__LOCAL_LIBC(nss_checkfieldlist) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __BOOL
+__LOCAL_LIBC(nss_checkfieldlist) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN_OPT(1) __BOOL
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(nss_checkfieldlist))(char *const *__list) {
 	if (!__list)
 		return 1;

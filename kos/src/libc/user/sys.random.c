@@ -34,7 +34,7 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_getrandom,hash:CRC-32=0x7c5027af]]]*/
+/*[[[head:libc_getrandom,hash:CRC-32=0x4f30f1a5]]]*/
 /* >> getrandom(2)
  * Ask the kernel for up to `num_bytes' bytes of random
  * data,   which  should  then  be  written  to  `buf'.
@@ -46,7 +46,7 @@ DECL_BEGIN
  *                calling thread being interrupted, `EINTR' is only set
  *                if no  random data  had already  been retrieved  from
  *                the kernel's random data sink. */
-INTERN ATTR_SECTION(".text.crt.system.random") WUNUSED ATTR_ACCESS_WRS(1, 2) ssize_t
+INTERN ATTR_SECTION(".text.crt.system.random") WUNUSED ATTR_OUTS(1, 2) ssize_t
 NOTHROW_NCX(LIBCCALL libc_getrandom)(void *buf,
                                      size_t num_bytes,
                                      unsigned int flags)
@@ -80,7 +80,7 @@ err:
 }
 /*[[[end:libc_getrandom]]]*/
 
-/*[[[head:libc_getentropy,hash:CRC-32=0xb1ef71b4]]]*/
+/*[[[head:libc_getentropy,hash:CRC-32=0xd40c5c35]]]*/
 /* >> getentropy(3)
  * Similar   to   `getrandom(buf, num_bytes, GRND_RANDOM)',  however
  * the  case  where  the  calling  thread  is  interrupted,  causing
@@ -93,7 +93,7 @@ err:
  * and `ENOSYS'  may be  translated into  `EIO'
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
-INTERN ATTR_SECTION(".text.crt.system.random") WUNUSED ATTR_ACCESS_WRS(1, 2) int
+INTERN ATTR_SECTION(".text.crt.system.random") WUNUSED ATTR_OUTS(1, 2) int
 NOTHROW_NCX(LIBCCALL libc_getentropy)(void *buf,
                                       size_t num_bytes)
 /*[[[body:libc_getentropy]]]*/

@@ -29,8 +29,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_prlimit,hash:CRC-32=0x5a41dee2]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_WR_OPT(4) int
+/*[[[head:libc_prlimit,hash:CRC-32=0x8c307272]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_IN_OPT(3) ATTR_OUT_OPT(4) int
 NOTHROW_NCX(LIBCCALL libc_prlimit)(pid_t pid,
                                    __rlimit_resource_t resource,
                                    struct rlimit const *new_limit,
@@ -60,11 +60,11 @@ NOTHROW_NCX(LIBCCALL libc_prlimit)(pid_t pid,
 }
 /*[[[end:libc_prlimit]]]*/
 
-/*[[[head:libc_prlimit64,hash:CRC-32=0xf89d9519]]]*/
+/*[[[head:libc_prlimit64,hash:CRC-32=0x1ac4e6a]]]*/
 #if __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__
 DEFINE_INTERN_ALIAS(libc_prlimit64, libc_prlimit);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_WR_OPT(4) int
+INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_IN_OPT(3) ATTR_OUT_OPT(4) int
 NOTHROW_NCX(LIBCCALL libc_prlimit64)(pid_t pid,
                                      __rlimit_resource_t resource,
                                      struct rlimit64 const *new_limit,
@@ -78,8 +78,8 @@ NOTHROW_NCX(LIBCCALL libc_prlimit64)(pid_t pid,
 #endif /* MAGIC:alias */
 /*[[[end:libc_prlimit64]]]*/
 
-/*[[[head:libc_getrlimit,hash:CRC-32=0xfaf34668]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_ACCESS_WR(2) int
+/*[[[head:libc_getrlimit,hash:CRC-32=0xa563f118]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_getrlimit)(__rlimit_resource_t resource,
                                      struct rlimit *rlimits)
 /*[[[body:libc_getrlimit]]]*/
@@ -90,11 +90,11 @@ NOTHROW_NCX(LIBCCALL libc_getrlimit)(__rlimit_resource_t resource,
 }
 /*[[[end:libc_getrlimit]]]*/
 
-/*[[[head:libc_getrlimit64,hash:CRC-32=0xf40ee462]]]*/
+/*[[[head:libc_getrlimit64,hash:CRC-32=0x902089e9]]]*/
 #if __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__
 DEFINE_INTERN_ALIAS(libc_getrlimit64, libc_getrlimit);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_ACCESS_WR(2) int
+INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_getrlimit64)(__rlimit_resource_t resource,
                                        struct rlimit64 *rlimits)
 /*[[[body:libc_getrlimit64]]]*/
@@ -104,8 +104,8 @@ NOTHROW_NCX(LIBCCALL libc_getrlimit64)(__rlimit_resource_t resource,
 #endif /* MAGIC:alias */
 /*[[[end:libc_getrlimit64]]]*/
 
-/*[[[head:libc_setrlimit,hash:CRC-32=0xb5d9d2d3]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_ACCESS_RO(2) int
+/*[[[head:libc_setrlimit,hash:CRC-32=0xbd0184d0]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc_setrlimit)(__rlimit_resource_t resource,
                                      struct rlimit const *rlimits)
 /*[[[body:libc_setrlimit]]]*/
@@ -116,11 +116,11 @@ NOTHROW_NCX(LIBCCALL libc_setrlimit)(__rlimit_resource_t resource,
 }
 /*[[[end:libc_setrlimit]]]*/
 
-/*[[[head:libc_setrlimit64,hash:CRC-32=0xa5f66c2]]]*/
+/*[[[head:libc_setrlimit64,hash:CRC-32=0x4bbde954]]]*/
 #if __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__
 DEFINE_INTERN_ALIAS(libc_setrlimit64, libc_setrlimit);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc_setrlimit64)(__rlimit_resource_t resource,
                                        struct rlimit64 const *rlimits)
 /*[[[body:libc_setrlimit64]]]*/
@@ -130,8 +130,8 @@ NOTHROW_NCX(LIBCCALL libc_setrlimit64)(__rlimit_resource_t resource,
 #endif /* MAGIC:alias */
 /*[[[end:libc_setrlimit64]]]*/
 
-/*[[[head:libc_getrusage,hash:CRC-32=0x8d04650d]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_ACCESS_WR(2) int
+/*[[[head:libc_getrusage,hash:CRC-32=0xf8cd9fa2]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_getrusage)(__rusage_who_t who,
                                      struct rusage *usage)
 /*[[[body:libc_getrusage]]]*/
@@ -142,11 +142,11 @@ NOTHROW_NCX(LIBCCALL libc_getrusage)(__rusage_who_t who,
 }
 /*[[[end:libc_getrusage]]]*/
 
-/*[[[head:libc_getrusage64,hash:CRC-32=0x9175355e]]]*/
+/*[[[head:libc_getrusage64,hash:CRC-32=0xbeb9ead8]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_getrusage64, libc_getrusage);
 #else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_ACCESS_WR(2) int
+INTERN ATTR_SECTION(".text.crt.sched.resource") ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_getrusage64)(__rusage_who_t who,
                                        struct rusage64 *usage)
 /*[[[body:libc_getrusage64]]]*/

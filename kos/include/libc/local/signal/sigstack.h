@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e1964a3 */
+/* HASH CRC-32:0x8989c02e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigaltstack_defined
 #define __local___localdep_sigaltstack_defined
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),sigaltstack,(__ss,__oss))
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),sigaltstack,(__ss,__oss))
 #endif /* !__local___localdep_sigaltstack_defined */
-__LOCAL_LIBC(sigstack) __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_WR_OPT(2) int
+__LOCAL_LIBC(sigstack) __ATTR_IN_OPT(1) __ATTR_OUT_OPT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigstack))(struct sigstack const *__ss, struct sigstack *__oss) {
 	struct sigaltstack __ass, __aoss;
 	int __result;

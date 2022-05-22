@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1188dbed */
+/* HASH CRC-32:0x85ea2eaf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_RO_OPT(3) __ATTR_LIBC_PRINTF(3, 0),__THROWING,__localdep_verrc,(int __status, __errno_t __used_errno, char const *__format, __builtin_va_list __args),verrc,(__status,__used_errno,__format,__args))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_IN_OPT(3) __ATTR_LIBC_PRINTF(3, 0),__THROWING,__localdep_verrc,(int __status, __errno_t __used_errno, char const *__format, __builtin_va_list __args),verrc,(__status,__used_errno,__format,__args))
 #elif (defined(__CRT_HAVE_vwarnc) || (defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit))
 __NAMESPACE_LOCAL_END
 #include <libc/local/err/verrc.h>
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(verr) __ATTR_NORETURN __ATTR_ACCESS_RO_OPT(2) __ATTR_LIBC_PRINTF(2, 0) void
+__LOCAL_LIBC(verr) __ATTR_NORETURN __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 0) void
 (__LIBCCALL __LIBC_LOCAL_NAME(verr))(int __status, char const *__format, __builtin_va_list __args) __THROWS(...) {
 	(__NAMESPACE_LOCAL_SYM __localdep_verrc)(__status, __libc_geterrno_or(0), __format, __args);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55944786 */
+/* HASH CRC-32:0xaa678a37 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-__LOCAL_LIBC(tdestroy_r) __ATTR_ACCESS_RW_OPT(1) __ATTR_NONNULL((2)) void
+__LOCAL_LIBC(tdestroy_r) __ATTR_INOUT_OPT(1) __ATTR_NONNULL((2)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(tdestroy_r))(void *__root, void (__LIBCCALL *__freefct)(void *__nodep, void *__arg), void *__arg) __THROWS(...) {
 	if (__root) {
 		void *__l, *__r;

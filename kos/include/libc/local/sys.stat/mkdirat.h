@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7186dc79 */
+/* HASH CRC-32:0xa3e1d5b1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fmkdirat_defined
 #define __local___localdep_fmkdirat_defined
-__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_fmkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode, __atflag_t __flags),fmkdirat,(__dirfd,__pathname,__mode,__flags))
+__CREDIRECT(__ATTR_IN(2),int,__NOTHROW_RPC,__localdep_fmkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode, __atflag_t __flags),fmkdirat,(__dirfd,__pathname,__mode,__flags))
 #endif /* !__local___localdep_fmkdirat_defined */
-__LOCAL_LIBC(mkdirat) __ATTR_ACCESS_RO(2) int
+__LOCAL_LIBC(mkdirat) __ATTR_IN(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkdirat))(__fd_t __dirfd, char const *__pathname, __mode_t __mode) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fmkdirat)(__dirfd, __pathname, __mode, 0);
 }

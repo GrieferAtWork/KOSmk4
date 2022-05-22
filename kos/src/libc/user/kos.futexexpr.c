@@ -30,7 +30,7 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_lfutexexpr,hash:CRC-32=0xf80a04a7]]]*/
+/*[[[head:libc_lfutexexpr,hash:CRC-32=0x91eb703e]]]*/
 /* >> lfutexexpr(2), lfutexexpr64(2)
  * The lfutexexpr(2) system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
@@ -50,7 +50,7 @@ DECL_BEGIN
  * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(4) NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") ATTR_IN(3) ATTR_IN_OPT(4) NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *ulockaddr,
                                       void *base,
                                       struct lfutexexpr const *expr,
@@ -76,7 +76,7 @@ NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *ulockaddr,
 }
 /*[[[end:libc_lfutexexpr]]]*/
 
-/*[[[head:libc_lfutexexpr64,hash:CRC-32=0xbc7f2c45]]]*/
+/*[[[head:libc_lfutexexpr64,hash:CRC-32=0x970c5d2d]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_lfutexexpr64, libc_lfutexexpr);
 #else /* MAGIC:alias */
@@ -99,7 +99,7 @@ DEFINE_INTERN_ALIAS(libc_lfutexexpr64, libc_lfutexexpr);
  * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(4) NONNULL((1)) int
+INTERN ATTR_SECTION(".text.crt.sched.futexlockexpr") ATTR_IN(3) ATTR_IN_OPT(4) NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(lfutex_t *ulockaddr,
                                         void *base,
                                         struct lfutexexpr const *expr,

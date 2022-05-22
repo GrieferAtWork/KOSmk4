@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32836221 */
+/* HASH CRC-32:0x6c3de8e2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,7 +71,7 @@ __SYSDECL_BEGIN
  * @param: match_flags:   Set of `FNM_*'
  * @return: 0           : `name' is matched by `pattern'
  * @return: FNM_NOMATCH : `name' is not matched by `pattern' */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,fnmatch,(char const *__pattern, char const *__name, __STDC_INT_AS_UINT_T __match_flags),(__pattern,__name,__match_flags))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,fnmatch,(char const *__pattern, char const *__name, __STDC_INT_AS_UINT_T __match_flags),(__pattern,__name,__match_flags))
 #else /* __CRT_HAVE_fnmatch */
 #include <libc/local/fnmatch/fnmatch.h>
 /* >> fnmatch(3)
@@ -80,7 +80,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),in
  * @param: match_flags:   Set of `FNM_*'
  * @return: 0           : `name' is matched by `pattern'
  * @return: FNM_NOMATCH : `name' is not matched by `pattern' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fnmatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_NCX(__LIBCCALL fnmatch)(char const *__pattern, char const *__name, __STDC_INT_AS_UINT_T __match_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fnmatch))(__pattern, __name, __match_flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fnmatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL fnmatch)(char const *__pattern, char const *__name, __STDC_INT_AS_UINT_T __match_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fnmatch))(__pattern, __name, __match_flags); })
 #endif /* !__CRT_HAVE_fnmatch */
 
 __SYSDECL_END

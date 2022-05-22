@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd416b7dd */
+/* HASH CRC-32:0x16df3f06 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsxfrm_defined
 #define __local___localdep_wcsxfrm_defined
 #ifdef __CRT_HAVE_wcsxfrm
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_WRS(1, 3),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsxfrm,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __buflen),wcsxfrm,(__dst,__src,__buflen))
+__CREDIRECT(__ATTR_INS(2, 3) __ATTR_OUTS(1, 3),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsxfrm,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __buflen),wcsxfrm,(__dst,__src,__buflen))
 #else /* __CRT_HAVE_wcsxfrm */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsxfrm.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcsxfrm __LIBC_LOCAL_NAME(wcsxfrm)
 #endif /* !__CRT_HAVE_wcsxfrm */
 #endif /* !__local___localdep_wcsxfrm_defined */
-__LOCAL_LIBC(wcsxfrm_l) __ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_WRS(1, 3) __SIZE_TYPE__
+__LOCAL_LIBC(wcsxfrm_l) __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsxfrm_l))(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __buflen, __locale_t __locale) {
 	(void)__locale;
 	return (__NAMESPACE_LOCAL_SYM __localdep_wcsxfrm)(__dst, __src, __buflen);

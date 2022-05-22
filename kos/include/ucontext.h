@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4a594d9 */
+/* HASH CRC-32:0x961bb0af */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __SYSDECL_BEGIN
  *       function.
  * WARNING: If the context returned by  this function is loaded after  the
  *          calling function has returned, then the behavior is undefined. */
-__CDECLARE_OPT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,getcontext,(ucontext_t *__restrict __ucp),(__ucp))
+__CDECLARE_OPT(__ATTR_OUT(1),int,__NOTHROW_NCX,getcontext,(ucontext_t *__restrict __ucp),(__ucp))
 /* >> setcontext(3)
  * Populate the current machine register state with values from `ucp',
  * such  that this  function will not  return to the  caller, but will
@@ -82,7 +82,7 @@ __CDECLARE_OPT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,getcontext,(ucontext_t *__r
  *       headers will define a macro `__CRT_SUPPORTS_UCONTEXT', which you
  *       may test for, and which allows you to omit error-checks for this
  *       function. */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,setcontext,(ucontext_t const *__restrict __ucp),(__ucp))
+__CDECLARE_OPT(__ATTR_IN(1),int,__NOTHROW_NCX,setcontext,(ucontext_t const *__restrict __ucp),(__ucp))
 /* >> swapcontext(3)
  * Atomically perform both a `getcontext(oucp)',  as well as a  `setcontext(ucp)',
  * such that execution will  continue at `ucp',  but code that  is hosted by  that
@@ -98,7 +98,7 @@ __CDECLARE_OPT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,setcontext,(ucontext_t cons
  *       headers will define a macro `__CRT_SUPPORTS_UCONTEXT', which you
  *       may test for, and which allows you to omit error-checks for this
  *       function. */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,swapcontext,(ucontext_t *__restrict __oucp, ucontext_t const *__restrict __ucp),(__oucp,__ucp))
+__CDECLARE_OPT(__ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,swapcontext,(ucontext_t *__restrict __oucp, ucontext_t const *__restrict __ucp),(__oucp,__ucp))
 #ifdef __CRT_HAVE_makecontext
 /* >> makecontext(3)
  * Initialize  a  user-context  `ucp'  to  perform  a  call  to  `func',  which
@@ -119,7 +119,7 @@ __CDECLARE_OPT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,swapcon
  *   - Have `ucp->uc_link' point to the context that should be  loaded
  *     when `func' returns normally, or set to `NULL' if the return of
  *     `func' should be handled as a call to `pthread_exit(NULL)' */
-__LIBC __ATTR_ACCESS_WR(1) __ATTR_NONNULL((2)) void __NOTHROW_NCX(__VLIBCCALL makecontext)(ucontext_t *__ucp, void (__LIBKCALL *__func)(void), __STDC_INT_AS_SIZE_T ___argc, ...) __CASMNAME_SAME("makecontext");
+__LIBC __ATTR_OUT(1) __ATTR_NONNULL((2)) void __NOTHROW_NCX(__VLIBCCALL makecontext)(ucontext_t *__ucp, void (__LIBKCALL *__func)(void), __STDC_INT_AS_SIZE_T ___argc, ...) __CASMNAME_SAME("makecontext");
 #endif /* __CRT_HAVE_makecontext */
 
 #ifdef __CRT_SUPPORTS_UCONTEXT

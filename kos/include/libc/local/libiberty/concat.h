@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1f427d5 */
+/* HASH CRC-32:0x413d9fc2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_vconcat __LIBC_LOCAL_NAME(vconcat)
 #endif /* !__local___localdep_vconcat_defined */
-__LOCAL_LIBC(concat) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_SENTINEL __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) char *
+__LOCAL_LIBC(concat) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_SENTINEL __ATTR_WUNUSED __ATTR_IN_OPT(1) char *
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(concat))(char const *__first, ...) {
 	char *__result;
 	__builtin_va_list __args;

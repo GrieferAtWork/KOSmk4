@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1734722f */
+/* HASH CRC-32:0x87a2ba80 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,7 +122,7 @@ NOTHROW_NCX(LIBCCALL libc___xpg_sigpause)(signo_t signo) {
 /* >> sigemptyset(3)
  * Clear the given signal set of all contained signals
  * @return: 0: Always returns `0' */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_ACCESS_WR(1) int
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sigemptyset)(sigset_t *set) {
 	libc_bzeroc(set->__val, COMPILER_LENOF(set->__val), __SIZEOF_POINTER__);
 	return 0;
@@ -131,7 +131,7 @@ NOTHROW_NCX(LIBCCALL libc_sigemptyset)(sigset_t *set) {
  * Add all possible signals (possibly even including undefined signals,
  * though these would be ignored by the kernel) to the given signal set
  * @return: 0: Always returns `0' */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_ACCESS_WR(1) int
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set) {
 #if __SIZEOF_POINTER__ == 8
 	libc_memsetq(set->__val, __UINT64_C(0xffffffffffffffff), COMPILER_LENOF(set->__val));
@@ -182,7 +182,7 @@ NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set) {
  * @return: 0:  Success (Always returned by the kernel-version)
  * @return: -1: [errno=EINVAL] invalid `signo'.
  *              Not returned by the kernel-version of this function! */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_ACCESS_RW(1) int
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set,
                                      signo_t signo) {
 	ulongptr_t mask, word;
@@ -197,7 +197,7 @@ NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set,
  * @return: 0:  Success (Always returned by the kernel-version)
  * @return: -1: [errno=EINVAL] invalid `signo'.
  *              Not returned by the kernel-version of this function! */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_ACCESS_RW(1) int
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set,
                                      signo_t signo) {
 	ulongptr_t mask, word;
@@ -214,7 +214,7 @@ NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set,
  * @return:  0: The given `signo' isn't apart of `set'
  * @return: -1: [errno=EINVAL] invalid `signo'.
  *              Not returned by the kernel-version of this function! */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
                                        signo_t signo) {
 	ulongptr_t mask, word;
@@ -227,7 +227,7 @@ NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
  * Check if the given signal set is empty
  * @return: != 0: Yes, it is empty
  * @return: == 0: No, at least 1 signal is contained */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *__restrict set) {
 	size_t i;
 	for (i = 0; i < COMPILER_LENOF(set->__val); ++i) {
@@ -239,7 +239,7 @@ NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *__restrict set) {
 /* >> sigandset(3)
  * Set-up every signal `S' from `set' as the result of `set[S] = left[S] & right[S]'
  * @return: 0: Always returns `0' */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) int
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set,
                                      sigset_t const *left,
                                      sigset_t const *right) {
@@ -251,7 +251,7 @@ NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set,
 /* >> sigorset(3)
  * Set-up every signal `S' from `set' as the result of `set[S] = left[S] | right[S]'
  * @return: 0: Always returns `0' */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) int
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set,
                                     sigset_t const *left,
                                     sigset_t const *right) {
@@ -263,7 +263,7 @@ NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set,
 /* >> signandset(3)
  * Set-up every signal `S' from `set' as the result of `set[S] = left[S] & ~right[S]'
  * @return: 0: Always returns `0' */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) int
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_signandset)(sigset_t *set,
                                       sigset_t const *left,
                                       sigset_t const *right) {
@@ -306,7 +306,7 @@ NOTHROW_NCX(LIBCCALL libc_psignal)(signo_t signo,
 #include <bits/types.h>
 /* >> psiginfo(3)
  * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO_OPT(2) void
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_IN(1) ATTR_IN_OPT(2) void
 NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
                                     char const *s) {
 	char const *text;
@@ -830,7 +830,7 @@ print("@@pp_endif@@");
  * Deprecated, and slightly different version of `sigaltstack(2)'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_WR_OPT(2) int
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_IN_OPT(1) ATTR_OUT_OPT(2) int
 NOTHROW_NCX(LIBCCALL libc_sigstack)(struct sigstack const *ss,
                                     struct sigstack *oss) {
 	struct sigaltstack ass, aoss;
@@ -933,7 +933,7 @@ err:
  * the given `name', and the  signal's actual name. When  `name'
  * isn't recognized, return `0' instead.
  * This function also handles stuff like "SIGRTMIN+1" or "9" */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) signo_t
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED ATTR_IN(1) signo_t
 NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name) {
 	signo_t result;
 
@@ -1001,7 +1001,7 @@ NOTHROW_NCX(LIBCCALL libc_signalnext)(signo_t signo) {
  * Wrapper around  `sigabbrev_np(3)', that  also adds  additional
  * handling for `SIGRTMIN...`SIGRTMAX' signals, which are encoded
  * in a way that is compatible with `str2sig(3)'. */
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_ACCESS_WR(2) int
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_sig2str)(signo_t signo,
                                    char buf[32]) {
 	char const *name = libc_sigabbrev_np(signo);
@@ -1025,7 +1025,7 @@ NOTHROW_NCX(LIBCCALL libc_sig2str)(signo_t signo,
  *  - Doesn't automatically remove any "SIG" prefix.
  * @return: 0 : Success; `*p_signo' was filled
  * @return: -1: Unrecognized `name' (`errno(3)' was _NOT_ modified) */
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_IN(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_str2sig)(const char *name,
                                    signo_t *p_signo) {
 	signo_t result;

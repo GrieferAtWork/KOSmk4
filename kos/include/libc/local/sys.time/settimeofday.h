@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7cd1d20 */
+/* HASH CRC-32:0xa6a9eee */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_settimeofday32_defined
 #define __local___localdep_settimeofday32_defined
 #ifdef __CRT_HAVE_settimeofday
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___settimeofday)
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),__settimeofday,(__tv,__tz))
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),__settimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___libc_settimeofday)
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),__libc_settimeofday,(__tv,__tz))
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),__libc_settimeofday,(__tv,__tz))
 #else /* ... */
 #undef __local___localdep_settimeofday32_defined
 #endif /* !... */
@@ -41,13 +41,13 @@ __CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__
 #ifndef __local___localdep_settimeofday64_defined
 #define __local___localdep_settimeofday64_defined
 #if defined(__CRT_HAVE_settimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___settimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),__settimeofday,(__tv,__tz))
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),__settimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___libc_settimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),__libc_settimeofday,(__tv,__tz))
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),__libc_settimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE_settimeofday64)
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),settimeofday64,(__tv,__tz))
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),settimeofday64,(__tv,__tz))
 #elif defined(__CRT_HAVE_settimeofday) || defined(__CRT_HAVE___settimeofday) || defined(__CRT_HAVE___libc_settimeofday)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/settimeofday64.h>
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_settimeofday64_defined
 #endif /* !... */
 #endif /* !__local___localdep_settimeofday64_defined */
-__LOCAL_LIBC(settimeofday) __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2) int
+__LOCAL_LIBC(settimeofday) __ATTR_IN_OPT(1) __ATTR_IN_OPT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(settimeofday))(struct timeval const *__tv, struct timezone const *__tz) {
 #if defined(__CRT_HAVE_settimeofday) || defined(__CRT_HAVE___settimeofday) || defined(__CRT_HAVE___libc_settimeofday)
 	struct __timeval32 __tv32;

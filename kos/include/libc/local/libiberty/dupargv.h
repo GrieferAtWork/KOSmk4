@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f35768e */
+/* HASH CRC-32:0x41da3507 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_xstrdup,(char const *__restrict __string),xstrdup,(__string))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_NCX,__localdep_xstrdup,(char const *__restrict __string),xstrdup,(__string))
 #else /* __CRT_HAVE_xstrdup */
 __NAMESPACE_LOCAL_END
 #include <libc/local/libiberty/xstrdup.h>
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(dupargv) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) char **
+__LOCAL_LIBC(dupargv) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_IN_OPT(1) char **
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dupargv))(char *__KOS_FIXED_CONST *___argv) {
 	char **__result;
 	__SIZE_TYPE__ __i, ___argc;

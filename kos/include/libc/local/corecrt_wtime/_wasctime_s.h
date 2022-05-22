@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99b4416c */
+/* HASH CRC-32:0xb7f57140 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_asctime_r_defined
 #define __local___localdep_asctime_r_defined
 #ifdef __CRT_HAVE_asctime_r
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),char *,__NOTHROW_NCX,__localdep_asctime_r,(struct __NAMESPACE_STD_SYM tm const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_asctime_r,(struct __NAMESPACE_STD_SYM tm const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
 #else /* __CRT_HAVE_asctime_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/asctime_r.h>
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_asctime_r __LIBC_LOCAL_NAME(asctime_r)
 #endif /* !__CRT_HAVE_asctime_r */
 #endif /* !__local___localdep_asctime_r_defined */
-__LOCAL_LIBC(_wasctime_s) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __errno_t
+__LOCAL_LIBC(_wasctime_s) __ATTR_IN(3) __ATTR_OUTS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wasctime_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, struct __NAMESPACE_STD_SYM tm const *__tp) {
 	char __abuf[26], *__ptr;
 	unsigned int __i;

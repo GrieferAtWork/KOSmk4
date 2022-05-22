@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f62c88a */
+/* HASH CRC-32:0x53321291 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,16 +27,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_gettimeofday32_defined
 #define __local___localdep_gettimeofday32_defined
 #ifdef __CRT_HAVE_gettimeofday
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(1) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),gettimeofday,(__tv,__tz))
+__CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),gettimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___gettimeofday)
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(1) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),__gettimeofday,(__tv,__tz))
+__CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),__gettimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___libc_gettimeofday)
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(1) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),__libc_gettimeofday,(__tv,__tz))
+__CREDIRECT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),__libc_gettimeofday,(__tv,__tz))
 #else /* ... */
 #undef __local___localdep_gettimeofday32_defined
 #endif /* !... */
 #endif /* !__local___localdep_gettimeofday32_defined */
-__LOCAL_LIBC(gettimeofday64) __ATTR_ACCESS_WR_OPT(1) __ATTR_ACCESS_WR_OPT(2) int
+__LOCAL_LIBC(gettimeofday64) __ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gettimeofday64))(struct __timeval64 *__restrict __tv, void * __tz) {
 	int __result;
 	struct __timeval32 __tv32;

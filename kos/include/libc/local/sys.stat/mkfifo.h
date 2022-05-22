@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44def1b9 */
+/* HASH CRC-32:0xa75ffc6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mknod_defined
 #define __local___localdep_mknod_defined
 #ifdef __CRT_HAVE_mknod
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_mknod,(char const *__nodename, __mode_t __mode, __dev_t __dev),mknod,(__nodename,__mode,__dev))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_mknod,(char const *__nodename, __mode_t __mode, __dev_t __dev),mknod,(__nodename,__mode,__dev))
 #elif (defined(__CRT_HAVE_mknodat) || defined(__CRT_HAVE_fmknodat)) && defined(__AT_FDCWD)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.stat/mknod.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_mknod_defined
 #endif /* !... */
 #endif /* !__local___localdep_mknod_defined */
-__LOCAL_LIBC(mkfifo) __ATTR_ACCESS_RO(1) int
+__LOCAL_LIBC(mkfifo) __ATTR_IN(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkfifo))(char const *__fifoname, __mode_t __mode) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_mknod)(__fifoname, __mode | __S_IFIFO, 0);
 }

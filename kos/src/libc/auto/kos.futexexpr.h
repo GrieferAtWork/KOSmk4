@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a4e97dc */
+/* HASH CRC-32:0x696b378 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ DECL_BEGIN
  * @return: < 0: Timeout expired
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND' */
-INTDEF ATTR_ACCESS_RO_OPT(4) NONNULL((1, 3)) int (LIBCCALL libc_LFutexExprI)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags) THROWS(...);
+INTDEF ATTR_IN_OPT(4) NONNULL((1, 3)) int (LIBCCALL libc_LFutexExprI)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, unsigned int timeout_flags) THROWS(...);
 /* >> LFutexExprI(2), LFutexExprI64(2)
  * Same as `LFutexExpr()', but implicitly handle `E_INTERRUPT' exceptions by re-starting the system call.
  * @return: * :  The first  non-zero  return value  from  executing  all of  the  given  `expr'
@@ -53,7 +53,7 @@ INTDEF ATTR_ACCESS_RO_OPT(4) NONNULL((1, 3)) int (LIBCCALL libc_LFutexExprI)(lfu
  * @return: < 0: Timeout expired
  * @throws: E_SEGFAULT:         A faulty pointer was given
  * @throws: E_INVALID_ARGUMENT: One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND' */
-INTDEF ATTR_ACCESS_RO_OPT(4) NONNULL((1, 3)) int (LIBCCALL libc_LFutexExprI64)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags) THROWS(...);
+INTDEF ATTR_IN_OPT(4) NONNULL((1, 3)) int (LIBCCALL libc_LFutexExprI64)(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, unsigned int timeout_flags) THROWS(...);
 #endif /* !__KERNEL__ */
 
 DECL_END

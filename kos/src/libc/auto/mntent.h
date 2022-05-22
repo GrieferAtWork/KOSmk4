@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbddcba3 */
+/* HASH CRC-32:0x201f12c3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,27 +31,27 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> endmntent(3) */
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_RPC_NOKOS(LIBDCALL libd_endmntent)(FILE *stream);
+INTDEF ATTR_INOUT(1) int NOTHROW_RPC_NOKOS(LIBDCALL libd_endmntent)(FILE *stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> endmntent(3) */
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream);
+INTDEF ATTR_INOUT(1) int NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getmntent(3), getmntent_r(3) */
-INTDEF ATTR_ACCESS_RW(1) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent)(FILE *stream);
+INTDEF ATTR_INOUT(1) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent)(FILE *stream);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getmntent(3), getmntent_r(3) */
-INTDEF ATTR_ACCESS_RW(1) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream);
+INTDEF ATTR_INOUT(1) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getmntent(3), getmntent_r(3) */
-INTDEF ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WRS(3, 4) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUTS(3, 4) struct mntent *NOTHROW_RPC(LIBDCALL libd_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getmntent(3), getmntent_r(3) */
-INTDEF ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WRS(3, 4) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUTS(3, 4) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream, struct mntent *__restrict result, char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> addmntent(3)
@@ -59,7 +59,7 @@ INTDEF ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WRS(3, 4) struct mntent *
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int (LIBDCALL libd_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBDCALL libd_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> addmntent(3)
@@ -67,21 +67,21 @@ INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int (LIBDCALL libd_addmntent)(FILE *_
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int (LIBCCALL libc_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBCCALL libc_addmntent)(FILE *__restrict stream, struct mntent const *__restrict mnt) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> hasmntopt(3)
  * Check if `mnt->mnt_opts' contains an option matching `opt'.
  * @return: * :   Address of the `opt'-string in `mnt->mnt_opts'
  * @return: NULL: No option `opt' found in `mnt->mnt_opts' */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) char *NOTHROW_NCX(LIBDCALL libd_hasmntopt)(struct mntent const *mnt, char const *opt);
+INTDEF ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) char *NOTHROW_NCX(LIBDCALL libd_hasmntopt)(struct mntent const *mnt, char const *opt);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> hasmntopt(3)
  * Check if `mnt->mnt_opts' contains an option matching `opt'.
  * @return: * :   Address of the `opt'-string in `mnt->mnt_opts'
  * @return: NULL: No option `opt' found in `mnt->mnt_opts' */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) char *NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt, char const *opt);
+INTDEF ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) char *NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt, char const *opt);
 #endif /* !__KERNEL__ */
 
 DECL_END

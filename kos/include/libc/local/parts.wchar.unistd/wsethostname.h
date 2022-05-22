@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76acbd71 */
+/* HASH CRC-32:0xef8a6dfe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_wcstombsn_defined
 #define __local___localdep_convert_wcstombsn_defined
 #ifdef __CRT_HAVE_convert_wcstombsn
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR_OPT(3),char *,__NOTHROW_NCX,__localdep_convert_wcstombsn,(__WCHAR_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_OUT_OPT(3),char *,__NOTHROW_NCX,__localdep_convert_wcstombsn,(__WCHAR_TYPE__ const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_wcstombsn,(__str,__len,__preslen))
 #elif defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombsn.h>
@@ -54,16 +54,16 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_sethostname_defined
 #define __local___localdep_sethostname_defined
 #ifdef __CRT_HAVE_sethostname
-__CREDIRECT(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,__localdep_sethostname,(char const *__name, __SIZE_TYPE__ __len),sethostname,(__name,__len))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,__localdep_sethostname,(char const *__name, __SIZE_TYPE__ __len),sethostname,(__name,__len))
 #elif defined(__CRT_HAVE___sethostname)
-__CREDIRECT(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,__localdep_sethostname,(char const *__name, __SIZE_TYPE__ __len),__sethostname,(__name,__len))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,__localdep_sethostname,(char const *__name, __SIZE_TYPE__ __len),__sethostname,(__name,__len))
 #elif defined(__CRT_HAVE___libc_sethostname)
-__CREDIRECT(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,__localdep_sethostname,(char const *__name, __SIZE_TYPE__ __len),__libc_sethostname,(__name,__len))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,__localdep_sethostname,(char const *__name, __SIZE_TYPE__ __len),__libc_sethostname,(__name,__len))
 #else /* ... */
 #undef __local___localdep_sethostname_defined
 #endif /* !... */
 #endif /* !__local___localdep_sethostname_defined */
-__LOCAL_LIBC(wsethostname) __ATTR_ACCESS_ROS(1, 2) int
+__LOCAL_LIBC(wsethostname) __ATTR_INS(1, 2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wsethostname))(__WCHAR_TYPE__ const *__name, __SIZE_TYPE__ __len) {
 	int __result;
 	char *__utf8_name;

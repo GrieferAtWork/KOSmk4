@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8ddbfe5 */
+/* HASH CRC-32:0xb225b241 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __SYSDECL_BEGIN
  * away uses of this function when they (think) that clearing the memory
  * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
-__CREDIRECT_VOID(__ATTR_ACCESS_WRS(1, 2),__NOTHROW_NCX,__libc_core_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),bzero,(__dst,__n_bytes))
+__CREDIRECT_VOID(__ATTR_OUTS(1, 2),__NOTHROW_NCX,__libc_core_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE_explicit_bzero)
 #include <hybrid/typecore.h>
 /* >> explicit_bzero(3)
@@ -44,7 +44,7 @@ __CREDIRECT_VOID(__ATTR_ACCESS_WRS(1, 2),__NOTHROW_NCX,__libc_core_explicit_bzer
  * away uses of this function when they (think) that clearing the memory
  * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
-__CREDIRECT_VOID(__ATTR_ACCESS_WRS(1, 2),__NOTHROW_NCX,__libc_core_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),explicit_bzero,(__dst,__n_bytes))
+__CREDIRECT_VOID(__ATTR_OUTS(1, 2),__NOTHROW_NCX,__libc_core_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),explicit_bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE___bzero)
 #include <hybrid/typecore.h>
 /* >> explicit_bzero(3)
@@ -52,7 +52,7 @@ __CREDIRECT_VOID(__ATTR_ACCESS_WRS(1, 2),__NOTHROW_NCX,__libc_core_explicit_bzer
  * away uses of this function when they (think) that clearing the memory
  * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
-__CREDIRECT_VOID(__ATTR_ACCESS_WRS(1, 2),__NOTHROW_NCX,__libc_core_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),__bzero,(__dst,__n_bytes))
+__CREDIRECT_VOID(__ATTR_OUTS(1, 2),__NOTHROW_NCX,__libc_core_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),__bzero,(__dst,__n_bytes))
 #else /* ... */
 #include <libc/local/strings/explicit_bzero.h>
 /* >> explicit_bzero(3)

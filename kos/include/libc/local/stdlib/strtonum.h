@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x850b2e84 */
+/* HASH CRC-32:0x4371bb7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(6),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoi,(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __INTMAX_TYPE__ __lo, __INTMAX_TYPE__ __hi, __errno_t *__rstatus),strtoi,(__nptr,__endptr,__base,__lo,__hi,__rstatus))
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(6),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoi,(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __INTMAX_TYPE__ __lo, __INTMAX_TYPE__ __hi, __errno_t *__rstatus),strtoi,(__nptr,__endptr,__base,__lo,__hi,__rstatus))
 #else /* __CRT_HAVE_strtoi */
 __NAMESPACE_LOCAL_END
 #include <libc/local/inttypes/strtoi.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strtonum) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(4) __LONGLONG
+__LOCAL_LIBC(strtonum) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(4) __LONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtonum))(char const *__nptr, __LONGLONG __lo, __LONGLONG __hi, char const **__p_errstr) {
 	__errno_t __error;
 	__LONGLONG __result;

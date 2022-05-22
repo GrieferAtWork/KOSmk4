@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5dff8079 */
+/* HASH CRC-32:0x1811532d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(VLIBDCALL libd_wopen)(char16_t const *filename,
                                   oflag_t oflags,
                                   ...) {
@@ -60,7 +60,7 @@ NOTHROW_RPC(VLIBDCALL libd_wopen)(char16_t const *filename,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(VLIBKCALL libc_wopen)(char32_t const *filename,
                                   oflag_t oflags,
                                   ...) {
@@ -89,7 +89,7 @@ NOTHROW_RPC(VLIBKCALL libc_wopen)(char32_t const *filename,
 	return result;
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(LIBDCALL libd_wcreat)(char16_t const *filename,
                                   mode_t mode) {
 
@@ -108,7 +108,7 @@ NOTHROW_RPC(LIBDCALL libd_wcreat)(char16_t const *filename,
 
 }
 #include <asm/os/fcntl.h>
-INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(LIBKCALL libc_wcreat)(char32_t const *filename,
                                   mode_t mode) {
 
@@ -127,7 +127,7 @@ NOTHROW_RPC(LIBKCALL libc_wcreat)(char32_t const *filename,
 
 }
 #include <asm/os/oflags.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(VLIBDCALL libd_wopen64)(char16_t const *filename,
                                     oflag_t oflags,
                                     ...) {
@@ -163,7 +163,7 @@ NOTHROW_RPC(VLIBDCALL libd_wopen64)(char16_t const *filename,
 #if !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_wopen64, libc_wopen);
 #else /* !__O_LARGEFILE */
-INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(VLIBKCALL libc_wopen64)(char32_t const *filename,
                                     oflag_t oflags,
                                     ...) {
@@ -197,7 +197,7 @@ NOTHROW_RPC(VLIBKCALL libc_wopen64)(char32_t const *filename,
 }
 #endif /* __O_LARGEFILE */
 #include <asm/os/oflags.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(LIBDCALL libd_wcreat64)(char16_t const *filename,
                                     mode_t mode) {
 
@@ -219,7 +219,7 @@ NOTHROW_RPC(LIBDCALL libd_wcreat64)(char16_t const *filename,
 #if !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_wcreat64, libc_wcreat);
 #else /* !__O_LARGEFILE */
-INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(LIBKCALL libc_wcreat64)(char32_t const *filename,
                                     mode_t mode) {
 
@@ -238,7 +238,7 @@ NOTHROW_RPC(LIBKCALL libc_wcreat64)(char32_t const *filename,
 
 }
 #endif /* __O_LARGEFILE */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED ATTR_ACCESS_RO(2) fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED ATTR_IN(2) fd_t
 NOTHROW_RPC(VLIBDCALL libd_wopenat)(fd_t dirfd,
                                     char16_t const *filename,
                                     oflag_t oflags,
@@ -265,7 +265,7 @@ NOTHROW_RPC(VLIBDCALL libd_wopenat)(fd_t dirfd,
 
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_ACCESS_RO(2) fd_t
+INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_IN(2) fd_t
 NOTHROW_RPC(VLIBKCALL libc_wopenat)(fd_t dirfd,
                                     char32_t const *filename,
                                     oflag_t oflags,
@@ -292,7 +292,7 @@ NOTHROW_RPC(VLIBKCALL libc_wopenat)(fd_t dirfd,
 
 	return result;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED ATTR_ACCESS_RO(2) fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.utility") WUNUSED ATTR_IN(2) fd_t
 NOTHROW_RPC(VLIBDCALL libd_wopenat64)(fd_t dirfd,
                                       char16_t const *filename,
                                       oflag_t oflags,
@@ -329,7 +329,7 @@ NOTHROW_RPC(VLIBDCALL libd_wopenat64)(fd_t dirfd,
 #if !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_wopenat64, libc_wopenat);
 #else /* !__O_LARGEFILE */
-INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_ACCESS_RO(2) fd_t
+INTERN ATTR_SECTION(".text.crt.wchar.io.utility") WUNUSED ATTR_IN(2) fd_t
 NOTHROW_RPC(VLIBKCALL libc_wopenat64)(fd_t dirfd,
                                       char32_t const *filename,
                                       oflag_t oflags,

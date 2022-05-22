@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ee32f90 */
+/* HASH CRC-32:0x43acd0ce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strverscmp_defined
 #define __local___localdep_strverscmp_defined
 #ifdef __CRT_HAVE_strverscmp
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,__localdep_strverscmp,(char const *__s1, char const *__s2),strverscmp,(__s1,__s2))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strverscmp,(char const *__s1, char const *__s2),strverscmp,(__s1,__s2))
 #elif defined(__CRT_HAVE___strverscmp)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,__localdep_strverscmp,(char const *__s1, char const *__s2),__strverscmp,(__s1,__s2))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strverscmp,(char const *__s1, char const *__s2),__strverscmp,(__s1,__s2))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strverscmp.h>
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strverscmp __LIBC_LOCAL_NAME(strverscmp)
 #endif /* !... */
 #endif /* !__local___localdep_strverscmp_defined */
-__LOCAL_LIBC(versionsort) __ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
+__LOCAL_LIBC(versionsort) __ATTR_PURE __ATTR_IN(1) __ATTR_IN(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(versionsort))(struct dirent const **__e1, struct dirent const **__e2) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_strverscmp)((*__e1)->d_name, (*__e2)->d_name);
 }

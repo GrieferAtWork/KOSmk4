@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x457fc4ab */
+/* HASH CRC-32:0xe7471405 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,12 +27,12 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_utimensat32_defined
 #define __local___localdep_utimensat32_defined
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3),int,__NOTHROW_RPC,__localdep_utimensat32,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
+__CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_utimensat32,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
 #endif /* !__local___localdep_utimensat32_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(utimensat64) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(3) int
+__LOCAL_LIBC(utimensat64) __ATTR_IN(2) __ATTR_IN_OPT(3) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utimensat64))(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags) {
 #ifdef __AT_CHANGE_BTIME
 	struct __timespec32 __tms[3];

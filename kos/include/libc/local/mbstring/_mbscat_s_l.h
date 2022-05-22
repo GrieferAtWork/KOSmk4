@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9544f86 */
+/* HASH CRC-32:0x326ea200 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcat_s_defined
 #define __local___localdep_strcat_s_defined
 #ifdef __CRT_HAVE_strcat_s
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RW_OPT(1),__errno_t,__NOTHROW_NCX,__localdep_strcat_s,(char *__dst, __SIZE_TYPE__ __dstsize, char const *__src),strcat_s,(__dst,__dstsize,__src))
+__CREDIRECT(__ATTR_INOUT_OPT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,__localdep_strcat_s,(char *__dst, __SIZE_TYPE__ __dstsize, char const *__src),strcat_s,(__dst,__dstsize,__src))
 #else /* __CRT_HAVE_strcat_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcat_s.h>
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcat_s __LIBC_LOCAL_NAME(strcat_s)
 #endif /* !__CRT_HAVE_strcat_s */
 #endif /* !__local___localdep_strcat_s_defined */
-__LOCAL_LIBC(_mbscat_s_l) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RWS(1, 2) __errno_t
+__LOCAL_LIBC(_mbscat_s_l) __ATTR_IN(3) __ATTR_INOUTS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbscat_s_l))(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned char const *__src, __locale_t __locale) {
 	(void)__locale;
 	return (__NAMESPACE_LOCAL_SYM __localdep_strcat_s)((char *)__buf, __true_bufsize, (char const *)__src);

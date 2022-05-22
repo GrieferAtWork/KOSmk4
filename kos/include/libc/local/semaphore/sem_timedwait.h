@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda718338 */
+/* HASH CRC-32:0x89cd1428 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_sem_timedwait32_defined) && defined(__CRT_HAVE_sem_timedwait)
 #define __local___localdep_sem_timedwait32_defined
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(__sem_t *__restrict __self, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__self,__abstime))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(__sem_t *__restrict __self, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__self,__abstime))
 #endif /* !__local___localdep_sem_timedwait32_defined && __CRT_HAVE_sem_timedwait */
 #ifndef __local___localdep_sem_timedwait64_defined
 #define __local___localdep_sem_timedwait64_defined
 #if defined(__CRT_HAVE_sem_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_RPC,__localdep_sem_timedwait64,(__sem_t *__restrict __self, struct __timespec64 const *__restrict __abstime),sem_timedwait,(__self,__abstime))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,__localdep_sem_timedwait64,(__sem_t *__restrict __self, struct __timespec64 const *__restrict __abstime),sem_timedwait,(__self,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait64)
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_RPC,__localdep_sem_timedwait64,(__sem_t *__restrict __self, struct __timespec64 const *__restrict __abstime),sem_timedwait64,(__self,__abstime))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_RPC,__localdep_sem_timedwait64,(__sem_t *__restrict __self, struct __timespec64 const *__restrict __abstime),sem_timedwait64,(__self,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait)
 __NAMESPACE_LOCAL_END
 #include <libc/local/semaphore/sem_timedwait64.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_sem_timedwait64_defined
 #endif /* !... */
 #endif /* !__local___localdep_sem_timedwait64_defined */
-__LOCAL_LIBC(sem_timedwait) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int
+__LOCAL_LIBC(sem_timedwait) __ATTR_IN(2) __ATTR_INOUT(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait))(__sem_t *__restrict __self, struct timespec const *__restrict __abstime) {
 #ifdef __CRT_HAVE_sem_timedwait
 	struct __timespec32 __ts32;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38d9efdc */
+/* HASH CRC-32:0x642a1548 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(unicode_writeutf8) __ATTR_RETNONNULL __ATTR_ACCESS_WR(1) char *
+__LOCAL_LIBC(unicode_writeutf8) __ATTR_RETNONNULL __ATTR_OUT(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf8))(char *__restrict __dst, __CHAR32_TYPE__ __ch) {
 	if __likely(__ch <= ((__UINT32_TYPE__)1 << 7)-1) {
 		*__dst++ = (char)(unsigned char)__ch;

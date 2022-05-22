@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6fb3024 */
+/* HASH CRC-32:0xf58e4226 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_argz_delete_defined
 #define __local___localdep_argz_delete_defined
 #ifdef __CRT_HAVE_argz_delete
-__CREDIRECT_VOID(__ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2),__NOTHROW_NCX,__localdep_argz_delete,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__entry),argz_delete,(__pargz,__pargz_len,__entry))
+__CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,__localdep_argz_delete,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__entry),argz_delete,(__pargz,__pargz_len,__entry))
 #elif defined(__CRT_HAVE___argz_add_sep)
-__CREDIRECT_VOID(__ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2),__NOTHROW_NCX,__localdep_argz_delete,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__entry),__argz_add_sep,(__pargz,__pargz_len,__entry))
+__CREDIRECT_VOID(__ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_IN_OPT(3),__NOTHROW_NCX,__localdep_argz_delete,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__entry),__argz_add_sep,(__pargz,__pargz_len,__entry))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/argz/argz_delete.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_envz_entry_defined
 #define __local___localdep_envz_entry_defined
 #ifdef __CRT_HAVE_envz_entry
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_ROS(1, 2) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_envz_entry,(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name),envz_entry,(__envz,__envz_len,__name))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INS(1, 2) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_envz_entry,(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name),envz_entry,(__envz,__envz_len,__name))
 #else /* __CRT_HAVE_envz_entry */
 __NAMESPACE_LOCAL_END
 #include <libc/local/envz/envz_entry.h>
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_envz_entry __LIBC_LOCAL_NAME(envz_entry)
 #endif /* !__CRT_HAVE_envz_entry */
 #endif /* !__local___localdep_envz_entry_defined */
-__LOCAL_LIBC(envz_remove) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) void
+__LOCAL_LIBC(envz_remove) __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_remove))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __name) {
 	char *__entry;
 	__entry = (__NAMESPACE_LOCAL_SYM __localdep_envz_entry)(*__penvz, *__penvz_len, __name);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3320122e */
+/* HASH CRC-32:0xe005e376 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),__errno_t,__NOTHROW_NCX,__localdep__itow_s,(int __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_itow_s,(__val,__buf,__buflen,__radix))
+__CREDIRECT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_NCX,__localdep__itow_s,(int __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix),_itow_s,(__val,__buf,__buflen,__radix))
 #else /* __CRT_HAVE__itow_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdlib/_itow_s.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_itow) __ATTR_ACCESS_WR(2) __WCHAR_TYPE__ *
+__LOCAL_LIBC(_itow) __ATTR_OUT(2) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itow))(int __val, __WCHAR_TYPE__ *__buf, int __radix) {
 	(__NAMESPACE_LOCAL_SYM __localdep__itow_s)(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;

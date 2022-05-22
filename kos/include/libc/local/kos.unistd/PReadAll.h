@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9d076be */
+/* HASH CRC-32:0xde53e892 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_PReadAll32_defined) && defined(__CRT_HAVE_PReadAll)
 #define __local___localdep_PReadAll32_defined
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PReadAll32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PReadAll32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset))
 #endif /* !__local___localdep_PReadAll32_defined && __CRT_HAVE_PReadAll */
 #ifndef __local___localdep_PReadAll64_defined
 #define __local___localdep_PReadAll64_defined
 #if defined(__CRT_HAVE_PReadAll) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PReadAll64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PReadAll64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PReadAll64)
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PReadAll64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PReadAll64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_PReadAll64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PReadAll64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/PReadAll64.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_PReadAll64_defined
 #endif /* !... */
 #endif /* !__local___localdep_PReadAll64_defined */
-__LOCAL_LIBC(PReadAll) __ATTR_ACCESS_WRS(2, 3) __SIZE_TYPE__
+__LOCAL_LIBC(PReadAll) __ATTR_OUTS(2, 3) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(PReadAll))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __FS_TYPE(pos) __offset) __THROWS(...) {
 #ifdef __CRT_HAVE_PReadAll
 	return (__NAMESPACE_LOCAL_SYM __localdep_PReadAll32)(__fd, __buf, __bufsize, (__pos32_t)__offset);

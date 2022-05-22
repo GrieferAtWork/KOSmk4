@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x757ddcf6 */
+/* HASH CRC-32:0x261f52ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_c32tombs_defined
 #define __local___localdep_convert_c32tombs_defined
 #if defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_KOS$convert_wcstombs)
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif (defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -64,9 +64,9 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_pathconf_defined
 #define __local___localdep_pathconf_defined
 #ifdef __CRT_HAVE_pathconf
-__CREDIRECT(__ATTR_ACCESS_RO(1),__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),pathconf,(__path,__name))
+__CREDIRECT(__ATTR_IN(1),__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),pathconf,(__path,__name))
 #elif defined(__CRT_HAVE___pathconf)
-__CREDIRECT(__ATTR_ACCESS_RO(1),__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),__pathconf,(__path,__name))
+__CREDIRECT(__ATTR_IN(1),__LONGPTR_TYPE__,__NOTHROW_RPC,__localdep_pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),__pathconf,(__path,__name))
 #elif (defined(__CRT_HAVE_fpathconf) || defined(__CRT_HAVE___fpathconf)) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/pathconf.h>
@@ -76,7 +76,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_pathconf_defined
 #endif /* !... */
 #endif /* !__local___localdep_pathconf_defined */
-__LOCAL_LIBC(c32pathconf) __ATTR_ACCESS_RO(1) __LONGPTR_TYPE__
+__LOCAL_LIBC(c32pathconf) __ATTR_IN(1) __LONGPTR_TYPE__
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32pathconf))(__CHAR32_TYPE__ const *__path, __STDC_INT_AS_UINT_T __name) {
 	__LONGPTR_TYPE__ __result;
 	char *__utf8_path;

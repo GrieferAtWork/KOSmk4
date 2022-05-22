@@ -29,10 +29,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_sysinfo,hash:CRC-32=0xe659620c]]]*/
+/*[[[head:libc_sysinfo,hash:CRC-32=0x9ceb1159]]]*/
 /* >> sysinfo(2)
  * Return current system information */
-INTERN ATTR_SECTION(".text.crt.system.info") ATTR_ACCESS_WR(1) int
+INTERN ATTR_SECTION(".text.crt.system.info") ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sysinfo)(struct sysinfo *info)
 /*[[[body:libc_sysinfo]]]*/
 {

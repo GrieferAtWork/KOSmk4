@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c7dfedf */
+/* HASH CRC-32:0xbde4d637 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mkstemps64_defined
 #define __local___localdep_mkstemps64_defined
 #if defined(__CRT_HAVE_mkstemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_RPC,__localdep_mkstemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps,(__template_,__suffixlen))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__fd_t,__NOTHROW_RPC,__localdep_mkstemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps,(__template_,__suffixlen))
 #elif defined(__CRT_HAVE_mkstemps64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_RPC,__localdep_mkstemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps64,(__template_,__suffixlen))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__fd_t,__NOTHROW_RPC,__localdep_mkstemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps64,(__template_,__suffixlen))
 #elif (defined(__CRT_HAVE_mkostemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/mkstemps64.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_mkstemps64_defined
 #endif /* !... */
 #endif /* !__local___localdep_mkstemps64_defined */
-__LOCAL_LIBC(mkstemp64) __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __fd_t
+__LOCAL_LIBC(mkstemp64) __ATTR_WUNUSED __ATTR_INOUT(1) __fd_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkstemp64))(char *__template_) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_mkstemps64)(__template_, 0);
 }

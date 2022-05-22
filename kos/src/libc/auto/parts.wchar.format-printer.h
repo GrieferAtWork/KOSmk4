@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddf9019f */
+/* HASH CRC-32:0x439c9de0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ INTDEF NONNULL((1)) ssize_t (LIBKCALL libc_format_wrepeat)(pc32formatprinter pri
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-INTDEF ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_wescape)(pc16formatprinter printer, void *arg, char16_t const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
+INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_wescape)(pc16formatprinter printer, void *arg, char16_t const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
 /* >> format_escape(3)
  * Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -78,7 +78,7 @@ INTDEF ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_wescape)
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-INTDEF ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t (LIBKCALL libc_format_wescape)(pc32formatprinter printer, void *arg, char32_t const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
+INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBKCALL libc_format_wescape)(pc32formatprinter printer, void *arg, char32_t const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
  * @param: printer:  The format printer callback
@@ -89,7 +89,7 @@ INTDEF ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t (LIBKCALL libc_format_wescape)
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_whexdump)(pc16formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
+INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_whexdump)(pc16formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
 /* >> format_hexdump(3)
  * Print a hex dump of the given data using the provided format printer
  * @param: printer:  The format printer callback
@@ -100,7 +100,7 @@ INTDEF ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t (LIBDCALL libd_format_whexdump
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t (LIBKCALL libc_format_whexdump)(pc32formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
+INTDEF ATTR_INS(3, 4) NONNULL((1)) ssize_t (LIBKCALL libc_format_whexdump)(pc32formatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
  * this  function will call the given `printer' callback with various strings that, when put
@@ -113,7 +113,7 @@ INTDEF ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t (LIBKCALL libc_format_whexdump
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_ACCESS_RO(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t (LIBDCALL libd_format_vwprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t (LIBDCALL libd_format_vwprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, va_list args) THROWS(...);
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
  * this  function will call the given `printer' callback with various strings that, when put
@@ -126,7 +126,7 @@ INTDEF ATTR_ACCESS_RO(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t (LIBDCAL
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_ACCESS_RO(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t (LIBKCALL libc_format_vwprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t (LIBKCALL libc_format_vwprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, va_list args) THROWS(...);
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
  * this  function will call the given `printer' callback with various strings that, when put
@@ -139,7 +139,7 @@ INTDEF ATTR_ACCESS_RO(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t (LIBKCAL
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_ACCESS_RO(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t (LIBDCALL libd_format_wprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t (LIBDCALL libd_format_wprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, ...) THROWS(...);
 /* >> format_printf(3), format_vprintf(3)
  * Generic printf implementation. Taking a regular printf-style format string and arguments,
  * this  function will call the given `printer' callback with various strings that, when put
@@ -152,7 +152,7 @@ INTDEF ATTR_ACCESS_RO(3) ATTR_LIBC_C16PRINTF(3, 0) NONNULL((1)) ssize_t (LIBDCAL
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTDEF ATTR_ACCESS_RO(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t (LIBKCALL libc_format_wprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t (LIBKCALL libc_format_wprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, ...) THROWS(...);
 /* >> format_scanf(3), format_vscanf(3)
  * Generic     scanf     implementation
  * Taking a regular scanf-style format string and argument, these
@@ -177,7 +177,7 @@ INTDEF ATTR_ACCESS_RO(3) ATTR_LIBC_C32PRINTF(3, 0) NONNULL((1)) ssize_t (LIBKCAL
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBDCALL libd_format_vwscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char16_t const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_IN(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBDCALL libd_format_vwscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char16_t const *__restrict format, va_list args) THROWS(...);
 /* >> format_scanf(3), format_vscanf(3)
  * Generic     scanf     implementation
  * Taking a regular scanf-style format string and argument, these
@@ -202,7 +202,7 @@ INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBDC
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBKCALL libc_format_vwscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char32_t const *__restrict format, va_list args) THROWS(...);
+INTDEF ATTR_IN(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBKCALL libc_format_vwscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char32_t const *__restrict format, va_list args) THROWS(...);
 /* >> format_scanf(3), format_vscanf(3)
  * Generic     scanf     implementation
  * Taking a regular scanf-style format string and argument, these
@@ -227,7 +227,7 @@ INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBKC
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBDCALL libd_format_wscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char16_t const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_IN(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBDCALL libd_format_wscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char16_t const *__restrict format, ...) THROWS(...);
 /* >> format_scanf(3), format_vscanf(3)
  * Generic     scanf     implementation
  * Taking a regular scanf-style format string and argument, these
@@ -252,29 +252,29 @@ INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_C16SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBDC
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTDEF ATTR_ACCESS_RO(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBKCALL libc_format_wscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char32_t const *__restrict format, ...) THROWS(...);
+INTDEF ATTR_IN(4) ATTR_LIBC_C32SCANF(4, 0) NONNULL((1, 2)) ssize_t (LIBKCALL libc_format_wscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char32_t const *__restrict format, ...) THROWS(...);
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-INTDEF ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wsprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
+INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wsprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-INTDEF ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wsprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen);
+INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wsprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen);
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
  * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
  *       alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)' */
-INTDEF ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wsnprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
+INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wsnprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
  * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
  *       alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)' */
-INTDEF ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wsnprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen);
+INTDEF ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_wsnprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen);
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string
  * The  `arg'   argument   is   ignored,   and  you   may   safely   pass   `NULL' */
-INTDEF ATTR_PURE ATTR_ACCESS_ROS(2, 3) NONNULL((2)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wwidth)(void *arg, char16_t const *__restrict data, size_t datalen);
+INTDEF ATTR_PURE ATTR_INS(2, 3) NONNULL((2)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_wwidth)(void *arg, char16_t const *__restrict data, size_t datalen);
 /* Pack  and  finalize  a  given  aprintf  format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format  printer sub-system should  be used as follows:
@@ -296,7 +296,7 @@ INTDEF ATTR_PURE ATTR_ACCESS_ROS(2, 3) NONNULL((2)) ssize_t NOTHROW_NCX(__C16FOR
  *                  but may differ from `wcslen(return)' when NUL characters  were
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_WR_OPT(2) char16_t *NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *__restrict self, size_t *pstrlen);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char16_t *NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *__restrict self, size_t *pstrlen);
 /* Pack  and  finalize  a  given  aprintf  format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format  printer sub-system should  be used as follows:
@@ -318,33 +318,33 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCE
  *                  but may differ from `wcslen(return)' when NUL characters  were
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_WR_OPT(2) char32_t *NOTHROW_NCX(LIBKCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *__restrict self, size_t *pstrlen);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char32_t *NOTHROW_NCX(LIBKCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *__restrict self, size_t *pstrlen);
 /* >> format_waprintf_alloc(3)
  * Allocate  a  buffer  of  `num_wchars'  wide-characters  at  the  end  of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RW(1) char16_t *NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *__restrict self, size_t num_wchars);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INOUT(1) char16_t *NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *__restrict self, size_t num_wchars);
 /* >> format_waprintf_alloc(3)
  * Allocate  a  buffer  of  `num_wchars'  wide-characters  at  the  end  of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RW(1) char32_t *NOTHROW_NCX(LIBKCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *__restrict self, size_t num_wchars);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INOUT(1) char32_t *NOTHROW_NCX(LIBKCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *__restrict self, size_t num_wchars);
 /* >> format_waprintf_printer(3)
  * Print data  to a  dynamically allocated  heap buffer.  On error,  -1 is  returned
  * This function is intended to be used as a pwformatprinter-compatible printer sink
  * @return: datalen: Success.
  * @return: -1: [errno=ENOMEM] Insufficient memory. */
-INTDEF WUNUSED ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_waprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
+INTDEF WUNUSED ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_waprintf_printer)(void *arg, char16_t const *__restrict data, size_t datalen);
 /* >> format_waprintf_printer(3)
  * Print data  to a  dynamically allocated  heap buffer.  On error,  -1 is  returned
  * This function is intended to be used as a pwformatprinter-compatible printer sink
  * @return: datalen: Success.
  * @return: -1: [errno=ENOMEM] Insufficient memory. */
-INTDEF WUNUSED ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_waprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen);
+INTDEF WUNUSED ATTR_INS(2, 3) NONNULL((1)) ssize_t NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_waprintf_printer)(void *arg, char32_t const *__restrict data, size_t datalen);
 #endif /* !__KERNEL__ */
 
 DECL_END

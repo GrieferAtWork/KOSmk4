@@ -201,14 +201,14 @@ unsigned char *_mbsupr([[inout]] unsigned char *buf) {
 [[requires_function(_mbsnbcat_s_l), doc_alias("_mbsnbcat_s_l")]]
 [[decl_include("<hybrid/typecore.h>", "<bits/types.h>")]]
 /*dos*/ errno_t _mbsnbcat_s([[inout(? <= true_bufsize)]] unsigned char *buf, size_t true_bufsize,
-                            [[inp(? <= max_bytes)]] unsigned char const *src, size_t max_bytes) {
+                            [[in(? <= max_bytes)]] unsigned char const *src, size_t max_bytes) {
 	return _mbsnbcat_s_l(buf, true_bufsize, src, max_bytes, NULL);
 }
 
 [[requires_function(_mbsnbcat_l), doc_alias("_mbsnbcat_l")]]
 [[decl_include("<hybrid/typecore.h>")]]
 unsigned char *_mbsnbcat([[inout]] unsigned char *buf,
-                         [[inp(? <= max_bytes)]] unsigned char const *src, size_t max_bytes) {
+                         [[in(? <= max_bytes)]] unsigned char const *src, size_t max_bytes) {
 	return _mbsnbcat_l(buf, src, max_bytes, NULL);
 }
 

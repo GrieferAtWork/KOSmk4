@@ -39,8 +39,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc__seh_filter_dll,hash:CRC-32=0x54310a19]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_ACCESS_RW(2) int
+/*[[[head:libc__seh_filter_dll,hash:CRC-32=0xa7d4eb05]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_INOUT(2) int
 NOTHROW_NCX(LIBDCALL libc__seh_filter_dll)(__ULONG32_TYPE__ xno,
                                            struct _EXCEPTION_POINTERS *infp_ptrs)
 /*[[[body:libc__seh_filter_dll]]]*/
@@ -53,8 +53,8 @@ NOTHROW_NCX(LIBDCALL libc__seh_filter_dll)(__ULONG32_TYPE__ xno,
 }
 /*[[[end:libc__seh_filter_dll]]]*/
 
-/*[[[head:libc__seh_filter_exe,hash:CRC-32=0xf7711767]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_ACCESS_RW(2) int
+/*[[[head:libc__seh_filter_exe,hash:CRC-32=0x494f67b]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_INOUT(2) int
 NOTHROW_NCX(LIBDCALL libc__seh_filter_exe)(__ULONG32_TYPE__ xno,
                                            struct _EXCEPTION_POINTERS *infp_ptrs)
 /*[[[body:libc__seh_filter_exe]]]*/

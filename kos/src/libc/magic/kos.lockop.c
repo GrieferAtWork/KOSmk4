@@ -618,25 +618,25 @@ void _oblockop_reap_shared_rwlock([[inout]] struct oblockop_slist *__restrict se
 %extern "C++" {
 %{
 
-template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_NONNULL((3)) void
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_NONNULL((3)) void
 __NOTHROW(__LOCKOP_CC _oblockop_reap_atomic_lock)(_Toblockop_slist<__T> *__restrict __self,
                                                   struct atomic_lock *__restrict __lock,
                                                   __T *__restrict __obj) {
 	(_oblockop_reap_atomic_lock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
 }
-template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_NONNULL((3)) void
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_NONNULL((3)) void
 __NOTHROW(__LOCKOP_CC _oblockop_reap_atomic_rwlock)(_Toblockop_slist<__T> *__restrict __self,
                                                     struct atomic_rwlock *__restrict __lock,
                                                     __T *__restrict __obj) {
 	(_oblockop_reap_atomic_rwlock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
 }
-template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_NONNULL((3)) void
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_NONNULL((3)) void
 __NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
                                       struct atomic_lock *__restrict __lock,
                                       __T *__restrict __obj) {
 	(_oblockop_reap_atomic_lock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
 }
-template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_NONNULL((3)) void
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_NONNULL((3)) void
 __NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
                                       struct atomic_rwlock *__restrict __lock,
                                       __T *__restrict __obj) {
@@ -647,13 +647,13 @@ __NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
 
 %[insert:pp_if($has_function(_oblockop_reap_shared_lock))]
 %{
-template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_NONNULL((3)) void
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_NONNULL((3)) void
 __NOTHROW(__LOCKOP_CC _oblockop_reap_shared_lock)(_Toblockop_slist<__T> *__restrict __self,
                                                   struct shared_lock *__restrict __lock,
                                                   __T *__restrict __obj) {
 	(_oblockop_reap_shared_lock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
 }
-template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_NONNULL((3)) void
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_NONNULL((3)) void
 __NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
                                       struct shared_lock *__restrict __lock,
                                       __T *__restrict __obj) {
@@ -664,13 +664,13 @@ __NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
 
 %[insert:pp_if($has_function(_oblockop_reap_shared_rwlock))]
 %{
-template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_NONNULL((3)) void
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_NONNULL((3)) void
 __NOTHROW(__LOCKOP_CC _oblockop_reap_shared_rwlock)(_Toblockop_slist<__T> *__restrict __self,
                                                     struct shared_rwlock *__restrict __lock,
                                                     __T *__restrict __obj) {
 	(_oblockop_reap_shared_rwlock)((struct oblockop_slist *)__self, __lock, (void *)__obj);
 }
-template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_NONNULL((3)) void
+template<class __T> __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_NONNULL((3)) void
 __NOTHROW(__LOCKOP_CC _oblockop_reap)(_Toblockop_slist<__T> *__restrict __self,
                                       struct shared_rwlock *__restrict __lock,
                                       __T *__restrict __obj) {

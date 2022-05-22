@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e056fe9 */
+/* HASH CRC-32:0xc2b6ea47 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,16 +29,16 @@
 
 DECL_BEGIN
 
-INTDEF __NOBLOCK ATTR_ACCESS_RW(1) NONNULL((2, 3)) void NOTHROW(__LOCKOP_CC libc_lockop_reap_ex)(struct lockop_slist *__restrict self, __BOOL (__LOCKOP_CC *trylock)(void *cookie), void (__LOCKOP_CC *unlock)(void *cookie), void *cookie);
-INTDEF __NOBLOCK ATTR_ACCESS_RW(1) NONNULL((2, 3, 5)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_ex)(struct oblockop_slist *__restrict self, __BOOL (__LOCKOP_CC *trylock)(void *cookie), void (__LOCKOP_CC *unlock)(void *cookie), void *cookie, void *__restrict obj);
-INTDEF __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_lock)(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock);
-INTDEF __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) NONNULL((3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock)(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *__restrict obj);
-INTDEF __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_rwlock)(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock);
-INTDEF __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) NONNULL((3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock)(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *__restrict obj);
-INTDEF __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void NOTHROW(__LOCKOP_CC libc_lockop_reap_shared_lock)(struct lockop_slist *__restrict self, struct shared_lock *__restrict lock);
-INTDEF __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) NONNULL((3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_lock)(struct oblockop_slist *__restrict self, struct shared_lock *__restrict lock, void *__restrict obj);
-INTDEF __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void NOTHROW(__LOCKOP_CC libc_lockop_reap_shared_rwlock)(struct lockop_slist *__restrict self, struct shared_rwlock *__restrict lock);
-INTDEF __NOBLOCK ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) NONNULL((3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_rwlock)(struct oblockop_slist *__restrict self, struct shared_rwlock *__restrict lock, void *__restrict obj);
+INTDEF __NOBLOCK ATTR_INOUT(1) NONNULL((2, 3)) void NOTHROW(__LOCKOP_CC libc_lockop_reap_ex)(struct lockop_slist *__restrict self, __BOOL (__LOCKOP_CC *trylock)(void *cookie), void (__LOCKOP_CC *unlock)(void *cookie), void *cookie);
+INTDEF __NOBLOCK ATTR_INOUT(1) NONNULL((2, 3, 5)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_ex)(struct oblockop_slist *__restrict self, __BOOL (__LOCKOP_CC *trylock)(void *cookie), void (__LOCKOP_CC *unlock)(void *cookie), void *cookie, void *__restrict obj);
+INTDEF __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_lock)(struct lockop_slist *__restrict self, struct atomic_lock *__restrict lock);
+INTDEF __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock)(struct oblockop_slist *__restrict self, struct atomic_lock *__restrict lock, void *__restrict obj);
+INTDEF __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_rwlock)(struct lockop_slist *__restrict self, struct atomic_rwlock *__restrict lock);
+INTDEF __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock)(struct oblockop_slist *__restrict self, struct atomic_rwlock *__restrict lock, void *__restrict obj);
+INTDEF __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void NOTHROW(__LOCKOP_CC libc_lockop_reap_shared_lock)(struct lockop_slist *__restrict self, struct shared_lock *__restrict lock);
+INTDEF __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_lock)(struct oblockop_slist *__restrict self, struct shared_lock *__restrict lock, void *__restrict obj);
+INTDEF __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void NOTHROW(__LOCKOP_CC libc_lockop_reap_shared_rwlock)(struct lockop_slist *__restrict self, struct shared_rwlock *__restrict lock);
+INTDEF __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)) void NOTHROW(__LOCKOP_CC libc_oblockop_reap_shared_rwlock)(struct oblockop_slist *__restrict self, struct shared_rwlock *__restrict lock, void *__restrict obj);
 
 DECL_END
 

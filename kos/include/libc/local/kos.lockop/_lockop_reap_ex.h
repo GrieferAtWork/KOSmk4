@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d51f32e */
+/* HASH CRC-32:0x86cedd5e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ struct lockop_slist;
 #endif /* !_KOS_LOCKOP_H */
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_lockop_reap_ex) __NOBLOCK __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2, 3)) void
+__LOCAL_LIBC(_lockop_reap_ex) __NOBLOCK __ATTR_INOUT(1) __ATTR_NONNULL((2, 3)) void
 __NOTHROW(__LOCKOP_CC __LIBC_LOCAL_NAME(_lockop_reap_ex))(struct lockop_slist *__restrict __self, __BOOL (__LOCKOP_CC *__trylock)(void *__cookie), void (__LOCKOP_CC *__unlock)(void *__cookie), void *__cookie) {
 #ifndef __INTELLISENSE__
 #define __LOCAL_self      __self

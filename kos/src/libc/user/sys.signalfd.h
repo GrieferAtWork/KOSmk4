@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7483024 */
+/* HASH CRC-32:0xf850f5bb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ DECL_BEGIN
  *                mask should be updated to `sigmask'.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK'
  *                Meaningless,  but  still  validated  when  `fd != -1' */
-INTDEF WUNUSED ATTR_ACCESS_RO(2) fd_t NOTHROW_NCX(LIBCCALL libc_signalfd)(fd_t fd, sigset_t const *sigmask, __STDC_INT_AS_UINT_T flags);
+INTDEF WUNUSED ATTR_IN(2) fd_t NOTHROW_NCX(LIBCCALL libc_signalfd)(fd_t fd, sigset_t const *sigmask, __STDC_INT_AS_UINT_T flags);
 #endif /* !__KERNEL__ */
 
 DECL_END

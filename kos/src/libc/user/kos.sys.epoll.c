@@ -39,7 +39,7 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void const *LIBCCALL libc_get_rpc_exec
 /*[[[skip:libc_EPollCtl]]]*/
 /*[[[skip:libc_EPollWait]]]*/
 
-/*[[[head:libc_EPollPWait,hash:CRC-32=0xab272e57]]]*/
+/*[[[head:libc_EPollPWait,hash:CRC-32=0xfa057448]]]*/
 /* >> epoll_pwait(2)
  * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
  * waiting.  Wait until at least one of the conditions monitored by `epfd' to be met.
@@ -55,7 +55,7 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void const *LIBCCALL libc_get_rpc_exec
  *                    items of `events')
  * @return: 0:        No events happened before `timeout' expired.
  * @return: -1:       Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_RWS(2, 3) __STDC_UINT_AS_SIZE_T
+INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_INOUTS(2, 3) ATTR_IN_OPT(5) __STDC_UINT_AS_SIZE_T
 (LIBCCALL libc_EPollPWait)(fd_t epfd,
                            struct epoll_event *events,
                            __STDC_UINT_AS_SIZE_T maxevents,
@@ -72,7 +72,7 @@ INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_ACCESS_RO_OPT(5) ATTR_AC
 }
 /*[[[end:libc_EPollPWait]]]*/
 
-/*[[[head:libc_EPollRpcExec,hash:CRC-32=0x91dc130f]]]*/
+/*[[[head:libc_EPollRpcExec,hash:CRC-32=0xd0cb142a]]]*/
 /* >> epoll_rpc_exec(3)
  * Helper wrapper for  `EPOLL_CTL_RPC_PROG' that  automatically provides  the
  * necessary arch-specific RPC program to invoke `func(..., event->data.ptr)'
@@ -103,7 +103,7 @@ INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_ACCESS_RO_OPT(5) ATTR_AC
  *                             intact, and the  RPC will be  discarded as  soon
  *                             as an attempt to send it is made, or the monitor
  *                             is manually deleted via `EPOLL_CTL_DEL' */
-INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_ACCESS_RO(3) NONNULL((6)) void
+INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_IN(3) NONNULL((6)) void
 (LIBCCALL libc_EPollRpcExec)(fd_t epfd,
                              fd_t fd,
                              struct epoll_event const *event,

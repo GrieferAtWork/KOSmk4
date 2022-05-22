@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37731ef3 */
+/* HASH CRC-32:0x665bf221 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_WRS(1, 2),__errno_t,__NOTHROW_RPC,__localdep__strerror_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__message),_strerror_s,(__buf,__buflen,__message))
+__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_RPC,__localdep__strerror_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__message),_strerror_s,(__buf,__buflen,__message))
 #elif defined(__libc_geterrno)
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/_strerror_s.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__strerror_s_defined
 #endif /* !... */
 #endif /* !__local___localdep__strerror_s_defined */
-__LOCAL_LIBC(_strerror) __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) char *
+__LOCAL_LIBC(_strerror) __ATTR_WUNUSED __ATTR_IN_OPT(1) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_strerror))(char const *__message) {
 	static char __strerror_buf[64];
 	if ((__NAMESPACE_LOCAL_SYM __localdep__strerror_s)(__strerror_buf,

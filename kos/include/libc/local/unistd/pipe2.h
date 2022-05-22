@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb8edcb7 */
+/* HASH CRC-32:0x72d6be86 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,11 +27,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pipe_defined
 #define __local___localdep_pipe_defined
 #ifdef __CRT_HAVE_pipe
-__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_pipe,(__fd_t __pipedes[2]),pipe,(__pipedes))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_pipe,(__fd_t __pipedes[2]),pipe,(__pipedes))
 #elif defined(__CRT_HAVE___pipe)
-__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_pipe,(__fd_t __pipedes[2]),__pipe,(__pipedes))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_pipe,(__fd_t __pipedes[2]),__pipe,(__pipedes))
 #elif defined(__CRT_HAVE___libc_pipe)
-__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_pipe,(__fd_t __pipedes[2]),__libc_pipe,(__pipedes))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_pipe,(__fd_t __pipedes[2]),__libc_pipe,(__pipedes))
 #elif defined(__CRT_HAVE__pipe)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/pipe.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_pipe_defined
 #endif /* !... */
 #endif /* !__local___localdep_pipe_defined */
-__LOCAL_LIBC(pipe2) __ATTR_ACCESS_WR(1) int
+__LOCAL_LIBC(pipe2) __ATTR_OUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pipe2))(__fd_t __pipedes[2], __oflag_t __flags) {
 	/* TODO: Emulate using pipe()+fcntl() */
 	(void)__flags;

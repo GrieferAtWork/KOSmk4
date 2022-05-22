@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeaaad782 */
+/* HASH CRC-32:0x62e87767 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __SYSDECL_BEGIN
  * @param: child:   When non-NULL, fill with timings for child processes. (s.a. `RUSAGE_CHILDREN')
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE(__ATTR_ACCESS_WR_OPT(1) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,vtimes,(struct vtimes *__current, struct vtimes *__child),(__current,__child))
+__CDECLARE(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2),int,__NOTHROW_NCX,vtimes,(struct vtimes *__current, struct vtimes *__child),(__current,__child))
 #else /* __CRT_HAVE_vtimes */
 #include <asm/os/resource.h>
 #include <bits/types.h>
@@ -67,7 +67,7 @@ __CDECLARE(__ATTR_ACCESS_WR_OPT(1) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,vti
  * @param: child:   When non-NULL, fill with timings for child processes. (s.a. `RUSAGE_CHILDREN')
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(vtimes, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR_OPT(1) __ATTR_ACCESS_WR_OPT(2) int __NOTHROW_NCX(__LIBCCALL vtimes)(struct vtimes *__current, struct vtimes *__child) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vtimes))(__current, __child); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(vtimes, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2) int __NOTHROW_NCX(__LIBCCALL vtimes)(struct vtimes *__current, struct vtimes *__child) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vtimes))(__current, __child); })
 #endif /* __RUSAGE_SELF && __RUSAGE_CHILDREN && ((__CRT_HAVE_getrusage && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE___getrusage && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE___libc_getrusage && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE_getrusage64 && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__))) */
 #endif /* !__CRT_HAVE_vtimes */
 

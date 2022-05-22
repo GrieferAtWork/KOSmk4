@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebc411f2 */
+/* HASH CRC-32:0x2926185a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,31 +65,31 @@ typedef __ssize_t ssize_t;
 
 /* >> setxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_ROS(3, 4),int,__NOTHROW_RPC,setxattr,(char const *__path, char const *__name, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),(__path,__name,__buf,__bufsize,__flags))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_INS(3, 4),int,__NOTHROW_RPC,setxattr,(char const *__path, char const *__name, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),(__path,__name,__buf,__bufsize,__flags))
 /* >> lsetxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_ROS(3, 4),int,__NOTHROW_RPC,lsetxattr,(char const *__path, char const *__name, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),(__path,__name,__buf,__bufsize,__flags))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_INS(3, 4),int,__NOTHROW_RPC,lsetxattr,(char const *__path, char const *__name, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),(__path,__name,__buf,__bufsize,__flags))
 /* >> fsetxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_ROS(3, 4),int,__NOTHROW_RPC,fsetxattr,(__fd_t __fd, char const *__name, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),(__fd,__name,__buf,__bufsize,__flags))
+__CDECLARE_OPT(__ATTR_IN(2) __ATTR_INS(3, 4),int,__NOTHROW_RPC,fsetxattr,(__fd_t __fd, char const *__name, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),(__fd,__name,__buf,__bufsize,__flags))
 /* >> getxattr(2) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(3, 4),ssize_t,__NOTHROW_RPC,getxattr,(char const *__path, char const *__name, void *__buf, size_t __bufsize),(__path,__name,__buf,__bufsize))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_OUTS(3, 4),ssize_t,__NOTHROW_RPC,getxattr,(char const *__path, char const *__name, void *__buf, size_t __bufsize),(__path,__name,__buf,__bufsize))
 /* >> lgetxattr(2) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(3, 4),ssize_t,__NOTHROW_RPC,lgetxattr,(char const *__path, char const *__name, void *__buf, size_t __bufsize),(__path,__name,__buf,__bufsize))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_OUTS(3, 4),ssize_t,__NOTHROW_RPC,lgetxattr,(char const *__path, char const *__name, void *__buf, size_t __bufsize),(__path,__name,__buf,__bufsize))
 /* >> fgetxattr(2) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(3, 4),ssize_t,__NOTHROW_RPC,fgetxattr,(__fd_t __fd, char const *__name, void *__buf, size_t __bufsize),(__fd,__name,__buf,__bufsize))
+__CDECLARE_OPT(__ATTR_IN(2) __ATTR_OUTS(3, 4),ssize_t,__NOTHROW_RPC,fgetxattr,(__fd_t __fd, char const *__name, void *__buf, size_t __bufsize),(__fd,__name,__buf,__bufsize))
 /* >> listxattr(2) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,listxattr,(char const *__path, char *__listbuf, size_t __listbufsize),(__path,__listbuf,__listbufsize))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,listxattr,(char const *__path, char *__listbuf, size_t __listbufsize),(__path,__listbuf,__listbufsize))
 /* >> llistxattr(2) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,llistxattr,(char const *__path, char *__listbuf, size_t __listbufsize),(__path,__listbuf,__listbufsize))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,llistxattr,(char const *__path, char *__listbuf, size_t __listbufsize),(__path,__listbuf,__listbufsize))
 /* >> flistxattr(2) */
-__CDECLARE_OPT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,flistxattr,(__fd_t __fd, char *__listbuf, size_t __listbufsize),(__fd,__listbuf,__listbufsize))
+__CDECLARE_OPT(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,flistxattr,(__fd_t __fd, char *__listbuf, size_t __listbufsize),(__fd,__listbuf,__listbufsize))
 /* >> removexattr(2) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,removexattr,(char const *__path, char const *__name),(__path,__name))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,removexattr,(char const *__path, char const *__name),(__path,__name))
 /* >> lremovexattr(2) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,lremovexattr,(char const *__path, char const *__name),(__path,__name))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,lremovexattr,(char const *__path, char const *__name),(__path,__name))
 /* >> fremovexattr(2) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,fremovexattr,(__fd_t __fd, char const *__name),(__fd,__name))
+__CDECLARE_OPT(__ATTR_IN(2),int,__NOTHROW_RPC,fremovexattr,(__fd_t __fd, char const *__name),(__fd,__name))
 
 __SYSDECL_END
 #endif /* __CC__ */

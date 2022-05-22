@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec4cb04 */
+/* HASH CRC-32:0xf40fe8ce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 /* Check if `futex_waitwhile()' would block
  * @return: 0: `futex_waitwhile()' would block
  * @return: 1: `futex_waitwhile()' wouldn't block */
-INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile)(lfutex_t *uaddr,
                                               lfutex_t equal_to_value) {
 	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) == equal_to_value ? 0 : 1;
@@ -42,7 +42,7 @@ NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile)(lfutex_t *uaddr,
 /* Check if `futex_waituntil()' would block
  * @return: 0: `futex_waituntil()' would block
  * @return: 1: `futex_waituntil()' wouldn't block */
-INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_futex_trywaituntil)(lfutex_t *uaddr,
                                               lfutex_t not_equal_to_value) {
 	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) != not_equal_to_value ? 0 : 1;
@@ -51,7 +51,7 @@ NOTHROW_NCX(LIBCCALL libc_futex_trywaituntil)(lfutex_t *uaddr,
 /* Check if `futex_waitwhile_equal()' would block
  * @return: 0: `futex_waitwhile_equal()' would block
  * @return: 1: `futex_waitwhile_equal()' wouldn't block */
-INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_equal)(lfutex_t *uaddr,
                                                     lfutex_t equal_to_value) {
 	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) == equal_to_value ? 0 : 1;
@@ -60,7 +60,7 @@ NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_equal)(lfutex_t *uaddr,
 /* Check if `futex_waitwhile_notequal()' would block
  * @return: 0: `futex_waitwhile_notequal()' would block
  * @return: 1: `futex_waitwhile_notequal()' wouldn't block */
-INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_notequal)(lfutex_t *uaddr,
                                                        lfutex_t not_equal_to_value) {
 	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) != not_equal_to_value ? 0 : 1;
@@ -69,7 +69,7 @@ NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_notequal)(lfutex_t *uaddr,
 /* Check if `futex_waitwhile_above()' would block
  * @return: 0: `futex_waitwhile_above()' would block
  * @return: 1: `futex_waitwhile_above()' wouldn't block */
-INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_above)(lfutex_t *uaddr,
                                                     lfutex_t above_value) {
 	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) > above_value ? 0 : 1;
@@ -78,7 +78,7 @@ NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_above)(lfutex_t *uaddr,
 /* Check if `futex_waitwhile_below()' would block
  * @return: 0: `futex_waitwhile_below()' would block
  * @return: 1: `futex_waitwhile_below()' wouldn't block */
-INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_below)(lfutex_t *uaddr,
                                                     lfutex_t below_value) {
 	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) < below_value ? 0 : 1;
@@ -87,7 +87,7 @@ NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_below)(lfutex_t *uaddr,
 /* Check if `futex_waitwhile_aboveequal()' would block
  * @return: 0: `futex_waitwhile_aboveequal()' would block
  * @return: 1: `futex_waitwhile_aboveequal()' wouldn't block */
-INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_aboveequal)(lfutex_t *uaddr,
                                                          lfutex_t above_or_equal_value) {
 	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) >= above_or_equal_value ? 0 : 1;
@@ -96,7 +96,7 @@ NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_aboveequal)(lfutex_t *uaddr,
 /* Check if `futex_waitwhile_belowequal()' would block
  * @return: 0: `futex_waitwhile_belowequal()' would block
  * @return: 1: `futex_waitwhile_belowequal()' wouldn't block */
-INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_belowequal)(lfutex_t *uaddr,
                                                          lfutex_t below_or_equal_value) {
 	return __hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) <= below_or_equal_value ? 0 : 1;
@@ -105,7 +105,7 @@ NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_belowequal)(lfutex_t *uaddr,
 /* Check if `futex_waitwhile_exactbits()' would block
  * @return: 0: `futex_waitwhile_exactbits()' would block
  * @return: 1: `futex_waitwhile_exactbits()' wouldn't block */
-INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_exactbits)(lfutex_t *uaddr,
                                                         lfutex_t bitmask,
                                                         lfutex_t setmask) {
@@ -115,7 +115,7 @@ NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_exactbits)(lfutex_t *uaddr,
 /* Check if `futex_waituntil_exactbits()' would block
  * @return: 0: `futex_waituntil_exactbits()' would block
  * @return: 1: `futex_waituntil_exactbits()' wouldn't block */
-INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_futex_trywaituntil_exactbits)(lfutex_t *uaddr,
                                                         lfutex_t bitmask,
                                                         lfutex_t setmask) {
@@ -125,7 +125,7 @@ NOTHROW_NCX(LIBCCALL libc_futex_trywaituntil_exactbits)(lfutex_t *uaddr,
 /* Check if `futex_waitwhile_anybit()' would block
  * @return: 0: `futex_waitwhile_anybit()' would block
  * @return: 1: `futex_waitwhile_anybit()' wouldn't block */
-INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_anybit)(lfutex_t *uaddr,
                                                      lfutex_t bitmask) {
 	return (__hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) & bitmask) != 0 ? 0 : 1;
@@ -134,7 +134,7 @@ NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_anybit)(lfutex_t *uaddr,
 /* Check if `futex_waitwhile_allbits()' would block
  * @return: 0: `futex_waitwhile_allbits()' would block
  * @return: 1: `futex_waitwhile_allbits()' wouldn't block */
-INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.futex") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_futex_trywaitwhile_allbits)(lfutex_t *uaddr,
                                                       lfutex_t bitmask) {
 	return (__hybrid_atomic_load(*uaddr, __ATOMIC_ACQUIRE) & bitmask) == bitmask ? 0 : 1;

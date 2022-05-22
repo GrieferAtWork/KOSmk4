@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb45027c */
+/* HASH CRC-32:0xa461f2eb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/__assert.h>
 #include <bits/crt/inttypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(memmovedownl) __ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) __UINT32_TYPE__ *
+__LOCAL_LIBC(memmovedownl) __ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1) __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovedownl))(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords) {
 	__UINT32_TYPE__ *__pdst;
 	__UINT32_TYPE__ const *__psrc;

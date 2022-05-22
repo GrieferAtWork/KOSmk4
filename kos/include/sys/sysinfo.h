@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x675b69c5 */
+/* HASH CRC-32:0xb45c1103 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,15 +47,15 @@ __SYSDECL_BEGIN
 #if defined(__CRT_HAVE_sysinfo) && !defined(__solaris__)
 /* >> sysinfo(2)
  * Return current system information */
-__CDECLARE(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,sysinfo,(struct sysinfo *__info),(__info))
+__CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,sysinfo,(struct sysinfo *__info),(__info))
 #elif defined(__CRT_HAVE___sysinfo)
 /* >> sysinfo(2)
  * Return current system information */
-__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,sysinfo,(struct sysinfo *__info),__sysinfo,(__info))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,sysinfo,(struct sysinfo *__info),__sysinfo,(__info))
 #elif defined(__CRT_HAVE___libc_sysinfo)
 /* >> sysinfo(2)
  * Return current system information */
-__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,sysinfo,(struct sysinfo *__info),__libc_sysinfo,(__info))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,sysinfo,(struct sysinfo *__info),__libc_sysinfo,(__info))
 #else /* ... */
 #undef __sysinfo_defined
 #endif /* !... */

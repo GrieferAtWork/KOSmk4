@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0d2fefd */
+/* HASH CRC-32:0xb0427599 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wgetdcwd_dbg) __ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3) __WCHAR16_TYPE__ *
+__LOCAL_LIBC(_wgetdcwd_dbg) __ATTR_WUNUSED __ATTR_OUTS(2, 3) __WCHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_wgetdcwd_dbg))(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;

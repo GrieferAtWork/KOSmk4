@@ -27,9 +27,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_crypt,hash:CRC-32=0x6654890a]]]*/
+/*[[[head:libc_crypt,hash:CRC-32=0x8cc51a47]]]*/
 /* >> crypt(3), crypt_r(3) */
-INTERN ATTR_SECTION(".text.crt.string.encrypt") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) char *
+INTERN ATTR_SECTION(".text.crt.string.encrypt") ATTR_IN(1) ATTR_IN(2) char *
 NOTHROW_NCX(LIBCCALL libc_crypt)(char const *key,
                                  char const *salt)
 /*[[[body:libc_crypt]]]*/
@@ -68,9 +68,9 @@ NOTHROW_NCX(LIBCCALL libc_encrypt)(char *glibc_block,
 }
 /*[[[end:libc_encrypt]]]*/
 
-/*[[[head:libc_crypt_r,hash:CRC-32=0xfc1df864]]]*/
+/*[[[head:libc_crypt_r,hash:CRC-32=0xaaf2c861]]]*/
 /* >> crypt(3), crypt_r(3) */
-INTERN ATTR_SECTION(".text.crt.string.encrypt") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) NONNULL((3)) char *
+INTERN ATTR_SECTION(".text.crt.string.encrypt") ATTR_IN(1) ATTR_IN(2) NONNULL((3)) char *
 NOTHROW_NCX(LIBCCALL libc_crypt_r)(char const *key,
                                    char const *salt,
                                    struct crypt_data *__restrict data)
@@ -85,9 +85,9 @@ NOTHROW_NCX(LIBCCALL libc_crypt_r)(char const *key,
 }
 /*[[[end:libc_crypt_r]]]*/
 
-/*[[[head:libc_setkey_r,hash:CRC-32=0xe8a85cdb]]]*/
+/*[[[head:libc_setkey_r,hash:CRC-32=0xa7c76f54]]]*/
 /* >> setkey(3), setkey_r(3) */
-INTERN ATTR_SECTION(".text.crt.string.encrypt") ATTR_ACCESS_RO(1) NONNULL((2)) void
+INTERN ATTR_SECTION(".text.crt.string.encrypt") ATTR_IN(1) NONNULL((2)) void
 NOTHROW_NCX(LIBCCALL libc_setkey_r)(char const *key,
                                     struct crypt_data *__restrict data)
 /*[[[body:libc_setkey_r]]]*/

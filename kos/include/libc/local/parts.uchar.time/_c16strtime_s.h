@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfec4b030 */
+/* HASH CRC-32:0xd2c1e88a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,12 +30,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WR(1),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep__c16strtime,(__CHAR16_TYPE__ __buf[9]),_wstrtime,(__buf))
+__CREDIRECT(__ATTR_OUT(1),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep__c16strtime,(__CHAR16_TYPE__ __buf[9]),_wstrtime,(__buf))
 #elif defined(__CRT_HAVE_DOS$_wstrtime)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_ACCESS_WR(1),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep__c16strtime,(__CHAR16_TYPE__ __buf[9]),_wstrtime,(__buf))
+__CREDIRECT_DOS(__ATTR_OUT(1),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep__c16strtime,(__CHAR16_TYPE__ __buf[9]),_wstrtime,(__buf))
 #elif (defined(__CRT_HAVE__strtime) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wtime/_wstrtime.h>
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_c16strtime_s) __ATTR_ACCESS_WRS(1, 2) __errno_t
+__LOCAL_LIBC(_c16strtime_s) __ATTR_OUTS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_c16strtime_s))(__CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __buflen) {
 	if __unlikely(__buflen < 9)
 		return __ERANGE;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14ea04b7 */
+/* HASH CRC-32:0x6c660e63 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_removeat,(__fd_t __dirfd, char const *__filename),removeat,(__dirfd,__filename))
+__CREDIRECT(__ATTR_IN(2),int,__NOTHROW_RPC,__localdep_removeat,(__fd_t __dirfd, char const *__filename),removeat,(__dirfd,__filename))
 #elif defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat) && (defined(__AT_REMOVEREG) || (defined(__EISDIR) && defined(__ENOTDIR)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/removeat.h>
@@ -44,13 +44,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_rmdir_defined
 #define __local___localdep_rmdir_defined
 #ifdef __CRT_HAVE_rmdir
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_rmdir,(char const *__path),rmdir,(__path))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_rmdir,(char const *__path),rmdir,(__path))
 #elif defined(__CRT_HAVE__rmdir)
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_rmdir,(char const *__path),_rmdir,(__path))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_rmdir,(char const *__path),_rmdir,(__path))
 #elif defined(__CRT_HAVE___rmdir)
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_rmdir,(char const *__path),__rmdir,(__path))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_rmdir,(char const *__path),__rmdir,(__path))
 #elif defined(__CRT_HAVE___libc_rmdir)
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_rmdir,(char const *__path),__libc_rmdir,(__path))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_rmdir,(char const *__path),__libc_rmdir,(__path))
 #elif defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/rmdir.h>
@@ -63,13 +63,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unlink_defined
 #define __local___localdep_unlink_defined
 #ifdef __CRT_HAVE_unlink
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
 #elif defined(__CRT_HAVE__unlink)
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),_unlink,(__file))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),_unlink,(__file))
 #elif defined(__CRT_HAVE___unlink)
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__unlink,(__file))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__unlink,(__file))
 #elif defined(__CRT_HAVE___libc_unlink)
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__libc_unlink,(__file))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),__libc_unlink,(__file))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/unlink.h>
@@ -82,7 +82,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(remove) __ATTR_ACCESS_RO(1) int
+__LOCAL_LIBC(remove) __ATTR_IN(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(remove))(char const *__filename) {
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_removeat) || (defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat) && (defined(__AT_REMOVEREG) || (defined(__EISDIR) && defined(__ENOTDIR)))))
 	return (__NAMESPACE_LOCAL_SYM __localdep_removeat)(__AT_FDCWD, __filename);

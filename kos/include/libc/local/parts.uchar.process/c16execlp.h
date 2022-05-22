@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x764f5012 */
+/* HASH CRC-32:0x953233d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV),wexecvp,(__path,___argv))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV),wexecvp,(__path,___argv))
 #elif defined(__CRT_HAVE_DOS$wexecvp)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV),wexecvp,(__path,___argv))
+__CREDIRECT_DOS(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV),wexecvp,(__path,___argv))
 #elif defined(__CRT_HAVE__wexecvp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -69,7 +69,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV),_wexecvp,(__path,___argv))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV),_wexecvp,(__path,___argv))
 #elif defined(__CRT_HAVE_DOS$_wexecvp)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -83,7 +83,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV),_wexecvp,(__path,___argv))
+__CREDIRECT_DOS(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,__localdep_c16execvp,(__CHAR16_TYPE__ const *__restrict __file, __T16ARGV),_wexecvp,(__path,___argv))
 #elif (defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp) || ((defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_convert_wcstombsv) || defined(__CRT_HAVE_convert_wcstombsvn) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.process/wexecvp.h>
@@ -101,7 +101,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c16execlp) __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int
+__LOCAL_LIBC(c16execlp) __ATTR_SENTINEL __ATTR_IN(1) __ATTR_IN_OPT(2) int
 __NOTHROW_RPC(__VLIBDCALL __LIBC_LOCAL_NAME(c16execlp))(__CHAR16_TYPE__ const *__restrict __file, __CHAR16_TYPE__ const *__args, ...) {
 	__REDIRECT_EXECL(__CHAR16_TYPE__, (__NAMESPACE_LOCAL_SYM __localdep_c16execvp), __file, __args)
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87859cd0 */
+/* HASH CRC-32:0xf9e3175 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,14 +30,14 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO(1) struct spwd *NOTHROW_RPC(LIBDCALL libd_getspnam)(char const *__restrict name);
-INTDEF ATTR_ACCESS_RO(1) struct spwd *NOTHROW_RPC(LIBDCALL libd_sgetspent)(char const *__restrict string);
-INTDEF ATTR_ACCESS_RW(1) struct spwd *NOTHROW_RPC(LIBDCALL libd_fgetspent)(FILE *__restrict stream);
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RW(2) int NOTHROW_RPC(LIBDCALL libd_putspent)(struct spwd const *__restrict p, FILE *__restrict stream);
-INTDEF ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(4) ATTR_ACCESS_WRS(2, 3) int NOTHROW_RPC(LIBDCALL libd_getspent_r)(struct spwd *__restrict result_buf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) int NOTHROW_RPC(LIBDCALL libd_getspnam_r)(char const *__restrict name, struct spwd *__restrict result_buf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) int NOTHROW_RPC(LIBDCALL libd_sgetspent_r)(char const *__restrict string, struct spwd *__restrict result_buf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);
-INTDEF ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) int NOTHROW_RPC(LIBDCALL libd_fgetspent_r)(FILE *__restrict stream, struct spwd *__restrict result_buf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);
+INTDEF ATTR_IN(1) struct spwd *NOTHROW_RPC(LIBDCALL libd_getspnam)(char const *__restrict name);
+INTDEF ATTR_IN(1) struct spwd *NOTHROW_RPC(LIBDCALL libd_sgetspent)(char const *__restrict string);
+INTDEF ATTR_INOUT(1) struct spwd *NOTHROW_RPC(LIBDCALL libd_fgetspent)(FILE *__restrict stream);
+INTDEF ATTR_IN(1) ATTR_INOUT(2) int NOTHROW_RPC(LIBDCALL libd_putspent)(struct spwd const *__restrict p, FILE *__restrict stream);
+INTDEF ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3) int NOTHROW_RPC(LIBDCALL libd_getspent_r)(struct spwd *__restrict result_buf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);
+INTDEF ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int NOTHROW_RPC(LIBDCALL libd_getspnam_r)(char const *__restrict name, struct spwd *__restrict result_buf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);
+INTDEF ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int NOTHROW_RPC(LIBDCALL libd_sgetspent_r)(char const *__restrict string, struct spwd *__restrict result_buf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int NOTHROW_RPC(LIBDCALL libd_fgetspent_r)(FILE *__restrict stream, struct spwd *__restrict result_buf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

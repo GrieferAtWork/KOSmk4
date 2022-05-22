@@ -39,10 +39,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_wttyname_r,hash:CRC-32=0xfe95219]]]*/
+/*[[[head:libc_wttyname_r,hash:CRC-32=0xeb3312e]]]*/
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WRS(2, 3) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_OUTS(2, 3) int
 NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd,
                                       char32_t *buf,
                                       size_t buflen)
@@ -57,10 +57,10 @@ NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd,
 }
 /*[[[end:libc_wttyname_r]]]*/
 
-/*[[[head:libd_wttyname_r,hash:CRC-32=0xbe374bc5]]]*/
+/*[[[head:libd_wttyname_r,hash:CRC-32=0xb6065005]]]*/
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_ACCESS_WRS(2, 3) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_OUTS(2, 3) int
 NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
                                       char16_t *buf,
                                       size_t buflen)
@@ -75,8 +75,8 @@ NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
 }
 /*[[[end:libd_wttyname_r]]]*/
 
-/*[[[head:libc_wreadlinkat,hash:CRC-32=0xe546ad90]]]*/
-INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t
+/*[[[head:libc_wreadlinkat,hash:CRC-32=0x42dceca4]]]*/
+INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
 NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd,
                                        char32_t const *path,
                                        char32_t *buf,
@@ -87,8 +87,8 @@ NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd,
 }
 /*[[[end:libc_wreadlinkat]]]*/
 
-/*[[[head:libd_wreadlinkat,hash:CRC-32=0xce246e64]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t
+/*[[[head:libd_wreadlinkat,hash:CRC-32=0xb5e575d8]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
 NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd,
                                        char16_t const *path,
                                        char16_t *buf,
@@ -99,8 +99,8 @@ NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd,
 }
 /*[[[end:libd_wreadlinkat]]]*/
 
-/*[[[head:libc_wfreadlinkat,hash:CRC-32=0xe1dd4dd3]]]*/
-INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t
+/*[[[head:libc_wfreadlinkat,hash:CRC-32=0x6f349689]]]*/
+INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
 NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd,
                                         char32_t const *path,
                                         char32_t *buf,
@@ -119,8 +119,8 @@ NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd,
 }
 /*[[[end:libc_wfreadlinkat]]]*/
 
-/*[[[head:libd_wfreadlinkat,hash:CRC-32=0xa4710097]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t
+/*[[[head:libd_wfreadlinkat,hash:CRC-32=0x8ad9103f]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
 NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
                                         char16_t const *path,
                                         char16_t *buf,
@@ -139,8 +139,8 @@ NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
 }
 /*[[[end:libd_wfreadlinkat]]]*/
 
-/*[[[head:libc_wreadlink,hash:CRC-32=0x2483886e]]]*/
-INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) ssize_t
+/*[[[head:libc_wreadlink,hash:CRC-32=0xb7de597e]]]*/
+INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *path,
                                      char32_t *buf,
                                      size_t buflen)
@@ -150,8 +150,8 @@ NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *path,
 }
 /*[[[end:libc_wreadlink]]]*/
 
-/*[[[head:libd_wreadlink,hash:CRC-32=0x868144e0]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) ssize_t
+/*[[[head:libd_wreadlink,hash:CRC-32=0xc04798b]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *path,
                                      char16_t *buf,
                                      size_t buflen)

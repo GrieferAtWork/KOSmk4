@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe08a7316 */
+/* HASH CRC-32:0x5285e645 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ typedef __size_t size_t;
  *               be used as temporary storage by the implemenation
  *               The  contents  of this  array are  undefined upon
  *               return of this function. */
-__CDECLARE_VOID(__ATTR_ACCESS_RWS(2, 1) __ATTR_ACCESS_WRS(3, 1),__NOTHROW_NCX,sort_pointers,(size_t __count, void **__sortme, void **__work),(__count,__sortme,__work))
+__CDECLARE_VOID(__ATTR_INOUTS(2, 1) __ATTR_OUTS(3, 1),__NOTHROW_NCX,sort_pointers,(size_t __count, void **__sortme, void **__work),(__count,__sortme,__work))
 #else /* __CRT_HAVE_sort_pointers */
 #include <libc/local/sort/sort_pointers.h>
 /* >> sort_pointers(3)
@@ -56,7 +56,7 @@ __CDECLARE_VOID(__ATTR_ACCESS_RWS(2, 1) __ATTR_ACCESS_WRS(3, 1),__NOTHROW_NCX,so
  *               be used as temporary storage by the implemenation
  *               The  contents  of this  array are  undefined upon
  *               return of this function. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sort_pointers, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RWS(2, 1) __ATTR_ACCESS_WRS(3, 1) void __NOTHROW_NCX(__LIBCCALL sort_pointers)(size_t __count, void **__sortme, void **__work) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sort_pointers))(__count, __sortme, __work); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sort_pointers, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUTS(2, 1) __ATTR_OUTS(3, 1) void __NOTHROW_NCX(__LIBCCALL sort_pointers)(size_t __count, void **__sortme, void **__work) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sort_pointers))(__count, __sortme, __work); })
 #endif /* !__CRT_HAVE_sort_pointers */
 
 __SYSDECL_END

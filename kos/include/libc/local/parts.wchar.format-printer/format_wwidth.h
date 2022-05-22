@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf00b933 */
+/* HASH CRC-32:0xcfaf0012 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <bits/crt/wformat-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(format_wwidth) __ATTR_PURE __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((2)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_wwidth) __ATTR_PURE __ATTR_INS(2, 3) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__WFORMATPRINTER_CC __LIBC_LOCAL_NAME(format_wwidth))(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 #if __SIZEOF_WCHAR_T__ == 2
 	__SIZE_TYPE__ __result = 0;

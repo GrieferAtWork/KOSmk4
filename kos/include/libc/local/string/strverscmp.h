@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26b549ff */
+/* HASH CRC-32:0x44f96af1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_strverscmp_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strverscmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
+__LOCAL_LIBC(strverscmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strverscmp))(char const *__s1, char const *__s2) {
 	char const *__s1_start = __s1;
 	char __c1, __c2;

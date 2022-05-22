@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbffe9ba */
+/* HASH CRC-32:0xe8e0dc41 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(memrchrq) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __UINT64_TYPE__ *
+__LOCAL_LIBC(memrchrq) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrchrq))(void const *__restrict __haystack, __UINT64_TYPE__ __needle, __SIZE_TYPE__ __n_qwords) {
 	__UINT64_TYPE__ *__iter = (__UINT64_TYPE__ *)__haystack + __n_qwords;
 	while (__n_qwords--) {

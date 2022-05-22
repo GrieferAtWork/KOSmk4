@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5fe834a */
+/* HASH CRC-32:0xb4041311 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT(,__mode_t,__NOTHROW_NCX,__localdep_umask,(__mode_t __mode),__libc_um
 #undef __local___localdep_umask_defined
 #endif /* !... */
 #endif /* !__local___localdep_umask_defined */
-__LOCAL_LIBC(_umask_s) __ATTR_ACCESS_WR(2) __errno_t
+__LOCAL_LIBC(_umask_s) __ATTR_OUT(2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_umask_s))(__mode_t __nmode, __mode_t *__omode) {
 	*__omode = (__NAMESPACE_LOCAL_SYM __localdep_umask)(__nmode);
 	return __EOK;

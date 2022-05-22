@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bddd9c4 */
+/* HASH CRC-32:0xfefde75 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_isalpha __LIBC_LOCAL_NAME(isalpha)
 #endif /* !... */
 #endif /* !__local___localdep_isalpha_defined */
-__LOCAL_LIBC(basename) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) char *
+__LOCAL_LIBC(basename) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(basename))(char const *__filename) {
 	/* >> char *slash = strrchr(filename, '/');
 	 * >> return slash ? slash + 1 : (char *)filename; */

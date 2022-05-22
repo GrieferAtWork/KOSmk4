@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2996ee14 */
+/* HASH CRC-32:0x7feb9b67 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <bits/crt/resolv.h>
-INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WR_OPT(3) int
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_IN(1) ATTR_IN(2) ATTR_OUT_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_sym_ston)(struct res_sym const *symbols,
                                     char const *wanted_name,
                                     int *p_success) {
@@ -53,7 +53,7 @@ done:
 }
 #include <bits/crt/resolv.h>
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(3) char const *
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT_OPT(3) char const *
 NOTHROW_NCX(LIBCCALL libc_sym_ntos)(struct res_sym const *symbols,
                                     int wanted_number,
                                     int *p_success) {
@@ -82,7 +82,7 @@ NOTHROW_NCX(LIBCCALL libc_sym_ntos)(struct res_sym const *symbols,
 	return fallback_namebuf;
 }
 #include <bits/crt/resolv.h>
-INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(3) char const *
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT_OPT(3) char const *
 NOTHROW_NCX(LIBCCALL libc_sym_ntop)(struct res_sym const *symbols,
                                     int wanted_number,
                                     int *p_success) {
@@ -98,7 +98,7 @@ NOTHROW_NCX(LIBCCALL libc_sym_ntop)(struct res_sym const *symbols,
 	return libc_sym_ntos(symbols, wanted_number, p_success);
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_ACCESS_RO(1) NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.net.nameser") ATTR_IN(1) NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_dn_skipname)(u_char const *msg_ptr,
                                        u_char const *end_of_msg) {
 	u_char const *orig_msg_ptr = msg_ptr;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7644764 */
+/* HASH CRC-32:0x9ba0df61 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_timingsafe_memcmp_defined
 #define __local___localdep_timingsafe_memcmp_defined
 #ifdef __CRT_HAVE_timingsafe_memcmp
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 3) __ATTR_ACCESS_ROS(2, 3),int,__NOTHROW_NCX,__localdep_timingsafe_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),timingsafe_memcmp,(__s1,__s2,__n_bytes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3),int,__NOTHROW_NCX,__localdep_timingsafe_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),timingsafe_memcmp,(__s1,__s2,__n_bytes))
 #else /* __CRT_HAVE_timingsafe_memcmp */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/timingsafe_memcmp.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_timingsafe_memcmp __LIBC_LOCAL_NAME(timingsafe_memcmp)
 #endif /* !__CRT_HAVE_timingsafe_memcmp */
 #endif /* !__local___localdep_timingsafe_memcmp_defined */
-__LOCAL_LIBC(consttime_memequal) __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 3) __ATTR_ACCESS_ROS(2, 3) int
+__LOCAL_LIBC(consttime_memequal) __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(consttime_memequal))(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_timingsafe_memcmp)(__s1, __s2, __n_bytes) == 0;
 }

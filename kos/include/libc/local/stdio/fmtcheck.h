@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0b072a5 */
+/* HASH CRC-32:0x8dac6408 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_fmtcheck_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fmtcheck) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(1) __ATTR_FORMAT_ARG(2) char const *
+__LOCAL_LIBC(fmtcheck) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_IN_OPT(1) __ATTR_FORMAT_ARG(2) char const *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmtcheck))(char const *__user_format, char const *__good_format) {
 	/* TODO: Implement properly */
 	__COMPILER_IMPURE();

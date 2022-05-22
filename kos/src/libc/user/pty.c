@@ -33,7 +33,7 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_openpty,hash:CRC-32=0x555cdffd]]]*/
+/*[[[head:libc_openpty,hash:CRC-32=0x873775ed]]]*/
 /* >> openpty(2)
  * Create  a  new  ptty (psuedo  tty),  storing the  handles  for the
  * master/slave adapters in  `*amaster' and `*aslave'.  Additionally,
@@ -50,7 +50,7 @@ DECL_BEGIN
  * NOTE: On KOS, this function is a system call, though in other
  *       operating system it is often implemented via `open(2)',
  *       possibly combined with `ioctl(2)'. */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR_OPT(3) int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1) ATTR_OUT(2) ATTR_OUT_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_openpty)(fd_t *amaster,
                                    fd_t *aslave,
                                    char *name,

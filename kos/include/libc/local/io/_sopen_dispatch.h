@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc21d18fb */
+/* HASH CRC-32:0xd1eb3ec0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__sopen_s_defined
 #define __local___localdep__sopen_s_defined
 #ifdef __CRT_HAVE__sopen_s
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),__errno_t,__NOTHROW_RPC,__localdep__sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s,(__fd,__filename,__oflags,__sflags,__mode))
+__CREDIRECT(__ATTR_IN(2) __ATTR_OUT(1),__errno_t,__NOTHROW_RPC,__localdep__sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s,(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE__sopen_s_nolock)
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),__errno_t,__NOTHROW_RPC,__localdep__sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s_nolock,(__fd,__filename,__oflags,__sflags,__mode))
+__CREDIRECT(__ATTR_IN(2) __ATTR_OUT(1),__errno_t,__NOTHROW_RPC,__localdep__sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s_nolock,(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE_sopen) || defined(__CRT_HAVE__sopen) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/io/_sopen_s.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__sopen_s_defined
 #endif /* !... */
 #endif /* !__local___localdep__sopen_s_defined */
-__LOCAL_LIBC(_sopen_dispatch) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(5) __errno_t
+__LOCAL_LIBC(_sopen_dispatch) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(5) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_sopen_dispatch))(char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode, __fd_t *__fd, int __bsecure) {
 	(void)__bsecure;
 	return (__NAMESPACE_LOCAL_SYM __localdep__sopen_s)(__fd, __filename, __oflags, __sflags, __mode);

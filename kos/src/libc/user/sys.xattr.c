@@ -29,10 +29,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_setxattr,hash:CRC-32=0xa8115466]]]*/
+/*[[[head:libc_setxattr,hash:CRC-32=0x35606a7d]]]*/
 /* >> setxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_ROS(3, 4) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(1) ATTR_IN(2) ATTR_INS(3, 4) int
 NOTHROW_RPC(LIBCCALL libc_setxattr)(char const *path,
                                     char const *name,
                                     void const *buf,
@@ -46,10 +46,10 @@ NOTHROW_RPC(LIBCCALL libc_setxattr)(char const *path,
 }
 /*[[[end:libc_setxattr]]]*/
 
-/*[[[head:libc_lsetxattr,hash:CRC-32=0x8de909be]]]*/
+/*[[[head:libc_lsetxattr,hash:CRC-32=0x8f2c71a5]]]*/
 /* >> lsetxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_ROS(3, 4) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(1) ATTR_IN(2) ATTR_INS(3, 4) int
 NOTHROW_RPC(LIBCCALL libc_lsetxattr)(char const *path,
                                      char const *name,
                                      void const *buf,
@@ -63,10 +63,10 @@ NOTHROW_RPC(LIBCCALL libc_lsetxattr)(char const *path,
 }
 /*[[[end:libc_lsetxattr]]]*/
 
-/*[[[head:libc_fsetxattr,hash:CRC-32=0xc8bb6645]]]*/
+/*[[[head:libc_fsetxattr,hash:CRC-32=0x2f3db100]]]*/
 /* >> fsetxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(2) ATTR_ACCESS_ROS(3, 4) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(2) ATTR_INS(3, 4) int
 NOTHROW_RPC(LIBCCALL libc_fsetxattr)(fd_t fd,
                                      char const *name,
                                      void const *buf,
@@ -80,9 +80,9 @@ NOTHROW_RPC(LIBCCALL libc_fsetxattr)(fd_t fd,
 }
 /*[[[end:libc_fsetxattr]]]*/
 
-/*[[[head:libc_getxattr,hash:CRC-32=0xbfe4ed9]]]*/
+/*[[[head:libc_getxattr,hash:CRC-32=0xe7b9b9be]]]*/
 /* >> getxattr(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(1) ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
 NOTHROW_RPC(LIBCCALL libc_getxattr)(char const *path,
                                     char const *name,
                                     void *buf,
@@ -95,9 +95,9 @@ NOTHROW_RPC(LIBCCALL libc_getxattr)(char const *path,
 }
 /*[[[end:libc_getxattr]]]*/
 
-/*[[[head:libc_lgetxattr,hash:CRC-32=0x4ee75f5f]]]*/
+/*[[[head:libc_lgetxattr,hash:CRC-32=0x4f5fe4be]]]*/
 /* >> lgetxattr(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(1) ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
 NOTHROW_RPC(LIBCCALL libc_lgetxattr)(char const *path,
                                      char const *name,
                                      void *buf,
@@ -110,9 +110,9 @@ NOTHROW_RPC(LIBCCALL libc_lgetxattr)(char const *path,
 }
 /*[[[end:libc_lgetxattr]]]*/
 
-/*[[[head:libc_fgetxattr,hash:CRC-32=0x923329b5]]]*/
+/*[[[head:libc_fgetxattr,hash:CRC-32=0x6123bade]]]*/
 /* >> fgetxattr(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
 NOTHROW_RPC(LIBCCALL libc_fgetxattr)(fd_t fd,
                                      char const *name,
                                      void *buf,
@@ -125,9 +125,9 @@ NOTHROW_RPC(LIBCCALL libc_fgetxattr)(fd_t fd,
 }
 /*[[[end:libc_fgetxattr]]]*/
 
-/*[[[head:libc_listxattr,hash:CRC-32=0x1430659c]]]*/
+/*[[[head:libc_listxattr,hash:CRC-32=0x51636bba]]]*/
 /* >> listxattr(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_listxattr)(char const *path,
                                      char *listbuf,
                                      size_t listbufsize)
@@ -139,9 +139,9 @@ NOTHROW_RPC(LIBCCALL libc_listxattr)(char const *path,
 }
 /*[[[end:libc_listxattr]]]*/
 
-/*[[[head:libc_llistxattr,hash:CRC-32=0x81a0587c]]]*/
+/*[[[head:libc_llistxattr,hash:CRC-32=0xdb9e0b5a]]]*/
 /* >> llistxattr(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_llistxattr)(char const *path,
                                       char *listbuf,
                                       size_t listbufsize)
@@ -153,9 +153,9 @@ NOTHROW_RPC(LIBCCALL libc_llistxattr)(char const *path,
 }
 /*[[[end:libc_llistxattr]]]*/
 
-/*[[[head:libc_flistxattr,hash:CRC-32=0xaa9d5001]]]*/
+/*[[[head:libc_flistxattr,hash:CRC-32=0xf7ee98a9]]]*/
 /* >> flistxattr(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WRS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_flistxattr)(fd_t fd,
                                       char *listbuf,
                                       size_t listbufsize)
@@ -167,9 +167,9 @@ NOTHROW_RPC(LIBCCALL libc_flistxattr)(fd_t fd,
 }
 /*[[[end:libc_flistxattr]]]*/
 
-/*[[[head:libc_removexattr,hash:CRC-32=0xc37b0528]]]*/
+/*[[[head:libc_removexattr,hash:CRC-32=0xeabaab1e]]]*/
 /* >> removexattr(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_RPC(LIBCCALL libc_removexattr)(char const *path,
                                        char const *name)
 /*[[[body:libc_removexattr]]]*/
@@ -180,9 +180,9 @@ NOTHROW_RPC(LIBCCALL libc_removexattr)(char const *path,
 }
 /*[[[end:libc_removexattr]]]*/
 
-/*[[[head:libc_lremovexattr,hash:CRC-32=0x86cae311]]]*/
+/*[[[head:libc_lremovexattr,hash:CRC-32=0x95b22a6b]]]*/
 /* >> lremovexattr(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_RPC(LIBCCALL libc_lremovexattr)(char const *path,
                                         char const *name)
 /*[[[body:libc_lremovexattr]]]*/
@@ -193,9 +193,9 @@ NOTHROW_RPC(LIBCCALL libc_lremovexattr)(char const *path,
 }
 /*[[[end:libc_lremovexattr]]]*/
 
-/*[[[head:libc_fremovexattr,hash:CRC-32=0x90217c7d]]]*/
+/*[[[head:libc_fremovexattr,hash:CRC-32=0xf982dbf9]]]*/
 /* >> fremovexattr(2) */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(2) int
 NOTHROW_RPC(LIBCCALL libc_fremovexattr)(fd_t fd,
                                         char const *name)
 /*[[[body:libc_fremovexattr]]]*/

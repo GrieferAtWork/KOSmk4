@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5dc4da8 */
+/* HASH CRC-32:0xc6c939e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,16 +48,16 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_endaliasent)(void);
 INTDEF WUNUSED struct aliasent *NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent)(void);
 /* >> getaliasent_r(3)
  * Reentrant variant of `getaliasent(3)' (s.a. similar functions such as `getpwent_r(3)') */
-INTDEF ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(4) ATTR_ACCESS_WRS(2, 3) errno_t NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result);
+INTDEF ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3) errno_t NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result);
 /* >> getaliasbyname(3)
  * Find a database entry associated with the given `name'
  * @return: * :   A pointer to an internal, statically allocated structure
  * @return: NULL: [errno=ENOENT] No entry matching `name'
  * @return: NULL: [errno=*]      Error */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) struct aliasent *NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname)(char const *name);
+INTDEF WUNUSED ATTR_IN(1) struct aliasent *NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname)(char const *name);
 /* >> getaliasbyname_r(3)
  * Reentrant variant of `getaliasbyname(3)' (s.a. similar functions such as `getpwnam_r(3)') */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) errno_t NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name, struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result);
+INTDEF ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name, struct aliasent *__restrict result_buf, char *__restrict buffer, size_t buflen, struct aliasent **__restrict result);
 #endif /* !__KERNEL__ */
 
 DECL_END

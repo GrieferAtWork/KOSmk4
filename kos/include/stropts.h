@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf324d5c */
+/* HASH CRC-32:0x9e45142f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -288,11 +288,11 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,putmsg,(__fd_t __fd, struct strbuf const *__ct
 __CDECLARE_OPT(,int,__NOTHROW_RPC,putpmsg,(__fd_t __fd, struct strbuf const *__ctlptr, struct strbuf const *__dataptr, __STDC_INT_AS_UINT_T __band, __STDC_INT_AS_UINT_T __flags),(__fd,__ctlptr,__dataptr,__band,__flags))
 #if !defined(__fattach_defined) && defined(__CRT_HAVE_fattach)
 #define __fattach_defined
-__CDECLARE(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fd, char const *__restrict __path),(__fd,__path))
+__CDECLARE(__ATTR_IN(2),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fd, char const *__restrict __path),(__fd,__path))
 #endif /* !__fattach_defined && __CRT_HAVE_fattach */
 #if !defined(__fdetach_defined) && defined(__CRT_HAVE_fdetach)
 #define __fdetach_defined
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __path),(__path))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __path),(__path))
 #endif /* !__fdetach_defined && __CRT_HAVE_fdetach */
 #ifndef __ioctl_defined
 #define __ioctl_defined

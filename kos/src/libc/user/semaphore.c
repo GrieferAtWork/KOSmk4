@@ -79,7 +79,7 @@ STATIC_ASSERT(sizeof(sem_count_t) == SEM_COUNT_SIZE);
 
 
 
-/*[[[head:libc_sem_init,hash:CRC-32=0x6df5ee8d]]]*/
+/*[[[head:libc_sem_init,hash:CRC-32=0xc9634e67]]]*/
 /* >> sem_init(3)
  * Initialize the given semaphore `self' to start out with `value' tickets
  * @param: self:     The semaphore to initialize
@@ -93,7 +93,7 @@ STATIC_ASSERT(sizeof(sem_count_t) == SEM_COUNT_SIZE);
  *                  HINT: Never returned `#if SEM_VALUE_MAX >= UINT_MAX'
  * @return: -1:     [errno=ENOSYS] `pshared != 0', but inter-process semaphores aren't supported
  *                  HINT: Never returned `#ifdef __ARCH_HAVE_INTERPROCESS_SEMAPHORES' */
-INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_ACCESS_WR(1) int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *self,
                                     int pshared,
                                     unsigned int value)
@@ -110,11 +110,11 @@ NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *self,
 }
 /*[[[end:libc_sem_init]]]*/
 
-/*[[[head:libc_sem_destroy,hash:CRC-32=0xe0c9ce76]]]*/
+/*[[[head:libc_sem_destroy,hash:CRC-32=0xaddce588]]]*/
 /* >> sem_destroy(3)
  * Destroy a semaphore previously initialized by `sem_init(3)'
  * @return: 0: Success */
-INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_ACCESS_RW(1) int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *self)
 /*[[[body:libc_sem_destroy]]]*/
 {
@@ -142,7 +142,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.sched.semaphore") char const named_prefix[] = 
 #define NAMED_PREFIX_OFFSETOF_SEM COMPILER_STRLEN("/dev/shm/")
 
 
-/*[[[head:libc_sem_open,hash:CRC-32=0x774d9c6d]]]*/
+/*[[[head:libc_sem_open,hash:CRC-32=0xaec4fd15]]]*/
 /* >> sem_open(3)
  * Open a named semaphore `name', which must be string that starts with `/'
  * NOTE: When called multiple times with identical strings for  `name',
@@ -162,7 +162,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.sched.semaphore") char const named_prefix[] = 
  * @return: * :         A pointer to the opened semaphore, which must be closed by `sem_close(3)'
  * @return: SEM_FAILED: [errno=EINVAL] The given `name' contains no characters after the initial `/'
  * @return: SEM_FAILED: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_ACCESS_RO(1) sem_t *
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_IN(1) sem_t *
 NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name,
                                          oflag_t oflags,
                                          ...)
@@ -313,13 +313,13 @@ err:
 }
 /*[[[end:libc_sem_open]]]*/
 
-/*[[[head:libc_sem_close,hash:CRC-32=0x138e4257]]]*/
+/*[[[head:libc_sem_close,hash:CRC-32=0xee98e67f]]]*/
 /* >> sem_close(3)
  * Close a semaphore previously returned by `sem_open(3)'. But note the case
  * of opening the same semaphore more than once within the same process,  as
  * described by in `sem_open(3)' and by `__ARCH_HAVE_NON_UNIQUE_SEM_OPEN'->
  * @return: 0: Success */
-INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_ACCESS_RW(1) int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *self)
 /*[[[body:libc_sem_close]]]*/
 {
@@ -327,14 +327,14 @@ NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *self)
 }
 /*[[[end:libc_sem_close]]]*/
 
-/*[[[head:libc_sem_unlink,hash:CRC-32=0xc07bb359]]]*/
+/*[[[head:libc_sem_unlink,hash:CRC-32=0xef00f0e5]]]*/
 /* >> sem_unlink(3)
  * Unlink (delete) a named semaphore `name' that was
  * previously  created  by `sem_open(name, O_CREAT)'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `name' contains no characters after the initial `/'
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_IN(1) int
 NOTHROW_RPC_KOS(LIBCCALL libc_sem_unlink)(const char *name)
 /*[[[body:libc_sem_unlink]]]*/
 {
@@ -414,7 +414,7 @@ NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *self)
 }
 /*[[[end:libc_sem_wait]]]*/
 
-/*[[[head:libc_sem_timedwait,hash:CRC-32=0x2bc4151e]]]*/
+/*[[[head:libc_sem_timedwait,hash:CRC-32=0xa74822b0]]]*/
 /* >> sem_timedwait(3), sem_timedwait64(3)
  * Wait  for a  ticket to become  available to the  given semaphore `self'
  * Once a ticket has become available, consume it and return. If no ticket
@@ -422,7 +422,7 @@ NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *self)
  * @return: 0:  Success
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
-INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_IN(2) ATTR_INOUT(1) int
 NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict self,
                                          struct timespec const *__restrict abstime)
 /*[[[body:libc_sem_timedwait]]]*/
@@ -450,7 +450,7 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict self,
 }
 /*[[[end:libc_sem_timedwait]]]*/
 
-/*[[[head:libc_sem_timedwait64,hash:CRC-32=0x211a43f2]]]*/
+/*[[[head:libc_sem_timedwait64,hash:CRC-32=0xe61b6e41]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_sem_timedwait64, libc_sem_timedwait);
 #else /* MAGIC:alias */
@@ -461,7 +461,7 @@ DEFINE_INTERN_ALIAS(libc_sem_timedwait64, libc_sem_timedwait);
  * @return: 0:  Success
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
-INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_IN(2) ATTR_INOUT(1) int
 NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict self,
                                            struct timespec64 const *__restrict abstime)
 /*[[[body:libc_sem_timedwait64]]]*/
@@ -490,14 +490,14 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict self,
 #endif /* MAGIC:alias */
 /*[[[end:libc_sem_timedwait64]]]*/
 
-/*[[[head:libc_sem_trywait,hash:CRC-32=0xab5015a6]]]*/
+/*[[[head:libc_sem_trywait,hash:CRC-32=0x2ec888be]]]*/
 /* >> sem_trywait(3)
  * Atomically check if at least 1 ticket is available for `self', and consume
  * one  if this is the case, or return with `errno=EAGAIN' if no tickets were
  * available at the time of the call.
  * @return: 0:  Success
  * @return: -1: [errno=EAGAIN] A ticket could not be acquired without blocking. */
-INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_ACCESS_RW(1) int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *self)
 /*[[[body:libc_sem_trywait]]]*/
 {
@@ -515,13 +515,13 @@ NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *self)
 }
 /*[[[end:libc_sem_trywait]]]*/
 
-/*[[[head:libc_sem_post,hash:CRC-32=0x874e9405]]]*/
+/*[[[head:libc_sem_post,hash:CRC-32=0xbe1e7ff6]]]*/
 /* >> sem_post(3)
  * Post a ticket to the given semaphore `self', waking up to 1 other thread
  * that  may be waiting  for tickets to  become available before returning.
  * @return: 0:  Success
  * @return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted. */
-INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_ACCESS_RW(1) int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *self)
 /*[[[body:libc_sem_post]]]*/
 {
@@ -538,11 +538,11 @@ NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *self)
 }
 /*[[[end:libc_sem_post]]]*/
 
-/*[[[head:libc_sem_getvalue,hash:CRC-32=0x7cd5e909]]]*/
+/*[[[head:libc_sem_getvalue,hash:CRC-32=0x7d07537c]]]*/
 /* >> sem_getvalue(3)
  * Capture a snapshot of how may tickets are available storing that number in `*sval'
  * @return: 0: Success */
-INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) int
+INTERN ATTR_SECTION(".text.crt.sched.semaphore") ATTR_INOUT(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict self,
                                         __STDC_INT_AS_UINT_T *__restrict sval)
 /*[[[body:libc_sem_getvalue]]]*/

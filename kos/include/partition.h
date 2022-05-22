@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8037c17a */
+/* HASH CRC-32:0xc1c90389 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,28 +82,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(partition_delete, __FORCELOCAL __ATTR_ARTIFICIAL
  * Join the classes containing elements `a' and `b' into the same class
  * For  this, choose one  of the class's canonical  elements as the new
  * canonical element of the total  class, which is then also  returned. */
-__CDECLARE(__ATTR_ACCESS_RW(1),__STDC_INT_AS_UINT_T,__NOTHROW_NCX,partition_union,(struct partition_def *__self, __STDC_INT_AS_UINT_T __a, __STDC_INT_AS_UINT_T __b),(__self,__a,__b))
+__CDECLARE(__ATTR_INOUT(1),__STDC_INT_AS_UINT_T,__NOTHROW_NCX,partition_union,(struct partition_def *__self, __STDC_INT_AS_UINT_T __a, __STDC_INT_AS_UINT_T __b),(__self,__a,__b))
 #else /* __CRT_HAVE_partition_union */
 #include <libc/local/partition/partition_union.h>
 /* >> partition_union(3)
  * Join the classes containing elements `a' and `b' into the same class
  * For  this, choose one  of the class's canonical  elements as the new
  * canonical element of the total  class, which is then also  returned. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(partition_union, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) __STDC_INT_AS_UINT_T __NOTHROW_NCX(__LIBCCALL partition_union)(struct partition_def *__self, __STDC_INT_AS_UINT_T __a, __STDC_INT_AS_UINT_T __b) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(partition_union))(__self, __a, __b); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(partition_union, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __STDC_INT_AS_UINT_T __NOTHROW_NCX(__LIBCCALL partition_union)(struct partition_def *__self, __STDC_INT_AS_UINT_T __a, __STDC_INT_AS_UINT_T __b) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(partition_union))(__self, __a, __b); })
 #endif /* !__CRT_HAVE_partition_union */
 #ifdef __CRT_HAVE_partition_print
 /* >> partition_print(3)
  * Print classes (and  their elements) of  `self' to  `fp'
  * The format used is: '[' ['(' [0 1 2 3 4]... ')']... ']'
  * Example: "[(0 1 2 4 8)(3 6)(5 7)]" */
-__CDECLARE_VOID(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(2),__NOTHROW_NCX,partition_print,(struct partition_def __KOS_FIXED_CONST *__self, FILE *__fp),(__self,__fp))
+__CDECLARE_VOID(__ATTR_IN(1) __ATTR_INOUT(2),__NOTHROW_NCX,partition_print,(struct partition_def __KOS_FIXED_CONST *__self, FILE *__fp),(__self,__fp))
 #elif defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 #include <libc/local/partition/partition_print.h>
 /* >> partition_print(3)
  * Print classes (and  their elements) of  `self' to  `fp'
  * The format used is: '[' ['(' [0 1 2 3 4]... ')']... ']'
  * Example: "[(0 1 2 4 8)(3 6)(5 7)]" */
-__NAMESPACE_LOCAL_USING_OR_IMPL(partition_print, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(2) void __NOTHROW_NCX(__LIBCCALL partition_print)(struct partition_def __KOS_FIXED_CONST *__self, FILE *__fp) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(partition_print))(__self, __fp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(partition_print, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_INOUT(2) void __NOTHROW_NCX(__LIBCCALL partition_print)(struct partition_def __KOS_FIXED_CONST *__self, FILE *__fp) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(partition_print))(__self, __fp); })
 #endif /* ... */
 
 /* Return the canonical element for the class containing `element' */

@@ -30,12 +30,12 @@
 
 DECL_BEGIN
 
-/*[[[head:libc__ftime32,hash:CRC-32=0x754175c6]]]*/
+/*[[[head:libc__ftime32,hash:CRC-32=0x41268b9c]]]*/
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WR(1) void
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc__ftime32)(struct timeb32 *timebuf)
 /*[[[body:libc__ftime32]]]*/
 {
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc__ftime32)(struct timeb32 *timebuf)
 }
 /*[[[end:libc__ftime32]]]*/
 
-/*[[[head:libc__ftime64,hash:CRC-32=0x791097d]]]*/
+/*[[[head:libc__ftime64,hash:CRC-32=0x6eb92f19]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc__ftime64, libc__ftime32);
 #else /* MAGIC:alias */
@@ -52,7 +52,7 @@ DEFINE_INTERN_ALIAS(libc__ftime64, libc__ftime32);
  * Write information about the current time to `*timebuf'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WR(1) void
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc__ftime64)(struct timeb64 *timebuf)
 /*[[[body:libc__ftime64]]]*/
 {
@@ -62,12 +62,12 @@ NOTHROW_NCX(LIBCCALL libc__ftime64)(struct timeb64 *timebuf)
 #endif /* MAGIC:alias */
 /*[[[end:libc__ftime64]]]*/
 
-/*[[[head:libc__ftime32_s,hash:CRC-32=0xa544b756]]]*/
+/*[[[head:libc__ftime32_s,hash:CRC-32=0x47ec2ffa]]]*/
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WR(1) errno_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc__ftime32_s)(struct timeb32 *timebuf)
 /*[[[body:libc__ftime32_s]]]*/
 {
@@ -77,7 +77,7 @@ NOTHROW_NCX(LIBCCALL libc__ftime32_s)(struct timeb32 *timebuf)
 }
 /*[[[end:libc__ftime32_s]]]*/
 
-/*[[[head:libc__ftime64_s,hash:CRC-32=0x199eb1b4]]]*/
+/*[[[head:libc__ftime64_s,hash:CRC-32=0x91a9d241]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc__ftime64_s, libc__ftime32_s);
 #else /* MAGIC:alias */
@@ -85,7 +85,7 @@ DEFINE_INTERN_ALIAS(libc__ftime64_s, libc__ftime32_s);
  * Write information about the current time to `*timebuf'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WR(1) errno_t
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc__ftime64_s)(struct timeb64 *timebuf)
 /*[[[body:libc__ftime64_s]]]*/
 {
@@ -96,12 +96,12 @@ NOTHROW_NCX(LIBCCALL libc__ftime64_s)(struct timeb64 *timebuf)
 #endif /* MAGIC:alias */
 /*[[[end:libc__ftime64_s]]]*/
 
-/*[[[head:libc_ftime,hash:CRC-32=0x5968032e]]]*/
+/*[[[head:libc_ftime,hash:CRC-32=0x92d7809e]]]*/
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WR(1) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_ftime)(struct timeb *timebuf)
 /*[[[body:libc_ftime]]]*/
 {
@@ -125,7 +125,7 @@ NOTHROW_NCX(LIBCCALL libc_ftime)(struct timeb *timebuf)
 }
 /*[[[end:libc_ftime]]]*/
 
-/*[[[head:libc_ftime64,hash:CRC-32=0xa0c8c4d0]]]*/
+/*[[[head:libc_ftime64,hash:CRC-32=0x40235ff8]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ftime64, libc_ftime);
 #else /* MAGIC:alias */
@@ -133,7 +133,7 @@ DEFINE_INTERN_ALIAS(libc_ftime64, libc_ftime);
  * Write information about the current time to `*timebuf'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WR(1) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_ftime64)(struct timeb64 *timebuf)
 /*[[[body:libc_ftime64]]]*/
 {

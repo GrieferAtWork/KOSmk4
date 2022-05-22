@@ -168,9 +168,9 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endgrent)(void)
 }
 /*[[[end:libc_endgrent]]]*/
 
-/*[[[head:libc_fgetgrent,hash:CRC-32=0x3059274e]]]*/
+/*[[[head:libc_fgetgrent,hash:CRC-32=0xcfb85688]]]*/
 /* >> fgetgrent(3), fgetgrent_r(3) */
-INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_ACCESS_RW(1) struct group *
+INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_INOUT(1) struct group *
 NOTHROW_RPC(LIBCCALL libc_fgetgrent)(FILE *__restrict stream)
 /*[[[body:libc_fgetgrent]]]*/
 {
@@ -194,9 +194,9 @@ NOTHROW_RPC(LIBCCALL libc_getgrgid)(gid_t gid)
 }
 /*[[[end:libc_getgrgid]]]*/
 
-/*[[[head:libc_getgrnam,hash:CRC-32=0x719a0f9e]]]*/
+/*[[[head:libc_getgrnam,hash:CRC-32=0x5e609a8d]]]*/
 /* >> getgrnam(3), getgrnam_r(3) */
-INTERN ATTR_SECTION(".text.crt.database.grp") WUNUSED ATTR_ACCESS_RO(1) struct group *
+INTERN ATTR_SECTION(".text.crt.database.grp") WUNUSED ATTR_IN(1) struct group *
 NOTHROW_RPC(LIBCCALL libc_getgrnam)(char const *__restrict name)
 /*[[[body:libc_getgrnam]]]*/
 {
@@ -227,9 +227,9 @@ NOTHROW_RPC(LIBCCALL libc_getgrent)(void)
 /*[[[end:libc_getgrent]]]*/
 
 
-/*[[[head:libc_getgrgid_r,hash:CRC-32=0xc9a33b09]]]*/
+/*[[[head:libc_getgrgid_r,hash:CRC-32=0xa17d73d4]]]*/
 /* >> getgrgid(3), getgrgid_r(3) */
-INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) int
+INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int
 NOTHROW_RPC(LIBCCALL libc_getgrgid_r)(gid_t gid,
                                       struct group *__restrict resultbuf,
                                       char *__restrict buffer,
@@ -252,9 +252,9 @@ NOTHROW_RPC(LIBCCALL libc_getgrgid_r)(gid_t gid,
 }
 /*[[[end:libc_getgrgid_r]]]*/
 
-/*[[[head:libc_getgrnam_r,hash:CRC-32=0xdf17235c]]]*/
+/*[[[head:libc_getgrnam_r,hash:CRC-32=0x141dfb99]]]*/
 /* >> getgrnam(3), getgrnam_r(3) */
-INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) int
+INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int
 NOTHROW_RPC(LIBCCALL libc_getgrnam_r)(char const *__restrict name,
                                       struct group *__restrict resultbuf,
                                       char *__restrict buffer,
@@ -277,9 +277,9 @@ NOTHROW_RPC(LIBCCALL libc_getgrnam_r)(char const *__restrict name,
 }
 /*[[[end:libc_getgrnam_r]]]*/
 
-/*[[[head:libc_getgrent_r,hash:CRC-32=0x48a2e633]]]*/
+/*[[[head:libc_getgrent_r,hash:CRC-32=0x911e03a6]]]*/
 /* >> getgrent(3), getgrent_r(3) */
-INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(4) ATTR_ACCESS_WRS(2, 3) int
+INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3) int
 NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group *__restrict resultbuf,
                                       char *__restrict buffer,
                                       size_t buflen,
@@ -300,9 +300,9 @@ NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group *__restrict resultbuf,
 }
 /*[[[end:libc_getgrent_r]]]*/
 
-/*[[[head:libc_setgroups,hash:CRC-32=0x509c9220]]]*/
+/*[[[head:libc_setgroups,hash:CRC-32=0xa01621e2]]]*/
 /* >> setgroups(2) */
-INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_ACCESS_ROS(2, 1) int
+INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_INS(2, 1) int
 NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count,
                                      gid_t const *groups)
 /*[[[body:libc_setgroups]]]*/

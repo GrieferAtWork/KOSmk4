@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d2af131 */
+/* HASH CRC-32:0x26d0f659 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strend_defined
 #define __local___localdep_strend_defined
 #ifdef __CRT_HAVE_strend
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
 #else /* __CRT_HAVE_strend */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strend.h>
@@ -37,9 +37,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strpbrk_defined
 #define __local___localdep_strpbrk_defined
 #if __has_builtin(__builtin_strpbrk) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strpbrk)
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_NCX,__localdep_strpbrk,(char const *__haystack, char const *__accept),strpbrk,{ return __builtin_strpbrk(__haystack, __accept); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),char *,__NOTHROW_NCX,__localdep_strpbrk,(char const *__haystack, char const *__accept),strpbrk,{ return __builtin_strpbrk(__haystack, __accept); })
 #elif defined(__CRT_HAVE_strpbrk)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_NCX,__localdep_strpbrk,(char const *__haystack, char const *__accept),strpbrk,(__haystack,__accept))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),char *,__NOTHROW_NCX,__localdep_strpbrk,(char const *__haystack, char const *__accept),strpbrk,(__haystack,__accept))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strpbrk.h>
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(bufsplit) __ATTR_ACCESS_RW_OPT(1) __ATTR_ACCESS_WR_OPT(3) __SIZE_TYPE__
+__LOCAL_LIBC(bufsplit) __ATTR_INOUT_OPT(1) __ATTR_OUT_OPT(3) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bufsplit))(char *__string, __SIZE_TYPE__ __result_c, char **__result_v) {
 	__SIZE_TYPE__ __count;
 	char const *__splitchar;

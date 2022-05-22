@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5bdcfe2 */
+/* HASH CRC-32:0x35f6b3ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsrchrnul_defined
 #define __local___localdep_wcsrchrnul_defined
 #ifdef __CRT_HAVE_wcsrchrnul
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsrchrnul,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle),wcsrchrnul,(__haystack,__needle))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsrchrnul,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle),wcsrchrnul,(__haystack,__needle))
 #else /* __CRT_HAVE_wcsrchrnul */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsrchrnul.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcsrchrnul __LIBC_LOCAL_NAME(wcsrchrnul)
 #endif /* !__CRT_HAVE_wcsrchrnul */
 #endif /* !__local___localdep_wcsrchrnul_defined */
-__LOCAL_LIBC(wcsroff) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __SIZE_TYPE__
+__LOCAL_LIBC(wcsroff) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsroff))(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle) {
 	return (__SIZE_TYPE__)((__NAMESPACE_LOCAL_SYM __localdep_wcsrchrnul)(__haystack, __needle) - __haystack);
 }

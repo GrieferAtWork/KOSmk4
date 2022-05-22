@@ -72,7 +72,7 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 
 
 
-/*[[[head:libd_open,hash:CRC-32=0x8ac6bddf]]]*/
+/*[[[head:libd_open,hash:CRC-32=0x479dfc4b]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -85,7 +85,7 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
                                  oflag_t oflags,
                                  ...)
@@ -112,7 +112,7 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
 }
 /*[[[end:libd_open]]]*/
 
-/*[[[head:libc_open,hash:CRC-32=0x623e2432]]]*/
+/*[[[head:libc_open,hash:CRC-32=0x74e61786]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -125,7 +125,7 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename,
                                  oflag_t oflags,
                                  ...)
@@ -144,10 +144,10 @@ NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename,
 }
 /*[[[end:libc_open]]]*/
 
-/*[[[head:libd_creat,hash:CRC-32=0xd6e92df4]]]*/
+/*[[[head:libd_creat,hash:CRC-32=0xe4db7b86]]]*/
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename,
                                  mode_t mode)
 /*[[[body:libd_creat]]]*/
@@ -156,10 +156,10 @@ NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename,
 }
 /*[[[end:libd_creat]]]*/
 
-/*[[[head:libc_creat,hash:CRC-32=0x3acf255e]]]*/
+/*[[[head:libc_creat,hash:CRC-32=0x66d7aff0]]]*/
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
                                  mode_t mode)
 /*[[[body:libc_creat]]]*/
@@ -174,7 +174,7 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
 }
 /*[[[end:libc_creat]]]*/
 
-/*[[[head:libd_openat,hash:CRC-32=0xe5b0d17a]]]*/
+/*[[[head:libd_openat,hash:CRC-32=0x6daf104f]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -187,7 +187,7 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") WUNUSED ATTR_ACCESS_RO(2) fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") WUNUSED ATTR_IN(2) fd_t
 NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
                                    char const *filename,
                                    oflag_t oflags,
@@ -213,7 +213,7 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
 }
 /*[[[end:libd_openat]]]*/
 
-/*[[[head:libc_openat,hash:CRC-32=0x33a9c83e]]]*/
+/*[[[head:libc_openat,hash:CRC-32=0xdf30d763]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -226,7 +226,7 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED ATTR_ACCESS_RO(2) fd_t
+INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED ATTR_IN(2) fd_t
 NOTHROW_RPC(VLIBCCALL libc_openat)(fd_t dirfd,
                                    char const *filename,
                                    oflag_t oflags,
@@ -303,8 +303,8 @@ NOTHROW_RPC(LIBCCALL libc_vmsplice)(fd_t fdout,
 }
 /*[[[end:libc_vmsplice]]]*/
 
-/*[[[head:libc_splice,hash:CRC-32=0xa0e243bd]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(4) ssize_t
+/*[[[head:libc_splice,hash:CRC-32=0xcaa48d6e]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_INOUT(2) ATTR_INOUT(4) ssize_t
 NOTHROW_RPC(LIBCCALL libc_splice)(fd_t fdin,
                                   __PIO_OFFSET64 *offin,
                                   fd_t fdout,
@@ -338,8 +338,8 @@ NOTHROW_RPC(LIBCCALL libc_tee)(fd_t fdin,
 }
 /*[[[end:libc_tee]]]*/
 
-/*[[[head:libc_name_to_handle_at,hash:CRC-32=0xd2a3af00]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_ACCESS_WR(3) int
+/*[[[head:libc_name_to_handle_at,hash:CRC-32=0xcdb231e8]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_OUT(3) int
 NOTHROW_RPC(LIBCCALL libc_name_to_handle_at)(fd_t dirfd,
                                              char const *name,
                                              struct file_handle *handle,
@@ -354,8 +354,8 @@ NOTHROW_RPC(LIBCCALL libc_name_to_handle_at)(fd_t dirfd,
 }
 /*[[[end:libc_name_to_handle_at]]]*/
 
-/*[[[head:libc_open_by_handle_at,hash:CRC-32=0x5019cf78]]]*/
-INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_ACCESS_RO(2) fd_t
+/*[[[head:libc_open_by_handle_at,hash:CRC-32=0xfae3ffd2]]]*/
+INTERN ATTR_SECTION(".text.crt.io.utility") ATTR_IN(2) fd_t
 NOTHROW_RPC(LIBCCALL libc_open_by_handle_at)(fd_t mountdirfd,
                                              struct file_handle *handle,
                                              int flags)

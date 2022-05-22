@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9708c03 */
+/* HASH CRC-32:0xc66994b5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_devname_r_defined
 #define __local___localdep_devname_r_defined
-__CREDIRECT(__ATTR_ACCESS_WRS(3, 4),int,__NOTHROW_NCX,__localdep_devname_r,(__dev_t __dev, __mode_t __type, char *__buf, __SIZE_TYPE__ __len),devname_r,(__dev,__type,__buf,__len))
+__CREDIRECT(__ATTR_OUTS(3, 4),int,__NOTHROW_NCX,__localdep_devname_r,(__dev_t __dev, __mode_t __type, char *__buf, __SIZE_TYPE__ __len),devname_r,(__dev,__type,__buf,__len))
 #endif /* !__local___localdep_devname_r_defined */
 __LOCAL_LIBC(devname) __ATTR_CONST char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(devname))(__dev_t __dev, __mode_t __type) {

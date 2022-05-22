@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea0777fb */
+/* HASH CRC-32:0x1325c83c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -554,12 +554,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtempnam_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __
 #ifndef ___fullpath_dbg_defined
 #define ___fullpath_dbg_defined
 #ifdef __CRT_HAVE__fullpath_dbg
-__LIBC __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) char *__NOTHROW_NCX(__LIBDCALL _fullpath_dbg)(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_fullpath_dbg");
+__LIBC __ATTR_WUNUSED __ATTR_IN(2) __ATTR_OUTS(1, 3) char *__NOTHROW_NCX(__LIBDCALL _fullpath_dbg)(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_fullpath_dbg");
 #else /* __CRT_HAVE__fullpath_dbg */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE__fullpath) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_frealpathat))
 #include <libc/local/crtdbg/_fullpath_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_fullpath_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) char *__NOTHROW_NCX(__LIBDCALL _fullpath_dbg)(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fullpath_dbg))(__full_path, __path, __bufsize, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_fullpath_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_OUTS(1, 3) char *__NOTHROW_NCX(__LIBDCALL _fullpath_dbg)(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fullpath_dbg))(__full_path, __path, __bufsize, __block_type, __filename, __line); })
 #else /* __CRT_HAVE__fullpath || (__AT_FDCWD && __CRT_HAVE_frealpathat) */
 #undef ___fullpath_dbg_defined
 #endif /* !__CRT_HAVE__fullpath && (!__AT_FDCWD || !__CRT_HAVE_frealpathat) */
@@ -568,19 +568,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_fullpath_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __
 #ifndef ___wfullpath_dbg_defined
 #define ___wfullpath_dbg_defined
 #ifdef __CRT_HAVE__wfullpath_dbg
-__LIBC __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wfullpath_dbg)(__WCHAR16_TYPE__ *__full_path, __WCHAR16_TYPE__ const *__path, __SIZE_TYPE__ __buflen, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wfullpath_dbg");
+__LIBC __ATTR_WUNUSED __ATTR_IN(2) __ATTR_OUTS(1, 3) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wfullpath_dbg)(__WCHAR16_TYPE__ *__full_path, __WCHAR16_TYPE__ const *__path, __SIZE_TYPE__ __buflen, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wfullpath_dbg");
 #else /* __CRT_HAVE__wfullpath_dbg */
 #include <libc/local/crtdbg/_wfullpath_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wfullpath_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wfullpath_dbg)(__WCHAR16_TYPE__ *__full_path, __WCHAR16_TYPE__ const *__path, __SIZE_TYPE__ __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfullpath_dbg))(__full_path, __path, __buflen, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wfullpath_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_OUTS(1, 3) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wfullpath_dbg)(__WCHAR16_TYPE__ *__full_path, __WCHAR16_TYPE__ const *__path, __SIZE_TYPE__ __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wfullpath_dbg))(__full_path, __path, __buflen, __block_type, __filename, __line); })
 #endif /* !__CRT_HAVE__wfullpath_dbg */
 #endif /* !___wfullpath_dbg_defined */
 #ifndef ___getcwd_dbg_defined
 #define ___getcwd_dbg_defined
 #ifdef __CRT_HAVE__getcwd_dbg
-__LIBC __ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2) char *__NOTHROW_NCX(__LIBDCALL _getcwd_dbg)(char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_getcwd_dbg");
+__LIBC __ATTR_WUNUSED __ATTR_OUTS(1, 2) char *__NOTHROW_NCX(__LIBDCALL _getcwd_dbg)(char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_getcwd_dbg");
 #elif defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
 #include <libc/local/crtdbg/_getcwd_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_getcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2) char *__NOTHROW_NCX(__LIBDCALL _getcwd_dbg)(char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getcwd_dbg))(__buf, __bufsize, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_getcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUTS(1, 2) char *__NOTHROW_NCX(__LIBDCALL _getcwd_dbg)(char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getcwd_dbg))(__buf, __bufsize, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___getcwd_dbg_defined
 #endif /* !... */
@@ -588,10 +588,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_getcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #ifndef ___wgetcwd_dbg_defined
 #define ___wgetcwd_dbg_defined
 #ifdef __CRT_HAVE__wgetcwd_dbg
-__LIBC __ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetcwd_dbg)(__WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wgetcwd_dbg");
+__LIBC __ATTR_WUNUSED __ATTR_OUTS(1, 2) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetcwd_dbg)(__WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wgetcwd_dbg");
 #elif (defined(__CRT_HAVE_wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wgetcwd) || (defined(__CRT_HAVE__wgetcwd) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wgetcwd) || ((defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 2) || ((defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)) && ((defined(__CRT_HAVE_convert_mbstowcs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_mbstowcs) || ((defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE_convert_mbstowcsn) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2) || (((defined(__CRT_HAVE_format_waprintf_printer) && __SIZEOF_WCHAR_T__ == 2 && defined(__C16FORMATPRINTER_CC_IS_WFORMATPRINTER_CC)) || defined(__CRT_HAVE_DOS$format_waprintf_printer) || (defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && ((defined(__CRT_HAVE_format_waprintf_pack) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))))
 #include <libc/local/crtdbg/_wgetcwd_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wgetcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetcwd_dbg)(__WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetcwd_dbg))(__buf, __buflen, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wgetcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUTS(1, 2) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetcwd_dbg)(__WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetcwd_dbg))(__buf, __buflen, __block_type, __filename, __line); })
 #else /* ... */
 #undef ___wgetcwd_dbg_defined
 #endif /* !... */
@@ -599,12 +599,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wgetcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #ifndef ___getdcwd_dbg_defined
 #define ___getdcwd_dbg_defined
 #ifdef __CRT_HAVE__getdcwd_dbg
-__LIBC __ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3) char *__NOTHROW_NCX(__LIBDCALL _getdcwd_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_getdcwd_dbg");
+__LIBC __ATTR_WUNUSED __ATTR_OUTS(2, 3) char *__NOTHROW_NCX(__LIBDCALL _getdcwd_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_getdcwd_dbg");
 #else /* __CRT_HAVE__getdcwd_dbg */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE__getdcwd) || defined(__CRT_HAVE__getdcwd_nolock) || (defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD))
 #include <libc/local/crtdbg/_getdcwd_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_getdcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3) char *__NOTHROW_NCX(__LIBDCALL _getdcwd_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd_dbg))(__driveno, __buf, __bufsize, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_getdcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUTS(2, 3) char *__NOTHROW_NCX(__LIBDCALL _getdcwd_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd_dbg))(__driveno, __buf, __bufsize, __block_type, __filename, __line); })
 #else /* __CRT_HAVE__getdcwd || __CRT_HAVE__getdcwd_nolock || (__CRT_HAVE_frealpath4 && __AT_FDDRIVE_CWD) */
 #undef ___getdcwd_dbg_defined
 #endif /* !__CRT_HAVE__getdcwd && !__CRT_HAVE__getdcwd_nolock && (!__CRT_HAVE_frealpath4 || !__AT_FDDRIVE_CWD) */
@@ -613,21 +613,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_getdcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #ifndef ___wgetdcwd_dbg_defined
 #define ___wgetdcwd_dbg_defined
 #ifdef __CRT_HAVE__wgetdcwd_dbg
-__LIBC __ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetdcwd_dbg)(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wgetdcwd_dbg");
+__LIBC __ATTR_WUNUSED __ATTR_OUTS(2, 3) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetdcwd_dbg)(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wgetdcwd_dbg");
 #else /* __CRT_HAVE__wgetdcwd_dbg */
 #include <libc/local/crtdbg/_wgetdcwd_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wgetdcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetdcwd_dbg)(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetdcwd_dbg))(__driveno, __buf, __buflen, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wgetdcwd_dbg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUTS(2, 3) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetdcwd_dbg)(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetdcwd_dbg))(__driveno, __buf, __buflen, __block_type, __filename, __line); })
 #endif /* !__CRT_HAVE__wgetdcwd_dbg */
 #endif /* !___wgetdcwd_dbg_defined */
 #ifndef ___getdcwd_lk_dbg_defined
 #define ___getdcwd_lk_dbg_defined
 #ifdef __CRT_HAVE__getdcwd_dbg
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3),char *,__NOTHROW_NCX,__LIBDCALL,_getdcwd_lk_dbg,(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line),_getdcwd_dbg,(__driveno,__buf,__bufsize,__block_type,__filename,__line))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_OUTS(2, 3),char *,__NOTHROW_NCX,__LIBDCALL,_getdcwd_lk_dbg,(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line),_getdcwd_dbg,(__driveno,__buf,__bufsize,__block_type,__filename,__line))
 #else /* __CRT_HAVE__getdcwd_dbg */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE__getdcwd) || defined(__CRT_HAVE__getdcwd_nolock) || (defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD))
 #include <libc/local/crtdbg/_getdcwd_dbg.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3) char *__NOTHROW_NCX(__LIBDCALL _getdcwd_lk_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd_dbg))(__driveno, __buf, __bufsize, __block_type, __filename, __line); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUTS(2, 3) char *__NOTHROW_NCX(__LIBDCALL _getdcwd_lk_dbg)(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdcwd_dbg))(__driveno, __buf, __bufsize, __block_type, __filename, __line); }
 #else /* __CRT_HAVE__getdcwd || __CRT_HAVE__getdcwd_nolock || (__CRT_HAVE_frealpath4 && __AT_FDDRIVE_CWD) */
 #undef ___getdcwd_lk_dbg_defined
 #endif /* !__CRT_HAVE__getdcwd && !__CRT_HAVE__getdcwd_nolock && (!__CRT_HAVE_frealpath4 || !__AT_FDDRIVE_CWD) */
@@ -636,21 +636,21 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3) char *__NO
 #ifndef ___wgetdcwd_lk_dbg_defined
 #define ___wgetdcwd_lk_dbg_defined
 #ifdef __CRT_HAVE__wgetdcwd_dbg
-__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3),__WCHAR16_TYPE__ *,__NOTHROW_NCX,__LIBDCALL,_wgetdcwd_lk_dbg,(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line),_wgetdcwd_dbg,(__driveno,__buf,__buflen,__block_type,__filename,__line))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_WUNUSED __ATTR_OUTS(2, 3),__WCHAR16_TYPE__ *,__NOTHROW_NCX,__LIBDCALL,_wgetdcwd_lk_dbg,(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line),_wgetdcwd_dbg,(__driveno,__buf,__buflen,__block_type,__filename,__line))
 #else /* __CRT_HAVE__wgetdcwd_dbg */
 #include <libc/local/crtdbg/_wgetdcwd_dbg.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetdcwd_lk_dbg)(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetdcwd_dbg))(__driveno, __buf, __buflen, __block_type, __filename, __line); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUTS(2, 3) __WCHAR16_TYPE__ *__NOTHROW_NCX(__LIBDCALL _wgetdcwd_lk_dbg)(int __driveno, __WCHAR16_TYPE__ *__buf, __STDC_INT_AS_SIZE_T __buflen, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wgetdcwd_dbg))(__driveno, __buf, __buflen, __block_type, __filename, __line); }
 #endif /* !__CRT_HAVE__wgetdcwd_dbg */
 #endif /* !___wgetdcwd_lk_dbg_defined */
 #ifndef ___dupenv_s_dbg_defined
 #define ___dupenv_s_dbg_defined
 #ifdef __CRT_HAVE__dupenv_s_dbg
-__LIBC _Check_return_wat_ __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) __ATTR_ACCESS_WR(2) __errno_t __NOTHROW_NCX(__LIBDCALL _dupenv_s_dbg)(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_dupenv_s_dbg");
+__LIBC _Check_return_wat_ __ATTR_IN(3) __ATTR_OUT(1) __ATTR_OUT(2) __errno_t __NOTHROW_NCX(__LIBDCALL _dupenv_s_dbg)(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_dupenv_s_dbg");
 #else /* __CRT_HAVE__dupenv_s_dbg */
 #include <libc/template/environ.h>
 #if defined(__CRT_HAVE__dupenv_s) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_strdup) || defined(__CRT_HAVE__strdup) || defined(__CRT_HAVE__mbsdup) || defined(__CRT_HAVE___strdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)))
 #include <libc/local/crtdbg/_dupenv_s_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_dupenv_s_dbg, __FORCELOCAL __ATTR_ARTIFICIAL _Check_return_wat_ __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) __ATTR_ACCESS_WR(2) __errno_t __NOTHROW_NCX(__LIBDCALL _dupenv_s_dbg)(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_dupenv_s_dbg))(__pbuf, __pbufsize, __varname, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_dupenv_s_dbg, __FORCELOCAL __ATTR_ARTIFICIAL _Check_return_wat_ __ATTR_IN(3) __ATTR_OUT(1) __ATTR_OUT(2) __errno_t __NOTHROW_NCX(__LIBDCALL _dupenv_s_dbg)(char **__pbuf, __SIZE_TYPE__ *__pbufsize, char const *__varname, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_dupenv_s_dbg))(__pbuf, __pbufsize, __varname, __block_type, __filename, __line); })
 #else /* __CRT_HAVE__dupenv_s || ((__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_strdup || __CRT_HAVE__strdup || __CRT_HAVE__mbsdup || __CRT_HAVE___strdup || __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign)) */
 #undef ___dupenv_s_dbg_defined
 #endif /* !__CRT_HAVE__dupenv_s && ((!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_strdup && !__CRT_HAVE__strdup && !__CRT_HAVE__mbsdup && !__CRT_HAVE___strdup && !__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign)) */
@@ -659,10 +659,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_dupenv_s_dbg, __FORCELOCAL __ATTR_ARTIFICIAL _C
 #ifndef ___wdupenv_s_dbg_defined
 #define ___wdupenv_s_dbg_defined
 #ifdef __CRT_HAVE__wdupenv_s_dbg
-__LIBC _Check_return_wat_ __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) __ATTR_ACCESS_WR(2) __errno_t __NOTHROW_NCX(__LIBDCALL _wdupenv_s_dbg)(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wdupenv_s_dbg");
+__LIBC _Check_return_wat_ __ATTR_IN(3) __ATTR_OUT(1) __ATTR_OUT(2) __errno_t __NOTHROW_NCX(__LIBDCALL _wdupenv_s_dbg)(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line) __CASMNAME_SAME("_wdupenv_s_dbg");
 #else /* __CRT_HAVE__wdupenv_s_dbg */
 #include <libc/local/crtdbg/_wdupenv_s_dbg.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wdupenv_s_dbg, __FORCELOCAL __ATTR_ARTIFICIAL _Check_return_wat_ __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) __ATTR_ACCESS_WR(2) __errno_t __NOTHROW_NCX(__LIBDCALL _wdupenv_s_dbg)(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wdupenv_s_dbg))(__pbuf, __pbuflen, __varname, __block_type, __filename, __line); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wdupenv_s_dbg, __FORCELOCAL __ATTR_ARTIFICIAL _Check_return_wat_ __ATTR_IN(3) __ATTR_OUT(1) __ATTR_OUT(2) __errno_t __NOTHROW_NCX(__LIBDCALL _wdupenv_s_dbg)(__WCHAR16_TYPE__ **__pbuf, __SIZE_TYPE__ *__pbuflen, __WCHAR16_TYPE__ const *__varname, int __block_type, char const *__filename, int __line) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wdupenv_s_dbg))(__pbuf, __pbuflen, __varname, __block_type, __filename, __line); })
 #endif /* !__CRT_HAVE__wdupenv_s_dbg */
 #endif /* !___wdupenv_s_dbg_defined */
 #ifdef __CRT_HAVE__CrtCheckMemory

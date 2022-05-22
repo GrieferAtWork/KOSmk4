@@ -25,9 +25,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_login,hash:CRC-32=0xb6e66d8f]]]*/
+/*[[[head:libc_login,hash:CRC-32=0xdfff61b6]]]*/
 /* >> login(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_ACCESS_RO(1) void
+INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_IN(1) void
 NOTHROW_RPC_KOS(LIBCCALL libc_login)(struct utmp const *entry)
 /*[[[body:libc_login]]]*/
 /*AUTO*/{
@@ -37,9 +37,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_login)(struct utmp const *entry)
 }
 /*[[[end:libc_login]]]*/
 
-/*[[[head:libc_logout,hash:CRC-32=0x23ceebf6]]]*/
+/*[[[head:libc_logout,hash:CRC-32=0xb2784cb8]]]*/
 /* >> logout(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_IN(1) int
 NOTHROW_RPC_KOS(LIBCCALL libc_logout)(char const *ut_line)
 /*[[[body:libc_logout]]]*/
 /*AUTO*/{
@@ -50,9 +50,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_logout)(char const *ut_line)
 }
 /*[[[end:libc_logout]]]*/
 
-/*[[[head:libc_logwtmp,hash:CRC-32=0x4f4e54ac]]]*/
+/*[[[head:libc_logwtmp,hash:CRC-32=0xaffc193f]]]*/
 /* >> logwtmp(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) void
+INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) void
 NOTHROW_RPC_KOS(LIBCCALL libc_logwtmp)(char const *ut_line,
                                        char const *ut_name,
                                        char const *ut_host)
@@ -66,9 +66,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_logwtmp)(char const *ut_line,
 }
 /*[[[end:libc_logwtmp]]]*/
 
-/*[[[head:libc_updwtmp,hash:CRC-32=0x11339bfb]]]*/
+/*[[[head:libc_updwtmp,hash:CRC-32=0xe3b8ecb5]]]*/
 /* >> updwtmp(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) void
+INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_IN(1) ATTR_IN(2) void
 NOTHROW_RPC_KOS(LIBCCALL libc_updwtmp)(char const *wtmp_file,
                                        struct utmp const *utmp)
 /*[[[body:libc_updwtmp]]]*/
@@ -80,9 +80,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_updwtmp)(char const *wtmp_file,
 }
 /*[[[end:libc_updwtmp]]]*/
 
-/*[[[head:libc_utmpname,hash:CRC-32=0x6d3733b4]]]*/
+/*[[[head:libc_utmpname,hash:CRC-32=0x9fcf61a9]]]*/
 /* >> utmpname(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_IN(1) int
 NOTHROW_RPC_KOS(LIBCCALL libc_utmpname)(char const *file)
 /*[[[body:libc_utmpname]]]*/
 /*AUTO*/{
@@ -127,9 +127,9 @@ NOTHROW_NCX(LIBCCALL libc_endutent)(void)
 }
 /*[[[end:libc_endutent]]]*/
 
-/*[[[head:libc_getutid,hash:CRC-32=0x19c5cd01]]]*/
+/*[[[head:libc_getutid,hash:CRC-32=0x189bd4d]]]*/
 /* >> getutid(3), getutid_r(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_ACCESS_RO(1) struct utmp *
+INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_IN(1) struct utmp *
 NOTHROW_RPC_KOS(LIBCCALL libc_getutid)(struct utmp const *id)
 /*[[[body:libc_getutid]]]*/
 /*AUTO*/{
@@ -140,9 +140,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutid)(struct utmp const *id)
 }
 /*[[[end:libc_getutid]]]*/
 
-/*[[[head:libc_getutline,hash:CRC-32=0xc3d1c5ed]]]*/
+/*[[[head:libc_getutline,hash:CRC-32=0x8fd28bc1]]]*/
 /* >> getutline(3), getutline_r(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_ACCESS_RO(1) struct utmp *
+INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_IN(1) struct utmp *
 NOTHROW_RPC_KOS(LIBCCALL libc_getutline)(struct utmp const *line)
 /*[[[body:libc_getutline]]]*/
 /*AUTO*/{
@@ -153,9 +153,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutline)(struct utmp const *line)
 }
 /*[[[end:libc_getutline]]]*/
 
-/*[[[head:libc_pututline,hash:CRC-32=0x60790753]]]*/
+/*[[[head:libc_pututline,hash:CRC-32=0x8e63caa7]]]*/
 /* >> pututline(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_ACCESS_RO(1) struct utmp *
+INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_IN(1) struct utmp *
 NOTHROW_RPC_KOS(LIBCCALL libc_pututline)(struct utmp const *utmp_ptr)
 /*[[[body:libc_pututline]]]*/
 /*AUTO*/{
@@ -166,9 +166,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_pututline)(struct utmp const *utmp_ptr)
 }
 /*[[[end:libc_pututline]]]*/
 
-/*[[[head:libc_getutent_r,hash:CRC-32=0x4de3a566]]]*/
+/*[[[head:libc_getutent_r,hash:CRC-32=0xe33a94a]]]*/
 /* >> getutent(3), getutent_r(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) int
+INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_OUT(1) ATTR_OUT(2) int
 NOTHROW_RPC_KOS(LIBCCALL libc_getutent_r)(struct utmp *buffer,
                                           struct utmp **result)
 /*[[[body:libc_getutent_r]]]*/
@@ -181,9 +181,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutent_r)(struct utmp *buffer,
 }
 /*[[[end:libc_getutent_r]]]*/
 
-/*[[[head:libc_getutid_r,hash:CRC-32=0xc3d0a833]]]*/
+/*[[[head:libc_getutid_r,hash:CRC-32=0x8d95a869]]]*/
 /* >> getutid(3), getutid_r(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) int
+INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3) int
 NOTHROW_RPC_KOS(LIBCCALL libc_getutid_r)(struct utmp const *id,
                                          struct utmp *buffer,
                                          struct utmp **result)
@@ -198,9 +198,9 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutid_r)(struct utmp const *id,
 }
 /*[[[end:libc_getutid_r]]]*/
 
-/*[[[head:libc_getutline_r,hash:CRC-32=0xca1d0359]]]*/
+/*[[[head:libc_getutline_r,hash:CRC-32=0xae57a40]]]*/
 /* >> getutline(3), getutline_r(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) int
+INTERN ATTR_SECTION(".text.crt.database.utmp") ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3) int
 NOTHROW_RPC_KOS(LIBCCALL libc_getutline_r)(struct utmp const *line,
                                            struct utmp *buffer,
                                            struct utmp **result)

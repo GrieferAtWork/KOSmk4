@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa9b3dc */
+/* HASH CRC-32:0x3c5f9034 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__c32ctime64_s_defined
 #define __local___localdep__c32ctime64_s_defined
 #if defined(__CRT_HAVE__wctime64_s) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__c32ctime64_s,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __time64_t const *__timer),_wctime64_s,(__buf,__buflen,__timer))
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__c32ctime64_s,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __time64_t const *__timer),_wctime64_s,(__buf,__buflen,__timer))
 #elif defined(__CRT_HAVE_KOS$_wctime64_s)
-__CREDIRECT_KOS(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__c32ctime64_s,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __time64_t const *__timer),_wctime64_s,(__buf,__buflen,__timer))
+__CREDIRECT_KOS(__ATTR_IN(3) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__c32ctime64_s,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __time64_t const *__timer),_wctime64_s,(__buf,__buflen,__timer))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wtime/_wctime64_s.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__c32ctime64_s __LIBC_LOCAL_NAME(_c32ctime64_s)
 #endif /* !... */
 #endif /* !__local___localdep__c32ctime64_s_defined */
-__LOCAL_LIBC(_c32ctime32_s) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __errno_t
+__LOCAL_LIBC(_c32ctime32_s) __ATTR_IN(3) __ATTR_OUTS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(_c32ctime32_s))(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __time32_t const *__timer) {
 	__time64_t __timer64 = (__time64_t)*__timer;
 	return (__NAMESPACE_LOCAL_SYM __localdep__c32ctime64_s)(__buf, __buflen, &__timer64);

@@ -56,8 +56,8 @@ NOTHROW_RPC(LIBCCALL libc_getspent)(void)
 }
 /*[[[end:libc_getspent]]]*/
 
-/*[[[head:libc_getspnam,hash:CRC-32=0x54d094d9]]]*/
-INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_ACCESS_RO(1) struct spwd *
+/*[[[head:libc_getspnam,hash:CRC-32=0x956bc9da]]]*/
+INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_IN(1) struct spwd *
 NOTHROW_RPC(LIBCCALL libc_getspnam)(char const *__restrict name)
 /*[[[body:libc_getspnam]]]*/
 /*AUTO*/{
@@ -68,8 +68,8 @@ NOTHROW_RPC(LIBCCALL libc_getspnam)(char const *__restrict name)
 }
 /*[[[end:libc_getspnam]]]*/
 
-/*[[[head:libc_sgetspent,hash:CRC-32=0xc5d84e79]]]*/
-INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_ACCESS_RO(1) struct spwd *
+/*[[[head:libc_sgetspent,hash:CRC-32=0x9438b9fc]]]*/
+INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_IN(1) struct spwd *
 NOTHROW_RPC(LIBCCALL libc_sgetspent)(char const *__restrict string)
 /*[[[body:libc_sgetspent]]]*/
 /*AUTO*/{
@@ -80,8 +80,8 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent)(char const *__restrict string)
 }
 /*[[[end:libc_sgetspent]]]*/
 
-/*[[[head:libc_fgetspent,hash:CRC-32=0x9c9cfaed]]]*/
-INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_ACCESS_RW(1) struct spwd *
+/*[[[head:libc_fgetspent,hash:CRC-32=0x6b3d6456]]]*/
+INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_INOUT(1) struct spwd *
 NOTHROW_RPC(LIBCCALL libc_fgetspent)(FILE *__restrict stream)
 /*[[[body:libc_fgetspent]]]*/
 /*AUTO*/{
@@ -92,8 +92,8 @@ NOTHROW_RPC(LIBCCALL libc_fgetspent)(FILE *__restrict stream)
 }
 /*[[[end:libc_fgetspent]]]*/
 
-/*[[[head:libc_putspent,hash:CRC-32=0xb405aaa7]]]*/
-INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_ACCESS_RO(1) ATTR_ACCESS_RW(2) int
+/*[[[head:libc_putspent,hash:CRC-32=0x4a86c51a]]]*/
+INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_IN(1) ATTR_INOUT(2) int
 NOTHROW_RPC(LIBCCALL libc_putspent)(struct spwd const *__restrict p,
                                     FILE *__restrict stream)
 /*[[[body:libc_putspent]]]*/
@@ -106,8 +106,8 @@ NOTHROW_RPC(LIBCCALL libc_putspent)(struct spwd const *__restrict p,
 }
 /*[[[end:libc_putspent]]]*/
 
-/*[[[head:libc_getspent_r,hash:CRC-32=0x12a1005d]]]*/
-INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(4) ATTR_ACCESS_WRS(2, 3) int
+/*[[[head:libc_getspent_r,hash:CRC-32=0x9a3e31a4]]]*/
+INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3) int
 NOTHROW_RPC(LIBCCALL libc_getspent_r)(struct spwd *__restrict result_buf,
                                       char *__restrict buffer,
                                       size_t buflen,
@@ -124,8 +124,8 @@ NOTHROW_RPC(LIBCCALL libc_getspent_r)(struct spwd *__restrict result_buf,
 }
 /*[[[end:libc_getspent_r]]]*/
 
-/*[[[head:libc_getspnam_r,hash:CRC-32=0x2d78073d]]]*/
-INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) int
+/*[[[head:libc_getspnam_r,hash:CRC-32=0x48cd8769]]]*/
+INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int
 NOTHROW_RPC(LIBCCALL libc_getspnam_r)(char const *__restrict name,
                                       struct spwd *__restrict result_buf,
                                       char *__restrict buffer,
@@ -144,8 +144,8 @@ NOTHROW_RPC(LIBCCALL libc_getspnam_r)(char const *__restrict name,
 }
 /*[[[end:libc_getspnam_r]]]*/
 
-/*[[[head:libc_sgetspent_r,hash:CRC-32=0x9330bfe6]]]*/
-INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) int
+/*[[[head:libc_sgetspent_r,hash:CRC-32=0x8ec5e6cf]]]*/
+INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int
 NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string,
                                        struct spwd *__restrict result_buf,
                                        char *__restrict buffer,
@@ -164,8 +164,8 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string,
 }
 /*[[[end:libc_sgetspent_r]]]*/
 
-/*[[[head:libc_fgetspent_r,hash:CRC-32=0xcb91082f]]]*/
-INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) int
+/*[[[head:libc_fgetspent_r,hash:CRC-32=0xcba37a43]]]*/
+INTERN ATTR_SECTION(".text.crt.database.shadow") ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) int
 NOTHROW_RPC(LIBCCALL libc_fgetspent_r)(FILE *__restrict stream,
                                        struct spwd *__restrict result_buf,
                                        char *__restrict buffer,

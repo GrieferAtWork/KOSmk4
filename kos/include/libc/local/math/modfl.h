@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ada82fd */
+/* HASH CRC-32:0x7c1be904 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,11 +27,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_modf_defined
 #define __local___localdep_modf_defined
 #if __has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)
-__CEIREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WR(2),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),modf,{ return __builtin_modf(__x, __iptr); })
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),modf,{ return __builtin_modf(__x, __iptr); })
 #elif defined(__CRT_HAVE_modf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WR(2),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),modf,(__x,__iptr))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),modf,(__x,__iptr))
 #elif defined(__CRT_HAVE___modf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WR(2),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),__modf,(__x,__iptr))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),__modf,(__x,__iptr))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/modf.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/modf.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(modfl) __ATTR_WUNUSED __ATTR_ACCESS_WR(2) __LONGDOUBLE
+__LOCAL_LIBC(modfl) __ATTR_WUNUSED __ATTR_OUT(2) __LONGDOUBLE
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modfl))(__LONGDOUBLE __x, __LONGDOUBLE *__iptr) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 

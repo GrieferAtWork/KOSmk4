@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x394421ff */
+/* HASH CRC-32:0x2659ad69 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_LEAF __ATTR_ACCESS_WR(1),__NOTHROW_NCX,__localdep_bzeroc,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bzeroc,(__dst,__elem_count,__elem_size))
+__CREDIRECT_VOID(__ATTR_LEAF __ATTR_OUT(1),__NOTHROW_NCX,__localdep_bzeroc,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bzeroc,(__dst,__elem_count,__elem_size))
 #else /* __CRT_HAVE_bzeroc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/bzeroc.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_bzeroc __LIBC_LOCAL_NAME(bzeroc)
 #endif /* !__CRT_HAVE_bzeroc */
 #endif /* !__local___localdep_bzeroc_defined */
-__LOCAL_LIBC(sigemptyset) __ATTR_ACCESS_WR(1) int
+__LOCAL_LIBC(sigemptyset) __ATTR_OUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigemptyset))(struct __sigset_struct *__set) {
 	(__NAMESPACE_LOCAL_SYM __localdep_bzeroc)(__set->__val, __COMPILER_LENOF(__set->__val), __SIZEOF_POINTER__);
 	return 0;

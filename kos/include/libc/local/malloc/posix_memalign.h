@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fd096ea */
+/* HASH CRC-32:0x90b6abf0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(posix_memalign) __ATTR_ACCESS_WR(1) __errno_t
+__LOCAL_LIBC(posix_memalign) __ATTR_OUT(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_memalign))(void **__restrict __pp, __SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes) {
 	void *__result;
 	__SIZE_TYPE__ __d = __alignment / sizeof(void *);

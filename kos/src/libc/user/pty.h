@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2fb279 */
+/* HASH CRC-32:0x704e7606 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ DECL_BEGIN
  * NOTE: On KOS, this function is a system call, though in other
  *       operating system it is often implemented via `open(2)',
  *       possibly combined with `ioctl(2)'. */
-INTDEF ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR_OPT(3) int NOTHROW_NCX(LIBCCALL libc_openpty)(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp);
+INTDEF ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1) ATTR_OUT(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBCCALL libc_openpty)(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp);
 #endif /* !__KERNEL__ */
 
 DECL_END

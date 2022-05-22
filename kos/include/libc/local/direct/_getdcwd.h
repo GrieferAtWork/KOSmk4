@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72a07368 */
+/* HASH CRC-32:0xb0cd7016 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,12 +30,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WR_OPT(2),char *,__NOTHROW_RPC,__localdep_frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpath4,(__fd,__resolved,__buflen,__flags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT_OPT(2),char *,__NOTHROW_RPC,__localdep_frealpath4,(__fd_t __fd, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpath4,(__fd,__resolved,__buflen,__flags))
 #endif /* !__local___localdep_frealpath4_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_getdcwd) __ATTR_ACCESS_WRS(2, 3) char *
+__LOCAL_LIBC(_getdcwd) __ATTR_OUTS(2, 3) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_getdcwd))(int __drive, char *__buf, __SIZE_TYPE__ __bufsize) {
 	if __unlikely(__drive < __AT_DOS_DRIVEMIN || __drive > __AT_DOS_DRIVEMAX) {
 #ifdef __EINVAL

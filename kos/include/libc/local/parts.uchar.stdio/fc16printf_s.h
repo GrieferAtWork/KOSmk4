@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c51e74c */
+/* HASH CRC-32:0xa03b24cf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vfc16printf_s_defined
 #define __local___localdep_vfc16printf_s_defined
 #if defined(__CRT_HAVE_vfwprintf_s) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __ATTR_LIBC_C16PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vfc16printf_s,(__FILE *__stream, __CHAR16_TYPE__ const *__format, __builtin_va_list __args),vfwprintf_s,(__stream,__format,__args))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1) __ATTR_LIBC_C16PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vfc16printf_s,(__FILE *__stream, __CHAR16_TYPE__ const *__format, __builtin_va_list __args),vfwprintf_s,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_DOS$vfwprintf_s)
-__CREDIRECT_DOS(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __ATTR_LIBC_C16PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vfc16printf_s,(__FILE *__stream, __CHAR16_TYPE__ const *__format, __builtin_va_list __args),vfwprintf_s,(__stream,__format,__args))
+__CREDIRECT_DOS(__ATTR_IN(2) __ATTR_INOUT(1) __ATTR_LIBC_C16PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vfc16printf_s,(__FILE *__stream, __CHAR16_TYPE__ const *__format, __builtin_va_list __args),vfwprintf_s,(__stream,__format,__args))
 #elif (defined(__CRT_HAVE__vfwprintf_s_l) || defined(__CRT_HAVE___stdio_common_vfwprintf_s) || defined(__CRT_HAVE___stdio_common_vfwprintf) || defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_vfwprintf_unlocked) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE_putwc_unlocked)) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/vfwprintf_s.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_vfc16printf_s_defined
 #endif /* !... */
 #endif /* !__local___localdep_vfc16printf_s_defined */
-__LOCAL_LIBC(fc16printf_s) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __ATTR_LIBC_C16PRINTF(2, 3) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(fc16printf_s) __ATTR_IN(2) __ATTR_INOUT(1) __ATTR_LIBC_C16PRINTF(2, 3) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBDCALL __LIBC_LOCAL_NAME(fc16printf_s))(__FILE *__stream, __CHAR16_TYPE__ const *__format, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;

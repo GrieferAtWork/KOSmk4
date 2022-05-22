@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b86adff */
+/* HASH CRC-32:0xd8585f80 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,29 +31,29 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mq_open(3) */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) mqd_t NOTHROW_RPC(VLIBDCALL libd_mq_open)(char const *__restrict name, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(1) mqd_t NOTHROW_RPC(VLIBDCALL libd_mq_open)(char const *__restrict name, oflag_t oflags, ...);
 /* >> mq_close(3) */
 INTDEF int NOTHROW(LIBDCALL libd_mq_close)(mqd_t mqdes);
 /* >> mq_getattr(3) */
-INTDEF ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBDCALL libd_mq_getattr)(mqd_t mqdes, struct mq_attr *__restrict mqstat);
+INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_mq_getattr)(mqd_t mqdes, struct mq_attr *__restrict mqstat);
 /* >> mq_setattr(3) */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR_OPT(3) int NOTHROW_NCX(LIBDCALL libd_mq_setattr)(mqd_t mqdes, struct mq_attr const *__restrict mqstat, struct mq_attr *__restrict old_mqstat);
+INTDEF ATTR_IN(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBDCALL libd_mq_setattr)(mqd_t mqdes, struct mq_attr const *__restrict mqstat, struct mq_attr *__restrict old_mqstat);
 /* >> mq_unlink(3) */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd_mq_unlink)(char const *name);
+INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_mq_unlink)(char const *name);
 /* >> mq_notify(3) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_mq_notify)(mqd_t mqdes, struct sigevent const *notification);
 /* >> mq_receive(3) */
-INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_mq_receive)(mqd_t mqdes, char *__restrict msg_ptr, size_t msg_len, unsigned int *pmsg_prio);
+INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_mq_receive)(mqd_t mqdes, char *__restrict msg_ptr, size_t msg_len, unsigned int *pmsg_prio);
 /* >> mq_send(3) */
-INTDEF ATTR_ACCESS_ROS(2, 3) int NOTHROW_RPC(LIBDCALL libd_mq_send)(mqd_t mqdes, char const *msg_ptr, size_t msg_len, unsigned int msg_prio);
+INTDEF ATTR_INS(2, 3) int NOTHROW_RPC(LIBDCALL libd_mq_send)(mqd_t mqdes, char const *msg_ptr, size_t msg_len, unsigned int msg_prio);
 /* >> mq_timedreceive(3), mq_timedreceive64(3) */
-INTDEF ATTR_ACCESS_RO(5) ATTR_ACCESS_WRS(2, 3) ATTR_ACCESS_WR_OPT(4) ssize_t NOTHROW_RPC(LIBDCALL libd_mq_timedreceive)(mqd_t mqdes, char *__restrict msg_ptr, size_t msg_len, unsigned int *pmsg_prio, struct timespec const *__restrict abs_timeout);
+INTDEF ATTR_IN(5) ATTR_OUTS(2, 3) ATTR_OUT_OPT(4) ssize_t NOTHROW_RPC(LIBDCALL libd_mq_timedreceive)(mqd_t mqdes, char *__restrict msg_ptr, size_t msg_len, unsigned int *pmsg_prio, struct timespec const *__restrict abs_timeout);
 /* >> mq_timedsend(3), mq_timedsend64(3) */
-INTDEF ATTR_ACCESS_RO(5) ATTR_ACCESS_ROS(2, 3) int NOTHROW_RPC(LIBDCALL libd_mq_timedsend)(mqd_t mqdes, char const *msg_ptr, size_t msg_len, unsigned int msg_prio, struct timespec const *abs_timeout);
+INTDEF ATTR_IN(5) ATTR_INS(2, 3) int NOTHROW_RPC(LIBDCALL libd_mq_timedsend)(mqd_t mqdes, char const *msg_ptr, size_t msg_len, unsigned int msg_prio, struct timespec const *abs_timeout);
 /* >> mq_timedreceive(3), mq_timedreceive64(3) */
-INTDEF ATTR_ACCESS_RO(5) ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_mq_timedreceive64)(mqd_t mqdes, char *__restrict msg_ptr, size_t msg_len, unsigned int *pmsg_prio, struct timespec64 const *__restrict abs_timeout);
+INTDEF ATTR_IN(5) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_mq_timedreceive64)(mqd_t mqdes, char *__restrict msg_ptr, size_t msg_len, unsigned int *pmsg_prio, struct timespec64 const *__restrict abs_timeout);
 /* >> mq_timedsend(3), mq_timedsend64(3) */
-INTDEF ATTR_ACCESS_RO(5) ATTR_ACCESS_ROS(2, 3) int NOTHROW_RPC(LIBDCALL libd_mq_timedsend64)(mqd_t mqdes, char const *msg_ptr, size_t msg_len, unsigned int msg_prio, struct timespec64 const *abs_timeout);
+INTDEF ATTR_IN(5) ATTR_INS(2, 3) int NOTHROW_RPC(LIBDCALL libd_mq_timedsend64)(mqd_t mqdes, char const *msg_ptr, size_t msg_len, unsigned int msg_prio, struct timespec64 const *abs_timeout);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

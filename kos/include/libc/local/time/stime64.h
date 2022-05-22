@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab1282c4 */
+/* HASH CRC-32:0xa1288ed8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,16 +27,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_stime32_defined
 #define __local___localdep_crt_stime32_defined
 #ifdef __CRT_HAVE_stime
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_crt_stime32,(__time32_t const *__when),stime,(__when))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,__localdep_crt_stime32,(__time32_t const *__when),stime,(__when))
 #elif defined(__CRT_HAVE___stime)
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_crt_stime32,(__time32_t const *__when),__stime,(__when))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,__localdep_crt_stime32,(__time32_t const *__when),__stime,(__when))
 #elif defined(__CRT_HAVE___libc_stime)
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_crt_stime32,(__time32_t const *__when),__libc_stime,(__when))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,__localdep_crt_stime32,(__time32_t const *__when),__libc_stime,(__when))
 #else /* ... */
 #undef __local___localdep_crt_stime32_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_stime32_defined */
-__LOCAL_LIBC(stime64) __ATTR_ACCESS_RO(1) int
+__LOCAL_LIBC(stime64) __ATTR_IN(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stime64))(__time64_t const *__when) {
 	__time32_t __when32 = (__time32_t)*__when;
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_stime32)(&__when32);

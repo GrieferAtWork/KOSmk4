@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d482da7 */
+/* HASH CRC-32:0xb242b3b6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,24 +33,24 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* >> cfgetospeed(3) */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) speed_t
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_PURE WUNUSED ATTR_IN(1) speed_t
 NOTHROW_NCX(LIBCCALL libc_cfgetospeed)(struct termios const *__restrict termios_p) {
 	return termios_p->c_ospeed;
 }
 /* >> cfgetispeed(3) */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) speed_t
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_PURE WUNUSED ATTR_IN(1) speed_t
 NOTHROW_NCX(LIBCCALL libc_cfgetispeed)(struct termios const *__restrict termios_p) {
 	return termios_p->c_ispeed;
 }
 /* >> cfsetospeed(3) */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_RW(1) int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_cfsetospeed)(struct termios *__restrict termios_p,
                                        speed_t speed) {
 	termios_p->c_ospeed = speed;
 	return 0;
 }
 /* >> cfsetispeed(3) */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_RW(1) int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *__restrict termios_p,
                                        speed_t speed) {
 	termios_p->c_ispeed = speed;
@@ -58,7 +58,7 @@ NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *__restrict termios_p,
 }
 /* >> tcgetattr(3)
  * Get terminal attributes */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_WR(2) int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_tcgetattr)(fd_t fd,
                                      struct termios *__restrict termios_p) {
 	return (int)libc_ioctl(fd, __TCGETA, termios_p);
@@ -69,7 +69,7 @@ NOTHROW_NCX(LIBCCALL libc_tcgetattr)(fd_t fd,
 /* >> tcsetattr(3)
  * Set terminal attributes
  * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_RO(3) int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_IN(3) int
 NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd,
                                      __STDC_INT_AS_UINT_T optional_actions,
                                      struct termios const *__restrict termios_p) {
@@ -154,7 +154,7 @@ NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd,
 	return result;
 }
 /* >> cfsetspeed(3) */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_RW(1) int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p,
                                       speed_t speed) {
 	termios_p->c_ospeed = speed;
@@ -166,7 +166,7 @@ NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p,
  * Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
  * This entails the CANON and all control characters being disabled, as well as
  * any sort of input/output text processing no longer taking place. */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_RW(1) void
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc_cfmakeraw)(struct termios *__restrict termios_p) {
 	/* As documented here: http://man7.org/linux/man-pages/man3/termios.3.html
 	 * Note that the following additions were made:
@@ -310,7 +310,7 @@ for (local field, add, flags: ops) {
 /* >> cfmakesane(3)
  * Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
  * Sane here  refers  to  setting  all values  to  their  defaults,  as they  are  defined  in  <sys/ttydefaults.h> */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_WR(1) void
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p) {
 	/* Default everything to ZERO */
 	libc_bzero(termios_p, sizeof(*termios_p));

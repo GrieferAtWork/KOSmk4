@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbc76d62 */
+/* HASH CRC-32:0xf297289f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_END
  *               be used as temporary storage by the implemenation
  *               The  contents  of this  array are  undefined upon
  *               return of this function. */
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_ACCESS_RWS(2, 1) ATTR_ACCESS_WRS(3, 1) void
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_INOUTS(2, 1) ATTR_OUTS(3, 1) void
 NOTHROW_NCX(LIBCCALL libc_sort_pointers)(size_t count,
                                          void **sortme,
                                          void **work) {

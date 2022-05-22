@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51baa510 */
+/* HASH CRC-32:0xeed6c571 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec32 const *__rel_timeout),sigtimedwait,(__set,__info,__rel_timeout))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec32 const *__rel_timeout),sigtimedwait,(__set,__info,__rel_timeout))
 #endif /* !__local___localdep_sigtimedwait32_defined */
-__LOCAL_LIBC(sigtimedwait64) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_WR_OPT(2) int
+__LOCAL_LIBC(sigtimedwait64) __ATTR_IN(1) __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait64))(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__rel_timeout) {
 	struct __timespec32 __tmv;
 	if (!__rel_timeout)

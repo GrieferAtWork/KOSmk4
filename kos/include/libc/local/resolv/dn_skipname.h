@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x759c10d1 */
+/* HASH CRC-32:0x1292f2c3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ns_name_skip,(unsig
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(dn_skipname) __ATTR_ACCESS_RO(1) __ATTR_NONNULL((2)) int
+__LOCAL_LIBC(dn_skipname) __ATTR_IN(1) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dn_skipname))(unsigned char const *__msg_ptr, unsigned char const *__end_of_msg) {
 	unsigned char const *__orig_msg_ptr = __msg_ptr;
 	if ((__NAMESPACE_LOCAL_SYM __localdep_ns_name_skip)(&__msg_ptr, __end_of_msg) == -1)

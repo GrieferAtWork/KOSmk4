@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4e7d498 */
+/* HASH CRC-32:0x4fb3e6bb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,10 +34,10 @@ DECL_BEGIN
 INTDEF ssize_t NOTHROW_NCX(LIBCCALL libc_readahead)(fd_t fd, __PIO_OFFSET64 offset, size_t count);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_sync_file_range)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 count, unsigned int flags);
 INTDEF ssize_t NOTHROW_RPC(LIBCCALL libc_vmsplice)(fd_t fdout, struct iovec const *iov, size_t count, unsigned int flags);
-INTDEF ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(4) ssize_t NOTHROW_RPC(LIBCCALL libc_splice)(fd_t fdin, __PIO_OFFSET64 *offin, fd_t fdout, __PIO_OFFSET64 *offout, size_t length, unsigned int flags);
+INTDEF ATTR_INOUT(2) ATTR_INOUT(4) ssize_t NOTHROW_RPC(LIBCCALL libc_splice)(fd_t fdin, __PIO_OFFSET64 *offin, fd_t fdout, __PIO_OFFSET64 *offout, size_t length, unsigned int flags);
 INTDEF ssize_t NOTHROW_RPC(LIBCCALL libc_tee)(fd_t fdin, fd_t fdout, size_t length, unsigned int flags);
-INTDEF ATTR_ACCESS_WR(3) int NOTHROW_RPC(LIBCCALL libc_name_to_handle_at)(fd_t dirfd, char const *name, struct file_handle *handle, int *mnt_id, int flags);
-INTDEF ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(LIBCCALL libc_open_by_handle_at)(fd_t mountdirfd, struct file_handle *handle, int flags);
+INTDEF ATTR_OUT(3) int NOTHROW_RPC(LIBCCALL libc_name_to_handle_at)(fd_t dirfd, char const *name, struct file_handle *handle, int *mnt_id, int flags);
+INTDEF ATTR_IN(2) fd_t NOTHROW_RPC(LIBCCALL libc_open_by_handle_at)(fd_t mountdirfd, struct file_handle *handle, int flags);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_fallocate)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET offset, __PIO_OFFSET length);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_fallocate64)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET64 offset, __PIO_OFFSET64 length);
 INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd, fcntl_t cmd, ...);
@@ -53,7 +53,7 @@ INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd, fcntl_t 
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename, oflag_t oflags, ...);
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -66,13 +66,13 @@ INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(VLIBDCALL libd_open)(char cons
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename, oflag_t oflags, ...);
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename, mode_t mode);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename, mode_t mode);
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename, mode_t mode);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename, mode_t mode);
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -85,7 +85,7 @@ INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(LIBCCALL libc_creat)(char cons
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(VLIBDCALL libd_open64)(char const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(VLIBDCALL libd_open64)(char const *filename, oflag_t oflags, ...);
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -98,13 +98,13 @@ INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(VLIBDCALL libd_open64)(char co
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(VLIBCCALL libc_open64)(char const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(VLIBCCALL libc_open64)(char const *filename, oflag_t oflags, ...);
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(LIBDCALL libd_creat64)(char const *filename, mode_t mode);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(LIBDCALL libd_creat64)(char const *filename, mode_t mode);
 /* >> creat(2), creat64(2)
  * Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(LIBCCALL libc_creat64)(char const *filename, mode_t mode);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(LIBCCALL libc_creat64)(char const *filename, mode_t mode);
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -117,7 +117,7 @@ INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(LIBCCALL libc_creat64)(char co
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd, char const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(2) fd_t NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd, char const *filename, oflag_t oflags, ...);
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -130,7 +130,7 @@ INTDEF WUNUSED ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t di
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(VLIBCCALL libc_openat)(fd_t dirfd, char const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(2) fd_t NOTHROW_RPC(VLIBCCALL libc_openat)(fd_t dirfd, char const *filename, oflag_t oflags, ...);
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -143,7 +143,7 @@ INTDEF WUNUSED ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(VLIBCCALL libc_openat)(fd_t di
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(VLIBDCALL libd_openat64)(fd_t dirfd, char const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(2) fd_t NOTHROW_RPC(VLIBDCALL libd_openat64)(fd_t dirfd, char const *filename, oflag_t oflags, ...);
 /* >> open(2), open64(2), openat(2), openat64(2)
  * Open  a  new  file  handle  to  the  file  specified  by `filename'
  * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
@@ -156,7 +156,7 @@ INTDEF WUNUSED ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(VLIBDCALL libd_openat64)(fd_t 
  *   - HANDLE_TYPE_MFILE:      The actual filesystem object (including device files)
  *   - *:                      Certain filesystem names can literally return anything, such
  *                             as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(VLIBCCALL libc_openat64)(fd_t dirfd, char const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(2) fd_t NOTHROW_RPC(VLIBCCALL libc_openat64)(fd_t dirfd, char const *filename, oflag_t oflags, ...);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_posix_fadvise)(fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length, __STDC_INT_AS_UINT_T advise);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_posix_fallocate)(fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_posix_fadvise64)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 length, __STDC_INT_AS_UINT_T advise);

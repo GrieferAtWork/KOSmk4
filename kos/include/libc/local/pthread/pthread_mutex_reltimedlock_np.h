@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a031b5 */
+/* HASH CRC-32:0xc2b44bb7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_crt_pthread_mutex_reltimedlock32_np_defined) && defined(__CRT_HAVE_pthread_mutex_reltimedlock_np)
 #define __local___localdep_crt_pthread_mutex_reltimedlock32_np_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_mutex_reltimedlock32_np,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_mutex_reltimedlock_np,(__mutex,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_mutex_reltimedlock32_np,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_mutex_reltimedlock_np,(__mutex,__reltime))
 #endif /* !__local___localdep_crt_pthread_mutex_reltimedlock32_np_defined && __CRT_HAVE_pthread_mutex_reltimedlock_np */
 #ifndef __local___localdep_pthread_mutex_reltimedlock64_np_defined
 #define __local___localdep_pthread_mutex_reltimedlock64_np_defined
 #if defined(__CRT_HAVE_pthread_mutex_reltimedlock_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_reltimedlock64_np,(__pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime),pthread_mutex_reltimedlock_np,(__mutex,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_reltimedlock64_np,(__pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime),pthread_mutex_reltimedlock_np,(__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_mutex_reltimedlock64_np)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_reltimedlock64_np,(__pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime),pthread_mutex_reltimedlock64_np,(__mutex,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_reltimedlock64_np,(__pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime),pthread_mutex_reltimedlock64_np,(__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_mutex_reltimedlock_np)
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_mutex_reltimedlock64_np.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_pthread_mutex_reltimedlock64_np_defined
 #endif /* !... */
 #endif /* !__local___localdep_pthread_mutex_reltimedlock64_np_defined */
-__LOCAL_LIBC(pthread_mutex_reltimedlock_np) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __errno_t
+__LOCAL_LIBC(pthread_mutex_reltimedlock_np) __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock_np))(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) {
 #ifdef __CRT_HAVE_pthread_mutex_reltimedlock_np
 	__errno_t __result;

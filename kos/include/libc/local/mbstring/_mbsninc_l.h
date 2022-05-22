@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x945c930d */
+/* HASH CRC-32:0xe616fb5c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsnbcnt_l_defined
 #define __local___localdep__mbsnbcnt_l_defined
 #ifdef __CRT_HAVE__mbsnbcnt_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbsnbcnt_l,(unsigned char const *__str, __SIZE_TYPE__ __max_chars, __locale_t __locale),_mbsnbcnt_l,(__str,__max_chars,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbsnbcnt_l,(unsigned char const *__str, __SIZE_TYPE__ __max_chars, __locale_t __locale),_mbsnbcnt_l,(__str,__max_chars,__locale))
 #elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsnbcnt_l.h>

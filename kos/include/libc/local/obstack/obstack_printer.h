@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7303b558 */
+/* HASH CRC-32:0x43711501 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__obstack_newchunk_defined
 #define __local___localdep__obstack_newchunk_defined
 #ifdef __CRT_HAVE__obstack_newchunk
-__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,__localdep__obstack_newchunk,(struct obstack *__self, __SIZE_TYPE__ __num_bytes),_obstack_newchunk,(__self,__num_bytes))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,__localdep__obstack_newchunk,(struct obstack *__self, __SIZE_TYPE__ __num_bytes),_obstack_newchunk,(__self,__num_bytes))
 #elif defined(__LOCAL_obstack_alloc_failed_handler) || defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)
 __NAMESPACE_LOCAL_END
 #include <libc/local/obstack/_obstack_newchunk.h>
@@ -42,9 +42,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mempcpy_defined
 #define __local___localdep_mempcpy_defined
 #ifdef __CRT_HAVE_mempcpy
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_WRS(1, 3) __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_WRS(1, 3) __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpy.h>
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
-__LOCAL_LIBC(obstack_printer) __ATTR_WUNUSED __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
+__LOCAL_LIBC(obstack_printer) __ATTR_WUNUSED __ATTR_INS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(obstack_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	struct obstack *__me = (struct obstack *)__arg;
 	if ((__SIZE_TYPE__)(__me->chunk_limit - __me->next_free) < __datalen)

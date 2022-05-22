@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa65045e7 */
+/* HASH CRC-32:0xbe5e571d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_strchrnul_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strchrnul) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) char *
+__LOCAL_LIBC(strchrnul) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strchrnul))(char const *__restrict __haystack, int __needle) {
 	for (; *__haystack; ++__haystack) {
 		if ((unsigned char)*__haystack == (unsigned char)__needle)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe67da4cb */
+/* HASH CRC-32:0xb29486bd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,11 +31,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clock_gettime_defined
 #define __local___localdep_clock_gettime_defined
 #if defined(__CRT_HAVE_clock_gettime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),clock_gettime,(__clock_id,__tp))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),clock_gettime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE___clock_gettime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),__clock_gettime,(__clock_id,__tp))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),__clock_gettime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_gettime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),clock_gettime64,(__clock_id,__tp))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),clock_gettime64,(__clock_id,__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/clock_gettime.h>
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_clock_gettime __LIBC_LOCAL_NAME(clock_gettime)
 #endif /* !... */
 #endif /* !__local___localdep_clock_gettime_defined */
-__LOCAL_LIBC(timespec_get) __ATTR_ACCESS_WR(1) int
+__LOCAL_LIBC(timespec_get) __ATTR_OUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timespec_get))(struct timespec *__ts, __STDC_INT_AS_UINT_T __base) {
 	if (__base == __TIME_UTC) {
 		if ((__NAMESPACE_LOCAL_SYM __localdep_clock_gettime)(__CLOCK_REALTIME, __ts) == 0)

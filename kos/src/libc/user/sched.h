@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb15b36cf */
+/* HASH CRC-32:0x30f1b57c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,9 +81,9 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setns)(fd_t fd, __STDC_INT_AS_UINT_T nstype
  * calling this function has the same effect as returning `EXIT_CODE'
  * from `clone()'s `FN' callback */
 INTDEF ATTR_NORETURN void NOTHROW_NCX(LIBCCALL libc_exit_thread)(int exit_code);
-INTDEF ATTR_ACCESS_RO(2) int NOTHROW_NCX(LIBCCALL libc_sched_setparam)(pid_t pid, struct sched_param const *param);
-INTDEF ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_sched_getparam)(pid_t pid, struct sched_param *param);
-INTDEF ATTR_ACCESS_RO(3) int NOTHROW_NCX(LIBCCALL libc_sched_setscheduler)(pid_t pid, int policy, struct sched_param const *param);
+INTDEF ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_sched_setparam)(pid_t pid, struct sched_param const *param);
+INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_sched_getparam)(pid_t pid, struct sched_param *param);
+INTDEF ATTR_IN(3) int NOTHROW_NCX(LIBCCALL libc_sched_setscheduler)(pid_t pid, int policy, struct sched_param const *param);
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_sched_getscheduler)(pid_t pid);
 /* >> sched_yield(2)
  * @return: 1: Another thread was  executed prior to  the function  returning
@@ -92,10 +92,10 @@ INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_sched_getscheduler)(pid_t pid);
 INTDEF int NOTHROW(LIBCCALL libc_sched_yield)(void);
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_sched_get_priority_max)(__STDC_INT_AS_UINT_T algorithm);
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_sched_get_priority_min)(__STDC_INT_AS_UINT_T algorithm);
-INTDEF ATTR_ACCESS_RO_OPT(3) int NOTHROW_NCX(LIBCCALL libc_sched_setaffinity)(pid_t pid, size_t cpusetsize, cpu_set_t const *cpuset);
-INTDEF ATTR_ACCESS_WR_OPT(3) int NOTHROW_NCX(LIBCCALL libc_sched_getaffinity)(pid_t pid, size_t cpusetsize, cpu_set_t *cpuset);
-INTDEF ATTR_ACCESS_WR_OPT(2) int NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval)(pid_t pid, struct timespec *tms);
-INTDEF ATTR_ACCESS_WR_OPT(2) int NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid, struct timespec64 *tms);
+INTDEF ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_sched_setaffinity)(pid_t pid, size_t cpusetsize, cpu_set_t const *cpuset);
+INTDEF ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBCCALL libc_sched_getaffinity)(pid_t pid, size_t cpusetsize, cpu_set_t *cpuset);
+INTDEF ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval)(pid_t pid, struct timespec *tms);
+INTDEF ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid, struct timespec64 *tms);
 #endif /* !__KERNEL__ */
 
 DECL_END

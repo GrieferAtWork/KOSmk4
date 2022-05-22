@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fe20e2 */
+/* HASH CRC-32:0x586ac28c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,7 +104,7 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 typedef __key_t key_t;
 #endif /* !__key_t_defined */
 
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1),key_t,__NOTHROW_RPC,ftok,(char const *__pathname, __STDC_INT_AS_UINT_T __proj_id),(__pathname,__proj_id))
+__CDECLARE_OPT(__ATTR_IN(1),key_t,__NOTHROW_RPC,ftok,(char const *__pathname, __STDC_INT_AS_UINT_T __proj_id),(__pathname,__proj_id))
 
 __SYSDECL_END
 #endif /* __CC__ */

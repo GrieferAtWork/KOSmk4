@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4bd9f4d */
+/* HASH CRC-32:0x51492807 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__ismbblead_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__ismbblead_l_defined */
-__LOCAL_LIBC(_ismbslead_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
+__LOCAL_LIBC(_ismbslead_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ismbslead_l))(unsigned char const *__str, unsigned char const *__pos, __locale_t __locale) {
 	while (__str <= __pos) {
 		unsigned char __ch = *__str++;

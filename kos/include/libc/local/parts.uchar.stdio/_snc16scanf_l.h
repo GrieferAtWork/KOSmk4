@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44b3801f */
+/* HASH CRC-32:0xd37babf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__vsnc16scanf_l_defined
 #define __local___localdep__vsnc16scanf_l_defined
 #if defined(__CRT_HAVE__vsnwscanf_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_ROS(1, 2) __ATTR_LIBC_C16SCANF(3, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnc16scanf_l,(__CHAR16_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vsnwscanf_l,(__buf,__bufsize,__format,__locale,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INS(1, 2) __ATTR_LIBC_C16SCANF(3, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnc16scanf_l,(__CHAR16_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vsnwscanf_l,(__buf,__bufsize,__format,__locale,__args))
 #elif defined(__CRT_HAVE_DOS$_vsnwscanf_l)
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_ROS(1, 2) __ATTR_LIBC_C16SCANF(3, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnc16scanf_l,(__CHAR16_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vsnwscanf_l,(__buf,__bufsize,__format,__locale,__args))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INS(1, 2) __ATTR_LIBC_C16SCANF(3, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnc16scanf_l,(__CHAR16_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR16_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vsnwscanf_l,(__buf,__bufsize,__format,__locale,__args))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/_vsnwscanf_l.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__vsnc16scanf_l __LIBC_LOCAL_NAME(_vsnc16scanf_l)
 #endif /* !... */
 #endif /* !__local___localdep__vsnc16scanf_l_defined */
-__LOCAL_LIBC(_snc16scanf_l) __ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_ROS(1, 2) __ATTR_LIBC_C16SCANF(3, 5) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(_snc16scanf_l) __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INS(1, 2) __ATTR_LIBC_C16SCANF(3, 5) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBDCALL __LIBC_LOCAL_NAME(_snc16scanf_l))(__CHAR16_TYPE__ const *__buf, __SIZE_TYPE__ __bufsize, __CHAR16_TYPE__ const *__format, __locale_t __locale, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;

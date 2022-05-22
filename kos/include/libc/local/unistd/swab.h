@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x930f01a0 */
+/* HASH CRC-32:0xe2a78f2f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(swab) __ATTR_ACCESS_ROS(1, 3) __ATTR_ACCESS_WRS(2, 3) void
+__LOCAL_LIBC(swab) __ATTR_INS(1, 3) __ATTR_OUTS(2, 3) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(swab))(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes) {
 	__n_bytes &= ~1;
 	while (__n_bytes >= 2) {

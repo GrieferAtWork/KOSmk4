@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9a36007 */
+/* HASH CRC-32:0x958f990c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ typedef int (*__procfun)(void);
 #endif /* !____procfun_defined */
 #include <dlfcn.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_getdllprocaddr) __ATTR_ACCESS_RO_OPT(2) __procfun
+__LOCAL_LIBC(_getdllprocaddr) __ATTR_IN_OPT(2) __procfun
 (__LIBCCALL __LIBC_LOCAL_NAME(_getdllprocaddr))(__INTPTR_TYPE__ __hnd, char __KOS_FIXED_CONST *__symname, __INTPTR_TYPE__ __ord) __THROWS(...) {
 	(void)__ord;
 	return (__procfun)dlsym((void *)(__UINTPTR_TYPE__)__hnd, __symname);

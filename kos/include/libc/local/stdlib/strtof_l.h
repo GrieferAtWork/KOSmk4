@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19fd0113 */
+/* HASH CRC-32:0x9edae19c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtof_defined
 #define __local___localdep_strtof_defined
 #ifdef __CRT_HAVE_strtof
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2),float,__NOTHROW_NCX,__localdep_strtof,(char const *__restrict __nptr, char **__endptr),strtof,(__nptr,__endptr))
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),float,__NOTHROW_NCX,__localdep_strtof,(char const *__restrict __nptr, char **__endptr),strtof,(__nptr,__endptr))
 #elif defined(__CRT_HAVE___strtof)
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2),float,__NOTHROW_NCX,__localdep_strtof,(char const *__restrict __nptr, char **__endptr),__strtof,(__nptr,__endptr))
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),float,__NOTHROW_NCX,__localdep_strtof,(char const *__restrict __nptr, char **__endptr),__strtof,(__nptr,__endptr))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtof.h>
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtof __LIBC_LOCAL_NAME(strtof)
 #endif /* !... */
 #endif /* !__local___localdep_strtof_defined */
-__LOCAL_LIBC(strtof_l) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) float
+__LOCAL_LIBC(strtof_l) __ATTR_IN(1) __ATTR_OUT_OPT(2) float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtof_l))(char const *__restrict __nptr, char **__endptr, __locale_t __locale) {
 	(void)__locale;
 	return (__NAMESPACE_LOCAL_SYM __localdep_strtof)(__nptr, __endptr);

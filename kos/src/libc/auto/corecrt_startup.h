@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61f5f2b0 */
+/* HASH CRC-32:0x84bfeb89 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libc__initterm_e)(_onexit_t *start, _onexit_t *e
 INTDEF int NOTHROW_NCX(LIBDCALL libc__initialize_onexit_table)(struct _onexit_table_t *self);
 INTDEF int NOTHROW_NCX(LIBDCALL libc__register_onexit_function)(struct _onexit_table_t *self, _onexit_t function);
 INTDEF int NOTHROW_NCX(LIBDCALL libc__execute_onexit_table)(struct _onexit_table_t *self);
-INTDEF ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(3) int NOTHROW_NCX(LIBDCALL libc___dllonexit)(_onexit_t func, _onexit_t **p_begin, _onexit_t **p_end);
+INTDEF ATTR_INOUT(2) ATTR_INOUT(3) int NOTHROW_NCX(LIBDCALL libc___dllonexit)(_onexit_t func, _onexit_t **p_begin, _onexit_t **p_end);
 #endif /* !__KERNEL__ */
 
 DECL_END

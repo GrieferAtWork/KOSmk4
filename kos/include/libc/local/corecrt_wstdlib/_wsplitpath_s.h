@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccec9523 */
+/* HASH CRC-32:0xd5d0cb7f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyc.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wsplitpath_s) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WRS(4, 5) __ATTR_ACCESS_WRS(6, 7) __ATTR_ACCESS_WRS(8, 9) __errno_t
+__LOCAL_LIBC(_wsplitpath_s) __ATTR_IN(1) __ATTR_OUTS(2, 3) __ATTR_OUTS(4, 5) __ATTR_OUTS(6, 7) __ATTR_OUTS(8, 9) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wsplitpath_s))(__WCHAR_TYPE__ const *__restrict __abspath, __WCHAR_TYPE__ *__drive, __SIZE_TYPE__ __drivelen, __WCHAR_TYPE__ *__dir, __SIZE_TYPE__ __dirlen, __WCHAR_TYPE__ *__file, __SIZE_TYPE__ __filelen, __WCHAR_TYPE__ *__ext, __SIZE_TYPE__ __extlen) {
 	__SIZE_TYPE__ __len, __last_slash, __last_dot;
 	if __unlikely(!__abspath)

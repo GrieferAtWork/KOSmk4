@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ccedba3 */
+/* HASH CRC-32:0xbf2a7cc9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__c32asctime_s_defined
 #define __local___localdep__c32asctime_s_defined
 #if defined(__CRT_HAVE__wasctime_s) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__c32asctime_s,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen, struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__c32asctime_s,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen, struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
 #elif defined(__CRT_HAVE_KOS$_wasctime_s)
-__CREDIRECT_KOS(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__c32asctime_s,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen, struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
+__CREDIRECT_KOS(__ATTR_IN(3) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__c32asctime_s,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen, struct __NAMESPACE_STD_SYM tm const *__tp),_wasctime_s,(__buf,__buflen,__tp))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wtime/_wasctime_s.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__c32asctime_s __LIBC_LOCAL_NAME(_c32asctime_s)
 #endif /* !... */
 #endif /* !__local___localdep__c32asctime_s_defined */
-__LOCAL_LIBC(_c32asctime) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __CHAR32_TYPE__ *
+__LOCAL_LIBC(_c32asctime) __ATTR_WUNUSED __ATTR_IN(1) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(_c32asctime))(struct __NAMESPACE_STD_SYM tm const *__tp) {
 	static __CHAR32_TYPE__ __wasctime_retbuf[26] = { 0 };
 	return (__NAMESPACE_LOCAL_SYM __localdep__c32asctime_s)(__wasctime_retbuf, 26, __tp) ? __NULLPTR : __wasctime_retbuf;

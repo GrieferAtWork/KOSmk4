@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c630089 */
+/* HASH CRC-32:0x9dca616f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #include <parts/printf-config.h>
 #include <bits/math-constants.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(format_vwscanf) __ATTR_ACCESS_RO(4) __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_vwscanf) __ATTR_IN(4) __ATTR_LIBC_WSCANF(4, 0) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_vwscanf))(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE      __WCHAR_TYPE__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xece8ce54 */
+/* HASH CRC-32:0x36760b0b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,14 +30,14 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),__errno_t,__NOTHROW_NCX,__localdep_pthread_getschedparam,(__pthread_t __target_thread, int *__restrict __policy, struct sched_param *__restrict __param),pthread_getschedparam,(__target_thread,__policy,__param))
+__CREDIRECT(__ATTR_OUT(2) __ATTR_OUT(3),__errno_t,__NOTHROW_NCX,__localdep_pthread_getschedparam,(__pthread_t __target_thread, int *__restrict __policy, struct sched_param *__restrict __param),pthread_getschedparam,(__target_thread,__policy,__param))
 #endif /* !__local___localdep_pthread_getschedparam_defined */
 #ifndef __local___localdep_pthread_setschedparam_defined
 #define __local___localdep_pthread_setschedparam_defined
 __NAMESPACE_LOCAL_END
 #include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(3),__errno_t,__NOTHROW_NCX,__localdep_pthread_setschedparam,(__pthread_t __target_thread, int __policy, struct sched_param const *__param),pthread_setschedparam,(__target_thread,__policy,__param))
+__CREDIRECT(__ATTR_IN(3),__errno_t,__NOTHROW_NCX,__localdep_pthread_setschedparam,(__pthread_t __target_thread, int __policy, struct sched_param const *__param),pthread_setschedparam,(__target_thread,__policy,__param))
 #endif /* !__local___localdep_pthread_setschedparam_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/os/sched.h>

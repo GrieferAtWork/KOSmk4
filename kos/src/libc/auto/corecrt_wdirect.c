@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f62ede5 */
+/* HASH CRC-32:0x2935de45 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_ACCESS_WRS(2, 3) char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_OUTS(2, 3) char16_t *
 NOTHROW_RPC(LIBDCALL libd__wgetdcwd)(int drive,
                                      char16_t *buf,
                                      size_t size) {
@@ -47,7 +47,7 @@ NOTHROW_RPC(LIBDCALL libd__wgetdcwd)(int drive,
 	return libd_wfrealpath4(__AT_FDDRIVE_CWD(drive), buf, size, 0);
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_WRS(2, 3) char32_t *
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_OUTS(2, 3) char32_t *
 NOTHROW_RPC(LIBKCALL libc__wgetdcwd)(int drive,
                                      char32_t *buf,
                                      size_t size) {
@@ -61,11 +61,11 @@ NOTHROW_RPC(LIBKCALL libc__wgetdcwd)(int drive,
 	}
 	return libc_wfrealpath4(__AT_FDDRIVE_CWD(drive), buf, size, 0);
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_ACCESS_RO(1) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_IN(1) int
 NOTHROW_RPC(LIBDCALL libd__wmkdir)(char16_t const *path) {
 	return libd_wmkdir(path, 0755);
 }
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(1) int
 NOTHROW_RPC(LIBKCALL libc__wmkdir)(char32_t const *path) {
 	return libc_wmkdir(path, 0755);
 }

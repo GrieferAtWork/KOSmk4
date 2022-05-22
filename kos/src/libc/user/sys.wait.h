@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28bb3bff */
+/* HASH CRC-32:0x806159f0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,23 +46,23 @@ INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_waitpid)(pid_t pid, __WAIT_STATUS stat_lo
  * @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
  *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
-INTDEF ATTR_ACCESS_WR_OPT(3) int NOTHROW_RPC(LIBCCALL libc_waitid)(idtype_t idtype, id_t id, siginfo_t *infop, __STDC_INT_AS_UINT_T options);
+INTDEF ATTR_OUT_OPT(3) int NOTHROW_RPC(LIBCCALL libc_waitid)(idtype_t idtype, id_t id, siginfo_t *infop, __STDC_INT_AS_UINT_T options);
 /* >> wait3(2), wait3_64(2)
  * Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-INTDEF ATTR_ACCESS_WR_OPT(3) pid_t NOTHROW_RPC(LIBCCALL libc_wait3)(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage);
+INTDEF ATTR_OUT_OPT(3) pid_t NOTHROW_RPC(LIBCCALL libc_wait3)(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage);
 /* >> wait3(2), wait3_64(2)
  * Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-INTDEF ATTR_ACCESS_WR_OPT(3) pid_t NOTHROW_NCX(LIBCCALL libc_wait3_64)(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage);
+INTDEF ATTR_OUT_OPT(3) pid_t NOTHROW_NCX(LIBCCALL libc_wait3_64)(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage);
 /* >> wait4(2), wait4_64(2)
  * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-INTDEF ATTR_ACCESS_WR_OPT(4) pid_t NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage);
+INTDEF ATTR_OUT_OPT(4) pid_t NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage);
 /* >> wait4(2), wait4_64(2)
  * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-INTDEF ATTR_ACCESS_WR_OPT(4) pid_t NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage);
+INTDEF ATTR_OUT_OPT(4) pid_t NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage);
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,

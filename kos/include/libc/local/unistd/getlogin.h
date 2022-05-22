@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47f63e1e */
+/* HASH CRC-32:0x8177d44b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_cuserid_defined
 #define __local___localdep_cuserid_defined
 #ifdef __CRT_HAVE_cuserid
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),char *,__NOTHROW_NCX,__localdep_cuserid,(char *__s),cuserid,(__s))
+__CREDIRECT(__ATTR_OUT_OPT(1),char *,__NOTHROW_NCX,__localdep_cuserid,(char *__s),cuserid,(__s))
 #elif defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/cuserid.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined
 #ifdef __CRT_HAVE_getenv
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #elif defined(__LOCAL_environ)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/getenv.h>

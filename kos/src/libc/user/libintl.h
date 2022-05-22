@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d10ea44 */
+/* HASH CRC-32:0x127f6eb3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_RO_OPT(3) __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *NOTHROW_NCX(LIBCCALL libc_dcngettext)(char const *domainname, char const *msgid_singular, char const *msgid_plural, ulongptr_t n, int category);
+INTDEF ATTR_PURE WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) ATTR_IN_OPT(3) __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *NOTHROW_NCX(LIBCCALL libc_dcngettext)(char const *domainname, char const *msgid_singular, char const *msgid_plural, ulongptr_t n, int category);
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_textdomain)(char const *domainname);
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_bindtextdomain)(char const *domainname, char const *dirname);
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_bind_textdomain_codeset)(char const *domainname, char const *codeset);

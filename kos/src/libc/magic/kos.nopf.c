@@ -166,28 +166,28 @@ $size_t memset_nopf([[user, checked, out_opt(num_bytes)]] void *dst,
 #ifdef __NO_XBLOCK
 #ifndef __writeb_nopf_defined
 #define __writeb_nopf_defined 1
-__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WR_OPT(1) __BOOL
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUT_OPT(1) __BOOL
 __NOTHROW(writeb_nopf)(__USER __CHECKED void *__addr, __uint8_t __val) {
 	return memcpy_nopf(__addr, &__val, 1) == 0;
 }
 #endif /* !__writeb_nopf_defined */
 #ifndef __writew_nopf_defined
 #define __writew_nopf_defined 1
-__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WR_OPT(1) __BOOL
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUT_OPT(1) __BOOL
 __NOTHROW(writew_nopf)(__USER __CHECKED void *__addr, __uint16_t __val) {
 	return memcpy_nopf(__addr, &__val, 2) == 0;
 }
 #endif /* !__writew_nopf_defined */
 #ifndef __writel_nopf_defined
 #define __writel_nopf_defined 1
-__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WR_OPT(1) __BOOL
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUT_OPT(1) __BOOL
 __NOTHROW(writel_nopf)(__USER __CHECKED void *__addr, __uint32_t __val) {
 	return memcpy_nopf(__addr, &__val, 4) == 0;
 }
 #endif /* !__writel_nopf_defined */
 #ifndef __writeq_nopf_defined
 #define __writeq_nopf_defined 1
-__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WR_OPT(1) __BOOL
+__FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUT_OPT(1) __BOOL
 __NOTHROW(writeq_nopf)(__USER __CHECKED void *__addr, __uint64_t __val) {
 	return memcpy_nopf(__addr, &__val, 8) == 0;
 }

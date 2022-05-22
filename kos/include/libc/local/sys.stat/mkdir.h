@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fce4b60 */
+/* HASH CRC-32:0x1b5afe6c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,12 +27,12 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_dos_mkdir_defined) && defined(__CRT_HAVE__mkdir)
 #define __local___localdep_dos_mkdir_defined
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_dos_mkdir,(char const *__pathname),_mkdir,(__pathname))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_dos_mkdir,(char const *__pathname),_mkdir,(__pathname))
 #endif /* !__local___localdep_dos_mkdir_defined && __CRT_HAVE__mkdir */
 #ifndef __local___localdep_mkdirat_defined
 #define __local___localdep_mkdirat_defined
 #ifdef __CRT_HAVE_mkdirat
-__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_mkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),mkdirat,(__dirfd,__pathname,__mode))
+__CREDIRECT(__ATTR_IN(2),int,__NOTHROW_RPC,__localdep_mkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),mkdirat,(__dirfd,__pathname,__mode))
 #elif defined(__CRT_HAVE_fmkdirat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.stat/mkdirat.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_mkdirat_defined
 #endif /* !... */
 #endif /* !__local___localdep_mkdirat_defined */
-__LOCAL_LIBC(mkdir) __ATTR_ACCESS_RO(1) int
+__LOCAL_LIBC(mkdir) __ATTR_IN(1) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkdir))(char const *__pathname, __mode_t __mode) {
 #if defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
 	(void)__mode;

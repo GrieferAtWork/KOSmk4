@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1e9601d */
+/* HASH CRC-32:0x6bfc07f8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(pthread_spin_destroy) __ATTR_ACCESS_RW(1) __errno_t
+__LOCAL_LIBC(pthread_spin_destroy) __ATTR_INOUT(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_destroy))(__pthread_spinlock_t *__lock) {
 	__COMPILER_IMPURE();
 	(void)__lock; /* no-op */

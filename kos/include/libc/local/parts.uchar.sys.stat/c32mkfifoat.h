@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x652e8a1c */
+/* HASH CRC-32:0x9ab2773a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32mknodat_defined
 #define __local___localdep_c32mknodat_defined
 #if defined(__CRT_HAVE_wmknodat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_c32mknodat,(__fd_t __dirfd, __CHAR32_TYPE__ const *__nodename, __mode_t __mode, __dev_t __dev),wmknodat,(__dirfd,__nodename,__mode,__dev))
+__CREDIRECT(__ATTR_IN(2),int,__NOTHROW_RPC,__localdep_c32mknodat,(__fd_t __dirfd, __CHAR32_TYPE__ const *__nodename, __mode_t __mode, __dev_t __dev),wmknodat,(__dirfd,__nodename,__mode,__dev))
 #elif defined(__CRT_HAVE_KOS$wmknodat)
-__CREDIRECT_KOS(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_c32mknodat,(__fd_t __dirfd, __CHAR32_TYPE__ const *__nodename, __mode_t __mode, __dev_t __dev),wmknodat,(__dirfd,__nodename,__mode,__dev))
+__CREDIRECT_KOS(__ATTR_IN(2),int,__NOTHROW_RPC,__localdep_c32mknodat,(__fd_t __dirfd, __CHAR32_TYPE__ const *__nodename, __mode_t __mode, __dev_t __dev),wmknodat,(__dirfd,__nodename,__mode,__dev))
 #elif defined(__CRT_HAVE_wfmknodat) || (defined(__CRT_HAVE_fmknodat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || ((defined(__CRT_HAVE_mknodat) || defined(__CRT_HAVE_fmknodat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.sys.stat/wmknodat.h>
@@ -51,12 +51,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_KOS$convert_wcstombs)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_c32tombs,(__CHAR32_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif (defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -88,7 +88,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_mkfifoat_defined
 #define __local___localdep_mkfifoat_defined
 #ifdef __CRT_HAVE_mkfifoat
-__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_mkfifoat,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),mkfifoat,(__dirfd,__fifoname,__mode))
+__CREDIRECT(__ATTR_IN(2),int,__NOTHROW_RPC,__localdep_mkfifoat,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),mkfifoat,(__dirfd,__fifoname,__mode))
 #elif (defined(__CRT_HAVE_mknodat) || defined(__CRT_HAVE_fmknodat)) && defined(__S_IFIFO)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.stat/mkfifoat.h>
@@ -98,7 +98,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_mkfifoat_defined
 #endif /* !... */
 #endif /* !__local___localdep_mkfifoat_defined */
-__LOCAL_LIBC(c32mkfifoat) __ATTR_ACCESS_RO(2) int
+__LOCAL_LIBC(c32mkfifoat) __ATTR_IN(2) int
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32mkfifoat))(__fd_t __dirfd, __CHAR32_TYPE__ const *__fifoname, __mode_t __mode) {
 #if ((defined(__CRT_HAVE_wmknodat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wmknodat) || defined(__CRT_HAVE_wfmknodat) || (defined(__CRT_HAVE_fmknodat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || ((defined(__CRT_HAVE_mknodat) || defined(__CRT_HAVE_fmknodat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$wfmknodat) || (defined(__CRT_HAVE_fmknodat) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || ((defined(__CRT_HAVE_mknodat) || defined(__CRT_HAVE_fmknodat)) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && defined(__S_IFIFO)
 	return (__NAMESPACE_LOCAL_SYM __localdep_c32mknodat)(__dirfd, __fifoname, __mode | __S_IFIFO, 0);

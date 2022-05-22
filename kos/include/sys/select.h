@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd02853c2 */
+/* HASH CRC-32:0x920210a9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -169,7 +169,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used 
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__CDECLARE(__ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_RW_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+__CDECLARE(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_INOUT_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE___select) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
@@ -202,7 +202,7 @@ __CDECLARE(__ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__CREDIRECT(__ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_RW_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout),__select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+__CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_INOUT_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout),__select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
@@ -235,7 +235,7 @@ __CREDIRECT(__ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__CREDIRECT(__ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_RW_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout),select64,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+__CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_INOUT_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout),select64,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select64) || defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
 #include <libc/local/sys.select/select.h>
 /* >> select(2), select64(2), pselect(2), pselect64(2)
@@ -269,7 +269,7 @@ __CREDIRECT(__ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__NAMESPACE_LOCAL_USING_OR_IMPL(select, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_RW_OPT(5) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL select)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(select))(__nfds, __readfds, __writefds, __exceptfds, __timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(select, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_INOUT_OPT(5) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL select)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timeval *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(select))(__nfds, __readfds, __writefds, __exceptfds, __timeout); })
 #endif /* ... */
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_pselect) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
@@ -304,7 +304,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(select, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_AC
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__CDECLARE(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timespec const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
+__CDECLARE(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN_OPT(5) __ATTR_IN_OPT(6),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timespec const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
@@ -337,7 +337,7 @@ __CDECLARE(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_RW_OPT(
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timespec const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect64,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
+__CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN_OPT(5) __ATTR_IN_OPT(6),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timespec const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect64,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect64) || defined(__CRT_HAVE_pselect)
 #include <libc/local/sys.select/pselect.h>
 /* >> select(2), select64(2), pselect(2), pselect64(2)
@@ -371,7 +371,7 @@ __CREDIRECT(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_RW_OPT
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pselect, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL pselect)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timespec const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pselect))(__nfds, __readfds, __writefds, __exceptfds, __timeout, __sigmask); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pselect, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN_OPT(5) __ATTR_IN_OPT(6) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL pselect)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct timespec const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pselect))(__nfds, __readfds, __writefds, __exceptfds, __timeout, __sigmask); })
 #endif /* ... */
 #endif /* __USE_XOPEN2K */
 
@@ -408,7 +408,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pselect, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_A
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__CREDIRECT(__ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_RW_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+__CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_INOUT_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select64)
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
@@ -441,7 +441,7 @@ __CREDIRECT(__ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__CDECLARE(__ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_RW_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+__CDECLARE(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_INOUT_OPT(5),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,select64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
 #include <libc/local/sys.select/select64.h>
 /* >> select(2), select64(2), pselect(2), pselect64(2)
@@ -475,7 +475,7 @@ __CDECLARE(__ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__NAMESPACE_LOCAL_USING_OR_IMPL(select64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_RW_OPT(5) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL select64)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(select64))(__nfds, __readfds, __writefds, __exceptfds, __timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(select64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_INOUT_OPT(5) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL select64)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(select64))(__nfds, __readfds, __writefds, __exceptfds, __timeout); })
 #endif /* ... */
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_pselect) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -510,7 +510,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(select64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
+__CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN_OPT(5) __ATTR_IN_OPT(6),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect64)
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
@@ -543,7 +543,7 @@ __CREDIRECT(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_RW_OPT
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__CDECLARE(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
+__CDECLARE(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN_OPT(5) __ATTR_IN_OPT(6),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,pselect64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect)
 #include <libc/local/sys.select/pselect64.h>
 /* >> select(2), select64(2), pselect(2), pselect64(2)
@@ -577,7 +577,7 @@ __CDECLARE(__ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_RW_OPT(
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pselect64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_RW_OPT(2) __ATTR_ACCESS_RW_OPT(3) __ATTR_ACCESS_RW_OPT(4) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL pselect64)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pselect64))(__nfds, __readfds, __writefds, __exceptfds, __timeout, __sigmask); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pselect64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN_OPT(5) __ATTR_IN_OPT(6) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL pselect64)(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pselect64))(__nfds, __readfds, __writefds, __exceptfds, __timeout, __sigmask); })
 #endif /* ... */
 #endif /* __USE_XOPEN2K */
 #endif /* __USE_TIME64 */

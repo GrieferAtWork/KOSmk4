@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17427288 */
+/* HASH CRC-32:0x7016e41c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RO(1) char *NOTHROW_NCX(LIBDCALL libd_getenv)(char const *varname);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) char *NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname);
+INTDEF WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBDCALL libd_getenv)(char const *varname);
+INTDEF WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_exit)(int status) THROWS(...);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_atexit)(void (LIBCCALL *func)(void));
 INTDEF ATTR_NORETURN void (LIBCCALL libc_quick_exit)(int status) THROWS(...);
@@ -44,10 +44,10 @@ INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(
 INTDEF void NOTHROW_NCX(LIBCCALL libc_free)(void *mallptr);
 INTDEF void NOTHROW(LIBCCALL libc_srand)(long seed);
 INTDEF int NOTHROW(LIBCCALL libc_rand)(void);
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_strfromd)(char *__restrict buf, size_t buflen, char const *__restrict format, double fp);
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_strfromf)(char *__restrict buf, size_t buflen, char const *__restrict format, float fp);
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_strfroml)(char *__restrict buf, size_t buflen, char const *__restrict format, __LONGDOUBLE fp);
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed);
+INTDEF ATTR_IN(3) ATTR_OUTS(1, 2) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_strfromd)(char *__restrict buf, size_t buflen, char const *__restrict format, double fp);
+INTDEF ATTR_IN(3) ATTR_OUTS(1, 2) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_strfromf)(char *__restrict buf, size_t buflen, char const *__restrict format, float fp);
+INTDEF ATTR_IN(3) ATTR_OUTS(1, 2) __STDC_INT32_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_strfroml)(char *__restrict buf, size_t buflen, char const *__restrict format, __LONGDOUBLE fp);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict pseed);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_drand48_r)(struct drand48_data *__restrict buffer, double *__restrict result);
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_erand48_r)(unsigned short xsubi[3], struct drand48_data *__restrict buffer, double *__restrict result);
@@ -69,10 +69,10 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_on_exit)(void (LIBDCALL *func)
 #ifndef __KERNEL__
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_on_exit)(void (LIBCCALL *func)(int status, void *arg), void *arg);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_clearenv)(void);
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname, char const *val, int replace);
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname, char const *val, int replace);
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname);
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname);
+INTDEF ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname, char const *val, int replace);
+INTDEF ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname, char const *val, int replace);
+INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname);
+INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname);
 INTDEF double NOTHROW_NCX(LIBCCALL libc_drand48)(void);
 INTDEF long NOTHROW_NCX(LIBCCALL libc_lrand48)(void);
 INTDEF long NOTHROW_NCX(LIBCCALL libc_mrand48)(void);
@@ -82,11 +82,11 @@ INTDEF NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc_jrand48)(unsigned short xsubi
 INTDEF void NOTHROW_NCX(LIBCCALL libc_srand48)(long seedval);
 INTDEF NONNULL((1)) unsigned short *NOTHROW_NCX(LIBCCALL libc_seed48)(unsigned short seed16v[3]);
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_lcong48)(unsigned short param[7]);
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd_putenv)(char *string);
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBCCALL libc_putenv)(char *string);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_putenv)(char *string);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_putenv)(char *string);
 INTDEF long NOTHROW_NCX(LIBCCALL libc_random)(void);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_srandom)(unsigned int seed);
-INTDEF ATTR_ACCESS_WRS(2, 3) char *NOTHROW_NCX(LIBCCALL libc_initstate)(unsigned int seed, char *statebuf, size_t statelen);
+INTDEF ATTR_OUTS(2, 3) char *NOTHROW_NCX(LIBCCALL libc_initstate)(unsigned int seed, char *statebuf, size_t statelen);
 INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf);
 /* >> frealpath4(2)
  * Load the filesystem location of a given file handle.
@@ -99,7 +99,7 @@ INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf);
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTDEF WUNUSED ATTR_ACCESS_WR_OPT(2) char *NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
+INTDEF WUNUSED ATTR_OUT_OPT(2) char *NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
 /* >> frealpath4(2)
  * Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
@@ -111,7 +111,7 @@ INTDEF WUNUSED ATTR_ACCESS_WR_OPT(2) char *NOTHROW_RPC(LIBDCALL libd_frealpath4)
  * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
  *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
-INTDEF WUNUSED ATTR_ACCESS_WR_OPT(2) char *NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
+INTDEF WUNUSED ATTR_OUT_OPT(2) char *NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
 /* >> frealpathat(2)
  * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
@@ -126,7 +126,7 @@ INTDEF WUNUSED ATTR_ACCESS_WR_OPT(2) char *NOTHROW_RPC(LIBCCALL libc_frealpath4)
  *       pass `0' for `buflen' to automatically determine the required buffer size.
  * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
  * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
-INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WR_OPT(3) char *NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t buflen, atflag_t flags);
+INTDEF WUNUSED ATTR_IN(2) ATTR_OUT_OPT(3) char *NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t buflen, atflag_t flags);
 /* >> frealpathat(2)
  * Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
@@ -141,29 +141,29 @@ INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WR_OPT(3) char *NOTHROW_RPC(LIBDCAL
  *       pass `0' for `buflen' to automatically determine the required buffer size.
  * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
  * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
-INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WR_OPT(3) char *NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t buflen, atflag_t flags);
+INTDEF WUNUSED ATTR_IN(2) ATTR_OUT_OPT(3) char *NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t buflen, atflag_t flags);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd);
 INTDEF WUNUSED fd_t NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags);
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTDEF ATTR_ACCESS_WRS(2, 3) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf, size_t buflen);
+INTDEF ATTR_OUTS(2, 3) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated   with   the   master   descriptor   `fd' */
-INTDEF ATTR_ACCESS_WRS(2, 3) int NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd, char *buf, size_t buflen);
+INTDEF ATTR_OUTS(2, 3) int NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getpt)(void);
 /* >> canonicalize_file_name(3)
  * Return the result of `realpath(filename)' as a `malloc()'-
  * allocated  buffer. Upon error, `NULL' is returned instead. */
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_RO(1) char *NOTHROW_RPC(LIBDCALL libd_canonicalize_file_name)(char const *filename);
+INTDEF ATTR_MALLOC WUNUSED ATTR_IN(1) char *NOTHROW_RPC(LIBDCALL libd_canonicalize_file_name)(char const *filename);
 /* >> canonicalize_file_name(3)
  * Return the result of `realpath(filename)' as a `malloc()'-
  * allocated  buffer. Upon error, `NULL' is returned instead. */
-INTDEF ATTR_MALLOC WUNUSED ATTR_ACCESS_RO(1) char *NOTHROW_RPC(LIBCCALL libc_canonicalize_file_name)(char const *filename);
-INTDEF WUNUSED ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) char *NOTHROW_NCX(LIBCCALL libc_getbsize)(int *headerlenp, __LONGPTR_TYPE__ *blocksizep);
-INTDEF ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RWS(1, 2) int NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
-INTDEF ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RWS(1, 2) int NOTHROW_NCX(LIBCCALL libc_sradixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
+INTDEF ATTR_MALLOC WUNUSED ATTR_IN(1) char *NOTHROW_RPC(LIBCCALL libc_canonicalize_file_name)(char const *filename);
+INTDEF WUNUSED ATTR_OUT(1) ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_getbsize)(int *headerlenp, __LONGPTR_TYPE__ *blocksizep);
+INTDEF ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
+INTDEF ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_sradixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
 /* >> devname(3), devname_r(3) */
-INTDEF ATTR_ACCESS_WRS(3, 4) int NOTHROW_NCX(LIBCCALL libc_devname_r)(dev_t dev, mode_t type, char *buf, size_t len);
+INTDEF ATTR_OUTS(3, 4) int NOTHROW_NCX(LIBCCALL libc_devname_r)(dev_t dev, mode_t type, char *buf, size_t len);
 /* >> humanize_number(3), dehumanize_number(3)
  * @param: scale: Set of `HN_GETSCALE | HN_AUTOSCALE'
  * @param: flags: Set of `HN_DECIMAL | HN_NOSPACE | HN_B | HN_DIVISOR_1000 | HN_IEC_PREFIXES' */
@@ -204,19 +204,19 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW_NCX(LIBCCALL libc___p__fm
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode);
 INTDEF unsigned int NOTHROW_NCX(LIBCCALL libc__set_abort_behavior)(unsigned int flags, unsigned int mask);
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) errno_t NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file, char const *envvar, char *__restrict resultpath, size_t resultpath_len);
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file, char const *envvar, char *__restrict resultpath, size_t resultpath_len);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode);
 INTDEF int NOTHROW_NCX(LIBCCALL libc__set_error_mode)(int mode);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq, unsigned int duration);
 INTDEF onexit_t NOTHROW_NCX(LIBCCALL libc_onexit)(onexit_t func);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wgetenv)(char32_t const *varname);
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd__wputenv)(char16_t *string);
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBKCALL libc__wputenv)(char32_t *string);
+INTDEF WUNUSED ATTR_IN(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname);
+INTDEF WUNUSED ATTR_IN(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wgetenv)(char32_t const *varname);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd__wputenv)(char16_t *string);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBKCALL libc__wputenv)(char32_t *string);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__wputenv_s)(char16_t const *varname, char16_t const *val);
 INTDEF errno_t NOTHROW_NCX(LIBKCALL libc__wputenv_s)(char32_t const *varname, char32_t const *val);
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) errno_t NOTHROW_RPC(LIBDCALL libd__wsearchenv_s)(char16_t const *file, char16_t const *envvar, char16_t *__restrict resultpath, size_t resultpath_len);
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) errno_t NOTHROW_RPC(LIBKCALL libc__wsearchenv_s)(char32_t const *file, char32_t const *envvar, char32_t *__restrict resultpath, size_t resultpath_len);
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC(LIBDCALL libd__wsearchenv_s)(char16_t const *file, char16_t const *envvar, char16_t *__restrict resultpath, size_t resultpath_len);
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC(LIBKCALL libc__wsearchenv_s)(char32_t const *file, char32_t const *envvar, char32_t *__restrict resultpath, size_t resultpath_len);
 #endif /* !__KERNEL__ */
 
 DECL_END

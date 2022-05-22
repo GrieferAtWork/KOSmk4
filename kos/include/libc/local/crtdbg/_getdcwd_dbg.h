@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb65ac39d */
+/* HASH CRC-32:0x8b5a6a3b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,12 +31,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),char *,__NOTHROW_RPC,__localdep__getdcwd,(int __drive, char *__buf, __SIZE_TYPE__ __bufsize),_getdcwd,(__drive,__buf,__bufsize))
+__CREDIRECT(__ATTR_OUTS(2, 3),char *,__NOTHROW_RPC,__localdep__getdcwd,(int __drive, char *__buf, __SIZE_TYPE__ __bufsize),_getdcwd,(__drive,__buf,__bufsize))
 #elif defined(__CRT_HAVE__getdcwd_nolock)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),char *,__NOTHROW_RPC,__localdep__getdcwd,(int __drive, char *__buf, __SIZE_TYPE__ __bufsize),_getdcwd_nolock,(__drive,__buf,__bufsize))
+__CREDIRECT(__ATTR_OUTS(2, 3),char *,__NOTHROW_RPC,__localdep__getdcwd,(int __drive, char *__buf, __SIZE_TYPE__ __bufsize),_getdcwd_nolock,(__drive,__buf,__bufsize))
 #elif defined(__CRT_HAVE_frealpath4) && defined(__AT_FDDRIVE_CWD)
 __NAMESPACE_LOCAL_END
 #include <libc/local/direct/_getdcwd.h>
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__getdcwd_defined
 #endif /* !... */
 #endif /* !__local___localdep__getdcwd_defined */
-__LOCAL_LIBC(_getdcwd_dbg) __ATTR_WUNUSED __ATTR_ACCESS_WRS(2, 3) char *
+__LOCAL_LIBC(_getdcwd_dbg) __ATTR_WUNUSED __ATTR_OUTS(2, 3) char *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_getdcwd_dbg))(int __driveno, char *__buf, __STDC_INT_AS_SIZE_T __bufsize, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeefb338b */
+/* HASH CRC-32:0xe276e983 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmoveq_defined
 #define __local___localdep_memmoveq_defined
 #ifdef __CRT_HAVE_memmoveq
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memmoveq,(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords),memmoveq,(__dst,__src,__n_qwords))
 #else /* __CRT_HAVE_memmoveq */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmoveq.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memmoveq __LIBC_LOCAL_NAME(memmoveq)
 #endif /* !__CRT_HAVE_memmoveq */
 #endif /* !__local___localdep_memmoveq_defined */
-__LOCAL_LIBC(mempmoveq) __ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) __UINT64_TYPE__ *
+__LOCAL_LIBC(mempmoveq) __ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveq))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords) {
 	return (__UINT64_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memmoveq)(__dst, __src, __n_qwords) + __n_qwords;
 }

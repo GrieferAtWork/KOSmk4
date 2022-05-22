@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69286404 */
+/* HASH CRC-32:0xf65878ef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_rand_r_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(rand_r) __ATTR_ACCESS_RW(1) int
+__LOCAL_LIBC(rand_r) __ATTR_INOUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rand_r))(unsigned int *__restrict __pseed) {
 	(void)__pseed;
 	__COMPILER_IMPURE();

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78ee9f75 */
+/* HASH CRC-32:0x4bd5c6f3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_END
 #define __yearstodays(__n_years) (((146097 * (__n_years)) / 400) /*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(normalize_struct_tm) __ATTR_RETNONNULL __ATTR_ACCESS_RW(1) struct __NAMESPACE_STD_SYM tm *
+__LOCAL_LIBC(normalize_struct_tm) __ATTR_RETNONNULL __ATTR_INOUT(1) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(normalize_struct_tm))(struct __NAMESPACE_STD_SYM tm *__restrict __tp) {
 	/* Normalize seconds. */
 	if (__tp->tm_sec < 0) {

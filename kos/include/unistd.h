@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72cf1003 */
+/* HASH CRC-32:0xfafc0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -326,17 +326,17 @@ __NOTHROW(__LIBCCALL ___get_environ_wrapper)(void) {
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CEIDECLARE_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),{ return __builtin_execv(__path, (char *const *)___argv); })
+__CEIDECLARE_GCCNCX(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),{ return __builtin_execv(__path, (char *const *)___argv); })
 #elif defined(__CRT_HAVE_execv)
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CDECLARE_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),(__path,___argv))
+__CDECLARE_GCCNCX(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),(__path,___argv))
 #elif defined(__CRT_HAVE__execv)
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CREDIRECT_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),_execv,(__path,___argv))
+__CREDIRECT_GCCNCX(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),_execv,(__path,___argv))
 #else /* ... */
 #include <libc/template/environ.h>
 #if (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__LOCAL_environ)
@@ -344,7 +344,7 @@ __CREDIRECT_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,exe
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(execv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_RPC(__LIBCCALL execv)(char const *__restrict __path, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execv))(__path, ___argv); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBCCALL execv)(char const *__restrict __path, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execv))(__path, ___argv); })
 #else /* (__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve) && __LOCAL_environ */
 #undef __execv_defined
 #endif /* (!__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve) || !__LOCAL_environ */
@@ -356,27 +356,27 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACC
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CEIDECLARE_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),{ return __builtin_execve(__path, (char *const *)___argv, (char *const *)___envp); })
+__CEIDECLARE_GCCNCX(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),{ return __builtin_execve(__path, (char *const *)___argv, (char *const *)___envp); })
 #elif defined(__CRT_HAVE_execve)
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CDECLARE_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),(__path,___argv,___envp))
+__CDECLARE_GCCNCX(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),(__path,___argv,___envp))
 #elif defined(__CRT_HAVE__execve)
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CREDIRECT_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),_execve,(__path,___argv,___envp))
+__CREDIRECT_GCCNCX(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),_execve,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE___execve)
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CREDIRECT_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),__execve,(__path,___argv,___envp))
+__CREDIRECT_GCCNCX(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),__execve,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE___libc_execve)
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CREDIRECT_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),__libc_execve,(__path,___argv,___envp))
+__CREDIRECT_GCCNCX(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),__libc_execve,(__path,___argv,___envp))
 #else /* ... */
 #undef __execve_defined
 #endif /* !... */
@@ -387,17 +387,17 @@ __CREDIRECT_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),i
 /* >> execvp(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CEIDECLARE_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),{ return __builtin_execvp(__file, (char *const *)___argv); })
+__CEIDECLARE_GCCNCX(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),{ return __builtin_execvp(__file, (char *const *)___argv); })
 #elif defined(__CRT_HAVE_execvp)
 /* >> execvp(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CDECLARE_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),(__file,___argv))
+__CDECLARE_GCCNCX(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),(__file,___argv))
 #elif defined(__CRT_HAVE__execvp)
 /* >> execvp(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CREDIRECT_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),_execvp,(__file,___argv))
+__CREDIRECT_GCCNCX(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),_execvp,(__file,___argv))
 #else /* ... */
 #include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
@@ -406,7 +406,7 @@ __CREDIRECT_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,exe
 /* >> execvp(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_RPC(__LIBCCALL execvp)(char const *__restrict __file, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvp))(__file, ___argv); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBCCALL execvp)(char const *__restrict __file, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvp))(__file, ___argv); })
 #else /* (__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve) && __hybrid_alloca)) && __LOCAL_environ */
 #undef __execvp_defined
 #endif /* (!__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe && ((!__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve) || !__hybrid_alloca)) || !__LOCAL_environ */
@@ -418,7 +418,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_AC
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-__CEIDECLARE_GCCNCX(__ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,execl,(char const *__restrict __path, char const *__args, ...),{ return __builtin_execl(__path, __args, __builtin_va_arg_pack()); })
+__CEIDECLARE_GCCNCX(__ATTR_SENTINEL __ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,execl,(char const *__restrict __path, char const *__args, ...),{ return __builtin_execl(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execl)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -426,7 +426,7 @@ __CEIDECLARE_GCCNCX(__ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
-__LIBC __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME_SAME_GCCNCX("execl");
+__LIBC __ATTR_SENTINEL __ATTR_IN(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME_SAME_GCCNCX("execl");
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -437,7 +437,7 @@ __LIBC __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int __NOTHROW
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
-__LIBC __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME_GCCNCX("_execl");
+__LIBC __ATTR_SENTINEL __ATTR_IN(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME_GCCNCX("_execl");
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -449,7 +449,7 @@ __LIBC __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int __NOTHROW
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl))(__path, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_IN(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl))(__path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define execl(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -465,7 +465,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SEN
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-__CEIDECLARE_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_SENTINEL_O(1),int,__NOTHROW_RPC,execle,(char const *__restrict __path, char const *__args, ...),{ return __builtin_execle(__path, __args, __builtin_va_arg_pack()); })
+__CEIDECLARE_GCCNCX(__ATTR_IN(1) __ATTR_IN_OPT(2) __ATTR_SENTINEL_O(1),int,__NOTHROW_RPC,execle,(char const *__restrict __path, char const *__args, ...),{ return __builtin_execle(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execle)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -474,7 +474,7 @@ __CEIDECLARE_GCCNCX(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_SENTINEL_
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
-__LIBC __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ...) __CASMNAME_SAME_GCCNCX("execle");
+__LIBC __ATTR_IN(1) __ATTR_IN_OPT(2) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ...) __CASMNAME_SAME_GCCNCX("execle");
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -486,7 +486,7 @@ __LIBC __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_SENTINEL_O(1) int __NO
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
-__LIBC __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ...) __CASMNAME_GCCNCX("_execle");
+__LIBC __ATTR_IN(1) __ATTR_IN_OPT(2) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ...) __CASMNAME_GCCNCX("_execle");
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -497,7 +497,7 @@ __LIBC __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_SENTINEL_O(1) int __NO
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle))(__path, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN_OPT(2) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle))(__path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define execle(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -511,7 +511,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_AC
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-__CEIDECLARE_GCCNCX(__ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_RPC,execlp,(char const *__restrict __file, char const *__args, ...),{ return __builtin_execlp(__file, __args, __builtin_va_arg_pack()); })
+__CEIDECLARE_GCCNCX(__ATTR_SENTINEL __ATTR_IN(1) __ATTR_IN_OPT(2),int,__NOTHROW_RPC,execlp,(char const *__restrict __file, char const *__args, ...),{ return __builtin_execlp(__file, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execlp)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -519,7 +519,7 @@ __CEIDECLARE_GCCNCX(__ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2),
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
-__LIBC __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME_GCCNCX("execlp");
+__LIBC __ATTR_SENTINEL __ATTR_IN(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME_GCCNCX("execlp");
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -530,7 +530,7 @@ __LIBC __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int __NOTHROW
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
-__LIBC __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ...) __CASMNAME_GCCNCX("_execlp");
+__LIBC __ATTR_SENTINEL __ATTR_IN(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ...) __CASMNAME_GCCNCX("_execlp");
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -543,7 +543,7 @@ __LIBC __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int __NOTHROW
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(execlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp))(__file, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_IN(1) __ATTR_IN_OPT(2) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp))(__file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define execlp(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -560,12 +560,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SE
 /* >> execvpe(3)
  * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__file,___argv,___envp))
+__CDECLARE(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__file,___argv,___envp))
 #elif defined(__CRT_HAVE__execvpe)
 /* >> execvpe(3)
  * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),_execvpe,(__file,___argv,___envp))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),_execvpe,(__file,___argv,___envp))
 #else /* ... */
 #include <hybrid/__alloca.h>
 #include <libc/template/environ.h>
@@ -574,7 +574,7 @@ __CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),int,__NO
 /* >> execvpe(3)
  * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) int __NOTHROW_RPC(__LIBCCALL execvpe)(char const *__restrict __file, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvpe))(__file, ___argv, ___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3) int __NOTHROW_RPC(__LIBCCALL execvpe)(char const *__restrict __file, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvpe))(__file, ___argv, ___envp); })
 #else /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve) && __hybrid_alloca */
 #undef __execvpe_defined
 #endif /* (!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve) || !__hybrid_alloca */
@@ -590,13 +590,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_A
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME("execlpe");
+__LIBC __ATTR_IN(1) __ATTR_IN_OPT(2) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME("execlpe");
 #elif defined(__CRT_HAVE__execlpe)
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-__LIBC __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME("_execlpe");
+__LIBC __ATTR_IN(1) __ATTR_IN_OPT(2) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME("_execlpe");
 #else /* ... */
 #include <hybrid/__alloca.h>
 #include <libc/template/environ.h>
@@ -607,7 +607,7 @@ __LIBC __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_SENTINEL_O(1) int __NO
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe))(__file, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN_OPT(2) __ATTR_SENTINEL_O(1) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe))(__file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define execlpe(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
@@ -672,21 +672,21 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,gettid,(void),?GetCurr
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),(__pipedes))
+__CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),(__pipedes))
 #elif defined(__CRT_HAVE___pipe)
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer)
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),__pipe,(__pipedes))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),__pipe,(__pipedes))
 #elif defined(__CRT_HAVE___libc_pipe)
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer)
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),__libc_pipe,(__pipedes))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),__libc_pipe,(__pipedes))
 #elif defined(__CRT_HAVE__pipe)
 #include <libc/local/unistd/pipe.h>
 /* >> pipe(2)
@@ -694,7 +694,7 @@ __CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),__l
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pipe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL pipe)(__fd_t __pipedes[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pipe))(__pipedes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pipe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL pipe)(__fd_t __pipedes[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pipe))(__pipedes); })
 #endif /* ... */
 #ifndef __sleep_defined
 #define __sleep_defined
@@ -929,19 +929,19 @@ __CREDIRECT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,getegid,(void),__libc_getegid,(
  * @return: * : [count == 0] The required number of groups
  * @return: * : [count != 0] The number of groups that were actually returned
  * @return: -1: [errno == -EINVAL && count != 0] There are more than `count' groups */
-__CDECLARE(__ATTR_ACCESS_WRS(2, 1),int,__NOTHROW_NCX,getgroups,(int __size, __gid_t __list[]),(__size,__list))
+__CDECLARE(__ATTR_OUTS(2, 1),int,__NOTHROW_NCX,getgroups,(int __size, __gid_t __list[]),(__size,__list))
 #elif defined(__CRT_HAVE___getgroups)
 /* >> getgroups(2)
  * @return: * : [count == 0] The required number of groups
  * @return: * : [count != 0] The number of groups that were actually returned
  * @return: -1: [errno == -EINVAL && count != 0] There are more than `count' groups */
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 1),int,__NOTHROW_NCX,getgroups,(int __size, __gid_t __list[]),__getgroups,(__size,__list))
+__CREDIRECT(__ATTR_OUTS(2, 1),int,__NOTHROW_NCX,getgroups,(int __size, __gid_t __list[]),__getgroups,(__size,__list))
 #elif defined(__CRT_HAVE___libc_getgroups)
 /* >> getgroups(2)
  * @return: * : [count == 0] The required number of groups
  * @return: * : [count != 0] The number of groups that were actually returned
  * @return: -1: [errno == -EINVAL && count != 0] There are more than `count' groups */
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 1),int,__NOTHROW_NCX,getgroups,(int __size, __gid_t __list[]),__libc_getgroups,(__size,__list))
+__CREDIRECT(__ATTR_OUTS(2, 1),int,__NOTHROW_NCX,getgroups,(int __size, __gid_t __list[]),__libc_getgroups,(__size,__list))
 #endif /* ... */
 #ifdef __CRT_HAVE_setuid
 /* >> setuid(2)
@@ -1109,7 +1109,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #endif /* !__ttyname_defined */
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-__CDECLARE_OPT(__ATTR_ACCESS_WRS(2, 3),int,__NOTHROW_RPC,ttyname_r,(__fd_t __fd, char *__buf, size_t __buflen),(__fd,__buf,__buflen))
+__CDECLARE_OPT(__ATTR_OUTS(2, 3),int,__NOTHROW_RPC,ttyname_r,(__fd_t __fd, char *__buf, size_t __buflen),(__fd,__buf,__buflen))
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,tcgetpgrp,(__fd_t __fd),(__fd))
@@ -1139,22 +1139,22 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getlogin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifdef __CRT_HAVE_chown
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,chown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,chown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
 #elif defined(__CRT_HAVE___chown)
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,chown,(char const *__file, __uid_t __owner, __gid_t __group),__chown,(__file,__owner,__group))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,chown,(char const *__file, __uid_t __owner, __gid_t __group),__chown,(__file,__owner,__group))
 #elif defined(__CRT_HAVE___libc_chown)
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,chown,(char const *__file, __uid_t __owner, __gid_t __group),__libc_chown,(__file,__owner,__group))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,chown,(char const *__file, __uid_t __owner, __gid_t __group),__libc_chown,(__file,__owner,__group))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_fchownat)
 #include <libc/local/unistd/chown.h>
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL chown)(char const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(chown))(__file, __owner, __group); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL chown)(char const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(chown))(__file, __owner, __group); })
 #endif /* __AT_FDCWD && __CRT_HAVE_fchownat */
 #endif /* !... */
 #ifdef __CRT_HAVE_pathconf
@@ -1164,7 +1164,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACC
  * return: * : The configuration limit associated with `name' for `path'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-__CDECLARE(__ATTR_ACCESS_RO(1),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
+__CDECLARE(__ATTR_IN(1),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
 #elif defined(__CRT_HAVE___pathconf)
 /* >> pathconf(2)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
@@ -1172,7 +1172,7 @@ __CDECLARE(__ATTR_ACCESS_RO(1),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char con
  * return: * : The configuration limit associated with `name' for `path'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-__CREDIRECT(__ATTR_ACCESS_RO(1),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),__pathconf,(__path,__name))
+__CREDIRECT(__ATTR_IN(1),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),__pathconf,(__path,__name))
 #else /* ... */
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
@@ -1184,28 +1184,28 @@ __CREDIRECT(__ATTR_ACCESS_RO(1),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char co
  * return: * : The configuration limit associated with `name' for `path'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pathconf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __LONGPTR_TYPE__ __NOTHROW_RPC(__LIBCCALL pathconf)(char const *__path, __STDC_INT_AS_UINT_T __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pathconf))(__path, __name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pathconf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __LONGPTR_TYPE__ __NOTHROW_RPC(__LIBCCALL pathconf)(char const *__path, __STDC_INT_AS_UINT_T __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pathconf))(__path, __name); })
 #endif /* (__CRT_HAVE_fpathconf || __CRT_HAVE___fpathconf) && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && __O_RDONLY */
 #endif /* !... */
 #ifdef __CRT_HAVE_link
 /* >> link(2)
  * Create a hard link from `from', leading to `to' */
-__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,link,(char const *__from, char const *__to),(__from,__to))
+__CDECLARE(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,link,(char const *__from, char const *__to),(__from,__to))
 #elif defined(__CRT_HAVE___link)
 /* >> link(2)
  * Create a hard link from `from', leading to `to' */
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,link,(char const *__from, char const *__to),__link,(__from,__to))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,link,(char const *__from, char const *__to),__link,(__from,__to))
 #elif defined(__CRT_HAVE___libc_link)
 /* >> link(2)
  * Create a hard link from `from', leading to `to' */
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,link,(char const *__from, char const *__to),__libc_link,(__from,__to))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,link,(char const *__from, char const *__to),__libc_link,(__from,__to))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_linkat)
 #include <libc/local/unistd/link.h>
 /* >> link(2)
  * Create a hard link from `from', leading to `to' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_RPC(__LIBCCALL link)(char const *__from, char const *__to) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(link))(__from, __to); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBCCALL link)(char const *__from, char const *__to) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(link))(__from, __to); })
 #endif /* __AT_FDCWD && __CRT_HAVE_linkat */
 #endif /* !... */
 #ifndef __exit_defined
@@ -1238,7 +1238,7 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),xexit,(__
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
-__CDECLARE(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
+__CDECLARE(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__read)
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
@@ -1247,7 +1247,7 @@ __CDECLARE(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),_read,(__fd,__buf,__bufsize))
+__CREDIRECT(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),_read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___read)
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
@@ -1256,7 +1256,7 @@ __CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, voi
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),__read,(__fd,__buf,__bufsize))
+__CREDIRECT(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),__read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___libc_read)
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
@@ -1265,7 +1265,7 @@ __CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, voi
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),__libc_read,(__fd,__buf,__bufsize))
+__CREDIRECT(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__buf, size_t __bufsize),__libc_read,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __read_defined
 #endif /* !... */
@@ -1280,7 +1280,7 @@ __CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, voi
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
-__CDECLARE(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
+__CDECLARE(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__write)
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
@@ -1289,7 +1289,7 @@ __CDECLARE(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, voi
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),_write,(__fd,__buf,__bufsize))
+__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),_write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___write)
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
@@ -1298,7 +1298,7 @@ __CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, vo
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),__write,(__fd,__buf,__bufsize))
+__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),__write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___libc_write)
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
@@ -1307,7 +1307,7 @@ __CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, vo
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),__libc_write,(__fd,__buf,__bufsize))
+__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),__libc_write,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __write_defined
 #endif /* !... */
@@ -1323,7 +1323,7 @@ __CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, vo
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-__CDECLARE(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,readall,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
+__CDECLARE(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,readall,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #elif (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek))
 #include <libc/local/unistd/readall.h>
 /* >> readall(3)
@@ -1333,7 +1333,7 @@ __CDECLARE(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,readall,(__fd_t __fd, v
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-__NAMESPACE_LOCAL_USING_OR_IMPL(readall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WRS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL readall)(__fd_t __fd, void *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readall))(__fd, __buf, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(readall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL readall)(__fd_t __fd, void *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readall))(__fd, __buf, __bufsize); })
 #else /* ... */
 #undef __readall_defined
 #endif /* !... */
@@ -1345,7 +1345,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(readall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_A
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-__CDECLARE(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,writeall,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
+__CDECLARE(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,writeall,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #else /* __CRT_HAVE_writeall */
 #include <bits/crt/format-printer.h>
 #if defined(__CRT_HAVE_write_printer) && defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__
@@ -1353,14 +1353,14 @@ __CDECLARE(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,writeall,(__fd_t __fd, 
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,writeall,(__fd_t __fd, void const *__buf, size_t __bufsize),write_printer,(__fd,__buf,__bufsize))
+__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,writeall,(__fd_t __fd, void const *__buf, size_t __bufsize),write_printer,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 #include <libc/local/unistd/writeall.h>
 /* >> writeall(3)
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
-__NAMESPACE_LOCAL_USING_OR_IMPL(writeall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL writeall)(__fd_t __fd, void const *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(writeall))(__fd, __buf, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(writeall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL writeall)(__fd_t __fd, void const *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(writeall))(__fd, __buf, __bufsize); })
 #else /* ... */
 #undef __writeall_defined
 #endif /* !... */
@@ -1372,20 +1372,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(writeall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * A pformatprinter-compatible consumer that dumps all input data into `fd' by use
  * of `writeall(3)'. The given `fd' should be encoded by  `WRITE_PRINTER_ARG(fd)'.
  * @return: * : Same as `writeall(3)' */
-__COMPILER_CREDIRECT(__LIBC,__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,__FORMATPRINTER_CC,write_printer,(void *__fd, char const *__restrict __buf, size_t __bufsize),writeall,(__fd,__buf,__bufsize))
+__COMPILER_CREDIRECT(__LIBC,__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,__FORMATPRINTER_CC,write_printer,(void *__fd, char const *__restrict __buf, size_t __bufsize),writeall,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE_write_printer)
 /* >> write_printer(3)
  * A pformatprinter-compatible consumer that dumps all input data into `fd' by use
  * of `writeall(3)'. The given `fd' should be encoded by  `WRITE_PRINTER_ARG(fd)'.
  * @return: * : Same as `writeall(3)' */
-__LIBC __ATTR_ACCESS_ROS(2, 3) ssize_t __NOTHROW_RPC(__FORMATPRINTER_CC write_printer)(void *__fd, char const *__restrict __buf, size_t __bufsize) __CASMNAME_SAME("write_printer");
+__LIBC __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__FORMATPRINTER_CC write_printer)(void *__fd, char const *__restrict __buf, size_t __bufsize) __CASMNAME_SAME("write_printer");
 #elif defined(__CRT_HAVE_writeall) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)
 #include <libc/local/unistd/write_printer.h>
 /* >> write_printer(3)
  * A pformatprinter-compatible consumer that dumps all input data into `fd' by use
  * of `writeall(3)'. The given `fd' should be encoded by  `WRITE_PRINTER_ARG(fd)'.
  * @return: * : Same as `writeall(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(write_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(2, 3) ssize_t __NOTHROW_RPC(__FORMATPRINTER_CC write_printer)(void *__fd, char const *__restrict __buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(write_printer))(__fd, __buf, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(write_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__FORMATPRINTER_CC write_printer)(void *__fd, char const *__restrict __buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(write_printer))(__fd, __buf, __bufsize); })
 #endif /* ... */
 #define WRITE_PRINTER_ARG(fd) ((void *)(__UINTPTR_TYPE__)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))(fd))
 #endif /* __USE_KOS */
@@ -1547,22 +1547,22 @@ __CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),__libc_close,(__fd))
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
 #elif defined(__CRT_HAVE__access)
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
 #elif defined(__CRT_HAVE___access)
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),__access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),__access,(__file,__type))
 #elif defined(__CRT_HAVE___libc_access)
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),__libc_access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),__libc_access,(__file,__type))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
@@ -1570,7 +1570,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,access,(char co
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(access, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL access)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(access))(__file, __type); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(access, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL access)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(access))(__file, __type); })
 #else /* __AT_FDCWD && __CRT_HAVE_faccessat */
 #undef __access_defined
 #endif /* !__AT_FDCWD || !__CRT_HAVE_faccessat */
@@ -1581,19 +1581,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(access, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #ifdef __CRT_HAVE_chdir
 /* >> chdir(2)
  * Change the current working directory to `path' */
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,chdir,(char const *__path),(__path))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,chdir,(char const *__path),(__path))
 #elif defined(__CRT_HAVE__chdir)
 /* >> chdir(2)
  * Change the current working directory to `path' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,chdir,(char const *__path),_chdir,(__path))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,chdir,(char const *__path),_chdir,(__path))
 #elif defined(__CRT_HAVE___chdir)
 /* >> chdir(2)
  * Change the current working directory to `path' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,chdir,(char const *__path),__chdir,(__path))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,chdir,(char const *__path),__chdir,(__path))
 #elif defined(__CRT_HAVE___libc_chdir)
 /* >> chdir(2)
  * Change the current working directory to `path' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,chdir,(char const *__path),__libc_chdir,(__path))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,chdir,(char const *__path),__libc_chdir,(__path))
 #else /* ... */
 #undef __chdir_defined
 #endif /* !... */
@@ -1603,11 +1603,11 @@ __CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,chdir,(char const *__path),__l
 #ifdef __CRT_HAVE_getcwd
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-__CDECLARE(__ATTR_ACCESS_WR_OPT(1),char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),(__buf,__bufsize))
+__CDECLARE(__ATTR_OUT_OPT(1),char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),(__buf,__bufsize))
 #elif defined(__CRT_HAVE__getcwd)
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),_getcwd,(__buf,__bufsize))
+__CREDIRECT(__ATTR_OUT_OPT(1),char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),_getcwd,(__buf,__bufsize))
 #else /* ... */
 #undef __getcwd_defined
 #endif /* !... */
@@ -1617,26 +1617,26 @@ __CREDIRECT(__ATTR_ACCESS_WR_OPT(1),char *,__NOTHROW_RPC,getcwd,(char *__buf, si
 #ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,unlink,(char const *__file),(__file))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,unlink,(char const *__file),(__file))
 #elif defined(__CRT_HAVE__unlink)
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
 #elif defined(__CRT_HAVE___unlink)
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,unlink,(char const *__file),__unlink,(__file))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,unlink,(char const *__file),__unlink,(__file))
 #elif defined(__CRT_HAVE___libc_unlink)
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,unlink,(char const *__file),__libc_unlink,(__file))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,unlink,(char const *__file),__libc_unlink,(__file))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/unlink.h>
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL unlink)(char const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlink))(__file); })
 #else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef __unlink_defined
 #endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
@@ -1647,26 +1647,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_AC
 #ifdef __CRT_HAVE_rmdir
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,rmdir,(char const *__path),(__path))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,rmdir,(char const *__path),(__path))
 #elif defined(__CRT_HAVE__rmdir)
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,rmdir,(char const *__path),_rmdir,(__path))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,rmdir,(char const *__path),_rmdir,(__path))
 #elif defined(__CRT_HAVE___rmdir)
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,rmdir,(char const *__path),__rmdir,(__path))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,rmdir,(char const *__path),__rmdir,(__path))
 #elif defined(__CRT_HAVE___libc_rmdir)
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,rmdir,(char const *__path),__libc_rmdir,(__path))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,rmdir,(char const *__path),__libc_rmdir,(__path))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/rmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); })
 #else /* __AT_FDCWD && __AT_REMOVEDIR && __CRT_HAVE_unlinkat */
 #undef __rmdir_defined
 #endif /* !__AT_FDCWD || !__AT_REMOVEDIR || !__CRT_HAVE_unlinkat */
@@ -1677,17 +1677,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACC
 /* >> euidaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,euidaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,euidaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
 #elif defined(__CRT_HAVE_eaccess)
 /* >> euidaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,euidaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),eaccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,euidaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),eaccess,(__file,__type))
 #elif defined(__CRT_HAVE__access) && defined(__CRT_DOS)
 /* >> euidaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,euidaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,euidaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_faccessat)
@@ -1695,7 +1695,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,euidaccess,(cha
 /* >> euidaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-__NAMESPACE_LOCAL_USING_OR_IMPL(euidaccess, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL euidaccess)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(euidaccess))(__file, __type); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(euidaccess, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL euidaccess)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(euidaccess))(__file, __type); })
 #endif /* __AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
 #endif /* !... */
 #ifndef __eaccess_defined
@@ -1704,17 +1704,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(euidaccess, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 /* >> eaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),euidaccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),euidaccess,(__file,__type))
 #elif defined(__CRT_HAVE_eaccess)
 /* >> eaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
 #elif defined(__CRT_HAVE__access) && defined(__CRT_DOS)
 /* >> eaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,eaccess,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__AT_EACCESS) && defined(__CRT_HAVE_faccessat)
@@ -1722,7 +1722,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,eaccess,(char c
 /* >> eaccess(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `file', testing for `type', using the effective filesystem ids */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL eaccess)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(euidaccess))(__file, __type); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL eaccess)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(euidaccess))(__file, __type); }
 #else /* __AT_FDCWD && __AT_EACCESS && __CRT_HAVE_faccessat */
 #undef __eaccess_defined
 #endif /* !__AT_FDCWD || !__AT_EACCESS || !__CRT_HAVE_faccessat */
@@ -1734,24 +1734,24 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) int __NOTHROW_
 /* >> faccessat(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
  * Test for access to the specified file `dfd:file', testing for `type' */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,faccessat,(__fd_t __dfd, char const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),(__dfd,__file,__type,__flags))
+__CDECLARE_OPT(__ATTR_IN(2),int,__NOTHROW_RPC,faccessat,(__fd_t __dfd, char const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),(__dfd,__file,__type,__flags))
 /* >> fchownat(2)
  * Change the ownership of a given `dfd:file' to `group:owner' */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,fchownat,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
+__CDECLARE_OPT(__ATTR_IN(2),int,__NOTHROW_RPC,fchownat,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
 /* >> linkat(2)
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(4),int,__NOTHROW_RPC,linkat,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
+__CDECLARE_OPT(__ATTR_IN(2) __ATTR_IN(4),int,__NOTHROW_RPC,linkat,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
 #ifdef __CRT_HAVE_symlinkat
 /* >> symlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
-__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,symlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
+__CDECLARE(__ATTR_IN(1) __ATTR_IN(3),int,__NOTHROW_RPC,symlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
 #elif defined(__CRT_HAVE_fsymlinkat)
 #include <libc/local/unistd/symlinkat.h>
 /* >> symlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(symlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(3) int __NOTHROW_RPC(__LIBCCALL symlinkat)(char const *__link_text, __fd_t __tofd, char const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(symlinkat))(__link_text, __tofd, __target_path); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(symlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(3) int __NOTHROW_RPC(__LIBCCALL symlinkat)(char const *__link_text, __fd_t __tofd, char const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(symlinkat))(__link_text, __tofd, __target_path); })
 #endif /* ... */
 #ifdef __CRT_HAVE_readlinkat
 /* >> readlinkat(2)
@@ -1762,7 +1762,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(symlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(3, 4),ssize_t,__NOTHROW_RPC,readlinkat,(__fd_t __dfd, char const *__path, char *__buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
+__CDECLARE(__ATTR_IN(2) __ATTR_OUTS(3, 4),ssize_t,__NOTHROW_RPC,readlinkat,(__fd_t __dfd, char const *__path, char *__buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
 #elif defined(__CRT_HAVE_freadlinkat)
 #include <libc/local/unistd/readlinkat.h>
 /* >> readlinkat(2)
@@ -1773,22 +1773,22 @@ __CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(3, 4),ssize_t,__NOTHROW_RPC,rea
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(readlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(3, 4) ssize_t __NOTHROW_RPC(__LIBCCALL readlinkat)(__fd_t __dfd, char const *__path, char *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readlinkat))(__dfd, __path, __buf, __buflen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(readlinkat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_OUTS(3, 4) ssize_t __NOTHROW_RPC(__LIBCCALL readlinkat)(__fd_t __dfd, char const *__path, char *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readlinkat))(__dfd, __path, __buf, __buflen); })
 #endif /* ... */
 #ifdef __USE_KOS
 /* >> fsymlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path'
  * @param flags: Set of `0 | AT_DOSPATH' */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,fsymlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path, __atflag_t __flags),(__link_text,__tofd,__target_path,__flags))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_IN(3),int,__NOTHROW_RPC,fsymlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path, __atflag_t __flags),(__link_text,__tofd,__target_path,__flags))
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(3, 4),ssize_t,__NOTHROW_RPC,freadlinkat,(__fd_t __dfd, char const *__path, char *__buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
+__CDECLARE_OPT(__ATTR_IN(2) __ATTR_OUTS(3, 4),ssize_t,__NOTHROW_RPC,freadlinkat,(__fd_t __dfd, char const *__path, char *__buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
 #endif /* __USE_KOS */
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,unlinkat,(__fd_t __dfd, char const *__name, __atflag_t __flags),(__dfd,__name,__flags))
+__CDECLARE_OPT(__ATTR_IN(2),int,__NOTHROW_RPC,unlinkat,(__fd_t __dfd, char const *__name, __atflag_t __flags),(__dfd,__name,__flags))
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_LARGEFILE64
@@ -1846,85 +1846,85 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lseek64, __FORCELOCAL __ATTR_ARTIFICIAL __off64_
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__CDECLARE(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE___libc_pread) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),__libc_pread,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),__libc_pread,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pread64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),pread64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),pread64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE___pread64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),__pread64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),__pread64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pread64) || defined(__CRT_HAVE___pread64) || defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 #include <libc/local/unistd/pread.h>
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pread, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WRS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pread)(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pread))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pread, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pread)(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pread))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pwrite) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__CDECLARE(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE___libc_pwrite) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),__libc_pwrite,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),__libc_pwrite,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwrite64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),pwrite64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),pwrite64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE___pwrite64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),__pwrite64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),__pwrite64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwrite64) || defined(__CRT_HAVE___pwrite64) || defined(__CRT_HAVE_pwrite) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 #include <libc/local/unistd/pwrite.h>
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pwrite, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pwrite)(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwrite))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pwrite, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pwrite)(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwrite))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 
 #ifdef __USE_KOS
 #if defined(__CRT_HAVE_preadall) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-__CDECLARE(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,preadall,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,preadall,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_preadall64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,preadall,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),preadall64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,preadall,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),preadall64,(__fd,__buf,__bufsize,__offset))
 #elif (defined(__CRT_HAVE_preadall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_preadall64) || defined(__CRT_HAVE_pread64) || defined(__CRT_HAVE___pread64) || defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 #include <libc/local/unistd/preadall.h>
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(preadall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WRS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL preadall)(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadall))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(preadall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL preadall)(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadall))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pwriteall) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-__CDECLARE(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,pwriteall,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwriteall,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwriteall64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,pwriteall,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),pwriteall64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwriteall,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),pwriteall64,(__fd,__buf,__bufsize,__offset))
 #elif (defined(__CRT_HAVE_pwriteall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_pwriteall64) || defined(__CRT_HAVE_pwrite64) || defined(__CRT_HAVE___pwrite64) || defined(__CRT_HAVE_pwrite) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 #include <libc/local/unistd/pwriteall.h>
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pwriteall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pwriteall)(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwriteall))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pwriteall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pwriteall)(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwriteall))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #endif /* __USE_KOS */
 
@@ -1933,75 +1933,75 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pwriteall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,pread64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),pread,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,pread64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),pread,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pread64)
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__CDECLARE(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,pread64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,pread64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE___pread64)
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,pread64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),__pread64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,pread64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),__pread64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 #include <libc/local/unistd/pread64.h>
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pread64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WRS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pread64)(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pread64))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pread64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pread64)(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pread64))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pwrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,pwrite64,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),pwrite,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwrite64,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),pwrite,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwrite64)
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__CDECLARE(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,pwrite64,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwrite64,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE___pwrite64)
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,pwrite64,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),__pwrite64,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwrite64,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),__pwrite64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwrite) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 #include <libc/local/unistd/pwrite64.h>
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pwrite64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pwrite64)(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwrite64))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pwrite64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pwrite64)(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwrite64))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 
 #ifdef __USE_KOS
 #if defined(__CRT_HAVE_preadall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,preadall64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),preadall,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,preadall64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),preadall,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_preadall64)
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-__CDECLARE(__ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,preadall64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,preadall64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pread64) || defined(__CRT_HAVE___pread64) || defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 #include <libc/local/unistd/preadall64.h>
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(preadall64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WRS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL preadall64)(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadall64))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(preadall64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL preadall64)(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadall64))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pwriteall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,pwriteall64,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),pwriteall,(__fd,__buf,__bufsize,__offset))
+__CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwriteall64,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),pwriteall,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwriteall64)
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-__CDECLARE(__ATTR_ACCESS_ROS(2, 3),ssize_t,__NOTHROW_RPC,pwriteall64,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),(__fd,__buf,__bufsize,__offset))
+__CDECLARE(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,pwriteall64,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwrite64) || defined(__CRT_HAVE___pwrite64) || defined(__CRT_HAVE_pwrite) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 #include <libc/local/unistd/pwriteall64.h>
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pwriteall64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pwriteall64)(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwriteall64))(__fd, __buf, __bufsize, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pwriteall64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL pwriteall64)(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwriteall64))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #endif /* __USE_KOS */
 #endif /* __USE_LARGEFILE64 */
@@ -2021,7 +2021,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(dup3, __FORCELOCAL __ATTR_ARTIFICIAL __fd_t __NO
  * @param: flags:   Set of `O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,pipe2,(__fd_t __pipedes[2], __oflag_t __flags),(__pipedes,__flags))
+__CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,pipe2,(__fd_t __pipedes[2], __oflag_t __flags),(__pipedes,__flags))
 #elif defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE___libc_pipe) || defined(__CRT_HAVE__pipe)
 #include <libc/local/unistd/pipe2.h>
 /* >> pipe2(2)
@@ -2030,7 +2030,7 @@ __CDECLARE(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,pipe2,(__fd_t __pipedes[2], __o
  * @param: flags:   Set of `O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pipe2, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL pipe2)(__fd_t __pipedes[2], __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pipe2))(__pipedes, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pipe2, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL pipe2)(__fd_t __pipedes[2], __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pipe2))(__pipedes, __flags); })
 #endif /* ... */
 #endif /* __USE_GNU || __USE_NETBSD */
 
@@ -2139,12 +2139,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(group_member, __FORCELOCAL __ATTR_ARTIFICIAL int
  * Get the real, effective, and saved UID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_ACCESS_WR_OPT(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
+__CDECLARE_OPT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *__suid),(__ruid,__euid,__suid))
 /* >> getresgid(2)
  * Get the real, effective, and saved GID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-__CDECLARE_OPT(__ATTR_ACCESS_WR_OPT(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
+__CDECLARE_OPT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
 /* >> setresuid(2)
  * @return: 0 : Success
  * Set the real, effective, and saved UID of the calling thread.
@@ -2174,7 +2174,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(usleep, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
  * should be obvious why you shouldn't use this one.
  * And  if it isn't, take a look at the arguments of
  * this function, compared to `getcwd()' */
-__CDECLARE(__ATTR_ACCESS_WR(1) __ATTR_DEPRECATED("Use getcwd()"),char *,__NOTHROW_RPC,getwd,(char *__buf),(__buf))
+__CDECLARE(__ATTR_DEPRECATED("Use getcwd()") __ATTR_OUT(1),char *,__NOTHROW_RPC,getwd,(char *__buf),(__buf))
 #elif defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
 #include <libc/local/unistd/getwd.h>
 /* >> getwd(3)
@@ -2182,7 +2182,7 @@ __CDECLARE(__ATTR_ACCESS_WR(1) __ATTR_DEPRECATED("Use getcwd()"),char *,__NOTHRO
  * should be obvious why you shouldn't use this one.
  * And  if it isn't, take a look at the arguments of
  * this function, compared to `getcwd()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getwd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(1) __ATTR_DEPRECATED("Use getcwd()") char *__NOTHROW_RPC(__LIBCCALL getwd)(char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwd))(__buf); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getwd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use getcwd()") __ATTR_OUT(1) char *__NOTHROW_RPC(__LIBCCALL getwd)(char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwd))(__buf); })
 #endif /* ... */
 #ifdef __CRT_HAVE_ualarm
 __CDECLARE(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t ___value, __useconds_t __interval),(___value,__interval))
@@ -2359,7 +2359,7 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getsid,(__pid_t __pid),__libc_g
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,lchown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,lchown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
 #else /* __CRT_HAVE_lchown */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && defined(__CRT_HAVE_fchownat)
@@ -2367,7 +2367,7 @@ __CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,lchown,(char const *__file, __u
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lchown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL lchown)(char const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lchown))(__file, __owner, __group); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lchown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL lchown)(char const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lchown))(__file, __owner, __group); })
 #endif /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW && __CRT_HAVE_fchownat */
 #endif /* !__CRT_HAVE_lchown */
 
@@ -2384,19 +2384,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lchown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_AC
 #if defined(__CRT_HAVE_truncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,truncate,(char const *__file, __PIO_OFFSET __length),(__file,__length))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,truncate,(char const *__file, __PIO_OFFSET __length),(__file,__length))
 #elif defined(__CRT_HAVE___truncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,truncate,(char const *__file, __PIO_OFFSET __length),__truncate,(__file,__length))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,truncate,(char const *__file, __PIO_OFFSET __length),__truncate,(__file,__length))
 #elif defined(__CRT_HAVE___libc_truncate) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,truncate,(char const *__file, __PIO_OFFSET __length),__libc_truncate,(__file,__length))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,truncate,(char const *__file, __PIO_OFFSET __length),__libc_truncate,(__file,__length))
 #elif defined(__CRT_HAVE_truncate64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,truncate,(char const *__file, __PIO_OFFSET __length),truncate64,(__file,__length))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,truncate,(char const *__file, __PIO_OFFSET __length),truncate64,(__file,__length))
 #else /* ... */
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
@@ -2404,7 +2404,7 @@ __CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,truncate,(char const *__file, 
 #include <libc/local/unistd/truncate.h>
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(truncate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_NCX(__LIBCCALL truncate)(char const *__file, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncate))(__file, __length); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(truncate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL truncate)(char const *__file, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncate))(__file, __length); })
 #endif /* __CRT_HAVE_truncate64 || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open) && (__CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate || __CRT_HAVE___ftruncate || __CRT_HAVE___libc_ftruncate || __CRT_HAVE__chsize || __CRT_HAVE_chsize)) || __CRT_HAVE_truncate || __CRT_HAVE___truncate || __CRT_HAVE___libc_truncate || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate || __CRT_HAVE___ftruncate || __CRT_HAVE___libc_ftruncate || __CRT_HAVE__chsize || __CRT_HAVE_chsize)) */
 #endif /* !... */
 
@@ -2412,26 +2412,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(truncate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #if defined(__CRT_HAVE_truncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,truncate64,(char const *__file, __PIO_OFFSET64 __length),truncate,(__file,__length))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,truncate64,(char const *__file, __PIO_OFFSET64 __length),truncate,(__file,__length))
 #elif defined(__CRT_HAVE___truncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,truncate64,(char const *__file, __PIO_OFFSET64 __length),__truncate,(__file,__length))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,truncate64,(char const *__file, __PIO_OFFSET64 __length),__truncate,(__file,__length))
 #elif defined(__CRT_HAVE___libc_truncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,truncate64,(char const *__file, __PIO_OFFSET64 __length),__libc_truncate,(__file,__length))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,truncate64,(char const *__file, __PIO_OFFSET64 __length),__libc_truncate,(__file,__length))
 #elif defined(__CRT_HAVE_truncate64)
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,truncate64,(char const *__file, __PIO_OFFSET64 __length),(__file,__length))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,truncate64,(char const *__file, __PIO_OFFSET64 __length),(__file,__length))
 #else /* ... */
 #include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_truncate) || defined(__CRT_HAVE___truncate) || defined(__CRT_HAVE___libc_truncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE___ftruncate) || defined(__CRT_HAVE___libc_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_chsize)))
 #include <libc/local/unistd/truncate64.h>
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_NCX(__LIBCCALL truncate64)(char const *__file, __PIO_OFFSET64 __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncate64))(__file, __length); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL truncate64)(char const *__file, __PIO_OFFSET64 __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncate64))(__file, __length); })
 #endif /* __CRT_HAVE_truncate || __CRT_HAVE___truncate || __CRT_HAVE___libc_truncate || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open) && (__CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate || __CRT_HAVE___ftruncate || __CRT_HAVE___libc_ftruncate || __CRT_HAVE__chsize || __CRT_HAVE_chsize)) */
 #endif /* !... */
 #endif /* __USE_LARGEFILE64 */
@@ -2445,7 +2445,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * Replace the calling process with the application image referred
  * to by `execfd'  and execute it's  `main()' method, passing  the
  * given `argv', and setting `environ' to `envp'. */
-__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,fexecve,(__fd_t __execfd, __TARGV, __TENVP),(__execfd,___argv,___envp))
+__CDECLARE(__ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,fexecve,(__fd_t __execfd, __TARGV, __TENVP),(__execfd,___argv,___envp))
 #else /* __CRT_HAVE_fexecve */
 #include <asm/os/features.h>
 #if defined(__OS_HAVE_PROCFS_SELF_FD) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve))
@@ -2454,7 +2454,7 @@ __CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),int,__NOTHROW_RPC,fexecve,(__
  * Replace the calling process with the application image referred
  * to by `execfd'  and execute it's  `main()' method, passing  the
  * given `argv', and setting `environ' to `envp'. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fexecve, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) int __NOTHROW_RPC(__LIBCCALL fexecve)(__fd_t __execfd, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fexecve))(__execfd, ___argv, ___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fexecve, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_IN(3) int __NOTHROW_RPC(__LIBCCALL fexecve)(__fd_t __execfd, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fexecve))(__execfd, ___argv, ___envp); })
 #else /* __OS_HAVE_PROCFS_SELF_FD && (__CRT_HAVE_execve || __CRT_HAVE__execve || __CRT_HAVE___execve || __CRT_HAVE___libc_execve) */
 #undef __fexecve_defined
 #endif /* !__OS_HAVE_PROCFS_SELF_FD || (!__CRT_HAVE_execve && !__CRT_HAVE__execve && !__CRT_HAVE___execve && !__CRT_HAVE___libc_execve) */
@@ -2502,7 +2502,7 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),exit,(__
  * @return: * :    Required buffer size (including a trailing \0-character)
  * @return: 1 :    Empty configuration string.
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
-__CDECLARE_OPT(__ATTR_ACCESS_WRS(2, 3),size_t,__NOTHROW_NCX,confstr,(__STDC_INT_AS_UINT_T __name, char *__buf, size_t __buflen),(__name,__buf,__buflen))
+__CDECLARE_OPT(__ATTR_OUTS(2, 3),size_t,__NOTHROW_NCX,confstr,(__STDC_INT_AS_UINT_T __name, char *__buf, size_t __buflen),(__name,__buf,__buflen))
 #if !defined(optarg) && defined(__CRT_HAVE_optarg)
 __CSDECLARE(,char *,optarg)
 #define optarg optarg
@@ -2670,19 +2670,19 @@ __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,ttyslot,(void),())
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
-__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,symlink,(char const *__link_text, char const *__target_path),(__link_text,__target_path))
+__CDECLARE(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,symlink,(char const *__link_text, char const *__target_path),(__link_text,__target_path))
 #elif defined(__CRT_HAVE___symlink)
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,symlink,(char const *__link_text, char const *__target_path),__symlink,(__link_text,__target_path))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,symlink,(char const *__link_text, char const *__target_path),__symlink,(__link_text,__target_path))
 #elif defined(__CRT_HAVE___libc_symlink)
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,symlink,(char const *__link_text, char const *__target_path),__libc_symlink,(__link_text,__target_path))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,symlink,(char const *__link_text, char const *__target_path),__libc_symlink,(__link_text,__target_path))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_symlinkat) || defined(__CRT_HAVE_fsymlinkat))
@@ -2691,7 +2691,7 @@ __CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,symlink,(c
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_RPC(__LIBCCALL symlink)(char const *__link_text, char const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(symlink))(__link_text, __target_path); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBCCALL symlink)(char const *__link_text, char const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(symlink))(__link_text, __target_path); })
 #endif /* __AT_FDCWD && (__CRT_HAVE_symlinkat || __CRT_HAVE_fsymlinkat) */
 #endif /* !... */
 #ifdef __CRT_HAVE_readlink
@@ -2704,7 +2704,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_A
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,readlink,(char const *__path, char *__buf, size_t __buflen),(__path,__buf,__buflen))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,readlink,(char const *__path, char *__buf, size_t __buflen),(__path,__buf,__buflen))
 #elif defined(__CRT_HAVE___readlink)
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
@@ -2715,7 +2715,7 @@ __CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,rea
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,readlink,(char const *__path, char *__buf, size_t __buflen),__readlink,(__path,__buf,__buflen))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,readlink,(char const *__path, char *__buf, size_t __buflen),__readlink,(__path,__buf,__buflen))
 #elif defined(__CRT_HAVE___libc_readlink)
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
@@ -2726,7 +2726,7 @@ __CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,re
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,readlink,(char const *__path, char *__buf, size_t __buflen),__libc_readlink,(__path,__buf,__buflen))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUTS(2, 3),ssize_t,__NOTHROW_RPC,readlink,(char const *__path, char *__buf, size_t __buflen),__libc_readlink,(__path,__buf,__buflen))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_readlinkat) || defined(__CRT_HAVE_freadlinkat))
@@ -2740,7 +2740,7 @@ __CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3),ssize_t,__NOTHROW_RPC,re
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(readlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL readlink)(char const *__path, char *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readlink))(__path, __buf, __buflen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(readlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUTS(2, 3) ssize_t __NOTHROW_RPC(__LIBCCALL readlink)(char const *__path, char *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readlink))(__path, __buf, __buflen); })
 #endif /* __AT_FDCWD && (__CRT_HAVE_readlinkat || __CRT_HAVE_freadlinkat) */
 #endif /* !... */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
@@ -2750,7 +2750,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(readlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 /* >> getlogin_r(3)
  * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
  * s.a. `getlogin()' and `cuserid()' */
-__CDECLARE(__ATTR_ACCESS_WRS(1, 2),int,__NOTHROW_RPC,getlogin_r,(char *__name, size_t __name_len),(__name,__name_len))
+__CDECLARE(__ATTR_OUTS(1, 2),int,__NOTHROW_RPC,getlogin_r,(char *__name, size_t __name_len),(__name,__name_len))
 #else /* __CRT_HAVE_getlogin_r */
 #include <libc/template/environ.h>
 #if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid)))
@@ -2758,7 +2758,7 @@ __CDECLARE(__ATTR_ACCESS_WRS(1, 2),int,__NOTHROW_RPC,getlogin_r,(char *__name, s
 /* >> getlogin_r(3)
  * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
  * s.a. `getlogin()' and `cuserid()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getlogin_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WRS(1, 2) int __NOTHROW_RPC(__LIBCCALL getlogin_r)(char *__name, size_t __name_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getlogin_r))(__name, __name_len); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getlogin_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) int __NOTHROW_RPC(__LIBCCALL getlogin_r)(char *__name, size_t __name_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getlogin_r))(__name, __name_len); })
 #endif /* __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid)) */
 #endif /* !__CRT_HAVE_getlogin_r */
 #endif /* __USE_REENTRANT || __USE_POSIX199506 */
@@ -2767,47 +2767,47 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getlogin_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #ifdef __CRT_HAVE_gethostname
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-__CDECLARE(__ATTR_ACCESS_WRS(1, 2),int,__NOTHROW_NCX,gethostname,(char *__name, size_t __buflen),(__name,__buflen))
+__CDECLARE(__ATTR_OUTS(1, 2),int,__NOTHROW_NCX,gethostname,(char *__name, size_t __buflen),(__name,__buflen))
 #elif defined(__CRT_HAVE___gethostname)
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-__CREDIRECT(__ATTR_ACCESS_WRS(1, 2),int,__NOTHROW_NCX,gethostname,(char *__name, size_t __buflen),__gethostname,(__name,__buflen))
+__CREDIRECT(__ATTR_OUTS(1, 2),int,__NOTHROW_NCX,gethostname,(char *__name, size_t __buflen),__gethostname,(__name,__buflen))
 #endif /* ... */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 #ifdef __USE_MISC
 /* >> setlogin(3) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,setlogin,(char const *__name),(__name))
+__CDECLARE_OPT(__ATTR_IN(1),int,__NOTHROW_NCX,setlogin,(char const *__name),(__name))
 #ifdef __CRT_HAVE_sethostname
 /* >> sethostname(2)
  * Set the name of the hosting machine */
-__CDECLARE(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,sethostname,(char const *__name, size_t __len),(__name,__len))
+__CDECLARE(__ATTR_INS(1, 2),int,__NOTHROW_NCX,sethostname,(char const *__name, size_t __len),(__name,__len))
 #elif defined(__CRT_HAVE___sethostname)
 /* >> sethostname(2)
  * Set the name of the hosting machine */
-__CREDIRECT(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,sethostname,(char const *__name, size_t __len),__sethostname,(__name,__len))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,sethostname,(char const *__name, size_t __len),__sethostname,(__name,__len))
 #elif defined(__CRT_HAVE___libc_sethostname)
 /* >> sethostname(2)
  * Set the name of the hosting machine */
-__CREDIRECT(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,sethostname,(char const *__name, size_t __len),__libc_sethostname,(__name,__len))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,sethostname,(char const *__name, size_t __len),__libc_sethostname,(__name,__len))
 #endif /* ... */
 /* >> sethostid(3) */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,sethostid,(__LONGPTR_TYPE__ __id),(__id))
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-__CDECLARE_OPT(__ATTR_ACCESS_WRS(1, 2),int,__NOTHROW_NCX,getdomainname,(char *__name, size_t __buflen),(__name,__buflen))
+__CDECLARE_OPT(__ATTR_OUTS(1, 2),int,__NOTHROW_NCX,getdomainname,(char *__name, size_t __buflen),(__name,__buflen))
 #ifdef __CRT_HAVE_setdomainname
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-__CDECLARE(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,setdomainname,(char const *__name, size_t __len),(__name,__len))
+__CDECLARE(__ATTR_INS(1, 2),int,__NOTHROW_NCX,setdomainname,(char const *__name, size_t __len),(__name,__len))
 #elif defined(__CRT_HAVE___setdomainname)
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-__CREDIRECT(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,setdomainname,(char const *__name, size_t __len),__setdomainname,(__name,__len))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,setdomainname,(char const *__name, size_t __len),__setdomainname,(__name,__len))
 #elif defined(__CRT_HAVE___libc_setdomainname)
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-__CREDIRECT(__ATTR_ACCESS_ROS(1, 2),int,__NOTHROW_NCX,setdomainname,(char const *__name, size_t __len),__libc_setdomainname,(__name,__len))
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,setdomainname,(char const *__name, size_t __len),__libc_setdomainname,(__name,__len))
 #endif /* ... */
 #ifdef __CRT_HAVE_vhangup
 /* >> vhangup(3) */
@@ -2845,18 +2845,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(daemon, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 #endif /* !__CRT_HAVE_daemon */
 #endif /* !__daemon_defined */
 /* >> revoke(3) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,revoke,(char const *__file),(__file))
+__CDECLARE_OPT(__ATTR_IN(1),int,__NOTHROW_RPC,revoke,(char const *__file),(__file))
 #ifndef __acct_defined
 #define __acct_defined
 #ifdef __CRT_HAVE_acct
 /* Switch process accounting on and off */
-__CDECLARE(__ATTR_ACCESS_RO_OPT(1),int,__NOTHROW_RPC,acct,(const char *__filename),(__filename))
+__CDECLARE(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(const char *__filename),(__filename))
 #elif defined(__CRT_HAVE___acct)
 /* Switch process accounting on and off */
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1),int,__NOTHROW_RPC,acct,(const char *__filename),__acct,(__filename))
+__CREDIRECT(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(const char *__filename),__acct,(__filename))
 #elif defined(__CRT_HAVE___libc_acct)
 /* Switch process accounting on and off */
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1),int,__NOTHROW_RPC,acct,(const char *__filename),__libc_acct,(__filename))
+__CREDIRECT(__ATTR_IN_OPT(1),int,__NOTHROW_RPC,acct,(const char *__filename),__libc_acct,(__filename))
 #else /* ... */
 #undef __acct_defined
 #endif /* !... */
@@ -2894,7 +2894,7 @@ __CVREDIRECT(,__LONG64_TYPE__,__NOTHROW_RPC,syscall64,(__syscall_ulong_t __sysno
  * and `ENOSYS'  may be  translated into  `EIO'
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2),int,__NOTHROW_NCX,getentropy,(void *__buf, size_t __num_bytes),(__buf,__num_bytes))
+__CDECLARE(__ATTR_WUNUSED __ATTR_OUTS(1, 2),int,__NOTHROW_NCX,getentropy,(void *__buf, size_t __num_bytes),(__buf,__num_bytes))
 #else /* __CRT_HAVE_getentropy */
 #include <asm/os/random.h>
 #if defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
@@ -2911,7 +2911,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2),int,__NOTHROW_NCX,getentropy,(
  * and `ENOSYS'  may be  translated into  `EIO'
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WRS(1, 2) int __NOTHROW_NCX(__LIBCCALL getentropy)(void *__buf, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getentropy))(__buf, __num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUTS(1, 2) int __NOTHROW_NCX(__LIBCCALL getentropy)(void *__buf, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getentropy))(__buf, __num_bytes); })
 #else /* __GRND_RANDOM && __CRT_HAVE_getrandom */
 #undef __getentropy_defined
 #endif /* !__GRND_RANDOM || !__CRT_HAVE_getrandom */
@@ -2924,17 +2924,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 /* >> chroot(2)
  * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,chroot,(char const *__restrict __path),(__path))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,chroot,(char const *__restrict __path),(__path))
 #elif defined(__CRT_HAVE___chroot)
 /* >> chroot(2)
  * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,chroot,(char const *__restrict __path),__chroot,(__path))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,chroot,(char const *__restrict __path),__chroot,(__path))
 #elif defined(__CRT_HAVE___libc_chroot)
 /* >> chroot(2)
  * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,chroot,(char const *__restrict __path),__libc_chroot,(__path))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,chroot,(char const *__restrict __path),__libc_chroot,(__path))
 #endif /* ... */
 #ifndef __getpass_defined
 #define __getpass_defined
@@ -3097,7 +3097,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fdatasync, __FORCELOCAL __ATTR_ARTIFICIAL int __
 #if !defined(__crypt_defined) && defined(__CRT_HAVE_crypt)
 #define __crypt_defined
 /* >> crypt(3), crypt_r(3) */
-__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_NCX,crypt,(char const *__key, char const *__salt),(__key,__salt))
+__CDECLARE(__ATTR_IN(1) __ATTR_IN(2),char *,__NOTHROW_NCX,crypt,(char const *__key, char const *__salt),(__key,__salt))
 #endif /* !__crypt_defined && __CRT_HAVE_crypt */
 #if !defined(__encrypt_defined) && defined(__CRT_HAVE_encrypt)
 #define __encrypt_defined
@@ -3111,20 +3111,20 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, 
  * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
-__CDECLARE_VOID(__ATTR_ACCESS_ROS(1, 3) __ATTR_ACCESS_WRS(2, 3),__NOTHROW_NCX,swab,(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes),(__from,__to,__n_bytes))
+__CDECLARE_VOID(__ATTR_INS(1, 3) __ATTR_OUTS(2, 3),__NOTHROW_NCX,swab,(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes),(__from,__to,__n_bytes))
 #elif defined(__CRT_HAVE__swab)
 /* >> swab(3)
  * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
-__CREDIRECT_VOID(__ATTR_ACCESS_ROS(1, 3) __ATTR_ACCESS_WRS(2, 3),__NOTHROW_NCX,swab,(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes),_swab,(__from,__to,__n_bytes))
+__CREDIRECT_VOID(__ATTR_INS(1, 3) __ATTR_OUTS(2, 3),__NOTHROW_NCX,swab,(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes),_swab,(__from,__to,__n_bytes))
 #else /* ... */
 #include <libc/local/unistd/swab.h>
 /* >> swab(3)
  * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
-__NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(1, 3) __ATTR_ACCESS_WRS(2, 3) void __NOTHROW_NCX(__LIBCCALL swab)(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swab))(__from, __to, __n_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(1, 3) __ATTR_OUTS(2, 3) void __NOTHROW_NCX(__LIBCCALL swab)(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swab))(__from, __to, __n_bytes); })
 #endif /* !... */
 #endif /* !__swab_defined */
 #endif /* __USE_XOPEN */
@@ -3156,7 +3156,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_R
  * If the actual  username is longer  than this,  it may be  truncated, and  programs
  * that wish to support longer usernames  should make use of `getlogin_r()'  instead.
  * s.a. `getlogin()' and `getlogin_r()' */
-__CDECLARE(__ATTR_ACCESS_WR_OPT(1),char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
+__CDECLARE(__ATTR_OUT_OPT(1),char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
 #else /* __CRT_HAVE_cuserid */
 #include <libc/template/environ.h>
 #if defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid)))
@@ -3168,7 +3168,7 @@ __CDECLARE(__ATTR_ACCESS_WR_OPT(1),char *,__NOTHROW_NCX,cuserid,(char *__s),(__s
  * If the actual  username is longer  than this,  it may be  truncated, and  programs
  * that wish to support longer usernames  should make use of `getlogin_r()'  instead.
  * s.a. `getlogin()' and `getlogin_r()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(cuserid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR_OPT(1) char *__NOTHROW_NCX(__LIBCCALL cuserid)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cuserid))(__s); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cuserid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT_OPT(1) char *__NOTHROW_NCX(__LIBCCALL cuserid)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cuserid))(__s); })
 #else /* __CRT_HAVE_getlogin_r || __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid)) */
 #undef __cuserid_defined
 #endif /* !__CRT_HAVE_getlogin_r && !__CRT_HAVE_getenv && !__LOCAL_environ && (!__CRT_HAVE_getpwuid_r || (!__CRT_HAVE_geteuid && !__CRT_HAVE___geteuid && !__CRT_HAVE___libc_geteuid)) */
@@ -3240,7 +3240,7 @@ typedef __sa_family_t sa_family_t; /* One of `AF_*' */
  *              so the KOS implementation of this function simply leaves its value
  *              untouched when this happens (other implementations might set it to
  *              `ERANGE' for example...) */
-__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups),(__user,__group,__groups,__ngroups))
+__CDECLARE(__ATTR_IN(1) __ATTR_INOUT(4) __ATTR_OUT(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,getgrouplist,(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups),(__user,__group,__groups,__ngroups))
 #elif defined(__CRT_HAVE_setgrent) && defined(__CRT_HAVE_getgrent)
 #include <libc/local/grp/getgrouplist.h>
 /* >> getgrouplist(3)
@@ -3265,7 +3265,7 @@ __CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(3),__STDC_IN
  *              so the KOS implementation of this function simply leaves its value
  *              untouched when this happens (other implementations might set it to
  *              `ERANGE' for example...) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getgrouplist, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(3) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL getgrouplist)(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getgrouplist))(__user, __group, __groups, __ngroups); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getgrouplist, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_INOUT(4) __ATTR_OUT(3) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL getgrouplist)(char const *__user, __gid_t __group, __gid_t *__groups, __STDC_INT_AS_SIZE_T *__ngroups) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getgrouplist))(__user, __group, __groups, __ngroups); })
 #else /* ... */
 #undef __getgrouplist_defined
 #endif /* !... */
@@ -3281,7 +3281,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getgrouplist, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * @return: -1: [errno=ENOMEM] Out of member
  * @return: -1: [errno=EPERM]  You're not allowed  to call  `setgroups(2)',
  *                             or at least not in the way you're trying to. */
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,initgroups,(char const *__user, __gid_t __group),(__user,__group))
 #elif (defined(__CRT_HAVE_getgrouplist) || (defined(__CRT_HAVE_setgrent) && defined(__CRT_HAVE_getgrent))) && (defined(__CRT_HAVE_setgroups) || defined(__CRT_HAVE___setgroups) || defined(__CRT_HAVE___libc_setgroups)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/grp/initgroups.h>
 /* >> initgroups(3)
@@ -3292,7 +3292,7 @@ __CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,initgroups,(char const *__user,
  * @return: -1: [errno=ENOMEM] Out of member
  * @return: -1: [errno=EPERM]  You're not allowed  to call  `setgroups(2)',
  *                             or at least not in the way you're trying to. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(initgroups, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL initgroups)(char const *__user, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(initgroups))(__user, __group); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(initgroups, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL initgroups)(char const *__user, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(initgroups))(__user, __group); })
 #else /* ... */
 #undef __initgroups_defined
 #endif /* !... */
@@ -3310,7 +3310,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(initgroups, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * descriptor of that file.
  * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_RPC,mkstemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),(__template_,__suffixlen))
+__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),__fd_t,__NOTHROW_RPC,mkstemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),(__template_,__suffixlen))
 #elif defined(__CRT_HAVE_mkstemps64)
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
@@ -3321,7 +3321,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_RPC,mkstemps,(cha
  * descriptor of that file.
  * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_RPC,mkstemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps64,(__template_,__suffixlen))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__fd_t,__NOTHROW_RPC,mkstemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps64,(__template_,__suffixlen))
 #else /* ... */
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_mkostemps) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
@@ -3335,7 +3335,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RW(1),__fd_t,__NOTHROW_RPC,mkstemps,(ch
  * descriptor of that file.
  * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mkstemps, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __fd_t __NOTHROW_RPC(__LIBCCALL mkstemps)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemps))(__template_, __suffixlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkstemps, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INOUT(1) __fd_t __NOTHROW_RPC(__LIBCCALL mkstemps)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemps))(__template_, __suffixlen); })
 #else /* (__CRT_HAVE_mkostemps && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #undef __mkstemps_defined
 #endif /* (!__CRT_HAVE_mkostemps || (__USE_FILE_OFFSET64 && __O_LARGEFILE && __O_LARGEFILE)) && !__CRT_HAVE_mkostemps64 && !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && !__CRT_HAVE___libc_open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
@@ -3386,13 +3386,13 @@ __CDECLARE(,int,__NOTHROW_RPC,rresvport,(int *__alport),(__alport))
 #define __setgroups_defined
 #ifdef __CRT_HAVE_setgroups
 /* >> setgroups(2) */
-__CDECLARE(__ATTR_ACCESS_ROS(2, 1),int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
+__CDECLARE(__ATTR_INS(2, 1),int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),(__count,__groups))
 #elif defined(__CRT_HAVE___setgroups)
 /* >> setgroups(2) */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 1),int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__setgroups,(__count,__groups))
+__CREDIRECT(__ATTR_INS(2, 1),int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__setgroups,(__count,__groups))
 #elif defined(__CRT_HAVE___libc_setgroups)
 /* >> setgroups(2) */
-__CREDIRECT(__ATTR_ACCESS_ROS(2, 1),int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__libc_setgroups,(__count,__groups))
+__CREDIRECT(__ATTR_INS(2, 1),int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups),__libc_setgroups,(__count,__groups))
 #else /* ... */
 #undef __setgroups_defined
 #endif /* !... */
@@ -3431,7 +3431,7 @@ __CDECLARE(,int,__NOTHROW_RPC,ruserok,(char const *__rhost, int __suser, char co
  *    p[10] = ' '; // '+', if "alternate or additional access control
  *                 //          methods associated with the inode"
  *    p[11] = '\0'; */
-__CDECLARE_VOID(__ATTR_ACCESS_WR(2),__NOTHROW_NCX,strmode,(__mode_t __mode, char __p[12]),(__mode,__p))
+__CDECLARE_VOID(__ATTR_OUT(2),__NOTHROW_NCX,strmode,(__mode_t __mode, char __p[12]),(__mode,__p))
 #else /* __CRT_HAVE_strmode */
 #include <libc/local/string/strmode.h>
 /* Generate  a file mode representation similar to what's printed by `ls -l'
@@ -3456,7 +3456,7 @@ __CDECLARE_VOID(__ATTR_ACCESS_WR(2),__NOTHROW_NCX,strmode,(__mode_t __mode, char
  *    p[10] = ' '; // '+', if "alternate or additional access control
  *                 //          methods associated with the inode"
  *    p[11] = '\0'; */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strmode, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(2) void __NOTHROW_NCX(__LIBCCALL strmode)(__mode_t __mode, char __p[12]) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strmode))(__mode, __p); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strmode, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(2) void __NOTHROW_NCX(__LIBCCALL strmode)(__mode_t __mode, char __p[12]) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strmode))(__mode, __p); })
 #endif /* !__CRT_HAVE_strmode */
 #endif /* !__strmode_defined */
 #ifndef __strsignal_defined
@@ -3555,7 +3555,7 @@ __CDECLARE(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_TYPE_
  * @return: NULL: [ENOMEM]      Insufficient memory
  * @return: NULL: [ENODATA]     End-of-file while reading, and `GETPASS_FAIL_EOF' was set.
  * @return: NULL: [*]           Error */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_WR_OPT(2),char *,__NOTHROW_RPC,getpassfd,(char const *__prompt, char *__buf, size_t __buflen, __fd_t __fds[3], __STDC_INT_AS_UINT_T __flags, int __timeout_in_seconds),(__prompt,__buf,__buflen,__fds,__flags,__timeout_in_seconds))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN_OPT(1) __ATTR_IN_OPT(4) __ATTR_OUT_OPT(2),char *,__NOTHROW_RPC,getpassfd,(char const *__prompt, char *__buf, size_t __buflen, __fd_t __fds[3], __STDC_INT_AS_UINT_T __flags, int __timeout_in_seconds),(__prompt,__buf,__buflen,__fds,__flags,__timeout_in_seconds))
 #elif defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)
 #include <libc/local/unistd/getpassfd.h>
 /* >> getpassfd(3)
@@ -3598,38 +3598,38 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(4) __ATTR
  * @return: NULL: [ENOMEM]      Insufficient memory
  * @return: NULL: [ENODATA]     End-of-file while reading, and `GETPASS_FAIL_EOF' was set.
  * @return: NULL: [*]           Error */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getpassfd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_WR_OPT(2) char *__NOTHROW_RPC(__LIBCCALL getpassfd)(char const *__prompt, char *__buf, size_t __buflen, __fd_t __fds[3], __STDC_INT_AS_UINT_T __flags, int __timeout_in_seconds) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpassfd))(__prompt, __buf, __buflen, __fds, __flags, __timeout_in_seconds); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpassfd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN_OPT(1) __ATTR_IN_OPT(4) __ATTR_OUT_OPT(2) char *__NOTHROW_RPC(__LIBCCALL getpassfd)(char const *__prompt, char *__buf, size_t __buflen, __fd_t __fds[3], __STDC_INT_AS_UINT_T __flags, int __timeout_in_seconds) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpassfd))(__prompt, __buf, __buflen, __fds, __flags, __timeout_in_seconds); })
 #endif /* ... */
 #ifdef __CRT_HAVE_getpass_r
 /* >> getpass_r(3) */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_WR_OPT(2),char *,__NOTHROW_RPC,getpass_r,(char const *__prompt, char *__buf, size_t __bufsize),(__prompt,__buf,__bufsize))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN_OPT(1) __ATTR_OUT_OPT(2),char *,__NOTHROW_RPC,getpass_r,(char const *__prompt, char *__buf, size_t __bufsize),(__prompt,__buf,__bufsize))
 #elif defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read) || defined(__CRT_HAVE_readpassphrase)
 #include <libc/local/unistd/getpass_r.h>
 /* >> getpass_r(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getpass_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_WR_OPT(2) char *__NOTHROW_RPC(__LIBCCALL getpass_r)(char const *__prompt, char *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass_r))(__prompt, __buf, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpass_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN_OPT(1) __ATTR_OUT_OPT(2) char *__NOTHROW_RPC(__LIBCCALL getpass_r)(char const *__prompt, char *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass_r))(__prompt, __buf, __bufsize); })
 #endif /* ... */
 
 /* WARNING: `setmode(3)' is also a completely different DOS-specific function in <io.h>! */
 #if !defined(__setmode_defined) && defined(__CRT_HAVE_setmode)
 #define __setmode_defined
 /* >> setmode(3), getmode(3) */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),void *,__NOTHROW_NCX,setmode,(char const *__mode_str),(__mode_str))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),void *,__NOTHROW_NCX,setmode,(char const *__mode_str),(__mode_str))
 #endif /* !__setmode_defined && __CRT_HAVE_setmode */
 /* >> setmode(3), getmode(3) */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__mode_t,__NOTHROW_NCX,getmode,(void const *__bbox, __mode_t __mode),(__bbox,__mode))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_IN(1),__mode_t,__NOTHROW_NCX,getmode,(void const *__bbox, __mode_t __mode),(__bbox,__mode))
 #ifndef __getpeereid_defined
 #define __getpeereid_defined
 #ifdef __CRT_HAVE_getpeereid
 /* >> getpeereid(3)
  * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
-__CDECLARE(__ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3),int,__NOTHROW_NCX,getpeereid,(__fd_t __sockfd, uid_t *__euid, gid_t *__egid),(__sockfd,__euid,__egid))
+__CDECLARE(__ATTR_OUT(2) __ATTR_OUT(3),int,__NOTHROW_NCX,getpeereid,(__fd_t __sockfd, uid_t *__euid, gid_t *__egid),(__sockfd,__euid,__egid))
 #else /* __CRT_HAVE_getpeereid */
 #include <asm/os/socket.h>
 #if defined(__CRT_HAVE_getsockopt) && defined(__SOL_SOCKET) && defined(__SO_PEERCRED)
 #include <libc/local/unistd/getpeereid.h>
 /* >> getpeereid(3)
  * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getpeereid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3) int __NOTHROW_NCX(__LIBCCALL getpeereid)(__fd_t __sockfd, uid_t *__euid, gid_t *__egid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpeereid))(__sockfd, __euid, __egid); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpeereid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(2) __ATTR_OUT(3) int __NOTHROW_NCX(__LIBCCALL getpeereid)(__fd_t __sockfd, uid_t *__euid, gid_t *__egid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpeereid))(__sockfd, __euid, __egid); })
 #else /* __CRT_HAVE_getsockopt && __SOL_SOCKET && __SO_PEERCRED */
 #undef __getpeereid_defined
 #endif /* !__CRT_HAVE_getsockopt || !__SOL_SOCKET || !__SO_PEERCRED */
@@ -3665,12 +3665,12 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(void (__LIBCCALL *__prepare)
 #ifdef __CRT_HAVE_ctermid_r
 /* >> ctermid_r(3)
  * Same as `ctermid', but return `NULL' when `s' is `NULL' */
-__CDECLARE(__ATTR_ACCESS_WR_OPT(1),char *,__NOTHROW_NCX,ctermid_r,(char *__s),(__s))
+__CDECLARE(__ATTR_OUT_OPT(1),char *,__NOTHROW_NCX,ctermid_r,(char *__s),(__s))
 #else /* __CRT_HAVE_ctermid_r */
 #include <libc/local/unistd/ctermid_r.h>
 /* >> ctermid_r(3)
  * Same as `ctermid', but return `NULL' when `s' is `NULL' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR_OPT(1) char *__NOTHROW_NCX(__LIBCCALL ctermid_r)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctermid_r))(__s); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT_OPT(1) char *__NOTHROW_NCX(__LIBCCALL ctermid_r)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctermid_r))(__s); })
 #endif /* !__CRT_HAVE_ctermid_r */
 #endif /* !__ctermid_r_defined */
 #endif /* __USE_REENTRANT || __USE_SOLARIS */
@@ -3850,11 +3850,11 @@ __CDECLARE(,int,__NOTHROW_RPC,rresvport_af,(int *__alport, __UINT16_TYPE__ __af)
 #ifdef __USE_SOLARIS
 #if !defined(__fattach_defined) && defined(__CRT_HAVE_fattach)
 #define __fattach_defined
-__CDECLARE(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fd, char const *__restrict __path),(__fd,__path))
+__CDECLARE(__ATTR_IN(2),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fd, char const *__restrict __path),(__fd,__path))
 #endif /* !__fattach_defined && __CRT_HAVE_fattach */
 #if !defined(__fdetach_defined) && defined(__CRT_HAVE_fdetach)
 #define __fdetach_defined
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __path),(__path))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __path),(__path))
 #endif /* !__fdetach_defined && __CRT_HAVE_fdetach */
 #ifndef __ioctl_defined
 #define __ioctl_defined
@@ -3908,24 +3908,24 @@ __CDECLARE(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, 
 #if defined(__CRT_HAVE_stime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),(__when))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),(__when))
 #elif defined(__CRT_HAVE___stime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),__stime,(__when))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),__stime,(__when))
 #elif defined(__CRT_HAVE___libc_stime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),__libc_stime,(__when))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),__libc_stime,(__when))
 #elif defined(__CRT_HAVE_stime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),stime64,(__when))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),stime64,(__when))
 #elif defined(__CRT_HAVE_stime64) || defined(__CRT_HAVE_stime) || defined(__CRT_HAVE___stime) || defined(__CRT_HAVE___libc_stime)
 #include <libc/local/time/stime.h>
 /* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
-__NAMESPACE_LOCAL_USING_OR_IMPL(stime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_NCX(__LIBCCALL stime)(__TM_TYPE(time) const *__when) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stime))(__when); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(stime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_NCX(__LIBCCALL stime)(__TM_TYPE(time) const *__when) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stime))(__when); })
 #else /* ... */
 #undef __stime_defined
 #endif /* !... */
@@ -3998,7 +3998,7 @@ __CREDIRECT_VOID(,__NOTHROW,yield,(void),thr_yield,())
  * the function will set errno=ERANGE and return -1
  * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
  * @return: -1: Error. (s.a. `errno') */
-__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,resolvepath,(char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen),(__filename,__resolved,__buflen))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUTS(2, 3),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,resolvepath,(char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen),(__filename,__resolved,__buflen))
 #else /* __CRT_HAVE_resolvepath */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_frealpathat) && defined(__AT_FDCWD)
@@ -4014,7 +4014,7 @@ __CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3),__STDC_INT_AS_SSIZE_T,__N
  * the function will set errno=ERANGE and return -1
  * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
  * @return: -1: Error. (s.a. `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(resolvepath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL resolvepath)(char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(resolvepath))(__filename, __resolved, __buflen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(resolvepath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUTS(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL resolvepath)(char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(resolvepath))(__filename, __resolved, __buflen); })
 #endif /* __CRT_HAVE_frealpathat && __AT_FDCWD */
 #endif /* !__CRT_HAVE_resolvepath */
 #ifndef __tell_defined

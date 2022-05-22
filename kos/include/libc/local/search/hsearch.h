@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed006683 */
+/* HASH CRC-32:0x7578d48e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 struct hsearch_data;
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(3),int,__NOTHROW_NCX,__localdep_hsearch_r,(struct entry __item, ACTION __action, struct entry **__retval, struct hsearch_data *__htab),hsearch_r,(__item,__action,__retval,__htab))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_OUT(3),int,__NOTHROW_NCX,__localdep_hsearch_r,(struct entry __item, ACTION __action, struct entry **__retval, struct hsearch_data *__htab),hsearch_r,(__item,__action,__retval,__htab))
 #else /* __CRT_HAVE_hsearch_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/hsearch_r.h>

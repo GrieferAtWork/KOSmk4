@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x148f6df5 */
+/* HASH CRC-32:0x40223482 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,15 +33,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_atoi_defined
 #define __local___localdep_atoi_defined
 #ifdef __CRT_HAVE_atoi
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_atoi,(char const *__restrict __nptr),atoi,(__nptr))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_NCX,__localdep_atoi,(char const *__restrict __nptr),atoi,(__nptr))
 #else /* __CRT_HAVE_atoi */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_atol) && __SIZEOF_INT__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_atoi,(char const *__restrict __nptr),atol,(__nptr))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_NCX,__localdep_atoi,(char const *__restrict __nptr),atol,(__nptr))
 #elif defined(__CRT_HAVE_atoll) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep_atoi,(char const *__restrict __nptr),atoll,(__nptr))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_NCX,__localdep_atoi,(char const *__restrict __nptr),atoll,(__nptr))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/atoi.h>
@@ -56,12 +56,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_closedir,(struct __dirstream *__dirp),closedir,(__dirp))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__localdep_closedir,(struct __dirstream *__dirp),closedir,(__dirp))
 #elif defined(__CRT_HAVE___libc_closedir)
 __NAMESPACE_LOCAL_END
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_closedir,(struct __dirstream *__dirp),__libc_closedir,(__dirp))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__localdep_closedir,(struct __dirstream *__dirp),__libc_closedir,(__dirp))
 #elif defined(__USE_DOS_DIRENT)
 __NAMESPACE_LOCAL_END
 #include <libc/local/dirent/closedir.h>
@@ -89,12 +89,12 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd,
 __NAMESPACE_LOCAL_END
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct __dirstream *,__NOTHROW_RPC,__localdep_opendir,(char const *__name),opendir,(__name))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),struct __dirstream *,__NOTHROW_RPC,__localdep_opendir,(char const *__name),opendir,(__name))
 #elif defined(__CRT_HAVE___libc_opendir)
 __NAMESPACE_LOCAL_END
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct __dirstream *,__NOTHROW_RPC,__localdep_opendir,(char const *__name),__libc_opendir,(__name))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),struct __dirstream *,__NOTHROW_RPC,__localdep_opendir,(char const *__name),__libc_opendir,(__name))
 #elif (defined(__AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))) || defined(__USE_DOS_DIRENT)
 __NAMESPACE_LOCAL_END
 #include <libc/local/dirent/opendir.h>
@@ -110,27 +110,27 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent *,__NOTHROW_RPC,__localdep_readdir,(struct __dirstream *__restrict __dirp),readdirk,(__dirp))
+__CREDIRECT(__ATTR_INOUT(1),struct dirent *,__NOTHROW_RPC,__localdep_readdir,(struct __dirstream *__restrict __dirp),readdirk,(__dirp))
 #elif defined(__CRT_HAVE_readdirk64) && defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 __NAMESPACE_LOCAL_END
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent *,__NOTHROW_RPC,__localdep_readdir,(struct __dirstream *__restrict __dirp),readdirk64,(__dirp))
+__CREDIRECT(__ATTR_INOUT(1),struct dirent *,__NOTHROW_RPC,__localdep_readdir,(struct __dirstream *__restrict __dirp),readdirk64,(__dirp))
 #elif defined(__CRT_HAVE_readdir) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 __NAMESPACE_LOCAL_END
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent *,__NOTHROW_RPC,__localdep_readdir,(struct __dirstream *__restrict __dirp),readdir,(__dirp))
+__CREDIRECT(__ATTR_INOUT(1),struct dirent *,__NOTHROW_RPC,__localdep_readdir,(struct __dirstream *__restrict __dirp),readdir,(__dirp))
 #elif defined(__CRT_HAVE___libc_readdir) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 __NAMESPACE_LOCAL_END
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent *,__NOTHROW_RPC,__localdep_readdir,(struct __dirstream *__restrict __dirp),__libc_readdir,(__dirp))
+__CREDIRECT(__ATTR_INOUT(1),struct dirent *,__NOTHROW_RPC,__localdep_readdir,(struct __dirstream *__restrict __dirp),__libc_readdir,(__dirp))
 #elif defined(__CRT_HAVE_readdir64) && !defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 __NAMESPACE_LOCAL_END
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RW(1),struct dirent *,__NOTHROW_RPC,__localdep_readdir,(struct __dirstream *__restrict __dirp),readdir64,(__dirp))
+__CREDIRECT(__ATTR_INOUT(1),struct dirent *,__NOTHROW_RPC,__localdep_readdir,(struct __dirstream *__restrict __dirp),readdir64,(__dirp))
 #elif defined(__USE_DOS_DIRENT)
 __NAMESPACE_LOCAL_END
 #include <libc/local/dirent/readdir.h>

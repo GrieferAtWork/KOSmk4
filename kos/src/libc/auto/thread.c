@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ce2d369 */
+/* HASH CRC-32:0x5234e82c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <asm/crt/pthreadvalues.h>
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_WR(6) NONNULL((3)) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_OUT(6) NONNULL((3)) errno_t
 NOTHROW_NCX(LIBCCALL libc_thr_create)(void *stack_base,
                                       size_t stack_size,
                                       void *(LIBCCALL *start_routine)(void *arg),
@@ -121,7 +121,7 @@ done_attr:;
 	}
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_WR(2) ATTR_ACCESS_WR_OPT(3) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_OUT(2) ATTR_OUT_OPT(3) errno_t
 NOTHROW_RPC(LIBCCALL libc_thr_join)(thread_t thr,
                                     thread_t *p_departed,
                                     void **thread_return) {
@@ -157,7 +157,7 @@ NOTHROW_NCX(LIBCCALL libc_thr_getprio)(thread_t thr,
 		*p_priority = param.sched_priority;
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_ACCESS_WR(2) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.threads") ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_thr_getspecific)(thread_key_t key,
                                            void **p_val) {
 	void *val;

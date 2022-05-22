@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb1a0498 */
+/* HASH CRC-32:0x2cde1bc6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_crt_gmtime64_s_defined) && defined(__CRT_HAVE__gmtime64_s)
 #define __local___localdep_crt_gmtime64_s_defined
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),__errno_t,__NOTHROW_NCX,__localdep_crt_gmtime64_s,(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time64_t const *__restrict __timer),_gmtime64_s,(__tp,__timer))
+__CREDIRECT(__ATTR_IN(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,__localdep_crt_gmtime64_s,(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time64_t const *__restrict __timer),_gmtime64_s,(__tp,__timer))
 #endif /* !__local___localdep_crt_gmtime64_s_defined && __CRT_HAVE__gmtime64_s */
 __NAMESPACE_LOCAL_END
 #if defined(__BUILDING_LIBC) || !defined(__CRT_HAVE__gmtime64_s)
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_END
 
 #endif /* __BUILDING_LIBC || !__CRT_HAVE__gmtime64_s */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(gmtime64_r) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) struct __NAMESPACE_STD_SYM tm *
+__LOCAL_LIBC(gmtime64_r) __ATTR_IN(1) __ATTR_OUT(2) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp) {
 #ifdef __CRT_HAVE__gmtime64_s
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_gmtime64_s)(__tp, __timer) ? __NULLPTR : __tp;

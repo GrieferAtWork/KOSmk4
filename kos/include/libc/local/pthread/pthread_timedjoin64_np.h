@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79f12608 */
+/* HASH CRC-32:0x838c4a75 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_pthread_timedjoin32_np_defined
 #define __local___localdep_crt_pthread_timedjoin32_np_defined
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_WR_OPT(2),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_timedjoin32_np,(__pthread_t __pthread, void **__thread_return, struct __timespec32 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
+__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_timedjoin32_np,(__pthread_t __pthread, void **__thread_return, struct __timespec32 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
 #endif /* !__local___localdep_crt_pthread_timedjoin32_np_defined */
-__LOCAL_LIBC(pthread_timedjoin64_np) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_WR_OPT(2) __errno_t
+__LOCAL_LIBC(pthread_timedjoin64_np) __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_timedjoin64_np))(__pthread_t __pthread, void **__thread_return, struct __timespec64 const *__abstime) {
 	struct __timespec32 __abstime32;
 	if (!__abstime)

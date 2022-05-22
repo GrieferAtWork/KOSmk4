@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86f781ca */
+/* HASH CRC-32:0x1e545f91 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wctomb_s_defined
 #define __local___localdep_wctomb_s_defined
 #ifdef __CRT_HAVE_wctomb_s
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WR_OPT(1),__errno_t,__NOTHROW_NCX,__localdep_wctomb_s,(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ __wc),wctomb_s,(__presult,__buf,__buflen,__wc))
+__CREDIRECT(__ATTR_OUTS(2, 3) __ATTR_OUT_OPT(1),__errno_t,__NOTHROW_NCX,__localdep_wctomb_s,(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ __wc),wctomb_s,(__presult,__buf,__buflen,__wc))
 #else /* __CRT_HAVE_wctomb_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/wctomb_s.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wctomb_s_l) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WR_OPT(1) __errno_t
+__LOCAL_LIBC(_wctomb_s_l) __ATTR_OUTS(2, 3) __ATTR_OUT_OPT(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wctomb_s_l))(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ __wc, __locale_t __locale) {
 	(void)__locale;
 	return (__NAMESPACE_LOCAL_SYM __localdep_wctomb_s)(__presult, __buf, __buflen, __wc);

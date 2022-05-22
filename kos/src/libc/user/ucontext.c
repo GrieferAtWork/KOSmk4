@@ -28,7 +28,7 @@ DECL_BEGIN
 #define CRT_NOT_REALLY_UNIMPLEMENTED \
 	CRT_UNIMPLEMENTED
 
-/*[[[head:libc_getcontext,hash:CRC-32=0xf9d1fb0c]]]*/
+/*[[[head:libc_getcontext,hash:CRC-32=0x91e81c4a]]]*/
 #ifndef LIBC_ARCH_HAVE_GETCONTEXT
 /* >> getcontext(3)
  * Save the caller's current register  state into the given  `ucp'
@@ -42,7 +42,7 @@ DECL_BEGIN
  *       function.
  * WARNING: If the context returned by  this function is loaded after  the
  *          calling function has returned, then the behavior is undefined. */
-INTERN ATTR_SECTION(".text.crt.cpu.ucontext") ATTR_ACCESS_WR(1) int
+INTERN ATTR_SECTION(".text.crt.cpu.ucontext") ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_getcontext)(ucontext_t *__restrict ucp)
 /*[[[body:libc_getcontext]]]*/
 {
@@ -53,7 +53,7 @@ NOTHROW_NCX(LIBCCALL libc_getcontext)(ucontext_t *__restrict ucp)
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_getcontext]]]*/
 
-/*[[[head:libc_setcontext,hash:CRC-32=0x24cedd6a]]]*/
+/*[[[head:libc_setcontext,hash:CRC-32=0x3f9e55db]]]*/
 #ifndef LIBC_ARCH_HAVE_SETCONTEXT
 /* >> setcontext(3)
  * Populate the current machine register state with values from `ucp',
@@ -77,7 +77,7 @@ NOTHROW_NCX(LIBCCALL libc_getcontext)(ucontext_t *__restrict ucp)
  *       headers will define a macro `__CRT_SUPPORTS_UCONTEXT', which you
  *       may test for, and which allows you to omit error-checks for this
  *       function. */
-INTERN ATTR_SECTION(".text.crt.cpu.ucontext") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.cpu.ucontext") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *__restrict ucp)
 /*[[[body:libc_setcontext]]]*/
 {
@@ -88,7 +88,7 @@ NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *__restrict ucp)
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_setcontext]]]*/
 
-/*[[[head:libc_swapcontext,hash:CRC-32=0x17fdc5d4]]]*/
+/*[[[head:libc_swapcontext,hash:CRC-32=0x80aa48c3]]]*/
 #ifndef LIBC_ARCH_HAVE_SWAPCONTEXT
 /* >> swapcontext(3)
  * Atomically perform both a `getcontext(oucp)',  as well as a  `setcontext(ucp)',
@@ -105,7 +105,7 @@ NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *__restrict ucp)
  *       headers will define a macro `__CRT_SUPPORTS_UCONTEXT', which you
  *       may test for, and which allows you to omit error-checks for this
  *       function. */
-INTERN ATTR_SECTION(".text.crt.cpu.ucontext") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) int
+INTERN ATTR_SECTION(".text.crt.cpu.ucontext") ATTR_IN(2) ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp,
                                        ucontext_t const *__restrict ucp)
 /*[[[body:libc_swapcontext]]]*/
@@ -118,7 +118,7 @@ NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp,
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_swapcontext]]]*/
 
-/*[[[head:libc_makecontext,hash:CRC-32=0x7d09971]]]*/
+/*[[[head:libc_makecontext,hash:CRC-32=0xba02b357]]]*/
 #ifndef LIBC_ARCH_HAVE_MAKECONTEXT
 /* >> makecontext(3)
  * Initialize  a  user-context  `ucp'  to  perform  a  call  to  `func',  which
@@ -139,7 +139,7 @@ NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp,
  *   - Have `ucp->uc_link' point to the context that should be  loaded
  *     when `func' returns normally, or set to `NULL' if the return of
  *     `func' should be handled as a call to `pthread_exit(NULL)' */
-INTERN ATTR_SECTION(".text.crt.cpu.ucontext") ATTR_ACCESS_WR(1) NONNULL((2)) void
+INTERN ATTR_SECTION(".text.crt.cpu.ucontext") ATTR_OUT(1) NONNULL((2)) void
 NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
                                         void (LIBKCALL *func)(void),
                                         __STDC_INT_AS_SIZE_T argc,

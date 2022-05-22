@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x813aff0d */
+/* HASH CRC-32:0xd3343884 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_mbstoc32n_defined
 #define __local___localdep_convert_mbstoc32n_defined
 #if defined(__CRT_HAVE_convert_mbstowcsn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR_OPT(3),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32n,(char const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_mbstowcsn,(__str,__len,__preslen))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_OUT_OPT(3),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32n,(char const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_mbstowcsn,(__str,__len,__preslen))
 #elif defined(__CRT_HAVE_KOS$convert_mbstowcsn)
-__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR_OPT(3),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32n,(char const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_mbstowcsn,(__str,__len,__preslen))
+__CREDIRECT_KOS(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_OUT_OPT(3),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_convert_mbstoc32n,(char const *__restrict __str, __SIZE_TYPE__ __len, __SIZE_TYPE__ *__preslen),convert_mbstowcsn,(__str,__len,__preslen))
 #elif (defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_mbstowcsn.h>
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(convert_mbstoc32) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __CHAR32_TYPE__ *
+__LOCAL_LIBC(convert_mbstoc32) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN_OPT(1) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(convert_mbstoc32))(char const *__restrict __str) {
 	if __unlikely(!__str) {
 #ifdef __EINVAL

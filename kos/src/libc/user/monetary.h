@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e4b97e2 */
+/* HASH CRC-32:0xb6d8d735 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,16 +30,16 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_STRFMON(3, 4) ssize_t NOTHROW_NCX(VLIBDCALL libd_strfmon)(char *__restrict s, size_t maxsize, char const *__restrict format, ...);
+INTDEF ATTR_IN(3) ATTR_LIBC_STRFMON(3, 4) ATTR_OUTS(1, 2) ssize_t NOTHROW_NCX(VLIBDCALL libd_strfmon)(char *__restrict s, size_t maxsize, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_STRFMON(3, 4) ssize_t NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s, size_t maxsize, char const *__restrict format, ...);
+INTDEF ATTR_IN(3) ATTR_LIBC_STRFMON(3, 4) ATTR_OUTS(1, 2) ssize_t NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s, size_t maxsize, char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_STRFMON(4, 5) ssize_t NOTHROW_NCX(VLIBDCALL libd_strfmon_l)(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...);
+INTDEF ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2) ssize_t NOTHROW_NCX(VLIBDCALL libd_strfmon_l)(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_STRFMON(4, 5) ssize_t NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...);
+INTDEF ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2) ssize_t NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s, size_t maxsize, locale_t loc, const char *__restrict format, ...);
 #endif /* !__KERNEL__ */
 
 DECL_END

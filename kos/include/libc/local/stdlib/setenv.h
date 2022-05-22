@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4327d02c */
+/* HASH CRC-32:0x79938a38 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,12 +26,12 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dos_putenv_s_defined
 #define __local___localdep_dos_putenv_s_defined
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,__localdep_dos_putenv_s,(char const *__varname, char const *__val),_putenv_s,(__varname,__val))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_dos_putenv_s,(char const *__varname, char const *__val),_putenv_s,(__varname,__val))
 #endif /* !__local___localdep_dos_putenv_s_defined */
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined
 #ifdef __CRT_HAVE_getenv
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #elif defined(__LOCAL_environ)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/getenv.h>
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_getenv_defined
 #endif /* !... */
 #endif /* !__local___localdep_getenv_defined */
-__LOCAL_LIBC(setenv) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
+__LOCAL_LIBC(setenv) __ATTR_IN(1) __ATTR_IN(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setenv))(char const *__varname, char const *__val, int __replace) {
 	if (!__replace && (__NAMESPACE_LOCAL_SYM __localdep_getenv)(__varname))
 		return 0;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5c12185 */
+/* HASH CRC-32:0xaae65596 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wctype_defined
 #define __local___localdep_wctype_defined
 #ifdef __CRT_HAVE_wctype
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__wctype_t,__NOTHROW_NCX,__localdep_wctype,(char const *__prop),wctype,(__prop))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__wctype_t,__NOTHROW_NCX,__localdep_wctype,(char const *__prop),wctype,(__prop))
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/wctype.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_wctype_defined
 #endif /* !... */
 #endif /* !__local___localdep_wctype_defined */
-__LOCAL_LIBC(wctype_l) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __wctype_t
+__LOCAL_LIBC(wctype_l) __ATTR_WUNUSED __ATTR_IN(1) __wctype_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctype_l))(char const *__prop, __locale_t __locale) {
 	__COMPILER_IMPURE();
 	(void)__locale;

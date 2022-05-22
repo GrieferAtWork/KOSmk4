@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x984e020b */
+/* HASH CRC-32:0xc6a9d798 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_tryread,(struct shared_rwlock *__restrict __self),shared_rwlock_tryread,{
+__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_tryread,(struct shared_rwlock *__restrict __self),shared_rwlock_tryread,{
 	__UINTPTR_TYPE__ __temp;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	do {
@@ -48,7 +48,7 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOT
 __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_tryread)(struct shared_rwlock *__restrict __self) {
+__LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_tryread)(struct shared_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __temp;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	do {
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 #include <sched/sig.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(shared_rwlock_read_nx) __ATTR_WUNUSED __BLOCKING __ATTR_ACCESS_RW(1) __BOOL
+__LOCAL_LIBC(shared_rwlock_read_nx) __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL
 (__FCALL __LIBC_LOCAL_NAME(shared_rwlock_read_nx))(struct shared_rwlock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_wasconnected());
 	while (!(__NAMESPACE_LOCAL_SYM __localdep_shared_rwlock_tryread)(__self)) {

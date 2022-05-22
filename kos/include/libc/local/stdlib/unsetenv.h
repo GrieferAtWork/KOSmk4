@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x107fb3b3 */
+/* HASH CRC-32:0x7f8a7be0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyc.h>
@@ -40,9 +40,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_putenv_defined
 #define __local___localdep_putenv_defined
 #ifdef __CRT_HAVE_putenv
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_putenv,(char *__string),putenv,(__string))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__localdep_putenv,(char *__string),putenv,(__string))
 #elif defined(__CRT_HAVE__putenv)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_putenv,(char *__string),_putenv,(__string))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__localdep_putenv,(char *__string),_putenv,(__string))
 #else /* ... */
 #undef __local___localdep_putenv_defined
 #endif /* !... */
@@ -53,7 +53,7 @@ __CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_putenv,(char *__str
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <parts/malloca.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(unsetenv) __ATTR_ACCESS_RO(1) int
+__LOCAL_LIBC(unsetenv) __ATTR_IN(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unsetenv))(char const *__varname) {
 	int __result;
 	char *__copy;

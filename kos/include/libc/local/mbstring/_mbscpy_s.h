@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13cbb1bb */
+/* HASH CRC-32:0x1f07e820 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbscpy_s_l_defined
 #define __local___localdep__mbscpy_s_l_defined
 #ifdef __CRT_HAVE__mbscpy_s_l
-__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__mbscpy_s_l,(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned char const *__src, __locale_t __locale),_mbscpy_s_l,(__buf,__true_bufsize,__src,__locale))
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__mbscpy_s_l,(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned char const *__src, __locale_t __locale),_mbscpy_s_l,(__buf,__true_bufsize,__src,__locale))
 #else /* __CRT_HAVE__mbscpy_s_l */
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbscpy_s_l.h>
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__mbscpy_s_l __LIBC_LOCAL_NAME(_mbscpy_s_l)
 #endif /* !__CRT_HAVE__mbscpy_s_l */
 #endif /* !__local___localdep__mbscpy_s_l_defined */
-__LOCAL_LIBC(_mbscpy_s) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __errno_t
+__LOCAL_LIBC(_mbscpy_s) __ATTR_IN(3) __ATTR_OUTS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbscpy_s))(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned char const *__src) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbscpy_s_l)(__buf, __true_bufsize, __src, __NULLPTR);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2351ca72 */
+/* HASH CRC-32:0x2aeb3289 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined
 #ifdef __CRT_HAVE_getenv
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #elif defined(__LOCAL_environ)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/getenv.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/template/__libc_enable_secure.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(secure_getenv) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) char *
+__LOCAL_LIBC(secure_getenv) __ATTR_WUNUSED __ATTR_IN(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(secure_getenv))(char const *__varname) {
 #ifdef __LOCAL___libc_enable_secure
 	if (__LOCAL___libc_enable_secure)

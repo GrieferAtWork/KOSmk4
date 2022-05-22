@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff239967 */
+/* HASH CRC-32:0x8c9bef7b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LIBC __ATTR_NORETURN __ATTR_ACCESS_RO_OPT(2) __ATTR_LIBC_PRINTF(2, 3) void (__VLIBCCALL __localdep_errx)(int __status, char const *__format, ...) __THROWS(...) __CASMNAME("errx");
+__LIBC __ATTR_NORETURN __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 3) void (__VLIBCCALL __localdep_errx)(int __status, char const *__format, ...) __THROWS(...) __CASMNAME("errx");
 #elif defined(__CRT_HAVE_verrx) || ((defined(__CRT_HAVE_vwarnx) || (defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE_xexit)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/err/errx.h>
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strsuftollx_defined
 #define __local___localdep_strsuftollx_defined
 #ifdef __CRT_HAVE_strsuftollx
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),__LONGLONG,__NOTHROW_NCX,__localdep_strsuftollx,(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi, char *__errbuf, __SIZE_TYPE__ __errbuflen),strsuftollx,(__desc,__val,__lo,__hi,__errbuf,__errbuflen))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),__LONGLONG,__NOTHROW_NCX,__localdep_strsuftollx,(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi, char *__errbuf, __SIZE_TYPE__ __errbuflen),strsuftollx,(__desc,__val,__lo,__hi,__errbuf,__errbuflen))
 #else /* __CRT_HAVE_strsuftollx */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strsuftollx.h>
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/os/stdlib.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strsuftoll) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __LONGLONG
+__LOCAL_LIBC(strsuftoll) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __LONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsuftoll))(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi) {
 	__LONGLONG __result;
 	char __error_message[128];

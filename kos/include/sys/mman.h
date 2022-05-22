@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff7b0ffa */
+/* HASH CRC-32:0x7e1a7819 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -700,25 +700,25 @@ __CREDIRECT(,int,__NOTHROW_NCX,munlockall,(void),__libc_munlockall,())
 #endif /* ... */
 #ifdef __CRT_HAVE_shm_open
 /* >> shm_open(3) */
-__CDECLARE(__ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,shm_open,(char const *__name, __oflag_t __oflags, mode_t __mode),(__name,__oflags,__mode))
+__CDECLARE(__ATTR_IN(1),__fd_t,__NOTHROW_RPC,shm_open,(char const *__name, __oflag_t __oflags, mode_t __mode),(__name,__oflags,__mode))
 #else /* __CRT_HAVE_shm_open */
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/sys.mman/shm_open.h>
 /* >> shm_open(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(shm_open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__LIBCCALL shm_open)(char const *__name, __oflag_t __oflags, mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shm_open))(__name, __oflags, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(shm_open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __fd_t __NOTHROW_RPC(__LIBCCALL shm_open)(char const *__name, __oflag_t __oflags, mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shm_open))(__name, __oflags, __mode); })
 #endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #endif /* !__CRT_HAVE_shm_open */
 #ifdef __CRT_HAVE_shm_unlink
 /* >> shm_unlink(3) */
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,shm_unlink,(char const *__name),(__name))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,shm_unlink,(char const *__name),(__name))
 #else /* __CRT_HAVE_shm_unlink */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || defined(__CRT_HAVE___unlink) || defined(__CRT_HAVE___libc_unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
 #include <libc/local/sys.mman/shm_unlink.h>
 /* >> shm_unlink(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(shm_unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL shm_unlink)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shm_unlink))(__name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(shm_unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL shm_unlink)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shm_unlink))(__name); })
 #endif /* __CRT_HAVE_unlink || __CRT_HAVE__unlink || __CRT_HAVE___unlink || __CRT_HAVE___libc_unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
 #endif /* !__CRT_HAVE_shm_unlink */
 
@@ -864,7 +864,7 @@ __SYSDECL_BEGIN
  * @return: -1: [errno=ENOMEM] Out of memory
  * @return: -1: [errno=EBADF]  Invalid `fd'
  * @return: -1: [errno=*]      Read error */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,fmapfile,(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes),(__mapping,__fd,__offset,__max_bytes,__num_trailing_nulbytes))
+__CDECLARE(__ATTR_WUNUSED __ATTR_OUT(1),int,__NOTHROW_NCX,fmapfile,(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes),(__mapping,__fd,__offset,__max_bytes,__num_trailing_nulbytes))
 #elif (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/sys.mman/fmapfile.h>
 /* >> fmapfile(3)
@@ -903,13 +903,13 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,fmapfile,(struct
  * @return: -1: [errno=ENOMEM] Out of memory
  * @return: -1: [errno=EBADF]  Invalid `fd'
  * @return: -1: [errno=*]      Read error */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fmapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL fmapfile)(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmapfile))(__mapping, __fd, __offset, __max_bytes, __num_trailing_nulbytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL fmapfile)(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmapfile))(__mapping, __fd, __offset, __max_bytes, __num_trailing_nulbytes); })
 #endif /* ... */
 #ifdef __CRT_HAVE_fmapfileat
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,fmapfileat,(struct mapfile *__restrict __mapping, __fd_t __dirfd, char const *__filename, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes, __atflag_t __atflags),(__mapping,__dirfd,__filename,__offset,__max_bytes,__num_trailing_nulbytes,__atflags))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_OUT(1),int,__NOTHROW_NCX,fmapfileat,(struct mapfile *__restrict __mapping, __fd_t __dirfd, char const *__filename, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes, __atflag_t __atflags),(__mapping,__dirfd,__filename,__offset,__max_bytes,__num_trailing_nulbytes,__atflags))
 #else /* __CRT_HAVE_fmapfileat */
 #include <asm/os/oflags.h>
 #if defined(__O_RDONLY) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_fmapfile) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
@@ -917,13 +917,13 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1),int,__NOTHROW_
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fmapfileat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL fmapfileat)(struct mapfile *__restrict __mapping, __fd_t __dirfd, char const *__filename, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes, __atflag_t __atflags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmapfileat))(__mapping, __dirfd, __filename, __offset, __max_bytes, __num_trailing_nulbytes, __atflags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmapfileat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL fmapfileat)(struct mapfile *__restrict __mapping, __fd_t __dirfd, char const *__filename, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes, __atflag_t __atflags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmapfileat))(__mapping, __dirfd, __filename, __offset, __max_bytes, __num_trailing_nulbytes, __atflags); })
 #endif /* __O_RDONLY && (__CRT_HAVE_openat64 || __CRT_HAVE_openat) && (__CRT_HAVE_fmapfile || ((__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))) */
 #endif /* !__CRT_HAVE_fmapfileat */
 #ifdef __CRT_HAVE_mapfile
 /* >> mapfile(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,mapfile,(struct mapfile *__restrict __mapping, char const *__filename, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes),(__mapping,__filename,__offset,__max_bytes,__num_trailing_nulbytes))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,mapfile,(struct mapfile *__restrict __mapping, char const *__filename, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes),(__mapping,__filename,__offset,__max_bytes,__num_trailing_nulbytes))
 #else /* __CRT_HAVE_mapfile */
 #include <asm/os/fcntl.h>
 #include <asm/os/oflags.h>
@@ -931,18 +931,18 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),int,__NOTHROW_
 #include <libc/local/sys.mman/mapfile.h>
 /* >> mapfile(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) int __NOTHROW_NCX(__LIBCCALL mapfile)(struct mapfile *__restrict __mapping, char const *__filename, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mapfile))(__mapping, __filename, __offset, __max_bytes, __num_trailing_nulbytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL mapfile)(struct mapfile *__restrict __mapping, char const *__filename, __pos64_t __offset, size_t __max_bytes, size_t __num_trailing_nulbytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mapfile))(__mapping, __filename, __offset, __max_bytes, __num_trailing_nulbytes); })
 #endif /* (__AT_FDCWD && (__CRT_HAVE_fmapfileat || (__O_RDONLY && (__CRT_HAVE_openat64 || __CRT_HAVE_openat) && (__CRT_HAVE_fmapfile || ((__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc)))))) || (__O_RDONLY && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fmapfile || ((__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc)))) */
 #endif /* !__CRT_HAVE_mapfile */
 #ifdef __CRT_HAVE_unmapfile
 /* >> unmapfile(3)
  * Delete a file mapping previously created by `mapfile(3)' */
-__CDECLARE(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,unmapfile,(struct mapfile *__restrict __mapping),(__mapping))
+__CDECLARE(__ATTR_INOUT(1),int,__NOTHROW_NCX,unmapfile,(struct mapfile *__restrict __mapping),(__mapping))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #include <libc/local/sys.mman/unmapfile.h>
 /* >> unmapfile(3)
  * Delete a file mapping previously created by `mapfile(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unmapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL unmapfile)(struct mapfile *__restrict __mapping) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unmapfile))(__mapping); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unmapfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) int __NOTHROW_NCX(__LIBCCALL unmapfile)(struct mapfile *__restrict __mapping) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unmapfile))(__mapping); })
 #endif /* ... */
 #endif /* __USE_KOS */
 

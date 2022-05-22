@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f725f99 */
+/* HASH CRC-32:0xcd85144 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_statvfs)(char const *file, struct statvfs *buf);
-INTDEF ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_fstatvfs)(fd_t filedes, struct statvfs *buf);
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_statvfs64)(const char *file, struct statvfs64 *buf);
-INTDEF ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_fstatvfs64)(fd_t filedes, struct statvfs64 *buf);
+INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_statvfs)(char const *file, struct statvfs *buf);
+INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_fstatvfs)(fd_t filedes, struct statvfs *buf);
+INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_statvfs64)(const char *file, struct statvfs64 *buf);
+INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_fstatvfs64)(fd_t filedes, struct statvfs64 *buf);
 #endif /* !__KERNEL__ */
 
 DECL_END

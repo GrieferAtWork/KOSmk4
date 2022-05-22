@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a62d1eb */
+/* HASH CRC-32:0xd0624a9a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ DECL_BEGIN
  * @param: match_flags:   Set of `FNM_*'
  * @return: 0           : `name' is matched by `pattern'
  * @return: FNM_NOMATCH : `name' is not matched by `pattern' */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_NCX(LIBDCALL libd_fnmatch)(char const *pattern, char const *name, __STDC_INT_AS_UINT_T match_flags);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_fnmatch)(char const *pattern, char const *name, __STDC_INT_AS_UINT_T match_flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fnmatch(3)
@@ -45,7 +45,7 @@ INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_NCX(LIB
  * @param: match_flags:   Set of `FNM_*'
  * @return: 0           : `name' is matched by `pattern'
  * @return: FNM_NOMATCH : `name' is not matched by `pattern' */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern, char const *name, __STDC_INT_AS_UINT_T match_flags);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern, char const *name, __STDC_INT_AS_UINT_T match_flags);
 #endif /* !__KERNEL__ */
 
 DECL_END

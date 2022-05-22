@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4291248d */
+/* HASH CRC-32:0xb9e919f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ DECL_BEGIN
  * @param: child:   When non-NULL, fill with timings for child processes. (s.a. `RUSAGE_CHILDREN')
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_ACCESS_WR_OPT(1) ATTR_ACCESS_WR_OPT(2) int
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) int
 NOTHROW_NCX(LIBCCALL libc_vtimes)(struct vtimes *current,
                                   struct vtimes *child) {
 	int result = 0;

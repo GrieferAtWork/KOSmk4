@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed19d7ce */
+/* HASH CRC-32:0x5f8ce7c0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,28 +30,28 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) void NOTHROW_NCX(LIBDCALL libd_timeval_add)(struct timeval *result, struct timeval const *lhs, struct timeval const *rhs);
+INTDEF ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd_timeval_add)(struct timeval *result, struct timeval const *lhs, struct timeval const *rhs);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) void NOTHROW_NCX(LIBCCALL libc_timeval_add)(struct timeval *result, struct timeval const *lhs, struct timeval const *rhs);
+INTDEF ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void NOTHROW_NCX(LIBCCALL libc_timeval_add)(struct timeval *result, struct timeval const *lhs, struct timeval const *rhs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) void NOTHROW_NCX(LIBDCALL libd_timeval_sub)(struct timeval *result, struct timeval const *lhs, struct timeval const *rhs);
+INTDEF ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd_timeval_sub)(struct timeval *result, struct timeval const *lhs, struct timeval const *rhs);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) void NOTHROW_NCX(LIBCCALL libc_timeval_sub)(struct timeval *result, struct timeval const *lhs, struct timeval const *rhs);
+INTDEF ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void NOTHROW_NCX(LIBCCALL libc_timeval_sub)(struct timeval *result, struct timeval const *lhs, struct timeval const *rhs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) void NOTHROW_NCX(LIBDCALL libd_timeval_add64)(struct timeval64 *result, struct timeval64 const *lhs, struct timeval64 const *rhs);
+INTDEF ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd_timeval_add64)(struct timeval64 *result, struct timeval64 const *lhs, struct timeval64 const *rhs);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) void NOTHROW_NCX(LIBCCALL libc_timeval_add64)(struct timeval64 *result, struct timeval64 const *lhs, struct timeval64 const *rhs);
+INTDEF ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void NOTHROW_NCX(LIBCCALL libc_timeval_add64)(struct timeval64 *result, struct timeval64 const *lhs, struct timeval64 const *rhs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) void NOTHROW_NCX(LIBDCALL libd_timeval_sub64)(struct timeval64 *result, struct timeval64 const *lhs, struct timeval64 const *rhs);
+INTDEF ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd_timeval_sub64)(struct timeval64 *result, struct timeval64 const *lhs, struct timeval64 const *rhs);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) void NOTHROW_NCX(LIBCCALL libc_timeval_sub64)(struct timeval64 *result, struct timeval64 const *lhs, struct timeval64 const *rhs);
+INTDEF ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void NOTHROW_NCX(LIBCCALL libc_timeval_sub64)(struct timeval64 *result, struct timeval64 const *lhs, struct timeval64 const *rhs);
 #endif /* !__KERNEL__ */
 
 DECL_END

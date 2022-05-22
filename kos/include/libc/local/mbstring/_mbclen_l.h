@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedef8357 */
+/* HASH CRC-32:0xc9c1386d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__ismbblead_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__ismbblead_l_defined */
-__LOCAL_LIBC(_mbclen_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __SIZE_TYPE__
+__LOCAL_LIBC(_mbclen_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbclen_l))(unsigned char const *__str, __locale_t __locale) {
 	__SIZE_TYPE__ __result = 1;
 	if ((__NAMESPACE_LOCAL_SYM __localdep__ismbblead_l)(__str[0], __locale) && __str[1])

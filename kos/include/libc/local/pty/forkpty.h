@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8798857d */
+/* HASH CRC-32:0xf05ce49a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,9 +106,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_login_tty_defined */
 #ifndef __local___localdep_openpty_defined
 #define __local___localdep_openpty_defined
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_WR(1) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR_OPT(3),int,__NOTHROW_NCX,__localdep_openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),openpty,(__amaster,__aslave,__name,__termp,__winp))
+__CREDIRECT(__ATTR_IN_OPT(4) __ATTR_IN_OPT(5) __ATTR_OUT(1) __ATTR_OUT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,__localdep_openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),openpty,(__amaster,__aslave,__name,__termp,__winp))
 #endif /* !__local___localdep_openpty_defined */
-__LOCAL_LIBC(forkpty) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RO(4) __ATTR_ACCESS_WR(1) __ATTR_ACCESS_WR_OPT(2) __pid_t
+__LOCAL_LIBC(forkpty) __ATTR_IN(3) __ATTR_IN(4) __ATTR_OUT(1) __ATTR_OUT_OPT(2) __pid_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(forkpty))(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp) {
 	int __error;
 	__fd_t __master, __slave;

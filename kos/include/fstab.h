@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f727a13 */
+/* HASH CRC-32:0xf3790f92 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,struct fstab *,__NOTHROW_NCX,getfsent,(void),())
  * @return: * :   Pointer to a statically allocated fstab entry for `special_file'
  * @return: NULL: [errno = <unchanged>] No entry exists matching `special_file'
  * @return: NULL: [errno = *] Error */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct fstab *,__NOTHROW_NCX,getfsspec,(const char *__special_file),(__special_file))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),struct fstab *,__NOTHROW_NCX,getfsspec,(const char *__special_file),(__special_file))
 #elif defined(__CRT_HAVE_getfsent) && defined(__CRT_HAVE_setfsent)
 #include <libc/local/fstab/getfsspec.h>
 /* >> getfsspec(3)
@@ -86,7 +86,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct fstab *,__NOTHROW_NCX,getfs
  * @return: * :   Pointer to a statically allocated fstab entry for `special_file'
  * @return: NULL: [errno = <unchanged>] No entry exists matching `special_file'
  * @return: NULL: [errno = *] Error */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getfsspec, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) struct fstab *__NOTHROW_NCX(__LIBCCALL getfsspec)(const char *__special_file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getfsspec))(__special_file); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getfsspec, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) struct fstab *__NOTHROW_NCX(__LIBCCALL getfsspec)(const char *__special_file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getfsspec))(__special_file); })
 #endif /* ... */
 #ifdef __CRT_HAVE_getfsfile
 /* >> getfsfile(3)
@@ -94,7 +94,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getfsspec, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
  * @return: * :   Pointer to a statically allocated fstab entry for `mount_point'
  * @return: NULL: [errno = <unchanged>] No entry exists matching `mount_point'
  * @return: NULL: [errno = *] Error */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct fstab *,__NOTHROW_NCX,getfsfile,(const char *__mount_point),(__mount_point))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),struct fstab *,__NOTHROW_NCX,getfsfile,(const char *__mount_point),(__mount_point))
 #elif defined(__CRT_HAVE_getfsent) && defined(__CRT_HAVE_setfsent)
 #include <libc/local/fstab/getfsfile.h>
 /* >> getfsfile(3)
@@ -102,7 +102,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),struct fstab *,__NOTHROW_NCX,getfs
  * @return: * :   Pointer to a statically allocated fstab entry for `mount_point'
  * @return: NULL: [errno = <unchanged>] No entry exists matching `mount_point'
  * @return: NULL: [errno = *] Error */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getfsfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) struct fstab *__NOTHROW_NCX(__LIBCCALL getfsfile)(const char *__mount_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getfsfile))(__mount_point); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getfsfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) struct fstab *__NOTHROW_NCX(__LIBCCALL getfsfile)(const char *__mount_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getfsfile))(__mount_point); })
 #endif /* ... */
 
 __SYSDECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d510d54 */
+/* HASH CRC-32:0xa46cbe34 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #undef __local___localdep_realloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_realloc_defined */
-__LOCAL_LIBC(sl_add) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int
+__LOCAL_LIBC(sl_add) __ATTR_IN(2) __ATTR_INOUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_add))(struct _stringlist *__sl, char *__name) {
 	if __unlikely(__sl->sl_cur >= __sl->sl_max) {
 		char **__new_vector;

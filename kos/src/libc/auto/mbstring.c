@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd95d9e86 */
+/* HASH CRC-32:0xc5879dc2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,185 +61,185 @@ NOTHROW_NCX(LIBCCALL libc__mbctombb)(unsigned int ch) {
  * Returns the type (one of `_MBC_*' from `<mbctype.h>')
  * of the byte at `str[byte_index]'. If that byte is out
  * of bounds, return `_MBC_ILLEGAL' */
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc__mbsbtype)(unsigned char const *str,
                                      size_t byte_index) {
 	return libc__mbsbtype_l(str, byte_index, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(3) ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(3) ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbscat_s)(unsigned char *buf,
                                      size_t true_bufsize,
                                      unsigned char const *src) {
 	return libc__mbscat_s_l(buf, true_bufsize, src, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbschr)(unsigned char const *__restrict haystack,
                                    unsigned int needle) {
 	return libc__mbschr_l(haystack, needle, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbscmp)(unsigned char const *lhs,
                                    unsigned char const *rhs) {
 	return libc__mbscmp_l(lhs, rhs, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbscoll)(unsigned char const *lhs,
                                     unsigned char const *rhs) {
 	return libc__mbscoll_l(lhs, rhs, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(3) ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbscpy_s)(unsigned char *buf,
                                      size_t true_bufsize,
                                      unsigned char const *src) {
 	return libc__mbscpy_s_l(buf, true_bufsize, src, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) size_t
 NOTHROW_NCX(LIBCCALL libc__mbscspn)(unsigned char const *haystack,
                                     unsigned char const *reject) {
 	return libc__mbscspn_l(haystack, reject, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsdec)(unsigned char const *start,
                                    unsigned char const *pos) {
 	return libc__mbsdec_l(start, pos, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbsicmp)(unsigned char const *lhs,
                                     unsigned char const *rhs) {
 	return libc__mbsicmp_l(lhs, rhs, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbsicoll)(unsigned char const *lhs,
                                      unsigned char const *rhs) {
 	return libc__mbsicoll_l(lhs, rhs, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsinc)(unsigned char const *ptr) {
 	return libc__mbsinc_l(ptr, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) size_t
 NOTHROW_NCX(LIBCCALL libc__mbslen)(unsigned char const *str) {
 	return libc__mbslen_l(str, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 2) NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_INS(1, 2) NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsnlen)(unsigned char const *str,
                                     size_t max_bytes) {
 	return libc__mbsnlen_l(str, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbslwr_s)(unsigned char *buf,
                                      size_t true_bufsize) {
 	return libc__mbslwr_s_l(buf, true_bufsize, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_INOUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbslwr)(unsigned char *buf) {
 	return libc__mbslwr_l(buf, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_INOUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsupr)(unsigned char *buf) {
 	return libc__mbsupr_l(buf, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 2) NONNULL((3)) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) ATTR_INS(3, 4) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsnbcat_s)(unsigned char *buf,
                                        size_t true_bufsize,
                                        unsigned char const *src,
                                        size_t max_bytes) {
 	return libc__mbsnbcat_s_l(buf, true_bufsize, src, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RW(1) NONNULL((2)) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUT(1) ATTR_INS(2, 3) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsnbcat)(unsigned char *buf,
                                      unsigned char const *src,
                                      size_t max_bytes) {
 	return libc__mbsnbcat_l(buf, src, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 3) ATTR_ACCESS_ROS(2, 3) NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbcmp)(unsigned char const *lhs,
                                      unsigned char const *rhs,
                                      size_t max_bytes) {
 	return libc__mbsnbcmp_l(lhs, rhs, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 3) ATTR_ACCESS_ROS(2, 3) NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbcoll)(unsigned char const *lhs,
                                       unsigned char const *rhs,
                                       size_t max_bytes) {
 	return libc__mbsnbcoll_l(lhs, rhs, max_bytes, NULL);
 }
 /* Returns byte-offset from `str' after skipping `max_chars' characters. */
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsnbcnt)(unsigned char const *str,
                                      size_t max_chars) {
 	return libc__mbsnbcnt_l(str, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 4) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(3) ATTR_OUTS(1, 4) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsnbcpy_s)(unsigned char *buf,
                                        size_t true_bufsize,
                                        unsigned char const *src,
                                        size_t bufsize) {
 	return libc__mbsnbcpy_s_l(buf, true_bufsize, src, bufsize, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(2) ATTR_OUTS(1, 3) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsnbcpy)(unsigned char *buf,
                                      unsigned char const *src,
                                      size_t bufsize) {
 	return libc__mbsnbcpy_l(buf, src, bufsize, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 3) ATTR_ACCESS_ROS(2, 3) NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbicmp)(unsigned char const *lhs,
                                       unsigned char const *rhs,
                                       size_t max_bytes) {
 	return libc__mbsnbicmp_l(lhs, rhs, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 3) ATTR_ACCESS_ROS(2, 3) NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbicoll)(unsigned char const *lhs,
                                        unsigned char const *rhs,
                                        size_t max_bytes) {
 	return libc__mbsnbicoll_l(lhs, rhs, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 4) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 4) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsnbset_s)(unsigned char *buf,
                                        size_t true_bufsize,
                                        unsigned int ch,
                                        size_t max_bytes) {
 	return libc__mbsnbset_s_l(buf, true_bufsize, ch, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 3) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 3) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsnbset)(unsigned char *buf,
                                      unsigned int ch,
                                      size_t max_bytes) {
 	return libc__mbsnbset_l(buf, ch, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(3) ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(3) ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsncat_s)(unsigned char *buf,
                                       size_t true_bufsize,
                                       unsigned char const *src,
                                       size_t max_chars) {
 	return libc__mbsncat_s_l(buf, true_bufsize, src, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(2) ATTR_INOUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsncat)(unsigned char *buf,
                                     unsigned char const *src,
                                     size_t max_chars) {
 	return libc__mbsncat_l(buf, src, max_chars, NULL);
 }
 /* Returns # of characters in (up to) first `max_bytes' of `str'. */
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 2) NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_INS(1, 2) NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsnccnt)(unsigned char const *str,
                                      size_t max_bytes) {
 	return libc__mbsnccnt_l(str, max_bytes, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbsncmp)(unsigned char const *lhs,
                                     unsigned char const *rhs,
                                     size_t max_chars) {
 	return libc__mbsncmp_l(lhs, rhs, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbsncoll)(unsigned char const *lhs,
                                      unsigned char const *rhs,
                                      size_t max_chars) {
 	return libc__mbsncoll_l(lhs, rhs, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(3) ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsncpy_s)(unsigned char *buf,
                                       size_t true_bufsize,
                                       unsigned char const *src,
@@ -248,114 +248,114 @@ NOTHROW_NCX(LIBCCALL libc__mbsncpy_s)(unsigned char *buf,
 }
 /* WARNING: This function writes up to `max_chars' characters
  *          (read  as: up to `2 * max_chars' bytes) to `buf'! */
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(2) ATTR_OUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsncpy)(unsigned char *buf,
                                     unsigned char const *src,
                                     size_t max_chars) {
 	return libc__mbsncpy_l(buf, src, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) unsigned int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbsnextc)(unsigned char const *str) {
 	return libc__mbsnextc_l(str, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbsnicmp)(unsigned char const *lhs,
                                      unsigned char const *rhs,
                                      size_t max_chars) {
 	return libc__mbsnicmp_l(lhs, rhs, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbsnicoll)(unsigned char const *lhs,
                                       unsigned char const *rhs,
                                       size_t max_chars) {
 	return libc__mbsnicoll_l(lhs, rhs, max_chars, NULL);
 }
 /* Returns pointer to `max_chars'th character of `str' (or strend() when `max_chars > _mbslen_l(str)') */
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsninc)(unsigned char const *str,
                                     size_t max_chars) {
 	return libc__mbsninc_l(str, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsnset_s)(unsigned char *buf,
                                       size_t true_bufsize,
                                       unsigned int ch,
                                       size_t max_chars) {
 	return libc__mbsnset_s_l(buf, true_bufsize, ch, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_INOUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsnset)(unsigned char *buf,
                                     unsigned int ch,
                                     size_t max_chars) {
 	return libc__mbsnset_l(buf, ch, max_chars, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbspbrk)(unsigned char const *haystack,
                                     unsigned char const *accept) {
 	return libc__mbspbrk_l(haystack, accept, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsrchr)(unsigned char const *haystack,
                                     unsigned int needle) {
 	return libc__mbsrchr_l(haystack, needle, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_INOUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsrev)(unsigned char *buf) {
 	return libc__mbsrev_l(buf, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsset_s)(unsigned char *buf,
                                      size_t true_bufsize,
                                      unsigned int ch) {
 	return libc__mbsset_s_l(buf, true_bufsize, ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_INOUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsset)(unsigned char *buf,
                                    unsigned int ch) {
 	return libc__mbsset_l(buf, ch, NULL);
 }
 /* Returs a byte-offset */
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsspn)(unsigned char const *haystack,
                                    unsigned char const *accept) {
 	return libc__mbsspn_l(haystack, accept, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsspnp)(unsigned char const *haystack,
                                     unsigned char const *accept) {
 	return libc__mbsspnp_l(haystack, accept, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsstr)(unsigned char const *haystack,
                                    unsigned char const *needle) {
 	return libc__mbsstr_l(haystack, needle, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW_OPT(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") WUNUSED ATTR_IN(2) ATTR_INOUT_OPT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbstok)(unsigned char *str,
                                    unsigned char const *delim) {
 	return libc__mbstok_l(str, delim, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(3) ATTR_ACCESS_RW_OPT(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") WUNUSED ATTR_IN(2) ATTR_INOUT(3) ATTR_INOUT_OPT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbstok_s)(unsigned char *str,
                                      unsigned char const *delim,
                                      unsigned char **__restrict save_ptr) {
 	return libc__mbstok_s_l(str, delim, save_ptr, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsupr_s)(unsigned char *buf,
                                      size_t true_bufsize) {
 	return libc__mbsupr_s_l(buf, true_bufsize, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) size_t
 NOTHROW_NCX(LIBCCALL libc__mbclen)(unsigned char const *str) {
 	return libc__mbclen_l(str, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) void
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(2) ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc__mbccpy)(unsigned char *dst,
                                    unsigned char const *src) {
 	libc__mbccpy_l(dst, src, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_ACCESS_WR_OPT(3) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(4) ATTR_OUTS(1, 2) ATTR_OUT_OPT(3) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbccpy_s)(unsigned char *dst,
                                      size_t true_dstsize,
                                      int *p_copied,
@@ -454,31 +454,31 @@ INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbctokata)(unsigned int ch) {
 	return libc__mbctokata_l(ch, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__ismbslead)(unsigned char const *str,
                                       unsigned char const *pos) {
 	return libc__ismbslead_l(str, pos, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__ismbstrail)(unsigned char const *str,
                                        unsigned char const *pos) {
 	return libc__ismbstrail_l(str, pos, NULL);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_IN(2) ATTR_INOUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbscat_l)(unsigned char *__restrict dst,
                                      unsigned char const *__restrict src,
                                      locale_t locale) {
 	(void)locale;
 	return (unsigned char *)libc_strcat((char *)dst, (char const *)src);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_IN(2) ATTR_OUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbscpy_l)(unsigned char *__restrict dst,
                                      unsigned char const *__restrict src,
                                      locale_t locale) {
 	(void)locale;
 	return (unsigned char *)libc_strcpy((char *)dst, (char const *)src);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) void
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(2) ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc__mbccpy_l)(unsigned char *dst,
                                      unsigned char const *src,
                                      locale_t locale) {
@@ -489,7 +489,7 @@ NOTHROW_NCX(LIBCCALL libc__mbccpy_l)(unsigned char *dst,
 }
 /* WARNING: This function writes up to `max_chars' characters
  *          (read  as: up to `2 * max_chars' bytes) to `buf'! */
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(2) ATTR_OUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsncpy_l)(unsigned char *buf,
                                       unsigned char const *src,
                                       size_t max_chars,
@@ -514,7 +514,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsncpy_l)(unsigned char *buf,
 	libc_bzero(dst, max_chars);
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(1, 3) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(2) ATTR_OUTS(1, 3) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsnbcpy_l)(unsigned char *buf,
                                        unsigned char const *src,
                                        size_t bufsize,
@@ -543,7 +543,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcpy_l)(unsigned char *buf,
 	return buf;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbschr_l)(unsigned char const *__restrict haystack,
                                      unsigned int needle,
                                      locale_t locale) {
@@ -561,21 +561,21 @@ NOTHROW_NCX(LIBCCALL libc__mbschr_l)(unsigned char const *__restrict haystack,
 	}
 	return NULL;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbscoll_l)(unsigned char const *lhs,
                                       unsigned char const *rhs,
                                       locale_t locale) {
 	/* XXX: Implement properly? */
 	return libc__mbscmp_l(lhs, rhs, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbsicoll_l)(unsigned char const *lhs,
                                        unsigned char const *rhs,
                                        locale_t locale) {
 	/* XXX: Implement properly? */
 	return libc__mbscmp_l(lhs, rhs, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbsncoll_l)(unsigned char const *lhs,
                                        unsigned char const *rhs,
                                        size_t max_chars,
@@ -583,7 +583,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsncoll_l)(unsigned char const *lhs,
 	/* XXX: Implement properly? */
 	return libc__mbsncmp_l(lhs, rhs, max_chars, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbsnicoll_l)(unsigned char const *lhs,
                                         unsigned char const *rhs,
                                         size_t max_chars,
@@ -591,7 +591,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnicoll_l)(unsigned char const *lhs,
 	/* XXX: Implement properly? */
 	return libc__mbsnicmp_l(lhs, rhs, max_chars, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 3) ATTR_ACCESS_ROS(2, 3) NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbcoll_l)(unsigned char const *lhs,
                                         unsigned char const *rhs,
                                         size_t max_bytes,
@@ -599,7 +599,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcoll_l)(unsigned char const *lhs,
 	/* XXX: Implement properly? */
 	return libc__mbsnbcmp_l(lhs, rhs, max_bytes, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 3) ATTR_ACCESS_ROS(2, 3) NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbicoll_l)(unsigned char const *lhs,
                                          unsigned char const *rhs,
                                          size_t max_bytes,
@@ -608,7 +608,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbicoll_l)(unsigned char const *lhs,
 	return libc__mbsnbicmp_l(lhs, rhs, max_bytes, locale);
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_INOUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbslwr_l)(unsigned char *buf,
                                      locale_t locale) {
 	unsigned char *iter = buf;
@@ -634,7 +634,7 @@ do_1byte_lower:
 	return buf;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_INOUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsupr_l)(unsigned char *buf,
                                      locale_t locale) {
 	unsigned char *iter = buf;
@@ -659,7 +659,7 @@ do_1byte_lower:
 	}
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsinc_l)(unsigned char const *ptr,
                                      locale_t locale) {
 	if (libc__ismbblead_l(*ptr++, locale)) {
@@ -677,7 +677,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsninc_l)(unsigned char const *str,
 		str += libc__mbsnbcnt_l(str, max_chars, locale);
 	return (unsigned char *)str;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsdec_l)(unsigned char const *start,
                                      unsigned char const *pos,
                                      locale_t locale) {
@@ -695,7 +695,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsdec_l)(unsigned char const *start,
 	return (unsigned char *)iter;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) size_t
 NOTHROW_NCX(LIBCCALL libc__mbscspn_l)(unsigned char const *haystack,
                                       unsigned char const *reject,
                                       locale_t locale) {
@@ -713,7 +713,7 @@ NOTHROW_NCX(LIBCCALL libc__mbscspn_l)(unsigned char const *haystack,
 	return (size_t)(iter - haystack);
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) size_t
 NOTHROW_NCX(LIBCCALL libc__mbslen_l)(unsigned char const *str,
                                      locale_t locale) {
 	size_t result;
@@ -727,7 +727,7 @@ NOTHROW_NCX(LIBCCALL libc__mbslen_l)(unsigned char const *str,
 	return result;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 2) NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_INS(1, 2) NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsnlen_l)(unsigned char const *str,
                                       size_t max_bytes,
                                       locale_t locale) {
@@ -746,7 +746,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnlen_l)(unsigned char const *str,
 	}
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(2) ATTR_INOUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsncat_l)(unsigned char *buf,
                                       unsigned char const *src,
                                       size_t max_chars,
@@ -771,7 +771,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsncat_l)(unsigned char *buf,
 	}
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_ROS(2, 3) ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUT(1) ATTR_INS(2, 3) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsnbcat_l)(unsigned char *buf,
                                        unsigned char const *src,
                                        size_t max_bytes,
@@ -804,7 +804,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcat_l)(unsigned char *buf,
 }
 #include <hybrid/typecore.h>
 /* Returns # of characters in (up to) first `max_bytes' of `str'. */
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 2) NONNULL((1)) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_INS(1, 2) NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsnccnt_l)(unsigned char const *str,
                                        size_t max_bytes,
                                        locale_t locale) {
@@ -831,7 +831,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnccnt_l)(unsigned char const *str,
 }
 #include <hybrid/typecore.h>
 /* Returns byte-offset from `str' after skipping `max_chars' characters. */
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsnbcnt_l)(unsigned char const *str,
                                        size_t max_chars,
                                        locale_t locale) {
@@ -850,7 +850,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcnt_l)(unsigned char const *str,
 	return (size_t)(iter - str);
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbscmp_l)(unsigned char const *lhs,
                                      unsigned char const *rhs,
                                      locale_t locale) {
@@ -870,7 +870,7 @@ NOTHROW_NCX(LIBCCALL libc__mbscmp_l)(unsigned char const *lhs,
 	return 0;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbsicmp_l)(unsigned char const *lhs,
                                       unsigned char const *rhs,
                                       locale_t locale) {
@@ -894,7 +894,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsicmp_l)(unsigned char const *lhs,
 	return 0;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbsncmp_l)(unsigned char const *lhs,
                                       unsigned char const *rhs,
                                       size_t max_chars,
@@ -915,7 +915,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsncmp_l)(unsigned char const *lhs,
 	return 0;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__mbsnicmp_l)(unsigned char const *lhs,
                                        unsigned char const *rhs,
                                        size_t max_chars,
@@ -940,7 +940,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnicmp_l)(unsigned char const *lhs,
 	return 0;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 3) ATTR_ACCESS_ROS(2, 3) NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbcmp_l)(unsigned char const *lhs,
                                        unsigned char const *rhs,
                                        size_t max_bytes,
@@ -967,7 +967,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcmp_l)(unsigned char const *lhs,
 	return 0;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 3) ATTR_ACCESS_ROS(2, 3) NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc__mbsnbicmp_l)(unsigned char const *lhs,
                                         unsigned char const *rhs,
                                         size_t max_bytes,
@@ -997,7 +997,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbicmp_l)(unsigned char const *lhs,
 	}
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) unsigned int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) unsigned int
 NOTHROW_NCX(LIBCCALL libc__mbsnextc_l)(unsigned char const *str,
                                        locale_t locale) {
 	uint16_t result = str[0];
@@ -1006,7 +1006,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnextc_l)(unsigned char const *str,
 	return result;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbspbrk_l)(unsigned char const *haystack,
                                       unsigned char const *accept,
                                       locale_t locale) {
@@ -1033,7 +1033,7 @@ NOTHROW_NCX(LIBCCALL libc__mbspbrk_l)(unsigned char const *haystack,
 	return NULL;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsrchr_l)(unsigned char const *haystack,
                                       unsigned int needle,
                                       locale_t locale) {
@@ -1052,7 +1052,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsrchr_l)(unsigned char const *haystack,
 	}
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_INOUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsrev_l)(unsigned char *buf,
                                      locale_t locale) {
 	size_t bytes;
@@ -1070,7 +1070,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsrev_l)(unsigned char *buf,
 	}
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_ACCESS_RO(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_IN(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsset_l)(unsigned char *buf,
                                      unsigned int ch,
                                      locale_t locale) {
@@ -1090,7 +1090,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsset_l)(unsigned char *buf,
 	}
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_ACCESS_RW(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_RETNONNULL ATTR_INOUT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsnset_l)(unsigned char *buf,
                                       unsigned int ch,
                                       size_t max_chars,
@@ -1111,7 +1111,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnset_l)(unsigned char *buf,
 	}
 	return buf;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 3) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 3) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsnbset_l)(unsigned char *buf,
                                        unsigned int ch,
                                        size_t max_bytes,
@@ -1138,7 +1138,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbset_l)(unsigned char *buf,
 	return buf;
 }
 /* Returs a byte-offset */
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) size_t
 NOTHROW_NCX(LIBCCALL libc__mbsspn_l)(unsigned char const *haystack,
                                      unsigned char const *accept,
                                      locale_t locale) {
@@ -1158,7 +1158,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsspn_l)(unsigned char const *haystack,
 	}
 	return (size_t)(iter - haystack);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsspnp_l)(unsigned char const *haystack,
                                       unsigned char const *accept,
                                       locale_t locale) {
@@ -1167,7 +1167,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsspnp_l)(unsigned char const *haystack,
 		haystack = NULL;
 	return (unsigned char *)haystack;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbsstr_l)(unsigned char const *haystack,
                                      unsigned char const *needle,
                                      locale_t locale) {
@@ -1196,14 +1196,14 @@ NOTHROW_NCX(LIBCCALL libc__mbsstr_l)(unsigned char const *haystack,
 	}
 	return (unsigned char *)haystack;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW_OPT(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") WUNUSED ATTR_IN(2) ATTR_INOUT_OPT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbstok_l)(unsigned char *str,
                                      unsigned char const *delim,
                                      locale_t locale) {
 	static unsigned char *save_ptr = NULL;
 	return libc__mbstok_s_l(str, delim, &save_ptr, locale);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(3) ATTR_ACCESS_RW_OPT(1) unsigned char *
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") WUNUSED ATTR_IN(2) ATTR_INOUT(3) ATTR_INOUT_OPT(1) unsigned char *
 NOTHROW_NCX(LIBCCALL libc__mbstok_s_l)(unsigned char *str,
                                        unsigned char const *delim,
                                        unsigned char **__restrict save_ptr,
@@ -1230,7 +1230,7 @@ NOTHROW_NCX(LIBCCALL libc__mbstok_s_l)(unsigned char *str,
 	return str;
 }
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) size_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) size_t
 NOTHROW_NCX(LIBCCALL libc__mbclen_l)(unsigned char const *str,
                                      locale_t locale) {
 	size_t result = 1;
@@ -1238,7 +1238,7 @@ NOTHROW_NCX(LIBCCALL libc__mbclen_l)(unsigned char const *str,
 		result = 2;
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(3) ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(3) ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbscat_s_l)(unsigned char *buf,
                                        size_t true_bufsize,
                                        unsigned char const *src,
@@ -1246,7 +1246,7 @@ NOTHROW_NCX(LIBCCALL libc__mbscat_s_l)(unsigned char *buf,
 	(void)locale;
 	return libc_strcat_s((char *)buf, true_bufsize, (char const *)src);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(3) ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbscpy_s_l)(unsigned char *buf,
                                        size_t true_bufsize,
                                        unsigned char const *src,
@@ -1254,7 +1254,7 @@ NOTHROW_NCX(LIBCCALL libc__mbscpy_s_l)(unsigned char *buf,
 	(void)locale;
 	return libc_strcpy_s((char *)buf, true_bufsize, (char const *)src);
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbslwr_s_l)(unsigned char *buf,
                                        size_t true_bufsize,
                                        locale_t locale) {
@@ -1263,7 +1263,7 @@ NOTHROW_NCX(LIBCCALL libc__mbslwr_s_l)(unsigned char *buf,
 	libc__mbslwr_l(buf, locale);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsupr_s_l)(unsigned char *buf,
                                        size_t true_bufsize,
                                        locale_t locale) {
@@ -1272,7 +1272,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsupr_s_l)(unsigned char *buf,
 	libc__mbsupr_l(buf, locale);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_ROS(3, 4) ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) ATTR_INS(3, 4) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsnbcat_s_l)(unsigned char *buf,
                                          size_t true_bufsize,
                                          unsigned char const *src,
@@ -1284,7 +1284,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcat_s_l)(unsigned char *buf,
 	libc__mbsnbcat_l(buf, src, max_bytes, locale);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 4) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(3) ATTR_OUTS(1, 4) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsnbcpy_s_l)(unsigned char *buf,
                                          size_t true_bufsize,
                                          unsigned char const *src,
@@ -1296,7 +1296,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbcpy_s_l)(unsigned char *buf,
 	return 0;
 }
 #include <hybrid/__minmax.h>
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsnbset_s_l)(unsigned char *buf,
                                          size_t true_bufsize,
                                          unsigned int ch,
@@ -1307,7 +1307,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnbset_s_l)(unsigned char *buf,
 	libc__mbsnbset_l(buf, ch, max_bytes, locale);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(3) ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(3) ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsncat_s_l)(unsigned char *buf,
                                         size_t true_bufsize,
                                         unsigned char const *src,
@@ -1320,7 +1320,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsncat_s_l)(unsigned char *buf,
 	libc__mbsncat_l(buf, src, max_chars, locale);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(3) ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsncpy_s_l)(unsigned char *buf,
                                         size_t true_bufsize,
                                         unsigned char const *src,
@@ -1355,7 +1355,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsncpy_s_l)(unsigned char *buf,
 	libc_bzero(buf, max_chars);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsnset_s_l)(unsigned char *buf,
                                         size_t true_bufsize,
                                         unsigned int ch,
@@ -1368,7 +1368,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsnset_s_l)(unsigned char *buf,
 	libc__mbsnset_l(buf, ch, max_chars, locale);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RWS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_INOUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbsset_s_l)(unsigned char *buf,
                                        size_t true_bufsize,
                                        unsigned int ch,
@@ -1378,7 +1378,7 @@ NOTHROW_NCX(LIBCCALL libc__mbsset_s_l)(unsigned char *buf,
 	libc__mbsset_l(buf, ch, locale);
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_IN(4) ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__mbccpy_s_l)(unsigned char *dst,
                                        size_t true_dstsize,
                                        int *p_copied,
@@ -1402,7 +1402,7 @@ NOTHROW_NCX(LIBCCALL libc__mbccpy_s_l)(unsigned char *dst,
 	}
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__ismbslead_l)(unsigned char const *str,
                                         unsigned char const *pos,
                                         locale_t locale) {
@@ -1420,7 +1420,7 @@ NOTHROW_NCX(LIBCCALL libc__ismbslead_l)(unsigned char const *str,
 	}
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc__ismbstrail_l)(unsigned char const *str,
                                          unsigned char const *pos,
                                          locale_t locale) {
@@ -1465,7 +1465,7 @@ NOTHROW_NCX(LIBCCALL libc__mbbtype_l)(unsigned char ch,
  * Returns the type (one of `_MBC_*' from `<mbctype.h>')
  * of the byte at `str[byte_index]'. If that byte is out
  * of bounds, return `_MBC_ILLEGAL' */
-INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.dos.mbstring") ATTR_PURE WUNUSED ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc__mbsbtype_l)(unsigned char const *str,
                                        size_t byte_index,
                                        locale_t locale) {

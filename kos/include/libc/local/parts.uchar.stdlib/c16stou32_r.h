@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbca4f27a */
+/* HASH CRC-32:0x840f49a0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c16stou32_r) __ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4) __UINT32_TYPE__
+__LOCAL_LIBC(c16stou32_r) __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4) __UINT32_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stou32_r))(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
 	__UINT32_TYPE__ __result;
 	__CHAR16_TYPE__ const *__num_start = __nptr;

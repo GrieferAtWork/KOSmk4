@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa87389ed */
+/* HASH CRC-32:0x29bb8519 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -59,7 +59,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_removeat_defined
 #define __local___localdep_removeat_defined
 #ifdef __CRT_HAVE_removeat
-__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_removeat,(__fd_t __dirfd, char const *__filename),removeat,(__dirfd,__filename))
+__CREDIRECT(__ATTR_IN(2),int,__NOTHROW_RPC,__localdep_removeat,(__fd_t __dirfd, char const *__filename),removeat,(__dirfd,__filename))
 #elif defined(__AT_REMOVEDIR) && defined(__CRT_HAVE_unlinkat) && (defined(__AT_REMOVEREG) || (defined(__EISDIR) && defined(__ENOTDIR)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/removeat.h>
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wunlinkat_defined
 #define __local___localdep_wunlinkat_defined
 #ifdef __CRT_HAVE_wunlinkat
-__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __atflag_t __flags),wunlinkat,(__dfd,__file,__flags))
+__CREDIRECT(__ATTR_IN(2),int,__NOTHROW_RPC,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __atflag_t __flags),wunlinkat,(__dfd,__file,__flags))
 #elif defined(__CRT_HAVE_unlinkat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.unistd/wunlinkat.h>
@@ -82,7 +82,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_wunlinkat_defined
 #endif /* !... */
 #endif /* !__local___localdep_wunlinkat_defined */
-__LOCAL_LIBC(wremoveat) __ATTR_ACCESS_RO(2) int
+__LOCAL_LIBC(wremoveat) __ATTR_IN(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wremoveat))(__fd_t __dirfd, __WCHAR_TYPE__ const *__filename) {
 #if (defined(__CRT_HAVE_wunlinkat) || defined(__CRT_HAVE_unlinkat)) && defined(__AT_REMOVEREG) && defined(__AT_REMOVEDIR)
 	return (__NAMESPACE_LOCAL_SYM __localdep_wunlinkat)(__dirfd, __filename, __AT_REMOVEREG | __AT_REMOVEDIR);

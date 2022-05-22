@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25f9503d */
+/* HASH CRC-32:0x261c811b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <hybrid/typecore.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c16ftime) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RO(4) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_C16FTIME(3, 0) __SIZE_TYPE__
+__LOCAL_LIBC(c16ftime) __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C16FTIME(3, 0) __ATTR_OUTS(1, 2) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16ftime))(__CHAR16_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR16_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) {
 	if (__buflen)
 		*__buf = 0;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38e9fc54 */
+/* HASH CRC-32:0x4cffed25 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_ntp_adjtime32_defined) && defined(__CRT_HAVE_ntp_adjtime)
 #define __local___localdep_ntp_adjtime32_defined
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_ntp_adjtime32,(struct __timex32 *__restrict __tntx),ntp_adjtime,(__tntx))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__localdep_ntp_adjtime32,(struct __timex32 *__restrict __tntx),ntp_adjtime,(__tntx))
 #endif /* !__local___localdep_ntp_adjtime32_defined && __CRT_HAVE_ntp_adjtime */
 #ifndef __local___localdep_ntp_adjtime64_defined
 #define __local___localdep_ntp_adjtime64_defined
 #if defined(__CRT_HAVE_ntp_adjtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_ntp_adjtime64,(struct __timex64 *__restrict __tntx),ntp_adjtime,(__tntx))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__localdep_ntp_adjtime64,(struct __timex64 *__restrict __tntx),ntp_adjtime,(__tntx))
 #elif defined(__CRT_HAVE_ntp_adjtime64)
-__CREDIRECT(__ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,__localdep_ntp_adjtime64,(struct __timex64 *__restrict __tntx),ntp_adjtime64,(__tntx))
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__localdep_ntp_adjtime64,(struct __timex64 *__restrict __tntx),ntp_adjtime64,(__tntx))
 #elif defined(__CRT_HAVE_ntp_adjtime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.timex/ntp_adjtime64.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_ntp_adjtime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_ntp_adjtime64_defined */
-__LOCAL_LIBC(ntp_adjtime) __ATTR_ACCESS_RW(1) int
+__LOCAL_LIBC(ntp_adjtime) __ATTR_INOUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_adjtime))(struct timex *__restrict __tntx) {
 	int __result;
 #ifdef __CRT_HAVE_ntp_adjtime

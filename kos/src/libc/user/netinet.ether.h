@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67c02e6c */
+/* HASH CRC-32:0xc05e518f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,11 +34,11 @@ DECL_BEGIN
 /* Map a given `addr' to its corresponding hostname from `/etc/ethers'
  * @return: 0 : Success
  * @return: * : No entry for `addr' found, or `/etc/ethers' doesn't exist. */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) int NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname, struct ether_addr const *addr);
+INTDEF ATTR_IN(2) ATTR_OUT(1) int NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname, struct ether_addr const *addr);
 /* Map a given `hostname' into its corresponding address from `/etc/ethers'
  * @return: 0 : Success
  * @return: * : No entry for `hostname' found, or `/etc/ethers' doesn't exist. */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname, struct ether_addr *addr);
+INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname, struct ether_addr *addr);
 #endif /* !__KERNEL__ */
 
 DECL_END

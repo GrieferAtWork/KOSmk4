@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x402988ae */
+/* HASH CRC-32:0xecd685a1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd, __epoll_ctl_t op, fd_
  *                    items of `events')
  * @return: 0:        No events happened before `timeout' expired.
  * @return: -1:       Error (s.a. `errno') */
-INTDEF ATTR_ACCESS_WRS(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_epoll_wait)(fd_t epfd, struct epoll_event *events, __STDC_INT_AS_SIZE_T maxevents, int timeout);
+INTDEF ATTR_OUTS(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_epoll_wait)(fd_t epfd, struct epoll_event *events, __STDC_INT_AS_SIZE_T maxevents, int timeout);
 /* >> epoll_pwait(2)
  * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
  * waiting.  Wait until at least one of the conditions monitored by `epfd' to be met.
@@ -88,7 +88,7 @@ INTDEF ATTR_ACCESS_WRS(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_epo
  *                    items of `events')
  * @return: 0:        No events happened before `timeout' expired.
  * @return: -1:       Error (s.a. `errno') */
-INTDEF ATTR_ACCESS_WRS(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd, struct epoll_event *events, __STDC_INT_AS_SIZE_T maxevents, int timeout, sigset_t const *ss);
+INTDEF ATTR_OUTS(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd, struct epoll_event *events, __STDC_INT_AS_SIZE_T maxevents, int timeout, sigset_t const *ss);
 /* >> epoll_rpc_exec(3)
  * Helper wrapper for  `EPOLL_CTL_RPC_PROG' that  automatically provides  the
  * necessary arch-specific RPC program to invoke `func(..., event->data.ptr)'
@@ -119,7 +119,7 @@ INTDEF ATTR_ACCESS_WRS(2, 3) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_epo
  *                             intact, and the  RPC will be  discarded as  soon
  *                             as an attempt to send it is made, or the monitor
  *                             is manually deleted via `EPOLL_CTL_DEL' */
-INTDEF ATTR_ACCESS_RO(3) NONNULL((6)) int NOTHROW_NCX(LIBCCALL libc_epoll_rpc_exec)(fd_t epfd, fd_t fd, struct epoll_event const *event, pid_t target_tid, unsigned int mode, prpc_exec_callback_t func);
+INTDEF ATTR_IN(3) NONNULL((6)) int NOTHROW_NCX(LIBCCALL libc_epoll_rpc_exec)(fd_t epfd, fd_t fd, struct epoll_event const *event, pid_t target_tid, unsigned int mode, prpc_exec_callback_t func);
 #endif /* !__KERNEL__ */
 
 DECL_END

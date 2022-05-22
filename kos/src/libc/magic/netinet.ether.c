@@ -83,7 +83,7 @@ struct ether_addr *ether_aton_r([[in]] char const *__restrict asc,
 [[wunused, doc_alias("ether_aton")]]
 [[impl_include("<net/ethernet.h>", "<libc/template/hex.h>")]]
 struct ether_addr *ether_paton_r([[inout]] char const **__restrict pasc,
-                                 [[in]] struct ether_addr *__restrict addr) {
+                                 [[out]] struct ether_addr *__restrict addr) {
 	unsigned int i;
 	char const *asc = *pasc;
 	for (i = 0; i < 6; ++i) {

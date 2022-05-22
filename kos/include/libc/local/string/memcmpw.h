@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4908b658 */
+/* HASH CRC-32:0x63e9d74 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(memcmpw) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __INT16_TYPE__
+__LOCAL_LIBC(memcmpw) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __INT16_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmpw))(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words) {
 	__INT16_TYPE__ const *__p1 = (__INT16_TYPE__ const *)__s1;
 	__INT16_TYPE__ const *__p2 = (__INT16_TYPE__ const *)__s2;

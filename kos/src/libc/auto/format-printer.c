@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71ea443a */
+/* HASH CRC-32:0x9686f1ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,7 +118,7 @@ err:
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_INS(3, 4) NONNULL((1)) ssize_t
 (LIBCCALL libc_format_escape)(pformatprinter printer,
                               void *arg,
                               char const *__restrict text,
@@ -385,7 +385,7 @@ err:
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_ACCESS_ROS(3, 4) NONNULL((1)) ssize_t
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_INS(3, 4) NONNULL((1)) ssize_t
 (LIBCCALL libc_format_hexdump)(pformatprinter printer,
                                void *arg,
                                void const *__restrict data,
@@ -597,7 +597,7 @@ err:
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_ACCESS_RO(3) ATTR_LIBC_PRINTF(3, 0) NONNULL((1)) ssize_t
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_IN(3) ATTR_LIBC_PRINTF(3, 0) NONNULL((1)) ssize_t
 (LIBCCALL libc_format_vprintf)(pformatprinter printer,
                                void *arg,
                                char const *__restrict format,
@@ -637,7 +637,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_ACCESS_RO(3) ATTR_LIBC_PRINT
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.format") ATTR_ACCESS_RO(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.format") ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)) ssize_t
 (VLIBDCALL libd_format_printf)(pformatprinter printer,
                                void *arg,
                                char const *__restrict format,
@@ -662,7 +662,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.format") ATTR_ACCES
  *    a second argument is passed that indicates the absolute length in characters.
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_ACCESS_RO(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)) ssize_t
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_IN(3) ATTR_LIBC_PRINTF(3, 4) NONNULL((1)) ssize_t
 (VLIBCCALL libc_format_printf)(pformatprinter printer,
                                void *arg,
                                char const *__restrict format,
@@ -700,7 +700,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_ACCESS_RO(3) ATTR_LIBC_PRINT
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_ACCESS_RO(4) ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_IN(4) ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2)) ssize_t
 (LIBCCALL libc_format_vscanf)(pformatgetc pgetc,
                               pformatungetc pungetc,
                               void *arg,
@@ -742,7 +742,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_ACCESS_RO(4) ATTR_LIBC_SCANF
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.format") ATTR_ACCESS_RO(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.format") ATTR_IN(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)) ssize_t
 (VLIBDCALL libd_format_scanf)(pformatgetc pgetc,
                               pformatungetc pungetc,
                               void *arg,
@@ -780,7 +780,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.string.format") ATTR_ACCES
  * @return: 0 :  No data could be scanned.
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_ACCESS_RO(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_IN(4) ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2)) ssize_t
 (VLIBCCALL libc_format_scanf)(pformatgetc pgetc,
                               pformatungetc pungetc,
                               void *arg,
@@ -796,7 +796,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_ACCESS_RO(4) ATTR_LIBC_SCANF
 /* >> format_sprintf_printer(3)
  * Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_INS(2, 3) NONNULL((1)) ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_sprintf_printer)(void *arg,
                                                             char const *__restrict data,
                                                             size_t datalen) {
@@ -809,7 +809,7 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_sprintf_printer)(void *arg,
  * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
  * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',  or
  *       alternatively the sum of return values of all calls to `format_snprintf_printer(3)' */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_INS(2, 3) NONNULL((1)) ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_snprintf_printer)(void *arg,
                                                              char const *__restrict data,
                                                              size_t datalen) {
@@ -831,7 +831,7 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_snprintf_printer)(void *arg,
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string
  * The  `arg'   argument   is   ignored,   and  you   may   safely   pass   `NULL' */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_PURE ATTR_ACCESS_ROS(2, 3) NONNULL((2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_PURE ATTR_INS(2, 3) NONNULL((2)) ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_width)(void *arg,
                                                   char const *__restrict data,
                                                   size_t datalen) {
@@ -852,7 +852,7 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_width)(void *arg,
 /* >> format_length(3)
  * Always re-return `datalen' and ignore all other arguments
  * Both the `arg'  and `data' arguments  are simply  ignored */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_CONST ATTR_ACCESS_ROS(2, 3) NONNULL((2)) ssize_t
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_CONST ATTR_INS(2, 3) NONNULL((2)) ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(void *arg,
                                                    char const *__restrict data,
                                                    size_t datalen) {
@@ -892,7 +892,7 @@ struct format_aprintf_data {
  *                  but may differ from `strlen(return)' when NUL characters  were
  *                  printed to the aprintf-printer at one point.
  *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_WR_OPT(2) char *
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char *
 NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__restrict self,
                                                size_t *pstrlen) {
 	/* Free unused buffer memory. */
@@ -955,7 +955,7 @@ struct format_aprintf_data {
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory (errno is set of `ENOMEM') */
-INTERN ATTR_SECTION(".text.crt.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RW(1) ATTR_ALLOC_SIZE((2)) char *
+INTERN ATTR_SECTION(".text.crt.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_INOUT(1) char *
 NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self,
                                                 size_t num_chars) {
 	char *result;
@@ -990,7 +990,7 @@ err:
  * This function is intended to be used as a pformatprinter-compatible printer sink
  * @return: datalen: Success.
  * @return: -1: [errno=ENOMEM] Insufficient memory. */
-INTERN ATTR_SECTION(".text.crt.string.format") WUNUSED ATTR_ACCESS_ROS(2, 3) NONNULL((1)) ssize_t
+INTERN ATTR_SECTION(".text.crt.string.format") WUNUSED ATTR_INS(2, 3) NONNULL((1)) ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_aprintf_printer)(void *arg,
                                                             char const *__restrict data,
                                                             size_t datalen) {

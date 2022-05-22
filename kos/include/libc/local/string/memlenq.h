@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31550b83 */
+/* HASH CRC-32:0x467e8e93 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memendq_defined
 #define __local___localdep_memendq_defined
 #ifdef __CRT_HAVE_memendq
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memendq,(void const *__restrict __haystack, __UINT64_TYPE__ __needle, __SIZE_TYPE__ __n_bytes),memendq,(__haystack,__needle,__n_bytes))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memendq,(void const *__restrict __haystack, __UINT64_TYPE__ __needle, __SIZE_TYPE__ __n_bytes),memendq,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memendq */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memendq.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memendq __LIBC_LOCAL_NAME(memendq)
 #endif /* !__CRT_HAVE_memendq */
 #endif /* !__local___localdep_memendq_defined */
-__LOCAL_LIBC(memlenq) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __SIZE_TYPE__
+__LOCAL_LIBC(memlenq) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memlenq))(void const *__restrict __haystack, __UINT64_TYPE__ __needle, __SIZE_TYPE__ __n_qwords) {
 	return (__SIZE_TYPE__)((__NAMESPACE_LOCAL_SYM __localdep_memendq)(__haystack, __needle, __n_qwords) - (__UINT64_TYPE__ *)__haystack);
 }

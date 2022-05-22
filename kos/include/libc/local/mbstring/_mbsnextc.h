@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2407cd3f */
+/* HASH CRC-32:0x32e913ab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),unsigned int,__NOTHROW_NCX,__localdep__mbsnextc_l,(unsigned char const *__str, __locale_t __locale),_mbsnextc_l,(__str,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),unsigned int,__NOTHROW_NCX,__localdep__mbsnextc_l,(unsigned char const *__str, __locale_t __locale),_mbsnextc_l,(__str,__locale))
 #elif defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsnextc_l.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__mbsnextc_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__mbsnextc_l_defined */
-__LOCAL_LIBC(_mbsnextc) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) unsigned int
+__LOCAL_LIBC(_mbsnextc) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) unsigned int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnextc))(unsigned char const *__str) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbsnextc_l)(__str, __NULLPTR);
 }

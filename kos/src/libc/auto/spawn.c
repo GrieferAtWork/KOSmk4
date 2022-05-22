@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10d9057 */
+/* HASH CRC-32:0x6e298377 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ DECL_BEGIN
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
  * @return: * :          Error (errno-code describing the reason of failure) */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_WR(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
                                            fd_t execfd,
                                            posix_spawn_file_actions_t const *file_actions,
@@ -456,7 +456,7 @@ child_error:
  * @param: envp:         Same as the `envp' accepted by `execve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
  * @return: * :          Error (errno-code describing the reason of failure) */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_WR(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid,
                                        char const *__restrict path,
                                        posix_spawn_file_actions_t const *file_actions,
@@ -513,7 +513,7 @@ __NAMESPACE_LOCAL_END
  * directly making  use of  `file'  as the  absolute filename  of  the file  to  execute.
  * Note however  that  when  `file'  contains any  slashes,  `$PATH'  won't  be  searched
  * either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)') */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_WR(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid,
                                         const char *__restrict file,
                                         posix_spawn_file_actions_t const *file_actions,
@@ -566,7 +566,7 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid,
 /* >> posix_spawnattr_init(3)
  * Initialize a given set of spawn attributes to all zero
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_WR(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_init)(posix_spawnattr_t *__restrict attr) {
 	libc_bzero(attr, sizeof(*attr));
 	return 0;
@@ -574,7 +574,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_init)(posix_spawnattr_t *__restrict at
 /* >> posix_spawnattr_destroy(3)
  * Destroy a given set of spawn attributes
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_destroy)(posix_spawnattr_t *__restrict attr) {
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 	libc_memset(attr, 0xcc, sizeof(*attr));
@@ -584,7 +584,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_destroy)(posix_spawnattr_t *__restrict
 /* >> posix_spawnattr_setflags(3)
  * Get the set of flags previously specified by `posix_spawnattr_setflags()'
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getflags)(posix_spawnattr_t const *__restrict attr,
                                                     short int *__restrict pflags) {
 	*pflags = (short int)(unsigned short int)attr->__flags;
@@ -600,7 +600,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getflags)(posix_spawnattr_t const *__r
  *   - POSIX_SPAWN_SETSCHEDULER:  s.a. posix_spawnattr_setschedpolicy(3)
  *   - POSIX_SPAWN_SETSCHEDPARAM: s.a. posix_spawnattr_setschedparam(3)
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setflags)(posix_spawnattr_t *__restrict attr,
                                                     short int flags) {
 	attr->__flags = (uint16_t)(unsigned short int)flags;
@@ -610,7 +610,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setflags)(posix_spawnattr_t *__restric
  * Get the set of signal handler that are reset of `SIG_DFL' by
  * the  child  process  when  `POSIX_SPAWN_SETSIGDEF'  is  set.
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigdefault)(posix_spawnattr_t const *__restrict attr,
                                                          sigset_t *__restrict sigdefault) {
 	libc_memcpy(sigdefault, &attr->__sd, sizeof(sigset_t));
@@ -620,7 +620,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigdefault)(posix_spawnattr_t const
  * Set the set of signal handler that are reset of `SIG_DFL' by
  * the  child  process  when  `POSIX_SPAWN_SETSIGDEF'  is  set.
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigdefault)(posix_spawnattr_t *__restrict attr,
                                                          sigset_t const *__restrict sigdefault) {
 	libc_memcpy(&attr->__sd, sigdefault, sizeof(sigset_t));
@@ -630,7 +630,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigdefault)(posix_spawnattr_t *__re
  * Get the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
  * that the  child process  will perform  when `POSIX_SPAWN_SETSIGMASK'  is  set.
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigmask)(posix_spawnattr_t const *__restrict attr,
                                                       sigset_t *__restrict sigmask) {
 	libc_memcpy(sigmask, &attr->__ss, sizeof(sigset_t));
@@ -640,7 +640,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigmask)(posix_spawnattr_t const *_
  * Set the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
  * that the  child process  will perform  when `POSIX_SPAWN_SETSIGMASK'  is  set.
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigmask)(posix_spawnattr_t *__restrict attr,
                                                       sigset_t const *__restrict sigmask) {
 	libc_memcpy(&attr->__ss, sigmask, sizeof(sigset_t));
@@ -650,7 +650,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigmask)(posix_spawnattr_t *__restr
  * Get the `pgid'  argument of a  call `setpgid(getpid(), pgid)'  that
  * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__restrict attr,
                                                      pid_t *__restrict pgroup) {
 	*pgroup = attr->__pgrp;
@@ -661,7 +661,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__
  * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
  * HINT: A call `setpgid(getpid(), 0)' is the same as `setpgid(getpid(), getpid())'!
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setpgroup)(posix_spawnattr_t *__restrict attr,
                                                      pid_t pgroup) {
 	attr->__pgrp = pgroup;
@@ -671,7 +671,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setpgroup)(posix_spawnattr_t *__restri
  * Get the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
  * that  the  child process  will  perform when  `POSIX_SPAWN_SETSCHEDULER'  is set.
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedpolicy)(posix_spawnattr_t const *__restrict attr,
                                                           int *__restrict schedpolicy) {
 	*schedpolicy = attr->__policy;
@@ -681,7 +681,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedpolicy)(posix_spawnattr_t cons
  * Set the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
  * that  the  child process  will  perform when  `POSIX_SPAWN_SETSCHEDULER'  is set.
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedpolicy)(posix_spawnattr_t *__restrict attr,
                                                           int schedpolicy) {
 	attr->__policy = schedpolicy;
@@ -691,7 +691,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedpolicy)(posix_spawnattr_t *__r
  * Get the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
  * that  the child  process will  perform when  `POSIX_SPAWN_SETSCHEDPARAM' is set.
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(1) ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedparam)(posix_spawnattr_t const *__restrict attr,
                                                          struct sched_param *__restrict schedparam) {
 	libc_memcpy(schedparam, &attr->__sp, sizeof(struct sched_param));
@@ -701,7 +701,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedparam)(posix_spawnattr_t const
  * Set the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
  * that  the child  process will  perform when  `POSIX_SPAWN_SETSCHEDPARAM' is set.
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedparam)(posix_spawnattr_t *__restrict attr,
                                                          struct sched_param const *__restrict schedparam) {
 	libc_memcpy(&attr->__sp, schedparam, sizeof(struct sched_param));
@@ -710,7 +710,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedparam)(posix_spawnattr_t *__re
 /* >> posix_spawn_file_actions_init(3)
  * Initialize the given spawn-file-actions object `file_actions'
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_WR(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_OUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_init)(posix_spawn_file_actions_t *__restrict file_actions) {
 	libc_bzero(file_actions, sizeof(*file_actions));
 	return 0;
@@ -718,7 +718,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_init)(posix_spawn_file_action
 /* >> posix_spawn_file_actions_destroy(3)
  * Finalize the given spawn-file-actions object `file_actions'
  * @return: 0 : Success */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_actions_t *__restrict file_actions) {
 
 	unsigned int i;
@@ -753,7 +753,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_act
 	return 0;
 }
 /* Helper functions for allocating an a new file-spawn action entry */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") WUNUSED ATTR_ACCESS_RW(1) struct __spawn_action *
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") WUNUSED ATTR_INOUT(1) struct __spawn_action *
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_alloc)(posix_spawn_file_actions_t *__restrict file_actions) {
 	struct __spawn_action *result;
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -792,7 +792,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_alloc)(posix_spawn_file_actio
  * Note though  that the  intermediate file  returned  by `open()'  will not  remain  open!
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(3) ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict file_actions,
                                                             fd_t fd,
                                                             char const *__restrict path,
@@ -832,7 +832,7 @@ err:
  * Enqueue a call `close(fd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclose)(posix_spawn_file_actions_t *__restrict file_actions,
                                                              fd_t fd) {
 	struct __spawn_action *action;
@@ -854,7 +854,7 @@ err:
  * Enqueue a call `dup2(oldfd, newfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict file_actions,
                                                             fd_t oldfd,
                                                             fd_t newfd) {
@@ -878,7 +878,7 @@ err:
  * Enqueue a call `tcsetpgrp(fd, getpid())' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict file_actions,
                                                                     fd_t fd) {
 	struct __spawn_action *action;
@@ -900,7 +900,7 @@ err:
  * Enqueue a call `closefrom(lowfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclosefrom_np)(posix_spawn_file_actions_t *__restrict file_actions,
                                                                     fd_t lowfd) {
 	struct __spawn_action *action;
@@ -922,7 +922,7 @@ err:
  * Enqueue a call `chdir(path)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(2) ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions,
                                                                 const char *__restrict path) {
 	struct __spawn_action *action;
@@ -950,7 +950,7 @@ err:
  * Enqueue a call `fchdir(dfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_ACCESS_RW(1) errno_t
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions,
                                                                  fd_t dfd) {
 	struct __spawn_action *action;

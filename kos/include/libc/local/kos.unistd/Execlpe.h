@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb24b8ac9 */
+/* HASH CRC-32:0xcd2c5b27 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,12 +38,12 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3),__THROWING,__localdep_Execvpe,(char const *__restrict __file, __TARGV, __TENVP),Execvpe,(__file,___argv,___envp))
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),__THROWING,__localdep_Execvpe,(char const *__restrict __file, __TARGV, __TENVP),Execvpe,(__file,___argv,___envp))
 #endif /* !__local___localdep_Execvpe_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(Execlpe) __ATTR_NORETURN __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_SENTINEL_O(1) void
+__LOCAL_LIBC(Execlpe) __ATTR_NORETURN __ATTR_IN(1) __ATTR_IN_OPT(2) __ATTR_SENTINEL_O(1) void
 (__VLIBCCALL __LIBC_LOCAL_NAME(Execlpe))(char const *__restrict __file, char const *__args, ...) __THROWS(...) {
 	__REDIRECT_XEXECLE(char, (__NAMESPACE_LOCAL_SYM __localdep_Execvpe), __file, __args)
 }

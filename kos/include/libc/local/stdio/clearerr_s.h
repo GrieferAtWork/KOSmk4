@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3856744 */
+/* HASH CRC-32:0xf9f0cb59 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clearerr_defined
 #define __local___localdep_clearerr_defined
 #if defined(__CRT_HAVE_clearerr_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,__localdep_clearerr,(__FILE *__restrict __stream),clearerr_unlocked,(__stream))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,__localdep_clearerr,(__FILE *__restrict __stream),clearerr_unlocked,(__stream))
 #elif defined(__CRT_HAVE_clearerr)
-__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,__localdep_clearerr,(__FILE *__restrict __stream),clearerr,(__stream))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,__localdep_clearerr,(__FILE *__restrict __stream),clearerr,(__stream))
 #elif defined(__CRT_HAVE_clearerr_unlocked)
-__CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,__localdep_clearerr,(__FILE *__restrict __stream),clearerr_unlocked,(__stream))
+__CREDIRECT_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,__localdep_clearerr,(__FILE *__restrict __stream),clearerr_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_clearerr_defined
 #endif /* !... */
@@ -40,7 +40,7 @@ __CREDIRECT_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,__localdep_clearerr,(__FILE *
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(clearerr_s) __ATTR_ACCESS_RW(1) __errno_t
+__LOCAL_LIBC(clearerr_s) __ATTR_INOUT(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clearerr_s))(__FILE *__restrict __stream) {
 	if (!__stream) {
 #ifdef __EINVAL

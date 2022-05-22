@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9997905e */
+/* HASH CRC-32:0xb6543b71 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,10 +33,10 @@ DECL_BEGIN
 INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_readahead)(fd_t fd, __PIO_OFFSET64 offset, size_t count);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sync_file_range)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 count, unsigned int flags);
 INTDEF ssize_t NOTHROW_RPC(LIBDCALL libd_vmsplice)(fd_t fdout, struct iovec const *iov, size_t count, unsigned int flags);
-INTDEF ATTR_ACCESS_RW(2) ATTR_ACCESS_RW(4) ssize_t NOTHROW_RPC(LIBDCALL libd_splice)(fd_t fdin, __PIO_OFFSET64 *offin, fd_t fdout, __PIO_OFFSET64 *offout, size_t length, unsigned int flags);
+INTDEF ATTR_INOUT(2) ATTR_INOUT(4) ssize_t NOTHROW_RPC(LIBDCALL libd_splice)(fd_t fdin, __PIO_OFFSET64 *offin, fd_t fdout, __PIO_OFFSET64 *offout, size_t length, unsigned int flags);
 INTDEF ssize_t NOTHROW_RPC(LIBDCALL libd_tee)(fd_t fdin, fd_t fdout, size_t length, unsigned int flags);
-INTDEF ATTR_ACCESS_WR(3) int NOTHROW_RPC(LIBDCALL libd_name_to_handle_at)(fd_t dirfd, char const *name, struct file_handle *handle, int *mnt_id, int flags);
-INTDEF ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(LIBDCALL libd_open_by_handle_at)(fd_t mountdirfd, struct file_handle *handle, int flags);
+INTDEF ATTR_OUT(3) int NOTHROW_RPC(LIBDCALL libd_name_to_handle_at)(fd_t dirfd, char const *name, struct file_handle *handle, int *mnt_id, int flags);
+INTDEF ATTR_IN(2) fd_t NOTHROW_RPC(LIBDCALL libd_open_by_handle_at)(fd_t mountdirfd, struct file_handle *handle, int flags);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_fallocate)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET offset, __PIO_OFFSET length);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_fallocate64)(fd_t fd, __STDC_INT_AS_UINT_T mode, __PIO_OFFSET64 offset, __PIO_OFFSET64 length);
 INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd_fcntl)(fd_t fd, fcntl_t cmd, ...);

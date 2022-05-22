@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc25d7476 */
+/* HASH CRC-32:0xcc938f5c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_WRS(2, 3) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_OUTS(2, 3) char *
 NOTHROW_RPC(LIBDCALL libd__getdcwd)(int drive,
                                     char *buf,
                                     size_t bufsize) {
@@ -49,7 +49,7 @@ NOTHROW_RPC(LIBDCALL libd__getdcwd)(int drive,
 	return libd_frealpath4(__AT_FDDRIVE_CWD(drive), buf, bufsize, 0);
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_WRS(2, 3) char *
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") ATTR_OUTS(2, 3) char *
 NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive,
                                     char *buf,
                                     size_t bufsize) {
@@ -76,11 +76,11 @@ NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive) {
 	}
 	return libc_fchdir(__AT_FDDRIVE_ROOT(drive));
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBDCALL libd__mkdir)(char const *path) {
 	return libd_mkdir(path, 0755);
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBCCALL libc__mkdir)(char const *path) {
 	return libc_mkdir(path, 0755);
 }

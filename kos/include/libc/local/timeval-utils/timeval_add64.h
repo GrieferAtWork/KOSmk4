@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32add8b7 */
+/* HASH CRC-32:0x574e8e30 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(timeval_add64) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) void
+__LOCAL_LIBC(timeval_add64) __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timeval_add64))(struct __timeval64 *__result, struct __timeval64 const *__lhs, struct __timeval64 const *__rhs) {
 	__result->tv_sec  = __lhs->tv_sec  + __rhs->tv_sec;
 	__result->tv_usec = __lhs->tv_usec + __rhs->tv_usec;

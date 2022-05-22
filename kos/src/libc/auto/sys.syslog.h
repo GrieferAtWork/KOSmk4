@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95afae51 */
+/* HASH CRC-32:0x1ae50810 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,16 +32,16 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF void NOTHROW_RPC(LIBDCALL libd_openlog)(char const *ident, __STDC_INT_AS_UINT_T option, __STDC_INT_AS_UINT_T facility);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setlogmask)(__STDC_INT_AS_UINT_T mask);
-INTDEF ATTR_ACCESS_RO(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_RPC(VLIBDCALL libd_syslog)(__STDC_INT_AS_UINT_T level, char const *format, ...);
+INTDEF ATTR_IN(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_RPC(VLIBDCALL libd_syslog)(__STDC_INT_AS_UINT_T level, char const *format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_RPC(VLIBCCALL libc_syslog)(__STDC_INT_AS_UINT_T level, char const *format, ...);
+INTDEF ATTR_IN(2) ATTR_LIBC_PRINTF(2, 3) void NOTHROW_RPC(VLIBCCALL libc_syslog)(__STDC_INT_AS_UINT_T level, char const *format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_RPC(LIBDCALL libd_vsyslog)(__STDC_INT_AS_UINT_T level, char const *format, va_list args);
+INTDEF ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_RPC(LIBDCALL libd_vsyslog)(__STDC_INT_AS_UINT_T level, char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_RPC(LIBCCALL libc_vsyslog)(__STDC_INT_AS_UINT_T level, char const *format, va_list args);
+INTDEF ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) void NOTHROW_RPC(LIBCCALL libc_vsyslog)(__STDC_INT_AS_UINT_T level, char const *format, va_list args);
 #endif /* !__KERNEL__ */
 
 DECL_END

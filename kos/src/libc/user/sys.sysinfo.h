@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe990d39 */
+/* HASH CRC-32:0x29384f0a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> sysinfo(2)
  * Return current system information */
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_sysinfo)(struct sysinfo *info);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_sysinfo)(struct sysinfo *info);
 /* >> get_nprocs_conf(3)
  * Return the # of configured online processors */
 INTDEF WUNUSED int NOTHROW(LIBCCALL libc_get_nprocs_conf)(void);

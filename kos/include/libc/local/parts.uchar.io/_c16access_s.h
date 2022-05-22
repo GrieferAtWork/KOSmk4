@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc7d304d */
+/* HASH CRC-32:0x13fb3d6a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,22 +32,22 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_c16access,(__CHAR16_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,__localdep_c16access,(__CHAR16_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$waccess)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_c16access,(__CHAR16_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,__localdep_c16access,(__CHAR16_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
 #elif defined(__CRT_HAVE__waccess) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_c16access,(__CHAR16_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type),_waccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,__localdep_c16access,(__CHAR16_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type),_waccess,(__file,__type))
 #elif defined(__CRT_HAVE_DOS$_waccess)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_c16access,(__CHAR16_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type),_waccess,(__file,__type))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,__localdep_c16access,(__CHAR16_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type),_waccess,(__file,__type))
 #elif (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wfaccessat) || (defined(__CRT_HAVE_faccessat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_access) || defined(__CRT_HAVE__access) || defined(__CRT_HAVE___access) || defined(__CRT_HAVE___libc_access) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.unistd/waccess.h>
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_c16access_s) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __errno_t
+__LOCAL_LIBC(_c16access_s) __ATTR_WUNUSED __ATTR_IN(1) __errno_t
 __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(_c16access_s))(__CHAR16_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type) {
 	if ((__NAMESPACE_LOCAL_SYM __localdep_c16access)(__file, __type) != 0)
 		return __libc_geterrno_or(1);

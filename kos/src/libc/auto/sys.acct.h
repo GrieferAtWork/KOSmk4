@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfa1aac3 */
+/* HASH CRC-32:0xe48cef8b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Switch process accounting on and off */
-INTDEF ATTR_ACCESS_RO_OPT(1) int NOTHROW_RPC(LIBDCALL libd_acct)(const char *filename);
+INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBDCALL libd_acct)(const char *filename);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcef098c8 */
+/* HASH CRC-32:0x53c8c986 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ DECL_BEGIN
  * NOTE: On KOS, this function is a system call, though in other
  *       operating system it is often implemented via `open(2)',
  *       possibly combined with `ioctl(2)'. */
-INTDEF ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR_OPT(3) int NOTHROW_NCX(LIBDCALL libd_openpty)(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp);
+INTDEF ATTR_IN_OPT(4) ATTR_IN_OPT(5) ATTR_OUT(1) ATTR_OUT(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBDCALL libd_openpty)(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp);
 /* >> forkpty(3)
  * A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',
  * such  that  the newly  created PTY  is open  under all  std-handles in
@@ -55,7 +55,7 @@ INTDEF ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_WR(1) ATTR_ACCESS
  * it returns in  both the  parent and child  processes, returning  `0'
  * for the child, and the child's PID for the parent (or -1 in only the
  * parent if something went wrong) */
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR_OPT(2) pid_t NOTHROW_NCX(LIBDCALL libd_forkpty)(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp);
+INTDEF ATTR_IN(3) ATTR_IN(4) ATTR_OUT(1) ATTR_OUT_OPT(2) pid_t NOTHROW_NCX(LIBDCALL libd_forkpty)(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> forkpty(3)
@@ -66,7 +66,7 @@ INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR_OPT(
  * it returns in  both the  parent and child  processes, returning  `0'
  * for the child, and the child's PID for the parent (or -1 in only the
  * parent if something went wrong) */
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR_OPT(2) pid_t NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp);
+INTDEF ATTR_IN(3) ATTR_IN(4) ATTR_OUT(1) ATTR_OUT_OPT(2) pid_t NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp);
 #endif /* !__KERNEL__ */
 
 DECL_END

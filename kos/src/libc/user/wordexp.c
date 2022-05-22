@@ -2816,7 +2816,7 @@ done:
 
 
 
-/*[[[head:libc_wordexp,hash:CRC-32=0x27ce2bf0]]]*/
+/*[[[head:libc_wordexp,hash:CRC-32=0x2fb559ad]]]*/
 /* >> wordexp(3)
  * Do shell-like expansion of `string'
  * @param: string: The string to expand
@@ -2824,7 +2824,7 @@ done:
  * @param: flags:  Expansion flags (set of `WRDE_*' from <wordexp.h>)
  * @return: 0 : Success
  * @return: * : Error (return value is one of `WRDE_*' from <wordexp.h>) */
-INTERN ATTR_SECTION(".text.crt.wordexp") ATTR_ACCESS_RO(1) NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.wordexp") ATTR_IN(1) NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_wordexp)(char const *__restrict string,
                                    wordexp_t *__restrict self,
                                    __STDC_INT_AS_UINT_T flags)

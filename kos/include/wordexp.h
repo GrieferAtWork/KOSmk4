@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6242ced */
+/* HASH CRC-32:0x43fed6f1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,16 +107,16 @@ typedef struct __wordexp_struct wordexp_t;
  * @param: flags:  Expansion flags (set of `WRDE_*' from <wordexp.h>)
  * @return: 0 : Success
  * @return: * : Error (return value is one of `WRDE_*' from <wordexp.h>) */
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1) __ATTR_NONNULL((2)),int,__NOTHROW_NCX,wordexp,(char const *__restrict __string, wordexp_t *__restrict __self, __STDC_INT_AS_UINT_T __flags),(__string,__self,__flags))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_NONNULL((2)),int,__NOTHROW_NCX,wordexp,(char const *__restrict __string, wordexp_t *__restrict __self, __STDC_INT_AS_UINT_T __flags),(__string,__self,__flags))
 #ifdef __CRT_HAVE_wordfree
 /* >> wordfree(3)
  * Free dynamic allocations made by `wordexp(3)' */
-__CDECLARE_VOID(__ATTR_ACCESS_RW_OPT(1),__NOTHROW_NCX,wordfree,(wordexp_t *__self),(__self))
+__CDECLARE_VOID(__ATTR_INOUT_OPT(1),__NOTHROW_NCX,wordfree,(wordexp_t *__self),(__self))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #include <libc/local/wordexp/wordfree.h>
 /* >> wordfree(3)
  * Free dynamic allocations made by `wordexp(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(wordfree, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW_OPT(1) void __NOTHROW_NCX(__LIBCCALL wordfree)(wordexp_t *__self) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wordfree))(__self); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wordfree, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(1) void __NOTHROW_NCX(__LIBCCALL wordfree)(wordexp_t *__self) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wordfree))(__self); })
 #endif /* ... */
 
 __SYSDECL_END

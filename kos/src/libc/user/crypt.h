@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62421c1 */
+/* HASH CRC-32:0x9d103dc3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,13 +34,13 @@ DECL_BEGIN
 /* >> setkey(3), setkey_r(3) */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_setkey)(char const *key);
 /* >> crypt(3), crypt_r(3) */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) char *NOTHROW_NCX(LIBCCALL libc_crypt)(char const *key, char const *salt);
+INTDEF ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBCCALL libc_crypt)(char const *key, char const *salt);
 /* >> encrypt(3), encrypt_r(3) */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_encrypt)(char *glibc_block, __STDC_INT_AS_UINT_T edflag);
 /* >> crypt(3), crypt_r(3) */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) NONNULL((3)) char *NOTHROW_NCX(LIBCCALL libc_crypt_r)(char const *key, char const *salt, struct crypt_data *__restrict data);
+INTDEF ATTR_IN(1) ATTR_IN(2) NONNULL((3)) char *NOTHROW_NCX(LIBCCALL libc_crypt_r)(char const *key, char const *salt, struct crypt_data *__restrict data);
 /* >> setkey(3), setkey_r(3) */
-INTDEF ATTR_ACCESS_RO(1) NONNULL((2)) void NOTHROW_NCX(LIBCCALL libc_setkey_r)(char const *key, struct crypt_data *__restrict data);
+INTDEF ATTR_IN(1) NONNULL((2)) void NOTHROW_NCX(LIBCCALL libc_setkey_r)(char const *key, struct crypt_data *__restrict data);
 /* >> encrypt(3), encrypt_r(3) */
 INTDEF NONNULL((1, 3)) void NOTHROW_NCX(LIBCCALL libc_encrypt_r)(char *glibc_block, int edflag, struct crypt_data *__restrict data);
 #endif /* !__KERNEL__ */

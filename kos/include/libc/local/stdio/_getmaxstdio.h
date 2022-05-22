@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36ad7532 */
+/* HASH CRC-32:0x68f80a57 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,22 +32,22 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/os/rlimit.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_getrlimit,(int __resource, struct rlimit *__rlimits),getrlimit,(__resource,__rlimits))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_getrlimit,(int __resource, struct rlimit *__rlimits),getrlimit,(__resource,__rlimits))
 #elif defined(__CRT_HAVE___getrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)
 __NAMESPACE_LOCAL_END
 #include <bits/os/rlimit.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_getrlimit,(int __resource, struct rlimit *__rlimits),__getrlimit,(__resource,__rlimits))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_getrlimit,(int __resource, struct rlimit *__rlimits),__getrlimit,(__resource,__rlimits))
 #elif defined(__CRT_HAVE___libc_getrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)
 __NAMESPACE_LOCAL_END
 #include <bits/os/rlimit.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_getrlimit,(int __resource, struct rlimit *__rlimits),__libc_getrlimit,(__resource,__rlimits))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_getrlimit,(int __resource, struct rlimit *__rlimits),__libc_getrlimit,(__resource,__rlimits))
 #elif defined(__CRT_HAVE_getrlimit64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)
 __NAMESPACE_LOCAL_END
 #include <bits/os/rlimit.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,__localdep_getrlimit,(int __resource, struct rlimit *__rlimits),getrlimit64,(__resource,__rlimits))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_getrlimit,(int __resource, struct rlimit *__rlimits),getrlimit64,(__resource,__rlimits))
 #else /* ... */
 #undef __local___localdep_getrlimit_defined
 #endif /* !... */

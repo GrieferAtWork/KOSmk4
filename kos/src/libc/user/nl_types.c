@@ -27,8 +27,8 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_catopen,hash:CRC-32=0x81dac797]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.heap.malloc") ATTR_ACCESS_RO(1) nl_catd
+/*[[[head:libc_catopen,hash:CRC-32=0x2708d50a]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.heap.malloc") ATTR_IN(1) nl_catd
 NOTHROW_RPC(LIBCCALL libc_catopen)(char const *cat_name,
                                    int flag)
 /*[[[body:libc_catopen]]]*/

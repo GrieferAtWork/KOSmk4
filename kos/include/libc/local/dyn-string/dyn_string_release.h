@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2325be4a */
+/* HASH CRC-32:0xaf5470a8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #undef __local___localdep_realloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_realloc_defined */
-__LOCAL_LIBC(dyn_string_release) __ATTR_RETNONNULL __ATTR_ACCESS_RW(1) char *
+__LOCAL_LIBC(dyn_string_release) __ATTR_RETNONNULL __ATTR_INOUT(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dyn_string_release))(struct dyn_string *__self) {
 	char *__result = __self->s;
 #if (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && !defined(__OPTIMIZE_SIZE__)

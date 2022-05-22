@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1572a47 */
+/* HASH CRC-32:0x25835610 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_tdelete_r_defined
 #define __local___localdep_tdelete_r_defined
 #ifdef __CRT_HAVE_tdelete_r
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RW_OPT(2) __ATTR_NONNULL((3)),void *,__THROWING,__localdep_tdelete_r,(void const *__restrict __key, void **__restrict __vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),tdelete_r,(__key,__vrootp,__compar,__arg))
+__CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_IN_OPT(1) __ATTR_NONNULL((3)),void *,__THROWING,__localdep_tdelete_r,(void const *__restrict __key, void **__restrict __vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),tdelete_r,(__key,__vrootp,__compar,__arg))
 #else /* __CRT_HAVE_tdelete_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/tdelete_r.h>
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_defined */
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(tdelete) __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RW_OPT(2) __ATTR_NONNULL((3)) void *
+__LOCAL_LIBC(tdelete) __ATTR_INOUT_OPT(2) __ATTR_IN_OPT(1) __ATTR_NONNULL((3)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __key, void **__restrict __vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	return (__NAMESPACE_LOCAL_SYM __localdep_tdelete_r)(__key, __vrootp, (int (__LIBCCALL *)(void const *, void const *, void *))(void *)__compar, __NULLPTR);

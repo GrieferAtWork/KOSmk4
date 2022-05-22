@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd36c4ac9 */
+/* HASH CRC-32:0x4ea61802 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) bool
+INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_PURE WUNUSED ATTR_IN_OPT(1) bool
 NOTHROW_NCX(LIBCCALL libc_nss_checkfield)(char const *field) {
 	if (!field)
 		return true;
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_nss_checkfield)(char const *field) {
 		return false;
 	return true;
 }
-INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) bool
+INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_PURE WUNUSED ATTR_IN_OPT(1) bool
 NOTHROW_NCX(LIBCCALL libc_nss_checkfieldlist)(char *const *list) {
 	if (!list)
 		return true;
@@ -61,7 +61,7 @@ NOTHROW_NCX(LIBCCALL libc_nss_checkfieldlist)(char *const *list) {
  * Write the given entry `ent' into the given `stream'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_ACCESS_RO(1) ATTR_ACCESS_RW(2) int
+INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_IN(1) ATTR_INOUT(2) int
 (LIBCCALL libc_putpwent)(struct passwd const *__restrict ent,
                          FILE *__restrict stream) THROWS(...) {
 	__STDC_INT_AS_SSIZE_T error;
@@ -141,7 +141,7 @@ err_inval:
  * @return: ENOENT: The last entry has already been read (use `rewind(stream)' to rewind the database)
  * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
  * @return: * :     Error (one of `E*' from `<errno.h>') */
-INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) errno_t
+INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t
 NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
                                        struct passwd *__restrict resultbuf,
                                        char *__restrict buffer,
@@ -156,7 +156,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `uid'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(3) ATTR_ACCESS_WR(6) ATTR_ACCESS_WRS(4, 5) errno_t
+INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t
 NOTHROW_RPC(LIBCCALL libc_fgetpwuid_r)(FILE *__restrict stream,
                                        uid_t uid,
                                        struct passwd *__restrict resultbuf,
@@ -178,7 +178,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwuid_r)(FILE *__restrict stream,
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(3) ATTR_ACCESS_WR(6) ATTR_ACCESS_WRS(4, 5) errno_t
+INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t
 NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream,
                                        const char *__restrict name,
                                        struct passwd *__restrict resultbuf,
@@ -207,7 +207,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream,
  * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
  *                  Note that in this case, `errno' will have also been set to `ERANGE'
  * @return: * :     Error (one of `E*' from `<errno.h>') */
-INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) errno_t
+INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_INOUT(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t
 NOTHROW_RPC(LIBCCALL libc_fgetpwfiltered_r)(FILE *__restrict stream,
                                             struct passwd *__restrict resultbuf,
                                             char *__restrict buffer,
@@ -396,7 +396,7 @@ nextline:
  * Re-construct the password-file line for the given uid in the
  * given  buffer. This  knows the  format that  the caller will
  * expect, but this need not be the format of the password file */
-INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_ACCESS_WR(2) int
+INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_OUT(2) int
 NOTHROW_RPC(LIBCCALL libc_getpw)(uid_t uid,
                                  char *buffer) {
 	struct passwd *ent;
@@ -421,7 +421,7 @@ err:
 }
 /* >> sgetpwent(3)
  * Old libc4/5 function (only here for compat) */
-INTERN ATTR_SECTION(".text.crt.compat.linux") ATTR_ACCESS_RO(1) struct passwd *
+INTERN ATTR_SECTION(".text.crt.compat.linux") ATTR_IN(1) struct passwd *
 NOTHROW_NCX(LIBCCALL libc_sgetpwent)(char const *line) {
 	struct passwd *result = NULL;
 	FILE *tempfp;

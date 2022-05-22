@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28136802 */
+/* HASH CRC-32:0x8d887d8f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,27 +61,27 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sl_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 /* >> sl_add(3)
  * Append a  given `name'  to  `sl'. `name'  is  considered
  * inherited if the StringList is destroyed with `freeit=1' */
-__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,sl_add,(struct _stringlist *__sl, char *__name),(__sl,__name))
+__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_NCX,sl_add,(struct _stringlist *__sl, char *__name),(__sl,__name))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/stringlist/sl_add.h>
 /* >> sl_add(3)
  * Append a  given `name'  to  `sl'. `name'  is  considered
  * inherited if the StringList is destroyed with `freeit=1' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sl_add, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL sl_add)(struct _stringlist *__sl, char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_add))(__sl, __name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sl_add, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) int __NOTHROW_NCX(__LIBCCALL sl_add)(struct _stringlist *__sl, char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_add))(__sl, __name); })
 #endif /* ... */
 #ifdef __CRT_HAVE_sl_free
 /* >> sl_free(3)
  * Free a given string list. When `freeit' is non-zero, all contained
  * string pointers (as previously added with `sl_add()') will also be
  * `free(3)'d. */
-__CDECLARE_VOID(__ATTR_ACCESS_RW_OPT(1),__NOTHROW_NCX,sl_free,(struct _stringlist *__sl, int __freeit),(__sl,__freeit))
+__CDECLARE_VOID(__ATTR_INOUT_OPT(1),__NOTHROW_NCX,sl_free,(struct _stringlist *__sl, int __freeit),(__sl,__freeit))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #include <libc/local/stringlist/sl_free.h>
 /* >> sl_free(3)
  * Free a given string list. When `freeit' is non-zero, all contained
  * string pointers (as previously added with `sl_add()') will also be
  * `free(3)'d. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sl_free, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW_OPT(1) void __NOTHROW_NCX(__LIBCCALL sl_free)(struct _stringlist *__sl, int __freeit) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_free))(__sl, __freeit); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sl_free, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(1) void __NOTHROW_NCX(__LIBCCALL sl_free)(struct _stringlist *__sl, int __freeit) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_free))(__sl, __freeit); })
 #endif /* ... */
 #ifdef __CRT_HAVE_sl_find
 /* >> sl_find(3)
@@ -89,7 +89,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sl_free, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_A
  * return a  pointer to  the equivalent  string within  `sl' (i.e.  the
  * pointer originally  passed to  `sl_add()'  to insert  that  string).
  * If `sl' doesn't contain an equivalent string, return `NULL' instead. */
-__CDECLARE(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_NCX,sl_find,(struct _stringlist __KOS_FIXED_CONST *__sl, char const *__name),(__sl,__name))
+__CDECLARE(__ATTR_PURE __ATTR_IN(1) __ATTR_IN(2),char *,__NOTHROW_NCX,sl_find,(struct _stringlist __KOS_FIXED_CONST *__sl, char const *__name),(__sl,__name))
 #else /* __CRT_HAVE_sl_find */
 #include <libc/local/stringlist/sl_find.h>
 /* >> sl_find(3)
@@ -97,7 +97,7 @@ __CDECLARE(__ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_
  * return a  pointer to  the equivalent  string within  `sl' (i.e.  the
  * pointer originally  passed to  `sl_add()'  to insert  that  string).
  * If `sl' doesn't contain an equivalent string, return `NULL' instead. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sl_find, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) char *__NOTHROW_NCX(__LIBCCALL sl_find)(struct _stringlist __KOS_FIXED_CONST *__sl, char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_find))(__sl, __name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sl_find, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_IN(1) __ATTR_IN(2) char *__NOTHROW_NCX(__LIBCCALL sl_find)(struct _stringlist __KOS_FIXED_CONST *__sl, char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_find))(__sl, __name); })
 #endif /* !__CRT_HAVE_sl_find */
 #ifndef __sl_delete_defined
 #define __sl_delete_defined
@@ -107,7 +107,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sl_find, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'
  * @return: -1: No string equal to `name' was found in `sl' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_NCX,sl_delete,(struct _stringlist *__sl, char const *__name, int __freeit),(__sl,__name,__freeit))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),int,__NOTHROW_NCX,sl_delete,(struct _stringlist *__sl, char const *__name, int __freeit),(__sl,__name,__freeit))
 #else /* __CRT_HAVE_sl_delete */
 #include <libc/local/stringlist/sl_delete.h>
 /* >> sl_delete(3) [NetBSD]
@@ -115,7 +115,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1),int,__NOTHROW_
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'
  * @return: -1: No string equal to `name' was found in `sl' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sl_delete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) int __NOTHROW_NCX(__LIBCCALL sl_delete)(struct _stringlist *__sl, char const *__name, int __freeit) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_delete))(__sl, __name, __freeit); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sl_delete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) int __NOTHROW_NCX(__LIBCCALL sl_delete)(struct _stringlist *__sl, char const *__name, int __freeit) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sl_delete))(__sl, __name, __freeit); })
 #endif /* !__CRT_HAVE_sl_delete */
 #endif /* !__sl_delete_defined */
 

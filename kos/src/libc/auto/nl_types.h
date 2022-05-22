@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0991af1 */
+/* HASH CRC-32:0xfef56799 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO(1) nl_catd NOTHROW_RPC(LIBDCALL libd_catopen)(char const *cat_name, int flag);
+INTDEF ATTR_IN(1) nl_catd NOTHROW_RPC(LIBDCALL libd_catopen)(char const *cat_name, int flag);
 INTDEF char *NOTHROW_NCX(LIBDCALL libd_catgets)(nl_catd catalog, int set, int number, char const *string);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_catclose)(nl_catd catalog);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

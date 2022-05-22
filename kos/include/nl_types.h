@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x890f7145 */
+/* HASH CRC-32:0xe5adc2b2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __SYSDECL_BEGIN
 typedef void *nl_catd;
 typedef int nl_item;
 
-__CDECLARE_OPT(__ATTR_ACCESS_RO(1),nl_catd,__NOTHROW_RPC,catopen,(char const *__cat_name, int __flag),(__cat_name,__flag))
+__CDECLARE_OPT(__ATTR_IN(1),nl_catd,__NOTHROW_RPC,catopen,(char const *__cat_name, int __flag),(__cat_name,__flag))
 __CDECLARE_OPT(,char *,__NOTHROW_NCX,catgets,(nl_catd __catalog, int __set, int __number, char const *__string),(__catalog,__set,__number,__string))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,catclose,(nl_catd __catalog),(__catalog))
 

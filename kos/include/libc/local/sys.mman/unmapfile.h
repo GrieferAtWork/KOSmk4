@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5325c600 */
+/* HASH CRC-32:0x75611f01 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __CREDIRECT(__ATTR_ACCESS_NONE(1),int,__NOTHROW_NCX,__localdep_munmap,(void *__a
 #undef __local___localdep_munmap_defined
 #endif /* !... */
 #endif /* !__local___localdep_munmap_defined */
-__LOCAL_LIBC(unmapfile) __ATTR_ACCESS_RW(1) int
+__LOCAL_LIBC(unmapfile) __ATTR_INOUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unmapfile))(struct mapfile *__restrict __mapping) {
 	if (__mapping->__mf_mapsize) {
 #if defined(__CRT_HAVE_munmap) || defined(__CRT_HAVE___munmap) || defined(__CRT_HAVE___libc_munmap)

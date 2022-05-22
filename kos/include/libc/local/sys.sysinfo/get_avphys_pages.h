@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20af3c3 */
+/* HASH CRC-32:0xcf5f00b3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,17 +57,17 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCA
 __NAMESPACE_LOCAL_END
 #include <linux/sysinfo.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_sysinfo,(struct sysinfo *__info),sysinfo,(__info))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_sysinfo,(struct sysinfo *__info),sysinfo,(__info))
 #elif defined(__CRT_HAVE___sysinfo)
 __NAMESPACE_LOCAL_END
 #include <linux/sysinfo.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_sysinfo,(struct sysinfo *__info),__sysinfo,(__info))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_sysinfo,(struct sysinfo *__info),__sysinfo,(__info))
 #elif defined(__CRT_HAVE___libc_sysinfo)
 __NAMESPACE_LOCAL_END
 #include <linux/sysinfo.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_sysinfo,(struct sysinfo *__info),__libc_sysinfo,(__info))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_sysinfo,(struct sysinfo *__info),__libc_sysinfo,(__info))
 #else /* ... */
 #undef __local___localdep_sysinfo_defined
 #endif /* !... */

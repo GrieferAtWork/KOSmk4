@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa50cd97a */
+/* HASH CRC-32:0x625c466c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,13 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RW(5) __ATTR_ACCESS_WR(4),int,__NOTHROW_NCX,__localdep_getsockopt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void *__restrict __optval, __socklen_t *__restrict __optlen),getsockopt,(__sockfd,__level,__optname,__optval,__optlen))
+__CREDIRECT(__ATTR_INOUT(5) __ATTR_OUT(4),int,__NOTHROW_NCX,__localdep_getsockopt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void *__restrict __optval, __socklen_t *__restrict __optlen),getsockopt,(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* !__local___localdep_getsockopt_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/os/ucred.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getpeereid) __ATTR_ACCESS_WR(2) __ATTR_ACCESS_WR(3) int
+__LOCAL_LIBC(getpeereid) __ATTR_OUT(2) __ATTR_OUT(3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getpeereid))(__fd_t __sockfd, __uid_t *__euid, __gid_t *__egid) {
 	int __result;
 	struct ucred __cred;

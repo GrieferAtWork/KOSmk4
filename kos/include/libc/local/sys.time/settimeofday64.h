@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e75ce30 */
+/* HASH CRC-32:0xb3790d7a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_settimeofday32_defined
 #define __local___localdep_settimeofday32_defined
 #ifdef __CRT_HAVE_settimeofday
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___settimeofday)
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),__settimeofday,(__tv,__tz))
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),__settimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___libc_settimeofday)
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),__libc_settimeofday,(__tv,__tz))
+__CREDIRECT(__ATTR_IN_OPT(1) __ATTR_IN_OPT(2),int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),__libc_settimeofday,(__tv,__tz))
 #else /* ... */
 #undef __local___localdep_settimeofday32_defined
 #endif /* !... */
 #endif /* !__local___localdep_settimeofday32_defined */
-__LOCAL_LIBC(settimeofday64) __ATTR_ACCESS_RO_OPT(1) __ATTR_ACCESS_RO_OPT(2) int
+__LOCAL_LIBC(settimeofday64) __ATTR_IN_OPT(1) __ATTR_IN_OPT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(settimeofday64))(struct __timeval64 const *__tv, struct timezone const *__tz) {
 	struct __timeval32 __tv32;
 	if (!__tv)

@@ -25,9 +25,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libd_strfmon,hash:CRC-32=0x38f85bc0]]]*/
+/*[[[head:libd_strfmon,hash:CRC-32=0x12f68638]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.monetary") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_STRFMON(3, 4) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.monetary") ATTR_IN(3) ATTR_LIBC_STRFMON(3, 4) ATTR_OUTS(1, 2) ssize_t
 NOTHROW_NCX(VLIBDCALL libd_strfmon)(char *__restrict s,
                                     size_t maxsize,
                                     char const *__restrict format,
@@ -44,8 +44,8 @@ NOTHROW_NCX(VLIBDCALL libd_strfmon)(char *__restrict s,
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_strfmon]]]*/
 
-/*[[[head:libc_strfmon,hash:CRC-32=0x114a801a]]]*/
-INTERN ATTR_SECTION(".text.crt.utility.monetary") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_STRFMON(3, 4) ssize_t
+/*[[[head:libc_strfmon,hash:CRC-32=0x3a8a2c85]]]*/
+INTERN ATTR_SECTION(".text.crt.utility.monetary") ATTR_IN(3) ATTR_LIBC_STRFMON(3, 4) ATTR_OUTS(1, 2) ssize_t
 NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s,
                                     size_t maxsize,
                                     char const *__restrict format,
@@ -61,9 +61,9 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s,
 }
 /*[[[end:libc_strfmon]]]*/
 
-/*[[[head:libd_strfmon_l,hash:CRC-32=0x3b5ec31a]]]*/
+/*[[[head:libd_strfmon_l,hash:CRC-32=0x6906d5b4]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.monetary") ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_STRFMON(4, 5) ssize_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.monetary") ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2) ssize_t
 NOTHROW_NCX(VLIBDCALL libd_strfmon_l)(char *__restrict s,
                                       size_t maxsize,
                                       locale_t loc,
@@ -82,8 +82,8 @@ NOTHROW_NCX(VLIBDCALL libd_strfmon_l)(char *__restrict s,
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_strfmon_l]]]*/
 
-/*[[[head:libc_strfmon_l,hash:CRC-32=0x615a880e]]]*/
-INTERN ATTR_SECTION(".text.crt.utility.monetary") ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) ATTR_LIBC_STRFMON(4, 5) ssize_t
+/*[[[head:libc_strfmon_l,hash:CRC-32=0xbaf847b1]]]*/
+INTERN ATTR_SECTION(".text.crt.utility.monetary") ATTR_IN(4) ATTR_LIBC_STRFMON(4, 5) ATTR_OUTS(1, 2) ssize_t
 NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s,
                                       size_t maxsize,
                                       locale_t loc,

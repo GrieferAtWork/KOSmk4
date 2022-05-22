@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb75f1651 */
+/* HASH CRC-32:0x1caa2635 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_bsearch_r_defined
 #define __local___localdep_bsearch_r_defined
 #ifdef __CRT_HAVE_bsearch_r
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_NONNULL((5)),void *,__THROWING,__localdep_bsearch_r,(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),bsearch_r,(__pkey,__pbase,__item_count,__item_size,__compar,__arg))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN_OPT(2) __ATTR_NONNULL((5)),void *,__THROWING,__localdep_bsearch_r,(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),bsearch_r,(__pkey,__pbase,__item_count,__item_size,__compar,__arg))
 #else /* __CRT_HAVE_bsearch_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/bsearch_r.h>
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_defined */
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(bsearch) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO_OPT(2) __ATTR_NONNULL((5)) void *
+__LOCAL_LIBC(bsearch) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN_OPT(2) __ATTR_NONNULL((5)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(bsearch))(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	return (void *)(__NAMESPACE_LOCAL_SYM __localdep_bsearch_r)(__pkey, __pbase, __item_count, __item_size,

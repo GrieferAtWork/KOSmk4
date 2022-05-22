@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x237c9e2d */
+/* HASH CRC-32:0x62438650 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcstombs_s_defined
 #define __local___localdep_wcstombs_s_defined
 #ifdef __CRT_HAVE_wcstombs_s
-__CREDIRECT(__ATTR_ACCESS_ROS(4, 5) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WR_OPT(1),__errno_t,__NOTHROW_NCX,__localdep_wcstombs_s,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __maxlen),wcstombs_s,(__presult,__buf,__buflen,__src,__maxlen))
+__CREDIRECT(__ATTR_INS(4, 5) __ATTR_OUTS(2, 3) __ATTR_OUT_OPT(1),__errno_t,__NOTHROW_NCX,__localdep_wcstombs_s,(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __maxlen),wcstombs_s,(__presult,__buf,__buflen,__src,__maxlen))
 #else /* __CRT_HAVE_wcstombs_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/wcstombs_s.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wcstombs_s_l) __ATTR_ACCESS_ROS(4, 5) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WR_OPT(1) __errno_t
+__LOCAL_LIBC(_wcstombs_s_l) __ATTR_INS(4, 5) __ATTR_OUTS(2, 3) __ATTR_OUT_OPT(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcstombs_s_l))(__SIZE_TYPE__ *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
 	(void)__locale;
 	return (__NAMESPACE_LOCAL_SYM __localdep_wcstombs_s)(__presult, __buf, __buflen, __src, __maxlen);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4e72169 */
+/* HASH CRC-32:0x289731c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,14 +36,14 @@ DECL_BEGIN
 INTDEF fd_t NOTHROW(LIBCCALL libc_timerfd_create)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags);
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WR_OPT(4) int NOTHROW_NCX(LIBCCALL libc_timerfd_settime)(fd_t ufd, __STDC_INT_AS_UINT_T flags, struct itimerspec const *utmr, struct itimerspec *otmr);
+INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) int NOTHROW_NCX(LIBCCALL libc_timerfd_settime)(fd_t ufd, __STDC_INT_AS_UINT_T flags, struct itimerspec const *utmr, struct itimerspec *otmr);
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
-INTDEF ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_timerfd_gettime)(fd_t ufd, struct itimerspec *__restrict otmr);
+INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_timerfd_gettime)(fd_t ufd, struct itimerspec *__restrict otmr);
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WR_OPT(4) int NOTHROW_NCX(LIBCCALL libc_timerfd_settime64)(fd_t ufd, __STDC_INT_AS_UINT_T flags, struct itimerspec64 const *utmr, struct itimerspec64 *otmr);
+INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) int NOTHROW_NCX(LIBCCALL libc_timerfd_settime64)(fd_t ufd, __STDC_INT_AS_UINT_T flags, struct itimerspec64 const *utmr, struct itimerspec64 *otmr);
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
-INTDEF ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_timerfd_gettime64)(fd_t ufd, struct itimerspec64 *__restrict otmr);
+INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_timerfd_gettime64)(fd_t ufd, struct itimerspec64 *__restrict otmr);
 #endif /* !__KERNEL__ */
 
 DECL_END

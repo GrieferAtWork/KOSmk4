@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a04e18f */
+/* HASH CRC-32:0xdaeaf719 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ DECL_BEGIN
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
  * @return: * :          Error (errno-code describing the reason of failure) */
-INTDEF ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBDCALL libd_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_fspawn_np(3)
@@ -79,7 +79,7 @@ INTDEF ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
  * @return: * :          Error (errno-code describing the reason of failure) */
-INTDEF ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn(3)
@@ -105,7 +105,7 @@ INTDEF ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_
  * @param: envp:         Same as the `envp' accepted by `execve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
  * @return: * :          Error (errno-code describing the reason of failure) */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBDCALL libd_posix_spawn)(pid_t *__restrict pid, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_posix_spawn)(pid_t *__restrict pid, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn(3)
@@ -131,7 +131,7 @@ INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(
  * @param: envp:         Same as the `envp' accepted by `execve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
  * @return: * :          Error (errno-code describing the reason of failure) */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnp(3)
@@ -139,7 +139,7 @@ INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(
  * directly making  use of  `file'  as the  absolute filename  of  the file  to  execute.
  * Note however  that  when  `file'  contains any  slashes,  `$PATH'  won't  be  searched
  * either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)') */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBDCALL libd_posix_spawnp)(pid_t *__restrict pid, const char *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_posix_spawnp)(pid_t *__restrict pid, const char *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnp(3)
@@ -147,43 +147,43 @@ INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(
  * directly making  use of  `file'  as the  absolute filename  of  the file  to  execute.
  * Note however  that  when  `file'  contains any  slashes,  `$PATH'  won't  be  searched
  * either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)') */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(5) ATTR_ACCESS_RO(6) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid, const char *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
+INTDEF ATTR_IN(2) ATTR_IN(5) ATTR_IN(6) ATTR_IN_OPT(3) ATTR_IN_OPT(4) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid, const char *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_init(3)
  * Initialize a given set of spawn attributes to all zero
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_WR(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_init)(posix_spawnattr_t *__restrict attr);
+INTDEF ATTR_OUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_init)(posix_spawnattr_t *__restrict attr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_init(3)
  * Initialize a given set of spawn attributes to all zero
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_WR(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_init)(posix_spawnattr_t *__restrict attr);
+INTDEF ATTR_OUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_init)(posix_spawnattr_t *__restrict attr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_destroy(3)
  * Destroy a given set of spawn attributes
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_destroy)(posix_spawnattr_t *__restrict attr);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_destroy)(posix_spawnattr_t *__restrict attr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_destroy(3)
  * Destroy a given set of spawn attributes
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_destroy)(posix_spawnattr_t *__restrict attr);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_destroy)(posix_spawnattr_t *__restrict attr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_setflags(3)
  * Get the set of flags previously specified by `posix_spawnattr_setflags()'
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getflags)(posix_spawnattr_t const *__restrict attr, short int *__restrict pflags);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getflags)(posix_spawnattr_t const *__restrict attr, short int *__restrict pflags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_setflags(3)
  * Get the set of flags previously specified by `posix_spawnattr_setflags()'
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getflags)(posix_spawnattr_t const *__restrict attr, short int *__restrict pflags);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getflags)(posix_spawnattr_t const *__restrict attr, short int *__restrict pflags);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_setflags(3)
@@ -196,7 +196,7 @@ INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBCCALL libc_pos
  *   - POSIX_SPAWN_SETSCHEDULER:  s.a. posix_spawnattr_setschedpolicy(3)
  *   - POSIX_SPAWN_SETSCHEDPARAM: s.a. posix_spawnattr_setschedparam(3)
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setflags)(posix_spawnattr_t *__restrict attr, short int flags);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setflags)(posix_spawnattr_t *__restrict attr, short int flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_setflags(3)
@@ -209,77 +209,77 @@ INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setfl
  *   - POSIX_SPAWN_SETSCHEDULER:  s.a. posix_spawnattr_setschedpolicy(3)
  *   - POSIX_SPAWN_SETSCHEDPARAM: s.a. posix_spawnattr_setschedparam(3)
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setflags)(posix_spawnattr_t *__restrict attr, short int flags);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setflags)(posix_spawnattr_t *__restrict attr, short int flags);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getsigdefault(3)
  * Get the set of signal handler that are reset of `SIG_DFL' by
  * the  child  process  when  `POSIX_SPAWN_SETSIGDEF'  is  set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getsigdefault)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigdefault);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getsigdefault)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigdefault);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getsigdefault(3)
  * Get the set of signal handler that are reset of `SIG_DFL' by
  * the  child  process  when  `POSIX_SPAWN_SETSIGDEF'  is  set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigdefault)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigdefault);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigdefault)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigdefault);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_setsigdefault(3)
  * Set the set of signal handler that are reset of `SIG_DFL' by
  * the  child  process  when  `POSIX_SPAWN_SETSIGDEF'  is  set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setsigdefault)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigdefault);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setsigdefault)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigdefault);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_setsigdefault(3)
  * Set the set of signal handler that are reset of `SIG_DFL' by
  * the  child  process  when  `POSIX_SPAWN_SETSIGDEF'  is  set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigdefault)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigdefault);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigdefault)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigdefault);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getsigmask(3)
  * Get the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
  * that the  child process  will perform  when `POSIX_SPAWN_SETSIGMASK'  is  set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getsigmask)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigmask);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getsigmask)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigmask);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getsigmask(3)
  * Get the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
  * that the  child process  will perform  when `POSIX_SPAWN_SETSIGMASK'  is  set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigmask)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigmask);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigmask)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigmask);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getsigmask(3)
  * Set the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
  * that the  child process  will perform  when `POSIX_SPAWN_SETSIGMASK'  is  set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setsigmask)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigmask);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setsigmask)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigmask);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getsigmask(3)
  * Set the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
  * that the  child process  will perform  when `POSIX_SPAWN_SETSIGMASK'  is  set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigmask)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigmask);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigmask)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigmask);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getpgroup(3)
  * Get the `pgid'  argument of a  call `setpgid(getpid(), pgid)'  that
  * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__restrict attr, pid_t *__restrict pgroup);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__restrict attr, pid_t *__restrict pgroup);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getpgroup(3)
  * Get the `pgid'  argument of a  call `setpgid(getpid(), pgid)'  that
  * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__restrict attr, pid_t *__restrict pgroup);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__restrict attr, pid_t *__restrict pgroup);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getschedparam(3)
@@ -287,7 +287,7 @@ INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBCCALL libc_pos
  * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
  * HINT: A call `setpgid(getpid(), 0)' is the same as `setpgid(getpid(), getpid())'!
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setpgroup)(posix_spawnattr_t *__restrict attr, pid_t pgroup);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setpgroup)(posix_spawnattr_t *__restrict attr, pid_t pgroup);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getschedparam(3)
@@ -295,89 +295,89 @@ INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setpg
  * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
  * HINT: A call `setpgid(getpid(), 0)' is the same as `setpgid(getpid(), getpid())'!
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setpgroup)(posix_spawnattr_t *__restrict attr, pid_t pgroup);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setpgroup)(posix_spawnattr_t *__restrict attr, pid_t pgroup);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getschedparam(3)
  * Get the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
  * that  the  child process  will  perform when  `POSIX_SPAWN_SETSCHEDULER'  is set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getschedpolicy)(posix_spawnattr_t const *__restrict attr, int *__restrict schedpolicy);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getschedpolicy)(posix_spawnattr_t const *__restrict attr, int *__restrict schedpolicy);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getschedparam(3)
  * Get the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
  * that  the  child process  will  perform when  `POSIX_SPAWN_SETSCHEDULER'  is set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedpolicy)(posix_spawnattr_t const *__restrict attr, int *__restrict schedpolicy);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedpolicy)(posix_spawnattr_t const *__restrict attr, int *__restrict schedpolicy);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getschedparam(3)
  * Set the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
  * that  the  child process  will  perform when  `POSIX_SPAWN_SETSCHEDULER'  is set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setschedpolicy)(posix_spawnattr_t *__restrict attr, int schedpolicy);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setschedpolicy)(posix_spawnattr_t *__restrict attr, int schedpolicy);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getschedparam(3)
  * Set the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
  * that  the  child process  will  perform when  `POSIX_SPAWN_SETSCHEDULER'  is set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedpolicy)(posix_spawnattr_t *__restrict attr, int schedpolicy);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedpolicy)(posix_spawnattr_t *__restrict attr, int schedpolicy);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getschedparam(3)
  * Get the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
  * that  the child  process will  perform when  `POSIX_SPAWN_SETSCHEDPARAM' is set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getschedparam)(posix_spawnattr_t const *__restrict attr, struct sched_param *__restrict schedparam);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getschedparam)(posix_spawnattr_t const *__restrict attr, struct sched_param *__restrict schedparam);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getschedparam(3)
  * Get the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
  * that  the child  process will  perform when  `POSIX_SPAWN_SETSCHEDPARAM' is set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedparam)(posix_spawnattr_t const *__restrict attr, struct sched_param *__restrict schedparam);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedparam)(posix_spawnattr_t const *__restrict attr, struct sched_param *__restrict schedparam);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_setschedparam(3)
  * Set the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
  * that  the child  process will  perform when  `POSIX_SPAWN_SETSCHEDPARAM' is set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setschedparam)(posix_spawnattr_t *__restrict attr, struct sched_param const *__restrict schedparam);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setschedparam)(posix_spawnattr_t *__restrict attr, struct sched_param const *__restrict schedparam);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_setschedparam(3)
  * Set the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
  * that  the child  process will  perform when  `POSIX_SPAWN_SETSCHEDPARAM' is set.
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedparam)(posix_spawnattr_t *__restrict attr, struct sched_param const *__restrict schedparam);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedparam)(posix_spawnattr_t *__restrict attr, struct sched_param const *__restrict schedparam);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_init(3)
  * Initialize the given spawn-file-actions object `file_actions'
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_WR(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_init)(posix_spawn_file_actions_t *__restrict file_actions);
+INTDEF ATTR_OUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_init)(posix_spawn_file_actions_t *__restrict file_actions);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_init(3)
  * Initialize the given spawn-file-actions object `file_actions'
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_WR(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_init)(posix_spawn_file_actions_t *__restrict file_actions);
+INTDEF ATTR_OUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_init)(posix_spawn_file_actions_t *__restrict file_actions);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_destroy(3)
  * Finalize the given spawn-file-actions object `file_actions'
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_destroy)(posix_spawn_file_actions_t *__restrict file_actions);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_destroy)(posix_spawn_file_actions_t *__restrict file_actions);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_destroy(3)
  * Finalize the given spawn-file-actions object `file_actions'
  * @return: 0 : Success */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_actions_t *__restrict file_actions);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_actions_t *__restrict file_actions);
 /* Helper functions for allocating an a new file-spawn action entry */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) struct __spawn_action *NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_alloc)(posix_spawn_file_actions_t *__restrict file_actions);
+INTDEF WUNUSED ATTR_INOUT(1) struct __spawn_action *NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_alloc)(posix_spawn_file_actions_t *__restrict file_actions);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_addopen(3)
@@ -385,7 +385,7 @@ INTDEF WUNUSED ATTR_ACCESS_RW(1) struct __spawn_action *NOTHROW_NCX(LIBCCALL lib
  * Note though  that the  intermediate file  returned  by `open()'  will not  remain  open!
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd, char const *__restrict path, oflag_t oflags, mode_t mode);
+INTDEF ATTR_IN(3) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd, char const *__restrict path, oflag_t oflags, mode_t mode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_addopen(3)
@@ -393,91 +393,91 @@ INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_pos
  * Note though  that the  intermediate file  returned  by `open()'  will not  remain  open!
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd, char const *__restrict path, oflag_t oflags, mode_t mode);
+INTDEF ATTR_IN(3) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd, char const *__restrict path, oflag_t oflags, mode_t mode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_addclose(3)
  * Enqueue a call `close(fd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addclose)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addclose)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_addclose(3)
  * Enqueue a call `close(fd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclose)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclose)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_adddup2(3)
  * Enqueue a call `dup2(oldfd, newfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict file_actions, fd_t oldfd, fd_t newfd);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict file_actions, fd_t oldfd, fd_t newfd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_adddup2(3)
  * Enqueue a call `dup2(oldfd, newfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict file_actions, fd_t oldfd, fd_t newfd);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict file_actions, fd_t oldfd, fd_t newfd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_addtcsetpgrp_np(3)
  * Enqueue a call `tcsetpgrp(fd, getpid())' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_addtcsetpgrp_np(3)
  * Enqueue a call `tcsetpgrp(fd, getpid())' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_addclosefrom_np(3)
  * Enqueue a call `closefrom(lowfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addclosefrom_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t lowfd);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addclosefrom_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t lowfd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_addclosefrom_np(3)
  * Enqueue a call `closefrom(lowfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclosefrom_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t lowfd);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclosefrom_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t lowfd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_addchdir_np(3)
  * Enqueue a call `chdir(path)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, const char *__restrict path);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, const char *__restrict path);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_addchdir_np(3)
  * Enqueue a call `chdir(path)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, const char *__restrict path);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, const char *__restrict path);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_addfchdir_np(3)
  * Enqueue a call `fchdir(dfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_addfchdir_np(3)
  * Enqueue a call `fchdir(dfd)' to be performed by the child process
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
-INTDEF ATTR_ACCESS_RW(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd);
 #endif /* !__KERNEL__ */
 
 DECL_END

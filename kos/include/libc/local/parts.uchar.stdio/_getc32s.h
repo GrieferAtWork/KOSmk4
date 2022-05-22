@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53bb81e4 */
+/* HASH CRC-32:0x8c1e0b0a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__getc32s_s_defined
 #define __local___localdep__getc32s_s_defined
 #if defined(__CRT_HAVE__getws_s) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_ACCESS_WRS(1, 2),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep__getc32s_s,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen),_getws_s,(__buf,__buflen))
+__CREDIRECT(__ATTR_OUTS(1, 2),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep__getc32s_s,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen),_getws_s,(__buf,__buflen))
 #elif defined(__CRT_HAVE_KOS$_getws_s)
-__CREDIRECT_KOS(__ATTR_ACCESS_WRS(1, 2),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep__getc32s_s,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen),_getws_s,(__buf,__buflen))
+__CREDIRECT_KOS(__ATTR_OUTS(1, 2),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep__getc32s_s,(__CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen),_getws_s,(__buf,__buflen))
 #elif defined(__LOCAL_stdin) && (defined(__CRT_HAVE_fgetws) || defined(__CRT_HAVE_fgetws_unlocked) || defined(__CRT_HAVE__fgetws_nolock) || ((defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc) || defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE_getwc_unlocked)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/_getws_s.h>
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__getc32s_s_defined
 #endif /* !... */
 #endif /* !__local___localdep__getc32s_s_defined */
-__LOCAL_LIBC(_getc32s) __ATTR_ACCESS_WR(1) __CHAR32_TYPE__ *
+__LOCAL_LIBC(_getc32s) __ATTR_OUT(1) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(_getc32s))(__CHAR32_TYPE__ *__buf) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__getc32s_s)(__buf, (__SIZE_TYPE__)-1);
 }

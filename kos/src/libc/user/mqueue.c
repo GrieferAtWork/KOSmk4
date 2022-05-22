@@ -35,9 +35,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_mq_open,hash:CRC-32=0x326bf6d2]]]*/
+/*[[[head:libc_mq_open,hash:CRC-32=0x12f8a482]]]*/
 /* >> mq_open(3) */
-INTERN ATTR_SECTION(".text.crt.utility.mqueue") WUNUSED ATTR_ACCESS_RO(1) mqd_t
+INTERN ATTR_SECTION(".text.crt.utility.mqueue") WUNUSED ATTR_IN(1) mqd_t
 NOTHROW_RPC(VLIBCCALL libc_mq_open)(char const *__restrict name,
                                     oflag_t oflags,
                                     ...)
@@ -64,9 +64,9 @@ NOTHROW(LIBCCALL libc_mq_close)(mqd_t mqdes)
 }
 /*[[[end:libc_mq_close]]]*/
 
-/*[[[head:libc_mq_getattr,hash:CRC-32=0x2d3086e0]]]*/
+/*[[[head:libc_mq_getattr,hash:CRC-32=0x1c285ed1]]]*/
 /* >> mq_getattr(3) */
-INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_ACCESS_WR(2) int
+INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_OUT(2) int
 NOTHROW_NCX(LIBCCALL libc_mq_getattr)(mqd_t mqdes,
                                       struct mq_attr *__restrict mqstat)
 /*[[[body:libc_mq_getattr]]]*/
@@ -77,9 +77,9 @@ NOTHROW_NCX(LIBCCALL libc_mq_getattr)(mqd_t mqdes,
 }
 /*[[[end:libc_mq_getattr]]]*/
 
-/*[[[head:libc_mq_setattr,hash:CRC-32=0x3fdc92e7]]]*/
+/*[[[head:libc_mq_setattr,hash:CRC-32=0x8deeec62]]]*/
 /* >> mq_setattr(3) */
-INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR_OPT(3) int
+INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_IN(2) ATTR_OUT_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_mq_setattr)(mqd_t mqdes,
                                       struct mq_attr const *__restrict mqstat,
                                       struct mq_attr *__restrict old_mqstat)
@@ -91,9 +91,9 @@ NOTHROW_NCX(LIBCCALL libc_mq_setattr)(mqd_t mqdes,
 }
 /*[[[end:libc_mq_setattr]]]*/
 
-/*[[[head:libc_mq_unlink,hash:CRC-32=0x676b214f]]]*/
+/*[[[head:libc_mq_unlink,hash:CRC-32=0x530af74b]]]*/
 /* >> mq_unlink(3) */
-INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_IN(1) int
 NOTHROW_NCX(LIBCCALL libc_mq_unlink)(char const *name)
 /*[[[body:libc_mq_unlink]]]*/
 {
@@ -116,9 +116,9 @@ NOTHROW_NCX(LIBCCALL libc_mq_notify)(mqd_t mqdes,
 }
 /*[[[end:libc_mq_notify]]]*/
 
-/*[[[head:libc_mq_receive,hash:CRC-32=0x9b8a1e68]]]*/
+/*[[[head:libc_mq_receive,hash:CRC-32=0x8477db5a]]]*/
 /* >> mq_receive(3) */
-INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_ACCESS_WRS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_mq_receive)(mqd_t mqdes,
                                       char *__restrict msg_ptr,
                                       size_t msg_len,
@@ -140,9 +140,9 @@ NOTHROW_RPC(LIBCCALL libc_mq_receive)(mqd_t mqdes,
 }
 /*[[[end:libc_mq_receive]]]*/
 
-/*[[[head:libc_mq_send,hash:CRC-32=0x82694384]]]*/
+/*[[[head:libc_mq_send,hash:CRC-32=0x73947e3e]]]*/
 /* >> mq_send(3) */
-INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_ACCESS_ROS(2, 3) int
+INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_INS(2, 3) int
 NOTHROW_RPC(LIBCCALL libc_mq_send)(mqd_t mqdes,
                                    char const *msg_ptr,
                                    size_t msg_len,
@@ -159,9 +159,9 @@ NOTHROW_RPC(LIBCCALL libc_mq_send)(mqd_t mqdes,
 }
 /*[[[end:libc_mq_send]]]*/
 
-/*[[[head:libc_mq_timedreceive,hash:CRC-32=0x882ba296]]]*/
+/*[[[head:libc_mq_timedreceive,hash:CRC-32=0x552da9db]]]*/
 /* >> mq_timedreceive(3), mq_timedreceive64(3) */
-INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_ACCESS_RO(5) ATTR_ACCESS_WRS(2, 3) ATTR_ACCESS_WR_OPT(4) ssize_t
+INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_IN(5) ATTR_OUTS(2, 3) ATTR_OUT_OPT(4) ssize_t
 NOTHROW_RPC(LIBCCALL libc_mq_timedreceive)(mqd_t mqdes,
                                            char *__restrict msg_ptr,
                                            size_t msg_len,
@@ -184,9 +184,9 @@ NOTHROW_RPC(LIBCCALL libc_mq_timedreceive)(mqd_t mqdes,
 }
 /*[[[end:libc_mq_timedreceive]]]*/
 
-/*[[[head:libc_mq_timedsend,hash:CRC-32=0x8f44f621]]]*/
+/*[[[head:libc_mq_timedsend,hash:CRC-32=0xa88ea98d]]]*/
 /* >> mq_timedsend(3), mq_timedsend64(3) */
-INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_ACCESS_RO(5) ATTR_ACCESS_ROS(2, 3) int
+INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_IN(5) ATTR_INS(2, 3) int
 NOTHROW_RPC(LIBCCALL libc_mq_timedsend)(mqd_t mqdes,
                                         char const *msg_ptr,
                                         size_t msg_len,
@@ -201,12 +201,12 @@ NOTHROW_RPC(LIBCCALL libc_mq_timedsend)(mqd_t mqdes,
 }
 /*[[[end:libc_mq_timedsend]]]*/
 
-/*[[[head:libc_mq_timedreceive64,hash:CRC-32=0xe3fc7a24]]]*/
+/*[[[head:libc_mq_timedreceive64,hash:CRC-32=0xcd5dafbc]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_mq_timedreceive64, libc_mq_timedreceive);
 #else /* MAGIC:alias */
 /* >> mq_timedreceive(3), mq_timedreceive64(3) */
-INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_ACCESS_RO(5) ATTR_ACCESS_WRS(2, 3) ssize_t
+INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_IN(5) ATTR_OUTS(2, 3) ssize_t
 NOTHROW_RPC(LIBCCALL libc_mq_timedreceive64)(mqd_t mqdes,
                                              char *__restrict msg_ptr,
                                              size_t msg_len,
@@ -237,12 +237,12 @@ NOTHROW_RPC(LIBCCALL libc_mq_timedreceive64)(mqd_t mqdes,
 #endif /* MAGIC:alias */
 /*[[[end:libc_mq_timedreceive64]]]*/
 
-/*[[[head:libc_mq_timedsend64,hash:CRC-32=0xbda48055]]]*/
+/*[[[head:libc_mq_timedsend64,hash:CRC-32=0xc094a13a]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_mq_timedsend64, libc_mq_timedsend);
 #else /* MAGIC:alias */
 /* >> mq_timedsend(3), mq_timedsend64(3) */
-INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_ACCESS_RO(5) ATTR_ACCESS_ROS(2, 3) int
+INTERN ATTR_SECTION(".text.crt.utility.mqueue") ATTR_IN(5) ATTR_INS(2, 3) int
 NOTHROW_RPC(LIBCCALL libc_mq_timedsend64)(mqd_t mqdes,
                                           char const *msg_ptr,
                                           size_t msg_len,

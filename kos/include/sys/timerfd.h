@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x212c00c3 */
+/* HASH CRC-32:0x137019fe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,54 +112,54 @@ __CDECLARE_OPT(,__fd_t,__NOTHROW,timerfd_create,(clockid_t __clock_id, __STDC_IN
 #if defined(__CRT_HAVE_timerfd_settime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-__CDECLARE(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR_OPT(4),int,__NOTHROW_NCX,timerfd_settime,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr),(__ufd,__flags,__utmr,__otmr))
+__CDECLARE(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,timerfd_settime,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr),(__ufd,__flags,__utmr,__otmr))
 #elif defined(__CRT_HAVE_timerfd_settime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR_OPT(4),int,__NOTHROW_NCX,timerfd_settime,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr),timerfd_settime64,(__ufd,__flags,__utmr,__otmr))
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,timerfd_settime,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr),timerfd_settime64,(__ufd,__flags,__utmr,__otmr))
 #elif defined(__CRT_HAVE_timerfd_settime64) || defined(__CRT_HAVE_timerfd_settime)
 #include <libc/local/sys.timerfd/timerfd_settime.h>
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_settime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR_OPT(4) int __NOTHROW_NCX(__LIBCCALL timerfd_settime)(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_settime))(__ufd, __flags, __utmr, __otmr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_settime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_OUT_OPT(4) int __NOTHROW_NCX(__LIBCCALL timerfd_settime)(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec const *__utmr, struct itimerspec *__otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_settime))(__ufd, __flags, __utmr, __otmr); })
 #endif /* ... */
 #if defined(__CRT_HAVE_timerfd_gettime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
-__CDECLARE(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,timerfd_gettime,(__fd_t __ufd, struct itimerspec *__restrict __otmr),(__ufd,__otmr))
+__CDECLARE(__ATTR_OUT(2),int,__NOTHROW_NCX,timerfd_gettime,(__fd_t __ufd, struct itimerspec *__restrict __otmr),(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,timerfd_gettime,(__fd_t __ufd, struct itimerspec *__restrict __otmr),timerfd_gettime64,(__ufd,__otmr))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,timerfd_gettime,(__fd_t __ufd, struct itimerspec *__restrict __otmr),timerfd_gettime64,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime64) || defined(__CRT_HAVE_timerfd_gettime)
 #include <libc/local/sys.timerfd/timerfd_gettime.h>
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_gettime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(2) int __NOTHROW_NCX(__LIBCCALL timerfd_gettime)(__fd_t __ufd, struct itimerspec *__restrict __otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_gettime))(__ufd, __otmr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_gettime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL timerfd_gettime)(__fd_t __ufd, struct itimerspec *__restrict __otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_gettime))(__ufd, __otmr); })
 #endif /* ... */
 
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_timerfd_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR_OPT(4),int,__NOTHROW_NCX,timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec64 const *__utmr, struct itimerspec64 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec64 const *__utmr, struct itimerspec64 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
 #elif defined(__CRT_HAVE_timerfd_settime64)
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-__CDECLARE(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR_OPT(4),int,__NOTHROW_NCX,timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec64 const *__utmr, struct itimerspec64 *__otmr),(__ufd,__flags,__utmr,__otmr))
+__CDECLARE(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_NCX,timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec64 const *__utmr, struct itimerspec64 *__otmr),(__ufd,__flags,__utmr,__otmr))
 #elif defined(__CRT_HAVE_timerfd_settime)
 #include <libc/local/sys.timerfd/timerfd_settime64.h>
 /* >> timerfd_settime(2), timerfd_settime64(2)
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_settime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR_OPT(4) int __NOTHROW_NCX(__LIBCCALL timerfd_settime64)(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec64 const *__utmr, struct itimerspec64 *__otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_settime64))(__ufd, __flags, __utmr, __otmr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_settime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_OUT_OPT(4) int __NOTHROW_NCX(__LIBCCALL timerfd_settime64)(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct itimerspec64 const *__utmr, struct itimerspec64 *__otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_settime64))(__ufd, __flags, __utmr, __otmr); })
 #endif /* ... */
 #if defined(__CRT_HAVE_timerfd_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,timerfd_gettime64,(__fd_t __ufd, struct itimerspec64 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,timerfd_gettime64,(__fd_t __ufd, struct itimerspec64 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime64)
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
-__CDECLARE(__ATTR_ACCESS_WR(2),int,__NOTHROW_NCX,timerfd_gettime64,(__fd_t __ufd, struct itimerspec64 *__restrict __otmr),(__ufd,__otmr))
+__CDECLARE(__ATTR_OUT(2),int,__NOTHROW_NCX,timerfd_gettime64,(__fd_t __ufd, struct itimerspec64 *__restrict __otmr),(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime)
 #include <libc/local/sys.timerfd/timerfd_gettime64.h>
 /* >> timerfd_gettime(2), timerfd_gettime64(2) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_gettime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_WR(2) int __NOTHROW_NCX(__LIBCCALL timerfd_gettime64)(__fd_t __ufd, struct itimerspec64 *__restrict __otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_gettime64))(__ufd, __otmr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_gettime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL timerfd_gettime64)(__fd_t __ufd, struct itimerspec64 *__restrict __otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_gettime64))(__ufd, __otmr); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __CC__ */

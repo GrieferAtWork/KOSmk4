@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95bf3050 */
+/* HASH CRC-32:0x597e9d83 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_Read_defined
 #define __local___localdep_Read_defined
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_Read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),Read,(__fd,__buf,__bufsize))
+__CREDIRECT(__ATTR_OUTS(2, 3),__SIZE_TYPE__,__THROWING,__localdep_Read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),Read,(__fd,__buf,__bufsize))
 #endif /* !__local___localdep_Read_defined */
 #ifndef __local___localdep_lseek_defined
 #define __local___localdep_lseek_defined
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 #include <kos/except.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ReadAll) __ATTR_ACCESS_WRS(2, 3) __SIZE_TYPE__
+__LOCAL_LIBC(ReadAll) __ATTR_OUTS(2, 3) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(ReadAll))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize) __THROWS(...) {
 	__SIZE_TYPE__ __result, __temp;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_Read)(__fd, __buf, __bufsize);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ba617f4 */
+/* HASH CRC-32:0xac11ab51 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,11 +31,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wait4_32_defined
 #define __local___localdep_wait4_32_defined
 #ifdef __CRT_HAVE_wait4
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(4),__pid_t,__NOTHROW_RPC,__localdep_wait4_32,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),wait4,(__pid,__stat_loc,__options,__usage))
+__CREDIRECT(__ATTR_OUT_OPT(4),__pid_t,__NOTHROW_RPC,__localdep_wait4_32,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),wait4,(__pid,__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE___wait4)
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(4),__pid_t,__NOTHROW_RPC,__localdep_wait4_32,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),__wait4,(__pid,__stat_loc,__options,__usage))
+__CREDIRECT(__ATTR_OUT_OPT(4),__pid_t,__NOTHROW_RPC,__localdep_wait4_32,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),__wait4,(__pid,__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE___libc_wait4)
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(4),__pid_t,__NOTHROW_RPC,__localdep_wait4_32,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),__libc_wait4,(__pid,__stat_loc,__options,__usage))
+__CREDIRECT(__ATTR_OUT_OPT(4),__pid_t,__NOTHROW_RPC,__localdep_wait4_32,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),__libc_wait4,(__pid,__stat_loc,__options,__usage))
 #else /* ... */
 #undef __local___localdep_wait4_32_defined
 #endif /* !... */
@@ -43,7 +43,7 @@ __CREDIRECT(__ATTR_ACCESS_WR_OPT(4),__pid_t,__NOTHROW_RPC,__localdep_wait4_32,(_
 __NAMESPACE_LOCAL_END
 #include <bits/os/rusage-convert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wait4_64) __ATTR_ACCESS_WR_OPT(4) __pid_t
+__LOCAL_LIBC(wait4_64) __ATTR_OUT_OPT(4) __pid_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wait4_64))(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage) {
 	__pid_t __result;
 	struct __rusage32 __ru32;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b6cfbf5 */
+/* HASH CRC-32:0xe86760ba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__strtime_defined
 #define __local___localdep__strtime_defined
 #ifdef __CRT_HAVE__strtime
-__CREDIRECT(__ATTR_ACCESS_WR(1),char *,__NOTHROW_NCX,__localdep__strtime,(char __buf[9]),_strtime,(__buf))
+__CREDIRECT(__ATTR_OUT(1),char *,__NOTHROW_NCX,__localdep__strtime,(char __buf[9]),_strtime,(__buf))
 #elif defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/_strtime.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__strtime_defined
 #endif /* !... */
 #endif /* !__local___localdep__strtime_defined */
-__LOCAL_LIBC(_wstrtime) __ATTR_ACCESS_WR(1) __WCHAR_TYPE__ *
+__LOCAL_LIBC(_wstrtime) __ATTR_OUT(1) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wstrtime))(__WCHAR_TYPE__ __buf[9]) {
 	unsigned int __i;
 	char __abuf[9], *__ptr;

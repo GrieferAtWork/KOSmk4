@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb56af4f */
+/* HASH CRC-32:0xb4a9d02c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,10 +48,10 @@ INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_d
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_dos_lbasename)(char const *filename);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RO(1) char *NOTHROW_NCX(LIBDCALL libd_lrealpath)(char const *path);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBDCALL libd_lrealpath)(char const *path);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RO(1) char *NOTHROW_NCX(LIBCCALL libc_lrealpath)(char const *path);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBCCALL libc_lrealpath)(char const *path);
 INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_getpwd)(void);
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_errno_max)(void);
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_signo_max)(void);
@@ -108,10 +108,10 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_xcalloc)(size_t elem_count, size_t elem_size);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) char *NOTHROW_NCX(LIBDCALL libd_xstrdup)(char const *__restrict string);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBDCALL libd_xstrdup)(char const *__restrict string);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) char *NOTHROW_NCX(LIBCCALL libc_xstrdup)(char const *__restrict string);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBCCALL libc_xstrdup)(char const *__restrict string);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBDCALL libd_xstrndup)(char const *string, size_t max_chars);
@@ -120,103 +120,103 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *NOTHR
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBCCALL libc_xstrndup)(char const *string, size_t max_chars);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ALLOC_SIZE((3)) void *NOTHROW_NCX(LIBDCALL libd_xmemdup)(void const *src, size_t src_bytes, size_t alloc_size);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((3)) ATTR_INS(1, 2) void *NOTHROW_NCX(LIBDCALL libd_xmemdup)(void const *src, size_t src_bytes, size_t alloc_size);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_ROS(1, 2) ATTR_ALLOC_SIZE((3)) void *NOTHROW_NCX(LIBCCALL libc_xmemdup)(void const *src, size_t src_bytes, size_t alloc_size);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((3)) ATTR_INS(1, 2) void *NOTHROW_NCX(LIBCCALL libc_xmemdup)(void const *src, size_t src_bytes, size_t alloc_size);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strdupf(3), vstrdupf(3)
  * Print the given `format' into a newly allocated, heap-allocated string */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) char *NOTHROW_NCX(LIBDCALL libd_xvasprintf)(char const *format, va_list args);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0) char *NOTHROW_NCX(LIBDCALL libd_xvasprintf)(char const *format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strdupf(3), vstrdupf(3)
  * Print the given `format' into a newly allocated, heap-allocated string */
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 0) char *NOTHROW_NCX(LIBCCALL libc_xvasprintf)(char const *format, va_list args);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN(1) ATTR_LIBC_PRINTF(1, 0) char *NOTHROW_NCX(LIBCCALL libc_xvasprintf)(char const *format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) char *NOTHROW_NCX(VLIBDCALL libd_xasprintf)(char const *__restrict format, ...);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) char *NOTHROW_NCX(VLIBDCALL libd_xasprintf)(char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) ATTR_LIBC_PRINTF(1, 2) char *NOTHROW_NCX(VLIBCCALL libc_xasprintf)(char const *__restrict format, ...);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) char *NOTHROW_NCX(VLIBCCALL libc_xasprintf)(char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RO_OPT(1) char **NOTHROW_NCX(LIBDCALL libd_dupargv)(char *__KOS_FIXED_CONST *argv);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN_OPT(1) char **NOTHROW_NCX(LIBDCALL libd_dupargv)(char *__KOS_FIXED_CONST *argv);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RO_OPT(1) char **NOTHROW_NCX(LIBCCALL libc_dupargv)(char *__KOS_FIXED_CONST *argv);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN_OPT(1) char **NOTHROW_NCX(LIBCCALL libc_dupargv)(char *__KOS_FIXED_CONST *argv);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO_OPT(1) void NOTHROW_NCX(LIBDCALL libd_freeargv)(char **argv);
+INTDEF ATTR_IN_OPT(1) void NOTHROW_NCX(LIBDCALL libd_freeargv)(char **argv);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO_OPT(1) void NOTHROW_NCX(LIBCCALL libc_freeargv)(char **argv);
+INTDEF ATTR_IN_OPT(1) void NOTHROW_NCX(LIBCCALL libc_freeargv)(char **argv);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_countargv)(char *const *argv);
+INTDEF ATTR_PURE WUNUSED ATTR_IN_OPT(1) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_countargv)(char *const *argv);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO_OPT(1) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_countargv)(char *const *argv);
+INTDEF ATTR_PURE WUNUSED ATTR_IN_OPT(1) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_countargv)(char *const *argv);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_fdmatch)(fd_t fd1, fd_t fd2);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RO_OPT(1) char **NOTHROW_NCX(LIBDCALL libd_buildargv)(char const *cmdline);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN_OPT(1) char **NOTHROW_NCX(LIBDCALL libd_buildargv)(char const *cmdline);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ACCESS_RO_OPT(1) char **NOTHROW_NCX(LIBCCALL libc_buildargv)(char const *cmdline);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN_OPT(1) char **NOTHROW_NCX(LIBCCALL libc_buildargv)(char const *cmdline);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> expandargv(3)
  * Expand special `@file' arguments passed on the commandline */
-INTDEF ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void NOTHROW_NCX(LIBDCALL libd_expandargv)(int *p_argc, char ***p_argv);
+INTDEF ATTR_INOUT(1) ATTR_INOUT(2) void NOTHROW_NCX(LIBDCALL libd_expandargv)(int *p_argc, char ***p_argv);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> expandargv(3)
  * Expand special `@file' arguments passed on the commandline */
-INTDEF ATTR_ACCESS_RW(1) ATTR_ACCESS_RW(2) void NOTHROW_NCX(LIBCCALL libc_expandargv)(int *p_argc, char ***p_argv);
+INTDEF ATTR_INOUT(1) ATTR_INOUT(2) void NOTHROW_NCX(LIBCCALL libc_expandargv)(int *p_argc, char ***p_argv);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* @return: 0 : Success
  * @return: 1 : Error */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RW_OPT(2) int NOTHROW_NCX(LIBDCALL libd_writeargv)(char *const *argv, FILE *fp);
+INTDEF ATTR_IN(1) ATTR_INOUT_OPT(2) int NOTHROW_NCX(LIBDCALL libd_writeargv)(char *const *argv, FILE *fp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* @return: 0 : Success
  * @return: 1 : Error */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RW_OPT(2) int NOTHROW_NCX(LIBCCALL libc_writeargv)(char *const *argv, FILE *fp);
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(LIBCCALL libc_vconcat)(char const *first, va_list args);
+INTDEF ATTR_IN(1) ATTR_INOUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc_writeargv)(char *const *argv, FILE *fp);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN_OPT(1) char *NOTHROW_NCX(LIBCCALL libc_vconcat)(char const *first, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(VLIBDCALL libd_concat)(char const *first, ...);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_IN_OPT(1) char *NOTHROW_NCX(VLIBDCALL libd_concat)(char const *first, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(VLIBCCALL libc_concat)(char const *first, ...);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_IN_OPT(1) char *NOTHROW_NCX(VLIBCCALL libc_concat)(char const *first, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) char *NOTHROW_NCX(VLIBDCALL libd_reconcat)(char *old_ptr, char const *first, ...);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) char *NOTHROW_NCX(VLIBDCALL libd_reconcat)(char *old_ptr, char const *first, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) char *NOTHROW_NCX(VLIBCCALL libc_reconcat)(char *old_ptr, char const *first, ...);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL ATTR_SENTINEL WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) char *NOTHROW_NCX(VLIBCCALL libc_reconcat)(char *old_ptr, char const *first, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO_OPT(1) ulongptr_t NOTHROW_NCX(VLIBDCALL libd_concat_length)(char const *first, ...);
+INTDEF ATTR_IN_OPT(1) ulongptr_t NOTHROW_NCX(VLIBDCALL libd_concat_length)(char const *first, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO_OPT(1) ulongptr_t NOTHROW_NCX(VLIBCCALL libc_concat_length)(char const *first, ...);
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIBCCALL libc_concat_vcopy)(char *dst, char const *first, va_list args);
+INTDEF ATTR_IN_OPT(1) ulongptr_t NOTHROW_NCX(VLIBCCALL libc_concat_length)(char const *first, ...);
+INTDEF ATTR_RETNONNULL ATTR_IN_OPT(2) ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc_concat_vcopy)(char *dst, char const *first, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(VLIBDCALL libd_concat_copy)(char *dst, char const *first, ...);
+INTDEF ATTR_RETNONNULL ATTR_IN_OPT(2) ATTR_OUT(1) char *NOTHROW_NCX(VLIBDCALL libd_concat_copy)(char *dst, char const *first, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(2) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(VLIBCCALL libc_concat_copy)(char *dst, char const *first, ...);
+INTDEF ATTR_RETNONNULL ATTR_IN_OPT(2) ATTR_OUT(1) char *NOTHROW_NCX(VLIBCCALL libc_concat_copy)(char *dst, char const *first, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(VLIBDCALL libd_concat_copy2)(char const *first, ...);
+INTDEF ATTR_IN_OPT(1) char *NOTHROW_NCX(VLIBDCALL libd_concat_copy2)(char const *first, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(VLIBCCALL libc_concat_copy2)(char const *first, ...);
+INTDEF ATTR_IN_OPT(1) char *NOTHROW_NCX(VLIBCCALL libc_concat_copy2)(char const *first, ...);
 /* >> get_run_time(3)
  * Return the amount of time the calling process has run (in  microseconds)
  * If possible, time spent idling isn't counted, though if not possible, it
@@ -239,16 +239,16 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED char *NOTHROW_NCX(LIBCCALL 
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_choose_tmpdir)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) char *NOTHROW_NCX(LIBDCALL libd_make_temp_file_with_prefix)(char const *prefix, char const *suffix);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) char *NOTHROW_NCX(LIBDCALL libd_make_temp_file_with_prefix)(char const *prefix, char const *suffix);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) char *NOTHROW_NCX(LIBCCALL libc_make_temp_file_with_prefix)(char const *prefix, char const *suffix);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(2) char *NOTHROW_NCX(LIBCCALL libc_make_temp_file_with_prefix)(char const *prefix, char const *suffix);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(LIBDCALL libd_make_temp_file)(char const *suffix);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN_OPT(1) char *NOTHROW_NCX(LIBDCALL libd_make_temp_file)(char const *suffix);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(LIBCCALL libc_make_temp_file)(char const *suffix);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN_OPT(1) char *NOTHROW_NCX(LIBCCALL libc_make_temp_file)(char const *suffix);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unlink_if_ordinary(3)
@@ -256,7 +256,7 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ACCESS
  * @return:  0: File was deleted
  * @return:  1: File doesn't exist, isn't accessible, or not a "regular" file.
  * @return: -1: Unlink failed (s.a. `errno') */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd_unlink_if_ordinary)(char const *filename);
+INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_unlink_if_ordinary)(char const *filename);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> unlink_if_ordinary(3)
@@ -264,15 +264,15 @@ INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd_unlink_if_ordinary)(char 
  * @return:  0: File was deleted
  * @return:  1: File doesn't exist, isn't accessible, or not a "regular" file.
  * @return: -1: Unlink failed (s.a. `errno') */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBCCALL libc_unlink_if_ordinary)(char const *filename);
+INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_unlink_if_ordinary)(char const *filename);
 INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc_physmem_total)(void);
 INTDEF ATTR_PURE WUNUSED double NOTHROW_NCX(LIBCCALL libc_physmem_available)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 2) NONNULL((1)) __UINT32_TYPE__ NOTHROW_NCX(LIBDCALL libd_xcrc32)(__BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UINT32_TYPE__ crc);
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) NONNULL((1)) __UINT32_TYPE__ NOTHROW_NCX(LIBDCALL libd_xcrc32)(__BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UINT32_TYPE__ crc);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_ROS(1, 2) NONNULL((1)) __UINT32_TYPE__ NOTHROW_NCX(LIBCCALL libc_xcrc32)(__BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UINT32_TYPE__ crc);
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) NONNULL((1)) __UINT32_TYPE__ NOTHROW_NCX(LIBCCALL libc_xcrc32)(__BYTE_TYPE__ const *buf, __STDC_INT_AS_SIZE_T len, __UINT32_TYPE__ crc);
 /* >> hex_init(3)
  * Initialize the `_hex_value' array (unless it was already statically initialized) */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_hex_init)(void);

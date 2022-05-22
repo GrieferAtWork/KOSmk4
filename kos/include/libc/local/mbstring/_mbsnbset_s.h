@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4627d6e */
+/* HASH CRC-32:0x5215fb88 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsnbset_s_l_defined
 #define __local___localdep__mbsnbset_s_l_defined
 #ifdef __CRT_HAVE__mbsnbset_s_l
-__CREDIRECT(__ATTR_ACCESS_RWS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__mbsnbset_s_l,(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned int __ch, __SIZE_TYPE__ __max_bytes, __locale_t __locale),_mbsnbset_s_l,(__buf,__true_bufsize,__ch,__max_bytes,__locale))
+__CREDIRECT(__ATTR_INOUTS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__mbsnbset_s_l,(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned int __ch, __SIZE_TYPE__ __max_bytes, __locale_t __locale),_mbsnbset_s_l,(__buf,__true_bufsize,__ch,__max_bytes,__locale))
 #elif defined(__CRT_HAVE__mbsnbset_l) || defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsnbset_s_l.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__mbsnbset_s_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__mbsnbset_s_l_defined */
-__LOCAL_LIBC(_mbsnbset_s) __ATTR_ACCESS_RWS(1, 4) __errno_t
+__LOCAL_LIBC(_mbsnbset_s) __ATTR_INOUTS(1, 4) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsnbset_s))(unsigned char *__buf, __SIZE_TYPE__ __true_bufsize, unsigned int __ch, __SIZE_TYPE__ __max_bytes) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbsnbset_s_l)(__buf, __true_bufsize, __ch, __max_bytes, __NULLPTR);
 }

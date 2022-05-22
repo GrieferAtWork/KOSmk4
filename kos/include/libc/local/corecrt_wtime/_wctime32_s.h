@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96473cb5 */
+/* HASH CRC-32:0xad051983 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__wctime64_s_defined
 #define __local___localdep__wctime64_s_defined
 #ifdef __CRT_HAVE__wctime64_s
-__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__wctime64_s,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __time64_t const *__timer),_wctime64_s,(__buf,__buflen,__timer))
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__wctime64_s,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __time64_t const *__timer),_wctime64_s,(__buf,__buflen,__timer))
 #else /* __CRT_HAVE__wctime64_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wtime/_wctime64_s.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__wctime64_s __LIBC_LOCAL_NAME(_wctime64_s)
 #endif /* !__CRT_HAVE__wctime64_s */
 #endif /* !__local___localdep__wctime64_s_defined */
-__LOCAL_LIBC(_wctime32_s) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __errno_t
+__LOCAL_LIBC(_wctime32_s) __ATTR_IN(3) __ATTR_OUTS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wctime32_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __time32_t const *__timer) {
 	__time64_t __timer64 = (__time64_t)*__timer;
 	return (__NAMESPACE_LOCAL_SYM __localdep__wctime64_s)(__buf, __buflen, &__timer64);

@@ -260,15 +260,15 @@
 #define __ATTR_ERROR_T          __ATTR_ERROR
 #define __ATTR_RETURNS_TWICE_T  __ATTR_RETURNS_TWICE
 #define __ATTR_ACCESS_NONE_T    __ATTR_ACCESS_NONE
-#define __ATTR_ACCESS_ROS_T     __ATTR_ACCESS_ROS
-#define __ATTR_ACCESS_WRS_T     __ATTR_ACCESS_WRS
-#define __ATTR_ACCESS_RWS_T     __ATTR_ACCESS_RWS
-#define __ATTR_ACCESS_RO_OPT_T  __ATTR_ACCESS_RO_OPT
-#define __ATTR_ACCESS_WR_OPT_T  __ATTR_ACCESS_WR_OPT
-#define __ATTR_ACCESS_RW_OPT_T  __ATTR_ACCESS_RW_OPT
-#define __ATTR_ACCESS_RO_T      __ATTR_ACCESS_RO
-#define __ATTR_ACCESS_WR_T      __ATTR_ACCESS_WR
-#define __ATTR_ACCESS_RW_T      __ATTR_ACCESS_RW
+#define __ATTR_INS_T            __ATTR_INS
+#define __ATTR_OUTS_T           __ATTR_OUTS
+#define __ATTR_INOUTS_T         __ATTR_INOUTS
+#define __ATTR_IN_OPT_T         __ATTR_IN_OPT
+#define __ATTR_OUT_OPT_T        __ATTR_OUT_OPT
+#define __ATTR_INOUT_OPT_T      __ATTR_INOUT_OPT
+#define __ATTR_IN_T             __ATTR_IN
+#define __ATTR_OUT_T            __ATTR_OUT
+#define __ATTR_INOUT_T          __ATTR_INOUT
 #else
 #define __ATTR_LEAF_T           /* nothing */
 #define __ATTR_CONST_T          /* nothing */
@@ -291,15 +291,15 @@
 #define __ATTR_ERROR_T          /* nothing */
 #define __ATTR_RETURNS_TWICE_T  /* nothing */
 #define __ATTR_ACCESS_NONE_T    /* nothing */
-#define __ATTR_ACCESS_ROS_T     /* nothing */
-#define __ATTR_ACCESS_WRS_T     /* nothing */
-#define __ATTR_ACCESS_RWS_T     /* nothing */
-#define __ATTR_ACCESS_RO_OPT_T  /* nothing */
-#define __ATTR_ACCESS_WR_OPT_T  /* nothing */
-#define __ATTR_ACCESS_RW_OPT_T  /* nothing */
-#define __ATTR_ACCESS_RO_T      /* nothing */
-#define __ATTR_ACCESS_WR_T      /* nothing */
-#define __ATTR_ACCESS_RW_T      /* nothing */
+#define __ATTR_INS_T            /* nothing */
+#define __ATTR_OUTS_T           /* nothing */
+#define __ATTR_INOUTS_T         /* nothing */
+#define __ATTR_IN_OPT_T         /* nothing */
+#define __ATTR_OUT_OPT_T        /* nothing */
+#define __ATTR_INOUT_OPT_T      /* nothing */
+#define __ATTR_IN_T             /* nothing */
+#define __ATTR_OUT_T            /* nothing */
+#define __ATTR_INOUT_T          /* nothing */
 #endif
 
 

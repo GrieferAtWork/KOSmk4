@@ -51,8 +51,8 @@ NOTHROW_NCX(LIBKCALL libc__wcserror)(errno_t errno_value)
 }
 /*[[[end:libc__wcserror]]]*/
 
-/*[[[head:libd__wcserror_s,hash:CRC-32=0x764308e7]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_ACCESS_WRS(1, 2) errno_t
+/*[[[head:libd__wcserror_s,hash:CRC-32=0x8112f866]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf,
                                        size_t bufsize,
                                        errno_t errno_value)
@@ -66,8 +66,8 @@ NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf,
 }
 /*[[[end:libd__wcserror_s]]]*/
 
-/*[[[head:libc__wcserror_s,hash:CRC-32=0x3de121cc]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_ACCESS_WRS(1, 2) errno_t
+/*[[[head:libc__wcserror_s,hash:CRC-32=0x5b86bbcd]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc__wcserror_s)(char32_t *buf,
                                        size_t bufsize,
                                        errno_t errno_value)
@@ -81,8 +81,8 @@ NOTHROW_NCX(LIBKCALL libc__wcserror_s)(char32_t *buf,
 }
 /*[[[end:libc__wcserror_s]]]*/
 
-/*[[[head:libd___wcserror,hash:CRC-32=0xace0d505]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_ACCESS_RO(1) char16_t *
+/*[[[head:libd___wcserror,hash:CRC-32=0x75366b3a]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_IN(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message)
 /*[[[body:libd___wcserror]]]*/
 /*AUTO*/{
@@ -93,8 +93,8 @@ NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message)
 }
 /*[[[end:libd___wcserror]]]*/
 
-/*[[[head:libc___wcserror,hash:CRC-32=0x7ea7745e]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_ACCESS_RO(1) char32_t *
+/*[[[head:libc___wcserror,hash:CRC-32=0x33551a78]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_IN(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc___wcserror)(char32_t const *message)
 /*[[[body:libc___wcserror]]]*/
 /*AUTO*/{
@@ -105,8 +105,8 @@ NOTHROW_NCX(LIBKCALL libc___wcserror)(char32_t const *message)
 }
 /*[[[end:libc___wcserror]]]*/
 
-/*[[[head:libd___wcserror_s,hash:CRC-32=0xaa84aade]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
+/*[[[head:libd___wcserror_s,hash:CRC-32=0xae6f7abe]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_IN(3) ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,
                                         size_t bufsize,
                                         char16_t const *message)
@@ -120,8 +120,8 @@ NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,
 }
 /*[[[end:libd___wcserror_s]]]*/
 
-/*[[[head:libc___wcserror_s,hash:CRC-32=0x1cf400e8]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t
+/*[[[head:libc___wcserror_s,hash:CRC-32=0x8589722]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_IN(3) ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBKCALL libc___wcserror_s)(char32_t *buf,
                                         size_t bufsize,
                                         char32_t const *message)

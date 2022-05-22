@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b3965d4 */
+/* HASH CRC-32:0x59a0820 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,12 +29,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32rtombs,(char *__dst, __CHAR32_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
+__CREDIRECT(__ATTR_INOUT(2) __ATTR_INOUT_OPT(4) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32rtombs,(char *__dst, __CHAR32_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
 #elif defined(__CRT_HAVE_KOS$wcsrtombs)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_ACCESS_RW(2) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_WR_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32rtombs,(char *__dst, __CHAR32_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
+__CREDIRECT_KOS(__ATTR_INOUT(2) __ATTR_INOUT_OPT(4) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32rtombs,(char *__dst, __CHAR32_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsrtombs.h>
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32rtombs __LIBC_LOCAL_NAME(c32rtombs)
 #endif /* !... */
 #endif /* !__local___localdep_c32rtombs_defined */
-__LOCAL_LIBC(c32stombs) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) __SIZE_TYPE__
+__LOCAL_LIBC(c32stombs) __ATTR_IN(2) __ATTR_OUTS(1, 3) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32stombs))(char *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __dstlen) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_c32rtombs)(__dst, (__CHAR32_TYPE__ const **)&__src, __dstlen, __NULLPTR);
 }

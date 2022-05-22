@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a692733 */
+/* HASH CRC-32:0x9c681240 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,34 +60,34 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(objalloc_create, __FORCELOCAL __ATTR_ARTIFICIAL 
  * Allocate `num_bytes' of memory from `self'
  * @return: * :   The `num_bytes'-large data-blob
  * @return: NULL: Out of memory */
-__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,_objalloc_alloc,(struct objalloc *__self, __ULONGPTR_TYPE__ __num_bytes),(__self,__num_bytes))
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INOUT(1),void *,__NOTHROW_NCX,_objalloc_alloc,(struct objalloc *__self, __ULONGPTR_TYPE__ __num_bytes),(__self,__num_bytes))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/objalloc/_objalloc_alloc.h>
 /* >> _objalloc_alloc(3)
  * Allocate `num_bytes' of memory from `self'
  * @return: * :   The `num_bytes'-large data-blob
  * @return: NULL: Out of memory */
-__NAMESPACE_LOCAL_USING_OR_IMPL(_objalloc_alloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL _objalloc_alloc)(struct objalloc *__self, __ULONGPTR_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_objalloc_alloc))(__self, __num_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_objalloc_alloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INOUT(1) void *__NOTHROW_NCX(__LIBCCALL _objalloc_alloc)(struct objalloc *__self, __ULONGPTR_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_objalloc_alloc))(__self, __num_bytes); })
 #endif /* ... */
 #ifdef __CRT_HAVE_objalloc_free
 /* >> objalloc_free(3)
  * Free all memory allocated by `self', before also freeing `self' */
-__CDECLARE_VOID(__ATTR_ACCESS_RW(1),__NOTHROW_NCX,objalloc_free,(struct objalloc *__self),(__self))
+__CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,objalloc_free,(struct objalloc *__self),(__self))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #include <libc/local/objalloc/objalloc_free.h>
 /* >> objalloc_free(3)
  * Free all memory allocated by `self', before also freeing `self' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(objalloc_free, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) void __NOTHROW_NCX(__LIBCCALL objalloc_free)(struct objalloc *__self) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(objalloc_free))(__self); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(objalloc_free, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) void __NOTHROW_NCX(__LIBCCALL objalloc_free)(struct objalloc *__self) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(objalloc_free))(__self); })
 #endif /* ... */
 #ifdef __CRT_HAVE_objalloc_free_block
 /* >> objalloc_free_block(3)
  * Free a given `ptr', as well as everything allocated since. */
-__CDECLARE_VOID(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),__NOTHROW_NCX,objalloc_free_block,(struct objalloc *__self, void *__ptr),(__self,__ptr))
+__CDECLARE_VOID(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__NOTHROW_NCX,objalloc_free_block,(struct objalloc *__self, void *__ptr),(__self,__ptr))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 #include <libc/local/objalloc/objalloc_free_block.h>
 /* >> objalloc_free_block(3)
  * Free a given `ptr', as well as everything allocated since. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(objalloc_free_block, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) void __NOTHROW_NCX(__LIBCCALL objalloc_free_block)(struct objalloc *__self, void *__ptr) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(objalloc_free_block))(__self, __ptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(objalloc_free_block, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_NONNULL((2)) void __NOTHROW_NCX(__LIBCCALL objalloc_free_block)(struct objalloc *__self, void *__ptr) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(objalloc_free_block))(__self, __ptr); })
 #endif /* ... */
 #if defined(__CRT_HAVE__objalloc_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
 #ifndef __NO_XBLOCK

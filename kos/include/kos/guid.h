@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f0e18c4 */
+/* HASH CRC-32:0x181c382d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -160,7 +160,7 @@ typedef union __ATTR_PACKED {
  * >> guid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
  * @return: string + GUID_STRLEN: Success
  * @return: NULL:                 `string' isn't a valid GUID. */
-__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),char const *,__NOTHROW_NCX,guid_fromstr,(char const __string[GUID_STRLEN], guid_t *__restrict __result),(__string,__result))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),char const *,__NOTHROW_NCX,guid_fromstr,(char const __string[GUID_STRLEN], guid_t *__restrict __result),(__string,__result))
 #else /* __CRT_HAVE_guid_fromstr */
 #include <libc/local/kos.guid/guid_fromstr.h>
 /* >> guid_fromstr(3)
@@ -169,7 +169,7 @@ __CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),char const *,__NOTHROW_NCX,gu
  * >> guid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
  * @return: string + GUID_STRLEN: Success
  * @return: NULL:                 `string' isn't a valid GUID. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(guid_fromstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) char const *__NOTHROW_NCX(__LIBCCALL guid_fromstr)(char const __string[GUID_STRLEN], guid_t *__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(guid_fromstr))(__string, __result); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(guid_fromstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(2) char const *__NOTHROW_NCX(__LIBCCALL guid_fromstr)(char const __string[GUID_STRLEN], guid_t *__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(guid_fromstr))(__string, __result); })
 #endif /* !__CRT_HAVE_guid_fromstr */
 
 __SYSDECL_END

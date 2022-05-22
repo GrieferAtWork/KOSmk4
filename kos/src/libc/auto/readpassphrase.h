@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3ab1409 */
+/* HASH CRC-32:0xdb6ce5c6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,14 +34,14 @@ DECL_BEGIN
  * @param: flags: Set of `RPP_*' (from `<readpassphrase.h>')
  * @return: buf:  Success
  * @return: NULL: Error (s.a. `errno') */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_WRS(2, 3) char *NOTHROW_NCX(LIBDCALL libd_readpassphrase)(char const *prompt, char *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
+INTDEF ATTR_IN_OPT(1) ATTR_OUTS(2, 3) char *NOTHROW_NCX(LIBDCALL libd_readpassphrase)(char const *prompt, char *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> readpassphrase(3)
  * @param: flags: Set of `RPP_*' (from `<readpassphrase.h>')
  * @return: buf:  Success
  * @return: NULL: Error (s.a. `errno') */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_WRS(2, 3) char *NOTHROW_NCX(LIBCCALL libc_readpassphrase)(char const *prompt, char *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
+INTDEF ATTR_IN_OPT(1) ATTR_OUTS(2, 3) char *NOTHROW_NCX(LIBCCALL libc_readpassphrase)(char const *prompt, char *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 #endif /* !__KERNEL__ */
 
 DECL_END

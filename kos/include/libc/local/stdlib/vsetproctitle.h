@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cec6df1 */
+/* HASH CRC-32:0x46afa348 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,13 +73,13 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setname_np,(__pthread_t __target_thread, const char *__name),pthread_setname_np,(__target_thread,__name))
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setname_np,(__pthread_t __target_thread, const char *__name),pthread_setname_np,(__target_thread,__name))
 #elif defined(__CRT_HAVE_pthread_set_name_np)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setname_np,(__pthread_t __target_thread, const char *__name),pthread_set_name_np,(__target_thread,__name))
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_setname_np,(__pthread_t __target_thread, const char *__name),pthread_set_name_np,(__target_thread,__name))
 #else /* ... */
 #undef __local___localdep_pthread_setname_np_defined
 #endif /* !... */
@@ -91,19 +91,19 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_PRINTF(3, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsnprintf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args),vsnprintf,{ return __builtin_vsnprintf(__buf, __buflen, __format, __args); })
+__CEIREDIRECT(__ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 0) __ATTR_OUTS(1, 2),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsnprintf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args),vsnprintf,{ return __builtin_vsnprintf(__buf, __buflen, __format, __args); })
 #elif defined(__CRT_HAVE_vsnprintf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_PRINTF(3, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsnprintf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args),vsnprintf,(__buf,__buflen,__format,__args))
+__CREDIRECT(__ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 0) __ATTR_OUTS(1, 2),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsnprintf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args),vsnprintf,(__buf,__buflen,__format,__args))
 #elif defined(__CRT_HAVE___vsnprintf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(3) __ATTR_ACCESS_WRS(1, 2) __ATTR_LIBC_PRINTF(3, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsnprintf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args),__vsnprintf,(__buf,__buflen,__format,__args))
+__CREDIRECT(__ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 0) __ATTR_OUTS(1, 2),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsnprintf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args),__vsnprintf,(__buf,__buflen,__format,__args))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/vsnprintf.h>
@@ -114,7 +114,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vstrdupf_defined
 #define __local___localdep_vstrdupf_defined
 #ifdef __CRT_HAVE_vstrdupf
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_LIBC_PRINTF(1, 0),char *,__NOTHROW_NCX,__localdep_vstrdupf,(char const *__restrict __format, __builtin_va_list __args),vstrdupf,(__format,__args))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_IN(1) __ATTR_LIBC_PRINTF(1, 0),char *,__NOTHROW_NCX,__localdep_vstrdupf,(char const *__restrict __format, __builtin_va_list __args),vstrdupf,(__format,__args))
 #elif defined(__CRT_HAVE_vasprintf) || ((defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/vstrdupf.h>
@@ -124,7 +124,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_vstrdupf_defined
 #endif /* !... */
 #endif /* !__local___localdep_vstrdupf_defined */
-__LOCAL_LIBC(vsetproctitle) __ATTR_ACCESS_RO(1) __ATTR_LIBC_PRINTF(1, 0) void
+__LOCAL_LIBC(vsetproctitle) __ATTR_IN(1) __ATTR_LIBC_PRINTF(1, 0) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsetproctitle))(char const *__format, __builtin_va_list __args) {
 	/* Load+fill a buffer for the fully qualified program name. */
 #ifdef __TASK_COMM_LEN

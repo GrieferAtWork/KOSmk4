@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64fdb06a */
+/* HASH CRC-32:0x66d26df3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <hybrid/typecore.h>
 #include <libc/template/unicode_utf8seqlen.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(unicode_readutf8_n) __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)) __CHAR32_TYPE__
+__LOCAL_LIBC(unicode_readutf8_n) __ATTR_INOUT(1) __ATTR_NONNULL((2)) __CHAR32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_n))(char const **__restrict __ptext, char const *__text_end) {
 	__CHAR32_TYPE__ __result;
 	char const *__iter = *__ptext;

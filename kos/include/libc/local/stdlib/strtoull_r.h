@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x725292f3 */
+/* HASH CRC-32:0xb364ed3b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtou32_r_defined
 #define __local___localdep_strtou32_r_defined
 #ifdef __CRT_HAVE_strtou32_r
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou32_r,(__nptr,__endptr,__base,__error))
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou32_r,(__nptr,__endptr,__base,__error))
 #else /* __CRT_HAVE_strtou32_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtou32_r.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strtou64_r_defined
 #define __local___localdep_strtou64_r_defined
 #ifdef __CRT_HAVE_strtou64_r
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou64_r,(__nptr,__endptr,__base,__error))
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou64_r,(__nptr,__endptr,__base,__error))
 #else /* __CRT_HAVE_strtou64_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtou64_r.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/limitcore.h>
 #include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strtoull_r) __ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4) __ULONGLONG
+__LOCAL_LIBC(strtoull_r) __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4) __ULONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoull_r))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
 #if __SIZEOF_LONG_LONG__ >= 8
 	return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __localdep_strtou64_r)(__nptr, __endptr, __base, __error);

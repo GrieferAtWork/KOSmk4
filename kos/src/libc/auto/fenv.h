@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf83c16da */
+/* HASH CRC-32:0xf009f8df */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,19 +51,19 @@ INTDEF int (LIBCCALL libc_feraiseexcept)(int excepts) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fegetexceptflag(3) */
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_fegetexceptflag)(fexcept_t *flagp, int excepts);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fegetexceptflag)(fexcept_t *flagp, int excepts);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fegetexceptflag(3) */
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp, int excepts);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp, int excepts);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fesetexceptflag(3) */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd_fesetexceptflag)(fexcept_t const *flagp, int excepts);
+INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_fesetexceptflag)(fexcept_t const *flagp, int excepts);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fesetexceptflag(3) */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp, int excepts);
+INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp, int excepts);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fetestexcept(3) */
@@ -103,35 +103,35 @@ INTDEF int NOTHROW(LIBCCALL libc_fesetround)(int rounding_direction);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fegetenv(3) */
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_fegetenv)(fenv_t *envp);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fegetenv)(fenv_t *envp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fegetenv(3) */
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_fegetenv)(fenv_t *envp);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fegetenv)(fenv_t *envp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> feholdexcept(3) */
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_feholdexcept)(fenv_t *envp);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_feholdexcept)(fenv_t *envp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> feholdexcept(3) */
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_feholdexcept)(fenv_t *envp);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_feholdexcept)(fenv_t *envp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fesetenv(3) */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd_fesetenv)(fenv_t const *envp);
+INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_fesetenv)(fenv_t const *envp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fesetenv(3) */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBCCALL libc_fesetenv)(fenv_t const *envp);
+INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_fesetenv)(fenv_t const *envp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> feupdateenv(3) */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd_feupdateenv)(fenv_t const *envp);
+INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_feupdateenv)(fenv_t const *envp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> feupdateenv(3) */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBCCALL libc_feupdateenv)(fenv_t const *envp);
+INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_feupdateenv)(fenv_t const *envp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> feenableexcept(3) */

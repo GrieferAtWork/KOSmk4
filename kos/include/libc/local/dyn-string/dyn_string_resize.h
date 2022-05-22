@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6c42dd8 */
+/* HASH CRC-32:0x4e48df92 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_xrealloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_xrealloc_defined */
-__LOCAL_LIBC(dyn_string_resize) __ATTR_RETNONNULL __ATTR_ACCESS_RW(1) struct dyn_string *
+__LOCAL_LIBC(dyn_string_resize) __ATTR_RETNONNULL __ATTR_INOUT(1) struct dyn_string *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dyn_string_resize))(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars) {
 	char *__newbuf;
 	__SIZE_TYPE__ __newalloc;

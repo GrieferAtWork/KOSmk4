@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabd9c7e6 */
+/* HASH CRC-32:0xb5795197 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strnstr) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_ROS(1, 3) __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(strnstr) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INS(1, 3) __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnstr))(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) {
 	char __ch, __needle_start = *__needle++;
 	while (__haystack_maxlen-- && (__ch = *__haystack++) != '\0') {

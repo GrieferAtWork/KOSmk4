@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcca6e43b */
+/* HASH CRC-32:0x8f4e5e4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,7 +105,7 @@ typedef struct __sigset_struct sigset_t;
  *                mask should be updated to `sigmask'.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK'
  *                Meaningless,  but  still  validated  when  `fd != -1' */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2),__fd_t,__NOTHROW_NCX,signalfd,(__fd_t __fd, sigset_t const *__sigmask, __STDC_INT_AS_UINT_T __flags),(__fd,__sigmask,__flags))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__NOTHROW_NCX,signalfd,(__fd_t __fd, sigset_t const *__sigmask, __STDC_INT_AS_UINT_T __flags),(__fd,__sigmask,__flags))
 
 __SYSDECL_END
 #endif /* __CC__ */

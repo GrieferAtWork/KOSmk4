@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25192425 */
+/* HASH CRC-32:0xd0fa18de */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,18 +30,18 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(VLIBDCALL libd_wopen)(char16_t const *filename, oflag_t oflags, ...);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(VLIBKCALL libc_wopen)(char32_t const *filename, oflag_t oflags, ...);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(LIBDCALL libd_wcreat)(char16_t const *filename, mode_t mode);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(LIBKCALL libc_wcreat)(char32_t const *filename, mode_t mode);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(VLIBDCALL libd_wopen64)(char16_t const *filename, oflag_t oflags, ...);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(VLIBKCALL libc_wopen64)(char32_t const *filename, oflag_t oflags, ...);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(LIBDCALL libd_wcreat64)(char16_t const *filename, mode_t mode);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(LIBKCALL libc_wcreat64)(char32_t const *filename, mode_t mode);
-INTDEF WUNUSED ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(VLIBDCALL libd_wopenat)(fd_t dirfd, char16_t const *filename, oflag_t oflags, ...);
-INTDEF WUNUSED ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(VLIBKCALL libc_wopenat)(fd_t dirfd, char32_t const *filename, oflag_t oflags, ...);
-INTDEF WUNUSED ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(VLIBDCALL libd_wopenat64)(fd_t dirfd, char16_t const *filename, oflag_t oflags, ...);
-INTDEF WUNUSED ATTR_ACCESS_RO(2) fd_t NOTHROW_RPC(VLIBKCALL libc_wopenat64)(fd_t dirfd, char32_t const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(VLIBDCALL libd_wopen)(char16_t const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(VLIBKCALL libc_wopen)(char32_t const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(LIBDCALL libd_wcreat)(char16_t const *filename, mode_t mode);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(LIBKCALL libc_wcreat)(char32_t const *filename, mode_t mode);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(VLIBDCALL libd_wopen64)(char16_t const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(VLIBKCALL libc_wopen64)(char32_t const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(LIBDCALL libd_wcreat64)(char16_t const *filename, mode_t mode);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(LIBKCALL libc_wcreat64)(char32_t const *filename, mode_t mode);
+INTDEF WUNUSED ATTR_IN(2) fd_t NOTHROW_RPC(VLIBDCALL libd_wopenat)(fd_t dirfd, char16_t const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(2) fd_t NOTHROW_RPC(VLIBKCALL libc_wopenat)(fd_t dirfd, char32_t const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(2) fd_t NOTHROW_RPC(VLIBDCALL libd_wopenat64)(fd_t dirfd, char16_t const *filename, oflag_t oflags, ...);
+INTDEF WUNUSED ATTR_IN(2) fd_t NOTHROW_RPC(VLIBKCALL libc_wopenat64)(fd_t dirfd, char32_t const *filename, oflag_t oflags, ...);
 #endif /* !__KERNEL__ */
 
 DECL_END

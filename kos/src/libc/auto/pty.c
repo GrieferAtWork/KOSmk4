@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb985a7bd */
+/* HASH CRC-32:0x8d4dbf47 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ DECL_BEGIN
  * it returns in  both the  parent and child  processes, returning  `0'
  * for the child, and the child's PID for the parent (or -1 in only the
  * parent if something went wrong) */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WR(1) ATTR_ACCESS_WR_OPT(2) pid_t
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_IN(3) ATTR_IN(4) ATTR_OUT(1) ATTR_OUT_OPT(2) pid_t
 NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster,
                                    char *name,
                                    struct termios const *termp,

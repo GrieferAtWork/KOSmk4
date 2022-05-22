@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53a27b9e */
+/* HASH CRC-32:0x2063cc20 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_WRS(2, 3) __ATTR_ACCESS_WRS(4, 5) __ATTR_ACCESS_WRS(6, 7) __ATTR_ACCESS_WRS(8, 9),__errno_t,__NOTHROW_NCX,__localdep__wsplitpath_s,(__WCHAR_TYPE__ const *__restrict __abspath, __WCHAR_TYPE__ *__drive, __SIZE_TYPE__ __drivelen, __WCHAR_TYPE__ *__dir, __SIZE_TYPE__ __dirlen, __WCHAR_TYPE__ *__file, __SIZE_TYPE__ __filelen, __WCHAR_TYPE__ *__ext, __SIZE_TYPE__ __extlen),_wsplitpath_s,(__abspath,__drive,__drivelen,__dir,__dirlen,__file,__filelen,__ext,__extlen))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUTS(2, 3) __ATTR_OUTS(4, 5) __ATTR_OUTS(6, 7) __ATTR_OUTS(8, 9),__errno_t,__NOTHROW_NCX,__localdep__wsplitpath_s,(__WCHAR_TYPE__ const *__restrict __abspath, __WCHAR_TYPE__ *__drive, __SIZE_TYPE__ __drivelen, __WCHAR_TYPE__ *__dir, __SIZE_TYPE__ __dirlen, __WCHAR_TYPE__ *__file, __SIZE_TYPE__ __filelen, __WCHAR_TYPE__ *__ext, __SIZE_TYPE__ __extlen),_wsplitpath_s,(__abspath,__drive,__drivelen,__dir,__dirlen,__file,__filelen,__ext,__extlen))
 #else /* __CRT_HAVE__wsplitpath_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdlib/_wsplitpath_s.h>
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__wsplitpath_s __LIBC_LOCAL_NAME(_wsplitpath_s)
 #endif /* !__CRT_HAVE__wsplitpath_s */
 #endif /* !__local___localdep__wsplitpath_s_defined */
-__LOCAL_LIBC(_wsplitpath) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(3) __ATTR_ACCESS_WR_OPT(4) __ATTR_ACCESS_WR_OPT(5) void
+__LOCAL_LIBC(_wsplitpath) __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(3) __ATTR_OUT_OPT(4) __ATTR_OUT_OPT(5) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wsplitpath))(__WCHAR_TYPE__ const *__restrict __abspath, __WCHAR_TYPE__ *__drive, __WCHAR_TYPE__ *__dir, __WCHAR_TYPE__ *__file, __WCHAR_TYPE__ *__ext) {
 	(__NAMESPACE_LOCAL_SYM __localdep__wsplitpath_s)(__abspath,
 	             __drive, __drive ? 3 : 0,

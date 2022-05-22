@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcb31542 */
+/* HASH CRC-32:0x85a873c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ DECL_BEGIN
 #include <kos/parts/malloca.h>
 #include <libc/errno.h>
 #include <bits/types.h>
-INTERN ATTR_SECTION(".text.crt.except.system.mman") ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_SECTION(".text.crt.except.system.mman") ATTR_IN(1) fd_t
 (LIBCCALL libc_ShmOpen)(char const *name,
                         oflag_t oflags,
                         mode_t mode) THROWS(...) {
@@ -86,7 +86,7 @@ INTERN ATTR_SECTION(".text.crt.except.system.mman") ATTR_ACCESS_RO(1) fd_t
 #include <asm/os/paths.h>
 #include <hybrid/typecore.h>
 #include <kos/parts/malloca.h>
-INTERN ATTR_SECTION(".text.crt.except.system.mman") ATTR_ACCESS_RO(1) void
+INTERN ATTR_SECTION(".text.crt.except.system.mman") ATTR_IN(1) void
 (LIBCCALL libc_ShmUnlink)(char const *name) THROWS(...) {
 	char *fullname;
 	size_t namelen;

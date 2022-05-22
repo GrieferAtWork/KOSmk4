@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd40b10b1 */
+/* HASH CRC-32:0x62ac2b00 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <bits/crt/mbstate.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(unicode_c8toc32) __ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(1) __SIZE_TYPE__
+__LOCAL_LIBC(unicode_c8toc32) __ATTR_INOUT(4) __ATTR_INS(2, 3) __ATTR_OUT(1) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c8toc32))(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs) {
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __n; ++__i) {

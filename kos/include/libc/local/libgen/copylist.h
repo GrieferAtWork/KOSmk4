@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98338a3d */
+/* HASH CRC-32:0x590d8506 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,9 +39,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_copylist64_defined
 #define __local___localdep_copylist64_defined
 #if defined(__CRT_HAVE_copylist) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),char *,__NOTHROW_RPC,__localdep_copylist64,(char const *__filename, __PIO_OFFSET64 *__p_filesize),copylist,(__filename,__p_filesize))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_RPC,__localdep_copylist64,(char const *__filename, __PIO_OFFSET64 *__p_filesize),copylist,(__filename,__p_filesize))
 #elif defined(__CRT_HAVE_copylist64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),char *,__NOTHROW_RPC,__localdep_copylist64,(char const *__filename, __PIO_OFFSET64 *__p_filesize),copylist64,(__filename,__p_filesize))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_RPC,__localdep_copylist64,(char const *__filename, __PIO_OFFSET64 *__p_filesize),copylist64,(__filename,__p_filesize))
 #elif (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 __NAMESPACE_LOCAL_END
 #include <libc/local/libgen/copylist64.h>
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_copylist_sz __LIBC_LOCAL_NAME(copylist_sz)
 #endif /* !__local___localdep_copylist_sz_defined && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
-__LOCAL_LIBC(copylist) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) char *
+__LOCAL_LIBC(copylist) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(copylist))(char const *__filename, __PIO_OFFSET *__p_filesize) {
 #if (defined(__CRT_HAVE_copylist64) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__
 	__PIO_OFFSET64 __filesize64;

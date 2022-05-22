@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7e0620c */
+/* HASH CRC-32:0xb095cba2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_towlower __LIBC_LOCAL_NAME(towlower)
 #endif /* !... */
 #endif /* !__local___localdep_towlower_defined */
-__LOCAL_LIBC(wcsncasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 3) __ATTR_ACCESS_ROS(2, 3) __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(wcsncasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncasecmp))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen) {
 	__WCHAR_TYPE__ __c1, __c2;
 	do {

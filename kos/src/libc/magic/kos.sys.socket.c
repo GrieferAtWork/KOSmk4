@@ -54,7 +54,7 @@ void SocketPair(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
 
 [[throws, doc_alias("bind")]]
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
-void Bind($fd_t sockfd, /*[[inp(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
+void Bind($fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
           socklen_t addr_len);
 
 [[throws, doc_alias("getsockname")]]
@@ -64,7 +64,7 @@ void GetSockName($fd_t sockfd, /*[[out/ *(*addr_len <= *addr_len)* /]]*/ __SOCKA
 
 [[cp, throws, doc_alias("connect")]]
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
-void Connect($fd_t sockfd, /*[[inp(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
+void Connect($fd_t sockfd, /*[[in(addr_len)]]*/ __CONST_SOCKADDR_ARG addr,
              socklen_t addr_len);
 
 [[throws, doc_alias("getpeername")]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2018f72 */
+/* HASH CRC-32:0xa0808766 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,31 +33,31 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> setxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_ROS(3, 4) int NOTHROW_RPC(LIBCCALL libc_setxattr)(char const *path, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_INS(3, 4) int NOTHROW_RPC(LIBCCALL libc_setxattr)(char const *path, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 /* >> lsetxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_ROS(3, 4) int NOTHROW_RPC(LIBCCALL libc_lsetxattr)(char const *path, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_INS(3, 4) int NOTHROW_RPC(LIBCCALL libc_lsetxattr)(char const *path, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 /* >> fsetxattr(2)
  * @param: flags: One of `XATTR_*', or `0' */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_ROS(3, 4) int NOTHROW_RPC(LIBCCALL libc_fsetxattr)(fd_t fd, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
+INTDEF ATTR_IN(2) ATTR_INS(3, 4) int NOTHROW_RPC(LIBCCALL libc_fsetxattr)(fd_t fd, char const *name, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 /* >> getxattr(2) */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t NOTHROW_RPC(LIBCCALL libc_getxattr)(char const *path, char const *name, void *buf, size_t bufsize);
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBCCALL libc_getxattr)(char const *path, char const *name, void *buf, size_t bufsize);
 /* >> lgetxattr(2) */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t NOTHROW_RPC(LIBCCALL libc_lgetxattr)(char const *path, char const *name, void *buf, size_t bufsize);
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBCCALL libc_lgetxattr)(char const *path, char const *name, void *buf, size_t bufsize);
 /* >> fgetxattr(2) */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) ssize_t NOTHROW_RPC(LIBCCALL libc_fgetxattr)(fd_t fd, char const *name, void *buf, size_t bufsize);
+INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBCCALL libc_fgetxattr)(fd_t fd, char const *name, void *buf, size_t bufsize);
 /* >> listxattr(2) */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_listxattr)(char const *path, char *listbuf, size_t listbufsize);
+INTDEF ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_listxattr)(char const *path, char *listbuf, size_t listbufsize);
 /* >> llistxattr(2) */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_llistxattr)(char const *path, char *listbuf, size_t listbufsize);
+INTDEF ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_llistxattr)(char const *path, char *listbuf, size_t listbufsize);
 /* >> flistxattr(2) */
-INTDEF ATTR_ACCESS_WRS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_flistxattr)(fd_t fd, char *listbuf, size_t listbufsize);
+INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_flistxattr)(fd_t fd, char *listbuf, size_t listbufsize);
 /* >> removexattr(2) */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBCCALL libc_removexattr)(char const *path, char const *name);
+INTDEF ATTR_IN(1) ATTR_IN(2) int NOTHROW_RPC(LIBCCALL libc_removexattr)(char const *path, char const *name);
 /* >> lremovexattr(2) */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBCCALL libc_lremovexattr)(char const *path, char const *name);
+INTDEF ATTR_IN(1) ATTR_IN(2) int NOTHROW_RPC(LIBCCALL libc_lremovexattr)(char const *path, char const *name);
 /* >> fremovexattr(2) */
-INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBCCALL libc_fremovexattr)(fd_t fd, char const *name);
+INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBCCALL libc_fremovexattr)(fd_t fd, char const *name);
 #endif /* !__KERNEL__ */
 
 DECL_END

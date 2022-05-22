@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60ab84cf */
+/* HASH CRC-32:0x8d23b8b2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_ACCESS_RO_OPT(1) ATTR_LIBC_PRINTF(1, 2) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void
 (VLIBDCALL libd_warn)(char const *format,
                       ...) THROWS(...) {
 	va_list args;
@@ -47,7 +47,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_ACCESS_RO_OPT
 #ifndef __KERNEL__
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
-INTERN ATTR_SECTION(".text.crt.error") ATTR_ACCESS_RO_OPT(1) ATTR_LIBC_PRINTF(1, 2) void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void
 (VLIBCCALL libc_warn)(char const *format,
                       ...) THROWS(...) {
 	va_list args;
@@ -58,7 +58,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_ACCESS_RO_OPT(1) ATTR_LIBC_PRINTF(1,
 #include <libc/errno.h>
 /* >> warn(3), vwarn(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
-INTERN ATTR_SECTION(".text.crt.error") ATTR_ACCESS_RO_OPT(1) ATTR_LIBC_PRINTF(1, 0) void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0) void
 (LIBCCALL libc_vwarn)(char const *format,
                       va_list args) THROWS(...) {
 	libc_vwarnc(__libc_geterrno_or(0), format, args);
@@ -67,7 +67,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_ACCESS_RO_OPT(1) ATTR_LIBC_PRINTF(1,
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_ACCESS_RO_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
 (VLIBDCALL libd_warnc)(errno_t used_errno,
                        char const *format,
                        ...) THROWS(...) {
@@ -80,7 +80,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_ACCESS_RO_OPT
 #ifndef __KERNEL__
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-INTERN ATTR_SECTION(".text.crt.error") ATTR_ACCESS_RO_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
 (VLIBCCALL libc_warnc)(errno_t used_errno,
                        char const *format,
                        ...) THROWS(...) {
@@ -93,7 +93,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_ACCESS_RO_OPT(2) ATTR_LIBC_PRINTF(2,
 #include <libc/template/program_invocation_name.h>
 /* >> warnc(3), vwarnc(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
-INTERN ATTR_SECTION(".text.crt.error") ATTR_ACCESS_RO_OPT(2) ATTR_LIBC_PRINTF(2, 0) void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void
 (LIBCCALL libc_vwarnc)(errno_t used_errno,
                        char const *format,
                        va_list args) THROWS(...) {
@@ -115,7 +115,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_ACCESS_RO_OPT(2) ATTR_LIBC_PRINTF(2,
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_ACCESS_RO_OPT(1) ATTR_LIBC_PRINTF(1, 2) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void
 (VLIBDCALL libd_warnx)(char const *format,
                        ...) THROWS(...) {
 	va_list args;
@@ -127,7 +127,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_ACCESS_RO_OPT
 #ifndef __KERNEL__
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
-INTERN ATTR_SECTION(".text.crt.error") ATTR_ACCESS_RO_OPT(1) ATTR_LIBC_PRINTF(1, 2) void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 2) void
 (VLIBCCALL libc_warnx)(char const *format,
                        ...) THROWS(...) {
 	va_list args;
@@ -139,7 +139,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_ACCESS_RO_OPT(1) ATTR_LIBC_PRINTF(1,
 #include <libc/template/program_invocation_name.h>
 /* >> warnx(3), vwarnx(3)
  * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
-INTERN ATTR_SECTION(".text.crt.error") ATTR_ACCESS_RO_OPT(1) ATTR_LIBC_PRINTF(1, 0) void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_IN_OPT(1) ATTR_LIBC_PRINTF(1, 0) void
 (LIBCCALL libc_vwarnx)(char const *format,
                        va_list args) THROWS(...) {
 
@@ -157,7 +157,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_ACCESS_RO_OPT(1) ATTR_LIBC_PRINTF(1,
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> err(3), verr(3)
  * Same as `warn()', but follow up by calling `exit(status)' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
 (VLIBDCALL libd_err)(int status,
                      char const *format,
                      ...) THROWS(...) {
@@ -169,7 +169,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR
 #ifndef __KERNEL__
 /* >> err(3), verr(3)
  * Same as `warn()', but follow up by calling `exit(status)' */
-INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
 (VLIBCCALL libc_err)(int status,
                      char const *format,
                      ...) THROWS(...) {
@@ -180,7 +180,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(2) ATTR_
 #include <libc/errno.h>
 /* >> err(3), verr(3)
  * Same as `warn()', but follow up by calling `exit(status)' */
-INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(2) ATTR_LIBC_PRINTF(2, 0) void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void
 (LIBCCALL libc_verr)(int status,
                      char const *format,
                      va_list args) THROWS(...) {
@@ -190,7 +190,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(2) ATTR_
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(3) ATTR_LIBC_PRINTF(3, 4) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 4) void
 (VLIBDCALL libd_errc)(int status,
                       errno_t used_errno,
                       char const *format,
@@ -203,7 +203,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR
 #ifndef __KERNEL__
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(3) ATTR_LIBC_PRINTF(3, 4) void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 4) void
 (VLIBCCALL libc_errc)(int status,
                       errno_t used_errno,
                       char const *format,
@@ -214,7 +214,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(3) ATTR_
 }
 /* >> errc(3), verrc(3)
  * Same as `warnc()', but follow up by calling `exit(status)' */
-INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(3) ATTR_LIBC_PRINTF(3, 0) void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_IN_OPT(3) ATTR_LIBC_PRINTF(3, 0) void
 (LIBCCALL libc_verrc)(int status,
                       errno_t used_errno,
                       char const *format,
@@ -226,7 +226,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(3) ATTR_
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> errx(3), verrx(3)
  * Same as `warnx()', but follow up by calling `exit(status)' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
 (VLIBDCALL libd_errx)(int status,
                       char const *format,
                       ...) THROWS(...) {
@@ -238,7 +238,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR
 #ifndef __KERNEL__
 /* >> errx(3), verrx(3)
  * Same as `warnx()', but follow up by calling `exit(status)' */
-INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 3) void
 (VLIBCCALL libc_errx)(int status,
                       char const *format,
                       ...) THROWS(...) {
@@ -248,7 +248,7 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(2) ATTR_
 }
 /* >> errx(3), verrx(3)
  * Same as `warnx()', but follow up by calling `exit(status)' */
-INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_ACCESS_RO_OPT(2) ATTR_LIBC_PRINTF(2, 0) void
+INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_IN_OPT(2) ATTR_LIBC_PRINTF(2, 0) void
 (LIBCCALL libc_verrx)(int status,
                       char const *format,
                       va_list args) THROWS(...) {

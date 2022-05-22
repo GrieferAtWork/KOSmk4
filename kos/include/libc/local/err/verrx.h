@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8819da59 */
+/* HASH CRC-32:0xc7242e27 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_exit,(int __status),xexit
 #ifndef __local___localdep_vwarnx_defined
 #define __local___localdep_vwarnx_defined
 #ifdef __CRT_HAVE_vwarnx
-__CREDIRECT_VOID(__ATTR_ACCESS_RO_OPT(1) __ATTR_LIBC_PRINTF(1, 0),__THROWING,__localdep_vwarnx,(char const *__format, __builtin_va_list __args),vwarnx,(__format,__args))
+__CREDIRECT_VOID(__ATTR_IN_OPT(1) __ATTR_LIBC_PRINTF(1, 0),__THROWING,__localdep_vwarnx,(char const *__format, __builtin_va_list __args),vwarnx,(__format,__args))
 #elif defined(__LOCAL_stderr) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))
 __NAMESPACE_LOCAL_END
 #include <libc/local/err/vwarnx.h>
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_vwarnx_defined
 #endif /* !... */
 #endif /* !__local___localdep_vwarnx_defined */
-__LOCAL_LIBC(verrx) __ATTR_NORETURN __ATTR_ACCESS_RO_OPT(2) __ATTR_LIBC_PRINTF(2, 0) void
+__LOCAL_LIBC(verrx) __ATTR_NORETURN __ATTR_IN_OPT(2) __ATTR_LIBC_PRINTF(2, 0) void
 (__LIBCCALL __LIBC_LOCAL_NAME(verrx))(int __status, char const *__format, __builtin_va_list __args) __THROWS(...) {
 	(__NAMESPACE_LOCAL_SYM __localdep_vwarnx)(__format, __args);
 	(__NAMESPACE_LOCAL_SYM __localdep_exit)(__status);

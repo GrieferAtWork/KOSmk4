@@ -878,9 +878,9 @@ NOTHROW_RPC(LIBCCALL libd_dos_stat64)(char const *__restrict filename,
 
 
 
-/*[[[head:libd_mkdir,hash:CRC-32=0x92ee9327]]]*/
+/*[[[head:libd_mkdir,hash:CRC-32=0x8c747e5d]]]*/
 /* >> mkdir(2) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBDCALL libd_mkdir)(char const *pathname,
                                  mode_t mode)
 /*[[[body:libd_mkdir]]]*/
@@ -889,9 +889,9 @@ NOTHROW_RPC(LIBDCALL libd_mkdir)(char const *pathname,
 }
 /*[[[end:libd_mkdir]]]*/
 
-/*[[[head:libc_mkdir,hash:CRC-32=0xf9027f7f]]]*/
+/*[[[head:libc_mkdir,hash:CRC-32=0x3399481d]]]*/
 /* >> mkdir(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBCCALL libc_mkdir)(char const *pathname,
                                  mode_t mode)
 /*[[[body:libc_mkdir]]]*/
@@ -902,9 +902,9 @@ NOTHROW_RPC(LIBCCALL libc_mkdir)(char const *pathname,
 }
 /*[[[end:libc_mkdir]]]*/
 
-/*[[[head:libd_chmod,hash:CRC-32=0xbe94b48b]]]*/
+/*[[[head:libd_chmod,hash:CRC-32=0x4f85a79e]]]*/
 /* >> chmod(2) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBDCALL libd_chmod)(char const *filename,
                                  mode_t mode)
 /*[[[body:libd_chmod]]]*/
@@ -913,9 +913,9 @@ NOTHROW_RPC(LIBDCALL libd_chmod)(char const *filename,
 }
 /*[[[end:libd_chmod]]]*/
 
-/*[[[head:libc_chmod,hash:CRC-32=0x78145634]]]*/
+/*[[[head:libc_chmod,hash:CRC-32=0xea2d1b4b]]]*/
 /* >> chmod(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBCCALL libc_chmod)(char const *filename,
                                  mode_t mode)
 /*[[[body:libc_chmod]]]*/
@@ -926,9 +926,9 @@ NOTHROW_RPC(LIBCCALL libc_chmod)(char const *filename,
 }
 /*[[[end:libc_chmod]]]*/
 
-/*[[[head:libd_lchmod,hash:CRC-32=0x98365bb8]]]*/
+/*[[[head:libd_lchmod,hash:CRC-32=0xb1ae665c]]]*/
 /* >> lchmod(2) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBDCALL libd_lchmod)(char const *filename,
                                   mode_t mode)
 /*[[[body:libd_lchmod]]]*/
@@ -938,9 +938,9 @@ NOTHROW_RPC(LIBDCALL libd_lchmod)(char const *filename,
 /*[[[end:libd_lchmod]]]*/
 
 
-/*[[[head:libc_lchmod,hash:CRC-32=0x22eac83c]]]*/
+/*[[[head:libc_lchmod,hash:CRC-32=0x8313092]]]*/
 /* >> lchmod(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBCCALL libc_lchmod)(char const *filename,
                                   mode_t mode)
 /*[[[body:libc_lchmod]]]*/
@@ -976,10 +976,10 @@ NOTHROW_NCX(LIBCCALL libc_getumask)(void)
 }
 /*[[[end:libc_getumask]]]*/
 
-/*[[[head:libd_fmkdirat,hash:CRC-32=0xa0e3b958]]]*/
+/*[[[head:libd_fmkdirat,hash:CRC-32=0x5d540e37]]]*/
 /* >> fmkdirat(2)
  * @param flags: Set of `0 | AT_DOSPATH' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(2) int
 NOTHROW_RPC(LIBDCALL libd_fmkdirat)(fd_t dirfd,
                                     char const *pathname,
                                     mode_t mode,
@@ -990,10 +990,10 @@ NOTHROW_RPC(LIBDCALL libd_fmkdirat)(fd_t dirfd,
 }
 /*[[[end:libd_fmkdirat]]]*/
 
-/*[[[head:libc_fmkdirat,hash:CRC-32=0xfa067a72]]]*/
+/*[[[head:libc_fmkdirat,hash:CRC-32=0x674a1bcf]]]*/
 /* >> fmkdirat(2)
  * @param flags: Set of `0 | AT_DOSPATH' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_IN(2) int
 NOTHROW_RPC(LIBCCALL libc_fmkdirat)(fd_t dirfd,
                                     char const *pathname,
                                     mode_t mode,
@@ -1006,10 +1006,10 @@ NOTHROW_RPC(LIBCCALL libc_fmkdirat)(fd_t dirfd,
 }
 /*[[[end:libc_fmkdirat]]]*/
 
-/*[[[head:libd_fmknodat,hash:CRC-32=0xf3abb6e9]]]*/
+/*[[[head:libd_fmknodat,hash:CRC-32=0x8c26728]]]*/
 /* >> fmknodat(2)
  * @param flags: Set of `0 | AT_DOSPATH' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(2) int
 NOTHROW_RPC(LIBDCALL libd_fmknodat)(fd_t dirfd,
                                     char const *nodename,
                                     mode_t mode,
@@ -1021,10 +1021,10 @@ NOTHROW_RPC(LIBDCALL libd_fmknodat)(fd_t dirfd,
 }
 /*[[[end:libd_fmknodat]]]*/
 
-/*[[[head:libc_fmknodat,hash:CRC-32=0xf1c35e5a]]]*/
+/*[[[head:libc_fmknodat,hash:CRC-32=0x346ae0f0]]]*/
 /* >> fmknodat(2)
  * @param flags: Set of `0 | AT_DOSPATH' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_IN(2) int
 NOTHROW_RPC(LIBCCALL libc_fmknodat)(fd_t dirfd,
                                     char const *nodename,
                                     mode_t mode,
@@ -1038,10 +1038,10 @@ NOTHROW_RPC(LIBCCALL libc_fmknodat)(fd_t dirfd,
 }
 /*[[[end:libc_fmknodat]]]*/
 
-/*[[[head:libd_fchmodat,hash:CRC-32=0xc15b00d8]]]*/
+/*[[[head:libd_fchmodat,hash:CRC-32=0x85891ba5]]]*/
 /* >> fchmodat(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(2) int
 NOTHROW_RPC(LIBDCALL libd_fchmodat)(fd_t dirfd,
                                     char const *filename,
                                     mode_t mode,
@@ -1052,10 +1052,10 @@ NOTHROW_RPC(LIBDCALL libd_fchmodat)(fd_t dirfd,
 }
 /*[[[end:libd_fchmodat]]]*/
 
-/*[[[head:libc_fchmodat,hash:CRC-32=0x83b278a2]]]*/
+/*[[[head:libc_fchmodat,hash:CRC-32=0x4c434e95]]]*/
 /* >> fchmodat(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_IN(2) int
 NOTHROW_RPC(LIBCCALL libc_fchmodat)(fd_t dirfd,
                                     char const *filename,
                                     mode_t mode,
@@ -1068,9 +1068,9 @@ NOTHROW_RPC(LIBCCALL libc_fchmodat)(fd_t dirfd,
 }
 /*[[[end:libc_fchmodat]]]*/
 
-/*[[[head:libd_mkdirat,hash:CRC-32=0x6a988f1]]]*/
+/*[[[head:libd_mkdirat,hash:CRC-32=0x70c726b9]]]*/
 /* >> mkdirat(2) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(2) int
 NOTHROW_RPC(LIBDCALL libd_mkdirat)(fd_t dirfd,
                                    char const *pathname,
                                    mode_t mode)
@@ -1080,9 +1080,9 @@ NOTHROW_RPC(LIBDCALL libd_mkdirat)(fd_t dirfd,
 }
 /*[[[end:libd_mkdirat]]]*/
 
-/*[[[head:libc_mkdirat,hash:CRC-32=0x3454fef6]]]*/
+/*[[[head:libc_mkdirat,hash:CRC-32=0x7cd4467d]]]*/
 /* >> mkdirat(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_IN(2) int
 NOTHROW_RPC(LIBCCALL libc_mkdirat)(fd_t dirfd,
                                    char const *pathname,
                                    mode_t mode)
@@ -1107,9 +1107,9 @@ NOTHROW_RPC(LIBCCALL libc_fchmod)(fd_t fd,
 }
 /*[[[end:libc_fchmod]]]*/
 
-/*[[[head:libd_mknod,hash:CRC-32=0x25a6a740]]]*/
+/*[[[head:libd_mknod,hash:CRC-32=0xce46e063]]]*/
 /* >> mknod(2) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(1) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBDCALL libd_mknod)(char const *nodename,
                                  mode_t mode,
                                  dev_t dev)
@@ -1119,9 +1119,9 @@ NOTHROW_RPC(LIBDCALL libd_mknod)(char const *nodename,
 }
 /*[[[end:libd_mknod]]]*/
 
-/*[[[head:libc_mknod,hash:CRC-32=0xe219008e]]]*/
+/*[[[head:libc_mknod,hash:CRC-32=0xd34908d]]]*/
 /* >> mknod(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(1) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBCCALL libc_mknod)(char const *nodename,
                                  mode_t mode,
                                  dev_t dev)
@@ -1137,9 +1137,9 @@ NOTHROW_RPC(LIBCCALL libc_mknod)(char const *nodename,
 }
 /*[[[end:libc_mknod]]]*/
 
-/*[[[head:libd_mknodat,hash:CRC-32=0x24f6d93c]]]*/
+/*[[[head:libd_mknodat,hash:CRC-32=0xb3d431dc]]]*/
 /* >> mknodat(2) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_ACCESS_RO(2) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(2) int
 NOTHROW_RPC(LIBDCALL libd_mknodat)(fd_t dirfd,
                                    char const *nodename,
                                    mode_t mode,
@@ -1150,9 +1150,9 @@ NOTHROW_RPC(LIBDCALL libd_mknodat)(fd_t dirfd,
 }
 /*[[[end:libd_mknodat]]]*/
 
-/*[[[head:libc_mknodat,hash:CRC-32=0x7b92cc4b]]]*/
+/*[[[head:libc_mknodat,hash:CRC-32=0xff9ab7db]]]*/
 /* >> mknodat(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_ACCESS_RO(2) int
+INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_IN(2) int
 NOTHROW_RPC(LIBCCALL libc_mknodat)(fd_t dirfd,
                                    char const *nodename,
                                    mode_t mode,
@@ -1165,10 +1165,10 @@ NOTHROW_RPC(LIBCCALL libc_mknodat)(fd_t dirfd,
 }
 /*[[[end:libc_mknodat]]]*/
 
-/*[[[head:libd_utimensat,hash:CRC-32=0x15337a20]]]*/
+/*[[[head:libd_utimensat,hash:CRC-32=0x777fa138]]]*/
 /* >> utimensat(2), utimensat64(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify_time") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify_time") ATTR_IN(2) ATTR_IN_OPT(3) int
 NOTHROW_RPC(LIBDCALL libd_utimensat)(fd_t dirfd,
                                      char const *filename,
                                      struct timespec const times[2 /*or:3*/],
@@ -1181,10 +1181,10 @@ NOTHROW_RPC(LIBDCALL libd_utimensat)(fd_t dirfd,
 
 
 
-/*[[[head:libc_utimensat,hash:CRC-32=0x2ce89563]]]*/
+/*[[[head:libc_utimensat,hash:CRC-32=0x3ca6af73]]]*/
 /* >> utimensat(2), utimensat64(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
-INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_IN(2) ATTR_IN_OPT(3) int
 NOTHROW_RPC(LIBCCALL libc_utimensat)(fd_t dirfd,
                                      char const *filename,
                                      struct timespec const times[2 /*or:3*/],
@@ -1197,13 +1197,13 @@ NOTHROW_RPC(LIBCCALL libc_utimensat)(fd_t dirfd,
 }
 /*[[[end:libc_utimensat]]]*/
 
-/*[[[head:libd_utimensat64,hash:CRC-32=0x2bfe0ef7]]]*/
+/*[[[head:libd_utimensat64,hash:CRC-32=0xc84813c]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libd_utimensat64, libd_utimensat);
 #else /* MAGIC:alias */
 /* >> utimensat(2), utimensat64(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify_time") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify_time") ATTR_IN(2) ATTR_IN_OPT(3) int
 NOTHROW_RPC(LIBDCALL libd_utimensat64)(fd_t dirfd,
                                        char const *filename,
                                        struct timespec64 const times[2 /*or:3*/],
@@ -1215,13 +1215,13 @@ NOTHROW_RPC(LIBDCALL libd_utimensat64)(fd_t dirfd,
 #endif /* MAGIC:alias */
 /*[[[end:libd_utimensat64]]]*/
 
-/*[[[head:libc_utimensat64,hash:CRC-32=0x6b9feee]]]*/
+/*[[[head:libc_utimensat64,hash:CRC-32=0x72292233]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_utimensat64, libc_utimensat);
 #else /* MAGIC:alias */
 /* >> utimensat(2), utimensat64(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_BTIME | AT_DOSPATH' */
-INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_IN(2) ATTR_IN_OPT(3) int
 NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd,
                                        char const *filename,
                                        struct timespec64 const times[2 /*or:3*/],
@@ -1241,9 +1241,9 @@ NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_utimensat64]]]*/
 
-/*[[[head:libc_futimens,hash:CRC-32=0x7ea096db]]]*/
+/*[[[head:libc_futimens,hash:CRC-32=0x2a18d4b1]]]*/
 /* >> futimens(2), futimens64(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_ACCESS_RO_OPT(2) int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_IN_OPT(2) int
 NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd,
                                     struct timespec const times[2 /*or:3*/])
 /*[[[body:libc_futimens]]]*/
@@ -1254,12 +1254,12 @@ NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd,
 }
 /*[[[end:libc_futimens]]]*/
 
-/*[[[head:libc_futimens64,hash:CRC-32=0x937c4779]]]*/
+/*[[[head:libc_futimens64,hash:CRC-32=0xbece5ab4]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimens64, libc_futimens);
 #else /* MAGIC:alias */
 /* >> futimens(2), futimens64(2) */
-INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_ACCESS_RO_OPT(2) int
+INTERN ATTR_SECTION(".text.crt.fs.modify_time") ATTR_IN_OPT(2) int
 NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd,
                                       struct timespec64 const times[2 /*or:3*/])
 /*[[[body:libc_futimens64]]]*/
@@ -1282,8 +1282,8 @@ NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd,
 DEFINE_INTERN_ALIAS(libc__wstat64i32, libc__wstat64);
 DEFINE_INTERN_ALIAS(libd__wstat64i32, libd__wstat64);
 
-/*[[[head:libc__wstat64,hash:CRC-32=0xe50145ac]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.stat") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int
+/*[[[head:libc__wstat64,hash:CRC-32=0x41d2d86]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.stat") ATTR_IN(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBKCALL libc__wstat64)(char32_t const *filename,
                                     struct __dos_stat64 *buf)
 /*[[[body:libc__wstat64]]]*/
@@ -1299,8 +1299,8 @@ NOTHROW_NCX(LIBKCALL libc__wstat64)(char32_t const *filename,
 }
 /*[[[end:libc__wstat64]]]*/
 
-/*[[[head:libd__wstat64,hash:CRC-32=0xe5f8387c]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.stat") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int
+/*[[[head:libd__wstat64,hash:CRC-32=0xe86b34cc]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.stat") ATTR_IN(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBDCALL libd__wstat64)(char16_t const *filename,
                                     struct __dos_stat64 *buf)
 /*[[[body:libd__wstat64]]]*/
@@ -1316,8 +1316,8 @@ NOTHROW_NCX(LIBDCALL libd__wstat64)(char16_t const *filename,
 }
 /*[[[end:libd__wstat64]]]*/
 
-/*[[[head:libc__wstat32i64,hash:CRC-32=0xa385cbaa]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.stat") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int
+/*[[[head:libc__wstat32i64,hash:CRC-32=0xca324604]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.stat") ATTR_IN(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBKCALL libc__wstat32i64)(char32_t const *filename,
                                        struct __dos_stat32i64 *buf)
 /*[[[body:libc__wstat32i64]]]*/
@@ -1333,8 +1333,8 @@ NOTHROW_NCX(LIBKCALL libc__wstat32i64)(char32_t const *filename,
 }
 /*[[[end:libc__wstat32i64]]]*/
 
-/*[[[head:libd__wstat32i64,hash:CRC-32=0xc43a11f0]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.stat") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int
+/*[[[head:libd__wstat32i64,hash:CRC-32=0xb94fbb5d]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.stat") ATTR_IN(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBDCALL libd__wstat32i64)(char16_t const *filename,
                                        struct __dos_stat32i64 *buf)
 /*[[[body:libd__wstat32i64]]]*/
@@ -1350,8 +1350,8 @@ NOTHROW_NCX(LIBDCALL libd__wstat32i64)(char16_t const *filename,
 }
 /*[[[end:libd__wstat32i64]]]*/
 
-/*[[[head:libc__wstat32,hash:CRC-32=0xd5cfd50e]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.stat") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int
+/*[[[head:libc__wstat32,hash:CRC-32=0x34d3bd24]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.stat") ATTR_IN(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBKCALL libc__wstat32)(char32_t const *filename,
                                     struct __dos_stat32 *buf)
 /*[[[body:libc__wstat32]]]*/
@@ -1367,8 +1367,8 @@ NOTHROW_NCX(LIBKCALL libc__wstat32)(char32_t const *filename,
 }
 /*[[[end:libc__wstat32]]]*/
 
-/*[[[head:libd__wstat32,hash:CRC-32=0xd536a8de]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.stat") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int
+/*[[[head:libd__wstat32,hash:CRC-32=0xd8a5a46e]]]*/
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.stat") ATTR_IN(1) ATTR_OUT(2) int
 NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
                                     struct __dos_stat32 *buf)
 /*[[[body:libd__wstat32]]]*/

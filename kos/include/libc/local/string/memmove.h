@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd375ba6d */
+/* HASH CRC-32:0xc384c3c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(memmove) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_WRS(1, 3) __ATTR_NONNULL((1, 2)) void *
+__LOCAL_LIBC(memmove) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmove))(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__pdst;
 	__BYTE_TYPE__ const *__psrc;

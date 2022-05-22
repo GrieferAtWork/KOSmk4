@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x310d16e */
+/* HASH CRC-32:0x74bc1a7d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ DECL_BEGIN
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(4, 5) int NOTHROW_RPC(LIBDCALL libd_rpc_schedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params, size_t max_param_count);
+INTDEF ATTR_IN(3) ATTR_INS(4, 5) int NOTHROW_RPC(LIBDCALL libd_rpc_schedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params, size_t max_param_count);
 /* >> rpc_exec(3)
  * Send an RPC to `target_tid' (which must be a thread within the  current
  * process). The RPC will modify  the target thread's register state  such
@@ -147,7 +147,7 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_rpc_interrupt)(pid_t target_tid, unsigned i
  *                             still many  reasons outside  of your  control
  *                             for why  it may  terminate immediately  after
  *                             the RPC program finished. */
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_ROS(4, 5) void (LIBDCALL libd_RpcSchedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params, size_t max_param_count) THROWS(...);
+INTDEF ATTR_IN(3) ATTR_INS(4, 5) void (LIBDCALL libd_RpcSchedule)(pid_t target_tid, unsigned int mode, void const *program, void const *const *params, size_t max_param_count) THROWS(...);
 /* >> rpc_exec(3)
  * Send an RPC to `target_tid' (which must be a thread within the  current
  * process). The RPC will modify  the target thread's register state  such

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a971a51 */
+/* HASH CRC-32:0xf6ebce2e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <hybrid/typecore.h>
 #include <asm/signed-shift.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(timingsafe_memcmp) __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 3) __ATTR_ACCESS_ROS(2, 3) int
+__LOCAL_LIBC(timingsafe_memcmp) __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timingsafe_memcmp))(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) {
 	int __result = 0, __finished = 0;
 	/* Suppress warnings about ATTR_PURE. Even though they're correct,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce4f3fc3 */
+/* HASH CRC-32:0x58e7ebc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,32 +34,32 @@ DECL_BEGIN
  * Write information about the current time to `*timebuf'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_ACCESS_WR(1) void NOTHROW_NCX(LIBDCALL libd__ftime32)(struct timeb32 *timebuf);
+INTDEF ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd__ftime32)(struct timeb32 *timebuf);
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_ACCESS_WR(1) void NOTHROW_NCX(LIBDCALL libd__ftime64)(struct timeb64 *timebuf);
+INTDEF ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd__ftime64)(struct timeb64 *timebuf);
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_ACCESS_WR(1) errno_t NOTHROW_NCX(LIBDCALL libd__ftime32_s)(struct timeb32 *timebuf);
+INTDEF ATTR_OUT(1) errno_t NOTHROW_NCX(LIBDCALL libd__ftime32_s)(struct timeb32 *timebuf);
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_ACCESS_WR(1) errno_t NOTHROW_NCX(LIBDCALL libd__ftime64_s)(struct timeb64 *timebuf);
+INTDEF ATTR_OUT(1) errno_t NOTHROW_NCX(LIBDCALL libd__ftime64_s)(struct timeb64 *timebuf);
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_ftime)(struct timeb *timebuf);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_ftime)(struct timeb *timebuf);
 /* >> ftime(3), ftime64(3)
  * Write information about the current time to `*timebuf'
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_ftime64)(struct timeb64 *timebuf);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_ftime64)(struct timeb64 *timebuf);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

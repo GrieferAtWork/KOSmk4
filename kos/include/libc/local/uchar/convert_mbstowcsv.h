@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2db86a02 */
+/* HASH CRC-32:0x3c6fc6bd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_mbstowcsvn_defined
 #define __local___localdep_convert_mbstowcsvn_defined
 #ifdef __CRT_HAVE_convert_mbstowcsvn
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_ROS(1, 2),__WCHAR_TYPE__ **,__NOTHROW_NCX,__localdep_convert_mbstowcsvn,(char const *const *__restrict __vector, __SIZE_TYPE__ __count),convert_mbstowcsvn,(__vector,__count))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_INS(1, 2),__WCHAR_TYPE__ **,__NOTHROW_NCX,__localdep_convert_mbstowcsvn,(char const *const *__restrict __vector, __SIZE_TYPE__ __count),convert_mbstowcsvn,(__vector,__count))
 #elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_mbstowcsvn.h>
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(convert_mbstowcsv) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1) __WCHAR_TYPE__ **
+__LOCAL_LIBC(convert_mbstowcsv) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN_OPT(1) __WCHAR_TYPE__ **
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(convert_mbstowcsv))(char const *const *__restrict __vector) {
 	__SIZE_TYPE__ __count = 0;
 	if __unlikely(!__vector) {

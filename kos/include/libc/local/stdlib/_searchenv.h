@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e2e556e */
+/* HASH CRC-32:0x57ab4625 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,12 +28,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(3, 4),__errno_t,__NOTHROW_RPC,__localdep__searchenv_s,(char const *__file, char const *__envvar, char *__restrict __resultpath, __SIZE_TYPE__ __resultpath_len),_searchenv_s,(__file,__envvar,__resultpath,__resultpath_len))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_OUTS(3, 4),__errno_t,__NOTHROW_RPC,__localdep__searchenv_s,(char const *__file, char const *__envvar, char *__restrict __resultpath, __SIZE_TYPE__ __resultpath_len),_searchenv_s,(__file,__envvar,__resultpath,__resultpath_len))
 #endif /* !__local___localdep__searchenv_s_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_searchenv) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3) void
+__LOCAL_LIBC(_searchenv) __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3) void
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_searchenv))(char const *__file, char const *__envvar, char *__restrict __resultpath) {
 	(__NAMESPACE_LOCAL_SYM __localdep__searchenv_s)(__file, __envvar, __resultpath, (__SIZE_TYPE__)-1);
 }

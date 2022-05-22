@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3fa0df2 */
+/* HASH CRC-32:0xe7e0a6b9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ DECL_BEGIN
  * systems, this function is fairly dumb and relies on all traversed
  * code having been compiled with function frames enabled.
  * @return: * : The actual number of pointers written to `array' (always `<= size') */
-INTDEF ATTR_ACCESS_WRS(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array, __STDC_INT_AS_SIZE_T size);
+INTDEF ATTR_OUTS(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array, __STDC_INT_AS_SIZE_T size);
 /* >> backtrace_symbols(3)
  * Return  an  array  of  exactly  `size'  elements  that  contains  the
  * names   associated  with  program-counters  from  the  given  `array'
@@ -56,13 +56,13 @@ INTDEF ATTR_ACCESS_WRS(1, 2) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_back
  * not the individual strings pointed-to by that vector!
  * @return: * :   A heap pointer to a vector of function names
  * @return: NULL: Insufficient heap memory available */
-INTDEF ATTR_ACCESS_ROS(1, 2) char **NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array, __STDC_INT_AS_SIZE_T size);
+INTDEF ATTR_INS(1, 2) char **NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array, __STDC_INT_AS_SIZE_T size);
 /* >> backtrace_symbols_fd(3)
  * Same as `backtrace_symbols()', but rather than return a vector
  * of symbol names, print the  names directly to `fd', such  that
  * one  function name will be written per line, with `size' lines
  * written in total. */
-INTDEF ATTR_ACCESS_ROS(1, 2) void NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd);
+INTDEF ATTR_INS(1, 2) void NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array, __STDC_INT_AS_SIZE_T size, fd_t fd);
 #endif /* !__KERNEL__ */
 
 DECL_END

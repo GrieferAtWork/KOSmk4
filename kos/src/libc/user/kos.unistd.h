@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdbb1e93 */
+/* HASH CRC-32:0x19b04e66 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,21 +34,21 @@ DECL_BEGIN
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTDEF ATTR_NORETURN ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) void (LIBCCALL libc_Execv)(char const *__restrict path, __TARGV) THROWS(...);
+INTDEF ATTR_NORETURN ATTR_IN(1) ATTR_IN(2) void (LIBCCALL libc_Execv)(char const *__restrict path, __TARGV) THROWS(...);
 /* >> execve(2)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTDEF ATTR_NORETURN ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) void (LIBCCALL libc_Execve)(char const *__restrict path, __TARGV, __TENVP) THROWS(...);
+INTDEF ATTR_NORETURN ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) void (LIBCCALL libc_Execve)(char const *__restrict path, __TARGV, __TENVP) THROWS(...);
 /* >> execvp(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTDEF ATTR_NORETURN ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) void (LIBCCALL libc_Execvp)(char const *__restrict file, __TARGV) THROWS(...);
+INTDEF ATTR_NORETURN ATTR_IN(1) ATTR_IN(2) void (LIBCCALL libc_Execvp)(char const *__restrict file, __TARGV) THROWS(...);
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer)
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_ACCESS_WR(1) void (LIBCCALL libc_Pipe)(fd_t pipedes[2]) THROWS(...);
+INTDEF ATTR_OUT(1) void (LIBCCALL libc_Pipe)(fd_t pipedes[2]) THROWS(...);
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
@@ -93,10 +93,10 @@ INTDEF void (LIBCCALL libc_SetGid)(gid_t gid) THROWS(...);
 INTDEF WUNUSED pid_t (LIBCCALL libc_Fork)(void) THROWS(...);
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
-INTDEF ATTR_ACCESS_RO(1) void (LIBCCALL libc_Chown)(char const *file, uid_t owner, gid_t group) THROWS(...);
+INTDEF ATTR_IN(1) void (LIBCCALL libc_Chown)(char const *file, uid_t owner, gid_t group) THROWS(...);
 /* >> link(2)
  * Create a hard link from `from', leading to `to' */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) void (LIBCCALL libc_Link)(char const *from, char const *to) THROWS(...);
+INTDEF ATTR_IN(1) ATTR_IN(2) void (LIBCCALL libc_Link)(char const *from, char const *to) THROWS(...);
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
@@ -104,7 +104,7 @@ INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) void (LIBCCALL libc_Link)(char const 
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
-INTDEF ATTR_ACCESS_WRS(2, 3) size_t (LIBCCALL libc_Read)(fd_t fd, void *buf, size_t bufsize) THROWS(...);
+INTDEF ATTR_OUTS(2, 3) size_t (LIBCCALL libc_Read)(fd_t fd, void *buf, size_t bufsize) THROWS(...);
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
@@ -112,7 +112,7 @@ INTDEF ATTR_ACCESS_WRS(2, 3) size_t (LIBCCALL libc_Read)(fd_t fd, void *buf, siz
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
-INTDEF ATTR_ACCESS_ROS(2, 3) size_t (LIBCCALL libc_Write)(fd_t fd, void const *buf, size_t bufsize) THROWS(...);
+INTDEF ATTR_INS(2, 3) size_t (LIBCCALL libc_Write)(fd_t fd, void const *buf, size_t bufsize) THROWS(...);
 /* >> readall(3)
  * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
@@ -120,7 +120,7 @@ INTDEF ATTR_ACCESS_ROS(2, 3) size_t (LIBCCALL libc_Write)(fd_t fd, void const *b
  * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
-INTDEF ATTR_ACCESS_WRS(2, 3) size_t (LIBCCALL libc_ReadAll)(fd_t fd, void *buf, size_t bufsize) THROWS(...);
+INTDEF ATTR_OUTS(2, 3) size_t (LIBCCALL libc_ReadAll)(fd_t fd, void *buf, size_t bufsize) THROWS(...);
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF pos_t (LIBCCALL libc_LSeek)(fd_t fd, off_t offset, int whence) THROWS(...);
@@ -134,26 +134,26 @@ INTDEF fd_t (LIBCCALL libc_Dup2)(fd_t oldfd, fd_t newfd) THROWS(...);
 INTDEF WUNUSED fd_t (LIBCCALL libc_Dup)(fd_t fd) THROWS(...);
 /* >> chdir(2)
  * Change the current working directory to `path' */
-INTDEF ATTR_ACCESS_RO(1) void (LIBCCALL libc_Chdir)(char const *path) THROWS(...);
+INTDEF ATTR_IN(1) void (LIBCCALL libc_Chdir)(char const *path) THROWS(...);
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
-INTDEF ATTR_ACCESS_WRS(1, 2) char *(LIBCCALL libc_GetCwd)(char *buf, size_t bufsize) THROWS(...);
+INTDEF ATTR_OUTS(1, 2) char *(LIBCCALL libc_GetCwd)(char *buf, size_t bufsize) THROWS(...);
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `file' */
-INTDEF ATTR_ACCESS_RO(1) void (LIBCCALL libc_Unlink)(char const *file) THROWS(...);
+INTDEF ATTR_IN(1) void (LIBCCALL libc_Unlink)(char const *file) THROWS(...);
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-INTDEF ATTR_ACCESS_RO(1) void (LIBCCALL libc_Rmdir)(char const *path) THROWS(...);
+INTDEF ATTR_IN(1) void (LIBCCALL libc_Rmdir)(char const *path) THROWS(...);
 /* >> fchownat(2)
  * Change the ownership of a given `dfd:file' to `group:owner' */
-INTDEF ATTR_ACCESS_RO(2) void (LIBCCALL libc_FChownAt)(fd_t dfd, char const *file, uid_t owner, gid_t group, atflag_t flags) THROWS(...);
+INTDEF ATTR_IN(2) void (LIBCCALL libc_FChownAt)(fd_t dfd, char const *file, uid_t owner, gid_t group, atflag_t flags) THROWS(...);
 /* >> linkat(2)
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(4) void (LIBCCALL libc_LinkAt)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags) THROWS(...);
+INTDEF ATTR_IN(2) ATTR_IN(4) void (LIBCCALL libc_LinkAt)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags) THROWS(...);
 /* >> symlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) void (LIBCCALL libc_SymlinkAt)(char const *link_text, fd_t tofd, char const *target_path) THROWS(...);
+INTDEF ATTR_IN(1) ATTR_IN(3) void (LIBCCALL libc_SymlinkAt)(char const *link_text, fd_t tofd, char const *target_path) THROWS(...);
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * WARNING: This  function is badly designed and will neither append a trailing
@@ -162,46 +162,46 @@ INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(3) void (LIBCCALL libc_SymlinkAt)(char c
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) size_t (LIBCCALL libc_ReadlinkAt)(fd_t dfd, char const *__restrict path, char *__restrict buf, size_t buflen) THROWS(...);
+INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) size_t (LIBCCALL libc_ReadlinkAt)(fd_t dfd, char const *__restrict path, char *__restrict buf, size_t buflen) THROWS(...);
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WRS(3, 4) size_t (LIBCCALL libc_FReadlinkAt)(fd_t dfd, char const *__restrict path, char *__restrict buf, size_t buflen, atflag_t flags) THROWS(...);
+INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) size_t (LIBCCALL libc_FReadlinkAt)(fd_t dfd, char const *__restrict path, char *__restrict buf, size_t buflen, atflag_t flags) THROWS(...);
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
-INTDEF ATTR_ACCESS_RO(2) void (LIBCCALL libc_UnlinkAt)(fd_t dfd, char const *name, atflag_t flags) THROWS(...);
+INTDEF ATTR_IN(2) void (LIBCCALL libc_UnlinkAt)(fd_t dfd, char const *name, atflag_t flags) THROWS(...);
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF pos64_t (LIBCCALL libc_LSeek64)(fd_t fd, off64_t offset, int whence) THROWS(...);
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTDEF ATTR_ACCESS_WRS(2, 3) size_t (LIBCCALL libc_PRead)(fd_t fd, void *buf, size_t bufsize, pos_t offset) THROWS(...);
+INTDEF ATTR_OUTS(2, 3) size_t (LIBCCALL libc_PRead)(fd_t fd, void *buf, size_t bufsize, pos_t offset) THROWS(...);
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTDEF ATTR_ACCESS_ROS(2, 3) size_t (LIBCCALL libc_PWrite)(fd_t fd, void const *buf, size_t bufsize, pos_t offset) THROWS(...);
+INTDEF ATTR_INS(2, 3) size_t (LIBCCALL libc_PWrite)(fd_t fd, void const *buf, size_t bufsize, pos_t offset) THROWS(...);
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF ATTR_ACCESS_WRS(2, 3) size_t (LIBCCALL libc_PReadAll)(fd_t fd, void *buf, size_t bufsize, pos_t offset) THROWS(...);
+INTDEF ATTR_OUTS(2, 3) size_t (LIBCCALL libc_PReadAll)(fd_t fd, void *buf, size_t bufsize, pos_t offset) THROWS(...);
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
-INTDEF ATTR_ACCESS_WRS(2, 3) size_t (LIBCCALL libc_PRead64)(fd_t fd, void *buf, size_t bufsize, pos64_t offset) THROWS(...);
+INTDEF ATTR_OUTS(2, 3) size_t (LIBCCALL libc_PRead64)(fd_t fd, void *buf, size_t bufsize, pos64_t offset) THROWS(...);
 /* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
-INTDEF ATTR_ACCESS_ROS(2, 3) size_t (LIBCCALL libc_PWrite64)(fd_t fd, void const *buf, size_t bufsize, pos64_t offset) THROWS(...);
+INTDEF ATTR_INS(2, 3) size_t (LIBCCALL libc_PWrite64)(fd_t fd, void const *buf, size_t bufsize, pos64_t offset) THROWS(...);
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF ATTR_ACCESS_WRS(2, 3) size_t (LIBCCALL libc_PReadAll64)(fd_t fd, void *buf, size_t bufsize, pos64_t offset) THROWS(...);
+INTDEF ATTR_OUTS(2, 3) size_t (LIBCCALL libc_PReadAll64)(fd_t fd, void *buf, size_t bufsize, pos64_t offset) THROWS(...);
 /* >> pipe2(2)
  * Construct a [reader,writer]-pair of pipes
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer
  * @param: flags:   Set of `O_CLOEXEC | O_CLOFORK | O_NONBLOCK | O_DIRECT'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
-INTDEF ATTR_ACCESS_WR(1) void (LIBCCALL libc_Pipe2)(fd_t pipedes[2], oflag_t flags) THROWS(...);
+INTDEF ATTR_OUT(1) void (LIBCCALL libc_Pipe2)(fd_t pipedes[2], oflag_t flags) THROWS(...);
 INTDEF fd_t (LIBCCALL libc_Dup3)(fd_t oldfd, fd_t newfd, oflag_t flags) THROWS(...);
 /* >> get_current_dir_name(3)
  * Return an malloc(3)'d string  representing the current working  directory
@@ -213,8 +213,8 @@ INTDEF fd_t (LIBCCALL libc_Dup3)(fd_t oldfd, fd_t newfd, oflag_t flags) THROWS(.
  * made thread-safe, so try not to use this one. */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *(LIBCCALL libc_GetCurrentDirName)(void) THROWS(...);
 INTDEF void (LIBCCALL libc_SyncFs)(fd_t fd) THROWS(...);
-INTDEF ATTR_ACCESS_WR_OPT(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(3) void (LIBCCALL libc_GetResUid)(uid_t *ruid, uid_t *euid, uid_t *suid) THROWS(...);
-INTDEF ATTR_ACCESS_WR_OPT(1) ATTR_ACCESS_WR_OPT(2) ATTR_ACCESS_WR_OPT(3) void (LIBCCALL libc_GetResGid)(gid_t *rgid, gid_t *egid, gid_t *sgid) THROWS(...);
+INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) void (LIBCCALL libc_GetResUid)(uid_t *ruid, uid_t *euid, uid_t *suid) THROWS(...);
+INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) void (LIBCCALL libc_GetResGid)(gid_t *rgid, gid_t *egid, gid_t *sgid) THROWS(...);
 INTDEF void (LIBCCALL libc_SetResUid)(uid_t ruid, uid_t euid, uid_t suid) THROWS(...);
 INTDEF void (LIBCCALL libc_SetResGid)(gid_t rgid, gid_t egid, gid_t sgid) THROWS(...);
 /* >> vfork(2)
@@ -263,22 +263,22 @@ INTDEF WUNUSED pid_t (LIBCCALL libc_GetSid)(pid_t pid) THROWS(...);
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
-INTDEF ATTR_ACCESS_RO(1) void (LIBCCALL libc_LChown)(char const *file, uid_t owner, gid_t group) THROWS(...);
+INTDEF ATTR_IN(1) void (LIBCCALL libc_LChown)(char const *file, uid_t owner, gid_t group) THROWS(...);
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-INTDEF ATTR_ACCESS_RO(1) void (LIBCCALL libc_Truncate)(char const *file, pos_t length) THROWS(...);
+INTDEF ATTR_IN(1) void (LIBCCALL libc_Truncate)(char const *file, pos_t length) THROWS(...);
 /* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
-INTDEF ATTR_ACCESS_RO(1) void (LIBCCALL libc_Truncate64)(char const *file, pos64_t length) THROWS(...);
+INTDEF ATTR_IN(1) void (LIBCCALL libc_Truncate64)(char const *file, pos64_t length) THROWS(...);
 /* >> fexecve(2)
  * Replace the calling process with the application image referred
  * to by `execfd'  and execute it's  `main()' method, passing  the
  * given `argv', and setting `environ' to `envp'. */
-INTDEF ATTR_NORETURN ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) void (LIBCCALL libc_FExecve)(fd_t fd, __TARGV, __TENVP) THROWS(...);
+INTDEF ATTR_NORETURN ATTR_IN(2) ATTR_IN(3) void (LIBCCALL libc_FExecve)(fd_t fd, __TARGV, __TENVP) THROWS(...);
 /* >> execvpe(3)
  * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-INTDEF ATTR_NORETURN ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) void (LIBCCALL libc_Execvpe)(char const *__restrict file, __TARGV, __TENVP) THROWS(...);
+INTDEF ATTR_NORETURN ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) void (LIBCCALL libc_Execvpe)(char const *__restrict file, __TARGV, __TENVP) THROWS(...);
 INTDEF int (LIBCCALL libc_Nice)(int inc) THROWS(...);
 /* >> setpgrp(3)
  * Move the calling process into its own process group.
@@ -310,7 +310,7 @@ INTDEF void (LIBCCALL libc_SetEGid)(gid_t egid) THROWS(...);
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) void (LIBCCALL libc_Symlink)(char const *link_text, char const *target_path) THROWS(...);
+INTDEF ATTR_IN(1) ATTR_IN(2) void (LIBCCALL libc_Symlink)(char const *link_text, char const *target_path) THROWS(...);
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
@@ -320,25 +320,25 @@ INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) void (LIBCCALL libc_Symlink)(char con
  *          keep on over allocating until the function indicates that it didn't
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WRS(2, 3) size_t (LIBCCALL libc_Readlink)(char const *__restrict path, char *__restrict buf, size_t buflen) THROWS(...);
+INTDEF ATTR_IN(1) ATTR_OUTS(2, 3) size_t (LIBCCALL libc_Readlink)(char const *__restrict path, char *__restrict buf, size_t buflen) THROWS(...);
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-INTDEF ATTR_ACCESS_WRS(1, 2) void (LIBCCALL libc_GetHostName)(char *name, size_t buflen) THROWS(...);
+INTDEF ATTR_OUTS(1, 2) void (LIBCCALL libc_GetHostName)(char *name, size_t buflen) THROWS(...);
 /* >> sethostname(2)
  * Set the name of the hosting machine */
-INTDEF ATTR_ACCESS_ROS(1, 2) void (LIBCCALL libc_SetHostName)(char const *name, size_t len) THROWS(...);
+INTDEF ATTR_INS(1, 2) void (LIBCCALL libc_SetHostName)(char const *name, size_t len) THROWS(...);
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-INTDEF ATTR_ACCESS_WRS(1, 2) void (LIBCCALL libc_GetDomainName)(char *name, size_t buflen) THROWS(...);
+INTDEF ATTR_OUTS(1, 2) void (LIBCCALL libc_GetDomainName)(char *name, size_t buflen) THROWS(...);
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
-INTDEF ATTR_ACCESS_ROS(1, 2) void (LIBCCALL libc_SetDomainName)(char const *name, size_t len) THROWS(...);
+INTDEF ATTR_INS(1, 2) void (LIBCCALL libc_SetDomainName)(char const *name, size_t len) THROWS(...);
 INTDEF __syscall_slong_t (VLIBCCALL libc_Syscall)(syscall_ulong_t sysno, ...) THROWS(...);
 INTDEF __LONG64_TYPE__ (VLIBCCALL libc_Syscall64)(syscall_ulong_t sysno, ...) THROWS(...);
 /* >> chroot(2)
  * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
-INTDEF ATTR_ACCESS_RO(1) void (LIBCCALL libc_ChRoot)(char const *__restrict path) THROWS(...);
+INTDEF ATTR_IN(1) void (LIBCCALL libc_ChRoot)(char const *__restrict path) THROWS(...);
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
 INTDEF void (LIBCCALL libc_FTruncate)(fd_t fd, pos_t length) THROWS(...);

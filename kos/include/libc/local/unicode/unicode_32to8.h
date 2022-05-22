@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc206dcde */
+/* HASH CRC-32:0x80b2607d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_writeutf8_defined
 #define __local___localdep_unicode_writeutf8_defined
 #ifdef __CRT_HAVE_unicode_writeutf8
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_WR(1),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_OUT(1),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf8 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_writeutf8.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_unicode_writeutf8 __LIBC_LOCAL_NAME(unicode_writeutf8)
 #endif /* !__CRT_HAVE_unicode_writeutf8 */
 #endif /* !__local___localdep_unicode_writeutf8_defined */
-__LOCAL_LIBC(unicode_32to8) __ATTR_RETNONNULL __ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_WR(1) char *
+__LOCAL_LIBC(unicode_32to8) __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_32to8))(char *__restrict __utf8_dst, __CHAR32_TYPE__ const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_characters) {
 	while (__utf32_characters--)
 		__utf8_dst = (__NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8)(__utf8_dst, *__utf32_text++);

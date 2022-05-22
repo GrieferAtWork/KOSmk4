@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6deb0c8e */
+/* HASH CRC-32:0xa53f813e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ether_aton_r_defined
 #define __local___localdep_ether_aton_r_defined
 #ifdef __CRT_HAVE_ether_aton_r
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_aton_r,(char const *__restrict __asc, struct ether_addr *__restrict __addr),ether_aton_r,(__asc,__addr))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_aton_r,(char const *__restrict __asc, struct ether_addr *__restrict __addr),ether_aton_r,(__asc,__addr))
 #else /* __CRT_HAVE_ether_aton_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/netinet.ether/ether_aton_r.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <net/ethernet.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ether_aton) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) struct ether_addr *
+__LOCAL_LIBC(ether_aton) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) struct ether_addr *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_aton))(char const *__restrict __asc) {
 	static struct ether_addr __addr;
 	return (__NAMESPACE_LOCAL_SYM __localdep_ether_aton_r)(__asc, &__addr);

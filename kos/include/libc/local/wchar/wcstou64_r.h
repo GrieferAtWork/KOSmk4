@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8f10746 */
+/* HASH CRC-32:0x56e73cf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcstou64_r) __ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4) __UINT64_TYPE__
+__LOCAL_LIBC(wcstou64_r) __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4) __UINT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou64_r))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
 	__UINT64_TYPE__ __result;
 	__WCHAR_TYPE__ const *__num_start = __nptr;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7dff941f */
+/* HASH CRC-32:0xc64a0514 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pipe2_defined
 #define __local___localdep_pipe2_defined
 #ifdef __CRT_HAVE_pipe2
-__CREDIRECT(__ATTR_ACCESS_WR(1),int,__NOTHROW_NCX,__localdep_pipe2,(__fd_t __pipedes[2], __oflag_t __flags),pipe2,(__pipedes,__flags))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_pipe2,(__fd_t __pipedes[2], __oflag_t __flags),pipe2,(__pipedes,__flags))
 #elif defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE___libc_pipe) || defined(__CRT_HAVE__pipe)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/pipe2.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_pipe2_defined
 #endif /* !... */
 #endif /* !__local___localdep_pipe2_defined */
-__LOCAL_LIBC(_pipe) __ATTR_ACCESS_WR(1) int
+__LOCAL_LIBC(_pipe) __ATTR_OUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_pipe))(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode) {
 	(void)__pipesize;
 	return (__NAMESPACE_LOCAL_SYM __localdep_pipe2)(__pipedes, __textmode);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80e7e2dc */
+/* HASH CRC-32:0xf4920ba3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-__LOCAL_LIBC(wordfree) __ATTR_ACCESS_RW_OPT(1) void
+__LOCAL_LIBC(wordfree) __ATTR_INOUT_OPT(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wordfree))(struct __wordexp_struct *__self) {
 	__SIZE_TYPE__ __i, __end;
 	char **__words;

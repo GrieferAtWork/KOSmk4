@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc22a2b73 */
+/* HASH CRC-32:0xf36ba3c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ DECL_BEGIN
  *                   When `NULL', don't change the locale.
  * @return: * :      The current locale set for `category'
  * @return: NULL:    Error */
-INTDEF ATTR_ACCESS_RO_OPT(2) char *NOTHROW_NCX(LIBDCALL libd_setlocale)(int category, char const *locale);
+INTDEF ATTR_IN_OPT(2) char *NOTHROW_NCX(LIBDCALL libd_setlocale)(int category, char const *locale);
 /* >> newlocale(3)
  * @param: category_mask: Set of `LC_*_MASK' */
 INTDEF locale_t NOTHROW_NCX(LIBDCALL libd_newlocale)(int category_mask, char const *locale, locale_t base);
@@ -68,7 +68,7 @@ INTDEF WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd__W_Getmonths)(void);
 INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBKCALL libc__W_Getmonths)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_RO(4) ATTR_ACCESS_WRS(1, 2) size_t NOTHROW_NCX(LIBDCALL libd__Strftime)(char *buf, size_t bufsize, char const *format, struct tm const *tms, void *lc_time_arg);
+INTDEF ATTR_IN(3) ATTR_IN(4) ATTR_OUTS(1, 2) size_t NOTHROW_NCX(LIBDCALL libd__Strftime)(char *buf, size_t bufsize, char const *format, struct tm const *tms, void *lc_time_arg);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

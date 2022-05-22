@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d269b70 */
+/* HASH CRC-32:0x81ea56b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.system.syslog") ATTR_ACCESS_RO(2) ATTR_LIBC_PRINTF(2, 3) void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.system.syslog") ATTR_IN(2) ATTR_LIBC_PRINTF(2, 3) void
 NOTHROW_RPC(VLIBDCALL libd_syslog)(__STDC_INT_AS_UINT_T level,
                                    char const *format,
                                    ...) {
@@ -41,7 +41,7 @@ NOTHROW_RPC(VLIBDCALL libd_syslog)(__STDC_INT_AS_UINT_T level,
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.system.syslog") ATTR_ACCESS_RO(2) ATTR_LIBC_PRINTF(2, 3) void
+INTERN ATTR_SECTION(".text.crt.system.syslog") ATTR_IN(2) ATTR_LIBC_PRINTF(2, 3) void
 NOTHROW_RPC(VLIBCCALL libc_syslog)(__STDC_INT_AS_UINT_T level,
                                    char const *format,
                                    ...) {
@@ -50,7 +50,7 @@ NOTHROW_RPC(VLIBCCALL libc_syslog)(__STDC_INT_AS_UINT_T level,
 	libc_vsyslog(level, format, args);
 	va_end(args);
 }
-INTERN ATTR_SECTION(".text.crt.system.syslog") ATTR_ACCESS_RO(2) ATTR_LIBC_PRINTF(2, 0) void
+INTERN ATTR_SECTION(".text.crt.system.syslog") ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) void
 NOTHROW_RPC(LIBCCALL libc_vsyslog)(__STDC_INT_AS_UINT_T level,
                                    char const *format,
                                    va_list args) {

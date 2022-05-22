@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7693ac52 */
+/* HASH CRC-32:0x25b577c4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* >> ustat(2) */
-INTDEF ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_ustat)(dev_t dev, struct ustat *ubuf);
+INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_ustat)(dev_t dev, struct ustat *ubuf);
 #endif /* !__KERNEL__ */
 
 DECL_END

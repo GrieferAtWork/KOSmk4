@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30a1a12c */
+/* HASH CRC-32:0x97da632a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,14 +30,14 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(1) errno_t NOTHROW_RPC(LIBDCALL libd__access_s)(char const *filename, __STDC_INT_AS_UINT_T type);
-INTDEF ATTR_ACCESS_RO(1) errno_t NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename, __STDC_INT_AS_UINT_T type);
+INTDEF ATTR_IN(1) errno_t NOTHROW_RPC(LIBDCALL libd__access_s)(char const *filename, __STDC_INT_AS_UINT_T type);
+INTDEF ATTR_IN(1) errno_t NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename, __STDC_INT_AS_UINT_T type);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBDCALL libd__umask_s)(mode_t nmode, mode_t *omode);
+INTDEF ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd__umask_s)(mode_t nmode, mode_t *omode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBCCALL libc__umask_s)(mode_t nmode, mode_t *omode);
+INTDEF ATTR_OUT(2) errno_t NOTHROW_NCX(LIBCCALL libc__umask_s)(mode_t nmode, mode_t *omode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF oflag_t NOTHROW_NCX(LIBDCALL libd__setmode)(fd_t fd, oflag_t mode);
@@ -47,22 +47,22 @@ INTDEF oflag_t NOTHROW_NCX(LIBCCALL libc__setmode)(fd_t fd, oflag_t mode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd__findclose)(intptr_t findfd);
-INTDEF ATTR_ACCESS_WR(2) int NOTHROW_RPC(LIBDCALL libd__findnext32)(intptr_t findfd, struct _finddata32_t *__restrict finddata);
-INTDEF ATTR_ACCESS_WR(2) int NOTHROW_RPC(LIBDCALL libd__findnext32i64)(intptr_t findfd, struct _finddata32i64_t *__restrict finddata);
-INTDEF ATTR_ACCESS_WR(2) int NOTHROW_RPC(LIBDCALL libd__findnext64)(intptr_t findfd, struct __finddata64_t *__restrict finddata);
+INTDEF ATTR_OUT(2) int NOTHROW_RPC(LIBDCALL libd__findnext32)(intptr_t findfd, struct _finddata32_t *__restrict finddata);
+INTDEF ATTR_OUT(2) int NOTHROW_RPC(LIBDCALL libd__findnext32i64)(intptr_t findfd, struct _finddata32i64_t *__restrict finddata);
+INTDEF ATTR_OUT(2) int NOTHROW_RPC(LIBDCALL libd__findnext64)(intptr_t findfd, struct __finddata64_t *__restrict finddata);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBDCALL libd__sopen_s)(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode);
-INTDEF ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) errno_t NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(5) errno_t NOTHROW_RPC(LIBDCALL libd__sopen_dispatch)(char const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(5) errno_t NOTHROW_RPC(LIBCCALL libc__sopen_dispatch)(char const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure);
+INTDEF ATTR_IN(2) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBDCALL libd__sopen_s)(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode);
+INTDEF ATTR_IN(2) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd, char const *filename, oflag_t oflags, int sflags, mode_t mode);
+INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(5) errno_t NOTHROW_RPC(LIBDCALL libd__sopen_dispatch)(char const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure);
+INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(5) errno_t NOTHROW_RPC(LIBCCALL libc__sopen_dispatch)(char const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RWS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__mktemp_s)(char *template_, size_t size);
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd__pipe)(fd_t pipedes[2], uint32_t pipesize, oflag_t textmode);
+INTDEF ATTR_INOUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__mktemp_s)(char *template_, size_t size);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd__pipe)(fd_t pipedes[2], uint32_t pipesize, oflag_t textmode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2], uint32_t pipesize, oflag_t textmode);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2], uint32_t pipesize, oflag_t textmode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED int64_t NOTHROW_NCX(LIBDCALL libd__filelengthi64)(fd_t fd);
@@ -95,8 +95,8 @@ INTDEF WUNUSED fd_t NOTHROW_NCX(LIBDCALL libd__open_osfhandle)(intptr_t osfd, of
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc__open_osfhandle)(intptr_t osfd, oflag_t flags);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(VLIBDCALL libd_sopen)(char const *filename, oflag_t oflags, int sflags, ...);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(VLIBCCALL libc_sopen)(char const *filename, oflag_t oflags, int sflags, ...);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(VLIBDCALL libd_sopen)(char const *filename, oflag_t oflags, int sflags, ...);
+INTDEF WUNUSED ATTR_IN(1) fd_t NOTHROW_RPC(VLIBCCALL libc_sopen)(char const *filename, oflag_t oflags, int sflags, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED __LONG32_TYPE__ NOTHROW_NCX(LIBDCALL libd__filelength)(fd_t fd);

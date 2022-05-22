@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36c05758 */
+/* HASH CRC-32:0xe6423e9e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcschr,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle),wcschr,(__haystack,__needle))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcschr,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle),wcschr,(__haystack,__needle))
 #else /* __CRT_HAVE_wcschr */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcschr.h>
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcschr __LIBC_LOCAL_NAME(wcschr)
 #endif /* !__CRT_HAVE_wcschr */
 #endif /* !__local___localdep_wcschr_defined */
-__LOCAL_LIBC(wcssep) __ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(1) __WCHAR_TYPE__ *
+__LOCAL_LIBC(wcssep) __ATTR_LEAF __ATTR_IN(2) __ATTR_INOUT(1) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcssep))(__WCHAR_TYPE__ **__restrict __stringp, __WCHAR_TYPE__ const *__restrict __delim) {
 	__WCHAR_TYPE__ *__result, *__iter;
 	if ((__result = *__stringp) == __NULLPTR || !*__result)

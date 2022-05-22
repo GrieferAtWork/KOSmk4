@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0ccd435 */
+/* HASH CRC-32:0x38146192 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dyn_string_resize_defined
 #define __local___localdep_dyn_string_resize_defined
 #ifdef __CRT_HAVE_dyn_string_resize
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_RW(1),struct dyn_string *,__NOTHROW_NCX,__localdep_dyn_string_resize,(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars),dyn_string_resize,(__self,__min_chars))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_INOUT(1),struct dyn_string *,__NOTHROW_NCX,__localdep_dyn_string_resize,(struct dyn_string *__self, __STDC_INT_AS_SIZE_T __min_chars),dyn_string_resize,(__self,__min_chars))
 #elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_xrealloc) || defined(__CRT_HAVE_xmalloc_failed))
 __NAMESPACE_LOCAL_END
 #include <libc/local/dyn-string/dyn_string_resize.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyc.h>
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),void *,__NOTHROW_NCX,__localdep_memmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmoveupc,(__dst,__src,__elem_count,__elem_size))
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),void *,__NOTHROW_NCX,__localdep_memmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmoveupc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmoveupc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmoveupc.h>
@@ -69,7 +69,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(dyn_string_insert) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(1) int
+__LOCAL_LIBC(dyn_string_insert) __ATTR_IN(3) __ATTR_INOUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dyn_string_insert))(struct dyn_string *__dst, __STDC_INT_AS_SIZE_T __index, struct dyn_string __KOS_FIXED_CONST *__src) {
 	__hybrid_assert((__SIZE_TYPE__)__index <= __dst->length);
 	__dst = (__NAMESPACE_LOCAL_SYM __localdep_dyn_string_resize)(__dst, __dst->length + __src->length);

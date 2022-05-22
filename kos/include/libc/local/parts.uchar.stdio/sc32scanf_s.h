@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe37cc9cd */
+/* HASH CRC-32:0xbbda9565 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vsc32scanf_s_defined
 #define __local___localdep_vsc32scanf_s_defined
 #if defined(__CRT_HAVE_vswscanf_s) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsc32scanf_s,(__CHAR32_TYPE__ const *__buf, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),vswscanf_s,(__buf,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsc32scanf_s,(__CHAR32_TYPE__ const *__buf, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),vswscanf_s,(__buf,__format,__args))
 #elif defined(__CRT_HAVE_KOS$vswscanf_s)
-__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsc32scanf_s,(__CHAR32_TYPE__ const *__buf, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),vswscanf_s,(__buf,__format,__args))
+__CREDIRECT_KOS(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_C32SCANF(2, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vsc32scanf_s,(__CHAR32_TYPE__ const *__buf, __CHAR32_TYPE__ const *__format, __builtin_va_list __args),vswscanf_s,(__buf,__format,__args))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/corecrt_wstdio/vswscanf_s.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_vsc32scanf_s __LIBC_LOCAL_NAME(vsc32scanf_s)
 #endif /* !... */
 #endif /* !__local___localdep_vsc32scanf_s_defined */
-__LOCAL_LIBC(sc32scanf_s) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_LIBC_C32SCANF(2, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(sc32scanf_s) __ATTR_WUNUSED __ATTR_IN(2) __ATTR_LIBC_C32SCANF(2, 3) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBKCALL __LIBC_LOCAL_NAME(sc32scanf_s))(__CHAR32_TYPE__ const *__buf, __CHAR32_TYPE__ const *__format, ...) {
 	__STDC_INT_AS_SSIZE_T __result;
 	__builtin_va_list __args;

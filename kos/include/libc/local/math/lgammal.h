@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2da6b243 */
+/* HASH CRC-32:0x2cf3adbe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lgammal_r_defined
 #define __local___localdep_lgammal_r_defined
 #if __has_builtin(__builtin_lgammal_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgammal_r)
-__CEIREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WR(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_lgammal_r,(__LONGDOUBLE __x, int *__signgamp),lgammal_r,{ return __builtin_lgammal_r(__x, __signgamp); })
+__CEIREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_lgammal_r,(__LONGDOUBLE __x, int *__signgamp),lgammal_r,{ return __builtin_lgammal_r(__x, __signgamp); })
 #elif defined(__CRT_HAVE_lgammal_r)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WR(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_lgammal_r,(__LONGDOUBLE __x, int *__signgamp),lgammal_r,(__x,__signgamp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_lgammal_r,(__LONGDOUBLE __x, int *__signgamp),lgammal_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgammal_r)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_WR(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_lgammal_r,(__LONGDOUBLE __x, int *__signgamp),__lgammal_r,(__x,__signgamp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_lgammal_r,(__LONGDOUBLE __x, int *__signgamp),__lgammal_r,(__x,__signgamp))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/lgammal_r.h>

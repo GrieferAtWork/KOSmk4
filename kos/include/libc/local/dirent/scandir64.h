@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23fe249b */
+/* HASH CRC-32:0x817d1752 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,18 +29,18 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_scandirat64_defined
 #define __local___localdep_scandirat64_defined
 #if defined(__CRT_HAVE_scandiratk) && defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandiratk,(__dirfd,__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_IN(2) __ATTR_OUT(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandiratk,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandiratk64) && defined(__CRT_KOS)
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandiratk64,(__dirfd,__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_IN(2) __ATTR_OUT(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandiratk64,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirat) && !defined(__CRT_KOS) && defined(_DIRENT_MATCHES_DIRENT64)
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandirat,(__dirfd,__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_IN(2) __ATTR_OUT(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandirat,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirat64) && !defined(__CRT_KOS)
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandirat64,(__dirfd,__dir,__namelist,__selector,__cmp))
+__CREDIRECT(__ATTR_IN(2) __ATTR_OUT(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)),scandirat64,(__dirfd,__dir,__namelist,__selector,__cmp))
 #else /* ... */
 #undef __local___localdep_scandirat64_defined
 #endif /* !... */
 #endif /* !__local___localdep_scandirat64_defined */
-__LOCAL_LIBC(scandir64) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(scandir64) __ATTR_IN(1) __ATTR_OUT(2) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(scandir64))(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, int (__LIBKCALL *__selector)(struct dirent64 const *__entry), int (__LIBKCALL *__cmp)(struct dirent64 const **__a, struct dirent64 const **__b)) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_scandirat64)(__AT_FDCWD, __dir, __namelist, __selector, __cmp);
 }

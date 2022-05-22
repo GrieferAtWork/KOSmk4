@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc01b0cfb */
+/* HASH CRC-32:0x122b9840 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ DECL_BEGIN
  * >> dirname(NULL);              // Returns "."
  * Note  that for this purpose, `path' may be modified in-place, meaning
  * that you should really always pass an strdup()'d, or writable string. */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(LIBDCALL libd_dirname)(char *path);
+INTDEF ATTR_RETNONNULL ATTR_IN_OPT(1) char *NOTHROW_NCX(LIBDCALL libd_dirname)(char *path);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Return the directory, that is everything leading up to, but not
@@ -73,7 +73,7 @@ INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(LIBDCALL libd_dir
  * >> dirname(NULL);              // Returns "."
  * Note  that for this purpose, `path' may be modified in-place, meaning
  * that you should really always pass an strdup()'d, or writable string. */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(LIBCCALL libc_dirname)(char *path);
+INTDEF ATTR_RETNONNULL ATTR_IN_OPT(1) char *NOTHROW_NCX(LIBCCALL libc_dirname)(char *path);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Return the filename-part, that is everything following
@@ -101,7 +101,7 @@ INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(1) char *NOTHROW_NCX(LIBCCALL libc_dir
  * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
  * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RW_OPT(1) char *NOTHROW_NCX(LIBDCALL libd___xpg_basename)(char *filename);
+INTDEF ATTR_RETNONNULL ATTR_INOUT_OPT(1) char *NOTHROW_NCX(LIBDCALL libd___xpg_basename)(char *filename);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Return the filename-part, that is everything following
@@ -129,7 +129,7 @@ INTDEF ATTR_RETNONNULL ATTR_ACCESS_RW_OPT(1) char *NOTHROW_NCX(LIBDCALL libd___x
  * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
  * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RW_OPT(1) char *NOTHROW_NCX(LIBCCALL libc___xpg_basename)(char *filename);
+INTDEF ATTR_RETNONNULL ATTR_INOUT_OPT(1) char *NOTHROW_NCX(LIBCCALL libc___xpg_basename)(char *filename);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> bgets(3)
@@ -148,7 +148,7 @@ INTDEF ATTR_RETNONNULL ATTR_ACCESS_RW_OPT(1) char *NOTHROW_NCX(LIBCCALL libc___x
  * @return: * :   Returns a pointer to the trailing NUL written to `buf'
  *                There is no true error  case; read errors are  treated
  *                the same way as end-of-file. */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RW(3) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIBDCALL libd_bgets)(char *buf, size_t buflen_minus_one, FILE *fp, char __KOS_FIXED_CONST *stop_chars);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(3) ATTR_IN_OPT(4) ATTR_OUT(1) char *NOTHROW_NCX(LIBDCALL libd_bgets)(char *buf, size_t buflen_minus_one, FILE *fp, char __KOS_FIXED_CONST *stop_chars);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> bgets(3)
@@ -167,7 +167,7 @@ INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RW(3) ATTR_ACCESS_WR(1)
  * @return: * :   Returns a pointer to the trailing NUL written to `buf'
  *                There is no true error  case; read errors are  treated
  *                the same way as end-of-file. */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RW(3) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIBCCALL libc_bgets)(char *buf, size_t buflen_minus_one, FILE *fp, char __KOS_FIXED_CONST *stop_chars);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(3) ATTR_IN_OPT(4) ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc_bgets)(char *buf, size_t buflen_minus_one, FILE *fp, char __KOS_FIXED_CONST *stop_chars);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> bufsplit(3)
@@ -190,7 +190,7 @@ INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO_OPT(4) ATTR_ACCESS_RW(3) ATTR_ACCESS_WR(1)
  *              stored in `result_v'. All remaining pointers in `result_v'
  *              beyond `return' (and  before `result_c')  are filled  with
  *              the empty string found at `strend(IN:string)'. */
-INTDEF ATTR_ACCESS_RW_OPT(1) ATTR_ACCESS_WR_OPT(3) size_t NOTHROW_NCX(LIBDCALL libd_bufsplit)(char *string, size_t result_c, char **result_v);
+INTDEF ATTR_INOUT_OPT(1) ATTR_OUT_OPT(3) size_t NOTHROW_NCX(LIBDCALL libd_bufsplit)(char *string, size_t result_c, char **result_v);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> bufsplit(3)
@@ -213,10 +213,10 @@ INTDEF ATTR_ACCESS_RW_OPT(1) ATTR_ACCESS_WR_OPT(3) size_t NOTHROW_NCX(LIBDCALL l
  *              stored in `result_v'. All remaining pointers in `result_v'
  *              beyond `return' (and  before `result_c')  are filled  with
  *              the empty string found at `strend(IN:string)'. */
-INTDEF ATTR_ACCESS_RW_OPT(1) ATTR_ACCESS_WR_OPT(3) size_t NOTHROW_NCX(LIBCCALL libc_bufsplit)(char *string, size_t result_c, char **result_v);
-INTDEF ATTR_ACCESS_WR(2) char *NOTHROW_NCX(LIBCCALL libc_fcopylist_sz)(fd_t fd, size_t *p_filesize);
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *NOTHROW_NCX(LIBDCALL libd_copylist_sz)(char const *filename, size_t *p_filesize);
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *NOTHROW_NCX(LIBCCALL libc_copylist_sz)(char const *filename, size_t *p_filesize);
+INTDEF ATTR_INOUT_OPT(1) ATTR_OUT_OPT(3) size_t NOTHROW_NCX(LIBCCALL libc_bufsplit)(char *string, size_t result_c, char **result_v);
+INTDEF ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_fcopylist_sz)(fd_t fd, size_t *p_filesize);
+INTDEF ATTR_IN(1) ATTR_OUT(2) char *NOTHROW_NCX(LIBDCALL libd_copylist_sz)(char const *filename, size_t *p_filesize);
+INTDEF ATTR_IN(1) ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_copylist_sz)(char const *filename, size_t *p_filesize);
 /* >> copylist(3), copylist64(3)
  * Load a given file `filename' into memory (via `malloc(3)'), and return
  * a  pointer to this newly malloc'd data-blob (the caller is responsible
@@ -253,7 +253,7 @@ INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *NOTHROW_NCX(LIBCCALL libc_copyl
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *NOTHROW_RPC(LIBDCALL libd_copylist)(char const *filename, __PIO_OFFSET *p_filesize);
+INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(2) char *NOTHROW_RPC(LIBDCALL libd_copylist)(char const *filename, __PIO_OFFSET *p_filesize);
 /* >> copylist(3), copylist64(3)
  * Load a given file `filename' into memory (via `malloc(3)'), and return
  * a  pointer to this newly malloc'd data-blob (the caller is responsible
@@ -290,7 +290,7 @@ INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *NOTHROW_RPC(LIBDCALL li
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *NOTHROW_RPC(LIBCCALL libc_copylist)(char const *filename, __PIO_OFFSET *p_filesize);
+INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(2) char *NOTHROW_RPC(LIBCCALL libc_copylist)(char const *filename, __PIO_OFFSET *p_filesize);
 /* >> copylist(3), copylist64(3)
  * Load a given file `filename' into memory (via `malloc(3)'), and return
  * a  pointer to this newly malloc'd data-blob (the caller is responsible
@@ -327,7 +327,7 @@ INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *NOTHROW_RPC(LIBCCALL li
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *NOTHROW_RPC(LIBDCALL libd_copylist64)(char const *filename, __PIO_OFFSET64 *p_filesize);
+INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(2) char *NOTHROW_RPC(LIBDCALL libd_copylist64)(char const *filename, __PIO_OFFSET64 *p_filesize);
 /* >> copylist(3), copylist64(3)
  * Load a given file `filename' into memory (via `malloc(3)'), and return
  * a  pointer to this newly malloc'd data-blob (the caller is responsible
@@ -364,7 +364,7 @@ INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *NOTHROW_RPC(LIBDCALL li
  *      -> copylist64() is identical to copylist() because pos_t is  always
  *         64-bit, meaning that its existence isn't explicitly warranted on
  *         this architecture. */
-INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *NOTHROW_RPC(LIBCCALL libc_copylist64)(char const *filename, __PIO_OFFSET64 *p_filesize);
+INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(2) char *NOTHROW_RPC(LIBCCALL libc_copylist64)(char const *filename, __PIO_OFFSET64 *p_filesize);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strcadd(3)
@@ -372,7 +372,7 @@ INTDEF WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *NOTHROW_RPC(LIBCCALL li
  * To prevent a buffer overflow, `dstbuf' should be at least `strlen(string) + 1'
  * bytes long (the +1 because this function appends a trailing '\0')
  * @return: * : A pointer to the trailing '\0' appended to `dstbuf' */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIBDCALL libd_strcadd)(char *dstbuf, char const *string);
+INTDEF ATTR_RETNONNULL ATTR_IN(2) ATTR_OUT(1) char *NOTHROW_NCX(LIBDCALL libd_strcadd)(char *dstbuf, char const *string);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strcadd(3)
@@ -380,19 +380,19 @@ INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIB
  * To prevent a buffer overflow, `dstbuf' should be at least `strlen(string) + 1'
  * bytes long (the +1 because this function appends a trailing '\0')
  * @return: * : A pointer to the trailing '\0' appended to `dstbuf' */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIBCCALL libc_strcadd)(char *dstbuf, char const *string);
+INTDEF ATTR_RETNONNULL ATTR_IN(2) ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc_strcadd)(char *dstbuf, char const *string);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strccpy(3)
  * Same as `strcadd()', but re-returns `dstbuf' rather than `strend(dstbuf)'
  * @return: dstbuf: Always re-returns `dstbuf' */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIBDCALL libd_strccpy)(char *dstbuf, char const *string);
+INTDEF ATTR_RETNONNULL ATTR_IN(2) ATTR_OUT(1) char *NOTHROW_NCX(LIBDCALL libd_strccpy)(char *dstbuf, char const *string);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strccpy(3)
  * Same as `strcadd()', but re-returns `dstbuf' rather than `strend(dstbuf)'
  * @return: dstbuf: Always re-returns `dstbuf' */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIBCCALL libc_strccpy)(char *dstbuf, char const *string);
+INTDEF ATTR_RETNONNULL ATTR_IN(2) ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc_strccpy)(char *dstbuf, char const *string);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strcadd(3)
@@ -401,7 +401,7 @@ INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIB
  * long (the +1 because this function appends a trailing '\0')
  * When non-NULL, characters from `dont_encode' are not encoded, but instead kept as-is.
  * @return: * : A pointer to the trailing '\0' appended to `dstbuf' */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIBDCALL libd_streadd)(char *dstbuf, char const *string, char const *dont_encode);
+INTDEF ATTR_RETNONNULL ATTR_IN(2) ATTR_IN_OPT(3) ATTR_OUT(1) char *NOTHROW_NCX(LIBDCALL libd_streadd)(char *dstbuf, char const *string, char const *dont_encode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strcadd(3)
@@ -410,47 +410,47 @@ INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_WR(1)
  * long (the +1 because this function appends a trailing '\0')
  * When non-NULL, characters from `dont_encode' are not encoded, but instead kept as-is.
  * @return: * : A pointer to the trailing '\0' appended to `dstbuf' */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIBCCALL libc_streadd)(char *dstbuf, char const *string, char const *dont_encode);
+INTDEF ATTR_RETNONNULL ATTR_IN(2) ATTR_IN_OPT(3) ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc_streadd)(char *dstbuf, char const *string, char const *dont_encode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strecpy(3)
  * Same as `streadd()', but re-returns `dstbuf' rather than `strend(dstbuf)'
  * @return: dstbuf: Always re-returns `dstbuf' */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIBDCALL libd_strecpy)(char *dstbuf, char const *string, char const *dont_encode);
+INTDEF ATTR_RETNONNULL ATTR_IN(2) ATTR_IN_OPT(3) ATTR_OUT(1) char *NOTHROW_NCX(LIBDCALL libd_strecpy)(char *dstbuf, char const *string, char const *dont_encode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strecpy(3)
  * Same as `streadd()', but re-returns `dstbuf' rather than `strend(dstbuf)'
  * @return: dstbuf: Always re-returns `dstbuf' */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(2) ATTR_ACCESS_RO_OPT(3) ATTR_ACCESS_WR(1) char *NOTHROW_NCX(LIBCCALL libc_strecpy)(char *dstbuf, char const *string, char const *dont_encode);
+INTDEF ATTR_RETNONNULL ATTR_IN(2) ATTR_IN_OPT(3) ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc_strecpy)(char *dstbuf, char const *string, char const *dont_encode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strfind(3)
  * Same as `p = strstr(haystack, needle); p ? p - haystack : -1'
  * @return: * : `needle' found at `haystack + return'
  * @return: -1: `needle' not found in `haystack' */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_strfind)(char const *haystack, char const *needle);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_strfind)(char const *haystack, char const *needle);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strfind(3)
  * Same as `p = strstr(haystack, needle); p ? p - haystack : -1'
  * @return: * : `needle' found at `haystack + return'
  * @return: -1: `needle' not found in `haystack' */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_strfind)(char const *haystack, char const *needle);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_strfind)(char const *haystack, char const *needle);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strrspn(3)
  * Scanning from the right, return a pointer to last character in  `haystack'
  * for which `strchr(accept, ch) != NULL'. If `haystack' consists entirely of
  * characters from `accept', re-returns `haystack'. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) char *NOTHROW_NCX(LIBDCALL libd_strrspn)(char const *haystack, char const *accept);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBDCALL libd_strrspn)(char const *haystack, char const *accept);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strrspn(3)
  * Scanning from the right, return a pointer to last character in  `haystack'
  * for which `strchr(accept, ch) != NULL'. If `haystack' consists entirely of
  * characters from `accept', re-returns `haystack'. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) char *NOTHROW_NCX(LIBCCALL libc_strrspn)(char const *haystack, char const *accept);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBCCALL libc_strrspn)(char const *haystack, char const *accept);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strtrns(3)
@@ -461,7 +461,7 @@ INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) cha
  * of `repl_map' can be accessed,  and that the `result'  buffer
  * has space for at least `strlen(string) + 1' characters.
  * @return: result: Always re-returns `result' */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(4) char *NOTHROW_NCX(LIBDCALL libd_strtrns)(char const *string, char const *find_map, char const *repl_map, char *result);
+INTDEF ATTR_RETNONNULL ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) ATTR_OUT(4) char *NOTHROW_NCX(LIBDCALL libd_strtrns)(char const *string, char const *find_map, char const *repl_map, char *result);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strtrns(3)
@@ -472,7 +472,7 @@ INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATT
  * of `repl_map' can be accessed,  and that the `result'  buffer
  * has space for at least `strlen(string) + 1' characters.
  * @return: result: Always re-returns `result' */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(4) char *NOTHROW_NCX(LIBCCALL libc_strtrns)(char const *string, char const *find_map, char const *repl_map, char *result);
+INTDEF ATTR_RETNONNULL ATTR_IN(1) ATTR_IN(2) ATTR_IN(3) ATTR_OUT(4) char *NOTHROW_NCX(LIBCCALL libc_strtrns)(char const *string, char const *find_map, char const *repl_map, char *result);
 #endif /* !__KERNEL__ */
 
 DECL_END

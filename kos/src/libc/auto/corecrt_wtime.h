@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5341ac30 */
+/* HASH CRC-32:0x2dc58287 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,26 +30,26 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RO(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wasctime)(struct tm const *tp);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wasctime)(struct tm const *tp);
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wasctime_s)(char16_t *buf, size_t buflen, struct tm const *tp);
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wasctime_s)(char32_t *buf, size_t buflen, struct tm const *tp);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wctime32)(time32_t const *timer);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wctime32)(time32_t const *timer);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wctime64)(time64_t const *timer);
-INTDEF WUNUSED ATTR_ACCESS_RO(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wctime64)(time64_t const *timer);
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wctime32_s)(char16_t *buf, size_t buflen, time32_t const *timer);
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wctime32_s)(char32_t *buf, size_t buflen, time32_t const *timer);
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wctime64_s)(char16_t *buf, size_t buflen, time64_t const *timer);
-INTDEF ATTR_ACCESS_RO(3) ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wctime64_s)(char32_t *buf, size_t buflen, time64_t const *timer);
-INTDEF ATTR_ACCESS_WR(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wstrtime)(char16_t buf[9]);
-INTDEF ATTR_ACCESS_WR(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wstrtime)(char32_t buf[9]);
-INTDEF ATTR_ACCESS_WR(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wstrdate)(char16_t buf[9]);
-INTDEF ATTR_ACCESS_WR(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wstrdate)(char32_t buf[9]);
-INTDEF ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wstrtime_s)(char16_t *buf, size_t buflen);
-INTDEF ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wstrtime_s)(char32_t *buf, size_t buflen);
-INTDEF ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wstrdate_s)(char16_t *buf, size_t buflen);
-INTDEF ATTR_ACCESS_WRS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wstrdate_s)(char32_t *buf, size_t buflen);
+INTDEF WUNUSED ATTR_IN(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wasctime)(struct tm const *tp);
+INTDEF WUNUSED ATTR_IN(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wasctime)(struct tm const *tp);
+INTDEF ATTR_IN(3) ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wasctime_s)(char16_t *buf, size_t buflen, struct tm const *tp);
+INTDEF ATTR_IN(3) ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wasctime_s)(char32_t *buf, size_t buflen, struct tm const *tp);
+INTDEF WUNUSED ATTR_IN(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wctime32)(time32_t const *timer);
+INTDEF WUNUSED ATTR_IN(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wctime32)(time32_t const *timer);
+INTDEF WUNUSED ATTR_IN(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wctime64)(time64_t const *timer);
+INTDEF WUNUSED ATTR_IN(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wctime64)(time64_t const *timer);
+INTDEF ATTR_IN(3) ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wctime32_s)(char16_t *buf, size_t buflen, time32_t const *timer);
+INTDEF ATTR_IN(3) ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wctime32_s)(char32_t *buf, size_t buflen, time32_t const *timer);
+INTDEF ATTR_IN(3) ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wctime64_s)(char16_t *buf, size_t buflen, time64_t const *timer);
+INTDEF ATTR_IN(3) ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wctime64_s)(char32_t *buf, size_t buflen, time64_t const *timer);
+INTDEF ATTR_OUT(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wstrtime)(char16_t buf[9]);
+INTDEF ATTR_OUT(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wstrtime)(char32_t buf[9]);
+INTDEF ATTR_OUT(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wstrdate)(char16_t buf[9]);
+INTDEF ATTR_OUT(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wstrdate)(char32_t buf[9]);
+INTDEF ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wstrtime_s)(char16_t *buf, size_t buflen);
+INTDEF ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wstrtime_s)(char32_t *buf, size_t buflen);
+INTDEF ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wstrdate_s)(char16_t *buf, size_t buflen);
+INTDEF ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wstrdate_s)(char32_t *buf, size_t buflen);
 #endif /* !__KERNEL__ */
 
 DECL_END

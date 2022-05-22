@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x595f7f5b */
+/* HASH CRC-32:0xeac6fe9c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,12 +27,12 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_OpenAt32_defined
 #define __local___localdep_OpenAt32_defined
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2),__fd_t,__THROWING,__localdep_OpenAt32,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(2),__fd_t,__THROWING,__localdep_OpenAt32,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #endif /* !__local___localdep_OpenAt32_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/oflags.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(OpenAt64) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __fd_t
+__LOCAL_LIBC(OpenAt64) __ATTR_WUNUSED __ATTR_IN(2) __fd_t
 (__VLIBCCALL __LIBC_LOCAL_NAME(OpenAt64))(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) __THROWS(...) {
 	__fd_t __result;
 	__builtin_va_list __args;

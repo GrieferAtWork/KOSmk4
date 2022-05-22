@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e3f8cd9 */
+/* HASH CRC-32:0x3998de4e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strstr_defined
 #define __local___localdep_strstr_defined
 #if __has_builtin(__builtin_strstr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strstr)
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_NCX,__localdep_strstr,(char const *__haystack, char const *__needle),strstr,{ return __builtin_strstr(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),char *,__NOTHROW_NCX,__localdep_strstr,(char const *__haystack, char const *__needle),strstr,{ return __builtin_strstr(__haystack, __needle); })
 #elif defined(__CRT_HAVE_strstr)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),char *,__NOTHROW_NCX,__localdep_strstr,(char const *__haystack, char const *__needle),strstr,(__haystack,__needle))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),char *,__NOTHROW_NCX,__localdep_strstr,(char const *__haystack, char const *__needle),strstr,(__haystack,__needle))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strstr.h>
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strstr __LIBC_LOCAL_NAME(strstr)
 #endif /* !... */
 #endif /* !__local___localdep_strstr_defined */
-__LOCAL_LIBC(strfind) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __STDC_INT_AS_SSIZE_T
+__LOCAL_LIBC(strfind) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strfind))(char const *__haystack, char const *__needle) {
 	char const *__ptr = (__NAMESPACE_LOCAL_SYM __localdep_strstr)(__haystack, __needle);
 	return __ptr ? (__STDC_INT_AS_SSIZE_T)(__ptr - __haystack) : -1;

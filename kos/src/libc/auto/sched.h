@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x520fcc70 */
+/* HASH CRC-32:0x7c0f1268 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,16 +69,16 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_setns)(fd_t fd, __STDC_INT_AS_UINT_T nstype
  * calling this function has the same effect as returning `EXIT_CODE'
  * from `clone()'s `FN' callback */
 INTDEF ATTR_NORETURN void NOTHROW_NCX(LIBDCALL libd_exit_thread)(int exit_code);
-INTDEF ATTR_ACCESS_RO(2) int NOTHROW_NCX(LIBDCALL libd_sched_setparam)(pid_t pid, struct sched_param const *param);
-INTDEF ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBDCALL libd_sched_getparam)(pid_t pid, struct sched_param *param);
-INTDEF ATTR_ACCESS_RO(3) int NOTHROW_NCX(LIBDCALL libd_sched_setscheduler)(pid_t pid, int policy, struct sched_param const *param);
+INTDEF ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_sched_setparam)(pid_t pid, struct sched_param const *param);
+INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_sched_getparam)(pid_t pid, struct sched_param *param);
+INTDEF ATTR_IN(3) int NOTHROW_NCX(LIBDCALL libd_sched_setscheduler)(pid_t pid, int policy, struct sched_param const *param);
 INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_sched_getscheduler)(pid_t pid);
 INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_sched_get_priority_max)(__STDC_INT_AS_UINT_T algorithm);
 INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_sched_get_priority_min)(__STDC_INT_AS_UINT_T algorithm);
-INTDEF ATTR_ACCESS_RO_OPT(3) int NOTHROW_NCX(LIBDCALL libd_sched_setaffinity)(pid_t pid, size_t cpusetsize, cpu_set_t const *cpuset);
-INTDEF ATTR_ACCESS_WR_OPT(3) int NOTHROW_NCX(LIBDCALL libd_sched_getaffinity)(pid_t pid, size_t cpusetsize, cpu_set_t *cpuset);
-INTDEF ATTR_ACCESS_WR_OPT(2) int NOTHROW_NCX(LIBDCALL libd_sched_rr_get_interval)(pid_t pid, struct timespec *tms);
-INTDEF ATTR_ACCESS_WR_OPT(2) int NOTHROW_NCX(LIBDCALL libd_sched_rr_get_interval64)(pid_t pid, struct timespec64 *tms);
+INTDEF ATTR_IN_OPT(3) int NOTHROW_NCX(LIBDCALL libd_sched_setaffinity)(pid_t pid, size_t cpusetsize, cpu_set_t const *cpuset);
+INTDEF ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBDCALL libd_sched_getaffinity)(pid_t pid, size_t cpusetsize, cpu_set_t *cpuset);
+INTDEF ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBDCALL libd_sched_rr_get_interval)(pid_t pid, struct timespec *tms);
+INTDEF ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBDCALL libd_sched_rr_get_interval64)(pid_t pid, struct timespec64 *tms);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

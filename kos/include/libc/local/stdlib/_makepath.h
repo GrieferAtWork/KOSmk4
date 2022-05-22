@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b03e4d6 */
+/* HASH CRC-32:0xee18fcd5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_RO_OPT(6) __ATTR_ACCESS_WRS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__makepath_s,(char *__buf, __SIZE_TYPE__ __buflen, char const *__drive, char const *__dir, char const *__file, char const *__ext),_makepath_s,(__buf,__buflen,__drive,__dir,__file,__ext))
+__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_IN_OPT(4) __ATTR_IN_OPT(5) __ATTR_IN_OPT(6) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,__localdep__makepath_s,(char *__buf, __SIZE_TYPE__ __buflen, char const *__drive, char const *__dir, char const *__file, char const *__ext),_makepath_s,(__buf,__buflen,__drive,__dir,__file,__ext))
 #else /* __CRT_HAVE__makepath_s */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/_makepath_s.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_makepath) __ATTR_ACCESS_RO_OPT(2) __ATTR_ACCESS_RO_OPT(3) __ATTR_ACCESS_RO_OPT(4) __ATTR_ACCESS_RO_OPT(5) __ATTR_ACCESS_WR(1) void
+__LOCAL_LIBC(_makepath) __ATTR_IN_OPT(2) __ATTR_IN_OPT(3) __ATTR_IN_OPT(4) __ATTR_IN_OPT(5) __ATTR_OUT(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath))(char *__restrict __buf, char const *__drive, char const *__dir, char const *__file, char const *__ext) {
 	(__NAMESPACE_LOCAL_SYM __localdep__makepath_s)(__buf, (__SIZE_TYPE__)-1, __drive, __dir, __file, __ext);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4292828 */
+/* HASH CRC-32:0x3080782d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_convert_wcstombs_defined
 #define __local___localdep_convert_wcstombs_defined
 #ifdef __CRT_HAVE_convert_wcstombs
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -54,16 +54,16 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_popen_defined
 #define __local___localdep_popen_defined
 #ifdef __CRT_HAVE_popen
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(1),__FILE *,__NOTHROW_RPC,__localdep_popen,(char const *__command, char const *__modes),popen,(__command,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_IN_OPT(1),__FILE *,__NOTHROW_RPC,__localdep_popen,(char const *__command, char const *__modes),popen,(__command,__modes))
 #elif defined(__CRT_HAVE__popen)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(1),__FILE *,__NOTHROW_RPC,__localdep_popen,(char const *__command, char const *__modes),_popen,(__command,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_IN_OPT(1),__FILE *,__NOTHROW_RPC,__localdep_popen,(char const *__command, char const *__modes),_popen,(__command,__modes))
 #elif defined(__CRT_HAVE__IO_popen)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(1),__FILE *,__NOTHROW_RPC,__localdep_popen,(char const *__command, char const *__modes),_IO_popen,(__command,__modes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_IN_OPT(1),__FILE *,__NOTHROW_RPC,__localdep_popen,(char const *__command, char const *__modes),_IO_popen,(__command,__modes))
 #else /* ... */
 #undef __local___localdep_popen_defined
 #endif /* !... */
 #endif /* !__local___localdep_popen_defined */
-__LOCAL_LIBC(wpopen) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) __FILE *
+__LOCAL_LIBC(wpopen) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __FILE *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wpopen))(__WCHAR_TYPE__ const *__command, __WCHAR_TYPE__ const *__mode) {
 	__FILE *__result = __NULLPTR;
 	/*utf-8*/ char *__utf8_command;

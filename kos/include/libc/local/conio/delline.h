@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb260f1c3 */
+/* HASH CRC-32:0xedbdefdd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__cputs_defined
 #define __local___localdep__cputs_defined
 #ifdef __CRT_HAVE__cputs
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep__cputs,(char const *__restrict __str),_cputs,(__str))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_NCX,__localdep__cputs,(char const *__restrict __str),_cputs,(__str))
 #elif (defined(__CRT_HAVE__putch_nolock) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE__putch) || (defined(__CRT_HAVE_stdtty) && (defined(__CRT_HAVE_putc) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_putc_unlocked) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE__putc_nolock) || defined(__CRT_HAVE__fputc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/conio/_cputs.h>

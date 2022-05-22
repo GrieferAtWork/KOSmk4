@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe6a2e0d */
+/* HASH CRC-32:0x6c3312fc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,19 +55,19 @@ INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBDCALL libd_munlock)(void const *ad
  * @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_mlockall)(__STDC_INT_AS_UINT_T flags);
 /* >> shm_open(3) */
-INTDEF ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(LIBDCALL libd_shm_open)(char const *name, oflag_t oflags, mode_t mode);
+INTDEF ATTR_IN(1) fd_t NOTHROW_RPC(LIBDCALL libd_shm_open)(char const *name, oflag_t oflags, mode_t mode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> shm_open(3) */
-INTDEF ATTR_ACCESS_RO(1) fd_t NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name, oflag_t oflags, mode_t mode);
+INTDEF ATTR_IN(1) fd_t NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name, oflag_t oflags, mode_t mode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> shm_unlink(3) */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_shm_unlink)(char const *name);
+INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBDCALL libd_shm_unlink)(char const *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> shm_unlink(3) */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name);
+INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBDCALL libd_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
@@ -154,7 +154,7 @@ INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBDCALL libd_pkey_mprotect)(void *ad
  * @return: -1: [errno=ENOMEM] Out of memory
  * @return: -1: [errno=EBADF]  Invalid `fd'
  * @return: -1: [errno=*]      Read error */
-INTDEF WUNUSED ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
+INTDEF WUNUSED ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fmapfile(3)
@@ -193,39 +193,39 @@ INTDEF WUNUSED ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct 
  * @return: -1: [errno=ENOMEM] Out of memory
  * @return: -1: [errno=EBADF]  Invalid `fd'
  * @return: -1: [errno=*]      Read error */
-INTDEF WUNUSED ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
+INTDEF WUNUSED ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
-INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_fmapfileat)(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes, atflag_t atflags);
+INTDEF WUNUSED ATTR_IN(3) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fmapfileat)(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes, atflag_t atflags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
-INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_fmapfileat)(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes, atflag_t atflags);
+INTDEF WUNUSED ATTR_IN(3) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fmapfileat)(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes, atflag_t atflags);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mapfile(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_mapfile)(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
+INTDEF WUNUSED ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_mapfile)(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> mapfile(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)' */
-INTDEF WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBCCALL libc_mapfile)(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
+INTDEF WUNUSED ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_mapfile)(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unmapfile(3)
  * Delete a file mapping previously created by `mapfile(3)' */
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd_unmapfile)(struct mapfile *__restrict mapping);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_unmapfile)(struct mapfile *__restrict mapping);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> unmapfile(3)
  * Delete a file mapping previously created by `mapfile(3)' */
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBCCALL libc_unmapfile)(struct mapfile *__restrict mapping);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_unmapfile)(struct mapfile *__restrict mapping);
 #endif /* !__KERNEL__ */
 
 DECL_END

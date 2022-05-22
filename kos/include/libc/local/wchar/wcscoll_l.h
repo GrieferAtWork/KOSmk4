@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa405c65 */
+/* HASH CRC-32:0xf74cc68d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcscoll_defined
 #define __local___localdep_wcscoll_defined
 #ifdef __CRT_HAVE_wcscoll
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,__localdep_wcscoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscoll,(__s1,__s2))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_wcscoll,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscoll,(__s1,__s2))
 #else /* __CRT_HAVE_wcscoll */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcscoll.h>
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcscoll __LIBC_LOCAL_NAME(wcscoll)
 #endif /* !__CRT_HAVE_wcscoll */
 #endif /* !__local___localdep_wcscoll_defined */
-__LOCAL_LIBC(wcscoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
+__LOCAL_LIBC(wcscoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscoll_l))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __locale_t __locale) {
 	/* XXX: Implement properly? */
 	(void)__locale;

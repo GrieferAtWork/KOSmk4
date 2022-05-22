@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83ad4d63 */
+/* HASH CRC-32:0x7b539cc7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ DECL_BEGIN
  *               be used as temporary storage by the implemenation
  *               The  contents  of this  array are  undefined upon
  *               return of this function. */
-INTDEF ATTR_ACCESS_RWS(2, 1) ATTR_ACCESS_WRS(3, 1) void NOTHROW_NCX(LIBDCALL libd_sort_pointers)(size_t count, void **sortme, void **work);
+INTDEF ATTR_INOUTS(2, 1) ATTR_OUTS(3, 1) void NOTHROW_NCX(LIBDCALL libd_sort_pointers)(size_t count, void **sortme, void **work);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sort_pointers(3)
@@ -45,7 +45,7 @@ INTDEF ATTR_ACCESS_RWS(2, 1) ATTR_ACCESS_WRS(3, 1) void NOTHROW_NCX(LIBDCALL lib
  *               be used as temporary storage by the implemenation
  *               The  contents  of this  array are  undefined upon
  *               return of this function. */
-INTDEF ATTR_ACCESS_RWS(2, 1) ATTR_ACCESS_WRS(3, 1) void NOTHROW_NCX(LIBCCALL libc_sort_pointers)(size_t count, void **sortme, void **work);
+INTDEF ATTR_INOUTS(2, 1) ATTR_OUTS(3, 1) void NOTHROW_NCX(LIBCCALL libc_sort_pointers)(size_t count, void **sortme, void **work);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91e53964 */
+/* HASH CRC-32:0x3211df6f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,7 +143,7 @@ __DECL_BEGIN
  * If digit characters which equate to values greater than 16 should be
  * supported, then `unicode_getnumeric(64|dbl|ldbl)' should be used! */
 #ifdef __INTELLISENSE__
-__ATTR_WUNUSED __ATTR_ACCESS_WR(3) __BOOL
+__ATTR_WUNUSED __ATTR_OUT(3) __BOOL
 __NOTHROW_NCX(__libc_unicode_asdigit)(__CHAR32_TYPE__ ch, __UINT8_TYPE__ radix,
                                       __UINT8_TYPE__ * __restrict presult);
 #else /* __INTELLISENSE__ */
@@ -278,7 +278,7 @@ __DECL_END
  * If digit characters which equate to values greater than 16 should be
  * supported, then `unicode_getnumeric(64|dbl|ldbl)' should be used! */
 #ifdef __INTELLISENSE__
-__ATTR_WUNUSED __ATTR_ACCESS_WR(3) __BOOL
+__ATTR_WUNUSED __ATTR_OUT(3) __BOOL
 __NOTHROW_NCX(__libc_unicode_asdigit)(__CHAR32_TYPE__ ch, __UINT8_TYPE__ radix,
                                       __UINT8_TYPE__ *__restrict presult);
 #else /* __INTELLISENSE__ */

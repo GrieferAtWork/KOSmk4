@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d6accc7 */
+/* HASH CRC-32:0xc3baa7e8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-__LOCAL_LIBC(_objalloc_alloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ALLOC_SIZE((2)) void *
+__LOCAL_LIBC(_objalloc_alloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_INOUT(1) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_objalloc_alloc))(struct objalloc *__self, __ULONGPTR_TYPE__ __num_bytes) {
 	struct __objalloc_chunk *__newchunk;
 	__SIZE_TYPE__ __size = (__SIZE_TYPE__)__num_bytes;

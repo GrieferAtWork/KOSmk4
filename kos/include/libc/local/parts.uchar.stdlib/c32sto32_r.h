@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea83c063 */
+/* HASH CRC-32:0x5fd12b8c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,7 +71,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__overflow.h>
 #include <hybrid/limitcore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c32sto32_r) __ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4) __INT32_TYPE__
+__LOCAL_LIBC(c32sto32_r) __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4) __INT32_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32sto32_r))(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
 	__INT32_TYPE__ __result;
 	__CHAR32_TYPE__ __sign;

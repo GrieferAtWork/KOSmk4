@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83d7095d */
+/* HASH CRC-32:0x708a722b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_twalk_r_defined
 #define __local___localdep_twalk_r_defined
 #ifdef __CRT_HAVE_twalk_r
-__CREDIRECT_VOID(__ATTR_ACCESS_RO_OPT(1),__THROWING,__localdep_twalk_r,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level, void *__arg), void *__arg),twalk_r,(__root,__action,__arg))
+__CREDIRECT_VOID(__ATTR_IN_OPT(1),__THROWING,__localdep_twalk_r,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level, void *__arg), void *__arg),twalk_r,(__root,__action,__arg))
 #else /* __CRT_HAVE_twalk_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/twalk_r.h>
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !____invoke_twalk_action_helper_defined */
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(twalk) __ATTR_ACCESS_RO_OPT(1) void
+__LOCAL_LIBC(twalk) __ATTR_IN_OPT(1) void
 (__LIBCCALL __LIBC_LOCAL_NAME(twalk))(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level)) __THROWS(...) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	(__NAMESPACE_LOCAL_SYM __localdep_twalk_r)(__root, (void (__LIBCCALL *)(void const *, VISIT, int, void *))(void *)__action, __NULLPTR);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x613d6f8c */
+/* HASH CRC-32:0x80bb9d53 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,12 +31,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_c16mkdir,(__CHAR16_TYPE__ const *__pathname, __mode_t __mode),wmkdir,(__pathname,__mode))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_c16mkdir,(__CHAR16_TYPE__ const *__pathname, __mode_t __mode),wmkdir,(__pathname,__mode))
 #elif defined(__CRT_HAVE_DOS$wmkdir)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,__localdep_c16mkdir,(__CHAR16_TYPE__ const *__pathname, __mode_t __mode),wmkdir,(__pathname,__mode))
+__CREDIRECT_DOS(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_c16mkdir,(__CHAR16_TYPE__ const *__pathname, __mode_t __mode),wmkdir,(__pathname,__mode))
 #elif (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__wmkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wmkdirat) || defined(__CRT_HAVE_wfmkdirat) || (defined(__CRT_HAVE_fmkdirat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || ((defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 2)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.sys.stat/wmkdir.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_c16mkdir_defined
 #endif /* !... */
 #endif /* !__local___localdep_c16mkdir_defined */
-__LOCAL_LIBC(_c16mkdir) __ATTR_ACCESS_RO(1) int
+__LOCAL_LIBC(_c16mkdir) __ATTR_IN(1) int
 __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(_c16mkdir))(__CHAR16_TYPE__ const *__path) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_c16mkdir)(__path, 0755);
 }

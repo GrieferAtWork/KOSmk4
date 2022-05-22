@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99a54210 */
+/* HASH CRC-32:0x9878e4a7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,12 +29,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ __bufsize),getcwd,(__buf,__bufsize))
+__CREDIRECT(__ATTR_OUT_OPT(1),char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ __bufsize),getcwd,(__buf,__bufsize))
 #elif defined(__CRT_HAVE__getcwd)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(1),char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ __bufsize),_getcwd,(__buf,__bufsize))
+__CREDIRECT(__ATTR_OUT_OPT(1),char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ __bufsize),_getcwd,(__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_getcwd_defined
 #endif /* !... */
@@ -42,7 +42,7 @@ __CREDIRECT(__ATTR_ACCESS_WR_OPT(1),char *,__NOTHROW_RPC,__localdep_getcwd,(char
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getwd) __ATTR_ACCESS_WR(1) __ATTR_DEPRECATED("Use getcwd()") char *
+__LOCAL_LIBC(getwd) __ATTR_DEPRECATED("Use getcwd()") __ATTR_OUT(1) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getwd))(char *__buf) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_getcwd)(__buf, (__SIZE_TYPE__)-1);
 }

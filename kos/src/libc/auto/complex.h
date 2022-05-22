@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0cd4a4c */
+/* HASH CRC-32:0xd3be29f6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,11 +31,11 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* calculate cosh and sinh */
-INTDEF ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void NOTHROW_NCX(LIBCCALL libc__cchshf)(float x, float *c, float *s);
+INTDEF ATTR_OUT(2) ATTR_OUT(3) void NOTHROW_NCX(LIBCCALL libc__cchshf)(float x, float *c, float *s);
 /* calculate cosh and sinh */
-INTDEF ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void NOTHROW_NCX(LIBCCALL libc__cchshl)(__LONGDOUBLE x, __LONGDOUBLE *c, __LONGDOUBLE *s);
+INTDEF ATTR_OUT(2) ATTR_OUT(3) void NOTHROW_NCX(LIBCCALL libc__cchshl)(__LONGDOUBLE x, __LONGDOUBLE *c, __LONGDOUBLE *s);
 /* calculate cosh and sinh */
-INTDEF ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) void NOTHROW_NCX(LIBCCALL libc__cchsh)(double x, double *c, double *s);
+INTDEF ATTR_OUT(2) ATTR_OUT(3) void NOTHROW_NCX(LIBCCALL libc__cchsh)(double x, double *c, double *s);
 INTDEF ATTR_CONST WUNUSED float NOTHROW_NCX(LIBCCALL libc__redupif)(float x);
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc__redupil)(__LONGDOUBLE x);
 INTDEF ATTR_CONST WUNUSED double NOTHROW_NCX(LIBCCALL libc__redupi)(double x);

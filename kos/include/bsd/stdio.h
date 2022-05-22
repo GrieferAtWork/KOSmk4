@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23b0220f */
+/* HASH CRC-32:0x560e317d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __SYSDECL_BEGIN
  * instead. This function is meant to  be used to validate user-provided  printf
  * format strings before actually using them, after they've been read from  lang
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(1) __ATTR_FORMAT_ARG(2),char const *,__NOTHROW_NCX,fmtcheck,(char const *__user_format, char const *__good_format),(__user_format,__good_format))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_IN_OPT(1) __ATTR_FORMAT_ARG(2),char const *,__NOTHROW_NCX,fmtcheck,(char const *__user_format, char const *__good_format),(__user_format,__good_format))
 #else /* __CRT_HAVE_fmtcheck */
 #include <libc/local/stdio/fmtcheck.h>
 /* >> fmtcheck(3)
@@ -62,7 +62,7 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO
  * instead. This function is meant to  be used to validate user-provided  printf
  * format strings before actually using them, after they've been read from  lang
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fmtcheck, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO_OPT(1) __ATTR_FORMAT_ARG(2) char const *__NOTHROW_NCX(__LIBCCALL fmtcheck)(char const *__user_format, char const *__good_format) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmtcheck))(__user_format, __good_format); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmtcheck, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_IN_OPT(1) __ATTR_FORMAT_ARG(2) char const *__NOTHROW_NCX(__LIBCCALL fmtcheck)(char const *__user_format, char const *__good_format) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmtcheck))(__user_format, __good_format); })
 #endif /* !__CRT_HAVE_fmtcheck */
 #endif /* !__fmtcheck_defined */
 #if !defined(__fgetln_defined) && defined(__CRT_HAVE_fgetln)
@@ -82,7 +82,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fmtcheck, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  *                of this function, and documentation states that it may also
  *                be invalidated during any  other I/O operation relating  to
  *                `stream', tough this isn't the case under KOS. */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RW(1) __ATTR_ACCESS_WR_OPT(2),char *,__NOTHROW_NCX,fgetln,(__FILE *__restrict __stream, __SIZE_TYPE__ *__restrict __lenp),(__stream,__lenp))
+__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT_OPT(2),char *,__NOTHROW_NCX,fgetln,(__FILE *__restrict __stream, __SIZE_TYPE__ *__restrict __lenp),(__stream,__lenp))
 #endif /* !__fgetln_defined && __CRT_HAVE_fgetln */
 #ifndef __fpurge_defined
 #define __fpurge_defined

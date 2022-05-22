@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81165ab4 */
+/* HASH CRC-32:0x5d424382 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_itoa_s) __ATTR_ACCESS_WRS(2, 3) __errno_t
+__LOCAL_LIBC(_itoa_s) __ATTR_OUTS(2, 3) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itoa_s))(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) {
 	char *__p;
 	int __temp;

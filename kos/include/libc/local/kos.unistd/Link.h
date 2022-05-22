@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb54691f0 */
+/* HASH CRC-32:0xddd6dbac */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_VOID(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(4),__THROWING,__localdep_LinkAt,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),LinkAt,(__fromfd,__from,__tofd,__to,__flags))
+__CREDIRECT_VOID(__ATTR_IN(2) __ATTR_IN(4),__THROWING,__localdep_LinkAt,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),LinkAt,(__fromfd,__from,__tofd,__to,__flags))
 #endif /* !__local___localdep_LinkAt_defined */
-__LOCAL_LIBC(Link) __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) void
+__LOCAL_LIBC(Link) __ATTR_IN(1) __ATTR_IN(2) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Link))(char const *__from, char const *__to) __THROWS(...) {
 	(__NAMESPACE_LOCAL_SYM __localdep_LinkAt)(__AT_FDCWD, __from, __AT_FDCWD, __to, 0);
 }

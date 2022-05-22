@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a2b036f */
+/* HASH CRC-32:0x8b1d6960 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,12 +79,12 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_hdestroy)(void);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> hsearch_r(3)
  * Reentrant versions which can handle multiple hashing tables at the same time */
-INTDEF ATTR_ACCESS_RW(4) ATTR_ACCESS_WR(3) int NOTHROW_NCX(LIBDCALL libd_hsearch_r)(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab);
+INTDEF ATTR_INOUT(4) ATTR_OUT(3) int NOTHROW_NCX(LIBDCALL libd_hsearch_r)(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> hsearch_r(3)
  * Reentrant versions which can handle multiple hashing tables at the same time */
-INTDEF ATTR_ACCESS_RW(4) ATTR_ACCESS_WR(3) int NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab);
+INTDEF ATTR_INOUT(4) ATTR_OUT(3) int NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> hcreate_r(3) */
@@ -106,143 +106,143 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab);
 /* >> tsearch(3), tsearch_r(3)
  * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *(LIBDCALL libd_tsearch_r)(void const *key, void **vrootp, int (LIBDCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
+INTDEF ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)) void *(LIBDCALL libd_tsearch_r)(void const *key, void **vrootp, int (LIBDCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tsearch(3), tsearch_r(3)
  * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *(LIBCCALL libc_tsearch_r)(void const *key, void **vrootp, int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
+INTDEF ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)) void *(LIBCCALL libc_tsearch_r)(void const *key, void **vrootp, int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tfind(3), tfind_r(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) NONNULL((3)) void *(LIBDCALL libd_tfind_r)(void const *key, void *const *vrootp, int (LIBDCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
+INTDEF ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((3)) void *(LIBDCALL libd_tfind_r)(void const *key, void *const *vrootp, int (LIBDCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tfind(3), tfind_r(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) NONNULL((3)) void *(LIBCCALL libc_tfind_r)(void const *key, void *const *vrootp, int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
+INTDEF ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((3)) void *(LIBCCALL libc_tfind_r)(void const *key, void *const *vrootp, int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tdelete(3), tdelete_r(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *(LIBDCALL libd_tdelete_r)(void const *__restrict key, void **__restrict vrootp, int (LIBDCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
+INTDEF ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)) void *(LIBDCALL libd_tdelete_r)(void const *__restrict key, void **__restrict vrootp, int (LIBDCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tdelete(3), tdelete_r(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *(LIBCCALL libc_tdelete_r)(void const *__restrict key, void **__restrict vrootp, int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
+INTDEF ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)) void *(LIBCCALL libc_tdelete_r)(void const *__restrict key, void **__restrict vrootp, int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
-INTDEF ATTR_ACCESS_RO_OPT(1) void (LIBDCALL libd_twalk_r)(void const *root, void (LIBDCALL *action)(void const *nodep, VISIT value, int level, void *arg), void *arg) THROWS(...);
+INTDEF ATTR_IN_OPT(1) void (LIBDCALL libd_twalk_r)(void const *root, void (LIBDCALL *action)(void const *nodep, VISIT value, int level, void *arg), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
-INTDEF ATTR_ACCESS_RO_OPT(1) void (LIBCCALL libc_twalk_r)(void const *root, void (LIBCCALL *action)(void const *nodep, VISIT value, int level, void *arg), void *arg) THROWS(...);
+INTDEF ATTR_IN_OPT(1) void (LIBCCALL libc_twalk_r)(void const *root, void (LIBCCALL *action)(void const *nodep, VISIT value, int level, void *arg), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
-INTDEF ATTR_ACCESS_RW_OPT(1) NONNULL((2)) void (LIBDCALL libd_tdestroy_r)(void *root, void (LIBDCALL *freefct)(void *nodep, void *arg), void *arg) THROWS(...);
+INTDEF ATTR_INOUT_OPT(1) NONNULL((2)) void (LIBDCALL libd_tdestroy_r)(void *root, void (LIBDCALL *freefct)(void *nodep, void *arg), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
-INTDEF ATTR_ACCESS_RW_OPT(1) NONNULL((2)) void (LIBCCALL libc_tdestroy_r)(void *root, void (LIBCCALL *freefct)(void *nodep, void *arg), void *arg) THROWS(...);
+INTDEF ATTR_INOUT_OPT(1) NONNULL((2)) void (LIBCCALL libc_tdestroy_r)(void *root, void (LIBCCALL *freefct)(void *nodep, void *arg), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tsearch(3), tsearch_r(3)
  * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *(LIBDCALL libd_tsearch)(void const *key, void **vrootp, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
+INTDEF ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)) void *(LIBDCALL libd_tsearch)(void const *key, void **vrootp, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tsearch(3), tsearch_r(3)
  * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *(LIBCCALL libc_tsearch)(void const *key, void **vrootp, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
+INTDEF ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)) void *(LIBCCALL libc_tsearch)(void const *key, void **vrootp, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tfind(3), tfind_r(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) NONNULL((3)) void *(LIBDCALL libd_tfind)(void const *key, void *const *vrootp, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
+INTDEF ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((3)) void *(LIBDCALL libd_tfind)(void const *key, void *const *vrootp, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tfind(3), tfind_r(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RO_OPT(2) NONNULL((3)) void *(LIBCCALL libc_tfind)(void const *key, void *const *vrootp, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
+INTDEF ATTR_IN_OPT(1) ATTR_IN_OPT(2) NONNULL((3)) void *(LIBCCALL libc_tfind)(void const *key, void *const *vrootp, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tdelete(3), tdelete_r(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *(LIBDCALL libd_tdelete)(void const *__restrict key, void **__restrict vrootp, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
+INTDEF ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)) void *(LIBDCALL libd_tdelete)(void const *__restrict key, void **__restrict vrootp, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tdelete(3), tdelete_r(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW_OPT(2) NONNULL((3)) void *(LIBCCALL libc_tdelete)(void const *__restrict key, void **__restrict vrootp, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
+INTDEF ATTR_INOUT_OPT(2) ATTR_IN_OPT(1) NONNULL((3)) void *(LIBCCALL libc_tdelete)(void const *__restrict key, void **__restrict vrootp, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
-INTDEF ATTR_ACCESS_RO_OPT(1) void (LIBDCALL libd_twalk)(void const *root, void (LIBDCALL *action)(void const *nodep, VISIT value, int level)) THROWS(...);
+INTDEF ATTR_IN_OPT(1) void (LIBDCALL libd_twalk)(void const *root, void (LIBDCALL *action)(void const *nodep, VISIT value, int level)) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
-INTDEF ATTR_ACCESS_RO_OPT(1) void (LIBCCALL libc_twalk)(void const *root, void (LIBCCALL *action)(void const *nodep, VISIT value, int level)) THROWS(...);
+INTDEF ATTR_IN_OPT(1) void (LIBCCALL libc_twalk)(void const *root, void (LIBCCALL *action)(void const *nodep, VISIT value, int level)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
-INTDEF ATTR_ACCESS_RW_OPT(1) NONNULL((2)) void (LIBDCALL libd_tdestroy)(void *root, void (LIBDCALL *freefct)(void *nodep)) THROWS(...);
+INTDEF ATTR_INOUT_OPT(1) NONNULL((2)) void (LIBDCALL libd_tdestroy)(void *root, void (LIBDCALL *freefct)(void *nodep)) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
-INTDEF ATTR_ACCESS_RW_OPT(1) NONNULL((2)) void (LIBCCALL libc_tdestroy)(void *root, void (LIBCCALL *freefct)(void *nodep)) THROWS(...);
+INTDEF ATTR_INOUT_OPT(1) NONNULL((2)) void (LIBCCALL libc_tdestroy)(void *root, void (LIBCCALL *freefct)(void *nodep)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lfind(3)
  * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
-INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(1) NONNULL((2, 5)) void *(LIBDCALL libd_lfind)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, __compar_fn_t compar) THROWS(...);
+INTDEF WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBDCALL libd_lfind)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, __compar_fn_t compar) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lfind(3)
  * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
-INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(1) NONNULL((2, 5)) void *(LIBCCALL libc_lfind)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, __compar_fn_t compar) THROWS(...);
+INTDEF WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBCCALL libc_lfind)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, __compar_fn_t compar) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lsearch(3)
  * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
  * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW(3) NONNULL((2, 5)) void *(LIBDCALL libd_lsearch)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
+INTDEF ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBDCALL libd_lsearch)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lsearch(3)
  * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
  * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
-INTDEF ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW(3) NONNULL((2, 5)) void *(LIBCCALL libc_lsearch)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
+INTDEF ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBCCALL libc_lsearch)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(1) NONNULL((2, 5)) void *(LIBDCALL libd__lfind_s)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
+INTDEF WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBDCALL libd__lfind_s)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RO(3) ATTR_ACCESS_RO_OPT(1) NONNULL((2, 5)) void *(LIBCCALL libc__lfind_s)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
+INTDEF WUNUSED ATTR_IN(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBCCALL libc__lfind_s)(void const *key, void const *pbase, size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW(3) NONNULL((2, 5)) void *(LIBDCALL libd__lsearch_s)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
+INTDEF WUNUSED ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBDCALL libd__lsearch_s)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_ACCESS_RO_OPT(1) ATTR_ACCESS_RW(3) NONNULL((2, 5)) void *(LIBCCALL libc__lsearch_s)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
+INTDEF WUNUSED ATTR_INOUT(3) ATTR_IN_OPT(1) NONNULL((2, 5)) void *(LIBCCALL libc__lsearch_s)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
 
 DECL_END

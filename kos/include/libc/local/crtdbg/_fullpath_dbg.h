@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc24e971 */
+/* HASH CRC-32:0x4e857232 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__fullpath_defined
 #define __local___localdep__fullpath_defined
 #ifdef __CRT_HAVE__fullpath
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3),char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_OUTS(1, 3),char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_frealpathat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/_fullpath.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__fullpath_defined
 #endif /* !... */
 #endif /* !__local___localdep__fullpath_defined */
-__LOCAL_LIBC(_fullpath_dbg) __ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WRS(1, 3) char *
+__LOCAL_LIBC(_fullpath_dbg) __ATTR_WUNUSED __ATTR_IN(2) __ATTR_OUTS(1, 3) char *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_fullpath_dbg))(char *__full_path, char const *__path, __SIZE_TYPE__ __bufsize, int __block_type, char const *__filename, int __line) {
 	(void)__block_type;
 	(void)__filename;

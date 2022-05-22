@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b187631 */
+/* HASH CRC-32:0xdfd2e9cb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strncat_defined
 #define __local___localdep_strncat_defined
 #if __has_builtin(__builtin_strncat) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncat)
-__CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,__localdep_strncat,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __max_srclen),strncat,{ return __builtin_strncat(__buf, __src, __max_srclen); })
+__CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUT(1) __ATTR_INS(2, 3) __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,__localdep_strncat,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __max_srclen),strncat,{ return __builtin_strncat(__buf, __src, __max_srclen); })
 #elif defined(__CRT_HAVE_strncat)
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_ACCESS_ROS(2, 3) __ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,__localdep_strncat,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __max_srclen),strncat,(__buf,__src,__max_srclen))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUT(1) __ATTR_INS(2, 3) __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,__localdep_strncat,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __max_srclen),strncat,(__buf,__src,__max_srclen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strncat.h>

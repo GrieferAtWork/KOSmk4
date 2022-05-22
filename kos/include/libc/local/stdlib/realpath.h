@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9ff2c15 */
+/* HASH CRC-32:0x4e9d1825 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,12 +29,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR_OPT(3),char *,__NOTHROW_RPC,__localdep_frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpathat,(__dirfd,__filename,__resolved,__buflen,__flags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_OUT_OPT(3),char *,__NOTHROW_RPC,__localdep_frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, __SIZE_TYPE__ __buflen, __atflag_t __flags),frealpathat,(__dirfd,__filename,__resolved,__buflen,__flags))
 #endif /* !__local___localdep_frealpathat_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/limits.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(realpath) __ATTR_WUNUSED __ATTR_ACCESS_RO(1) char *
+__LOCAL_LIBC(realpath) __ATTR_WUNUSED __ATTR_IN(1) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(realpath))(char const *__filename, char *__resolved) {
 #if defined(__PATH_MAX) && __PATH_MAX != -1
 	return (__NAMESPACE_LOCAL_SYM __localdep_frealpathat)(__AT_FDCWD, __filename, __resolved, __resolved ? __PATH_MAX : 0, 0);

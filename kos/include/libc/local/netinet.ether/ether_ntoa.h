@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac8606ec */
+/* HASH CRC-32:0xd3b4c76a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_ether_ntoa_r_defined
 #define __local___localdep_ether_ntoa_r_defined
 #ifdef __CRT_HAVE_ether_ntoa_r
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),char *,__NOTHROW_NCX,__localdep_ether_ntoa_r,(struct ether_addr const *__restrict __addr, char *__restrict __buf),ether_ntoa_r,(__addr,__buf))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_ether_ntoa_r,(struct ether_addr const *__restrict __addr, char *__restrict __buf),ether_ntoa_r,(__addr,__buf))
 #else /* __CRT_HAVE_ether_ntoa_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/netinet.ether/ether_ntoa_r.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <net/ethernet.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ether_ntoa) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) char *
+__LOCAL_LIBC(ether_ntoa) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_ntoa))(struct ether_addr const *__restrict __addr) {
 	static char __buf[21];
 	return (__NAMESPACE_LOCAL_SYM __localdep_ether_ntoa_r)(__addr, __buf);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa893a1fc */
+/* HASH CRC-32:0xceb73b88 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_RO(1) key_t NOTHROW_RPC(LIBDCALL libd_ftok)(char const *pathname, __STDC_INT_AS_UINT_T proj_id);
+INTDEF ATTR_IN(1) key_t NOTHROW_RPC(LIBDCALL libd_ftok)(char const *pathname, __STDC_INT_AS_UINT_T proj_id);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

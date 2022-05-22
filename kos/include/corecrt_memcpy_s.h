@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca51fb6 */
+/* HASH CRC-32:0x1438123b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,19 +51,19 @@ typedef __errno_t errno_t;
 #ifndef __memcpy_s_defined
 #define __memcpy_s_defined
 #ifdef __CRT_HAVE_memcpy_s
-__CDECLARE(__ATTR_ACCESS_ROS(3, 4) __ATTR_ACCESS_WRS(1, 2),__errno_t,__NOTHROW_NCX,memcpy_s,(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength),(__dst,__dstlength,__src,__srclength))
+__CDECLARE(__ATTR_INS(3, 4) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,memcpy_s,(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength),(__dst,__dstlength,__src,__srclength))
 #else /* __CRT_HAVE_memcpy_s */
 #include <libc/local/string/memcpy_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(memcpy_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(3, 4) __ATTR_ACCESS_WRS(1, 2) __errno_t __NOTHROW_NCX(__LIBCCALL memcpy_s)(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy_s))(__dst, __dstlength, __src, __srclength); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(memcpy_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2) __errno_t __NOTHROW_NCX(__LIBCCALL memcpy_s)(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy_s))(__dst, __dstlength, __src, __srclength); })
 #endif /* !__CRT_HAVE_memcpy_s */
 #endif /* !__memcpy_s_defined */
 #ifndef __memmove_s_defined
 #define __memmove_s_defined
 #ifdef __CRT_HAVE_memmove_s
-__CDECLARE(__ATTR_ACCESS_ROS(3, 4) __ATTR_ACCESS_WRS(1, 2),__errno_t,__NOTHROW_NCX,memmove_s,(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength),(__dst,__dstlength,__src,__srclength))
+__CDECLARE(__ATTR_INS(3, 4) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,memmove_s,(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength),(__dst,__dstlength,__src,__srclength))
 #else /* __CRT_HAVE_memmove_s */
 #include <libc/local/string/memmove_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(memmove_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_ROS(3, 4) __ATTR_ACCESS_WRS(1, 2) __errno_t __NOTHROW_NCX(__LIBCCALL memmove_s)(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove_s))(__dst, __dstlength, __src, __srclength); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(memmove_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2) __errno_t __NOTHROW_NCX(__LIBCCALL memmove_s)(void *__dst, rsize_t __dstlength, void const *__src, rsize_t __srclength) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove_s))(__dst, __dstlength, __src, __srclength); })
 #endif /* !__CRT_HAVE_memmove_s */
 #endif /* !__memmove_s_defined */
 

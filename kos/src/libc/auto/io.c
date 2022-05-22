@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x718507f8 */
+/* HASH CRC-32:0x111e85b7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_RO(1) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_IN(1) errno_t
 NOTHROW_RPC(LIBDCALL libd__access_s)(char const *filename,
                                      __STDC_INT_AS_UINT_T type) {
 	if (libd_access(filename, type) == 0)
@@ -41,14 +41,14 @@ NOTHROW_RPC(LIBDCALL libd__access_s)(char const *filename,
 	return __libd_geterrno_or(1);
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_RO(1) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") ATTR_IN(1) errno_t
 NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename,
                                      __STDC_INT_AS_UINT_T type) {
 	if (libc_access(filename, type) == 0)
 		return EOK;
 	return __libc_geterrno_or(1);
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.property") ATTR_ACCESS_WR(2) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.fs.property") ATTR_OUT(2) errno_t
 NOTHROW_NCX(LIBCCALL libc__umask_s)(mode_t nmode,
                                     mode_t *omode) {
 	*omode = libc_umask(nmode);
@@ -68,7 +68,7 @@ NOTHROW_NCX(LIBCCALL libc__setmode)(fd_t fd,
 
 }
 #include <libc/errno.h>
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") ATTR_IN(2) ATTR_OUT(1) errno_t
 NOTHROW_RPC(LIBDCALL libd__sopen_s)(fd_t *fd,
                                     char const *filename,
                                     oflag_t oflags,
@@ -89,7 +89,7 @@ NOTHROW_RPC(LIBDCALL libd__sopen_s)(fd_t *fd,
 	return 0;
 }
 #include <libc/errno.h>
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") ATTR_ACCESS_RO(2) ATTR_ACCESS_WR(1) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") ATTR_IN(2) ATTR_OUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd,
                                     char const *filename,
                                     oflag_t oflags,
@@ -109,7 +109,7 @@ NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd,
 	*fd = result;
 	return 0;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(5) errno_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_IN(1) ATTR_OUT(5) errno_t
 NOTHROW_RPC(LIBDCALL libd__sopen_dispatch)(char const *filename,
                                            oflag_t oflags,
                                            int sflags,
@@ -119,7 +119,7 @@ NOTHROW_RPC(LIBDCALL libd__sopen_dispatch)(char const *filename,
 	(void)bsecure;
 	return libd__sopen_s(fd, filename, oflags, sflags, mode);
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(5) errno_t
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_IN(1) ATTR_OUT(5) errno_t
 NOTHROW_RPC(LIBCCALL libc__sopen_dispatch)(char const *filename,
                                            oflag_t oflags,
                                            int sflags,
@@ -129,7 +129,7 @@ NOTHROW_RPC(LIBCCALL libc__sopen_dispatch)(char const *filename,
 	(void)bsecure;
 	return libc__sopen_s(fd, filename, oflags, sflags, mode);
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") ATTR_ACCESS_WR(1) int
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2],
                                  uint32_t pipesize,
                                  oflag_t textmode) {
@@ -201,7 +201,7 @@ NOTHROW_NCX(LIBCCALL libc__open_osfhandle)(intptr_t osfd,
 	COMPILER_IMPURE();
 	return (fd_t)osfd;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(VLIBDCALL libd_sopen)(char const *filename,
                                   oflag_t oflags,
                                   int sflags,
@@ -214,7 +214,7 @@ NOTHROW_RPC(VLIBDCALL libd_sopen)(char const *filename,
 	va_end(args);
 	return result;
 }
-INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_ACCESS_RO(1) fd_t
+INTERN ATTR_SECTION(".text.crt.dos.fs.io") WUNUSED ATTR_IN(1) fd_t
 NOTHROW_RPC(VLIBCCALL libc_sopen)(char const *filename,
                                   oflag_t oflags,
                                   int sflags,

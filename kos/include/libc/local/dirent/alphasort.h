@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12cba9f4 */
+/* HASH CRC-32:0x831e8618 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcoll_defined
 #define __local___localdep_strcoll_defined
 #ifdef __CRT_HAVE_strcoll
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_NCX,__localdep_strcoll,(char const *__s1, char const *__s2),strcoll,(__s1,__s2))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcoll,(char const *__s1, char const *__s2),strcoll,(__s1,__s2))
 #else /* __CRT_HAVE_strcoll */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcoll.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcoll __LIBC_LOCAL_NAME(strcoll)
 #endif /* !__CRT_HAVE_strcoll */
 #endif /* !__local___localdep_strcoll_defined */
-__LOCAL_LIBC(alphasort) __ATTR_PURE __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int
+__LOCAL_LIBC(alphasort) __ATTR_PURE __ATTR_IN(1) __ATTR_IN(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(alphasort))(struct dirent const **__e1, struct dirent const **__e2) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_strcoll)((*__e1)->d_name, (*__e2)->d_name);
 }

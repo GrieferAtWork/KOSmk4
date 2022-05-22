@@ -124,7 +124,7 @@ TODO: Incomplete
 | `[nullable]`             | no-op                                                     |
 | `[null]`                 | no-op                                                     |
 | `[nonnull]`              | Add arg index to `ATTR_NONNULL((...))`                    |
-| `[inp(...)]`             | Same as `[nonnull]`                                       |
+| `[in]`                   | `__ATTR_`                                       |
 | `[inpb(...)]`            | Same as `[nonnull]`                                       |
 | `[inp_opt(...)]`         | no-op                                                     |
 | `[inpb_opt(...)]`        | no-op                                                     |

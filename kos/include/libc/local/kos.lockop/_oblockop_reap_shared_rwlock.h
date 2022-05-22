@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x607c2860 */
+/* HASH CRC-32:0x8f2eedc8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 #include <kos/asm/futex.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),void,__NOTHROW,__FCALL,__localdep_shared_rwlock_endwrite,(struct shared_rwlock *__restrict __self),shared_rwlock_endwrite,{
+__COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_INOUT(1),void,__NOTHROW,__FCALL,__localdep_shared_rwlock_endwrite,(struct shared_rwlock *__restrict __self),shared_rwlock_endwrite,{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
@@ -47,14 +47,14 @@ __COMPILER_CEIREDIRECT(__NOBLOCK __ATTR_ACCESS_RW(1),void,__NOTHROW,__FCALL,__lo
 		__shared_rwlock_rdwait_broadcast(__self);
 })
 #elif defined(__CRT_HAVE_shared_rwlock_endwrite)
-__COMPILER_CREDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_ACCESS_RW(1),__NOTHROW,__FCALL,__localdep_shared_rwlock_endwrite,(struct shared_rwlock *__restrict __self),shared_rwlock_endwrite,(__self))
+__COMPILER_CREDIRECT_VOID(__LIBC,__NOBLOCK __ATTR_INOUT(1),__NOTHROW,__FCALL,__localdep_shared_rwlock_endwrite,(struct shared_rwlock *__restrict __self),shared_rwlock_endwrite,(__self))
 #elif defined(__shared_rwlock_wrwait_send)
 __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 #include <hybrid/__assert.h>
 #include <kos/asm/futex.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) void __NOTHROW(__FCALL __localdep_shared_rwlock_endwrite)(struct shared_rwlock *__restrict __self) {
+__LOCAL __NOBLOCK __ATTR_INOUT(1) void __NOTHROW(__FCALL __localdep_shared_rwlock_endwrite)(struct shared_rwlock *__restrict __self) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	__COMPILER_BARRIER();
 	__hybrid_assertf(__self->sl_lock == (__UINTPTR_TYPE__)-1, "Lock isn't in write-mode (%x)", __self->sl_lock);
@@ -72,7 +72,7 @@ __LOCAL __NOBLOCK __ATTR_ACCESS_RW(1) void __NOTHROW(__FCALL __localdep_shared_r
 __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_trywrite,(struct shared_rwlock *__restrict __self),shared_rwlock_trywrite,{
+__COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,__FCALL,__localdep_shared_rwlock_trywrite,(struct shared_rwlock *__restrict __self),shared_rwlock_trywrite,{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
@@ -84,7 +84,7 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1),__BOOL,__NOT
 __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_ACCESS_RW(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_trywrite)(struct shared_rwlock *__restrict __self) {
+__LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL __localdep_shared_rwlock_trywrite)(struct shared_rwlock *__restrict __self) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (!__hybrid_atomic_cmpxch(__self->sl_lock, 0, (__UINTPTR_TYPE__)-1,
 	                            __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
@@ -99,7 +99,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/lockop.h>
 #endif /* !_KOS_LOCKOP_H */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_oblockop_reap_shared_rwlock) __NOBLOCK __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) __ATTR_NONNULL((3)) void
+__LOCAL_LIBC(_oblockop_reap_shared_rwlock) __NOBLOCK __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_NONNULL((3)) void
 __NOTHROW(__LOCKOP_CC __LIBC_LOCAL_NAME(_oblockop_reap_shared_rwlock))(struct oblockop_slist *__restrict __self, struct shared_rwlock *__restrict __lock, void *__restrict __obj) {
 #ifndef __INTELLISENSE__
 #define __LOCAL_self      __self

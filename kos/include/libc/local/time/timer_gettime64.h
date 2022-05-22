@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82fc007 */
+/* HASH CRC-32:0xf4ecc0df */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_timer_gettime32_defined
 #define __local___localdep_timer_gettime32_defined
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_timer_gettime32,(__timer_t __timerid, struct itimerspec *___value),timer_gettime,(__timerid,___value))
+__CREDIRECT(__ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_timer_gettime32,(__timer_t __timerid, struct itimerspec *___value),timer_gettime,(__timerid,___value))
 #endif /* !__local___localdep_timer_gettime32_defined */
-__LOCAL_LIBC(timer_gettime64) __ATTR_ACCESS_WR(2) int
+__LOCAL_LIBC(timer_gettime64) __ATTR_OUT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_gettime64))(__timer_t __timerid, struct __itimerspec64 *___value) {
 	int __result;
 	struct __itimerspec32 __value32;

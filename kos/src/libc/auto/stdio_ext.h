@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3534e81 */
+/* HASH CRC-32:0x38bd71a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,30 +33,30 @@ DECL_BEGIN
 /* >> __fbufsize(3)
  * Returns the used buffer size of the given `stream' (s.a. `setvbuf(3)')
  * @return: * : Used buffer size of `stream' */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) size_t NOTHROW_NCX(LIBDCALL libd___fbufsize)(FILE __KOS_FIXED_CONST *stream);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) size_t NOTHROW_NCX(LIBDCALL libd___fbufsize)(FILE __KOS_FIXED_CONST *stream);
 /* >> __freading(3)
  * Returns  non-zero if the `stream' is read-only, or "the last operation
  * performed on `stream' was a read-operation". On KOS, this last part is
  * implemented such that we check for unsaved changes to `stream'. */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd___freading)(FILE __KOS_FIXED_CONST *stream);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd___freading)(FILE __KOS_FIXED_CONST *stream);
 /* >> __fwriting(3)
  * Returns non-zero if the `stream'  is "write-only", or "the last  operation
  * performed on `stream' was a write-operation". On KOS, our stdio impl  does
  * not support write-only files (if reading isn't allowed, this will only  be
  * enforced on an fd-level by the kernel). Instead, we implement `__fwriting'
  * to return indicative of `stream' containing any unwritten changes. */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd___fwriting)(FILE __KOS_FIXED_CONST *stream);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd___fwriting)(FILE __KOS_FIXED_CONST *stream);
 /* >> __freadable(3)
  * Returns non-zero if `stream'  allows for reading (s.a.  `fread(3)')
  * On  KOS, all stdio files can be  read from (except those opened for
  * file descriptors opened as `O_WRONLY', though in this case write(2)
  * is still attempted). As such, KOS  considers all stdio files to  be
  * readable, meaning that on KOS this function always returns `1'. */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd___freadable)(FILE __KOS_FIXED_CONST *stream);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd___freadable)(FILE __KOS_FIXED_CONST *stream);
 /* >> __fwritable(3)
  * Returns non-zero if `stream' is writable, that is: has been opened
  * with "w",  "r+", or  some similar  flag that  allows for  writing. */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd___fwritable)(FILE __KOS_FIXED_CONST *stream);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd___fwritable)(FILE __KOS_FIXED_CONST *stream);
 /* >> __flbf(3)
  * Return  non-zero  if `stream'  is line-buffered.  (s.a. `_IOLBF')
  * Note  that on KOS, the line-buffered attribute of stdio files may
@@ -64,7 +64,7 @@ INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) int NOTHROW_NCX(LIBDCALL libd___fwrit
  * referring to a TTY. If this is the case, this function will  make
  * the appropriate call to `isatty(3)' and set the internal is-line-
  * buffered flag accordingly, before returning its state. */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd___flbf)(FILE *stream);
+INTDEF ATTR_PURE WUNUSED ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd___flbf)(FILE *stream);
 /* >> __fpurge(3)
  * Discard all modified, but unwritten data from `stream', as  well
  * as  all unread data previously buffered, but not yet read. After
@@ -76,7 +76,7 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd___fpurge)(FILE *stream);
  * file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
  * to write all modified data to the system, and following such a call,
  * this function will return `0' until new unwritten data appears. */
-INTDEF ATTR_PURE WUNUSED ATTR_ACCESS_RO(1) size_t NOTHROW_NCX(LIBDCALL libd___fpending)(FILE __KOS_FIXED_CONST *stream);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) size_t NOTHROW_NCX(LIBDCALL libd___fpending)(FILE __KOS_FIXED_CONST *stream);
 /* >> __fsetlocking(3)
  * Set the locking type for `stream' to `type'. This affects all stdio functions
  * that aren't already lock-less by nature (iow: everything but `*_unlocked(3)')

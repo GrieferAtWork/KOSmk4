@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3eaba20 */
+/* HASH CRC-32:0xbdadbdc0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__mbsbtype_l_defined
 #define __local___localdep__mbsbtype_l_defined
 #ifdef __CRT_HAVE__mbsbtype_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_NCX,__localdep__mbsbtype_l,(unsigned char const *__str, __SIZE_TYPE__ __byte_index, __locale_t __locale),_mbsbtype_l,(__str,__byte_index,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_NCX,__localdep__mbsbtype_l,(unsigned char const *__str, __SIZE_TYPE__ __byte_index, __locale_t __locale),_mbsbtype_l,(__str,__byte_index,__locale))
 #elif defined(__CRT_HAVE__mbbtype_l) || ((defined(__CRT_HAVE__ismbbtrail_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__ismbblead_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)) && (defined(__CRT_HAVE__ismbbprint_l) || defined(__CRT_HAVE__ismbbkana_l) || defined(__CRT_HAVE__ismbbkprint_l) || defined(__CRT_HAVE__mbctype) || defined(__CRT_HAVE___p__mbctype)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/mbstring/_mbsbtype_l.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__mbsbtype_l_defined
 #endif /* !... */
 #endif /* !__local___localdep__mbsbtype_l_defined */
-__LOCAL_LIBC(_mbsbtype) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) int
+__LOCAL_LIBC(_mbsbtype) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbsbtype))(unsigned char const *__str, __SIZE_TYPE__ __byte_index) {
 	return (__NAMESPACE_LOCAL_SYM __localdep__mbsbtype_l)(__str, __byte_index, __NULLPTR);
 }

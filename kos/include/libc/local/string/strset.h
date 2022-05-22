@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x522f3ea8 */
+/* HASH CRC-32:0x4c0945b5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_strset_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strset) __ATTR_LEAF __ATTR_ACCESS_RW(1) char *
+__LOCAL_LIBC(strset) __ATTR_LEAF __ATTR_INOUT(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strset))(char *__restrict __str, int __ch) {
 	char *__iter;
 	for (__iter = __str; *__iter; ++__iter)

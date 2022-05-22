@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71cbf537 */
+/* HASH CRC-32:0x5471e915 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(bitcpy) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) void
+__LOCAL_LIBC(bitcpy) __ATTR_IN(3) __ATTR_OUT(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bitcpy))(void *__restrict __dst_base, __SIZE_TYPE__ __dst_bit_offset, void const *__restrict __src_base, __SIZE_TYPE__ __src_bit_offset, __SIZE_TYPE__ __num_bits) {
 	while (__num_bits) {
 		__BYTE_TYPE__ __remaining, __src_value, __remaining_temp;

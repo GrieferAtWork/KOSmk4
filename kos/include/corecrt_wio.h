@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22836775 */
+/* HASH CRC-32:0xb473dbb0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,127 +69,127 @@ struct _wfinddata32i64_t;
 struct _wfinddata64i32_t;
 
 #ifdef __CRT_HAVE_waccess
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,_waccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,_waccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),waccess,(__file,__type))
 #elif defined(__CRT_HAVE__waccess)
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,_waccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,_waccess,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
 #elif (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wfaccessat) || (defined(__CRT_HAVE_faccessat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_access) || defined(__CRT_HAVE__access) || defined(__CRT_HAVE___access) || defined(__CRT_HAVE___libc_access) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <libc/local/parts.wchar.unistd/waccess.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL _waccess)(wchar_t const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(waccess))(__file, __type); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL _waccess)(wchar_t const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(waccess))(__file, __type); }
 #endif /* ... */
 #ifdef __CRT_HAVE__waccess_s
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),errno_t,__NOTHROW_RPC,_waccess_s,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),errno_t,__NOTHROW_RPC,_waccess_s,(wchar_t const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
 #elif defined(__CRT_HAVE_waccess) || defined(__CRT_HAVE__waccess) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wfaccessat) || (defined(__CRT_HAVE_faccessat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_access) || defined(__CRT_HAVE__access) || defined(__CRT_HAVE___access) || defined(__CRT_HAVE___libc_access) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <libc/local/corecrt_wio/_waccess_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_waccess_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) errno_t __NOTHROW_RPC(__LIBCCALL _waccess_s)(wchar_t const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_waccess_s))(__file, __type); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_waccess_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) errno_t __NOTHROW_RPC(__LIBCCALL _waccess_s)(wchar_t const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_waccess_s))(__file, __type); })
 #endif /* ... */
 #ifdef __CRT_HAVE_wchmod
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,_wchmod,(wchar_t const *__filename, __mode_t __mode),wchmod,(__filename,__mode))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,_wchmod,(wchar_t const *__filename, __mode_t __mode),wchmod,(__filename,__mode))
 #elif defined(__CRT_HAVE__wchmod)
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,_wchmod,(wchar_t const *__filename, __mode_t __mode),(__filename,__mode))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,_wchmod,(wchar_t const *__filename, __mode_t __mode),(__filename,__mode))
 #elif (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wfchmodat) || (defined(__CRT_HAVE_fchmodat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_chmod) || defined(__CRT_HAVE__chmod) || defined(__CRT_HAVE___chmod) || defined(__CRT_HAVE___libc_chmod) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_fchmodat))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <libc/local/parts.wchar.sys.stat/wchmod.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL _wchmod)(wchar_t const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wchmod))(__filename, __mode); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL _wchmod)(wchar_t const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wchmod))(__filename, __mode); }
 #endif /* ... */
 #if defined(__CRT_HAVE_wcreat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_wcreat,(wchar_t const *__filename, __mode_t __mode),wcreat,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__NOTHROW_RPC,_wcreat,(wchar_t const *__filename, __mode_t __mode),wcreat,(__filename,__mode))
 #elif defined(__CRT_HAVE__wcreat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_wcreat,(wchar_t const *__filename, __mode_t __mode),(__filename,__mode))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__NOTHROW_RPC,_wcreat,(wchar_t const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE_wcreat64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_wcreat,(wchar_t const *__filename, __mode_t __mode),wcreat64,(__filename,__mode))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__NOTHROW_RPC,_wcreat,(wchar_t const *__filename, __mode_t __mode),wcreat64,(__filename,__mode))
 #elif (defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && (defined(__CRT_HAVE_wopen64) || defined(__CRT_HAVE_wopen) || defined(__CRT_HAVE__wopen) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wopenat64) || defined(__CRT_HAVE_wopenat) || ((defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || (((defined(__CRT_HAVE_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || (defined(__CRT_HAVE__creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || (defined(__CRT_HAVE___creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || (defined(__CRT_HAVE___libc_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_creat64) || (defined(__O_CREAT) && defined(__O_WRONLY) && defined(__O_TRUNC) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <libc/local/parts.wchar.fcntl/wcreat.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__LIBCCALL _wcreat)(wchar_t const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcreat))(__filename, __mode); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) __fd_t __NOTHROW_RPC(__LIBCCALL _wcreat)(wchar_t const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcreat))(__filename, __mode); }
 #endif /* ... */
 #ifdef __CRT_HAVE_wunlink
-__CREDIRECT(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,_wunlink,(wchar_t const *__file),wunlink,(__file))
+__CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,_wunlink,(wchar_t const *__file),wunlink,(__file))
 #elif defined(__CRT_HAVE__wunlink)
-__CDECLARE(__ATTR_ACCESS_RO(1),int,__NOTHROW_RPC,_wunlink,(wchar_t const *__file),(__file))
+__CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,_wunlink,(wchar_t const *__file),(__file))
 #elif (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wunlinkat) || (defined(__CRT_HAVE_unlinkat) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || defined(__CRT_HAVE___unlink) || defined(__CRT_HAVE___libc_unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <libc/local/parts.wchar.unistd/wunlink.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) int __NOTHROW_RPC(__LIBCCALL _wunlink)(wchar_t const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wunlink))(__file); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL _wunlink)(wchar_t const *__file) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wunlink))(__file); }
 #endif /* ... */
 #ifdef __CRT_HAVE_wrename
-__CREDIRECT(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,_wrename,(wchar_t const *__oldname, wchar_t const *__newname_or_path),wrename,(__oldname,__newname_or_path))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,_wrename,(wchar_t const *__oldname, wchar_t const *__newname_or_path),wrename,(__oldname,__newname_or_path))
 #elif defined(__CRT_HAVE__wrename)
-__CDECLARE(__ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,_wrename,(wchar_t const *__oldname, wchar_t const *__newname_or_path),(__oldname,__newname_or_path))
+__CDECLARE(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,_wrename,(wchar_t const *__oldname, wchar_t const *__newname_or_path),(__oldname,__newname_or_path))
 #elif (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wrenameat) || defined(__CRT_HAVE_wrenameat2) || (defined(__CRT_HAVE_renameat2) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_renameat2)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <libc/local/parts.wchar.stdio/wrename.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2) int __NOTHROW_RPC(__LIBCCALL _wrename)(wchar_t const *__oldname, wchar_t const *__newname_or_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wrename))(__oldname, __newname_or_path); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBCCALL _wrename)(wchar_t const *__oldname, wchar_t const *__newname_or_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wrename))(__oldname, __newname_or_path); }
 #endif /* ... */
-__CDECLARE_OPT(__ATTR_ACCESS_RWS(1, 2),errno_t,__NOTHROW_NCX,_wmktemp_s,(wchar_t *__template_, size_t __bufsize),(__template_,__bufsize))
-__CDECLARE_OPT(__ATTR_RETNONNULL __ATTR_ACCESS_RW(1),wchar_t *,__NOTHROW_NCX,_wmktemp,(wchar_t *__template_),(__template_))
+__CDECLARE_OPT(__ATTR_INOUTS(1, 2),errno_t,__NOTHROW_NCX,_wmktemp_s,(wchar_t *__template_, size_t __bufsize),(__template_,__bufsize))
+__CDECLARE_OPT(__ATTR_RETNONNULL __ATTR_INOUT(1),wchar_t *,__NOTHROW_NCX,_wmktemp,(wchar_t *__template_),(__template_))
 
 #ifdef __CRT_HAVE__wsopen_s
-__CDECLARE(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1),errno_t,__NOTHROW_RPC,_wsopen_s,(__fd_t *__fd, wchar_t const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
+__CDECLARE(__ATTR_IN(2) __ATTR_OUT(1),errno_t,__NOTHROW_RPC,_wsopen_s,(__fd_t *__fd, wchar_t const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE__wsopen) || defined(__CRT_HAVE_wopen64) || defined(__CRT_HAVE_wopen) || defined(__CRT_HAVE__wopen) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wopenat64) || defined(__CRT_HAVE_wopenat) || ((defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <libc/local/corecrt_wio/_wsopen_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wsopen_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_WR(1) errno_t __NOTHROW_RPC(__LIBCCALL _wsopen_s)(__fd_t *__fd, wchar_t const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsopen_s))(__fd, __filename, __oflags, __sflags, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wsopen_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_OUT(1) errno_t __NOTHROW_RPC(__LIBCCALL _wsopen_s)(__fd_t *__fd, wchar_t const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsopen_s))(__fd, __filename, __oflags, __sflags, __mode); })
 #endif /* ... */
 #ifdef __CRT_HAVE__wsopen_dispatch
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(5),errno_t,__NOTHROW_RPC,_wsopen_dispatch,(wchar_t const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode, __fd_t *__fd, int __bsecure),(__filename,__oflags,__sflags,__mode,__fd,__bsecure))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(5),errno_t,__NOTHROW_RPC,_wsopen_dispatch,(wchar_t const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode, __fd_t *__fd, int __bsecure),(__filename,__oflags,__sflags,__mode,__fd,__bsecure))
 #elif defined(__CRT_HAVE__wsopen_s) || defined(__CRT_HAVE__wsopen) || defined(__CRT_HAVE_wopen64) || defined(__CRT_HAVE_wopen) || defined(__CRT_HAVE__wopen) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wopenat64) || defined(__CRT_HAVE_wopenat) || ((defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <libc/local/corecrt_wio/_wsopen_dispatch.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wsopen_dispatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(5) errno_t __NOTHROW_RPC(__LIBCCALL _wsopen_dispatch)(wchar_t const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode, __fd_t *__fd, int __bsecure) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsopen_dispatch))(__filename, __oflags, __sflags, __mode, __fd, __bsecure); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wsopen_dispatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(5) errno_t __NOTHROW_RPC(__LIBCCALL _wsopen_dispatch)(wchar_t const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode, __fd_t *__fd, int __bsecure) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsopen_dispatch))(__filename, __oflags, __sflags, __mode, __fd, __bsecure); })
 #endif /* ... */
 #if defined(__CRT_HAVE_wopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_wopen,(wchar_t const *__filename, __oflag_t __oflags),wopen,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__NOTHROW_RPC,_wopen,(wchar_t const *__filename, __oflag_t __oflags),wopen,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__wopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
-__LIBC __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__VLIBCCALL _wopen)(wchar_t const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("_wopen");
+__LIBC __ATTR_WUNUSED __ATTR_IN(1) __fd_t __NOTHROW_RPC(__VLIBCCALL _wopen)(wchar_t const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("_wopen");
 #elif defined(__CRT_HAVE_wopen64)
-__CVREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1),__fd_t,__NOTHROW_RPC,_wopen,(wchar_t const *__filename, __oflag_t __oflags),wopen64,(__filename,__oflags),__oflags,1,(__mode_t))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),__fd_t,__NOTHROW_RPC,_wopen,(wchar_t const *__filename, __oflag_t __oflags),wopen64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_wopen) || defined(__CRT_HAVE__wopen) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wopenat64) || defined(__CRT_HAVE_wopenat) || ((defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <libc/local/parts.wchar.fcntl/wopen.h>
 #define _wopen(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wopen))(__VA_ARGS__)
 #endif /* ... */
 #ifdef __CRT_HAVE__wsopen
-__LIBC __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__VLIBCCALL _wsopen)(wchar_t const *__filename, __oflag_t __oflags, int __sflags, ...) __CASMNAME_SAME("_wsopen");
+__LIBC __ATTR_WUNUSED __ATTR_IN(1) __fd_t __NOTHROW_RPC(__VLIBCCALL _wsopen)(wchar_t const *__filename, __oflag_t __oflags, int __sflags, ...) __CASMNAME_SAME("_wsopen");
 #elif defined(__CRT_HAVE_wopen64) || defined(__CRT_HAVE_wopen) || defined(__CRT_HAVE__wopen) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_wopenat64) || defined(__CRT_HAVE_wopenat) || ((defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #include <libc/local/corecrt_wio/_wsopen.h>
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wsopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __fd_t __NOTHROW_RPC(__VLIBCCALL _wsopen)(wchar_t const *__filename, __oflag_t __oflags, int __sflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsopen))(__filename, __oflags, __sflags, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wsopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) __fd_t __NOTHROW_RPC(__VLIBCCALL _wsopen)(wchar_t const *__filename, __oflag_t __oflags, int __sflags, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsopen))(__filename, __oflags, __sflags, __builtin_va_arg_pack()); })
 #else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
 #define _wsopen(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wsopen))(__VA_ARGS__)
 #endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
 #endif /* ... */
 #ifdef __CRT_HAVE__wfindfirst32
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_wfindfirst32,(wchar_t const *__restrict __filename, struct _wfinddata32_t *__restrict __finddata),(__filename,__finddata))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),intptr_t,__NOTHROW_RPC,_wfindfirst32,(wchar_t const *__restrict __filename, struct _wfinddata32_t *__restrict __finddata),(__filename,__finddata))
 #elif defined(__CRT_HAVE__wfindfirst)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_wfindfirst32,(wchar_t const *__restrict __filename, struct _wfinddata32_t *__restrict __finddata),_wfindfirst,(__filename,__finddata))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),intptr_t,__NOTHROW_RPC,_wfindfirst32,(wchar_t const *__restrict __filename, struct _wfinddata32_t *__restrict __finddata),_wfindfirst,(__filename,__finddata))
 #endif /* ... */
 #ifdef __CRT_HAVE__wfindfirst32i64
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_wfindfirst32i64,(wchar_t const *__restrict __filename, struct _wfinddata32i64_t *__restrict __finddata),(__filename,__finddata))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),intptr_t,__NOTHROW_RPC,_wfindfirst32i64,(wchar_t const *__restrict __filename, struct _wfinddata32i64_t *__restrict __finddata),(__filename,__finddata))
 #elif defined(__CRT_HAVE__wfindfirsti64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_wfindfirst32i64,(wchar_t const *__restrict __filename, struct _wfinddata32i64_t *__restrict __finddata),_wfindfirsti64,(__filename,__finddata))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),intptr_t,__NOTHROW_RPC,_wfindfirst32i64,(wchar_t const *__restrict __filename, struct _wfinddata32i64_t *__restrict __finddata),_wfindfirsti64,(__filename,__finddata))
 #endif /* ... */
 #ifdef __CRT_HAVE__wfindfirst64
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_wfindfirst64,(wchar_t const *__restrict __filename, struct _wfinddata64_t *__restrict __finddata),(__filename,__finddata))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),intptr_t,__NOTHROW_RPC,_wfindfirst64,(wchar_t const *__restrict __filename, struct _wfinddata64_t *__restrict __finddata),(__filename,__finddata))
 #elif defined(__CRT_HAVE__wfindfirst64i32)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_wfindfirst64,(wchar_t const *__restrict __filename, struct _wfinddata64_t *__restrict __finddata),_wfindfirst64i32,(__filename,__finddata))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),intptr_t,__NOTHROW_RPC,_wfindfirst64,(wchar_t const *__restrict __filename, struct _wfinddata64_t *__restrict __finddata),_wfindfirst64i32,(__filename,__finddata))
 #endif /* ... */
 #ifdef __CRT_HAVE__wfindfirst64
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_wfindfirst64i32,(wchar_t const *__restrict __filename, struct _wfinddata64i32_t *__restrict __finddata),_wfindfirst64,(__filename,__finddata))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),intptr_t,__NOTHROW_RPC,_wfindfirst64i32,(wchar_t const *__restrict __filename, struct _wfinddata64i32_t *__restrict __finddata),_wfindfirst64,(__filename,__finddata))
 #elif defined(__CRT_HAVE__wfindfirst64i32)
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR(2),intptr_t,__NOTHROW_RPC,_wfindfirst64i32,(wchar_t const *__restrict __filename, struct _wfinddata64i32_t *__restrict __finddata),(__filename,__finddata))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1) __ATTR_OUT(2),intptr_t,__NOTHROW_RPC,_wfindfirst64i32,(wchar_t const *__restrict __filename, struct _wfinddata64i32_t *__restrict __finddata),(__filename,__finddata))
 #endif /* ... */
 #ifdef __CRT_HAVE__wfindnext32
-__CDECLARE(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_wfindnext32,(intptr_t __findfd, struct _wfinddata32_t *__restrict __finddata),(__findfd,__finddata))
+__CDECLARE(__ATTR_OUT(2),int,__NOTHROW_RPC,_wfindnext32,(intptr_t __findfd, struct _wfinddata32_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__wfindnext)
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_wfindnext32,(intptr_t __findfd, struct _wfinddata32_t *__restrict __finddata),_wfindnext,(__findfd,__finddata))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_RPC,_wfindnext32,(intptr_t __findfd, struct _wfinddata32_t *__restrict __finddata),_wfindnext,(__findfd,__finddata))
 #endif /* ... */
 #ifdef __CRT_HAVE__wfindnext32i64
-__CDECLARE(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_wfindnext32i64,(intptr_t __findfd, struct _wfinddata32i64_t *__restrict __finddata),(__findfd,__finddata))
+__CDECLARE(__ATTR_OUT(2),int,__NOTHROW_RPC,_wfindnext32i64,(intptr_t __findfd, struct _wfinddata32i64_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__wfindnexti64)
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_wfindnext32i64,(intptr_t __findfd, struct _wfinddata32i64_t *__restrict __finddata),_wfindnexti64,(__findfd,__finddata))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_RPC,_wfindnext32i64,(intptr_t __findfd, struct _wfinddata32i64_t *__restrict __finddata),_wfindnexti64,(__findfd,__finddata))
 #endif /* ... */
 #ifdef __CRT_HAVE__wfindnext64
-__CDECLARE(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_wfindnext64,(intptr_t __findfd, struct _wfinddata64_t *__restrict __finddata),(__findfd,__finddata))
+__CDECLARE(__ATTR_OUT(2),int,__NOTHROW_RPC,_wfindnext64,(intptr_t __findfd, struct _wfinddata64_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__wfindnext64i32)
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_wfindnext64,(intptr_t __findfd, struct _wfinddata64_t *__restrict __finddata),_wfindnext64i32,(__findfd,__finddata))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_RPC,_wfindnext64,(intptr_t __findfd, struct _wfinddata64_t *__restrict __finddata),_wfindnext64i32,(__findfd,__finddata))
 #endif /* ... */
 #ifdef __CRT_HAVE__wfindnext64
-__CREDIRECT(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_wfindnext64i32,(intptr_t __findfd, struct _wfinddata64i32_t *__restrict __finddata),_wfindnext64,(__findfd,__finddata))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_RPC,_wfindnext64i32,(intptr_t __findfd, struct _wfinddata64i32_t *__restrict __finddata),_wfindnext64,(__findfd,__finddata))
 #elif defined(__CRT_HAVE__wfindnext64i32)
-__CDECLARE(__ATTR_ACCESS_WR(2),int,__NOTHROW_RPC,_wfindnext64i32,(intptr_t __findfd, struct _wfinddata64i32_t *__restrict __finddata),(__findfd,__finddata))
+__CDECLARE(__ATTR_OUT(2),int,__NOTHROW_RPC,_wfindnext64i32,(intptr_t __findfd, struct _wfinddata64i32_t *__restrict __finddata),(__findfd,__finddata))
 #endif /* ... */
 
 #ifndef _WFINDDATA_T_DEFINED

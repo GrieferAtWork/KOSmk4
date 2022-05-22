@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x462765bc */
+/* HASH CRC-32:0x678527ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,17 +31,17 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> adjtimex(2), adjtimex64(2) */
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd_adjtimex)(struct timex *__restrict ntx);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_adjtimex)(struct timex *__restrict ntx);
 /* >> ntp_gettime(3), ntp_gettime64(3) */
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_ntp_gettimex)(struct ntptimeval *__restrict ntv);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_ntp_gettimex)(struct ntptimeval *__restrict ntv);
 /* >> ntp_adjtime(3), ntp_adjtime64(3) */
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd_ntp_adjtime)(struct timex *__restrict tntx);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_ntp_adjtime)(struct timex *__restrict tntx);
 /* >> adjtimex(2), adjtimex64(2) */
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd_adjtimex64)(struct timex64 *__restrict ntx);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_adjtimex64)(struct timex64 *__restrict ntx);
 /* >> ntp_adjtime(3), ntp_adjtime64(3) */
-INTDEF ATTR_ACCESS_RW(1) int NOTHROW_NCX(LIBDCALL libd_ntp_adjtime64)(struct timex64 *__restrict tntx);
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_ntp_adjtime64)(struct timex64 *__restrict tntx);
 /* >> ntp_gettime(3), ntp_gettime64(3) */
-INTDEF ATTR_ACCESS_WR(1) int NOTHROW_NCX(LIBDCALL libd_ntp_gettimex64)(struct ntptimeval64 *__restrict ntv);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_ntp_gettimex64)(struct ntptimeval64 *__restrict ntv);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

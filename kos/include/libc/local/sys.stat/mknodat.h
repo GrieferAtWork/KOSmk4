@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c75e9de */
+/* HASH CRC-32:0x6156f3d5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fmknodat_defined
 #define __local___localdep_fmknodat_defined
-__CREDIRECT(__ATTR_ACCESS_RO(2),int,__NOTHROW_RPC,__localdep_fmknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),fmknodat,(__dirfd,__nodename,__mode,__dev,__flags))
+__CREDIRECT(__ATTR_IN(2),int,__NOTHROW_RPC,__localdep_fmknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),fmknodat,(__dirfd,__nodename,__mode,__dev,__flags))
 #endif /* !__local___localdep_fmknodat_defined */
-__LOCAL_LIBC(mknodat) __ATTR_ACCESS_RO(2) int
+__LOCAL_LIBC(mknodat) __ATTR_IN(2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mknodat))(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fmknodat)(__dirfd, __nodename, __mode, __dev, 0);
 }

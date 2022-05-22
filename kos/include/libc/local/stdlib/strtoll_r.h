@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8590d8dd */
+/* HASH CRC-32:0xee829ba7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strto32_r_defined
 #define __local___localdep_strto32_r_defined
 #ifdef __CRT_HAVE_strto32_r
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4),__INT32_TYPE__,__NOTHROW_NCX,__localdep_strto32_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto32_r,(__nptr,__endptr,__base,__error))
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4),__INT32_TYPE__,__NOTHROW_NCX,__localdep_strto32_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto32_r,(__nptr,__endptr,__base,__error))
 #else /* __CRT_HAVE_strto32_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strto32_r.h>
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strto64_r_defined
 #define __local___localdep_strto64_r_defined
 #ifdef __CRT_HAVE_strto64_r
-__CREDIRECT(__ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto64_r,(__nptr,__endptr,__base,__error))
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strto64_r,(__nptr,__endptr,__base,__error))
 #else /* __CRT_HAVE_strto64_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strto64_r.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/limitcore.h>
 #include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strtoll_r) __ATTR_LEAF __ATTR_ACCESS_RO(1) __ATTR_ACCESS_WR_OPT(2) __ATTR_ACCESS_WR_OPT(4) __LONGLONG
+__LOCAL_LIBC(strtoll_r) __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4) __LONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoll_r))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
 #if __SIZEOF_LONG_LONG__ >= 8
 	return (__LONGLONG)(__NAMESPACE_LOCAL_SYM __localdep_strto64_r)(__nptr, __endptr, __base, __error);

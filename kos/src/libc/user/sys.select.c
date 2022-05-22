@@ -41,7 +41,7 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_select,hash:CRC-32=0x6421ccf8]]]*/
+/*[[[head:libc_select,hash:CRC-32=0xb57124a7]]]*/
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
@@ -73,7 +73,7 @@ DECL_BEGIN
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_ACCESS_RW_OPT(2) ATTR_ACCESS_RW_OPT(3) ATTR_ACCESS_RW_OPT(4) ATTR_ACCESS_RW_OPT(5) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_INOUT_OPT(5) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_select)(__STDC_INT_AS_SIZE_T nfds,
                                   fd_set *__restrict readfds,
                                   fd_set *__restrict writefds,
@@ -103,7 +103,7 @@ NOTHROW_RPC(LIBCCALL libc_select)(__STDC_INT_AS_SIZE_T nfds,
 /*[[[end:libc_select]]]*/
 
 
-/*[[[head:libc_pselect,hash:CRC-32=0x52664121]]]*/
+/*[[[head:libc_pselect,hash:CRC-32=0xdd223bbb]]]*/
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
@@ -135,7 +135,7 @@ NOTHROW_RPC(LIBCCALL libc_select)(__STDC_INT_AS_SIZE_T nfds,
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_RO_OPT(6) ATTR_ACCESS_RW_OPT(2) ATTR_ACCESS_RW_OPT(3) ATTR_ACCESS_RW_OPT(4) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_IN_OPT(5) ATTR_IN_OPT(6) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_pselect)(__STDC_INT_AS_SIZE_T nfds,
                                    fd_set *__restrict readfds,
                                    fd_set *__restrict writefds,
@@ -153,7 +153,7 @@ NOTHROW_RPC(LIBCCALL libc_pselect)(__STDC_INT_AS_SIZE_T nfds,
 }
 /*[[[end:libc_pselect]]]*/
 
-/*[[[head:libc_select64,hash:CRC-32=0x4966ea87]]]*/
+/*[[[head:libc_select64,hash:CRC-32=0xc8ac12b1]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_select64, libc_select);
 #else /* MAGIC:alias */
@@ -188,7 +188,7 @@ DEFINE_INTERN_ALIAS(libc_select64, libc_select);
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_ACCESS_RW_OPT(2) ATTR_ACCESS_RW_OPT(3) ATTR_ACCESS_RW_OPT(4) ATTR_ACCESS_RW_OPT(5) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_INOUT_OPT(5) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_select64)(__STDC_INT_AS_SIZE_T nfds,
                                     fd_set *__restrict readfds,
                                     fd_set *__restrict writefds,
@@ -209,7 +209,7 @@ NOTHROW_RPC(LIBCCALL libc_select64)(__STDC_INT_AS_SIZE_T nfds,
 #endif /* MAGIC:alias */
 /*[[[end:libc_select64]]]*/
 
-/*[[[head:libc_pselect64,hash:CRC-32=0xd599d914]]]*/
+/*[[[head:libc_pselect64,hash:CRC-32=0x525c0335]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pselect64, libc_pselect);
 #else /* MAGIC:alias */
@@ -244,7 +244,7 @@ DEFINE_INTERN_ALIAS(libc_pselect64, libc_pselect);
  * @return: -1: [errno=EINTR]  The system call was interrupted
  * @return: -1: [errno=EINVAL] `timeout->tv_nsec' is invalid
  * @return: -1: [errno=ENOMEM] Insufficient kernel memory to form task connections */
-INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_ACCESS_RO_OPT(5) ATTR_ACCESS_RO_OPT(6) ATTR_ACCESS_RW_OPT(2) ATTR_ACCESS_RW_OPT(3) ATTR_ACCESS_RW_OPT(4) __STDC_INT_AS_SSIZE_T
+INTERN ATTR_SECTION(".text.crt.io.poll") ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_IN_OPT(5) ATTR_IN_OPT(6) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_pselect64)(__STDC_INT_AS_SIZE_T nfds,
                                      fd_set *__restrict readfds,
                                      fd_set *__restrict writefds,

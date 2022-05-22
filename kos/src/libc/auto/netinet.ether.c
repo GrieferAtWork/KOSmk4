@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2967bdbb */
+/* HASH CRC-32:0x87866839 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
 #include <net/ethernet.h>
 /* Convert `addr' into a 20-character-long string that
  * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
-INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) char *
+INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *
 NOTHROW_NCX(LIBCCALL libc_ether_ntoa)(struct ether_addr const *__restrict addr) {
 	static char buf[21];
 	return libc_ether_ntoa_r(addr, buf);
@@ -43,7 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_ether_ntoa)(struct ether_addr const *__restrict addr) 
 #include <net/ethernet.h>
 /* Convert `addr' into a 20-character-long string that
  * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
-INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) char *
+INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT(2) char *
 NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr,
                                         char *__restrict buf) {
 	libc_sprintf(buf, "%x:%x:%x:%x:%x:%x",
@@ -55,7 +55,7 @@ NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr
 #include <net/ethernet.h>
 /* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
-INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL WUNUSED ATTR_ACCESS_RO(1) struct ether_addr *
+INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL WUNUSED ATTR_IN(1) struct ether_addr *
 NOTHROW_NCX(LIBCCALL libc_ether_aton)(char const *__restrict asc) {
 	static struct ether_addr addr;
 	return libc_ether_aton_r(asc, &addr);
@@ -63,7 +63,7 @@ NOTHROW_NCX(LIBCCALL libc_ether_aton)(char const *__restrict asc) {
 #include <net/ethernet.h>
 /* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
-INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) struct ether_addr *
+INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED ATTR_IN(1) ATTR_OUT(2) struct ether_addr *
 NOTHROW_NCX(LIBCCALL libc_ether_aton_r)(char const *__restrict asc,
                                         struct ether_addr *__restrict addr) {
 	return libc_ether_paton_r((char const **)&asc, addr);
@@ -72,7 +72,7 @@ NOTHROW_NCX(LIBCCALL libc_ether_aton_r)(char const *__restrict asc,
 #include <libc/template/hex.h>
 /* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
-INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED ATTR_ACCESS_RO(2) ATTR_ACCESS_RW(1) struct ether_addr *
+INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED ATTR_INOUT(1) ATTR_OUT(2) struct ether_addr *
 NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc,
                                          struct ether_addr *__restrict addr) {
 	unsigned int i;
@@ -110,7 +110,7 @@ NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc,
  * @return: 0 : Success
  * @return: -1: Failed to parse the  `addr'-portion
  *              (`ether_paton_r()' returned `NULL') */
-INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(3) int
+INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(3) int
 NOTHROW_NCX(LIBCCALL libc_ether_line)(char const *line,
                                       struct ether_addr *addr,
                                       char *hostname) {

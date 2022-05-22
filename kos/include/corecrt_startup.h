@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d747525 */
+/* HASH CRC-32:0xb2792a8f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,10 +83,10 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 #endif /* !_CRT_ONEXIT_T_DEFINED */
 
 #ifdef __CRT_HAVE__seh_filter_dll
-__LIBC __ATTR_ACCESS_RW(2) int __NOTHROW_NCX(__LIBDCALL _seh_filter_dll)(__ULONG32_TYPE__ __xno, struct _EXCEPTION_POINTERS *__infp_ptrs) __CASMNAME_SAME("_seh_filter_dll");
+__LIBC __ATTR_INOUT(2) int __NOTHROW_NCX(__LIBDCALL _seh_filter_dll)(__ULONG32_TYPE__ __xno, struct _EXCEPTION_POINTERS *__infp_ptrs) __CASMNAME_SAME("_seh_filter_dll");
 #endif /* __CRT_HAVE__seh_filter_dll */
 #ifdef __CRT_HAVE__seh_filter_exe
-__LIBC __ATTR_ACCESS_RW(2) int __NOTHROW_NCX(__LIBDCALL _seh_filter_exe)(__ULONG32_TYPE__ __xno, struct _EXCEPTION_POINTERS *__infp_ptrs) __CASMNAME_SAME("_seh_filter_exe");
+__LIBC __ATTR_INOUT(2) int __NOTHROW_NCX(__LIBDCALL _seh_filter_exe)(__ULONG32_TYPE__ __xno, struct _EXCEPTION_POINTERS *__infp_ptrs) __CASMNAME_SAME("_seh_filter_exe");
 #endif /* __CRT_HAVE__seh_filter_exe */
 #ifdef __CRT_HAVE__query_app_type
 __LIBC __ATTR_CONST __ATTR_WUNUSED _crt_app_type __NOTHROW_NCX(__LIBDCALL _query_app_type)(void) __CASMNAME_SAME("_query_app_type");

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40a4b71f */
+/* HASH CRC-32:0x5eda59bc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,21 +35,21 @@ INTDEF mode_t NOTHROW_NCX(LIBDCALL libd_umask)(mode_t mode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> mkfifo(2) */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBDCALL libd_mkfifo)(char const *fifoname, mode_t mode);
+INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBDCALL libd_mkfifo)(char const *fifoname, mode_t mode);
 /* >> mkfifo(2) */
-INTDEF ATTR_ACCESS_RO(1) int NOTHROW_RPC(LIBCCALL libc_mkfifo)(char const *fifoname, mode_t mode);
+INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBCCALL libc_mkfifo)(char const *fifoname, mode_t mode);
 /* >> mkfifoat(2) */
-INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBDCALL libd_mkfifoat)(fd_t dirfd, char const *fifoname, mode_t mode);
+INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBDCALL libd_mkfifoat)(fd_t dirfd, char const *fifoname, mode_t mode);
 /* >> mkfifoat(2) */
-INTDEF ATTR_ACCESS_RO(2) int NOTHROW_RPC(LIBCCALL libc_mkfifoat)(fd_t dirfd, char const *fifoname, mode_t mode);
+INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBCCALL libc_mkfifoat)(fd_t dirfd, char const *fifoname, mode_t mode);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fchmod(2) */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_fchmod)(fd_t fd, mode_t mode);
 /* >> futimens(2), futimens64(2) */
-INTDEF ATTR_ACCESS_RO_OPT(2) int NOTHROW_RPC(LIBDCALL libd_futimens)(fd_t fd, struct timespec const times[2 /*or:3*/]);
+INTDEF ATTR_IN_OPT(2) int NOTHROW_RPC(LIBDCALL libd_futimens)(fd_t fd, struct timespec const times[2 /*or:3*/]);
 /* >> futimens(2), futimens64(2) */
-INTDEF ATTR_ACCESS_RO_OPT(2) int NOTHROW_RPC(LIBDCALL libd_futimens64)(fd_t fd, struct timespec64 const times[2 /*or:3*/]);
+INTDEF ATTR_IN_OPT(2) int NOTHROW_RPC(LIBDCALL libd_futimens64)(fd_t fd, struct timespec64 const times[2 /*or:3*/]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END

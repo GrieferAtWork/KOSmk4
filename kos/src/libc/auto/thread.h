@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bcc14dc */
+/* HASH CRC-32:0xf2abfe2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,16 +30,16 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_WR(6) NONNULL((3)) errno_t NOTHROW_NCX(LIBDCALL libd_thr_create)(void *stack_base, size_t stack_size, void *(LIBDCALL *start_routine)(void *arg), void *arg, long flags, thread_t *newthread);
+INTDEF ATTR_OUT(6) NONNULL((3)) errno_t NOTHROW_NCX(LIBDCALL libd_thr_create)(void *stack_base, size_t stack_size, void *(LIBDCALL *start_routine)(void *arg), void *arg, long flags, thread_t *newthread);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_WR(6) NONNULL((3)) errno_t NOTHROW_NCX(LIBCCALL libc_thr_create)(void *stack_base, size_t stack_size, void *(LIBCCALL *start_routine)(void *arg), void *arg, long flags, thread_t *newthread);
+INTDEF ATTR_OUT(6) NONNULL((3)) errno_t NOTHROW_NCX(LIBCCALL libc_thr_create)(void *stack_base, size_t stack_size, void *(LIBCCALL *start_routine)(void *arg), void *arg, long flags, thread_t *newthread);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_WR(2) ATTR_ACCESS_WR_OPT(3) errno_t NOTHROW_RPC(LIBDCALL libd_thr_join)(thread_t thr, thread_t *p_departed, void **thread_return);
+INTDEF ATTR_OUT(2) ATTR_OUT_OPT(3) errno_t NOTHROW_RPC(LIBDCALL libd_thr_join)(thread_t thr, thread_t *p_departed, void **thread_return);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_WR(2) ATTR_ACCESS_WR_OPT(3) errno_t NOTHROW_RPC(LIBCCALL libc_thr_join)(thread_t thr, thread_t *p_departed, void **thread_return);
+INTDEF ATTR_OUT(2) ATTR_OUT_OPT(3) errno_t NOTHROW_RPC(LIBCCALL libc_thr_join)(thread_t thr, thread_t *p_departed, void **thread_return);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_thr_setprio)(thread_t thr, int priority);
@@ -54,10 +54,10 @@ INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBDCALL libd_thr_getprio)(thread_t thr,
 INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc_thr_getprio)(thread_t thr, int *p_priority);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBDCALL libd_thr_getspecific)(thread_key_t key, void **p_val);
+INTDEF ATTR_OUT(2) errno_t NOTHROW_NCX(LIBDCALL libd_thr_getspecific)(thread_key_t key, void **p_val);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_WR(2) errno_t NOTHROW_NCX(LIBCCALL libc_thr_getspecific)(thread_key_t key, void **p_val);
+INTDEF ATTR_OUT(2) errno_t NOTHROW_NCX(LIBCCALL libc_thr_getspecific)(thread_key_t key, void **p_val);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> thr_stksegment(3)

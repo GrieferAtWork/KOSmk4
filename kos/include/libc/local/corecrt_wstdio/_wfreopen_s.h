@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72c334f1 */
+/* HASH CRC-32:0xabd31862 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ACCESS_RO_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN_OPT(1),char *,__NOTHROW_NCX,__localdep_convert_wcstombs,(__WCHAR_TYPE__ const *__str),convert_wcstombs,(__str))
 #elif defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/convert_wcstombs.h>
@@ -59,7 +59,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 #ifndef __local___localdep_freopen_s_defined
 #define __local___localdep_freopen_s_defined
 #ifdef __CRT_HAVE_freopen_s
-__CREDIRECT(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW(4) __ATTR_ACCESS_WR(1),__errno_t,__NOTHROW_RPC,__localdep_freopen_s,(__FILE **__pstream, char const *__filename, char const *__modes, __FILE *__oldstream),freopen_s,(__pstream,__filename,__modes,__oldstream))
+__CREDIRECT(__ATTR_IN(2) __ATTR_IN(3) __ATTR_INOUT(4) __ATTR_OUT(1),__errno_t,__NOTHROW_RPC,__localdep_freopen_s,(__FILE **__pstream, char const *__filename, char const *__modes, __FILE *__oldstream),freopen_s,(__pstream,__filename,__modes,__oldstream))
 #elif (defined(__CRT_HAVE_freopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_freopen64) || (defined(__CRT_HAVE_freopen_unlocked) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_freopen64_unlocked)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/freopen_s.h>
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wfreopen_s) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_RW_OPT(4) __ATTR_ACCESS_WR(1) __errno_t
+__LOCAL_LIBC(_wfreopen_s) __ATTR_IN(2) __ATTR_IN(3) __ATTR_INOUT_OPT(4) __ATTR_OUT(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wfreopen_s))(__FILE **__pstream, __WCHAR_TYPE__ const *__filename, __WCHAR_TYPE__ const *__mode, __FILE *__stream) {
 	__errno_t __result;
 	char *__utf8_filename;

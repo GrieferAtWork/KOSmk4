@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc580bd46 */
+/* HASH CRC-32:0x8d71750 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sched_rr_get_interval32_defined
 #define __local___localdep_sched_rr_get_interval32_defined
 #ifdef __CRT_HAVE_sched_rr_get_interval
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),sched_rr_get_interval,(__pid,__tms))
+__CREDIRECT(__ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),sched_rr_get_interval,(__pid,__tms))
 #elif defined(__CRT_HAVE___sched_rr_get_interval)
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),__sched_rr_get_interval,(__pid,__tms))
+__CREDIRECT(__ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),__sched_rr_get_interval,(__pid,__tms))
 #elif defined(__CRT_HAVE___libc_sched_rr_get_interval)
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),__libc_sched_rr_get_interval,(__pid,__tms))
+__CREDIRECT(__ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),__libc_sched_rr_get_interval,(__pid,__tms))
 #else /* ... */
 #undef __local___localdep_sched_rr_get_interval32_defined
 #endif /* !... */
@@ -40,13 +40,13 @@ __CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_in
 #ifndef __local___localdep_sched_rr_get_interval64_defined
 #define __local___localdep_sched_rr_get_interval64_defined
 #if defined(__CRT_HAVE_sched_rr_get_interval) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),sched_rr_get_interval,(__pid,__tms))
+__CREDIRECT(__ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),sched_rr_get_interval,(__pid,__tms))
 #elif defined(__CRT_HAVE___sched_rr_get_interval) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),__sched_rr_get_interval,(__pid,__tms))
+__CREDIRECT(__ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),__sched_rr_get_interval,(__pid,__tms))
 #elif defined(__CRT_HAVE___libc_sched_rr_get_interval) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),__libc_sched_rr_get_interval,(__pid,__tms))
+__CREDIRECT(__ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),__libc_sched_rr_get_interval,(__pid,__tms))
 #elif defined(__CRT_HAVE_sched_rr_get_interval64)
-__CREDIRECT(__ATTR_ACCESS_WR_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),sched_rr_get_interval64,(__pid,__tms))
+__CREDIRECT(__ATTR_OUT_OPT(2),int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),sched_rr_get_interval64,(__pid,__tms))
 #elif defined(__CRT_HAVE_sched_rr_get_interval) || defined(__CRT_HAVE___sched_rr_get_interval) || defined(__CRT_HAVE___libc_sched_rr_get_interval)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sched/sched_rr_get_interval64.h>
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_sched_rr_get_interval64_defined
 #endif /* !... */
 #endif /* !__local___localdep_sched_rr_get_interval64_defined */
-__LOCAL_LIBC(sched_rr_get_interval) __ATTR_ACCESS_WR_OPT(2) int
+__LOCAL_LIBC(sched_rr_get_interval) __ATTR_OUT_OPT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sched_rr_get_interval))(__pid_t __pid, struct timespec *__tms) {
 #if defined(__CRT_HAVE_sched_rr_get_interval) || defined(__CRT_HAVE___sched_rr_get_interval) || defined(__CRT_HAVE___libc_sched_rr_get_interval)
 	struct __timespec32 __tms32;

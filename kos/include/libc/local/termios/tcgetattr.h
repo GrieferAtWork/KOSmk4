@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x251eef39 */
+/* HASH CRC-32:0x54b05a58 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd,
 #undef __local___localdep_ioctl_defined
 #endif /* !... */
 #endif /* !__local___localdep_ioctl_defined */
-__LOCAL_LIBC(tcgetattr) __ATTR_ACCESS_WR(2) int
+__LOCAL_LIBC(tcgetattr) __ATTR_OUT(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcgetattr))(__fd_t __fd, struct termios *__restrict __termios_p) {
 	return (int)(__NAMESPACE_LOCAL_SYM __localdep_ioctl)(__fd, __TCGETA, __termios_p);
 }

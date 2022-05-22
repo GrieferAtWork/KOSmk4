@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2a84f05 */
+/* HASH CRC-32:0xdac29830 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,22 +82,22 @@ __CDECLARE_VOID_OPT(,__THROWING,MLockAll,(__STDC_INT_AS_UINT_T __flags),(__flags
 /* >> munlockall(2) */
 __CDECLARE_VOID_OPT(,__THROWING,MUnlockAll,(void),())
 #ifdef __CRT_HAVE_ShmOpen
-__CDECLARE(__ATTR_ACCESS_RO(1),__fd_t,__THROWING,ShmOpen,(char const *__name, __oflag_t __oflags, mode_t __mode),(__name,__oflags,__mode))
+__CDECLARE(__ATTR_IN(1),__fd_t,__THROWING,ShmOpen,(char const *__name, __oflag_t __oflags, mode_t __mode),(__name,__oflags,__mode))
 #else /* __CRT_HAVE_ShmOpen */
 #include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_Open64) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
 #include <libc/local/kos.sys.mman/ShmOpen.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ShmOpen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) __fd_t (__LIBCCALL ShmOpen)(char const *__name, __oflag_t __oflags, mode_t __mode) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ShmOpen))(__name, __oflags, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ShmOpen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __fd_t (__LIBCCALL ShmOpen)(char const *__name, __oflag_t __oflags, mode_t __mode) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ShmOpen))(__name, __oflags, __mode); })
 #endif /* __CRT_HAVE_Open64 || (__AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt)) || __CRT_HAVE_Open */
 #endif /* !__CRT_HAVE_ShmOpen */
 #ifdef __CRT_HAVE_ShmUnlink
-__CDECLARE_VOID(__ATTR_ACCESS_RO(1),__THROWING,ShmUnlink,(char const *__name),(__name))
+__CDECLARE_VOID(__ATTR_IN(1),__THROWING,ShmUnlink,(char const *__name),(__name))
 #else /* __CRT_HAVE_ShmUnlink */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_Unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt))
 #include <libc/local/kos.sys.mman/ShmUnlink.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ShmUnlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(1) void (__LIBCCALL ShmUnlink)(char const *__name) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ShmUnlink))(__name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ShmUnlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) void (__LIBCCALL ShmUnlink)(char const *__name) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ShmUnlink))(__name); })
 #endif /* __CRT_HAVE_Unlink || (__AT_FDCWD && __CRT_HAVE_UnlinkAt) */
 #endif /* !__CRT_HAVE_ShmUnlink */
 

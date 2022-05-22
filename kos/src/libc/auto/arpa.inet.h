@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dd5001e */
+/* HASH CRC-32:0x4d5018e6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ INTDEF ATTR_CONST WUNUSED struct in_addr NOTHROW_NCX(LIBCCALL libc_inet_makeaddr
  *     123      (decimal)
  *     0x123 (hex)
  *     0123  (oct) */
-INTDEF ATTR_PURE ATTR_ACCESS_RO(1) in_addr_t NOTHROW_NCX(LIBDCALL libd_inet_addr)(char const *__restrict cp);
+INTDEF ATTR_PURE ATTR_IN(1) in_addr_t NOTHROW_NCX(LIBDCALL libd_inet_addr)(char const *__restrict cp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> inet_addr(3)
@@ -93,7 +93,7 @@ INTDEF ATTR_PURE ATTR_ACCESS_RO(1) in_addr_t NOTHROW_NCX(LIBDCALL libd_inet_addr
  *     123      (decimal)
  *     0x123 (hex)
  *     0123  (oct) */
-INTDEF ATTR_PURE ATTR_ACCESS_RO(1) in_addr_t NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp);
+INTDEF ATTR_PURE ATTR_IN(1) in_addr_t NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_ntoa(3)
@@ -114,24 +114,24 @@ INTDEF ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBCCALL libc_inet_ntoa)(struct
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_ntoa_r(3)
  * Re-entrant version of `inet_ntoa()' */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_WR(2) char *NOTHROW_NCX(LIBDCALL libd_inet_ntoa_r)(struct in_addr inaddr, char buf[16]);
+INTDEF ATTR_RETNONNULL ATTR_OUT(2) char *NOTHROW_NCX(LIBDCALL libd_inet_ntoa_r)(struct in_addr inaddr, char buf[16]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> inet_ntoa_r(3)
  * Re-entrant version of `inet_ntoa()' */
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_WR(2) char *NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr, char buf[16]);
+INTDEF ATTR_RETNONNULL ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr, char buf[16]);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_network(3)
  * This function is  the same as  `inet_addr()', except  that
  * the return value is in host-endian, rather than net-endian */
-INTDEF ATTR_PURE ATTR_ACCESS_RO(1) uint32_t NOTHROW_NCX(LIBDCALL libd_inet_network)(char const *__restrict cp);
+INTDEF ATTR_PURE ATTR_IN(1) uint32_t NOTHROW_NCX(LIBDCALL libd_inet_network)(char const *__restrict cp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> inet_network(3)
  * This function is  the same as  `inet_addr()', except  that
  * the return value is in host-endian, rather than net-endian */
-INTDEF ATTR_PURE ATTR_ACCESS_RO(1) uint32_t NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp);
+INTDEF ATTR_PURE ATTR_IN(1) uint32_t NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_aton(3)
@@ -149,7 +149,7 @@ INTDEF ATTR_PURE ATTR_ACCESS_RO(1) uint32_t NOTHROW_NCX(LIBCCALL libc_inet_netwo
  *     0123  (oct)
  * @return: 0: Bad input format
  * @return: 1: Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBDCALL libd_inet_aton)(char const *__restrict cp, struct in_addr *__restrict inp);
+INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_inet_aton)(char const *__restrict cp, struct in_addr *__restrict inp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> inet_aton(3)
@@ -167,7 +167,7 @@ INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBDCALL libd_inet_at
  *     0123  (oct)
  * @return: 0: Bad input format
  * @return: 1: Success */
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp, struct in_addr *__restrict inp);
+INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp, struct in_addr *__restrict inp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_paton(3)
@@ -184,7 +184,7 @@ INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_inet_at
  * @param: network_addr: When non-zero, `*pcp' is a network address
  * @return: 0: Bad input format
  * @return: 1: Success */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBDCALL libd_inet_paton)(char const **__restrict pcp, struct in_addr *__restrict inp, int network_addr);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_inet_paton)(char const **__restrict pcp, struct in_addr *__restrict inp, int network_addr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> inet_paton(3)
@@ -201,7 +201,7 @@ INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBDCALL libd
  * @param: network_addr: When non-zero, `*pcp' is a network address
  * @return: 0: Bad input format
  * @return: 1: Success */
-INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp, struct in_addr *__restrict inp, int network_addr);
+INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_inet_paton)(char const **__restrict pcp, struct in_addr *__restrict inp, int network_addr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_neta(3)
@@ -213,7 +213,7 @@ INTDEF WUNUSED ATTR_ACCESS_RW(1) ATTR_ACCESS_WR(2) int NOTHROW_NCX(LIBCCALL libc
  *     %u.%u.%u.%u  For everything else
  * @return: buf:  Success
  * @return: NULL: [errno=EMSGSIZE]: The given `len' is too small */
-INTDEF ATTR_ACCESS_WRS(2, 3) char *NOTHROW_NCX(LIBDCALL libd_inet_neta)(uint32_t net, char *buf, size_t len);
+INTDEF ATTR_OUTS(2, 3) char *NOTHROW_NCX(LIBDCALL libd_inet_neta)(uint32_t net, char *buf, size_t len);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> inet_neta(3)
@@ -225,7 +225,7 @@ INTDEF ATTR_ACCESS_WRS(2, 3) char *NOTHROW_NCX(LIBDCALL libd_inet_neta)(uint32_t
  *     %u.%u.%u.%u  For everything else
  * @return: buf:  Success
  * @return: NULL: [errno=EMSGSIZE]: The given `len' is too small */
-INTDEF ATTR_ACCESS_WRS(2, 3) char *NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net, char *buf, size_t len);
+INTDEF ATTR_OUTS(2, 3) char *NOTHROW_NCX(LIBCCALL libc_inet_neta)(uint32_t net, char *buf, size_t len);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> inet_net_ntop(3)

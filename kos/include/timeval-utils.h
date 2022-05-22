@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5ff4084 */
+/* HASH CRC-32:0xf1a5448f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,38 +37,38 @@ __SYSDECL_BEGIN
 
 #include <bits/types.h>
 #if defined(__CRT_HAVE_timeval_add) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CDECLARE_VOID(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1),__NOTHROW_NCX,timeval_add,(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs),(__result,__lhs,__rhs))
+__CDECLARE_VOID(__ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1),__NOTHROW_NCX,timeval_add,(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs),(__result,__lhs,__rhs))
 #elif defined(__CRT_HAVE_timeval_add64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT_VOID(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1),__NOTHROW_NCX,timeval_add,(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs),timeval_add64,(__result,__lhs,__rhs))
+__CREDIRECT_VOID(__ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1),__NOTHROW_NCX,timeval_add,(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs),timeval_add64,(__result,__lhs,__rhs))
 #else /* ... */
 #include <libc/local/timeval-utils/timeval_add.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(timeval_add, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) void __NOTHROW_NCX(__LIBCCALL timeval_add)(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timeval_add))(__result, __lhs, __rhs); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timeval_add, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1) void __NOTHROW_NCX(__LIBCCALL timeval_add)(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timeval_add))(__result, __lhs, __rhs); })
 #endif /* !... */
 #if defined(__CRT_HAVE_timeval_sub) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CDECLARE_VOID(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1),__NOTHROW_NCX,timeval_sub,(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs),(__result,__lhs,__rhs))
+__CDECLARE_VOID(__ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1),__NOTHROW_NCX,timeval_sub,(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs),(__result,__lhs,__rhs))
 #elif defined(__CRT_HAVE_timeval_sub64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT_VOID(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1),__NOTHROW_NCX,timeval_sub,(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs),timeval_sub64,(__result,__lhs,__rhs))
+__CREDIRECT_VOID(__ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1),__NOTHROW_NCX,timeval_sub,(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs),timeval_sub64,(__result,__lhs,__rhs))
 #else /* ... */
 #include <libc/local/timeval-utils/timeval_sub.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(timeval_sub, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) void __NOTHROW_NCX(__LIBCCALL timeval_sub)(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timeval_sub))(__result, __lhs, __rhs); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timeval_sub, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1) void __NOTHROW_NCX(__LIBCCALL timeval_sub)(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timeval_sub))(__result, __lhs, __rhs); })
 #endif /* !... */
 
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_timeval_add) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT_VOID(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1),__NOTHROW_NCX,timeval_add64,(struct timeval64 *__result, struct timeval64 const *__lhs, struct timeval64 const *__rhs),timeval_add,(__result,__lhs,__rhs))
+__CREDIRECT_VOID(__ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1),__NOTHROW_NCX,timeval_add64,(struct timeval64 *__result, struct timeval64 const *__lhs, struct timeval64 const *__rhs),timeval_add,(__result,__lhs,__rhs))
 #elif defined(__CRT_HAVE_timeval_add64)
-__CDECLARE_VOID(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1),__NOTHROW_NCX,timeval_add64,(struct timeval64 *__result, struct timeval64 const *__lhs, struct timeval64 const *__rhs),(__result,__lhs,__rhs))
+__CDECLARE_VOID(__ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1),__NOTHROW_NCX,timeval_add64,(struct timeval64 *__result, struct timeval64 const *__lhs, struct timeval64 const *__rhs),(__result,__lhs,__rhs))
 #else /* ... */
 #include <libc/local/timeval-utils/timeval_add64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(timeval_add64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) void __NOTHROW_NCX(__LIBCCALL timeval_add64)(struct timeval64 *__result, struct timeval64 const *__lhs, struct timeval64 const *__rhs) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timeval_add64))(__result, __lhs, __rhs); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timeval_add64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1) void __NOTHROW_NCX(__LIBCCALL timeval_add64)(struct timeval64 *__result, struct timeval64 const *__lhs, struct timeval64 const *__rhs) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timeval_add64))(__result, __lhs, __rhs); })
 #endif /* !... */
 #if defined(__CRT_HAVE_timeval_sub) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT_VOID(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1),__NOTHROW_NCX,timeval_sub64,(struct timeval64 *__result, struct timeval64 const *__lhs, struct timeval64 const *__rhs),timeval_sub,(__result,__lhs,__rhs))
+__CREDIRECT_VOID(__ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1),__NOTHROW_NCX,timeval_sub64,(struct timeval64 *__result, struct timeval64 const *__lhs, struct timeval64 const *__rhs),timeval_sub,(__result,__lhs,__rhs))
 #elif defined(__CRT_HAVE_timeval_sub64)
-__CDECLARE_VOID(__ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1),__NOTHROW_NCX,timeval_sub64,(struct timeval64 *__result, struct timeval64 const *__lhs, struct timeval64 const *__rhs),(__result,__lhs,__rhs))
+__CDECLARE_VOID(__ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1),__NOTHROW_NCX,timeval_sub64,(struct timeval64 *__result, struct timeval64 const *__lhs, struct timeval64 const *__rhs),(__result,__lhs,__rhs))
 #else /* ... */
 #include <libc/local/timeval-utils/timeval_sub64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(timeval_sub64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RO(3) __ATTR_ACCESS_WR(1) void __NOTHROW_NCX(__LIBCCALL timeval_sub64)(struct timeval64 *__result, struct timeval64 const *__lhs, struct timeval64 const *__rhs) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timeval_sub64))(__result, __lhs, __rhs); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timeval_sub64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1) void __NOTHROW_NCX(__LIBCCALL timeval_sub64)(struct timeval64 *__result, struct timeval64 const *__lhs, struct timeval64 const *__rhs) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timeval_sub64))(__result, __lhs, __rhs); })
 #endif /* !... */
 #endif /* __USE_TIME64 */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd549f09b */
+/* HASH CRC-32:0x805c0425 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,32 +44,32 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_res_hnok)(char const *a);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_res_ownok)(char const *a);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_res_mailok)(char const *a);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_res_dnok)(char const *a);
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WR_OPT(3) int NOTHROW_NCX(LIBDCALL libd_sym_ston)(struct res_sym const *symbols, char const *wanted_name, int *p_success);
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBDCALL libd_sym_ston)(struct res_sym const *symbols, char const *wanted_name, int *p_success);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(1) ATTR_ACCESS_RO(2) ATTR_ACCESS_WR_OPT(3) int NOTHROW_NCX(LIBCCALL libc_sym_ston)(struct res_sym const *symbols, char const *wanted_name, int *p_success);
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBCCALL libc_sym_ston)(struct res_sym const *symbols, char const *wanted_name, int *p_success);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(3) char const *NOTHROW_NCX(LIBDCALL libd_sym_ntos)(struct res_sym const *symbols, int wanted_number, int *p_success);
+INTDEF ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT_OPT(3) char const *NOTHROW_NCX(LIBDCALL libd_sym_ntos)(struct res_sym const *symbols, int wanted_number, int *p_success);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(3) char const *NOTHROW_NCX(LIBCCALL libc_sym_ntos)(struct res_sym const *symbols, int wanted_number, int *p_success);
+INTDEF ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT_OPT(3) char const *NOTHROW_NCX(LIBCCALL libc_sym_ntos)(struct res_sym const *symbols, int wanted_number, int *p_success);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(3) char const *NOTHROW_NCX(LIBDCALL libd_sym_ntop)(struct res_sym const *symbols, int wanted_number, int *p_success);
+INTDEF ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT_OPT(3) char const *NOTHROW_NCX(LIBDCALL libd_sym_ntop)(struct res_sym const *symbols, int wanted_number, int *p_success);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_RETNONNULL ATTR_ACCESS_RO(1) ATTR_ACCESS_WR_OPT(3) char const *NOTHROW_NCX(LIBCCALL libc_sym_ntop)(struct res_sym const *symbols, int wanted_number, int *p_success);
+INTDEF ATTR_RETNONNULL ATTR_IN(1) ATTR_OUT_OPT(3) char const *NOTHROW_NCX(LIBCCALL libc_sym_ntop)(struct res_sym const *symbols, int wanted_number, int *p_success);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd_b64_ntop)(u_char const *a, size_t b, char *c, size_t d);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_b64_pton)(char const *a, u_char *b, size_t c);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_loc_aton)(char const *a, u_char *b);
 INTDEF char const *NOTHROW_NCX(LIBDCALL libd_loc_ntoa)(u_char const *a, char *b);
-INTDEF ATTR_ACCESS_RO(1) NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_dn_skipname)(u_char const *msg_ptr, u_char const *end_of_msg);
+INTDEF ATTR_IN(1) NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_dn_skipname)(u_char const *msg_ptr, u_char const *end_of_msg);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_ACCESS_RO(1) NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_dn_skipname)(u_char const *msg_ptr, u_char const *end_of_msg);
+INTDEF ATTR_IN(1) NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_dn_skipname)(u_char const *msg_ptr, u_char const *end_of_msg);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF char const *NOTHROW_NCX(LIBDCALL libd_p_class)(int a);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc824c2 */
+/* HASH CRC-32:0x85ccc57a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16ttyname_r_defined
 #define __local___localdep_c16ttyname_r_defined
 #if defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_ACCESS_WRS(2, 3),int,__NOTHROW_RPC,__localdep_c16ttyname_r,(__fd_t __fd, __CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wttyname_r,(__fd,__buf,__buflen))
+__CREDIRECT(__ATTR_OUTS(2, 3),int,__NOTHROW_RPC,__localdep_c16ttyname_r,(__fd_t __fd, __CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wttyname_r,(__fd,__buf,__buflen))
 #elif defined(__CRT_HAVE_DOS$wttyname_r)
-__CREDIRECT_DOS(__ATTR_ACCESS_WRS(2, 3),int,__NOTHROW_RPC,__localdep_c16ttyname_r,(__fd_t __fd, __CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wttyname_r,(__fd,__buf,__buflen))
+__CREDIRECT_DOS(__ATTR_OUTS(2, 3),int,__NOTHROW_RPC,__localdep_c16ttyname_r,(__fd_t __fd, __CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wttyname_r,(__fd,__buf,__buflen))
 #else /* ... */
 #undef __local___localdep_c16ttyname_r_defined
 #endif /* !... */

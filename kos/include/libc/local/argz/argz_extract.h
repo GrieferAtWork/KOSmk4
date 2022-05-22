@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x985389ea */
+/* HASH CRC-32:0x7cef1127 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined
 #ifdef __CRT_HAVE_strlen
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-__LOCAL_LIBC(argz_extract) __ATTR_ACCESS_ROS(1, 2) __ATTR_ACCESS_WR(3) void
+__LOCAL_LIBC(argz_extract) __ATTR_INS(1, 2) __ATTR_OUT(3) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_extract))(char const *__restrict __argz, __SIZE_TYPE__ __argz_len, char **__restrict ___argv) {
 	__SIZE_TYPE__ __i;
 	if __unlikely(!__argz_len)

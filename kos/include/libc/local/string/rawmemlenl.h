@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x131954c0 */
+/* HASH CRC-32:0xa703adb0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_rawmemchrl_defined
 #define __local___localdep_rawmemchrl_defined
 #ifdef __CRT_HAVE_rawmemchrl
-__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ACCESS_RO(1),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_rawmemchrl,(void const *__restrict __haystack, __UINT32_TYPE__ __needle),rawmemchrl,(__haystack,__needle))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_rawmemchrl,(void const *__restrict __haystack, __UINT32_TYPE__ __needle),rawmemchrl,(__haystack,__needle))
 #else /* __CRT_HAVE_rawmemchrl */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/rawmemchrl.h>
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_rawmemchrl __LIBC_LOCAL_NAME(rawmemchrl)
 #endif /* !__CRT_HAVE_rawmemchrl */
 #endif /* !__local___localdep_rawmemchrl_defined */
-__LOCAL_LIBC(rawmemlenl) __ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __SIZE_TYPE__
+__LOCAL_LIBC(rawmemlenl) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemlenl))(void const *__restrict __haystack, __UINT32_TYPE__ __needle) {
 	return (__SIZE_TYPE__)((__NAMESPACE_LOCAL_SYM __localdep_rawmemchrl)(__haystack, __needle) - (__UINT32_TYPE__ *)__haystack);
 }

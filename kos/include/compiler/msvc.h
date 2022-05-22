@@ -260,16 +260,16 @@
 #define __NO_ATTR_FORMAT_ARG
 #define __ATTR_FORMAT_ARG(x) /* nothing */
 #define __NO_ATTR_ACCESS
-#define __ATTR_ACCESS_NONE(ptr_index)            /* Nothing */
-#define __ATTR_ACCESS_ROS(ptr_index, size_index) /* Nothing */
-#define __ATTR_ACCESS_WRS(ptr_index, size_index) /* Nothing */
-#define __ATTR_ACCESS_RWS(ptr_index, size_index) /* Nothing */
-#define __ATTR_ACCESS_RO_OPT(ptr_index)          /* Nothing */
-#define __ATTR_ACCESS_WR_OPT(ptr_index)          /* Nothing */
-#define __ATTR_ACCESS_RW_OPT(ptr_index)          /* Nothing */
-#define __ATTR_ACCESS_RO(ptr_index)              /* Nothing */
-#define __ATTR_ACCESS_WR(ptr_index)              /* Nothing */
-#define __ATTR_ACCESS_RW(ptr_index)              /* Nothing */
+#define __ATTR_ACCESS_NONE(ptr_index)        /* Nothing */
+#define __ATTR_INS(ptr_index, size_index)    /* Nothing */
+#define __ATTR_OUTS(ptr_index, size_index)   /* Nothing */
+#define __ATTR_INOUTS(ptr_index, size_index) /* Nothing */
+#define __ATTR_IN_OPT(ptr_index)             /* Nothing */
+#define __ATTR_OUT_OPT(ptr_index)            /* Nothing */
+#define __ATTR_INOUT_OPT(ptr_index)          /* Nothing */
+#define __ATTR_IN(ptr_index)                 /* Nothing */
+#define __ATTR_OUT(ptr_index)                /* Nothing */
+#define __ATTR_INOUT(ptr_index)              /* Nothing */
 
 #define __IF0    __pragma(warning(suppress: 4127)) if(0)
 #define __IF1    __pragma(warning(suppress: 4127)) if(1)

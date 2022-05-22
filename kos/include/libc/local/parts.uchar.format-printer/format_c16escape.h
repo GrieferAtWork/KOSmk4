@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1e3582a */
+/* HASH CRC-32:0x3f6dd935 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_readutf16_n_defined
 #define __local___localdep_unicode_readutf16_n_defined
 #ifdef __CRT_HAVE_unicode_readutf16_n
-__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf16_n,(__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_end),unicode_readutf16_n,(__ptext,__text_end))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf16_n,(__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_end),unicode_readutf16_n,(__ptext,__text_end))
 #else /* __CRT_HAVE_unicode_readutf16_n */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf16_n.h>
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_unicode_readutf8_n_defined
 #define __local___localdep_unicode_readutf8_n_defined
 #ifdef __CRT_HAVE_unicode_readutf8_n
-__CREDIRECT(__ATTR_ACCESS_RW(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
 #else /* __CRT_HAVE_unicode_readutf8_n */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf8_n.h>
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/template/itoa_digits.h>
 #include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(format_c16escape) __ATTR_ACCESS_ROS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_c16escape) __ATTR_INS(3, 4) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(format_c16escape))(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) {
 	__PRIVATE __CHAR16_TYPE__ const __quote[1] = { '\"' };
 	__CHAR16_TYPE__ __encoded_text[12]; __SIZE_TYPE__ __encoded_text_size;

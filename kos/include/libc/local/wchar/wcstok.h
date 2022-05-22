@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa159ad67 */
+/* HASH CRC-32:0x66c25bb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcscspn_defined
 #define __local___localdep_wcscspn_defined
 #ifdef __CRT_HAVE_wcscspn
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #else /* __CRT_HAVE_wcscspn */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcscspn.h>
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcsspn_defined
 #define __local___localdep_wcsspn_defined
 #ifdef __CRT_HAVE_wcsspn
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_ACCESS_RO(1) __ATTR_ACCESS_RO(2),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #else /* __CRT_HAVE_wcsspn */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsspn.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcsspn __LIBC_LOCAL_NAME(wcsspn)
 #endif /* !__CRT_HAVE_wcsspn */
 #endif /* !__local___localdep_wcsspn_defined */
-__LOCAL_LIBC(wcstok) __ATTR_ACCESS_RO(2) __ATTR_ACCESS_RW(3) __ATTR_ACCESS_RW_OPT(1) __WCHAR_TYPE__ *
+__LOCAL_LIBC(wcstok) __ATTR_IN(2) __ATTR_INOUT(3) __ATTR_INOUT_OPT(1) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstok))(__WCHAR_TYPE__ *__str, __WCHAR_TYPE__ const *__restrict __delim, __WCHAR_TYPE__ **__restrict __save_ptr) {
 	__WCHAR_TYPE__ *__end;
 	if (!__str)

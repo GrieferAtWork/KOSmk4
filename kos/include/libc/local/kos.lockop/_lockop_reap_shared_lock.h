@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafdc8560 */
+/* HASH CRC-32:0x97597788 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ struct shared_lock;
 #include <hybrid/__atomic.h>
 #include <kos/sched/shared-lock.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_lockop_reap_shared_lock) __NOBLOCK __ATTR_ACCESS_RW(1) __ATTR_ACCESS_RW(2) void
+__LOCAL_LIBC(_lockop_reap_shared_lock) __NOBLOCK __ATTR_INOUT(1) __ATTR_INOUT(2) void
 __NOTHROW(__LOCKOP_CC __LIBC_LOCAL_NAME(_lockop_reap_shared_lock))(struct lockop_slist *__restrict __self, struct shared_lock *__restrict __lock) {
 #ifndef __INTELLISENSE__
 #define __LOCAL_self      __self

@@ -68,10 +68,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent)(void)
 }
 /*[[[end:libc_getaliasent]]]*/
 
-/*[[[head:libc_getaliasent_r,hash:CRC-32=0x78c1f1fd]]]*/
+/*[[[head:libc_getaliasent_r,hash:CRC-32=0x4eb5318]]]*/
 /* >> getaliasent_r(3)
  * Reentrant variant of `getaliasent(3)' (s.a. similar functions such as `getpwent_r(3)') */
-INTERN ATTR_SECTION(".text.crt.database.aliases") ATTR_ACCESS_WR(1) ATTR_ACCESS_WR(4) ATTR_ACCESS_WRS(2, 3) errno_t
+INTERN ATTR_SECTION(".text.crt.database.aliases") ATTR_OUT(1) ATTR_OUT(4) ATTR_OUTS(2, 3) errno_t
 NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_buf,
                                              char *__restrict buffer,
                                              size_t buflen,
@@ -87,13 +87,13 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_
 }
 /*[[[end:libc_getaliasent_r]]]*/
 
-/*[[[head:libc_getaliasbyname,hash:CRC-32=0x620b8a7f]]]*/
+/*[[[head:libc_getaliasbyname,hash:CRC-32=0xc5cd2f7]]]*/
 /* >> getaliasbyname(3)
  * Find a database entry associated with the given `name'
  * @return: * :   A pointer to an internal, statically allocated structure
  * @return: NULL: [errno=ENOENT] No entry matching `name'
  * @return: NULL: [errno=*]      Error */
-INTERN ATTR_SECTION(".text.crt.database.aliases") WUNUSED ATTR_ACCESS_RO(1) struct aliasent *
+INTERN ATTR_SECTION(".text.crt.database.aliases") WUNUSED ATTR_IN(1) struct aliasent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname)(char const *name)
 /*[[[body:libc_getaliasbyname]]]*/
 /*AUTO*/{
@@ -104,10 +104,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname)(char const *name)
 }
 /*[[[end:libc_getaliasbyname]]]*/
 
-/*[[[head:libc_getaliasbyname_r,hash:CRC-32=0x579244cf]]]*/
+/*[[[head:libc_getaliasbyname_r,hash:CRC-32=0xa45bb18f]]]*/
 /* >> getaliasbyname_r(3)
  * Reentrant variant of `getaliasbyname(3)' (s.a. similar functions such as `getpwnam_r(3)') */
-INTERN ATTR_SECTION(".text.crt.database.aliases") ATTR_ACCESS_RO(1) ATTR_ACCESS_WR(2) ATTR_ACCESS_WR(5) ATTR_ACCESS_WRS(3, 4) errno_t
+INTERN ATTR_SECTION(".text.crt.database.aliases") ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t
 NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name,
                                                 struct aliasent *__restrict result_buf,
                                                 char *__restrict buffer,
