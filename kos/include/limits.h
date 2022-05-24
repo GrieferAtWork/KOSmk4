@@ -64,7 +64,7 @@
 #endif /* !MB_LEN_MAX */
 
 #ifndef CHAR_BIT
-#define CHAR_BIT  __CHAR_BIT__
+#define CHAR_BIT __CHAR_BIT__
 #endif /* !CHAR_BIT */
 #ifndef SCHAR_MIN
 #define SCHAR_MIN __SCHAR_MIN__
@@ -76,34 +76,34 @@
 #define UCHAR_MAX __UCHAR_MAX__
 #endif /* !UCHAR_MAX */
 #ifndef CHAR_MIN
-#define CHAR_MIN  __CHAR_MIN__
+#define CHAR_MIN __CHAR_MIN__
 #endif /* !CHAR_MIN */
 #ifndef CHAR_MAX
-#define CHAR_MAX  __CHAR_MAX__
+#define CHAR_MAX __CHAR_MAX__
 #endif /* !CHAR_MAX */
 #ifndef SHRT_MIN
-#define SHRT_MIN  __SHRT_MIN__
+#define SHRT_MIN __SHRT_MIN__
 #endif /* !SHRT_MIN */
 #ifndef SHRT_MAX
-#define SHRT_MAX  __SHRT_MAX__
+#define SHRT_MAX __SHRT_MAX__
 #endif /* !SHRT_MAX */
 #ifndef USHRT_MAX
 #define USHRT_MAX __USHRT_MAX__
 #endif /* !USHRT_MAX */
 #ifndef INT_MIN
-#define INT_MIN   __INT_MIN__
+#define INT_MIN __INT_MIN__
 #endif /* !INT_MIN */
 #ifndef INT_MAX
-#define INT_MAX   __INT_MAX__
+#define INT_MAX __INT_MAX__
 #endif /* !INT_MAX */
 #ifndef UINT_MAX
-#define UINT_MAX  __UINT_MAX__
+#define UINT_MAX __UINT_MAX__
 #endif /* !UINT_MAX */
 #ifndef LONG_MIN
-#define LONG_MIN  __LONG_MIN__
+#define LONG_MIN __LONG_MIN__
 #endif /* !LONG_MIN */
 #ifndef LONG_MAX
-#define LONG_MAX  __LONG_MAX__
+#define LONG_MAX __LONG_MAX__
 #endif /* !LONG_MAX */
 #ifndef ULONG_MAX
 #define ULONG_MAX __ULONG_MAX__
@@ -111,29 +111,39 @@
 
 #ifdef __USE_ISOC99
 #if !defined(LLONG_MIN) && defined(__LONG_LONG_MIN__)
-#define LLONG_MIN  __LONG_LONG_MIN__
+#define LLONG_MIN __LONG_LONG_MIN__
 #endif /* !LLONG_MIN && __LONG_LONG_MIN__ */
 #if !defined(LLONG_MAX) && defined(__LONG_LONG_MAX__)
-#define LLONG_MAX  __LONG_LONG_MAX__
+#define LLONG_MAX __LONG_LONG_MAX__
 #endif /* !LLONG_MAX && __LONG_LONG_MAX__ */
 #if !defined(ULLONG_MAX) && defined(__ULONG_LONG_MAX__)
 #define ULLONG_MAX __ULONG_LONG_MAX__
 #endif /* !ULLONG_MAX && __ULONG_LONG_MAX__ */
 #endif /* __USE_ISOC99 */
 
+#ifdef __USE_ISOC17
+#ifndef BOOL_MAX
+#define BOOL_MAX 1
+#endif /* !BOOL_MAX */
+#ifndef BOOL_WIDTH
+#define BOOL_WIDTH 1
+#endif /* !BOOL_WIDTH */
+#endif /* __USE_ISOC17 */
+
 #ifdef __USE_GNU
 #if !defined(LONG_LONG_MIN) && defined(__LONG_LONG_MIN__)
-#define LONG_LONG_MIN  __LONG_LONG_MIN__
+#define LONG_LONG_MIN __LONG_LONG_MIN__
 #endif /* !LONG_LONG_MIN && __LONG_LONG_MIN__ */
 #if !defined(LONG_LONG_MAX) && defined(__LONG_LONG_MAX__)
-#define LONG_LONG_MAX  __LONG_LONG_MAX__
+#define LONG_LONG_MAX __LONG_LONG_MAX__
 #endif /* !LONG_LONG_MAX && __LONG_LONG_MAX__ */
 #if !defined(ULONG_LONG_MAX) && defined(__ULONG_LONG_MAX__)
 #define ULONG_LONG_MAX __ULONG_LONG_MAX__
 #endif /* !ULONG_LONG_MAX && __ULONG_LONG_MAX__ */
 #endif /* __USE_GNU */
 
-#if defined(__USE_GNU) || defined(__STDC_WANT_IEC_60559_BFP_EXT__)
+#if (defined(__USE_GNU) || defined(__USE_ISOC17) || \
+     defined(__STDC_WANT_IEC_60559_BFP_EXT__))
 #ifndef CHAR_WIDTH
 #define CHAR_WIDTH __SCHAR_WIDTH__
 #endif /* !CHAR_WIDTH */
@@ -167,7 +177,7 @@
 #ifndef ULLONG_WIDTH
 #define ULLONG_WIDTH __LONG_LONG_WIDTH__
 #endif /* !ULLONG_WIDTH */
-#endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
+#endif /* __USE_GNU || __USE_ISOC17 || __STDC_WANT_IEC_60559_BFP_EXT__ */
 
 
 #ifdef __USE_DOS
@@ -192,9 +202,11 @@
 #endif /* __PRIVATE_MIN_S16 */
 
 /* """Extension""" Define something that belongs in <stdint.h> */
+#ifndef __USE_DOS_CLEAN
 #ifndef SIZE_MAX
 #define SIZE_MAX __SIZE_MAX__
 #endif  /* SIZE_MAX */
+#endif /* !__USE_DOS_CLEAN */
 
 #ifdef __USE_DOS_SLIB
 #ifndef RSIZE_MAX

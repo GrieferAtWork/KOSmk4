@@ -812,8 +812,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: `file(1)' appears to be broken */
 
-	/* TODO: Add BOOL_MAX and BOOL_WIDTH to <limits.h> */
-
 	/* TODO: Support for `__has_c_attribute()' in <__stdinc.h> and <compiler/generic.h> */
 
 	/* TODO: Check if we support `__STDC_WANT_IEC_60559_EXT__' in <float.h> */
