@@ -4599,6 +4599,7 @@
 #define __CRT_HAVE_sigandset
 #define __CRT_HAVE_sigblock
 #define __CRT_HAVE_sigcodedesc_np
+#define __CRT_HAVE_sigcodename_np
 #define __CRT_HAVE_sigdelset
 #define __CRT_HAVE_sigdescr_np
 #define __CRT_HAVE_sigemptyset

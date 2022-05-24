@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad11c370 */
+/* HASH CRC-32:0xab0ab1b5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2240,6 +2240,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(psiginfo, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__CRT_HAVE_psiginfo */
 #endif /* !__psiginfo_defined */
 #ifdef __USE_KOS
+#ifdef __CRT_HAVE_sigcodename_np
+/* >> sigcodename_np(3)
+ * Return a name of `code', as read from `siginfo_t::si_code',
+ * and used in conjunction with a given signal `signo'.
+ * e.g. `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"' */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,sigcodename_np,(__signo_t __signo, int __code),(__signo,__code))
+#else /* __CRT_HAVE_sigcodename_np */
+#include <libc/local/signal/sigcodename_np.h>
+/* >> sigcodename_np(3)
+ * Return a name of `code', as read from `siginfo_t::si_code',
+ * and used in conjunction with a given signal `signo'.
+ * e.g. `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(sigcodename_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL sigcodename_np)(__signo_t __signo, int __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigcodename_np))(__signo, __code); })
+#endif /* !__CRT_HAVE_sigcodename_np */
 #ifdef __CRT_HAVE_sigcodedesc_np
 /* >> sigcodedesc_np(3)
  * Return a textual description of `code', as read from `siginfo_t::si_code',

@@ -68,10 +68,10 @@ dbg_print_siginfo(siginfo_t const *__restrict info) {
 	           sigabbrev_np(info->si_signo),
 	           sigdescr_np(info->si_signo));
 	if (info->si_code != 0) {
-		dbg_printf(DBGSTR("\tcode:  %u (" AC_WHITE("%s") ")\n"),
+		dbg_printf(DBGSTR("\tcode:  %u (" AC_CYAN("%s") ": " AC_WHITE("%s") ")\n"),
 		           (unsigned int)info->si_code,
-		           sigcodedesc_np(info->si_signo,
-		                          info->si_code));
+		           sigcodename_np(info->si_signo, info->si_code),
+		           sigcodedesc_np(info->si_signo, info->si_code));
 	}
 	if (info->si_errno != 0) {
 		dbg_printf(DBGSTR("\terrno: %" PRIuN(__SIZEOF_ERRNO_T__)
@@ -128,7 +128,6 @@ dbg_coredump(void const *const *traceback_vector,
 	dbg_loadcolor();
 	dbg_putc('\n');
 
-#define VINFO_FORMAT  "%[vinfo:%p [%Rf:%l,%c:%n]]"
 	if (reason) {
 		if (COREDUMP_INFO_ISEXCEPT(unwind_error)) {
 			siginfo_t siginfo;
@@ -240,10 +239,10 @@ printk_err_siginfo(siginfo_t const *__restrict info) {
 	       sigabbrev_np(info->si_signo),
 	       sigdescr_np(info->si_signo));
 	if (info->si_code != 0) {
-		printk(KERN_ERR "\tcode:  %u (%s)\n",
+		printk(KERN_ERR "\tcode:  %u (%s: %s)\n",
 		       (unsigned int)info->si_code,
-		       sigcodedesc_np(info->si_signo,
-		                      info->si_code));
+		       sigcodename_np(info->si_signo, info->si_code),
+		       sigcodedesc_np(info->si_signo, info->si_code));
 	}
 	if (info->si_errno != 0) {
 		printk(KERN_ERR "\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) " (%s: %s)\n",

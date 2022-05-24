@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4952a3bd */
+/* HASH CRC-32:0x50b890b2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -214,6 +214,7 @@
 #define __CRT_HAVE_sigaddset
 #define __CRT_HAVE_sigandset
 #define __CRT_HAVE_sigcodedesc_np
+#define __CRT_HAVE_sigcodename_np
 #define __CRT_HAVE_sigdelset
 #define __CRT_HAVE_sigdescr_np
 #define __CRT_HAVE_sigemptyset

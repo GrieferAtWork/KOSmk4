@@ -2274,13 +2274,13 @@ void psiginfo([[in]] siginfo_t const *pinfo,
 }
 
 %#ifdef __USE_KOS
-@@>> sigcodedesc_np(3)
-@@Return a textual description of `code', as read from `siginfo_t::si_code',
-@@and used in conjunction with a given signal `signo'. This function is used
-@@for the implementation of `psiginfo(3)'
+@@>> sigcodename_np(3)
+@@Return a name of `code', as read from `siginfo_t::si_code',
+@@and used in conjunction with a given signal `signo'.
+@@e.g. `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"'
 [[kernel, const, wunused, decl_include("<bits/types.h>")]]
 [[impl_include("<asm/os/signal.h>", "<asm/os/siginfo.h>")]]
-char const *sigcodedesc_np($signo_t signo, int code) {
+char const *sigcodename_np($signo_t signo, int code) {
 	char const *result = NULL;
 /*[[[deemon
 import util;
@@ -2324,7 +2324,7 @@ function printSigCodeSelector(prefix: string) {
 			code = code.unsigned8;
 		if (code >= #codes)
 			codes.resize(code + 1);
-		codes[code] = comment;
+		codes[code] = name.lstrip("_") + "\0" + comment;
 	}
 	local partitions: {(int, {string...})...} = splitValues(codes);
 	local isFirst = true;
@@ -2354,7 +2354,7 @@ function printSigCodeSelector(prefix: string) {
 			File.Writer text;
 			for (local i, item: util.enumerate(items)) {
 				if (!item)
-					item = "";
+					item = "\0";
 				if (i != #items - 1)
 					item = item + "\0";
 				text << item;
@@ -2383,7 +2383,7 @@ printSigCodeSelector("__SI_");
 print("		break;");
 print("	}");
 print("	if (result) {");
-print("		for (; code; --code)");
+print("		for (code *= 2; code; --code)");
 print("			result = strend(result) + 1;");
 print("		if (!*result)");
 print("			result = NULL;");
@@ -2395,7 +2395,7 @@ function printFallbackSigCodeSelector(prefix: string) {
 		if (!name.startswith(prefix))
 			continue;
 		print("@@pp_ifdef ", name, "@@");
-		print("		case ", name, ": result = ", repr(comment), "; break;");
+		print("		case ", name, ": result = ", repr(name.lstrip("_") + "\0" + comment), "; break;");
 		print("@@pp_endif@@");
 	}
 	print("		default: break;");
@@ -2422,9 +2422,10 @@ print("@@pp_endif@@");
 	case __SIGILL:
 		if ((unsigned int)code <= 0x8) {
 			static char const repr_ill[] =
-			"\0Illegal opcode\0Illegal operand\0Illegal addressing mode\0Illegal "
-			"trap\0Privileged opcode\0Privileged register\0Coprocessor error\0Int"
-			"ernal stack error";
+			"\0\0ILL_ILLOPC\0Illegal opcode\0ILL_ILLOPN\0Illegal operand\0ILL_ILLAD"
+			"R\0Illegal addressing mode\0ILL_ILLTRP\0Illegal trap\0ILL_PRVOPC\0Pri"
+			"vileged opcode\0ILL_PRVREG\0Privileged register\0ILL_COPROC\0Coproce"
+			"ssor error\0ILL_BADSTK\0Internal stack error";
 			result = repr_ill;
 		}
 		break;
@@ -2432,10 +2433,11 @@ print("@@pp_endif@@");
 	case __SIGFPE:
 		if ((unsigned int)code <= 0x8) {
 			static char const repr_fpe[] =
-			"\0Integer divide by zero\0Integer overflow\0Floating point divide b"
-			"y zero\0Floating point overflow\0Floating point underflow\0Floating"
-			" point inexact result\0Floating point invalid operation\0Subscript"
-			" out of range";
+			"\0\0FPE_INTDIV\0Integer divide by zero\0FPE_INTOVF\0Integer overflow\0"
+			"FPE_FLTDIV\0Floating point divide by zero\0FPE_FLTOVF\0Floating poi"
+			"nt overflow\0FPE_FLTUND\0Floating point underflow\0FPE_FLTRES\0Float"
+			"ing point inexact result\0FPE_FLTINV\0Floating point invalid opera"
+			"tion\0FPE_FLTSUB\0Subscript out of range";
 			result = repr_fpe;
 		}
 		break;
@@ -2443,8 +2445,8 @@ print("@@pp_endif@@");
 	case __SIGSEGV:
 		if ((unsigned int)code <= 0x2) {
 			static char const repr_segv[] =
-			"\0Address not mapped to object\0Invalid permissions for mapped obj"
-			"ect";
+			"\0\0SEGV_MAPERR\0Address not mapped to object\0SEGV_ACCERR\0Invalid p"
+			"ermissions for mapped object";
 			result = repr_segv;
 		}
 		break;
@@ -2452,9 +2454,10 @@ print("@@pp_endif@@");
 	case __SIGBUS:
 		if ((unsigned int)code <= 0x5) {
 			static char const repr_bus[] =
-			"\0Invalid address alignment\0Non-existent physical address\0Object "
-			"specific hardware error\0Hardware memory error: action required\0H"
-			"ardware memory error: action optional";
+			"\0\0BUS_ADRALN\0Invalid address alignment\0BUS_ADRERR\0Non-existent p"
+			"hysical address\0BUS_OBJERR\0Object specific hardware error\0BUS_MC"
+			"EERR_AR\0Hardware memory error: action required\0BUS_MCEERR_AO\0Har"
+			"dware memory error: action optional";
 			result = repr_bus;
 		}
 		break;
@@ -2462,7 +2465,7 @@ print("@@pp_endif@@");
 	case __SIGTRAP:
 		if ((unsigned int)code <= 0x2) {
 			static char const repr_trap[] =
-			"\0Process breakpoint\0Process trace trap";
+			"\0\0TRAP_BRKPT\0Process breakpoint\0TRAP_TRACE\0Process trace trap";
 			result = repr_trap;
 		}
 		break;
@@ -2470,9 +2473,10 @@ print("@@pp_endif@@");
 	case __SIGCHLD:
 		if ((unsigned int)code <= 0x6) {
 			static char const repr_cld[] =
-			"\0Child has exited\0Child was killed\0Child terminated abnormally\0T"
-			"raced child has trapped\0Child has stopped\0Stopped child has cont"
-			"inued";
+			"\0\0CLD_EXITED\0Child has exited\0CLD_KILLED\0Child was killed\0CLD_DU"
+			"MPED\0Child terminated abnormally\0CLD_TRAPPED\0Traced child has tr"
+			"apped\0CLD_STOPPED\0Child has stopped\0CLD_CONTINUED\0Stopped child "
+			"has continued";
 			result = repr_cld;
 		}
 		break;
@@ -2480,9 +2484,9 @@ print("@@pp_endif@@");
 	case __SIGPOLL:
 		if ((unsigned int)code <= 0x6) {
 			static char const repr_poll[] =
-			"\0Data input available\0Output buffers available\0Input message ava"
-			"ilable\0I/O error\0High priority input available\0Device disconnect"
-			"ed";
+			"\0\0POLL_IN\0Data input available\0POLL_OUT\0Output buffers available"
+			"\0POLL_MSG\0Input message available\0POLL_ERR\0I/O error\0POLL_PRI\0Hi"
+			"gh priority input available\0POLL_HUP\0Device disconnected";
 			result = repr_poll;
 		}
 		break;
@@ -2490,26 +2494,26 @@ print("@@pp_endif@@");
 	default:
 		code = (unsigned int)code & 0xff;
 		if ((unsigned int)code == 0x0) {
-			result = "Sent by kill, sigsend";
+			result = "SI_USER\0Sent by kill, sigsend";
 			code   = 0;
 		} else if ((unsigned int)code == 0x80) {
-			result = "Send by kernel";
+			result = "SI_KERNEL\0Send by kernel";
 			code   = 0;
 		} else if ((unsigned int)code == 0xc4) {
-			result = "Sent by asynch name lookup completion";
+			result = "SI_ASYNCNL\0Sent by asynch name lookup completion";
 			code   = 0;
 		} else if ((unsigned int)code >= 0xfa && (unsigned int)code <= 0xff) {
 			static char const repr_si[] =
-			"Sent by tkill\0Sent by queued SIGIO\0Sent by AIO completion\0Sent b"
-			"y real time mesq state change\0Sent by timer expiration\0Sent by s"
-			"igqueue";
+			"SI_TKILL\0Sent by tkill\0SI_SIGIO\0Sent by queued SIGIO\0SI_ASYNCIO\0"
+			"Sent by AIO completion\0SI_MESGQ\0Sent by real time mesq state cha"
+			"nge\0SI_TIMER\0Sent by timer expiration\0SI_QUEUE\0Sent by sigqueue";
 			result = repr_si;
 			code -= 0xfa;
 		}
 		break;
 	}
 	if (result) {
-		for (; code; --code)
+		for (code *= 2; code; --code)
 			result = strend(result) + 1;
 		if (!*result)
 			result = NULL;
@@ -2521,28 +2525,28 @@ print("@@pp_endif@@");
 	case __SIGILL:
 		switch (code) {
 @@pp_ifdef __ILL_ILLOPC@@
-		case __ILL_ILLOPC: result = "Illegal opcode"; break;
+		case __ILL_ILLOPC: result = "ILL_ILLOPC\0Illegal opcode"; break;
 @@pp_endif@@
 @@pp_ifdef __ILL_ILLOPN@@
-		case __ILL_ILLOPN: result = "Illegal operand"; break;
+		case __ILL_ILLOPN: result = "ILL_ILLOPN\0Illegal operand"; break;
 @@pp_endif@@
 @@pp_ifdef __ILL_ILLADR@@
-		case __ILL_ILLADR: result = "Illegal addressing mode"; break;
+		case __ILL_ILLADR: result = "ILL_ILLADR\0Illegal addressing mode"; break;
 @@pp_endif@@
 @@pp_ifdef __ILL_ILLTRP@@
-		case __ILL_ILLTRP: result = "Illegal trap"; break;
+		case __ILL_ILLTRP: result = "ILL_ILLTRP\0Illegal trap"; break;
 @@pp_endif@@
 @@pp_ifdef __ILL_PRVOPC@@
-		case __ILL_PRVOPC: result = "Privileged opcode"; break;
+		case __ILL_PRVOPC: result = "ILL_PRVOPC\0Privileged opcode"; break;
 @@pp_endif@@
 @@pp_ifdef __ILL_PRVREG@@
-		case __ILL_PRVREG: result = "Privileged register"; break;
+		case __ILL_PRVREG: result = "ILL_PRVREG\0Privileged register"; break;
 @@pp_endif@@
 @@pp_ifdef __ILL_COPROC@@
-		case __ILL_COPROC: result = "Coprocessor error"; break;
+		case __ILL_COPROC: result = "ILL_COPROC\0Coprocessor error"; break;
 @@pp_endif@@
 @@pp_ifdef __ILL_BADSTK@@
-		case __ILL_BADSTK: result = "Internal stack error"; break;
+		case __ILL_BADSTK: result = "ILL_BADSTK\0Internal stack error"; break;
 @@pp_endif@@
 		default: break;
 		}
@@ -2553,28 +2557,28 @@ print("@@pp_endif@@");
 	case __SIGFPE:
 		switch (code) {
 @@pp_ifdef __FPE_INTDIV@@
-		case __FPE_INTDIV: result = "Integer divide by zero"; break;
+		case __FPE_INTDIV: result = "FPE_INTDIV\0Integer divide by zero"; break;
 @@pp_endif@@
 @@pp_ifdef __FPE_INTOVF@@
-		case __FPE_INTOVF: result = "Integer overflow"; break;
+		case __FPE_INTOVF: result = "FPE_INTOVF\0Integer overflow"; break;
 @@pp_endif@@
 @@pp_ifdef __FPE_FLTDIV@@
-		case __FPE_FLTDIV: result = "Floating point divide by zero"; break;
+		case __FPE_FLTDIV: result = "FPE_FLTDIV\0Floating point divide by zero"; break;
 @@pp_endif@@
 @@pp_ifdef __FPE_FLTOVF@@
-		case __FPE_FLTOVF: result = "Floating point overflow"; break;
+		case __FPE_FLTOVF: result = "FPE_FLTOVF\0Floating point overflow"; break;
 @@pp_endif@@
 @@pp_ifdef __FPE_FLTUND@@
-		case __FPE_FLTUND: result = "Floating point underflow"; break;
+		case __FPE_FLTUND: result = "FPE_FLTUND\0Floating point underflow"; break;
 @@pp_endif@@
 @@pp_ifdef __FPE_FLTRES@@
-		case __FPE_FLTRES: result = "Floating point inexact result"; break;
+		case __FPE_FLTRES: result = "FPE_FLTRES\0Floating point inexact result"; break;
 @@pp_endif@@
 @@pp_ifdef __FPE_FLTINV@@
-		case __FPE_FLTINV: result = "Floating point invalid operation"; break;
+		case __FPE_FLTINV: result = "FPE_FLTINV\0Floating point invalid operation"; break;
 @@pp_endif@@
 @@pp_ifdef __FPE_FLTSUB@@
-		case __FPE_FLTSUB: result = "Subscript out of range"; break;
+		case __FPE_FLTSUB: result = "FPE_FLTSUB\0Subscript out of range"; break;
 @@pp_endif@@
 		default: break;
 		}
@@ -2585,10 +2589,10 @@ print("@@pp_endif@@");
 	case __SIGSEGV:
 		switch (code) {
 @@pp_ifdef __SEGV_MAPERR@@
-		case __SEGV_MAPERR: result = "Address not mapped to object"; break;
+		case __SEGV_MAPERR: result = "SEGV_MAPERR\0Address not mapped to object"; break;
 @@pp_endif@@
 @@pp_ifdef __SEGV_ACCERR@@
-		case __SEGV_ACCERR: result = "Invalid permissions for mapped object"; break;
+		case __SEGV_ACCERR: result = "SEGV_ACCERR\0Invalid permissions for mapped object"; break;
 @@pp_endif@@
 		default: break;
 		}
@@ -2599,19 +2603,19 @@ print("@@pp_endif@@");
 	case __SIGBUS:
 		switch (code) {
 @@pp_ifdef __BUS_ADRALN@@
-		case __BUS_ADRALN: result = "Invalid address alignment"; break;
+		case __BUS_ADRALN: result = "BUS_ADRALN\0Invalid address alignment"; break;
 @@pp_endif@@
 @@pp_ifdef __BUS_ADRERR@@
-		case __BUS_ADRERR: result = "Non-existent physical address"; break;
+		case __BUS_ADRERR: result = "BUS_ADRERR\0Non-existent physical address"; break;
 @@pp_endif@@
 @@pp_ifdef __BUS_OBJERR@@
-		case __BUS_OBJERR: result = "Object specific hardware error"; break;
+		case __BUS_OBJERR: result = "BUS_OBJERR\0Object specific hardware error"; break;
 @@pp_endif@@
 @@pp_ifdef __BUS_MCEERR_AR@@
-		case __BUS_MCEERR_AR: result = "Hardware memory error: action required"; break;
+		case __BUS_MCEERR_AR: result = "BUS_MCEERR_AR\0Hardware memory error: action required"; break;
 @@pp_endif@@
 @@pp_ifdef __BUS_MCEERR_AO@@
-		case __BUS_MCEERR_AO: result = "Hardware memory error: action optional"; break;
+		case __BUS_MCEERR_AO: result = "BUS_MCEERR_AO\0Hardware memory error: action optional"; break;
 @@pp_endif@@
 		default: break;
 		}
@@ -2622,10 +2626,10 @@ print("@@pp_endif@@");
 	case __SIGTRAP:
 		switch (code) {
 @@pp_ifdef __TRAP_BRKPT@@
-		case __TRAP_BRKPT: result = "Process breakpoint"; break;
+		case __TRAP_BRKPT: result = "TRAP_BRKPT\0Process breakpoint"; break;
 @@pp_endif@@
 @@pp_ifdef __TRAP_TRACE@@
-		case __TRAP_TRACE: result = "Process trace trap"; break;
+		case __TRAP_TRACE: result = "TRAP_TRACE\0Process trace trap"; break;
 @@pp_endif@@
 		default: break;
 		}
@@ -2636,22 +2640,22 @@ print("@@pp_endif@@");
 	case __SIGCHLD:
 		switch (code) {
 @@pp_ifdef __CLD_EXITED@@
-		case __CLD_EXITED: result = "Child has exited"; break;
+		case __CLD_EXITED: result = "CLD_EXITED\0Child has exited"; break;
 @@pp_endif@@
 @@pp_ifdef __CLD_KILLED@@
-		case __CLD_KILLED: result = "Child was killed"; break;
+		case __CLD_KILLED: result = "CLD_KILLED\0Child was killed"; break;
 @@pp_endif@@
 @@pp_ifdef __CLD_DUMPED@@
-		case __CLD_DUMPED: result = "Child terminated abnormally"; break;
+		case __CLD_DUMPED: result = "CLD_DUMPED\0Child terminated abnormally"; break;
 @@pp_endif@@
 @@pp_ifdef __CLD_TRAPPED@@
-		case __CLD_TRAPPED: result = "Traced child has trapped"; break;
+		case __CLD_TRAPPED: result = "CLD_TRAPPED\0Traced child has trapped"; break;
 @@pp_endif@@
 @@pp_ifdef __CLD_STOPPED@@
-		case __CLD_STOPPED: result = "Child has stopped"; break;
+		case __CLD_STOPPED: result = "CLD_STOPPED\0Child has stopped"; break;
 @@pp_endif@@
 @@pp_ifdef __CLD_CONTINUED@@
-		case __CLD_CONTINUED: result = "Stopped child has continued"; break;
+		case __CLD_CONTINUED: result = "CLD_CONTINUED\0Stopped child has continued"; break;
 @@pp_endif@@
 		default: break;
 		}
@@ -2662,22 +2666,22 @@ print("@@pp_endif@@");
 	case __SIGPOLL:
 		switch (code) {
 @@pp_ifdef __POLL_IN@@
-		case __POLL_IN: result = "Data input available"; break;
+		case __POLL_IN: result = "POLL_IN\0Data input available"; break;
 @@pp_endif@@
 @@pp_ifdef __POLL_OUT@@
-		case __POLL_OUT: result = "Output buffers available"; break;
+		case __POLL_OUT: result = "POLL_OUT\0Output buffers available"; break;
 @@pp_endif@@
 @@pp_ifdef __POLL_MSG@@
-		case __POLL_MSG: result = "Input message available"; break;
+		case __POLL_MSG: result = "POLL_MSG\0Input message available"; break;
 @@pp_endif@@
 @@pp_ifdef __POLL_ERR@@
-		case __POLL_ERR: result = "I/O error"; break;
+		case __POLL_ERR: result = "POLL_ERR\0I/O error"; break;
 @@pp_endif@@
 @@pp_ifdef __POLL_PRI@@
-		case __POLL_PRI: result = "High priority input available"; break;
+		case __POLL_PRI: result = "POLL_PRI\0High priority input available"; break;
 @@pp_endif@@
 @@pp_ifdef __POLL_HUP@@
-		case __POLL_HUP: result = "Device disconnected"; break;
+		case __POLL_HUP: result = "POLL_HUP\0Device disconnected"; break;
 @@pp_endif@@
 		default: break;
 		}
@@ -2687,31 +2691,31 @@ print("@@pp_endif@@");
 	default:
 		switch (code) {
 @@pp_ifdef __SI_ASYNCNL@@
-		case __SI_ASYNCNL: result = "Sent by asynch name lookup completion"; break;
+		case __SI_ASYNCNL: result = "SI_ASYNCNL\0Sent by asynch name lookup completion"; break;
 @@pp_endif@@
 @@pp_ifdef __SI_TKILL@@
-		case __SI_TKILL: result = "Sent by tkill"; break;
+		case __SI_TKILL: result = "SI_TKILL\0Sent by tkill"; break;
 @@pp_endif@@
 @@pp_ifdef __SI_SIGIO@@
-		case __SI_SIGIO: result = "Sent by queued SIGIO"; break;
+		case __SI_SIGIO: result = "SI_SIGIO\0Sent by queued SIGIO"; break;
 @@pp_endif@@
 @@pp_ifdef __SI_ASYNCIO@@
-		case __SI_ASYNCIO: result = "Sent by AIO completion"; break;
+		case __SI_ASYNCIO: result = "SI_ASYNCIO\0Sent by AIO completion"; break;
 @@pp_endif@@
 @@pp_ifdef __SI_MESGQ@@
-		case __SI_MESGQ: result = "Sent by real time mesq state change"; break;
+		case __SI_MESGQ: result = "SI_MESGQ\0Sent by real time mesq state change"; break;
 @@pp_endif@@
 @@pp_ifdef __SI_TIMER@@
-		case __SI_TIMER: result = "Sent by timer expiration"; break;
+		case __SI_TIMER: result = "SI_TIMER\0Sent by timer expiration"; break;
 @@pp_endif@@
 @@pp_ifdef __SI_QUEUE@@
-		case __SI_QUEUE: result = "Sent by sigqueue"; break;
+		case __SI_QUEUE: result = "SI_QUEUE\0Sent by sigqueue"; break;
 @@pp_endif@@
 @@pp_ifdef __SI_USER@@
-		case __SI_USER: result = "Sent by kill, sigsend"; break;
+		case __SI_USER: result = "SI_USER\0Sent by kill, sigsend"; break;
 @@pp_endif@@
 @@pp_ifdef __SI_KERNEL@@
-		case __SI_KERNEL: result = "Send by kernel"; break;
+		case __SI_KERNEL: result = "SI_KERNEL\0Send by kernel"; break;
 @@pp_endif@@
 		default: break;
 		}
@@ -2719,6 +2723,19 @@ print("@@pp_endif@@");
 	}
 @@pp_endif@@
 /*[[[end]]]*/
+	return result;
+}
+
+@@>> sigcodedesc_np(3)
+@@Return a textual description of `code', as read from `siginfo_t::si_code',
+@@and used in conjunction with a given signal `signo'. This function is used
+@@for the implementation of `psiginfo(3)'
+[[kernel, const, wunused, decl_include("<bits/types.h>")]]
+[[requires_function(sigcodename_np)]]
+char const *sigcodedesc_np($signo_t signo, int code) {
+	char const *result = sigcodename_np(signo, code);
+	if (result)
+		result = strend(result) + 1;
 	return result;
 }
 

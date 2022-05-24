@@ -4445,6 +4445,7 @@
 #define __CRT_HAVE_sigandset
 #define __CRT_HAVE_sigblock
 #define __CRT_HAVE_sigcodedesc_np
+#define __CRT_HAVE_sigcodename_np
 #define __CRT_HAVE_sigdelset
 #define __CRT_HAVE_sigdescr_np
 #define __CRT_HAVE_sigemptyset
@@ -9918,6 +9919,7 @@
 #define __CRT_HAVE_KOS$sigandset
 #define __CRT_HAVE_KOS$sigblock
 #define __CRT_HAVE_KOS$sigcodedesc_np
+#define __CRT_HAVE_KOS$sigcodename_np
 #define __CRT_HAVE_KOS$sigdelset
 #define __CRT_HAVE_KOS$sigdescr_np
 #define __CRT_HAVE_KOS$sigemptyset
@@ -14480,6 +14482,7 @@
 #define __CRT_HAVE_DOS$sigandset
 #define __CRT_HAVE_DOS$sigblock
 #define __CRT_HAVE_DOS$sigcodedesc_np
+#define __CRT_HAVE_DOS$sigcodename_np
 #define __CRT_HAVE_DOS$sigdelset
 #define __CRT_HAVE_DOS$sigdescr_np
 #define __CRT_HAVE_DOS$sigemptyset

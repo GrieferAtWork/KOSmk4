@@ -39,8 +39,8 @@
      (!defined(__LINKER__) && !defined(__ASSEMBLY__) &&   \
       !defined(__ASSEMBLER__) && !defined(__assembler) && \
       !defined(__DEEMON__)))
-#define __CC__  1 /* C Compiler. */
-#define __CCAST   /* Nothing */
+#define __CC__ 1 /* C Compiler. */
+#define __CCAST  /* Nothing */
 #else /* ... */
 #undef __cplusplus
 #define __CCAST(T) /* Nothing */
@@ -76,7 +76,6 @@
 #include "compiler/pp-generic.h"
 
 #ifndef __CC__
-#include "compiler/c.h"
 #include "compiler/other.h"
 #else /* !__CC__ */
 #define __COMPILER_LENOF(arr)  (sizeof(arr) / sizeof(*(arr)))

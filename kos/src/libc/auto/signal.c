@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9407accd */
+/* HASH CRC-32:0xa5167cad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -379,12 +379,12 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 }
 #endif /* !__KERNEL__ */
 #include <asm/os/siginfo.h>
-/* >> sigcodedesc_np(3)
- * Return a textual description of `code', as read from `siginfo_t::si_code',
- * and used in conjunction with a given signal `signo'. This function is used
- * for the implementation of `psiginfo(3)' */
+/* >> sigcodename_np(3)
+ * Return a name of `code', as read from `siginfo_t::si_code',
+ * and used in conjunction with a given signal `signo'.
+ * e.g. `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(LIBCCALL libc_sigcodedesc_np)(signo_t signo,
+NOTHROW_NCX(LIBCCALL libc_sigcodename_np)(signo_t signo,
                                           int code) {
 	char const *result = NULL;
 /*[[[deemon
@@ -429,7 +429,7 @@ function printSigCodeSelector(prefix: string) {
 			code = code.unsigned8;
 		if (code >= #codes)
 			codes.resize(code + 1);
-		codes[code] = comment;
+		codes[code] = name.lstrip("_") + "\0" + comment;
 	}
 	local partitions: {(int, {string...})...} = splitValues(codes);
 	local isFirst = true;
@@ -459,7 +459,7 @@ function printSigCodeSelector(prefix: string) {
 			File.Writer text;
 			for (local i, item: util.enumerate(items)) {
 				if (!item)
-					item = "";
+					item = "\0";
 				if (i != #items - 1)
 					item = item + "\0";
 				text << item;
@@ -488,7 +488,7 @@ printSigCodeSelector("__SI_");
 print("		break;");
 print("	}");
 print("	if (result) {");
-print("		for (; code; --code)");
+print("		for (code *= 2; code; --code)");
 print("			result = strend(result) + 1;");
 print("		if (!*result)");
 print("			result = NULL;");
@@ -500,7 +500,7 @@ function printFallbackSigCodeSelector(prefix: string) {
 		if (!name.startswith(prefix))
 			continue;
 		print("@@pp_ifdef ", name, "@@");
-		print("		case ", name, ": result = ", repr(comment), "; break;");
+		print("		case ", name, ": result = ", repr(name.lstrip("_") + "\0" + comment), "; break;");
 		print("@@pp_endif@@");
 	}
 	print("		default: break;");
@@ -527,9 +527,10 @@ print("@@pp_endif@@");
 	case __SIGILL:
 		if ((unsigned int)code <= 0x8) {
 			static char const repr_ill[] =
-			"\0Illegal opcode\0Illegal operand\0Illegal addressing mode\0Illegal "
-			"trap\0Privileged opcode\0Privileged register\0Coprocessor error\0Int"
-			"ernal stack error";
+			"\0\0ILL_ILLOPC\0Illegal opcode\0ILL_ILLOPN\0Illegal operand\0ILL_ILLAD"
+			"R\0Illegal addressing mode\0ILL_ILLTRP\0Illegal trap\0ILL_PRVOPC\0Pri"
+			"vileged opcode\0ILL_PRVREG\0Privileged register\0ILL_COPROC\0Coproce"
+			"ssor error\0ILL_BADSTK\0Internal stack error";
 			result = repr_ill;
 		}
 		break;
@@ -537,10 +538,11 @@ print("@@pp_endif@@");
 	case __SIGFPE:
 		if ((unsigned int)code <= 0x8) {
 			static char const repr_fpe[] =
-			"\0Integer divide by zero\0Integer overflow\0Floating point divide b"
-			"y zero\0Floating point overflow\0Floating point underflow\0Floating"
-			" point inexact result\0Floating point invalid operation\0Subscript"
-			" out of range";
+			"\0\0FPE_INTDIV\0Integer divide by zero\0FPE_INTOVF\0Integer overflow\0"
+			"FPE_FLTDIV\0Floating point divide by zero\0FPE_FLTOVF\0Floating poi"
+			"nt overflow\0FPE_FLTUND\0Floating point underflow\0FPE_FLTRES\0Float"
+			"ing point inexact result\0FPE_FLTINV\0Floating point invalid opera"
+			"tion\0FPE_FLTSUB\0Subscript out of range";
 			result = repr_fpe;
 		}
 		break;
@@ -548,8 +550,8 @@ print("@@pp_endif@@");
 	case __SIGSEGV:
 		if ((unsigned int)code <= 0x2) {
 			static char const repr_segv[] =
-			"\0Address not mapped to object\0Invalid permissions for mapped obj"
-			"ect";
+			"\0\0SEGV_MAPERR\0Address not mapped to object\0SEGV_ACCERR\0Invalid p"
+			"ermissions for mapped object";
 			result = repr_segv;
 		}
 		break;
@@ -557,9 +559,10 @@ print("@@pp_endif@@");
 	case __SIGBUS:
 		if ((unsigned int)code <= 0x5) {
 			static char const repr_bus[] =
-			"\0Invalid address alignment\0Non-existent physical address\0Object "
-			"specific hardware error\0Hardware memory error: action required\0H"
-			"ardware memory error: action optional";
+			"\0\0BUS_ADRALN\0Invalid address alignment\0BUS_ADRERR\0Non-existent p"
+			"hysical address\0BUS_OBJERR\0Object specific hardware error\0BUS_MC"
+			"EERR_AR\0Hardware memory error: action required\0BUS_MCEERR_AO\0Har"
+			"dware memory error: action optional";
 			result = repr_bus;
 		}
 		break;
@@ -567,7 +570,7 @@ print("@@pp_endif@@");
 	case __SIGTRAP:
 		if ((unsigned int)code <= 0x2) {
 			static char const repr_trap[] =
-			"\0Process breakpoint\0Process trace trap";
+			"\0\0TRAP_BRKPT\0Process breakpoint\0TRAP_TRACE\0Process trace trap";
 			result = repr_trap;
 		}
 		break;
@@ -575,9 +578,10 @@ print("@@pp_endif@@");
 	case __SIGCHLD:
 		if ((unsigned int)code <= 0x6) {
 			static char const repr_cld[] =
-			"\0Child has exited\0Child was killed\0Child terminated abnormally\0T"
-			"raced child has trapped\0Child has stopped\0Stopped child has cont"
-			"inued";
+			"\0\0CLD_EXITED\0Child has exited\0CLD_KILLED\0Child was killed\0CLD_DU"
+			"MPED\0Child terminated abnormally\0CLD_TRAPPED\0Traced child has tr"
+			"apped\0CLD_STOPPED\0Child has stopped\0CLD_CONTINUED\0Stopped child "
+			"has continued";
 			result = repr_cld;
 		}
 		break;
@@ -585,9 +589,9 @@ print("@@pp_endif@@");
 	case __SIGPOLL:
 		if ((unsigned int)code <= 0x6) {
 			static char const repr_poll[] =
-			"\0Data input available\0Output buffers available\0Input message ava"
-			"ilable\0I/O error\0High priority input available\0Device disconnect"
-			"ed";
+			"\0\0POLL_IN\0Data input available\0POLL_OUT\0Output buffers available"
+			"\0POLL_MSG\0Input message available\0POLL_ERR\0I/O error\0POLL_PRI\0Hi"
+			"gh priority input available\0POLL_HUP\0Device disconnected";
 			result = repr_poll;
 		}
 		break;
@@ -595,26 +599,26 @@ print("@@pp_endif@@");
 	default:
 		code = (unsigned int)code & 0xff;
 		if ((unsigned int)code == 0x0) {
-			result = "Sent by kill, sigsend";
+			result = "SI_USER\0Sent by kill, sigsend";
 			code   = 0;
 		} else if ((unsigned int)code == 0x80) {
-			result = "Send by kernel";
+			result = "SI_KERNEL\0Send by kernel";
 			code   = 0;
 		} else if ((unsigned int)code == 0xc4) {
-			result = "Sent by asynch name lookup completion";
+			result = "SI_ASYNCNL\0Sent by asynch name lookup completion";
 			code   = 0;
 		} else if ((unsigned int)code >= 0xfa && (unsigned int)code <= 0xff) {
 			static char const repr_si[] =
-			"Sent by tkill\0Sent by queued SIGIO\0Sent by AIO completion\0Sent b"
-			"y real time mesq state change\0Sent by timer expiration\0Sent by s"
-			"igqueue";
+			"SI_TKILL\0Sent by tkill\0SI_SIGIO\0Sent by queued SIGIO\0SI_ASYNCIO\0"
+			"Sent by AIO completion\0SI_MESGQ\0Sent by real time mesq state cha"
+			"nge\0SI_TIMER\0Sent by timer expiration\0SI_QUEUE\0Sent by sigqueue";
 			result = repr_si;
 			code -= 0xfa;
 		}
 		break;
 	}
 	if (result) {
-		for (; code; --code)
+		for (code *= 2; code; --code)
 			result = libc_strend(result) + 1;
 		if (!*result)
 			result = NULL;
@@ -824,6 +828,18 @@ print("@@pp_endif@@");
 
 
 /*[[[end]]]*/
+	return result;
+}
+/* >> sigcodedesc_np(3)
+ * Return a textual description of `code', as read from `siginfo_t::si_code',
+ * and used in conjunction with a given signal `signo'. This function is used
+ * for the implementation of `psiginfo(3)' */
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED char const *
+NOTHROW_NCX(LIBCCALL libc_sigcodedesc_np)(signo_t signo,
+                                          int code) {
+	char const *result = libc_sigcodename_np(signo, code);
+	if (result)
+		result = libc_strend(result) + 1;
 	return result;
 }
 #ifndef __KERNEL__
@@ -1083,6 +1099,7 @@ DEFINE_PUBLIC_ALIAS(killpg, libc_killpg);
 DEFINE_PUBLIC_ALIAS(psignal, libc_psignal);
 DEFINE_PUBLIC_ALIAS(psiginfo, libc_psiginfo);
 #endif /* !__KERNEL__ */
+DEFINE_PUBLIC_ALIAS(sigcodename_np, libc_sigcodename_np);
 DEFINE_PUBLIC_ALIAS(sigcodedesc_np, libc_sigcodedesc_np);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(sigstack, libc_sigstack);

@@ -30,12 +30,13 @@
 #if (!defined(__INTELLISENSE__) && defined(__CC__) && \
      defined(__KOS__) && defined(__KERNEL__) &&       \
      defined(__COMPILER_HAVE_GCC_ASM) && !defined(__HAVE_FPU))
-/* Define  some assembler macros to cause compiler error when GCC generates
- * floating-point instructions. This can unintentionally happen when 32-bit
- * codes uses ATOMIC_READ() or ATOMIC_WRITE() with 64-bit operands.
+/* Define some macros to force liner errors when GCC tries to use
+ * floating-point instructions. This  can unintentionally  happen
+ * when 32-bit codes  uses ATOMIC_READ()  or ATOMIC_WRITE()  with
+ * 64-bit operands.
  *
- * These are set-up to cause linker errors (which include file+line info)
- * when an FPU instruction does end up being used. */
+ * These are set-up to cause linker errors (which include file+
+ * line info) when an FPU  instruction does end up being  used. */
 __asm__(
 ".macro fildq _a:vararg\n"
 "\t.hidden __x86_linkerror_fpu_instruction_fildq\n"
