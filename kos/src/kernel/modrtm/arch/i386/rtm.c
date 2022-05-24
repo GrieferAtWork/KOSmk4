@@ -1461,10 +1461,8 @@ x86_emulate_xbegin(struct icpustate *__restrict state,
 #ifdef HAVE_RTM_EMULATION_TRACE
 			printk(KERN_TRACE "[rtm] Emulate %p: ",
 			       (void *)mach.r_pip);
-			disasm_single(&syslog_printer,
-			              SYSLOG_LEVEL_TRACE,
-			              (void *)mach.r_pip,
-			              DISASSEMBLER_TARGET_CURRENT,
+			disasm_single(&syslog_printer, SYSLOG_LEVEL_TRACE, (void *)mach.r_pip,
+			              disassembler_target_from_icpustate(mach.r_icstate),
 			              DISASSEMBLER_FNOADDR);
 			printk(KERN_TRACE "\t# "
 			                  "a=%#" PRIxPTR " "

@@ -79,8 +79,8 @@ INTERN_FUNCTION(libc_rtm_begin)
 .Lrtm_begin_maybe_xbegin:
 	.byte  0x90 /* nop */
 	.byte  0xe9 /* jmp (with 32-bit operand) */
-	.reloc ., R_X86_64_PC32, libc_rtm_begin_init;
-	.long  -4;
+	.reloc ., R_X86_64_PC32, libc_rtm_begin_init - 4;
+	.long  0;
 	/* Hardware RTM entered. */
 .Lrtm_begin_do_return:
 	ret

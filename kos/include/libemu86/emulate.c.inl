@@ -2766,6 +2766,14 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 		}
 	}
 #endif /* !EMU86_GETSEGBASE_IS_NOOP_ALL */
+#if __SIZEOF_POINTER__ > 4 && CONFIG_LIBEMU86_WANT_32BIT
+	if (EMU86_F_IS32(op_flags))
+		result &= UINT32_C(0xffffffff);
+#endif /* __SIZEOF_POINTER__ > 4 && CONFIG_LIBEMU86_WANT_32BIT */
+#if __SIZEOF_POINTER__ > 2 && CONFIG_LIBEMU86_WANT_16BIT
+	if (EMU86_F_IS16(op_flags))
+		result &= UINT16_C(0xffff);
+#endif /* __SIZEOF_POINTER__ > 2 && CONFIG_LIBEMU86_WANT_16BIT */
 	return (byte_t *)result;
 }
 #endif /* !EMU86_MODRM_MEMADDR */
@@ -2811,6 +2819,14 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 	}
 	if (modrm->mi_index != 0xff)
 		result += EMU86_GETREGP(modrm->mi_index, op_flags) << modrm->mi_shift;
+#if __SIZEOF_POINTER__ > 4 && CONFIG_LIBEMU86_WANT_32BIT
+	if (EMU86_F_IS32(op_flags))
+		result &= UINT32_C(0xffffffff);
+#endif /* __SIZEOF_POINTER__ > 4 && CONFIG_LIBEMU86_WANT_32BIT */
+#if __SIZEOF_POINTER__ > 2 && CONFIG_LIBEMU86_WANT_16BIT
+	if (EMU86_F_IS16(op_flags))
+		result &= UINT16_C(0xffff);
+#endif /* __SIZEOF_POINTER__ > 2 && CONFIG_LIBEMU86_WANT_16BIT */
 	return (byte_t *)result;
 }
 #endif /* !EMU86_GETSEGBASE_IS_NOOP_ALL */

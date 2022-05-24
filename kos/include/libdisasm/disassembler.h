@@ -56,6 +56,14 @@ enum {
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
+#if defined(__i386__) || defined(__x86_64__)
+#define disassembler_target_from_icpustate(state) (icpustate_isvm86(state) ? DISASSEMBLER_TARGET_8086 : icpustate_is32bit(state) ? DISASSEMBLER_TARGET_I386 : DISASSEMBLER_TARGET_X86_64)
+#define disassembler_target_from_scpustate(state) (scpustate_isvm86(state) ? DISASSEMBLER_TARGET_8086 : scpustate_is32bit(state) ? DISASSEMBLER_TARGET_I386 : DISASSEMBLER_TARGET_X86_64)
+#define disassembler_target_from_ucpustate(state) (ucpustate_isvm86(state) ? DISASSEMBLER_TARGET_8086 : ucpustate_is32bit(state) ? DISASSEMBLER_TARGET_I386 : DISASSEMBLER_TARGET_X86_64)
+#define disassembler_target_from_fcpustate(state) (fcpustate_isvm86(state) ? DISASSEMBLER_TARGET_8086 : fcpustate_is32bit(state) ? DISASSEMBLER_TARGET_I386 : DISASSEMBLER_TARGET_X86_64)
+#endif /* __i386__ || __x86_64__ */
+
+
 /* The target ID for the hosting machine. */
 #ifdef __x86_64__
 #define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_X86_64
