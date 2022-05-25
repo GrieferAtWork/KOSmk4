@@ -571,7 +571,7 @@ INTDEF void *ASMCALL libdl____tls_get_addr(void); /* Only available on some arch
 INTDEF void *LIBCCALL libdl___tls_get_addr(void *arg);
 
 
-struct tls_segment;
+struct dltls_segment;
 
 /* Allocate/Free a static TLS segment
  * These functions are called by by libc in  order to safely create a new thread, such  that
@@ -579,12 +579,12 @@ struct tls_segment;
  * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
-INTDEF ATTR_MALLOC WUNUSED struct tls_segment *
+INTDEF ATTR_MALLOC WUNUSED struct dltls_segment *
 NOTHROW(DLFCN_CC libdl_dltlsallocseg)(void);
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
 INTDEF NONNULL((1)) int DLFCN_CC
-libdl_dltlsfreeseg(USER struct tls_segment *ptr)
+libdl_dltlsfreeseg(USER struct dltls_segment *ptr)
 		THROWS(E_SEGFAULT, ...);
 
 /* Return a pointer to the base of the given module's
@@ -688,16 +688,11 @@ libdl_dltlsaddr(USER DlModule *self)
  * @return: NULL: Invalid `tls_handle' or `tls_segment', or
  *                allocation/initialization failed. (s.a. `dlerror()') */
 INTDEF WUNUSED void *__DLFCN_DLTLSADDR2_CC
-libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg)
+libdl_dltlsaddr2(USER DlModule *self, USER struct dltls_segment *seg)
 		THROWS(E_SEGFAULT, ...);
 INTDEF WUNUSED void *__DLFCN_DLTLSADDR2_CC
 libdl_dltlsaddr2_noinit(DlModule *__restrict self,
-                        USER struct tls_segment *seg);
-
-/* Return a pointer to the main thread's  TLS segment. The caller must ensure  that
- * this segment has not, and will not be deleted. Otherwise, behavior is undefined. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED void *CC
-libdl_dlmainsegment(void);
+                        USER struct dltls_segment *seg);
 
 /* Similar to `libdl_dltlsaddr()', but do no lazy allocation
  * and return NULL if the module doesn't have a TLS segment. */

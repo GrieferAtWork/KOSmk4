@@ -44,13 +44,13 @@ libdl_dltlsbase(DlModule *__restrict self) THROWS(...)
  * @return: * :   Pointer to the base of the TLS segment associated with `tls_handle' within the calling thread.
  * @return: NULL: Invalid `tls_handle', or allocation/initialization failed. (s.a. `dlerror()') */
 INTERN WUNUSED void *__DLFCN_DLTLSADDR2_CC
-libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEGFAULT, ...)
+libdl_dltlsaddr2(USER DlModule *self, USER struct dltls_segment *seg) THROWS(E_SEGFAULT, ...)
 #endif /* !FAIL_ON_ERROR */
 {
 #ifdef FAIL_ON_ERROR
-	struct tls_segment *seg;
+	struct dltls_segment *seg;
 #endif /* FAIL_ON_ERROR */
-	struct dtls_extension *extab;
+	struct dltls_extension *extab;
 #ifndef FAIL_ON_ERROR
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_badmodule;
@@ -62,9 +62,9 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 	/* Simple case: Static TLS, and special case: Empty TLS */
 	if (self->dm_tlsstoff || unlikely(!self->dm_tlsmsize))
 		return (byte_t *)seg + self->dm_tlsstoff;
-	tls_segment_ex_read(seg);
+	dltls_segment_ex_read(seg);
 	extab = dtls_extension_tree_locate(seg->ts_extree, self);
-	tls_segment_ex_endread(seg);
+	dltls_segment_ex_endread(seg);
 	if (extab)
 		return extab->te_data;
 	/* Lazily allocate missing extension tables.
@@ -92,10 +92,10 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 	/* Allocate the actual extension table. */
 	{
 		uintptr_t data_offset;
-		data_offset = sizeof(struct dtls_extension);
+		data_offset = sizeof(struct dltls_extension);
 		data_offset += self->dm_tlsalign - 1;
 		data_offset &= ~(self->dm_tlsalign - 1);
-		extab = (struct dtls_extension *)memalign(self->dm_tlsalign,
+		extab = (struct dltls_extension *)memalign(self->dm_tlsalign,
 		                                          data_offset + self->dm_tlsmsize);
 		if unlikely(!extab)
 			goto err_nomem;
@@ -122,15 +122,15 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 	 *      isn't   (and   probably  couldn't)   be   re-entrant  in   the   general  case...
 	 *      What do the  specs say  about a  signal handler being  the first  to access  some
 	 *      thread-local variable? */
-	tls_segment_ex_write(seg);
+	dltls_segment_ex_write(seg);
 	{
-		struct dtls_extension *newtab;
+		struct dltls_extension *newtab;
 		newtab = dtls_extension_tree_locate(seg->ts_extree, self);
 		if unlikely(newtab != NULL) {
 			/* Some other thread already allocated the TLS segment for us
 			 * XXX: Can this even happen? (I don't think it can, considering
 			 *      we're using lazy allocations) */
-			tls_segment_ex_endwrite(seg);
+			dltls_segment_ex_endwrite(seg);
 			/* Invoke TLS finalizers. */
 			RAII_FINALLY { free(extab); };
 			if (self->dm_tls_fini)
@@ -139,7 +139,7 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEG
 		}
 	}
 	dtls_extension_tree_insert(&seg->ts_extree, extab);
-	tls_segment_ex_endwrite(seg);
+	dltls_segment_ex_endwrite(seg);
 	return extab->te_data;
 err_nomem:
 	dl_seterror_nomem();

@@ -49,6 +49,7 @@
 #include <string.h>
 #include <syslog.h>
 
+#include <libdl/tls.h>
 #include <libzlib/error.h>
 #include <libzlib/inflate.h>
 
@@ -904,25 +905,25 @@ NOTHROW(DLFCN_CC libdl_dlgethandle)(void const *static_pointer, unsigned int fla
 			continue;
 		if ((uintptr_t)static_pointer >= result->dm_loadend)
 			continue;
-		/* Support for formats other than ELF. */
 		if (result->dm_ops) {
-			if (!(*result->dm_ops->df_ismapped)(result,
-			                                    (uintptr_t)static_pointer -
-			                                    result->dm_loadaddr))
-				continue;
-			goto got_result;
-		}
-		/* Make sure that `static_pointer' maps to some program segment. */
-		for (i = 0; i < result->dm_elf.de_phnum; ++i) {
-			uintptr_t segment_base;
-			if (result->dm_elf.de_phdr[i].p_type != PT_LOAD)
-				continue;
-			segment_base = result->dm_loadaddr + result->dm_elf.de_phdr[i].p_vaddr;
-			if ((uintptr_t)static_pointer < segment_base)
-				continue;
-			if ((uintptr_t)static_pointer >= segment_base + result->dm_elf.de_phdr[i].p_memsz)
-				continue;
-			goto got_result;
+			/* Support for formats other than ELF. */
+			if ((*result->dm_ops->df_ismapped)(result,
+			                                   (uintptr_t)static_pointer -
+			                                   result->dm_loadaddr))
+				goto got_result;
+		} else {
+			/* Make sure that `static_pointer' maps to some program segment. */
+			for (i = 0; i < result->dm_elf.de_phnum; ++i) {
+				uintptr_t segment_base;
+				if (result->dm_elf.de_phdr[i].p_type != PT_LOAD)
+					continue;
+				segment_base = result->dm_loadaddr + result->dm_elf.de_phdr[i].p_vaddr;
+				if ((uintptr_t)static_pointer < segment_base)
+					continue;
+				if ((uintptr_t)static_pointer >= segment_base + result->dm_elf.de_phdr[i].p_memsz)
+					continue;
+				goto got_result;
+			}
 		}
 	}
 	dlglobals_all_endread(&dl_globals);
@@ -2720,6 +2721,20 @@ decref_module_and_continue:
 		goto again;
 	}
 	dlglobals_all_endread(&dl_globals);
+}
+
+
+/* Return a pointer to the main thread's  TLS segment. The caller must ensure  that
+ * this segment has not, and will not be deleted. Otherwise, behavior is undefined. */
+PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED void *CC
+libdl_dlmainsegment(void) {
+	struct dltls_segment *result;
+	dlglobals_tls_segment_read(&dl_globals);
+	result = LIST_FIRST(&dl_globals.dg_tls_segment_list);
+	while (LIST_NEXT(result, ts_threads) != NULL)
+		result = LIST_NEXT(result, ts_threads);
+	dlglobals_tls_segment_endread(&dl_globals);
+	return result;
 }
 
 

@@ -1156,12 +1156,12 @@ libpe_linker_main(struct peexec_info *__restrict info,
 		 *       that will copy the base addresses of PE TLS segments allocated above
 		 *       into the TLS  extension table  of the  ELF-TLS context  of the  main
 		 *       thread.
-		 * >> struct tls_segment *me;
+		 * >> struct dltls_segment *me;
 		 * >> RD_TLS_BASE_REGISTER(*(void **)&me);
 		 * >> FOREACH (pemod: dl_globals.dg_alllist) {
 		 * >>     if (!HAS_TLS(pemod))
 		 * >>         continue;
-		 * >>     struct dtls_extension *node = malloc();
+		 * >>     struct dltls_extension *node = malloc();
 		 * >>     node->te_module = pemod;
 		 * >>     node->te_data   = TLS_BASE_IN_MAIN_THREAD(pemod);
 		 * >>     dtls_extension_tree_insert(&me->ts_extree, node);

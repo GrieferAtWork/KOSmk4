@@ -121,13 +121,14 @@ INTERN DlModule dl_rtld_module = {
 
 /* libdl global variables (as also shared with extension drivers) */
 INTERN struct dlglobals dl_globals = {
-	.dg_peb         = NULL, /* Initialized in `linker_main()' */
-	.dg_libpath     = NULL, /* Initialized in `linker_main()' */
-	.dg_errmsg      = NULL,
-	.dg_globallist  = { NULL, NULL }, /* Manually initialized (would otherwise need relocations) */
-	.dg_globallock  = ATOMIC_RWLOCK_INIT,
-	.dg_alllist     = DLIST_HEAD_INITIALIZER(dl_globals.dg_alllist),
-	.dg_alllock     = ATOMIC_RWLOCK_INIT,
+	.dg_peb              = NULL, /* Initialized in `linker_main()' */
+	.dg_libpath          = NULL, /* Initialized in `linker_main()' */
+	.dg_globallist       = { NULL, NULL }, /* Manually initialized (would otherwise need relocations) */
+	.dg_globallock       = ATOMIC_RWLOCK_INIT,
+	.dg_alllist          = DLIST_HEAD_INITIALIZER(dl_globals.dg_alllist),
+	.dg_alllock          = ATOMIC_RWLOCK_INIT,
+	.dg_tls_segment_list = LIST_HEAD_INITIALIZER(dl_globals.dg_tls_segment_list),
+	.dg_tls_segment_lock = ATOMIC_RWLOCK_INIT,
 };
 
 /* Set to true if the sys_debugtrap() system call is disabled. */

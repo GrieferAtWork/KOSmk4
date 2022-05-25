@@ -31,21 +31,23 @@
 	- RTLD will always make use of the initial process environment (as available through `__peb` (from `<kos/exec/peb.h>`) and aliased by `__initenv` (from `<stdlib.h>` with `defined(_DOS_SOURCE)`))
 	- The times at which configuration variables are parsed are chosen at the discretion of `libdl` itself and may not be relied upon (they may be parsed during initial program initialization, only upon first being used, or every time they are used)
 		- As such, changes made to `__peb.pp_envp` and/or `__peb.pp_envp[argi]` and/or `__peb.pp_envp[argi][chari]` may or may not affect later calls made to any of the RTLD functions exposed through `<dlfcn.h>` (with or without `defined(_KOS_SOURCE)`)
-- A new symbol type `STT_KOS_IDATA` has been added that allows for data-symbols to be exported from shared libraries, whilst providing custom callbacks for initializing said data field. This callback will only be invoked if the symbol is actually being used (i.e. as part of a dynamic relocation, or when directly addressed by a call to `dlsym(3)`).
-	- In this regard, this new symbol type behaves the same as `STT_GNU_IFUNC`, however unlike that extension, this one can only be used for data symbols, and can only be used to export data-symbols from shared libraries (or rather: a `.dynsym`-symbol-table to be exact). As such, `STT_KOS_IDATA` cannot be used to declare data objects of `INTERN` or `PRIVATE` visibility.
-	- The intended use of this symbol type is to enable (seemingly) pre-initialized data-symbols to be exported from libraries, such as for example:  
+- A new symbol type `STT_KOS_IDATA` has been added that allows for data-symbols to be exported from shared libraries, whilst providing a custom callback to initialize said data. This callback will only be invoked if the symbol is actually being used (i.e. as part of a dynamic relocation, or when directly addressed by a call to `dlsym(3)`).
+	- In this regard, this new symbol type behaves the same as `STT_GNU_IFUNC`, however unlike that extension, this one can only be used for data symbols (whereas `STT_GNU_IFUNC` can only be used for function symbols), and can only be used to export data-symbols from shared libraries (or rather: a `.dynsym`-symbol-table to be exact). As such, `STT_KOS_IDATA` cannot be used to declare data objects of `INTERN` or `PRIVATE` visibility.
+	- The intended use of this symbol type is to enable (seemingly) pre-initialized data-symbols to be exported from libraries without any additinoal relocations, such as for example:  
 
 	  ```c
-	  extern pid_t process_pid;
+	  extern pid_t procpid;
 	  ```
 
-	  Note that no such symbol exists in libc, but it could be added easily as:  
+	  Note that no such symbol exists in libc, but it could easily be added as:  
 
 	  ```c
 	  #include <hybrid/compiler.h>
 	  #include <kos/exec/idata.h>
 	  #include <pthread.h>
 	  #include <unistd.h>
+	  
+	  DECL_BEGIN
 	  
 	  PRIVATE pid_t intern_procpid = 0;
 	  PRIVATE void init_procpid(void) {
@@ -58,9 +60,11 @@
 	      pthread_once(&didinit, &init_procpid);
 	      return &intern_procpid;
 	  }
+	  
+	  DECL_END
 	  ```
 
-	- Currently, `STT_KOS_IDATA` is used by KOS's `libc.so` to export `sys_errlist` without the need of additional relocations, by simply having the `STT_KOS_IDATA`-callback fill in the array elements, such that no overhead exists for initializing the vector for programs that do not actually make use of the symbol.
+	- Currently, `STT_KOS_IDATA` is used by KOS's `libc.so` to export `sys_errlist` without the need of additional relocations, by simply having the `STT_KOS_IDATA`-callback fill in the array elements, such that no overhead exists for initializing the vector for programs that do not actually make use of the symbol (by now, it is also used to initialize various other symbols, but `sys_errlist` was the first).
 	- Behavior:
 		- No guaranty is made that a callback will only be invoked once:
 			- Subsequent calls to `dlsym(3)` may each re-invoke the callback once again (the same also goes for later-loaded modules with relocations to the same symbol, or even a single module with more than 1 relocation addressing the same symbol)

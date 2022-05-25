@@ -40,6 +40,21 @@
 #include <syslog.h>
 #include <unistd.h>
 
+#include <libdl/tls.h>
+
+#define RBTREE_LEFT_LEANING /* Use left-leaning trees */
+#define RBTREE_NOTHROW      NOTHROW
+#define RBTREE(name)        dtls_extension_tree_##name
+#define RBTREE_T            struct dltls_extension
+#define RBTREE_Tkey         DlModule *
+#define RBTREE_NODEFIELD    te_tree
+#define RBTREE_GETKEY       dtls_extension_getmodule
+#define RBTREE_REDFIELD     te_redblack
+#define RBTREE_REDBIT       DTLS_EXTENSION_REDBIT
+#define RBTREE_KEY_LO(a, b) ((uintptr_t)(a) < (uintptr_t)(b))
+#define RBTREE_KEY_EQ(a, b) ((uintptr_t)(a) == (uintptr_t)(b))
+#include <hybrid/sequence/rbtree-abi.h>
+
 DECL_BEGIN
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
@@ -48,167 +63,54 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-
-struct dtls_extension {
-	/* Tree for mapping TLS extensions data tables to modules.
-	 * NOTE: These extension tables are allocated lazily! */
-	LLRBTREE_NODE(dtls_extension) te_tree;     /* [lock(:ts_exlock)] R/B-tree node. */
-	union {
-		DlModule                 *te_module;   /* [0..1][lock(:ts_exlock)] The module itself.
-		                                        * The  least significant bit  of this is used
-		                                        * to indicate if this leaf is red of black! */
-		uintptr_t                 te_redblack; /* Red/black status bit at bit#0 */
-	};
-	byte_t                       *te_data;     /* [1..1][const] Pointer to the base of TLS data. */
-	/* The actual extension data goes here. (with proper alignment, and pointed-to by `te_data') */
-};
-#define dtls_extension_getmodule(self) ((DlModule *)((self)->te_redblack & ~1))
-
-
-DECL_END
-
-#define RBTREE_LEFT_LEANING /* Use left-leaning trees */
-#define RBTREE_NOTHROW      NOTHROW
-#define RBTREE(name)        dtls_extension_tree_##name
-#define RBTREE_T            struct dtls_extension
-#define RBTREE_Tkey         DlModule *
-#define RBTREE_NODEFIELD    te_tree
-#define RBTREE_GETKEY       dtls_extension_getmodule
-#define RBTREE_REDFIELD     te_redblack
-#define RBTREE_REDBIT       1
-#define RBTREE_KEY_LO(a, b) ((uintptr_t)(a) < (uintptr_t)(b))
-#define RBTREE_KEY_EQ(a, b) ((uintptr_t)(a) == (uintptr_t)(b))
-#include <hybrid/sequence/rbtree-abi.h>
-
-DECL_BEGIN
-
-/* This is the actual structure that the TLS register (e.g. `%fs.base' / `%gs.base') points to. */
-struct tls_segment {
-	/* Static TLS data goes here (aka. at negative offsets from `ts_self') */
-	struct tls_segment           *ts_self;    /* [1..1][const][== self] Self-pointer
-	                                           * At offset 0; mandaged by ELF, and a good idea in general. */
-	LIST_ENTRY(tls_segment)       ts_threads; /* [lock(:static_tls_lock)] Thread entry within `static_tls_list' */
-	struct atomic_rwlock          ts_exlock;  /* Lock for `ts_extree' */
-	LLRBTREE_ROOT(dtls_extension) ts_extree;  /* [0..1][lock(ts_exlock)] TLS extension table. */
-};
-
-/* Helper macros for `struct tls_segment::ts_exlock' */
-#define tls_segment_ex_mustreap(self)   0
-#define tls_segment_ex_reap(self)       (void)0
-#define _tls_segment_ex_reap(self)      (void)0
-#define tls_segment_ex_write(self)      atomic_rwlock_write(&(self)->ts_exlock)
-#define tls_segment_ex_trywrite(self)   atomic_rwlock_trywrite(&(self)->ts_exlock)
-#define tls_segment_ex_endwrite(self)   (atomic_rwlock_endwrite(&(self)->ts_exlock), tls_segment_ex_reap(self))
-#define _tls_segment_ex_endwrite(self)  atomic_rwlock_endwrite(&(self)->ts_exlock)
-#define tls_segment_ex_read(self)       atomic_rwlock_read(&(self)->ts_exlock)
-#define tls_segment_ex_tryread(self)    atomic_rwlock_tryread(&(self)->ts_exlock)
-#define _tls_segment_ex_endread(self)   atomic_rwlock_endread(&(self)->ts_exlock)
-#define tls_segment_ex_endread(self)    (void)(atomic_rwlock_endread(&(self)->ts_exlock) && (tls_segment_ex_reap(self), 0))
-#define _tls_segment_ex_end(self)       atomic_rwlock_end(&(self)->ts_exlock)
-#define tls_segment_ex_end(self)        (void)(atomic_rwlock_end(&(self)->ts_exlock) && (tls_segment_ex_reap(self), 0))
-#define tls_segment_ex_upgrade(self)    atomic_rwlock_upgrade(&(self)->ts_exlock)
-#define tls_segment_ex_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->ts_exlock)
-#define tls_segment_ex_downgrade(self)  atomic_rwlock_downgrade(&(self)->ts_exlock)
-#define tls_segment_ex_reading(self)    atomic_rwlock_reading(&(self)->ts_exlock)
-#define tls_segment_ex_writing(self)    atomic_rwlock_writing(&(self)->ts_exlock)
-#define tls_segment_ex_canread(self)    atomic_rwlock_canread(&(self)->ts_exlock)
-#define tls_segment_ex_canwrite(self)   atomic_rwlock_canwrite(&(self)->ts_exlock)
-#define tls_segment_ex_waitread(self)   atomic_rwlock_waitread(&(self)->ts_exlock)
-#define tls_segment_ex_waitwrite(self)  atomic_rwlock_waitwrite(&(self)->ts_exlock)
-
-
-STATIC_ASSERT_MSG(offsetof(struct tls_segment, ts_self) == 0,
+STATIC_ASSERT_MSG(offsetof(struct dltls_segment, ts_self) == 0,
                   "The self-pointer being at offset=0 is ABI mandated");
 
-LIST_HEAD(tls_segment_list, tls_segment);
-
-/* [0..n][lock(static_tls_lock)] List of all allocated static-tls segments (usually 1 for each thread) */
-PRIVATE struct tls_segment_list static_tls_list = LIST_HEAD_INITIALIZER(static_tls_list);
-PRIVATE struct atomic_rwlock static_tls_lock    = ATOMIC_RWLOCK_INIT;
-
-/* Helper macros for `static_tls_lock' */
-#define static_tls_mustreap()   0
-#define static_tls_reap()       (void)0
-#define _static_tls_reap()      (void)0
-#define static_tls_write()      atomic_rwlock_write(&static_tls_lock)
-#define static_tls_trywrite()   atomic_rwlock_trywrite(&static_tls_lock)
-#define static_tls_endwrite()   (atomic_rwlock_endwrite(&static_tls_lock), static_tls_reap())
-#define _static_tls_endwrite()  atomic_rwlock_endwrite(&static_tls_lock)
-#define static_tls_read()       atomic_rwlock_read(&static_tls_lock)
-#define static_tls_tryread()    atomic_rwlock_tryread(&static_tls_lock)
-#define _static_tls_endread()   atomic_rwlock_endread(&static_tls_lock)
-#define static_tls_endread()    (void)(atomic_rwlock_endread(&static_tls_lock) && (static_tls_reap(), 0))
-#define _static_tls_end()       atomic_rwlock_end(&static_tls_lock)
-#define static_tls_end()        (void)(atomic_rwlock_end(&static_tls_lock) && (static_tls_reap(), 0))
-#define static_tls_upgrade()    atomic_rwlock_upgrade(&static_tls_lock)
-#define static_tls_tryupgrade() atomic_rwlock_tryupgrade(&static_tls_lock)
-#define static_tls_downgrade()  atomic_rwlock_downgrade(&static_tls_lock)
-#define static_tls_reading()    atomic_rwlock_reading(&static_tls_lock)
-#define static_tls_writing()    atomic_rwlock_writing(&static_tls_lock)
-#define static_tls_canread()    atomic_rwlock_canread(&static_tls_lock)
-#define static_tls_canwrite()   atomic_rwlock_canwrite(&static_tls_lock)
-#define static_tls_waitread()   atomic_rwlock_waitread(&static_tls_lock)
-#define static_tls_waitwrite()  atomic_rwlock_waitwrite(&static_tls_lock)
-
-/* Return a pointer to the main thread's  TLS segment. The caller must ensure  that
- * this segment has not, and will not be deleted. Otherwise, behavior is undefined. */
-INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED void *CC
-libdl_dlmainsegment(void) {
-	struct tls_segment *result;
-	static_tls_read();
-	result = LIST_FIRST(&static_tls_list);
-	while (LIST_NEXT(result, ts_threads) != NULL)
-		result = LIST_NEXT(result, ts_threads);
-	static_tls_endread();
-	return result;
-}
-
-
 /* Minimum alignment of the static TLS segment. */
-PRIVATE size_t static_tls_align = COMPILER_ALIGNOF(struct tls_segment);
+PRIVATE size_t tls_segment_align = COMPILER_ALIGNOF(struct dltls_segment);
 
-/* Total  size   of  the   static  TLS   segment  (including   the  `struct tls_segment'   descriptor)
- * NOTE: The segment base itself is then located at `p + static_tls_size - sizeof(struct tls_segment)' */
-PRIVATE size_t static_tls_size = sizeof(struct tls_segment);
-PRIVATE size_t static_tls_size_no_segment = 0;
+/* Total size of the static TLS segment (including the `struct dltls_segment' descriptor)
+ * NOTE: The segment base itself is then located at `p + tls_segment_size - sizeof(struct dltls_segment)' */
+PRIVATE size_t tls_segment_size = sizeof(struct dltls_segment);
+PRIVATE size_t tls_segment_size_no_segment = 0;
 
-/* Initializer for the first `static_tls_size_no_segment' bytes of the static TLS segment. */
-PRIVATE void const *static_tls_init = NULL;
+/* Initializer for the first `tls_segment_size_no_segment' bytes of the static TLS segment. */
+PRIVATE void const *tls_segment_init = NULL;
 
 
 
 INTERN NONNULL((1)) void
 NOTHROW(CC DlModule_RemoveTLSExtension)(DlModule *__restrict self) {
-	struct tls_segment *iter;
-	struct dtls_extension *chain, *next;
+	struct dltls_segment *iter;
+	struct dltls_extension *chain, *next;
 	chain = NULL;
 again:
-	static_tls_read();
-	LIST_FOREACH (iter, &static_tls_list, ts_threads) {
-		if (!tls_segment_ex_trywrite(iter)) {
+	dlglobals_tls_segment_read(&dl_globals);
+	LIST_FOREACH (iter, &dl_globals.dg_tls_segment_list, ts_threads) {
+		if (!dltls_segment_ex_trywrite(iter)) {
 #ifndef __OPTIMIZE_SIZE__
 			/* Try to get read-lock and check if this TLS segment even uses `self'
 			 * If not, then we can simply skip it without ever having to acquire a
 			 * write-lock! */
-			if (!tls_segment_ex_tryread(iter)) {
+			if (!dltls_segment_ex_tryread(iter)) {
 				next = dtls_extension_tree_locate(iter->ts_extree, self);
-				tls_segment_ex_endread(iter);
+				dltls_segment_ex_endread(iter);
 				if (!next)
 					continue; /* Unused */
 			}
 #endif /* !__OPTIMIZE_SIZE__ */
-			static_tls_endread();
+			dlglobals_tls_segment_endread(&dl_globals);
 			sys_sched_yield();
 			goto again;
 		}
 		next = dtls_extension_tree_remove(&iter->ts_extree, self);
-		tls_segment_ex_endwrite(iter);
+		dltls_segment_ex_endwrite(iter);
 		if (next) {
 			next->te_tree.rb_lhs = chain;
 			chain                = next;
 		}
 	}
-	static_tls_endread();
+	dlglobals_tls_segment_endread(&dl_globals);
 
 	/* Free all instances of extension data for this module. */
 	while (chain) {
@@ -234,15 +136,15 @@ NOTHROW_RPC(CC DlModule_InitStaticTLSBindings)(void) {
 			continue;
 		if (iter->dm_ops)
 			continue;
-		if (static_tls_align < iter->dm_tlsalign)
-			static_tls_align = iter->dm_tlsalign;
+		if (tls_segment_align < iter->dm_tlsalign)
+			tls_segment_align = iter->dm_tlsalign;
 		endptr -= iter->dm_tlsmsize;
 		endptr &= ~(iter->dm_tlsalign - 1);
 		iter->dm_tlsstoff = endptr;
 	}
-	static_tls_size_no_segment = (size_t)-endptr;
-	static_tls_init = malloc(static_tls_size_no_segment);
-	if unlikely(!static_tls_init)
+	tls_segment_size_no_segment = (size_t)-endptr;
+	tls_segment_init = malloc(tls_segment_size_no_segment);
+	if unlikely(!tls_segment_init)
 		goto err_nomem;
 
 	/* Load static TLS template data */
@@ -252,8 +154,8 @@ NOTHROW_RPC(CC DlModule_InitStaticTLSBindings)(void) {
 			continue;
 		if (iter->dm_ops)
 			continue;
-		dst = (byte_t *)static_tls_init +
-		      static_tls_size_no_segment +
+		dst = (byte_t *)tls_segment_init +
+		      tls_segment_size_no_segment +
 		      iter->dm_tlsstoff;
 		if (iter->dm_tlsfsize) {
 			fd_t fd = DlModule_GetFd(iter);
@@ -271,8 +173,8 @@ NOTHROW_RPC(CC DlModule_InitStaticTLSBindings)(void) {
 		      iter->dm_tlsmsize -
 		      iter->dm_tlsfsize);
 	}
-	static_tls_size = static_tls_size_no_segment;
-	static_tls_size += sizeof(struct tls_segment);
+	tls_segment_size = tls_segment_size_no_segment;
+	tls_segment_size += sizeof(struct dltls_segment);
 	return 0;
 err_nomem:
 	dl_seterror_nomem();
@@ -281,7 +183,7 @@ err:
 }
 
 PRIVATE NONNULL((1)) void
-NOTHROW(CC try_incref_extension_table_modules)(struct dtls_extension *__restrict self) {
+NOTHROW(CC try_incref_extension_table_modules)(struct dltls_extension *__restrict self) {
 	DlModule *mod;
 again:
 	mod = dtls_extension_getmodule(self);
@@ -300,10 +202,10 @@ again:
 }
 
 PRIVATE NONNULL((1)) void CC
-decref_tls_extension_modules(struct dtls_extension *__restrict self)
+decref_tls_extension_modules(struct dltls_extension *__restrict self)
 		THROWS(...) {
 	DlModule *mod;
-	struct dtls_extension *minptr, *maxptr;
+	struct dltls_extension *minptr, *maxptr;
 again:
 	mod = dtls_extension_getmodule(self);
 	if (mod)
@@ -324,11 +226,11 @@ again:
 }
 
 PRIVATE NONNULL((1, 2)) void CC
-fini_tls_extension_tables(struct dtls_extension *__restrict self,
-                          struct tls_segment *__restrict segment)
+fini_tls_extension_tables(struct dltls_extension *__restrict self,
+                          struct dltls_segment *__restrict segment)
 		THROWS(...) {
 	DlModule *mod;
-	struct dtls_extension *minptr, *maxptr;
+	struct dltls_extension *minptr, *maxptr;
 again:
 	mod = dtls_extension_getmodule(self);
 	if (mod != NULL) {
@@ -361,20 +263,20 @@ again:
 
 /* Run finalizers for all TLS segments allocated within the calling thread. */
 INTERN void CC DlModule_RunAllTlsFinalizers(void) THROWS(...) {
-	struct tls_segment *self;
-	struct dtls_extension *ext_free;
+	struct dltls_segment *self;
+	struct dltls_extension *ext_free;
 	RD_TLS_BASE_REGISTER(*(void **)&self);
 	if unlikely(!self)
 		return;
-	tls_segment_ex_write(self);
+	dltls_segment_ex_write(self);
 	ext_free = self->ts_extree;
 	if (ext_free) {
 		try_incref_extension_table_modules(ext_free);
-		tls_segment_ex_endwrite(self);
+		dltls_segment_ex_endwrite(self);
 		/* Free the extension tables, and invoke finalizers. */
 		fini_tls_extension_tables(ext_free, self);
 	} else {
-		tls_segment_ex_endwrite(self);
+		dltls_segment_ex_endwrite(self);
 	}
 }
 
@@ -385,22 +287,21 @@ INTERN void CC DlModule_RunAllTlsFinalizers(void) THROWS(...) {
  * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
-INTERN ATTR_MALLOC WUNUSED struct tls_segment *
+INTERN ATTR_MALLOC WUNUSED struct dltls_segment *
 NOTHROW(DLFCN_CC libdl_dltlsallocseg)(void) {
-	struct tls_segment *result;
-	result = (struct tls_segment *)memalign(static_tls_align,
-	                                        static_tls_size);
+	struct dltls_segment *result;
+	result = (struct dltls_segment *)memalign(tls_segment_align,
+	                                          tls_segment_size);
 	if unlikely(!result)
 		goto err_nomem;
-	memcpy(result, static_tls_init, static_tls_size_no_segment);
-	result = (struct tls_segment *)((byte_t *)result +
-	                                static_tls_size_no_segment);
+	result = (struct dltls_segment *)mempcpy(result, tls_segment_init,
+	                                         tls_segment_size_no_segment);
 	result->ts_self = result;
 	atomic_rwlock_init(&result->ts_exlock);
 	result->ts_extree = NULL;
-	static_tls_write();
-	LIST_INSERT_HEAD(&static_tls_list, result, ts_threads);
-	static_tls_endwrite();
+	dlglobals_tls_segment_write(&dl_globals);
+	LIST_INSERT_HEAD(&dl_globals.dg_tls_segment_list, result, ts_threads);
+	dlglobals_tls_segment_endwrite(&dl_globals);
 	return result;
 err_nomem:
 	dl_seterror_nomem();
@@ -408,11 +309,11 @@ err_nomem:
 }
 
 PRIVATE NONNULL((1, 2)) void CC
-delete_extension_tables(struct dtls_extension *__restrict self,
-                        struct tls_segment *__restrict segment)
+delete_extension_tables(struct dltls_extension *__restrict self,
+                        struct dltls_segment *__restrict segment)
 		THROWS(...) {
 	DlModule *mod;
-	struct dtls_extension *minptr, *maxptr;
+	struct dltls_extension *minptr, *maxptr;
 again:
 	mod = dtls_extension_getmodule(self);
 	if (mod != NULL) {
@@ -444,33 +345,33 @@ again:
 }
 
 LOCAL NONNULL((1)) void CC
-clear_extension_table(struct tls_segment *__restrict self)
+clear_extension_table(struct dltls_segment *__restrict self)
 		THROWS(...) {
-	struct dtls_extension *ext_free;
-	tls_segment_ex_write(self);
+	struct dltls_extension *ext_free;
+	dltls_segment_ex_write(self);
 	ext_free = self->ts_extree;
 	if (ext_free) {
 		self->ts_extree = NULL;
 		try_incref_extension_table_modules(ext_free);
-		tls_segment_ex_endwrite(self);
+		dltls_segment_ex_endwrite(self);
 		/* Free the extension tables, and invoke finalizers. */
 		delete_extension_tables(ext_free, self);
 	} else {
-		tls_segment_ex_endwrite(self);
+		dltls_segment_ex_endwrite(self);
 	}
 }
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
 INTERN NONNULL((1)) int DLFCN_CC
-libdl_dltlsfreeseg(USER struct tls_segment *seg)
+libdl_dltlsfreeseg(USER struct dltls_segment *seg)
 		THROWS(E_SEGFAULT, ...) {
 	if unlikely(!DL_VERIFY_TLS_SEGMENT(seg))
 		goto err_badptr;
-	static_tls_write();
+	dlglobals_tls_segment_write(&dl_globals);
 	LIST_REMOVE(seg, ts_threads);
-	static_tls_endwrite();
+	dlglobals_tls_segment_endwrite(&dl_globals);
 	clear_extension_table(seg);
-	free((byte_t *)seg - static_tls_size_no_segment);
+	free((byte_t *)seg - tls_segment_size_no_segment);
 	return 0;
 err_badptr:
 	return dl_seterror_badptr(seg);
@@ -647,8 +548,8 @@ INTERN WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(CC DlModule_TryGetTLSAddr)(USER DlModule *self)
 		THROWS(E_SEGFAULT) {
 	byte_t *result;
-	struct tls_segment *tls;
-	struct dtls_extension *extab;
+	struct dltls_segment *tls;
+	struct dltls_extension *extab;
 	if unlikely(!self->dm_tlsmsize)
 		return NULL; /* No TLS segment. */
 	RD_TLS_BASE_REGISTER(*(void **)&tls);
@@ -656,10 +557,10 @@ NOTHROW_NCX(CC DlModule_TryGetTLSAddr)(USER DlModule *self)
 	/* Simple case: Static TLS */
 	if (self->dm_tlsstoff)
 		return (byte_t *)tls + self->dm_tlsstoff;
-	tls_segment_ex_read(tls);
+	dltls_segment_ex_read(tls);
 	extab  = dtls_extension_tree_locate(tls->ts_extree, self);
 	result = extab ? extab->te_data : NULL;
-	tls_segment_ex_endread(tls);
+	dltls_segment_ex_endread(tls);
 	return result;
 }
 
@@ -668,7 +569,7 @@ NOTHROW_NCX(CC DlModule_TryGetTLSAddr)(USER DlModule *self)
 INTERN WUNUSED void *__DLFCN_DLTLSADDR_CC
 libdl_dltlsaddr(USER DlModule *self) THROWS(E_SEGFAULT, ...) {
 	void *result;
-	struct tls_segment *seg;
+	struct dltls_segment *seg;
 	RD_TLS_BASE_REGISTER(*(void **)&seg);
 	result = libdl_dltlsaddr2(self, seg);
 	return result;

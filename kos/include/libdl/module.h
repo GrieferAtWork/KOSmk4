@@ -383,17 +383,28 @@ TAILQ_HEAD(dlmodule_tailq, dlmodule);
 DLIST_HEAD(dlmodule_dlist, dlmodule);
 #endif /* !__dlmodule_dlist_defined */
 
+#ifndef __dltls_segment_list_defined
+#define __dltls_segment_list_defined
+struct dltls_segment;
+LIST_HEAD(dltls_segment_list, dltls_segment);
+#endif /* !__dltls_segment_list_defined */
 
 /* Libdl global data (defined here because shared with DL extension drivers) */
 struct dlglobals {
-	struct process_peb   *dg_peb;           /* [1..1][const] Process environment block (The `__peb' symbol resolves to the address of this struct member) */
-	char                 *dg_libpath;       /* [1..1][const] The library path set when the program was started (initenv:$LD_LIBRARY_PATH) */
-	char                 *dg_errmsg;        /* [0..1] The current DL error message */
-	struct dlmodule_tailq dg_globallist;    /* [1..N][lock(dg_globallock)] List of RTLD_GLOBAL modules (first element is main program). */
-	struct atomic_rwlock  dg_globallock;    /* Lock for `dg_globallist' */
-	struct dlmodule_dlist dg_alllist;       /* [1..N][lock(dg_alllock)] List of all loaded modules. */
-	struct atomic_rwlock  dg_alllock;       /* Lock for `dg_alllist' */
-	char                  dg_errbuf[128];   /* Default buffer area for error messages. */
+	struct process_peb       *dg_peb;              /* [1..1][const] Process environment block (The `__peb' symbol resolves to the address of this struct member) */
+	char                     *dg_libpath;          /* [1..1][const] The library path set when the program was started (initenv:$LD_LIBRARY_PATH) */
+	struct dlmodule_tailq     dg_globallist;       /* [1..N][lock(dg_globallock)] List of RTLD_GLOBAL modules (first element is main program). */
+	struct atomic_rwlock      dg_globallock;       /* Lock for `dg_globallist' */
+	struct dlmodule_dlist     dg_alllist;          /* [1..N][lock(dg_alllock)] List of all loaded modules. */
+	struct atomic_rwlock      dg_alllock;          /* Lock for `dg_alllist' */
+	struct dltls_segment_list dg_tls_segment_list; /* [0..n][lock(dg_tls_segment_lock)] List of all allocated static-tls segments (usually 1 for each thread)
+	                                                * The last element in  this list is assumed  to have once  been allocated for the  main thread. Iow:  all
+	                                                * additional threads must insert their  segments at the front! (only  empty before TLS was allocated  for
+	                                                * the main thread). */
+	struct atomic_rwlock      dg_tls_segment_lock; /* Lock for `dg_tls_segment_list' */
+	/* TODO: Remove the following 2 and put them into `struct dltls_segment' */
+	char                     *dg_errmsg;           /* [0..1] The current DL error message */
+	char                      dg_errbuf[128];      /* Default buffer area for error messages. */
 };
 
 /* Return a pointer to the `struct dlmodule' for the main application. */
@@ -453,6 +464,29 @@ struct dlglobals {
 #define dlglobals_all_waitread(self)   atomic_rwlock_waitread(&(self)->dg_alllock)
 #define dlglobals_all_waitwrite(self)  atomic_rwlock_waitwrite(&(self)->dg_alllock)
 
+/* Helper macros for `struct dlglobals::dg_tls_segment_lock' */
+#define dlglobals_tls_segment_mustreap(self)   0
+#define dlglobals_tls_segment_reap(self)       (void)0
+#define _dlglobals_tls_segment_reap(self)      (void)0
+#define dlglobals_tls_segment_write(self)      atomic_rwlock_write(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_trywrite(self)   atomic_rwlock_trywrite(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_endwrite(self)   (atomic_rwlock_endwrite(&(self)->dg_tls_segment_lock), dlglobals_tls_segment_reap(self))
+#define _dlglobals_tls_segment_endwrite(self)  atomic_rwlock_endwrite(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_read(self)       atomic_rwlock_read(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_tryread(self)    atomic_rwlock_tryread(&(self)->dg_tls_segment_lock)
+#define _dlglobals_tls_segment_endread(self)   atomic_rwlock_endread(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_endread(self)    (void)(atomic_rwlock_endread(&(self)->dg_tls_segment_lock) && (dlglobals_tls_segment_reap(self), 0))
+#define _dlglobals_tls_segment_end(self)       atomic_rwlock_end(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_end(self)        (void)(atomic_rwlock_end(&(self)->dg_tls_segment_lock) && (dlglobals_tls_segment_reap(self), 0))
+#define dlglobals_tls_segment_upgrade(self)    atomic_rwlock_upgrade(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_downgrade(self)  atomic_rwlock_downgrade(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_reading(self)    atomic_rwlock_reading(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_writing(self)    atomic_rwlock_writing(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_canread(self)    atomic_rwlock_canread(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_canwrite(self)   atomic_rwlock_canwrite(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_waitread(self)   atomic_rwlock_waitread(&(self)->dg_tls_segment_lock)
+#define dlglobals_tls_segment_waitwrite(self)  atomic_rwlock_waitwrite(&(self)->dg_tls_segment_lock)
 
 DECL_END
 #endif /* __CC__ */
