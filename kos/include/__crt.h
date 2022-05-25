@@ -36,15 +36,19 @@
      !defined(__CRT_KOS) && !defined(__CRT_CYG) &&            \
      !defined(__CRT_GENERIC) && !defined(__CRT_KOS_KERNEL) && \
      !defined(__CRT_FREESTANDING))
-#if defined(__KOS__) && defined(__KERNEL__)
+#ifdef _CRT
+/* Allow the user to do `-D_CRT=glibc' on the commandline to select the linked
+ * crt. Support values for `_CRT' can be found in <crt-features/_crt-select.h> */
+#include <crt-features/_crt-select.h>
+#elif defined(__KOS__) && defined(__KERNEL__)
 #   define __CRT_KOS_KERNEL
 #   define __CRT_KOS_PRIMARY
 #   define __CRT_KOS
+//#elif defined(__STDC_HOSTED__) && (__STDC_HOSTED__ + 0) == 0
 /* This might seem like a good idea, but programs using `-ffreestanding',
  * but still ending up #including some  CRT header will likely also  pass
  * `-lc' on the  commandline, so  we shouldn't  respond to  that flag  to
  * determine the linked CRT library to be non-present... */
-//#elif defined(__STDC_HOSTED__) && (__STDC_HOSTED__ + 0) == 0
 ///* Freestanding CRT environment. */
 //#   define __CRT_FREESTANDING
 #elif defined(__KOS__)
@@ -64,13 +68,7 @@
       defined(_WIN64) || defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || \
       defined(_WIN32_WCE) || defined(WIN32_WCE)
 #   define __CRT_DOS_PRIMARY
-/* XXX: TinyC links against an older version of MSVCRT by default,
- *      so we use the old names by default as well. */
-#ifdef __TINYC__
 #   define __CRT_DOS
-#else
-#   define __CRT_DOS
-#endif
 #else /* ... */
 #   define __CRT_GENERIC
 #endif /* !... */
