@@ -660,13 +660,13 @@ again_parse_arg_annotations:
 					 *   Explicitly state that `p' is loaded as a c-string (same as `[[in]] char const *p`)
 					 * - >> [[in(strnlen(., maxlen))]] char const *p, size_t maxlen
 					 *   Specify that `p' is a read_only argument, and that `strnlen(p, maxlen)'
-					 *   characters may be accessed. For gcc, we encode this as:
+					 *   characters  may   be   accessed.   For  gcc,   we   encode   this   as:
 					 *   >> __attribute__((access(read_only, <I>, <indexof("maxlen")>)))
 					 *   Since it seems to interprete the size-argument as a sort-of max-size (rather than exact size)
 					 * - >> [[in(return <= num_bytes)]] void const *buf, size_t num_bytes
 					 *   >> [[out(return <= num_bytes)]] void *buf, size_t num_bytes
 					 *   Explicitly specify that up to `num_bytes' (and exactly `return' bytes) are accessed from `buf'
-					 *   For gcc, we encode this as (there doesn't seem to be a way to incorporate `return'):
+					 *   For  gcc,  we encode  this  as (there  doesn't  seem to  be  a way  to  incorporate `return'):
 					 *   >> __attribute__((access(read_only, <I>, <indexof("num_bytes")>)))
 					 */
 				case "in":
@@ -684,8 +684,8 @@ again_parse_arg_annotations:
 					local shouldMarkAsNonNull = !tok.endswith("_opt");
 					if (self.next() == "(") {
 						/* A sized in/out/inout argument implies a non-NULL argument
-						 * if the function it is attached to is PURE or LEAF. Being
-						 * a pure or leaf function means that we don't modify the
+						 * if the function it is attached to is PURE or LEAF.  Being
+						 * a  pure or leaf  function means that  we don't modify the
 						 * global state, meaning that NULL-arguments would simply be
 						 * handled as a no-op.
 						 *

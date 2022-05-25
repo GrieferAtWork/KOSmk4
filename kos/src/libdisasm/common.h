@@ -58,7 +58,7 @@ libda_disasm_single(pformatprinter printer, void *arg, void const *pc,
                     uintptr_half_t target DFL(DISASSEMBLER_TARGET_CURRENT),
                     uintptr_half_t flags DFL(DISASSEMBLER_FNORMAL));
 
-/* Disassembly and print lines (s.a. `disasm_print_line()') until `endpc'
+/* Disassemble and print lines (s.a. `disasm_print_line()') until `endpc'
  * has been reached, or a printer error has occurred.
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
@@ -68,7 +68,7 @@ libda_disasm_print_until(struct disassembler *__restrict self,
 
 /* Disassemble a single  instruction line, following  formatting rules  specified
  * by `DISASSEMBLER_F*', potentially printing multiple lines of the instruction's
- * bytes don't all fit into a single line (s.a. `').
+ * bytes don't all fit into a single line (s.a. `d_maxbytes').
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
 INTDEF NONNULL((1)) ssize_t CC

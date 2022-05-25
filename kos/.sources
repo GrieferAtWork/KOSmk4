@@ -148,7 +148,7 @@ CC_FLAGS({
 	 *    Still broken (but in a slightly different way) :/
 	 *    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105685
 	 * If (and once) this gets fixed for real, and I've updated
-	 * the toolchain (once again), this'll get enabled again. */
+	 * the  toolchain (once again),  this'll get enabled again. */
 //	"-Wsuggest-attribute=cold",
 
 	/* Causes warnings about functions with `kernel_panic("TO" "DO")', so nope! */

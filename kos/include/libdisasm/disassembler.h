@@ -236,7 +236,7 @@ disasm_single(__pformatprinter printer, void *arg, void const *pc,
 #endif /* LIBDISASM_WANT_PROTOTYPES */
 
 
-/* Disassembly and print lines (s.a. `disasm_print_line()') until `endpc'
+/* Disassemble and print lines (s.a. `disasm_print_line()') until `endpc'
  * has been reached, or a printer error has occurred.
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
@@ -251,7 +251,7 @@ disasm_print_until(struct disassembler *__restrict self,
 
 /* Disassemble a single  instruction line, following  formatting rules  specified
  * by `DISASSEMBLER_F*', potentially printing multiple lines of the instruction's
- * bytes don't all fit into a single line (s.a. `').
+ * bytes don't all fit into a single line (s.a. `d_maxbytes').
  * @return: * : The sum of all printer callbacks ever executed with `self'
  * @return: <0: The printer error that has occurred. */
 typedef __ATTR_NONNULL_T((1)) __ssize_t

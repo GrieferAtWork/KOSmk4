@@ -621,7 +621,7 @@
 #define __ATTR_INOUT(ptr_index) __attribute__((__access__(__read_write__, ptr_index)))
 #endif /* !__has_attribute(__nonnull__) */
 #elif defined(__INTELLISENSE__)
-/* Intellisense doesn't understand __access__, but to get error high-lighting (since
+/* Intellisense doesn't understand __access__, but to get error high-lighting  (since
  * the `ptr_index' argument must reference a pointer-argument), we can use some other
  * attributes that it does know! */
 #define __ATTR_ACCESS_NONE(ptr_index)        __attribute__((__nonnull__(ptr_index)))
@@ -998,4 +998,3 @@ template<class __T1, class __T2> struct __gcc_types_compatible:
 #endif /* ... */
 
 /************************************************************************/
-

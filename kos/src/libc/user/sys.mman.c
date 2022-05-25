@@ -34,9 +34,9 @@
 #include "sys.mman.h"
 
 
-/* FIXME: We currently "-Wmaybe-uninitialized" because calling `sys_mlock()' below
+/* FIXME: We currently  "-Wmaybe-uninitialized"  because  calling  `sys_mlock()'  below
  *        triggers "warning : 'addr' may be used uninitialized [-Wmaybe-uninitialized]"
- *        because `mlock(2)' is annotated with `[[access(none)]]', but the associated
+ *        because `mlock(2)' is annotated  with `[[access(none)]]', but the  associated
  *        system call `sys_mlock(2)' doesn't have that annotation.
  * -> The proper solution would be to also annotate `sys_mlock(2)' as such! */
 #ifdef __GNUC__

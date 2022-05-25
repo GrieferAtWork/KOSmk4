@@ -445,7 +445,7 @@ service_part:
 	if unlikely(chain == NULL)
 		return ASYNC_RESUME; /* Wait for more parts. */
 
-	/* Restore all elements that come after `' */
+	/* Restore all elements that come after `chain' */
 	next = SLIST_NEXT(chain, _mp_joblink);
 	if unlikely(next) {
 		REF struct mpart *last;

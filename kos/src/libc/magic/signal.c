@@ -2276,8 +2276,8 @@ void psiginfo([[in]] siginfo_t const *pinfo,
 %#ifdef __USE_KOS
 @@>> sigcodename_np(3)
 @@Return a name of `code', as read from `siginfo_t::si_code',
-@@and used in conjunction with a given signal `signo'.
-@@e.g. `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"'
+@@and used  in  conjunction  with  a  given  signal  `signo'.
+@@e.g.   `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"'
 [[kernel, const, wunused, decl_include("<bits/types.h>")]]
 [[impl_include("<asm/os/signal.h>", "<asm/os/siginfo.h>")]]
 char const *sigcodename_np($signo_t signo, int code) {

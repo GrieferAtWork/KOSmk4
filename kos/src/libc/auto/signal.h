@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x424e29e4 */
+/* HASH CRC-32:0x11f53b43 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -398,14 +398,14 @@ INTDEF ATTR_IN(1) ATTR_IN_OPT(2) void NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginf
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigcodename_np(3)
  * Return a name of `code', as read from `siginfo_t::si_code',
- * and used in conjunction with a given signal `signo'.
- * e.g. `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"' */
+ * and used  in  conjunction  with  a  given  signal  `signo'.
+ * e.g.   `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"' */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_sigcodename_np)(signo_t signo, int code);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigcodename_np(3)
  * Return a name of `code', as read from `siginfo_t::si_code',
- * and used in conjunction with a given signal `signo'.
- * e.g. `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"' */
+ * and used  in  conjunction  with  a  given  signal  `signo'.
+ * e.g.   `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"' */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_sigcodename_np)(signo_t signo, int code);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigcodedesc_np(3)

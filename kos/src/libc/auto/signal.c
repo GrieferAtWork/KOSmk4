@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5167cad */
+/* HASH CRC-32:0x5fe13748 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -381,8 +381,8 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 #include <asm/os/siginfo.h>
 /* >> sigcodename_np(3)
  * Return a name of `code', as read from `siginfo_t::si_code',
- * and used in conjunction with a given signal `signo'.
- * e.g. `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"' */
+ * and used  in  conjunction  with  a  given  signal  `signo'.
+ * e.g.   `sigcodename_np(SIGILL, ILL_ILLOPC) -> "ILL_ILLOPC"' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED char const *
 NOTHROW_NCX(LIBCCALL libc_sigcodename_np)(signo_t signo,
                                           int code) {

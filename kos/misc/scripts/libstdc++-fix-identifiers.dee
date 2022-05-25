@@ -37,7 +37,7 @@ for (local line: (
 }
 
 /* Some more identifiers we don't want libstdc++ to use
- * s.a. `kos/misc/libgen/c/escape.dee:special_escapes` */
+ * s.a.  `kos/misc/libgen/c/escape.dee:special_escapes` */
 SAL_MACRO_NAMES.update({
 	"__used",        /* Macro in <sys/cdefs.h> */
 	"__unused",      /* Macro in <sys/cdefs.h> */
@@ -190,5 +190,3 @@ function fixPath(path: string) {
 
 
 fixPath([...][1]);
-
-
