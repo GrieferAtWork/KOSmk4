@@ -1240,9 +1240,7 @@ decode_form:
 	return false;
 }
 
-#if __SIZEOF_POINTER__ == 8
-DEFINE_INTERN_ALIAS(libdi_debuginfo_cu_parser_getconst64, libdi_debuginfo_cu_parser_getconst);
-#else /* __SIZEOF_POINTER__ == 8 */
+#if __SIZEOF_POINTER__ != 8
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self,
                                                      uintptr_t form, uint64_t *__restrict presult,
