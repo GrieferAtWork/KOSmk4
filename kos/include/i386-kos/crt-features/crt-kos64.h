@@ -3159,6 +3159,7 @@
 #define __CRT_HAVE_getwchar_unlocked
 #define __CRT_HAVE_getwd
 #define __CRT_HAVE_getxattr
+#define __CRT_HAVE_gid_from_group
 #define __CRT_HAVE_glob
 #define __CRT_HAVE_glob64
 #define __CRT_HAVE_globfree
@@ -3174,6 +3175,7 @@
 #define __CRT_HAVE_gnu_get_libc_version
 #define __CRT_HAVE_gotoxy
 #define __CRT_HAVE_grantpt
+#define __CRT_HAVE_group_from_gid
 #define __CRT_HAVE_group_member
 #define __CRT_HAVE_gsignal
 #define __CRT_HAVE_gtty
@@ -4323,6 +4325,7 @@
 #define __CRT_HAVE_setfsuid
 #define __CRT_HAVE_setgid
 #define __CRT_HAVE_setgrent
+#define __CRT_HAVE_setgroupent
 #define __CRT_HAVE_setgroups
 #define __CRT_HAVE_sethostent
 #define __CRT_HAVE_sethostid
@@ -8822,6 +8825,7 @@
 #define __CRT_HAVE_KOS$getwchar_unlocked
 #define __CRT_HAVE_KOS$getwd
 #define __CRT_HAVE_KOS$getxattr
+#define __CRT_HAVE_KOS$gid_from_group
 #define __CRT_HAVE_KOS$gmtime
 #define __CRT_HAVE_KOS$gmtime64
 #define __CRT_HAVE_KOS$gmtime64_r
@@ -8831,6 +8835,7 @@
 #define __CRT_HAVE_KOS$gnu_dev_minor
 #define __CRT_HAVE_KOS$gotoxy
 #define __CRT_HAVE_KOS$grantpt
+#define __CRT_HAVE_KOS$group_from_gid
 #define __CRT_HAVE_KOS$group_member
 #define __CRT_HAVE_KOS$gsignal
 #define __CRT_HAVE_KOS$gtty
@@ -9863,6 +9868,7 @@
 #define __CRT_HAVE_KOS$setfsgid
 #define __CRT_HAVE_KOS$setfsuid
 #define __CRT_HAVE_KOS$setgid
+#define __CRT_HAVE_KOS$setgroupent
 #define __CRT_HAVE_KOS$setgroups
 #define __CRT_HAVE_KOS$sethostent
 #define __CRT_HAVE_KOS$sethostid
@@ -13389,6 +13395,7 @@
 #define __CRT_HAVE_DOS$getwchar_unlocked
 #define __CRT_HAVE_DOS$getwd
 #define __CRT_HAVE_DOS$getxattr
+#define __CRT_HAVE_DOS$gid_from_group
 #define __CRT_HAVE_DOS$gmtime
 #define __CRT_HAVE_DOS$gmtime64
 #define __CRT_HAVE_DOS$gmtime64_r
@@ -13398,6 +13405,7 @@
 #define __CRT_HAVE_DOS$gnu_dev_minor
 #define __CRT_HAVE_DOS$gotoxy
 #define __CRT_HAVE_DOS$grantpt
+#define __CRT_HAVE_DOS$group_from_gid
 #define __CRT_HAVE_DOS$group_member
 #define __CRT_HAVE_DOS$gsignal
 #define __CRT_HAVE_DOS$gtty
@@ -14430,6 +14438,7 @@
 #define __CRT_HAVE_DOS$setfsgid
 #define __CRT_HAVE_DOS$setfsuid
 #define __CRT_HAVE_DOS$setgid
+#define __CRT_HAVE_DOS$setgroupent
 #define __CRT_HAVE_DOS$setgroups
 #define __CRT_HAVE_DOS$sethostent
 #define __CRT_HAVE_DOS$sethostid

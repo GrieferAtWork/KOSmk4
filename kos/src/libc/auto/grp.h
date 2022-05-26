@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x692d3a3 */
+/* HASH CRC-32:0xd4dd2204 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,7 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_RPC
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_RPC(LIBDCALL libd_fgetgrnam_r)(FILE *__restrict stream, const char *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_RPC(LIBDCALL libd_fgetgrnam_r)(FILE *__restrict stream, char const *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fgetgrnam_r(3)
@@ -91,7 +91,7 @@ INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t 
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_RPC(LIBCCALL libc_fgetgrnam_r)(FILE *__restrict stream, const char *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_RPC(LIBCCALL libc_fgetgrnam_r)(FILE *__restrict stream, char const *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
 /* >> fgetgrfiltered_r(3)
  * Filtered read from `stream'
  * @param: filtered_gid:  When not equal to `(gid_t)-1', require this GID
@@ -179,6 +179,24 @@ INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBDCALL libd_initgroups)(char const *user, gi
  * @return: -1: [errno=EPERM]  You're not allowed  to call  `setgroups(2)',
  *                             or at least not in the way you're trying to. */
 INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user, gid_t group);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF int NOTHROW_NCX(LIBDCALL libd_setgroupent)(int keep_open);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF int NOTHROW_NCX(LIBCCALL libc_setgroupent)(int keep_open);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_gid_from_group)(char const *name, gid_t *p_gid);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_gid_from_group)(char const *name, gid_t *p_gid);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_group_from_gid)(gid_t gid, int nogroup);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_group_from_gid)(gid_t gid, int nogroup);
 #endif /* !__KERNEL__ */
 
 DECL_END

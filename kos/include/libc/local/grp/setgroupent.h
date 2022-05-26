@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x2571f352 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,27 +18,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%(c_prefix){
-/* (#) Portability: libbsd (/include/bsd/pwd.h) */
+#ifndef __local_setgroupent_defined
+#define __local_setgroupent_defined
+#include <__crt.h>
+#ifdef __CRT_HAVE_setgrent
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_setgrent_defined
+#define __local___localdep_setgrent_defined
+__CREDIRECT_VOID(,__NOTHROW_RPC,__localdep_setgrent,(void),setgrent,())
+#endif /* !__local___localdep_setgrent_defined */
+__LOCAL_LIBC(setgroupent) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setgroupent))(int __keep_open) {
+	(void)__keep_open;
+	(__NAMESPACE_LOCAL_SYM __localdep_setgrent)();
+	return 0;
 }
-
-%[define_replacement(errno_t = __errno_t)]
-
-%[insert:prefix(
-#include <pwd.h>
-)]%{
-
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-}
-
-%[insert:extern(uid_from_user)]
-%[insert:extern(user_from_uid)]
-
-%{
-
-__SYSDECL_END
-#endif /* __CC__ */
-
-}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_setgroupent_defined
+#define __local___localdep_setgroupent_defined
+#define __localdep_setgroupent __LIBC_LOCAL_NAME(setgroupent)
+#endif /* !__local___localdep_setgroupent_defined */
+#else /* __CRT_HAVE_setgrent */
+#undef __local_setgroupent_defined
+#endif /* !__CRT_HAVE_setgrent */
+#endif /* !__local_setgroupent_defined */

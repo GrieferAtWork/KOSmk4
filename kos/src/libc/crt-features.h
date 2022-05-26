@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3cc25cc */
+/* HASH CRC-32:0x40961555 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1925,6 +1925,7 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$getxattr
+#define __CRT_HAVE_DOS$gid_from_group
 #define __CRT_HAVE_DOS$gmtime
 #define __CRT_HAVE_DOS$gmtime64
 #define __CRT_HAVE_DOS$gmtime64_r
@@ -1934,6 +1935,7 @@
 #define __CRT_HAVE_DOS$gnu_dev_minor
 #define __CRT_HAVE_DOS$gotoxy
 #define __CRT_HAVE_DOS$grantpt
+#define __CRT_HAVE_DOS$group_from_gid
 #define __CRT_HAVE_DOS$group_member
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -3048,6 +3050,7 @@
 #define __CRT_HAVE_DOS$setfsgid
 #define __CRT_HAVE_DOS$setfsuid
 #define __CRT_HAVE_DOS$setgid
+#define __CRT_HAVE_DOS$setgroupent
 #define __CRT_HAVE_DOS$setgroups
 #define __CRT_HAVE_DOS$sethostent
 #define __CRT_HAVE_DOS$sethostid
@@ -6108,6 +6111,7 @@
 #define __CRT_HAVE_getwchar_unlocked
 #define __CRT_HAVE_getwd
 #define __CRT_HAVE_getxattr
+#define __CRT_HAVE_gid_from_group
 #define __CRT_HAVE_glob
 #define __CRT_HAVE_glob64
 #define __CRT_HAVE_globfree
@@ -6121,6 +6125,7 @@
 #define __CRT_HAVE_gnu_dev_minor
 #define __CRT_HAVE_gotoxy
 #define __CRT_HAVE_grantpt
+#define __CRT_HAVE_group_from_gid
 #define __CRT_HAVE_group_member
 #define __CRT_HAVE_gsignal
 #define __CRT_HAVE_gtty
@@ -7246,6 +7251,7 @@
 #define __CRT_HAVE_setfsuid
 #define __CRT_HAVE_setgid
 #define __CRT_HAVE_setgrent
+#define __CRT_HAVE_setgroupent
 #define __CRT_HAVE_setgroups
 #define __CRT_HAVE_sethostent
 #define __CRT_HAVE_sethostid

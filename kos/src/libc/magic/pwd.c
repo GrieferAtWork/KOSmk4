@@ -663,7 +663,7 @@ int setpassent(int keep_open) {
 	return 0;
 }
 
-[[decl_include("<bits/types.h>")]]
+[[guard, decl_include("<bits/types.h>")]]
 [[impl_include("<bits/types.h>")]]
 [[impl_include("<bits/crt/db/passwd.h>")]]
 [[requires_function(getpwnam)]]
@@ -676,10 +676,11 @@ int uid_from_user([[in]] char const *name, [[out]] uid_t *p_uid) {
 	return -1;
 }
 
-[[wunused]]
+[[guard, wunused]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<bits/types.h>")]]
 [[impl_include("<bits/crt/db/passwd.h>")]]
+[[impl_include("<bits/crt/inttypes.h>")]]
 [[requires_function(getpwuid)]]
 char const *user_from_uid(uid_t uid, int nouser) {
 	struct passwd *ent = getpwuid(uid);
@@ -695,7 +696,7 @@ char const *user_from_uid(uid_t uid, int nouser) {
 @@pp_else@@
 		static char fallback_strbuf[__COMPILER_LENOF("-9223372036854775808")];
 @@pp_endif@@
-		sprintf(fallback_strbuf, "%d", uid);
+		sprintf(fallback_strbuf, "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d", uid);
 		return fallback_strbuf;
 	}
 	return NULL;

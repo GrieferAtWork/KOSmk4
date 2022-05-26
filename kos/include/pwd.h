@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23f03ed5 */
+/* HASH CRC-32:0xa2638035 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -276,18 +276,28 @@ __CDECLARE(,int,__NOTHROW_NCX,setpassent,(int __keep_open),(__keep_open))
 #include <libc/local/pwd/setpassent.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(setpassent, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL setpassent)(int __keep_open) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setpassent))(__keep_open); })
 #endif /* ... */
+#ifndef __uid_from_user_defined
+#define __uid_from_user_defined
 #ifdef __CRT_HAVE_uid_from_user
 __CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,uid_from_user,(char const *__name, uid_t *__p_uid),(__name,__p_uid))
 #elif defined(__CRT_HAVE_getpwnam) || (defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent))
 #include <libc/local/pwd/uid_from_user.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(uid_from_user, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL uid_from_user)(char const *__name, uid_t *__p_uid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uid_from_user))(__name, __p_uid); })
-#endif /* ... */
+#else /* ... */
+#undef __uid_from_user_defined
+#endif /* !... */
+#endif /* !__uid_from_user_defined */
+#ifndef __user_from_uid_defined
+#define __user_from_uid_defined
 #ifdef __CRT_HAVE_user_from_uid
 __CDECLARE(__ATTR_WUNUSED,char const *,__NOTHROW_NCX,user_from_uid,(uid_t __uid, int __nouser),(__uid,__nouser))
 #elif defined(__CRT_HAVE_getpwuid) || (defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent))
 #include <libc/local/pwd/user_from_uid.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(user_from_uid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL user_from_uid)(uid_t __uid, int __nouser) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(user_from_uid))(__uid, __nouser); })
-#endif /* ... */
+#else /* ... */
+#undef __user_from_uid_defined
+#endif /* !... */
+#endif /* !__user_from_uid_defined */
 #ifdef __CRT_HAVE_pw_dup
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),struct passwd *,__NOTHROW_NCX,pw_dup,(struct passwd const *__ent),(__ent))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)

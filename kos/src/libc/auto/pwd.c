@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ec254a5 */
+/* HASH CRC-32:0x9a11b736 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -454,6 +454,7 @@ NOTHROW_NCX(LIBCCALL libc_uid_from_user)(char const *name,
 }
 #include <bits/types.h>
 #include <bits/crt/db/passwd.h>
+#include <bits/crt/inttypes.h>
 INTERN ATTR_SECTION(".text.crt.database.pwd") WUNUSED char const *
 NOTHROW_NCX(LIBCCALL libc_user_from_uid)(uid_t uid,
                                          int nouser) {
@@ -470,7 +471,7 @@ NOTHROW_NCX(LIBCCALL libc_user_from_uid)(uid_t uid,
 #else /* ... */
 		static char fallback_strbuf[__COMPILER_LENOF("-9223372036854775808")];
 #endif /* !... */
-		libc_sprintf(fallback_strbuf, "%d", uid);
+		libc_sprintf(fallback_strbuf, "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d", uid);
 		return fallback_strbuf;
 	}
 	return NULL;

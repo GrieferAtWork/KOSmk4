@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6af0879 */
+/* HASH CRC-32:0x1bcca2f7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,7 +152,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetgrgid_r)(FILE *__restrict stream,
  * @return: * : Error (one of `E*' from `<errno.h>') */
 INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t
 NOTHROW_RPC(LIBCCALL libc_fgetgrnam_r)(FILE *__restrict stream,
-                                       const char *__restrict name,
+                                       char const *__restrict name,
                                        struct group *__restrict resultbuf,
                                        char *__restrict buffer,
                                        size_t buflen,
@@ -495,6 +495,48 @@ done:
 
 	return result;
 }
+INTERN ATTR_SECTION(".text.crt.database.grp") int
+NOTHROW_NCX(LIBCCALL libc_setgroupent)(int keep_open) {
+	(void)keep_open;
+	libc_setgrent();
+	return 0;
+}
+#include <bits/types.h>
+#include <bits/crt/db/group.h>
+INTERN ATTR_SECTION(".text.crt.database.grp") ATTR_IN(1) ATTR_OUT(2) int
+NOTHROW_NCX(LIBCCALL libc_gid_from_group)(char const *name,
+                                          gid_t *p_gid) {
+	struct group *ent = libc_getgrnam(name);
+	if (ent) {
+		*p_gid = ent->gr_gid;
+		return 0;
+	}
+	return -1;
+}
+#include <bits/types.h>
+#include <bits/crt/db/group.h>
+#include <bits/crt/inttypes.h>
+INTERN ATTR_SECTION(".text.crt.database.grp") WUNUSED char const *
+NOTHROW_NCX(LIBCCALL libc_group_from_gid)(gid_t gid,
+                                          int nogroup) {
+	struct group *ent = libc_getgrgid(gid);
+	if (ent)
+		return ent->gr_name;
+	if (nogroup == 0) {
+#if __SIZEOF_GID_T__ == 1
+		static char fallback_strbuf[__COMPILER_LENOF("-128")];
+#elif __SIZEOF_GID_T__ == 2
+		static char fallback_strbuf[__COMPILER_LENOF("-32768")];
+#elif __SIZEOF_GID_T__ == 4
+		static char fallback_strbuf[__COMPILER_LENOF("-2147483648")];
+#else /* ... */
+		static char fallback_strbuf[__COMPILER_LENOF("-9223372036854775808")];
+#endif /* !... */
+		libc_sprintf(fallback_strbuf, "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "d", gid);
+		return fallback_strbuf;
+	}
+	return NULL;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -506,6 +548,9 @@ DEFINE_PUBLIC_ALIAS(fgetgrgid_r, libc_fgetgrgid_r);
 DEFINE_PUBLIC_ALIAS(fgetgrnam_r, libc_fgetgrnam_r);
 DEFINE_PUBLIC_ALIAS(getgrouplist, libc_getgrouplist);
 DEFINE_PUBLIC_ALIAS(initgroups, libc_initgroups);
+DEFINE_PUBLIC_ALIAS(setgroupent, libc_setgroupent);
+DEFINE_PUBLIC_ALIAS(gid_from_group, libc_gid_from_group);
+DEFINE_PUBLIC_ALIAS(group_from_gid, libc_group_from_gid);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_GRP_C */

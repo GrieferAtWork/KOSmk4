@@ -36,8 +36,8 @@ __SYSDECL_BEGIN
 
 }
 
-//TODO:%[insert:extern(gid_from_group)]
-//TODO:%[insert:extern(group_from_gid)]
+%[insert:extern(gid_from_group)]
+%[insert:extern(group_from_gid)]
 
 %{
 

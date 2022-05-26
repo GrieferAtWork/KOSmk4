@@ -287,7 +287,7 @@ $errno_t fgetgrgid_r([[inout]] $FILE *__restrict stream, $gid_t gid,
 [[cp, decl_include("<bits/crt/db/group.h>", "<bits/types.h>")]]
 [[requires_function(fgetgrfiltered_r), impl_include("<libc/errno.h>")]]
 $errno_t fgetgrnam_r([[inout]] $FILE *__restrict stream,
-                     [[in]] const char *__restrict name,
+                     [[in]] char const *__restrict name,
                      [[out]] struct group *__restrict resultbuf,
                      [[out(buflen)]] char *__restrict buffer, size_t buflen,
                      [[out]] struct group **__restrict result) {
@@ -651,6 +651,59 @@ done:
 	return result;
 }
 %#endif /* __USE_MISC */
+
+
+%
+%#ifdef __USE_BSD
+
+[[requires_function(setgrent)]]
+int setgroupent(int keep_open) {
+	(void)keep_open;
+	setgrent();
+	return 0;
+}
+
+[[guard, decl_include("<bits/types.h>")]]
+[[impl_include("<bits/types.h>")]]
+[[impl_include("<bits/crt/db/group.h>")]]
+[[requires_function(getgrnam)]]
+int gid_from_group([[in]] char const *name, [[out]] gid_t *p_gid) {
+	struct group *ent = getgrnam(name);
+	if (ent) {
+		*p_gid = ent->@gr_gid@;
+		return 0;
+	}
+	return -1;
+}
+
+
+[[guard, wunused]]
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<bits/types.h>")]]
+[[impl_include("<bits/crt/db/group.h>")]]
+[[impl_include("<bits/crt/inttypes.h>")]]
+[[requires_function(getgrgid)]]
+char const *group_from_gid(gid_t gid, int nogroup) {
+	struct group *ent = getgrgid(gid);
+	if (ent)
+		return ent->@gr_name@;
+	if (nogroup == 0) {
+@@pp_if __SIZEOF_GID_T__ == 1@@
+		static char fallback_strbuf[__COMPILER_LENOF("-128")];
+@@pp_elif __SIZEOF_GID_T__ == 2@@
+		static char fallback_strbuf[__COMPILER_LENOF("-32768")];
+@@pp_elif __SIZEOF_GID_T__ == 4@@
+		static char fallback_strbuf[__COMPILER_LENOF("-2147483648")];
+@@pp_else@@
+		static char fallback_strbuf[__COMPILER_LENOF("-9223372036854775808")];
+@@pp_endif@@
+		sprintf(fallback_strbuf, "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "d", gid);
+		return fallback_strbuf;
+	}
+	return NULL;
+}
+
+%#endif /* __USE_BSD */
 
 
 %{

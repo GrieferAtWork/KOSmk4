@@ -3312,6 +3312,7 @@
 #define __CRT_HAVE_getwchar_unlocked
 #define __CRT_HAVE_getwd
 #define __CRT_HAVE_getxattr
+#define __CRT_HAVE_gid_from_group
 #define __CRT_HAVE_glob
 #define __CRT_HAVE_glob64
 #define __CRT_HAVE_globfree
@@ -3327,6 +3328,7 @@
 #define __CRT_HAVE_gnu_get_libc_version
 #define __CRT_HAVE_gotoxy
 #define __CRT_HAVE_grantpt
+#define __CRT_HAVE_group_from_gid
 #define __CRT_HAVE_group_member
 #define __CRT_HAVE_gsignal
 #define __CRT_HAVE_gtty
@@ -4477,6 +4479,7 @@
 #define __CRT_HAVE_setfsuid
 #define __CRT_HAVE_setgid
 #define __CRT_HAVE_setgrent
+#define __CRT_HAVE_setgroupent
 #define __CRT_HAVE_setgroups
 #define __CRT_HAVE_sethostent
 #define __CRT_HAVE_sethostid
