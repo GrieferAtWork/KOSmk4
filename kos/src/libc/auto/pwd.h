@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb951a137 */
+/* HASH CRC-32:0x3513a6a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ INTDEF WUNUSED struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwuid)(uid_t uid);
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `name' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-INTDEF WUNUSED ATTR_IN(1) struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwnam)(const char *name);
+INTDEF WUNUSED ATTR_IN(1) struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwnam)(char const *name);
 /* >> fgetpwent(3)
  * Read an entry from `stream'
  * return: * :                         A pointer to the read password entry
@@ -80,7 +80,7 @@ INTDEF ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC(LIBDCALL libd
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC(LIBDCALL libd_getpwnam_r)(const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC(LIBDCALL libd_getpwnam_r)(char const *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 /* >> getpwent_r(3)
  * Read an entry from the password-file stream, opening it if necessary.
  * @return: 0 :     Success (`*result' is made to point at `resultbuf')
@@ -127,7 +127,7 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_RPC
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwnam_r)(FILE *__restrict stream, const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwnam_r)(FILE *__restrict stream, char const *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fgetpwnam_r(3)
@@ -135,7 +135,7 @@ INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t 
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream, const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream, char const *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 /* >> fgetpwfiltered_r(3)
  * Filtered read from `stream'
  * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
@@ -171,6 +171,30 @@ INTDEF ATTR_IN(1) struct passwd *NOTHROW_NCX(LIBDCALL libd_sgetpwent)(char const
 /* >> sgetpwent(3)
  * Old libc4/5 function (only here for compat) */
 INTDEF ATTR_IN(1) struct passwd *NOTHROW_NCX(LIBCCALL libc_sgetpwent)(char const *line);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF int NOTHROW_NCX(LIBDCALL libd_setpassent)(int keep_open);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF int NOTHROW_NCX(LIBCCALL libc_setpassent)(int keep_open);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_uid_from_user)(char const *name, uid_t *p_uid);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_IN(1) ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_uid_from_user)(char const *name, uid_t *p_uid);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_user_from_uid)(uid_t uid, int nouser);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_user_from_uid)(uid_t uid, int nouser);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED ATTR_IN(1) struct passwd *NOTHROW_NCX(LIBDCALL libd_pw_dup)(struct passwd const *ent);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED ATTR_IN(1) struct passwd *NOTHROW_NCX(LIBCCALL libc_pw_dup)(struct passwd const *ent);
 #endif /* !__KERNEL__ */
 
 DECL_END

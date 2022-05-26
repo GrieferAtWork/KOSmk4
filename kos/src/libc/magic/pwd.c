@@ -170,7 +170,7 @@ struct passwd *getpwuid($uid_t uid) {
 [[cp, decl_include("<bits/crt/db/passwd.h>"), export_as("_getpwnam")]]
 [[wunused, requires_function(setpwent, getpwent)]]
 [[userimpl, impl_include("<bits/crt/db/passwd.h>")]]
-struct passwd *getpwnam([[in]] const char *name) {
+struct passwd *getpwnam([[in]] char const *name) {
 	struct passwd *result;
 	setpwent();
 	while ((result = getpwent()) != NULL) {
@@ -316,7 +316,7 @@ $errno_t getpwuid_r($uid_t uid,
 @@@return: 0 : (*result == NULL) No entry for `name'
 @@@return: * : Error (one of `E*' from `<errno.h>')
 [[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
-$errno_t getpwnam_r([[in]] const char *__restrict name,
+$errno_t getpwnam_r([[in]] char const *__restrict name,
                     [[out]] struct passwd *__restrict resultbuf,
                     [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
                     [[out]] struct passwd **__restrict result);
@@ -379,7 +379,7 @@ $errno_t fgetpwuid_r([[inout]] $FILE *__restrict stream, $uid_t uid,
 [[cp, decl_include("<bits/crt/db/passwd.h>", "<bits/types.h>")]]
 [[requires_function(fgetpwfiltered_r), impl_include("<libc/errno.h>")]]
 $errno_t fgetpwnam_r([[inout]] $FILE *__restrict stream,
-                     [[in]] const char *__restrict name,
+                     [[in]] char const *__restrict name,
                      [[out]] struct passwd *__restrict resultbuf,
                      [[out(? <= buflen)]] char *__restrict buffer, size_t buflen,
                      [[out]] struct passwd **__restrict result) {
@@ -651,6 +651,103 @@ struct passwd *sgetpwent([[in]] char const *line) {
 	}
 	return result;
 }
+
+
+%
+%#ifdef __USE_BSD
+
+[[requires_function(setpwent)]]
+int setpassent(int keep_open) {
+	(void)keep_open;
+	setpwent();
+	return 0;
+}
+
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<bits/types.h>")]]
+[[impl_include("<bits/crt/db/passwd.h>")]]
+[[requires_function(getpwnam)]]
+int uid_from_user([[in]] char const *name, [[out]] uid_t *p_uid) {
+	struct passwd *ent = getpwnam(name);
+	if (ent) {
+		*p_uid = ent->@pw_uid@;
+		return 0;
+	}
+	return -1;
+}
+
+[[wunused]]
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<bits/types.h>")]]
+[[impl_include("<bits/crt/db/passwd.h>")]]
+[[requires_function(getpwuid)]]
+char const *user_from_uid(uid_t uid, int nouser) {
+	struct passwd *ent = getpwuid(uid);
+	if (ent)
+		return ent->@pw_name@;
+	if (nouser == 0) {
+@@pp_if __SIZEOF_UID_T__ == 1@@
+		static char fallback_strbuf[__COMPILER_LENOF("-128")];
+@@pp_elif __SIZEOF_UID_T__ == 2@@
+		static char fallback_strbuf[__COMPILER_LENOF("-32768")];
+@@pp_elif __SIZEOF_UID_T__ == 4@@
+		static char fallback_strbuf[__COMPILER_LENOF("-2147483648")];
+@@pp_else@@
+		static char fallback_strbuf[__COMPILER_LENOF("-9223372036854775808")];
+@@pp_endif@@
+		sprintf(fallback_strbuf, "%d", uid);
+		return fallback_strbuf;
+	}
+	return NULL;
+}
+
+
+[[wunused, requires_function(malloc)]]
+[[decl_include("<bits/crt/db/passwd.h>")]]
+[[impl_include("<bits/crt/db/passwd.h>")]]
+struct passwd *pw_dup([[in]] struct passwd const *ent) {
+	static uint8_t const strfield_offsets[] = {
+		offsetof(struct passwd, @pw_name@),
+		offsetof(struct passwd, @pw_passwd@),
+		offsetof(struct passwd, @pw_gecos@),
+		offsetof(struct passwd, @pw_dir@),
+		offsetof(struct passwd, @pw_shell@),
+	};
+	struct passwd *result;
+	unsigned int i;
+	size_t reslen = sizeof(struct passwd);
+	for (i = 0; i < COMPILER_LENOF(strfield_offsets); ++i) {
+		char const *str = *(char const *const *)((byte_t const *)ent + strfield_offsets[i]);
+		if (str != NULL) /* Should never be NULL, but programs may not respect that... */
+			reslen += strlen(str) * sizeof(char);
+		reslen += sizeof(char);
+	}
+	/* Allocate the duplicate */
+	result = (struct passwd *)malloc(reslen);
+	if (result) {
+		char *p;
+		result = (struct passwd *)memcpy(result, ent, sizeof(struct passwd));
+		/* Copy strings. */
+		p = (char *)result + 1;
+		for (i = 0; i < COMPILER_LENOF(strfield_offsets); ++i) {
+			char const *str = *(char const *const *)((byte_t const *)ent + strfield_offsets[i]);
+			*(char **)((byte_t *)result + strfield_offsets[i]) = p;
+			if (str != NULL) /* Should never be NULL, but programs may not respect that... */
+				p = (char *)mempcpyc(p, str, strlen(str), sizeof(char));
+			*p++ = '\0';
+		}
+	}
+	return result;
+}
+
+/*TODO:
+char *bcrypt_gensalt(u_int8_t);
+char *bcrypt(char const *, char const *);
+int bcrypt_newhash(char const *, int, char *, size_t);
+int bcrypt_checkpass(char const *, char const *);
+*/
+
+%#endif /* __USE_BSD */
 
 
 %{

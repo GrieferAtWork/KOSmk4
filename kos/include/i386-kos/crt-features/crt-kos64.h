@@ -4073,6 +4073,7 @@
 #define __CRT_HAVE_putwchar
 #define __CRT_HAVE_putwchar_unlocked
 #define __CRT_HAVE_pvalloc
+#define __CRT_HAVE_pw_dup
 #define __CRT_HAVE_pwait
 #define __CRT_HAVE_pwrite
 #define __CRT_HAVE_pwrite64
@@ -4341,6 +4342,7 @@
 #define __CRT_HAVE_setnetent
 #define __CRT_HAVE_setnetgrent
 #define __CRT_HAVE_setns
+#define __CRT_HAVE_setpassent
 #define __CRT_HAVE_setpgid
 #define __CRT_HAVE_setpgrp
 #define __CRT_HAVE_setpriority
@@ -5654,6 +5656,7 @@
 #define __CRT_HAVE_ufromfpx
 #define __CRT_HAVE_ufromfpxf
 #define __CRT_HAVE_ufromfpxl
+#define __CRT_HAVE_uid_from_user
 #define __CRT_HAVE_ulckpwdf
 #define __CRT_HAVE_ulimit
 #define __CRT_HAVE_ulltostr
@@ -5707,6 +5710,7 @@
 #define __CRT_HAVE_updwtmp
 #define __CRT_HAVE_updwtmpx
 #define __CRT_HAVE_uselocale
+#define __CRT_HAVE_user_from_uid
 #define __CRT_HAVE_usleep
 #define __CRT_HAVE_ustat
 #define __CRT_HAVE_utime
@@ -9641,6 +9645,7 @@
 #define __CRT_HAVE_KOS$putwchar
 #define __CRT_HAVE_KOS$putwchar_unlocked
 #define __CRT_HAVE_KOS$pvalloc
+#define __CRT_HAVE_KOS$pw_dup
 #define __CRT_HAVE_KOS$pwait
 #define __CRT_HAVE_KOS$pwrite
 #define __CRT_HAVE_KOS$pwrite64
@@ -9876,6 +9881,7 @@
 #define __CRT_HAVE_KOS$setnetent
 #define __CRT_HAVE_KOS$setnetgrent
 #define __CRT_HAVE_KOS$setns
+#define __CRT_HAVE_KOS$setpassent
 #define __CRT_HAVE_KOS$setpgid
 #define __CRT_HAVE_KOS$setpriority
 #define __CRT_HAVE_KOS$setproctitle
@@ -10299,6 +10305,7 @@
 #define __CRT_HAVE_KOS$ufromfpx
 #define __CRT_HAVE_KOS$ufromfpxf
 #define __CRT_HAVE_KOS$ufromfpxl
+#define __CRT_HAVE_KOS$uid_from_user
 #define __CRT_HAVE_KOS$ulimit
 #define __CRT_HAVE_KOS$ulltostr
 #define __CRT_HAVE_KOS$ultoa
@@ -10349,6 +10356,7 @@
 #define __CRT_HAVE_KOS$updwtmp
 #define __CRT_HAVE_KOS$updwtmpx
 #define __CRT_HAVE_KOS$uselocale
+#define __CRT_HAVE_KOS$user_from_uid
 #define __CRT_HAVE_KOS$usleep
 #define __CRT_HAVE_KOS$ustat
 #define __CRT_HAVE_KOS$utime
@@ -14204,6 +14212,7 @@
 #define __CRT_HAVE_DOS$putwchar
 #define __CRT_HAVE_DOS$putwchar_unlocked
 #define __CRT_HAVE_DOS$pvalloc
+#define __CRT_HAVE_DOS$pw_dup
 #define __CRT_HAVE_DOS$pwait
 #define __CRT_HAVE_DOS$pwrite
 #define __CRT_HAVE_DOS$pwrite64
@@ -14439,6 +14448,7 @@
 #define __CRT_HAVE_DOS$setnetent
 #define __CRT_HAVE_DOS$setnetgrent
 #define __CRT_HAVE_DOS$setns
+#define __CRT_HAVE_DOS$setpassent
 #define __CRT_HAVE_DOS$setpgid
 #define __CRT_HAVE_DOS$setpriority
 #define __CRT_HAVE_DOS$setproctitle
@@ -14862,6 +14872,7 @@
 #define __CRT_HAVE_DOS$ufromfpx
 #define __CRT_HAVE_DOS$ufromfpxf
 #define __CRT_HAVE_DOS$ufromfpxl
+#define __CRT_HAVE_DOS$uid_from_user
 #define __CRT_HAVE_DOS$ulimit
 #define __CRT_HAVE_DOS$ulltostr
 #define __CRT_HAVE_DOS$ultoa
@@ -14912,6 +14923,7 @@
 #define __CRT_HAVE_DOS$updwtmp
 #define __CRT_HAVE_DOS$updwtmpx
 #define __CRT_HAVE_DOS$uselocale
+#define __CRT_HAVE_DOS$user_from_uid
 #define __CRT_HAVE_DOS$usleep
 #define __CRT_HAVE_DOS$ustat
 #define __CRT_HAVE_DOS$utime

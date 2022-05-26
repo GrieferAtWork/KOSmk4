@@ -4227,6 +4227,7 @@
 #define __CRT_HAVE_putwchar
 #define __CRT_HAVE_putwchar_unlocked
 #define __CRT_HAVE_pvalloc
+#define __CRT_HAVE_pw_dup
 #define __CRT_HAVE_pwait
 #define __CRT_HAVE_pwrite
 #define __CRT_HAVE_pwrite64
@@ -4495,6 +4496,7 @@
 #define __CRT_HAVE_setnetent
 #define __CRT_HAVE_setnetgrent
 #define __CRT_HAVE_setns
+#define __CRT_HAVE_setpassent
 #define __CRT_HAVE_setpgid
 #define __CRT_HAVE_setpgrp
 #define __CRT_HAVE_setpriority
@@ -5997,6 +5999,7 @@
 #define __CRT_HAVE_ufromfpx
 #define __CRT_HAVE_ufromfpxf
 #define __CRT_HAVE_ufromfpxl
+#define __CRT_HAVE_uid_from_user
 #define __CRT_HAVE_ulckpwdf
 #define __CRT_HAVE_ulimit
 #define __CRT_HAVE_ulltostr
@@ -6050,6 +6053,7 @@
 #define __CRT_HAVE_updwtmp
 #define __CRT_HAVE_updwtmpx
 #define __CRT_HAVE_uselocale
+#define __CRT_HAVE_user_from_uid
 #define __CRT_HAVE_usleep
 #define __CRT_HAVE_ustat
 #define __CRT_HAVE_utime

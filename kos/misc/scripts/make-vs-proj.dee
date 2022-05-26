@@ -46,12 +46,6 @@ global final PROJ_CONFIGS = {
 #define PROJ_CONFIGS_DEFINES(name)   PROJ_CONFIGS[name][1]
 
 
-global final PROJ_TARGET_CONFIGS = {
-	"i386-kos",
-	"x86_64-kos"
-};
-
-
 global final FILE_KIND_MSC = 0;
 global final FILE_KIND_HDR = 1;
 global final FILE_KIND_SRC = 2;
@@ -62,6 +56,7 @@ global final HEADER_MAPPING: {string: int} = {
 	""          : FILE_KIND_HDR,
 	"c"         : FILE_KIND_SRC,
 	"stackdump" : FILE_KIND_IGN,
+	"dec"       : FILE_KIND_IGN,
 };
 
 global FILES: {string: int} = Dict({
@@ -302,7 +297,8 @@ createVsFile("kos.vcxproj", [](fp) {
 "	<ItemDefinitionGroup Condition=\"'$(Configuration)|$(Platform)'=='" << config << "|" << target_int << "'\">
 		<ClCompile>
 			<WarningLevel>Level3</WarningLevel>
-			<Optimization>" << ("Optimize" in config ? "MaxSpeed" : "Disabled") << "</Optimization>";
+			<Optimization>" << ("Optimize" in config ? "MaxSpeed" : "Disabled") << "</Optimization>
+";
 			if ("Optimize" in config) {
 				fp <<
 "			<FunctionLevelLinking>true</FunctionLevelLinking>

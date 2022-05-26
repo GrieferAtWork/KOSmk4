@@ -31,6 +31,9 @@ BEGIN
 	];
 	local KERNEL_C_SOURCES = [
 		/* Include libc auto- and hybrid-sources */
+		/* TODO: Don't include all auto sources. - Only include those that actually
+		 *       define anything outside of `#ifndef __KERNEL__'. - This should be
+		 *       automated by `generate_headers.dee' */
 		"../../libc/auto/*.c",
 		"../../libc/hybrid/arch/" + XARCH + "/*.c",
 		"../../libc/hybrid/*.c",

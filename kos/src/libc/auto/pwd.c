@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ea61802 */
+/* HASH CRC-32:0x3ec254a5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -180,7 +180,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwuid_r)(FILE *__restrict stream,
  * @return: * : Error (one of `E*' from `<errno.h>') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) ATTR_OUT(6) ATTR_OUTS(4, 5) errno_t
 NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream,
-                                       const char *__restrict name,
+                                       char const *__restrict name,
                                        struct passwd *__restrict resultbuf,
                                        char *__restrict buffer,
                                        size_t buflen,
@@ -434,6 +434,83 @@ NOTHROW_NCX(LIBCCALL libc_sgetpwent)(char const *line) {
 	}
 	return result;
 }
+INTERN ATTR_SECTION(".text.crt.database.pwd") int
+NOTHROW_NCX(LIBCCALL libc_setpassent)(int keep_open) {
+	(void)keep_open;
+	libc_setpwent();
+	return 0;
+}
+#include <bits/types.h>
+#include <bits/crt/db/passwd.h>
+INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_IN(1) ATTR_OUT(2) int
+NOTHROW_NCX(LIBCCALL libc_uid_from_user)(char const *name,
+                                         uid_t *p_uid) {
+	struct passwd *ent = libc_getpwnam(name);
+	if (ent) {
+		*p_uid = ent->pw_uid;
+		return 0;
+	}
+	return -1;
+}
+#include <bits/types.h>
+#include <bits/crt/db/passwd.h>
+INTERN ATTR_SECTION(".text.crt.database.pwd") WUNUSED char const *
+NOTHROW_NCX(LIBCCALL libc_user_from_uid)(uid_t uid,
+                                         int nouser) {
+	struct passwd *ent = libc_getpwuid(uid);
+	if (ent)
+		return ent->pw_name;
+	if (nouser == 0) {
+#if __SIZEOF_UID_T__ == 1
+		static char fallback_strbuf[__COMPILER_LENOF("-128")];
+#elif __SIZEOF_UID_T__ == 2
+		static char fallback_strbuf[__COMPILER_LENOF("-32768")];
+#elif __SIZEOF_UID_T__ == 4
+		static char fallback_strbuf[__COMPILER_LENOF("-2147483648")];
+#else /* ... */
+		static char fallback_strbuf[__COMPILER_LENOF("-9223372036854775808")];
+#endif /* !... */
+		libc_sprintf(fallback_strbuf, "%d", uid);
+		return fallback_strbuf;
+	}
+	return NULL;
+}
+#include <bits/crt/db/passwd.h>
+INTERN ATTR_SECTION(".text.crt.database.pwd") WUNUSED ATTR_IN(1) struct passwd *
+NOTHROW_NCX(LIBCCALL libc_pw_dup)(struct passwd const *ent) {
+	static uint8_t const strfield_offsets[] = {
+		offsetof(struct passwd, pw_name),
+		offsetof(struct passwd, pw_passwd),
+		offsetof(struct passwd, pw_gecos),
+		offsetof(struct passwd, pw_dir),
+		offsetof(struct passwd, pw_shell),
+	};
+	struct passwd *result;
+	unsigned int i;
+	size_t reslen = sizeof(struct passwd);
+	for (i = 0; i < COMPILER_LENOF(strfield_offsets); ++i) {
+		char const *str = *(char const *const *)((byte_t const *)ent + strfield_offsets[i]);
+		if (str != NULL) /* Should never be NULL, but programs may not respect that... */
+			reslen += libc_strlen(str) * sizeof(char);
+		reslen += sizeof(char);
+	}
+	/* Allocate the duplicate */
+	result = (struct passwd *)libc_malloc(reslen);
+	if (result) {
+		char *p;
+		result = (struct passwd *)libc_memcpy(result, ent, sizeof(struct passwd));
+		/* Copy strings. */
+		p = (char *)result + 1;
+		for (i = 0; i < COMPILER_LENOF(strfield_offsets); ++i) {
+			char const *str = *(char const *const *)((byte_t const *)ent + strfield_offsets[i]);
+			*(char **)((byte_t *)result + strfield_offsets[i]) = p;
+			if (str != NULL) /* Should never be NULL, but programs may not respect that... */
+				p = (char *)libc_mempcpyc(p, str, libc_strlen(str), sizeof(char));
+			*p++ = '\0';
+		}
+	}
+	return result;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -446,6 +523,10 @@ DEFINE_PUBLIC_ALIAS(fgetpwnam_r, libc_fgetpwnam_r);
 DEFINE_PUBLIC_ALIAS(getpw, libc_getpw);
 DEFINE_PUBLIC_ALIAS(_sgetpwent, libc_sgetpwent);
 DEFINE_PUBLIC_ALIAS(sgetpwent, libc_sgetpwent);
+DEFINE_PUBLIC_ALIAS(setpassent, libc_setpassent);
+DEFINE_PUBLIC_ALIAS(uid_from_user, libc_uid_from_user);
+DEFINE_PUBLIC_ALIAS(user_from_uid, libc_user_from_uid);
+DEFINE_PUBLIC_ALIAS(pw_dup, libc_pw_dup);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_PWD_C */

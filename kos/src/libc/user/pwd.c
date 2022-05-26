@@ -224,14 +224,14 @@ NOTHROW_RPC(LIBCCALL libc_getpwuid)(uid_t uid)
 }
 /*[[[end:libc_getpwuid]]]*/
 
-/*[[[head:libc_getpwnam,hash:CRC-32=0x30e43e8f]]]*/
+/*[[[head:libc_getpwnam,hash:CRC-32=0xa479e868]]]*/
 /* >> getpwnam(3)
  * Search for an entry with a matching username
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `name' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") WUNUSED ATTR_IN(1) struct passwd *
-NOTHROW_RPC(LIBCCALL libc_getpwnam)(const char *name)
+NOTHROW_RPC(LIBCCALL libc_getpwnam)(char const *name)
 /*[[[body:libc_getpwnam]]]*/
 {
 	struct passwd *result;
@@ -294,14 +294,14 @@ NOTHROW_RPC(LIBCCALL libc_getpwuid_r)(uid_t uid,
 }
 /*[[[end:libc_getpwuid_r]]]*/
 
-/*[[[head:libc_getpwnam_r,hash:CRC-32=0x4ca27003]]]*/
+/*[[[head:libc_getpwnam_r,hash:CRC-32=0xf296ce76]]]*/
 /* >> getpwnam_r(3)
  * Search for an entry with a matching username
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t
-NOTHROW_RPC(LIBCCALL libc_getpwnam_r)(const char *__restrict name,
+NOTHROW_RPC(LIBCCALL libc_getpwnam_r)(char const *__restrict name,
                                       struct passwd *__restrict resultbuf,
                                       char *__restrict buffer,
                                       size_t buflen,

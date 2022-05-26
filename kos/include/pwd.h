@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b489149 */
+/* HASH CRC-32:0x23f03ed5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,7 +133,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getpwuid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `name' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),struct passwd *,__NOTHROW_RPC,getpwnam,(const char *__name),(__name))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),struct passwd *,__NOTHROW_RPC,getpwnam,(char const *__name),(__name))
 #elif defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent)
 #include <libc/local/pwd/getpwnam.h>
 /* >> getpwnam(3)
@@ -141,7 +141,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),struct passwd *,__NOTHROW_RPC,getpwnam,(c
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `name' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getpwnam, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) struct passwd *__NOTHROW_RPC(__LIBCCALL getpwnam)(const char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpwnam))(__name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpwnam, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) struct passwd *__NOTHROW_RPC(__LIBCCALL getpwnam)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpwnam))(__name); })
 #endif /* ... */
 
 #ifdef __USE_MISC
@@ -180,7 +180,7 @@ __CDECLARE_OPT(__ATTR_OUT(2) __ATTR_OUT(5) __ATTR_OUTS(3, 4),__errno_t,__NOTHROW
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(5) __ATTR_OUTS(3, 4),__errno_t,__NOTHROW_RPC,getpwnam_r,(const char *__restrict __name, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__name,__resultbuf,__buffer,__buflen,__result))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(5) __ATTR_OUTS(3, 4),__errno_t,__NOTHROW_RPC,getpwnam_r,(char const *__restrict __name, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__name,__resultbuf,__buffer,__buflen,__result))
 #ifdef __USE_MISC
 /* >> getpwent_r(3)
  * Read an entry from the password-file stream, opening it if necessary.
@@ -236,7 +236,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fgetpwuid_r, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1) __ATTR_OUT(3) __ATTR_OUT(6) __ATTR_OUTS(4, 5),__errno_t,__NOTHROW_RPC,fgetpwnam_r,(__FILE *__restrict __stream, const char *__restrict __name, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__stream,__name,__resultbuf,__buffer,__buflen,__result))
+__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1) __ATTR_OUT(3) __ATTR_OUT(6) __ATTR_OUTS(4, 5),__errno_t,__NOTHROW_RPC,fgetpwnam_r,(__FILE *__restrict __stream, char const *__restrict __name, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result),(__stream,__name,__resultbuf,__buffer,__buflen,__result))
 #else /* __CRT_HAVE_fgetpwnam_r */
 #include <bits/crt/stdio.h>
 #if (defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)) && (defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))) && (defined(__CRT_HAVE_fparseln) || ((defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && (defined(__CRT_HAVE_feof) || defined(__CRT_HAVE__IO_feof) || defined(__CRT_HAVE_feof_unlocked))
@@ -246,7 +246,7 @@ __CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1) __ATTR_OUT(3) __ATTR_OUT(6) __ATTR_OUTS(
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fgetpwnam_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) __ATTR_OUT(3) __ATTR_OUT(6) __ATTR_OUTS(4, 5) __errno_t __NOTHROW_RPC(__LIBCCALL fgetpwnam_r)(__FILE *__restrict __stream, const char *__restrict __name, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetpwnam_r))(__stream, __name, __resultbuf, __buffer, __buflen, __result); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fgetpwnam_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) __ATTR_OUT(3) __ATTR_OUT(6) __ATTR_OUTS(4, 5) __errno_t __NOTHROW_RPC(__LIBCCALL fgetpwnam_r)(__FILE *__restrict __stream, char const *__restrict __name, struct passwd *__restrict __resultbuf, char *__restrict __buffer, size_t __buflen, struct passwd **__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetpwnam_r))(__stream, __name, __resultbuf, __buffer, __buflen, __result); })
 #endif /* (__CRT_HAVE_fgetpos64 || __CRT_HAVE__IO_fgetpos64 || __CRT_HAVE_fgetpos64_unlocked || __CRT_HAVE_ftello64 || __CRT_HAVE_ftell64 || __CRT_HAVE__ftelli64 || __CRT_HAVE_ftello64_unlocked || __CRT_HAVE_ftell64_unlocked || __CRT_HAVE__ftelli64_nolock || __CRT_HAVE_fgetpos || __CRT_HAVE__IO_fgetpos || __CRT_HAVE_fgetpos_unlocked || __CRT_HAVE_ftello || __CRT_HAVE_ftello_unlocked || __CRT_HAVE_ftell || __CRT_HAVE__IO_ftell || __CRT_HAVE_ftell_unlocked || __CRT_HAVE__ftell_nolock) && (__CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || (__SEEK_SET && (__CRT_HAVE_fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock))) && (__CRT_HAVE_fparseln || ((__CRT_HAVE_getc || __CRT_HAVE_fgetc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || __CRT_HAVE__getc_nolock || __CRT_HAVE__fgetc_nolock || (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow || __CRT_HAVE___underflow)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))) && (__CRT_HAVE_feof || __CRT_HAVE__IO_feof || __CRT_HAVE_feof_unlocked) */
 #endif /* !__CRT_HAVE_fgetpwnam_r */
 #endif /* __USE_KOS */
@@ -268,6 +268,33 @@ __CDECLARE(__ATTR_OUT(2),int,__NOTHROW_RPC,getpw,(__uid_t __uid, char *__buffer)
 __NAMESPACE_LOCAL_USING_OR_IMPL(getpw, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(2) int __NOTHROW_RPC(__LIBCCALL getpw)(__uid_t __uid, char *__buffer) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpw))(__uid, __buffer); })
 #endif /* ... */
 #endif /* __USE_GNU */
+
+#ifdef __USE_BSD
+#ifdef __CRT_HAVE_setpassent
+__CDECLARE(,int,__NOTHROW_NCX,setpassent,(int __keep_open),(__keep_open))
+#elif defined(__CRT_HAVE_setpwent)
+#include <libc/local/pwd/setpassent.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(setpassent, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL setpassent)(int __keep_open) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setpassent))(__keep_open); })
+#endif /* ... */
+#ifdef __CRT_HAVE_uid_from_user
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,uid_from_user,(char const *__name, uid_t *__p_uid),(__name,__p_uid))
+#elif defined(__CRT_HAVE_getpwnam) || (defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent))
+#include <libc/local/pwd/uid_from_user.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(uid_from_user, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL uid_from_user)(char const *__name, uid_t *__p_uid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uid_from_user))(__name, __p_uid); })
+#endif /* ... */
+#ifdef __CRT_HAVE_user_from_uid
+__CDECLARE(__ATTR_WUNUSED,char const *,__NOTHROW_NCX,user_from_uid,(uid_t __uid, int __nouser),(__uid,__nouser))
+#elif defined(__CRT_HAVE_getpwuid) || (defined(__CRT_HAVE_setpwent) && defined(__CRT_HAVE_getpwent))
+#include <libc/local/pwd/user_from_uid.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(user_from_uid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL user_from_uid)(uid_t __uid, int __nouser) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(user_from_uid))(__uid, __nouser); })
+#endif /* ... */
+#ifdef __CRT_HAVE_pw_dup
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),struct passwd *,__NOTHROW_NCX,pw_dup,(struct passwd const *__ent),(__ent))
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
+#include <libc/local/pwd/pw_dup.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(pw_dup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) struct passwd *__NOTHROW_NCX(__LIBCCALL pw_dup)(struct passwd const *__ent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pw_dup))(__ent); })
+#endif /* ... */
+#endif /* __USE_BSD */
 #endif /* __CC__ */
 
 __SYSDECL_END

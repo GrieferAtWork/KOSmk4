@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30285abb */
+/* HASH CRC-32:0x8ce37aaa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ INTDEF WUNUSED struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwuid)(uid_t uid);
  * return: * :                         A pointer to the read password entry
  * return: NULL: (errno = <unchanged>) No entry for `name' exists
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
-INTDEF WUNUSED ATTR_IN(1) struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwnam)(const char *name);
+INTDEF WUNUSED ATTR_IN(1) struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwnam)(char const *name);
 /* >> fgetpwent(3)
  * Read an entry from `stream'
  * return: * :                         A pointer to the read password entry
@@ -74,7 +74,7 @@ INTDEF ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC(LIBCCALL libc
  * @return: 0 : (*result != NULL) Success
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
-INTDEF ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC(LIBCCALL libc_getpwnam_r)(const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
+INTDEF ATTR_IN(1) ATTR_OUT(2) ATTR_OUT(5) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC(LIBCCALL libc_getpwnam_r)(char const *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
 /* >> getpwent_r(3)
  * Read an entry from the password-file stream, opening it if necessary.
  * @return: 0 :     Success (`*result' is made to point at `resultbuf')

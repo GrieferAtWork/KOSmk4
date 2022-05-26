@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21ec231 */
+/* HASH CRC-32:0xa16986d5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1464,6 +1464,10 @@ DFUN(".text.crt.dos.database.pwd", libd_fgetpwuid_r, libc_fgetpwuid_r, TIn(__SIZ
 DFUN(".text.crt.dos.database.pwd", libd_fgetpwnam_r, libc_fgetpwnam_r, TIn(__SIZEOF_ERRNO_T__), 6, TP, TP, TP, TP, TI, TP)
 DFUN(".text.crt.dos.database.pwd", libd_getpw, libc_getpw, TD, 2, TIn(__SIZEOF_UID_T__), TP)
 DFUN(".text.crt.compat.linux", libd_sgetpwent, libc_sgetpwent, TP, 1, TP)
+DFUN(".text.crt.dos.database.pwd", libd_setpassent, libc_setpassent, TD, 1, TD)
+DFUN(".text.crt.dos.database.pwd", libd_uid_from_user, libc_uid_from_user, TD, 2, TP, TP)
+DFUN(".text.crt.dos.database.pwd", libd_user_from_uid, libc_user_from_uid, TP, 2, TIn(__SIZEOF_UID_T__), TD)
+DFUN(".text.crt.dos.database.pwd", libd_pw_dup, libc_pw_dup, TP, 1, TP)
 
 /* readpassphrase */
 DFUN(".text.crt.dos.bsd", libd_readpassphrase, libc_readpassphrase, TP, 4, TP, TP, TI, TD)

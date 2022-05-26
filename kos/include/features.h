@@ -361,50 +361,50 @@
 #define __USE_ISOC17 1
 #endif /* _ISOC17_SOURCE || __STDC_VERSION__ >= 201112L */
 
-#if (defined(_ISOC11_SOURCE) || defined(_ISOC17_SOURCE) || \
+#if (defined(_ISOC11_SOURCE) || defined(__USE_ISOC17) || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
 #ifndef __ISO_C_VISIBLE
 #define __ISO_C_VISIBLE 2011 /* API alias (don't use in headers!) */
 #endif /* !__ISO_C_VISIBLE */
 #define __USE_ISOC11 1
-#endif /* _ISOC11_SOURCE || _ISOC17_SOURCE || __STDC_VERSION__ >= 201112L */
+#endif /* _ISOC11_SOURCE || __USE_ISOC17 || __STDC_VERSION__ >= 201112L */
 
-#if (defined(_ISOC99_SOURCE) || defined(_ISOC11_SOURCE) || defined(_ISOC17_SOURCE) || \
+#if (defined(_ISOC99_SOURCE) || defined(__USE_ISOC11) || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L))
 #ifndef __ISO_C_VISIBLE
 #define __ISO_C_VISIBLE 1999 /* API alias (don't use in headers!) */
 #endif /* !__ISO_C_VISIBLE */
 #define __USE_ISOC99 1
-#endif /* _ISOC99_SOURCE || _ISOC11_SOURCE || _ISOC17_SOURCE || __STDC_VERSION__ >= 199901L */
+#endif /* _ISOC99_SOURCE || __USE_ISOC11 || __STDC_VERSION__ >= 199901L */
 
-#if (defined(_ISOC95_SOURCE) || defined(_ISOC99_SOURCE) || \
-     defined(_ISOC11_SOURCE) || defined(_ISOC17_SOURCE) || \
+#if (defined(_ISOC95_SOURCE) || defined(__USE_ISOC99) || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L))
 #ifndef __ISO_C_VISIBLE
 #define __ISO_C_VISIBLE 1995 /* API alias (don't use in headers!) */
 #endif /* !__ISO_C_VISIBLE */
 #define __USE_ISOC95 1
-#endif /* _ISOC95_SOURCE || _ISOC99_SOURCE || _ISOC11_SOURCE || _ISOC17_SOURCE || __STDC_VERSION__ >= 199409L */
-
-#if (defined(_ISOCXX11_SOURCE) || defined(_ISOCXX14_SOURCE) || defined(_ISOCXX17_SOURCE) || \
-     defined(__GXX_EXPERIMENTAL_CXX0X__) || (defined(__cplusplus) && __cplusplus >= 201103L))
-#define __USE_ISOCXX11 1
-#endif /* _ISOCXX11_SOURCE || _ISOCXX14_SOURCE || _ISOCXX17_SOURCE || __GXX_EXPERIMENTAL_CXX0X__ || __cplusplus >= 201103L */
-
-#if (defined(_ISOCXX14_SOURCE) || defined(_ISOCXX17_SOURCE) || \
-     (defined(__cplusplus) && __cplusplus >= 201103L))
-#define __USE_ISOCXX14 1
-#endif /* _ISOCXX14_SOURCE || __cplusplus > 201103L */
-
-#if (defined(_ISOCXX17_SOURCE) || \
-     (defined(__cplusplus) && __cplusplus >= 201703L))
-#define __USE_ISOCXX17 1
-#endif /* _ISOCXX17_SOURCE || __cplusplus > 201703L */
+#endif /* _ISOC95_SOURCE || __USE_ISOC99 || __STDC_VERSION__ >= 199409L */
 
 #if (defined(_ISOCXX2A_SOURCE) || \
      (defined(__cplusplus) && __cplusplus > 201703L))
 #define __USE_ISOCXX2A 1
 #endif /* _ISOCXX2A_SOURCE || __cplusplus > 201703L */
+
+#if (defined(_ISOCXX17_SOURCE) || defined(__USE_ISOCXX2A) || \
+     (defined(__cplusplus) && __cplusplus >= 201703L))
+#define __USE_ISOCXX17 1
+#endif /* _ISOCXX17_SOURCE || __USE_ISOCXX2A || __cplusplus > 201703L */
+
+#if (defined(_ISOCXX14_SOURCE) || defined(__USE_ISOCXX17) || \
+     (defined(__cplusplus) && __cplusplus >= 201103L))
+#define __USE_ISOCXX14 1
+#endif /* _ISOCXX14_SOURCE || __USE_ISOCXX17 || __cplusplus > 201103L */
+
+#if (defined(_ISOCXX11_SOURCE) || defined(__USE_ISOCXX14) || \
+     (defined(__cplusplus) && __cplusplus >= 201103L) || \
+     defined(__GXX_EXPERIMENTAL_CXX0X__))
+#define __USE_ISOCXX11 1
+#endif /* _ISOCXX11_SOURCE || __USE_ISOCXX14 || __cplusplus >= 201103L || __GXX_EXPERIMENTAL_CXX0X__ */
 
 #if defined(__cplusplus) && (!defined(__GNUC__) || __GCC_VERSION_NUM >= 40400)
 /* Enable proper C++ prototype declarations. */
