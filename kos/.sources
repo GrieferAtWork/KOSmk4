@@ -100,8 +100,8 @@ if (CONFIG_DEBUG) {
 
 GCC_FLAGS({
 	/* TODO: Add support for dwarf-5 in `libdebuginfo' */
-	"-gdwarf-4", /* Always generate debug information. */
-	"-pipe",     /* Use pipes to speed up compilation */
+	"-g",    /* Always generate debug information. */
+	"-pipe", /* Use pipes to speed up compilation */
 })
 
 

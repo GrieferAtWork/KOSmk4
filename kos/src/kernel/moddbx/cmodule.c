@@ -72,6 +72,7 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
                                         byte_t const *dip) {
 	uintptr_t temp;
 	byte_t const *reader;
+	uint8_t unit_type;
 	reader = cmodunit_di_start(self);
 	result->dup_cu_info_hdr = reader;
 	/* 7.5.1.1   Compilation Unit Header */
@@ -95,12 +96,33 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
 
 	result->dsp_version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
 	reader += 2;
+	if (result->dsp_version >= 5) {
+		unit_type = *(uint8_t const *)reader; /* unit_type */
+		reader += 1;
+		result->dsp_addrsize = *(uint8_t const *)reader; /* address_size */
+		reader += 1;
+	} else {
+		unit_type = DW_UT_compile;
+	}
 	temp = UNALIGNED_GET32((uint32_t const *)reader); /* debug_abbrev_offset */
 	reader += 4;
 	if (temp == 0xffffffff)
 		reader += 8;
-	result->dsp_addrsize = *(uint8_t const *)reader; /* address_size */
-	reader += 1;
+	if (result->dsp_version < 5) {
+		result->dsp_addrsize = *(uint8_t const *)reader; /* address_size */
+		reader += 1;
+	}
+	switch (unit_type) {
+	case DW_UT_skeleton:
+	case DW_UT_split_compile:
+		reader += 8; /* dwo_id */
+		break;
+	case DW_UT_type:
+		reader += 8;                   /* type_signature */
+		reader += result->dsp_ptrsize; /* type_offset */
+		break;
+	default: break;
+	}
 	result->dsp_cu_info_pos = reader;
 	if (dip) {
 		/* If the given pointer is outside the valid range, setup the parser for EOF. */
@@ -412,6 +434,20 @@ NOTHROW(FCALL cmodule_reloc_units)(struct cmodule *new_addr,
 }
 
 
+#if __SIZEOF_POINTER__ > 4
+#define addrsize_isvalid(v) ((v) == 1 || (v) == 2 || (v) == 4 || (v) == 8)
+#else /* __SIZEOF_POINTER__ > 4 */
+#define addrsize_isvalid(v) ((v) == 1 || (v) == 2 || (v) == 4)
+#endif /* __SIZEOF_POINTER__ <= 4 */
+
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL print_invalid_addrsize_warning)(di_debuginfo_cu_parser_t const *__restrict parser,
+                                              byte_t const *__restrict reader) {
+	printk(KERN_ERR "[dbx][dwarf%" PRIu16 "] Illegal address_size %#" PRIx8 " in .debug_info CU header at %p\n",
+	       parser->dsp_version, parser->dsp_addrsize, reader);
+}
+
+
 PRIVATE WUNUSED NONNULL((1)) REF struct cmodule *
 NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 #define SIZEOF_CMODULE(cuc)              \
@@ -453,6 +489,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 			di_debuginfo_cu_parser_t parser;
 			size_t length;
 			uintptr_t debug_abbrev_offset;
+			uint8_t unit_type;
 			struct cmodunit *cu;
 			if (cuc_used >= cuc_alloc) {
 				/* Must allocate space for more CUs. */
@@ -500,6 +537,18 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 			cu[1].cu_di_start = next_cu; /* Set the END-pointer. */
 			parser.dsp_version = UNALIGNED_GET16((uint16_t const *)reader);
 			reader += 2; /* version */
+			if (parser.dsp_version >= 5) {
+				unit_type = *(uint8_t const *)reader; /* unit_type */
+				reader += 1;
+				parser.dsp_addrsize = *(uint8_t const *)reader; /* address_size */
+				if unlikely(!addrsize_isvalid(parser.dsp_addrsize)) {
+					print_invalid_addrsize_warning(&parser, reader);
+					goto done_cucs;
+				}
+				reader += 1;
+			} else {
+				unit_type = DW_UT_compile;
+			}
 			debug_abbrev_offset = UNALIGNED_GET32((uint32_t const *)reader); /* debug_abbrev_offset */
 			reader += 4;
 			if (debug_abbrev_offset == 0xffffffff) {
@@ -518,20 +567,27 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 			cu->cu_abbrev.dua_cache_size = 0;
 			cu->cu_abbrev.dua_cache_next = 0;
 
-			parser.dsp_addrsize = *(uint8_t const *)reader; /* address_size */
-#if __SIZEOF_POINTER__ > 4
-			if unlikely(parser.dsp_addrsize != 1 && parser.dsp_addrsize != 2 &&
-			            parser.dsp_addrsize != 4 && parser.dsp_addrsize != 8)
-#else /* __SIZEOF_POINTER__ > 4 */
-			if unlikely(parser.dsp_addrsize != 1 && parser.dsp_addrsize != 2 &&
-			            parser.dsp_addrsize != 4)
-#endif /* __SIZEOF_POINTER__ <= 4 */
-			{
-				printk(KERN_ERR "[dbx] Illegal address_size %#" PRIx8 " in .debug_info CU header at %p\n",
-				       parser.dsp_addrsize, reader);
-				goto done_cucs;
+			if (parser.dsp_version < 5) {
+				parser.dsp_addrsize = *(uint8_t const *)reader; /* address_size */
+				if unlikely(!addrsize_isvalid(parser.dsp_addrsize)) {
+					print_invalid_addrsize_warning(&parser, reader);
+					goto done_cucs;
+				}
+				reader += 1;
 			}
-			reader += 1;
+
+			switch (unit_type) {
+			case DW_UT_skeleton:
+			case DW_UT_split_compile:
+				reader += 8; /* dwo_id */
+				break;
+			case DW_UT_type:
+				reader += 8;                  /* type_signature */
+				reader += parser.dsp_ptrsize; /* type_offset */
+				break;
+			default: break;
+			}
+
 			/* At  this point,  `reader' would be  used to initialize  `dsp_cu_info_pos' of a
 			 * parser, which in all likelihood would yield a `DW_TAG_compile_unit' component. */
 

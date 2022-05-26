@@ -38,6 +38,22 @@
  * compile with `DEBUG_FRAME' to get `.debug_frame' support. */
 #define DEBUG_FRAME 1
 #ifndef __INTELLISENSE__
+#undef CC
+#undef CASE
+#undef CORRUPT
+#undef ERROR
+#undef ERRORF
+#undef TRACE
+#undef DOTRACE
+
+#include "../libunwind/api.h"
+#include "../libunwind/dwarf.h"
+#undef CC
+#undef dwarf_decode_sleb128
+#undef dwarf_decode_uleb128
+#undef dwarf_decode_pointer
+#define CC LIBDEBUGINFO_CC
+
 #define FIND_SPECIFIC_ADDRESS
 #include "../libunwind/eh_frame-find_fde.c.inl"
 /**/
