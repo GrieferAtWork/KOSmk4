@@ -903,6 +903,8 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 				PRINT("] = ");
 				switch (attr.dica_form) {
 
+				/* TODO: Missing forms */
+
 				case DW_FORM_strp:
 				case DW_FORM_string: {
 					char const *value;
@@ -927,7 +929,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 				case DW_FORM_udata:
 				case DW_FORM_sec_offset: {
 					uintptr_t value;
-					if (!libdi_debuginfo_cu_parser_getconst(&parser, attr.dica_form, &value))
+					if (!libdi_debuginfo_cu_parser_getconst(&parser, attr.dica_form, &value, _attr_reader))
 						goto err_bad_value;
 					PRINTF("%" PRIuPTR " (%#" PRIxPTR ")", value, value);
 				}	break;

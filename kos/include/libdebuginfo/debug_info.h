@@ -256,32 +256,34 @@ typedef struct di_debuginfo_location_struct {
  * >>     } while (debuginfo_cu_parser_next(&parser) == DEBUG_INFO_ERROR_SUCCESS);
  * >> }
  */
-#define DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self)                                                   \
-	for (__byte_t const *_attr_reader = (__byte_t const *)(self)->dup_comp.dic_attrib;                \
-	     (self)->_di_debuginfo_cu_parser_struct_base_ dsp_cu_info_pos <                               \
-	     (self)->_di_debuginfo_cu_parser_struct_base_ dsp_cu_info_end;                                \
-	     debuginfo_cu_parser_skipform(_di_debuginfo_cu_parser_struct_asbase(self), (attr).dica_form)) \
-		if (((attr).dica_name = dwarf_decode_uleb128((__byte_t const **)&_attr_reader),               \
-		     (attr).dica_form = dwarf_decode_uleb128((__byte_t const **)&_attr_reader), 0))           \
-			;                                                                                         \
-		else if (!(attr).dica_name && !(attr).dica_form)                                              \
-			break;                                                                                    \
+#define DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self)                                         \
+	for (__byte_t const *_attr_reader = (__byte_t const *)(self)->dup_comp.dic_attrib;      \
+	     (self)->_di_debuginfo_cu_parser_struct_base_ dsp_cu_info_pos <                     \
+	     (self)->_di_debuginfo_cu_parser_struct_base_ dsp_cu_info_end;                      \
+	     debuginfo_cu_parser_skipform(_di_debuginfo_cu_parser_struct_asbase(self),          \
+	                                  (attr).dica_form, (__byte_t const **)&_attr_reader))  \
+		if (((attr).dica_name = dwarf_decode_uleb128((__byte_t const **)&_attr_reader),     \
+		     (attr).dica_form = dwarf_decode_uleb128((__byte_t const **)&_attr_reader), 0)) \
+			;                                                                               \
+		else if (!(attr).dica_name && !(attr).dica_form)                                    \
+			break;                                                                          \
 		else
 
 /* Helper to break out of a `DI_DEBUGINFO_CU_PARSER_EACHATTR()'
  * loop, whilst  keep the  parser state  consistent and  valid. */
-#define DI_DEBUGINFO_CU_PARSER_EACHATTR_BREAK(attr, self)                                                \
-	do {                                                                                                 \
-		for (;;) {                                                                                       \
-			debuginfo_cu_parser_skipform(_di_debuginfo_cu_parser_struct_asbase(self), (attr).dica_form); \
-			if ((self)->_di_debuginfo_cu_parser_struct_base_ dsp_cu_info_pos >=                          \
-			    (self)->_di_debuginfo_cu_parser_struct_base_ dsp_cu_info_end)                            \
-				break;                                                                                   \
-			(attr).dica_name = dwarf_decode_uleb128((__byte_t const **)&_attr_reader);                   \
-			(attr).dica_form = dwarf_decode_uleb128((__byte_t const **)&_attr_reader);                   \
-			if (!(attr).dica_name && !(attr).dica_form)                                                  \
-				break;                                                                                   \
-		}                                                                                                \
+#define DI_DEBUGINFO_CU_PARSER_EACHATTR_BREAK(attr, self)                                     \
+	do {                                                                                      \
+		for (;;) {                                                                            \
+			debuginfo_cu_parser_skipform(_di_debuginfo_cu_parser_struct_asbase(self),         \
+			                             (attr).dica_form, (__byte_t const **)&_attr_reader); \
+			if ((self)->_di_debuginfo_cu_parser_struct_base_ dsp_cu_info_pos >=               \
+			    (self)->_di_debuginfo_cu_parser_struct_base_ dsp_cu_info_end)                 \
+				break;                                                                        \
+			(attr).dica_name = dwarf_decode_uleb128((__byte_t const **)&_attr_reader);        \
+			(attr).dica_form = dwarf_decode_uleb128((__byte_t const **)&_attr_reader);        \
+			if (!(attr).dica_name && !(attr).dica_form)                                       \
+				break;                                                                        \
+		}                                                                                     \
 	}	__WHILE0
 
 
@@ -329,13 +331,15 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t
 
 /* Skip data associated with the given attribute form.
  * @param: form: One of `DW_FORM_*' */
-typedef __ATTR_NONNULL_T((1)) void
+typedef __ATTR_NONNULL_T((1, 3)) void
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_SKIPFORM)(di_debuginfo_cu_simple_parser_t *__restrict self,
-                                                                dwarf_uleb128_t form);
+                                                                dwarf_uleb128_t form,
+                                                                __byte_t const **__restrict p_attr_reader);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) void
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) void
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_skipform)(di_debuginfo_cu_simple_parser_t *__restrict self,
-                                                            dwarf_uleb128_t form);
+                                                            dwarf_uleb128_t form,
+                                                            __byte_t const **__restrict p_attr_reader);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 /* Start a new component.
@@ -387,7 +391,7 @@ typedef struct di_debuginfo_block_struct {
  * `form' into a storage class matching the given result-operand.
  *  - debuginfo_cu_parser_getstring(): DW_FORM_strp, DW_FORM_string
  *  - debuginfo_cu_parser_getaddr():   DW_FORM_addr
- *  - debuginfo_cu_parser_getconst():  DW_FORM_data1, DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_sdata, DW_FORM_udata, DW_FORM_sec_offset
+ *  - debuginfo_cu_parser_getconst():  DW_FORM_data1, DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_sdata, DW_FORM_udata, DW_FORM_sec_offset, DW_FORM_implicit_const
  *  - debuginfo_cu_parser_getflag():   DW_FORM_flag, DW_FORM_flag_present
  *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata
  *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc
@@ -395,9 +399,9 @@ typedef struct di_debuginfo_block_struct {
 typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETSTRING)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, char const **__restrict presult);
 typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETSTRING_EX)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, char const **__restrict presult, di_string_sections_t const *__restrict sections);
 typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETADDR)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult);
-typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult);
-typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST64)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult);
-typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST128)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __hybrid_uint128_t *__restrict presult);
+typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult, __byte_t const *__restrict attr_reader);
+typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST64)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult, __byte_t const *__restrict attr_reader);
+typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST128)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __hybrid_uint128_t *__restrict presult, __byte_t const *__restrict attr_reader);
 typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETFLAG)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __BOOL *__restrict presult);
 typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETREF)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __byte_t const **__restrict presult);
 typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETEXPR)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, di_debuginfo_location_t *__restrict result);
@@ -406,9 +410,9 @@ typedef __ATTR_NONNULL_T((1, 3)) __BOOL __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGI
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, char const **__restrict presult);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getstring_ex)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, char const **__restrict presult, di_string_sections_t const *__restrict sections);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getaddr)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult);
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult);
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uint64_t *__restrict presult);
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __hybrid_uint128_t *__restrict presult);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult, __byte_t const *__restrict attr_reader);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __uint64_t *__restrict presult, __byte_t const *__restrict attr_reader);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __hybrid_uint128_t *__restrict presult, __byte_t const *__restrict attr_reader);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getflag)(di_debuginfo_cu_simple_parser_t const *__restrict self, __uintptr_t form, __BOOL *__restrict presult);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __byte_t const **__restrict presult);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, di_debuginfo_location_t *__restrict result);

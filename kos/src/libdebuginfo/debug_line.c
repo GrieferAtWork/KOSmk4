@@ -83,7 +83,7 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict s
 			}
 			dwarf_decode_uleb128(&fmtreader);        /* file_name_entry_format.type */
 			form = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.form */
-			libdi_debuginfo_cu_parser_skipform(&parser, form);
+			libdi_debuginfo_cu_parser_skipform(&parser, form, &fmtreader);
 		}
 	}
 
@@ -99,7 +99,7 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict s
 			form = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.form */
 			switch (type) {
 			case DW_LNCT_directory_index:
-				if (!libdi_debuginfo_cu_parser_getconst(&parser, form, &index))
+				if (!libdi_debuginfo_cu_parser_getconst(&parser, form, &index, fmtreader))
 					index = (dwarf_uleb128_t)-1;
 				break;
 			case DW_LNCT_path:
@@ -109,7 +109,7 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict s
 			default:
 				break;
 			}
-			libdi_debuginfo_cu_parser_skipform(&parser, form);
+			libdi_debuginfo_cu_parser_skipform(&parser, form, &fmtreader);
 		}
 	}
 
@@ -142,7 +142,7 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict s
 			}
 			dwarf_decode_uleb128(&fmtreader);        /* file_name_entry_format.type */
 			form = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.form */
-			libdi_debuginfo_cu_parser_skipform(&parser, form);
+			libdi_debuginfo_cu_parser_skipform(&parser, form, &fmtreader);
 		}
 	}
 
@@ -163,7 +163,7 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict s
 			default:
 				break;
 			}
-			libdi_debuginfo_cu_parser_skipform(&parser, form);
+			libdi_debuginfo_cu_parser_skipform(&parser, form, &fmtreader);
 		}
 	}
 }
@@ -341,16 +341,16 @@ again:
 			parser.dsp_addrsize    = result->dlu_addrsize;
 			parser.dsp_version     = result->dlu_version;
 			for (i = 0; i < result->dlu_pathcount; ++i) {
-				byte_t const *format_reader = (byte_t const *)result->dlu_pathfmt;
-				uint8_t format_count = *(uint8_t const *)format_reader;
-				format_reader += 1;
-				for (; format_count; --format_count) {
+				byte_t const *fmtreader = (byte_t const *)result->dlu_pathfmt;
+				uint8_t fmtcount        = *(uint8_t const *)fmtreader;
+				fmtreader += 1;
+				for (; fmtcount; --fmtcount) {
 					dwarf_uleb128_t form;
 					if unlikely(parser.dsp_cu_info_pos >= parser.dsp_cu_info_end)
 						ERROR(err_corrupted);
-					dwarf_decode_uleb128(&format_reader);        /* directory_entry_format.type */
-					form = dwarf_decode_uleb128(&format_reader); /* directory_entry_format.form */
-					libdi_debuginfo_cu_parser_skipform(&parser, form);
+					dwarf_decode_uleb128(&fmtreader);        /* directory_entry_format.type */
+					form = dwarf_decode_uleb128(&fmtreader); /* directory_entry_format.form */
+					libdi_debuginfo_cu_parser_skipform(&parser, form, &fmtreader);
 				}
 			}
 			reader = parser.dsp_cu_info_pos;

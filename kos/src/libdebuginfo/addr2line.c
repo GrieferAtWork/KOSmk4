@@ -751,8 +751,8 @@ libdi_debug_addr2line_print_filename(pformatprinter printer, void *arg,
                                      char const *filename) {
 	ssize_t temp, result = 0;
 	unsigned int strid;
-	if (pathname && (pathname[0] == '/' ||
-	                 (pathname[1] == ':' && isupper(pathname[0])))) {
+	if (pathname && (pathname[0] == '/' || pathname[0] == '\\' ||
+	                 (isalpha(pathname[0]) && pathname[1] == ':'))) {
 		cubase = NULL; /* `pathname' is an absolute path (can happen for
 		                *  system include paths such as /usr/include) */
 	}

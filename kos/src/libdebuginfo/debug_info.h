@@ -111,9 +111,10 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restr
 
 /* Skip data associated with the given attribute form.
  * @param: form: One of `DW_FORM_*' */
-INTDEF NONNULL((1)) void
+INTDEF NONNULL((1, 3)) void
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipform)(di_debuginfo_cu_simple_parser_t *__restrict self,
-                                                   dwarf_uleb128_t form);
+                                                   dwarf_uleb128_t form,
+                                                   byte_t const **__restrict p_attr_reader);
 
 /* Start a new component.
  * @return: true:  ...
@@ -136,7 +137,7 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_d
  * `form' into a storage class matching the given result-operand.
  *  - debuginfo_cu_parser_getstring(): DW_FORM_strp, DW_FORM_string
  *  - debuginfo_cu_parser_getaddr():   DW_FORM_addr
- *  - debuginfo_cu_parser_getconst():  DW_FORM_data1, DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_sdata, DW_FORM_udata, DW_FORM_sec_offset
+ *  - debuginfo_cu_parser_getconst():  DW_FORM_data1, DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_sdata, DW_FORM_udata, DW_FORM_sec_offset, DW_FORM_implicit_const
  *  - debuginfo_cu_parser_getflag():   DW_FORM_flag, DW_FORM_flag_present
  *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata
  *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc
@@ -144,13 +145,13 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_d
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, char const **__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring_ex)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, char const **__restrict presult, di_string_sections_t const *__restrict sections);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getaddr)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
+INTDEF NONNULL((1, 3, 4)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult, byte_t const *__restrict attr_reader);
 #if __SIZEOF_POINTER__ == 8
 #define libdi_debuginfo_cu_parser_getconst64 libdi_debuginfo_cu_parser_getconst
 #else /* __SIZEOF_POINTER__ == 8 */
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint64_t *__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint64_t *__restrict presult, byte_t const *__restrict attr_reader);
 #endif /* __SIZEOF_POINTER__ != 8 */
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint128_t *__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint128_t *__restrict presult, byte_t const *__restrict attr_reader);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getflag)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, bool *__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, byte_t const **__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, di_debuginfo_location_t *__restrict result);

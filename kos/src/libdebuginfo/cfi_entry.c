@@ -340,7 +340,8 @@ NOTHROW_NCX(CC parse_attributes_for_ranges)(di_debuginfo_cu_parser_t *__restrict
 
 		case DW_AT_ranges:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &range->r_ranges_offset))
+			                                                &range->r_ranges_offset,
+			                                                _attr_reader))
 				ERROR(err);
 			error = DEBUG_INFO_ERROR_SUCCESS;
 			break;
@@ -355,7 +356,8 @@ NOTHROW_NCX(CC parse_attributes_for_ranges)(di_debuginfo_cu_parser_t *__restrict
 		case DW_AT_high_pc:
 			if (!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &range->r_endpc)) {
 				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-				                                                &range->r_endpc))
+				                                                &range->r_endpc,
+				                                                _attr_reader))
 					ERROR(err);
 				high_pc_is_relative = true;
 			}

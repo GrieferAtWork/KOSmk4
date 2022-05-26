@@ -685,7 +685,8 @@ NOTHROW(FCALL dw_enumerate_fields)(struct cmodule *__restrict mod,
 
 					case DW_AT_data_member_location:
 						if unlikely(!debuginfo_cu_parser_getconst(&parser, attr.dica_form,
-						                                          &data_member_location))
+						                                          &data_member_location,
+						                                          _attr_reader))
 							data_member_location = 0;
 						break;
 
@@ -730,7 +731,8 @@ NOTHROW(FCALL dw_determine_type_size)(struct cmodule *__restrict mod,
 	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
 		if (attr.dica_name == DW_AT_byte_size) {
 			uintptr_t temp;
-			if (debuginfo_cu_parser_getconst(&parser, attr.dica_form, &temp))
+			if (debuginfo_cu_parser_getconst(&parser, attr.dica_form,
+			                                 &temp, _attr_reader))
 				*ptype_size = (size_t)temp;
 		}
 	}
@@ -1214,7 +1216,8 @@ do_character:
 					di_debuginfo_component_attrib_t attr;
 					DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
 						if (attr.dica_name == DW_AT_upper_bound) {
-							if (debuginfo_cu_parser_getconst(&parser, attr.dica_form, &elem_count))
+							if (debuginfo_cu_parser_getconst(&parser, attr.dica_form,
+							                                 &elem_count, _attr_reader))
 								++elem_count;
 							goto got_elem_count;
 						}

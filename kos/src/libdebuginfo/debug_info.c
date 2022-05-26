@@ -464,10 +464,10 @@ NOTHROW_NCX(CC abbrev_lookup)(byte_t const *__restrict reader,
 	while (reader < abbrev_end) {
 		uintptr_t code, tag;
 		uintptr_t attr_name, attr_form;
-		code = dwarf_decode_uleb128(&reader);
+		code = dwarf_decode_uleb128((byte_t const **)&reader);
 		if (!code)
 			break;
-		tag = dwarf_decode_uleb128(&reader);
+		tag = dwarf_decode_uleb128((byte_t const **)&reader);
 		if (code == abbrev_code) {
 			result->dic_tag         = (uintptr_half_t)tag;
 			result->dic_haschildren = *(uint8_t const *)reader;
@@ -477,10 +477,13 @@ NOTHROW_NCX(CC abbrev_lookup)(byte_t const *__restrict reader,
 		reader += 1; /* has_children */
 		while (reader < abbrev_end) {
 			/* Skip attributes of this tag. */
-			attr_name = dwarf_decode_uleb128(&reader);
-			attr_form = dwarf_decode_uleb128(&reader);
+			attr_name = dwarf_decode_uleb128((byte_t const **)&reader);
+			attr_form = dwarf_decode_uleb128((byte_t const **)&reader);
 			if (!attr_name && !attr_form)
 				break;
+			/* Must skip implicit constant value in this special case! */
+			if (attr_form == DW_FORM_implicit_const)
+				dwarf_decode_sleb128((byte_t const **)&reader);
 		}
 	}
 	return false;
@@ -507,6 +510,9 @@ NOTHROW_NCX(CC abbrev_findcache)(byte_t const *__restrict reader,
 			attr_form = dwarf_decode_uleb128((byte_t const **)&reader);
 			if (!attr_name && !attr_form)
 				break;
+			/* Must skip implicit constant value in this special case! */
+			if (attr_form == DW_FORM_implicit_const)
+				dwarf_decode_sleb128((byte_t const **)&reader);
 		}
 	}
 	return NULL;
@@ -779,7 +785,8 @@ again:
  * @param: form: One of `DW_FORM_*' */
 INTERN TEXTSECTION NONNULL((1)) void
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipform)(di_debuginfo_cu_simple_parser_t *__restrict self,
-                                                   dwarf_uleb128_t form) {
+                                                   dwarf_uleb128_t form,
+                                                   byte_t const **__restrict p_attr_reader) {
 decode_form:
 	switch (form) {
 
@@ -893,7 +900,11 @@ decode_form:
 		goto decode_form;
 
 	case DW_FORM_flag_present:
+		break;
+
 	case DW_FORM_implicit_const:
+		/* Special case: constant is read from the attribute stream as an SLEB128! */
+		dwarf_decode_sleb128(p_attr_reader);
 		break;
 
 	default: break;
@@ -1007,7 +1018,7 @@ INTERN_CONST STRINGSECTION char const unknown_string[] = "??" "?";
  * `form' into a storage class matching the given result-operand.
  *  - debuginfo_cu_parser_getstring(): DW_FORM_strp, DW_FORM_string
  *  - debuginfo_cu_parser_getaddr():   DW_FORM_addr
- *  - debuginfo_cu_parser_getconst():  DW_FORM_data1, DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_sdata, DW_FORM_udata, DW_FORM_sec_offset
+ *  - debuginfo_cu_parser_getconst():  DW_FORM_data1, DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_sdata, DW_FORM_udata, DW_FORM_sec_offset, DW_FORM_implicit_const
  *  - debuginfo_cu_parser_getflag():   DW_FORM_flag, DW_FORM_flag_present
  *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata
  *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc
@@ -1154,7 +1165,8 @@ decode_form:
 
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self,
-                                                   uintptr_t form, uintptr_t *__restrict presult) {
+                                                   uintptr_t form, uintptr_t *__restrict presult,
+                                                   byte_t const *__restrict attr_reader) {
 	byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
@@ -1212,6 +1224,11 @@ decode_form:
 		*presult = (uintptr_t)dwarf_decode_uleb128(&reader);
 		return true;
 
+	case DW_FORM_implicit_const:
+		/* Special case: constant is read from the attribute stream as an SLEB128! */
+		*presult = (uintptr_t)dwarf_decode_sleb128((byte_t const **)&attr_reader);
+		return true;
+
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dsp_cu_info_end)
 			break;
@@ -1228,7 +1245,8 @@ DEFINE_INTERN_ALIAS(libdi_debuginfo_cu_parser_getconst64, libdi_debuginfo_cu_par
 #else /* __SIZEOF_POINTER__ == 8 */
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self,
-                                                     uintptr_t form, uint64_t *__restrict presult) {
+                                                     uintptr_t form, uint64_t *__restrict presult,
+                                                     byte_t const *__restrict attr_reader) {
 	byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
@@ -1286,6 +1304,11 @@ decode_form:
 		libdi_dwarf_decode_uleb128_64(reader, presult);
 		return true;
 
+	case DW_FORM_implicit_const:
+		/* Special case: constant is read from the attribute stream as an SLEB128! */
+		libdi_dwarf_decode_sleb128_64(attr_reader, (int64_t *)presult);
+		return true;
+
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dsp_cu_info_end)
 			break;
@@ -1300,7 +1323,8 @@ decode_form:
 
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self,
-                                                      uintptr_t form, uint128_t *__restrict presult) {
+                                                      uintptr_t form, uint128_t *__restrict presult,
+                                                      byte_t const *__restrict attr_reader) {
 	byte_t const *reader;
 	reader = self->dsp_cu_info_pos;
 decode_form:
@@ -1347,6 +1371,11 @@ decode_form:
 
 	case DW_FORM_udata: /* constant */
 		libdi_dwarf_decode_uleb128_128(reader, presult);
+		return true;
+
+	case DW_FORM_implicit_const:
+		/* Special case: constant is read from the attribute stream as an SLEB128! */
+		libdi_dwarf_decode_sleb128_128(attr_reader, (int128_t *)presult);
 		return true;
 
 	case DW_FORM_indirect:
@@ -1604,7 +1633,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit)(di_debuginfo_cu_
 
 		case DW_AT_ranges:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->cu_ranges.r_ranges_offset))
+			                                                &result->cu_ranges.r_ranges_offset,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -1617,7 +1647,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit)(di_debuginfo_cu_
 		case DW_AT_high_pc:
 			if (!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->cu_ranges.r_endpc)) {
 				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-				                                                &result->cu_ranges.r_endpc))
+				                                                &result->cu_ranges.r_endpc,
+				                                                _attr_reader))
 					ERROR(err);
 				high_pc_is_relative = true;
 			}
@@ -1625,14 +1656,16 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit)(di_debuginfo_cu_
 
 		case DW_AT_stmt_list:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->cu_stmt_list))
+			                                                &result->cu_stmt_list,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_addr_base:
 		case DW_AT_GNU_addr_base:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->cu_addr_base))
+			                                                &result->cu_addr_base,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -1660,7 +1693,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit_simple)(di_debugi
 
 		case DW_AT_ranges:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->cu_ranges.r_ranges_offset))
+			                                                &result->cu_ranges.r_ranges_offset,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -1673,7 +1707,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit_simple)(di_debugi
 		case DW_AT_high_pc:
 			if (!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->cu_ranges.r_endpc)) {
 				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-				                                                &result->cu_ranges.r_endpc))
+				                                                &result->cu_ranges.r_endpc,
+				                                                _attr_reader))
 					ERROR(err);
 				high_pc_is_relative = true;
 			}
@@ -1682,7 +1717,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit_simple)(di_debugi
 		case DW_AT_addr_base:
 		case DW_AT_GNU_addr_base:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->cu_addr_base))
+			                                                &result->cu_addr_base,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -1730,7 +1766,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_subprogram)(di_debuginfo_cu_pa
 
 		case DW_AT_ranges:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->sp_ranges.r_ranges_offset))
+			                                                &result->sp_ranges.r_ranges_offset,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -1743,7 +1780,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_subprogram)(di_debuginfo_cu_pa
 		case DW_AT_high_pc:
 			if (!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->sp_ranges.r_endpc)) {
 				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-				                                                &result->sp_ranges.r_endpc))
+				                                                &result->sp_ranges.r_endpc,
+				                                                _attr_reader))
 					ERROR(err);
 				high_pc_is_relative = true;
 			}
@@ -1757,19 +1795,22 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_subprogram)(di_debuginfo_cu_pa
 
 		case DW_AT_decl_file:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->sp_decl_file))
+			                                                &result->sp_decl_file,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_line:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->sp_decl_line))
+			                                                &result->sp_decl_line,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_column:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->sp_decl_column))
+			                                                &result->sp_decl_column,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -1818,7 +1859,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_inlined_subroutine)(di_debugin
 
 		case DW_AT_ranges:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->is_ranges.r_ranges_offset))
+			                                                &result->is_ranges.r_ranges_offset,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -1831,7 +1873,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_inlined_subroutine)(di_debugin
 		case DW_AT_high_pc:
 			if (!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->is_ranges.r_endpc)) {
 				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-				                                                &result->is_ranges.r_endpc))
+				                                                &result->is_ranges.r_endpc,
+				                                                _attr_reader))
 					ERROR(err);
 				high_pc_is_relative = true;
 			}
@@ -1845,19 +1888,22 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_inlined_subroutine)(di_debugin
 
 		case DW_AT_call_column:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->is_call_column))
+			                                                &result->is_call_column,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_call_file:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->is_call_file))
+			                                                &result->is_call_file,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_call_line:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->is_call_line))
+			                                                &result->is_call_line,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -1884,7 +1930,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_lexical_block)(di_debuginfo_cu
 
 		case DW_AT_ranges:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->lb_ranges.r_ranges_offset))
+			                                                &result->lb_ranges.r_ranges_offset,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -1897,7 +1944,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_lexical_block)(di_debuginfo_cu
 		case DW_AT_high_pc:
 			if (!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->lb_ranges.r_endpc)) {
 				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-				                                                &result->lb_ranges.r_endpc))
+				                                                &result->lb_ranges.r_endpc,
+				                                                _attr_reader))
 					ERROR(err);
 				high_pc_is_relative = true;
 			}
@@ -1938,7 +1986,9 @@ NOTHROW_NCX(CC load_array_size_size)(di_debuginfo_cu_parser_t *__restrict self,
 				di_debuginfo_component_attrib_t attr;
 				DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &pp) {
 					if (attr.dica_name == DW_AT_upper_bound) {
-						if (libdi_debuginfo_cu_parser_getconst(&pp, attr.dica_form, &elem_count))
+						if (libdi_debuginfo_cu_parser_getconst(&pp, attr.dica_form,
+						                                       &elem_count,
+						                                       _attr_reader))
 							++elem_count;
 						goto got_elem_count;
 					}
@@ -2001,7 +2051,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_type)(di_debuginfo_cu_parser_t
 
 		case DW_AT_encoding:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->t_encoding))
+			                                                &result->t_encoding,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -2019,25 +2070,29 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_type)(di_debuginfo_cu_parser_t
 
 		case DW_AT_decl_file:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->t_decl_file))
+			                                                &result->t_decl_file,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_line:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->t_decl_line))
+			                                                &result->t_decl_line,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_column:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->t_decl_column))
+			                                                &result->t_decl_column,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_byte_size:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->t_sizeof))
+			                                                &result->t_sizeof,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -2117,19 +2172,22 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_member)(di_debuginfo_cu_parser
 
 		case DW_AT_decl_file:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->m_decl_file))
+			                                                &result->m_decl_file,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_line:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->m_decl_line))
+			                                                &result->m_decl_line,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_column:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->m_decl_column))
+			                                                &result->m_decl_column,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -2144,20 +2202,23 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_member)(di_debuginfo_cu_parser
 			 *       however in the case of struct members, we're pretty safe to assume
 			 *       that this shouldn't ~normally~ happen... */
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->m_offset))
+			                                                &result->m_offset,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_bit_offset:
 		case DW_AT_data_bit_offset:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->m_bit_offset))
+			                                                &result->m_bit_offset,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_bit_size:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->m_bit_size))
+			                                                &result->m_bit_size,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -2223,19 +2284,22 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_variable)(di_debuginfo_cu_pars
 
 		case DW_AT_decl_file:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->v_decl_file))
+			                                                &result->v_decl_file,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_line:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->v_decl_line))
+			                                                &result->v_decl_line,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
 		case DW_AT_decl_column:
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
-			                                                &result->v_decl_column))
+			                                                &result->v_decl_column,
+			                                                _attr_reader))
 				ERROR(err);
 			break;
 
@@ -2591,7 +2655,9 @@ do_prefix_type:
 					di_debuginfo_component_attrib_t attr;
 					DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &pp) {
 						if (attr.dica_name == DW_AT_upper_bound) {
-							if (libdi_debuginfo_cu_parser_getconst(&pp, attr.dica_form, &elem_count))
+							if (libdi_debuginfo_cu_parser_getconst(&pp, attr.dica_form,
+							                                       &elem_count,
+							                                       _attr_reader))
 								++elem_count;
 							goto got_elem_count;
 						}
@@ -3065,7 +3131,9 @@ generic_print_address:
 					di_debuginfo_component_attrib_t attr;
 					DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &pp) {
 						if (attr.dica_name == DW_AT_upper_bound) {
-							if (libdi_debuginfo_cu_parser_getconst(&pp, attr.dica_form, &elem_count))
+							if (libdi_debuginfo_cu_parser_getconst(&pp, attr.dica_form,
+							                                       &elem_count,
+							                                       _attr_reader))
 								++elem_count;
 							goto got_elem_count;
 						}
@@ -3234,7 +3302,9 @@ print_unknown_inner_array_type:
 						if (attr.dica_name == DW_AT_name) {
 							libdi_debuginfo_cu_parser_getstring(&pp, attr.dica_form, &enum_name);
 						} else if (attr.dica_name == DW_AT_const_value) {
-							libdi_debuginfo_cu_parser_getconst(&pp, attr.dica_form, &enum_value);
+							libdi_debuginfo_cu_parser_getconst(&pp, attr.dica_form,
+							                                   &enum_value,
+							                                   _attr_reader);
 						}
 					}
 					if (enum_value == value) {

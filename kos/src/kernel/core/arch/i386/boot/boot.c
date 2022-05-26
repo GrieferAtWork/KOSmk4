@@ -347,14 +347,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	__hybrid_assert(!kmalloc_leaks());
 
-#if 0
-	{
-		extern void FCALL tb(void);
-		tb();
-	}
-	BREAKPOINT();
-#endif
-
 	/* Update the given initial user-state to start
 	 * executing /bin/init (or whatever was passed as `init=...') */
 	state = kernel_initialize_exec_init(state);

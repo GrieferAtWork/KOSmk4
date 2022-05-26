@@ -2458,13 +2458,13 @@ NOTHROW(FCALL loadinfo_location)(di_debuginfo_cu_parser_t const *__restrict pars
 		bzero(&info->clv_data.s_var.v_location, sizeof(info->clv_data.s_var.v_location));
 }
 
-PRIVATE NONNULL((1, 2)) void
+PRIVATE NONNULL((1, 2, 4)) void
 NOTHROW(FCALL loadinfo_const_value)(di_debuginfo_cu_parser_t const *__restrict parser,
                                     struct cmodsyminfo *__restrict info,
-                                    uintptr_t form) {
+                                    uintptr_t form, byte_t const *__restrict attr_reader) {
 	uintptr_t value;
 	di_debuginfo_block_t block;
-	if (debuginfo_cu_parser_getconst(parser, form, &value)) {
+	if (debuginfo_cu_parser_getconst(parser, form, &value, attr_reader)) {
 		info->clv_data.s_var.v_objaddr = info->clv_data.s_var._v_objdata;
 		UNALIGNED_SET((uintptr_t *)info->clv_data.s_var._v_objdata, value);
 	} else if (debuginfo_cu_parser_getblock(parser, form, &block)) {
@@ -2523,7 +2523,7 @@ again:
 
 				case DW_AT_const_value:
 					if (!has_object_address)
-						loadinfo_const_value(&inner_parser, info, attr.dica_form);
+						loadinfo_const_value(&inner_parser, info, attr.dica_form, _attr_reader);
 					break;
 
 				default:
@@ -2856,7 +2856,7 @@ again_attributes:
 
 			case DW_AT_const_value:
 				if (!has_object_address)
-					loadinfo_const_value(&info->clv_parser, info, attr.dica_form);
+					loadinfo_const_value(&info->clv_parser, info, attr.dica_form, _attr_reader);
 				break;
 
 			case DW_AT_type:
