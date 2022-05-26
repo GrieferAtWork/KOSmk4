@@ -141,9 +141,6 @@ struct cmodsym {
 	                         * By  default, this  name is  the string  pointed-to by the
 	                         * `DW_AT_linkage_name'  attribute,  but  uses  `DW_AT_name'
 	                         * as a fallback. */
-	/* TODO: Add a config option where `cms_name' isn't cached, but is instead  lazily
-	 *       re-calculated every time it is needed (by loading the DIP and parsing its
-	 *       attributes for an `DW_AT_linkage_name' or `DW_AT_name' field) */
 	uintptr_t     cms_dip;  /* [1..1] Debug  information  pointer  for  this  symbol  & namespace.
 	                         * Use this pointer to load the associated DWARF debug info by passing
 	                         * it to  `cmodunit_parser_from_dip()' or  `cmodule_parser_from_dip()'

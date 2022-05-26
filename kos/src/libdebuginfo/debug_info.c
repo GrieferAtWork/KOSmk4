@@ -967,7 +967,7 @@ again:
 
 INTERN TEXTSECTION NONNULL((1)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextchild)(di_debuginfo_cu_parser_t *__restrict self) {
-	if (!self->dup_comp.dic_haschildren)
+	if (self->dup_comp.dic_haschildren == DW_CHILDREN_no)
 		return false;
 	return libdi_debuginfo_cu_parser_next(self);
 }
@@ -975,7 +975,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextchild)(di_debuginfo_cu_parser_t *__
 INTERN TEXTSECTION NONNULL((1)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(di_debuginfo_cu_parser_t *__restrict self) {
 	byte_t const *reader;
-	if (self->dup_comp.dic_haschildren)
+	if (self->dup_comp.dic_haschildren != DW_CHILDREN_no)
 		return false;
 	reader = self->dsp_cu_info_pos;
 	if (reader >= self->dsp_cu_info_end ||
@@ -987,7 +987,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(di_debuginfo_cu_parser_t *
 INTERN TEXTSECTION NONNULL((1)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *__restrict self) {
 	byte_t const *reader;
-	if (self->dup_comp.dic_haschildren)
+	if (self->dup_comp.dic_haschildren != DW_CHILDREN_no)
 		return false;
 	reader = self->dsp_cu_info_pos;
 	if (reader >= self->dsp_cu_info_end ||

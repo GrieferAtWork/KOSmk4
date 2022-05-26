@@ -91,7 +91,7 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
 	/* Calculate the end-pointer for this CU, but limit by the max end of the CU. */
 	if (OVERFLOW_UADD((uintptr_t)result->dup_cu_info_hdr, temp,
 	                  (uintptr_t *)&result->dsp_cu_info_end) ||
-		result->dsp_cu_info_end > cmodunit_di_maxend(self))
+	    result->dsp_cu_info_end > cmodunit_di_maxend(self))
 		result->dsp_cu_info_end = cmodunit_di_maxend(self);
 
 	result->dsp_version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
@@ -2803,18 +2803,23 @@ NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
 		has_object_address             = true;
 		info->clv_data.s_var.v_objaddr = (void *)(cmodule_getloadaddr(info->clv_mod) +
 		                                          symbol_addr);
-		/* Try to load the CU by looking at the symbol address. */
-		if (!info->clv_unit)
-			info->clv_unit = cmodule_findunit_from_pc(info->clv_mod, symbol_addr);
 	}
 no_sip_addr:
 	if (!info->clv_unit) {
-		if (!info->clv_dip)
-			goto no_unit;
 		/* Lookup the appropriate compilation unit. */
-		info->clv_unit = cmodule_findunit_from_dip(info->clv_mod, info->clv_dip);
-		if unlikely(!info->clv_unit) {
-no_unit:
+		if (info->clv_dip)
+			info->clv_unit = cmodule_findunit_from_dip(info->clv_mod, info->clv_dip);
+		/* Try to load the CU by looking at the symbol address.
+		 * Only do this if we don't have the DIP-address, or if
+		 * we were unable to map the DIP-address. */
+		if (!info->clv_unit && has_object_address) {
+			uintptr_t symbol_addr;
+			symbol_addr = (uintptr_t)info->clv_data.s_var.v_objaddr;
+			symbol_addr -= cmodule_getloadaddr(info->clv_mod);
+			info->clv_dip  = NULL; /* Re-calculate from `clv_unit' (s.a. `cmod_symenum_search_for_address()') */
+			info->clv_unit = cmodule_findunit_from_pc(info->clv_mod, symbol_addr);
+		}
+		if (!info->clv_unit) {
 			/* Shouldn't happen... (fill in stub-data) */
 			bzero(&info->clv_cu, sizeof(info->clv_cu));
 			bzero(&info->clv_parser, sizeof(info->clv_parser));
