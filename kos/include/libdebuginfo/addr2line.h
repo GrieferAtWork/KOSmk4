@@ -37,34 +37,41 @@ typedef struct di_addr2line_sections_struct {
 	/* Debug information sections required for implementing addr2line.
 	 * NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
-	__byte_t const *ds_debug_abbrev_start;  /* [0..1] `.debug_abbrev' start */
-	__byte_t const *ds_debug_abbrev_end;    /* [0..1] `.debug_abbrev' end */
-	__byte_t const *ds_debug_info_start;    /* [0..1] `.debug_info' start */
-	__byte_t const *ds_debug_info_end;      /* [0..1] `.debug_info' end */
-	__byte_t const *ds_debug_str_start;     /* [0..1] `.debug_str' start */
-	__byte_t const *ds_debug_str_end;       /* [0..1] `.debug_str' end */
-	__byte_t const *ds_debug_aranges_start; /* [0..1] `.debug_aranges' start */
-	__byte_t const *ds_debug_aranges_end;   /* [0..1] `.debug_aranges' end */
-	__byte_t const *ds_debug_ranges_start;  /* [0..1] `.debug_ranges' start */
-	__byte_t const *ds_debug_ranges_end;    /* [0..1] `.debug_ranges' end */
-	__byte_t const *ds_debug_line_start;    /* [0..1] `.debug_line' start */
-	__byte_t const *ds_debug_line_end;      /* [0..1] `.debug_line' end */
-	__byte_t const *ds_strtab_start;        /* [0..1] `.strtab' / `.dynstr' start */
-	__byte_t const *ds_strtab_end;          /* [0..1] `.strtab' / `.dynstr' end */
-	__byte_t const *ds_symtab_start;        /* [0..1] `.symtab' / `.dynsym' start */
-	__byte_t const *ds_symtab_end;          /* [0..1] `.symtab' / `.dynsym' end */
-	__size_t        ds_symtab_ent;          /* Entity size of `.symtab' / `.dynsym' */
+	__byte_t const *ds_debug_abbrev_start;   /* [0..1] `.debug_abbrev' start */
+	__byte_t const *ds_debug_abbrev_end;     /* [0..1] `.debug_abbrev' end */
+	__byte_t const *ds_debug_info_start;     /* [0..1] `.debug_info' start */
+	__byte_t const *ds_debug_info_end;       /* [0..1] `.debug_info' end */
+	/*BEGIN:compat(di_string_sections_t)*/
+	__byte_t const *ds_debug_str_start;      /* [0..1] `.debug_str' start */
+	__byte_t const *ds_debug_str_end;        /* [0..1] `.debug_str' end */
+	__byte_t const *ds_debug_line_str_start; /* [0..1] `.debug_line_str' start */
+	__byte_t const *ds_debug_line_str_end;   /* [0..1] `.debug_line_str' end */
+	/*END:compat(di_string_sections_t)*/
+	__byte_t const *ds_debug_aranges_start;  /* [0..1] `.debug_aranges' start */
+	__byte_t const *ds_debug_aranges_end;    /* [0..1] `.debug_aranges' end */
+	__byte_t const *ds_debug_ranges_start;   /* [0..1] `.debug_ranges' start */
+	__byte_t const *ds_debug_ranges_end;     /* [0..1] `.debug_ranges' end */
+	__byte_t const *ds_debug_line_start;     /* [0..1] `.debug_line' start */
+	__byte_t const *ds_debug_line_end;       /* [0..1] `.debug_line' end */
+	__byte_t const *ds_strtab_start;         /* [0..1] `.strtab' / `.dynstr' start */
+	__byte_t const *ds_strtab_end;           /* [0..1] `.strtab' / `.dynstr' end */
+	__byte_t const *ds_symtab_start;         /* [0..1] `.symtab' / `.dynsym' start */
+	__byte_t const *ds_symtab_end;           /* [0..1] `.symtab' / `.dynsym' end */
+	__size_t        ds_symtab_ent;           /* Entity size of `.symtab' / `.dynsym' */
 } di_addr2line_sections_t;
+#define di_addr2line_sections_as_di_string_sections(x) \
+	((di_string_sections_t *)&(x)->ds_debug_str_start)
 
 typedef struct di_addr2line_dl_sections_struct {
-	__REF module_section_t *dl_debug_abbrev;  /* [0..1] Reference to the `.debug_abbrev' section */
-	__REF module_section_t *dl_debug_info;    /* [0..1] Reference to the `.debug_info' section */
-	__REF module_section_t *dl_debug_str;     /* [0..1] Reference to the `.debug_str' section */
-	__REF module_section_t *dl_debug_aranges; /* [0..1] Reference to the `.debug_aranges' section */
-	__REF module_section_t *dl_debug_ranges;  /* [0..1] Reference to the `.debug_ranges' section */
-	__REF module_section_t *dl_debug_line;    /* [0..1] Reference to the `.debug_line' section */
-	__REF module_section_t *dl_strtab;        /* [0..1] Reference to the `.strtab' or `.dynstr' section */
-	__REF module_section_t *dl_symtab;        /* [0..1] Reference to the `.symtab' or `.dynsym' section */
+	__REF module_section_t *dl_debug_abbrev;   /* [0..1] Reference to the `.debug_abbrev' section */
+	__REF module_section_t *dl_debug_info;     /* [0..1] Reference to the `.debug_info' section */
+	__REF module_section_t *dl_debug_str;      /* [0..1] Reference to the `.debug_str' section */
+	__REF module_section_t *dl_debug_line_str; /* [0..1] Reference to the `.debug_line_str' section */
+	__REF module_section_t *dl_debug_aranges;  /* [0..1] Reference to the `.debug_aranges' section */
+	__REF module_section_t *dl_debug_ranges;   /* [0..1] Reference to the `.debug_ranges' section */
+	__REF module_section_t *dl_debug_line;     /* [0..1] Reference to the `.debug_line' section */
+	__REF module_section_t *dl_strtab;         /* [0..1] Reference to the `.strtab' or `.dynstr' section */
+	__REF module_section_t *dl_symtab;         /* [0..1] Reference to the `.symtab' or `.dynsym' section */
 } di_addr2line_dl_sections_t;
 
 

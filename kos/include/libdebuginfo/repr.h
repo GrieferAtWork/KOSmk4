@@ -60,14 +60,15 @@ LIBDEBUGINFO_DECL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(LIBDEBUGINFO
 
 /* Dump the given debug information in a human-readable format to `printer':
  * >> void *dump_module = dlgetmodule("libc");
- * >> size_t debug_info_size, debug_abbrev_size, debug_str_size, debug_loc_size;
- * >> byte_t const *debug_info_data, *debug_abbrev_data, *debug_str_data, *debug_loc_data;
+ * >> size_t debug_info_size, debug_abbrev_size, debug_str_size, debug_line_str_size, debug_loc_size;
+ * >> byte_t const *debug_info_data, *debug_abbrev_data, *debug_str_data, *debug_line_str_data, *debug_loc_data;
  * >> PDEBUG_REPR_DUMP debug_repr_dump;
  * >> *(void **)&debug_repr_dump = dlsym(dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL), "debug_repr_dump");
- * >> debug_info_data   = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_info"), &debug_info_size);
- * >> debug_abbrev_data = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_abbrev"), &debug_abbrev_size);
- * >> debug_str_data    = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_str"), &debug_str_size);
- * >> debug_loc_data    = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_loc"), &debug_loc_size);
+ * >> debug_info_data     = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_info"), &debug_info_size);
+ * >> debug_abbrev_data   = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_abbrev"), &debug_abbrev_size);
+ * >> debug_str_data      = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_str"), &debug_str_size);
+ * >> debug_line_str_data = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_line_str"), &debug_line_str_size);
+ * >> debug_loc_data      = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_loc"), &debug_loc_size);
  * >> debug_repr_dump(&file_printer, stdout,
  * >>                 debug_info_data, debug_info_data + debug_info_size,
  * >>                 debug_abbrev_data, debug_abbrev_data + debug_abbrev_size,
@@ -78,14 +79,16 @@ typedef __ATTR_NONNULL_T((1)) __ssize_t
                                     __byte_t const *debug_info_start, __byte_t const *debug_info_end,
                                     __byte_t const *debug_abbrev_start, __byte_t const *debug_abbrev_end,
                                     __byte_t const *debug_loc_start, __byte_t const *debug_loc_end,
-                                    __byte_t const *debug_str_start, __byte_t const *debug_str_end);
+                                    __byte_t const *debug_str_start, __byte_t const *debug_str_end,
+                                    __byte_t const *debug_line_str_start, __byte_t const *debug_line_str_end);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
 (LIBDEBUGINFO_CC debug_repr_dump)(__pformatprinter printer, void *arg,
                                   __byte_t const *debug_info_start, __byte_t const *debug_info_end,
                                   __byte_t const *debug_abbrev_start, __byte_t const *debug_abbrev_end,
                                   __byte_t const *debug_loc_start, __byte_t const *debug_loc_end,
-                                  __byte_t const *debug_str_start, __byte_t const *debug_str_end);
+                                  __byte_t const *debug_str_start, __byte_t const *debug_str_end,
+                                  __byte_t const *debug_line_str_start, __byte_t const *debug_line_str_end);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 

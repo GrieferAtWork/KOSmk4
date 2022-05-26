@@ -123,32 +123,37 @@ struct unwind_register {
 
 struct cfientry_sections {
 	/*BEGIN:compat(unwind_emulator_sections_t)*/
-	__byte_t const *ds_eh_frame_hdr_start;  /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' start */
-	__byte_t const *ds_eh_frame_hdr_end;    /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' end */
-	__byte_t const *ds_eh_frame_start;      /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' start */
-	__byte_t const *ds_eh_frame_end;        /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' end */
-	__byte_t const *ds_debug_frame_start;   /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' start */
-	__byte_t const *ds_debug_frame_end;     /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' end */
-	__byte_t const *ds_debug_addr_start;    /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' start */
-	__byte_t const *ds_debug_addr_end;      /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' end */
+	__byte_t const *ds_eh_frame_hdr_start;   /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' start */
+	__byte_t const *ds_eh_frame_hdr_end;     /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' end */
+	__byte_t const *ds_eh_frame_start;       /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' start */
+	__byte_t const *ds_eh_frame_end;         /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' end */
+	__byte_t const *ds_debug_frame_start;    /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' start */
+	__byte_t const *ds_debug_frame_end;      /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' end */
+	__byte_t const *ds_debug_addr_start;     /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' start */
+	__byte_t const *ds_debug_addr_end;       /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' end */
 	/*BEGIN:compat(di_debuginfo_cu_parser_sections_t)*/
-	__byte_t const *ds_debug_loc_start;     /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' start */
-	__byte_t const *ds_debug_loc_end;       /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' end */
-	__byte_t const *ds_debug_abbrev_start;  /* [0..1][const] `.debug_abbrev' start */
-	__byte_t const *ds_debug_abbrev_end;    /* [0..1][const] `.debug_abbrev' end */
-	__byte_t const *ds_debug_info_start;    /* [0..1][const] `.debug_info' start */
-	__byte_t const *ds_debug_info_end;      /* [0..1][const] `.debug_info' end */
+	__byte_t const *ds_debug_loc_start;      /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' start */
+	__byte_t const *ds_debug_loc_end;        /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' end */
+	__byte_t const *ds_debug_abbrev_start;   /* [0..1][const] `.debug_abbrev' start */
+	__byte_t const *ds_debug_abbrev_end;     /* [0..1][const] `.debug_abbrev' end */
+	__byte_t const *ds_debug_info_start;     /* [0..1][const] `.debug_info' start */
+	__byte_t const *ds_debug_info_end;       /* [0..1][const] `.debug_info' end */
 	/*END:compat(unwind_emulator_sections_t)*/
-	__byte_t const *ds_debug_str_start;     /* [0..0][const] Always NULL */
-	__byte_t const *ds_debug_str_end;       /* [0..0][const] Always NULL */
+	/*BEGIN:compat(di_string_sections_t)*/
+	__byte_t const *ds_debug_str_start;      /* [0..0][const] Always NULL */
+	__byte_t const *ds_debug_str_end;        /* [0..0][const] Always NULL */
+	__byte_t const *ds_debug_str_line_start; /* [0..0][const] Always NULL */
+	__byte_t const *ds_debug_str_line_end;   /* [0..0][const] Always NULL */
+	/*END:compat(di_string_sections_t)*/
 	/*END:compat(di_debuginfo_cu_parser_sections_t)*/
-	__byte_t const *ds_debug_aranges_start; /* [0..1][const] `.debug_aranges' start */
-	__byte_t const *ds_debug_aranges_end;   /* [0..1][const] `.debug_aranges' end */
-	__byte_t const *ds_debug_ranges_start;  /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' start */
-	__byte_t const *ds_debug_ranges_end;    /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' end */
+	__byte_t const *ds_debug_aranges_start;  /* [0..1][const] `.debug_aranges' start */
+	__byte_t const *ds_debug_aranges_end;    /* [0..1][const] `.debug_aranges' end */
+	__byte_t const *ds_debug_ranges_start;   /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' start */
+	__byte_t const *ds_debug_ranges_end;     /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' end */
 };
 #define cfientry_sections_as_unwind_emulator_sections_t(self)        ((unwind_emulator_sections_t *)&(self)->ds_eh_frame_hdr_start)
 #define cfientry_sections_as_di_debuginfo_cu_parser_sections_t(self) ((di_debuginfo_cu_parser_sections_t *)&(self)->ds_debug_loc_start)
+#define cfientry_sections_as_di_string_sections_t(self)              ((di_string_sections_t *)&(self)->ds_debug_str_start)
 
 struct cfientry {
 	unwind_getreg_t ce_regget;     /* [1..1][const]  Callback for  reading out  the value  of a register.
@@ -206,6 +211,15 @@ struct cfientry {
 };
 #define cfientry_as_unwind_emulator_sections_t(self)        cfientry_sections_as_unwind_emulator_sections_t(&(self)->ce_sections)
 #define cfientry_as_di_debuginfo_cu_parser_sections_t(self) cfientry_sections_as_di_debuginfo_cu_parser_sections_t(&(self)->ce_sections)
+
+
+/* Ignore bogus (at least to me) warning about using `offsetof(struct cfientry, ...)'
+ * The  cause is  that `di_debuginfo_cu_parser_t' is  technically a c++  class with a
+ * custom base. However, we already assume that a c++ class base simply gets inserted
+ * at the start of a structure, meaning that this warning is meaningless to us! */
+#if defined(__GNUC__) && __GNUC__ >= 6
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
+#endif /* __GNUC__ >= 6 */
 
 #define cfientry_alloc(unwind_rega)                                        \
 	((struct cfientry *)alloca(offsetof(struct cfientry, ce_unwind_regv) + \
@@ -617,7 +631,7 @@ NOTHROW_NCX(CC is_cfi_expression_a_simple_register_push)(struct cfientry *__rest
 	byte_t const *expr;
 	expr = debuginfo_location_select(loc, self->cr_cu.cu_ranges.r_startpc,
 	                                 self->ce_modrelpc,
-	                                 self->ce_parser.dup_addrsize, &length);
+	                                 self->ce_parser.dsp_addrsize, &length);
 	if unlikely(!expr)
 		return false;
 	switch (length) {
@@ -684,7 +698,7 @@ NOTHROW_NCX(LIBUNWIND_CC evaluate_call_site_expression)(struct cfientry *__restr
 	expr = debuginfo_location_select(location,
 	                                 self->cr_cu.cu_ranges.r_startpc,
 	                                 self->ce_modrelpc,
-	                                 self->ce_parser.dup_addrsize,
+	                                 self->ce_parser.dsp_addrsize,
 	                                 &expr_length);
 	if unlikely(!expr)
 		return UNWIND_OPTIMIZED_AWAY;
@@ -713,8 +727,8 @@ again_runexpr:
 	emulator.ue_addroffset         = module_getloadaddr(self->ce_module);
 	emulator.ue_objaddr            = NULL;
 	emulator.ue_bjmprem            = UNWIND_EMULATOR_BJMPREM_DEFAULT;
-	emulator.ue_addrsize           = self->ce_parser.dup_addrsize;
-	emulator.ue_ptrsize            = self->ce_parser.dup_ptrsize;
+	emulator.ue_addrsize           = self->ce_parser.dsp_addrsize;
+	emulator.ue_ptrsize            = self->ce_parser.dsp_ptrsize;
 	emulator.ue_piecewrite         = 0;
 	emulator.ue_piecebuf           = (byte_t *)dst;
 	emulator.ue_piecesiz           = CFI_REGISTER_SIZE(emulator.ue_addrsize, dw_regno);
@@ -855,7 +869,7 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 	error = cfientry_loadmodule(self); /* Load module information */
 	if (error != UNWIND_SUCCESS)
 		return error;
-	saved_dip = self->ce_parser.dup_cu_info_pos;
+	saved_dip = self->ce_parser.dsp_cu_info_pos;
 	/* Scan the call-site we've discovered for `DW_TAG_GNU_call_site_parameter' children */
 	if (libdi_debuginfo_cu_parser_nextchild(&self->ce_parser)) {
 		size_t callsite_depth = self->ce_parser.dup_child_depth;
@@ -889,7 +903,7 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 				}
 				/* Check if `location' references the register that we're looking for. */
 				if (is_cfi_expression_a_simple_register_push(self, &location, dw_regno)) {
-					self->ce_parser.dup_cu_info_pos = saved_dip;
+					self->ce_parser.dsp_cu_info_pos = saved_dip;
 					/* Found  it! -> Evaluate the call-site-value expression,
 					 * and write the expression result into the `dst' buffer. */
 					return evaluate_call_site_expression(self, &call_site_value,
@@ -906,10 +920,10 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 	 * NOTE: Only return this  error if we  didn't find a  `DW_TAG_GNU_call_site'
 	 *       tag  for  the  given  PC-location,  because  no  such  tag   exists.
 	 *       Anything else should cause some other error to be returned, instead! */
-	self->ce_parser.dup_cu_info_pos = saved_dip;
+	self->ce_parser.dsp_cu_info_pos = saved_dip;
 	return UNWIND_OPTIMIZED_AWAY;
 err:
-	self->ce_parser.dup_cu_info_pos = saved_dip;
+	self->ce_parser.dsp_cu_info_pos = saved_dip;
 	return UNWIND_CORRUPTED;
 }
 

@@ -54,25 +54,28 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(CC libdi_debug_repr_DW_EH_PE)(uint
 
 /* Dump the given debug information in a human-readable format to `printer':
  * >> void *dump_module = dlgetmodule("libc");
- * >> size_t debug_info_size, debug_abbrev_size, debug_str_size, debug_loc_size;
- * >> byte_t const *debug_info_data, *debug_abbrev_data, *debug_str_data, *debug_loc_data;
+ * >> size_t debug_info_size, debug_abbrev_size, debug_str_size, debug_line_str_size, debug_loc_size;
+ * >> byte_t const *debug_info_data, *debug_abbrev_data, *debug_str_data, *debug_line_str_data, *debug_loc_data;
  * >> PDEBUG_REPR_DUMP debug_repr_dump;
  * >> *(void **)&debug_repr_dump = dlsym(dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL), "debug_repr_dump");
- * >> debug_info_data   = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_info"), &debug_info_size);
- * >> debug_abbrev_data = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_abbrev"), &debug_abbrev_size);
- * >> debug_str_data    = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_str"), &debug_str_size);
- * >> debug_loc_data    = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_loc"), &debug_loc_size);
+ * >> debug_info_data     = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_info"), &debug_info_size);
+ * >> debug_abbrev_data   = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_abbrev"), &debug_abbrev_size);
+ * >> debug_str_data      = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_str"), &debug_str_size);
+ * >> debug_line_str_data = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_line_str"), &debug_line_str_size);
+ * >> debug_loc_data      = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_loc"), &debug_loc_size);
  * >> debug_repr_dump(&file_printer, stdout,
  * >>                 debug_info_data, debug_info_data + debug_info_size,
  * >>                 debug_abbrev_data, debug_abbrev_data + debug_abbrev_size,
  * >>                 debug_loc_data, debug_loc_data + debug_loc_size,
- * >>                 debug_str_data, debug_str_data + debug_str_size); */
+ * >>                 debug_str_data, debug_str_data + debug_str_size,
+ * >>                 debug_line_str_data, debug_line_str_data + debug_line_str_size); */
 INTDEF NONNULL((1)) ssize_t CC
 libdi_debug_repr_dump(pformatprinter printer, void *arg,
                       byte_t const *debug_info_start, byte_t const *debug_info_end,
                       byte_t const *debug_abbrev_start, byte_t const *debug_abbrev_end,
                       byte_t const *debug_loc_start, byte_t const *debug_loc_end,
-                      byte_t const *debug_str_start, byte_t const *debug_str_end);
+                      byte_t const *debug_str_start, byte_t const *debug_str_end,
+                      byte_t const *debug_line_str_start, byte_t const *debug_line_str_end);
 
 /* Print the  disassembly of  a given  CFI expression  starting at  `pc',
  * covering a total  of `length'  bytes. One instruction  is printed  per

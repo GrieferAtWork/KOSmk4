@@ -1011,7 +1011,7 @@ again:
 	if unlikely(!type_debug_info)
 		goto err_corrupt;
 	memcpy(&parser, cu_parser, sizeof(di_debuginfo_cu_parser_t));
-	parser.dup_cu_info_pos = (byte_t *)type_debug_info;
+	parser.dsp_cu_info_pos = (byte_t *)type_debug_info;
 	if (!debuginfo_cu_parser_next(&parser))
 		goto err_corrupt;
 	if (!debuginfo_cu_parser_loadattr_type(&parser, &typinfo))

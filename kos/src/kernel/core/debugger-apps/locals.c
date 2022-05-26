@@ -142,8 +142,8 @@ do_print_local(void *UNUSED(arg),
 		                                    &num_bits,
 		                                    &sp->sp_frame_base,
 		                                    NULL,
-		                                    parser->dup_addrsize,
-		                                    parser->dup_ptrsize);
+		                                    parser->dsp_addrsize,
+		                                    parser->dsp_ptrsize);
 	} else
 #endif /* __ARCH_HAVE_COMPAT */
 	{
@@ -159,8 +159,8 @@ do_print_local(void *UNUSED(arg),
 		                                    &num_bits,
 		                                    &sp->sp_frame_base,
 		                                    NULL,
-		                                    parser->dup_addrsize,
-		                                    parser->dup_ptrsize);
+		                                    parser->dsp_addrsize,
+		                                    parser->dsp_ptrsize);
 	}
 	if unlikely(error == UNWIND_SUCCESS) {
 		/* Print the local variable. */

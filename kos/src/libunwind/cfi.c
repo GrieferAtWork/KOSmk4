@@ -308,13 +308,15 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 		ERROR(err_invalid_function);
 	COMPILER_READ_BARRIER();
 #endif /* !__KERNEL__ */
-	di_reader                   = self->ue_sectinfo->ues_debug_info_start;
-	sect.cps_debug_abbrev_start = self->ue_sectinfo->ues_debug_abbrev_start;
-	sect.cps_debug_abbrev_end   = self->ue_sectinfo->ues_debug_abbrev_end;
-	sect.cps_debug_str_start    = NULL;
-	sect.cps_debug_str_end      = NULL;
-	sect.cps_debug_loc_start    = self->ue_sectinfo->ues_debug_loc_start;
-	sect.cps_debug_loc_end      = self->ue_sectinfo->ues_debug_loc_end;
+	di_reader = self->ue_sectinfo->ues_debug_info_start;
+	sect.cps_debug_abbrev_start   = self->ue_sectinfo->ues_debug_abbrev_start;
+	sect.cps_debug_abbrev_end     = self->ue_sectinfo->ues_debug_abbrev_end;
+	sect.cps_debug_str_start      = NULL;
+	sect.cps_debug_str_end        = NULL;
+	sect.cps_debug_line_str_start = NULL;
+	sect.cps_debug_line_str_end   = NULL;
+	sect.cps_debug_loc_start      = self->ue_sectinfo->ues_debug_loc_start;
+	sect.cps_debug_loc_end        = self->ue_sectinfo->ues_debug_loc_end;
 	di_error = debuginfo_cu_parser_loadunit(&di_reader, self->ue_sectinfo->ues_debug_info_end,
 	                                        &sect, &parser, &abbrev, component_pointer);
 	if unlikely(di_error != DEBUG_INFO_ERROR_SUCCESS)

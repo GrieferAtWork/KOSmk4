@@ -28,6 +28,7 @@
 #include <kos/types.h>
 
 #include <format-printer.h>
+#include <int128.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -111,7 +112,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restr
 /* Skip data associated with the given attribute form.
  * @param: form: One of `DW_FORM_*' */
 INTDEF NONNULL((1)) void
-NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipform)(di_debuginfo_cu_parser_t *__restrict self,
+NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipform)(di_debuginfo_cu_simple_parser_t *__restrict self,
                                                    dwarf_uleb128_t form);
 
 /* Start a new component.
@@ -141,12 +142,19 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_d
  *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc
  *  - debuginfo_cu_parser_getblock():  DW_FORM_block, DW_FORM_block1, DW_FORM_block2, DW_FORM_block4 */
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, char const **__restrict presult);
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getaddr)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getflag)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, bool *__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring_ex)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, char const **__restrict presult, di_string_sections_t const *__restrict sections);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getaddr)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
+#if __SIZEOF_POINTER__ == 8
+#define libdi_debuginfo_cu_parser_getconst64 libdi_debuginfo_cu_parser_getconst
+#else /* __SIZEOF_POINTER__ == 8 */
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst64)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint64_t *__restrict presult);
+#endif /* __SIZEOF_POINTER__ != 8 */
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst128)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, uint128_t *__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getflag)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, bool *__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, byte_t const **__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, di_debuginfo_location_t *__restrict result);
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getblock)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, di_debuginfo_block_t *__restrict result);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getblock)(di_debuginfo_cu_simple_parser_t const *__restrict self, uintptr_t form, di_debuginfo_block_t *__restrict result);
 
 
 /* Load attributes specific to a certain component:
@@ -181,7 +189,7 @@ INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_va
  * >>     void *buffer;
  * >>
  * >>     // Load type information for the variable.
- * >>     pp.dup_cu_info_pos = var.v_type;
+ * >>     pp.dup_base.dsp_cu_info_pos = var.v_type;
  * >>     debuginfo_cu_parser_loadattr_type(&pp, &typ);
  * >>
  * >>     // Load the value of this variable.
@@ -198,8 +206,8 @@ INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_va
  * >>                                 &num_written_bits,
  * >>                                 &<sp>->sp_frame_base,
  * >>                                 NULL,
- * >>                                 parser->dup_addrsize,
- * >>                                 parser->dup_ptrsize);
+ * >>                                 parser->dup_base.dsp_addrsize,
+ * >>                                 parser->dup_base.dsp_ptrsize);
  * >>
  * >>     // Print a representation of the variable, and its data.
  * >>     debuginfo_print_value(printer, arg, &pp, &type, v.v_name, buffer, typ.t_sizeof);

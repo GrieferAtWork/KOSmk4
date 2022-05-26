@@ -60,8 +60,8 @@ struct cvalue_cfiexpr {
 	di_debuginfo_location_t v_framebase;         /* Frame-base expression. */
 	uintptr_t               v_cu_ranges_startpc; /* == di_debuginfo_compile_unit_t::cu_ranges::r_startpc */
 	uintptr_t               v_cu_addr_base;      /* == di_debuginfo_compile_unit_t::cu_addr_base */
-	uint8_t                 v_addrsize;          /* == di_debuginfo_cu_parser_t::dup_addrsize */
-	uint8_t                 v_ptrsize;           /* == di_debuginfo_cu_parser_t::dup_ptrsize */
+	uint8_t                 v_addrsize;          /* == di_debuginfo_cu_simple_parser_t::dsp_addrsize */
+	uint8_t                 v_ptrsize;           /* == di_debuginfo_cu_simple_parser_t::dsp_ptrsize */
 	void                   *v_objaddr;           /* [0..1] Object address. */
 };
 

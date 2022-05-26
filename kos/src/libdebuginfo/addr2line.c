@@ -181,8 +181,8 @@ NOTHROW_NCX(CC scan_cu_stmt_list)(di_debuginfo_compile_unit_t const *__restrict 
 				result->al_dclcol    = 0;
 				libdi_debugline_loadfile(&unit,
 				                         info.dl_srcfile,
-				                         &result->al_srcpath,
-				                         &result->al_srcfile);
+				                         di_debug_addr2line_srcas_debugline_fileinfo(result),
+				                         di_addr2line_sections_as_di_string_sections(sections));
 				/* Try to substitute symbol name information by searching through .symtab */
 				search_symtab(sections, result, module_relative_pc, true);
 				return DEBUG_INFO_ERROR_SUCCESS;
@@ -304,8 +304,8 @@ fill_result_sp:
 						if (error != DEBUG_INFO_ERROR_SUCCESS)
 							goto fill_result_sp_any_cu;
 						libdi_debugline_loadfile(&unit, sp.sp_decl_file,
-						                         &result->al_dclpath,
-						                         &result->al_dclfile);
+						                         di_debug_addr2line_dclas_debugline_fileinfo(result),
+						                         di_addr2line_sections_as_di_string_sections(sections));
 						/* Scan this CU for source-level information. */
 						error = libdi_debugline_scanunit(&unit, &info, module_relative_pc);
 						if (error == DEBUG_INFO_ERROR_SUCCESS) {
@@ -314,8 +314,8 @@ fill_result_debugline_success:
 							result->al_lineend   = info.dl_lineend;
 							result->al_linediscr = (uintptr_t)info.dl_discriminator;
 							libdi_debugline_loadfile(&unit, info.dl_srcfile,
-							                         &result->al_srcpath,
-							                         &result->al_srcfile);
+							                         di_debug_addr2line_srcas_debugline_fileinfo(result),
+							                         di_addr2line_sections_as_di_string_sections(sections));
 							result->al_srcline = info.dl_srcline;
 							result->al_srccol  = info.dl_srccol;
 						} else {
@@ -346,7 +346,7 @@ fill_result_sp_any_cu:
 				}
 				/* Figure out how many levels of line function recursion are present at this location. */
 				inline_recursion        = 1;
-				subprogram_child_start  = self->dup_cu_info_pos;
+				subprogram_child_start  = self->dsp_cu_info_pos;
 				innermost_is_subprogram = NULL;
 				for (;;) {
 					if (!libdi_debuginfo_cu_parser_next(self))
@@ -392,7 +392,7 @@ fill_result_sp_any_cu:
 						 * inline function). NOTE: Re-use the  SP-loader code, but override the  SP
 						 * values to instead refer to information about the inline function. */
 						if (!innermost_is_subprogram ||
-						    (self->dup_cu_info_pos = innermost_is_subprogram,
+						    (self->dsp_cu_info_pos = innermost_is_subprogram,
 						     !libdi_debuginfo_cu_parser_next(self)) ||
 						    !libdi_debuginfo_cu_parser_loadattr_subprogram(self, &sp)) {
 							/* Failed to load information about the inline function -> Just post NULL-info for it. */
@@ -426,7 +426,7 @@ fill_result_sp_any_cu:
 				 * happens. */
 
 				/* Rewind to the start of child components of this sub-program. */
-				self->dup_cu_info_pos          = subprogram_child_start;
+				self->dsp_cu_info_pos = subprogram_child_start;
 				self->dup_child_depth          = subprogram_depth;
 				self->dup_comp.dic_haschildren = DW_CHILDREN_yes;
 				for (;;) {
@@ -450,11 +450,11 @@ fill_result_sp_any_cu:
 							if (inline_recursion == 1) {
 								uint8_t old_has_children;
 								/* This is the level that dictates the containing SP */
-								subprogram_child_start = self->dup_cu_info_pos;
+								subprogram_child_start = self->dsp_cu_info_pos;
 								subprogram_depth       = self->dup_child_depth;
 								old_has_children       = self->dup_comp.dic_haschildren;
 								if (!is.is_subprogram ||
-								    (self->dup_cu_info_pos = is.is_subprogram,
+								    (self->dsp_cu_info_pos = is.is_subprogram,
 								     !libdi_debuginfo_cu_parser_next(self)) ||
 								    !libdi_debuginfo_cu_parser_loadattr_subprogram(self, &sp)) {
 									sp.sp_rawname     = NULL;
@@ -463,7 +463,7 @@ fill_result_sp_any_cu:
 									sp.sp_decl_column = 0;
 									sp.sp_decl_file   = 0;
 								}
-								self->dup_cu_info_pos          = subprogram_child_start;
+								self->dsp_cu_info_pos          = subprogram_child_start;
 								self->dup_child_depth          = subprogram_depth;
 								self->dup_comp.dic_haschildren = old_has_children;
 							} else if (inline_recursion == 0) {
@@ -500,8 +500,12 @@ fill_result_sp_any_cu:
 					debug_line_reader = sections->ds_debug_line_start + cu.cu_stmt_list;
 					error             = libdi_debugline_loadunit(&debug_line_reader, sections->ds_debug_line_end, &unit);
 					if (error == DEBUG_INFO_ERROR_SUCCESS) {
-						libdi_debugline_loadfile(&unit, sp.sp_decl_file, &result->al_dclpath, &result->al_dclfile);
-						libdi_debugline_loadfile(&unit, is.is_call_file, &result->al_srcpath, &result->al_srcfile);
+						libdi_debugline_loadfile(&unit, sp.sp_decl_file,
+						                         di_debug_addr2line_dclas_debugline_fileinfo(result),
+						                         di_addr2line_sections_as_di_string_sections(sections));
+						libdi_debugline_loadfile(&unit, is.is_call_file,
+						                         di_debug_addr2line_srcas_debugline_fileinfo(result),
+						                         di_addr2line_sections_as_di_string_sections(sections));
 					}
 				}
 				return DEBUG_INFO_ERROR_SUCCESS;
@@ -615,12 +619,14 @@ err_nodata:
 		uintptr_t debuginfo_cu_offset;
 		byte_t const *cu_start;
 		bool has_corruptions;
-		cu_sections.cps_debug_abbrev_start = sections->ds_debug_abbrev_start;
-		cu_sections.cps_debug_abbrev_end   = sections->ds_debug_abbrev_end;
-		cu_sections.cps_debug_loc_start    = NULL;
-		cu_sections.cps_debug_loc_end      = NULL;
-		cu_sections.cps_debug_str_start    = sections->ds_debug_str_start;
-		cu_sections.cps_debug_str_end      = sections->ds_debug_str_end;
+		cu_sections.cps_debug_abbrev_start   = sections->ds_debug_abbrev_start;
+		cu_sections.cps_debug_abbrev_end     = sections->ds_debug_abbrev_end;
+		cu_sections.cps_debug_loc_start      = NULL;
+		cu_sections.cps_debug_loc_end        = NULL;
+		cu_sections.cps_debug_str_start      = sections->ds_debug_str_start;
+		cu_sections.cps_debug_str_end        = sections->ds_debug_str_end;
+		cu_sections.cps_debug_line_str_start = sections->ds_debug_line_str_start;
+		cu_sections.cps_debug_line_str_end   = sections->ds_debug_line_str_end;
 
 		/* Use .debug_aranges to narrow down the search to a single CU. */
 		if (sections->ds_debug_aranges_start < sections->ds_debug_aranges_end) {
@@ -715,8 +721,8 @@ err_nodata:
 				result->al_cuname = NULL;
 				result->al_cubase = NULL;
 				libdi_debugline_loadfile(&unit, info.dl_srcfile,
-				                         &result->al_srcpath,
-				                         &result->al_srcfile);
+				                         di_debug_addr2line_srcas_debugline_fileinfo(result),
+				                         di_addr2line_sections_as_di_string_sections(sections));
 				result->al_srcline = info.dl_srcline;
 				result->al_srccol  = info.dl_srccol;
 				result->al_dclpath = NULL;
@@ -798,16 +804,17 @@ err:
 
 
 
-INTERN_CONST STRINGSECTION char const secname_debug_line[]    = ".debug_line";
-INTERN_CONST STRINGSECTION char const secname_debug_info[]    = ".debug_info";
-INTERN_CONST STRINGSECTION char const secname_debug_abbrev[]  = ".debug_abbrev";
-INTERN_CONST STRINGSECTION char const secname_debug_aranges[] = ".debug_aranges";
-INTERN_CONST STRINGSECTION char const secname_debug_str[]     = ".debug_str";
-INTERN_CONST STRINGSECTION char const secname_debug_ranges[]  = ".debug_ranges";
-INTERN_CONST STRINGSECTION char const secname_symtab[]        = ".symtab";
-INTERN_CONST STRINGSECTION char const secname_strtab[]        = ".strtab";
-INTERN_CONST STRINGSECTION char const secname_dynsym[]        = ".dynsym";
-INTERN_CONST STRINGSECTION char const secname_dynstr[]        = ".dynstr";
+INTERN_CONST STRINGSECTION char const secname_debug_line[]     = ".debug_line";
+INTERN_CONST STRINGSECTION char const secname_debug_info[]     = ".debug_info";
+INTERN_CONST STRINGSECTION char const secname_debug_abbrev[]   = ".debug_abbrev";
+INTERN_CONST STRINGSECTION char const secname_debug_aranges[]  = ".debug_aranges";
+INTERN_CONST STRINGSECTION char const secname_debug_str[]      = ".debug_str";
+INTERN_CONST STRINGSECTION char const secname_debug_line_str[] = ".debug_line_str";
+INTERN_CONST STRINGSECTION char const secname_debug_ranges[]   = ".debug_ranges";
+INTERN_CONST STRINGSECTION char const secname_symtab[]         = ".symtab";
+INTERN_CONST STRINGSECTION char const secname_strtab[]         = ".strtab";
+INTERN_CONST STRINGSECTION char const secname_dynsym[]         = ".dynsym";
+INTERN_CONST STRINGSECTION char const secname_dynstr[]         = ".dynstr";
 
 
 /* Load debug sections, given a handle to a module, as returned by dlopen()
@@ -836,9 +843,10 @@ NOTHROW_NCX(CC libdi_debug_addr2line_sections_lock)(module_t *dl_handle,
 set_no_extened_debug_info_2:
 		dl_sections->dl_debug_abbrev = NULL;
 set_no_extened_debug_info:
-		dl_sections->dl_debug_aranges = NULL;
-		dl_sections->dl_debug_str     = NULL;
-		dl_sections->dl_debug_ranges  = NULL;
+		dl_sections->dl_debug_aranges  = NULL;
+		dl_sections->dl_debug_str      = NULL;
+		dl_sections->dl_debug_line_str = NULL;
+		dl_sections->dl_debug_ranges   = NULL;
 	} else {
 		/* Load .debug_info and .dl_debug_abbrev */
 		dl_sections->dl_debug_info = locksection(secname_debug_info);
@@ -850,9 +858,10 @@ set_no_extened_debug_info:
 			goto set_no_extened_debug_info;
 		}
 		/* All all of the remaining debug information sections (which are optional, though) */
-		dl_sections->dl_debug_aranges = locksection(secname_debug_aranges);
-		dl_sections->dl_debug_str     = locksection(secname_debug_str);
-		dl_sections->dl_debug_ranges  = locksection(secname_debug_ranges);
+		dl_sections->dl_debug_aranges  = locksection(secname_debug_aranges);
+		dl_sections->dl_debug_str      = locksection(secname_debug_str);
+		dl_sections->dl_debug_line_str = locksection(secname_debug_line_str);
+		dl_sections->dl_debug_ranges   = locksection(secname_debug_ranges);
 	}
 	dl_sections->dl_symtab = locksection(secname_symtab);
 	if (dl_sections->dl_symtab) {
@@ -918,6 +927,11 @@ err_no_data:
 		             sections->ds_debug_str_start,
 		             sections->ds_debug_str_end);
 	}
+	if (dl_sections->dl_debug_line_str) {
+		LOAD_SECTION(dl_sections->dl_debug_line_str,
+		             sections->ds_debug_line_str_start,
+		             sections->ds_debug_line_str_end);
+	}
 	if (dl_sections->dl_debug_ranges) {
 		LOAD_SECTION(dl_sections->dl_debug_ranges,
 		             sections->ds_debug_ranges_start,
@@ -946,6 +960,7 @@ NOTHROW_NCX(CC libdi_debug_addr2line_sections_unlock)(di_addr2line_dl_sections_t
 	module_section_xdecref(dl_sections->dl_symtab);
 	module_section_xdecref(dl_sections->dl_debug_ranges);
 	module_section_xdecref(dl_sections->dl_debug_str);
+	module_section_xdecref(dl_sections->dl_debug_line_str);
 	module_section_xdecref(dl_sections->dl_debug_aranges);
 	module_section_xdecref(dl_sections->dl_debug_abbrev);
 	module_section_xdecref(dl_sections->dl_debug_info);

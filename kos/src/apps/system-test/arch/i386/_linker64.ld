@@ -199,6 +199,7 @@ SECTIONS {
 	.debug_line     0 : { *(.debug_line .debug_line.* .debug_line_end) }
 	.debug_frame    0 : { *(.debug_frame) }
 	.debug_str      0 : { *(.debug_str) }
+	.debug_line_str 0 : { *(.debug_line_str) }
 	.debug_loc      0 : { *(.debug_loc) }
 	.debug_macinfo  0 : { *(.debug_macinfo) }
 	.debug_weaknames 0 : { *(.debug_weaknames) }

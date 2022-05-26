@@ -513,6 +513,7 @@ INTDEF struct driver_section kernel_section_debug_info;
 INTDEF struct driver_section kernel_section_debug_aranges;
 INTDEF struct driver_section kernel_section_debug_abbrev;
 INTDEF struct driver_section kernel_section_debug_str;
+INTDEF struct driver_section kernel_section_debug_line_str;
 INTDEF struct driver_section kernel_section_debug_ranges;
 INTDEF struct driver_section kernel_section_debug_loc;
 INTDEF struct driver_section kernel_section_pertask;

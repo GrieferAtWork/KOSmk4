@@ -241,6 +241,7 @@ SECTIONS {
 	PROVIDE_HIDDEN(__kernel_debug_aranges_end = ABSOLUTE(__kernel_debug_aranges_start + __kernel_debug_aranges_size));
 	PROVIDE_HIDDEN(__kernel_debug_abbrev_end = ABSOLUTE(__kernel_debug_abbrev_start + __kernel_debug_abbrev_size));
 	PROVIDE_HIDDEN(__kernel_debug_str_end = ABSOLUTE(__kernel_debug_str_start + __kernel_debug_str_size));
+	PROVIDE_HIDDEN(__kernel_debug_line_str_end = ABSOLUTE(__kernel_debug_line_str_start + __kernel_debug_line_str_size));
 	PROVIDE_HIDDEN(__kernel_debug_ranges_end = ABSOLUTE(__kernel_debug_ranges_start + __kernel_debug_ranges_size));
 	PROVIDE_HIDDEN(__kernel_debug_loc_end = ABSOLUTE(__kernel_debug_loc_start + __kernel_debug_loc_size));
 
@@ -646,6 +647,7 @@ SECTIONS {
 	.debug_aranges 0 : { *(.debug_aranges) }
 	.debug_abbrev 0 : { *(.debug_abbrev) }
 	.debug_str 0 : { *(.debug_str) }
+	.debug_line_str 0 : { *(.debug_line_str) }
 	.debug_ranges 0 : { *(.debug_ranges) }
 	.debug_loc 0 : { *(.debug_loc) }
 

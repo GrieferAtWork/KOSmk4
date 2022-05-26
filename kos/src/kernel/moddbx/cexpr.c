@@ -3256,8 +3256,8 @@ fallback_load_opt_type:
 	if (sym->clv_parser.dup_comp.dic_tag == DW_TAG_subprogram) {
 		/* Special case: Must complete `symtype' by loading argument types. */
 		REF struct ctype *function_type;
-		sym->clv_parser.dup_cu_info_pos = sym->clv_dip;
-		if (sym->clv_parser.dup_cu_info_pos && debuginfo_cu_parser_next(&sym->clv_parser)) {
+		sym->clv_parser.dsp_cu_info_pos = sym->clv_dip;
+		if (sym->clv_parser.dsp_cu_info_pos && debuginfo_cu_parser_next(&sym->clv_parser)) {
 			debuginfo_cu_parser_skipattr(&sym->clv_parser);
 			result = ctype_fromdw_subroutine(sym->clv_mod,
 			                                 sym->clv_unit,
@@ -3290,8 +3290,8 @@ got_symbol_type:
 			expr.v_framebase         = sym->clv_data.s_var.v_framebase;
 			expr.v_cu_ranges_startpc = sym->clv_cu.cu_ranges.r_startpc;
 			expr.v_cu_addr_base      = sym->clv_cu.cu_addr_base;
-			expr.v_addrsize          = sym->clv_parser.dup_addrsize;
-			expr.v_ptrsize           = sym->clv_parser.dup_ptrsize;
+			expr.v_addrsize          = sym->clv_parser.dsp_addrsize;
+			expr.v_ptrsize           = sym->clv_parser.dsp_ptrsize;
 			expr.v_objaddr           = sym->clv_data.s_var.v_objaddr;
 
 			/* Push the symbol expression. */

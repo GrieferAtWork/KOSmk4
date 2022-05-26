@@ -84,20 +84,23 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
                       byte_t *debug_info_start, byte_t *debug_info_end,
                       byte_t *debug_abbrev_start, byte_t *debug_abbrev_end,
                       byte_t *debug_loc_start, byte_t *debug_loc_end,
-                      byte_t *debug_str_start, byte_t *debug_str_end);
+                      byte_t *debug_str_start, byte_t *debug_str_end,
+                      byte_t *debug_line_str_start, byte_t *debug_line_str_end);
 
 PRIVATE void dump_debuginfo() {
-	byte_t *di, *da, *dl, *ds;
+	byte_t *di, *da, *dl, *ds, *dS;
 	di = (byte_t *)driver_section_cdata(&kernel_section_debug_info);
 	da = (byte_t *)driver_section_cdata(&kernel_section_debug_abbrev);
 	dl = (byte_t *)driver_section_cdata(&kernel_section_debug_loc);
 	ds = (byte_t *)driver_section_cdata(&kernel_section_debug_str);
+	dS = (byte_t *)driver_section_cdata(&kernel_section_debug_line_str);
 	libdi_debug_repr_dump(&syslog_printer,
 	                      SYSLOG_LEVEL_RAW,
 	                      di, di + kernel_section_debug_info.ds_csize,
 	                      da, da + kernel_section_debug_abbrev.ds_csize,
 	                      dl, dl + kernel_section_debug_loc.ds_csize,
-	                      ds, ds + kernel_section_debug_str.ds_csize);
+	                      ds, ds + kernel_section_debug_str.ds_csize,
+	                      dS, dS + kernel_section_debug_line_str.ds_csize);
 }
 #endif
 
@@ -343,6 +346,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 #endif /* CONFIG_SELFTEST */
 
 	__hybrid_assert(!kmalloc_leaks());
+
+#if 0
+	{
+		extern void FCALL tb(void);
+		tb();
+	}
+	BREAKPOINT();
+#endif
 
 	/* Update the given initial user-state to start
 	 * executing /bin/init (or whatever was passed as `init=...') */

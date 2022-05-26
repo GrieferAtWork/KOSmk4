@@ -77,39 +77,39 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
 	/* 7.5.1.1   Compilation Unit Header */
 	temp = UNALIGNED_GET32((uint32_t const *)reader); /* unit_length */
 	reader += 4;
-	result->dup_ptrsize = 4;
+	result->dsp_ptrsize = 4;
 	if (temp == UINT32_C(0xffffffff)) {
 		/* 7.4 32-Bit and 64-Bit DWARF Formats
 		 * In the 64-bit DWARF format, an initial length field is 96 bits in size, and has two parts:
 		 *  - The first 32-bits have the value 0xffffffff.
 		 *  - The following 64-bits contain the actual length represented as an unsigned 64-bit integer. */
 		temp = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader); /* unit_length */
-		result->dup_ptrsize = 8;
+		result->dsp_ptrsize = 8;
 		reader += 8;
 	}
 	/* Calculate the end-pointer for this CU, but limit by the max end of the CU. */
 	if (OVERFLOW_UADD((uintptr_t)result->dup_cu_info_hdr, temp,
-	                  (uintptr_t *)&result->dup_cu_info_end) ||
-		result->dup_cu_info_end > cmodunit_di_maxend(self))
-		result->dup_cu_info_end = cmodunit_di_maxend(self);
+	                  (uintptr_t *)&result->dsp_cu_info_end) ||
+		result->dsp_cu_info_end > cmodunit_di_maxend(self))
+		result->dsp_cu_info_end = cmodunit_di_maxend(self);
 
-	result->dup_version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
+	result->dsp_version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
 	reader += 2;
 	temp = UNALIGNED_GET32((uint32_t const *)reader); /* debug_abbrev_offset */
 	reader += 4;
 	if (temp == 0xffffffff)
 		reader += 8;
-	result->dup_addrsize = *(uint8_t const *)reader; /* address_size */
+	result->dsp_addrsize = *(uint8_t const *)reader; /* address_size */
 	reader += 1;
-	result->dup_cu_info_pos = reader;
+	result->dsp_cu_info_pos = reader;
 	if (dip) {
 		/* If the given pointer is outside the valid range, setup the parser for EOF. */
 		if (dip < result->dup_cu_info_hdr ||
-		    dip > result->dup_cu_info_end)
-			dip = result->dup_cu_info_end;
-		result->dup_cu_info_pos = dip;
+		    dip > result->dsp_cu_info_end)
+			dip = result->dsp_cu_info_end;
+		result->dsp_cu_info_pos = dip;
 	}
-	reader                = result->dup_cu_info_end;
+	reader                = result->dsp_cu_info_end;
 	result->dup_sections  = cmodule_di_debuginfo_cu_parser_sections(mod);
 	result->dup_cu_abbrev = (di_debuginfo_cu_abbrev_t *)&self->cu_abbrev;
 	/* Load the first component of the compilation unit. */
@@ -117,7 +117,7 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
 		/* Fill in a stub/EOF component. */
 		result->dup_comp.dic_tag         = 0; /* DW_TAG_... */
 		result->dup_comp.dic_haschildren = DW_CHILDREN_no;
-		result->dup_cu_info_pos = result->dup_cu_info_end;
+		result->dsp_cu_info_pos = result->dsp_cu_info_end;
 	}
 	result->dup_child_depth = 0;
 }
@@ -476,7 +476,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 			cu->cu_symbols.mst_symv = (struct cmodsym *)-1; /* Not loaded. */
 			length = UNALIGNED_GET32((uint32_t const *)reader); /* unit_length */
 			reader += 4;
-			parser.dup_ptrsize = 4;
+			parser.dsp_ptrsize = 4;
 			if (length >= UINT32_C(0xfffffff0)) {
 				if (length == UINT32_C(0xffffffff)) {
 					/* 7.4 32-Bit and 64-Bit DWARF Formats
@@ -485,7 +485,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 					 *  - The following 64-bits contain the actual length represented as an unsigned 64-bit integer. */
 					length = (size_t)UNALIGNED_GET64((uint64_t const *)reader);
 					reader += 8;
-					parser.dup_ptrsize = 8;
+					parser.dsp_ptrsize = 8;
 				} else {
 					/* 7.2.2 Initial Length Values
 					 * ...
@@ -498,7 +498,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 			if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&next_cu) || next_cu > end)
 				next_cu = end;
 			cu[1].cu_di_start = next_cu; /* Set the END-pointer. */
-			parser.dup_version = UNALIGNED_GET16((uint16_t const *)reader);
+			parser.dsp_version = UNALIGNED_GET16((uint16_t const *)reader);
 			reader += 2; /* version */
 			debug_abbrev_offset = UNALIGNED_GET32((uint32_t const *)reader); /* debug_abbrev_offset */
 			reader += 4;
@@ -518,21 +518,21 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 			cu->cu_abbrev.dua_cache_size = 0;
 			cu->cu_abbrev.dua_cache_next = 0;
 
-			parser.dup_addrsize = *(uint8_t const *)reader; /* address_size */
+			parser.dsp_addrsize = *(uint8_t const *)reader; /* address_size */
 #if __SIZEOF_POINTER__ > 4
-			if unlikely(parser.dup_addrsize != 1 && parser.dup_addrsize != 2 &&
-			            parser.dup_addrsize != 4 && parser.dup_addrsize != 8)
+			if unlikely(parser.dsp_addrsize != 1 && parser.dsp_addrsize != 2 &&
+			            parser.dsp_addrsize != 4 && parser.dsp_addrsize != 8)
 #else /* __SIZEOF_POINTER__ > 4 */
-			if unlikely(parser.dup_addrsize != 1 && parser.dup_addrsize != 2 &&
-			            parser.dup_addrsize != 4)
+			if unlikely(parser.dsp_addrsize != 1 && parser.dsp_addrsize != 2 &&
+			            parser.dsp_addrsize != 4)
 #endif /* __SIZEOF_POINTER__ <= 4 */
 			{
 				printk(KERN_ERR "[dbx] Illegal address_size %#" PRIx8 " in .debug_info CU header at %p\n",
-				       parser.dup_addrsize, reader);
+				       parser.dsp_addrsize, reader);
 				goto done_cucs;
 			}
 			reader += 1;
-			/* At  this point,  `reader' would be  used to initialize  `dup_cu_info_pos' of a
+			/* At  this point,  `reader' would be  used to initialize  `dsp_cu_info_pos' of a
 			 * parser, which in all likelihood would yield a `DW_TAG_compile_unit' component. */
 
 			/* If what follows is a  `DW_TAG_compile_unit', which itself is  then
@@ -543,8 +543,8 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod) {
 			parser.dup_sections    = cmodule_di_debuginfo_cu_parser_sections(result);
 			parser.dup_cu_abbrev   = &cu->cu_abbrev;
 			parser.dup_cu_info_hdr = cmodunit_di_start(cu);
-			parser.dup_cu_info_end = cmodunit_di_maxend(cu);
-			parser.dup_cu_info_pos = reader;
+			parser.dsp_cu_info_end = cmodunit_di_maxend(cu);
+			parser.dsp_cu_info_pos = reader;
 			parser.dup_child_depth = 0;
 			/* Ignore CUs for which we can't load any initial component. */
 			if (debuginfo_cu_parser_next(&parser)) {
@@ -795,7 +795,7 @@ NOTHROW(FCALL parse_symbol_name_for_object_r)(di_debuginfo_cu_parser_t *__restri
                                               bool *__restrict phas_location_information) {
 	di_debuginfo_cu_parser_t inner_parser;
 	memcpy(&inner_parser, self, sizeof(inner_parser));
-	inner_parser.dup_cu_info_pos = abstract_origin;
+	inner_parser.dsp_cu_info_pos = abstract_origin;
 	if (!debuginfo_cu_parser_next(&inner_parser))
 		return NULL;
 	return parse_symbol_name_for_object(&inner_parser, pns, true,
@@ -816,7 +816,7 @@ NOTHROW(FCALL parse_variable_specifications)(di_debuginfo_cu_parser_t const *__r
 	di_debuginfo_cu_parser_t inner_parser;
 	di_debuginfo_component_attrib_t attr;
 	memcpy(&inner_parser, self, sizeof(inner_parser));
-	inner_parser.dup_cu_info_pos = specification;
+	inner_parser.dsp_cu_info_pos = specification;
 again:
 	if (debuginfo_cu_parser_next(&inner_parser)) {
 		if (inner_parser.dup_comp.dic_tag == DW_TAG_variable ||
@@ -833,7 +833,7 @@ again:
 						return;
 					if (dbg_awaituser()) /* Allow the user to break an infinite loop caused by bad debug-info... */
 						return;
-					inner_parser.dup_cu_info_pos = abstract_origin;
+					inner_parser.dsp_cu_info_pos = abstract_origin;
 					goto again;
 				}	break;
 
@@ -881,7 +881,7 @@ NOTHROW(FCALL parse_symbol_name_for_object)(di_debuginfo_cu_parser_t *__restrict
 	byte_t const *attrib_pos;
 	char const *result = NULL;
 again:
-	attrib_pos = self->dup_cu_info_pos;
+	attrib_pos = self->dsp_cu_info_pos;
 	switch (self->dup_comp.dic_tag) {
 
 	case DW_TAG_variable:
@@ -1093,11 +1093,11 @@ do_abstract_origin:
 		if (dbg_awaituser()) /* Allow the user to break an infinite loop caused by bad debug-info... */
 			return NULL;
 		if (reuse_parser) {
-			self->dup_cu_info_pos = abstract_origin;
+			self->dsp_cu_info_pos = abstract_origin;
 			goto again;
 		} else {
 			/* Make sure that the original parser is exited correctly. */
-			self->dup_cu_info_pos = attrib_pos;
+			self->dsp_cu_info_pos = attrib_pos;
 			debuginfo_cu_parser_skipattr(self);
 		}
 		return parse_symbol_name_for_object_r(self, abstract_origin, pns,
@@ -1449,14 +1449,14 @@ again:
 			if (!loc.l_expr || loc.l_llist)
 				goto nope;
 			length = (size_t)dwarf_decode_uleb128(&loc.l_expr);
-			if (length != ((size_t)1 + parser.dup_addrsize))
+			if (length != ((size_t)1 + parser.dsp_addrsize))
 				goto nope;
 			if (*loc.l_expr != DW_OP_addr)
 				goto nope;
 			++loc.l_expr;
-			if (parser.dup_addrsize == 4) {
+			if (parser.dsp_addrsize == 4) {
 				*pmodule_relative_addr = (uintptr_t)UNALIGNED_GET32((uint32_t const *)loc.l_expr);
-			} else if (parser.dup_addrsize == 8) {
+			} else if (parser.dsp_addrsize == 8) {
 				*pmodule_relative_addr = (uintptr_t)UNALIGNED_GET64((uint64_t const *)loc.l_expr);
 			} else {
 				goto nope;
@@ -1741,7 +1741,7 @@ NOTHROW(FCALL cmodunit_loadsyms)(struct cmodunit *__restrict self,
 				goto err_interrupt;
 		}
 		cu_depth = parser.dup_child_depth;
-		dip      = parser.dup_cu_info_pos;
+		dip      = parser.dsp_cu_info_pos;
 		/* Scan the elements of the compilation-unit. */
 		if (debuginfo_cu_parser_nextchild(&parser)) {
 			do {
@@ -2490,7 +2490,7 @@ NOTHROW(FCALL loadinfo_specifications)(struct cmodsyminfo *__restrict info,
 	di_debuginfo_cu_parser_t inner_parser;
 	di_debuginfo_component_attrib_t attr;
 	memcpy(&inner_parser, &info->clv_parser, sizeof(inner_parser));
-	inner_parser.dup_cu_info_pos = specification;
+	inner_parser.dsp_cu_info_pos = specification;
 again:
 	if (debuginfo_cu_parser_next(&inner_parser)) {
 		if (inner_parser.dup_comp.dic_tag == DW_TAG_variable ||
@@ -2508,7 +2508,7 @@ again:
 						return;
 					if (dbg_awaituser()) /* Allow the user to break an infinite loop caused by bad debug-info... */
 						return;
-					inner_parser.dup_cu_info_pos = abstract_origin;
+					inner_parser.dsp_cu_info_pos = abstract_origin;
 					goto again;
 				}	break;
 
@@ -2595,14 +2595,14 @@ again:
 			if (!loc.l_expr || loc.l_llist)
 				break;
 			length = (size_t)dwarf_decode_uleb128(&loc.l_expr);
-			if (length != ((size_t)1 + parser->dup_addrsize))
+			if (length != ((size_t)1 + parser->dsp_addrsize))
 				break;
 			if (*loc.l_expr != DW_OP_addr)
 				break;
 			++loc.l_expr;
-			if (parser->dup_addrsize == 4) {
+			if (parser->dsp_addrsize == 4) {
 				module_relative_component_addr = (uintptr_t)UNALIGNED_GET32((uint32_t const *)loc.l_expr);
-			} else if (parser->dup_addrsize == 8) {
+			} else if (parser->dsp_addrsize == 8) {
 				module_relative_component_addr = (uintptr_t)UNALIGNED_GET64((uint64_t const *)loc.l_expr);
 			} else {
 				break;
@@ -2624,7 +2624,7 @@ again:
 			memcpy(&_inner_parser, parser, sizeof(*parser));
 			parser = &_inner_parser;
 		}
-		parser->dup_cu_info_pos = referenced_component;
+		parser->dsp_cu_info_pos = referenced_component;
 		if (debuginfo_cu_parser_next(&_inner_parser))
 			goto again;
 	}
@@ -2645,7 +2645,7 @@ NOTHROW(FCALL cmod_symenum_search_for_address)(struct cmodsyminfo *__restrict in
 		size_t cu_depth;
 		/* Load the initial compile-unit container-tag. */
 		cu_depth = info->clv_parser.dup_child_depth;
-		dip      = info->clv_parser.dup_cu_info_pos;
+		dip      = info->clv_parser.dsp_cu_info_pos;
 		/* Scan the elements of the compilation-unit. */
 		if (debuginfo_cu_parser_nextchild(&info->clv_parser)) {
 			do {
@@ -2823,12 +2823,12 @@ no_unit:
 
 do_load_dip:
 	/* Load symbol-specific debug information. */
-	info->clv_parser.dup_cu_info_pos = info->clv_dip;
+	info->clv_parser.dsp_cu_info_pos = info->clv_dip;
 	if (!info->clv_dip || !debuginfo_cu_parser_next(&info->clv_parser)) {
 		/* Fill in a stub/EOF component. */
 		info->clv_parser.dup_comp.dic_tag         = 0; /* DW_TAG_... */
 		info->clv_parser.dup_comp.dic_haschildren = DW_CHILDREN_no;
-		info->clv_parser.dup_cu_info_pos = info->clv_parser.dup_cu_info_end;
+		info->clv_parser.dsp_cu_info_pos = info->clv_parser.dsp_cu_info_end;
 	}
 
 	/* Load attributes of the pointed-to element to extract var-information. */
@@ -2843,7 +2843,7 @@ again_attributes:
 				if unlikely(!debuginfo_cu_parser_getref(&info->clv_parser, attr.dica_form,
 				                                        &abstract_origin))
 					goto done_attributes;
-				info->clv_parser.dup_cu_info_pos = abstract_origin;
+				info->clv_parser.dsp_cu_info_pos = abstract_origin;
 				if unlikely(!debuginfo_cu_parser_next(&info->clv_parser))
 					goto done_attributes;
 				goto again_attributes;

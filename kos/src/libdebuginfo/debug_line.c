@@ -40,50 +40,162 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <stdint.h>
 #include <string.h>
 
+#include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/debug_line.h>
 #include <libdebuginfo/dwarf.h>
 #include <libunwind/dwarf.h>
 
+#include "debug_info.h"
 #include "debug_line.h"
 
 DECL_BEGIN
 
 /* Decode a given file index into its filename and pathname components. */
 INTERN NONNULL((1, 3, 4)) void
-NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t *__restrict self,
-                                         dwarf_uleb128_t index,
-                                         char const **__restrict ppathname,
-                                         char const **__restrict pfilename) {
-	if (!index) {
-		*ppathname = NULL;
-		*pfilename = NULL;
-	} else {
-		char const *iter;
-		iter = (char const *)self->dlu_filetable;
-		while (--index && (byte_t *)iter < self->dlu_textbase) {
-			if (!*iter)
-				break; /* Invalid file ID */
-			iter = strend(iter) + 1;
-			dwarf_decode_uleb128((byte_t const **)&iter);
-			dwarf_decode_uleb128((byte_t const **)&iter);
-			dwarf_decode_uleb128((byte_t const **)&iter);
-		}
-		*pfilename = iter;
-		/* Parse the directory number. */
-		iter  = strend(iter) + 1;
-		index = dwarf_decode_uleb128((byte_t const **)&iter);
-		if (!index || --index >= self->dlu_pathcount)
-			*ppathname = NULL;
-		else {
-			iter = self->dlu_pathtable;
-			while (index) {
-				--index;
-				iter = strend(iter) + 1;
+NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict self, dwarf_uleb128_t index,
+                                         di_debugline_fileinfo_t *__restrict result,
+                                         struct di_string_sections_struct const *__restrict sections) {
+	di_debuginfo_cu_simple_parser_t parser;
+	bzero(result, sizeof(*result));
+	if (self->dlu_version < 5) {
+		if (!index)
+			return;
+		--index;
+	}
+
+	/* Load a parser for file data. */
+	parser.dsp_cu_info_end = self->dlu_textbase;
+	parser.dsp_cu_info_pos = self->dlu_filedata;
+	parser.dsp_ptrsize     = self->dlu_ptrsize;
+	parser.dsp_addrsize    = self->dlu_addrsize;
+	parser.dsp_version     = self->dlu_version;
+
+	/* Skip entires that we don't care about. */
+	for (; index; --index) {
+		byte_t const *fmtreader = (byte_t const *)self->dlu_filefmt;
+		uint8_t fmtcount        = *(uint8_t const *)fmtreader;
+		fmtreader += 1;
+		for (; fmtcount; --fmtcount) {
+			dwarf_uleb128_t form;
+			if unlikely(parser.dsp_cu_info_pos >= parser.dsp_cu_info_end) {
+				CORRUPT();
+				return;
 			}
-			*ppathname = iter;
+			dwarf_decode_uleb128(&fmtreader);        /* file_name_entry_format.type */
+			form = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.form */
+			libdi_debuginfo_cu_parser_skipform(&parser, form);
+		}
+	}
+
+	/* Decode our own entry! */
+	{
+		byte_t const *fmtreader = (byte_t const *)self->dlu_filefmt;
+		uint8_t fmtcount        = *(uint8_t const *)fmtreader;
+		fmtreader += 1;
+		index = (dwarf_uleb128_t)-1;
+		for (; fmtcount; --fmtcount) {
+			dwarf_uleb128_t type, form;
+			type = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.type */
+			form = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.form */
+			switch (type) {
+			case DW_LNCT_directory_index:
+				if (!libdi_debuginfo_cu_parser_getconst(&parser, form, &index))
+					index = (dwarf_uleb128_t)-1;
+				break;
+			case DW_LNCT_path:
+				if (!libdi_debuginfo_cu_parser_getstring_ex(&parser, form, &result->dlfi_file, sections))
+					result->dlfi_file = NULL;
+				break;
+			default:
+				break;
+			}
+			libdi_debuginfo_cu_parser_skipform(&parser, form);
+		}
+	}
+
+	/* Verify that we have a path index. */
+	if (index == (dwarf_uleb128_t)-1)
+		return;
+	if (self->dlu_version < 5) {
+		if (!index)
+			return;
+		--index;
+	}
+	if unlikely(index >= self->dlu_pathcount) {
+		CORRUPT(); /* Shouldn't happen */
+		return;
+	}
+
+	/* Modify the parser to decode path- rather than file-names. */
+	parser.dsp_cu_info_pos = self->dlu_pathdata;
+
+	/* Skip entires that we don't care about. */
+	for (; index; --index) {
+		byte_t const *fmtreader = (byte_t const *)self->dlu_pathfmt;
+		uint8_t fmtcount        = *(uint8_t const *)fmtreader;
+		fmtreader += 1;
+		for (; fmtcount; --fmtcount) {
+			dwarf_uleb128_t form;
+			if unlikely(parser.dsp_cu_info_pos >= parser.dsp_cu_info_end) {
+				CORRUPT();
+				return;
+			}
+			dwarf_decode_uleb128(&fmtreader);        /* file_name_entry_format.type */
+			form = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.form */
+			libdi_debuginfo_cu_parser_skipform(&parser, form);
+		}
+	}
+
+	/* Decode our path index! */
+	{
+		byte_t const *fmtreader = (byte_t const *)self->dlu_pathfmt;
+		uint8_t fmtcount        = *(uint8_t const *)fmtreader;
+		fmtreader += 1;
+		for (; fmtcount; --fmtcount) {
+			dwarf_uleb128_t type, form;
+			type = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.type */
+			form = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.form */
+			switch (type) {
+			case DW_LNCT_path:
+				if (!libdi_debuginfo_cu_parser_getstring_ex(&parser, form, &result->dlfi_path, sections))
+					result->dlfi_path = NULL;
+				break;
+			default:
+				break;
+			}
+			libdi_debuginfo_cu_parser_skipform(&parser, form);
 		}
 	}
 }
+
+
+/* DWARF5-style format descriptor for DWARF4 path/file info (di_debugline_fileinfo_format_t) */
+PRIVATE byte_t const dwarf4_lne_pathfmt[] = {
+	1,              /* dlff_count */
+	DW_LNCT_path,   /* dlff_entries[0].dlffe_type */
+	DW_FORM_string, /* dlff_entries[0].dlffe_form */
+};
+
+/* NOTE: In DWARF4, file information looked like this:
+ * >> typedef struct __ATTR_PACKED {
+ * >>     char            fe_name[1024]; // Filename (NUL-terminated)
+ * >>     dwarf_uleb128_t fe_path;       // File path index.
+ * >>     dwarf_uleb128_t fe_b;          // timestamp...
+ * >>     dwarf_uleb128_t fe_c;          // file size...
+ * >> } di_debugline_fileent_t; */
+PRIVATE byte_t const dwarf4_lne_filefmt[] = {
+	4,                       /* dlff_count */
+	DW_LNCT_path,            /* dlff_entries[0].dlffe_type -- fe_name */
+	DW_FORM_string,          /* dlff_entries[0].dlffe_form -- fe_name */
+	DW_LNCT_directory_index, /* dlff_entries[1].dlffe_type -- fe_path */
+	DW_FORM_udata,           /* dlff_entries[1].dlffe_form -- fe_path */
+	DW_LNCT_timestamp,       /* dlff_entries[2].dlffe_type -- fe_b */
+	DW_FORM_udata,           /* dlff_entries[2].dlffe_form -- fe_b */
+	DW_LNCT_size,            /* dlff_entries[3].dlffe_type -- fe_c */
+	DW_FORM_udata,           /* dlff_entries[3].dlffe_form -- fe_c */
+};
+
+
 
 /* Given a pointer to the start of a  debug_line CU (or a pointer to the start  of
  * the .debug_line section), initialize the given debugline CU structure `result',
@@ -130,91 +242,153 @@ NOTHROW_NCX(CC libdi_debugline_loadunit)(byte_t const **__restrict preader,
                                          byte_t const *__restrict text_end,
                                          di_debugline_unit_t *__restrict result) {
 	uintptr_t length;
-	uint16_t version;
 	byte_t const *reader;
 	byte_t const *next_cu, *cu_text;
 	reader = *preader;
 again:
 	if (reader >= text_end)
 		goto section_eof;
+	/* 6.2.4 The Line Number Program Header */
 	length = UNALIGNED_GET32((uint32_t const *)reader);
 	if (length <= 15)     /* 15: Minimum size of the DWARF LineInfo header. */
 		goto section_eof; /* Sentinel */
 	reader += 4;
+	result->dlu_ptrsize = 4;
 	if unlikely(length == UINT32_C(0xffffffff)) {
 		length = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 		if (length <= 15)
 			goto section_eof; /* Sentinel */
+		result->dlu_ptrsize = 8;
 		reader += 8;
-		if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&next_cu) || next_cu > text_end)
-			next_cu = text_end;
-		version = UNALIGNED_GET16((uint16_t const *)reader);
-		reader += 2;
-		length = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
-		reader += 8;
-		if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&cu_text) || cu_text > next_cu)
-			goto do_next_chunk;
-	} else {
-		if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&next_cu) || next_cu > text_end)
-			next_cu = text_end;
-		version = UNALIGNED_GET16((uint16_t const *)reader);
-		reader += 2;
-		length = UNALIGNED_GET32((uint32_t const *)reader);
-		reader += 4;
-		if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&cu_text) || cu_text > next_cu) {
-do_next_chunk:
-			reader = next_cu;
-			goto again;
-		}
 	}
+	if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&next_cu) || next_cu > text_end)
+		next_cu = text_end;
+	result->dlu_version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
+	reader += 2;
+	result->dlu_addrsize = sizeof(void *);
+	if (result->dlu_version >= 5) {
+		result->dlu_addrsize = *(uint8_t const *)reader; /* address_size */
+		reader += 1;
+		/*segment_selector_size = *(uint8_t const *)reader;*/ /* segment_selector_size */
+		reader += 1;
+	}
+
+	/* header_length */
+	length = result->dlu_ptrsize == 8 ? (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader)
+	                                  : UNALIGNED_GET32((uint32_t const *)reader);
+	reader += result->dlu_ptrsize;
+	if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&cu_text) || cu_text > next_cu) {
+		reader = next_cu;
+		goto again;
+	}
+
 	/* Save initial information. */
 	result->dlu_headerbase = reader;
 	result->dlu_textbase   = cu_text;
 	result->dlu_cuend      = next_cu;
-	result->dlu_version    = version;
+
 	/* Decode the CU header. */
-	result->dlu_min_insn_length = *(uint8_t const *)reader;
+	result->dlu_min_insn_length = *(uint8_t const *)reader; /* minimum_instruction_length */
+	reader += 1;
 	if unlikely(!result->dlu_min_insn_length)
 		result->dlu_min_insn_length = 1;
-	reader += 1;
+
 	result->dlu_max_ops_per_insn = 1;
-	if (version >= 4) {
-		result->dlu_max_ops_per_insn = *(uint8_t const *)reader;
+	if (result->dlu_version >= 4) {
+		result->dlu_max_ops_per_insn = *(uint8_t const *)reader; /* maximum_operations_per_instruction */
 		reader += 1;
 		if unlikely(!result->dlu_max_ops_per_insn)
 			result->dlu_max_ops_per_insn = 1;
 	}
-	result->dlu_default_isstmt = *(uint8_t const *)reader;
+	result->dlu_default_isstmt = *(uint8_t const *)reader; /* default_is_stmt */
 	reader += 1;
-	result->dlu_line_base = *(int8_t const *)reader;
+	result->dlu_line_base = *(int8_t const *)reader; /* line_base */
 	reader += 1;
-	result->dlu_line_range = *(uint8_t const *)reader;
+	result->dlu_line_range = *(uint8_t const *)reader; /* line_range */
 	reader += 1;
-	result->dlu_opcode_base = *(uint8_t const *)reader;
+	result->dlu_opcode_base = *(uint8_t const *)reader; /* opcode_base */
 	reader += 1;
-	result->dlu_opcode_lengths = reader;
+	result->dlu_opcode_lengths = reader; /* standard_opcode_lengths */
 	if unlikely(!result->dlu_line_range)
 		result->dlu_line_range = 1;
 	if (result->dlu_opcode_base)
 		reader += result->dlu_opcode_base - 1;
-	if unlikely(reader > cu_text)
+	if unlikely(reader >= cu_text)
 		goto err_corrupted; /* Illegal overflow */
-	result->dlu_pathtable = (char *)reader;
-	result->dlu_pathcount = 0;
-	for (;;) {
-		if (!*(char *)reader) {
-			++reader;
-			break;
+	if (result->dlu_version >= 5) {
+		uint8_t count;
+
+		/* Directory format table. */
+		result->dlu_pathfmt = (di_debugline_fileinfo_format_t const *)reader;
+		count = *(uint8_t const *)reader; /* directory_entry_format_count */
+		reader += 1;
+		for (; count; --count) {
+			dwarf_decode_uleb128(&reader); /* directory_entry_format.type */
+			dwarf_decode_uleb128(&reader); /* directory_entry_format.form */
 		}
-		if unlikely(reader >= cu_text) {
-			reader = cu_text;
-			break;
+
+		/* Directory table. */
+		result->dlu_pathcount = dwarf_decode_uleb128(&reader); /* directories_count */
+		result->dlu_pathdata  = reader;                        /* directories */
+
+		/* Skip `directories' table */
+		{
+			size_t i;
+			di_debuginfo_cu_simple_parser_t parser;
+			parser.dsp_cu_info_end = cu_text;
+			parser.dsp_cu_info_pos = reader;
+			parser.dsp_ptrsize     = result->dlu_ptrsize;
+			parser.dsp_addrsize    = result->dlu_addrsize;
+			parser.dsp_version     = result->dlu_version;
+			for (i = 0; i < result->dlu_pathcount; ++i) {
+				byte_t const *format_reader = (byte_t const *)result->dlu_pathfmt;
+				uint8_t format_count = *(uint8_t const *)format_reader;
+				format_reader += 1;
+				for (; format_count; --format_count) {
+					dwarf_uleb128_t form;
+					if unlikely(parser.dsp_cu_info_pos >= parser.dsp_cu_info_end)
+						ERROR(err_corrupted);
+					dwarf_decode_uleb128(&format_reader);        /* directory_entry_format.type */
+					form = dwarf_decode_uleb128(&format_reader); /* directory_entry_format.form */
+					libdi_debuginfo_cu_parser_skipform(&parser, form);
+				}
+			}
+			reader = parser.dsp_cu_info_pos;
 		}
-		reader = (byte_t *)(strend((char *)reader) + 1);
-		++result->dlu_pathcount;
+
+		/* File format table. */
+		result->dlu_filefmt = (di_debugline_fileinfo_format_t const *)reader;
+		count = *(uint8_t const *)reader; /* file_name_entry_format_count */
+		reader += 1;
+		for (; count; --count) {
+			dwarf_decode_uleb128(&reader); /* file_name_entry_format.type */
+			dwarf_decode_uleb128(&reader); /* file_name_entry_format.form */
+		}
+
+		/* File table. */
+		dwarf_decode_uleb128(&reader); /* file_names_count */
+		result->dlu_filedata = reader; /* file_names */
+	} else {
+		result->dlu_pathfmt   = (di_debugline_fileinfo_format_t const *)dwarf4_lne_pathfmt;
+		result->dlu_filefmt   = (di_debugline_fileinfo_format_t const *)dwarf4_lne_filefmt;
+		/* Scan path table. */
+		result->dlu_pathdata  = reader;
+		result->dlu_pathcount = 0;
+		for (;;) {
+			if (!*(char *)reader) {
+				++reader;
+				break;
+			}
+			if unlikely(reader >= cu_text) {
+				reader = cu_text;
+				break;
+			}
+			reader = (byte_t *)(strend((char *)reader) + 1);
+			++result->dlu_pathcount;
+		}
+		result->dlu_filedata = reader;
 	}
-	result->dlu_filetable = (di_debugline_fileent_t *)reader;
-	*preader              = next_cu;
+	*preader = next_cu;
 	return DEBUG_INFO_ERROR_SUCCESS;
 section_eof:
 	return DEBUG_INFO_ERROR_NOFRAME;

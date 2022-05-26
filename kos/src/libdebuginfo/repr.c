@@ -844,44 +844,49 @@ libdl_debug_repr_cfi_expression(pformatprinter printer, void *arg,
 
 /* Dump the given debug information in a human-readable format to `printer':
  * >> void *dump_module = dlgetmodule("libc");
- * >> size_t debug_info_size, debug_abbrev_size, debug_str_size, debug_loc_size;
- * >> byte_t const *debug_info_data, *debug_abbrev_data, *debug_str_data, *debug_loc_data;
+ * >> size_t debug_info_size, debug_abbrev_size, debug_str_size, debug_line_str_size, debug_loc_size;
+ * >> byte_t const *debug_info_data, *debug_abbrev_data, *debug_str_data, *debug_line_str_data, *debug_loc_data;
  * >> PDEBUG_REPR_DUMP debug_repr_dump;
  * >> *(void **)&debug_repr_dump = dlsym(dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL), "debug_repr_dump");
- * >> debug_info_data   = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_info"), &debug_info_size);
- * >> debug_abbrev_data = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_abbrev"), &debug_abbrev_size);
- * >> debug_str_data    = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_str"), &debug_str_size);
- * >> debug_loc_data    = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_loc"), &debug_loc_size);
+ * >> debug_info_data     = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_info"), &debug_info_size);
+ * >> debug_abbrev_data   = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_abbrev"), &debug_abbrev_size);
+ * >> debug_str_data      = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_str"), &debug_str_size);
+ * >> debug_line_str_data = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_line_str"), &debug_line_str_size);
+ * >> debug_loc_data      = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_loc"), &debug_loc_size);
  * >> debug_repr_dump(&file_printer, stdout,
  * >>                 debug_info_data, debug_info_data + debug_info_size,
  * >>                 debug_abbrev_data, debug_abbrev_data + debug_abbrev_size,
  * >>                 debug_loc_data, debug_loc_data + debug_loc_size,
- * >>                 debug_str_data, debug_str_data + debug_str_size); */
+ * >>                 debug_str_data, debug_str_data + debug_str_size,
+ * >>                 debug_line_str_data, debug_line_str_data + debug_line_str_size); */
 INTERN REPR_TEXTSECTION NONNULL((1)) ssize_t CC
 libdi_debug_repr_dump(pformatprinter printer, void *arg,
                       byte_t const *debug_info_start, byte_t const *debug_info_end,
                       byte_t const *debug_abbrev_start, byte_t const *debug_abbrev_end,
                       byte_t const *debug_loc_start, byte_t const *debug_loc_end,
-                      byte_t const *debug_str_start, byte_t const *debug_str_end) {
+                      byte_t const *debug_str_start, byte_t const *debug_str_end,
+                      byte_t const *debug_line_str_start, byte_t const *debug_line_str_end) {
 	ssize_t temp, result = 0;
 	char const *s;
 	byte_t const *debug_info_iter;
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_cu_abbrev_t abbrev;
 	di_debuginfo_cu_parser_sections_t cu_sections;
-	debug_info_iter                    = debug_info_start;
-	cu_sections.cps_debug_abbrev_start = debug_abbrev_start;
-	cu_sections.cps_debug_abbrev_end   = debug_abbrev_end;
-	cu_sections.cps_debug_loc_start    = debug_loc_start;
-	cu_sections.cps_debug_loc_end      = debug_loc_end;
-	cu_sections.cps_debug_str_start    = debug_str_start;
-	cu_sections.cps_debug_str_end      = debug_str_end;
+	debug_info_iter                      = debug_info_start;
+	cu_sections.cps_debug_abbrev_start   = debug_abbrev_start;
+	cu_sections.cps_debug_abbrev_end     = debug_abbrev_end;
+	cu_sections.cps_debug_loc_start      = debug_loc_start;
+	cu_sections.cps_debug_loc_end        = debug_loc_end;
+	cu_sections.cps_debug_str_start      = debug_str_start;
+	cu_sections.cps_debug_str_end        = debug_str_end;
+	cu_sections.cps_debug_line_str_start = debug_line_str_start;
+	cu_sections.cps_debug_line_str_end   = debug_line_str_end;
 	while (libdi_debuginfo_cu_parser_loadunit(&debug_info_iter, debug_info_end,
 	                                          &cu_sections, &parser,
 	                                          &abbrev, NULL) == DEBUG_INFO_ERROR_SUCCESS) {
 		do {
 			DO(format_repeat(printer, arg, '\t', parser.dup_child_depth));
-			PRINTF("%#p:", parser.dup_cu_info_pos - debug_info_start);
+			PRINTF("%#p:", parser.dsp_cu_info_pos - debug_info_start);
 			s = libdi_debug_repr_DW_TAG(parser.dup_comp.dic_tag);
 			DO(s ? format_printf(printer, arg, REPR_STRING("DW_TAG_%s:\n"), s)
 			     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR ":\n"), (uintptr_t)parser.dup_comp.dic_tag));
@@ -948,11 +953,11 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 					if (!libdi_debuginfo_cu_parser_getref(&parser, attr.dica_form, &value))
 						goto err_bad_value;
 					p2                 = parser;
-					p2.dup_cu_info_pos = value;
+					p2.dsp_cu_info_pos = value;
 					if unlikely(!libdi_debuginfo_cu_parser_next(&p2)) {
 						PRINT("<BAD REFERENCE>");
 					} else {
-						PRINTF("%#p:", p2.dup_cu_info_pos - debug_info_start);
+						PRINTF("%#p:", p2.dsp_cu_info_pos - debug_info_start);
 						s = libdi_debug_repr_DW_TAG(p2.dup_comp.dic_tag);
 						DO(s ? format_printf(printer, arg, REPR_STRING("DW_TAG_%s"), s)
 						     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR),
@@ -1022,8 +1027,8 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 					if (value.l_expr) {
 						DO(libdl_debug_repr_cfi_expression(printer, arg, value.l_expr,
 						                                   parser.dup_child_depth + 1,
-						                                   parser.dup_addrsize,
-						                                   parser.dup_ptrsize));
+						                                   parser.dsp_addrsize,
+						                                   parser.dsp_ptrsize));
 					} else {
 						uintptr_t cu_base;
 						size_t indent;
@@ -1034,28 +1039,28 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 						for (;;) {
 							uint16_t length;
 							uintptr_t range_start, range_end;
-							if (parser.dup_addrsize >= sizeof(uintptr_t)) {
+							if (parser.dsp_addrsize >= sizeof(uintptr_t)) {
 								range_start = UNALIGNED_GET((uintptr_t const *)value.l_llist);
-								value.l_llist += parser.dup_addrsize;
+								value.l_llist += parser.dsp_addrsize;
 								range_end = UNALIGNED_GET((uintptr_t const *)value.l_llist);
-								value.l_llist += parser.dup_addrsize;
+								value.l_llist += parser.dsp_addrsize;
 #if __SIZEOF_POINTER__ > 4
-							} else if (parser.dup_addrsize >= 4) {
+							} else if (parser.dsp_addrsize >= 4) {
 								range_start = UNALIGNED_GET32((uint32_t const *)value.l_llist);
-								value.l_llist += parser.dup_addrsize;
+								value.l_llist += parser.dsp_addrsize;
 								range_end = UNALIGNED_GET32((uint32_t const *)value.l_llist);
-								value.l_llist += parser.dup_addrsize;
+								value.l_llist += parser.dsp_addrsize;
 #endif /* __SIZEOF_POINTER__ > 4 */
-							} else if (parser.dup_addrsize >= 2) {
+							} else if (parser.dsp_addrsize >= 2) {
 								range_start = UNALIGNED_GET16((uint16_t const *)value.l_llist);
-								value.l_llist += parser.dup_addrsize;
+								value.l_llist += parser.dsp_addrsize;
 								range_end = UNALIGNED_GET16((uint16_t const *)value.l_llist);
-								value.l_llist += parser.dup_addrsize;
+								value.l_llist += parser.dsp_addrsize;
 							} else {
 								range_start = *(uint8_t const *)value.l_llist;
-								value.l_llist += parser.dup_addrsize;
+								value.l_llist += parser.dsp_addrsize;
 								range_end = *(uint8_t const *)value.l_llist;
-								value.l_llist += parser.dup_addrsize;
+								value.l_llist += parser.dsp_addrsize;
 							}
 							length = UNALIGNED_GET16((uint16_t const *)value.l_llist);
 							value.l_llist += 2;
@@ -1075,8 +1080,8 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 								PRINTF("%#" PRIxPTR "-%#" PRIxPTR ": ", range_start, range_end);
 								DO(libdl_debug_repr_cfi_expression_with_length(printer, arg, value.l_llist,
 								                                               length, indent,
-								                                               parser.dup_addrsize,
-								                                               parser.dup_ptrsize));
+								                                               parser.dsp_addrsize,
+								                                               parser.dsp_ptrsize));
 							}
 							value.l_llist += length;
 						}

@@ -289,13 +289,14 @@ BEGIN
 		options[DILINK_START]     = "__kernel_debug_start";
 		options[DILINK_SIZE]      = "__kernel_debug_size";
 		options[DILINK_BINDINGS]  = {
-			(".debug_line",    "__kernel_debug_line_start",    "__kernel_debug_line_size"),
-			(".debug_info",    "__kernel_debug_info_start",    "__kernel_debug_info_size"),
-			(".debug_aranges", "__kernel_debug_aranges_start", "__kernel_debug_aranges_size"),
-			(".debug_abbrev",  "__kernel_debug_abbrev_start",  "__kernel_debug_abbrev_size"),
-			(".debug_str",     "__kernel_debug_str_start",     "__kernel_debug_str_size"),
-			(".debug_ranges",  "__kernel_debug_ranges_start",  "__kernel_debug_ranges_size"),
-			(".debug_loc",     "__kernel_debug_loc_start",     "__kernel_debug_loc_size"),
+			(".debug_line",     "__kernel_debug_line_start",     "__kernel_debug_line_size"),
+			(".debug_info",     "__kernel_debug_info_start",     "__kernel_debug_info_size"),
+			(".debug_aranges",  "__kernel_debug_aranges_start",  "__kernel_debug_aranges_size"),
+			(".debug_abbrev",   "__kernel_debug_abbrev_start",   "__kernel_debug_abbrev_size"),
+			(".debug_str",      "__kernel_debug_str_start",      "__kernel_debug_str_size"),
+			(".debug_line_str", "__kernel_debug_line_str_start", "__kernel_debug_line_str_size"),
+			(".debug_ranges",   "__kernel_debug_ranges_start",   "__kernel_debug_ranges_size"),
+			(".debug_loc",      "__kernel_debug_loc_start",      "__kernel_debug_loc_size"),
 		};
 
 		LINKER_SCRIPT("arch/" + XARCH + "/_kernel.ld")

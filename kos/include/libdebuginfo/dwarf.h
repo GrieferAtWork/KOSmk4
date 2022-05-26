@@ -24,14 +24,28 @@
 
 /* NOTE: The DWARF implementation here is based on information gathered
  *       from  binutils,  but  mostly  from  the  online specifications
- *       "http://www.dwarfstd.org/doc/DWARF4.pdf", section 6.2
+ *  - "http://www.dwarfstd.org/doc/DWARF4.pdf", section 6.2
+ *  - "http://www.dwarfstd.org/doc/DWARF5.pdf", section 6.2
  *
  * SOURCES:
  *   - http://www.dwarfstd.org/doc/DWARF4.pdf
+ *   - http://www.dwarfstd.org/doc/DWARF5.pdf
  *   - http://www.dwarfstd.org/doc/dwarf-2.0.0.pdf
  *   - https://sourceware.org/elfutils/DwarfExtensions
  *
  */
+
+
+
+/* Possible values for `di_debugline_fileinfo_format_entry_t::' */
+#define DW_LNCT_path            0x1 /* DW_FORM_*: string */
+#define DW_LNCT_directory_index 0x2 /* DW_FORM_*: constant */
+#define DW_LNCT_timestamp       0x3 /* DW_FORM_*: constant, block */
+#define DW_LNCT_size            0x4 /* DW_FORM_*: constant */
+#define DW_LNCT_MD5             0x5 /* DW_FORM_*: constant (DW_FORM_data16) */
+#define DW_LNCT_lo_user         0x2000
+#define DW_LNCT_hi_user         0x3fff
+
 
 #define DW_LNS_extended_op        0
 #define DW_LNS_copy               1
@@ -543,21 +557,21 @@
 #define DW_FORM_sec_offset     0x17 /* lineptr, loclistptr, macptr, rangelistptr, addrptr, stroffsetsptr, rnglistsptr */
 #define DW_FORM_exprloc        0x18 /* exprloc */
 #define DW_FORM_flag_present   0x19 /* flag */
-#define DW_FORM_strx           0x1a /* ??? */
+#define DW_FORM_strx           0x1a /* string */
 #define DW_FORM_addrx          0x1b /* ??? */
 #define DW_FORM_ref_sup4       0x1c /* ??? */
-#define DW_FORM_strp_sup       0x1d /* ??? */
+#define DW_FORM_strp_sup       0x1d /* string */
 #define DW_FORM_data16         0x1e /* constant */
-#define DW_FORM_line_strp      0x1f /* ??? */
+#define DW_FORM_line_strp      0x1f /* string */
 #define DW_FORM_ref_sig8       0x20 /* reference */
 #define DW_FORM_implicit_const 0x21 /* ??? */
 #define DW_FORM_loclistx       0x22 /* ??? */
 #define DW_FORM_rnglistx       0x23 /* ??? */
 #define DW_FORM_ref_sup8       0x24 /* ??? */
-#define DW_FORM_strx1          0x25 /* ??? */
-#define DW_FORM_strx2          0x26 /* ??? */
-#define DW_FORM_strx3          0x27 /* ??? */
-#define DW_FORM_strx4          0x28 /* ??? */
+#define DW_FORM_strx1          0x25 /* string */
+#define DW_FORM_strx2          0x26 /* string */
+#define DW_FORM_strx3          0x27 /* string */
+#define DW_FORM_strx4          0x28 /* string */
 #define DW_FORM_addrx1         0x29 /* ??? */
 #define DW_FORM_addrx2         0x2a /* ??? */
 #define DW_FORM_addrx3         0x2b /* ??? */
@@ -613,6 +627,62 @@
 #define DW_ATE_HP_VAX_complex_float   0x8f /* ??? */
 #define DW_ATE_HP_VAX_complex_float_d 0x90 /* ??? */
 #define DW_ATE_hi_user                0xff
+
+
+/* Possible values for `unit_type' in `.debug_info' */
+#define DW_UT_compile       0x01
+#define DW_UT_type          0x02
+#define DW_UT_partial       0x03
+#define DW_UT_skeleton      0x04
+#define DW_UT_split_compile 0x05
+#define DW_UT_split_type    0x06
+#define DW_UT_lo_user       0x80
+#define DW_UT_hi_user       0xff
+
+
+#ifdef __CC__
+#include "api.h"
+
+#include <hybrid/int128.h>
+
+#include <bits/types.h>
+
+__DECL_BEGIN
+
+/* Similar to the functions from `libunwind(3)', but these decode into a 64-bit integer! */
+typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((1, 2)) __byte_t const *
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDWARF_DECODE_SLEB128_64)(__byte_t const *__restrict reader,
+                                                           __int64_t *__restrict p_result);
+typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((1, 2)) __byte_t const *
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDWARF_DECODE_ULEB128_64)(__byte_t const **__restrict preader,
+                                                           __uint64_t *__restrict p_result);
+#ifdef LIBDEBUGINFO_WANT_PROTOTYPES
+LIBDEBUGINFO_DECL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __byte_t const *
+__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_sleb128_64)(__byte_t const *__restrict reader,
+                                                       __int64_t *__restrict p_result);
+LIBDEBUGINFO_DECL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __byte_t const *
+__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_uleb128_64)(__byte_t const *__restrict reader,
+                                                       __uint64_t *__restrict p_result);
+#endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
+
+/* Similar to the functions from `libunwind(3)', but these actually decode into a 128-bit integer! */
+typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((1, 2)) __byte_t const *
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDWARF_DECODE_SLEB128_128)(__byte_t const *__restrict reader,
+                                                            __hybrid_int128_t *__restrict p_result);
+typedef __ATTR_RETNONNULL_T __ATTR_NONNULL_T((1, 2)) __byte_t const *
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDWARF_DECODE_ULEB128_128)(__byte_t const **__restrict preader,
+                                                            __hybrid_uint128_t *__restrict p_result);
+#ifdef LIBDEBUGINFO_WANT_PROTOTYPES
+LIBDEBUGINFO_DECL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __byte_t const *
+__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_sleb128_128)(__byte_t const *__restrict reader,
+                                                        __hybrid_int128_t *__restrict p_result);
+LIBDEBUGINFO_DECL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __byte_t const *
+__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_uleb128_128)(__byte_t const *__restrict reader,
+                                                        __hybrid_uint128_t *__restrict p_result);
+#endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
+
+__DECL_END
+#endif /* __CC__ */
 
 
 #endif /* !_LIBDEBUGINFO_DWARF_H */

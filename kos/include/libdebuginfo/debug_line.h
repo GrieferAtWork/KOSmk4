@@ -37,43 +37,62 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-typedef struct {
-	char            fe_name[1024]; /* Filename (NUL-terminated) */
-	dwarf_uleb128_t fe_path;       /* File path index. */
-	dwarf_uleb128_t fe_b;          /* timestamp... */
-	dwarf_uleb128_t fe_c;          /* timestamp... */
-} di_debugline_fileent_t;
+/* Representation of `directory_entry_format' and `file_name_entry_format' */
+typedef struct __ATTR_PACKED {
+	dwarf_uleb128_t dlffe_type; /* One of `DW_LNCT_*' */
+	dwarf_uleb128_t dlffe_form; /* One of `DW_FORM_*' */
+} di_debugline_fileinfo_format_entry_t;
+
+typedef struct __ATTR_PACKED {
+	__uint8_t                                                     dlff_count;    /* directory_entry_format_count, file_name_entry_format_count */
+	COMPILER_FLEXIBLE_ARRAY(di_debugline_fileinfo_format_entry_t, dlff_entries); /* directory_entry_format, file_name_entry_format */
+} di_debugline_fileinfo_format_t;
 
 typedef struct {
 	/* Compilation unit descriptor, as decoded from `.debug_line' */
-	__byte_t const               *dlu_headerbase;       /* [1..1] Base address of the CU header. */
-	__byte_t const               *dlu_textbase;         /* [1..1] Base address of the CU resolver text. */
-	__byte_t const               *dlu_cuend;            /* [1..1] End address of the CU segment. */
-	char const                   *dlu_pathtable;        /* [1..1] Table to path names (e.g. "include/headers\0source/files\0\0") */
-	__size_t                      dlu_pathcount;        /* Number of path strings located in `dlu_pathtable' */
-	di_debugline_fileent_t const *dlu_filetable;        /* [1..1] Table to file names */
-	__uint16_t                    dlu_version;          /* Used during decoding... */
-	__uint8_t                     dlu_min_insn_length;  /* Used during decoding... */
-	__uint8_t                     dlu_max_ops_per_insn; /* Used during decoding... */
-	__uint8_t                     dlu_default_isstmt;   /* Used during decoding... */
-	__int8_t                      dlu_line_base;        /* Used during decoding... */
-	__uint8_t                     dlu_line_range;       /* Used during decoding... */
-	__uint8_t                     dlu_opcode_base;      /* Used during decoding... */
-	__uint8_t const              *dlu_opcode_lengths;   /* Used during decoding... */
+	__byte_t const                       *dlu_headerbase;       /* [1..1] Base address of the CU header. */
+	__byte_t const                       *dlu_textbase;         /* [1..1] Base address of the CU resolver text. */
+	__byte_t const                       *dlu_cuend;            /* [1..1] End address of the CU segment. */
+	di_debugline_fileinfo_format_t const *dlu_pathfmt;          /* [1..1] Format of path names. */
+	__size_t                              dlu_pathcount;        /* # of path-strings in `dlu_pathdata' */
+	__byte_t const                       *dlu_pathdata;         /* [0..dlu_pathcount] Path data (array of `dlu_pathfmt') */
+	di_debugline_fileinfo_format_t const *dlu_filefmt;          /* [1..1] Format of file names. */
+	__byte_t const                       *dlu_filedata;         /* [0..dlu_filecount] Path data (array of `dlu_filefmt') */
+	__uint16_t                            dlu_version;          /* Used during decoding... */
+	__uint8_t                             dlu_min_insn_length;  /* Used during decoding... */
+	__uint8_t                             dlu_max_ops_per_insn; /* Used during decoding... */
+	__uint8_t                             dlu_default_isstmt;   /* Used during decoding... */
+	__int8_t                              dlu_line_base;        /* Used during decoding... */
+	__uint8_t                             dlu_line_range;       /* Used during decoding... */
+	__uint8_t                             dlu_opcode_base;      /* Used during decoding... */
+	__uint8_t const                      *dlu_opcode_lengths;   /* Used during decoding... */
+	__uint8_t                             dlu_ptrsize;          /* Pointer size (4 in 32-bit DWARF; 8 in 64-bit DWARF). */
+	__uint8_t                             dlu_addrsize;         /* Address size */
 } di_debugline_unit_t;
+
+
+typedef struct {
+	char const *dlfi_path; /* [0..1] File path */
+	char const *dlfi_file; /* [0..1] File name */
+} di_debugline_fileinfo_t;
+
+#define di_debug_addr2line_srcas_debugline_fileinfo(x) \
+	((di_debugline_fileinfo_t *)&(x)->al_srcpath)
+#define di_debug_addr2line_dclas_debugline_fileinfo(x) \
+	((di_debugline_fileinfo_t *)&(x)->al_dclpath)
+
+struct di_string_sections_struct;
 
 /* Decode a given file index into its filename and pathname components. */
 typedef __ATTR_NONNULL_T((1, 3, 4)) void
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGLINE_LOADFILE)(di_debugline_unit_t *__restrict self,
-                                                      dwarf_uleb128_t index,
-                                                      char const **__restrict ppathname,
-                                                      char const **__restrict pfilename);
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGLINE_LOADFILE)(di_debugline_unit_t const *__restrict self, dwarf_uleb128_t index,
+                                                      di_debugline_fileinfo_t *__restrict result,
+                                                      struct di_string_sections_struct const *__restrict sections);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3, 4)) void
-__NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadfile)(di_debugline_unit_t *__restrict self,
-                                                  dwarf_uleb128_t index,
-                                                  char const **__restrict ppathname,
-                                                  char const **__restrict pfilename);
+__NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadfile)(di_debugline_unit_t const *__restrict self, dwarf_uleb128_t index,
+                                                  di_debugline_fileinfo_t *__restrict result,
+                                                  struct di_string_sections_struct const *__restrict sections);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 
