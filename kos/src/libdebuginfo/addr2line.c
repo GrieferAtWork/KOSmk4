@@ -621,6 +621,8 @@ err_nodata:
 		bool has_corruptions;
 		cu_sections.cps_debug_abbrev_start   = sections->ds_debug_abbrev_start;
 		cu_sections.cps_debug_abbrev_end     = sections->ds_debug_abbrev_end;
+		cu_sections.cps_debug_info_start     = sections->ds_debug_info_start;
+		cu_sections.cps_debug_info_end       = sections->ds_debug_info_end;
 		cu_sections.cps_debug_loc_start      = NULL;
 		cu_sections.cps_debug_loc_end        = NULL;
 		cu_sections.cps_debug_str_start      = sections->ds_debug_str_start;

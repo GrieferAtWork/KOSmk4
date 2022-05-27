@@ -875,6 +875,8 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 	debug_info_iter                      = debug_info_start;
 	cu_sections.cps_debug_abbrev_start   = debug_abbrev_start;
 	cu_sections.cps_debug_abbrev_end     = debug_abbrev_end;
+	cu_sections.cps_debug_info_start     = debug_info_start;
+	cu_sections.cps_debug_info_end       = debug_info_end;
 	cu_sections.cps_debug_loc_start      = debug_loc_start;
 	cu_sections.cps_debug_loc_end        = debug_loc_end;
 	cu_sections.cps_debug_str_start      = debug_str_start;

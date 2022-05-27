@@ -47,6 +47,7 @@
 #define DW_LNCT_hi_user         0x3fff
 
 
+/* Line number program opcodes (simple) */
 #define DW_LNS_extended_op        0
 #define DW_LNS_copy               1
 #define DW_LNS_advance_pc         2
@@ -61,6 +62,7 @@
 #define DW_LNS_set_epilogue_begin 11
 #define DW_LNS_set_isa            12
 
+/* Line number program opcodes (extended) */
 /*      DW_LNE_                            0x00 */
 #define DW_LNE_end_sequence                0x01
 #define DW_LNE_set_address                 0x02
@@ -481,6 +483,7 @@
 #define DW_AT_APPLE_property                 0x3fed /* ??? */
 
 
+/* DWARF source language codes. */
 /*      DW_LANG_                0x0000 */
 #define DW_LANG_C89             0x0001
 #define DW_LANG_C               0x0002
@@ -531,59 +534,60 @@
 #define DW_LANG_Upc             0x8765
 
 
+/* DWARF attribute formats. */
 /*      DW_FORM_               0x00  * ... */
-#define DW_FORM_addr           0x01 /* address */
+#define DW_FORM_addr           0x01 /* [+dsp_addrsize] address */
 /*      DW_FORM_               0x02  * ... */
-#define DW_FORM_block2         0x03 /* block */
-#define DW_FORM_block4         0x04 /* block */
-#define DW_FORM_data2          0x05 /* constant */
-#define DW_FORM_data4          0x06 /* constant */
-#define DW_FORM_data8          0x07 /* constant */
-#define DW_FORM_string         0x08 /* string */
-#define DW_FORM_block          0x09 /* block */
-#define DW_FORM_block1         0x0a /* block */
-#define DW_FORM_data1          0x0b /* constant */
-#define DW_FORM_flag           0x0c /* flag */
-#define DW_FORM_sdata          0x0d /* constant */
-#define DW_FORM_strp           0x0e /* string */
-#define DW_FORM_udata          0x0f /* constant */
-#define DW_FORM_ref_addr       0x10 /* reference */
-#define DW_FORM_ref1           0x11 /* reference */
-#define DW_FORM_ref2           0x12 /* reference */
-#define DW_FORM_ref4           0x13 /* reference */
-#define DW_FORM_ref8           0x14 /* reference */
-#define DW_FORM_ref_udata      0x15 /* reference */
-#define DW_FORM_indirect       0x16 /* (see section 7.5.3) */
-#define DW_FORM_sec_offset     0x17 /* lineptr, loclistptr, macptr, rangelistptr, addrptr, stroffsetsptr, rnglistsptr */
-#define DW_FORM_exprloc        0x18 /* exprloc */
-#define DW_FORM_flag_present   0x19 /* flag */
-#define DW_FORM_strx           0x1a /* string */
-#define DW_FORM_addrx          0x1b /* ??? */
-#define DW_FORM_ref_sup4       0x1c /* ??? */
-#define DW_FORM_strp_sup       0x1d /* string */
-#define DW_FORM_data16         0x1e /* constant */
-#define DW_FORM_line_strp      0x1f /* string */
-#define DW_FORM_ref_sig8       0x20 /* reference */
-#define DW_FORM_implicit_const 0x21 /* ??? */
-#define DW_FORM_loclistx       0x22 /* ??? */
-#define DW_FORM_rnglistx       0x23 /* ??? */
-#define DW_FORM_ref_sup8       0x24 /* ??? */
-#define DW_FORM_strx1          0x25 /* string */
-#define DW_FORM_strx2          0x26 /* string */
-#define DW_FORM_strx3          0x27 /* string */
-#define DW_FORM_strx4          0x28 /* string */
-#define DW_FORM_addrx1         0x29 /* ??? */
-#define DW_FORM_addrx2         0x2a /* ??? */
-#define DW_FORM_addrx3         0x2b /* ??? */
-#define DW_FORM_addrx4         0x2c /* ??? */
+#define DW_FORM_block2         0x03 /* [+2+*(u16*)] block */
+#define DW_FORM_block4         0x04 /* [+4+*(u32*)] block */
+#define DW_FORM_data2          0x05 /* [+2] constant */
+#define DW_FORM_data4          0x06 /* [+4] constant */
+#define DW_FORM_data8          0x07 /* [+8] constant */
+#define DW_FORM_string         0x08 /* [+strlen(.)+1] string */
+#define DW_FORM_block          0x09 /* [+uleb128+*(uleb128*)] block */
+#define DW_FORM_block1         0x0a /* [+1+*(u8*)] block */
+#define DW_FORM_data1          0x0b /* [+1] constant */
+#define DW_FORM_flag           0x0c /* [+1] flag */
+#define DW_FORM_sdata          0x0d /* [+sleb128] constant */
+#define DW_FORM_strp           0x0e /* [+dsp_ptrsize] string */
+#define DW_FORM_udata          0x0f /* [+uleb128] constant */
+#define DW_FORM_ref_addr       0x10 /* [+dsp_ptrsize] reference */
+#define DW_FORM_ref1           0x11 /* [+1] reference */
+#define DW_FORM_ref2           0x12 /* [+2] reference */
+#define DW_FORM_ref4           0x13 /* [+4] reference */
+#define DW_FORM_ref8           0x14 /* [+8] reference */
+#define DW_FORM_ref_udata      0x15 /* [+uleb128] reference */
+#define DW_FORM_indirect       0x16 /* [+1+...] (see section 7.5.3) */
+#define DW_FORM_sec_offset     0x17 /* [+dsp_ptrsize] lineptr, loclist, loclistsptr, rnglist, rnglistsptr, macptr, addrptr, stroffsetsptr */
+#define DW_FORM_exprloc        0x18 /* [+uleb128+*(uleb128*)] exprloc */
+#define DW_FORM_flag_present   0x19 /* [+0] flag */
+#define DW_FORM_strx           0x1a /* [+uleb128] string */
+#define DW_FORM_addrx          0x1b /* [+uleb128] address */
+#define DW_FORM_ref_sup4       0x1c /* [+4] reference */
+#define DW_FORM_strp_sup       0x1d /* [+dsp_ptrsize] string */
+#define DW_FORM_data16         0x1e /* [+16] constant */
+#define DW_FORM_line_strp      0x1f /* [+dsp_ptrsize] string */
+#define DW_FORM_ref_sig8       0x20 /* [+8] reference */
+#define DW_FORM_implicit_const 0x21 /* [+0] constant (NOTE: Constant is read as `sleb128' from attr-reader (iow: the one you read `uleb128 -> DW_FORM_implicit_const' from)) */
+#define DW_FORM_loclistx       0x22 /* [+uleb128] loclist */
+#define DW_FORM_rnglistx       0x23 /* [+uleb128] rnglist */
+#define DW_FORM_ref_sup8       0x24 /* [+8] reference */
+#define DW_FORM_strx1          0x25 /* [+1] string */
+#define DW_FORM_strx2          0x26 /* [+2] string */
+#define DW_FORM_strx3          0x27 /* [+3] string */
+#define DW_FORM_strx4          0x28 /* [+4] string */
+#define DW_FORM_addrx1         0x29 /* [+1] address */
+#define DW_FORM_addrx2         0x2a /* [+2] address */
+#define DW_FORM_addrx3         0x2b /* [+3] address */
+#define DW_FORM_addrx4         0x2c /* [+4] address */
 /*      DW_FORM_               0x2d  * ... */
 /*      DW_FORM_               0x2e  * ... */
 /*      DW_FORM_               0x2f  * ... */
 /*      DW_FORM_               ....  * ... */
-#define DW_FORM_GNU_addr_index 0x1f01 /* ??? */
-#define DW_FORM_GNU_str_index  0x1f02 /* ??? */
-#define DW_FORM_GNU_ref_alt    0x1f20 /* ??? */
-#define DW_FORM_GNU_strp_alt   0x1f21 /* ??? */
+#define DW_FORM_GNU_addr_index 0x1f01 /* [+uleb128] (alias for `DW_FORM_addrx') */
+#define DW_FORM_GNU_str_index  0x1f02 /* [+uleb128] (alias for `DW_FORM_strx') */
+#define DW_FORM_GNU_ref_alt    0x1f20 /* [+dsp_ptrsize] (alias for `DW_FORM_ref_sup4' or `DW_FORM_ref_sup8') */
+#define DW_FORM_GNU_strp_alt   0x1f21 /* [+dsp_ptrsize] (alias for `DW_FORM_strp_sup') */
 
 
 /* NOTE: Taken form `http://www.dwarfstd.org/doc/DWARF4.pdf' (Figure 13. Encoding attribute values) */

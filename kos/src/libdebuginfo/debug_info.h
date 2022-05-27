@@ -135,11 +135,11 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_d
 
 /* Load the current debug information as an attribute encoded  as
  * `form' into a storage class matching the given result-operand.
- *  - debuginfo_cu_parser_getstring(): DW_FORM_strp, DW_FORM_string
- *  - debuginfo_cu_parser_getaddr():   DW_FORM_addr
+ *  - debuginfo_cu_parser_getstring(): DW_FORM_strp, DW_FORM_string, DW_FORM_line_strp, DW_FORM_strp_sup, DW_FORM_strx, DW_FORM_strx1, DW_FORM_strx2, DW_FORM_strx3, DW_FORM_strx4
+ *  - debuginfo_cu_parser_getaddr():   DW_FORM_addr, DW_FORM_addrx, DW_FORM_addrx1, DW_FORM_addrx2, DW_FORM_addrx3, DW_FORM_addrx4
  *  - debuginfo_cu_parser_getconst():  DW_FORM_data1, DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_sdata, DW_FORM_udata, DW_FORM_sec_offset, DW_FORM_implicit_const
  *  - debuginfo_cu_parser_getflag():   DW_FORM_flag, DW_FORM_flag_present
- *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata
+ *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata, DW_FORM_ref_sup4, DW_FORM_ref_sig8, DW_FORM_ref_sup8
  *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc
  *  - debuginfo_cu_parser_getblock():  DW_FORM_block, DW_FORM_block1, DW_FORM_block2, DW_FORM_block4 */
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, char const **__restrict presult);

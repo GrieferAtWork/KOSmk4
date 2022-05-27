@@ -311,6 +311,8 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 	di_reader = self->ue_sectinfo->ues_debug_info_start;
 	sect.cps_debug_abbrev_start   = self->ue_sectinfo->ues_debug_abbrev_start;
 	sect.cps_debug_abbrev_end     = self->ue_sectinfo->ues_debug_abbrev_end;
+	sect.cps_debug_info_start     = self->ue_sectinfo->ues_debug_info_start;
+	sect.cps_debug_info_end       = self->ue_sectinfo->ues_debug_info_end;
 	sect.cps_debug_str_start      = NULL;
 	sect.cps_debug_str_end        = NULL;
 	sect.cps_debug_line_str_start = NULL;

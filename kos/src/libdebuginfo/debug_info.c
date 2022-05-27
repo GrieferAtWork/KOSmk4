@@ -76,6 +76,13 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
+#if __SIZEOF_POINTER__ > 4
+#define addrsize_isvalid(v) ((v) == 1 || (v) == 2 || (v) == 4 || (v) == 8)
+#else /* __SIZEOF_POINTER__ > 4 */
+#define addrsize_isvalid(v) ((v) == 1 || (v) == 2 || (v) == 4)
+#endif /* __SIZEOF_POINTER__ <= 4 */
+
+
 
 /* Initialize an iterator for enumerating ranges stored within a given debug_info range selector.
  * >> uintptr_t start_pc, end_pc;
@@ -699,7 +706,7 @@ again:
 			/* 7.2.2 Initial Length Values
 			 * ...
 			 * values 0xfffffff0 through 0xffffffff are reserved by DWARF */
-			return DEBUG_INFO_ERROR_CORRUPT;
+			ERROR(err_corrupt);
 		}
 	}
 	if (OVERFLOW_UADD((uintptr_t)reader, temp, (uintptr_t *)&result->dsp_cu_info_end) ||
@@ -724,23 +731,13 @@ again:
 	if unlikely(OVERFLOW_UADD((uintptr_t)sectinfo->cps_debug_abbrev_start, temp,
 	                          (uintptr_t *)&abbrev->dua_abbrev) ||
 	            abbrev->dua_abbrev >= sectinfo->cps_debug_abbrev_end)
-		return DEBUG_INFO_ERROR_CORRUPT;
+		ERROR(err_corrupt);
 	if (result->dsp_version < 5) {
 		result->dsp_addrsize = *(uint8_t const *)reader; /* address_size */
 		reader += 1;
 	}
-#if __SIZEOF_POINTER__ > 4
-	if unlikely(result->dsp_addrsize != 1 &&
-	            result->dsp_addrsize != 2 &&
-	            result->dsp_addrsize != 4 &&
-	            result->dsp_addrsize != 8)
-		return DEBUG_INFO_ERROR_CORRUPT;
-#else /* __SIZEOF_POINTER__ > 4 */
-	if unlikely(result->dsp_addrsize != 1 &&
-	            result->dsp_addrsize != 2 &&
-	            result->dsp_addrsize != 4)
-		return DEBUG_INFO_ERROR_CORRUPT;
-#endif /* __SIZEOF_POINTER__ <= 4 */
+	if unlikely(!addrsize_isvalid(result->dsp_addrsize))
+		ERROR(err_corrupt);
 	switch (unit_type) {
 	case DW_UT_skeleton:
 	case DW_UT_split_compile:
@@ -777,6 +774,8 @@ again:
 	*pdebug_info_reader     = reader;
 	result->dup_child_depth = 0;
 	return DEBUG_INFO_ERROR_SUCCESS;
+err_corrupt:
+	return DEBUG_INFO_ERROR_CORRUPT;
 }
 
 
@@ -798,6 +797,8 @@ decode_form:
 	case DW_FORM_strp:
 	case DW_FORM_sec_offset:
 	case DW_FORM_strp_sup:
+	case DW_FORM_GNU_strp_alt:
+	case DW_FORM_GNU_ref_alt:
 	case DW_FORM_line_strp:
 		self->dsp_cu_info_pos += self->dsp_ptrsize;
 		break;
@@ -880,7 +881,9 @@ decode_form:
 	case DW_FORM_udata:
 	case DW_FORM_ref_udata:
 	case DW_FORM_strx:
+	case DW_FORM_GNU_str_index:
 	case DW_FORM_addrx:
+	case DW_FORM_GNU_addr_index:
 	case DW_FORM_loclistx:
 	case DW_FORM_rnglistx:
 		dwarf_decode_uleb128((byte_t const **)&self->dsp_cu_info_pos);
@@ -893,12 +896,6 @@ decode_form:
 		                        1;
 		break;
 
-	case DW_FORM_indirect:
-		if unlikely(self->dsp_cu_info_pos >= self->dsp_cu_info_end)
-			break;
-		form = dwarf_decode_uleb128((byte_t const **)&self->dsp_cu_info_pos);
-		goto decode_form;
-
 	case DW_FORM_flag_present:
 		break;
 
@@ -906,6 +903,12 @@ decode_form:
 		/* Special case: constant is read from the attribute stream as an SLEB128! */
 		dwarf_decode_sleb128(p_attr_reader);
 		break;
+
+	case DW_FORM_indirect:
+		if unlikely(self->dsp_cu_info_pos >= self->dsp_cu_info_end)
+			break;
+		form = dwarf_decode_uleb128((byte_t const **)&self->dsp_cu_info_pos);
+		goto decode_form;
 
 	default: break;
 	}
@@ -1016,11 +1019,11 @@ INTERN_CONST STRINGSECTION char const unknown_string[] = "??" "?";
 
 /* Load the current debug information as an attribute encoded  as
  * `form' into a storage class matching the given result-operand.
- *  - debuginfo_cu_parser_getstring(): DW_FORM_strp, DW_FORM_string
- *  - debuginfo_cu_parser_getaddr():   DW_FORM_addr
+ *  - debuginfo_cu_parser_getstring(): DW_FORM_strp, DW_FORM_string, DW_FORM_line_strp, DW_FORM_strp_sup, DW_FORM_strx, DW_FORM_strx1, DW_FORM_strx2, DW_FORM_strx3, DW_FORM_strx4
+ *  - debuginfo_cu_parser_getaddr():   DW_FORM_addr, DW_FORM_addrx, DW_FORM_addrx1, DW_FORM_addrx2, DW_FORM_addrx3, DW_FORM_addrx4
  *  - debuginfo_cu_parser_getconst():  DW_FORM_data1, DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_sdata, DW_FORM_udata, DW_FORM_sec_offset, DW_FORM_implicit_const
  *  - debuginfo_cu_parser_getflag():   DW_FORM_flag, DW_FORM_flag_present
- *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata
+ *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata, DW_FORM_ref_sup4, DW_FORM_ref_sig8, DW_FORM_ref_sup8
  *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc
  *  - debuginfo_cu_parser_getblock():  DW_FORM_block, DW_FORM_block1, DW_FORM_block2, DW_FORM_block4 */
 INTERN TEXTSECTION NONNULL((1, 3)) bool
@@ -1099,12 +1102,14 @@ decode_form:
 		*presult = (char const *)reader;
 		return true;
 
-	// XXX: #define DW_FORM_strx           0x1a /* string */
-	// XXX: #define DW_FORM_strp_sup       0x1d /* string */
-	// XXX: #define DW_FORM_strx1          0x25 /* string */
-	// XXX: #define DW_FORM_strx2          0x26 /* string */
-	// XXX: #define DW_FORM_strx3          0x27 /* string */
-	// XXX: #define DW_FORM_strx4          0x28 /* string */
+	// TODO: case DW_FORM_strx:
+	// TODO: case DW_FORM_GNU_str_index:
+	// TODO: case DW_FORM_strp_sup:
+	// TODO: case DW_FORM_GNU_strp_alt:
+	// TODO: case DW_FORM_strx1:
+	// TODO: case DW_FORM_strx2:
+	// TODO: case DW_FORM_strx3:
+	// TODO: case DW_FORM_strx4:
 
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dsp_cu_info_end)
@@ -1151,6 +1156,13 @@ decode_form:
 			__builtin_unreachable();
 		}
 		return true;
+
+	// TODO: case DW_FORM_addrx:
+	// TODO: case DW_FORM_GNU_addr_index:
+	// TODO: case DW_FORM_addrx1:
+	// TODO: case DW_FORM_addrx2:
+	// TODO: case DW_FORM_addrx3:
+	// TODO: case DW_FORM_addrx4:
 
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dsp_cu_info_end)
@@ -1414,6 +1426,84 @@ decode_form:
 	return false;
 }
 
+
+/* Given the bounds of a .debug_info section, find a DWARF-5 type-unit
+ * that matches the given `signature' and return a pointer to its type
+ * info.
+ * @return: * : Pointer into `.debug_info' (WARNING: probably not part of caller's CU)
+ * @return: NULL: Type information not found. */
+PRIVATE WUNUSED NONNULL((1, 2)) byte_t const *
+NOTHROW_NCX(CC find_typeunit_by_signature)(byte_t const *reader,
+                                           byte_t const *end,
+                                           uint64_t signature) {
+	while ((reader + 8) < end) {
+		uintptr_t length;
+		uint8_t ptrsize, unit_type;
+		uint16_t version;
+		byte_t const *nextptr, *header;
+		uint64_t type_signature;
+
+		/* 7.5.1.1   Compilation Unit Header */
+		header = reader;
+		length = UNALIGNED_GET32((uint32_t const *)reader);
+		reader += 4;
+		ptrsize = 4;
+		if (length >= UINT32_C(0xfffffff0)) {
+			if (length == UINT32_C(0xffffffff)) {
+				/* 7.4 32-Bit and 64-Bit DWARF Formats
+				 * In the 64-bit DWARF format, an initial length field is 96 bits in size, and has two parts:
+				 *  - The first 32-bits have the value 0xffffffff.
+				 *  - The following 64-bits contain the actual length represented as an unsigned 64-bit integer. */
+				length = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
+				reader += 8;
+				ptrsize = 8;
+			} else {
+				/* 7.2.2 Initial Length Values
+				 * ...
+				 * values 0xfffffff0 through 0xffffffff are reserved by DWARF */
+				ERROR(err_corrupt);
+			}
+		}
+		if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&nextptr) || nextptr > end)
+			nextptr = end;
+		version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
+		reader += 2;
+		if (version < 5)
+			goto next_cu; /* unit_type didn't exist yet */
+		unit_type = *(uint8_t const *)reader; /* unit_type */
+		reader += 1;
+		if (unit_type != DW_UT_type)
+			goto next_cu; /* We're on the look-out for type-units! */
+
+		/*address_size = *(uint8_t const *)reader;*/ /* address_size */
+		reader += 1;
+
+		length = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader); /* debug_abbrev_offset */
+		reader += 4;
+		if (length == 0xffffffff) {
+			/*length = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);*/
+			reader += 8;
+		}
+		type_signature = UNALIGNED_GET64((uint64_t const *)reader); /* type_signature */
+		reader += 8;
+		if (type_signature == signature) {
+			/* Found it! */
+			uintptr_t offset; /* type_offset */
+			offset = ptrsize == 4 ? (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader)
+			                      : (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
+			reader = header + offset;
+			if (reader < header || reader >= nextptr)
+				ERROR(err_corrupt);
+			return reader;
+		}
+next_cu:
+		reader = nextptr;
+	}
+err_corrupt:
+	return NULL;
+}
+
+
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self,
                                                  uintptr_t form, byte_t const **__restrict presult) {
@@ -1437,7 +1527,12 @@ decode_form:
 		default:
 			__builtin_unreachable();
 		}
-		break;
+		/* Relative to the start of `.debug_info' */
+		if unlikely(offset >= (size_t)(self->dup_sections->cps_debug_info_end -
+		                               self->dup_sections->cps_debug_info_start))
+			ERROR(err);
+		*presult = self->dup_sections->cps_debug_info_start + offset;
+		return true;
 
 	case DW_FORM_ref1:
 		offset = (uintptr_t)(*(uint8_t const *)reader);
@@ -1452,13 +1547,29 @@ decode_form:
 		break;
 
 	case DW_FORM_ref8:
-	case DW_FORM_ref_sig8: /* ??? */
 		offset = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 		break;
 
 	case DW_FORM_ref_udata:
 		offset = dwarf_decode_uleb128(&reader);
 		break;
+
+	case DW_FORM_ref_sig8: {
+		/* Reference to a type-unit */
+		uint64_t signature = UNALIGNED_GET64((uint64_t const *)reader);
+		byte_t const *ptr;
+		ptr = find_typeunit_by_signature(self->dup_sections->cps_debug_info_start,
+		                                 self->dup_sections->cps_debug_info_end,
+		                                 signature);
+		if unlikely(!ptr)
+			ERRORF(err, "signature = %#" PRIx64, signature);
+		*presult = ptr;
+		return true;
+	}	break;
+
+	// TODO: case DW_FORM_GNU_ref_alt:
+	// TODO: case DW_FORM_ref_sup4:
+	// TODO: case DW_FORM_ref_sup8:
 
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dsp_cu_info_end)
@@ -1469,6 +1580,7 @@ decode_form:
 	default:
 		return false;
 	}
+	/* Default: relative to the current CU */
 	if unlikely(offset >= (size_t)(self->dsp_cu_info_end -
 	                               self->dup_cu_info_hdr))
 		ERROR(err);

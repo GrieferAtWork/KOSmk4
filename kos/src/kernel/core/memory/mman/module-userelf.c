@@ -884,7 +884,7 @@ NOTHROW(FCALL system_cc_mman_module_cache)(struct mman *__restrict self,
                                            struct ccinfo *__restrict info) {
 	struct userelf_module_slist dead;
 
-	/* Try to acquire the lock because we need to be NOBLOCK! */
+	/* Try to acquire the lock because we may need to be NOBLOCK! */
 	if (!mman_lock_tryacquire(self)) {
 		if (ccinfo_noblock(info))
 			return;
@@ -1326,7 +1326,7 @@ set_node_nullptr:
 						 * us and a different variant of the same module. And
 						 * considering that we're still dealing with the same
 						 * underlying `mfile', better be safe than sorry, and
-						 * simply go done the not-an-elf-file path... */
+						 * simply go down the not-an-elf-file path... */
 						goto not_an_elf_file_phdrv_result_mmlock;
 					}
 				}
@@ -2001,13 +2001,7 @@ uem_trycreate(struct mman *__restrict self,
 	file = part->mp_file;
 
 	/* Check  for  specific files  that are  known to
-	 * never be able to be apart of a UserELF module.
-	 *
-	 * Note however that while some of these may  not
-	 * be able to form a UserELF module on their own,
-	 * they _are_ able to do so as extension to  some
-	 * other, adjacent, neighboring (and most  likely
-	 * preceding) mapping. */
+	 * never be able to be apart of a UserELF module. */
 	if (file == &mfile_ndef || file == &mfile_phys) {
 		mpart_lock_release(part);
 		return NULL;
@@ -2076,7 +2070,7 @@ uem_trycreate(struct mman *__restrict self,
 		 * between their different  program headers  (possibly
 		 * to  aid in debugging  by making out-of-bound memory
 		 * access fault more often), so even if `node' doesn't
-		 * have a n immediate neighbor, that doesn't mean that
+		 * have  an immediate neighbor, that doesn't mean that
 		 * it can't possibly be apart of a library.
 		 *
 		 * However, in the event that  `node' is the result  of
