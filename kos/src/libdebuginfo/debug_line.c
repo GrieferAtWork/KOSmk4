@@ -50,6 +50,25 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 DECL_BEGIN
 
+PRIVATE NONNULL((1, 2)) bool
+NOTHROW_NCX(CC skip_fileinfo)(di_debuginfo_cu_simple_parser_t *__restrict parser,
+                              di_debugline_fileinfo_format_t const *__restrict format) {
+	byte_t const *fmtreader = (byte_t const *)format;
+	uint8_t fmtcount        = *(uint8_t const *)fmtreader;
+	fmtreader += 1;
+	for (; fmtcount; --fmtcount) {
+		dwarf_uleb128_t form;
+		if unlikely(parser->dsp_cu_info_pos >= parser->dsp_cu_info_end) {
+			CORRUPT();
+			return false;
+		}
+		dwarf_decode_uleb128(&fmtreader);        /* file_name_entry_format.type */
+		form = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.form */
+		libdi_debuginfo_cu_parser_skipform(parser, form, &fmtreader);
+	}
+	return true;
+}
+
 /* Decode a given file index into its filename and pathname components. */
 INTERN NONNULL((1, 3, 4)) void
 NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict self, dwarf_uleb128_t index,
@@ -72,19 +91,8 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict s
 
 	/* Skip entires that we don't care about. */
 	for (; index; --index) {
-		byte_t const *fmtreader = (byte_t const *)self->dlu_filefmt;
-		uint8_t fmtcount        = *(uint8_t const *)fmtreader;
-		fmtreader += 1;
-		for (; fmtcount; --fmtcount) {
-			dwarf_uleb128_t form;
-			if unlikely(parser.dsp_cu_info_pos >= parser.dsp_cu_info_end) {
-				CORRUPT();
-				return;
-			}
-			dwarf_decode_uleb128(&fmtreader);        /* file_name_entry_format.type */
-			form = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.form */
-			libdi_debuginfo_cu_parser_skipform(&parser, form, &fmtreader);
-		}
+		if unlikely(!skip_fileinfo(&parser, self->dlu_filefmt))
+			ERROR(err_corrupt);
 	}
 
 	/* Decode our own entry! */
@@ -103,7 +111,9 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict s
 					index = (dwarf_uleb128_t)-1;
 				break;
 			case DW_LNCT_path:
-				if (!libdi_debuginfo_cu_parser_getstring_ex(&parser, form, &result->dlfi_file, sections))
+				if (!libdi_debuginfo_cu_parser_getstring_ex(&parser, form,
+				                                            &result->dlfi_file,
+				                                            sections))
 					result->dlfi_file = NULL;
 				break;
 			default:
@@ -121,29 +131,16 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict s
 			return;
 		--index;
 	}
-	if unlikely(index >= self->dlu_pathcount) {
-		CORRUPT(); /* Shouldn't happen */
-		return;
-	}
+	if unlikely(index >= self->dlu_pathcount)
+		ERROR(err_corrupt); /* Shouldn't happen */
 
 	/* Modify the parser to decode path- rather than file-names. */
 	parser.dsp_cu_info_pos = self->dlu_pathdata;
 
 	/* Skip entires that we don't care about. */
 	for (; index; --index) {
-		byte_t const *fmtreader = (byte_t const *)self->dlu_pathfmt;
-		uint8_t fmtcount        = *(uint8_t const *)fmtreader;
-		fmtreader += 1;
-		for (; fmtcount; --fmtcount) {
-			dwarf_uleb128_t form;
-			if unlikely(parser.dsp_cu_info_pos >= parser.dsp_cu_info_end) {
-				CORRUPT();
-				return;
-			}
-			dwarf_decode_uleb128(&fmtreader);        /* file_name_entry_format.type */
-			form = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.form */
-			libdi_debuginfo_cu_parser_skipform(&parser, form, &fmtreader);
-		}
+		if unlikely(!skip_fileinfo(&parser, self->dlu_pathfmt))
+			ERROR(err_corrupt);
 	}
 
 	/* Decode our path index! */
@@ -157,7 +154,9 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict s
 			form = dwarf_decode_uleb128(&fmtreader); /* file_name_entry_format.form */
 			switch (type) {
 			case DW_LNCT_path:
-				if (!libdi_debuginfo_cu_parser_getstring_ex(&parser, form, &result->dlfi_path, sections))
+				if (!libdi_debuginfo_cu_parser_getstring_ex(&parser, form,
+				                                            &result->dlfi_path,
+				                                            sections))
 					result->dlfi_path = NULL;
 				break;
 			default:
@@ -166,6 +165,9 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict s
 			libdi_debuginfo_cu_parser_skipform(&parser, form, &fmtreader);
 		}
 	}
+	return;
+err_corrupt:
+	return;
 }
 
 
@@ -341,17 +343,8 @@ again:
 			parser.dsp_addrsize    = result->dlu_addrsize;
 			parser.dsp_version     = result->dlu_version;
 			for (i = 0; i < result->dlu_pathcount; ++i) {
-				byte_t const *fmtreader = (byte_t const *)result->dlu_pathfmt;
-				uint8_t fmtcount        = *(uint8_t const *)fmtreader;
-				fmtreader += 1;
-				for (; fmtcount; --fmtcount) {
-					dwarf_uleb128_t form;
-					if unlikely(parser.dsp_cu_info_pos >= parser.dsp_cu_info_end)
-						ERROR(err_corrupted);
-					dwarf_decode_uleb128(&fmtreader);        /* directory_entry_format.type */
-					form = dwarf_decode_uleb128(&fmtreader); /* directory_entry_format.form */
-					libdi_debuginfo_cu_parser_skipform(&parser, form, &fmtreader);
-				}
+				if unlikely(!skip_fileinfo(&parser, result->dlu_pathfmt))
+					ERROR(err_corrupted);
 			}
 			reader = parser.dsp_cu_info_pos;
 		}

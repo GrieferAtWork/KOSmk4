@@ -40,7 +40,8 @@
  * unwind_emulator_sections_t: .eh_frame_hdr, .eh_frame, .debug_frame, .debug_addr, .debug_loc, .debug_abbrev, .debug_info
  * di_addr2line_sections_t:                                                                     .debug_abbrev, .debug_info, .debug_str, .debug_line_str, .debug_aranges, .debug_ranges, .debug_line, .strtab, .symtab
  * di_enum_locals_sections_t:                                          .debug_addr, .debug_loc, .debug_abbrev, .debug_info, .debug_str, .debug_line_str, .debug_aranges, .debug_ranges
- * di_debuginfo_cu_parser_sections_t:                                               .debug_loc, .debug_abbrev,              .debug_str, .debug_line_str
+ * di_debuginfo_cu_parser_sections_t:                                               .debug_loc, .debug_abbrev, .debug_info, .debug_str, .debug_line_str
+ * di_string_sections_t:                                                                                                    .debug_str, .debug_line_str
  */
 
 
