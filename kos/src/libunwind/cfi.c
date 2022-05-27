@@ -1863,7 +1863,6 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 	case DW_OP_not:
 	case DW_OP_or:
 	case DW_OP_plus:
-	case DW_OP_plus_uconst:
 	case DW_OP_shl:
 	case DW_OP_shr:
 	case DW_OP_shra:
@@ -1927,6 +1926,8 @@ skip_1_sleb128:
 		break;
 
 	case DW_OP_bit_piece:
+	case DW_OP_regval_type:
+	case DW_OP_GNU_regval_type:
 		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
 		ATTR_FALLTHROUGH
 	case DW_OP_constu:
@@ -1936,9 +1937,29 @@ skip_1_sleb128:
 	case DW_OP_GNU_addr_index:
 	case DW_OP_constx:
 	case DW_OP_GNU_const_index:
+	case DW_OP_plus_uconst:
+	case DW_OP_convert:
+	case DW_OP_GNU_convert:
+	case DW_OP_reinterpret:
+	case DW_OP_GNU_reinterpret:
 skip_1_uleb128:
 		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
 		break;
+
+	case DW_OP_const_type:
+	case DW_OP_GNU_const_type: {
+		uint8_t size;
+		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
+		size = *(uint8_t const *)unwind_pc;
+		unwind_pc += 1;
+		unwind_pc += size;
+	}	break;
+
+	case DW_OP_deref_type:
+	case DW_OP_GNU_deref_type:
+	case DW_OP_xderef_type:
+		unwind_pc += 1;
+		goto skip_1_uleb128;
 
 	case DW_OP_implicit_value:
 	case DW_OP_entry_value:

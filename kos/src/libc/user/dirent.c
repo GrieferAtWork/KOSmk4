@@ -557,7 +557,8 @@ NOTHROW_RPC(LIBCCALL libc_scandiratk)(fd_t dirfd,
 			if (libc_geterrno() != EOK)
 				goto err; /* It's an error! */
 			/* Its EOF */
-		} break;
+			break;
+		}
 		/* Check with the filter-function if we should use this entry. */
 		if (selector) {
 			if ((*selector)(ent) == 0)

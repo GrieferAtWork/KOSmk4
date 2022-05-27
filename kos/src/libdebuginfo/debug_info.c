@@ -1868,7 +1868,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_subprogram)(di_debuginfo_cu_pa
 				ERROR(err);
 			break;
 
-		case DW_AT_linkage_name:
+		DW_CASE_AT_linkage_name:
 			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form,
 			                                                 &result->sp_rawname))
 				ERROR(err);
@@ -2172,7 +2172,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_type)(di_debuginfo_cu_parser_t
 				ERROR(err);
 			break;
 
-		case DW_AT_linkage_name:
+		DW_CASE_AT_linkage_name:
 			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form,
 			                                                 &result->t_rawname))
 				ERROR(err);
@@ -2386,7 +2386,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_variable)(di_debuginfo_cu_pars
 				ERROR(err);
 			break;
 
-		case DW_AT_linkage_name:
+		DW_CASE_AT_linkage_name:
 			if unlikely(!libdi_debuginfo_cu_parser_getstring(self, attr.dica_form,
 			                                                 &result->v_rawname))
 				ERROR(err);

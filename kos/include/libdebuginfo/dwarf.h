@@ -348,6 +348,8 @@
 #define DW_AT_const_expr              0x6c /* flag */
 #define DW_AT_enum_class              0x6d /* flag */
 #define DW_AT_linkage_name            0x6e /* string */
+#define DW_IS_AT_linkage_name(x)      ((x) == DW_AT_linkage_name || (x) == DW_AT_MIPS_linkage_name || (x) == DW_AT_HP_linkage_name)
+#define DW_CASE_AT_linkage_name       case DW_AT_linkage_name: case DW_AT_MIPS_linkage_name: case DW_AT_HP_linkage_name
 #define DW_AT_string_length_bit_size  0x6f /* constant */
 #define DW_AT_string_length_byte_size 0x70 /* constant */
 #define DW_AT_rank                    0x71 /* constant, exprloc */
@@ -393,7 +395,7 @@
 #define DW_AT_MIPS_loop_unroll_factor        0x2005 /* ??? */
 #define DW_AT_HP_prologue                    0x2005 /* ??? */
 #define DW_AT_MIPS_software_pipeline_depth   0x2006 /* ??? */
-#define DW_AT_MIPS_linkage_name              0x2007 /* ??? */
+#define DW_AT_MIPS_linkage_name              0x2007 /* Alias for `DW_AT_linkage_name' */
 #define DW_AT_MIPS_stride                    0x2008 /* ??? */
 #define DW_AT_HP_epilogue                    0x2008 /* ??? */
 #define DW_AT_MIPS_abstract_name             0x2009 /* ??? */
@@ -415,7 +417,7 @@
 #define DW_AT_HP_cold_region_low_pc          0x2017 /* ??? */
 #define DW_AT_HP_cold_region_high_pc         0x2018 /* ??? */
 #define DW_AT_HP_all_variables_modifiable    0x2019 /* ??? */
-#define DW_AT_HP_linkage_name                0x201a /* ??? */
+#define DW_AT_HP_linkage_name                0x201a /* Alias for `DW_AT_linkage_name' */
 #define DW_AT_HP_prof_flags                  0x201b /* ??? */
 #define DW_AT_HP_unit_name                   0x201f /* ??? */
 #define DW_AT_HP_unit_size                   0x2020 /* ??? */

@@ -267,12 +267,12 @@
 #define DW_OP_addrx                0xa1 /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc))) */
 #define DW_OP_constx               0xa2 /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc))) */
 #define DW_OP_entry_value          0xa3 /* [+*]   size = dwarf_decode_uleb128(&pc); EVAL_DW_OP_CODE_AT_SUBPROGRAM_ENTRY(pc, pc + size); pc += size; */
-#define DW_OP_const_type           0xa4 /* <Not supported> */
-#define DW_OP_regval_type          0xa5 /* <Not supported> */
-#define DW_OP_deref_type           0xa6 /* <Not supported> */
-#define DW_OP_xderef_type          0xa7 /* <Not supported> */
-#define DW_OP_convert              0xa8 /* <Not supported> */
-#define DW_OP_reinterpret          0xa9 /* <Not supported> */
+#define DW_OP_const_type           0xa4 /* [+*]   dwarf_decode_uleb128(&pc); size = *(u8 const *)pc; pc += 1; pc += size; <Not supported> */
+#define DW_OP_regval_type          0xa5 /* [+*]   dwarf_decode_uleb128(&pc); dwarf_decode_uleb128(&pc); <Not supported> */
+#define DW_OP_deref_type           0xa6 /* [+*]   pc += 1; dwarf_decode_uleb128(&pc); <Not supported> */
+#define DW_OP_xderef_type          0xa7 /* [+*]   pc += 1; dwarf_decode_uleb128(&pc); <Not supported> */
+#define DW_OP_convert              0xa8 /* [+*]   dwarf_decode_uleb128(&pc); <Not supported> */
+#define DW_OP_reinterpret          0xa9 /* [+*]   dwarf_decode_uleb128(&pc); <Not supported> */
 /*      DW_OP_                     0xaa  * ... */
 /*      DW_OP_                     ...   * ... */
 /*      DW_OP_                     0xdf  * ... */
@@ -303,12 +303,12 @@
 #define DW_OP_GNU_encoded_addr     0xf1 /* [+1+*] format = *pc++; PUSH(decode_pointer(format, &pc)); // Format is one of `DW_EH_PE_*' */
 #define DW_OP_GNU_implicit_pointer 0xf2 /* <Not supported> */
 #define DW_OP_GNU_entry_value      0xf3 /* [+*]   size = dwarf_decode_uleb128(&pc); EVAL_DW_OP_CODE_AT_SUBPROGRAM_ENTRY(pc, pc + size); pc += size; (Alias for `DW_OP_entry_value') */
-#define DW_OP_GNU_const_type       0xf4 /* <Not supported> */
-#define DW_OP_GNU_regval_type      0xf5 /* <Not supported> */
-#define DW_OP_GNU_deref_type       0xf6 /* <Not supported> */
-#define DW_OP_GNU_convert          0xf7 /* <Not supported> */
+#define DW_OP_GNU_const_type       0xf4 /* <Not supported> (alias for `DW_OP_const_type') */
+#define DW_OP_GNU_regval_type      0xf5 /* <Not supported> (alias for `DW_OP_regval_type') */
+#define DW_OP_GNU_deref_type       0xf6 /* <Not supported> (alias for `DW_OP_deref_type') */
+#define DW_OP_GNU_convert          0xf7 /* <Not supported> (alias for `DW_OP_convert') */
 #define DW_OP_PGI_omp_thread_num   0xf8 /* <Not supported> */
-#define DW_OP_GNU_reinterpret      0xf9 /* <Not supported> */
+#define DW_OP_GNU_reinterpret      0xf9 /* <Not supported> (alias for `DW_OP_reinterpret') */
 #define DW_OP_GNU_parameter_ref    0xfa /* <Not supported> */
 #define DW_OP_GNU_addr_index       0xfb /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc)))  (alias for `DW_OP_addrx') */
 #define DW_OP_GNU_const_index      0xfc /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc)))  (alias for `DW_OP_addrx') */

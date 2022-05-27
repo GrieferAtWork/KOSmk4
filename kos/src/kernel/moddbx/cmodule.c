@@ -893,7 +893,7 @@ again:
 					goto again;
 				}	break;
 
-				case DW_AT_linkage_name:
+				DW_CASE_AT_linkage_name:
 					if (!*plinkage_name) {
 						if unlikely(!debuginfo_cu_parser_getstring(&inner_parser, attr.dica_form, plinkage_name))
 							*plinkage_name = NULL;
@@ -975,7 +975,7 @@ again:
 				}
 			}	break;
 
-			case DW_AT_linkage_name:
+			DW_CASE_AT_linkage_name:
 				if (!result) {
 					if unlikely(!debuginfo_cu_parser_getstring(self, attr.dica_form, &result))
 						result = NULL;
@@ -1026,7 +1026,7 @@ again:
 			case DW_AT_abstract_origin:
 				goto do_abstract_origin;
 
-			case DW_AT_linkage_name:
+			DW_CASE_AT_linkage_name:
 				if (!result) {
 					if unlikely(!debuginfo_cu_parser_getstring(self, attr.dica_form, &result))
 						result = NULL;

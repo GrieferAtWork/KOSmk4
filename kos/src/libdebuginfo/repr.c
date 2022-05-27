@@ -99,7 +99,7 @@ for (local macroName, macroValue: enumerateMacrosFromFiles({
 		if (!macroName.startswith(prefix))
 			continue;
 		local name = macroName[#prefix:];
-		if (name in ["lo_user", "hi_user"])
+		if (name in ["lo_user", "hi_user", "OFFMASK", "BASEMASK"])
 			continue;
 		if (macroValue >= #values)
 			values.resize(macroValue + 1);
@@ -894,28 +894,40 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 			     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR ":\n"), (uintptr_t)parser.dup_comp.dic_tag));
 			di_debuginfo_component_attrib_t attr;
 			DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
+				byte_t const *orig_reader = parser.dsp_cu_info_pos;
 				DO(format_repeat(printer, arg, '\t', parser.dup_child_depth + 1));
 				PRINT("[");
 				s = libdi_debug_repr_DW_AT(attr.dica_name);
 				DO(s ? format_printf(printer, arg, REPR_STRING("DW_AT_%s:"), s)
 				     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR ":"), (uintptr_t)attr.dica_name));
+decode_form:
 				s = libdi_debug_repr_DW_FORM(attr.dica_form);
 				DO(s ? format_printf(printer, arg, REPR_STRING("DW_FORM_%s"), s)
 				     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR ""), (uintptr_t)attr.dica_form));
 				PRINT("] = ");
 				switch (attr.dica_form) {
 
-				/* TODO: Missing forms */
+				case DW_FORM_indirect:
+					attr.dica_form = dwarf_decode_uleb128(&parser.dsp_cu_info_pos);
+					PRINT("[");
+					goto decode_form;
 
 				case DW_FORM_strp:
-				case DW_FORM_string: {
+				case DW_FORM_string:
+				case DW_FORM_strx:
+				case DW_FORM_strp_sup:
+				case DW_FORM_line_strp:
+				case DW_FORM_GNU_str_index:
+				case DW_FORM_GNU_strp_alt: {
 					char const *value;
 					if (!libdi_debuginfo_cu_parser_getstring(&parser, attr.dica_form, &value))
 						goto err_bad_value;
 					PRINTF("%q", value);
 				}	break;
 
-				case DW_FORM_addr: {
+				case DW_FORM_addr:
+				case DW_FORM_addrx:
+				case DW_FORM_GNU_addr_index: {
 					uintptr_t value;
 					if (!libdi_debuginfo_cu_parser_getaddr(&parser, attr.dica_form, &value))
 						goto err_bad_value;
@@ -929,7 +941,10 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 				case DW_FORM_data16:
 				case DW_FORM_sdata:
 				case DW_FORM_udata:
-				case DW_FORM_sec_offset: {
+				case DW_FORM_sec_offset:
+				case DW_FORM_implicit_const:
+				case DW_FORM_loclistx:
+				case DW_FORM_rnglistx: {
 					uintptr_t value;
 					if (!libdi_debuginfo_cu_parser_getconst(&parser, attr.dica_form, &value, _attr_reader))
 						goto err_bad_value;
@@ -951,7 +966,10 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 				case DW_FORM_ref4:
 				case DW_FORM_ref8:
 				case DW_FORM_ref_sig8:
-				case DW_FORM_ref_udata: {
+				case DW_FORM_ref_udata:
+				case DW_FORM_ref_sup4:
+				case DW_FORM_ref_sup8:
+				case DW_FORM_GNU_ref_alt: {
 					byte_t const *value;
 					di_debuginfo_cu_parser_t p2;
 					if (!libdi_debuginfo_cu_parser_getref(&parser, attr.dica_form, &value))
@@ -1104,6 +1122,7 @@ err_bad_value:
 					break;
 				}
 				PRINT("\n");
+				parser.dsp_cu_info_pos = orig_reader;
 			}
 		} while (libdi_debuginfo_cu_parser_next(&parser));
 		libdi_debuginfo_cu_abbrev_fini(&abbrev);

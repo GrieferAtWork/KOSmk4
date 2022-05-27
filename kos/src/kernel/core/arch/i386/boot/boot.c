@@ -77,30 +77,32 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(dbg, KERNEL_COMMANDLINE_OPTION_TYPE_
 
 #if 0
 #include <format-printer.h>
-#include <libdebuginfo/api.h>
+#include <libdebuginfo/repr.h>
+#include <kernel/mman/driver.h>
 #include <kernel/syslog.h>
-INTDEF NONNULL((1)) ssize_t LIBDEBUGINFO_CC
-libdi_debug_repr_dump(pformatprinter printer, void *arg,
-                      byte_t *debug_info_start, byte_t *debug_info_end,
-                      byte_t *debug_abbrev_start, byte_t *debug_abbrev_end,
-                      byte_t *debug_loc_start, byte_t *debug_loc_end,
-                      byte_t *debug_str_start, byte_t *debug_str_end,
-                      byte_t *debug_line_str_start, byte_t *debug_line_str_end);
+
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
+(LIBDEBUGINFO_CC debug_repr_dump)(__pformatprinter printer, void *arg,
+                                  __byte_t const *debug_info_start, __byte_t const *debug_info_end,
+                                  __byte_t const *debug_abbrev_start, __byte_t const *debug_abbrev_end,
+                                  __byte_t const *debug_loc_start, __byte_t const *debug_loc_end,
+                                  __byte_t const *debug_str_start, __byte_t const *debug_str_end,
+                                  __byte_t const *debug_line_str_start, __byte_t const *debug_line_str_end);
 
 PRIVATE void dump_debuginfo() {
-	byte_t *di, *da, *dl, *ds, *dS;
-	di = (byte_t *)driver_section_cdata(&kernel_section_debug_info);
-	da = (byte_t *)driver_section_cdata(&kernel_section_debug_abbrev);
-	dl = (byte_t *)driver_section_cdata(&kernel_section_debug_loc);
-	ds = (byte_t *)driver_section_cdata(&kernel_section_debug_str);
-	dS = (byte_t *)driver_section_cdata(&kernel_section_debug_line_str);
-	libdi_debug_repr_dump(&syslog_printer,
-	                      SYSLOG_LEVEL_RAW,
-	                      di, di + kernel_section_debug_info.ds_csize,
-	                      da, da + kernel_section_debug_abbrev.ds_csize,
-	                      dl, dl + kernel_section_debug_loc.ds_csize,
-	                      ds, ds + kernel_section_debug_str.ds_csize,
-	                      dS, dS + kernel_section_debug_line_str.ds_csize);
+	byte_t const *di, *da, *dl, *ds, *dS;
+	size_t si, sa, sl, ss, sS;
+	di = module_section_getaddr_inflate(&kernel_section_debug_info, &si);
+	da = module_section_getaddr_inflate(&kernel_section_debug_abbrev, &sa);
+	dl = module_section_getaddr_inflate(&kernel_section_debug_loc, &sl);
+	ds = module_section_getaddr_inflate(&kernel_section_debug_str, &ss);
+	dS = module_section_getaddr_inflate(&kernel_section_debug_line_str, &sS);
+	debug_repr_dump(&syslog_printer, SYSLOG_LEVEL_RAW,
+	                di, di + si,
+	                da, da + sa,
+	                dl, dl + sl,
+	                ds, ds + ss,
+	                dS, dS + sS);
 }
 #endif
 
