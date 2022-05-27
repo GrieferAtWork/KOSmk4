@@ -33,8 +33,8 @@ DECL_BEGIN
 
 /* Decode a given file index into its filename and pathname components. */
 INTDEF NONNULL((1, 3, 4)) void
-NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict self, dwarf_uleb128_t index,
-                                         di_debugline_fileinfo_t *__restrict result,
+NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t *__restrict self, /* Only non-const for lazy init */
+                                         dwarf_uleb128_t index, di_debugline_fileinfo_t *__restrict result,
                                          struct di_string_sections_struct const *__restrict sections);
 
 /* Given a pointer to the start of a  debug_line CU (or a pointer to the start  of

@@ -37,6 +37,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <kos/types.h>
 
+#include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -69,10 +70,94 @@ NOTHROW_NCX(CC skip_fileinfo)(di_debuginfo_cu_simple_parser_t *__restrict parser
 	return true;
 }
 
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC debugline_unit_count_dwarf4_numfiles)(di_debugline_unit_t const *__restrict self) {
+	size_t result        = 0;
+	byte_t const *reader = self->dlu_filedata;
+	for (;;) {
+		if (!*(char *)reader)
+			break;
+		if unlikely(reader >= self->dlu_textbase)
+			break;
+		reader = (byte_t *)(strend((char *)reader) + 1);
+		dwarf_decode_uleb128((byte_t const **)&reader);
+		dwarf_decode_uleb128((byte_t const **)&reader);
+		dwarf_decode_uleb128((byte_t const **)&reader);
+		++result;
+	}
+	return result;
+}
+
+/* Find the data-blob associated with the `nth' extended file descriptor. */
+PRIVATE WUNUSED NONNULL((1)) byte_t const *
+NOTHROW_NCX(CC debugline_unit_get_extra_file)(di_debugline_unit_t const *__restrict self,
+                                              dwarf_uleb128_t nth) {
+	byte_t const *reader = self->dlu_textbase;
+	while (reader < self->dlu_cuend) {
+		uint8_t opcode = *reader++;
+		switch (opcode) {
+
+		case DW_LNS_extended_op: {
+			byte_t const *ext_data;
+			uintptr_t temp;
+			temp     = dwarf_decode_uleb128(&reader);
+			ext_data = reader;
+			if unlikely(OVERFLOW_UADD((uintptr_t)reader, temp,
+			                          (uintptr_t *)&reader))
+				ERROR(done);
+			if unlikely(reader > self->dlu_cuend)
+				ERROR(done);
+			if (temp != 0) {
+				opcode = *ext_data++;
+				/* Check for extended file entries. */
+				if (opcode == DW_LNE_define_file) {
+					if (nth == 0)
+						return ext_data;
+					--nth;
+				}
+			}
+		}	break;
+
+		case DW_LNS_advance_pc:
+		case DW_LNS_set_file:
+		case DW_LNS_set_column:
+		case DW_LNS_set_isa:
+			dwarf_decode_uleb128(&reader);
+			break;
+
+		case DW_LNS_advance_line:
+			dwarf_decode_sleb128(&reader);
+			break;
+
+		case DW_LNS_fixed_advance_pc:
+			reader += 2;
+			break;
+
+		case DW_LNS_negate_stmt:
+		case DW_LNS_set_basic_block:
+		case DW_LNS_const_add_pc:
+		case DW_LNS_set_prologue_end:
+		case DW_LNS_set_epilogue_begin:
+			break;
+
+		default:
+			if (opcode < self->dlu_opcode_base) {
+				/* Custom opcode. */
+				uint8_t n = self->dlu_opcode_lengths[opcode - 1];
+				while (n--)
+					dwarf_decode_uleb128(&reader);
+			}
+			break;
+		}
+	}
+done:
+	return NULL;
+}
+
 /* Decode a given file index into its filename and pathname components. */
 INTERN NONNULL((1, 3, 4)) void
-NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict self, dwarf_uleb128_t index,
-                                         di_debugline_fileinfo_t *__restrict result,
+NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t *__restrict self, /* Only non-const for lazy init */
+                                         dwarf_uleb128_t index, di_debugline_fileinfo_t *__restrict result,
                                          struct di_string_sections_struct const *__restrict sections) {
 	di_debuginfo_cu_simple_parser_t parser;
 	bzero(result, sizeof(*result));
@@ -80,6 +165,9 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict s
 		if (!index)
 			return;
 		--index;
+		/* Lazily calculate file counts. */
+		if (self->dlu_filecount == 0)
+			self->dlu_filecount = debugline_unit_count_dwarf4_numfiles(self);
 	}
 
 	/* Load a parser for file data. */
@@ -89,10 +177,22 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t const *__restrict s
 	parser.dsp_addrsize    = self->dlu_addrsize;
 	parser.dsp_version     = self->dlu_version;
 
-	/* Skip entires that we don't care about. */
-	for (; index; --index) {
-		if unlikely(!skip_fileinfo(&parser, self->dlu_filefmt))
-			ERROR(err_corrupt);
+	if (index >= self->dlu_filecount) {
+		/* Must be an extended file (~ala `DW_LNE_define_file')
+		 * NOTE: Officially, these were removed  in dwarf-5, but since  we
+		 *       also support dwarf-4, we still have to support them also!
+		 * s.a. DWARF4.pdf -- Section 6.2.5.3 -- 3. DW_LNE_define_file
+		 */
+		index -= self->dlu_filecount;
+		parser.dsp_cu_info_pos = debugline_unit_get_extra_file(self, index);
+		if unlikely(!parser.dsp_cu_info_pos)
+			ERRORF(err_corrupt, "index = %" PRIuSIZ, index);
+	} else {
+		/* Skip entires that we don't care about. */
+		for (; index; --index) {
+			if unlikely(!skip_fileinfo(&parser, self->dlu_filefmt))
+				ERROR(err_corrupt);
+		}
 	}
 
 	/* Decode our own entry! */
@@ -359,8 +459,8 @@ again:
 		}
 
 		/* File table. */
-		dwarf_decode_uleb128(&reader); /* file_names_count */
-		result->dlu_filedata = reader; /* file_names */
+		result->dlu_filecount = dwarf_decode_uleb128(&reader); /* file_names_count */
+		result->dlu_filedata  = reader;                        /* file_names */
 	} else {
 		result->dlu_pathfmt   = (di_debugline_fileinfo_format_t const *)dwarf4_lne_pathfmt;
 		result->dlu_filefmt   = (di_debugline_fileinfo_format_t const *)dwarf4_lne_filefmt;
@@ -379,7 +479,8 @@ again:
 			reader = (byte_t *)(strend((char *)reader) + 1);
 			++result->dlu_pathcount;
 		}
-		result->dlu_filedata = reader;
+		result->dlu_filedata  = reader;
+		result->dlu_filecount = 0; /* Calculated lazily */
 	}
 	*preader = next_cu;
 	return DEBUG_INFO_ERROR_SUCCESS;
@@ -480,9 +581,9 @@ found_state:
 				ext_data = reader;
 				if unlikely(OVERFLOW_UADD((uintptr_t)reader, temp,
 				                          (uintptr_t *)&reader))
-					goto done;
+					ERROR(done);
 				if unlikely(reader > self->dlu_cuend)
-					goto done;
+					ERROR(done);
 				if (temp != 0) {
 					opcode = *ext_data++;
 					/* Extended opcodes. */
@@ -511,7 +612,7 @@ found_state:
 					}	break;
 
 					case DW_LNE_define_file:
-						/* ... */
+						/* Handled by `debugline_unit_get_extra_file()' */
 						break;
 
 					case DW_LNE_set_discriminator:

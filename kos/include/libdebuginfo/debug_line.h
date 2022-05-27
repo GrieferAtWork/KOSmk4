@@ -54,9 +54,10 @@ typedef struct {
 	__byte_t const                       *dlu_textbase;         /* [1..1] Base address of the CU resolver text. */
 	__byte_t const                       *dlu_cuend;            /* [1..1] End address of the CU segment. */
 	di_debugline_fileinfo_format_t const *dlu_pathfmt;          /* [1..1] Format of path names. */
-	__size_t                              dlu_pathcount;        /* # of path-strings in `dlu_pathdata' */
+	__size_t                              dlu_pathcount;        /* # of path-items in `dlu_pathdata' */
 	__byte_t const                       *dlu_pathdata;         /* [0..dlu_pathcount] Path data (array of `dlu_pathfmt') */
 	di_debugline_fileinfo_format_t const *dlu_filefmt;          /* [1..1] Format of file names. */
+	__size_t                              dlu_filecount;        /* # of file-items in `dlu_filedata' */
 	__byte_t const                       *dlu_filedata;         /* [0..dlu_filecount] Path data (array of `dlu_filefmt') */
 	__uint16_t                            dlu_version;          /* Used during decoding... */
 	__uint8_t                             dlu_min_insn_length;  /* Used during decoding... */
@@ -85,13 +86,13 @@ struct di_string_sections_struct;
 
 /* Decode a given file index into its filename and pathname components. */
 typedef __ATTR_NONNULL_T((1, 3, 4)) void
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGLINE_LOADFILE)(di_debugline_unit_t const *__restrict self, dwarf_uleb128_t index,
-                                                      di_debugline_fileinfo_t *__restrict result,
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGLINE_LOADFILE)(di_debugline_unit_t *__restrict self, /* Only non-const for lazy init */
+                                                      dwarf_uleb128_t index, di_debugline_fileinfo_t *__restrict result,
                                                       struct di_string_sections_struct const *__restrict sections);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3, 4)) void
-__NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadfile)(di_debugline_unit_t const *__restrict self, dwarf_uleb128_t index,
-                                                  di_debugline_fileinfo_t *__restrict result,
+__NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadfile)(di_debugline_unit_t *__restrict self, /* Only non-const for lazy init */
+                                                  dwarf_uleb128_t index, di_debugline_fileinfo_t *__restrict result,
                                                   struct di_string_sections_struct const *__restrict sections);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
