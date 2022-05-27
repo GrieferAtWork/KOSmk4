@@ -355,6 +355,8 @@
 #define DW_AT_rank                    0x71 /* constant, exprloc */
 #define DW_AT_str_offsets_base        0x72 /* stroffsetsptr */
 #define DW_AT_addr_base               0x73 /* addrptr */
+#define DW_CASE_AT_addr_base          case DW_AT_addr_base: case DW_AT_GNU_addr_base
+#define DW_IS_AT_addr_base(x)         ((x) == DW_AT_addr_base || (x) == DW_AT_GNU_addr_base)
 #define DW_AT_rnglists_base           0x74 /* rnglistsptr */
 /*      DW_AT_                        0x75  * ... */
 #define DW_AT_dwo_name                0x76 /* string */

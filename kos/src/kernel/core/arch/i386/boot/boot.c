@@ -821,6 +821,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Check if we support `__STDC_WANT_IEC_60559_EXT__' in <float.h> */
 
+	/* TODO: dwarf-5 removes  `.debug_loc'  and  `.debug_ranges',  while
+	 *       replacing them with `.debug_loclists' and `.debug_rnglists'
+	 * Our libdebuginfo still references (and consumes) the former!
+	 *
+	 * Note that both of these sections only act to speed up debug info
+	 * queries, such that even though  we're currently unable to  parse
+	 * them, everything still works none-the-less! */
+
 	return state;
 }
 

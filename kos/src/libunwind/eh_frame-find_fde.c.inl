@@ -154,11 +154,12 @@ again:
 	/* Read code and data alignments. */
 	result->f_codealign = dwarf_decode_uleb128(&cie_reader); /* uleb128_t cie_codealign */
 	result->f_dataalign = dwarf_decode_sleb128(&cie_reader); /* uleb128_t cie_dataalign */
-	if unlikely(version == 1) {
+	if likely(version >= 3) {
+		result->f_retreg = (unwind_regno_t)dwarf_decode_uleb128(&cie_reader); /* cie_retreg */
+	} else {
+		/* dwarf-2 variant */
 		result->f_retreg = *(uint8_t const *)cie_reader; /* cie_retreg */
 		cie_reader += 1;                                 /* ... */
-	} else {
-		result->f_retreg = (unwind_regno_t)dwarf_decode_uleb128(&cie_reader); /* cie_retreg */
 	}
 
 	/* Pointer encodings default to `DW_EH_PE_absptr'. */

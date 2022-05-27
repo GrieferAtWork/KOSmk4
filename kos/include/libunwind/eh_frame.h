@@ -90,10 +90,10 @@
  * │ #endif
  * │     uleb128_t            cie_codealign; # Code alignment (s.a. `unwind_fde_t::f_codealign')
  * │     sleb128_t            cie_dataalign; # Data alignment (s.a. `unwind_fde_t::f_dataalign')
- * │ #if cie_version == 1
- * │     uint8_t              cie_retreg;    # Return register (s.a. `unwind_fde_t::f_retreg')
- * │ #else
+ * │ #if cie_version >= 3
  * │     uleb128_t            cie_retreg;    # Return register (s.a. `unwind_fde_t::f_retreg')
+ * │ #else
+ * │     uint8_t              cie_retreg;    # Return register (s.a. `unwind_fde_t::f_retreg')
  * │ #endif
  * │
  * │     // Augmentation data
