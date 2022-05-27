@@ -526,9 +526,9 @@ rambuffer_lock(struct video_buffer *__restrict self,
 	return 0;
 }
 
-INTERN NONNULL((1, 2)) void CC
-rambuffer_unlock(struct video_buffer *__restrict self,
-                 struct video_lock const *__restrict lock) {
+INTERN NONNULL((1, 2)) void
+NOTHROW(CC rambuffer_unlock)(struct video_buffer *__restrict self,
+                             struct video_lock const *__restrict lock) {
 #ifndef NDEBUG
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
