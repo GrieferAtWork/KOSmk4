@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe71a080d */
+/* HASH CRC-32:0xbb20c90c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -844,10 +844,36 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATT
 
 
 /* DOS-specific functions */
-__CDECLARE_OPT(,wchar_t *,__NOTHROW_NCX,_wcserror,(__errno_t __errno_value),(__errno_value))
-__CDECLARE_OPT(__ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,_wcserror_s,(wchar_t *__buf, __SIZE_TYPE__ __bufsize, __errno_t __errno_value),(__buf,__bufsize,__errno_value))
-__CDECLARE_OPT(__ATTR_IN(1),wchar_t *,__NOTHROW_NCX,__wcserror,(wchar_t const *__message),(__message))
-__CDECLARE_OPT(__ATTR_IN(3) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,__wcserror_s,(wchar_t *__buf, __SIZE_TYPE__ __bufsize, wchar_t const *__message),(__buf,__bufsize,__message))
+#ifdef __CRT_HAVE__wcserror
+__CDECLARE(,wchar_t *,__NOTHROW_NCX,_wcserror,(__errno_t __errno_value),(__errno_value))
+#elif defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
+#include <libc/local/corecrt_wstring/_wcserror.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wcserror, __FORCELOCAL __ATTR_ARTIFICIAL wchar_t *__NOTHROW_NCX(__LIBCCALL _wcserror)(__errno_t __errno_value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcserror))(__errno_value); })
+#endif /* ... */
+#ifdef __CRT_HAVE__wcserror_s
+__CDECLARE(__ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,_wcserror_s,(wchar_t *__buf, __SIZE_TYPE__ __buflen, __errno_t __errno_value),(__buf,__buflen,__errno_value))
+#elif defined(__CRT_HAVE__wcserror) || defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
+#include <libc/local/corecrt_wstring/_wcserror_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_wcserror_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) __errno_t __NOTHROW_NCX(__LIBCCALL _wcserror_s)(wchar_t *__buf, __SIZE_TYPE__ __buflen, __errno_t __errno_value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wcserror_s))(__buf, __buflen, __errno_value); })
+#endif /* ... */
+#ifdef __CRT_HAVE___wcserror
+__CDECLARE(__ATTR_IN_OPT(1),wchar_t *,__NOTHROW_NCX,__wcserror,(wchar_t const *__message),(__message))
+#else /* __CRT_HAVE___wcserror */
+#include <libc/errno.h>
+#if (defined(__CRT_HAVE__strerror) || defined(__CRT_HAVE__strerror_s) || defined(__libc_geterrno)) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/corecrt_wstring/__wcserror.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__wcserror, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) wchar_t *__NOTHROW_NCX(__LIBCCALL __wcserror)(wchar_t const *__message) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__wcserror))(__message); })
+#endif /* (__CRT_HAVE__strerror || __CRT_HAVE__strerror_s || __libc_geterrno) && (__CRT_HAVE_convert_mbstowcs || __CRT_HAVE_convert_mbstowcsn || ((__CRT_HAVE_format_waprintf_printer || __CRT_HAVE_format_waprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_format_waprintf_pack || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))) && (__CRT_HAVE_convert_wcstombs || __CRT_HAVE_convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
+#endif /* !__CRT_HAVE___wcserror */
+#ifdef __CRT_HAVE___wcserror_s
+__CDECLARE(__ATTR_IN_OPT(3) __ATTR_OUTS(1, 2),__errno_t,__NOTHROW_NCX,__wcserror_s,(wchar_t *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__message),(__buf,__buflen,__message))
+#else /* __CRT_HAVE___wcserror_s */
+#include <libc/errno.h>
+#if defined(__CRT_HAVE___wcserror) || ((defined(__CRT_HAVE__strerror) || defined(__CRT_HAVE__strerror_s) || defined(__libc_geterrno)) && (defined(__CRT_HAVE_convert_mbstowcs) || defined(__CRT_HAVE_convert_mbstowcsn) || ((defined(__CRT_HAVE_format_waprintf_printer) || defined(__CRT_HAVE_format_waprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_format_waprintf_pack) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
+#include <libc/local/corecrt_wstring/__wcserror_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__wcserror_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(3) __ATTR_OUTS(1, 2) __errno_t __NOTHROW_NCX(__LIBCCALL __wcserror_s)(wchar_t *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__message) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__wcserror_s))(__buf, __buflen, __message); })
+#endif /* __CRT_HAVE___wcserror || ((__CRT_HAVE__strerror || __CRT_HAVE__strerror_s || __libc_geterrno) && (__CRT_HAVE_convert_mbstowcs || __CRT_HAVE_convert_mbstowcsn || ((__CRT_HAVE_format_waprintf_printer || __CRT_HAVE_format_waprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && (__CRT_HAVE_format_waprintf_pack || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))) && (__CRT_HAVE_convert_wcstombs || __CRT_HAVE_convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc)) */
+#endif /* !__CRT_HAVE___wcserror_s */
 #ifdef __CRT_HAVE__wcsnset_s
 __CDECLARE(__ATTR_INOUTS(1, 4),__errno_t,__NOTHROW_NCX,_wcsnset_s,(wchar_t *__restrict __buf, __SIZE_TYPE__ __buflen, wchar_t __ch, __SIZE_TYPE__ __maxlen),(__buf,__buflen,__ch,__maxlen))
 #else /* __CRT_HAVE__wcsnset_s */

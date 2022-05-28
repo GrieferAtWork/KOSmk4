@@ -1397,11 +1397,11 @@ __CSDECLARE(,__errno_t,errno)
 #endif /* !__libc_geterrno && __libc_errno */
 
 #ifndef __libc_geterrno_or
-#ifdef __libc_errno
-#define __libc_geterrno_or(alt) __libc_errno
-#else /* __libc_errno */
+#ifdef __libc_geterrno
+#define __libc_geterrno_or(alt) __libc_geterrno()
+#else /* __libc_geterrno */
 #define __libc_geterrno_or(alt) alt
-#endif /* !__libc_errno */
+#endif /* !__libc_geterrno */
 #endif /* !__libc_geterrno_or */
 
 #ifndef __libc_seterrno

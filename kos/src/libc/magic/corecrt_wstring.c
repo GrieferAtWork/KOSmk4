@@ -122,18 +122,105 @@ typedef __SIZE_TYPE__ rsize_t;
 %[default:section(".text.crt.dos.wchar.errno")];
 
 [[wchar, decl_include("<bits/types.h>")]]
-wchar_t *_wcserror($errno_t errno_value);
+[[requires_function(strerror, convert_mbstowcs)]]
+[[impl_include("<libc/errno.h>", "<bits/types.h>")]]
+wchar_t *_wcserror($errno_t errno_value) {
+	static wchar_t *saved = NULL;
+	char const *newmsg;
+@@pp_ifdef __libc_geterrno@@
+	errno_t saved_errno;
+@@pp_endif@@
+	newmsg = strerror(errno_value);
+	/*if unlikely(!newmsg) // `strerror()' returns non-NULL
+		return NULL;*/
+
+	/* Convert message. */
+@@pp_ifdef __libc_geterrno@@
+	saved_errno = __libc_geterrno();
+@@pp_endif@@
+@@pp_if $has_function(free)@@
+	free(saved);
+@@pp_endif@@
+	saved = convert_mbstowcs(newmsg);
+@@pp_ifdef __libc_geterrno@@
+	__libc_seterrno(saved_errno);
+@@pp_endif@@
+	return saved;
+}
 
 [[wchar, decl_include("<bits/types.h>")]]
-$errno_t _wcserror_s([[out(? <= bufsize)]] wchar_t *buf,
-                     $size_t bufsize, $errno_t errno_value);
+[[requires_function(_wcserror)]]
+[[impl_include("<libc/errno.h>")]]
+$errno_t _wcserror_s([[out(? <= buflen)]] wchar_t *buf,
+                     $size_t buflen, $errno_t errno_value) {
+	wchar_t *msg  = _wcserror(errno_value);
+	size_t msglen = wcslen(msg) + 1;
+	if (msglen >= buflen) {
+@@pp_ifdef ERANGE@@
+		return $ERANGE;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
+	wmemcpy(buf, msg, msglen);
+	return 0;
+}
 
 [[wchar, decl_include("<hybrid/typecore.h>")]]
-wchar_t *__wcserror([[in]] wchar_t const *message);
+[[requires_function(_strerror, convert_mbstowcs, convert_wcstombs)]]
+[[impl_include("<libc/errno.h>", "<bits/types.h>")]]
+wchar_t *__wcserror([[in_opt]] wchar_t const *message) {
+	static wchar_t *saved = NULL;
+	char const *newmsg;
+	char *utf8_message;
+@@pp_ifdef __libc_geterrno@@
+	errno_t saved_errno;
+@@pp_endif@@
+	if (message == NULL) {
+		newmsg = _strerror(NULL);
+	} else {
+		utf8_message = convert_wcstombs(message);
+		if unlikely(!utf8_message)
+			return NULL;
+		newmsg = _strerror(utf8_message);
+@@pp_if $has_function(free)@@
+		free(utf8_message);
+@@pp_endif@@
+		if unlikely(!newmsg)
+			return NULL;
+	}
+
+	/* Convert message. */
+@@pp_ifdef __libc_geterrno@@
+	saved_errno = __libc_geterrno();
+@@pp_endif@@
+@@pp_if $has_function(free)@@
+	free(saved);
+@@pp_endif@@
+	saved = convert_mbstowcs(newmsg);
+@@pp_ifdef __libc_geterrno@@
+	__libc_seterrno(saved_errno);
+@@pp_endif@@
+	return saved;
+}
 
 [[wchar, decl_include("<bits/types.h>")]]
-$errno_t __wcserror_s([[out(? <= bufsize)]] wchar_t *buf, $size_t bufsize,
-                      [[in]] wchar_t const *message);
+[[requires_function(__wcserror)]]
+[[impl_include("<libc/errno.h>")]]
+$errno_t __wcserror_s([[out(? <= buflen)]] wchar_t *buf, $size_t buflen,
+                      [[in_opt]] wchar_t const *message) {
+	wchar_t *msg  = __wcserror(message);
+	size_t msglen = wcslen(msg) + 1;
+	if (msglen >= buflen) {
+@@pp_ifdef ERANGE@@
+		return $ERANGE;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
+	wmemcpy(buf, msg, msglen);
+	return 0;
+}
 
 [[wchar, section(".text.crt.dos.wchar.string.memory")]]
 [[decl_include("<bits/types.h>")]]
@@ -202,6 +289,16 @@ wcsncpy_s(*) %{generate(str2wcs("strncpy_s"))}
 %#endif /* !_WSTRING_DEFINED */
 
 %[insert:function(_wcstok = broken_dos_wcstok)]
+
+[[hidden]] _c16error(*) %{uchar16("_wcserror")}
+[[hidden]] _c32error(*) %{uchar32("_wcserror")}
+[[hidden]] _c16error_s(*) %{uchar16("_wcserror_s")}
+[[hidden]] _c32error_s(*) %{uchar32("_wcserror_s")}
+[[hidden]] __c16error(*) %{uchar16("__wcserror")}
+[[hidden]] __c32error(*) %{uchar32("__wcserror")}
+[[hidden]] __c16error_s(*) %{uchar16("__wcserror_s")}
+[[hidden]] __c32error_s(*) %{uchar32("__wcserror_s")}
+
 
 %{
 

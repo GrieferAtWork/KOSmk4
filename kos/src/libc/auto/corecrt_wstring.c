@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9385e74 */
+/* HASH CRC-32:0x9e3ae825 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,210 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "../user/corecrt_wstring.h"
+#include "corecrt_wstring.h"
+#include "../user/stdlib.h"
+#include "string.h"
+#include "uchar.h"
 #include "../user/wchar.h"
 #include "wctype.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <libc/errno.h>
+#include <bits/types.h>
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") char16_t *
+NOTHROW_NCX(LIBDCALL libd__wcserror)(errno_t errno_value) {
+	static char16_t *saved = NULL;
+	char const *newmsg;
+
+	errno_t saved_errno;
+
+	newmsg = libd_strerror(errno_value);
+	/*if unlikely(!newmsg) // `strerror()' returns non-NULL
+		return NULL;*/
+
+	/* Convert message. */
+
+	saved_errno = __libc_geterrno();
+
+
+	libc_free(saved);
+
+	saved = libd_convert_mbstowcs(newmsg);
+
+	__libc_seterrno(saved_errno);
+
+	return saved;
+}
+#include <libc/errno.h>
+#include <bits/types.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") char32_t *
+NOTHROW_NCX(LIBKCALL libc__wcserror)(errno_t errno_value) {
+	static char32_t *saved = NULL;
+	char const *newmsg;
+
+	errno_t saved_errno;
+
+	newmsg = libc_strerror(errno_value);
+	/*if unlikely(!newmsg) // `strerror()' returns non-NULL
+		return NULL;*/
+
+	/* Convert message. */
+
+	saved_errno = __libc_geterrno();
+
+
+	libc_free(saved);
+
+	saved = libc_convert_mbstowcs(newmsg);
+
+	__libc_seterrno(saved_errno);
+
+	return saved;
+}
+#include <libc/errno.h>
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_OUTS(1, 2) errno_t
+NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf,
+                                       size_t buflen,
+                                       errno_t errno_value) {
+	char16_t *msg  = libd__wcserror(errno_value);
+	size_t msglen = libd_wcslen(msg) + 1;
+	if (msglen >= buflen) {
+
+		return 34;
+
+
+
+	}
+	(char16_t *)libc_memcpyw(buf, msg, msglen);
+	return 0;
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_OUTS(1, 2) errno_t
+NOTHROW_NCX(LIBKCALL libc__wcserror_s)(char32_t *buf,
+                                       size_t buflen,
+                                       errno_t errno_value) {
+	char32_t *msg  = libc__wcserror(errno_value);
+	size_t msglen = libc_wcslen(msg) + 1;
+	if (msglen >= buflen) {
+
+		return ERANGE;
+
+
+
+	}
+	(char32_t *)libc_memcpyl(buf, msg, msglen);
+	return 0;
+}
+#include <libc/errno.h>
+#include <bits/types.h>
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_IN_OPT(1) char16_t *
+NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message) {
+	static char16_t *saved = NULL;
+	char const *newmsg;
+	char *utf8_message;
+
+	errno_t saved_errno;
+
+	if (message == NULL) {
+		newmsg = libc__strerror(NULL);
+	} else {
+		utf8_message = libd_convert_wcstombs(message);
+		if unlikely(!utf8_message)
+			return NULL;
+		newmsg = libc__strerror(utf8_message);
+
+		libc_free(utf8_message);
+
+		if unlikely(!newmsg)
+			return NULL;
+	}
+
+	/* Convert message. */
+
+	saved_errno = __libc_geterrno();
+
+
+	libc_free(saved);
+
+	saved = libd_convert_mbstowcs(newmsg);
+
+	__libc_seterrno(saved_errno);
+
+	return saved;
+}
+#include <libc/errno.h>
+#include <bits/types.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_IN_OPT(1) char32_t *
+NOTHROW_NCX(LIBKCALL libc___wcserror)(char32_t const *message) {
+	static char32_t *saved = NULL;
+	char const *newmsg;
+	char *utf8_message;
+
+	errno_t saved_errno;
+
+	if (message == NULL) {
+		newmsg = libc__strerror(NULL);
+	} else {
+		utf8_message = libc_convert_wcstombs(message);
+		if unlikely(!utf8_message)
+			return NULL;
+		newmsg = libc__strerror(utf8_message);
+
+		libc_free(utf8_message);
+
+		if unlikely(!newmsg)
+			return NULL;
+	}
+
+	/* Convert message. */
+
+	saved_errno = __libc_geterrno();
+
+
+	libc_free(saved);
+
+	saved = libc_convert_mbstowcs(newmsg);
+
+	__libc_seterrno(saved_errno);
+
+	return saved;
+}
+#include <libc/errno.h>
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_IN_OPT(3) ATTR_OUTS(1, 2) errno_t
+NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,
+                                        size_t buflen,
+                                        char16_t const *message) {
+	char16_t *msg  = libd___wcserror(message);
+	size_t msglen = libd_wcslen(msg) + 1;
+	if (msglen >= buflen) {
+
+		return 34;
+
+
+
+	}
+	(char16_t *)libc_memcpyw(buf, msg, msglen);
+	return 0;
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.errno") ATTR_IN_OPT(3) ATTR_OUTS(1, 2) errno_t
+NOTHROW_NCX(LIBKCALL libc___wcserror_s)(char32_t *buf,
+                                        size_t buflen,
+                                        char32_t const *message) {
+	char32_t *msg  = libc___wcserror(message);
+	size_t msglen = libc_wcslen(msg) + 1;
+	if (msglen >= buflen) {
+
+		return ERANGE;
+
+
+
+	}
+	(char32_t *)libc_memcpyl(buf, msg, msglen);
+	return 0;
+}
 #include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_INOUTS(1, 4) errno_t
@@ -572,6 +769,14 @@ NOTHROW_NCX(LIBKCALL libc_wcsncpy_s)(char32_t *dst,
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(DOS$_wcserror, libd__wcserror);
+DEFINE_PUBLIC_ALIAS(_wcserror, libc__wcserror);
+DEFINE_PUBLIC_ALIAS(DOS$_wcserror_s, libd__wcserror_s);
+DEFINE_PUBLIC_ALIAS(_wcserror_s, libc__wcserror_s);
+DEFINE_PUBLIC_ALIAS(DOS$__wcserror, libd___wcserror);
+DEFINE_PUBLIC_ALIAS(__wcserror, libc___wcserror);
+DEFINE_PUBLIC_ALIAS(DOS$__wcserror_s, libd___wcserror_s);
+DEFINE_PUBLIC_ALIAS(__wcserror_s, libc___wcserror_s);
 DEFINE_PUBLIC_ALIAS(DOS$_wcsnset_s, libd__wcsnset_s);
 DEFINE_PUBLIC_ALIAS(_wcsnset_s, libc__wcsnset_s);
 DEFINE_PUBLIC_ALIAS(DOS$_wcsset_s, libd__wcsset_s);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x317e7473 */
+/* HASH CRC-32:0x592d8188 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,11 +59,11 @@ __DECL_END
 #endif /* !__libc_geterrno && __libc_errno */
 
 #ifndef __libc_geterrno_or
-#ifdef __libc_errno
-#define __libc_geterrno_or(alt) __libc_errno
-#else /* __libc_errno */
+#ifdef __libc_geterrno
+#define __libc_geterrno_or(alt) __libc_geterrno()
+#else /* __libc_geterrno */
 #define __libc_geterrno_or(alt) alt
-#endif /* !__libc_errno */
+#endif /* !__libc_geterrno */
 #endif /* !__libc_geterrno_or */
 
 #ifndef __libc_seterrno

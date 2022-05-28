@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47bd2b44 */
+/* HASH CRC-32:0x7ec3e49f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,8 +55,6 @@
 #define __stub___pthread_unwind_next
 #define __stub___res_state
 #define __stub___solaris_sysinfo
-#define __stub___wcserror
-#define __stub___wcserror_s
 #define __stub__beep
 #define __stub__clearfp
 #define __stub__configthreadlocale
@@ -95,8 +93,6 @@
 #define __stub__statusfp2
 #define __stub__unlock_locales
 #define __stub__wcreate_locale
-#define __stub__wcserror
-#define __stub__wcserror_s
 #define __stub__wmktemp
 #define __stub__wmktemp_s
 #define __stub__wsearchenv_s
@@ -577,11 +573,7 @@
 #define __stub_DOS$_W_Gettnames
 #define __stub_DOS$_Wcsftime
 #define __stub_DOS$___lc_locale_name_func
-#define __stub_DOS$__wcserror
-#define __stub_DOS$__wcserror_s
 #define __stub_DOS$_wcreate_locale
-#define __stub_DOS$_wcserror
-#define __stub_DOS$_wcserror_s
 #define __stub_DOS$_wmktemp
 #define __stub_DOS$_wmktemp_s
 #define __stub_DOS$_wsearchenv_s
