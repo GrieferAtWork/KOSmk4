@@ -23,8 +23,10 @@
 #include "../api.h"
 /**/
 
+#include <kos/exec/idata.h>
 #include <kos/syscalls.h>
 
+#include <stdlib.h>
 #include <syscall.h>
 
 #include "time.h"
@@ -34,6 +36,63 @@
 
 DECL_BEGIN
 
+/************************************************************************/
+/* GLOBAL SYMBOLS: tzname, timezone, daylight, _dstbias                 */
+/************************************************************************/
+#undef tzname
+#undef timezone
+#undef daylight
+#undef _tzname
+#undef _timezone
+#undef _daylight
+#undef __tzname
+#undef __timezone
+#undef __daylight
+#undef _dstbias
+PRIVATE ATTR_SECTION(".bss.crt.time.timezone") char *libc_tzname_buf[2] = { NULL, NULL };
+INTERN ATTR_SECTION(".bss.crt.time.timezone") longptr_t libc_timezone = 0;
+INTERN ATTR_SECTION(".bss.crt.time.timezone") int libc_daylight = 0;
+INTERN ATTR_SECTION(".bss.crt.dos.time.timezone") __LONG32_TYPE__ libc__dstbias = 0;
+
+/* Default string pointed-to by `tzname[0,1]' before `tzset(3)' is called. */
+PRIVATE ATTR_SECTION(".rodata.crt.time.timezone")
+char const libc_tzname_default[] = "GMT";
+
+INTERN ATTR_SECTION(".text.crt.time.timezone") ATTR_RETNONNULL WUNUSED char **
+NOTHROW(LIBCCALL libc_resolve_tzname)(void) {
+	if (!libc_tzname_buf[1]) {
+		libc_tzname_buf[0] = (char *)libc_tzname_default;
+		COMPILER_WRITE_BARRIER();
+		libc_tzname_buf[1] = (char *)libc_tzname_default;
+	}
+	return libc_tzname_buf;
+}
+
+/* Exports */
+DEFINE_PUBLIC_ALIAS(daylight, libc_daylight);
+DEFINE_PUBLIC_ALIAS(_daylight, libc_daylight);
+DEFINE_PUBLIC_ALIAS(__daylight, libc_daylight);
+DEFINE_PUBLIC_ALIAS(timezone, libc_timezone);
+DEFINE_PUBLIC_ALIAS(_timezone, libc_timezone);
+DEFINE_PUBLIC_ALIAS(__timezone, libc_timezone);
+DEFINE_PUBLIC_IDATA_G(tzname, libc_resolve_tzname, 2 * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(_tzname, libc_resolve_tzname, 2 * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA_G(__tzname, libc_resolve_tzname, 2 * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_ALIAS(_dstbias, libc__dstbias);
+
+/* Restore NOREL definitions */
+#define tzname   GET_NOREL_GLOBAL(tzname)
+#define timezone GET_NOREL_GLOBAL(timezone)
+#define daylight GET_NOREL_GLOBAL(daylight)
+#define _dstbias GET_NOREL_GLOBAL(_dstbias)
+
+
+
+
+/************************************************************************/
+/* MAGIC FUNCTIONS                                                      */
+/************************************************************************/
+
 /*[[[head:libc_tzset,hash:CRC-32=0x58b1d4b5]]]*/
 /* >> tzset(3)
  * Set time conversion information from the `$TZ' environment variable.
@@ -41,11 +100,22 @@ DECL_BEGIN
 INTERN ATTR_SECTION(".text.crt.time") void
 NOTHROW_NCX(LIBCCALL libc_tzset)(void)
 /*[[[body:libc_tzset]]]*/
-/*AUTO*/{
+{
+	char const *tz = getenv("TZ");
+	if (!tz)
+		tz = "/etc/localtime";
+	if (!*tz)
+		tz = "Universal";
+	if (*tz == ':')
+		++tz;
+	/* TODO:
+	 * https://www.man7.org/linux/man-pages/man3/tzset.3.html
+	 * https://www.man7.org/linux/man-pages/man5/tzfile.5.html */
 	CRT_UNIMPLEMENTED("tzset"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_tzset]]]*/
+
 
 /*[[[head:libc_clock,hash:CRC-32=0x4139ade9]]]*/
 /* >> clock(3)
@@ -59,23 +129,6 @@ NOTHROW_NCX(LIBCCALL libc_clock)(void)
 	return (clock_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_clock]]]*/
-
-/*[[[head:libc_getdate,hash:CRC-32=0xdf966fed]]]*/
-/* >> getdate(3)
- * Parse the given string as a date specification and return a value
- * representing the value. The templates from the file identified by
- * the environment variable `$DATEMSK' are used. In case of an error
- * `getdate_err' is set */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(1) struct tm *
-NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string)
-/*[[[body:libc_getdate]]]*/
-/*AUTO*/{
-	(void)string;
-	CRT_UNIMPLEMENTEDF("getdate(%q)", string); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_getdate]]]*/
 
 /*[[[head:libc_clock_adjtime,hash:CRC-32=0x1182d872]]]*/
 /* >> clock_adjtime(2), clock_adjtime64(2) */
@@ -547,7 +600,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1c734a4f]]]*/
+/*[[[start:exports,hash:CRC-32=0xd855687e]]]*/
 DEFINE_PUBLIC_ALIAS(clock, libc_clock);
 DEFINE_PUBLIC_ALIAS(__time, libc_time);
 DEFINE_PUBLIC_ALIAS(__libc_time, libc_time);
@@ -590,7 +643,6 @@ DEFINE_PUBLIC_ALIAS(clock_settime64, libc_clock_settime64);
 DEFINE_PUBLIC_ALIAS(timer_settime64, libc_timer_settime64);
 DEFINE_PUBLIC_ALIAS(timer_gettime64, libc_timer_gettime64);
 DEFINE_PUBLIC_ALIAS(clock_nanosleep64, libc_clock_nanosleep64);
-DEFINE_PUBLIC_ALIAS(getdate, libc_getdate);
 DEFINE_PUBLIC_ALIAS(clock_adjtime, libc_clock_adjtime);
 DEFINE_PUBLIC_ALIAS(clock_adjtime64, libc_clock_adjtime64);
 DEFINE_PUBLIC_ALIAS(_get_tzname, libc__get_tzname);

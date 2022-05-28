@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5509636 */
+/* HASH CRC-32:0x850968db */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1571,46 +1571,39 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timespec_get, __FORCELOCAL __ATTR_ARTIFICIAL __A
      3  failed to get file status information,
      4  the template file is not a regular file,
      5  an error is encountered while reading the template file,
-     6  memory allication failed (not enough memory available),
+     6  memory allocation failed (not enough memory available),
      7  there is no line in the template that matches the input,
      8  invalid input specification Example: February 31 or a time is
         specified that can not be represented in a time_t (representing
         the time in seconds since 00:00:00 UTC, January 1, 1970) */
-#ifdef __CRT_HAVE_getdate_err
+#ifndef getdate_err
+#ifdef __LOCAL_getdate_err
+#define getdate_err __LOCAL_getdate_err
+#elif defined(__CRT_HAVE_getdate_err)
 __CSDECLARE(,int,getdate_err)
 #define getdate_err getdate_err
 #endif /* __CRT_HAVE_getdate_err */
+#endif /* !getdate_err */
+#ifdef __CRT_HAVE_getdate
 /* >> getdate(3)
  * Parse the given string as a date specification and return a value
  * representing the value. The templates from the file identified by
  * the environment variable `$DATEMSK' are used. In case of an error
  * `getdate_err' is set */
-__CDECLARE_OPT(__ATTR_IN(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,getdate,(const char *__string),(__string))
+__CDECLARE(__ATTR_IN(1),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,getdate,(const char *__string),(__string))
+#else /* __CRT_HAVE_getdate */
+#include <libc/template/getdate_err.h>
+#ifdef __LOCAL_getdate_err
+#include <libc/local/time/getdate.h>
+/* >> getdate(3)
+ * Parse the given string as a date specification and return a value
+ * representing the value. The templates from the file identified by
+ * the environment variable `$DATEMSK' are used. In case of an error
+ * `getdate_err' is set */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getdate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) struct __NAMESPACE_STD_SYM tm *__NOTHROW_NCX(__LIBCCALL getdate)(const char *__string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdate))(__string); })
+#endif /* __LOCAL_getdate_err */
+#endif /* !__CRT_HAVE_getdate */
 #endif /* __USE_XOPEN_EXTENDED */
-
-#ifdef __USE_GNU
-#ifndef __getdate_r_defined
-#define __getdate_r_defined
-#ifdef __CRT_HAVE_getdate_r
-/* >> getdate_r(3)
- * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
- * and the static buffer to return the result in, we provide a thread-safe
- * variant.  The  functionality is  the same.  The  result is  returned in
- * the  buffer pointed to by `resbufp' and in case of an error, the return
- * value is != 0  with the same values  as given above for  `getdate_err'. */
-__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,getdate_r,(char const *__restrict __string, struct __NAMESPACE_STD_SYM tm *__restrict __resbufp),(__string,__resbufp))
-#else /* __CRT_HAVE_getdate_r */
-#include <libc/local/time/getdate_r.h>
-/* >> getdate_r(3)
- * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
- * and the static buffer to return the result in, we provide a thread-safe
- * variant.  The  functionality is  the same.  The  result is  returned in
- * the  buffer pointed to by `resbufp' and in case of an error, the return
- * value is != 0  with the same values  as given above for  `getdate_err'. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getdate_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL getdate_r)(char const *__restrict __string, struct __NAMESPACE_STD_SYM tm *__restrict __resbufp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdate_r))(__string, __resbufp); })
-#endif /* !__CRT_HAVE_getdate_r */
-#endif /* !__getdate_r_defined */
-#endif /* __USE_GNU */
 
 #ifdef __USE_XOPEN2K8
 #ifdef __CRT_HAVE_strftime_l
@@ -1665,8 +1658,6 @@ __CDECLARE(__ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3),char *,__NOTHROW_NCX,strptime
  * the  provided  locale  and  not  the  global locale */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strptime_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_OUT(3) char *__NOTHROW_NCX(__LIBCCALL strptime_l)(char const *__restrict __s, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strptime_l))(__s, __format, __tp, __locale); })
 #endif /* !__CRT_HAVE_strptime_l */
-#ifndef __getdate_r_defined
-#define __getdate_r_defined
 #ifdef __CRT_HAVE_getdate_r
 /* >> getdate_r(3)
  * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
@@ -1685,7 +1676,6 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),int,__NOTHROW_NCX,getdate_r,(char const *_
  * value is != 0  with the same values  as given above for  `getdate_err'. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getdate_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL getdate_r)(char const *__restrict __string, struct __NAMESPACE_STD_SYM tm *__restrict __resbufp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdate_r))(__string, __resbufp); })
 #endif /* !__CRT_HAVE_getdate_r */
-#endif /* !__getdate_r_defined */
 #ifndef __clock_adjtime_defined
 #define __clock_adjtime_defined
 #if defined(__CRT_HAVE_clock_adjtime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebf39f3f */
+/* HASH CRC-32:0x98e8de12 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -293,6 +293,16 @@ INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_timespec_get64)(struct timespec
  * the environment variable `$DATEMSK' are used. In case of an error
  * `getdate_err' is set */
 INTDEF ATTR_IN(1) struct tm *NOTHROW_NCX(LIBDCALL libd_getdate)(const char *string);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> getdate(3)
+ * Parse the given string as a date specification and return a value
+ * representing the value. The templates from the file identified by
+ * the environment variable `$DATEMSK' are used. In case of an error
+ * `getdate_err' is set */
+INTDEF ATTR_IN(1) struct tm *NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strftime_l(3)
  * Similar to `strftime(3)' but take the information from
  * the   provided  locale  and   not  the  global  locale */

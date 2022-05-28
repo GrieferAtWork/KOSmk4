@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf0b8ded */
+/* HASH CRC-32:0x3e10843d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -206,7 +206,6 @@
 #define __stub_getaliasent
 #define __stub_getaliasent_r
 #define __stub_getbsize
-#define __stub_getdate
 #define __stub_gethostbyaddr
 #define __stub_gethostbyaddr_r
 #define __stub_gethostbyname

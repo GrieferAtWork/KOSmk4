@@ -3162,6 +3162,7 @@
 #define __CRT_HAVE_getcontext
 #define __CRT_HAVE_getcwd
 #define __CRT_HAVE_getdate
+#define __CRT_HAVE_getdate_err
 #define __CRT_HAVE_getdate_r
 #define __CRT_HAVE_getdelim
 #define __CRT_HAVE_getdelim_unlocked

@@ -86,27 +86,13 @@ PUBLIC ATTR_SECTION(".bss.crt.utility.regex") reg_syntax_t re_syntax_options = 0
 #undef tzname
 #undef timezone
 #undef daylight
-#undef _tzname
-#undef _timezone
-#undef _daylight
-#undef __tzname
-#undef __timezone
-#undef __daylight
 #undef _dstbias
+#undef getdate_err
 DEFINE_NOREL_GLOBAL_META(char *, tzname, ".crt.time.timezone");
 DEFINE_NOREL_GLOBAL_META(longptr_t, timezone, ".crt.time.timezone");
 DEFINE_NOREL_GLOBAL_META(int, daylight, ".crt.time.timezone");
 DEFINE_NOREL_GLOBAL_META(__LONG32_TYPE__, _dstbias, ".crt.dos.time.timezone");
-PUBLIC ATTR_SECTION(".bss.crt.time.timezone") char *tzname[2]              = { NULL, NULL };
-PUBLIC ATTR_SECTION(".bss.crt.time.timezone") longptr_t timezone           = 0;
-PUBLIC ATTR_SECTION(".bss.crt.time.timezone") int daylight                 = 0;
-PUBLIC ATTR_SECTION(".bss.crt.dos.time.timezone") __LONG32_TYPE__ _dstbias = 0;
-DEFINE_PUBLIC_ALIAS(_tzname, tzname);
-DEFINE_PUBLIC_ALIAS(_timezone, timezone);
-DEFINE_PUBLIC_ALIAS(_daylight, daylight);
-DEFINE_PUBLIC_ALIAS(__tzname, tzname);
-DEFINE_PUBLIC_ALIAS(__timezone, timezone);
-DEFINE_PUBLIC_ALIAS(__daylight, daylight);
+DEFINE_NOREL_GLOBAL_META(int, getdate_err, ".crt.time");
 
 
 /* <getopt.h> */

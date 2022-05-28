@@ -1709,21 +1709,37 @@ int timespec_get64([[out]] struct timespec64 *ts,
 
 %
 %#ifdef __USE_XOPEN_EXTENDED
-%/* Set to one of the following values to indicate an error.
-%     1  the DATEMSK environment variable is null or undefined,
-%     2  the template file cannot be opened for reading,
-%     3  failed to get file status information,
-%     4  the template file is not a regular file,
-%     5  an error is encountered while reading the template file,
-%     6  memory allication failed (not enough memory available),
-%     7  there is no line in the template that matches the input,
-%     8  invalid input specification Example: February 31 or a time is
-%        specified that can not be represented in a time_t (representing
-%        the time in seconds since 00:00:00 UTC, January 1, 1970) */
-%#ifdef __CRT_HAVE_getdate_err
-%__CSDECLARE(,int,getdate_err)
-%#define getdate_err getdate_err
-%#endif /* __CRT_HAVE_getdate_err */
+%{
+/* Set to one of the following values to indicate an error.
+     1  the DATEMSK environment variable is null or undefined,
+     2  the template file cannot be opened for reading,
+     3  failed to get file status information,
+     4  the template file is not a regular file,
+     5  an error is encountered while reading the template file,
+     6  memory allocation failed (not enough memory available),
+     7  there is no line in the template that matches the input,
+     8  invalid input specification Example: February 31 or a time is
+        specified that can not be represented in a time_t (representing
+        the time in seconds since 00:00:00 UTC, January 1, 1970) */
+#ifndef getdate_err
+#ifdef __LOCAL_getdate_err
+#define getdate_err __LOCAL_getdate_err
+#elif defined(__CRT_HAVE_getdate_err)
+__CSDECLARE(,int,getdate_err)
+#define getdate_err getdate_err
+#endif /* __CRT_HAVE_getdate_err */
+#endif /* !getdate_err */
+}
+
+
+%(auto_source){
+#ifndef __KERNEL__
+#undef getdate_err
+INTERN ATTR_SECTION(".bss.crt.time") int libc_getdate_err = 0;
+DEFINE_PUBLIC_ALIAS(getdate_err, libc_getdate_err);
+#define getdate_err GET_NOREL_GLOBAL(getdate_err)
+#endif /* !__KERNEL__ */
+}
 
 @@>> getdate(3)
 @@Parse the given string as a date specification and return a value
@@ -1731,13 +1747,18 @@ int timespec_get64([[out]] struct timespec64 *ts,
 @@the environment variable `$DATEMSK' are used. In case of an error
 @@`getdate_err' is set
 [[decl_include("<bits/crt/tm.h>")]]
-struct $tm *getdate([[in]] const char *string);
+[[requires_include("<libc/template/getdate_err.h>")]]
+[[requires($has_function(getdate_r) && defined(__LOCAL_getdate_err))]]
+[[impl_include("<bits/crt/tm.h>")]]
+struct $tm *getdate([[in]] const char *string) {
+	static @struct tm@ result;
+	int error = getdate_r(string, &result);
+	if (error == 0)
+		return &result;
+	__LOCAL_getdate_err = error;
+	return NULL;
+}
 %#endif /* __USE_XOPEN_EXTENDED */
-
-%
-%#ifdef __USE_GNU
-%[insert:extern(getdate_r)]
-%#endif /* __USE_GNU */
 
 
 
@@ -1820,7 +1841,7 @@ char *strptime_l([[in]] char const *__restrict s,
 @@variant.  The  functionality is  the same.  The  result is  returned in
 @@the  buffer pointed to by `resbufp' and in case of an error, the return
 @@value is != 0  with the same values  as given above for  `getdate_err'.
-[[guard, decl_include("<bits/crt/tm.h>")]]
+[[decl_include("<bits/crt/tm.h>")]]
 int getdate_r([[in]] char const *__restrict string,
               [[out]] struct $tm *__restrict resbufp) {
 	/* TODO */

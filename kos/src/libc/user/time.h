@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1346485 */
+/* HASH CRC-32:0x26b4ce21 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,12 +105,6 @@ INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_timer_gettime64)(timer_t timeri
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
  * High-resolution sleep with the specified clock */
 INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) int NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec64 const *requested_time, struct timespec64 *remaining);
-/* >> getdate(3)
- * Parse the given string as a date specification and return a value
- * representing the value. The templates from the file identified by
- * the environment variable `$DATEMSK' are used. In case of an error
- * `getdate_err' is set */
-INTDEF ATTR_IN(1) struct tm *NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string);
 #endif /* !__KERNEL__ */
 INTDEF char *libc_tzname[2];
 INTDEF int libc_daylight;

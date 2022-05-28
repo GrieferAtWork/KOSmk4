@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56faa68d */
+/* HASH CRC-32:0x77919bf2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -509,6 +509,29 @@ NOTHROW_NCX(LIBCCALL libc_timespec_get64)(struct timespec64 *ts,
 	return 0;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#endif /* !__KERNEL__ */
+#ifndef __KERNEL__
+#undef getdate_err
+INTERN ATTR_SECTION(".bss.crt.time") int libc_getdate_err = 0;
+DEFINE_PUBLIC_ALIAS(getdate_err, libc_getdate_err);
+#define getdate_err GET_NOREL_GLOBAL(getdate_err)
+#endif /* !__KERNEL__ */
+#ifndef __KERNEL__
+#include <bits/crt/tm.h>
+/* >> getdate(3)
+ * Parse the given string as a date specification and return a value
+ * representing the value. The templates from the file identified by
+ * the environment variable `$DATEMSK' are used. In case of an error
+ * `getdate_err' is set */
+INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(1) struct tm *
+NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string) {
+	static struct tm result;
+	int error = libc_getdate_r(string, &result);
+	if (error == 0)
+		return &result;
+	__LOCAL_getdate_err = error;
+	return NULL;
+}
 /* >> strftime_l(3)
  * Similar to `strftime(3)' but take the information from
  * the   provided  locale  and   not  the  global  locale */
@@ -1169,6 +1192,7 @@ DEFINE_PUBLIC_ALIAS(timespec_get, libc_timespec_get);
 DEFINE_PUBLIC_ALIAS(_timespec64_get, libc_timespec_get64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(timespec_get64, libc_timespec_get64);
+DEFINE_PUBLIC_ALIAS(getdate, libc_getdate);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strftime_l, libc_strftime_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
