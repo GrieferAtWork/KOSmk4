@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef68565a */
+/* HASH CRC-32:0x6d550882 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_INOUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wmktemp_s)(char16_t *template_, size_t bufsize);
-INTDEF ATTR_INOUTS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wmktemp_s)(char32_t *template_, size_t bufsize);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wmktemp)(char16_t *template_);
-INTDEF ATTR_RETNONNULL ATTR_INOUT(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wmktemp)(char32_t *template_);
 INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(2) intptr_t NOTHROW_RPC(LIBDCALL libd__wfindfirst32)(char16_t const *__restrict filename, struct _wfinddata32_t *__restrict finddata);
 INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(2) intptr_t NOTHROW_RPC(LIBKCALL libc__wfindfirst32)(char32_t const *__restrict filename, struct _wfinddata32_t *__restrict finddata);
 INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(2) intptr_t NOTHROW_RPC(LIBDCALL libd__wfindfirst32i64)(char16_t const *__restrict filename, struct _wfinddata32i64_t *__restrict finddata);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebdf25ac */
+/* HASH CRC-32:0xc04842ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,10 @@
 #include "../user/corecrt_wio.h"
 #include "parts.wchar.fcntl.h"
 #include "../user/parts.wchar.unistd.h"
+#include "../user/stdlib.h"
+#include "string.h"
+#include "uchar.h"
+#include "../user/wchar.h"
 
 DECL_BEGIN
 
@@ -46,6 +50,94 @@ NOTHROW_RPC(LIBKCALL libc__waccess_s)(char32_t const *file,
 	if (libc_waccess(file, type) != 0)
 		return __libc_geterrno_or(1);
 	return 0;
+}
+#include <libc/errno.h>
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_INOUTS(1, 2) errno_t
+NOTHROW_NCX(LIBDCALL libd__wmktemp_s)(char16_t *template_,
+                                      size_t bufsize) {
+	if (bufsize < 6)
+		goto err_inval;
+	template_ = libd__wmktemp(template_);
+	if (!*template_)
+		goto err_inval; /* ??? */
+	return 0;
+err_inval:
+
+	return 22;
+
+
+
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_INOUTS(1, 2) errno_t
+NOTHROW_NCX(LIBKCALL libc__wmktemp_s)(char32_t *template_,
+                                      size_t bufsize) {
+	if (bufsize < 6)
+		goto err_inval;
+	template_ = libc__wmktemp(template_);
+	if (!*template_)
+		goto err_inval; /* ??? */
+	return 0;
+err_inval:
+
+	return EINVAL;
+
+
+
+}
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_RETNONNULL ATTR_INOUT(1) char16_t *
+NOTHROW_NCX(LIBDCALL libd__wmktemp)(char16_t *template_) {
+	char *utf8_template, *rand;
+	char16_t *rand_dst;
+	size_t i;
+	utf8_template = libd_convert_wcstombs(template_);
+	if unlikely(!utf8_template)
+		goto err;
+	utf8_template = libc_mktemp(utf8_template);
+	if (!*utf8_template)
+		goto err_utf8_template;
+	rand = libc_strend(utf8_template) - 6;
+	rand_dst = libd_wcsend(template_) - 6;
+	for (i = 0; i < 6; ++i)
+		rand_dst[i] = (char16_t)(unsigned char)rand[i];
+
+	libc_free(utf8_template);
+
+	return template_;
+err_utf8_template:
+
+	libc_free(utf8_template);
+
+err:
+	*template_ = '\0';
+	return template_;
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_RETNONNULL ATTR_INOUT(1) char32_t *
+NOTHROW_NCX(LIBKCALL libc__wmktemp)(char32_t *template_) {
+	char *utf8_template, *rand;
+	char32_t *rand_dst;
+	size_t i;
+	utf8_template = libc_convert_wcstombs(template_);
+	if unlikely(!utf8_template)
+		goto err;
+	utf8_template = libc_mktemp(utf8_template);
+	if (!*utf8_template)
+		goto err_utf8_template;
+	rand = libc_strend(utf8_template) - 6;
+	rand_dst = libc_wcsend(template_) - 6;
+	for (i = 0; i < 6; ++i)
+		rand_dst[i] = (char32_t)(unsigned char)rand[i];
+
+	libc_free(utf8_template);
+
+	return template_;
+err_utf8_template:
+
+	libc_free(utf8_template);
+
+err:
+	*template_ = '\0';
+	return template_;
 }
 #include <libc/errno.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.io") ATTR_IN(2) ATTR_OUT(1) errno_t
@@ -142,6 +234,10 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$_waccess_s, libd__waccess_s);
 DEFINE_PUBLIC_ALIAS(_waccess_s, libc__waccess_s);
+DEFINE_PUBLIC_ALIAS(DOS$_wmktemp_s, libd__wmktemp_s);
+DEFINE_PUBLIC_ALIAS(_wmktemp_s, libc__wmktemp_s);
+DEFINE_PUBLIC_ALIAS(DOS$_wmktemp, libd__wmktemp);
+DEFINE_PUBLIC_ALIAS(_wmktemp, libc__wmktemp);
 DEFINE_PUBLIC_ALIAS(DOS$_wsopen_s, libd__wsopen_s);
 DEFINE_PUBLIC_ALIAS(_wsopen_s, libc__wsopen_s);
 DEFINE_PUBLIC_ALIAS(DOS$_wsopen_dispatch, libd__wsopen_dispatch);

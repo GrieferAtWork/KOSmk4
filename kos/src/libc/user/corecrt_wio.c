@@ -436,71 +436,13 @@ NOTHROW_RPC(LIBKCALL libc__wfindnext64)(intptr_t findfd,
 
 
 
-/*[[[head:libd__wmktemp_s,hash:CRC-32=0xc0587bfc]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_INOUTS(1, 2) errno_t
-NOTHROW_NCX(LIBDCALL libd__wmktemp_s)(char16_t *template_,
-                                      size_t bufsize)
-/*[[[body:libd__wmktemp_s]]]*/
-/*AUTO*/{
-	(void)template_;
-	(void)bufsize;
-	CRT_UNIMPLEMENTEDF("DOS$_wmktemp_s(%p, %Ix)", template_, bufsize); /* TODO */
-	return ENOSYS;
-}
-/*[[[end:libd__wmktemp_s]]]*/
-
-/*[[[head:libc__wmktemp_s,hash:CRC-32=0x38ad5868]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_INOUTS(1, 2) errno_t
-NOTHROW_NCX(LIBKCALL libc__wmktemp_s)(char32_t *template_,
-                                      size_t bufsize)
-/*[[[body:libc__wmktemp_s]]]*/
-/*AUTO*/{
-	(void)template_;
-	(void)bufsize;
-	CRT_UNIMPLEMENTEDF("_wmktemp_s(%p, %Ix)", template_, bufsize); /* TODO */
-	return ENOSYS;
-}
-/*[[[end:libc__wmktemp_s]]]*/
-
-/*[[[head:libd__wmktemp,hash:CRC-32=0x4883932]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_RETNONNULL ATTR_INOUT(1) char16_t *
-NOTHROW_NCX(LIBDCALL libd__wmktemp)(char16_t *template_)
-/*[[[body:libd__wmktemp]]]*/
-/*AUTO*/{
-	(void)template_;
-	CRT_UNIMPLEMENTEDF("DOS$_wmktemp(%p)", template_); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libd__wmktemp]]]*/
-
-/*[[[head:libc__wmktemp,hash:CRC-32=0x58c15044]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.utility") ATTR_RETNONNULL ATTR_INOUT(1) char32_t *
-NOTHROW_NCX(LIBKCALL libc__wmktemp)(char32_t *template_)
-/*[[[body:libc__wmktemp]]]*/
-/*AUTO*/{
-	(void)template_;
-	CRT_UNIMPLEMENTEDF("_wmktemp(%p)", template_); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc__wmktemp]]]*/
-
-
-
-
-
 
 #undef _wfindfirst
 #undef _wfindfirsti64
 #undef _wfindnext
 #undef _wfindnexti64
 
-/*[[[start:exports,hash:CRC-32=0x448ef099]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$_wmktemp_s, libd__wmktemp_s);
-DEFINE_PUBLIC_ALIAS(_wmktemp_s, libc__wmktemp_s);
-DEFINE_PUBLIC_ALIAS(DOS$_wmktemp, libd__wmktemp);
-DEFINE_PUBLIC_ALIAS(_wmktemp, libc__wmktemp);
+/*[[[start:exports,hash:CRC-32=0x3bde8363]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_wfindfirst, libd__wfindfirst32);
 DEFINE_PUBLIC_ALIAS(DOS$_wfindfirst32, libd__wfindfirst32);
 DEFINE_PUBLIC_ALIAS(_wfindfirst, libc__wfindfirst32);

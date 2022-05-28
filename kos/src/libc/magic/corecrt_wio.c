@@ -93,10 +93,51 @@ errno_t _waccess_s([[in]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
 %[default:section(".text.crt.dos.wchar.fs.utility")]
 
 [[wchar, decl_include("<bits/types.h>")]]
-errno_t _wmktemp_s([[inout(bufsize)]] wchar_t *template_, size_t bufsize);
+[[requires_function(_wmktemp)]]
+[[impl_include("<libc/errno.h>")]]
+errno_t _wmktemp_s([[inout(bufsize)]] wchar_t *template_, size_t bufsize) {
+	if (bufsize < 6)
+		goto err_inval;
+	template_ = _wmktemp(template_);
+	if (!*template_)
+		goto err_inval; /* ??? */
+	return 0;
+err_inval:
+@@pp_ifdef EINVAL@@
+	return $EINVAL;
+@@pp_else@@
+	return 1;
+@@pp_endif@@
+}
 
 [[wchar, nonnull, decl_include("<hybrid/typecore.h>")]]
-wchar_t *_wmktemp([[inout]] wchar_t *template_);
+[[requires_function(mktemp, convert_wcstombs)]]
+wchar_t *_wmktemp([[inout]] wchar_t *template_) {
+	char *utf8_template, *rand;
+	wchar_t *rand_dst;
+	size_t i;
+	utf8_template = convert_wcstombs(template_);
+	if unlikely(!utf8_template)
+		goto err;
+	utf8_template = mktemp(utf8_template);
+	if (!*utf8_template)
+		goto err_utf8_template;
+	rand = strend(utf8_template) - 6;
+	rand_dst = wcsend(template_) - 6;
+	for (i = 0; i < 6; ++i)
+		rand_dst[i] = (wchar_t)(unsigned char)rand[i];
+@@pp_if $has_function(free)@@
+	free(utf8_template);
+@@pp_endif@@
+	return template_;
+err_utf8_template:
+@@pp_if $has_function(free)@@
+	free(utf8_template);
+@@pp_endif@@
+err:
+	*template_ = '\0';
+	return template_;
+}
 
 
 %[default:section(".text.crt.dos.fs.io")]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c32fc52 */
+/* HASH CRC-32:0x7932eda5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,10 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTDEF WUNUSED ATTR_IN(1) errno_t NOTHROW_RPC(LIBDCALL libd__waccess_s)(char16_t const *file, __STDC_INT_AS_UINT_T type);
 INTDEF WUNUSED ATTR_IN(1) errno_t NOTHROW_RPC(LIBKCALL libc__waccess_s)(char32_t const *file, __STDC_INT_AS_UINT_T type);
+INTDEF ATTR_INOUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__wmktemp_s)(char16_t *template_, size_t bufsize);
+INTDEF ATTR_INOUTS(1, 2) errno_t NOTHROW_NCX(LIBKCALL libc__wmktemp_s)(char32_t *template_, size_t bufsize);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wmktemp)(char16_t *template_);
+INTDEF ATTR_RETNONNULL ATTR_INOUT(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wmktemp)(char32_t *template_);
 INTDEF ATTR_IN(2) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBDCALL libd__wsopen_s)(fd_t *fd, char16_t const *filename, oflag_t oflags, int sflags, mode_t mode);
 INTDEF ATTR_IN(2) ATTR_OUT(1) errno_t NOTHROW_RPC(LIBKCALL libc__wsopen_s)(fd_t *fd, char32_t const *filename, oflag_t oflags, int sflags, mode_t mode);
 INTDEF WUNUSED ATTR_IN(1) ATTR_OUT(5) errno_t NOTHROW_RPC(LIBDCALL libd__wsopen_dispatch)(char16_t const *filename, oflag_t oflags, int sflags, mode_t mode, fd_t *fd, int bsecure);
