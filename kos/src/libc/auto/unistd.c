@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f1cd039 */
+/* HASH CRC-32:0xca800023 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1363,6 +1363,12 @@ NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd,
 	}
 	return result;
 }
+/* >> ctermid_r(3)
+ * Same as `ctermid', but return `NULL' when `s' is `NULL' */
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUT_OPT(1) char *
+NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s) {
+	return s ? libc_ctermid(s) : NULL;
+}
 /* >> closefrom(2)
  * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 INTERN ATTR_SECTION(".text.crt.bsd.io.access") void
@@ -1534,6 +1540,7 @@ DEFINE_PUBLIC_ALIAS(cuserid, libc_cuserid);
 DEFINE_PUBLIC_ALIAS(getpassfd, libc_getpassfd);
 DEFINE_PUBLIC_ALIAS(getpass_r, libc_getpass_r);
 DEFINE_PUBLIC_ALIAS(getpeereid, libc_getpeereid);
+DEFINE_PUBLIC_ALIAS(ctermid_r, libc_ctermid_r);
 DEFINE_PUBLIC_ALIAS(closefrom, libc_closefrom);
 DEFINE_PUBLIC_ALIAS(issetugid, libc_issetugid);
 DEFINE_PUBLIC_ALIAS(fchroot, libc_fchroot);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba189355 */
+/* HASH CRC-32:0x32327989 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -670,6 +670,13 @@ INTDEF ATTR_OUT(2) ATTR_OUT(3) int NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t so
 /* >> ctermid_r(3)
  * Same as `ctermid', but return `NULL' when `s' is `NULL' */
 INTDEF ATTR_OUT_OPT(1) char *NOTHROW_NCX(LIBDCALL libd_ctermid_r)(char *s);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> ctermid_r(3)
+ * Same as `ctermid', but return `NULL' when `s' is `NULL' */
+INTDEF ATTR_OUT_OPT(1) char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sysconf(2)
  * @param: name: One of `_SC_*' from <asm/crt/confname.h>
  * Return   a   system    configuration   value    `name'

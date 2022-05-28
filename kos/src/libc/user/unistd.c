@@ -2028,9 +2028,9 @@ NOTHROW_NCX(LIBCCALL libc_setdomainname)(char const *name,
 INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_vhangup)(void)
 /*[[[body:libc_vhangup]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("vhangup"); /* TODO */
-	return libc_seterrno(ENOSYS);
+{
+	errno_t result = sys_vhangup();
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_vhangup]]]*/
 
@@ -3965,23 +3965,13 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 }
 /*[[[end:libc_getmode]]]*/
 
-/*[[[head:libc_ctermid_r,hash:CRC-32=0xee9a2dfe]]]*/
-/* >> ctermid_r(3)
- * Same as `ctermid', but return `NULL' when `s' is `NULL' */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUT_OPT(1) char *
-NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
-/*[[[body:libc_ctermid_r]]]*/
-/*AUTO*/{
-	return s ? ctermid(s) : NULL;
-}
-/*[[[end:libc_ctermid_r]]]*/
 
 
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf7ce8af8]]]*/
+/*[[[start:exports,hash:CRC-32=0xde89d8cb]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -4294,7 +4284,6 @@ DEFINE_PUBLIC_ALIAS(__libc_fdatasync, libc_fdatasync);
 DEFINE_PUBLIC_ALIAS(fdatasync, libc_fdatasync);
 DEFINE_PUBLIC_ALIAS(setmode, libc_setmode);
 DEFINE_PUBLIC_ALIAS(getmode, libc_getmode);
-DEFINE_PUBLIC_ALIAS(ctermid_r, libc_ctermid_r);
 DEFINE_PUBLIC_ALIAS(__sysconf, libc_sysconf);
 DEFINE_PUBLIC_ALIAS(sysconf, libc_sysconf);
 DEFINE_PUBLIC_ALIAS(close_range, libc_close_range);

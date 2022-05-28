@@ -3342,7 +3342,7 @@ int getpeereid($fd_t sockfd,
 @@>> ctermid_r(3)
 @@Same as `ctermid', but return `NULL' when `s' is `NULL'
 [[guard, requires_function(ctermid)]]
-[[userimpl, section(".text.crt{|.dos}.io.tty")]]
+[[section(".text.crt{|.dos}.io.tty")]]
 char *ctermid_r([[out_opt]] char *s) {
 	return s ? ctermid(s) : NULL;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x280f05b2 */
+/* HASH CRC-32:0xbf0b8ded */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -571,9 +571,6 @@
 #define __stub_uselocale
 #define __stub_utmpname
 #define __stub_utmpxname
-#define __stub___vhangup
-#define __stub___libc_vhangup
-#define __stub_vhangup
 #define __stub_wfreadlinkat
 #define __stub_wttyname_r
 #define __stub_xmalloc_failed
