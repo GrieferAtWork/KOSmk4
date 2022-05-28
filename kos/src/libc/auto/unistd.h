@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bed1463 */
+/* HASH CRC-32:0xba189355 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -156,7 +156,7 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTDEF ATTR_OUTS(2, 3) int NOTHROW_RPC(LIBDCALL libd_ttyname_r)(fd_t fd, char *buf, size_t buflen);
+INTDEF ATTR_OUTS(2, 3) errno_t NOTHROW_RPC(LIBDCALL libd_ttyname_r)(fd_t fd, char *buf, size_t buflen);
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_tcgetpgrp)(fd_t fd);
@@ -426,6 +426,16 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_seteuid)(uid_t euid);
  * @return: -1: [errno=EINVAL] : The given `egid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setegid)(gid_t egid);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> ttyslot(3)
+ * Returns the (1-based) index into ttys returned by `getttyent(3)' of
+ * the terminal currently associated with the caller (~ala `ttyname(3)')
+ * On error, or if caller's terminal isn't listed by `getttyent(3)', we
+ * instead return `0' */
+INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_ttyslot)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getlogin_r(3)
  * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
  * s.a. `getlogin()' and `cuserid()' */

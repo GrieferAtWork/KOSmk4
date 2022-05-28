@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad441bf */
+/* HASH CRC-32:0x95c5132b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2905,7 +2905,7 @@ DFUN(".text.crt.dos.sched.user", libd_setgid, libc_setgid, TD, 1, TIn(__SIZEOF_G
 DFUN(".text.crt.dos.system.utility", libd_alarm, libc_alarm, TD, 1, TD)
 DFUN(".text.crt.dos.fs.property", libd_fpathconf, libc_fpathconf, TP, 2, TIn(__SIZEOF_FD_T__), TD)
 DFUN(".text.crt.dos.io.tty", libd_ttyname, libc_ttyname, TP, 1, TIn(__SIZEOF_FD_T__))
-DFUN(".text.crt.dos.io.tty", libd_ttyname_r, libc_ttyname_r, TD, 3, TIn(__SIZEOF_FD_T__), TP, TI)
+DFUN(".text.crt.dos.io.tty", libd_ttyname_r, libc_ttyname_r, TIn(__SIZEOF_ERRNO_T__), 3, TIn(__SIZEOF_FD_T__), TP, TI)
 DFUN(".text.crt.dos.io.tty", libd_tcgetpgrp, libc_tcgetpgrp, TIn(__SIZEOF_PID_T__), 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.io.tty", libd_tcsetpgrp, libc_tcsetpgrp, TD, 2, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_PID_T__))
 DFUN(".text.crt.dos.io.read", libd_read, libc_read, TI, 3, TIn(__SIZEOF_FD_T__), TP, TI)

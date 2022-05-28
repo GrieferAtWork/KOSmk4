@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb095ee6 */
+/* HASH CRC-32:0xebe64d7c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,7 +148,7 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_pause)(void);
 INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd, __STDC_INT_AS_UINT_T name);
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTDEF ATTR_OUTS(2, 3) int NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd, char *buf, size_t buflen);
+INTDEF ATTR_OUTS(2, 3) errno_t NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd, char *buf, size_t buflen);
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd);
@@ -510,8 +510,6 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid);
  * @return: -1: [errno=EINVAL] : The given `egid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid);
-/* >> ttyslot(3) */
-INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_ttyslot)(void);
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.

@@ -533,10 +533,10 @@ NOTHROW_RPC(LIBCCALL libc_pause)(void)
 
 PRIVATE ATTR_SECTION(".rodata.crt.io.tty") char const devpath[] = "/dev";
 
-/*[[[head:libc_ttyname_r,hash:CRC-32=0xa8798498]]]*/
+/*[[[head:libc_ttyname_r,hash:CRC-32=0x2435f532]]]*/
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUTS(2, 3) int
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUTS(2, 3) errno_t
 NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
                                      char *buf,
                                      size_t buflen)
@@ -1873,18 +1873,6 @@ NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid)
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_setegid]]]*/
-
-/*[[[head:libc_ttyslot,hash:CRC-32=0xed7869b6]]]*/
-/* >> ttyslot(3) */
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_ttyslot)(void)
-/*[[[body:libc_ttyslot]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("ttyslot"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_ttyslot]]]*/
 
 /*[[[head:libd_symlink,hash:CRC-32=0xd8ddeed]]]*/
 /* >> symlink(3)
@@ -3996,7 +3984,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd2a87c59]]]*/
+/*[[[start:exports,hash:CRC-32=0xf7ce8af8]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -4252,7 +4240,6 @@ DEFINE_PUBLIC_ALIAS(setregid, libc_setregid);
 DEFINE_PUBLIC_ALIAS(gethostid, libc_gethostid);
 DEFINE_PUBLIC_ALIAS(seteuid, libc_seteuid);
 DEFINE_PUBLIC_ALIAS(setegid, libc_setegid);
-DEFINE_PUBLIC_ALIAS(ttyslot, libc_ttyslot);
 DEFINE_PUBLIC_ALIAS(DOS$__symlink, libd_symlink);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_symlink, libd_symlink);
 DEFINE_PUBLIC_ALIAS(DOS$symlink, libd_symlink);

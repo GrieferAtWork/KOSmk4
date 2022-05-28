@@ -39,10 +39,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_wttyname_r,hash:CRC-32=0xeb3312e]]]*/
+/*[[[head:libc_wttyname_r,hash:CRC-32=0xbebbdb5]]]*/
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_OUTS(2, 3) int
+INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_OUTS(2, 3) errno_t
 NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd,
                                       char32_t *buf,
                                       size_t buflen)
@@ -52,15 +52,14 @@ NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd,
 	(void)buf;
 	(void)buflen;
 	CRT_UNIMPLEMENTEDF("wttyname_r(%" PRIxN(__SIZEOF_FD_T__) ", %p, %Ix)", fd, buf, buflen); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc_wttyname_r]]]*/
 
-/*[[[head:libd_wttyname_r,hash:CRC-32=0xb6065005]]]*/
+/*[[[head:libd_wttyname_r,hash:CRC-32=0x714d3267]]]*/
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_OUTS(2, 3) int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") ATTR_OUTS(2, 3) errno_t
 NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
                                       char16_t *buf,
                                       size_t buflen)
@@ -70,8 +69,7 @@ NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
 	(void)buf;
 	(void)buflen;
 	CRT_UNIMPLEMENTEDF("DOS$wttyname_r(%" PRIxN(__SIZEOF_FD_T__) ", %p, %Ix)", fd, buf, buflen); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libd_wttyname_r]]]*/
 

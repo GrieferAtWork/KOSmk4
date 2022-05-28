@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfafc0 */
+/* HASH CRC-32:0x4867f0c8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1109,7 +1109,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #endif /* !__ttyname_defined */
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-__CDECLARE_OPT(__ATTR_OUTS(2, 3),int,__NOTHROW_RPC,ttyname_r,(__fd_t __fd, char *__buf, size_t __buflen),(__fd,__buf,__buflen))
+__CDECLARE_OPT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,ttyname_r,(__fd_t __fd, char *__buf, size_t __buflen),(__fd,__buf,__buflen))
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,tcgetpgrp,(__fd_t __fd),(__fd))
@@ -2660,8 +2660,22 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,seteuid,(__uid_t __euid),(__euid))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setegid,(__gid_t __egid),(__egid))
 #endif /* __USE_XOPEN2K */
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_UNIX98))
-/* >> ttyslot(3) */
-__CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,ttyslot,(void),())
+#ifdef __CRT_HAVE_ttyslot
+/* >> ttyslot(3)
+ * Returns the (1-based) index into ttys returned by `getttyent(3)' of
+ * the terminal currently associated with the caller (~ala `ttyname(3)')
+ * On error, or if caller's terminal isn't listed by `getttyent(3)', we
+ * instead return `0' */
+__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,ttyslot,(void),())
+#elif (defined(__CRT_HAVE_ttyname) || defined(__CRT_HAVE___ttyname) || defined(__CRT_HAVE_ttyname_r)) && defined(__CRT_HAVE_setttyent) && defined(__CRT_HAVE_getttyent)
+#include <libc/local/unistd/ttyslot.h>
+/* >> ttyslot(3)
+ * Returns the (1-based) index into ttys returned by `getttyent(3)' of
+ * the terminal currently associated with the caller (~ala `ttyname(3)')
+ * On error, or if caller's terminal isn't listed by `getttyent(3)', we
+ * instead return `0' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ttyslot, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL ttyslot)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ttyslot))(); })
+#endif /* ... */
 #endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_UNIX98) */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)

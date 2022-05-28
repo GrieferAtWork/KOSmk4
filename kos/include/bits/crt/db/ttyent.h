@@ -28,7 +28,7 @@
 __DECL_BEGIN
 
 struct ttyent {
-	char           *ty_name;    /* terminal device name */
+	char           *ty_name;    /* terminal device name (without "/dev/" prefix) */
 	char           *ty_getty;   /* command to execute, usually getty */
 	char           *ty_type;    /* terminal type for termcap */
 	int             ty_status;  /* status flags (Set of `TTY_ON | TTY_SECURE') */

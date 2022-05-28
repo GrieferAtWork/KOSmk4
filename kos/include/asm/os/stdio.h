@@ -56,6 +56,18 @@
 #endif /* __STDOUT_FILENO != 1 */
 #endif /* !__STDERR_FILENO */
 
+#if (__STDOUT_FILENO == __STDIN_FILENO + 1 && \
+     __STDERR_FILENO == __STDIN_FILENO + 2)
+#define __PRIVATE_FOREACH_STDFILENO(fd) \
+	for ((fd) = __STDIN_FILENO; (fd) <= __STDERR_FILENO; ++(fd))
+#else /* ... */
+#define __PRIVATE_FOREACH_STDFILENO(fd)                     \
+	for ((fd) = __STDIN_FILENO; (fd) != -1;                 \
+	     (fd) = (fd) == __STDIN_FILENO  ? __STDOUT_FILENO : \
+	            (fd) == __STDOUT_FILENO ? __STDERR_FILENO : -1)
+#endif /* !... */
+
+
 #ifndef __F_OK
 #define __F_OK 0 /* Test for existence. */
 #define __X_OK 1 /* Test for execute permission. */

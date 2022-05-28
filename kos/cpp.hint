@@ -1268,6 +1268,7 @@
 #define LIST_HEAD_P(T) struct{T*lh_first;}
 #define LIST_ENTRY(t) struct{struct t*le_next,**le_prev;}
 #define LIST_ENTRY_P(T) struct{T*le_next,**le_prev;}
+#define __PRIVATE_FOREACH_STDFILENO(...) for(;;)
 #define LIST_FOREACH(...) for(;;)
 #define LIST_FOREACH_P(...) for(;;)
 #define LIST_FOREACH_SAFE(...) for(;;)

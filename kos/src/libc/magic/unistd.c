@@ -821,7 +821,7 @@ char *ttyname($fd_t fd) {
 @@>> ttyname_r(3)
 @@Return the name of a TTY given its file descriptor
 [[cp, decl_include("<bits/types.h>")]]
-int ttyname_r($fd_t fd, [[out(? <= buflen)]] char *buf, size_t buflen);
+$errno_t ttyname_r($fd_t fd, [[out(? <= buflen)]] char *buf, size_t buflen);
 
 @@>> tcgetpgrp(2)
 @@Return the foreground process group of a given TTY file descriptor
@@ -2102,9 +2102,38 @@ int setegid($gid_t egid);
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_UNIX98))
 
 @@>> ttyslot(3)
-[[wunused]]
-[[section(".text.crt{|.dos}.io.tty")]]
-int ttyslot();
+@@Returns the (1-based) index into ttys returned by `getttyent(3)' of
+@@the terminal currently associated with the caller (~ala `ttyname(3)')
+@@On error, or if caller's terminal isn't listed by `getttyent(3)', we
+@@instead return `0'
+[[wunused, section(".text.crt{|.dos}.compat.glibc")]]
+[[requires_function(ttyname, setttyent, getttyent)]]
+[[impl_include("<libc/errno.h>", "<bits/types.h>")]]
+[[impl_include("<asm/os/stdio.h>", "<bits/crt/db/ttyent.h>")]]
+int ttyslot() {
+	fd_t fd;
+	__PRIVATE_FOREACH_STDFILENO(fd) {
+		char const *tnam;
+		int result;
+		@struct ttyent@ *tty;
+		if ((tnam = ttyname(fd)) == NULL)
+			continue;
+		tnam = strrchrnul(tnam, '/') + 1;
+		setttyent();
+		for (result = 1; (tty = getttyent()) != NULL; ++result) {
+			if (strcmp(tty->@ty_name@, tnam) == 0) {
+@@pp_if $has_function(endttyent)@@
+				endttyent();
+@@pp_endif@@
+				return result;
+			}
+		}
+@@pp_if $has_function(endttyent)@@
+		endttyent();
+@@pp_endif@@
+	}
+	return 0;
+}
 
 %#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_UNIX98) */
 

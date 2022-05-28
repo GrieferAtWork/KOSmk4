@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39c9d63c */
+/* HASH CRC-32:0x9f1cd039 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,7 @@
 #include "../user/sys.time.h"
 #include "termios.h"
 #include "../user/time.h"
+#include "../user/ttyent.h"
 
 DECL_BEGIN
 
@@ -507,6 +508,40 @@ NOTHROW(LIBCCALL libc_getdtablesize)(void) {
 
 
 
+}
+#include <libc/errno.h>
+#include <bits/types.h>
+#include <asm/os/stdio.h>
+#include <bits/crt/db/ttyent.h>
+/* >> ttyslot(3)
+ * Returns the (1-based) index into ttys returned by `getttyent(3)' of
+ * the terminal currently associated with the caller (~ala `ttyname(3)')
+ * On error, or if caller's terminal isn't listed by `getttyent(3)', we
+ * instead return `0' */
+INTERN ATTR_SECTION(".text.crt.compat.glibc") WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_ttyslot)(void) {
+	fd_t fd;
+	__PRIVATE_FOREACH_STDFILENO(fd) {
+		char const *tnam;
+		int result;
+		struct ttyent *tty;
+		if ((tnam = libc_ttyname(fd)) == NULL)
+			continue;
+		tnam = libc_strrchrnul(tnam, '/') + 1;
+		libc_setttyent();
+		for (result = 1; (tty = libc_getttyent()) != NULL; ++result) {
+			if (libc_strcmp(tty->ty_name, tnam) == 0) {
+
+				libc_endttyent();
+
+				return result;
+			}
+		}
+
+		libc_endttyent();
+
+	}
+	return 0;
 }
 #include <bits/crt/db/passwd.h>
 /* >> getlogin_r(3)
@@ -1485,6 +1520,7 @@ DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(__getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
+DEFINE_PUBLIC_ALIAS(ttyslot, libc_ttyslot);
 DEFINE_PUBLIC_ALIAS(getlogin_r, libc_getlogin_r);
 DEFINE_PUBLIC_ALIAS(daemon, libc_daemon);
 DEFINE_PUBLIC_ALIAS(getpassphrase, libc_getpass);
