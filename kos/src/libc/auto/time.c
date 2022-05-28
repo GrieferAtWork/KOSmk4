@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77919bf2 */
+/* HASH CRC-32:0x20c40431 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <kos/types.h>
 #include "../user/time.h"
 #include "../user/stdio.h"
+#include "string.h"
 #include "../user/sys.time.h"
 
 DECL_BEGIN
@@ -904,6 +905,39 @@ NOTHROW_NCX(LIBCCALL libc__get_dstbias)(__LONG32_TYPE__ *p_result) {
 	*p_result = __LOCAL_dstbias;
 	return 0;
 }
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.time") ATTR_OUT(1) ATTR_OUT_OPT(2) errno_t
+NOTHROW_NCX(LIBDCALL libd__get_tzname)(size_t *result,
+                                       char *buf,
+                                       size_t bufsize,
+                                       int index) {
+	return libd_errno_kos2dos(libc__get_tzname(result, buf, bufsize, index));
+}
+#include <libc/errno.h>
+INTERN ATTR_SECTION(".text.crt.time") ATTR_OUT(1) ATTR_OUT_OPT(2) errno_t
+NOTHROW_NCX(LIBCCALL libc__get_tzname)(size_t *result,
+                                       char *buf,
+                                       size_t bufsize,
+                                       int index) {
+	char *reqstr;
+	size_t reqsiz;
+	if (index < 0 || index > 1 || !result || (!buf && bufsize)) {
+
+		return EINVAL;
+
+
+
+	}
+
+	libc_tzset(); /* Update state of `tzname' */
+
+	reqstr  = __LOCAL_tzname[(unsigned int)index];
+	reqsiz  = (libc_strlen(reqstr) + 1) * sizeof(char);
+	*result = reqsiz;
+	if (bufsize > reqsiz)
+		bufsize = reqsiz;
+	libc_memcpy(buf, reqstr, bufsize);
+	return 0;
+}
 #include <libc/errno.h>
 /* >> gmtime_r(3), gmtime64_r(3)
  * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
@@ -1071,12 +1105,22 @@ NOTHROW_NCX(LIBCCALL libc__strdate)(char buf[9]) {
 	buf[8] = '\0';
 	return buf;
 }
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.time") ATTR_OUTS(1, 2) errno_t
+NOTHROW_NCX(LIBDCALL libd__strtime_s)(char *buf,
+                                      size_t bufsize) {
+	return libd_errno_kos2dos(libc__strtime_s(buf, bufsize));
+}
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.time") ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__strtime_s)(char *buf,
                                       size_t bufsize) {
-	if unlikely(bufsize < 9)
-		return 34;
+	if unlikely(bufsize < 9) {
+
+		return ERANGE;
+
+
+
+	}
 
 	libc__strtime(buf);
 
@@ -1085,12 +1129,22 @@ NOTHROW_NCX(LIBCCALL libc__strtime_s)(char *buf,
 
 	return 0;
 }
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.time") ATTR_OUTS(1, 2) errno_t
+NOTHROW_NCX(LIBDCALL libd__strdate_s)(char *buf,
+                                      size_t bufsize) {
+	return libd_errno_kos2dos(libc__strdate_s(buf, bufsize));
+}
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.time") ATTR_OUTS(1, 2) errno_t
 NOTHROW_NCX(LIBCCALL libc__strdate_s)(char *buf,
                                       size_t bufsize) {
-	if unlikely(bufsize < 9)
-		return 34;
+	if unlikely(bufsize < 9) {
+
+		return ERANGE;
+
+
+
+	}
 
 	libc__strdate(buf);
 
@@ -1220,6 +1274,8 @@ DEFINE_PUBLIC_ALIAS(__p__dstbias, libc___dstbias);
 DEFINE_PUBLIC_ALIAS(_get_daylight, libc__get_daylight);
 DEFINE_PUBLIC_ALIAS(_get_timezone, libc__get_timezone);
 DEFINE_PUBLIC_ALIAS(_get_dstbias, libc__get_dstbias);
+DEFINE_PUBLIC_ALIAS(DOS$_get_tzname, libd__get_tzname);
+DEFINE_PUBLIC_ALIAS(_get_tzname, libc__get_tzname);
 DEFINE_PUBLIC_ALIAS(_gmtime32_s, libc__gmtime32_s);
 DEFINE_PUBLIC_ALIAS(_gmtime64_s, libc__gmtime64_s);
 DEFINE_PUBLIC_ALIAS(_localtime32_s, libc__localtime32_s);
@@ -1228,7 +1284,9 @@ DEFINE_PUBLIC_ALIAS(_ctime32_s, libc__ctime32_s);
 DEFINE_PUBLIC_ALIAS(_ctime64_s, libc__ctime64_s);
 DEFINE_PUBLIC_ALIAS(_strtime, libc__strtime);
 DEFINE_PUBLIC_ALIAS(_strdate, libc__strdate);
+DEFINE_PUBLIC_ALIAS(DOS$_strtime_s, libd__strtime_s);
 DEFINE_PUBLIC_ALIAS(_strtime_s, libc__strtime_s);
+DEFINE_PUBLIC_ALIAS(DOS$_strdate_s, libd__strdate_s);
 DEFINE_PUBLIC_ALIAS(_strdate_s, libc__strdate_s);
 DEFINE_PUBLIC_ALIAS(_getsystime, libc__getsystime);
 DEFINE_PUBLIC_ALIAS(_setsystime, libc__setsystime);

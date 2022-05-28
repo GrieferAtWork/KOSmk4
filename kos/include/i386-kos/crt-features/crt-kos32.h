@@ -6792,6 +6792,7 @@
 #define __CRT_HAVE_KOS$_gcvt_s
 #define __CRT_HAVE_KOS$_get_doserrno
 #define __CRT_HAVE_KOS$_get_errno
+#define __CRT_HAVE_KOS$_get_tzname
 #define __CRT_HAVE_KOS$_get_wenviron
 #define __CRT_HAVE_KOS$_get_wpgmptr
 #define __CRT_HAVE_KOS$_getdcwd
@@ -6848,6 +6849,8 @@
 #define __CRT_HAVE_KOS$_stat64
 #define __CRT_HAVE_KOS$_stat64i32
 #define __CRT_HAVE_KOS$_stati64
+#define __CRT_HAVE_KOS$_strdate_s
+#define __CRT_HAVE_KOS$_strtime_s
 #define __CRT_HAVE_KOS$_swprintf
 #define __CRT_HAVE_KOS$_swprintf_c
 #define __CRT_HAVE_KOS$_swprintf_c_l
@@ -7710,6 +7713,7 @@
 #define __CRT_HAVE_DOS$_gcvt_s
 #define __CRT_HAVE_DOS$_get_doserrno
 #define __CRT_HAVE_DOS$_get_errno
+#define __CRT_HAVE_DOS$_get_tzname
 #define __CRT_HAVE_DOS$_get_wenviron
 #define __CRT_HAVE_DOS$_get_wpgmptr
 #define __CRT_HAVE_DOS$_getcwd
@@ -7802,6 +7806,8 @@
 #define __CRT_HAVE_DOS$_stat64
 #define __CRT_HAVE_DOS$_stat64i32
 #define __CRT_HAVE_DOS$_stati64
+#define __CRT_HAVE_DOS$_strdate_s
+#define __CRT_HAVE_DOS$_strtime_s
 #define __CRT_HAVE_DOS$_swprintf
 #define __CRT_HAVE_DOS$_swprintf_c
 #define __CRT_HAVE_DOS$_swprintf_c_l

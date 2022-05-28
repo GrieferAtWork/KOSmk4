@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x850968db */
+/* HASH CRC-32:0xb2b566f3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1878,7 +1878,15 @@ __CDECLARE(,errno_t,__NOTHROW_NCX,_get_dstbias,(__LONG32_TYPE__ *__p_result),(__
 __NAMESPACE_LOCAL_USING_OR_IMPL(_get_dstbias, __FORCELOCAL __ATTR_ARTIFICIAL errno_t __NOTHROW_NCX(__LIBCCALL _get_dstbias)(__LONG32_TYPE__ *__p_result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_get_dstbias))(__p_result); })
 #endif /* __LOCAL_dstbias */
 #endif /* !__CRT_HAVE__get_dstbias */
-__CDECLARE_OPT(__ATTR_OUT(1) __ATTR_OUTS(2, 3),errno_t,__NOTHROW_NCX,_get_tzname,(size_t *__result, char *__buf, size_t __bufsize, int __index),(__result,__buf,__bufsize,__index))
+#ifdef __CRT_HAVE__get_tzname
+__CDECLARE(__ATTR_OUT(1) __ATTR_OUT_OPT(2),errno_t,__NOTHROW_NCX,_get_tzname,(size_t *__result, char *__buf, size_t __bufsize, int __index),(__result,__buf,__bufsize,__index))
+#else /* __CRT_HAVE__get_tzname */
+#include <libc/template/tzname.h>
+#ifdef __LOCAL_tzname
+#include <libc/local/time/_get_tzname.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_get_tzname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) __ATTR_OUT_OPT(2) errno_t __NOTHROW_NCX(__LIBCCALL _get_tzname)(size_t *__result, char *__buf, size_t __bufsize, int __index) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_get_tzname))(__result, __buf, __bufsize, __index); })
+#endif /* __LOCAL_tzname */
+#endif /* !__CRT_HAVE__get_tzname */
 #ifdef __CRT_HAVE_ctime
 /* >> ctime(3), ctime64(3)
  * Equivalent to `asctime(localtime(timer))' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7193630 */
+/* HASH CRC-32:0x6944fdd6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,8 +42,13 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_strdate_s) __ATTR_OUTS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strdate_s))(char *__buf, __SIZE_TYPE__ __bufsize) {
-	if __unlikely(__bufsize < 9)
-		return 34;
+	if __unlikely(__bufsize < 9) {
+#ifdef __ERANGE
+		return __ERANGE;
+#else /* __ERANGE */
+		return 1;
+#endif /* !__ERANGE */
+	}
 
 
 

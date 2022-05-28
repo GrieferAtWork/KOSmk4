@@ -162,33 +162,6 @@ NOTHROW_NCX(LIBCCALL libc_clock_adjtime64)(clockid_t clock_id,
 #endif /* MAGIC:alias */
 /*[[[end:libc_clock_adjtime64]]]*/
 
-/*[[[head:libc__get_tzname,hash:CRC-32=0xd39fe3cf]]]*/
-INTERN ATTR_SECTION(".text.crt.time") ATTR_OUT(1) ATTR_OUTS(2, 3) errno_t
-NOTHROW_NCX(LIBCCALL libc__get_tzname)(size_t *result,
-                                       char *buf,
-                                       size_t bufsize,
-                                       int index)
-/*[[[body:libc__get_tzname]]]*/
-/*AUTO*/{
-	(void)result;
-	(void)buf;
-	(void)bufsize;
-	(void)index;
-	CRT_UNIMPLEMENTEDF("_get_tzname(%p, %q, %Ix, %x)", result, buf, bufsize, index); /* TODO */
-	return ENOSYS;
-}
-/*[[[end:libc__get_tzname]]]*/
-
-
-
-
-
-
-
-
-
-
-
 /*[[[head:libc_time,hash:CRC-32=0xc233bc10]]]*/
 /* >> time(2), time64(2)
  * Return the current time and put it in `*timer' if `timer' is not `NULL' */
@@ -197,8 +170,7 @@ NOTHROW_NCX(LIBCCALL libc_time)(time_t *timer)
 /*[[[body:libc_time]]]*/
 {
 #ifdef SYS_time
-	time_t result;
-	result = sys_time(timer);
+	time_t result = sys_time(timer);
 	return libc_seterrno_syserr(result);
 #else /* SYS_time */
 	struct timeval tv;
@@ -224,8 +196,7 @@ NOTHROW_NCX(LIBCCALL libc_time64)(time64_t *timer)
 /*[[[body:libc_time64]]]*/
 {
 #ifdef SYS_time64
-	time_t result;
-	result = sys_time64(timer);
+	time64_t result = sys_time64(timer);
 	return libc_seterrno_syserr(result);
 #else /* SYS_time64 */
 	struct timeval64 tv;
@@ -600,7 +571,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd855687e]]]*/
+/*[[[start:exports,hash:CRC-32=0xafaf24ca]]]*/
 DEFINE_PUBLIC_ALIAS(clock, libc_clock);
 DEFINE_PUBLIC_ALIAS(__time, libc_time);
 DEFINE_PUBLIC_ALIAS(__libc_time, libc_time);
@@ -645,7 +616,6 @@ DEFINE_PUBLIC_ALIAS(timer_gettime64, libc_timer_gettime64);
 DEFINE_PUBLIC_ALIAS(clock_nanosleep64, libc_clock_nanosleep64);
 DEFINE_PUBLIC_ALIAS(clock_adjtime, libc_clock_adjtime);
 DEFINE_PUBLIC_ALIAS(clock_adjtime64, libc_clock_adjtime64);
-DEFINE_PUBLIC_ALIAS(_get_tzname, libc__get_tzname);
 /*[[[end:exports]]]*/
 
 DECL_END

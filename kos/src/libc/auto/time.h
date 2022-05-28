@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98e8de12 */
+/* HASH CRC-32:0x1296d224 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -453,9 +453,10 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_dstbias)(__LONG32_TYPE__ *p_result
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_dstbias)(__LONG32_TYPE__ *p_result);
+INTDEF ATTR_OUT(1) ATTR_OUT_OPT(2) errno_t NOTHROW_NCX(LIBDCALL libd__get_tzname)(size_t *result, char *buf, size_t bufsize, int index);
+INTDEF ATTR_OUT(1) ATTR_OUT_OPT(2) errno_t NOTHROW_NCX(LIBCCALL libc__get_tzname)(size_t *result, char *buf, size_t bufsize, int index);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_OUT(1) ATTR_OUTS(2, 3) errno_t NOTHROW_NCX(LIBDCALL libd__get_tzname)(size_t *result, char *buf, size_t bufsize, int index);
 /* >> gmtime_r(3), gmtime64_r(3)
  * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
 INTDEF ATTR_IN(2) ATTR_OUT(1) errno_t NOTHROW_NCX(LIBDCALL libd__gmtime32_s)(struct tm *__restrict tp, time32_t const *__restrict timer);
@@ -526,17 +527,9 @@ INTDEF ATTR_OUT(1) char *NOTHROW_NCX(LIBDCALL libd__strdate)(char buf[9]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc__strdate)(char buf[9]);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__strtime_s)(char *buf, size_t bufsize);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBCCALL libc__strtime_s)(char *buf, size_t bufsize);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBDCALL libd__strdate_s)(char *buf, size_t bufsize);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_OUTS(1, 2) errno_t NOTHROW_NCX(LIBCCALL libc__strdate_s)(char *buf, size_t bufsize);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

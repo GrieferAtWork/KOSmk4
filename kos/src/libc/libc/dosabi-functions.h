@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd61c4ba */
+/* HASH CRC-32:0xe503df6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2819,7 +2819,6 @@ DFUN(".text.crt.dos.time", libd_asctime_r, libc_asctime_r, TP, 2, TP, TP)
 DFUN(".text.crt.dos.time.timezone", libd__get_daylight, libc__get_daylight, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.time.timezone", libd__get_timezone, libc__get_timezone, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.time.timezone", libd__get_dstbias, libc__get_dstbias, TIn(__SIZEOF_ERRNO_T__), 1, TP)
-DFUN(".text.crt.dos.time", libd__get_tzname, libc__get_tzname, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TI, TD)
 DFUN(".text.crt.dos.time", libd__gmtime32_s, libc__gmtime32_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libd__gmtime64_s, libd__gmtime32_s);
@@ -2840,8 +2839,6 @@ DFUN(".text.crt.dos.time", libd__ctime64_s, libc__ctime64_s, TIn(__SIZEOF_ERRNO_
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 DFUN(".text.crt.dos.time", libd__strtime, libc__strtime, TP, 1, TP)
 DFUN(".text.crt.dos.time", libd__strdate, libc__strdate, TP, 1, TP)
-DFUN(".text.crt.dos.time", libd__strtime_s, libc__strtime_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TI)
-DFUN(".text.crt.dos.time", libd__strdate_s, libc__strdate_s, TIn(__SIZEOF_ERRNO_T__), 2, TP, TI)
 DFUN(".text.crt.dos.time", libd__getsystime, libc__getsystime, TD, 1, TP)
 DFUN(".text.crt.dos.time", libd__setsystime, libc__setsystime, TD, 2, TP, TD)
 

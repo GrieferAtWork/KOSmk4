@@ -2231,9 +2231,33 @@ errno_t _get_dstbias(__LONG32_TYPE__ *p_result) {
 }
 
 [[decl_include("<bits/types.h>")]]
+[[impl_include("<libc/errno.h>")]]
+[[requires_include("<libc/template/tzname.h>")]]
+[[requires(defined(__LOCAL_tzname))]]
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _get_tzname([[out]] size_t *result,
-                    [[out(? <= bufsize)]] char *buf,
-                    size_t bufsize, int index);
+                    [[out_opt/*(*result <= bufsize)*/]] char *buf,
+                    size_t bufsize, int index) {
+	char *reqstr;
+	size_t reqsiz;
+	if (index < 0 || index > 1 || !result || (!buf && bufsize)) {
+@@pp_ifdef EINVAL@@
+		return $EINVAL;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
+@@pp_if $has_function(tzset)@@
+	tzset(); /* Update state of `tzname' */
+@@pp_endif@@
+	reqstr  = __LOCAL_tzname[(unsigned int)index];
+	reqsiz  = (strlen(reqstr) + 1) * sizeof(char);
+	*result = reqsiz;
+	if (bufsize > reqsiz)
+		bufsize = reqsiz;
+	memcpy(buf, reqstr, bufsize);
+	return 0;
+}
 
 
 [[nocrt, wunused, decl_include("<bits/types.h>")]]
@@ -2450,9 +2474,15 @@ char *_strdate([[out]] char buf[9]) {
 
 [[decl_include("<bits/types.h>"), requires_function(_strtime)]]
 [[impl_include("<libc/errno.h>")]]
-/*dos*/ errno_t _strtime_s([[out(? <= bufsize)]] char *buf, size_t bufsize) {
-	if unlikely(bufsize < 9)
-		return DOS_ERANGE;
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
+errno_t _strtime_s([[out(? <= bufsize)]] char *buf, size_t bufsize) {
+	if unlikely(bufsize < 9) {
+@@pp_ifdef ERANGE@@
+		return $ERANGE;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
 @@pp_ifdef __BUILDING_LIBC@@
 	_strtime(buf);
 @@pp_else@@
@@ -2464,9 +2494,15 @@ char *_strdate([[out]] char buf[9]) {
 
 [[decl_include("<bits/types.h>"), requires_function(_strdate)]]
 [[impl_include("<libc/errno.h>")]]
-/*dos*/ errno_t _strdate_s([[out(? <= bufsize)]] char *buf, size_t bufsize) {
-	if unlikely(bufsize < 9)
-		return DOS_ERANGE;
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
+errno_t _strdate_s([[out(? <= bufsize)]] char *buf, size_t bufsize) {
+	if unlikely(bufsize < 9) {
+@@pp_ifdef ERANGE@@
+		return $ERANGE;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
 @@pp_ifdef __BUILDING_LIBC@@
 	_strdate(buf);
 @@pp_else@@

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26b4ce21 */
+/* HASH CRC-32:0x87f38511 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,7 +114,6 @@ INTDEF longptr_t libc_timezone;
 INTDEF ATTR_INOUT(2) int NOTHROW_NCX(LIBCCALL libc_clock_adjtime)(clockid_t clock_id, struct timex *utx);
 /* >> clock_adjtime(2), clock_adjtime64(2) */
 INTDEF ATTR_INOUT(2) int NOTHROW_NCX(LIBCCALL libc_clock_adjtime64)(clockid_t clock_id, struct timex64 *utx);
-INTDEF ATTR_OUT(1) ATTR_OUTS(2, 3) errno_t NOTHROW_NCX(LIBCCALL libc__get_tzname)(size_t *result, char *buf, size_t bufsize, int index);
 #endif /* !__KERNEL__ */
 
 DECL_END

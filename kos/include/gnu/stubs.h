@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e10843d */
+/* HASH CRC-32:0x47bd2b44 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,6 @@
 #define __stub__get_current_locale
 #define __stub__get_output_format
 #define __stub__get_purecall_handler
-#define __stub__get_tzname
 #define __stub__getdiskfree
 #define __stub__lock_locales
 #define __stub__mbbtombc_l
