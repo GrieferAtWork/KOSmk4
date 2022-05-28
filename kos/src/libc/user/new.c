@@ -34,7 +34,7 @@ NOTHROW_NCX(LIBDCALL libc__query_new_handler)(void)
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("_query_new_handler"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return 0;
+	return NULL;
 }
 /*[[[end:libc__query_new_handler]]]*/
 
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBDCALL libc__set_new_handler)(_PNH newhandler)
 	(void)newhandler;
 	CRT_UNIMPLEMENTEDF("_set_new_handler(%p)", newhandler); /* TODO */
 	libc_seterrno(ENOSYS);
-	return 0;
+	return NULL;
 }
 /*[[[end:libc__set_new_handler]]]*/
 
@@ -56,8 +56,7 @@ NOTHROW_NCX(LIBDCALL libc__query_new_mode)(void)
 /*[[[body:libc__query_new_mode]]]*/
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("_query_new_mode"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__query_new_mode]]]*/
 
@@ -68,8 +67,7 @@ NOTHROW_NCX(LIBDCALL libc__set_new_mode)(int newmode)
 /*AUTO*/{
 	(void)newmode;
 	CRT_UNIMPLEMENTEDF("_set_new_mode(%x)", newmode); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__set_new_mode]]]*/
 

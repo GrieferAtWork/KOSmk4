@@ -268,8 +268,7 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(struct re_pattern_buffer *buffer,
 	(void)regs;
 	(void)stop;
 	CRT_UNIMPLEMENTEDF("re_match_2(%p, %q, %x, %q, %x, %x, %p, %x)", buffer, string1, length1, string2, length2, start, regs, stop); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_re_match_2]]]*/
 

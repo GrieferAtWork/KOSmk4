@@ -34,8 +34,7 @@ NOTHROW_NCX(LIBCCALL libc_gtty)(fd_t fd,
 	(void)fd;
 	(void)params;
 	CRT_UNIMPLEMENTEDF("gtty(%" PRIxN(__SIZEOF_FD_T__) ", %p)", fd, params); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_gtty]]]*/
 
@@ -48,8 +47,7 @@ NOTHROW_NCX(LIBCCALL libc_stty)(fd_t fd,
 	(void)fd;
 	(void)params;
 	CRT_UNIMPLEMENTEDF("stty(%" PRIxN(__SIZEOF_FD_T__) ", %p)", fd, params); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_stty]]]*/
 

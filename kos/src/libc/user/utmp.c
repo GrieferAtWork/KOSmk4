@@ -45,8 +45,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_logout)(char const *ut_line)
 /*AUTO*/{
 	(void)ut_line;
 	CRT_UNIMPLEMENTEDF("logout(%q)", ut_line); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_logout]]]*/
 
@@ -88,8 +87,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_utmpname)(char const *file)
 /*AUTO*/{
 	(void)file;
 	CRT_UNIMPLEMENTEDF("utmpname(%q)", file); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_utmpname]]]*/
 
@@ -176,8 +174,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutent_r)(struct utmp *buffer,
 	(void)buffer;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getutent_r(%p, %p)", buffer, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getutent_r]]]*/
 
@@ -193,8 +190,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutid_r)(struct utmp const *id,
 	(void)buffer;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getutid_r(%p, %p, %p)", id, buffer, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getutid_r]]]*/
 
@@ -210,8 +206,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutline_r)(struct utmp const *line,
 	(void)buffer;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getutline_r(%p, %p, %p)", line, buffer, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getutline_r]]]*/
 

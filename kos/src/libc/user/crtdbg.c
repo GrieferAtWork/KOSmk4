@@ -70,8 +70,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtGetReportHook)(void)
 /*[[[body:libc__CrtGetReportHook]]]*/
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("_CrtGetReportHook"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (_CRT_REPORT_HOOK)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtGetReportHook]]]*/
 
@@ -82,8 +81,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportHook)(_CRT_REPORT_HOOK pfn_new_hook)
 /*AUTO*/{
 	(void)pfn_new_hook;
 	CRT_UNIMPLEMENTED("_CrtSetReportHook"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (_CRT_REPORT_HOOK)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtSetReportHook]]]*/
 
@@ -96,8 +94,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportHook2)(int mode,
 	(void)mode;
 	(void)pfn_new_hook;
 	CRT_UNIMPLEMENTED("_CrtSetReportHook2"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtSetReportHook2]]]*/
 
@@ -110,8 +107,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportHookW2)(int mode,
 	(void)mode;
 	(void)pfn_new_hook;
 	CRT_UNIMPLEMENTED("_CrtSetReportHookW2"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtSetReportHookW2]]]*/
 
@@ -121,8 +117,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtGetAllocHook)(void)
 /*[[[body:libc__CrtGetAllocHook]]]*/
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("_CrtGetAllocHook"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (_CRT_ALLOC_HOOK)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtGetAllocHook]]]*/
 
@@ -133,8 +128,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetAllocHook)(_CRT_ALLOC_HOOK pfn_new_hook)
 /*AUTO*/{
 	(void)pfn_new_hook;
 	CRT_UNIMPLEMENTED("_CrtSetAllocHook"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (_CRT_ALLOC_HOOK)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtSetAllocHook]]]*/
 
@@ -144,8 +138,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtGetDumpClient)(void)
 /*[[[body:libc__CrtGetDumpClient]]]*/
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("_CrtGetDumpClient"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (_CRT_DUMP_CLIENT)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtGetDumpClient]]]*/
 
@@ -156,8 +149,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetDumpClient)(_CRT_DUMP_CLIENT pfn_new_dump)
 /*AUTO*/{
 	(void)pfn_new_dump;
 	CRT_UNIMPLEMENTED("_CrtSetDumpClient"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (_CRT_DUMP_CLIENT)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtSetDumpClient]]]*/
 
@@ -170,8 +162,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportMode)(int report_type,
 	(void)report_type;
 	(void)report_mode;
 	CRT_UNIMPLEMENTEDF("_CrtSetReportMode(%x, %x)", report_type, report_mode); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtSetReportMode]]]*/
 
@@ -185,7 +176,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportFile)(int report_type,
 	(void)report_file;
 	CRT_UNIMPLEMENTEDF("_CrtSetReportFile(%x, %p)", report_type, report_file); /* TODO */
 	libc_seterrno(ENOSYS);
-	return 0;
+	return NULL;
 }
 /*[[[end:libc__CrtSetReportFile]]]*/
 
@@ -205,8 +196,7 @@ NOTHROW_NCX(VLIBDCALL libc__CrtDbgReport)(int report_type,
 	(void)module_name;
 	(void)format;
 	CRT_UNIMPLEMENTEDF("_CrtDbgReport(%x, %q, %x, %q, %q, ...)", report_type, filename, line, module_name, format); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtDbgReport]]]*/
 
@@ -218,8 +208,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetDebugFillThreshold)(size_t new_debug_fill_thres
 /*AUTO*/{
 	(void)new_debug_fill_threshold;
 	CRT_UNIMPLEMENTEDF("_CrtSetDebugFillThreshold(%Ix)", new_debug_fill_threshold); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (size_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtSetDebugFillThreshold]]]*/
 
@@ -240,8 +229,7 @@ NOTHROW_NCX(VLIBDCALL libc__CrtDbgReportW)(int report_type,
 	(void)module_name;
 	(void)format;
 	CRT_UNIMPLEMENTEDF("_CrtDbgReportW(%x, %p, %x, %p, %p, ...)", report_type, filename, line, module_name, format); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtDbgReportW]]]*/
 
@@ -265,8 +253,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetBreakAlloc)(__LONG32_TYPE__ break_alloc)
 /*AUTO*/{
 	(void)break_alloc;
 	CRT_UNIMPLEMENTEDF("_CrtSetBreakAlloc(%" PRIx32 ")", break_alloc); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (__LONG32_TYPE__)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtSetBreakAlloc]]]*/
 

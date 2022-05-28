@@ -37,7 +37,7 @@ NOTHROW_RPC(LIBCCALL libc_catopen)(char const *cat_name,
 	(void)flag;
 	CRT_UNIMPLEMENTEDF("catopen(%q, %x)", cat_name, flag); /* TODO */
 	libc_seterrno(ENOSYS);
-	return 0;
+	return NULL;
 }
 /*[[[end:libc_catopen]]]*/
 
@@ -66,8 +66,7 @@ NOTHROW_NCX(LIBCCALL libc_catclose)(nl_catd catalog)
 /*AUTO*/{
 	(void)catalog;
 	CRT_UNIMPLEMENTEDF("catclose(%p)", catalog); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_catclose]]]*/
 

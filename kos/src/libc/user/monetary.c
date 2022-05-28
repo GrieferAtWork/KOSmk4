@@ -38,8 +38,7 @@ NOTHROW_NCX(VLIBDCALL libd_strfmon)(char *__restrict s,
 	(void)maxsize;
 	(void)format;
 	CRT_UNIMPLEMENTEDF("strfmon(%q, %Ix, %q, ...)", s, maxsize, format); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_strfmon]]]*/
@@ -56,8 +55,7 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon)(char *__restrict s,
 	(void)maxsize;
 	(void)format;
 	CRT_UNIMPLEMENTEDF("strfmon(%q, %Ix, %q, ...)", s, maxsize, format); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_strfmon]]]*/
 
@@ -76,8 +74,7 @@ NOTHROW_NCX(VLIBDCALL libd_strfmon_l)(char *__restrict s,
 	(void)loc;
 	(void)format;
 	CRT_UNIMPLEMENTEDF("strfmon_l(%q, %Ix, %p, %q, ...)", s, maxsize, loc, format); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_strfmon_l]]]*/
@@ -96,8 +93,7 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s,
 	(void)loc;
 	(void)format;
 	CRT_UNIMPLEMENTEDF("strfmon_l(%q, %Ix, %p, %q, ...)", s, maxsize, loc, format); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_strfmon_l]]]*/
 

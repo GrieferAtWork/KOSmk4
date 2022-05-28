@@ -96,8 +96,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbyname_r)(char const *name,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getrpcbyname_r(%q, %p, %q, %Ix, %p)", name, result_buf, buffer, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getrpcbyname_r]]]*/
 
@@ -116,8 +115,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbynumber_r)(int number,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getrpcbynumber_r(%x, %p, %q, %Ix, %p)", number, result_buf, buffer, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getrpcbynumber_r]]]*/
 
@@ -134,8 +132,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcent_r)(struct rpcent *result_buf,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getrpcent_r(%p, %q, %Ix, %p)", result_buf, buffer, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getrpcent_r]]]*/
 

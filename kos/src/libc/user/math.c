@@ -42,8 +42,7 @@ NOTHROW_NCX(LIBCCALL libc_fromfp)(double x,
 	(void)round;
 	(void)width;
 	CRT_UNIMPLEMENTEDF("fromfp(%f, %x, %x)", x, round, width); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (intmax_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fromfp]]]*/
 
@@ -58,8 +57,7 @@ NOTHROW_NCX(LIBCCALL libc_ufromfp)(double x,
 	(void)round;
 	(void)width;
 	CRT_UNIMPLEMENTEDF("ufromfp(%f, %x, %x)", x, round, width); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (uintmax_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ufromfp]]]*/
 
@@ -74,8 +72,7 @@ NOTHROW_NCX(LIBCCALL libc_fromfpx)(double x,
 	(void)round;
 	(void)width;
 	CRT_UNIMPLEMENTEDF("fromfpx(%f, %x, %x)", x, round, width); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (intmax_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fromfpx]]]*/
 
@@ -90,8 +87,7 @@ NOTHROW_NCX(LIBCCALL libc_ufromfpx)(double x,
 	(void)round;
 	(void)width;
 	CRT_UNIMPLEMENTEDF("ufromfpx(%f, %x, %x)", x, round, width); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (uintmax_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ufromfpx]]]*/
 
@@ -104,8 +100,7 @@ NOTHROW_NCX(LIBCCALL libc_fmaxmag)(double x,
 	(void)x;
 	(void)y;
 	CRT_UNIMPLEMENTEDF("fmaxmag(%f, %f)", x, y); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (double)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fmaxmag]]]*/
 
@@ -118,8 +113,7 @@ NOTHROW_NCX(LIBCCALL libc_fminmag)(double x,
 	(void)x;
 	(void)y;
 	CRT_UNIMPLEMENTEDF("fminmag(%f, %f)", x, y); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (double)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fminmag]]]*/
 

@@ -106,8 +106,7 @@ NOTHROW_RPC(LIBCCALL libc_utmpxname)(char const *file)
 /*AUTO*/{
 	(void)file;
 	CRT_UNIMPLEMENTEDF("utmpxname(%q)", file); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_utmpxname]]]*/
 

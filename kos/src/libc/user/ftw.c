@@ -39,8 +39,7 @@ NOTHROW_RPC(LIBCCALL libc_ftw)(char const *dir,
 	(void)func;
 	(void)nopenfd;
 	CRT_UNIMPLEMENTEDF("ftw(%q, %p, %x)", dir, func, nopenfd); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ftw]]]*/
 
@@ -59,8 +58,7 @@ NOTHROW_RPC(LIBCCALL libc_ftw64)(char const *dir,
 	(void)func;
 	(void)nopenfd;
 	CRT_UNIMPLEMENTEDF("ftw64(%q, %p, %x)", dir, func, nopenfd); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_ftw64]]]*/
@@ -80,8 +78,7 @@ NOTHROW_RPC(LIBCCALL libc_nftw)(char const *dir,
 	(void)descriptors;
 	(void)flags;
 	CRT_UNIMPLEMENTEDF("nftw(%q, %p, %x, %x)", dir, func, descriptors, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_nftw]]]*/
 
@@ -103,8 +100,7 @@ NOTHROW_RPC(LIBCCALL libc_nftw64)(char const *dir,
 	(void)descriptors;
 	(void)flags;
 	CRT_UNIMPLEMENTEDF("nftw64(%q, %p, %x, %x)", dir, func, descriptors, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_nftw64]]]*/

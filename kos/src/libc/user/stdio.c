@@ -3739,8 +3739,7 @@ NOTHROW_RPC(LIBCCALL libc__rmtmp)(void)
 /*[[[body:libc__rmtmp]]]*/
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("_rmtmp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__rmtmp]]]*/
 
@@ -3750,8 +3749,7 @@ NOTHROW_NCX(LIBCCALL libc__get_output_format)(void)
 /*[[[body:libc__get_output_format]]]*/
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("_get_output_format"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (uint32_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__get_output_format]]]*/
 
@@ -3762,8 +3760,7 @@ NOTHROW_NCX(LIBCCALL libc__set_output_format)(uint32_t format)
 /*AUTO*/{
 	(void)format;
 	CRT_UNIMPLEMENTEDF("_set_output_format(%" PRIx32 ")", format); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (uint32_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__set_output_format]]]*/
 

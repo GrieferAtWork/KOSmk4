@@ -334,7 +334,9 @@ again_compare_typenames:
 	@@Returns @true if @this @CType is a pointer
 	public property isPointer: bool = {
 		get(): bool {
-			return str(beforeName).endswith("*");
+			if (str(beforeName).endswith("*"))
+				return true;
+			return typeClass == "TP";
 		}
 	}
 

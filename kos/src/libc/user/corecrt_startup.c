@@ -48,8 +48,7 @@ NOTHROW_NCX(LIBDCALL libc__seh_filter_dll)(__ULONG32_TYPE__ xno,
 	(void)xno;
 	(void)infp_ptrs;
 	CRT_UNIMPLEMENTEDF("_seh_filter_dll(%" PRIx32 ", %p)", xno, infp_ptrs); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__seh_filter_dll]]]*/
 
@@ -62,8 +61,7 @@ NOTHROW_NCX(LIBDCALL libc__seh_filter_exe)(__ULONG32_TYPE__ xno,
 	(void)xno;
 	(void)infp_ptrs;
 	CRT_UNIMPLEMENTEDF("_seh_filter_exe(%" PRIx32 ", %p)", xno, infp_ptrs); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__seh_filter_exe]]]*/
 

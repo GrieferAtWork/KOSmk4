@@ -33,8 +33,7 @@ NOTHROW_NCX(LIBCCALL libc_getifaddrs)(struct ifaddrs **ifap)
 /*AUTO*/{
 	(void)ifap;
 	CRT_UNIMPLEMENTEDF("getifaddrs(%p)", ifap); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getifaddrs]]]*/
 

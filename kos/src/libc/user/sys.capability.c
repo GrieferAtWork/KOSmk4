@@ -37,8 +37,7 @@ NOTHROW_NCX(LIBCCALL libc_capset)(cap_user_header_t header,
 	(void)header;
 	(void)data;
 	CRT_UNIMPLEMENTEDF("capset(%p, %p)", header, data); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_capset]]]*/
 
@@ -52,8 +51,7 @@ NOTHROW_NCX(LIBCCALL libc_capget)(cap_user_header_t header,
 	(void)header;
 	(void)data;
 	CRT_UNIMPLEMENTEDF("capget(%p, %p)", header, data); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_capget]]]*/
 

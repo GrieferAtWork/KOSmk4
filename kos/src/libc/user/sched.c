@@ -49,8 +49,7 @@ NOTHROW_NCX(VLIBDCALL libd_clone)(int (LIBDCALL *fn)(void *arg),
 	(void)flags;
 	(void)arg;
 	CRT_UNIMPLEMENTEDF("clone(%p, %p, %x, %p, ...)", fn, child_stack, flags, arg); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (pid_t)libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:impl_if */
 /*[[[end:libd_clone]]]*/

@@ -60,8 +60,7 @@ NOTHROW_NCX(LIBCCALL libc_setlogmask)(__STDC_INT_AS_UINT_T mask)
 /*AUTO*/{
 	(void)mask;
 	CRT_UNIMPLEMENTEDF("setlogmask(%x)", mask); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_setlogmask]]]*/
 

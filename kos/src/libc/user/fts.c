@@ -51,8 +51,7 @@ NOTHROW_NCX(LIBCCALL libc_fts_close)(FTS *ftsp)
 /*AUTO*/{
 	(void)ftsp;
 	CRT_UNIMPLEMENTEDF("fts_close(%p)", ftsp); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fts_close]]]*/
 
@@ -100,8 +99,7 @@ NOTHROW_NCX(LIBCCALL libc_fts_set)(FTS *ftsp,
 	(void)f;
 	(void)instr;
 	CRT_UNIMPLEMENTEDF("fts_set(%p, %p, %x)", ftsp, f, instr); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fts_set]]]*/
 
@@ -136,8 +134,7 @@ NOTHROW_RPC(LIBCCALL libc_fts64_close)(FTS64 *ftsp)
 /*AUTO*/{
 	(void)ftsp;
 	CRT_UNIMPLEMENTEDF("fts64_close(%p)", ftsp); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_fts64_close]]]*/
@@ -197,8 +194,7 @@ NOTHROW_NCX(LIBCCALL libc_fts64_set)(FTS64 *ftsp,
 	(void)f;
 	(void)instr;
 	CRT_UNIMPLEMENTEDF("fts64_set(%p, %p, %x)", ftsp, f, instr); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_fts64_set]]]*/

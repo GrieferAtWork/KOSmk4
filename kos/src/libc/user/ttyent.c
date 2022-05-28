@@ -59,8 +59,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setttyent)(void)
 /*[[[body:libc_setttyent]]]*/
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("setttyent"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_setttyent]]]*/
 
@@ -71,8 +70,7 @@ NOTHROW_NCX(LIBCCALL libc_endttyent)(void)
 /*[[[body:libc_endttyent]]]*/
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("endttyent"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_endttyent]]]*/
 

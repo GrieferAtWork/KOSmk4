@@ -168,8 +168,7 @@ NOTHROW_RPC(LIBCCALL libc_gethostent_r)(struct hostent *__restrict result_buf,
 	(void)result;
 	(void)h_errnop;
 	CRT_UNIMPLEMENTEDF("gethostent_r(%p, %q, %Ix, %p, %p)", result_buf, buf, buflen, result, h_errnop); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_gethostent_r]]]*/
 
@@ -199,8 +198,7 @@ NOTHROW_RPC(LIBCCALL libc_gethostbyaddr_r)(void const *__restrict addr,
 	(void)result;
 	(void)h_errnop;
 	CRT_UNIMPLEMENTEDF("gethostbyaddr_r(%p, %" PRIxN(__SIZEOF_SOCKLEN_T__) ", %x, %p, %q, %Ix, %p, %p)", addr, len, type, result_buf, buf, buflen, result, h_errnop); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_gethostbyaddr_r]]]*/
 
@@ -226,8 +224,7 @@ NOTHROW_RPC(LIBCCALL libc_gethostbyname_r)(char const *__restrict name,
 	(void)result;
 	(void)h_errnop;
 	CRT_UNIMPLEMENTEDF("gethostbyname_r(%q, %p, %q, %Ix, %p, %p)", name, result_buf, buf, buflen, result, h_errnop); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_gethostbyname_r]]]*/
 
@@ -255,8 +252,7 @@ NOTHROW_RPC(LIBCCALL libc_gethostbyname2_r)(char const *__restrict name,
 	(void)result;
 	(void)h_errnop;
 	CRT_UNIMPLEMENTEDF("gethostbyname2_r(%q, %x, %p, %q, %Ix, %p, %p)", name, af, result_buf, buf, buflen, result, h_errnop); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_gethostbyname2_r]]]*/
 
@@ -346,8 +342,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetent_r)(struct netent *__restrict result_buf,
 	(void)result;
 	(void)h_errnop;
 	CRT_UNIMPLEMENTEDF("getnetent_r(%p, %q, %Ix, %p, %p)", result_buf, buf, buflen, result, h_errnop); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getnetent_r]]]*/
 
@@ -377,8 +372,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetbyaddr_r)(uint32_t net,
 	(void)result;
 	(void)h_errnop;
 	CRT_UNIMPLEMENTEDF("getnetbyaddr_r(%" PRIx32 ", %x, %p, %q, %Ix, %p, %p)", net, type, result_buf, buf, buflen, result, h_errnop); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getnetbyaddr_r]]]*/
 
@@ -406,8 +400,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetbyname_r)(char const *__restrict name,
 	(void)result;
 	(void)h_errnop;
 	CRT_UNIMPLEMENTEDF("getnetbyname_r(%q, %p, %q, %Ix, %p, %p)", name, result_buf, buf, buflen, result, h_errnop); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getnetbyname_r]]]*/
 
@@ -494,8 +487,7 @@ NOTHROW_RPC(LIBCCALL libc_getservent_r)(struct servent *__restrict result_buf,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getservent_r(%p, %q, %Ix, %p)", result_buf, buf, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getservent_r]]]*/
 
@@ -520,8 +512,7 @@ NOTHROW_RPC(LIBCCALL libc_getservbyname_r)(char const *__restrict name,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getservbyname_r(%q, %q, %p, %q, %Ix, %p)", name, proto, result_buf, buf, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getservbyname_r]]]*/
 
@@ -546,8 +537,7 @@ NOTHROW_RPC(LIBCCALL libc_getservbyport_r)(int port,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getservbyport_r(%x, %q, %p, %q, %Ix, %p)", port, proto, result_buf, buf, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getservbyport_r]]]*/
 
@@ -630,8 +620,7 @@ NOTHROW_RPC(LIBCCALL libc_getprotoent_r)(struct protoent *__restrict result_buf,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getprotoent_r(%p, %q, %Ix, %p)", result_buf, buf, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getprotoent_r]]]*/
 
@@ -654,8 +643,7 @@ NOTHROW_RPC(LIBCCALL libc_getprotobyname_r)(char const *__restrict name,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getprotobyname_r(%q, %p, %q, %Ix, %p)", name, result_buf, buf, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getprotobyname_r]]]*/
 
@@ -678,8 +666,7 @@ NOTHROW_RPC(LIBCCALL libc_getprotobynumber_r)(int proto,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getprotobynumber_r(%x, %p, %q, %Ix, %p)", proto, result_buf, buf, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getprotobynumber_r]]]*/
 
@@ -693,8 +680,7 @@ NOTHROW_RPC(LIBCCALL libc_setnetgrent)(char const *netgroup)
 /*AUTO*/{
 	(void)netgroup;
 	CRT_UNIMPLEMENTEDF("setnetgrent(%q)", netgroup); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_setnetgrent]]]*/
 
@@ -726,8 +712,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetgrent)(char **__restrict hostp,
 	(void)userp;
 	(void)domainp;
 	CRT_UNIMPLEMENTEDF("getnetgrent(%p, %p, %p)", hostp, userp, domainp); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getnetgrent]]]*/
 
@@ -747,8 +732,7 @@ NOTHROW_RPC(LIBCCALL libc_innetgr)(char const *netgroup,
 	(void)user;
 	(void)domain;
 	CRT_UNIMPLEMENTEDF("innetgr(%q, %q, %q, %q)", netgroup, host, user, domain); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_innetgr]]]*/
 
@@ -770,8 +754,7 @@ NOTHROW_RPC(LIBCCALL libc_getnetgrent_r)(char **__restrict hostp,
 	(void)buf;
 	(void)buflen;
 	CRT_UNIMPLEMENTEDF("getnetgrent_r(%p, %p, %p, %q, %Ix)", hostp, userp, domainp, buf, buflen); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getnetgrent_r]]]*/
 
@@ -800,8 +783,7 @@ NOTHROW_RPC(LIBCCALL libc_rcmd)(char **__restrict ahost,
 	(void)cmd;
 	(void)fd2p;
 	CRT_UNIMPLEMENTEDF("rcmd(%p, %" PRIx16 ", %q, %q, %q, %p)", ahost, rport, locuser, remuser, cmd, fd2p); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_rcmd]]]*/
 
@@ -828,8 +810,7 @@ NOTHROW_RPC(LIBCCALL libc_rcmd_af)(char **__restrict ahost,
 	(void)fd2p;
 	(void)af;
 	CRT_UNIMPLEMENTEDF("rcmd_af(%p, %" PRIx16 ", %q, %q, %q, %p, %" PRIx16 ")", ahost, rport, locuser, remuser, cmd, fd2p, af); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_rcmd_af]]]*/
 
@@ -857,8 +838,7 @@ NOTHROW_RPC(LIBCCALL libc_rexec)(char **__restrict ahost,
 	(void)cmd;
 	(void)fd2p;
 	CRT_UNIMPLEMENTEDF("rexec(%p, %x, %q, %q, %q, %p)", ahost, rport, name, pass, cmd, fd2p); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_rexec]]]*/
 
@@ -885,8 +865,7 @@ NOTHROW_RPC(LIBCCALL libc_rexec_af)(char **__restrict ahost,
 	(void)fd2p;
 	(void)af;
 	CRT_UNIMPLEMENTEDF("rexec_af(%p, %x, %q, %q, %q, %p, %" PRIx16 ")", ahost, rport, name, pass, cmd, fd2p, af); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_rexec_af]]]*/
 
@@ -908,8 +887,7 @@ NOTHROW_RPC(LIBCCALL libc_ruserok)(char const *rhost,
 	(void)remuser;
 	(void)locuser;
 	CRT_UNIMPLEMENTEDF("ruserok(%q, %x, %q, %q)", rhost, suser, remuser, locuser); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ruserok]]]*/
 
@@ -932,8 +910,7 @@ NOTHROW_RPC(LIBCCALL libc_ruserok_af)(char const *rhost,
 	(void)locuser;
 	(void)af;
 	CRT_UNIMPLEMENTEDF("ruserok_af(%q, %x, %q, %q, %" PRIx16 ")", rhost, suser, remuser, locuser, af); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ruserok_af]]]*/
 
@@ -956,8 +933,7 @@ NOTHROW_RPC(LIBCCALL libc_iruserok)(uint32_t raddr,
 	(void)remuser;
 	(void)locuser;
 	CRT_UNIMPLEMENTEDF("iruserok(%" PRIx32 ", %x, %q, %q)", raddr, suser, remuser, locuser); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_iruserok]]]*/
 
@@ -981,8 +957,7 @@ NOTHROW_RPC(LIBCCALL libc_iruserok_af)(void const *raddr,
 	(void)locuser;
 	(void)af;
 	CRT_UNIMPLEMENTEDF("iruserok_af(%p, %x, %q, %q, %" PRIx16 ")", raddr, suser, remuser, locuser, af); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_iruserok_af]]]*/
 
@@ -998,8 +973,7 @@ NOTHROW_RPC(LIBCCALL libc_rresvport)(int *alport)
 /*AUTO*/{
 	(void)alport;
 	CRT_UNIMPLEMENTEDF("rresvport(%p)", alport); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_rresvport]]]*/
 
@@ -1016,8 +990,7 @@ NOTHROW_RPC(LIBCCALL libc_rresvport_af)(int *alport,
 	(void)alport;
 	(void)af;
 	CRT_UNIMPLEMENTEDF("rresvport_af(%p, %" PRIx16 ")", alport, af); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_rresvport_af]]]*/
 
@@ -1035,8 +1008,7 @@ NOTHROW_RPC(LIBCCALL libc_getaddrinfo)(char const *__restrict name,
 	(void)req;
 	(void)pai;
 	CRT_UNIMPLEMENTEDF("getaddrinfo(%q, %q, %p, %p)", name, service, req, pai); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getaddrinfo]]]*/
 
@@ -1085,8 +1057,7 @@ NOTHROW_RPC(LIBCCALL libc_getnameinfo)(struct sockaddr const *__restrict sa,
 	(void)servlen;
 	(void)flags;
 	CRT_UNIMPLEMENTEDF("getnameinfo(%p, %" PRIxN(__SIZEOF_SOCKLEN_T__) ", %q, %" PRIxN(__SIZEOF_SOCKLEN_T__) ", %q, %" PRIxN(__SIZEOF_SOCKLEN_T__) ", %x)", sa, salen, host, hostlen, serv, servlen, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getnameinfo]]]*/
 
@@ -1108,8 +1079,7 @@ NOTHROW_RPC(LIBCCALL libc_getaddrinfo_a)(int mode,
 	(void)ent;
 	(void)sig;
 	CRT_UNIMPLEMENTEDF("getaddrinfo_a(%x, %p, %x, %p)", mode, list, ent, sig); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getaddrinfo_a]]]*/
 
@@ -1142,8 +1112,7 @@ NOTHROW_NCX(LIBCCALL libc_gai_error)(struct gaicb *req)
 /*AUTO*/{
 	(void)req;
 	CRT_UNIMPLEMENTEDF("gai_error(%p)", req); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_gai_error]]]*/
 
@@ -1155,8 +1124,7 @@ NOTHROW_NCX(LIBCCALL libc_gai_cancel)(struct gaicb *gaicbp)
 /*AUTO*/{
 	(void)gaicbp;
 	CRT_UNIMPLEMENTEDF("gai_cancel(%p)", gaicbp); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_gai_cancel]]]*/
 

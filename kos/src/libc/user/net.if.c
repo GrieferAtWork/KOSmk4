@@ -33,8 +33,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_if_nametoindex)(char const *ifname)
 /*AUTO*/{
 	(void)ifname;
 	CRT_UNIMPLEMENTEDF("if_nametoindex(%q)", ifname); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (unsigned int)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_if_nametoindex]]]*/
 

@@ -32,8 +32,7 @@ NOTHROW(LIBCCALL libc_isastream)(fd_t fd)
 /*AUTO*/{
 	(void)fd;
 	CRT_UNIMPLEMENTEDF("isastream(%" PRIxN(__SIZEOF_FD_T__) ")", fd); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_isastream]]]*/
 
@@ -53,8 +52,7 @@ NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fd,
 	(void)dataptr;
 	(void)pflags;
 	CRT_UNIMPLEMENTEDF("getmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %p)", fd, ctlptr, dataptr, pflags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getmsg]]]*/
 
@@ -76,8 +74,7 @@ NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fd,
 	(void)bandp;
 	(void)pflags;
 	CRT_UNIMPLEMENTEDF("getpmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %p, %p)", fd, ctlptr, dataptr, bandp, pflags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getpmsg]]]*/
 
@@ -95,8 +92,7 @@ NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fd,
 	(void)dataptr;
 	(void)flags;
 	CRT_UNIMPLEMENTEDF("putmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %x)", fd, ctlptr, dataptr, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_putmsg]]]*/
 
@@ -116,8 +112,7 @@ NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fd,
 	(void)band;
 	(void)flags;
 	CRT_UNIMPLEMENTEDF("putpmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %x, %x)", fd, ctlptr, dataptr, band, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_putpmsg]]]*/
 
@@ -130,8 +125,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fd,
 	(void)fd;
 	(void)path;
 	CRT_UNIMPLEMENTEDF("fattach(%" PRIxN(__SIZEOF_FD_T__) ", %q)", fd, path); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fattach]]]*/
 
@@ -142,8 +136,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path)
 /*AUTO*/{
 	(void)path;
 	CRT_UNIMPLEMENTEDF("fdetach(%q)", path); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fdetach]]]*/
 

@@ -248,8 +248,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_get_status)(struct pex_obj *obj,
 	(void)count;
 	(void)vector;
 	CRT_UNIMPLEMENTEDF("pex_get_status(%p, %x, %p)", obj, count, vector); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_pex_get_status]]]*/
 
@@ -280,8 +279,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_get_times)(struct pex_obj *obj,
 	(void)count;
 	(void)vector;
 	CRT_UNIMPLEMENTEDF("pex_get_times(%p, %x, %p)", obj, count, vector); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_pex_get_times]]]*/
 
@@ -341,8 +339,7 @@ NOTHROW_NCX(LIBCCALL libc_pexecute)(char const *a,
 	(void)f;
 	(void)g;
 	CRT_UNIMPLEMENTEDF("pexecute(%q, %p, %q, %q, %p, %p, %x)", a, b, c, d, e, f, g); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_pexecute]]]*/
 
@@ -357,8 +354,7 @@ NOTHROW_NCX(LIBCCALL libc_pwait)(int a,
 	(void)b;
 	(void)c;
 	CRT_UNIMPLEMENTEDF("pwait(%x, %p, %x)", a, b, c); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_pwait]]]*/
 

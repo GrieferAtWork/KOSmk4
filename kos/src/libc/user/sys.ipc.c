@@ -34,8 +34,7 @@ NOTHROW_RPC(LIBCCALL libc_ftok)(char const *pathname,
 	(void)pathname;
 	(void)proj_id;
 	CRT_UNIMPLEMENTEDF("ftok(%q, %x)", pathname, proj_id); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (key_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ftok]]]*/
 

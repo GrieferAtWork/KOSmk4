@@ -38,8 +38,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_pton)(int af,
 	(void)cp;
 	(void)buf;
 	CRT_UNIMPLEMENTEDF("inet_pton(%x, %q, %p)", af, cp, buf); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_inet_pton]]]*/
 
@@ -102,8 +101,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_pton)(int af,
 	(void)buf;
 	(void)len;
 	CRT_UNIMPLEMENTEDF("inet_net_pton(%x, %q, %p, %Ix)", af, cp, buf, len); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_inet_net_pton]]]*/
 
@@ -120,8 +118,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_addr)(char const *cp,
 	(void)buf;
 	(void)len;
 	CRT_UNIMPLEMENTEDF("inet_nsap_addr(%q, %p, %x)", cp, buf, len); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (unsigned int)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_inet_nsap_addr]]]*/
 

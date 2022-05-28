@@ -38,8 +38,7 @@ NOTHROW_NCX(LIBCCALL libc___solaris_sysinfo)(__STDC_INT_AS_UINT_T command,
 	(void)buf;
 	(void)buflen;
 	CRT_UNIMPLEMENTEDF("__solaris_sysinfo(%x, %q, %lx)", command, buf, buflen); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc___solaris_sysinfo]]]*/
 

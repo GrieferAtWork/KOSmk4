@@ -79,8 +79,7 @@ NOTHROW_RPC(LIBCCALL libc__getdiskfree)(unsigned int drive,
 	(void)drive;
 	(void)diskfree;
 	CRT_UNIMPLEMENTEDF("_getdiskfree(%x, %p)", drive, diskfree); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (unsigned int)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__getdiskfree]]]*/
 

@@ -1938,13 +1938,18 @@ generic_unimplemented:
 				["error_t", "errno_t", "$error_t", "$errno_t", "__errno_t"]) {
 			fp << "\treturn ENOSYS;\n";
 		} else {
-			fp << "\tlibc_seterrno(ENOSYS);\n";
 			if (returnType.isVoid) {
 				/* No return statement in void-functions */
+				fp << "\tlibc_seterrno(ENOSYS);\n";
 			} else if (returnType.isPointer) {
+				fp << "\tlibc_seterrno(ENOSYS);\n";
 				fp << "\treturn NULL;\n";
 			} else {
-				fp << "\treturn 0;\n";
+				fp << "\treturn ";
+				if (returnType.afterName || returnType.beforeName !in {
+						"int", "long", "fd_t", "ssize_t", "syscall_slong_t", "intmax_t" })
+					returnType.cprintCCastPrefix(fp, ESCAPE_MODE_NONE);
+				fp << "libc_seterrno(ENOSYS);\n";
 			}
 		}
 	}

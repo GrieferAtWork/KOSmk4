@@ -101,8 +101,7 @@ NOTHROW_RPC(LIBCCALL libc_putspent)(struct spwd const *__restrict p,
 	(void)p;
 	(void)stream;
 	CRT_UNIMPLEMENTEDF("putspent(%p, %p)", p, stream); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_putspent]]]*/
 
@@ -119,8 +118,7 @@ NOTHROW_RPC(LIBCCALL libc_getspent_r)(struct spwd *__restrict result_buf,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getspent_r(%p, %q, %Ix, %p)", result_buf, buffer, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getspent_r]]]*/
 
@@ -139,8 +137,7 @@ NOTHROW_RPC(LIBCCALL libc_getspnam_r)(char const *__restrict name,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("getspnam_r(%q, %p, %q, %Ix, %p)", name, result_buf, buffer, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getspnam_r]]]*/
 
@@ -159,8 +156,7 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("sgetspent_r(%q, %p, %q, %Ix, %p)", string, result_buf, buffer, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_sgetspent_r]]]*/
 
@@ -179,8 +175,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetspent_r)(FILE *__restrict stream,
 	(void)buflen;
 	(void)result;
 	CRT_UNIMPLEMENTEDF("fgetspent_r(%p, %p, %q, %Ix, %p)", stream, result_buf, buffer, buflen, result); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fgetspent_r]]]*/
 
@@ -190,8 +185,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_lckpwdf)(void)
 /*[[[body:libc_lckpwdf]]]*/
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("lckpwdf"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_lckpwdf]]]*/
 
@@ -201,8 +195,7 @@ NOTHROW_NCX(LIBCCALL libc_ulckpwdf)(void)
 /*[[[body:libc_ulckpwdf]]]*/
 /*AUTO*/{
 	CRT_UNIMPLEMENTED("ulckpwdf"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ulckpwdf]]]*/
 

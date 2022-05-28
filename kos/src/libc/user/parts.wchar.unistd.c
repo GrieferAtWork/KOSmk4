@@ -112,8 +112,7 @@ NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd,
 	(void)buflen;
 	(void)flags;
 	CRT_UNIMPLEMENTEDF("wfreadlinkat(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %Ix, %" PRIxN(__SIZEOF_ATFLAG_T__) ")", dfd, path, buf, buflen, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_wfreadlinkat]]]*/
 
@@ -132,8 +131,7 @@ NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
 	(void)buflen;
 	(void)flags;
 	CRT_UNIMPLEMENTEDF("DOS$wfreadlinkat(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %Ix, %" PRIxN(__SIZEOF_ATFLAG_T__) ")", dfd, path, buf, buflen, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libd_wfreadlinkat]]]*/
 

@@ -36,8 +36,7 @@ NOTHROW_NCX(LIBCCALL libc__mbbtombc_l)(unsigned int ch,
 	(void)ch;
 	(void)locale;
 	CRT_UNIMPLEMENTEDF("_mbbtombc_l(%x, %p)", ch, locale); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (unsigned int)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__mbbtombc_l]]]*/
 
@@ -51,8 +50,7 @@ NOTHROW_NCX(LIBCCALL libc__mbctombb_l)(unsigned int ch,
 	(void)ch;
 	(void)locale;
 	CRT_UNIMPLEMENTEDF("_mbctombb_l(%x, %p)", ch, locale); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (unsigned int)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__mbctombb_l]]]*/
 

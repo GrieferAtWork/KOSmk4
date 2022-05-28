@@ -36,8 +36,7 @@ NOTHROW_NCX(LIBCCALL libc_shmctl)(int shmid,
 	(void)cmd;
 	(void)buf;
 	CRT_UNIMPLEMENTEDF("shmctl(%x, %x, %p)", shmid, cmd, buf); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_shmctl]]]*/
 
@@ -52,8 +51,7 @@ NOTHROW_NCX(LIBCCALL libc_shmget)(key_t key,
 	(void)size;
 	(void)shmflg;
 	CRT_UNIMPLEMENTEDF("shmget(%" PRIxN(__SIZEOF_KEY_T__) ", %Ix, %x)", key, size, shmflg); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_shmget]]]*/
 
@@ -80,8 +78,7 @@ NOTHROW_NCX(LIBCCALL libc_shmdt)(void const *shmaddr)
 /*AUTO*/{
 	(void)shmaddr;
 	CRT_UNIMPLEMENTEDF("shmdt(%p)", shmaddr); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_shmdt]]]*/
 
