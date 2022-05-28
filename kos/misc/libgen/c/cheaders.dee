@@ -1639,6 +1639,15 @@ class LoaderFunctionImplementation {
 }
 
 
+@@Mapping of symbol names to sets of namespaces that use the cast-to-return-type trick
+@@When these appear in using declarations, code must be generated to check for macro
+@@definitions, which in turn must cause the return type to be imported, rather than
+@@the function itself.
+global usingImportReturnTypeTrickUsed: {string: HashSet with Namespace} = Dict();
+function usingImportReturnTypeNameOf(exposedName: string): string {
+	return "__PRIVATE_{}_rt".format({ exposedName });
+}
+
 
 class LocalFunction {
 	this = default;
@@ -1830,20 +1839,17 @@ class LocalFunction {
 				} else {
 					fp.ppIf("defined(__cplusplus)");
 				}
-				fp << "#define " << exposedName << "(...) ";
-				/* Use the cast-to-return-type-for-namespace-prefix trick.
-				 * TODO: Must use namespace-specific symbol names in case the
-				 *       return type is something like "int", or "void *". In
-				 *       these cases, we have to use a local typedef in order
-				 *       to declare a symbol we can use for the cast.
-				 * TODO: If someone later in the current file does a `using'
-				 *       for our namespace'd symbol, they have to check  for
-				 *       the case where we did the cast-trick, in which case
-				 *       they either have to do nothing, or namespace-using-
-				 *       import the custom type  symbol we created as  alias
-				 *       for the function's return type. */
+				/* Use the cast-to-return-type-for-namespace-prefix trick. */
+				local set = usingImportReturnTypeTrickUsed.get(exposedName);
+				if (set is none)
+					set = usingImportReturnTypeTrickUsed.setdefault(exposedName, HashSet());
+				set.insert(fp.namespace);
+				fp << "typedef ";
 				usedPrototype.returnType.cprint(fp, escapeMode);
-				fp << "(" << callToLocalName << "(__VA_ARGS__))\n";
+				local rtName = usingImportReturnTypeNameOf(exposedName);
+				fp	<< " " << rtName << ";\n"
+					<< "#define " << exposedName << "(...) "
+					<< rtName << "(" << callToLocalName << "(__VA_ARGS__))\n";
 				fp.ppElse();
 				fp << "#define " << exposedName << "(...) " << callToLocalName << "(__VA_ARGS__)\n";
 				if (exposedName != name)
@@ -2131,7 +2137,16 @@ class NamespaceBinding {
 			 * imported in that case) */
 			if (namespace === STD_NAMESPACE) {
 				/* We can always simply use keyUsing() in this case! */
-				namespace.keyUsing(fp, exposedName);
+				local rtTricks: HashSet with Namespace = usingImportReturnTypeTrickUsed.get(exposedName);
+				if (rtTricks !is none && namespace in rtTricks) {
+					fp.ppIfdef(exposedName);
+					namespace.keyUsing(fp, usingImportReturnTypeNameOf(exposedName));
+					fp.ppElse();
+					namespace.keyUsing(fp, exposedName);
+					fp.ppEndif();
+				} else {
+					namespace.keyUsing(fp, exposedName);
+				}
 				return;
 			}
 			local nsPrefix = namespace.prefix;
