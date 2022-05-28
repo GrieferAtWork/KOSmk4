@@ -2074,39 +2074,64 @@ NOTHROW_NCX(LIBCCALL libc_profil)(uint16_t *sample_buffer,
 }
 /*[[[end:libc_profil]]]*/
 
-/*[[[head:libc_getusershell,hash:CRC-32=0x620a6b9c]]]*/
-/* >> getusershell(3) */
-INTERN ATTR_SECTION(".text.crt.database.shell") WUNUSED char *
-NOTHROW_RPC(LIBCCALL libc_getusershell)(void)
-/*[[[body:libc_getusershell]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("getusershell"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_getusershell]]]*/
 
-/*[[[head:libc_endusershell,hash:CRC-32=0xd5d53e38]]]*/
-/* >> endusershell(3) */
-INTERN ATTR_SECTION(".text.crt.database.shell") void
-NOTHROW_NCX(LIBCCALL libc_endusershell)(void)
-/*[[[body:libc_endusershell]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("endusershell"); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_endusershell]]]*/
+
+PRIVATE ATTR_SECTION(".bss.crt.database.shell")
+FILE *usershells_file = NULL;
+PRIVATE ATTR_SECTION(".rodata.crt.database.shell")
+char const usershells_filename[] = _PATH_SHELLS;
+PRIVATE ATTR_SECTION(".rodata.crt.database.shell")
+char const usershells_defaultdata[] = "/bin/sh\n/bin/csh";
+
 
 /*[[[head:libc_setusershell,hash:CRC-32=0xdab349fb]]]*/
 /* >> setusershell(3) */
 INTERN ATTR_SECTION(".text.crt.database.shell") void
 NOTHROW_RPC(LIBCCALL libc_setusershell)(void)
 /*[[[body:libc_setusershell]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("setusershell"); /* TODO */
-	libc_seterrno(ENOSYS);
+{
+	if (usershells_file) {
+		rewind(usershells_file);
+	} else {
+		usershells_file = fopen(usershells_filename, "r");
+		if (!usershells_file) {
+			usershells_file = fmemopen((void *)usershells_defaultdata,
+			                           sizeof(usershells_defaultdata),
+			                           "r");
+		}
+	}
 }
 /*[[[end:libc_setusershell]]]*/
+
+/*[[[head:libc_endusershell,hash:CRC-32=0xd5d53e38]]]*/
+/* >> endusershell(3) */
+INTERN ATTR_SECTION(".text.crt.database.shell") void
+NOTHROW_NCX(LIBCCALL libc_endusershell)(void)
+/*[[[body:libc_endusershell]]]*/
+{
+	if (usershells_file) {
+		fclose(usershells_file);
+		usershells_file = NULL;
+	}
+}
+/*[[[end:libc_endusershell]]]*/
+
+/*[[[head:libc_getusershell,hash:CRC-32=0x620a6b9c]]]*/
+/* >> getusershell(3) */
+INTERN ATTR_SECTION(".text.crt.database.shell") WUNUSED char *
+NOTHROW_RPC(LIBCCALL libc_getusershell)(void)
+/*[[[body:libc_getusershell]]]*/
+{
+	char *result;
+	if (!usershells_file)
+		libc_setusershell();
+	/* Read the next non-empty file (hint: the buffer
+	 * here  is  automatically free'd  by fclose(3)!) */
+	while ((result = fgetln(usershells_file, NULL)) != NULL && !*result)
+		break;
+	return result;
+}
+/*[[[end:libc_getusershell]]]*/
 
 /*[[[head:libc_revoke,hash:CRC-32=0xde035669]]]*/
 /* >> revoke(3) */

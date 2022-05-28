@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fde95b7 */
+/* HASH CRC-32:0xcc183341 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -149,7 +149,6 @@
 #define __stub___endspent
 #define __stub_endspent
 #define __stub_endttyent
-#define __stub_endusershell
 #define __stub_endutent
 #define __stub_endutxent
 #define __stub_erand48
@@ -260,7 +259,6 @@
 #define __stub_getspnam_r
 #define __stub_getttyent
 #define __stub_getttynam
-#define __stub_getusershell
 #define __stub_getutent
 #define __stub_getutent_r
 #define __stub_getutid
@@ -538,7 +536,6 @@
 #define __stub_setstate
 #define __stub_setstate_r
 #define __stub_setttyent
-#define __stub_setusershell
 #define __stub_setutent
 #define __stub_setutxent
 #define __stub_sgetspent
