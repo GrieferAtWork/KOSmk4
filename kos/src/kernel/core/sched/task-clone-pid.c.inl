@@ -378,9 +378,9 @@ again_determine_group:
 		 * which is also meant to kill,  even though our `TASK_FRPC' flag  isn't
 		 * set yet.
 		 *
-		 * Because of this, we need a custom way of checking for signal, which
-		 * we facilitate by checking for TASK_FRPC, and even if that one's not
-		 * set, we also go through signals send to our process in order to see
+		 * Because of this, we need a custom way of checking for signals, which
+		 * we facilitate by checking for TASK_FRPC, and even if that one's  not
+		 * set,  we also go through signals send to our process in order to see
 		 * if there are any that aren't marked by the calling thread.
 		 *
 		 * FIXME: What about a process-directed RPC with the intend of killing the

@@ -543,7 +543,7 @@ mman_fork(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	 * >> }
 	 *
 	 * That way, we are guarantied that the kill-other-threads callback gets checked
-	 * to not be present  in an interlocked  manor with us  acquring the mman  lock! */
+	 * to not be present in  an interlocked manner with  us acquring the mman  lock! */
 
 	SLIST_INIT(&ft.ft_freelist);
 	ft.ft_didunlck = false;

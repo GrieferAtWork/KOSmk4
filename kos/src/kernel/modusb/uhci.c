@@ -2991,9 +2991,6 @@ uhci_find_pci_bar(struct pci_device const *__restrict dev) {
 	 *    of said BAR, as well as check if the BAR is even allocated.
 	 * #1: If only 1 BAR is allocated, that's the one
 	 * #2: If only 1 BAR has the expected I/O size, that's the one
-	 *     FIXME: Looking  at the I/O  sizes, I have a  feeling that the PCI
-	 *            driver loads these incorrectly... (I'm reading 0xffff3fc0,
-	 *            which is 0-BASE...)
 	 * #3: If only 1 BAR has `PCI_RESOURCE_FIO' set, that's the one
 	 * #4: Just use the first matching BAR...
 	 */

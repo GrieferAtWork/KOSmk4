@@ -903,7 +903,7 @@ no_capsules:
 		IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t common_init_regs[CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT];)
 		IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(byte_t uncommon_init_regs[(CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT + NBBY) / NBBY];)
 		IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(STATIC_ASSERT(sizeof(common_init_regs) == sizeof(result->cs_state.cs_regs));)
-		IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(STATIC_ASSERT(sizeof(uncommon_init_regs) == sizeof(result->cs_state.cs_uncommon));)
+		IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(STATIC_ASSERT(sizeof(uncommon_init_regs) == sizeof(result->cs_state.cs_uncommon));)
 		IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(memcpy(common_init_regs, result->cs_state.cs_regs, sizeof(result->cs_state.cs_regs));)
 		IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(memcpy(uncommon_init_regs, result->cs_state.cs_uncommon, sizeof(result->cs_state.cs_uncommon));)
 		/* Execute the eval-body */
@@ -967,12 +967,11 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t *__restrict self, /* 
 	        "self->f_pcend   = %p\n"
 	        "absolute_pc     = %p\n",
 	        self->f_pcstart, self->f_pcend, absolute_pc);
-	/* First round: Calculate the GNU adjustment, but assume there's not going
-	 *              to be any  CFI capsules (at  least not for  `absolute_pc')
-	 *              If we end  up with a  non-zero `capsule_recursion' in  the
-	 *              end, then we know  we have a  lot of work  ahead of us  in
-	 *              order  to figure out where exactly what is affected by the
-	 *              capsule. */
+	/* First round: Calculate the GNU adjustment, but assume there's not  going
+	 *              to be any CFI capsules (at least not for `absolute_pc'). If
+	 *              we end up with a  non-zero `capsule_recursion' in the  end,
+	 *              then  we know we have a lot of work ahead of us in order to
+	 *              figure out what exactly is affected by the capsule. */
 	current_pc = (uintptr_t)self->f_pcstart;
 	while (cfa_reader < cfa_end && current_pc <= (uintptr_t)absolute_pc) {
 		uint8_t opcode, operand;

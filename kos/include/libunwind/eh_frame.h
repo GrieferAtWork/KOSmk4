@@ -455,13 +455,13 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_landing_exec)(unwind_fde_t *__restrict __s
 typedef __ATTR_NONNULL_T((1, 2)) unsigned int
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_RULE)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                 unwind_cfa_register_t *__restrict __result,
-                                                unwind_regno_t dw_regno,
+                                                unwind_regno_t __dw_regno,
                                                 void const *__absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_rule)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                             unwind_cfa_register_t *__restrict __result,
-                                            unwind_regno_t dw_regno,
+                                            unwind_regno_t __dw_regno,
                                             void const *__absolute_pc);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 

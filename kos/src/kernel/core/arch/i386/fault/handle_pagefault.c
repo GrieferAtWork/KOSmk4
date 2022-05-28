@@ -1058,9 +1058,9 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 		 * that ~may~ be  replacing another pre-existing  mapping, we force  a
 		 * sync for the mapped range.
 		 *
-		 * FIXME: The original `mf.mfl_part' must only be decref'd _AFTER_  we
-		 *        did this. - Otherwise, other CPUs might have TLBs for memory
-		 *        that was already freed! */
+		 * FIXME: The original `mf.mfl_part' (from before mfault_lockpart_or_unlock)
+		 *        must only be decref'd _AFTER_ we did this. - Otherwise, other CPUs
+		 *        might have TLBs for memory that was already freed! */
 		if (prot & PAGEDIR_PROT_WRITE)
 			mman_sync(mf.mfl_addr, mf.mfl_size);
 
