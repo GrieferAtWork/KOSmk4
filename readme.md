@@ -241,7 +241,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- 3-part implementation
 		- `heap_alloc()`: Raw heap allocators (need to specify size when freeing memory)
 			- Used to implement `kmalloc()`
-			- Uses `vm_map()` (The kernel equivalent of `mmap()`) to allocate whole pages
+			- Uses `mman_map_kram()` (The kernel equivalent of `mmap()`) to allocate whole pages
 		- `slab_kmalloc()`: Slab allocator support
 			- Used to implement `kmalloc()`
 			- Slabs are sections of memory suitable for allocating fixed-length structures

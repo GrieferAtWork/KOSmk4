@@ -3166,7 +3166,7 @@ err_fault:
  * one of the following prefixes:
  *   - this_*      Addend is `(uintptr_t)dbg_current'
  *   - thiscpu_*   Addend is `(uintptr_t)dbg_current->t_cpu'
- *   - thisvm_*    Addend is `(uintptr_t)dbg_current->t_mman'
+ *   - thismman_*  Addend is `(uintptr_t)dbg_current->t_mman'
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No object matches the given `name' */

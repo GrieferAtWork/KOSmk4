@@ -501,7 +501,7 @@ DEFINE_PUBLIC_ALIAS(mfile_utryas, handle_mfile_tryas);
 DEFINE_PUBLIC_ALIAS(mfile_uprintlink, handle_mfile_printlink);
 
 
-/* DATABLOCK HANDLE OPERATIONS */
+/* MFILE HANDLE OPERATIONS */
 DEFINE_HANDLE_REFCNT_FUNCTIONS(mfile, struct mfile);
 
 /************************************************************************/

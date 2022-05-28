@@ -181,24 +181,24 @@ INTDEF struct mnode x86_kernel_mnodes[];
 	}
 
 INTERN struct mpart x86_kernel_mparts[6] = {
-#define DO_INIT_DATAPART(id, startpage, num_pages, num_bytes) \
+#define DO_INIT_MPART(id, startpage, num_pages, num_bytes) \
 	INIT_MPART(x86_kernel_mparts[id], &x86_kernel_mnodes[id], startpage, num_pages, num_bytes)
-	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_TEXT,   __kernel_text_startpage_p,   __kernel_text_numpages,   __kernel_text_size),
-	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_RODATA, __kernel_rodata_startpage_p, __kernel_rodata_numpages, __kernel_rodata_size),
+	DO_INIT_MPART(X86_KERNEL_MMAPPING_CORE_TEXT,   __kernel_text_startpage_p,   __kernel_text_numpages,   __kernel_text_size),
+	DO_INIT_MPART(X86_KERNEL_MMAPPING_CORE_RODATA, __kernel_rodata_startpage_p, __kernel_rodata_numpages, __kernel_rodata_size),
 #ifdef X86_KERNEL_MMAPPING_CORE_DATA
-	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_DATA,   __kernel_data_startpage_p,   __kernel_data_numpages,   __kernel_data_size),
+	DO_INIT_MPART(X86_KERNEL_MMAPPING_CORE_DATA,   __kernel_data_startpage_p,   __kernel_data_numpages,   __kernel_data_size),
 #else /* X86_KERNEL_MMAPPING_CORE_DATA */
-	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_DATA1,  __kernel_data1_startpage_p,  __kernel_data1_numpages,  __kernel_data1_size),
-	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_DATA2,  __kernel_data2_startpage_p,  __kernel_data2_numpages,  __kernel_data2_size),
+	DO_INIT_MPART(X86_KERNEL_MMAPPING_CORE_DATA1,  __kernel_data1_startpage_p,  __kernel_data1_numpages,  __kernel_data1_size),
+	DO_INIT_MPART(X86_KERNEL_MMAPPING_CORE_DATA2,  __kernel_data2_startpage_p,  __kernel_data2_numpages,  __kernel_data2_size),
 #endif /* !X86_KERNEL_MMAPPING_CORE_DATA */
-	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_XDATA,  __kernel_xdata_startpage_p,  __kernel_xdata_numpages,  __kernel_xdata_size),
+	DO_INIT_MPART(X86_KERNEL_MMAPPING_CORE_XDATA,  __kernel_xdata_startpage_p,  __kernel_xdata_numpages,  __kernel_xdata_size),
 #ifdef X86_KERNEL_MMAPPING_CORE_BSS
-	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_BSS,    __kernel_bss_startpage_p,    __kernel_bss_numpages,    __kernel_bss_size),
+	DO_INIT_MPART(X86_KERNEL_MMAPPING_CORE_BSS,    __kernel_bss_startpage_p,    __kernel_bss_numpages,    __kernel_bss_size),
 #else /* X86_KERNEL_MMAPPING_CORE_BSS */
-	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_BSS1,   __kernel_bss1_startpage_p,   __kernel_bss1_numpages,   __kernel_bss1_size),
-	DO_INIT_DATAPART(X86_KERNEL_MMAPPING_CORE_BSS2,   __kernel_bss2_startpage_p,   __kernel_bss2_numpages,   __kernel_bss2_size),
+	DO_INIT_MPART(X86_KERNEL_MMAPPING_CORE_BSS1,   __kernel_bss1_startpage_p,   __kernel_bss1_numpages,   __kernel_bss1_size),
+	DO_INIT_MPART(X86_KERNEL_MMAPPING_CORE_BSS2,   __kernel_bss2_startpage_p,   __kernel_bss2_numpages,   __kernel_bss2_size),
 #endif /* !X86_KERNEL_MMAPPING_CORE_BSS */
-#undef DO_INIT_DATAPART
+#undef DO_INIT_MPART
 };
 
 

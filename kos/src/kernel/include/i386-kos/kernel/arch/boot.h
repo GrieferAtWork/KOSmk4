@@ -77,7 +77,6 @@ INTDEF FREE void NOTHROW(KCALL x86_initialize_apic)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_alternatives)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_iobm)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_mman_kernel)(void);
-INTDEF FREE void NOTHROW(KCALL x86_initialize_kernel_vm_unmap)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_mman_kernel_rdonly)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_sysenter)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_rand_entropy)(void);

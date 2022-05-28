@@ -64,28 +64,28 @@ DECL_END
 
 
 #ifdef __ASSEMBLER__
-.macro reload_x86_debug_registers this_vm_reg:req, scratch_reg1:req, scratch_reg2:req, disable_local:req
-	mov    thismman_x86_dr7(\this_vm_reg), \scratch_reg1
+.macro reload_x86_debug_registers this_mman_reg:req, scratch_reg1:req, scratch_reg2:req, disable_local:req
+	mov    thismman_x86_dr7(\this_mman_reg), \scratch_reg1
 	test   $(DR7_L0|DR7_G0|DR7_L1|DR7_G1|DR7_L2|DR7_G2|DR7_L3|DR7_G3), \scratch_reg1
 	jz     991f
 	test   $(DR7_L0|DR7_G0), \scratch_reg1
 	jz     992f
-	mov    thismman_x86_dr0(\this_vm_reg), \scratch_reg2
+	mov    thismman_x86_dr0(\this_mman_reg), \scratch_reg2
 	mov    \scratch_reg2, %dr0
 992:
 	test   $(DR7_L1|DR7_G1), \scratch_reg1
 	jz     992f
-	mov    thismman_x86_dr1(\this_vm_reg), \scratch_reg2
+	mov    thismman_x86_dr1(\this_mman_reg), \scratch_reg2
 	mov    \scratch_reg2, %dr1
 992:
 	test   $(DR7_L2|DR7_G2), \scratch_reg1
 	jz     992f
-	mov    thismman_x86_dr2(\this_vm_reg), \scratch_reg2
+	mov    thismman_x86_dr2(\this_mman_reg), \scratch_reg2
 	mov    \scratch_reg2, %dr2
 992:
 	test   $(DR7_L3|DR7_G3), \scratch_reg1
 	jz     992f
-	mov    thismman_x86_dr2(\this_vm_reg), \scratch_reg2
+	mov    thismman_x86_dr2(\this_mman_reg), \scratch_reg2
 	mov    \scratch_reg2, %dr3
 992:
 	mov    \scratch_reg1, %dr7
