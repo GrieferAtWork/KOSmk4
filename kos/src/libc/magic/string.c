@@ -801,7 +801,7 @@ int strcmp([[in]] char const *s1, [[in]] char const *s2) {
 @@>> strncmp(3)
 @@Same as `strcmp', but compare at most `maxlen' characters from either string
 [[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, crtbuiltin, pure]]
+[[std, kernel, wunused, crtbuiltin, pure]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRNCMP))]]
 int strncmp([[in(strnlen(., maxlen))]] char const *s1,
             [[in(strnlen(., maxlen))]] char const *s2, size_t maxlen) {
@@ -818,7 +818,7 @@ int strncmp([[in(strnlen(., maxlen))]] char const *s1,
 @@>> strstr(3)
 @@Search for a given `needle' appearing as a sub-string within `haystack'
 @@If no such needle exists, return `NULL'
-[[std, wunused, crtbuiltin, pure]]
+[[std, kernel, wunused, crtbuiltin, pure]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRSTR))]]
 char *strstr([[in]] char const *haystack, [[in]] char const *needle)
 	[([[in]] char *haystack, [[in]] char const *needle): char *]
@@ -847,7 +847,7 @@ miss:
 @@Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
 @@The exact # of characters copied is `strlen(src) + 1' (+1 because
 @@the trailing NUL-character is also copied)
-[[std, crtbuiltin, leaf, dos_only_export_alias("_mbscpy"), libc]]
+[[std, kernel, crtbuiltin, leaf, dos_only_export_alias("_mbscpy"), libc]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCPY))]]
 [[nonnull]] char *strcpy([[out]] char *__restrict dst,
                          [[in]] char const *__restrict src) {
@@ -863,10 +863,9 @@ miss:
 [[decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRNCPY))]]
 [[nonnull]] char *strncpy([[out(buflen)]] char *__restrict buf,
-                          [[in(strnlen(src, buflen))]] char const *__restrict src, size_t buflen) {
-	size_t srclen = strnlen(src, buflen);
-	memcpy(buf, src, srclen * sizeof(char));
-	bzero(buf + srclen, (buflen - srclen) * sizeof(char));
+                          [[in(strnlen(src, buflen))]] char const *__restrict src,
+                          size_t buflen) {
+	stpncpy(buf, src, buflen);
 	return buf;
 }
 
@@ -874,7 +873,7 @@ miss:
 @@Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
 @@append it at the end of `dst', or more precisely copy to `strend(dst)'
 @@Always re-returns `dst'
-[[std, crtbuiltin, leaf, dos_only_export_alias("_mbscat")]]
+[[std, kernel, crtbuiltin, leaf, dos_only_export_alias("_mbscat")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRCAT))]]
 [[nonnull]] char *strcat([[inout]] char *__restrict dst,
                          [[in]] char const *__restrict src) {
@@ -1051,7 +1050,8 @@ $size_t strnlen([[in(strnlen(., maxlen))]] char const *__restrict str, $size_t m
 
 @@>> stpcpy(3)
 @@Same as `mempcpy(dst, src, (strlen(src) + 1) * sizeof(char)) - 1´
-[[crtbuiltin, leaf, export_alias("__stpcpy")]]
+[[crtbuiltin, kernel, leaf, alias("__stpcpy")]]
+[[if(!defined(__KERNEL__)), export_as("__stpcpy")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STPCPY))]]
 stpcpy:([[out]] char *__restrict buf,
         [[in]] char const *__restrict src)
@@ -1251,7 +1251,8 @@ void *memrchr([[in(n_bytes)]] void const *__restrict haystack, int needle, $size
 
 @@>> strcasestr(3), strcasestr_l(3)
 @@Same as `strstr', but ignore casing
-[[pure, wunused, export_alias("__strcasestr")]]
+[[kernel, pure, wunused, alias("__strcasestr")]]
+[[if(!defined(__KERNEL__)), export_as("__strcasestr")]]
 [[section(".text.crt{|.dos}.unicode.static.memory")]]
 [[nullable]] char *strcasestr([[in]] char const *haystack, [[in]] char const *needle)
 	[([[in]] char *haystack, [[in]] char const *needle): [[nullable]] char *]
@@ -1291,10 +1292,10 @@ void *memrchr([[in(n_bytes)]] void const *__restrict haystack, int needle, $size
 
 @@>> rawmemchr(3)
 @@Same as `memchr' with a search limit of `(size_t)-1'
-[[impl_include("<hybrid/typecore.h>")]]
 [[kernel, pure, wunused, alias("__rawmemchr")]]
 [[if(!defined(__KERNEL__)), kos_export_as("__rawmemchr")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RAWMEMCHR))]]
+[[impl_include("<hybrid/typecore.h>")]]
 [[nonnull]] void *rawmemchr([[in]] void const *__restrict haystack, int needle)
 	[([[in]] void *__restrict haystack, int needle): [[nonnull]] void *]
 	[([[in]] void const *__restrict haystack, int needle): [[nonnull]] void const *]
@@ -3534,7 +3535,8 @@ int bcmp([[in(n_bytes)]] void const *s1,
 %[insert:guarded_function(rindex = strrchr)]
 
 [[guard, dos_only_export_alias("_stricmp", "_strcmpi")]]
-[[export_alias("stricmp", "strcmpi", "__strcasecmp")]]
+[[kernel, alias("stricmp", "strcmpi", "__strcasecmp")]]
+[[if(!defined(__KERNEL__)), export_as("stricmp", "strcmpi", "__strcasecmp")]]
 [[pure, wunused, section(".text.crt{|.dos}.unicode.static.memory"), crtbuiltin]]
 int strcasecmp([[in]] char const *s1, [[in]] char const *s2) {
 	char c1, c2;
@@ -3551,9 +3553,9 @@ int strcasecmp([[in]] char const *s1, [[in]] char const *s2) {
 	return 0;
 }
 
-[[guard, decl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_strnicmp", "_strncmpi")]]
-[[export_alias("strnicmp", "strncmpi")]]
+[[guard, kernel, decl_include("<hybrid/typecore.h>")]]
+[[dos_only_export_alias("_strnicmp", "_strncmpi"), alias("strnicmp", "strncmpi")]]
+[[if(!defined(__KERNEL__)), export_as("strnicmp", "strncmpi")]]
 [[pure, wunused, section(".text.crt{|.dos}.unicode.static.memory"), crtbuiltin]]
 int strncasecmp([[in(strnlen(., maxlen))]] char const *s1,
                 [[in(strnlen(., maxlen))]] char const *s2,
@@ -3623,7 +3625,7 @@ __STDC_INT_AS_UINT_T ffsll(__LONGLONG i) {
 }
 %#endif /* __USE_GNU */
 
-[[leaf, guard, decl_include("<hybrid/typecore.h>")]]
+[[leaf, kernel, guard, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRLCAT))]]
 $size_t strlcat([[inout(bufsize)]] char *__restrict dst,
                 [[in]] char const *__restrict src,
@@ -3638,7 +3640,7 @@ $size_t strlcat([[inout(bufsize)]] char *__restrict dst,
 	return result + (new_dst - dst);
 }
 
-[[leaf, guard, decl_include("<hybrid/typecore.h>")]]
+[[leaf, kernel, guard, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRLCPY))]]
 $size_t strlcpy([[out(bufsize)]] char *__restrict dst,
                 [[in]] char const *__restrict src,

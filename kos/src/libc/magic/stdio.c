@@ -1521,9 +1521,10 @@ __LOCAL_LIBC(@vsscanf_ungetc@) ssize_t
 @@pp_endif@@
 )]
 
-[[std, guard, wunused, decl_include("<features.h>"), doc_alias("sscanf")]]
+[[std, kernel, guard, wunused, decl_include("<features.h>"), doc_alias("sscanf")]]
 [[impl_include("<hybrid/typecore.h>", "<bits/crt/format-printer.h>", "<asm/crt/stdio.h>")]]
-[[crtbuiltin, export_alias("__vsscanf", "_IO_vsscanf"), alias("_vsscanf", "_vsscanf_s")]]
+[[crtbuiltin, alias("__vsscanf", "_IO_vsscanf", "_vsscanf", "_vsscanf_s")]]
+[[if(!defined(__KERNEL__)), export_as("__vsscanf", "_IO_vsscanf"), ]]
 [[section(".text.crt{|.dos}.unicode.static.format.scanf")]]
 [[impl_prefix(DEFINE_VSSCANF_HELPERS)]]
 __STDC_INT_AS_SIZE_T vsscanf([[in]] char const *__restrict input,
@@ -1538,8 +1539,8 @@ __STDC_INT_AS_SIZE_T vsscanf([[in]] char const *__restrict input,
 @@>> sscanf(3), vsscanf(3)
 @@Scan data from a given `input' string, following `format'
 @@Return  the  number  of successfully  scanned  data items
-[[std, decl_include("<features.h>")]]
-[[crtbuiltin, export_alias("_IO_sscanf")]]
+[[std, kernel, decl_include("<features.h>"), crtbuiltin, alias("_IO_sscanf")]]
+[[if(!defined(__KERNEL__)), export_as("_IO_sscanf")]]
 [[section(".text.crt{|.dos}.unicode.static.format.scanf")]]
 __STDC_INT_AS_SIZE_T sscanf([[in]] char const *__restrict input,
                             [[in, format]] char const *__restrict format, ...)

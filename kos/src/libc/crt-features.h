@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x235b4fee */
+/* HASH CRC-32:0x39cbb080 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7531,7 +7531,9 @@
 #define __CRT_HAVE_srand48_r
 #define __CRT_HAVE_srandom
 #define __CRT_HAVE_srandom_r
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_sscanf
+#ifndef __KERNEL__
 #define __CRT_HAVE_sscanf_s
 #define __CRT_HAVE_ssignal
 #define __CRT_HAVE_stack_limit_increase
@@ -7543,17 +7545,25 @@
 #define __CRT_HAVE_statvfs64
 #define __CRT_HAVE_stime
 #define __CRT_HAVE_stime64
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_stpcpy
+#ifndef __KERNEL__
 #define __CRT_HAVE_stpncpy
 #define __CRT_HAVE_str2sig
 #define __CRT_HAVE_strcadd
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_strcasecmp
+#ifndef __KERNEL__
 #define __CRT_HAVE_strcasecmp_l
 #define __CRT_HAVE_strcasecoll
 #define __CRT_HAVE_strcasecoll_l
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_strcasestr
+#ifndef __KERNEL__
 #define __CRT_HAVE_strcasestr_l
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_strcat
+#ifndef __KERNEL__
 #define __CRT_HAVE_strcat_s
 #define __CRT_HAVE_strccpy
 #endif /* !__KERNEL__ */
@@ -7564,7 +7574,9 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_strcoll
 #define __CRT_HAVE_strcoll_l
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_strcpy
+#ifndef __KERNEL__
 #define __CRT_HAVE_strcpy_s
 #define __CRT_HAVE_strcspn
 #define __CRT_HAVE_strdup
@@ -7591,15 +7603,17 @@
 #define __CRT_HAVE_strfry
 #define __CRT_HAVE_strftime
 #define __CRT_HAVE_strftime_l
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_strlcat
 #define __CRT_HAVE_strlcpy
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_strlen
 #ifndef __KERNEL__
 #define __CRT_HAVE_strlwr
 #define __CRT_HAVE_strlwr_l
 #define __CRT_HAVE_strmode
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_strncasecmp
+#ifndef __KERNEL__
 #define __CRT_HAVE_strncasecmp_l
 #define __CRT_HAVE_strncasecoll
 #define __CRT_HAVE_strncasecoll_l
@@ -7607,7 +7621,9 @@
 #define __CRT_HAVE_strncat_s
 #define __CRT_HAVE_strnchr
 #define __CRT_HAVE_strnchrnul
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_strncmp
+#ifndef __KERNEL__
 #define __CRT_HAVE_strncoll
 #define __CRT_HAVE_strncoll_l
 #define __CRT_HAVE_strncpy
@@ -7646,8 +7662,8 @@
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_strstartcmp
 #define __CRT_HAVE_strstartcmpz
-#ifndef __KERNEL__
 #define __CRT_HAVE_strstr
+#ifndef __KERNEL__
 #define __CRT_HAVE_strsuftoll
 #define __CRT_HAVE_strsuftollx
 #endif /* !__KERNEL__ */
@@ -7962,7 +7978,9 @@
 #define __CRT_HAVE_vsprintf
 #ifndef __KERNEL__
 #define __CRT_HAVE_vsprintf_s
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_vsscanf
+#ifndef __KERNEL__
 #define __CRT_HAVE_vsscanf_s
 #define __CRT_HAVE_vstrdupf
 #define __CRT_HAVE_vswprintf

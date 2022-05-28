@@ -131,7 +131,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		char buf[TASK_COMM_LEN];
 		USER CHECKED char const *name;
 		name = (USER CHECKED char const *)validate_readableaddr((USER UNCHECKED char const *)arg2);
-		strncpy(buf, name, TASK_COMM_LEN);
+		strlcpy(buf, name, TASK_COMM_LEN);
 		task_setcomm(buf);
 	}	break;
 

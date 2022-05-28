@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe68d7687 */
+/* HASH CRC-32:0x143dc3ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -453,23 +453,19 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_str
  * Same as `strcmp', but compare at most `maxlen' characters from either string */
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strncmp)(char const *s1, char const *s2, size_t maxlen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* >> strncmp(3)
  * Same as `strcmp', but compare at most `maxlen' characters from either string */
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncmp)(char const *s1, char const *s2, size_t maxlen);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strstr(3)
  * Search for a given `needle' appearing as a sub-string within `haystack'
  * If no such needle exists, return `NULL' */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBDCALL libd_strstr)(char const *haystack, char const *needle);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* >> strstr(3)
  * Search for a given `needle' appearing as a sub-string within `haystack'
  * If no such needle exists, return `NULL' */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBCCALL libc_strstr)(char const *haystack, char const *needle);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strcpy(3)
  * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
@@ -477,13 +473,11 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBCCALL libc_s
  * the trailing NUL-character is also copied) */
 INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_IN(2) ATTR_OUT(1) char *NOTHROW_NCX(LIBDCALL libd_strcpy)(char *__restrict dst, char const *__restrict src);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* >> strcpy(3)
  * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
  * The exact # of characters copied is `strlen(src) + 1' (+1 because
  * the trailing NUL-character is also copied) */
 INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_IN(2) ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc_strcpy)(char *__restrict dst, char const *__restrict src);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strncpy(3)
  * Always write exactly `buflen' characters to `buf'. As far as
@@ -507,13 +501,11 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUTS(1, 3) NONNULL((1, 2)) 
  * Always re-returns `dst' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_IN(2) ATTR_INOUT(1) char *NOTHROW_NCX(LIBDCALL libd_strcat)(char *__restrict dst, char const *__restrict src);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* >> strcat(3)
  * Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
  * append it at the end of `dst', or more precisely copy to `strend(dst)'
  * Always re-returns `dst' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_IN(2) ATTR_INOUT(1) char *NOTHROW_NCX(LIBCCALL libc_strcat)(char *__restrict dst, char const *__restrict src);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strncat(3)
  * Copy at most max_srclen (or rather: exactly `strnlen(src, max_srclen)')
@@ -599,11 +591,9 @@ INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL
  * Same as `mempcpy(dst, src, (strlen(src) + 1) * sizeof(char)) - 1´ */
 INTDEF ATTR_LEAF ATTR_IN(2) ATTR_OUT(1) char *NOTHROW_NCX(LIBDCALL libd_stpcpy)(char *__restrict buf, char const *__restrict src);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* >> stpcpy(3)
  * Same as `mempcpy(dst, src, (strlen(src) + 1) * sizeof(char)) - 1´ */
 INTDEF ATTR_LEAF ATTR_IN(2) ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc_stpcpy)(char *__restrict buf, char const *__restrict src);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> stpncpy(3) */
 INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUTS(1, 3) NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_stpncpy)(char *__restrict buf, char const *__restrict src, size_t buflen);
@@ -685,11 +675,9 @@ INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOT
  * Same as `strstr', but ignore casing */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBDCALL libd_strcasestr)(char const *haystack, char const *needle);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* >> strcasestr(3), strcasestr_l(3)
  * Same as `strstr', but ignore casing */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBCCALL libc_strcasestr)(char const *haystack, char const *needle);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strchrnul(3)
  * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
@@ -889,15 +877,11 @@ INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHR
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_strcasecmp)(char const *s1, char const *s2);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_strcasecmp)(char const *s1, char const *s2);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strncasecmp)(char const *s1, char const *s2, size_t maxlen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strncasecmp)(char const *s1, char const *s2, size_t maxlen);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_UINT_T NOTHROW(LIBDCALL libd_ffs)(int i);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -919,15 +903,11 @@ INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_UINT_T NOTHROW(LIBCCALL libc_ffsll)(__LO
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_LEAF ATTR_IN(2) ATTR_INOUTS(1, 3) NONNULL((1)) size_t NOTHROW_NCX(LIBDCALL libd_strlcat)(char *__restrict dst, char const *__restrict src, size_t bufsize);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_LEAF ATTR_IN(2) ATTR_INOUTS(1, 3) NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_strlcat)(char *__restrict dst, char const *__restrict src, size_t bufsize);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_LEAF ATTR_IN(2) ATTR_OUTS(1, 3) NONNULL((1)) size_t NOTHROW_NCX(LIBDCALL libd_strlcpy)(char *__restrict dst, char const *__restrict src, size_t bufsize);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 INTDEF ATTR_LEAF ATTR_IN(2) ATTR_OUTS(1, 3) NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_strlcpy)(char *__restrict dst, char const *__restrict src, size_t bufsize);
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_LEAF ATTR_INS(2, 4) ATTR_OUTS(1, 4) NONNULL((1, 2)) void *NOTHROW_NCX(LIBDCALL libd_memccpy)(void *__restrict dst, void const *__restrict src, int needle, size_t num_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe167a2ec */
+/* HASH CRC-32:0xced89fbe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -407,6 +407,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("
 (LIBCCALL libc_gets)(char *__restrict buf) THROWS(...) {
 	return libc_fgets(buf, INT_MAX, stdin);
 }
+#endif /* !__KERNEL__ */
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 #include <asm/crt/stdio.h>
@@ -440,7 +441,6 @@ NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input,
 	                     &__NAMESPACE_LOCAL_SYM vsscanf_ungetc,
 	                     (void *)&input, format, args);
 }
-#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sscanf(3), vsscanf(3)
  * Scan data from a given `input' string, following `format'
@@ -457,7 +457,6 @@ NOTHROW_NCX(VLIBDCALL libd_sscanf)(char const *__restrict input,
 	return result;
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* >> sscanf(3), vsscanf(3)
  * Scan data from a given `input' string, following `format'
  * Return  the  number  of successfully  scanned  data items */
@@ -472,7 +471,6 @@ NOTHROW_NCX(VLIBCCALL libc_sscanf)(char const *__restrict input,
 	va_end(args);
 	return result;
 }
-#endif /* !__KERNEL__ */
 /* >> sprintf(3), vsprintf(3)
  * Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
@@ -617,9 +615,7 @@ NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf,
 	return result;
 }
 #ifndef __KERNEL__
-#include <hybrid/typecore.h>
 #include <hybrid/host.h>
-#include <bits/crt/format-printer.h>
 /* >> dprintf(3), vdprintf(3) */
 INTERN ATTR_SECTION(".text.crt.io.write") ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd,
@@ -706,7 +702,6 @@ INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED ATTR_OUT_OPT(1) char *
 NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf) {
 	return buf ? libc_tmpnam(buf) : NULL;
 }
-#include <asm/crt/stdio.h>
 /* >> setbuffer(3)
  * Specify the location and size for the buffer to-be used by `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") ATTR_INOUT(1) void
@@ -724,7 +719,6 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc_setlinebuf)(FILE *__restrict stream) {
 	libc_setvbuf(stream, NULL, _IOLBF, 0);
 }
-#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <asm/os/stdio.h>
 #include <bits/types.h>
@@ -841,7 +835,6 @@ NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem,
 
 	return result;
 }
-#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <bits/types.h>
 #include <asm/os/stdio.h>
@@ -1016,7 +1009,6 @@ NOTHROW_NCX(LIBCCALL libc_open_memstream)(char **bufloc,
 
 	return result;
 }
-#include <asm/crt/stdio.h>
 #include <hybrid/__assert.h>
 /* >> getdelim(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT(4) ssize_t
@@ -1094,7 +1086,6 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") ATTR_INOUT(1) int
                            int ch) THROWS(...) {
 	return libc__flsbuf(ch, stream);
 }
-#include <asm/crt/stdio.h>
 /* >> getw(3)
  * Similar to `getc()', but read 2 bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") ATTR_INOUT(1) int
@@ -1104,7 +1095,6 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") ATTR_INOUT(1) int
 	       ? (int)result
 	       : (int)EOF;
 }
-#include <asm/crt/stdio.h>
 /* >> putw(3)
  * Similar to `putc()', but write 2 bytes loaded from `W & 0xffff' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") ATTR_INOUT(2) int
@@ -1510,8 +1500,6 @@ NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *__restrict magic_cookie,
 
 	return result;
 }
-#include <hybrid/typecore.h>
-#include <asm/crt/stdio.h>
 #include <libc/errno.h>
 /* >> fgets_unlocked(3)
  * Same as `fgets()', but performs I/O without acquiring a lock to `stream' */
@@ -1605,7 +1593,6 @@ NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict self,
 	va_end(args);
 	return result;
 }
-#include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
 #ifndef __format_aprintf_data_defined
 #define __format_aprintf_data_defined
@@ -1670,7 +1657,6 @@ NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr,
 	va_end(args);
 	return result;
 }
-#include <asm/crt/stdio.h>
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") ATTR_INOUT(1) int
 (LIBCCALL libc_getw_unlocked)(FILE *__restrict stream) THROWS(...) {
 	u16 result;
@@ -1686,7 +1672,6 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") ATTR_INOUT(2) int
 	       ? w
 	       : EOF;
 }
-#include <asm/crt/stdio.h>
 #include <hybrid/__assert.h>
 /* >> getdelim(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.read") WUNUSED ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT(4) ssize_t
@@ -1826,7 +1811,6 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.printf") ATTR_IN(1) ATTR_LIBC
 	va_end(args);
 	return result;
 }
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__
 __LOCAL_LIBC(vfscanf_getc_unlocked) __format_word_t
@@ -2864,7 +2848,6 @@ NOTHROW_NCX(LIBCCALL libc___stdio_common_vfscanf)(uint64_t options,
 	(void)locale;
 	return libc_vfscanf(stream, format, args);
 }
-#include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 struct __vsnscanf_data {
 	unsigned char const *__ptr;
@@ -3045,7 +3028,6 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf_c)(char *buf,
                                         va_list args) {
 	return libc__vsnprintf_c_l(buf, bufsize, format, NULL, args);
 }
-#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_IN(2) ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsscanf_l)(char const *buf,
                                       char const *format,
@@ -4063,15 +4045,17 @@ DEFINE_PUBLIC_ALIAS(_IO_gets, libc_gets);
 DEFINE_PUBLIC_ALIAS(gets, libc_gets);
 DEFINE_PUBLIC_ALIAS(__vsscanf, libc_vsscanf);
 DEFINE_PUBLIC_ALIAS(_IO_vsscanf, libc_vsscanf);
-DEFINE_PUBLIC_ALIAS(vsscanf, libc_vsscanf);
 #endif /* !__KERNEL__ */
+DEFINE_PUBLIC_ALIAS(vsscanf, libc_vsscanf);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(DOS$_IO_sscanf, libd_sscanf);
 DEFINE_PUBLIC_ALIAS(DOS$sscanf, libd_sscanf);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_IO_sscanf, libc_sscanf);
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(sscanf, libc_sscanf);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_IO_vsprintf, libc_vsprintf);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(vsprintf, libc_vsprintf);
