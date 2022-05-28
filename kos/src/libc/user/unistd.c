@@ -2113,7 +2113,8 @@ NOTHROW_RPC(LIBCCALL libc_getusershell)(void)
 		libc_setusershell();
 	/* Read the next non-empty file (hint: the buffer
 	 * here  is  automatically free'd  by fclose(3)!) */
-	while ((result = fgetln(usershells_file, NULL)) != NULL && !*result)
+	while ((result = fgetln(usershells_file, NULL)) != NULL &&
+	       (*result == '\0' || *result == '\n'))
 		break;
 	return result;
 }

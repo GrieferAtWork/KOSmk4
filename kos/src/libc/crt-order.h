@@ -184,15 +184,16 @@
 	.syscalls
 
 	# Databases
-	.database.shell
-	.database.shadow
-	.database.pwd
-	.database.grp
-	.database.aliases
-	.database.mntent
 	.database.fstab
+	.database.mntent
+	.database.grp
+	.database.pwd
+	.database.shadow
 	.database.utmp
 	.database.utmpx
+	.database.aliases
+	.database.shell
+	.database.tty
 
 	.io.stropts                       # stream operations
 	.io.sgtty                         # gtty / stty
@@ -322,15 +323,16 @@
 	CB(PREFIX.crt.kos.syscalls) \
 	CB(PREFIX.crt.syscalls.selector PREFIX.crt.syscalls.x86_sysenter_common) \
 	CB(PREFIX.crt.syscalls) \
-	CB(PREFIX.crt.database.shell) \
-	CB(PREFIX.crt.database.shadow) \
-	CB(PREFIX.crt.database.pwd) \
-	CB(PREFIX.crt.database.grp) \
-	CB(PREFIX.crt.database.aliases) \
-	CB(PREFIX.crt.database.mntent) \
 	CB(PREFIX.crt.database.fstab) \
+	CB(PREFIX.crt.database.mntent) \
+	CB(PREFIX.crt.database.grp) \
+	CB(PREFIX.crt.database.pwd) \
+	CB(PREFIX.crt.database.shadow) \
 	CB(PREFIX.crt.database.utmp) \
 	CB(PREFIX.crt.database.utmpx) \
+	CB(PREFIX.crt.database.aliases) \
+	CB(PREFIX.crt.database.shell) \
+	CB(PREFIX.crt.database.tty) \
 	CB(PREFIX.crt.io.stropts) \
 	CB(PREFIX.crt.string.memory.strsignal) \
 	CB(PREFIX.crt.system.auxv) \
@@ -498,14 +500,15 @@
 	CB(PREFIX.crt.dos.timer) \
 	CB(PREFIX.crt.dos.errno.utility PREFIX.crt.dos.errno) \
 	CB(PREFIX.crt.dos.error) \
-	CB(PREFIX.crt.dos.database.shadow) \
-	CB(PREFIX.crt.dos.database.pwd) \
-	CB(PREFIX.crt.dos.database.grp) \
-	CB(PREFIX.crt.dos.database.aliases) \
-	CB(PREFIX.crt.dos.database.mntent) \
 	CB(PREFIX.crt.dos.database.fstab) \
+	CB(PREFIX.crt.dos.database.mntent) \
+	CB(PREFIX.crt.dos.database.grp) \
+	CB(PREFIX.crt.dos.database.pwd) \
+	CB(PREFIX.crt.dos.database.shadow) \
 	CB(PREFIX.crt.dos.database.utmp) \
 	CB(PREFIX.crt.dos.database.utmpx) \
+	CB(PREFIX.crt.dos.database.aliases) \
+	CB(PREFIX.crt.dos.database.tty) \
 	CB(PREFIX.crt.dos.io.stropts) \
 	CB(PREFIX.crt.dos.string.memory.strsignal) \
 	CB(PREFIX.crt.dos.system.auxv) \

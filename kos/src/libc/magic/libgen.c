@@ -539,7 +539,7 @@ char *copylist64([[in]] char const *filename,
 @@To prevent a buffer overflow, `dstbuf' should be at least `strlen(string) + 1'
 @@bytes long (the +1 because this function appends a trailing '\0')
 @@@return: * : A pointer to the trailing '\0' appended to `dstbuf'
-[[nonnull]]
+[[nonnull, impl_include("<hybrid/typecore.h>")]]
 char *strcadd([[out]] char *dstbuf, [[in]] char const *string) {
 	for (;;) {
 		char ch = *string++;

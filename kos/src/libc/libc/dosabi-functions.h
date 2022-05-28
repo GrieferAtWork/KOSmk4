@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95c5132b */
+/* HASH CRC-32:0xcd61c4ba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2852,7 +2852,7 @@ DFUN(".text.crt.dos.libiberty", libd_timeval_add64, libc_timeval_add64, TV, 3, T
 DFUN(".text.crt.dos.libiberty", libd_timeval_sub64, libc_timeval_sub64, TV, 3, TP, TP, TP)
 
 /* ttyent */
-DFUN(".text.crt.dos.database.utmpx", libd_getttynam, libc_getttynam, TP, 1, TP)
+DFUN(".text.crt.dos.database.tty", libd_getttynam, libc_getttynam, TP, 1, TP)
 
 /* uchar */
 DFUN(".text.crt.dos.wchar.unicode.convert", libd_convert_freev, libc_convert_freev, TV, 1, TP)

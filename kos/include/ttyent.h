@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd75875d */
+/* HASH CRC-32:0xf2dc33 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,11 +57,21 @@ __SYSDECL_BEGIN
 
 /* >> getttyent(3) */
 __CDECLARE_OPT(,struct ttyent *,__NOTHROW_RPC_KOS,getttyent,(void),())
+#ifdef __CRT_HAVE_getttynam
 /* >> getttynam(3) */
-__CDECLARE_OPT(__ATTR_IN(1),struct ttyent *,__NOTHROW_RPC_KOS,getttynam,(char const *__tty),(__tty))
-/* >> setttyent(3) */
+__CDECLARE(__ATTR_IN(1),struct ttyent *,__NOTHROW_RPC_KOS,getttynam,(char const *__tty),(__tty))
+#elif defined(__CRT_HAVE_setttyent) && defined(__CRT_HAVE_getttyent)
+#include <libc/local/ttyent/getttynam.h>
+/* >> getttynam(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getttynam, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) struct ttyent *__NOTHROW_RPC_KOS(__LIBCCALL getttynam)(char const *__tty) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getttynam))(__tty); })
+#endif /* ... */
+/* >> setttyent(3)
+ * @return: 1 : Success
+ * @return: 0 : Error */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,setttyent,(void),())
-/* >> endttyent(3) */
+/* >> endttyent(3)
+ * @return: 1 : Success
+ * @return: 0 : Error */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,endttyent,(void),())
 
 __SYSDECL_END

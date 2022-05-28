@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xf65a6f4c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,33 +18,37 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_CRT_DB_TTYENT_H
-#define _BITS_CRT_DB_TTYENT_H 1
+#ifndef GUARD_LIBC_AUTO_TTYENT_C
+#define GUARD_LIBC_AUTO_TTYENT_C 1
 
-#include <__crt.h>
-#include <__stdinc.h>
-
+#include "../api.h"
 #include <hybrid/typecore.h>
+#include <kos/types.h>
+#include "../user/ttyent.h"
+#include "string.h"
 
-#ifdef __CC__
-__DECL_BEGIN
+DECL_BEGIN
 
-struct ttyent {
-	char           *ty_name;    /* [1..1] terminal device name (without "/dev/" prefix) */
-	char           *ty_getty;   /* [1..1] command to execute, usually getty */
-	char           *ty_type;    /* [1..1] terminal type for termcap */
-	int             ty_status;  /* status flags (Set of `TTY_ON | TTY_SECURE') */
-#if __SIZEOF_POINTER__ >= __SIZEOF_INT__
-	__BYTE_TYPE__ __ty_pad[__SIZEOF_POINTER__ - __SIZEOF_INT__]; /* ... */
-#endif /* __SIZEOF_POINTER__ >= __SIZEOF_INT__ */
-	char           *ty_window;  /* [0..1] command to start up window manager */
-	char           *ty_comment; /* [0..1] comment field */
-#if !defined(__CRT_GLC_PRIMARY)
-	char           *ty_group;   /* [0..1] TTY group */
-#endif /* !__CRT_GLC_PRIMARY */
-};
+#ifndef __KERNEL__
+#include <bits/crt/db/ttyent.h>
+/* >> getttynam(3) */
+INTERN ATTR_SECTION(".text.crt.database.tty") ATTR_IN(1) struct ttyent *
+NOTHROW_RPC_KOS(LIBCCALL libc_getttynam)(char const *tty) {
+	struct ttyent *result;
+	if (!libc_setttyent())
+		return NULL;
+	while ((result = libc_getttyent()) != NULL) {
+		if (libc_strcmp(result->ty_name, tty) == 0)
+			break;
+	}
+	return result;
+}
+#endif /* !__KERNEL__ */
 
-__DECL_END
-#endif /* __CC__ */
+DECL_END
 
-#endif /* !_BITS_CRT_DB_TTYENT_H */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(getttynam, libc_getttynam);
+#endif /* !__KERNEL__ */
+
+#endif /* !GUARD_LIBC_AUTO_TTYENT_C */

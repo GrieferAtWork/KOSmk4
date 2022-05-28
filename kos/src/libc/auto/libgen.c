@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9731eb48 */
+/* HASH CRC-32:0x361f169e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -639,6 +639,7 @@ NOTHROW_RPC(LIBCCALL libc_copylist64)(char const *filename,
 
 }
 #endif /* !... */
+#include <hybrid/typecore.h>
 /* >> strcadd(3)
  * Decode C-style escape sequences from `string' and write the result to `dstbuf'
  * To prevent a buffer overflow, `dstbuf' should be at least `strlen(string) + 1'

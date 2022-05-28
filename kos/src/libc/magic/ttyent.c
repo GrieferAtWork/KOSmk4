@@ -28,7 +28,7 @@
 }
 
 %[define_replacement(fd_t = __fd_t)]
-%[default:section(".text.crt{|.dos}.database.utmpx")]
+%[default:section(".text.crt{|.dos}.database.tty")]
 
 %[insert:prefix(
 #include <features.h>
@@ -62,15 +62,29 @@ struct ttyent *getttyent();
 
 @@>> getttynam(3)
 [[cp_kos, decl_include("<bits/crt/db/ttyent.h>")]]
-struct ttyent *getttynam([[in]] char const *tty);
+[[requires_function(setttyent, getttyent)]]
+[[impl_include("<bits/crt/db/ttyent.h>")]]
+struct ttyent *getttynam([[in]] char const *tty) {
+	struct ttyent *result;
+	if (!setttyent())
+		return NULL;
+	while ((result = getttyent()) != NULL) {
+		if (strcmp(result->@ty_name@, tty) == 0)
+			break;
+	}
+	return result;
+}
 
 @@>> setttyent(3)
+@@@return: 1 : Success
+@@@return: 0 : Error
 [[cp_kos]]
 int setttyent();
 
 @@>> endttyent(3)
+@@@return: 1 : Success
+@@@return: 0 : Error
 int endttyent();
-
 
 %{
 

@@ -83,6 +83,7 @@
 #include <string.h>
 #include <syslog.h>
 #include <termios.h>
+#include <ttyent.h>
 #include <unistd.h>
 
 #include <libansitty/ctl.h>
@@ -1170,6 +1171,26 @@ int main_stackend(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_ttys(int argc, char *argv[], char *envp[]) {
+	struct ttyent *ent;
+	(void)argc, (void)argv, (void)envp;
+	if (!setttyent())
+		err(1, "setttyent() failed");
+	while ((ent = getttyent()) != NULL) {
+		printf("getttyent: { ty_name:%q, ty_getty:%q, ty_type:%q, ty_status:%#x, "
+		                    "ty_window: %q, ty_comment: %q, ty_group: %q}\n",
+		       ent->ty_name, ent->ty_getty, ent->ty_type,
+		       ent->ty_status, ent->ty_window, ent->ty_comment,
+		       ent->ty_group);
+	}
+	endttyent();
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -1218,6 +1239,7 @@ PRIVATE DEF defs[] = {
 	{ "leakmon", &main_leakmon },
 	{ "dosenv", &main_dosenv },
 	{ "stackend", &main_stackend },
+	{ "ttys", &main_ttys },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

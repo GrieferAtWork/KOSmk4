@@ -23,64 +23,212 @@
 #include "../api.h"
 /**/
 
+#include <sys/syslog.h>
+
+#include <ctype.h>
+#include <paths.h>
+#include <stdio.h>
+#include <string.h>
+
+#include <libgen.h>
+
 #include "ttyent.h"
 
 DECL_BEGIN
 
-/*[[[head:libc_getttyent,hash:CRC-32=0xf603834f]]]*/
+PRIVATE ATTR_SECTION(".bss.crt.database.tty") FILE *ttys_file = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.database.tty") struct ttyent tty_ent = { NULL, };
+
+/*[[[head:libc_setttyent,hash:CRC-32=0xc9f31f2e]]]*/
+/* >> setttyent(3)
+ * @return: 1 : Success
+ * @return: 0 : Error */
+INTERN ATTR_SECTION(".text.crt.database.tty") int
+NOTHROW_RPC_KOS(LIBCCALL libc_setttyent)(void)
+/*[[[body:libc_setttyent]]]*/
+{
+	if (ttys_file) {
+		rewind(ttys_file);
+	} else {
+		ttys_file = fopen(_PATH_TTYS, "r");
+		if (!ttys_file)
+			return 0;
+	}
+	return 1;
+}
+/*[[[end:libc_setttyent]]]*/
+
+/*[[[head:libc_endttyent,hash:CRC-32=0x1470f177]]]*/
+/* >> endttyent(3)
+ * @return: 1 : Success
+ * @return: 0 : Error */
+INTERN ATTR_SECTION(".text.crt.database.tty") int
+NOTHROW_NCX(LIBCCALL libc_endttyent)(void)
+/*[[[body:libc_endttyent]]]*/
+{
+	if (ttys_file) {
+		fclose(ttys_file);
+		ttys_file = NULL;
+	}
+	return 1;
+}
+/*[[[end:libc_endttyent]]]*/
+
+PRIVATE ATTR_SECTION(".text.crt.database.tty") ATTR_RETNONNULL NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL tty_strip_and_unescape)(char *str) {
+	while (isspace(*str))
+		++str;
+	if (*str == '"') {
+		char *eos = ++str;
+		while (*eos) {
+			if (*eos == '"')
+				break;
+			if (*eos == '\\') {
+				++eos;
+				if (*eos)
+					++eos;
+			} else {
+				++eos;
+			}
+		}
+		*eos = '\0';
+		str = strccpy(str, str);
+	} else {
+		char *eos = strend(str);
+		while (eos > str && isspace(eos[-1]))
+			--eos;
+		*eos = '\0';
+	}
+	return str;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.database.tty") ATTR_RETNONNULL NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL tty_nextfield)(char *str) {
+	while (*str) {
+		if (isspace(*str)) {
+			do {
+				++str;
+			} while (isspace(*str));
+			str[-1] = '\0';
+			break;
+		}
+		if (*str == '"') {
+			++str;
+			while (*str) {
+				if (*str == '"') {
+					++str;
+					break;
+				}
+				if (*str == '\\') {
+					++str;
+					if (*str)
+						++str;
+				} else {
+					++str;
+				}
+			}
+			if (*str)
+				str[-1] = '\0';
+			while (isspace(*str))
+				++str; /* Skip whitespace after end of quoted area */
+			break;
+		}
+		++str;
+	}
+	return str;
+}
+
+/*[[[head:libc_getttyent,hash:CRC-32=0xdca6cc64]]]*/
 /* >> getttyent(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmpx") struct ttyent *
+INTERN ATTR_SECTION(".text.crt.database.tty") struct ttyent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getttyent)(void)
 /*[[[body:libc_getttyent]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("getttyent"); /* TODO */
-	libc_seterrno(ENOSYS);
+{
+	char *line;
+	if (!ttys_file)
+		libc_setttyent();
+	while ((line = fgetln(ttys_file, NULL)) != NULL) {
+		char *temp;
+
+		/* Strip leading space */
+		while (isspace(*line))
+			++line;
+
+		if (*line == '\0' || *line == '#')
+			continue; /* Skip empty- or comment-only lines */
+
+		/* Strip trailing space */
+		temp = strend(line);
+		while (temp > line && isspace(temp[-1]))
+			--temp;
+		*temp = '\0';
+
+		/* Skip empty lines. */
+		if (*line == '\0')
+			continue;
+
+		/* Lines look something like this:
+		 * >> console "/usr/libexec/getty std.1200" vt100 on secure */
+		bzero(&tty_ent, sizeof(tty_ent));
+		tty_ent.ty_name  = line;
+		line             = tty_nextfield(line);
+		tty_ent.ty_getty = line;
+		line             = tty_nextfield(line);
+		tty_ent.ty_type  = line;
+		line             = tty_nextfield(line);
+
+		/* Parse flags */
+		while (*line && *line != '#') {
+			char *item = line, *value;
+			line = tty_nextfield(line);
+			item = tty_strip_and_unescape(item);
+			if (strcmp(item, "on") == 0) {
+				tty_ent.ty_status |= TTY_ON;
+				continue;
+			}
+			if (strcmp(item, "secure") == 0) {
+				tty_ent.ty_status |= TTY_SECURE;
+				continue;
+			}
+			value = strchr(item, '=');
+			if (value) {
+				*value++ = '\0';
+				value = tty_strip_and_unescape(value);
+				if (strcmp(item, "group") == 0) {
+					tty_ent.ty_group = value;
+					continue;
+				}
+				if (strcmp(item, "window") == 0) {
+					tty_ent.ty_window = value;
+					continue;
+				}
+				syslog(LOG_WARN, "Unrecognized flag in /dev/ttys line: '%#q=%q'\n", item, value);
+			} else {
+				syslog(LOG_WARN, "Unrecognized flag in /dev/ttys line: '%#q'\n", item);
+			}
+		}
+		if (*line == '#') {
+			/* Trailing comment */
+			do {
+				++line;
+			} while (isspace(*line));
+			tty_ent.ty_comment = line;
+		}
+
+		/* Unescape string fields. */
+		tty_ent.ty_name  = tty_strip_and_unescape(tty_ent.ty_name);
+		tty_ent.ty_getty = tty_strip_and_unescape(tty_ent.ty_getty);
+		tty_ent.ty_type  = tty_strip_and_unescape(tty_ent.ty_type);
+		return &tty_ent;
+	}
 	return NULL;
 }
 /*[[[end:libc_getttyent]]]*/
 
-/*[[[head:libc_getttynam,hash:CRC-32=0xabd64183]]]*/
-/* >> getttynam(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmpx") ATTR_IN(1) struct ttyent *
-NOTHROW_RPC_KOS(LIBCCALL libc_getttynam)(char const *tty)
-/*[[[body:libc_getttynam]]]*/
-/*AUTO*/{
-	(void)tty;
-	CRT_UNIMPLEMENTEDF("getttynam(%q)", tty); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_getttynam]]]*/
-
-/*[[[head:libc_setttyent,hash:CRC-32=0x855393c]]]*/
-/* >> setttyent(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmpx") int
-NOTHROW_RPC_KOS(LIBCCALL libc_setttyent)(void)
-/*[[[body:libc_setttyent]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("setttyent"); /* TODO */
-	return libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_setttyent]]]*/
-
-/*[[[head:libc_endttyent,hash:CRC-32=0x18249120]]]*/
-/* >> endttyent(3) */
-INTERN ATTR_SECTION(".text.crt.database.utmpx") int
-NOTHROW_NCX(LIBCCALL libc_endttyent)(void)
-/*[[[body:libc_endttyent]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("endttyent"); /* TODO */
-	return libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_endttyent]]]*/
 
 
-
-
-
-/*[[[start:exports,hash:CRC-32=0xe8fc5230]]]*/
+/*[[[start:exports,hash:CRC-32=0x21dee637]]]*/
 DEFINE_PUBLIC_ALIAS(getttyent, libc_getttyent);
-DEFINE_PUBLIC_ALIAS(getttynam, libc_getttynam);
 DEFINE_PUBLIC_ALIAS(setttyent, libc_setttyent);
 DEFINE_PUBLIC_ALIAS(endttyent, libc_endttyent);
 /*[[[end:exports]]]*/
