@@ -833,7 +833,7 @@ typedef uint8_t va_uint_t;
 
 
 #ifdef NEED_print_flagset8
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_flagset8(pformatprinter printer, void *arg,
                void const *flags_db, size_t stride,
                char const *flag_prefix, syscall_ulong_t flags) {
@@ -869,7 +869,7 @@ err:
 
 
 #ifdef NEED_print_flagset16
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_flagset16(pformatprinter printer, void *arg,
                 void const *flags_db, size_t stride,
                 char const *flag_prefix, syscall_ulong_t flags) {
@@ -905,7 +905,7 @@ err:
 
 
 #ifdef NEED_print_flagset32
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_flagset32(pformatprinter printer, void *arg,
                 void const *flags_db, size_t stride,
                 char const *flag_prefix, syscall_ulong_t flags) {
@@ -941,7 +941,7 @@ err:
 
 
 #ifdef NEED_print_flagset64
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_flagset64(pformatprinter printer, void *arg,
                 void const *flags_db, size_t stride,
                 char const *flag_prefix, uint64_t flags) {
@@ -1022,7 +1022,7 @@ PRIVATE struct {
 	{ S_ISUID, "S_ISUID" }
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_mode_t(pformatprinter printer, void *arg, mode_t mode) {
 	ssize_t temp, result = 0;
 	char const *name;
@@ -1114,7 +1114,7 @@ PRIVATE struct {
 	{ O_DOSPATH,   "O_DOSPATH" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_oflag_t_impl(pformatprinter printer, void *arg,
                    oflag_t oflags, bool force_accmode) {
 	ssize_t temp, result = 0;
@@ -1178,7 +1178,7 @@ err:
 	return temp;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_oflag_t(pformatprinter printer, void *arg,
               oflag_t oflags, oflag_t allowed_oflags) {
 	ssize_t temp, result;
@@ -1215,7 +1215,7 @@ PRIVATE struct {
 	{ AT_DOSPATH,          "AT_DOSPATH" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_atflag_t_impl(pformatprinter printer, void *arg,
                     atflag_t atflags,
                     char const *nameof_AT_READLINK_REQSIZE) {
@@ -1261,7 +1261,7 @@ err:
 	return temp;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_atflag_t(pformatprinter printer, void *arg,
                atflag_t atflags, atflag_t allowed_atflags,
                char const *nameof_AT_READLINK_REQSIZE) {
@@ -1298,7 +1298,7 @@ PRIVATE struct {
 	{ IO_NODATAZERO, "NODATAZERO" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_iomode_t_impl(pformatprinter printer, void *arg,
                    iomode_t iomodes, bool force_accmode) {
 	ssize_t temp, result = 0;
@@ -1353,7 +1353,7 @@ err:
 	return temp;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_iomode_t(pformatprinter printer, void *arg,
               iomode_t iomodes, iomode_t allowed_iomodes) {
 	ssize_t temp, result;
@@ -1377,7 +1377,7 @@ err:
 
 
 #ifdef NEED_print_fd_t
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_fd_t(pformatprinter printer, void *arg, fd_t fd) {
 	ssize_t result;
 	char const *name;
@@ -1451,7 +1451,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_clockid_t(pformatprinter printer, void *arg, clockid_t clockid) {
 	char const *name;
 	name = get_clockid_name(clockid);
@@ -1464,7 +1464,7 @@ print_clockid_t(pformatprinter printer, void *arg, clockid_t clockid) {
 
 
 #ifdef NEED_print_string
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_string(pformatprinter printer, void *arg,
              USER UNCHECKED char const *str,
              struct sc_argument *length_link) {
@@ -1493,7 +1493,7 @@ print_string(pformatprinter printer, void *arg,
 
 
 #ifdef NEED_print_bytes
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_bytes(pformatprinter printer, void *arg,
             USER CHECKED void const *buf, size_t len) {
 	ssize_t temp, result = 0;
@@ -1552,7 +1552,7 @@ is_printable_string(USER CHECKED char const *str,
 	return (num_printable * 4) >= (length * 3);
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_string_or_buffer(pformatprinter printer, void *arg,
                        USER UNCHECKED void const *buf,
                        size_t length) {
@@ -1619,7 +1619,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_sighandler_t(pformatprinter printer, void *arg,
                    sighandler_t hand) {
 	char const *name;
@@ -1679,7 +1679,7 @@ PRIVATE struct {
 	{ 0, "" }
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_poll_what(pformatprinter printer, void *arg, uint16_t events) {
 	return print_flagset16(printer, arg,
 	                       poll_event_flag_names,
@@ -1731,7 +1731,7 @@ PRIVATE struct {
 	{ 0, "" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_epoll_what(pformatprinter printer, void *arg, uint16_t events) {
 	return print_flagset16(printer, arg,
 	                       epoll_event_flag_names,
@@ -1743,7 +1743,7 @@ print_epoll_what(pformatprinter printer, void *arg, uint16_t events) {
 
 
 #ifdef NEED_print_pollfd
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_pollfd(pformatprinter printer, void *arg,
              struct pollfd const *__restrict pfd) {
 	ssize_t temp, result;
@@ -1764,7 +1764,7 @@ err:
 
 
 #ifdef NEED_print_pollfds
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_pollfds(pformatprinter printer, void *arg,
               USER CHECKED struct pollfd const *fds, size_t count) {
 	ssize_t temp, result = 0;
@@ -1802,7 +1802,7 @@ err:
 
 
 #ifdef NEED_print_timespec
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_timespec(pformatprinter printer, void *arg,
                struct timespec const *__restrict ts) {
 	ssize_t result;
@@ -1819,7 +1819,7 @@ print_timespec(pformatprinter printer, void *arg,
 
 
 #ifdef NEED_print_timespec_vector
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_timespec_vector(pformatprinter printer, void *arg,
                       struct timespec const *__restrict tsv,
                       size_t count) {
@@ -1844,7 +1844,7 @@ err:
 
 
 #ifdef NEED_print_timeval
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_timeval(pformatprinter printer, void *arg,
               struct timeval const *__restrict ts) {
 	ssize_t result;
@@ -1860,7 +1860,7 @@ print_timeval(pformatprinter printer, void *arg,
 
 
 #ifdef NEED_print_timeval_vector
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_timeval_vector(pformatprinter printer, void *arg,
                      struct timeval const *__restrict tsv,
                      size_t count) {
@@ -2134,7 +2134,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_ioctl_command_size(pformatprinter printer, void *arg, size_t size) {
 	ssize_t result;
 	char const *name;
@@ -2153,7 +2153,7 @@ print_ioctl_command_size(pformatprinter printer, void *arg, size_t size) {
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_ioctl_type(pformatprinter printer, void *arg,
                  syscall_ulong_t type) {
 	ssize_t result;
@@ -2167,7 +2167,7 @@ print_ioctl_type(pformatprinter printer, void *arg,
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_ioctl_command(pformatprinter printer, void *arg,
                     syscall_ulong_t command) {
 	char const *name;
@@ -2243,7 +2243,7 @@ err:
 
 
 #ifdef NEED_print_string_vector
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_string_vector(pformatprinter printer, void *arg,
                     USER UNCHECKED char const *USER UNCHECKED const *vector
 #ifdef HAVE_STRING_VECTOR_POINTER_SIZE
@@ -2362,7 +2362,7 @@ done:
 #define get_signo_name(signo) sigabbrev_np(signo)
 #endif /* !__KERNEL__ && !... */
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_signo_t(pformatprinter printer, void *arg, signo_t signo) {
 	char const *name = get_signo_name(signo);
 	if (name)
@@ -2445,7 +2445,7 @@ done:
 
 
 #ifdef NEED_print_socket_domain
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_socket_domain(pformatprinter printer, void *arg,
                     syscall_ulong_t domain) {
 	char const *name;
@@ -2462,7 +2462,7 @@ print_socket_domain(pformatprinter printer, void *arg,
 
 
 #ifdef NEED_print_socket_proto
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_socket_proto(pformatprinter printer, void *arg,
                    syscall_ulong_t proto) {
 	char const *name;
@@ -2490,7 +2490,7 @@ PRIVATE struct socket_type_flag const socket_type_flags[] = {
 	{ 0, "" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_socket_type_flags(pformatprinter printer, void *arg,
                         syscall_ulong_t type_flags) {
 	return print_flagset32(printer, arg, socket_type_flags,
@@ -2534,7 +2534,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_socket_type(pformatprinter printer, void *arg,
                   syscall_ulong_t type) {
 	char const *type_name;
@@ -2560,7 +2560,7 @@ err:
 
 
 #ifdef NEED_print_sockaddr
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_sockaddr(pformatprinter printer, void *arg,
                USER CHECKED struct sockaddr const *sa,
                socklen_t len) {
@@ -2654,7 +2654,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_seek_whence(pformatprinter printer, void *arg,
                   syscall_ulong_t whence) {
 	char const *name;
@@ -2710,7 +2710,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_fcntl_command(pformatprinter printer, void *arg,
                     syscall_ulong_t cmd) {
 	char const *name;
@@ -2735,7 +2735,7 @@ PRIVATE struct fdflag_name const fdflag_names[] = {
 	{ FD_CLOFORK, "CLOFORK" },
 	{ 0, "" },
 };
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_fd_flags(pformatprinter printer, void *arg,
                syscall_ulong_t fd_flags) {
 	return print_flagset8(printer, arg, fdflag_names,
@@ -2764,7 +2764,7 @@ PRIVATE struct dn_flag_name const dn_flag_names[] = {
 	{ 0, "" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_dn_flags(pformatprinter printer, void *arg,
                syscall_ulong_t dn_flags) {
 	return print_flagset32(printer, arg, dn_flag_names,
@@ -2802,7 +2802,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_f_owner_type(pformatprinter printer, void *arg,
                    unsigned int type) {
 	char const *name;
@@ -2831,7 +2831,7 @@ PRIVATE struct f_lock_name const f_lock_names[] = {
 	{ 0, "" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_f_lock(pformatprinter printer, void *arg,
              syscall_ulong_t lock) {
 	return print_flagset8(printer, arg, f_lock_names,
@@ -2845,7 +2845,7 @@ print_f_lock(pformatprinter printer, void *arg,
 
 
 #ifdef NEED_print_flock64
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_flock64(pformatprinter printer, void *arg,
               USER CHECKED struct flock64 const *obj) {
 	ssize_t result, temp;
@@ -2873,7 +2873,7 @@ err:
 
 
 #ifdef NEED_print_f_owner_ex
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_f_owner_ex(pformatprinter printer, void *arg,
                  USER CHECKED struct f_owner_ex const *obj) {
 	ssize_t result, temp;
@@ -2897,7 +2897,7 @@ err:
 
 
 #ifdef NEED_print_fcntl_arg
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_fcntl_arg(pformatprinter printer, void *arg,
                 syscall_ulong_t cmd,
                 USER UNCHECKED void *fcntl_arg) {
@@ -3024,7 +3024,7 @@ print_fcntl_arg(pformatprinter printer, void *arg,
 
 
 #ifdef NEED_print_iovec_entry
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_iovec_entry(pformatprinter printer, void *arg,
                   bool print_content,
                   USER UNCHECKED void *iov_base,
@@ -3055,7 +3055,7 @@ err:
 
 
 #if defined(NEED_print_iovecx32) || defined(NEED_print_iovecx64)
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_iovec_n(pformatprinter printer, void *arg, bool print_content,
 #if defined(NEED_print_iovecx32) && defined(NEED_print_iovecx64)
 #define print_iovecx32(printer, arg, print_content, iov, count) \
@@ -3123,7 +3123,7 @@ err:
 
 
 #ifdef NEED_print_fdset
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_fdset(pformatprinter printer, void *arg,
             USER CHECKED fd_set const *set,
             size_t nfds) {
@@ -3203,7 +3203,7 @@ PRIVATE struct msg_flag const msg_flag_names[] = {
 	{ MSG_CMSG_CLOFORK, { 'C', 'M', 'S', 'G', '_', 'C', 'L', 'O', 'F', 'O', 'R', 'K' } },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_msg_flags(pformatprinter printer, void *arg,
                 syscall_ulong_t msg_flags,
                 syscall_ulong_t valid_flags) {
@@ -3264,7 +3264,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_sockopt_level(pformatprinter printer, void *arg,
                     syscall_ulong_t level) {
 	char const *name;
@@ -3318,7 +3318,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_sockopt_optname(pformatprinter printer, void *arg,
                       syscall_ulong_t level,
                       syscall_ulong_t optname) {
@@ -3346,7 +3346,7 @@ print_sockopt_optname(pformatprinter printer, void *arg,
 
 
 #ifdef NEED_print_sigset
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_sigset(pformatprinter printer, void *arg,
              USER UNCHECKED sigset_t const *sigset,
              size_t sigsetsize) {
@@ -3438,17 +3438,23 @@ err:
 #if (defined(NEED_print_sigmask_sigset_and_len_x32) && \
      defined(NEED_print_sigmask_sigset_and_len_x64))
 #define NEED_print_sigmask_sigset_and_len_sizearg
-#endif /* NEED_print_sigmask_sigset_and_len_x32 && NEED_print_sigmask_sigset_and_len_x64 */
+#endif /* NEED_print_sigmask_sigset_and_len_x(32|64) */
+
+#ifdef NEED_print_sigmask_sigset_and_len_misc
+#define IF_NEED_print_sigmask_sigset_and_len_misc(...) __VA_ARGS__
+#else /* NEED_print_sigmask_sigset_and_len_misc */
+#define IF_NEED_print_sigmask_sigset_and_len_misc(...) /* nothing */
+#endif /* !NEED_print_sigmask_sigset_and_len_misc */
 
 #ifdef NEED_print_sigmask_sigset_and_len_sizearg
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_sigmask_sigset_and_len(pformatprinter printer, void *arg,
                              USER CHECKED void *ptr,
                              size_t sizeof_pointer)
 #else /* NEED_print_sigmask_sigset_and_len_sizearg */
 #define print_sigmask_sigset_and_len(printer, arg, ptr, sizeof_pointer) \
 	print_sigmask_sigset_and_len_impl(printer, arg, ptr)
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_sigmask_sigset_and_len_impl(pformatprinter printer, void *arg,
                                   USER CHECKED void *ptr)
 #endif /* !NEED_print_sigmask_sigset_and_len_sizearg */
@@ -3465,16 +3471,11 @@ print_sigmask_sigset_and_len_impl(pformatprinter printer, void *arg,
 	} else
 #endif /* NEED_print_sigmask_sigset_and_len_x32 */
 #ifdef NEED_print_sigmask_sigset_and_len_x64
-#ifdef NEED_print_sigmask_sigset_and_len_misc
-	if (sizeof_pointer == 8)
-#endif /* NEED_print_sigmask_sigset_and_len_misc */
-	{
+	IF_NEED_print_sigmask_sigset_and_len_misc(if (sizeof_pointer == 8)) {
 		ss_ptr = (USER UNCHECKED sigset_t const *)(uintptr_t)(*(uint64_t USER CHECKED const *)((byte_t *)ptr + 0));
 		ss_len = (size_t)(*(uint64_t USER CHECKED const *)((byte_t *)ptr + 8));
 	}
-#ifdef NEED_print_sigmask_sigset_and_len_misc
-	else
-#endif /* NEED_print_sigmask_sigset_and_len_misc */
+	IF_NEED_print_sigmask_sigset_and_len_misc(else)
 #endif /* NEED_print_sigmask_sigset_and_len_x64 */
 #ifdef NEED_print_sigmask_sigset_and_len_misc
 	{
@@ -3529,22 +3530,22 @@ struct mmap_prot_flag {
 PRIVATE struct mmap_prot_flag const mmap_prot_flags[] = {
 #if defined(PROT_NONE) && PROT_NONE != 0
 	{ PROT_NONE,  "NONE" },
-#endif /* PROT_NONE != 0 */
+#endif /* PROT_NONE && PROT_NONE != 0 */
 #if defined(PROT_EXEC) && PROT_EXEC != 0
 	{ PROT_EXEC,  "EXEC" },
-#endif /* PROT_EXEC != 0 */
+#endif /* PROT_EXEC && PROT_EXEC != 0 */
 #if defined(PROT_WRITE) && PROT_WRITE != 0
 	{ PROT_WRITE, "WRITE" },
-#endif /* PROT_WRITE != 0 */
+#endif /* PROT_WRITE && PROT_WRITE != 0 */
 #if defined(PROT_READ) && PROT_READ != 0
 	{ PROT_READ,  "READ" },
-#endif /* PROT_READ != 0 */
+#endif /* PROT_READ && PROT_READ != 0 */
 #if defined(PROT_SEM) && PROT_SEM != 0
 	{ PROT_SEM,   "SEM" },
-#endif /* PROT_SEM != 0 */
+#endif /* PROT_SEM && PROT_SEM != 0 */
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_mmap_prot(pformatprinter printer, void *arg,
                 syscall_ulong_t prot) {
 	ssize_t temp, result = 0;
@@ -3591,66 +3592,66 @@ struct mmap_flag {
 };
 
 PRIVATE struct mmap_flag const mmap_flags[] = {
-#ifdef MAP_SHARED
+#if defined(MAP_SHARED) && MAP_SHARED != 0
 	{ MAP_SHARED,        "SHARED" },
-#endif /* MAP_SHARED */
-#ifdef MAP_PRIVATE
+#endif /* MAP_SHARED && MAP_SHARED != 0 */
+#if defined(MAP_PRIVATE) && MAP_PRIVATE != 0
 	{ MAP_PRIVATE,       "PRIVATE" },
-#endif /* MAP_PRIVATE */
-#ifdef MAP_FIXED
+#endif /* MAP_PRIVATE && MAP_PRIVATE != 0 */
+#if defined(MAP_FIXED) && MAP_FIXED != 0
 	{ MAP_FIXED,         "FIXED" },
-#endif /* MAP_FIXED */
-#ifdef MAP_TYPE
+#endif /* MAP_FIXED && MAP_FIXED != 0 */
+#if defined(MAP_TYPE) && MAP_TYPE != 0
 	{ MAP_TYPE,          "TYPE" },
-#endif /* MAP_TYPE */
-#ifdef MAP_FILE
+#endif /* MAP_TYPE && MAP_TYPE != 0 */
+#if defined(MAP_FILE) && MAP_FILE != 0
 	{ MAP_FILE,          "FILE" },
-#endif /* MAP_FILE */
-#ifdef MAP_ANON
+#endif /* MAP_FILE && MAP_FILE != 0 */
+#if defined(MAP_ANON) && MAP_ANON != 0
 	{ MAP_ANON,          "ANON" },
-#endif /* MAP_ANON */
-#ifdef MAP_32BIT
+#endif /* MAP_ANON && MAP_ANON != 0 */
+#if defined(MAP_32BIT) && MAP_32BIT != 0
 	{ MAP_32BIT,         "32BIT" },
-#endif /* MAP_32BIT */
-#ifdef MAP_GROWSDOWN
+#endif /* MAP_32BIT && MAP_32BIT != 0 */
+#if defined(MAP_GROWSDOWN) && MAP_GROWSDOWN != 0
 	{ MAP_GROWSDOWN,     "GROWSDOWN" },
-#endif /* MAP_GROWSDOWN */
-#ifdef MAP_GROWSUP
+#endif /* MAP_GROWSDOWN && MAP_GROWSDOWN != 0 */
+#if defined(MAP_GROWSUP) && MAP_GROWSUP != 0
 	{ MAP_GROWSUP,       "GROWSUP" },
-#endif /* MAP_GROWSUP */
-#ifdef MAP_DENYWRITE
+#endif /* MAP_GROWSUP && MAP_GROWSUP != 0 */
+#if defined(MAP_DENYWRITE) && MAP_DENYWRITE != 0
 	{ MAP_DENYWRITE,     "DENYWRITE" },
-#endif /* MAP_DENYWRITE */
-#ifdef MAP_EXECUTABLE
+#endif /* MAP_DENYWRITE && MAP_DENYWRITE != 0 */
+#if defined(MAP_EXECUTABLE) && MAP_EXECUTABLE != 0
 	{ MAP_EXECUTABLE,    "EXECUTABLE" },
-#endif /* MAP_EXECUTABLE */
-#ifdef MAP_LOCKED
+#endif /* MAP_EXECUTABLE && MAP_EXECUTABLE != 0 */
+#if defined(MAP_LOCKED) && MAP_LOCKED != 0
 	{ MAP_LOCKED,        "LOCKED" },
-#endif /* MAP_LOCKED */
-#ifdef MAP_NORESERVE
+#endif /* MAP_LOCKED && MAP_LOCKED != 0 */
+#if defined(MAP_NORESERVE) && MAP_NORESERVE != 0
 	{ MAP_NORESERVE,     "NORESERVE" },
-#endif /* MAP_NORESERVE */
-#ifdef MAP_POPULATE
+#endif /* MAP_NORESERVE && MAP_NORESERVE != 0 */
+#if defined(MAP_POPULATE) && MAP_POPULATE != 0
 	{ MAP_POPULATE,      "POPULATE" },
-#endif /* MAP_POPULATE */
-#ifdef MAP_NONBLOCK
+#endif /* MAP_POPULATE && MAP_POPULATE != 0 */
+#if defined(MAP_NONBLOCK) && MAP_NONBLOCK != 0
 	{ MAP_NONBLOCK,      "NONBLOCK" },
-#endif /* MAP_NONBLOCK */
-#ifdef MAP_STACK
+#endif /* MAP_NONBLOCK && MAP_NONBLOCK != 0 */
+#if defined(MAP_STACK) && MAP_STACK != 0
 	{ MAP_STACK,         "STACK" },
-#endif /* MAP_STACK */
-#ifdef MAP_SYNC
+#endif /* MAP_STACK && MAP_STACK != 0 */
+#if defined(MAP_SYNC) && MAP_SYNC != 0
 	{ MAP_SYNC,          "SYNC" },
-#endif /* MAP_SYNC */
-#ifdef MAP_HUGETLB
+#endif /* MAP_SYNC && MAP_SYNC != 0 */
+#if defined(MAP_HUGETLB) && MAP_HUGETLB != 0
 	{ MAP_HUGETLB,       "HUGETLB" },
-#endif /* MAP_HUGETLB */
-#ifdef MAP_UNINITIALIZED
+#endif /* MAP_HUGETLB && MAP_HUGETLB != 0 */
+#if defined(MAP_UNINITIALIZED) && MAP_UNINITIALIZED != 0
 	{ MAP_UNINITIALIZED, "UNINITIALIZED" },
-#endif /* MAP_UNINITIALIZED */
+#endif /* MAP_UNINITIALIZED && MAP_UNINITIALIZED != 0 */
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_mmap_flags(pformatprinter printer, void *arg,
                  syscall_ulong_t flags) {
 	ssize_t temp, result = 0;
@@ -3724,7 +3725,7 @@ PRIVATE struct readdir_flag const readdir_flags[] = {
 	{ READDIR_WANTEOF, "WANTEOF" }
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_kreaddir_mode(pformatprinter printer, void *arg,
                     unsigned int mode) {
 	ssize_t temp, result;
@@ -3794,7 +3795,7 @@ PRIVATE struct sigaction_flag const sigaction_flags[] = {
 	{ 0, "" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_sigaction_flags(pformatprinter printer, void *arg,
                       syscall_ulong_t flags) {
 	return print_flagset32(printer, arg, sigaction_flags,
@@ -3808,7 +3809,7 @@ print_sigaction_flags(pformatprinter printer, void *arg,
 
 
 #ifdef NEED_print_sigaction
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_sigaction(pformatprinter printer, void *arg,
                 USER UNCHECKED sighandler_t sa_handler,
                 USER CHECKED sigset_t *sa_mask, size_t sigsetsize,
@@ -3847,7 +3848,7 @@ PRIVATE struct {
 	{ 0, "" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_epoll_create1_flags(pformatprinter printer, void *arg,
                           syscall_ulong_t flags) {
 	return print_flagset32(printer, arg, epoll_create1_flags,
@@ -3861,7 +3862,7 @@ print_epoll_create1_flags(pformatprinter printer, void *arg,
 
 
 #ifdef NEED_print_epoll_event
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_epoll_event(pformatprinter printer, void *arg,
                   USER CHECKED struct epoll_event const *ee) {
 	ssize_t temp, result;
@@ -3913,7 +3914,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_epoll_ctl(pformatprinter printer, void *arg,
                 syscall_ulong_t op) {
 	char const *name;
@@ -3947,7 +3948,7 @@ PRIVATE struct {
 	{ 0, "" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_mremap_flags(pformatprinter printer, void *arg,
                    syscall_ulong_t flags) {
 	return print_flagset32(printer, arg, mremap_flags,
@@ -3991,7 +3992,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_arch_prctl_command(pformatprinter printer, void *arg,
                          syscall_ulong_t command) {
 	char const *name;
@@ -4049,7 +4050,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_prctl_command(pformatprinter printer, void *arg,
                     syscall_ulong_t command) {
 	char const *name;
@@ -4108,14 +4109,14 @@ PRIVATE struct {
 };
 
 #ifdef NEED_print_clone_flags_ex
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_clone_flags_ex(pformatprinter printer, void *arg,
                      uint64_t flags, uint64_t valid_flags,
                      bool allow_csignal)
 #define print_clone_flags(printer, arg, flags, valid_flags) \
 	print_clone_flags_ex(printer, arg, (uint64_t)(flags), (uint64_t)(uint32_t)(valid_flags), true)
 #else /* NEED_print_clone_flags_ex */
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_clone_flags(pformatprinter printer, void *arg,
                   uint32_t flags, uint32_t valid_flags)
 #endif /* !NEED_print_clone_flags_ex */
@@ -4166,7 +4167,7 @@ err:
 
 
 #if defined(NEED_print_clone_args) || defined(__DEEMON__)
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_clone_args(pformatprinter printer, void *arg,
                  USER UNCHECKED struct clone_args const *_user_cargs,
                  size_t sizeof_args) {
@@ -4253,7 +4254,7 @@ PRIVATE struct {
 	{ 0, "" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_waitflags(pformatprinter printer, void *arg,
                 syscall_ulong_t flags) {
 	return print_flagset32(printer, arg, waitflags,
@@ -4290,7 +4291,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_idtype_t(pformatprinter printer, void *arg,
                syscall_ulong_t idtype) {
 	char const *name;
@@ -4315,7 +4316,7 @@ PRIVATE struct {
 	{ 0, "" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_eventfd_flags(pformatprinter printer, void *arg,
                     syscall_ulong_t flags) {
 	return print_flagset32(printer, arg, eventfd_flags,
@@ -4344,7 +4345,7 @@ PRIVATE struct {
 };
 #endif /* !... */
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_signalfd_flags(pformatprinter printer, void *arg,
                      syscall_ulong_t flags) {
 	return print_flagset32(printer, arg, signalfd_flags,
@@ -4381,7 +4382,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_exit_status(pformatprinter printer, void *arg,
                   syscall_ulong_t idtype) {
 	char const *name;
@@ -4426,7 +4427,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_exception_handler_mode(pformatprinter printer, void *arg,
                              syscall_ulong_t mode) {
 	ssize_t temp, result;
@@ -4485,7 +4486,7 @@ done:
 	return result;
 }
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_kcmp_type(pformatprinter printer, void *arg,
                 syscall_ulong_t kcmp_type) {
 	char const *name;
@@ -4509,7 +4510,7 @@ PRIVATE struct {
 	{ 0, "" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_access_type(pformatprinter printer, void *arg,
                   syscall_ulong_t flags) {
 	if (flags == F_OK)
@@ -4532,7 +4533,7 @@ PRIVATE struct {
 	{ 0, "" },
 };
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1)) ssize_t CC
 print_close_range_flags(pformatprinter printer, void *arg,
                         syscall_ulong_t flags) {
 	return print_flagset8(printer, arg, close_range_flags,

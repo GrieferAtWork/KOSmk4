@@ -487,7 +487,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      Conditional branch instruction should be unwound by remembering  the
 	 *      current CPU state,  and recursively  unwinding on both  ends of  the
 	 *      jump. Only if both  ends end up with  a successful unwind, and  only
-	 *      if both ends  result in all-identical  callee-preserve registers, is
+	 *      if both ends result  in all-identical callee-preserve registers,  is
 	 *      the unwind to-be considered successful. If a jump ends up going back
 	 *      on itself, its branch should simply be ignored (but if all  branches
 	 *      end up being ignored, unwinding also fails) */
@@ -828,6 +828,73 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Note that both of these sections only act to speed up debug info
 	 * queries, such that even though  we're currently unable to  parse
 	 * them, everything still works none-the-less! */
+
+	/* TODO: New library: `libinject'
+	 *
+	 * Can be used to redirect arbitrary instruction locations with custom function calls
+	 *
+	 * Usage:
+	 * - Tracing of function calls
+	 * - Hot-patching (including self-modifying code in libc)
+	 *   XXX: Maybe not necessarily for this case, since that's
+	 *        what <asm/redirect.h>  is  already  there  for...
+	 * - Mocking of function calls in a debug environment
+	 *   - For  this, might  also combine with  libdebuginfo in order  to allow PRIVATE
+	 *     functions to be mocked, given their names as strings (which are then located
+	 *     and translated to addresses via .debug_info)
+	 *
+	 * x86:
+	 * - Copy all whole instructions in a 5-byte area at the specified address.
+	 *   - `call' gets converted to `push' + `jmp'
+	 *   - On x86_64, must also update RIP-relative modr/m operands
+	 *     - To identify functions that include modr/m operands, an
+	 *       x86-specific function may  be added to  `libinstrlen'.
+	 * - Overwrite 5 bytes with `jmp' -- redirected-function
+	 * - Append an instruction `jmp <addr_after_5_byte_area>' to the copy
+	 * - Return a pointer to the copied address range. - This then  acts
+	 *   just like a function pointer that can be invoked to execute the
+	 *   previously overwritten function (idea is to call this one  from
+	 *   the injected function)
+	 *
+	 * - Problems:
+	 *   - How do we solve functions that contain a loop that jumps to
+	 *     some address  within the  first 5  bytes of  the  function.
+	 *   - What  should happen when the function contains a jump to the
+	 *     very first address. - The injected function would get called
+	 *     again, but this time function arguments have have gotten all
+	 *     clobbered...
+	 *   - What about functions that are smaller than 5 bytes? (like a
+	 *     function that only contains a `ret')
+	 * - Solution:
+	 *   - We could use `int3' to force a redirection, and set some  special
+	 *     kernel-space flag to tell KOS not to enter the debugger on  int3,
+	 *     but instead  jump  to  a special  user-space  location.  At  that
+	 *     location we  can  check  the  return-address to  be  one  of  the
+	 *     positions where code has been injected (if it's not one of  them,
+	 *     we simply tell the kernel to do normal int3 handling, but by-pass
+	 *     our redirection)
+	 *     - On  that note, it  might also be cool  to expose low-level hooks
+	 *       for other x86 interrupts like #PF or #DE. These hooks would then
+	 *       be invoked by the kernel prior to normal exception handling, but
+	 *       only of the interrupt return  address is located in  user-space.
+	 *     - These hooks would have ATTR_PERMMAN affinity.
+	 *     - Hookable interrupts: #DE, #BP, #OF, #BR, #UD, #NM, #TS, #NP, #SS, #GP, #PF, #MF, #AC, #XM
+	 *     - These hooks might look like interrupts, but they're not. Instead,
+	 *       they get invoked by the kernel only on those situations where  it
+	 *       would otherwise raise an exception, and should these hooks return
+	 *       via some custom system call, the previously suppressed  exception
+	 *       will still  be thrown  (exception details  were pushed  onto  the
+	 *       stack prior to the hook being invoked).
+	 *     - This hook-system might also be extended to allow user-space to
+	 *       define hardware interrupt handlers. Access to this feature can
+	 *       then be restricted via `CAP_SYS_RAWIO'.
+	 *   - At that point, we were able to jump to a custom location by only
+	 *     injecting a single byte, which  in turn means that no  situation
+	 *     can arise where code might  try to jump in  the middle of a  jmp
+	 *     instruction that  would otherwise  be used  by redirection  (and
+	 *     might happen if the function  being overwritten contains a  loop
+	 *     near its start)
+	 */
 
 	return state;
 }
