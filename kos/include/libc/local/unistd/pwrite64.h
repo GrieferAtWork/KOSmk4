@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7b4a3d8 */
+/* HASH CRC-32:0x9603c81a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,24 +35,24 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_crt_lseek32_defined
+#define __local___localdep_crt_lseek32_defined
+#ifdef __CRT_HAVE_lseek
+__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_crt_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE__lseek)
+__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_crt_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE___lseek)
+__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_crt_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE___libc_lseek)
+__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_crt_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
+#else /* ... */
+#undef __local___localdep_crt_lseek32_defined
+#endif /* !... */
+#endif /* !__local___localdep_crt_lseek32_defined */
 #if !defined(__local___localdep_crt_pwrite32_defined) && defined(__CRT_HAVE_pwrite)
 #define __local___localdep_crt_pwrite32_defined
 __CREDIRECT(__ATTR_INS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_crt_pwrite32,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),pwrite,(__fd,__buf,__bufsize,__offset))
 #endif /* !__local___localdep_crt_pwrite32_defined && __CRT_HAVE_pwrite */
-#ifndef __local___localdep_lseek32_defined
-#define __local___localdep_lseek32_defined
-#ifdef __CRT_HAVE_lseek
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE__lseek)
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE___lseek)
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE___libc_lseek)
-__CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
-#else /* ... */
-#undef __local___localdep_lseek32_defined
-#endif /* !... */
-#endif /* !__local___localdep_lseek32_defined */
 #ifndef __local___localdep_lseek64_defined
 #define __local___localdep_lseek64_defined
 #if defined(__CRT_HAVE_lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -114,13 +114,13 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwrite64))(__fd_t __fd, void const *_
 	/* It may not be quick, and it may not be SMP-safe, but it'll still do the job! */
 	__off32_t __oldpos;
 	__SSIZE_TYPE__ __result;
-	__oldpos = (__NAMESPACE_LOCAL_SYM __localdep_lseek32)(__fd, 0, __SEEK_CUR);
+	__oldpos = (__NAMESPACE_LOCAL_SYM __localdep_crt_lseek32)(__fd, 0, __SEEK_CUR);
 	if __unlikely(__oldpos < 0)
 		return -1;
-	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_lseek32)(__fd, (__off32_t)__offset, __SEEK_SET) < 0)
+	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_crt_lseek32)(__fd, (__off32_t)__offset, __SEEK_SET) < 0)
 		return -1;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_write)(__fd, __buf, __bufsize);
-	(__NAMESPACE_LOCAL_SYM __localdep_lseek32)(__fd, __oldpos, __SEEK_SET);
+	(__NAMESPACE_LOCAL_SYM __localdep_crt_lseek32)(__fd, __oldpos, __SEEK_SET);
 	return __result;
 #endif /* !... */
 }

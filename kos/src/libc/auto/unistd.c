@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd92a6df */
+/* HASH CRC-32:0xbfe6fad0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1281,7 +1281,7 @@ NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s) {
  * @return: NULL: [ENOMEM]      Insufficient memory
  * @return: NULL: [ENODATA]     End-of-file while reading, and `GETPASS_FAIL_EOF' was set.
  * @return: NULL: [*]           Error */
-INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(4) ATTR_OUT_OPT(2) char *
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED ATTR_IN_OPT(1) ATTR_IN_OPT(4) ATTR_OUT_OPT(2) char *
 NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
                                      char *buf,
                                      size_t buflen,
@@ -1827,7 +1827,7 @@ out:
 #include <asm/crt/getpassfd.h>
 #include <asm/crt/readpassphrase.h>
 /* >> getpass_r(3) */
-INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED ATTR_IN_OPT(1) ATTR_OUT_OPT(2) char *
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED ATTR_IN_OPT(1) ATTR_OUT_OPT(2) char *
 NOTHROW_RPC(LIBCCALL libc_getpass_r)(char const *prompt,
                                      char *buf,
                                      size_t bufsize) {
@@ -1852,7 +1852,7 @@ NOTHROW_RPC(LIBCCALL libc_getpass_r)(char const *prompt,
 #include <libc/errno.h>
 /* >> getpeereid(3)
  * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
-INTERN ATTR_SECTION(".text.crt.sched.user") ATTR_OUT(2) ATTR_OUT(3) int
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_OUT(2) ATTR_OUT(3) int
 NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd,
                                       uid_t *euid,
                                       gid_t *egid) {
@@ -1924,7 +1924,7 @@ NOTHROW_NCX(LIBCCALL libc_issetugid)(void) {
  * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
  * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
-INTERN ATTR_SECTION(".text.crt.sched.user") int
+INTERN ATTR_SECTION(".text.crt.bsd") int
 NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd) {
 	fd_t result;
 	result = libc_dup2(fd, __AT_FDROOT);

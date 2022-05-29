@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86a07ad7 */
+/* HASH CRC-32:0x5945fb7e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1444,6 +1444,9 @@ __LIBC __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__FORMATPRINTER_CC write_printer)(
  * @return: * : Same as `writeall(3)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(write_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) ssize_t __NOTHROW_RPC(__FORMATPRINTER_CC write_printer)(void *__fd, char const *__restrict __buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(write_printer))(__fd, __buf, __bufsize); })
 #endif /* ... */
+
+/* >> void *WRITE_PRINTER_ARG(fd_t fd);
+ * Encode a given `fd' as an argument to `write_printer(3)' */
 #define WRITE_PRINTER_ARG(fd) ((void *)(__UINTPTR_TYPE__)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))(fd))
 #endif /* __USE_KOS */
 

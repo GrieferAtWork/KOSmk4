@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8129fc93 */
+/* HASH CRC-32:0x11a034cf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2973,18 +2973,18 @@ DFUN(".text.crt.dos.io.sync", libd_fdatasync, libc_fdatasync, TD, 1, TIn(__SIZEO
 DFUN(".text.crt.dos.string.memory", libd_swab, libc_swab, TV, 3, TP, TP, TD)
 DFUN(".text.crt.dos.io.tty", libd_ctermid, libc_ctermid, TP, 1, TP)
 DFUN(".text.crt.dos.io.tty", libd_cuserid, libc_cuserid, TP, 1, TP)
-DFUN(".text.crt.dos.sched.user", libd_getpassfd, libc_getpassfd, TP, 6, TP, TP, TI, TP, TD, TD)
-DFUN(".text.crt.dos.sched.user", libd_getpass_r, libc_getpass_r, TP, 3, TP, TP, TI)
-DFUN(".text.crt.dos.sched.user", libd_setmode, libc_setmode, TP, 1, TP)
-DFUN(".text.crt.dos.sched.user", libd_getmode, libc_getmode, TIn(__SIZEOF_MODE_T__), 2, TP, TIn(__SIZEOF_MODE_T__))
-DFUN(".text.crt.dos.sched.user", libd_getpeereid, libc_getpeereid, TD, 3, TIn(__SIZEOF_FD_T__), TP, TP)
+DFUN(".text.crt.dos.bsd", libd_getpassfd, libc_getpassfd, TP, 6, TP, TP, TI, TP, TD, TD)
+DFUN(".text.crt.dos.bsd", libd_getpass_r, libc_getpass_r, TP, 3, TP, TP, TI)
+DFUN(".text.crt.dos.bsd", libd_setmode, libc_setmode, TP, 1, TP)
+DFUN(".text.crt.dos.bsd", libd_getmode, libc_getmode, TIn(__SIZEOF_MODE_T__), 2, TP, TIn(__SIZEOF_MODE_T__))
+DFUN(".text.crt.dos.bsd", libd_getpeereid, libc_getpeereid, TD, 3, TIn(__SIZEOF_FD_T__), TP, TP)
 DFUN(".text.crt.dos.bsd.user", libd_setruid, libc_setruid, TD, 1, TIn(__SIZEOF_UID_T__))
 DFUN(".text.crt.dos.bsd.user", libd_setrgid, libc_setrgid, TD, 1, TIn(__SIZEOF_GID_T__))
 DFUN(".text.crt.dos.io.tty", libd_ctermid_r, libc_ctermid_r, TP, 1, TP)
 DFUN(".text.crt.dos.system.configuration", libd_sysconf, libc_sysconf, TP, 1, TD)
 DFUN(".text.crt.dos.bsd.io.access", libd_closefrom, libc_closefrom, TV, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.bsd.io.access", libd_close_range, libc_close_range, TD, 3, TD, TD, TD)
-DFUN(".text.crt.dos.sched.user", libd_fchroot, libc_fchroot, TD, 1, TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.bsd", libd_fchroot, libc_fchroot, TD, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.solaris", libd_tell, libc_tell, TIn(__SIZEOF_OFF32_T__), 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.solaris", libd_tell64, libc_tell64, TIn(__SIZEOF_OFF64_T__), 1, TIn(__SIZEOF_FD_T__))
 

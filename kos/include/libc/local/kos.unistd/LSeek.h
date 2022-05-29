@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdff7a08e */
+/* HASH CRC-32:0xf8980df8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,6 @@
 #if defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep_LSeek32_defined) && defined(__CRT_HAVE_LSeek)
-#define __local___localdep_LSeek32_defined
-__CREDIRECT(,__pos32_t,__THROWING,__localdep_LSeek32,(__fd_t __fd, __off32_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
-#endif /* !__local___localdep_LSeek32_defined && __CRT_HAVE_LSeek */
 #ifndef __local___localdep_LSeek64_defined
 #define __local___localdep_LSeek64_defined
 #if defined(__CRT_HAVE_LSeek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -44,10 +40,14 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_LSeek64_defined
 #endif /* !... */
 #endif /* !__local___localdep_LSeek64_defined */
+#if !defined(__local___localdep_crt_LSeek32_defined) && defined(__CRT_HAVE_LSeek)
+#define __local___localdep_crt_LSeek32_defined
+__CREDIRECT(,__pos32_t,__THROWING,__localdep_crt_LSeek32,(__fd_t __fd, __off32_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
+#endif /* !__local___localdep_crt_LSeek32_defined && __CRT_HAVE_LSeek */
 __LOCAL_LIBC(LSeek) __FS_TYPE(pos)
 (__LIBCCALL __LIBC_LOCAL_NAME(LSeek))(__fd_t __fd, __FS_TYPE(off) __offset, int __whence) __THROWS(...) {
 #ifdef __CRT_HAVE_LSeek
-	return (__NAMESPACE_LOCAL_SYM __localdep_LSeek32)(__fd, (__off32_t)__offset, __whence);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_LSeek32)(__fd, (__off32_t)__offset, __whence);
 #else /* __CRT_HAVE_LSeek */
 	return (__NAMESPACE_LOCAL_SYM __localdep_LSeek64)(__fd, (__off64_t)__offset, __whence);
 #endif /* !__CRT_HAVE_LSeek */

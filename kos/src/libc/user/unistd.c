@@ -3530,9 +3530,9 @@ NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd)
 }
 /*[[[end:libc_fdatasync]]]*/
 
-/*[[[head:libc_setmode,hash:CRC-32=0xf3e470f6]]]*/
+/*[[[head:libc_setmode,hash:CRC-32=0xdfbc8204]]]*/
 /* >> setmode(3), getmode(3) */
-INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED ATTR_IN(1) void *
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED ATTR_IN(1) void *
 NOTHROW_NCX(LIBCCALL libc_setmode)(char const *mode_str)
 /*[[[body:libc_setmode]]]*/
 /*AUTO*/{
@@ -3543,9 +3543,9 @@ NOTHROW_NCX(LIBCCALL libc_setmode)(char const *mode_str)
 }
 /*[[[end:libc_setmode]]]*/
 
-/*[[[head:libc_getmode,hash:CRC-32=0xbd8969f6]]]*/
+/*[[[head:libc_getmode,hash:CRC-32=0xc14dd2df]]]*/
 /* >> setmode(3), getmode(3) */
-INTERN ATTR_SECTION(".text.crt.sched.user") WUNUSED ATTR_IN(1) mode_t
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED ATTR_IN(1) mode_t
 NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
                                    mode_t mode)
 /*[[[body:libc_getmode]]]*/

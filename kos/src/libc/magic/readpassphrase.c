@@ -26,11 +26,13 @@
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.bsd")]
 
-%{
+%[insert:prefix(
 #include <features.h>
-
+)]%[insert:prefix(
 #include <asm/crt/readpassphrase.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
 
 /* Flags for use with `readpassphrase(3)::flags' */
@@ -72,12 +74,12 @@ typedef __SIZE_TYPE__ size_t;
 @@@return: buf:  Success
 @@@return: NULL: Error (s.a. `errno')
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[requires_include("<asm/os/stdio.h>")]]
+[[requires(defined(__STDIN_FILENO) && $has_function(read))]]
 [[impl_include("<bits/types.h>", "<asm/os/stdio.h>", "<asm/os/oflags.h>")]]
 [[impl_include("<libc/errno.h>", "<paths.h>", "<asm/crt/readpassphrase.h>")]]
 [[impl_include("<asm/os/termios.h>", "<bits/os/termios.h>")]]
 [[impl_include("<asm/os/signal.h>", "<bits/os/sigaction.h>")]]
-[[requires_include("<asm/os/stdio.h>")]]
-[[requires(defined(__STDIN_FILENO) && $has_function(read))]]
 [[impl_prefix(
 @@pp_ifndef __LOCAL_READPASSPHRASE_HELPERS_DEFINED@@
 @@push_namespace(local)@@

@@ -190,17 +190,17 @@ size_t ReadAll($fd_t fd, [[out(bufsize)]] void *buf, size_t bufsize) {
 
 
 [[throws, decl_include("<bits/types.h>")]]
-[[doc_alias("lseek32"), ignore, nocrt, alias("LSeek")]]
-$pos32_t LSeek32($fd_t fd, $off32_t offset, int whence);
+[[doc_alias("crt_lseek32"), ignore, nocrt, alias("LSeek")]]
+$pos32_t crt_LSeek32($fd_t fd, $off32_t offset, int whence);
 
 [[throws, decl_include("<bits/types.h>"), doc_alias("lseek"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("LSeek")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("LSeek64")]]
-[[userimpl, requires($has_function(LSeek32) || $has_function(LSeek64))]]
+[[userimpl, requires($has_function(crt_LSeek32) || $has_function(LSeek64))]]
 [[section(".text.crt{|.dos}.except.io.seek")]]
 $pos_t LSeek($fd_t fd, $off_t offset, int whence) {
-@@pp_if $has_function(LSeek32)@@
-	return LSeek32(fd, ($off32_t)offset, whence);
+@@pp_if $has_function(crt_LSeek32)@@
+	return crt_LSeek32(fd, ($off32_t)offset, whence);
 @@pp_else@@
 	return LSeek64(fd, ($off64_t)offset, whence);
 @@pp_endif@@
@@ -280,10 +280,10 @@ void UnlinkAt($fd_t dfd, [[in]] char const *name, $atflag_t flags);
 %#ifdef __USE_LARGEFILE64
 [[throws, decl_include("<bits/types.h>")]]
 [[preferred_off64_variant_of(LSeek), doc_alias("lseek64")]]
-[[userimpl, requires_function(LSeek32)]]
+[[userimpl, requires_function(crt_LSeek32)]]
 [[section(".text.crt{|.dos}.except.io.large.seek")]]
 $pos64_t LSeek64($fd_t fd, $off64_t offset, int whence) {
-	return LSeek32(fd, (__off32_t)offset, whence);
+	return crt_LSeek32(fd, (__off32_t)offset, whence);
 }
 %#endif /* __USE_LARGEFILE64 */
 
