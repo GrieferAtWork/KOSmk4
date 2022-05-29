@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f9fac28 */
+/* HASH CRC-32:0x8136108b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -649,6 +649,96 @@ NOTHROW_RPC(LIBKCALL libc_wsymlinkat)(char32_t const *link_text,
 
 
 }
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
+NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd,
+                                       char16_t const *path,
+                                       char16_t *buf,
+                                       size_t buflen) {
+
+	return libd_wfreadlinkat(dfd, path, buf, buflen, 0);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
+NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd,
+                                       char32_t const *path,
+                                       char32_t *buf,
+                                       size_t buflen) {
+
+	return libc_wfreadlinkat(dfd, path, buf, buflen, 0);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_IN(1) ATTR_IN(3) int
 NOTHROW_RPC(LIBDCALL libd_wfsymlinkat)(char16_t const *link_text,
                                        fd_t tofd,
@@ -696,6 +786,172 @@ done_from:
 
 done:
 	return result;
+}
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
+NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
+                                        char16_t const *path,
+                                        char16_t *buf,
+                                        size_t buflen,
+                                        atflag_t flags) {
+	char *utf8_path;
+	ssize_t result;
+
+
+
+	size_t utf8_buflen = buflen * 3; /* s.a. `UNICODE_16TO8_MAXBUF()' */
+
+	char *utf8_buf = (char *)libc_malloc(utf8_buflen * sizeof(char));
+	if unlikely(!utf8_buf)
+		goto err;
+	utf8_path = libd_convert_wcstombs(path);
+	if unlikely(!utf8_path)
+		goto err_utf8_buf;
+
+again_freadlinkat:
+
+	result = libd_freadlinkat(dfd, utf8_path, utf8_buf, utf8_buflen, flags);
+
+
+
+	if likely(result >= 0) {
+		char16_t *dst;
+
+		if ((size_t)result > utf8_buflen) {
+			/* Caller used the REQSIZE flag, and the buffer was too small.
+			 * -> Allocate a larger utf-8 buffer so we can get the entire
+			 *    utf-8 string from the kernel! */
+			utf8_buflen = (size_t)result;
+
+			libc_free(utf8_buf);
+
+			utf8_buf = (char *)libc_malloc(utf8_buflen * sizeof(char));
+			if unlikely(!utf8_buf) {
+
+				libc_free(utf8_path);
+
+				goto err;
+			}
+			goto again_freadlinkat;
+		}
+
+		libc_free(utf8_path);
+
+
+
+
+
+		dst = (char16_t *)libc_unicode_8to16_n((char16_t *)buf, buflen, utf8_buf, (size_t)result);
+
+
+		if (flags & __AT_READLINK_REQSIZE) {
+
+
+
+			result = libc_unicode_len8to16(utf8_buf, (size_t)result);
+
+		} else
+
+		{
+			result = (size_t)(dst - buf);
+		}
+	} else {
+
+		libc_free(utf8_path);
+
+	}
+
+	libc_free(utf8_buf);
+
+	return result;
+err_utf8_buf:
+
+	libc_free(utf8_buf);
+
+err:
+	return -1;
+}
+INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
+NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd,
+                                        char32_t const *path,
+                                        char32_t *buf,
+                                        size_t buflen,
+                                        atflag_t flags) {
+	char *utf8_path;
+	ssize_t result;
+
+	size_t utf8_buflen = buflen * 7; /* s.a. `UNICODE_32TO8_MAXBUF()' */
+
+
+
+	char *utf8_buf = (char *)libc_malloc(utf8_buflen * sizeof(char));
+	if unlikely(!utf8_buf)
+		goto err;
+	utf8_path = libc_convert_wcstombs(path);
+	if unlikely(!utf8_path)
+		goto err_utf8_buf;
+
+again_freadlinkat:
+
+	result = libc_freadlinkat(dfd, utf8_path, utf8_buf, utf8_buflen, flags);
+
+
+
+	if likely(result >= 0) {
+		char32_t *dst;
+
+		if ((size_t)result > utf8_buflen) {
+			/* Caller used the REQSIZE flag, and the buffer was too small.
+			 * -> Allocate a larger utf-8 buffer so we can get the entire
+			 *    utf-8 string from the kernel! */
+			utf8_buflen = (size_t)result;
+
+			libc_free(utf8_buf);
+
+			utf8_buf = (char *)libc_malloc(utf8_buflen * sizeof(char));
+			if unlikely(!utf8_buf) {
+
+				libc_free(utf8_path);
+
+				goto err;
+			}
+			goto again_freadlinkat;
+		}
+
+		libc_free(utf8_path);
+
+
+
+		dst = (char32_t *)libc_unicode_8to32_n((char32_t *)buf, buflen, utf8_buf, (size_t)result);
+
+
+
+
+		if (flags & __AT_READLINK_REQSIZE) {
+
+			result = libc_unicode_len8to32(utf8_buf, (size_t)result);
+
+
+
+		} else
+
+		{
+			result = (size_t)(dst - buf);
+		}
+	} else {
+
+		libc_free(utf8_path);
+
+	}
+
+	libc_free(utf8_buf);
+
+	return result;
+err_utf8_buf:
+
+	libc_free(utf8_buf);
+
+err:
+	return -1;
 }
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_IN(2) int
 NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd,
@@ -906,6 +1162,98 @@ NOTHROW_RPC(LIBKCALL libc_wsymlink)(char32_t const *link_text,
                                     char32_t const *target_path) {
 
 	return libc_wfsymlinkat(link_text, __AT_FDCWD, target_path, 0);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+#include <asm/os/fcntl.h>
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t
+NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *path,
+                                     char16_t *buf,
+                                     size_t buflen) {
+
+	return libd_wreadlinkat(__AT_FDCWD, path, buf, buflen);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+#include <asm/os/fcntl.h>
+INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t
+NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *path,
+                                     char32_t *buf,
+                                     size_t buflen) {
+
+	return libc_wreadlinkat(__AT_FDCWD, path, buf, buflen);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1245,8 +1593,12 @@ DEFINE_PUBLIC_ALIAS(DOS$wlinkat, libd_wlinkat);
 DEFINE_PUBLIC_ALIAS(wlinkat, libc_wlinkat);
 DEFINE_PUBLIC_ALIAS(DOS$wsymlinkat, libd_wsymlinkat);
 DEFINE_PUBLIC_ALIAS(wsymlinkat, libc_wsymlinkat);
+DEFINE_PUBLIC_ALIAS(DOS$wreadlinkat, libd_wreadlinkat);
+DEFINE_PUBLIC_ALIAS(wreadlinkat, libc_wreadlinkat);
 DEFINE_PUBLIC_ALIAS(DOS$wfsymlinkat, libd_wfsymlinkat);
 DEFINE_PUBLIC_ALIAS(wfsymlinkat, libc_wfsymlinkat);
+DEFINE_PUBLIC_ALIAS(DOS$wfreadlinkat, libd_wfreadlinkat);
+DEFINE_PUBLIC_ALIAS(wfreadlinkat, libc_wfreadlinkat);
 DEFINE_PUBLIC_ALIAS(DOS$wunlinkat, libd_wunlinkat);
 DEFINE_PUBLIC_ALIAS(wunlinkat, libc_wunlinkat);
 DEFINE_PUBLIC_ALIAS(DOS$wlchown, libd_wlchown);
@@ -1257,6 +1609,8 @@ DEFINE_PUBLIC_ALIAS(DOS$wtruncate64, libd_wtruncate64);
 DEFINE_PUBLIC_ALIAS(wtruncate64, libc_wtruncate64);
 DEFINE_PUBLIC_ALIAS(DOS$wsymlink, libd_wsymlink);
 DEFINE_PUBLIC_ALIAS(wsymlink, libc_wsymlink);
+DEFINE_PUBLIC_ALIAS(DOS$wreadlink, libd_wreadlink);
+DEFINE_PUBLIC_ALIAS(wreadlink, libc_wreadlink);
 DEFINE_PUBLIC_ALIAS(DOS$wgethostname, libd_wgethostname);
 DEFINE_PUBLIC_ALIAS(wgethostname, libc_wgethostname);
 DEFINE_PUBLIC_ALIAS(DOS$wsetlogin, libd_wsetlogin);

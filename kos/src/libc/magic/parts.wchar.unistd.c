@@ -395,9 +395,52 @@ done:
 
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/fcntl.h>")]]
+[[requires($has_function(wfreadlinkat) ||
+           $has_function(malloc, readlinkat, convert_wcstombs))]]
 ssize_t wreadlinkat($fd_t dfd, [[in]] wchar_t const *path,
                     [[out(return <= buflen)]] wchar_t *buf,
-                    size_t buflen); /* TODO */
+                    size_t buflen) {
+@@pp_if defined(__AT_FDCWD) && $has_function(wfreadlinkat)@@
+	return wfreadlinkat(dfd, path, buf, buflen, 0);
+@@pp_else@@
+	char *utf8_path;
+	ssize_t result;
+@@pp_if __SIZEOF_WCHAR_T__ == 4@@
+	size_t utf8_buflen = buflen * 7; /* s.a. `UNICODE_32TO8_MAXBUF()' */
+@@pp_else@@
+	size_t utf8_buflen = buflen * 3; /* s.a. `UNICODE_16TO8_MAXBUF()' */
+@@pp_endif@@
+	char *utf8_buf = (char *)malloc(utf8_buflen * sizeof(char));
+	if unlikely(!utf8_buf)
+		goto err;
+	utf8_path = convert_wcstombs(path);
+	if unlikely(!utf8_path)
+		goto err_utf8_buf;
+	result = readlinkat(dfd, utf8_path, utf8_buf, utf8_buflen);
+@@pp_if $has_function(free)@@
+	free(utf8_path);
+@@pp_endif@@
+	if likely(result >= 0) {
+@@pp_if __SIZEOF_WCHAR_T__ == 4@@
+		dst = (wchar_t *)unicode_8to32_n((char32_t *)buf, buflen, utf8_buf, (size_t)result);
+@@pp_else@@
+		dst = (wchar_t *)unicode_8to16_n((char16_t *)buf, buflen, utf8_buf, (size_t)result);
+@@pp_endif@@
+		result = (size_t)(dst - buf);
+	}
+@@pp_if $has_function(free)@@
+	free(utf8_buf);
+@@pp_endif@@
+	return result;
+err_utf8_buf:
+@@pp_if $has_function(free)@@
+	free(utf8_buf);
+@@pp_endif@@
+err:
+	return -1;
+@@pp_endif@@
+}
 
 
 %#ifdef __USE_KOS
@@ -428,9 +471,88 @@ done:
 
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/fcntl.h>")]]
+[[requires_function(malloc, freadlinkat, convert_wcstombs)]]
 ssize_t wfreadlinkat($fd_t dfd, [[in]] wchar_t const *path,
                      [[out(return <= buflen)]] wchar_t *buf, size_t buflen,
-                     $atflag_t flags); /* TODO */
+                     $atflag_t flags) {
+	char *utf8_path;
+	ssize_t result;
+@@pp_if __SIZEOF_WCHAR_T__ == 4@@
+	size_t utf8_buflen = buflen * 7; /* s.a. `UNICODE_32TO8_MAXBUF()' */
+@@pp_else@@
+	size_t utf8_buflen = buflen * 3; /* s.a. `UNICODE_16TO8_MAXBUF()' */
+@@pp_endif@@
+	char *utf8_buf = (char *)malloc(utf8_buflen * sizeof(char));
+	if unlikely(!utf8_buf)
+		goto err;
+	utf8_path = convert_wcstombs(path);
+	if unlikely(!utf8_path)
+		goto err_utf8_buf;
+@@pp_ifdef __AT_READLINK_REQSIZE@@
+again_freadlinkat:
+@@pp_endif@@
+	result = freadlinkat(dfd, utf8_path, utf8_buf, utf8_buflen, flags);
+@@pp_if !defined(__AT_READLINK_REQSIZE) && $has_function(free)@@
+	free(utf8_path);
+@@pp_endif@@
+	if likely(result >= 0) {
+		wchar_t *dst;
+@@pp_ifdef __AT_READLINK_REQSIZE@@
+		if ((size_t)result > utf8_buflen) {
+			/* Caller used the REQSIZE flag, and the buffer was too small.
+			 * -> Allocate a larger utf-8 buffer so we can get the entire
+			 *    utf-8 string from the kernel! */
+			utf8_buflen = (size_t)result;
+@@pp_if $has_function(free)@@
+			free(utf8_buf);
+@@pp_endif@@
+			utf8_buf = (char *)malloc(utf8_buflen * sizeof(char));
+			if unlikely(!utf8_buf) {
+@@pp_if $has_function(free)@@
+				free(utf8_path);
+@@pp_endif@@
+				goto err;
+			}
+			goto again_freadlinkat;
+		}
+@@pp_if $has_function(free)@@
+		free(utf8_path);
+@@pp_endif@@
+@@pp_endif@@
+@@pp_if __SIZEOF_WCHAR_T__ == 4@@
+		dst = (wchar_t *)unicode_8to32_n((char32_t *)buf, buflen, utf8_buf, (size_t)result);
+@@pp_else@@
+		dst = (wchar_t *)unicode_8to16_n((char16_t *)buf, buflen, utf8_buf, (size_t)result);
+@@pp_endif@@
+@@pp_ifdef __AT_READLINK_REQSIZE@@
+		if (flags & __AT_READLINK_REQSIZE) {
+@@pp_if __SIZEOF_WCHAR_T__ == 4@@
+			result = unicode_len8to32(utf8_buf, (size_t)result);
+@@pp_else@@
+			result = unicode_len8to16(utf8_buf, (size_t)result);
+@@pp_endif@@
+		} else
+@@pp_endif@@
+		{
+			result = (size_t)(dst - buf);
+		}
+	} else {
+@@pp_if defined(__AT_READLINK_REQSIZE) && $has_function(free)@@
+		free(utf8_path);
+@@pp_endif@@
+	}
+@@pp_if $has_function(free)@@
+	free(utf8_buf);
+@@pp_endif@@
+	return result;
+err_utf8_buf:
+@@pp_if $has_function(free)@@
+	free(utf8_buf);
+@@pp_endif@@
+err:
+	return -1;
+}
 
 %#endif /* __USE_KOS */
 
@@ -588,9 +710,54 @@ done:
 
 [[section(".text.crt{|.dos}.wchar.fs.property")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/fcntl.h>")]]
+[[requires((defined(__AT_FDCWD) && $has_function(wreadlinkat)) ||
+           ($has_function(malloc, readlink, convert_wcstombs)))]]
+[[impl_include("<asm/os/fcntl.h>")]]
 ssize_t wreadlink([[in]] wchar_t const *path,
                   [[out(return <= buflen)]] wchar_t *buf,
-                  size_t buflen); /* TODO */
+                  size_t buflen) {
+@@pp_if defined(__AT_FDCWD) && $has_function(wreadlinkat)@@
+	return wreadlinkat(__AT_FDCWD, path, buf, buflen);
+@@pp_else@@
+	char *utf8_path;
+	ssize_t result;
+@@pp_if __SIZEOF_WCHAR_T__ == 4@@
+	size_t utf8_buflen = buflen * 7; /* s.a. `UNICODE_32TO8_MAXBUF()' */
+@@pp_else@@
+	size_t utf8_buflen = buflen * 3; /* s.a. `UNICODE_16TO8_MAXBUF()' */
+@@pp_endif@@
+	char *utf8_buf = (char *)malloc(utf8_buflen * sizeof(char));
+	if unlikely(!utf8_buf)
+		goto err;
+	utf8_path = convert_wcstombs(path);
+	if unlikely(!utf8_path)
+		goto err_utf8_buf;
+	result = readlink(utf8_path, utf8_buf, utf8_buflen);
+@@pp_if $has_function(free)@@
+	free(utf8_path);
+@@pp_endif@@
+	if likely(result >= 0) {
+		wchar_t *dst;
+@@pp_if __SIZEOF_WCHAR_T__ == 4@@
+		dst = (wchar_t *)unicode_8to32_n((char32_t *)buf, buflen, utf8_buf, (size_t)result);
+@@pp_else@@
+		dst = (wchar_t *)unicode_8to16_n((char16_t *)buf, buflen, utf8_buf, (size_t)result);
+@@pp_endif@@
+		result = (size_t)(dst - buf);
+	}
+@@pp_if $has_function(free)@@
+	free(utf8_buf);
+@@pp_endif@@
+	return result;
+err_utf8_buf:
+@@pp_if $has_function(free)@@
+	free(utf8_buf);
+@@pp_endif@@
+err:
+	return -1;
+@@pp_endif@@
+}
 
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 

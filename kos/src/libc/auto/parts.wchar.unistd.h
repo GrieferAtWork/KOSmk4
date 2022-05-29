@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e370f0b */
+/* HASH CRC-32:0xbae2a2a1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,8 +64,12 @@ INTDEF ATTR_IN(2) ATTR_IN(4) int NOTHROW_RPC(LIBDCALL libd_wlinkat)(fd_t fromfd,
 INTDEF ATTR_IN(2) ATTR_IN(4) int NOTHROW_RPC(LIBKCALL libc_wlinkat)(fd_t fromfd, char32_t const *from, fd_t tofd, char32_t const *to, atflag_t flags);
 INTDEF ATTR_IN(1) ATTR_IN(3) int NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *link_text, fd_t tofd, char16_t const *target_path);
 INTDEF ATTR_IN(1) ATTR_IN(3) int NOTHROW_RPC(LIBKCALL libc_wsymlinkat)(char32_t const *link_text, fd_t tofd, char32_t const *target_path);
+INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd, char16_t const *path, char16_t *buf, size_t buflen);
+INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd, char32_t const *path, char32_t *buf, size_t buflen);
 INTDEF ATTR_IN(1) ATTR_IN(3) int NOTHROW_RPC(LIBDCALL libd_wfsymlinkat)(char16_t const *link_text, fd_t tofd, char16_t const *target_path, atflag_t flags);
 INTDEF ATTR_IN(1) ATTR_IN(3) int NOTHROW_RPC(LIBKCALL libc_wfsymlinkat)(char32_t const *link_text, fd_t tofd, char32_t const *target_path, atflag_t flags);
+INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd, char16_t const *path, char16_t *buf, size_t buflen, atflag_t flags);
+INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd, char32_t const *path, char32_t *buf, size_t buflen, atflag_t flags);
 INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd, char16_t const *file, atflag_t flags);
 INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBKCALL libc_wunlinkat)(fd_t dfd, char32_t const *file, atflag_t flags);
 INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBDCALL libd_wlchown)(char16_t const *file, uid_t owner, gid_t group);
@@ -76,6 +80,8 @@ INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *fil
 INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBKCALL libc_wtruncate64)(char32_t const *file, __PIO_OFFSET64 length);
 INTDEF ATTR_IN(1) ATTR_IN(2) int NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *link_text, char16_t const *target_path);
 INTDEF ATTR_IN(1) ATTR_IN(2) int NOTHROW_RPC(LIBKCALL libc_wsymlink)(char32_t const *link_text, char32_t const *target_path);
+INTDEF ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *path, char16_t *buf, size_t buflen);
+INTDEF ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *path, char32_t *buf, size_t buflen);
 INTDEF ATTR_OUTS(1, 2) int NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name, size_t buflen);
 INTDEF ATTR_OUTS(1, 2) int NOTHROW_NCX(LIBKCALL libc_wgethostname)(char32_t *name, size_t buflen);
 INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_wsetlogin)(char16_t const *name);

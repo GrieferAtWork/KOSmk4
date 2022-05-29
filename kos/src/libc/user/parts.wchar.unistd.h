@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4932663 */
+/* HASH CRC-32:0xbfff16b7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,12 +37,6 @@ INTDEF ATTR_OUTS(2, 3) errno_t NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd, ch
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 INTDEF ATTR_OUTS(2, 3) errno_t NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd, char32_t *buf, size_t buflen);
-INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd, char16_t const *path, char16_t *buf, size_t buflen);
-INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd, char32_t const *path, char32_t *buf, size_t buflen);
-INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd, char16_t const *path, char16_t *buf, size_t buflen, atflag_t flags);
-INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd, char32_t const *path, char32_t *buf, size_t buflen, atflag_t flags);
-INTDEF ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *path, char16_t *buf, size_t buflen);
-INTDEF ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *path, char32_t *buf, size_t buflen);
 #endif /* !__KERNEL__ */
 
 DECL_END

@@ -73,103 +73,10 @@ NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
 }
 /*[[[end:libd_wttyname_r]]]*/
 
-/*[[[head:libc_wreadlinkat,hash:CRC-32=0x42dceca4]]]*/
-INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
-NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd,
-                                       char32_t const *path,
-                                       char32_t *buf,
-                                       size_t buflen)
-/*[[[body:libc_wreadlinkat]]]*/
-{
-	return libc_wfreadlinkat(dfd, path, buf, buflen, 0);
-}
-/*[[[end:libc_wreadlinkat]]]*/
 
-/*[[[head:libd_wreadlinkat,hash:CRC-32=0xb5e575d8]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
-NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd,
-                                       char16_t const *path,
-                                       char16_t *buf,
-                                       size_t buflen)
-/*[[[body:libd_wreadlinkat]]]*/
-{
-	return libd_wfreadlinkat(dfd, path, buf, buflen, 0);
-}
-/*[[[end:libd_wreadlinkat]]]*/
-
-/*[[[head:libc_wfreadlinkat,hash:CRC-32=0x6f349689]]]*/
-INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
-NOTHROW_RPC(LIBKCALL libc_wfreadlinkat)(fd_t dfd,
-                                        char32_t const *path,
-                                        char32_t *buf,
-                                        size_t buflen,
-                                        atflag_t flags)
-/*[[[body:libc_wfreadlinkat]]]*/
-/*AUTO*/{
-	(void)dfd;
-	(void)path;
-	(void)buf;
-	(void)buflen;
-	(void)flags;
-	CRT_UNIMPLEMENTEDF("wfreadlinkat(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %Ix, %" PRIxN(__SIZEOF_ATFLAG_T__) ")", dfd, path, buf, buflen, flags); /* TODO */
-	return libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_wfreadlinkat]]]*/
-
-/*[[[head:libd_wfreadlinkat,hash:CRC-32=0x8ad9103f]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t
-NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
-                                        char16_t const *path,
-                                        char16_t *buf,
-                                        size_t buflen,
-                                        atflag_t flags)
-/*[[[body:libd_wfreadlinkat]]]*/
-/*AUTO*/{
-	(void)dfd;
-	(void)path;
-	(void)buf;
-	(void)buflen;
-	(void)flags;
-	CRT_UNIMPLEMENTEDF("DOS$wfreadlinkat(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %Ix, %" PRIxN(__SIZEOF_ATFLAG_T__) ")", dfd, path, buf, buflen, flags); /* TODO */
-	return libc_seterrno(ENOSYS);
-}
-/*[[[end:libd_wfreadlinkat]]]*/
-
-/*[[[head:libc_wreadlink,hash:CRC-32=0xb7de597e]]]*/
-INTERN ATTR_SECTION(".text.crt.wchar.fs.property") ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t
-NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *path,
-                                     char32_t *buf,
-                                     size_t buflen)
-/*[[[body:libc_wreadlink]]]*/
-{
-	return libc_wfreadlinkat(AT_FDCWD, path, buf, buflen, 0);
-}
-/*[[[end:libc_wreadlink]]]*/
-
-/*[[[head:libd_wreadlink,hash:CRC-32=0xc04798b]]]*/
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.property") ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t
-NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *path,
-                                     char16_t *buf,
-                                     size_t buflen)
-/*[[[body:libd_wreadlink]]]*/
-{
-	return libd_wfreadlinkat(AT_FDCWD, path, buf, buflen, 0);
-}
-/*[[[end:libd_wreadlink]]]*/
-
-
-
-
-
-/*[[[start:exports,hash:CRC-32=0x8b0c53b2]]]*/
+/*[[[start:exports,hash:CRC-32=0xe1ba2d13]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$wttyname_r, libd_wttyname_r);
 DEFINE_PUBLIC_ALIAS(wttyname_r, libc_wttyname_r);
-DEFINE_PUBLIC_ALIAS(DOS$wreadlinkat, libd_wreadlinkat);
-DEFINE_PUBLIC_ALIAS(wreadlinkat, libc_wreadlinkat);
-DEFINE_PUBLIC_ALIAS(DOS$wfreadlinkat, libd_wfreadlinkat);
-DEFINE_PUBLIC_ALIAS(wfreadlinkat, libc_wfreadlinkat);
-DEFINE_PUBLIC_ALIAS(DOS$wreadlink, libd_wreadlink);
-DEFINE_PUBLIC_ALIAS(wreadlink, libc_wreadlink);
 /*[[[end:exports]]]*/
 
 DECL_END
