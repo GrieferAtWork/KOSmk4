@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f151de9 */
+/* HASH CRC-32:0xddf7746a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_getlogin_r_defined
 #include <__crt.h>
 #include <libc/template/environ.h>
-#if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid)))
+#if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid) || defined(__CRT_HAVE_getresuid)))
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getenv_defined
@@ -55,6 +55,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,__localdep_geteuid,(void),__libc_geteuid,())
+#elif defined(__CRT_HAVE_getresuid)
+__NAMESPACE_LOCAL_END
+#include <libc/local/unistd/geteuid.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_geteuid __LIBC_LOCAL_NAME(geteuid)
 #else /* ... */
 #undef __local___localdep_geteuid_defined
 #endif /* !... */
@@ -85,18 +90,18 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getlogin_r) __ATTR_OUTS(1, 2) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getlogin_r))(char *__name, __SIZE_TYPE__ __name_len) {
-#if defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid))
+#if defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid) || defined(__CRT_HAVE_getresuid))
 	char __buf[1024]; /* NSS_BUFLEN_PASSWD */
 	struct passwd __pwent, *__pwptr;
-#endif /* __CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid) */
+#endif /* __CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid || __CRT_HAVE_getresuid) */
 	char *__pwname;
 #if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
 	__pwname = (__NAMESPACE_LOCAL_SYM __localdep_getenv)("LOGNAME");
-#if defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid))
+#if defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid) || defined(__CRT_HAVE_getresuid))
 	if (!__pwname)
-#endif /* __CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid) */
+#endif /* __CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid || __CRT_HAVE_getresuid) */
 #endif /* __CRT_HAVE_getenv || __LOCAL_environ */
-#if defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid))
+#if defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid) || defined(__CRT_HAVE_getresuid))
 	{
 		if ((__NAMESPACE_LOCAL_SYM __localdep_getpwuid_r)((__NAMESPACE_LOCAL_SYM __localdep_geteuid)(), &__pwent, __buf,
 		               sizeof(__buf), &__pwptr) ||
@@ -106,7 +111,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getlogin_r))(char *__name, __SIZE_TYP
 		if (!__pwname)
 			return -1;
 	}
-#endif /* __CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid) */
+#endif /* __CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid || __CRT_HAVE_getresuid) */
 	if (__name_len) {
 		__name[__name_len - 1] = '\0';
 		(__NAMESPACE_LOCAL_SYM __localdep_strncpy)(__name, __pwname, __name_len - 1);
@@ -118,7 +123,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_getlogin_r_defined
 #define __localdep_getlogin_r __LIBC_LOCAL_NAME(getlogin_r)
 #endif /* !__local___localdep_getlogin_r_defined */
-#else /* __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid)) */
+#else /* __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid || __CRT_HAVE_getresuid)) */
 #undef __local_getlogin_r_defined
-#endif /* !__CRT_HAVE_getenv && !__LOCAL_environ && (!__CRT_HAVE_getpwuid_r || (!__CRT_HAVE_geteuid && !__CRT_HAVE___geteuid && !__CRT_HAVE___libc_geteuid)) */
+#endif /* !__CRT_HAVE_getenv && !__LOCAL_environ && (!__CRT_HAVE_getpwuid_r || (!__CRT_HAVE_geteuid && !__CRT_HAVE___geteuid && !__CRT_HAVE___libc_geteuid && !__CRT_HAVE_getresuid)) */
 #endif /* !__local_getlogin_r_defined */

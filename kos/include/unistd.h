@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4867f0c8 */
+/* HASH CRC-32:0xb8804257 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -884,6 +884,11 @@ __CREDIRECT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,getuid,(void),__getuid,())
 /* >> getuid(2)
  * Return the real user ID of the calling process */
 __CREDIRECT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,getuid,(void),__libc_getuid,())
+#elif defined(__CRT_HAVE_getresuid)
+#include <libc/local/unistd/getuid.h>
+/* >> getuid(2)
+ * Return the real user ID of the calling process */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getuid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __uid_t __NOTHROW_NCX(__LIBCCALL getuid)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getuid))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_getgid
 /* >> getgid(2)
@@ -897,6 +902,11 @@ __CREDIRECT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,getgid,(void),__getgid,())
 /* >> getgid(2)
  * Return the real group ID of the calling process */
 __CREDIRECT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,getgid,(void),__libc_getgid,())
+#elif defined(__CRT_HAVE_getresgid)
+#include <libc/local/unistd/getgid.h>
+/* >> getgid(2)
+ * Return the real group ID of the calling process */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getgid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __gid_t __NOTHROW_NCX(__LIBCCALL getgid)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getgid))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_geteuid
 /* >> geteuid(2)
@@ -910,6 +920,11 @@ __CREDIRECT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,geteuid,(void),__geteuid,())
 /* >> geteuid(2)
  * Return the effective user ID of the calling process */
 __CREDIRECT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,geteuid,(void),__libc_geteuid,())
+#elif defined(__CRT_HAVE_getresuid)
+#include <libc/local/unistd/geteuid.h>
+/* >> geteuid(2)
+ * Return the effective user ID of the calling process */
+__NAMESPACE_LOCAL_USING_OR_IMPL(geteuid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __uid_t __NOTHROW_NCX(__LIBCCALL geteuid)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(geteuid))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_getegid
 /* >> getegid(2)
@@ -923,6 +938,11 @@ __CREDIRECT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,getegid,(void),__getegid,())
 /* >> getegid(2)
  * Return the effective group ID of the calling process */
 __CREDIRECT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,getegid,(void),__libc_getegid,())
+#elif defined(__CRT_HAVE_getresgid)
+#include <libc/local/unistd/getegid.h>
+/* >> getegid(2)
+ * Return the effective group ID of the calling process */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getegid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __gid_t __NOTHROW_NCX(__LIBCCALL getegid)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getegid))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_getgroups
 /* >> getgroups(2)
@@ -964,6 +984,14 @@ __CREDIRECT(,int,__NOTHROW_NCX,setuid,(__uid_t __uid),__setuid,(__uid))
  * @return: -1: [errno=EINVAL] : The given `uid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CREDIRECT(,int,__NOTHROW_NCX,setuid,(__uid_t __uid),__libc_setuid,(__uid))
+#elif defined(__CRT_HAVE_setreuid) || defined(__CRT_HAVE___setreuid) || defined(__CRT_HAVE___libc_setreuid) || defined(__CRT_HAVE_setresuid)
+#include <libc/local/unistd/setuid.h>
+/* >> setuid(2)
+ * Set the effective user ID of the calling process
+ * @return: 0 : Success
+ * @return: -1: [errno=EINVAL] : The given `uid' is invalid
+ * @return: -1: [errno=EPERM]  : The current user is not privileged */
+__NAMESPACE_LOCAL_USING_OR_IMPL(setuid, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL setuid)(__uid_t __uid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setuid))(__uid); })
 #endif /* ... */
 #ifdef __CRT_HAVE_setgid
 /* >> setgid(2)
@@ -986,6 +1014,14 @@ __CREDIRECT(,int,__NOTHROW_NCX,setgid,(__gid_t __gid),__setgid,(__gid))
  * @return: -1: [errno=EINVAL] : The given `gid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CREDIRECT(,int,__NOTHROW_NCX,setgid,(__gid_t __gid),__libc_setgid,(__gid))
+#elif defined(__CRT_HAVE_setreuid) || defined(__CRT_HAVE___setreuid) || defined(__CRT_HAVE___libc_setreuid) || defined(__CRT_HAVE_setresuid)
+#include <libc/local/unistd/setgid.h>
+/* >> setgid(2)
+ * Set the effective group ID of the calling process
+ * @return: 0 : Success
+ * @return: -1: [errno=EINVAL] : The given `gid' is invalid
+ * @return: -1: [errno=EPERM]  : The current user is not privileged */
+__NAMESPACE_LOCAL_USING_OR_IMPL(setgid, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL setgid)(__gid_t __gid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setgid))(__gid); })
 #endif /* ... */
 #if __has_builtin(__builtin_fork) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fork)
 /* >> fork(2)
@@ -1072,7 +1108,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,pause,(void),__pause,())
 __CREDIRECT(,int,__NOTHROW_RPC,pause,(void),__libc_pause,())
 #endif /* ... */
 #ifdef __CRT_HAVE_fpathconf
-/* >> fpathconf(2)
+/* >> fpathconf(3)
  * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `fd'
  * return: * : The configuration limit associated with `name' for `fd'
@@ -1080,7 +1116,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,pause,(void),__libc_pause,())
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 __CDECLARE(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,fpathconf,(__fd_t __fd, __STDC_INT_AS_UINT_T __name),(__fd,__name))
 #elif defined(__CRT_HAVE___fpathconf)
-/* >> fpathconf(2)
+/* >> fpathconf(3)
  * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `fd'
  * return: * : The configuration limit associated with `name' for `fd'
@@ -1125,15 +1161,15 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,tcsetpgrp,(__fd_t __fd, __pid_t __pgrp_id),(__
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getlogin,(void),())
 #else /* __CRT_HAVE_getlogin */
 #include <libc/template/environ.h>
-#if defined(__CRT_HAVE_cuserid) || defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid)))
+#if defined(__CRT_HAVE_cuserid) || defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid) || defined(__CRT_HAVE_getresuid)))
 #include <libc/local/unistd/getlogin.h>
 /* >> getlogin(3)
  * Return the login name for the current user, or `NULL' on error.
  * s.a. `getlogin_r()' and `cuserid()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getlogin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL getlogin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getlogin))(); })
-#else /* __CRT_HAVE_cuserid || __CRT_HAVE_getlogin_r || __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid)) */
+#else /* __CRT_HAVE_cuserid || __CRT_HAVE_getlogin_r || __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid || __CRT_HAVE_getresuid)) */
 #undef __getlogin_defined
-#endif /* !__CRT_HAVE_cuserid && !__CRT_HAVE_getlogin_r && !__CRT_HAVE_getenv && !__LOCAL_environ && (!__CRT_HAVE_getpwuid_r || (!__CRT_HAVE_geteuid && !__CRT_HAVE___geteuid && !__CRT_HAVE___libc_geteuid)) */
+#endif /* !__CRT_HAVE_cuserid && !__CRT_HAVE_getlogin_r && !__CRT_HAVE_getenv && !__LOCAL_environ && (!__CRT_HAVE_getpwuid_r || (!__CRT_HAVE_geteuid && !__CRT_HAVE___geteuid && !__CRT_HAVE___libc_geteuid && !__CRT_HAVE_getresuid)) */
 #endif /* !__CRT_HAVE_getlogin */
 #endif /* !__getlogin_defined */
 #ifdef __CRT_HAVE_chown
@@ -1158,7 +1194,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(
 #endif /* __AT_FDCWD && __CRT_HAVE_fchownat */
 #endif /* !... */
 #ifdef __CRT_HAVE_pathconf
-/* >> pathconf(2)
+/* >> pathconf(3)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `path'
  * return: * : The configuration limit associated with `name' for `path'
@@ -1166,7 +1202,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 __CDECLARE(__ATTR_IN(1),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
 #elif defined(__CRT_HAVE___pathconf)
-/* >> pathconf(2)
+/* >> pathconf(3)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `path'
  * return: * : The configuration limit associated with `name' for `path'
@@ -1178,7 +1214,7 @@ __CREDIRECT(__ATTR_IN(1),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char const *__
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fpathconf) || defined(__CRT_HAVE___fpathconf)) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
 #include <libc/local/unistd/pathconf.h>
-/* >> pathconf(2)
+/* >> pathconf(3)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `path'
  * return: * : The configuration limit associated with `name' for `path'
@@ -2146,7 +2182,6 @@ __CDECLARE_OPT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHR
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(__ATTR_OUT_OPT(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,getresgid,(__gid_t *__rgid, __gid_t *__egid, __gid_t *__sgid),(__rgid,__egid,__sgid))
 /* >> setresuid(2)
- * @return: 0 : Success
  * Set the real, effective, and saved UID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
@@ -2559,10 +2594,18 @@ __CREDIRECT_VOID(,__NOTHROW_RPC,sync,(void),__libc_sync,())
  * made become visible on the underlying, persistent media */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sync, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL sync)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sync))(); })
 #endif /* !... */
+#ifdef __CRT_HAVE_setpgrp
 /* >> setpgrp(3)
  * Move the calling process into its own process group.
  * Equivalent to `setpgid(0, 0)' */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,setpgrp,(void),())
+__CDECLARE(,int,__NOTHROW_NCX,setpgrp,(void),())
+#elif defined(__CRT_HAVE_setpgid) || defined(__CRT_HAVE___setpgid) || defined(__CRT_HAVE___libc_setpgid)
+#include <libc/local/unistd/setpgrp.h>
+/* >> setpgrp(3)
+ * Move the calling process into its own process group.
+ * Equivalent to `setpgid(0, 0)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(setpgrp, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL setpgrp)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setpgrp))(); })
+#endif /* ... */
 #ifdef __CRT_HAVE_setreuid
 /* >> setreuid(2)
  * Set the real and effective UID of the calling thread.
@@ -2581,6 +2624,13 @@ __CREDIRECT(,int,__NOTHROW_NCX,setreuid,(__uid_t __ruid, __uid_t __euid),__setre
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(,int,__NOTHROW_NCX,setreuid,(__uid_t __ruid, __uid_t __euid),__libc_setreuid,(__ruid,__euid))
+#elif defined(__CRT_HAVE_setresuid)
+#include <libc/local/unistd/setreuid.h>
+/* >> setreuid(2)
+ * Set the real and effective UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(setreuid, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL setreuid)(__uid_t __ruid, __uid_t __euid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setreuid))(__ruid, __euid); })
 #endif /* ... */
 #ifdef __CRT_HAVE_setregid
 /* >> setregid(2)
@@ -2600,9 +2650,28 @@ __CREDIRECT(,int,__NOTHROW_NCX,setregid,(__gid_t __rgid, __gid_t __egid),__setre
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(,int,__NOTHROW_NCX,setregid,(__gid_t __rgid, __gid_t __egid),__libc_setregid,(__rgid,__egid))
+#elif defined(__CRT_HAVE_setresgid)
+#include <libc/local/unistd/setregid.h>
+/* >> setregid(2)
+ * Set the real and effective GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(setregid, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL setregid)(__gid_t __rgid, __gid_t __egid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setregid))(__rgid, __egid); })
 #endif /* ... */
-/* >> gethostid(3) */
-__CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,gethostid,(void),())
+#ifdef __CRT_HAVE_gethostid
+/* >> gethostid(3)
+ * Get the machine's "host id" (the contents of a 4-byte file "/etc/hostid") */
+__CDECLARE(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,gethostid,(void),())
+#else /* __CRT_HAVE_gethostid */
+#include <asm/os/oflags.h>
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_readall) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek))))
+#include <libc/local/unistd/gethostid.h>
+/* >> gethostid(3)
+ * Get the machine's "host id" (the contents of a 4-byte file "/etc/hostid") */
+__NAMESPACE_LOCAL_USING_OR_IMPL(gethostid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGPTR_TYPE__ __NOTHROW_NCX(__LIBCCALL gethostid)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gethostid))(); })
+#endif /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_readall || ((__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_llseek || __CRT_HAVE___llseek || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek))) */
+#endif /* !__CRT_HAVE_gethostid */
 #if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
 #if defined(__ARCH_PAGESIZE) && defined(__CRT_HAVE_getpagesize)
 /* >> getpagesize(3)
@@ -2646,33 +2715,53 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getdtablesize, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_XOPEN2K
+#ifdef __CRT_HAVE_seteuid
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `euid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,seteuid,(__uid_t __euid),(__euid))
+__CDECLARE(,int,__NOTHROW_NCX,seteuid,(__uid_t __euid),(__euid))
+#elif defined(__CRT_HAVE_setreuid) || defined(__CRT_HAVE___setreuid) || defined(__CRT_HAVE___libc_setreuid) || defined(__CRT_HAVE_setresuid)
+#include <libc/local/unistd/seteuid.h>
+/* >> seteuid(2)
+ * Set the effective user ID of the calling process
+ * @return: 0 : Success
+ * @return: -1: [errno=EINVAL] : The given `euid' is invalid
+ * @return: -1: [errno=EPERM]  : The current user is not privileged */
+__NAMESPACE_LOCAL_USING_OR_IMPL(seteuid, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL seteuid)(__uid_t __euid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(seteuid))(__euid); })
+#endif /* ... */
+#ifdef __CRT_HAVE_setegid
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `egid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,setegid,(__gid_t __egid),(__egid))
+__CDECLARE(,int,__NOTHROW_NCX,setegid,(__gid_t __egid),(__egid))
+#elif defined(__CRT_HAVE_setregid) || defined(__CRT_HAVE___setregid) || defined(__CRT_HAVE___libc_setregid) || defined(__CRT_HAVE_setresgid)
+#include <libc/local/unistd/setegid.h>
+/* >> setegid(2)
+ * Set the effective group ID of the calling process
+ * @return: 0 : Success
+ * @return: -1: [errno=EINVAL] : The given `egid' is invalid
+ * @return: -1: [errno=EPERM]  : The current user is not privileged */
+__NAMESPACE_LOCAL_USING_OR_IMPL(setegid, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL setegid)(__gid_t __egid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setegid))(__egid); })
+#endif /* ... */
 #endif /* __USE_XOPEN2K */
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_UNIX98))
 #ifdef __CRT_HAVE_ttyslot
 /* >> ttyslot(3)
- * Returns the (1-based) index into ttys returned by `getttyent(3)' of
+ * Returns the (1-based) index into  ttys returned by `getttyent(3)'  of
  * the terminal currently associated with the caller (~ala `ttyname(3)')
- * On error, or if caller's terminal isn't listed by `getttyent(3)', we
+ * On  error, or if caller's terminal isn't listed by `getttyent(3)', we
  * instead return `0' */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,ttyslot,(void),())
 #elif (defined(__CRT_HAVE_ttyname) || defined(__CRT_HAVE___ttyname) || defined(__CRT_HAVE_ttyname_r)) && defined(__CRT_HAVE_setttyent) && defined(__CRT_HAVE_getttyent)
 #include <libc/local/unistd/ttyslot.h>
 /* >> ttyslot(3)
- * Returns the (1-based) index into ttys returned by `getttyent(3)' of
+ * Returns the (1-based) index into  ttys returned by `getttyent(3)'  of
  * the terminal currently associated with the caller (~ala `ttyname(3)')
- * On error, or if caller's terminal isn't listed by `getttyent(3)', we
+ * On  error, or if caller's terminal isn't listed by `getttyent(3)', we
  * instead return `0' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ttyslot, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL ttyslot)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ttyslot))(); })
 #endif /* ... */
@@ -2767,13 +2856,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(readlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 __CDECLARE(__ATTR_OUTS(1, 2),int,__NOTHROW_RPC,getlogin_r,(char *__name, size_t __name_len),(__name,__name_len))
 #else /* __CRT_HAVE_getlogin_r */
 #include <libc/template/environ.h>
-#if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid)))
+#if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid) || defined(__CRT_HAVE_getresuid)))
 #include <libc/local/unistd/getlogin_r.h>
 /* >> getlogin_r(3)
  * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
  * s.a. `getlogin()' and `cuserid()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getlogin_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) int __NOTHROW_RPC(__LIBCCALL getlogin_r)(char *__name, size_t __name_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getlogin_r))(__name, __name_len); })
-#endif /* __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid)) */
+#endif /* __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid || __CRT_HAVE_getresuid)) */
 #endif /* !__CRT_HAVE_getlogin_r */
 #endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
@@ -2786,7 +2875,15 @@ __CDECLARE(__ATTR_OUTS(1, 2),int,__NOTHROW_NCX,gethostname,(char *__name, size_t
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 __CREDIRECT(__ATTR_OUTS(1, 2),int,__NOTHROW_NCX,gethostname,(char *__name, size_t __buflen),__gethostname,(__name,__buflen))
-#endif /* ... */
+#else /* ... */
+#include <bits/os/utsname.h>
+#if (defined(__CRT_HAVE_uname) || defined(__CRT_HAVE___uname) || defined(__CRT_HAVE___libc_uname)) && defined(__OFFSET_UTSNAME_NODENAME) && defined(_UTSNAME_NODENAME_LENGTH) && _UTSNAME_NODENAME_LENGTH
+#include <libc/local/unistd/gethostname.h>
+/* >> gethostname(3)
+ * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(gethostname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) int __NOTHROW_NCX(__LIBCCALL gethostname)(char *__name, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gethostname))(__name, __buflen); })
+#endif /* (__CRT_HAVE_uname || __CRT_HAVE___uname || __CRT_HAVE___libc_uname) && __OFFSET_UTSNAME_NODENAME && _UTSNAME_NODENAME_LENGTH && _UTSNAME_NODENAME_LENGTH */
+#endif /* !... */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 #ifdef __USE_MISC
@@ -2805,11 +2902,33 @@ __CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,sethostname,(char const *__name, 
  * Set the name of the hosting machine */
 __CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,sethostname,(char const *__name, size_t __len),__libc_sethostname,(__name,__len))
 #endif /* ... */
-/* >> sethostid(3) */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,sethostid,(__LONGPTR_TYPE__ __id),(__id))
+#ifdef __CRT_HAVE_sethostid
+/* >> sethostid(3)
+ * Set the machine's "host id" (the contents of a 4-byte file "/etc/hostid") */
+__CDECLARE(,int,__NOTHROW_NCX,sethostid,(__LONGPTR_TYPE__ __id),(__id))
+#else /* __CRT_HAVE_sethostid */
+#include <asm/os/oflags.h>
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_writeall) || (defined(__CRT_HAVE_write_printer) && defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)) && defined(__O_WRONLY) && defined(__O_CREAT) && defined(__O_TRUNC)
+#include <libc/local/unistd/sethostid.h>
+/* >> sethostid(3)
+ * Set the machine's "host id" (the contents of a 4-byte file "/etc/hostid") */
+__NAMESPACE_LOCAL_USING_OR_IMPL(sethostid, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL sethostid)(__LONGPTR_TYPE__ __id) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sethostid))(__id); })
+#endif /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_writeall || (__CRT_HAVE_write_printer && __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__) || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write) && __O_WRONLY && __O_CREAT && __O_TRUNC */
+#endif /* !__CRT_HAVE_sethostid */
+#ifdef __CRT_HAVE_getdomainname
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-__CDECLARE_OPT(__ATTR_OUTS(1, 2),int,__NOTHROW_NCX,getdomainname,(char *__name, size_t __buflen),(__name,__buflen))
+__CDECLARE(__ATTR_OUTS(1, 2),int,__NOTHROW_NCX,getdomainname,(char *__name, size_t __buflen),(__name,__buflen))
+#else /* __CRT_HAVE_getdomainname */
+#include <bits/os/utsname.h>
+#if (defined(__CRT_HAVE_uname) || defined(__CRT_HAVE___uname) || defined(__CRT_HAVE___libc_uname)) && defined(__OFFSET_UTSNAME_DOMAINNAME) && defined(_UTSNAME_DOMAIN_LENGTH) && _UTSNAME_DOMAIN_LENGTH
+#include <libc/local/unistd/getdomainname.h>
+/* >> getdomainname(3)
+ * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getdomainname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(1, 2) int __NOTHROW_NCX(__LIBCCALL getdomainname)(char *__name, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdomainname))(__name, __buflen); })
+#endif /* (__CRT_HAVE_uname || __CRT_HAVE___uname || __CRT_HAVE___libc_uname) && __OFFSET_UTSNAME_DOMAINNAME && _UTSNAME_DOMAIN_LENGTH && _UTSNAME_DOMAIN_LENGTH */
+#endif /* !__CRT_HAVE_getdomainname */
 #ifdef __CRT_HAVE_setdomainname
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
@@ -3173,7 +3292,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_R
 __CDECLARE(__ATTR_OUT_OPT(1),char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
 #else /* __CRT_HAVE_cuserid */
 #include <libc/template/environ.h>
-#if defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid)))
+#if defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && (defined(__CRT_HAVE_geteuid) || defined(__CRT_HAVE___geteuid) || defined(__CRT_HAVE___libc_geteuid) || defined(__CRT_HAVE_getresuid)))
 #include <libc/local/unistd/cuserid.h>
 /* >> cuserid(3)
  * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
@@ -3183,9 +3302,9 @@ __CDECLARE(__ATTR_OUT_OPT(1),char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
  * that wish to support longer usernames  should make use of `getlogin_r()'  instead.
  * s.a. `getlogin()' and `getlogin_r()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cuserid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT_OPT(1) char *__NOTHROW_NCX(__LIBCCALL cuserid)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cuserid))(__s); })
-#else /* __CRT_HAVE_getlogin_r || __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid)) */
+#else /* __CRT_HAVE_getlogin_r || __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && (__CRT_HAVE_geteuid || __CRT_HAVE___geteuid || __CRT_HAVE___libc_geteuid || __CRT_HAVE_getresuid)) */
 #undef __cuserid_defined
-#endif /* !__CRT_HAVE_getlogin_r && !__CRT_HAVE_getenv && !__LOCAL_environ && (!__CRT_HAVE_getpwuid_r || (!__CRT_HAVE_geteuid && !__CRT_HAVE___geteuid && !__CRT_HAVE___libc_geteuid)) */
+#endif /* !__CRT_HAVE_getlogin_r && !__CRT_HAVE_getenv && !__LOCAL_environ && (!__CRT_HAVE_getpwuid_r || (!__CRT_HAVE_geteuid && !__CRT_HAVE___geteuid && !__CRT_HAVE___libc_geteuid && !__CRT_HAVE_getresuid)) */
 #endif /* !__CRT_HAVE_cuserid */
 #endif /* !__cuserid_defined */
 #endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_XOPEN && !__USE_XOPEN2K) */
@@ -3649,6 +3768,48 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getpeereid, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !__CRT_HAVE_getsockopt || !__SOL_SOCKET || !__SO_PEERCRED */
 #endif /* !__CRT_HAVE_getpeereid */
 #endif /* !__getpeereid_defined */
+#ifdef __CRT_HAVE_lpathconf
+/* >> lpathconf(3)
+ * Same as `pathconf(3)', but don't dereference `path' if it's a symbolic link */
+__CDECLARE(__ATTR_IN(1),__LONGPTR_TYPE__,__NOTHROW_RPC,lpathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
+#else /* __CRT_HAVE_lpathconf */
+#include <asm/os/oflags.h>
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_HAVE_fpathconf) || defined(__CRT_HAVE___fpathconf)) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY) && defined(__O_PATH) && defined(__O_NOFOLLOW)
+#include <libc/local/unistd/lpathconf.h>
+/* >> lpathconf(3)
+ * Same as `pathconf(3)', but don't dereference `path' if it's a symbolic link */
+__NAMESPACE_LOCAL_USING_OR_IMPL(lpathconf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __LONGPTR_TYPE__ __NOTHROW_RPC(__LIBCCALL lpathconf)(char const *__path, __STDC_INT_AS_UINT_T __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lpathconf))(__path, __name); })
+#endif /* (__CRT_HAVE_fpathconf || __CRT_HAVE___fpathconf) && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && __O_RDONLY && __O_PATH && __O_NOFOLLOW */
+#endif /* !__CRT_HAVE_lpathconf */
+#ifdef __CRT_HAVE_setruid
+/* >> setruid(3)
+ * Set only the real UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+__CDECLARE(,int,__NOTHROW_NCX,setruid,(uid_t __ruid),(__ruid))
+#elif defined(__CRT_HAVE_setreuid) || defined(__CRT_HAVE___setreuid) || defined(__CRT_HAVE___libc_setreuid) || defined(__CRT_HAVE_setresuid)
+#include <libc/local/unistd/setruid.h>
+/* >> setruid(3)
+ * Set only the real UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(setruid, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL setruid)(uid_t __ruid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setruid))(__ruid); })
+#endif /* ... */
+#ifdef __CRT_HAVE_setrgid
+/* >> setrgid(3)
+ * Set only the real GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+__CDECLARE(,int,__NOTHROW_NCX,setrgid,(gid_t __rgid),(__rgid))
+#elif defined(__CRT_HAVE_setregid) || defined(__CRT_HAVE___setregid) || defined(__CRT_HAVE___libc_setregid) || defined(__CRT_HAVE_setresgid)
+#include <libc/local/unistd/setrgid.h>
+/* >> setrgid(3)
+ * Set only the real GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(setrgid, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL setrgid)(gid_t __rgid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setrgid))(__rgid); })
+#endif /* ... */
 #endif /* __USE_NETBSD */
 
 

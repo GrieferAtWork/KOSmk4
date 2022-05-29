@@ -716,25 +716,49 @@ $pid_t setsid();
 @@Return the real user ID of the calling process
 [[wunused, decl_include("<bits/types.h>")]]
 [[export_alias("__getuid", "__libc_getuid")]]
-$uid_t getuid();
+[[userimpl, requires_function(getresuid)]]
+$uid_t getuid() {
+	uid_t result;
+	if (getresuid(&result, NULL, NULL))
+		result = (uid_t)-1;
+	return result;
+}
 
 @@>> getgid(2)
 @@Return the real group ID of the calling process
 [[wunused, decl_include("<bits/types.h>")]]
 [[export_alias("__getgid", "__libc_getgid")]]
-$gid_t getgid();
+[[userimpl, requires_function(getresgid)]]
+$gid_t getgid() {
+	gid_t result;
+	if (getresgid(&result, NULL, NULL))
+		result = (gid_t)-1;
+	return result;
+}
 
 @@>> geteuid(2)
 @@Return the effective user ID of the calling process
 [[wunused, decl_include("<bits/types.h>")]]
 [[export_alias("__geteuid", "__libc_geteuid")]]
-$uid_t geteuid();
+[[userimpl, requires_function(getresuid)]]
+$uid_t geteuid() {
+	uid_t result;
+	if (getresuid(NULL, &result, NULL))
+		result = (uid_t)-1;
+	return result;
+}
 
 @@>> getegid(2)
 @@Return the effective group ID of the calling process
 [[wunused, decl_include("<bits/types.h>")]]
 [[export_alias("__getegid", "__libc_getegid")]]
-$gid_t getegid();
+[[userimpl, requires_function(getresgid)]]
+$gid_t getegid() {
+	gid_t result;
+	if (getresgid(NULL, &result, NULL))
+		result = (gid_t)-1;
+	return result;
+}
 
 @@>> getgroups(2)
 @@@return: * : [count == 0] The required number of groups
@@ -751,7 +775,13 @@ int getgroups(int size, [[out(return <= size)]] $gid_t list[]);
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
 [[decl_include("<bits/types.h>")]]
 [[export_alias("__setuid", "__libc_setuid")]]
-int setuid($uid_t uid);
+[[userimpl, requires_function(setreuid, seteuid)]]
+int setuid($uid_t uid) {
+	int result = setreuid(uid, uid);
+	if (result != 0)
+		result = seteuid(uid);
+	return result;
+}
 
 @@>> setgid(2)
 @@Set the effective group ID of the calling process
@@ -760,7 +790,13 @@ int setuid($uid_t uid);
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
 [[decl_include("<bits/types.h>")]]
 [[export_alias("__setgid", "__libc_setgid")]]
-int setgid($gid_t gid);
+[[userimpl, requires_function(setreuid, seteuid)]]
+int setgid($gid_t gid) {
+	int result = setregid(gid, gid);
+	if (result != 0)
+		result = setegid(gid);
+	return result;
+}
 
 
 @@>> fork(2)
@@ -795,7 +831,7 @@ unsigned int alarm(unsigned int seconds);
 [[export_alias("__pause", "__libc_pause")]]
 int pause();
 
-@@>> fpathconf(2)
+@@>> fpathconf(3)
 @@@param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
 @@Return a path configuration value associated with `name' for `fd'
 @@return: * : The configuration limit associated with `name' for `fd'
@@ -862,7 +898,7 @@ int chown([[in]] char const *file, $uid_t owner, $gid_t group) {
 	return fchownat(__AT_FDCWD, file, owner, group, 0);
 }
 
-@@>> pathconf(2)
+@@>> pathconf(3)
 @@@param: name: One of `_PC_*' from <asm/crt/confname.h>
 @@Return a path configuration value associated with `name' for `path'
 @@return: * : The configuration limit associated with `name' for `path'
@@ -1678,7 +1714,6 @@ int getresgid([[out_opt]] $gid_t *rgid,
               [[out_opt]] $gid_t *sgid);
 
 @@>> setresuid(2)
-@@@return: 0 : Success
 @@Set the real, effective, and saved UID of the calling thread.
 @@@return: 0 : Success
 @@@return: -1: Error (s.a. `errno')
@@ -2009,7 +2044,10 @@ void sync() {
 @@Move the calling process into its own process group.
 @@Equivalent to `setpgid(0, 0)'
 [[section(".text.crt{|.dos}.sched.process")]]
-int setpgrp();
+[[requires_function(setpgid)]]
+int setpgrp() {
+	return setpgid(0, 0);
+}
 
 @@>> setreuid(2)
 @@Set the real and effective UID of the calling thread.
@@ -2018,7 +2056,10 @@ int setpgrp();
 [[decl_include("<bits/types.h>")]]
 [[export_alias("__setreuid", "__libc_setreuid")]]
 [[section(".text.crt{|.dos}.sched.user")]]
-int setreuid($uid_t ruid, $uid_t euid);
+[[userimpl, requires_function(setresuid)]]
+int setreuid($uid_t ruid, $uid_t euid) {
+	return setresuid(ruid, euid, (uid_t)-1);
+}
 
 @@>> setregid(2)
 @@Set the real and effective GID of the calling thread.
@@ -2027,12 +2068,35 @@ int setreuid($uid_t ruid, $uid_t euid);
 [[decl_include("<bits/types.h>")]]
 [[export_alias("__setregid", "__libc_setregid")]]
 [[section(".text.crt{|.dos}.sched.user")]]
-int setregid($gid_t rgid, $gid_t egid);
+[[userimpl, requires_function(setresgid)]]
+int setregid($gid_t rgid, $gid_t egid) {
+	return setresgid(rgid, egid, (gid_t)-1);
+}
 
 @@>> gethostid(3)
+@@Get the machine's "host id" (the contents of a 4-byte file "/etc/hostid")
 [[wunused, decl_include("<hybrid/typecore.h>")]]
+[[requires_function(open, readall)]]
+[[impl_include("<paths.h>", "<bits/types.h>", "<asm/os/oflags.h>")]]
 [[section(".text.crt{|.dos}.system.configuration")]]
-$longptr_t gethostid();
+$longptr_t gethostid() {
+@@pp_ifdef O_RDONLY@@
+	fd_t fd = open(_PATH_HOSTID, O_RDONLY);
+@@pp_else@@
+	fd_t fd = open(_PATH_HOSTID, 0);
+@@pp_endif@@
+	if (fd >= 0) {
+		uint32_t id32;
+		ssize_t count = readall(fd, &id32, 4);
+@@pp_if $has_function(close)@@
+		close(fd);
+@@pp_endif@@
+		if (count == 4)
+			return (longptr_t)(ulongptr_t)id32;
+	}
+	/* XXX: Glibc also tries to use the host's IP address here... */
+	return 0;
+}
 
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
 @@>> getpagesize(3)
@@ -2086,7 +2150,10 @@ __STDC_INT_AS_SIZE_T getdtablesize() {
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
 [[decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.sched.user")]]
-int seteuid($uid_t euid);
+[[userimpl, requires_function(setreuid)]]
+int seteuid($uid_t euid) {
+	return setreuid((uid_t)-1, euid);
+}
 
 @@>> setegid(2)
 @@Set the effective group ID of the calling process
@@ -2095,16 +2162,19 @@ int seteuid($uid_t euid);
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
 [[decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.sched.user")]]
-int setegid($gid_t egid);
+[[userimpl, requires_function(setregid)]]
+int setegid($gid_t egid) {
+	return setregid((gid_t)-1, egid);
+}
 
 %#endif /* __USE_XOPEN2K */
 
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_UNIX98))
 
 @@>> ttyslot(3)
-@@Returns the (1-based) index into ttys returned by `getttyent(3)' of
+@@Returns the (1-based) index into  ttys returned by `getttyent(3)'  of
 @@the terminal currently associated with the caller (~ala `ttyname(3)')
-@@On error, or if caller's terminal isn't listed by `getttyent(3)', we
+@@On  error, or if caller's terminal isn't listed by `getttyent(3)', we
 @@instead return `0'
 [[wunused, section(".text.crt{|.dos}.compat.glibc")]]
 [[requires_function(ttyname, setttyent, getttyent)]]
@@ -2222,7 +2292,28 @@ int getlogin_r([[out(? <= name_len)]] char *name, size_t name_len) {
 [[decl_include("<hybrid/typecore.h>")]]
 [[export_alias("__gethostname")]] /* Yes: no `__libc_gethostname' alias for this one... */
 [[section(".text.crt{|.dos}.system.configuration")]]
-int gethostname([[out(? <= buflen)]] char *name, size_t buflen);
+[[requires_include("<bits/os/utsname.h>")]]
+[[requires($has_function(uname) && defined(__OFFSET_UTSNAME_NODENAME) &&
+           defined(@_UTSNAME_NODENAME_LENGTH@) && @_UTSNAME_NODENAME_LENGTH@)]]
+[[impl_include("<bits/os/utsname.h>", "<libc/errno.h>", "<bits/types.h>")]]
+int gethostname([[out(? <= buflen)]] char *name, size_t buflen) {
+	@struct utsname@ uts;
+	int result = uname(&uts);
+	if (result == 0) {
+		size_t len = strnlen(uts.@nodename@, @_UTSNAME_NODENAME_LENGTH@);
+		if (buflen <= len) {
+			/* EINVAL For gethostname() under libc: name is NULL or name is longer than len bytes. */
+@@pp_ifdef EINVAL@@
+			return libc_seterrno(EINVAL);
+@@pp_else@@
+			return libc_seterrno(1);
+@@pp_endif@@
+		}
+		memcpy(name, uts.@nodename@, len * sizeof(char));
+		name[len] = '\0';
+	}
+	return result;
+}
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 %
@@ -2239,15 +2330,102 @@ int setlogin([[in]] char const *name);
 int sethostname([[in(len)]] char const *name, size_t len);
 
 @@>> sethostid(3)
+@@Set the machine's "host id" (the contents of a 4-byte file "/etc/hostid")
 [[decl_include("<hybrid/typecore.h>")]]
+[[requires_include("<asm/os/oflags.h>")]]
+[[requires($has_function(open, writeall) && defined(__O_WRONLY) &&
+           defined(__O_CREAT) && defined(__O_TRUNC))]]
 [[section(".text.crt{|.dos}.system.configuration")]]
-int sethostid($longptr_t id);
+[[impl_include("<paths.h>", "<asm/os/oflags.h>")]]
+[[impl_include("<libc/errno.h>", "<bits/types.h>")]]
+int sethostid($longptr_t id) {
+	fd_t fd;
+	ssize_t count;
+	uint32_t id32;
+
+	/* Ensure that `id' fits into 4 bytes */
+@@pp_if __SIZEOF_POINTER__ > 4@@
+	if (id & ~UINT32_C(0xffffffff)) {
+@@pp_ifdef EOVERFLOW@@
+		return libc_seterrno(EOVERFLOW);
+@@pp_else@@
+		return libc_seterrno(1);
+@@pp_endif@@
+	}
+@@pp_endif@@
+
+	/* Try to open the hostid file for writing */
+	fd = open(_PATH_HOSTID, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd < 0) {
+		/* Try to lazily create the containing directory if it's missing. */
+@@pp_if $has_function(mkdir) && defined(libc_geterrno_or) && defined(ENOTDIR)@@
+		if (libc_geterrno() == ENOTDIR) {
+			/* Check if /etc was already created. */
+@@pp_ifndef EEXIST@@
+			mkdir(_PATH_HOSTID_CONTAINING_DIRECTORY, 0755);
+@@pp_else@@
+			if (mkdir(_PATH_HOSTID_CONTAINING_DIRECTORY, 0755) == 0 ||
+			    libc_geterrno() == EEXIST)
+@@pp_endif@@
+			{
+				fd = open(_PATH_HOSTID, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+				if (fd >= 0)
+					goto got_fd;
+#define WANT_got_fd
+			}
+		}
+@@pp_endif@@
+		return fd;
+	}
+#ifdef WANT_got_fd
+#undef WANT_got_fd
+got_fd:
+#endif /* WANT_got_fd */
+	id32  = (uint32_t)(ulongptr_t)id;
+	count = writeall(fd, &id32, 4);
+@@pp_if $has_function(close)@@
+	close(fd);
+@@pp_endif@@
+	if (count != 4) {
+@@pp_ifdef ENOSPC@@
+		if (count >= 0)
+			libc_seterrno(ENOSPC); /* ??? */
+@@pp_endif@@
+		return -1;
+	}
+	return 0;
+}
 
 @@>> getdomainname(3)
 @@Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)'
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.system.configuration")]]
-int getdomainname([[out(? <= buflen)]] char *name, size_t buflen);
+[[requires_include("<bits/os/utsname.h>")]]
+[[requires($has_function(uname) && defined(__OFFSET_UTSNAME_DOMAINNAME) &&
+           defined(@_UTSNAME_DOMAIN_LENGTH@) && @_UTSNAME_DOMAIN_LENGTH@)]]
+[[impl_include("<bits/os/utsname.h>", "<libc/errno.h>", "<bits/types.h>")]]
+int getdomainname([[out(? <= buflen)]] char *name, size_t buflen) {
+@@pp_ifndef __PRIVATE_UTSNAME_DOMAINNAME@@
+#define __PRIVATE_UTSNAME_DOMAINNAME @domainname@
+@@pp_endif@@
+	@struct utsname@ uts;
+	int result = uname(&uts);
+	if (result == 0) {
+		size_t len = strnlen(uts.__PRIVATE_UTSNAME_DOMAINNAME, @_UTSNAME_DOMAIN_LENGTH@);
+		if (buflen <= len) {
+			/* EINVAL For getdomainname() under libc: name is NULL or name is longer than len bytes. */
+@@pp_ifdef EINVAL@@
+			return libc_seterrno(EINVAL);
+@@pp_else@@
+			return libc_seterrno(1);
+@@pp_endif@@
+		}
+		memcpy(name, uts.__PRIVATE_UTSNAME_DOMAINNAME, len * sizeof(char));
+		name[len] = '\0';
+	}
+	return result;
+}
+
 
 @@>> setdomainname(2)
 @@Set the name of the hosting machine's domain
@@ -3306,6 +3484,49 @@ int getpeereid($fd_t sockfd,
 	return result;
 }
 
+@@>> lpathconf(3)
+@@Same as `pathconf(3)', but don't dereference `path' if it's a symbolic link
+[[crt_dos_variant, cp]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[requires_include("<asm/os/oflags.h>")]]
+[[requires($has_function(fpathconf) && $has_function(open) && defined(__O_RDONLY) &&
+           defined(__O_PATH) && defined(__O_NOFOLLOW))]]
+[[userimpl, section(".text.crt{|.dos}.fs.property")]]
+$longptr_t lpathconf([[in]] char const *path, __STDC_INT_AS_UINT_T name) {
+	fd_t fd;
+	longptr_t result;
+	fd = open(path, O_RDONLY | O_PATH | O_NOFOLLOW);
+	if unlikely(fd < 0)
+		return -1;
+	result = fpathconf(fd, name);
+@@pp_if $has_function(close)@@
+	close(fd);
+@@pp_endif@@
+	return result;
+}
+
+@@>> setruid(3)
+@@Set only the real UID of the calling thread.
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
+[[decl_include("<bits/types.h>")]]
+[[section(".text.crt{|.dos}.bsd.user")]]
+[[requires_function(setreuid)]]
+int setruid(uid_t ruid) {
+	return setreuid(ruid, (uid_t)-1);
+}
+
+@@>> setrgid(3)
+@@Set only the real GID of the calling thread.
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
+[[decl_include("<bits/types.h>")]]
+[[section(".text.crt{|.dos}.bsd.user")]]
+[[requires_function(setregid)]]
+int setrgid(gid_t rgid) {
+	return setregid(rgid, (gid_t)-1);
+}
+
 //TODO:int des_cipher(char const *, char *, long, int);
 //TODO:int des_setkey(char const *);
 //TODO:int exect(char const *, char *const *, char *const *);
@@ -3313,10 +3534,7 @@ int getpeereid($fd_t sockfd,
 //TODO:int fsync_range(int, int, off_t, off_t);
 //TODO:int getgroupmembership(char const *, gid_t, gid_t *, int, int *);
 //TODO:int iruserok(uint32_t, int, char const *, char const *);
-//TODO:long lpathconf(char const *, int);
 //TODO:int nfssvc(int, void *);
-//TODO:int setrgid(gid_t);
-//TODO:int setruid(uid_t);
 //TODO:int swapctl(int, void *, int);
 //TODO:int undelete(char const *);
 //TODO:int rresvport_af_addr(int *, int, void *);
@@ -3324,8 +3542,8 @@ int getpeereid($fd_t sockfd,
 //TODO:extern int optreset;
 //TODO:extern char *suboptarg;
 
-//int   reboot(int,   char  *);   //   Incompatible  w/   linux:   int  reboot(int)
-//int swapon(char const *); // Incompatible w/ linux: int swapon(char const *, int)
+// >> int reboot(int, char *); // Incompatible w/ linux: int reboot(int)
+// >> int swapon(char const *); // Incompatible w/ linux: int swapon(char const *, int)
 %#endif /* __USE_NETBSD */
 
 

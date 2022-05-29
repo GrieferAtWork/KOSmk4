@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ce7d3b9 */
+/* HASH CRC-32:0x2f4e4f6b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -318,9 +318,10 @@
 #endif /* __CRT_HAVE_getgroups || __CRT_HAVE___getgroups || __CRT_HAVE___libc_getgroups */
 
 #undef HAVE_GETHOSTNAME
-#if defined(__CRT_HAVE_gethostname) || defined(__CRT_HAVE___gethostname)
+#include <bits/os/utsname.h>
+#if defined(__CRT_HAVE_gethostname) || defined(__CRT_HAVE___gethostname) || ((defined(__CRT_HAVE_uname) || defined(__CRT_HAVE___uname) || defined(__CRT_HAVE___libc_uname)) && defined(__OFFSET_UTSNAME_NODENAME) && defined(_UTSNAME_NODENAME_LENGTH) && _UTSNAME_NODENAME_LENGTH)
 #define HAVE_GETHOSTNAME 1
-#endif /* __CRT_HAVE_gethostname || __CRT_HAVE___gethostname */
+#endif /* __CRT_HAVE_gethostname || __CRT_HAVE___gethostname || ((__CRT_HAVE_uname || __CRT_HAVE___uname || __CRT_HAVE___libc_uname) && __OFFSET_UTSNAME_NODENAME && _UTSNAME_NODENAME_LENGTH && _UTSNAME_NODENAME_LENGTH) */
 
 #undef HAVE_GETMNTENT
 #if defined(__CRT_HAVE_getmntent) || defined(__CRT_HAVE_getmntent_r) || defined(__CRT_HAVE___getmntent_r) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE__IO_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))

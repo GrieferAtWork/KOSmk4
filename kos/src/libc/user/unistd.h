@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbddeef3e */
+/* HASH CRC-32:0x1f6cf36c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -139,7 +139,7 @@ INTDEF unsigned int NOTHROW_NCX(LIBCCALL libc_alarm)(unsigned int seconds);
 /* >> pause(2)
  * Suspend execution until the delivery of a POSIX_SIGNAL */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_pause)(void);
-/* >> fpathconf(2)
+/* >> fpathconf(3)
  * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `fd'
  * return: * : The configuration limit associated with `name' for `fd'
@@ -161,14 +161,14 @@ INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBDCALL libd_chown)(char const *file, uid_t o
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
 INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBCCALL libc_chown)(char const *file, uid_t owner, gid_t group);
-/* >> pathconf(2)
+/* >> pathconf(3)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `path'
  * return: * : The configuration limit associated with `name' for `path'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 INTDEF ATTR_IN(1) longptr_t NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *path, __STDC_INT_AS_UINT_T name);
-/* >> pathconf(2)
+/* >> pathconf(3)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `path'
  * return: * : The configuration limit associated with `name' for `path'
@@ -390,7 +390,6 @@ INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBCCALL 
  * @return: -1: Error (s.a. `errno') */
 INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBCCALL libc_getresgid)(gid_t *rgid, gid_t *egid, gid_t *sgid);
 /* >> setresuid(2)
- * @return: 0 : Success
  * Set the real, effective, and saved UID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
@@ -482,10 +481,6 @@ INTDEF ATTR_OUTS(2, 3) size_t NOTHROW_NCX(LIBCCALL libc_confstr)(__STDC_INT_AS_U
  * unwritten buffers down to the hardware layer, ensuring that modifications
  * made become visible on the underlying, persistent media */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_sync)(void);
-/* >> setpgrp(3)
- * Move the calling process into its own process group.
- * Equivalent to `setpgid(0, 0)' */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_setpgrp)(void);
 /* >> setreuid(2)
  * Set the real and effective UID of the calling thread.
  * @return: 0 : Success
@@ -496,8 +491,6 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setreuid)(uid_t ruid, uid_t euid);
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid, gid_t egid);
-/* >> gethostid(3) */
-INTDEF WUNUSED longptr_t NOTHROW_NCX(LIBCCALL libc_gethostid)(void);
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
@@ -540,19 +533,11 @@ INTDEF ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_readlink)(ch
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 INTDEF ATTR_IN(1) ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_readlink)(char const *path, char *buf, size_t buflen);
-/* >> gethostname(3)
- * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-INTDEF ATTR_OUTS(1, 2) int NOTHROW_NCX(LIBCCALL libc_gethostname)(char *name, size_t buflen);
 /* >> setlogin(3) */
 INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name);
 /* >> sethostname(2)
  * Set the name of the hosting machine */
 INTDEF ATTR_INS(1, 2) int NOTHROW_NCX(LIBCCALL libc_sethostname)(char const *name, size_t len);
-/* >> sethostid(3) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_sethostid)(longptr_t id);
-/* >> getdomainname(3)
- * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-INTDEF ATTR_OUTS(1, 2) int NOTHROW_NCX(LIBCCALL libc_getdomainname)(char *name, size_t buflen);
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
 INTDEF ATTR_INS(1, 2) int NOTHROW_NCX(LIBCCALL libc_setdomainname)(char const *name, size_t len);
@@ -602,6 +587,12 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd);
 INTDEF WUNUSED ATTR_IN(1) void *NOTHROW_NCX(LIBCCALL libc_setmode)(char const *mode_str);
 /* >> setmode(3), getmode(3) */
 INTDEF WUNUSED ATTR_IN(1) mode_t NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox, mode_t mode);
+/* >> lpathconf(3)
+ * Same as `pathconf(3)', but don't dereference `path' if it's a symbolic link */
+INTDEF ATTR_IN(1) longptr_t NOTHROW_RPC(LIBDCALL libd_lpathconf)(char const *path, __STDC_INT_AS_UINT_T name);
+/* >> lpathconf(3)
+ * Same as `pathconf(3)', but don't dereference `path' if it's a symbolic link */
+INTDEF ATTR_IN(1) longptr_t NOTHROW_RPC(LIBCCALL libc_lpathconf)(char const *path, __STDC_INT_AS_UINT_T name);
 /* >> sysconf(2)
  * @param: name: One of `_SC_*' from <asm/crt/confname.h>
  * Return   a   system    configuration   value    `name'

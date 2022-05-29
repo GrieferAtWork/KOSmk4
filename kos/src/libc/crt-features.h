@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39cbb080 */
+/* HASH CRC-32:0xe14c4f66 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2188,6 +2188,11 @@
 #define __CRT_HAVE_DOS$logl
 #define __CRT_HAVE_DOS$logout
 #define __CRT_HAVE_DOS$logwtmp
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$lpathconf
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$lrand48_r
 #define __CRT_HAVE_DOS$lrealpath
 #define __CRT_HAVE_DOS$lremovexattr
@@ -3086,9 +3091,11 @@
 #define __CRT_HAVE_DOS$setresgid
 #define __CRT_HAVE_DOS$setresuid
 #define __CRT_HAVE_DOS$setreuid
+#define __CRT_HAVE_DOS$setrgid
 #define __CRT_HAVE_DOS$setrlimit
 #define __CRT_HAVE_DOS$setrlimit64
 #define __CRT_HAVE_DOS$setrpcent
+#define __CRT_HAVE_DOS$setruid
 #define __CRT_HAVE_DOS$setservent
 #define __CRT_HAVE_DOS$setsigmaskptr
 #define __CRT_HAVE_DOS$setsockopt
@@ -6393,6 +6400,7 @@
 #define __CRT_HAVE_logout
 #define __CRT_HAVE_logwtmp
 #define __CRT_HAVE_lowvideo
+#define __CRT_HAVE_lpathconf
 #define __CRT_HAVE_lrand48
 #define __CRT_HAVE_lrand48_r
 #define __CRT_HAVE_lrealpath
@@ -7289,9 +7297,11 @@
 #define __CRT_HAVE_setresgid
 #define __CRT_HAVE_setresuid
 #define __CRT_HAVE_setreuid
+#define __CRT_HAVE_setrgid
 #define __CRT_HAVE_setrlimit
 #define __CRT_HAVE_setrlimit64
 #define __CRT_HAVE_setrpcent
+#define __CRT_HAVE_setruid
 #define __CRT_HAVE_setservent
 #define __CRT_HAVE_setsid
 #define __CRT_HAVE_setsigmaskfullptr

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca800023 */
+/* HASH CRC-32:0xd86e0ec1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,9 @@
 #include "../user/sys.ioctl.h"
 #include "../user/sys.poll.h"
 #include "../user/sys.socket.h"
+#include "../user/sys.stat.h"
 #include "../user/sys.time.h"
+#include "../user/sys.utsname.h"
 #include "termios.h"
 #include "../user/time.h"
 #include "../user/ttyent.h"
@@ -491,6 +493,37 @@ NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value,
 err:
 	return (useconds_t)-1;
 }
+/* >> setpgrp(3)
+ * Move the calling process into its own process group.
+ * Equivalent to `setpgid(0, 0)' */
+INTERN ATTR_SECTION(".text.crt.sched.process") int
+NOTHROW_NCX(LIBCCALL libc_setpgrp)(void) {
+	return libc_setpgid(0, 0);
+}
+#include <paths.h>
+#include <bits/types.h>
+#include <asm/os/oflags.h>
+/* >> gethostid(3)
+ * Get the machine's "host id" (the contents of a 4-byte file "/etc/hostid") */
+INTERN ATTR_SECTION(".text.crt.system.configuration") WUNUSED longptr_t
+NOTHROW_NCX(LIBCCALL libc_gethostid)(void) {
+
+	fd_t fd = libc_open(_PATH_HOSTID, O_RDONLY);
+
+
+
+	if (fd >= 0) {
+		uint32_t id32;
+		ssize_t count = libc_readall(fd, &id32, 4);
+
+		libc_close(fd);
+
+		if (count == 4)
+			return (longptr_t)(ulongptr_t)id32;
+	}
+	/* XXX: Glibc also tries to use the host's IP address here... */
+	return 0;
+}
 #include <asm/pagesize.h>
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
@@ -514,9 +547,9 @@ NOTHROW(LIBCCALL libc_getdtablesize)(void) {
 #include <asm/os/stdio.h>
 #include <bits/crt/db/ttyent.h>
 /* >> ttyslot(3)
- * Returns the (1-based) index into ttys returned by `getttyent(3)' of
+ * Returns the (1-based) index into  ttys returned by `getttyent(3)'  of
  * the terminal currently associated with the caller (~ala `ttyname(3)')
- * On error, or if caller's terminal isn't listed by `getttyent(3)', we
+ * On  error, or if caller's terminal isn't listed by `getttyent(3)', we
  * instead return `0' */
 INTERN ATTR_SECTION(".text.crt.compat.glibc") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_ttyslot)(void) {
@@ -577,6 +610,123 @@ NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
 		libc_strncpy(name, pwname, name_len - 1);
 	}
 	return 0;
+}
+#include <bits/os/utsname.h>
+#include <libc/errno.h>
+#include <bits/types.h>
+/* >> gethostname(3)
+ * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
+INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_OUTS(1, 2) int
+NOTHROW_NCX(LIBCCALL libc_gethostname)(char *name,
+                                       size_t buflen) {
+	struct utsname uts;
+	int result = libc_uname(&uts);
+	if (result == 0) {
+		size_t len = libc_strnlen(uts.nodename, _UTSNAME_NODENAME_LENGTH);
+		if (buflen <= len) {
+			/* EINVAL For gethostname() under libc: name is NULL or name is longer than len bytes. */
+
+			return libc_seterrno(EINVAL);
+
+
+
+		}
+		libc_memcpy(name, uts.nodename, len * sizeof(char));
+		name[len] = '\0';
+	}
+	return result;
+}
+#include <paths.h>
+#include <asm/os/oflags.h>
+#include <libc/errno.h>
+#include <bits/types.h>
+/* >> sethostid(3)
+ * Set the machine's "host id" (the contents of a 4-byte file "/etc/hostid") */
+INTERN ATTR_SECTION(".text.crt.system.configuration") int
+NOTHROW_NCX(LIBCCALL libc_sethostid)(longptr_t id) {
+	fd_t fd;
+	ssize_t count;
+	uint32_t id32;
+
+	/* Ensure that `id' fits into 4 bytes */
+#if __SIZEOF_POINTER__ > 4
+	if (id & ~UINT32_C(0xffffffff)) {
+
+		return libc_seterrno(EOVERFLOW);
+
+
+
+	}
+#endif /* __SIZEOF_POINTER__ > 4 */
+
+	/* Try to open the hostid file for writing */
+	fd = libc_open(_PATH_HOSTID, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd < 0) {
+		/* Try to lazily create the containing directory if it's missing. */
+
+		if (libc_geterrno() == ENOTDIR) {
+			/* Check if /etc was already created. */
+
+
+
+			if (libc_mkdir(_PATH_HOSTID_CONTAINING_DIRECTORY, 0755) == 0 ||
+			    libc_geterrno() == EEXIST)
+
+			{
+				fd = libc_open(_PATH_HOSTID, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+				if (fd >= 0)
+					goto got_fd;
+#define WANT_got_fd
+			}
+		}
+
+		return fd;
+	}
+#ifdef WANT_got_fd
+#undef WANT_got_fd
+got_fd:
+#endif /* WANT_got_fd */
+	id32  = (uint32_t)(ulongptr_t)id;
+	count = libc_writeall(fd, &id32, 4);
+
+	libc_close(fd);
+
+	if (count != 4) {
+
+		if (count >= 0)
+			libc_seterrno(ENOSPC); /* ??? */
+
+		return -1;
+	}
+	return 0;
+}
+#include <bits/os/utsname.h>
+#include <libc/errno.h>
+#include <bits/types.h>
+/* >> getdomainname(3)
+ * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
+INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_OUTS(1, 2) int
+NOTHROW_NCX(LIBCCALL libc_getdomainname)(char *name,
+                                         size_t buflen) {
+#ifndef __PRIVATE_UTSNAME_DOMAINNAME
+#define __PRIVATE_UTSNAME_DOMAINNAME domainname
+#endif /* !__PRIVATE_UTSNAME_DOMAINNAME */
+	struct utsname uts;
+	int result = libc_uname(&uts);
+	if (result == 0) {
+		size_t len = libc_strnlen(uts.__PRIVATE_UTSNAME_DOMAINNAME, _UTSNAME_DOMAIN_LENGTH);
+		if (buflen <= len) {
+			/* EINVAL For getdomainname() under libc: name is NULL or name is longer than len bytes. */
+
+			return libc_seterrno(EINVAL);
+
+
+
+		}
+		libc_memcpy(name, uts.__PRIVATE_UTSNAME_DOMAINNAME, len * sizeof(char));
+		name[len] = '\0';
+	}
+	return result;
 }
 #include <bits/os/sigaction.h>
 #include <asm/os/signal.h>
@@ -1363,6 +1513,22 @@ NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd,
 	}
 	return result;
 }
+/* >> setruid(3)
+ * Set only the real UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.bsd.user") int
+NOTHROW_NCX(LIBCCALL libc_setruid)(uid_t ruid) {
+	return libc_setreuid(ruid, (uid_t)-1);
+}
+/* >> setrgid(3)
+ * Set only the real GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.bsd.user") int
+NOTHROW_NCX(LIBCCALL libc_setrgid)(gid_t rgid) {
+	return libc_setregid(rgid, (gid_t)-1);
+}
 /* >> ctermid_r(3)
  * Same as `ctermid', but return `NULL' when `s' is `NULL' */
 INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUT_OPT(1) char *
@@ -1522,12 +1688,18 @@ DEFINE_PUBLIC_ALIAS(usleep, libc_usleep);
 DEFINE_PUBLIC_ALIAS(DOS$getwd, libd_getwd);
 DEFINE_PUBLIC_ALIAS(getwd, libc_getwd);
 DEFINE_PUBLIC_ALIAS(ualarm, libc_ualarm);
+DEFINE_PUBLIC_ALIAS(setpgrp, libc_setpgrp);
+DEFINE_PUBLIC_ALIAS(gethostid, libc_gethostid);
 DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(__getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(ttyslot, libc_ttyslot);
 DEFINE_PUBLIC_ALIAS(getlogin_r, libc_getlogin_r);
+DEFINE_PUBLIC_ALIAS(__gethostname, libc_gethostname);
+DEFINE_PUBLIC_ALIAS(gethostname, libc_gethostname);
+DEFINE_PUBLIC_ALIAS(sethostid, libc_sethostid);
+DEFINE_PUBLIC_ALIAS(getdomainname, libc_getdomainname);
 DEFINE_PUBLIC_ALIAS(daemon, libc_daemon);
 DEFINE_PUBLIC_ALIAS(getpassphrase, libc_getpass);
 DEFINE_PUBLIC_ALIAS(getpass, libc_getpass);
@@ -1540,6 +1712,8 @@ DEFINE_PUBLIC_ALIAS(cuserid, libc_cuserid);
 DEFINE_PUBLIC_ALIAS(getpassfd, libc_getpassfd);
 DEFINE_PUBLIC_ALIAS(getpass_r, libc_getpass_r);
 DEFINE_PUBLIC_ALIAS(getpeereid, libc_getpeereid);
+DEFINE_PUBLIC_ALIAS(setruid, libc_setruid);
+DEFINE_PUBLIC_ALIAS(setrgid, libc_setrgid);
 DEFINE_PUBLIC_ALIAS(ctermid_r, libc_ctermid_r);
 DEFINE_PUBLIC_ALIAS(closefrom, libc_closefrom);
 DEFINE_PUBLIC_ALIAS(issetugid, libc_issetugid);

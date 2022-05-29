@@ -1511,9 +1511,8 @@ NOTHROW_NCX(LIBCCALL libc_getresgid)(gid_t *rgid,
 }
 /*[[[end:libc_getresgid]]]*/
 
-/*[[[head:libc_setresuid,hash:CRC-32=0x3482425f]]]*/
+/*[[[head:libc_setresuid,hash:CRC-32=0x65bb757d]]]*/
 /* >> setresuid(2)
- * @return: 0 : Success
  * Set the real, effective, and saved UID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
@@ -1726,20 +1725,6 @@ NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t execfd,
 }
 /*[[[end:libc_fexecve]]]*/
 
-/*[[[head:libc_setpgrp,hash:CRC-32=0xeef27930]]]*/
-/* >> setpgrp(3)
- * Move the calling process into its own process group.
- * Equivalent to `setpgid(0, 0)' */
-INTERN ATTR_SECTION(".text.crt.sched.process") int
-NOTHROW_NCX(LIBCCALL libc_setpgrp)(void)
-/*[[[body:libc_setpgrp]]]*/
-{
-	errno_t error;
-	error = sys_setpgid(0, 0);
-	return libc_seterrno_syserr(error);
-}
-/*[[[end:libc_setpgrp]]]*/
-
 /*[[[head:libc_setreuid,hash:CRC-32=0xb1ea64ca]]]*/
 /* >> setreuid(2)
  * Set the real and effective UID of the calling thread.
@@ -1772,69 +1757,6 @@ NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid,
 }
 /*[[[end:libc_setregid]]]*/
 
-PRIVATE ATTR_SECTION(".rodata.crt.system.configuration") char const hostid_pathname[] = "/etc";
-PRIVATE ATTR_SECTION(".rodata.crt.system.configuration") char const hostid_filename[] = "/etc/hostid";
-
-/*[[[head:libc_gethostid,hash:CRC-32=0xd6c89d9b]]]*/
-/* >> gethostid(3) */
-INTERN ATTR_SECTION(".text.crt.system.configuration") WUNUSED longptr_t
-NOTHROW_NCX(LIBCCALL libc_gethostid)(void)
-/*[[[body:libc_gethostid]]]*/
-{
-	fd_t fd;
-	uint32_t id32;
-	fd = sys_open(hostid_filename, O_RDONLY, 0);
-	if (fd >= 0) {
-		ssize_t count;
-		count = readall(fd, &id32, 4);
-		sys_close(fd);
-		if (count == 4)
-			return (long int)(unsigned long int)id32;
-	}
-	/* XXX: Glibc also tries to use the host's IP address here... */
-	return 0;
-}
-/*[[[end:libc_gethostid]]]*/
-
-/*[[[head:libc_sethostid,hash:CRC-32=0xb3db0ff1]]]*/
-/* >> sethostid(3) */
-INTERN ATTR_SECTION(".text.crt.system.configuration") int
-NOTHROW_NCX(LIBCCALL libc_sethostid)(longptr_t id)
-/*[[[body:libc_sethostid]]]*/
-{
-	fd_t fd;
-	ssize_t count;
-	uint32_t id32;
-#if __SIZEOF_LONG__ > 4
-	if (id & ~UINT32_C(0xffffffff))
-		return libc_seterrno(EOVERFLOW);
-#endif /* __SIZEOF_LONG__ > 4 */
-	fd = sys_open(hostid_filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	if (fd < 0) {
-		if (fd == -ENOTDIR) {
-			/* Check if /etc was already created. */
-			fd = sys_mkdir(hostid_pathname, 0755);
-			if (fd == -EOK || fd == -EEXIST) {
-				fd = sys_open(hostid_filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-				if (fd >= 0)
-					goto got_fd;
-			}
-		}
-		return libc_seterrno_syserr(fd);
-	}
-got_fd:
-	id32  = (uint32_t)(unsigned long int)id;
-	count = writeall(fd, &id32, 4);
-	sys_close(fd);
-	if (count <= 0) {
-		if (!count)
-			libc_seterrno(ENOSPC); /* ??? */
-		return -1;
-	}
-	return 0;
-}
-/*[[[end:libc_sethostid]]]*/
-
 /*[[[head:libc_seteuid,hash:CRC-32=0x14fcb70c]]]*/
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
@@ -1844,13 +1766,8 @@ got_fd:
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid)
 /*[[[body:libc_seteuid]]]*/
-{
-	errno_t error;
-	uid_t ruid;
-	error = _sys_getresuid(&ruid, NULL, NULL);
-	if (E_ISOK(error))
-		error = _sys_setreuid(ruid, euid);
-	return libc_seterrno_syserr(error);
+/*AUTO*/{
+	return setreuid((uid_t)-1, euid);
 }
 /*[[[end:libc_seteuid]]]*/
 
@@ -1863,13 +1780,8 @@ NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid)
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid)
 /*[[[body:libc_setegid]]]*/
-{
-	errno_t error;
-	gid_t rgid;
-	error = _sys_getresgid(&rgid, NULL, NULL);
-	if (E_ISOK(error))
-		error = _sys_setregid(rgid, egid);
-	return libc_seterrno_syserr(error);
+/*AUTO*/{
+	return setregid((gid_t)-1, egid);
 }
 /*[[[end:libc_setegid]]]*/
 
@@ -1897,12 +1809,12 @@ NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
                                    char const *target_path)
 /*[[[body:libc_symlink]]]*/
 {
-#ifdef __OPTIMIZE_SIZE__
+#if defined(__OPTIMIZE_SIZE__) || !defined(SYS_symlink)
 	return libc_symlinkat(link_text, AT_FDCWD, target_path);
-#else /* __OPTIMIZE_SIZE__ */
+#else /* __OPTIMIZE_SIZE__ || !SYS_symlink */
 	errno_t result = sys_symlink(link_text, target_path);
 	return libc_seterrno_syserr(result);
-#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__OPTIMIZE_SIZE__ && SYS_symlink */
 }
 /*[[[end:libc_symlink]]]*/
 
@@ -1942,37 +1854,14 @@ NOTHROW_RPC(LIBCCALL libc_readlink)(char const *path,
                                     size_t buflen)
 /*[[[body:libc_readlink]]]*/
 {
-#ifdef __OPTIMIZE_SIZE__
+#if defined(__OPTIMIZE_SIZE__) || !defined(SYS_readlink)
 	return libc_readlinkat(AT_FDCWD, path, buf, buflen);
-#else /* __OPTIMIZE_SIZE__ */
+#else /* __OPTIMIZE_SIZE__ || !SYS_readlink */
 	ssize_t result = sys_readlink(path, buf, buflen);
 	return libc_seterrno_syserr(result);
-#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__OPTIMIZE_SIZE__ && SYS_readlink */
 }
 /*[[[end:libc_readlink]]]*/
-
-/*[[[head:libc_gethostname,hash:CRC-32=0x6b4f0936]]]*/
-/* >> gethostname(3)
- * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
-INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_OUTS(1, 2) int
-NOTHROW_NCX(LIBCCALL libc_gethostname)(char *name,
-                                       size_t buflen)
-/*[[[body:libc_gethostname]]]*/
-{
-	struct utsname uts;
-	int result = uname(&uts);
-	if (result == 0) {
-		size_t len = strnlen(uts.nodename, _UTSNAME_NODENAME_LENGTH);
-		if (buflen <= len) {
-			/* EINVAL For getdomainname() under libc: name is NULL or name is longer than len bytes. */
-			return (int)libc_seterrno(EINVAL);
-		}
-		memcpy(name, uts.nodename, len, sizeof(char));
-		name[len] = '\0';
-	}
-	return result;
-}
-/*[[[end:libc_gethostname]]]*/
 
 /*[[[head:libc_sethostname,hash:CRC-32=0xcd816e29]]]*/
 /* >> sethostname(2)
@@ -1986,29 +1875,6 @@ NOTHROW_NCX(LIBCCALL libc_sethostname)(char const *name,
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_sethostname]]]*/
-
-/*[[[head:libc_getdomainname,hash:CRC-32=0xc551de18]]]*/
-/* >> getdomainname(3)
- * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
-INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_OUTS(1, 2) int
-NOTHROW_NCX(LIBCCALL libc_getdomainname)(char *name,
-                                         size_t buflen)
-/*[[[body:libc_getdomainname]]]*/
-{
-	struct utsname uts;
-	int result = uname(&uts);
-	if (result == 0) {
-		size_t len = strnlen(uts.domainname, _UTSNAME_DOMAIN_LENGTH);
-		if (buflen <= len) {
-			/* EINVAL For getdomainname() under libc: name is NULL or name is longer than len bytes. */
-			return (int)libc_seterrno(EINVAL);
-		}
-		memcpy(name, uts.domainname, len, sizeof(char));
-		name[len] = '\0';
-	}
-	return result;
-}
-/*[[[end:libc_getdomainname]]]*/
 
 /*[[[head:libc_setdomainname,hash:CRC-32=0x3a54e2c2]]]*/
 /* >> setdomainname(2)
@@ -2389,8 +2255,8 @@ PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] =
 #endif /* __SIZEOF_POINTER__ > 4 */
 #define FIELD_UNDEFINED UINT8_MAX
 
-/*[[[head:libc_fpathconf,hash:CRC-32=0xb1c5ff53]]]*/
-/* >> fpathconf(2)
+/*[[[head:libc_fpathconf,hash:CRC-32=0x906fd475]]]*/
+/* >> fpathconf(3)
  * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `fd'
  * return: * : The configuration limit associated with `name' for `fd'
@@ -2485,8 +2351,28 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 }
 /*[[[end:libc_fpathconf]]]*/
 
-/*[[[head:libd_pathconf,hash:CRC-32=0x399459e7]]]*/
-/* >> pathconf(2)
+
+PRIVATE ATTR_SECTION(".text.crt.fs.property") ATTR_IN(1) longptr_t
+NOTHROW_RPC(LIBDCALL do_pathconf)(char const *path,
+                                  __STDC_INT_AS_UINT_T name,
+                                  oflag_t path_oflags) {
+	longptr_t result;
+	/* Try not to open `path' if `name' is invalid, or has a constant value */
+	if unlikely(name >= COMPILER_LENOF(pc_constants)) {
+		result = libc_seterrno(EINVAL);
+	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT) {
+		fd_t fd;
+		fd = open(path, path_oflags);
+		if unlikely(fd < 0)
+			return -1;
+		result = libc_fpathconf(fd, name);
+		sys_close(fd);
+	}
+	return result;
+}
+
+/*[[[head:libd_pathconf,hash:CRC-32=0x4fbe995d]]]*/
+/* >> pathconf(3)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `path'
  * return: * : The configuration limit associated with `name' for `path'
@@ -2497,24 +2383,12 @@ NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *path,
                                     __STDC_INT_AS_UINT_T name)
 /*[[[body:libd_pathconf]]]*/
 {
-	longptr_t result;
-	/* Try not to open `path' if `name' is invalid, or has a constant value */
-	if unlikely(name >= COMPILER_LENOF(pc_constants)) {
-		result = libc_seterrno(EINVAL);
-	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT) {
-		fd_t fd;
-		fd = open(path, O_RDONLY | libd_O_DOSPATH);
-		if unlikely(fd < 0)
-			return -1;
-		result = libc_fpathconf(fd, name);
-		sys_close(fd);
-	}
-	return result;
+	return do_pathconf(path, name, O_RDONLY | libd_O_DOSPATH);
 }
 /*[[[end:libd_pathconf]]]*/
 
-/*[[[head:libc_pathconf,hash:CRC-32=0x1fdf5e90]]]*/
-/* >> pathconf(2)
+/*[[[head:libc_pathconf,hash:CRC-32=0x7e1d615e]]]*/
+/* >> pathconf(3)
  * @param: name: One of `_PC_*' from <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `path'
  * return: * : The configuration limit associated with `name' for `path'
@@ -2525,21 +2399,34 @@ NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
                                     __STDC_INT_AS_UINT_T name)
 /*[[[body:libc_pathconf]]]*/
 {
-	longptr_t result;
-	/* Try not to open `path' if `name' is invalid, or has a constant value */
-	if unlikely(name >= COMPILER_LENOF(pc_constants)) {
-		result = libc_seterrno(EINVAL);
-	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT) {
-		fd_t fd;
-		fd = open(path, O_RDONLY);
-		if unlikely(fd < 0)
-			return -1;
-		result = libc_fpathconf(fd, name);
-		sys_close(fd);
-	}
-	return result;
+	return do_pathconf(path, name, O_RDONLY);
 }
 /*[[[end:libc_pathconf]]]*/
+
+/*[[[head:libd_lpathconf,hash:CRC-32=0x931b871f]]]*/
+/* >> lpathconf(3)
+ * Same as `pathconf(3)', but don't dereference `path' if it's a symbolic link */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_IN(1) longptr_t
+NOTHROW_RPC(LIBDCALL libd_lpathconf)(char const *path,
+                                     __STDC_INT_AS_UINT_T name)
+/*[[[body:libd_lpathconf]]]*/
+{
+	return do_pathconf(path, name, O_RDONLY | O_PATH | O_NOFOLLOW | libd_O_DOSPATH);
+}
+/*[[[end:libd_lpathconf]]]*/
+
+/*[[[head:libc_lpathconf,hash:CRC-32=0x3468aa6]]]*/
+/* >> lpathconf(3)
+ * Same as `pathconf(3)', but don't dereference `path' if it's a symbolic link */
+INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_IN(1) longptr_t
+NOTHROW_RPC(LIBCCALL libc_lpathconf)(char const *path,
+                                     __STDC_INT_AS_UINT_T name)
+/*[[[body:libc_lpathconf]]]*/
+{
+	return do_pathconf(path, name, O_RDONLY | O_PATH | O_NOFOLLOW);
+}
+/*[[[end:libc_lpathconf]]]*/
+
 
 
 
@@ -3888,11 +3775,11 @@ NOTHROW_NCX(LIBCCALL libc_nice)(int inc)
 /*[[[body:libc_nice]]]*/
 {
 	syscall_slong_t error;
-#ifdef __sys_nice_defined
+#ifdef SYS_nice
 	error = sys_nice(-inc);
 	if unlikely(E_ISERR(error))
 		goto err;
-#else /* __sys_Xnice_defined */
+#else /* SYS_nice */
 	error = sys_getpriority(PRIO_PROCESS, 0);
 	if unlikely(E_ISERR(error))
 		goto err;
@@ -3904,7 +3791,7 @@ NOTHROW_NCX(LIBCCALL libc_nice)(int inc)
 	error = sys_getpriority(PRIO_PROCESS, 0);
 	if unlikely(E_ISERR(error))
 		goto err;
-#endif /* !__sys_Xnice_defined */
+#endif /* !SYS_nice */
 	return 20 - error;
 err:
 	return libc_seterrno_neg(error);
@@ -3967,11 +3854,7 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 
 
 
-
-
-
-
-/*[[[start:exports,hash:CRC-32=0xde89d8cb]]]*/
+/*[[[start:exports,hash:CRC-32=0x4346a4ba]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -4217,14 +4100,12 @@ DEFINE_PUBLIC_ALIAS(confstr, libc_confstr);
 DEFINE_PUBLIC_ALIAS(__sync, libc_sync);
 DEFINE_PUBLIC_ALIAS(__libc_sync, libc_sync);
 DEFINE_PUBLIC_ALIAS(sync, libc_sync);
-DEFINE_PUBLIC_ALIAS(setpgrp, libc_setpgrp);
 DEFINE_PUBLIC_ALIAS(__setreuid, libc_setreuid);
 DEFINE_PUBLIC_ALIAS(__libc_setreuid, libc_setreuid);
 DEFINE_PUBLIC_ALIAS(setreuid, libc_setreuid);
 DEFINE_PUBLIC_ALIAS(__setregid, libc_setregid);
 DEFINE_PUBLIC_ALIAS(__libc_setregid, libc_setregid);
 DEFINE_PUBLIC_ALIAS(setregid, libc_setregid);
-DEFINE_PUBLIC_ALIAS(gethostid, libc_gethostid);
 DEFINE_PUBLIC_ALIAS(seteuid, libc_seteuid);
 DEFINE_PUBLIC_ALIAS(setegid, libc_setegid);
 DEFINE_PUBLIC_ALIAS(DOS$__symlink, libd_symlink);
@@ -4239,14 +4120,10 @@ DEFINE_PUBLIC_ALIAS(DOS$readlink, libd_readlink);
 DEFINE_PUBLIC_ALIAS(__readlink, libc_readlink);
 DEFINE_PUBLIC_ALIAS(__libc_readlink, libc_readlink);
 DEFINE_PUBLIC_ALIAS(readlink, libc_readlink);
-DEFINE_PUBLIC_ALIAS(__gethostname, libc_gethostname);
-DEFINE_PUBLIC_ALIAS(gethostname, libc_gethostname);
 DEFINE_PUBLIC_ALIAS(setlogin, libc_setlogin);
 DEFINE_PUBLIC_ALIAS(__sethostname, libc_sethostname);
 DEFINE_PUBLIC_ALIAS(__libc_sethostname, libc_sethostname);
 DEFINE_PUBLIC_ALIAS(sethostname, libc_sethostname);
-DEFINE_PUBLIC_ALIAS(sethostid, libc_sethostid);
-DEFINE_PUBLIC_ALIAS(getdomainname, libc_getdomainname);
 DEFINE_PUBLIC_ALIAS(__setdomainname, libc_setdomainname);
 DEFINE_PUBLIC_ALIAS(__libc_setdomainname, libc_setdomainname);
 DEFINE_PUBLIC_ALIAS(setdomainname, libc_setdomainname);
@@ -4284,6 +4161,8 @@ DEFINE_PUBLIC_ALIAS(__libc_fdatasync, libc_fdatasync);
 DEFINE_PUBLIC_ALIAS(fdatasync, libc_fdatasync);
 DEFINE_PUBLIC_ALIAS(setmode, libc_setmode);
 DEFINE_PUBLIC_ALIAS(getmode, libc_getmode);
+DEFINE_PUBLIC_ALIAS(DOS$lpathconf, libd_lpathconf);
+DEFINE_PUBLIC_ALIAS(lpathconf, libc_lpathconf);
 DEFINE_PUBLIC_ALIAS(__sysconf, libc_sysconf);
 DEFINE_PUBLIC_ALIAS(sysconf, libc_sysconf);
 DEFINE_PUBLIC_ALIAS(close_range, libc_close_range);

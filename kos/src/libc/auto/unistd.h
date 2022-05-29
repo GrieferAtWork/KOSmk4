@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32327989 */
+/* HASH CRC-32:0x38e4b883 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -137,7 +137,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_setgid)(gid_t gid);
  * Schedule an to deliver a `SIGALRM' after letting `seconds' elapse.
  * You may pass `0' for `seconds' to disable a previously scheduled alarm */
 INTDEF unsigned int NOTHROW_NCX(LIBDCALL libd_alarm)(unsigned int seconds);
-/* >> fpathconf(2)
+/* >> fpathconf(3)
  * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `fd'
  * return: * : The configuration limit associated with `name' for `fd'
@@ -327,7 +327,6 @@ INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBDCALL 
  * @return: -1: Error (s.a. `errno') */
 INTDEF ATTR_OUT_OPT(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(3) int NOTHROW_NCX(LIBDCALL libd_getresgid)(gid_t *rgid, gid_t *egid, gid_t *sgid);
 /* >> setresuid(2)
- * @return: 0 : Success
  * Set the real, effective, and saved UID of the calling thread.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
@@ -395,6 +394,14 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_nice)(int inc);
  * @return: 1 :    Empty configuration string.
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
 INTDEF ATTR_OUTS(2, 3) size_t NOTHROW_NCX(LIBDCALL libd_confstr)(__STDC_INT_AS_UINT_T name, char *buf, size_t buflen);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> setpgrp(3)
+ * Move the calling process into its own process group.
+ * Equivalent to `setpgid(0, 0)' */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_setpgrp)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> setreuid(2)
  * Set the real and effective UID of the calling thread.
  * @return: 0 : Success
@@ -407,6 +414,9 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_setreuid)(uid_t ruid, uid_t euid);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setregid)(gid_t rgid, gid_t egid);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> gethostid(3)
+ * Get the machine's "host id" (the contents of a 4-byte file "/etc/hostid") */
+INTDEF WUNUSED longptr_t NOTHROW_NCX(LIBCCALL libc_gethostid)(void);
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW(LIBCCALL libc_getpagesize)(void);
@@ -429,9 +439,9 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_setegid)(gid_t egid);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> ttyslot(3)
- * Returns the (1-based) index into ttys returned by `getttyent(3)' of
+ * Returns the (1-based) index into  ttys returned by `getttyent(3)'  of
  * the terminal currently associated with the caller (~ala `ttyname(3)')
- * On error, or if caller's terminal isn't listed by `getttyent(3)', we
+ * On  error, or if caller's terminal isn't listed by `getttyent(3)', we
  * instead return `0' */
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_ttyslot)(void);
 #endif /* !__KERNEL__ */
@@ -451,16 +461,38 @@ INTDEF ATTR_OUTS(1, 2) int NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name, siz
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 INTDEF ATTR_OUTS(1, 2) int NOTHROW_NCX(LIBDCALL libd_gethostname)(char *name, size_t buflen);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> gethostname(3)
+ * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
+INTDEF ATTR_OUTS(1, 2) int NOTHROW_NCX(LIBCCALL libc_gethostname)(char *name, size_t buflen);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> setlogin(3) */
 INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBDCALL libd_setlogin)(char const *name);
 /* >> sethostname(2)
  * Set the name of the hosting machine */
 INTDEF ATTR_INS(1, 2) int NOTHROW_NCX(LIBDCALL libd_sethostname)(char const *name, size_t len);
-/* >> sethostid(3) */
+/* >> sethostid(3)
+ * Set the machine's "host id" (the contents of a 4-byte file "/etc/hostid") */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sethostid)(longptr_t id);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> sethostid(3)
+ * Set the machine's "host id" (the contents of a 4-byte file "/etc/hostid") */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_sethostid)(longptr_t id);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
 INTDEF ATTR_OUTS(1, 2) int NOTHROW_NCX(LIBDCALL libd_getdomainname)(char *name, size_t buflen);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> getdomainname(3)
+ * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
+INTDEF ATTR_OUTS(1, 2) int NOTHROW_NCX(LIBCCALL libc_getdomainname)(char *name, size_t buflen);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
 INTDEF ATTR_INS(1, 2) int NOTHROW_NCX(LIBDCALL libd_setdomainname)(char const *name, size_t len);
@@ -665,6 +697,34 @@ INTDEF ATTR_OUT(2) ATTR_OUT(3) int NOTHROW_NCX(LIBDCALL libd_getpeereid)(fd_t so
 /* >> getpeereid(3)
  * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
 INTDEF ATTR_OUT(2) ATTR_OUT(3) int NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd, uid_t *euid, gid_t *egid);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> setruid(3)
+ * Set only the real UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_setruid)(uid_t ruid);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> setruid(3)
+ * Set only the real UID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_setruid)(uid_t ruid);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> setrgid(3)
+ * Set only the real GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_setrgid)(gid_t rgid);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> setrgid(3)
+ * Set only the real GID of the calling thread.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_setrgid)(gid_t rgid);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ctermid_r(3)

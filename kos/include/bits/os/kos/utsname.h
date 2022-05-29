@@ -66,8 +66,10 @@ struct utsname /*[PREFIX()]*/ {
 #if _UTSNAME_DOMAIN_LENGTH
 #ifdef __USE_GNU
 	char domainname[_UTSNAME_DOMAIN_LENGTH]; /* Name of the domain of this node on the network. */
+#define __PRIVATE_UTSNAME_DOMAINNAME domainname
 #else /* __USE_GNU */
 	char __domainname[_UTSNAME_DOMAIN_LENGTH]; /* Name of the domain of this node on the network. */
+#define __PRIVATE_UTSNAME_DOMAINNAME __domainname
 #endif /* !__USE_GNU */
 #endif /* _UTSNAME_DOMAIN_LENGTH */
 };

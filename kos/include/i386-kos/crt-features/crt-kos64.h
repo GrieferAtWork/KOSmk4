@@ -3449,6 +3449,7 @@
 #define __CRT_HAVE_logwtmp
 #define __CRT_HAVE_longjmp
 #define __CRT_HAVE_lowvideo
+#define __CRT_HAVE_lpathconf
 #define __CRT_HAVE_lrand48
 #define __CRT_HAVE_lrand48_r
 #define __CRT_HAVE_lrealpath
@@ -4359,9 +4360,11 @@
 #define __CRT_HAVE_setresgid
 #define __CRT_HAVE_setresuid
 #define __CRT_HAVE_setreuid
+#define __CRT_HAVE_setrgid
 #define __CRT_HAVE_setrlimit
 #define __CRT_HAVE_setrlimit64
 #define __CRT_HAVE_setrpcent
+#define __CRT_HAVE_setruid
 #define __CRT_HAVE_setservent
 #define __CRT_HAVE_setsid
 #define __CRT_HAVE_setsigmaskfullptr
@@ -9073,6 +9076,7 @@
 #define __CRT_HAVE_KOS$logl
 #define __CRT_HAVE_KOS$logout
 #define __CRT_HAVE_KOS$logwtmp
+#define __CRT_HAVE_KOS$lpathconf
 #define __CRT_HAVE_KOS$lrand48_r
 #define __CRT_HAVE_KOS$lrealpath
 #define __CRT_HAVE_KOS$lremovexattr
@@ -9898,9 +9902,11 @@
 #define __CRT_HAVE_KOS$setresgid
 #define __CRT_HAVE_KOS$setresuid
 #define __CRT_HAVE_KOS$setreuid
+#define __CRT_HAVE_KOS$setrgid
 #define __CRT_HAVE_KOS$setrlimit
 #define __CRT_HAVE_KOS$setrlimit64
 #define __CRT_HAVE_KOS$setrpcent
+#define __CRT_HAVE_KOS$setruid
 #define __CRT_HAVE_KOS$setservent
 #define __CRT_HAVE_KOS$setsigmaskptr
 #define __CRT_HAVE_KOS$setsockopt
@@ -13643,6 +13649,7 @@
 #define __CRT_HAVE_DOS$logl
 #define __CRT_HAVE_DOS$logout
 #define __CRT_HAVE_DOS$logwtmp
+#define __CRT_HAVE_DOS$lpathconf
 #define __CRT_HAVE_DOS$lrand48_r
 #define __CRT_HAVE_DOS$lrealpath
 #define __CRT_HAVE_DOS$lremovexattr
@@ -14468,9 +14475,11 @@
 #define __CRT_HAVE_DOS$setresgid
 #define __CRT_HAVE_DOS$setresuid
 #define __CRT_HAVE_DOS$setreuid
+#define __CRT_HAVE_DOS$setrgid
 #define __CRT_HAVE_DOS$setrlimit
 #define __CRT_HAVE_DOS$setrlimit64
 #define __CRT_HAVE_DOS$setrpcent
+#define __CRT_HAVE_DOS$setruid
 #define __CRT_HAVE_DOS$setservent
 #define __CRT_HAVE_DOS$setsigmaskptr
 #define __CRT_HAVE_DOS$setsockopt

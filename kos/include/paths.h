@@ -398,6 +398,12 @@ __SYSDECL_END
 #ifndef _PATH_GSHADOW
 #define _PATH_GSHADOW "/etc/gshadow"
 #endif /* !_PATH_GSHADOW */
+#ifndef _PATH_HOSTID_CONTAINING_DIRECTORY
+#define _PATH_HOSTID_CONTAINING_DIRECTORY "/etc"
+#endif /* !_PATH_HOSTID_CONTAINING_DIRECTORY */
+#ifndef _PATH_HOSTID
+#define _PATH_HOSTID _PATH_HOSTID_CONTAINING_DIRECTORY "/hostid"
+#endif /* !_PATH_HOSTID */
 #ifndef _PATH_UTMP
 #define _PATH_UTMP "/var/run/utmp"
 #endif /* !_PATH_UTMP */

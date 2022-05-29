@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2047448f */
+/* HASH CRC-32:0xd2470d8f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -185,6 +185,11 @@ __CREDIRECT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,__localdep_getgid,(void),getgid
 __CREDIRECT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,__localdep_getgid,(void),__getgid,())
 #elif defined(__CRT_HAVE___libc_getgid)
 __CREDIRECT(__ATTR_WUNUSED,__gid_t,__NOTHROW_NCX,__localdep_getgid,(void),__libc_getgid,())
+#elif defined(__CRT_HAVE_getresgid)
+__NAMESPACE_LOCAL_END
+#include <libc/local/unistd/getgid.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_getgid __LIBC_LOCAL_NAME(getgid)
 #else /* ... */
 #undef __local___localdep_getgid_defined
 #endif /* !... */
@@ -197,6 +202,11 @@ __CREDIRECT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,__localdep_getuid,(void),getuid
 __CREDIRECT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,__localdep_getuid,(void),__getuid,())
 #elif defined(__CRT_HAVE___libc_getuid)
 __CREDIRECT(__ATTR_WUNUSED,__uid_t,__NOTHROW_NCX,__localdep_getuid,(void),__libc_getuid,())
+#elif defined(__CRT_HAVE_getresuid)
+__NAMESPACE_LOCAL_END
+#include <libc/local/unistd/getuid.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_getuid __LIBC_LOCAL_NAME(getuid)
 #else /* ... */
 #undef __local___localdep_getuid_defined
 #endif /* !... */
@@ -322,14 +332,32 @@ __CREDIRECT(__ATTR_IN(3),int,__NOTHROW_NCX,__localdep_sched_setscheduler,(__pid_
 #undef __local___localdep_sched_setscheduler_defined
 #endif /* !... */
 #endif /* !__local___localdep_sched_setscheduler_defined */
-#if !defined(__local___localdep_setegid_defined) && defined(__CRT_HAVE_setegid)
+#ifndef __local___localdep_setegid_defined
 #define __local___localdep_setegid_defined
+#ifdef __CRT_HAVE_setegid
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_setegid,(__gid_t __egid),setegid,(__egid))
-#endif /* !__local___localdep_setegid_defined && __CRT_HAVE_setegid */
-#if !defined(__local___localdep_seteuid_defined) && defined(__CRT_HAVE_seteuid)
+#elif defined(__CRT_HAVE_setregid) || defined(__CRT_HAVE___setregid) || defined(__CRT_HAVE___libc_setregid) || defined(__CRT_HAVE_setresgid)
+__NAMESPACE_LOCAL_END
+#include <libc/local/unistd/setegid.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_setegid __LIBC_LOCAL_NAME(setegid)
+#else /* ... */
+#undef __local___localdep_setegid_defined
+#endif /* !... */
+#endif /* !__local___localdep_setegid_defined */
+#ifndef __local___localdep_seteuid_defined
 #define __local___localdep_seteuid_defined
+#ifdef __CRT_HAVE_seteuid
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_seteuid,(__uid_t __euid),seteuid,(__euid))
-#endif /* !__local___localdep_seteuid_defined && __CRT_HAVE_seteuid */
+#elif defined(__CRT_HAVE_setreuid) || defined(__CRT_HAVE___setreuid) || defined(__CRT_HAVE___libc_setreuid) || defined(__CRT_HAVE_setresuid)
+__NAMESPACE_LOCAL_END
+#include <libc/local/unistd/seteuid.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_seteuid __LIBC_LOCAL_NAME(seteuid)
+#else /* ... */
+#undef __local___localdep_seteuid_defined
+#endif /* !... */
+#endif /* !__local___localdep_seteuid_defined */
 #ifndef __local___localdep_setpgid_defined
 #define __local___localdep_setpgid_defined
 #ifdef __CRT_HAVE_setpgid
@@ -795,16 +823,16 @@ __do_exec:
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 	if (__attrp) {
 		if (__attrp->__flags & __POSIX_SPAWN_RESETIDS) {
-#if (defined(__CRT_HAVE_seteuid) && (defined(__CRT_HAVE_getuid) || defined(__CRT_HAVE___getuid) || defined(__CRT_HAVE___libc_getuid))) || (defined(__CRT_HAVE_setegid) && (defined(__CRT_HAVE_getgid) || defined(__CRT_HAVE___getgid) || defined(__CRT_HAVE___libc_getgid)))
-#if defined(__CRT_HAVE_seteuid) && (defined(__CRT_HAVE_getuid) || defined(__CRT_HAVE___getuid) || defined(__CRT_HAVE___libc_getuid))
+#if ((defined(__CRT_HAVE_seteuid) || defined(__CRT_HAVE_setreuid) || defined(__CRT_HAVE___setreuid) || defined(__CRT_HAVE___libc_setreuid) || defined(__CRT_HAVE_setresuid)) && (defined(__CRT_HAVE_getuid) || defined(__CRT_HAVE___getuid) || defined(__CRT_HAVE___libc_getuid) || defined(__CRT_HAVE_getresuid))) || ((defined(__CRT_HAVE_setegid) || defined(__CRT_HAVE_setregid) || defined(__CRT_HAVE___setregid) || defined(__CRT_HAVE___libc_setregid) || defined(__CRT_HAVE_setresgid)) && (defined(__CRT_HAVE_getgid) || defined(__CRT_HAVE___getgid) || defined(__CRT_HAVE___libc_getgid) || defined(__CRT_HAVE_getresgid)))
+#if (defined(__CRT_HAVE_seteuid) || defined(__CRT_HAVE_setreuid) || defined(__CRT_HAVE___setreuid) || defined(__CRT_HAVE___libc_setreuid) || defined(__CRT_HAVE_setresuid)) && (defined(__CRT_HAVE_getuid) || defined(__CRT_HAVE___getuid) || defined(__CRT_HAVE___libc_getuid) || defined(__CRT_HAVE_getresuid))
 			if ((__NAMESPACE_LOCAL_SYM __localdep_seteuid)((__NAMESPACE_LOCAL_SYM __localdep_getuid)()))
 				goto __child_error;
-#endif /* __CRT_HAVE_seteuid && (__CRT_HAVE_getuid || __CRT_HAVE___getuid || __CRT_HAVE___libc_getuid) */
-#if defined(__CRT_HAVE_setegid) && (defined(__CRT_HAVE_getgid) || defined(__CRT_HAVE___getgid) || defined(__CRT_HAVE___libc_getgid))
+#endif /* (__CRT_HAVE_seteuid || __CRT_HAVE_setreuid || __CRT_HAVE___setreuid || __CRT_HAVE___libc_setreuid || __CRT_HAVE_setresuid) && (__CRT_HAVE_getuid || __CRT_HAVE___getuid || __CRT_HAVE___libc_getuid || __CRT_HAVE_getresuid) */
+#if (defined(__CRT_HAVE_setegid) || defined(__CRT_HAVE_setregid) || defined(__CRT_HAVE___setregid) || defined(__CRT_HAVE___libc_setregid) || defined(__CRT_HAVE_setresgid)) && (defined(__CRT_HAVE_getgid) || defined(__CRT_HAVE___getgid) || defined(__CRT_HAVE___libc_getgid) || defined(__CRT_HAVE_getresgid))
 			if ((__NAMESPACE_LOCAL_SYM __localdep_setegid)((__NAMESPACE_LOCAL_SYM __localdep_getgid)()))
 				goto __child_error;
-#endif /* __CRT_HAVE_setegid && (__CRT_HAVE_getgid || __CRT_HAVE___getgid || __CRT_HAVE___libc_getgid) */
-#else /* (__CRT_HAVE_seteuid && (__CRT_HAVE_getuid || __CRT_HAVE___getuid || __CRT_HAVE___libc_getuid)) || (__CRT_HAVE_setegid && (__CRT_HAVE_getgid || __CRT_HAVE___getgid || __CRT_HAVE___libc_getgid)) */
+#endif /* (__CRT_HAVE_setegid || __CRT_HAVE_setregid || __CRT_HAVE___setregid || __CRT_HAVE___libc_setregid || __CRT_HAVE_setresgid) && (__CRT_HAVE_getgid || __CRT_HAVE___getgid || __CRT_HAVE___libc_getgid || __CRT_HAVE_getresgid) */
+#else /* ((__CRT_HAVE_seteuid || __CRT_HAVE_setreuid || __CRT_HAVE___setreuid || __CRT_HAVE___libc_setreuid || __CRT_HAVE_setresuid) && (__CRT_HAVE_getuid || __CRT_HAVE___getuid || __CRT_HAVE___libc_getuid || __CRT_HAVE_getresuid)) || ((__CRT_HAVE_setegid || __CRT_HAVE_setregid || __CRT_HAVE___setregid || __CRT_HAVE___libc_setregid || __CRT_HAVE_setresgid) && (__CRT_HAVE_getgid || __CRT_HAVE___getgid || __CRT_HAVE___libc_getgid || __CRT_HAVE_getresgid)) */
 #ifdef __ENOSYS
 			(void)__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
@@ -813,7 +841,7 @@ __do_exec:
 			(void)__libc_seterrno(1);
 #endif /* !... */
 			goto __child_error;
-#endif /* (!__CRT_HAVE_seteuid || (!__CRT_HAVE_getuid && !__CRT_HAVE___getuid && !__CRT_HAVE___libc_getuid)) && (!__CRT_HAVE_setegid || (!__CRT_HAVE_getgid && !__CRT_HAVE___getgid && !__CRT_HAVE___libc_getgid)) */
+#endif /* ((!__CRT_HAVE_seteuid && !__CRT_HAVE_setreuid && !__CRT_HAVE___setreuid && !__CRT_HAVE___libc_setreuid && !__CRT_HAVE_setresuid) || (!__CRT_HAVE_getuid && !__CRT_HAVE___getuid && !__CRT_HAVE___libc_getuid && !__CRT_HAVE_getresuid)) && ((!__CRT_HAVE_setegid && !__CRT_HAVE_setregid && !__CRT_HAVE___setregid && !__CRT_HAVE___libc_setregid && !__CRT_HAVE_setresgid) || (!__CRT_HAVE_getgid && !__CRT_HAVE___getgid && !__CRT_HAVE___libc_getgid && !__CRT_HAVE_getresgid)) */
 		}
 		if (__attrp->__flags & __POSIX_SPAWN_SETPGROUP) {
 #if defined(__CRT_HAVE_setpgid) || defined(__CRT_HAVE___setpgid) || defined(__CRT_HAVE___libc_setpgid)

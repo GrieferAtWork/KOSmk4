@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe503df6 */
+/* HASH CRC-32:0x9e3a22b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2968,6 +2968,8 @@ DFUN(".text.crt.dos.sched.user", libd_getpass_r, libc_getpass_r, TP, 3, TP, TP, 
 DFUN(".text.crt.dos.sched.user", libd_setmode, libc_setmode, TP, 1, TP)
 DFUN(".text.crt.dos.sched.user", libd_getmode, libc_getmode, TIn(__SIZEOF_MODE_T__), 2, TP, TIn(__SIZEOF_MODE_T__))
 DFUN(".text.crt.dos.sched.user", libd_getpeereid, libc_getpeereid, TD, 3, TIn(__SIZEOF_FD_T__), TP, TP)
+DFUN(".text.crt.dos.bsd.user", libd_setruid, libc_setruid, TD, 1, TIn(__SIZEOF_UID_T__))
+DFUN(".text.crt.dos.bsd.user", libd_setrgid, libc_setrgid, TD, 1, TIn(__SIZEOF_GID_T__))
 DFUN(".text.crt.dos.io.tty", libd_ctermid_r, libc_ctermid_r, TP, 1, TP)
 DFUN(".text.crt.dos.system.configuration", libd_sysconf, libc_sysconf, TP, 1, TD)
 DFUN(".text.crt.dos.bsd.io.access", libd_closefrom, libc_closefrom, TV, 1, TIn(__SIZEOF_FD_T__))
