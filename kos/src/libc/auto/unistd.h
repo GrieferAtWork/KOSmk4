@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38e4b883 */
+/* HASH CRC-32:0xc7fa2947 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -430,6 +430,16 @@ INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW(LIBCCALL libc_getdtablesi
  * @return: -1: [errno=EINVAL] : The given `euid' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_seteuid)(uid_t euid);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> seteuid(2)
+ * Set the effective user ID of the calling process
+ * @return: 0 : Success
+ * @return: -1: [errno=EINVAL] : The given `euid' is invalid
+ * @return: -1: [errno=EPERM]  : The current user is not privileged */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
@@ -438,6 +448,12 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_seteuid)(uid_t euid);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setegid)(gid_t egid);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> setegid(2)
+ * Set the effective group ID of the calling process
+ * @return: 0 : Success
+ * @return: -1: [errno=EINVAL] : The given `egid' is invalid
+ * @return: -1: [errno=EPERM]  : The current user is not privileged */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid);
 /* >> ttyslot(3)
  * Returns the (1-based) index into  ttys returned by `getttyent(3)'  of
  * the terminal currently associated with the caller (~ala `ttyname(3)')

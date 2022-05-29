@@ -2076,7 +2076,8 @@ int setregid($gid_t rgid, $gid_t egid) {
 @@>> gethostid(3)
 @@Get the machine's "host id" (the contents of a 4-byte file "/etc/hostid")
 [[wunused, decl_include("<hybrid/typecore.h>")]]
-[[requires_function(open, readall)]]
+[[requires_include("<paths.h>")]]
+[[requires($has_function(open, readall) && defined(_PATH_HOSTID))]]
 [[impl_include("<paths.h>", "<bits/types.h>", "<asm/os/oflags.h>")]]
 [[section(".text.crt{|.dos}.system.configuration")]]
 $longptr_t gethostid() {
@@ -2150,7 +2151,7 @@ __STDC_INT_AS_SIZE_T getdtablesize() {
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
 [[decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.sched.user")]]
-[[userimpl, requires_function(setreuid)]]
+[[requires_function(setreuid)]]
 int seteuid($uid_t euid) {
 	return setreuid((uid_t)-1, euid);
 }
@@ -2162,7 +2163,7 @@ int seteuid($uid_t euid) {
 @@@return: -1: [errno=EPERM]  : The current user is not privileged
 [[decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.sched.user")]]
-[[userimpl, requires_function(setregid)]]
+[[requires_function(setregid)]]
 int setegid($gid_t egid) {
 	return setregid((gid_t)-1, egid);
 }
@@ -2332,9 +2333,9 @@ int sethostname([[in(len)]] char const *name, size_t len);
 @@>> sethostid(3)
 @@Set the machine's "host id" (the contents of a 4-byte file "/etc/hostid")
 [[decl_include("<hybrid/typecore.h>")]]
-[[requires_include("<asm/os/oflags.h>")]]
+[[requires_include("<asm/os/oflags.h>", "<paths.h>")]]
 [[requires($has_function(open, writeall) && defined(__O_WRONLY) &&
-           defined(__O_CREAT) && defined(__O_TRUNC))]]
+           defined(__O_CREAT) && defined(__O_TRUNC) && defined(_PATH_HOSTID))]]
 [[section(".text.crt{|.dos}.system.configuration")]]
 [[impl_include("<paths.h>", "<asm/os/oflags.h>")]]
 [[impl_include("<libc/errno.h>", "<bits/types.h>")]]

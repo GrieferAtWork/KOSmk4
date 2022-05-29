@@ -24,6 +24,12 @@
 #include "sys.mount.h"
 
 #include <kos/syscalls.h>
+#include <syscall.h>
+
+#ifndef SYS_umount
+#define sys_umount(special_file) sys_umount2(special_file, 0)
+#endif /* !SYS_umount */
+
 
 DECL_BEGIN
 
@@ -55,11 +61,7 @@ NOTHROW_RPC(LIBCCALL libc_umount)(char const *special_file)
 /*[[[body:libc_umount]]]*/
 {
 	errno_t result;
-#ifdef __NR_umount
 	result = sys_umount(special_file);
-#else /* __NR_umount */
-	result = sys_umount2(special_file, 0);
-#endif /* !__NR_umount */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_umount]]]*/

@@ -60,6 +60,7 @@
 #include "../libc/dl.h"
 #include "../libc/globals.h"
 #include "../libc/tls.h"
+#include "fcntl.h"
 #include "pthread.h"
 #include "stdlib.h"
 #include "unistd.h"
@@ -720,12 +721,12 @@ NOTHROW_RPC(LIBCCALL libc_link)(char const *from,
                                 char const *to)
 /*[[[body:libc_link]]]*/
 {
-#ifdef __OPTIMIZE_SIZE__
+#if defined(__OPTIMIZE_SIZE__) || !defined(SYS_link)
 	return libc_linkat(AT_FDCWD, from, AT_FDCWD, to, 0);
-#else /* __OPTIMIZE_SIZE__ */
+#else /* __OPTIMIZE_SIZE__ || !SYS_link */
 	errno_t result = sys_link(from, to);
 	return libc_seterrno_syserr(result);
-#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__OPTIMIZE_SIZE__ && SYS_link */
 }
 /*[[[end:libc_link]]]*/
 
@@ -780,32 +781,6 @@ NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd)
 }
 /*[[[end:libc_dup]]]*/
 
-/*[[[head:libc_dup2,hash:CRC-32=0x7ac90214]]]*/
-/* >> dup2(2)
- * @return: newfd: Returns the new handle upon success.
- * Duplicate a file referred to by `oldfd' into `newfd' */
-INTERN ATTR_SECTION(".text.crt.io.access") fd_t
-NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd,
-                                fd_t newfd)
-/*[[[body:libc_dup2]]]*/
-{
-	fd_t result = sys_dup2(oldfd, newfd);
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc_dup2]]]*/
-
-/*[[[head:libc_dup3,hash:CRC-32=0x88bdc54a]]]*/
-INTERN ATTR_SECTION(".text.crt.io.access") fd_t
-NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd,
-                                fd_t newfd,
-                                oflag_t flags)
-/*[[[body:libc_dup3]]]*/
-{
-	fd_t result = sys_dup3(oldfd, newfd, flags);
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc_dup3]]]*/
-
 /* Must clear `libd_dos_fsroot' in `DOS$chroot()' and `DOS$dup[2|3]()' with AT_FDROOT */
 INTDEF ATTR_SECTION(".text.crt.dos.fs.environ") void
 NOTHROW(CC libd_dos_fsroot_changed)(void);
@@ -827,6 +802,20 @@ NOTHROW_NCX(LIBDCALL libd_dup2)(fd_t oldfd,
 }
 /*[[[end:libd_dup2]]]*/
 
+/*[[[head:libc_dup2,hash:CRC-32=0x7ac90214]]]*/
+/* >> dup2(2)
+ * @return: newfd: Returns the new handle upon success.
+ * Duplicate a file referred to by `oldfd' into `newfd' */
+INTERN ATTR_SECTION(".text.crt.io.access") fd_t
+NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd,
+                                fd_t newfd)
+/*[[[body:libc_dup2]]]*/
+{
+	fd_t result = sys_dup2(oldfd, newfd);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_dup2]]]*/
+
 /*[[[head:libd_dup3,hash:CRC-32=0x24c0295f]]]*/
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.io.access") fd_t
 NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd,
@@ -841,6 +830,18 @@ NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd,
 	return result;
 }
 /*[[[end:libd_dup3]]]*/
+
+/*[[[head:libc_dup3,hash:CRC-32=0x88bdc54a]]]*/
+INTERN ATTR_SECTION(".text.crt.io.access") fd_t
+NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd,
+                                fd_t newfd,
+                                oflag_t flags)
+/*[[[body:libc_dup3]]]*/
+{
+	fd_t result = sys_dup3(oldfd, newfd, flags);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_dup3]]]*/
 
 /*[[[head:libc_close,hash:CRC-32=0x30df5919]]]*/
 /* >> close(2)
@@ -1029,7 +1030,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBDCALL libd_rmdir)(char const *path)
 /*[[[body:libd_rmdir]]]*/
 {
-	return libc_unlinkat(AT_FDCWD, path, AT_REMOVEDIR | libd_AT_DOSPATH);
+	return libd_unlinkat(AT_FDCWD, path, AT_REMOVEDIR);
 }
 /*[[[end:libd_rmdir]]]*/
 
@@ -1040,8 +1041,12 @@ INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path)
 /*[[[body:libc_rmdir]]]*/
 {
+#ifndef SYS_rmdir
+	return libc_unlinkat(AT_FDCWD, path, AT_REMOVEDIR);
+#else /* SYS_rmdir */
 	errno_t result = sys_rmdir(path);
 	return libc_seterrno_syserr(result);
+#endif /* !SYS_rmdir */
 }
 /*[[[end:libc_rmdir]]]*/
 
@@ -1054,7 +1059,7 @@ NOTHROW_RPC(LIBDCALL libd_euidaccess)(char const *file,
                                       __STDC_INT_AS_UINT_T type)
 /*[[[body:libd_euidaccess]]]*/
 {
-	return libc_faccessat(AT_FDCWD, file, type, libd_AT_DOSPATH | AT_EACCESS);
+	return libd_faccessat(AT_FDCWD, file, type, AT_EACCESS);
 }
 /*[[[end:libd_euidaccess]]]*/
 
@@ -1067,11 +1072,15 @@ NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file,
                                       __STDC_INT_AS_UINT_T type)
 /*[[[body:libc_euidaccess]]]*/
 {
+#ifdef __OPTIMIZE_SIZE__
+	return libc_faccessat(AT_FDCWD, file, type, AT_EACCESS);
+#else /* __OPTIMIZE_SIZE__ */
 	errno_t result;
 	result = sys_faccessat2(AT_FDCWD, file,
 	                        (syscall_ulong_t)(unsigned int)type,
 	                        AT_EACCESS);
 	return libc_seterrno_syserr(result);
+#endif /* !__OPTIMIZE_SIZE__ */
 }
 /*[[[end:libc_euidaccess]]]*/
 
@@ -1180,7 +1189,7 @@ NOTHROW_RPC(LIBDCALL libd_symlinkat)(char const *link_text,
                                      char const *target_path)
 /*[[[body:libd_symlinkat]]]*/
 {
-	return libc_fsymlinkat(link_text, tofd, target_path, libd_AT_DOSPATH);
+	return libd_fsymlinkat(link_text, tofd, target_path, 0);
 }
 /*[[[end:libd_symlinkat]]]*/
 
@@ -1219,7 +1228,7 @@ NOTHROW_RPC(LIBDCALL libd_readlinkat)(fd_t dfd,
                                       size_t buflen)
 /*[[[body:libd_readlinkat]]]*/
 {
-	return libc_freadlinkat(dfd, path, buf, buflen, libd_AT_DOSPATH);
+	return libd_freadlinkat(dfd, path, buf, buflen, 0);
 }
 /*[[[end:libd_readlinkat]]]*/
 
@@ -1354,7 +1363,7 @@ NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd,
 #ifdef SYS_lseek
 	result = sys_lseek(fd, (syscall_slong_t)offset, whence);
 #else /* SYS_lseek */
-	result = sys_lseek64(fd, (int64_t)offset, whence);
+	result = (off_t)sys_lseek64(fd, (int64_t)offset, whence);
 #endif /* !SYS_lseek */
 	return libc_seterrno_syserr(result);
 }
@@ -1610,7 +1619,7 @@ NOTHROW_RPC(LIBDCALL libd_lchown)(char const *file,
                                   gid_t group)
 /*[[[body:libd_lchown]]]*/
 {
-	return libc_fchownat(AT_FDCWD, file, owner, group, AT_SYMLINK_NOFOLLOW | libd_AT_DOSPATH);
+	return libd_fchownat(AT_FDCWD, file, owner, group, AT_SYMLINK_NOFOLLOW);
 }
 /*[[[end:libd_lchown]]]*/
 
@@ -1643,7 +1652,7 @@ NOTHROW_NCX(LIBDCALL libd_truncate)(char const *file,
 /*[[[body:libd_truncate]]]*/
 {
 	int result;
-	fd_t fd = open(file, O_RDWR | libd_O_DOSPATH);
+	fd_t fd = libd_open(file, O_RDWR);
 	if (fd < 0)
 		return -1;
 	result = libc_ftruncate(fd, length);
@@ -1660,8 +1669,18 @@ NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
                                     __PIO_OFFSET length)
 /*[[[body:libc_truncate]]]*/
 {
+#ifdef SYS_truncate
 	errno_t result = sys_truncate(file, (syscall_ulong_t)length);
 	return libc_seterrno_syserr(result);
+#else /* SYS_truncate */
+	int result;
+	fd_t fd = libc_open(file, O_RDWR);
+	if (fd < 0)
+		return -1;
+	result = libc_ftruncate(fd, length);
+	sys_close(fd);
+	return result;
+#endif /* !SYS_truncate */
 }
 /*[[[end:libc_truncate]]]*/
 
@@ -1677,7 +1696,7 @@ NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file,
 /*[[[body:libd_truncate64]]]*/
 {
 	int result;
-	fd_t fd = open(file, O_RDWR | libd_O_DOSPATH);
+	fd_t fd = libd_open(file, O_RDWR);
 	if (fd < 0)
 		return -1;
 	result = libc_ftruncate64(fd, length);
@@ -1698,8 +1717,18 @@ NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
                                       __PIO_OFFSET64 length)
 /*[[[body:libc_truncate64]]]*/
 {
+#ifdef SYS_truncate64
 	errno_t result = sys_truncate64(file, (uint64_t)(__pos64_t)length);
 	return libc_seterrno_syserr(result);
+#else /* SYS_truncate64 */
+	int result;
+	fd_t fd = libc_open(file, O_RDWR);
+	if (fd < 0)
+		return -1;
+	result = libc_ftruncate64(fd, length);
+	sys_close(fd);
+	return result;
+#endif /* !SYS_truncate64 */
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_truncate64]]]*/
@@ -1756,34 +1785,6 @@ NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid,
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_setregid]]]*/
-
-/*[[[head:libc_seteuid,hash:CRC-32=0x14fcb70c]]]*/
-/* >> seteuid(2)
- * Set the effective user ID of the calling process
- * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `euid' is invalid
- * @return: -1: [errno=EPERM]  : The current user is not privileged */
-INTERN ATTR_SECTION(".text.crt.sched.user") int
-NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid)
-/*[[[body:libc_seteuid]]]*/
-/*AUTO*/{
-	return setreuid((uid_t)-1, euid);
-}
-/*[[[end:libc_seteuid]]]*/
-
-/*[[[head:libc_setegid,hash:CRC-32=0x5114f16d]]]*/
-/* >> setegid(2)
- * Set the effective group ID of the calling process
- * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `egid' is invalid
- * @return: -1: [errno=EPERM]  : The current user is not privileged */
-INTERN ATTR_SECTION(".text.crt.sched.user") int
-NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid)
-/*[[[body:libc_setegid]]]*/
-/*AUTO*/{
-	return setregid((gid_t)-1, egid);
-}
-/*[[[end:libc_setegid]]]*/
 
 /*[[[head:libd_symlink,hash:CRC-32=0xd8ddeed]]]*/
 /* >> symlink(3)
@@ -2007,7 +2008,7 @@ NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path)
 /*[[[body:libd_chroot]]]*/
 {
 	int result;
-	fd_t fd = open(path, O_RDONLY | O_DIRECTORY | libd_O_DOSPATH);
+	fd_t fd = libd_open(path, O_RDONLY | O_DIRECTORY);
 	if (fd < 0)
 		return -1;
 	result = libd_dup2(fd, AT_FDROOT);
@@ -3854,7 +3855,7 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4346a4ba]]]*/
+/*[[[start:exports,hash:CRC-32=0x2a750565]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -4106,8 +4107,6 @@ DEFINE_PUBLIC_ALIAS(setreuid, libc_setreuid);
 DEFINE_PUBLIC_ALIAS(__setregid, libc_setregid);
 DEFINE_PUBLIC_ALIAS(__libc_setregid, libc_setregid);
 DEFINE_PUBLIC_ALIAS(setregid, libc_setregid);
-DEFINE_PUBLIC_ALIAS(seteuid, libc_seteuid);
-DEFINE_PUBLIC_ALIAS(setegid, libc_setegid);
 DEFINE_PUBLIC_ALIAS(DOS$__symlink, libd_symlink);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_symlink, libd_symlink);
 DEFINE_PUBLIC_ALIAS(DOS$symlink, libd_symlink);

@@ -69,15 +69,20 @@ struct exit_status {
 
 /* The structure describing an entry in the user accounting database. */
 struct utmp {
-	__INT16_TYPE__     ut_type;               /* Type of login. */
-	__pid_t            ut_pid;                /* Process ID of login process. */
-	char               ut_line[UT_LINESIZE];  /* Device name. */
-	char               ut_id[4];              /* Inittab ID. */
+	__INT16_TYPE__     ut_type;              /* Type of login. */
+	__pid_t            ut_pid;               /* Process ID of login process. */
+	char               ut_line[UT_LINESIZE]; /* Device name. */
+	char               ut_id[4];             /* Inittab ID. */
+#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
 	union {
-		char           ut_name[UT_NAMESIZE];  /* Username. */
-		char           ut_user[UT_NAMESIZE];  /* Username. */
+		char           ut_name[UT_NAMESIZE]; /* Username. */
+		char           ut_user[UT_NAMESIZE]; /* Username. */
 	};
-	char               ut_host[UT_HOSTSIZE];  /* Hostname for remote login. */
+#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
+#define ut_name        ut_user               /* Username. */
+	char               ut_user[UT_NAMESIZE]; /* Username. */
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+	char               ut_host[UT_HOSTSIZE]; /* Hostname for remote login. */
 	struct exit_status ut_exit;        /* Exit status of a process marked as DEAD_PROCESS. */
 	/* The ut_session and ut_tv fields must be the same size when compiled
 	 * 32- and 64-bit.  This allows  data files  and shared  memory to  be

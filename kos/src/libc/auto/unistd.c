@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd86e0ec1 */
+/* HASH CRC-32:0xeefcbf27 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -541,6 +541,24 @@ NOTHROW(LIBCCALL libc_getdtablesize)(void) {
 
 
 
+}
+/* >> seteuid(2)
+ * Set the effective user ID of the calling process
+ * @return: 0 : Success
+ * @return: -1: [errno=EINVAL] : The given `euid' is invalid
+ * @return: -1: [errno=EPERM]  : The current user is not privileged */
+INTERN ATTR_SECTION(".text.crt.sched.user") int
+NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid) {
+	return libc_setreuid((uid_t)-1, euid);
+}
+/* >> setegid(2)
+ * Set the effective group ID of the calling process
+ * @return: 0 : Success
+ * @return: -1: [errno=EINVAL] : The given `egid' is invalid
+ * @return: -1: [errno=EPERM]  : The current user is not privileged */
+INTERN ATTR_SECTION(".text.crt.sched.user") int
+NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid) {
+	return libc_setregid((gid_t)-1, egid);
 }
 #include <libc/errno.h>
 #include <bits/types.h>
@@ -1694,6 +1712,8 @@ DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(__getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
+DEFINE_PUBLIC_ALIAS(seteuid, libc_seteuid);
+DEFINE_PUBLIC_ALIAS(setegid, libc_setegid);
 DEFINE_PUBLIC_ALIAS(ttyslot, libc_ttyslot);
 DEFINE_PUBLIC_ALIAS(getlogin_r, libc_getlogin_r);
 DEFINE_PUBLIC_ALIAS(__gethostname, libc_gethostname);

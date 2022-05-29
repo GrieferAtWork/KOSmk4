@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f6cf36c */
+/* HASH CRC-32:0x2e272da9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -491,18 +491,6 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setreuid)(uid_t ruid, uid_t euid);
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid, gid_t egid);
-/* >> seteuid(2)
- * Set the effective user ID of the calling process
- * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `euid' is invalid
- * @return: -1: [errno=EPERM]  : The current user is not privileged */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid);
-/* >> setegid(2)
- * Set the effective group ID of the calling process
- * @return: 0 : Success
- * @return: -1: [errno=EINVAL] : The given `egid' is invalid
- * @return: -1: [errno=EPERM]  : The current user is not privileged */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid);
 /* >> symlink(3)
  * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.

@@ -189,7 +189,7 @@ int waccess([[in]] wchar_t const *file, __STDC_INT_AS_UINT_T type) {
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, cp, dos_export_alias("_wchdir")]]
-[[requires($has_function(chdir, convert_wcstombs))]]
+[[requires_function(chdir, convert_wcstombs)]]
 [[section(".text.crt{|.dos}.wchar.fs.basic_property")]]
 int wchdir([[in]] wchar_t const *path) {
 	longptr_t result;
@@ -207,7 +207,7 @@ int wchdir([[in]] wchar_t const *path) {
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, cp, guard, dos_export_alias("_wgetcwd")]]
-[[requires($has_function(getcwd, convert_mbstowcs))]]
+[[requires_function(getcwd, convert_mbstowcs)]]
 [[impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.wchar.fs.basic_property")]]
 wchar_t *wgetcwd([[out(? <= bufsize)]] wchar_t *buf, size_t bufsize) {
@@ -355,9 +355,9 @@ wchar_t *wget_current_dir_name(void) {
 %#endif /* __USE_GNU */
 
 %#ifdef __USE_ATFILE
-[[section(".text.crt{|.dos}.wchar.fs.property")]]
 [[wchar, cp, decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_function(faccessat, convert_wcstombs)]]
+[[section(".text.crt{|.dos}.wchar.fs.property")]]
 int wfaccessat($fd_t dfd, [[in]] wchar_t const *file,
                __STDC_INT_AS_UINT_T type, $atflag_t flags) {
 	int result;
@@ -373,9 +373,9 @@ int wfaccessat($fd_t dfd, [[in]] wchar_t const *file,
 }
 
 
-[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(fchownat, convert_wcstombs)]]
+[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 int wfchownat($fd_t dfd, [[in]] wchar_t const *file,
               $uid_t owner, $gid_t group, $atflag_t flags) {
 	int result;
@@ -391,9 +391,9 @@ int wfchownat($fd_t dfd, [[in]] wchar_t const *file,
 }
 
 
-[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_function(convert_wcstombs, linkat)]]
+[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 int wlinkat($fd_t fromfd, [[in]] wchar_t const *from,
             $fd_t tofd, [[in]] wchar_t const *to, $atflag_t flags) {
 	int result = -1;
@@ -416,10 +416,10 @@ done:
 	return result;
 }
 
-[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires($has_function(wfsymlinkat) ||
            $has_function(symlinkat, convert_wcstombs))]]
+[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 int wsymlinkat([[in]] wchar_t const *link_text, $fd_t tofd,
                [[in]] wchar_t const *target_path) {
 @@pp_if $has_function(wfsymlinkat)@@
@@ -446,11 +446,11 @@ done:
 @@pp_endif@@
 }
 
-[[section(".text.crt{|.dos}.wchar.fs.property")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(wfreadlinkat) ||
            $has_function(malloc, readlinkat, convert_wcstombs))]]
+[[section(".text.crt{|.dos}.wchar.fs.property")]]
 ssize_t wreadlinkat($fd_t dfd, [[in]] wchar_t const *path,
                     [[out(return <= buflen)]] wchar_t *buf,
                     size_t buflen) {
@@ -497,9 +497,9 @@ err:
 
 
 %#ifdef __USE_KOS
-[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
-[[requires($has_function(fsymlinkat, convert_wcstombs))]]
+[[requires_function(fsymlinkat, convert_wcstombs)]]
+[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 int wfsymlinkat([[in]] wchar_t const *link_text, $fd_t tofd,
                 [[in]] wchar_t const *target_path, $atflag_t flags) {
 	int result = -1;
@@ -522,10 +522,10 @@ done:
 	return result;
 }
 
-[[section(".text.crt{|.dos}.wchar.fs.property")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires_function(malloc, freadlinkat, convert_wcstombs)]]
+[[section(".text.crt{|.dos}.wchar.fs.property")]]
 ssize_t wfreadlinkat($fd_t dfd, [[in]] wchar_t const *path,
                      [[out(return <= buflen)]] wchar_t *buf, size_t buflen,
                      $atflag_t flags) {
@@ -609,9 +609,9 @@ err:
 
 %#endif /* __USE_KOS */
 
-[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
-[[requires($has_function(unlinkat, convert_wcstombs))]]
+[[requires_function(unlinkat, convert_wcstombs)]]
+[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 int wunlinkat($fd_t dfd, [[in]] wchar_t const *file, $atflag_t flags) {
 	int result;
 	char *utf8_file;
@@ -628,11 +628,11 @@ int wunlinkat($fd_t dfd, [[in]] wchar_t const *file, $atflag_t flags) {
 
 %#endif /* __USE_ATFILE */
 
-[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 [[cp, decl_include("<bits/types.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[wchar, requires_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(wfchownat)) ||
            $has_function(lchown, convert_wcstombs))]]
+[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 int wlchown([[in]] wchar_t const *file, $uid_t owner, $gid_t group) {
 @@pp_if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(wfchownat)@@
 	return wfchownat(__AT_FDCWD, file, owner, group, __AT_SYMLINK_NOFOLLOW);
@@ -677,10 +677,10 @@ int crt_wtruncate64([[in]] wchar_t const *file, $pos32_t length);
 [[wchar, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("wtruncate")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("wtruncate64")]]
-[[section(".text.crt{|.dos}.wchar.fs.modify"), decl_include("<bits/types.h>")]]
 [[requires($has_function(crt_wtruncate64) ||
            $has_function(crt_wtruncate32) ||
            $has_function(truncate, convert_wcstombs))]]
+[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 int wtruncate([[in]] wchar_t const *file, __PIO_OFFSET length) {
 @@pp_if $has_function(crt_wtruncate32) && !defined(__BUILDING_LIBC)@@
 	return crt_wtruncate32(file, (pos32_t)length);
@@ -701,11 +701,12 @@ int wtruncate([[in]] wchar_t const *file, __PIO_OFFSET length) {
 }
 
 %#ifdef __USE_LARGEFILE64
-[[wchar, section(".text.crt{|.dos}.wchar.fs.modify"), decl_include("<bits/types.h>")]]
-[[crt_dos_variant, preferred_off64_variant_of(wtruncate), doc_alias("wtruncate")]]
+[[wchar, crt_dos_variant, decl_include("<bits/types.h>")]]
+[[preferred_off64_variant_of(wtruncate), doc_alias("wtruncate")]]
 [[impl_include("<features.h>"), impl_prefix(DEFINE_PIO_OFFSET)]]
 [[requires($has_function(truncate64, convert_wcstombs) ||
            $has_function(crt_wtruncate32))]]
+[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 int wtruncate64([[in]] wchar_t const *file, __PIO_OFFSET64 length) {
 @@pp_if $has_function(truncate64, convert_wcstombs)@@
 	int result;
@@ -728,11 +729,11 @@ int wtruncate64([[in]] wchar_t const *file, __PIO_OFFSET64 length) {
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 
-[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wsymlinkat)) ||
            $has_function(symlink, convert_wcstombs))]]
+[[section(".text.crt{|.dos}.wchar.fs.modify")]]
 int wsymlink([[in]] wchar_t const *link_text,
              [[in]] wchar_t const *target_path) {
 @@pp_if defined(__AT_FDCWD) && $has_function(wfsymlinkat)@@
@@ -761,12 +762,12 @@ done:
 @@pp_endif@@
 }
 
-[[section(".text.crt{|.dos}.wchar.fs.property")]]
 [[wchar, cp, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires((defined(__AT_FDCWD) && $has_function(wreadlinkat)) ||
            ($has_function(malloc, readlink, convert_wcstombs)))]]
 [[impl_include("<asm/os/fcntl.h>")]]
+[[section(".text.crt{|.dos}.wchar.fs.property")]]
 ssize_t wreadlink([[in]] wchar_t const *path,
                   [[out(return <= buflen)]] wchar_t *buf,
                   size_t buflen) {
@@ -823,7 +824,7 @@ err:
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 [[wchar, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<bits/crt/wformat-printer.h>", "<bits/crt/mbstate.h>", "<libc/errno.h>")]]
-[[requires($has_function(uname))]]
+[[requires_function(uname)]]
 [[section(".text.crt{|.dos}.wchar.system.configuration")]]
 int wgethostname([[out(? <= buflen)]] wchar_t *name, size_t buflen) {
 	struct __LOCAL_format_wsnprintf_data {
@@ -867,7 +868,7 @@ int wgethostname([[out(? <= buflen)]] wchar_t *name, size_t buflen) {
 %
 %#ifdef __USE_MISC
 [[wchar, decl_include("<hybrid/typecore.h>")]]
-[[requires($has_function(setlogin, convert_wcstombs))]]
+[[requires_function(setlogin, convert_wcstombs)]]
 [[section(".text.crt{|.dos}.wchar.io.tty")]]
 int wsetlogin([[in]] wchar_t const *name) {
 	int result;
@@ -882,9 +883,9 @@ int wsetlogin([[in]] wchar_t const *name) {
 	return result;
 }
 
-[[section(".text.crt{|.dos}.wchar.system.configuration")]]
 [[wchar, decl_include("<hybrid/typecore.h>")]]
-[[requires($has_function(sethostname, convert_wcstombsn))]]
+[[requires_function(sethostname, convert_wcstombsn)]]
+[[section(".text.crt{|.dos}.wchar.system.configuration")]]
 int wsethostname([[in(? <= len)]] wchar_t const *name, size_t len) {
 	int result;
 	char *utf8_name;
@@ -900,7 +901,7 @@ int wsethostname([[in(? <= len)]] wchar_t const *name, size_t len) {
 }
 
 [[wchar, decl_include("<hybrid/typecore.h>")]]
-[[requires($has_function(uname))]]
+[[requires_function(uname)]]
 [[impl_include("<bits/crt/wformat-printer.h>", "<bits/crt/mbstate.h>", "<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.wchar.system.configuration")]]
 int wgetdomainname([[out(? <= buflen)]] wchar_t *name, size_t buflen) {
@@ -940,9 +941,9 @@ int wgetdomainname([[out(? <= buflen)]] wchar_t *name, size_t buflen) {
 	return result;
 }
 
-[[section(".text.crt{|.dos}.wchar.system.configuration")]]
 [[wchar, decl_include("<hybrid/typecore.h>")]]
-[[requires($has_function(setdomainname, convert_wcstombsn))]]
+[[requires_function(setdomainname, convert_wcstombsn)]]
+[[section(".text.crt{|.dos}.wchar.system.configuration")]]
 int wsetdomainname([[in(? <= len)]] wchar_t const *name, size_t len) {
 	int result;
 	char *utf8_name;
@@ -963,7 +964,7 @@ int wsetdomainname([[in(? <= len)]] wchar_t const *name, size_t len) {
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 [[wchar, cp, decl_include("<hybrid/typecore.h>")]]
-[[requires($has_function(chroot, convert_wcstombs))]]
+[[requires_function(chroot, convert_wcstombs)]]
 [[section(".text.crt{|.dos}.wchar.fs.utility")]]
 int wchroot([[in]] wchar_t const *path) {
 	longptr_t result;

@@ -95,7 +95,6 @@ struct __exit_status {
 /* The structure describing an entry in the user accounting database. */
 struct utmpx {
 	__INT16_TYPE__       ut_type;                /* Type of login. */
-	__INT16_TYPE__     __ut_pad;                 /* Hidden padding made visible... */
 	__pid_t              ut_pid;                 /* Process ID of login process. */
 	char                 ut_line[__UT_LINESIZE]; /* Devicename. */
 	char                 ut_id[4];               /* Inittab ID. */
