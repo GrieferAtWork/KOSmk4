@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9104a118 */
+/* HASH CRC-32:0x87703980 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_c16ttyname_defined
 #define __local_c16ttyname_defined
 #include <__crt.h>
-#if (defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wttyname_r)
+#if (defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wttyname_r) || defined(__CRT_HAVE_ttyname_r)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16ttyname_r_defined
@@ -30,6 +30,16 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,__localdep_c16ttyname_r,(__fd_t __fd, __CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wttyname_r,(__fd,__buf,__buflen))
 #elif defined(__CRT_HAVE_DOS$wttyname_r)
 __CREDIRECT_DOS(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,__localdep_c16ttyname_r,(__fd_t __fd, __CHAR16_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wttyname_r,(__fd,__buf,__buflen))
+#elif defined(__CRT_HAVE_ttyname_r) && __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.wchar.unistd/wttyname_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_c16ttyname_r __NAMESPACE_LOCAL_TYPEHAX(__errno_t(__LIBDCALL*)(__fd_t,__CHAR16_TYPE__ *,__SIZE_TYPE__),__errno_t(__LIBDCALL&)(__fd_t,__CHAR16_TYPE__ *,__SIZE_TYPE__),wttyname_r)
+#elif defined(__CRT_HAVE_ttyname_r)
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.uchar.unistd/c16ttyname_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_c16ttyname_r __LIBC_LOCAL_NAME(c16ttyname_r)
 #else /* ... */
 #undef __local___localdep_c16ttyname_r_defined
 #endif /* !... */
@@ -46,7 +56,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c16ttyname_defined
 #define __localdep_c16ttyname __LIBC_LOCAL_NAME(c16ttyname)
 #endif /* !__local___localdep_c16ttyname_defined */
-#else /* (__CRT_HAVE_wttyname_r && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wttyname_r */
+#else /* (__CRT_HAVE_wttyname_r && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wttyname_r || __CRT_HAVE_ttyname_r */
 #undef __local_c16ttyname_defined
-#endif /* (!__CRT_HAVE_wttyname_r || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wttyname_r */
+#endif /* (!__CRT_HAVE_wttyname_r || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wttyname_r && !__CRT_HAVE_ttyname_r */
 #endif /* !__local_c16ttyname_defined */

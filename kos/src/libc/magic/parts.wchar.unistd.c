@@ -39,8 +39,61 @@ __SYSDECL_BEGIN
 
 }
 
+[[section(".text.crt{|.dos}.wchar.io.tty")]]
 [[wchar]] wttyname(*) %{generate(str2wcs("ttyname"))}
-[[wchar, userimpl]] wttyname_r(*) %{generate(str2wcs("ttyname_r"))}
+
+/* [[wchar, userimpl]] wttyname_r(*) %{generate(str2wcs("ttyname_r"))} */
+%[define_str2wcs_replacement(ttyname_r = wttyname_r)]
+
+@@>> wttyname_r(3)
+@@Return the name of a TTY given its file descriptor
+[[wchar, cp, decl_include("<bits/types.h>")]]
+[[requires_function(ttyname_r), impl_include("<libc/errno.h>")]]
+[[section(".text.crt{|.dos}.wchar.io.tty")]]
+$errno_t wttyname_r($fd_t fd, [[out(? <= buflen)]] wchar_t *buf, size_t buflen) {
+	errno_t result;
+@@pp_if __SIZEOF_WCHAR_T__ == 4@@
+	size_t utf8_buflen = buflen * 7; /* s.a. `UNICODE_32TO8_MAXBUF()' */
+@@pp_else@@
+	size_t utf8_buflen = buflen * 3; /* s.a. `UNICODE_16TO8_MAXBUF()' */
+@@pp_endif@@
+	char *utf8_buf = (char *)malloc(utf8_buflen * sizeof(char));
+	if unlikely(!utf8_buf) {
+@@pp_ifdef ENOMEM@@
+		return $ENOMEM;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
+	result = ttyname_r(fd, utf8_buf, utf8_buflen);
+	if (result == 0) {
+		size_t reqlen;
+		utf8_buflen = strlen(utf8_buf) + 1; /* +1 for trailing NUL */
+@@pp_if __SIZEOF_WCHAR_T__ == 4@@
+		reqlen = unicode_len8to32(utf8_buf, utf8_buflen);
+@@pp_else@@
+		reqlen = unicode_len8to16(utf8_buf, utf8_buflen);
+@@pp_endif@@
+		if (reqlen > buflen) {
+@@pp_ifdef ERANGE@@
+			result = $ERANGE;
+@@pp_else@@
+			result = 1;
+@@pp_endif@@
+		} else {
+@@pp_if __SIZEOF_WCHAR_T__ == 4@@
+			buf = (wchar_t *)unicode_8to32_n((char32_t *)buf, buflen, utf8_buf, reqlen);
+@@pp_else@@
+			buf = (wchar_t *)unicode_8to16_n((char16_t *)buf, buflen, utf8_buf, reqlen);
+@@pp_endif@@
+			*buf = '\0'; /* NUL-terminate */
+		}
+	}
+@@pp_if $has_function(free)@@
+	free(utf8_buf);
+@@pp_endif@@
+	return result;
+}
 
 //[[wchar, userimpl]] wgetlogin(*) %{generate(str2wcs("getlogin"))}
 

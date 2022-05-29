@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbecff088 */
+/* HASH CRC-32:0x2b51f7c2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_c32ttyname_defined
 #define __local_c32ttyname_defined
 #include <__crt.h>
-#if (defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wttyname_r)
+#if (defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wttyname_r) || defined(__CRT_HAVE_ttyname_r)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32ttyname_r_defined
@@ -30,6 +30,16 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,__localdep_c32ttyname_r,(__fd_t __fd, __CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wttyname_r,(__fd,__buf,__buflen))
 #elif defined(__CRT_HAVE_KOS$wttyname_r)
 __CREDIRECT_KOS(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,__localdep_c32ttyname_r,(__fd_t __fd, __CHAR32_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wttyname_r,(__fd,__buf,__buflen))
+#elif defined(__CRT_HAVE_ttyname_r) && __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.wchar.unistd/wttyname_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_c32ttyname_r __NAMESPACE_LOCAL_TYPEHAX(__errno_t(__LIBKCALL*)(__fd_t,__CHAR32_TYPE__ *,__SIZE_TYPE__),__errno_t(__LIBKCALL&)(__fd_t,__CHAR32_TYPE__ *,__SIZE_TYPE__),wttyname_r)
+#elif defined(__CRT_HAVE_ttyname_r)
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.uchar.unistd/c32ttyname_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_c32ttyname_r __LIBC_LOCAL_NAME(c32ttyname_r)
 #else /* ... */
 #undef __local___localdep_c32ttyname_r_defined
 #endif /* !... */
@@ -46,7 +56,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_c32ttyname_defined
 #define __localdep_c32ttyname __LIBC_LOCAL_NAME(c32ttyname)
 #endif /* !__local___localdep_c32ttyname_defined */
-#else /* (__CRT_HAVE_wttyname_r && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wttyname_r */
+#else /* (__CRT_HAVE_wttyname_r && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wttyname_r || __CRT_HAVE_ttyname_r */
 #undef __local_c32ttyname_defined
-#endif /* (!__CRT_HAVE_wttyname_r || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wttyname_r */
+#endif /* (!__CRT_HAVE_wttyname_r || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wttyname_r && !__CRT_HAVE_ttyname_r */
 #endif /* !__local_c32ttyname_defined */

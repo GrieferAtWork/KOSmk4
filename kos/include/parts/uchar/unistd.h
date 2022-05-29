@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8f69982 */
+/* HASH CRC-32:0xeed212c8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,12 +55,12 @@ __CREDIRECT(__ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,c16ttyname,(__fd_t __fd),wtt
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __CREDIRECT_DOS(__ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,c16ttyname,(__fd_t __fd),wttyname,(__fd))
-#elif defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 2
+#elif (defined(__CRT_HAVE_wttyname_r) || defined(__CRT_HAVE_ttyname_r)) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/parts.wchar.unistd/wttyname.h>
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char16_t *__NOTHROW_RPC(__LIBDCALL c16ttyname)(__fd_t __fd) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wttyname))(__fd); }
-#elif defined(__CRT_HAVE_DOS$wttyname_r)
+#elif (defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wttyname_r) || defined(__CRT_HAVE_ttyname_r)
 #include <libc/local/parts.uchar.unistd/c16ttyname.h>
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
@@ -74,34 +74,54 @@ __CREDIRECT(__ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,c32ttyname,(__fd_t __fd),wtt
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __CREDIRECT_KOS(__ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,c32ttyname,(__fd_t __fd),wttyname,(__fd))
-#elif defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 4
+#elif (defined(__CRT_HAVE_wttyname_r) || defined(__CRT_HAVE_ttyname_r)) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/parts.wchar.unistd/wttyname.h>
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char32_t *__NOTHROW_RPC(__LIBKCALL c32ttyname)(__fd_t __fd) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wttyname))(__fd); }
-#elif defined(__CRT_HAVE_KOS$wttyname_r)
+#elif (defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wttyname_r) || defined(__CRT_HAVE_ttyname_r)
 #include <libc/local/parts.uchar.unistd/c32ttyname.h>
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32ttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char32_t *__NOTHROW_RPC(__LIBKCALL c32ttyname)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32ttyname))(__fd); })
 #endif /* ... */
 #if defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-/* >> ttyname_r(3)
+/* >> wttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 __CREDIRECT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,c16ttyname_r,(__fd_t __fd, char16_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
 #elif defined(__CRT_HAVE_DOS$wttyname_r)
-/* >> ttyname_r(3)
+/* >> wttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 __CREDIRECT_DOS(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,c16ttyname_r,(__fd_t __fd, char16_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
+#elif defined(__CRT_HAVE_ttyname_r) && __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/parts.wchar.unistd/wttyname_r.h>
+/* >> wttyname_r(3)
+ * Return the name of a TTY given its file descriptor */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) __errno_t __NOTHROW_RPC(__LIBDCALL c16ttyname_r)(__fd_t __fd, char16_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wttyname_r))(__fd, (__WCHAR_TYPE__ *)__buf, __buflen); }
+#elif defined(__CRT_HAVE_ttyname_r)
+#include <libc/local/parts.uchar.unistd/c16ttyname_r.h>
+/* >> wttyname_r(3)
+ * Return the name of a TTY given its file descriptor */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16ttyname_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) __errno_t __NOTHROW_RPC(__LIBDCALL c16ttyname_r)(__fd_t __fd, char16_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16ttyname_r))(__fd, __buf, __buflen); })
 #endif /* ... */
 #if defined(__CRT_HAVE_wttyname_r) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-/* >> ttyname_r(3)
+/* >> wttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 __CREDIRECT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,c32ttyname_r,(__fd_t __fd, char32_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
 #elif defined(__CRT_HAVE_KOS$wttyname_r)
-/* >> ttyname_r(3)
+/* >> wttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 __CREDIRECT_KOS(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,c32ttyname_r,(__fd_t __fd, char32_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
+#elif defined(__CRT_HAVE_ttyname_r) && __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/parts.wchar.unistd/wttyname_r.h>
+/* >> wttyname_r(3)
+ * Return the name of a TTY given its file descriptor */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) __errno_t __NOTHROW_RPC(__LIBKCALL c32ttyname_r)(__fd_t __fd, char32_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wttyname_r))(__fd, (__WCHAR_TYPE__ *)__buf, __buflen); }
+#elif defined(__CRT_HAVE_ttyname_r)
+#include <libc/local/parts.uchar.unistd/c32ttyname_r.h>
+/* >> wttyname_r(3)
+ * Return the name of a TTY given its file descriptor */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32ttyname_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) __errno_t __NOTHROW_RPC(__LIBKCALL c32ttyname_r)(__fd_t __fd, char32_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32ttyname_r))(__fd, __buf, __buflen); })
 #endif /* ... */
 #if defined(__CRT_HAVE_wchown) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,c16chown,(char16_t const *__file, __uid_t __owner, __gid_t __group),wchown,(__file,__owner,__group))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8aed48db */
+/* HASH CRC-32:0xc9fc6a01 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,15 +46,22 @@ __SYSDECL_BEGIN
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __CDECLARE(__ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wttyname,(__fd_t __fd),(__fd))
-#elif defined(__CRT_HAVE_wttyname_r)
+#elif defined(__CRT_HAVE_wttyname_r) || defined(__CRT_HAVE_ttyname_r)
 #include <libc/local/parts.wchar.unistd/wttyname.h>
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED wchar_t *__NOTHROW_RPC(__LIBCCALL wttyname)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wttyname))(__fd); })
 #endif /* ... */
-/* >> ttyname_r(3)
+#ifdef __CRT_HAVE_wttyname_r
+/* >> wttyname_r(3)
  * Return the name of a TTY given its file descriptor */
-__CDECLARE_OPT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,wttyname_r,(__fd_t __fd, wchar_t *__buf, size_t __buflen),(__fd,__buf,__buflen))
+__CDECLARE(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,wttyname_r,(__fd_t __fd, wchar_t *__buf, size_t __buflen),(__fd,__buf,__buflen))
+#elif defined(__CRT_HAVE_ttyname_r)
+#include <libc/local/parts.wchar.unistd/wttyname_r.h>
+/* >> wttyname_r(3)
+ * Return the name of a TTY given its file descriptor */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wttyname_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) __errno_t __NOTHROW_RPC(__LIBCCALL wttyname_r)(__fd_t __fd, wchar_t *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wttyname_r))(__fd, __buf, __buflen); })
+#endif /* ... */
 #ifdef __CRT_HAVE_wchown
 __CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,wchown,(wchar_t const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
 #else /* __CRT_HAVE_wchown */

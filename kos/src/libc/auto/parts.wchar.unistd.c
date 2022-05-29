@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8136108b */
+/* HASH CRC-32:0x365eb769 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "../user/parts.wchar.unistd.h"
+#include "parts.wchar.unistd.h"
 #include "parts.wchar.format-printer.h"
 #include "../user/stdlib.h"
 #include "string.h"
@@ -39,7 +39,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unsorted") WUNUSED char16_t *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.tty") WUNUSED char16_t *
 NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd) {
 	static char16_t buf[32];
 	if likely(libd_wttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
@@ -48,12 +48,112 @@ NOTHROW_RPC(LIBDCALL libd_wttyname)(fd_t fd) {
 }
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
-INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED char32_t *
+INTERN ATTR_SECTION(".text.crt.wchar.io.tty") WUNUSED char32_t *
 NOTHROW_RPC(LIBKCALL libc_wttyname)(fd_t fd) {
 	static char32_t buf[32];
 	if likely(libc_wttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
 		return buf;
 	return NULL;
+}
+#include <libc/errno.h>
+/* >> wttyname_r(3)
+ * Return the name of a TTY given its file descriptor */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.io.tty") ATTR_OUTS(2, 3) errno_t
+NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
+                                      char16_t *buf,
+                                      size_t buflen) {
+	errno_t result;
+
+
+
+	size_t utf8_buflen = buflen * 3; /* s.a. `UNICODE_16TO8_MAXBUF()' */
+
+	char *utf8_buf = (char *)libc_malloc(utf8_buflen * sizeof(char));
+	if unlikely(!utf8_buf) {
+
+		return 12;
+
+
+
+	}
+	result = libc_ttyname_r(fd, utf8_buf, utf8_buflen);
+	if (result == 0) {
+		size_t reqlen;
+		utf8_buflen = libc_strlen(utf8_buf) + 1; /* +1 for trailing NUL */
+
+
+
+		reqlen = libc_unicode_len8to16(utf8_buf, utf8_buflen);
+
+		if (reqlen > buflen) {
+
+			result = 34;
+
+
+
+		} else {
+
+
+
+			buf = (char16_t *)libc_unicode_8to16_n((char16_t *)buf, buflen, utf8_buf, reqlen);
+
+			*buf = '\0'; /* NUL-terminate */
+		}
+	}
+
+	libc_free(utf8_buf);
+
+	return result;
+}
+#include <libc/errno.h>
+/* >> wttyname_r(3)
+ * Return the name of a TTY given its file descriptor */
+INTERN ATTR_SECTION(".text.crt.wchar.io.tty") ATTR_OUTS(2, 3) errno_t
+NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd,
+                                      char32_t *buf,
+                                      size_t buflen) {
+	errno_t result;
+
+	size_t utf8_buflen = buflen * 7; /* s.a. `UNICODE_32TO8_MAXBUF()' */
+
+
+
+	char *utf8_buf = (char *)libc_malloc(utf8_buflen * sizeof(char));
+	if unlikely(!utf8_buf) {
+
+		return ENOMEM;
+
+
+
+	}
+	result = libc_ttyname_r(fd, utf8_buf, utf8_buflen);
+	if (result == 0) {
+		size_t reqlen;
+		utf8_buflen = libc_strlen(utf8_buf) + 1; /* +1 for trailing NUL */
+
+		reqlen = libc_unicode_len8to32(utf8_buf, utf8_buflen);
+
+
+
+		if (reqlen > buflen) {
+
+			result = ERANGE;
+
+
+
+		} else {
+
+			buf = (char32_t *)libc_unicode_8to32_n((char32_t *)buf, buflen, utf8_buf, reqlen);
+
+
+
+			*buf = '\0'; /* NUL-terminate */
+		}
+	}
+
+	libc_free(utf8_buf);
+
+	return result;
 }
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file,
@@ -1560,6 +1660,8 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$wttyname, libd_wttyname);
 DEFINE_PUBLIC_ALIAS(wttyname, libc_wttyname);
+DEFINE_PUBLIC_ALIAS(DOS$wttyname_r, libd_wttyname_r);
+DEFINE_PUBLIC_ALIAS(wttyname_r, libc_wttyname_r);
 DEFINE_PUBLIC_ALIAS(DOS$wchown, libd_wchown);
 DEFINE_PUBLIC_ALIAS(wchown, libc_wchown);
 DEFINE_PUBLIC_ALIAS(DOS$wpathconf, libd_wpathconf);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa379499a */
+/* HASH CRC-32:0x9734ed9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,21 @@
 #ifndef __local_wttyname_defined
 #define __local_wttyname_defined
 #include <__crt.h>
-#ifdef __CRT_HAVE_wttyname_r
+#if defined(__CRT_HAVE_wttyname_r) || defined(__CRT_HAVE_ttyname_r)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wttyname_r_defined
 #define __local___localdep_wttyname_r_defined
+#ifdef __CRT_HAVE_wttyname_r
 __CREDIRECT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,__localdep_wttyname_r,(__fd_t __fd, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen),wttyname_r,(__fd,__buf,__buflen))
+#elif defined(__CRT_HAVE_ttyname_r)
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.wchar.unistd/wttyname_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wttyname_r __LIBC_LOCAL_NAME(wttyname_r)
+#else /* ... */
+#undef __local___localdep_wttyname_r_defined
+#endif /* !... */
 #endif /* !__local___localdep_wttyname_r_defined */
 __LOCAL_LIBC(wttyname) __ATTR_WUNUSED __WCHAR_TYPE__ *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wttyname))(__fd_t __fd) {
@@ -40,7 +49,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_wttyname_defined
 #define __localdep_wttyname __LIBC_LOCAL_NAME(wttyname)
 #endif /* !__local___localdep_wttyname_defined */
-#else /* __CRT_HAVE_wttyname_r */
+#else /* __CRT_HAVE_wttyname_r || __CRT_HAVE_ttyname_r */
 #undef __local_wttyname_defined
-#endif /* !__CRT_HAVE_wttyname_r */
+#endif /* !__CRT_HAVE_wttyname_r && !__CRT_HAVE_ttyname_r */
 #endif /* !__local_wttyname_defined */

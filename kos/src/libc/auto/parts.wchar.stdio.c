@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x359cba85 */
+/* HASH CRC-32:0x91e709ce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "parts.wchar.stdio.h"
-#include "../user/parts.wchar.unistd.h"
+#include "parts.wchar.unistd.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
 #include "uchar.h"

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b162bdb */
+/* HASH CRC-32:0x142bd03e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include "corecrt_malloc.h"
 #include "../user/direct.h"
 #include "../user/malloc.h"
-#include "../user/parts.wchar.unistd.h"
+#include "parts.wchar.unistd.h"
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
 #include "string.h"

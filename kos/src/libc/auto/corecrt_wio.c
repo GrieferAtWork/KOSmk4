@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc04842ca */
+/* HASH CRC-32:0x5d5fb940 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <kos/types.h>
 #include "../user/corecrt_wio.h"
 #include "parts.wchar.fcntl.h"
-#include "../user/parts.wchar.unistd.h"
+#include "parts.wchar.unistd.h"
 #include "../user/stdlib.h"
 #include "string.h"
 #include "uchar.h"
