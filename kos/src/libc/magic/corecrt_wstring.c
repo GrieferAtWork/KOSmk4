@@ -210,7 +210,15 @@ wchar_t *__wcserror([[in_opt]] wchar_t const *message) {
 $errno_t __wcserror_s([[out(? <= buflen)]] wchar_t *buf, $size_t buflen,
                       [[in_opt]] wchar_t const *message) {
 	wchar_t *msg  = __wcserror(message);
-	size_t msglen = wcslen(msg) + 1;
+	size_t msglen;
+	if (!msg) {
+@@pp_ifdef EINVAL@@
+		return $EINVAL;
+@@pp_else@@
+		return 1;
+@@pp_endif@@
+	}
+	msglen = wcslen(msg) + 1;
 	if (msglen >= buflen) {
 @@pp_ifdef ERANGE@@
 		return $ERANGE;

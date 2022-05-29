@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e3ae825 */
+/* HASH CRC-32:0xfb5b0f10 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -200,7 +200,15 @@ NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,
                                         size_t buflen,
                                         char16_t const *message) {
 	char16_t *msg  = libd___wcserror(message);
-	size_t msglen = libd_wcslen(msg) + 1;
+	size_t msglen;
+	if (!msg) {
+
+		return 22;
+
+
+
+	}
+	msglen = libd_wcslen(msg) + 1;
 	if (msglen >= buflen) {
 
 		return 34;
@@ -217,7 +225,15 @@ NOTHROW_NCX(LIBKCALL libc___wcserror_s)(char32_t *buf,
                                         size_t buflen,
                                         char32_t const *message) {
 	char32_t *msg  = libc___wcserror(message);
-	size_t msglen = libc_wcslen(msg) + 1;
+	size_t msglen;
+	if (!msg) {
+
+		return EINVAL;
+
+
+
+	}
+	msglen = libc_wcslen(msg) + 1;
 	if (msglen >= buflen) {
 
 		return ERANGE;

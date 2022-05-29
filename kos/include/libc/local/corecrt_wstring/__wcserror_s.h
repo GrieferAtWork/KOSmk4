@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71ce2c93 */
+/* HASH CRC-32:0x92f231aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,7 +97,15 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__wcserror_s) __ATTR_IN_OPT(3) __ATTR_OUTS(1, 2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__wcserror_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ const *__message) {
 	__WCHAR_TYPE__ *__msg  = (__NAMESPACE_LOCAL_SYM __localdep___wcserror)(__message);
-	__SIZE_TYPE__ __msglen = (__NAMESPACE_LOCAL_SYM __localdep_wcslen)(__msg) + 1;
+	__SIZE_TYPE__ __msglen;
+	if (!__msg) {
+#ifdef __EINVAL
+		return __EINVAL;
+#else /* __EINVAL */
+		return 1;
+#endif /* !__EINVAL */
+	}
+	__msglen = (__NAMESPACE_LOCAL_SYM __localdep_wcslen)(__msg) + 1;
 	if (__msglen >= __buflen) {
 #ifdef __ERANGE
 		return __ERANGE;

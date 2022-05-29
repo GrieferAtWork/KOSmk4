@@ -59,6 +59,7 @@
 #include <sched/group.h>
 #include <sched/rpc.h>
 #include <sched/sigmask.h>
+#include <sched/task.h>
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
