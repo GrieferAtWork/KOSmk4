@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe14c4f66 */
+/* HASH CRC-32:0x729d5de3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3567,16 +3567,25 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$unicode_16to32
+#define __CRT_HAVE_DOS$unicode_16to32_n
 #define __CRT_HAVE_DOS$unicode_16to8
+#define __CRT_HAVE_DOS$unicode_16to8_n
 #define __CRT_HAVE_DOS$unicode_32to16
+#define __CRT_HAVE_DOS$unicode_32to16_n
 #define __CRT_HAVE_DOS$unicode_32to8
+#define __CRT_HAVE_DOS$unicode_32to8_n
 #define __CRT_HAVE_DOS$unicode_8to16
 #define __CRT_HAVE_DOS$unicode_8to16_chk
+#define __CRT_HAVE_DOS$unicode_8to16_chk_n
+#define __CRT_HAVE_DOS$unicode_8to16_n
 #define __CRT_HAVE_DOS$unicode_8to32
+#define __CRT_HAVE_DOS$unicode_8to32_n
 #define __CRT_HAVE_DOS$unicode_c16toc8
 #define __CRT_HAVE_DOS$unicode_c8toc16
 #define __CRT_HAVE_DOS$unicode_c8toc32
 #define __CRT_HAVE_DOS$unicode_fold
+#define __CRT_HAVE_DOS$unicode_len8to16
+#define __CRT_HAVE_DOS$unicode_len8to32
 #define __CRT_HAVE_DOS$unicode_readutf16
 #define __CRT_HAVE_DOS$unicode_readutf16_n
 #define __CRT_HAVE_DOS$unicode_readutf16_rev
@@ -3592,6 +3601,7 @@
 #define __CRT_HAVE_DOS$unicode_writeutf16
 #define __CRT_HAVE_DOS$unicode_writeutf16_chk
 #define __CRT_HAVE_DOS$unicode_writeutf8
+#define __CRT_HAVE_DOS$unicode_writeutf8_n
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && defined(_WIN32)
 #define __CRT_HAVE_DOS$unix_lbasename
@@ -7887,19 +7897,36 @@
 #define __CRT_HAVE_ungetwc_unlocked
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_unicode_16to32
+#ifndef __KERNEL__
+#define __CRT_HAVE_unicode_16to32_n
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_unicode_16to8
+#ifndef __KERNEL__
+#define __CRT_HAVE_unicode_16to8_n
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_unicode_32to16
+#ifndef __KERNEL__
+#define __CRT_HAVE_unicode_32to16_n
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_unicode_32to8
+#ifndef __KERNEL__
+#define __CRT_HAVE_unicode_32to8_n
+#endif /* !__KERNEL__ */
 #define __CRT_HAVE_unicode_8to16
 #ifndef __KERNEL__
 #define __CRT_HAVE_unicode_8to16_chk
+#define __CRT_HAVE_unicode_8to16_chk_n
+#define __CRT_HAVE_unicode_8to16_n
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_unicode_8to32
 #ifndef __KERNEL__
+#define __CRT_HAVE_unicode_8to32_n
 #define __CRT_HAVE_unicode_c16toc8
 #define __CRT_HAVE_unicode_c8toc16
 #define __CRT_HAVE_unicode_c8toc32
 #define __CRT_HAVE_unicode_fold
+#define __CRT_HAVE_unicode_len8to16
+#define __CRT_HAVE_unicode_len8to32
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_unicode_readutf16
 #define __CRT_HAVE_unicode_readutf16_n
@@ -7917,6 +7944,9 @@
 #define __CRT_HAVE_unicode_writeutf16
 #define __CRT_HAVE_unicode_writeutf16_chk
 #define __CRT_HAVE_unicode_writeutf8
+#ifndef __KERNEL__
+#define __CRT_HAVE_unicode_writeutf8_n
+#endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && defined(_WIN32)
 #define __CRT_HAVE_unix_lbasename
 #endif /* !__KERNEL__ && _WIN32 */

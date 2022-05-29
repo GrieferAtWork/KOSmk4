@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47f131e2 */
+/* HASH CRC-32:0xe764c5ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3527,15 +3527,25 @@ DEFINE_PUBLIC_ALIAS(DOS$unicode_readutf16_swap_rev, libd_unicode_readutf16_swap_
 DEFINE_PUBLIC_ALIAS(DOS$unicode_readutf16_rev_n, libd_unicode_readutf16_rev_n);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_readutf16_swap_rev_n, libd_unicode_readutf16_swap_rev_n);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_writeutf8, libd_unicode_writeutf8);
+DEFINE_PUBLIC_ALIAS(DOS$unicode_writeutf8_n, libd_unicode_writeutf8_n);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_writeutf16, libd_unicode_writeutf16);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_writeutf16_chk, libd_unicode_writeutf16_chk);
+DEFINE_PUBLIC_ALIAS(DOS$unicode_len8to16, libd_unicode_len8to16);
+DEFINE_PUBLIC_ALIAS(DOS$unicode_len8to32, libd_unicode_len8to32);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_8to16, libd_unicode_8to16);
+DEFINE_PUBLIC_ALIAS(DOS$unicode_8to16_n, libd_unicode_8to16_n);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_8to16_chk, libd_unicode_8to16_chk);
+DEFINE_PUBLIC_ALIAS(DOS$unicode_8to16_chk_n, libd_unicode_8to16_chk_n);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_8to32, libd_unicode_8to32);
+DEFINE_PUBLIC_ALIAS(DOS$unicode_8to32_n, libd_unicode_8to32_n);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_16to8, libd_unicode_16to8);
+DEFINE_PUBLIC_ALIAS(DOS$unicode_16to8_n, libd_unicode_16to8_n);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_16to32, libd_unicode_16to32);
+DEFINE_PUBLIC_ALIAS(DOS$unicode_16to32_n, libd_unicode_16to32_n);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_32to8, libd_unicode_32to8);
+DEFINE_PUBLIC_ALIAS(DOS$unicode_32to8_n, libd_unicode_32to8_n);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_32to16, libd_unicode_32to16);
+DEFINE_PUBLIC_ALIAS(DOS$unicode_32to16_n, libd_unicode_32to16_n);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_c8toc16, libd_unicode_c8toc16);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_c8toc32, libd_unicode_c8toc32);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_c16toc8, libd_unicode_c16toc8);

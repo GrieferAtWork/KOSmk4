@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93774103 */
+/* HASH CRC-32:0xd2cf89c5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_unicode_16to32_defined
-#define __local_unicode_16to32_defined
+#ifndef __local_unicode_16to32_n_defined
+#define __local_unicode_16to32_n_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -34,16 +34,18 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_unicode_readutf16_n __LIBC_LOCAL_NAME(unicode_readutf16_n)
 #endif /* !__CRT_HAVE_unicode_readutf16_n */
 #endif /* !__local___localdep_unicode_readutf16_n_defined */
-__LOCAL_LIBC(unicode_16to32) __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) __CHAR32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_16to32))(__CHAR32_TYPE__ *__restrict __utf32_dst, __CHAR16_TYPE__ const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_words) {
+__LOCAL_LIBC(unicode_16to32_n) __ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2) __CHAR32_TYPE__ *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_16to32_n))(__CHAR32_TYPE__ *__restrict __utf32_dst, __SIZE_TYPE__ __utf32_maxwords, __CHAR16_TYPE__ const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_words) {
 	__CHAR16_TYPE__ const *__utf16_end = __utf16_text + __utf16_words;
-	while (__utf16_text < __utf16_end)
+	while (__utf16_text < __utf16_end && __utf32_maxwords) {
 		*__utf32_dst++ = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf16_n)((__CHAR16_TYPE__ const **)&__utf16_text, __utf16_end);
+		--__utf32_maxwords;
+	}
 	return __utf32_dst;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_unicode_16to32_defined
-#define __local___localdep_unicode_16to32_defined
-#define __localdep_unicode_16to32 __LIBC_LOCAL_NAME(unicode_16to32)
-#endif /* !__local___localdep_unicode_16to32_defined */
-#endif /* !__local_unicode_16to32_defined */
+#ifndef __local___localdep_unicode_16to32_n_defined
+#define __local___localdep_unicode_16to32_n_defined
+#define __localdep_unicode_16to32_n __LIBC_LOCAL_NAME(unicode_16to32_n)
+#endif /* !__local___localdep_unicode_16to32_n_defined */
+#endif /* !__local_unicode_16to32_n_defined */

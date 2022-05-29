@@ -800,6 +800,60 @@ char *unicode_writeutf8([[out]] /*utf-8*/ char *__restrict dst, char32_t ch) {
 	return dst;
 }
 
+@@>> unicode_writeutf8_n(3)
+@@Same as `unicode_writeutf8(3)', but don't writ emore than `dst_maxbytes' bytes.
+[[nonnull, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+char *unicode_writeutf8_n([[out(? <= dst_maxbytes)]] /*utf-8*/ char *__restrict dst,
+                          char32_t ch, $size_t dst_maxbytes) {
+	if likely(dst_maxbytes != 0) {
+		if likely(ch <= UTF8_1BYTE_MAX) {
+			*dst++ = (char)(unsigned char)ch;
+		} else {
+			char tempbuf[7], *tempdst = tempbuf;
+			size_t templen;
+			if (ch <= UTF8_2BYTE_MAX) {
+				*tempdst++ = (char)(unsigned char)(0xc0 | (u8)((ch >> 6)/* & 0x1f*/));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch)&0x3f));
+			} else if (ch <= UTF8_3BYTE_MAX) {
+				*tempdst++ = (char)(unsigned char)(0xe0 | (u8)((ch >> 12)/* & 0x0f*/));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch)&0x3f));
+			} else if (ch <= UTF8_4BYTE_MAX) {
+				*tempdst++ = (char)(unsigned char)(0xf0 | (u8)((ch >> 18)/* & 0x07*/));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 12) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch)&0x3f));
+			} else if (ch <= UTF8_5BYTE_MAX) {
+				*tempdst++ = (char)(unsigned char)(0xf8 | (u8)((ch >> 24)/* & 0x03*/));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 18) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 12) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch)&0x3f));
+			} else if (ch <= UTF8_6BYTE_MAX) {
+				*tempdst++ = (char)(unsigned char)(0xfc | (u8)((ch >> 30)/* & 0x01*/));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 24) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 18) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 12) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch)&0x3f));
+			} else {
+				*tempdst++ = (char)(unsigned char)(0xfe);
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 30) & 0x03/* & 0x3f*/));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 24) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 18) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 12) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch >> 6) & 0x3f));
+				*tempdst++ = (char)(unsigned char)(0x80 | (u8)((ch)&0x3f));
+			}
+			templen = (size_t)(tempdst - tempbuf) * sizeof(char);
+			if (templen > dst_maxbytes)
+				templen = dst_maxbytes;
+			dst = (char *)mempcpy(dst, tempbuf, templen);
+		}
+	}
+	return dst;
+}
+
 @@>> unicode_writeutf16(3)
 @@Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
 @@location. This function will write at most `UNICODE_UTF16_CURLEN' words to `dst'
@@ -1066,18 +1120,57 @@ __LOCAL __ATTR_RETNONNULL __ATTR_OUT(1) char32_t *
 
 }
 
+
+@@>> unicode_len8to16(3)
+@@Return the number of utf-16 words needed to encode a given utf-8 string
+@@HINT: This is the exact number of words written by `unicode_8to16(3)'
+[[wunused, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+size_t unicode_len8to16([[in(utf8_bytes)]] /*utf-8*/ char const *__restrict utf8_text,
+                        $size_t utf8_bytes) {
+	size_t result = 0;
+	char const *utf8_end = utf8_text + utf8_bytes;
+	while (utf8_text < utf8_end) {
+		char32_t ch;
+		ch = unicode_readutf8_n((char const **)&utf8_text, utf8_end);
+		++result;
+		if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
+			/* Normal single-word utf-16 character */
+		} else {
+			/* Double-word utf-16 character */
+			++result;
+		}
+	}
+	return result;
+}
+
+@@>> unicode_len8to32(3)
+@@Return the number of utf-32 character needed to encode a given utf-8 string
+@@HINT: This is the exact number of words written by `unicode_8to32(3)'
+[[wunused, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+size_t unicode_len8to32([[in(utf8_bytes)]] /*utf-8*/ char const *__restrict utf8_text,
+                        $size_t utf8_bytes) {
+	size_t result = 0;
+	char const *utf8_end = utf8_text + utf8_bytes;
+	while (utf8_text < utf8_end) {
+		unicode_readutf8_n((char const **)&utf8_text, utf8_end);
+		++result;
+	}
+	return result;
+}
+
+
+
 @@>> unicode_8to16(3)
 @@Convert a given utf-8 string to utf-16.
-@@@param: utf16_dst: A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_characters)' words, or `*2' bytes
-@@@param: utf8_text: The input UTF-8 string to convert
-@@@param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
+@@@param: utf16_dst:  A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_bytes)' words, or `*2' bytes
+@@@param: utf8_text:  The input UTF-8 string to convert
+@@@param: utf8_bytes: The amount of UTF-8 bytes found in `utf8_text'
 @@@return: * : A pointer after the last written UTF-16 character
-[[kernel, nonnull]]
-[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+[[kernel, nonnull, decl_include("<hybrid/typecore.h>")]]
 char16_t *unicode_8to16([[out]] /*utf-16*/ char16_t *__restrict utf16_dst,
-                        [[in(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
-                        $size_t utf8_characters) {
-	char const *utf8_end = utf8_text + utf8_characters;
+                        [[in(utf8_bytes)]] /*utf-8*/ char const *__restrict utf8_text,
+                        $size_t utf8_bytes) {
+	char const *utf8_end = utf8_text + utf8_bytes;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
 		ch = unicode_readutf8_n((char const **)&utf8_text, utf8_end);
@@ -1086,20 +1179,49 @@ char16_t *unicode_8to16([[out]] /*utf-16*/ char16_t *__restrict utf16_dst,
 	return utf16_dst;
 }
 
+@@>> unicode_8to16_n(3)
+@@Same as `unicode_8to16(3)', but don't write more than `utf16_maxwords' words to `utf16_dst'
+@@@param: utf16_dst:      A buffer of at least `utf16_dst' words.
+@@@param: utf16_maxwords: Max # of words to write to `utf16_dst'
+@@@param: utf8_text:      The input UTF-8 string to convert
+@@@param: utf8_bytes:     The amount of UTF-8 bytes found in `utf8_text'
+@@@return: * : A pointer after the last written UTF-16 character
+[[nonnull, decl_include("<hybrid/typecore.h>")]]
+char16_t *unicode_8to16_n([[out(? <= utf16_maxwords)]] /*utf-16*/ char16_t *__restrict utf16_dst, $size_t utf16_maxwords,
+                          [[in(? <= utf8_bytes)]] /*utf-8*/ char const *__restrict utf8_text, $size_t utf8_bytes) {
+	char const *utf8_end = utf8_text + utf8_bytes;
+	while (utf8_text < utf8_end && utf16_maxwords) {
+		char32_t ch;
+		ch = unicode_readutf8_n((char const **)&utf8_text, utf8_end);
+		if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
+			*utf16_dst++ = (char16_t)ch;
+			--utf16_maxwords;
+		} else {
+			ch -= UTF16_SURROGATE_SHIFT;
+			*utf16_dst++ = UTF16_HIGH_SURROGATE_MIN + (char16_t)(ch >> 10);
+			--utf16_maxwords;
+			if unlikely(!utf16_maxwords)
+				break;
+			*utf16_dst++ = UTF16_LOW_SURROGATE_MIN + (char16_t)(ch & 0x3ff);
+			--utf16_maxwords;
+		}
+	}
+	return utf16_dst;
+}
+
 
 @@>> unicode_8to16_chk(3)
 @@Same as `unicode_8to16()', but return `NULL' if an attempt was made to write an invalid character.
-@@@param: utf16_dst: A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_characters)' words, or `*2' bytes
-@@@param: utf8_text: The input UTF-8 string to convert
-@@@param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
+@@@param: utf16_dst:  A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_bytes)' words, or `*2' bytes
+@@@param: utf8_text:  The input UTF-8 string to convert
+@@@param: utf8_bytes: The amount of UTF-8 bytes found in `utf8_text'
 @@@return: * : A pointer after the last written UTF-16 character.
 @@@return: NULL: Attempted to write an invalid character
-[[wunused]]
-[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+[[wunused, decl_include("<hybrid/typecore.h>")]]
 char16_t *unicode_8to16_chk([[out]] /*utf-16*/ char16_t *__restrict utf16_dst,
-                            [[in(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
-                            $size_t utf8_characters) {
-	char const *utf8_end = utf8_text + utf8_characters;
+                            [[in(utf8_bytes)]] /*utf-8*/ char const *__restrict utf8_text,
+                            $size_t utf8_bytes) {
+	char const *utf8_end = utf8_text + utf8_bytes;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
 		ch = unicode_readutf8_n((char const **)&utf8_text, utf8_end);
@@ -1110,36 +1232,87 @@ char16_t *unicode_8to16_chk([[out]] /*utf-16*/ char16_t *__restrict utf16_dst,
 	return utf16_dst;
 }
 
+@@>> unicode_8to16_chk_n(3)
+@@Same as `unicode_8to16_chk(3)', but don't write more than `utf16_maxwords' words to `utf16_dst'
+@@@param: utf16_dst:      A buffer of at least `utf16_dst' words.
+@@@param: utf16_maxwords: Max # of words to write to `utf16_dst'
+@@@param: utf8_text:      The input UTF-8 string to convert
+@@@param: utf8_bytes:     The amount of UTF-8 bytes found in `utf8_text'
+@@@return: * :   A pointer after the last written UTF-16 character
+@@@return: NULL: Attempted to write an invalid character
+[[wunused, decl_include("<hybrid/typecore.h>")]]
+char16_t *unicode_8to16_chk_n([[out(? <= utf16_maxwords)]] /*utf-16*/ char16_t *__restrict utf16_dst, $size_t utf16_maxwords,
+                              [[in(? <= utf8_bytes)]] /*utf-8*/ char const *__restrict utf8_text, $size_t utf8_bytes) {
+	char const *utf8_end = utf8_text + utf8_bytes;
+	while (utf8_text < utf8_end && utf16_maxwords) {
+		char32_t ch;
+		ch = unicode_readutf8_n((char const **)&utf8_text, utf8_end);
+		if (ch > UNICODE_MAXCHAR || (ch >= 0xd800 && ch <= 0xdfff))
+			return NULL;
+		if likely(ch <= 0xffff/* && (ch < 0xd800 || ch > 0xdfff)*/) {
+			*utf16_dst++ = (char16_t)ch;
+			--utf16_maxwords;
+		} else {
+			ch -= UTF16_SURROGATE_SHIFT;
+			*utf16_dst++ = UTF16_HIGH_SURROGATE_MIN + (char16_t)(ch >> 10);
+			--utf16_maxwords;
+			if unlikely(!utf16_maxwords)
+				break;
+			*utf16_dst++ = UTF16_LOW_SURROGATE_MIN + (char16_t)(ch & 0x3ff);
+			--utf16_maxwords;
+		}
+	}
+	return utf16_dst;
+}
+
+
 @@>> unicode_8to32(3)
 @@Convert a given utf-8 string to utf-32.
-@@@param: utf32_dst: A buffer of at least `UNICODE_8TO32_MAXBUF(utf8_characters)' dwords, or `*4' bytes
-@@@param: utf8_text: The input UTF-8 string to convert
-@@@param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
+@@@param: utf32_dst:  A buffer of at least `UNICODE_8TO32_MAXBUF(utf8_bytes)' dwords, or `*4' bytes
+@@@param: utf8_text:  The input UTF-8 string to convert
+@@@param: utf8_bytes: The amount of UTF-8 bytes found in `utf8_text'
 @@@return: * : A pointer after the last written UTF-32 character.
-[[kernel, nonnull]]
-[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+[[kernel, nonnull, decl_include("<hybrid/typecore.h>")]]
 char32_t *unicode_8to32([[out]] /*utf-32*/ char32_t *__restrict utf32_dst,
-                        [[in(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
-                        $size_t utf8_characters) {
-	char const *utf8_end = utf8_text + utf8_characters;
+                        [[in(utf8_bytes)]] /*utf-8*/ char const *__restrict utf8_text,
+                        $size_t utf8_bytes) {
+	char const *utf8_end = utf8_text + utf8_bytes;
 	while (utf8_text < utf8_end)
 		*utf32_dst++ = unicode_readutf8_n((char const **)&utf8_text, utf8_end);
 	return utf32_dst;
 }
 
 
+@@>> unicode_8to32_n(3)
+@@Same as `unicode_8to32(3)', but don't write more than `utf32_maxwords' words to `utf32_dst'
+@@@param: utf32_dst:      A buffer of at least `utf32_maxwords' dwords
+@@@param: utf32_maxwords: Max # of words to write to `utf16_dst'
+@@@param: utf8_text:      The input UTF-8 string to convert
+@@@param: utf8_bytes:     The amount of UTF-8 bytes found in `utf8_text'
+@@@return: * : A pointer after the last written UTF-32 character.
+[[nonnull, decl_include("<hybrid/typecore.h>")]]
+char32_t *unicode_8to32_n([[out(? <= utf32_maxwords)]] /*utf-32*/ char32_t *__restrict utf32_dst, $size_t utf32_maxwords,
+                          [[in(? <= utf8_bytes)]] /*utf-8*/ char const *__restrict utf8_text, $size_t utf8_bytes) {
+	char const *utf8_end = utf8_text + utf8_bytes;
+	while (utf8_text < utf8_end && utf32_maxwords) {
+		*utf32_dst++ = unicode_readutf8_n((char const **)&utf8_text, utf8_end);
+		--utf32_maxwords;
+	}
+	return utf32_dst;
+}
+
+
 @@>> unicode_16to8(3)
 @@Convert a given utf-16 string to utf-8.
-@@@param: utf8_dst: A buffer of at least `UNICODE_16TO8_MAXBUF(utf16_characters)' bytes
-@@@param: utf16_text: The input UTF-16 string to convert
-@@@param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
+@@@param: utf8_dst:    A buffer of at least `UNICODE_16TO8_MAXBUF(utf16_words)' bytes
+@@@param: utf16_text:  The input UTF-16 string to convert
+@@@param: utf16_words: The amount of UTF-16 words found in `utf16_text'
 @@@return: * : A pointer after the last written UTF-8 character
-[[kernel, nonnull]]
-[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+[[kernel, nonnull, decl_include("<hybrid/typecore.h>")]]
 char *unicode_16to8([[out]] /*utf-8*/ char *__restrict utf8_dst,
-                    [[in(utf16_characters)]] /*utf-16*/ char16_t const *__restrict utf16_text,
-                    $size_t utf16_characters) {
-	char16_t const *utf16_end = utf16_text + utf16_characters;
+                    [[in(utf16_words)]] /*utf-16*/ char16_t const *__restrict utf16_text,
+                    $size_t utf16_words) {
+	char16_t const *utf16_end = utf16_text + utf16_words;
 	while (utf16_text < utf16_end) {
 		char32_t ch;
 		ch = unicode_readutf16_n((char16_t const **)&utf16_text, utf16_end);
@@ -1157,55 +1330,163 @@ char *unicode_16to8([[out]] /*utf-8*/ char *__restrict utf8_dst,
 	return utf8_dst;
 }
 
+
+@@>> unicode_16to8_n(3)
+@@Same as `unicode_16to8(3)', but don't write more than `utf8_maxbytes' bytes to `utf8_dst'
+@@@param: utf8_dst:      A buffer of at least `utf8_maxbytes' bytes
+@@@param: utf8_maxbytes: Max # of bytes to write to `utf8_dst'
+@@@param: utf16_text:    The input UTF-16 string to convert
+@@@param: utf16_words:   The amount of UTF-16 words found in `utf16_text'
+@@@return: * : A pointer after the last written UTF-8 character
+[[nonnull, decl_include("<hybrid/typecore.h>")]]
+char *unicode_16to8_n([[out(? <= utf8_maxbytes)]] /*utf-8*/ char *__restrict utf8_dst, $size_t utf8_maxbytes,
+                      [[in(? <= utf16_words)]] /*utf-16*/ char16_t const *__restrict utf16_text, $size_t utf16_words) {
+	char16_t const *utf16_end = utf16_text + utf16_words;
+	while (utf16_text < utf16_end && utf8_maxbytes) {
+		char32_t ch;
+		ch = unicode_readutf16_n((char16_t const **)&utf16_text, utf16_end);
+		if (ch <= UTF8_1BYTE_MAX) {
+			*utf8_dst++ = (char)(u8)ch;
+			--utf8_maxbytes;
+		} else if (ch <= UTF8_2BYTE_MAX) {
+			*utf8_dst++ = (char)(0xc0 | (u8)((ch >> 6)/* & 0x1f*/));
+			--utf8_maxbytes;
+			if unlikely(!utf8_maxbytes)
+				break;
+			*utf8_dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+			--utf8_maxbytes;
+		} else {
+			*utf8_dst++ = (char)(0xe0 | (u8)((ch >> 12)/* & 0x0f*/));
+			--utf8_maxbytes;
+			if unlikely(!utf8_maxbytes)
+				break;
+			*utf8_dst++ = (char)(0x80 | (u8)((ch >> 6) & 0x3f));
+			--utf8_maxbytes;
+			if unlikely(!utf8_maxbytes)
+				break;
+			*utf8_dst++ = (char)(0x80 | (u8)((ch) & 0x3f));
+			--utf8_maxbytes;
+		}
+	}
+	return utf8_dst;
+}
+
+
 @@>> unicode_16to32(3)
 @@Convert a given utf-16 string to utf-32.
-@@@param: utf32_dst: A buffer of at least `UNICODE_16TO32_MAXBUF(utf16_characters)' dwords, or *4 bytes
-@@@param: utf16_text: The input UTF-16 string to convert
-@@@param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
+@@@param: utf32_dst:   A buffer of at least `UNICODE_16TO32_MAXBUF(utf16_words)' dwords, or *4 bytes
+@@@param: utf16_text:  The input UTF-16 string to convert
+@@@param: utf16_words: The amount of UTF-16 words found in `utf16_text'
 @@@return: * : A pointer after the last written UTF-32 character
-[[kernel, nonnull]]
-[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+[[kernel, nonnull, decl_include("<hybrid/typecore.h>")]]
 char32_t *unicode_16to32([[out]] /*utf-32*/ char32_t *__restrict utf32_dst,
-                         [[in(utf16_characters)]] /*utf-16*/ char16_t const *__restrict utf16_text,
-                         $size_t utf16_characters) {
-	char16_t const *utf16_end = utf16_text + utf16_characters;
+                         [[in(utf16_words)]] /*utf-16*/ char16_t const *__restrict utf16_text,
+                         $size_t utf16_words) {
+	char16_t const *utf16_end = utf16_text + utf16_words;
 	while (utf16_text < utf16_end)
 		*utf32_dst++ = unicode_readutf16_n((char16_t const **)&utf16_text, utf16_end);
 	return utf32_dst;
 }
 
+
+@@>> unicode_16to32_n(3)
+@@Same as `unicode_16to32(3)', but don't write more than `utf32_maxwords' words to `utf32_dst'
+@@@param: utf32_dst:      A buffer of at least `utf32_maxwords' dwords
+@@@param: utf32_maxwords: Max # of words to write to `utf16_dst'
+@@@param: utf16_text:     The input UTF-16 string to convert
+@@@param: utf16_words:    The amount of UTF-16 words found in `utf16_text'
+@@@return: * : A pointer after the last written UTF-32 character
+[[nonnull, decl_include("<hybrid/typecore.h>")]]
+char32_t *unicode_16to32_n([[out(? <= utf32_maxwords)]] /*utf-32*/ char32_t *__restrict utf32_dst, $size_t utf32_maxwords,
+                           [[in(? <= utf16_words)]] /*utf-16*/ char16_t const *__restrict utf16_text, $size_t utf16_words) {
+	char16_t const *utf16_end = utf16_text + utf16_words;
+	while (utf16_text < utf16_end && utf32_maxwords) {
+		*utf32_dst++ = unicode_readutf16_n((char16_t const **)&utf16_text, utf16_end);
+		--utf32_maxwords;
+	}
+	return utf32_dst;
+}
+
+
 @@>> unicode_32to8(3)
 @@Convert a given utf-32 string to utf-8.
-@@@param: utf8_dst: A buffer of at least `UNICODE_32TO8_MAXBUF(utf16_characters)' bytes
-@@@param: utf32_text: The input UTF-32 string to convert
-@@@param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
+@@@param: utf8_dst:     A buffer of at least `UNICODE_32TO8_MAXBUF(utf32_dwords)' bytes
+@@@param: utf32_text:   The input UTF-32 string to convert
+@@@param: utf32_dwords: The amount of UTF-32 dwords found in `utf32_text'
 @@@return: * : A pointer after the last written UTF-8 character
-[[kernel, nonnull]]
-[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+[[kernel, nonnull, decl_include("<hybrid/typecore.h>")]]
 char *unicode_32to8([[out]] /*utf-8*/ char *__restrict utf8_dst,
-                    [[in(utf32_characters)]] /*utf-32*/ char32_t const *__restrict utf32_text,
-                    $size_t utf32_characters) {
-	while (utf32_characters--)
+                    [[in(utf32_dwords)]] /*utf-32*/ char32_t const *__restrict utf32_text,
+                    $size_t utf32_dwords) {
+	while (utf32_dwords--)
 		utf8_dst = unicode_writeutf8(utf8_dst, *utf32_text++);
+	return utf8_dst;
+}
+
+@@>> unicode_32to8_n(3)
+@@Same as `unicode_32to8(3)', but don't write more than `utf8_maxbytes' bytes to `utf8_dst'
+@@@param: utf8_dst:      A buffer of at least `utf8_maxbytes' bytes
+@@@param: utf8_maxbytes: Max # of words to write to `utf8_dst'
+@@@param: utf32_text:    The input UTF-32 string to convert
+@@@param: utf32_dwords:  The amount of UTF-32 dwords found in `utf32_text'
+@@@return: * : A pointer after the last written UTF-8 character
+[[nonnull, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+char *unicode_32to8_n([[out(? <= utf8_maxbytes)]] /*utf-8*/ char *__restrict utf8_dst, $size_t utf8_maxbytes,
+                      [[in(? <= utf32_dwords)]] /*utf-32*/ char32_t const *__restrict utf32_text, $size_t utf32_dwords) {
+	char *utf8_bufend = utf8_dst + utf8_maxbytes;
+	while (utf32_dwords-- && utf8_dst < utf8_bufend) {
+		utf8_dst = unicode_writeutf8_n(utf8_dst, *utf32_text++,
+		                               (size_t)(utf8_bufend - utf8_dst));
+	}
 	return utf8_dst;
 }
 
 
 @@>> unicode_32to16(3)
 @@Convert a given utf-32 string to utf-16.
-@@@param: utf16_dst: A buffer of at least `UNICODE_32TO16_MAXBUF(utf16_characters)' words, or *2 bytes
-@@@param: utf32_text: The input UTF-32 string to convert
-@@@param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
+@@@param: utf16_dst:    A buffer of at least `UNICODE_32TO16_MAXBUF(utf32_dwords)' words, or *2 bytes
+@@@param: utf32_text:   The input UTF-32 string to convert
+@@@param: utf32_dwords: The amount of UTF-32 dwords found in `utf32_text'
 @@@return: * : A pointer after the last written UTF-16 character
-[[kernel, nonnull]]
-[[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
+[[kernel, nonnull, decl_include("<hybrid/typecore.h>")]]
 char16_t *unicode_32to16([[out]] /*utf-16*/ char16_t *__restrict utf16_dst,
-                         [[in(utf32_characters)]] /*utf-32*/ char32_t const *__restrict utf32_text,
-                         $size_t utf32_characters) {
-	while (utf32_characters--)
+                         [[in(utf32_dwords)]] /*utf-32*/ char32_t const *__restrict utf32_text,
+                         $size_t utf32_dwords) {
+	while (utf32_dwords--)
 		utf16_dst = unicode_writeutf16(utf16_dst, *utf32_text++);
 	return utf16_dst;
 }
+
+
+@@>> unicode_32to16_n(3)
+@@Same as `unicode_32to16(3)', but don't write more than `utf16_maxwords' words to `utf16_dst'
+@@@param: utf16_dst:      A buffer of at least `utf16_dst' words.
+@@@param: utf16_maxwords: Max # of words to write to `utf16_dst'
+@@@param: utf32_text:     The input UTF-32 string to convert
+@@@param: utf32_dwords:   The amount of UTF-32 dwords found in `utf32_text'
+@@@return: * : A pointer after the last written UTF-16 character
+[[nonnull, decl_include("<hybrid/typecore.h>")]]
+char16_t *unicode_32to16_n([[out(? <= utf16_maxwords)]] /*utf-16*/ char16_t *__restrict utf16_dst, $size_t utf16_maxwords,
+                           [[in(? <= utf32_dwords)]] /*utf-32*/ char32_t const *__restrict utf32_text, $size_t utf32_dwords) {
+	while (utf32_dwords-- && utf16_maxwords) {
+		char32_t ch = *utf32_text++;
+		if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
+			*utf16_dst++ = (char16_t)ch;
+			--utf16_maxwords;
+		} else {
+			ch -= UTF16_SURROGATE_SHIFT;
+			*utf16_dst++ = UTF16_HIGH_SURROGATE_MIN + (char16_t)(ch >> 10);
+			--utf16_maxwords;
+			if unlikely(!utf16_maxwords)
+				break;
+			*utf16_dst++ = UTF16_LOW_SURROGATE_MIN + (char16_t)(ch & 0x3ff);
+			--utf16_maxwords;
+		}
+	}
+	return utf16_dst;
+}
+
+
 
 
 
@@ -2199,6 +2480,33 @@ __NOTHROW_NCX(unicode_asdigit)(char32_t ch, __UINT8_TYPE__ radix,
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 #endif /* !____unicode_descriptor_defined */
+
+/* Wide-character integration */
+#if __SIZEOF_WCHAR_T__ == 4
+#define UNICODE_8TOW_MAXBUF UNICODE_8TO32_MAXBUF
+#define UNICODE_WTO8_MAXBUF UNICODE_32TO8_MAXBUF
+#define unicode_len8tow     unicode_len8to32
+#define unicode_wto8(utf8_dst, wchar_text, wchar_words) \
+	unicode_32to8(utf8_dst, (char32_t const *)(wchar_text), wchar_words)
+#define unicode_wto8_n(utf8_dst, utf8_maxbytes, wchar_text, wchar_words) \
+	unicode_32to8_n(utf8_dst, utf8_maxbytes, (char32_t const *)(wchar_text), wchar_words)
+#define unicode_8tow(wide_dst, utf8_text, utf8_bytes) \
+	(wchar_t *)unicode_8to32((char32_t *)(wide_dst), utf8_text, utf8_bytes)
+#define unicode_8tow_n(wide_dst, wide_maxwords, utf8_text, utf8_bytes) \
+	(wchar_t *)unicode_8to32_n((char32_t *)(wide_dst), wide_maxwords, utf8_text, utf8_bytes)
+#else /* __SIZEOF_WCHAR_T__ == 4 */
+#define UNICODE_8TOW_MAXBUF UNICODE_8TO16_MAXBUF
+#define UNICODE_WTO8_MAXBUF UNICODE_16TO8_MAXBUF
+#define unicode_len8tow     unicode_len8to16
+#define unicode_wto8(utf8_dst, wchar_text, wchar_words) \
+	unicode_16to8(utf8_dst, (char16_t const *)(wchar_text), wchar_words)
+#define unicode_wto8_n(utf8_dst, utf8_maxbytes, wchar_text, wchar_words) \
+	unicode_16to8_n(utf8_dst, utf8_maxbytes, (char16_t const *)(wchar_text), wchar_words)
+#define unicode_8tow(wide_dst, utf8_text, utf8_bytes) \
+	(wchar_t *)unicode_8to16((char16_t *)(wide_dst), utf8_text, utf8_bytes)
+#define unicode_8tow_n(wide_dst, wide_maxwords, utf8_text, utf8_bytes) \
+	(wchar_t *)unicode_8to16_n((char16_t *)(wide_dst), wide_maxwords, utf8_text, utf8_bytes)
+#endif /* __SIZEOF_WCHAR_T__ != 4 */
 
 __SYSDECL_END
 #endif /* __CC__ */

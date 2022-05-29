@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8bdba1c */
+/* HASH CRC-32:0x9480d3c1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,8 +35,8 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_unicode_readutf16_n */
 #endif /* !__local___localdep_unicode_readutf16_n_defined */
 __LOCAL_LIBC(unicode_16to8) __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_16to8))(char *__restrict __utf8_dst, __CHAR16_TYPE__ const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_characters) {
-	__CHAR16_TYPE__ const *__utf16_end = __utf16_text + __utf16_characters;
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_16to8))(char *__restrict __utf8_dst, __CHAR16_TYPE__ const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_words) {
+	__CHAR16_TYPE__ const *__utf16_end = __utf16_text + __utf16_words;
 	while (__utf16_text < __utf16_end) {
 		__CHAR32_TYPE__ __ch;
 		__ch = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf16_n)((__CHAR16_TYPE__ const **)&__utf16_text, __utf16_end);

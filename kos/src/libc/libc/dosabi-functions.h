@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e3a22b */
+/* HASH CRC-32:0x8129fc93 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2872,15 +2872,25 @@ DFUN(".text.crt.dos.unicode.UTF", libd_unicode_readutf16_swap_rev, libc_unicode_
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_readutf16_rev_n, libc_unicode_readutf16_rev_n, TI32, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_readutf16_swap_rev_n, libc_unicode_readutf16_swap_rev_n, TI32, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_writeutf8, libc_unicode_writeutf8, TP, 2, TP, TI32)
+DFUN(".text.crt.dos.unicode.UTF", libd_unicode_writeutf8_n, libc_unicode_writeutf8_n, TP, 3, TP, TI32, TI)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_writeutf16, libc_unicode_writeutf16, TP, 2, TP, TI32)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_writeutf16_chk, libc_unicode_writeutf16_chk, TP, 2, TP, TI32)
+DFUN(".text.crt.dos.unicode.UTF", libd_unicode_len8to16, libc_unicode_len8to16, TI, 2, TP, TI)
+DFUN(".text.crt.dos.unicode.UTF", libd_unicode_len8to32, libc_unicode_len8to32, TI, 2, TP, TI)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_8to16, libc_unicode_8to16, TP, 3, TP, TP, TI)
+DFUN(".text.crt.dos.unicode.UTF", libd_unicode_8to16_n, libc_unicode_8to16_n, TP, 4, TP, TI, TP, TI)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_8to16_chk, libc_unicode_8to16_chk, TP, 3, TP, TP, TI)
+DFUN(".text.crt.dos.unicode.UTF", libd_unicode_8to16_chk_n, libc_unicode_8to16_chk_n, TP, 4, TP, TI, TP, TI)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_8to32, libc_unicode_8to32, TP, 3, TP, TP, TI)
+DFUN(".text.crt.dos.unicode.UTF", libd_unicode_8to32_n, libc_unicode_8to32_n, TP, 4, TP, TI, TP, TI)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_16to8, libc_unicode_16to8, TP, 3, TP, TP, TI)
+DFUN(".text.crt.dos.unicode.UTF", libd_unicode_16to8_n, libc_unicode_16to8_n, TP, 4, TP, TI, TP, TI)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_16to32, libc_unicode_16to32, TP, 3, TP, TP, TI)
+DFUN(".text.crt.dos.unicode.UTF", libd_unicode_16to32_n, libc_unicode_16to32_n, TP, 4, TP, TI, TP, TI)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_32to8, libc_unicode_32to8, TP, 3, TP, TP, TI)
+DFUN(".text.crt.dos.unicode.UTF", libd_unicode_32to8_n, libc_unicode_32to8_n, TP, 4, TP, TI, TP, TI)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_32to16, libc_unicode_32to16, TP, 3, TP, TP, TI)
+DFUN(".text.crt.dos.unicode.UTF", libd_unicode_32to16_n, libc_unicode_32to16_n, TP, 4, TP, TI, TP, TI)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_c8toc16, libc_unicode_c8toc16, TI, 4, TP, TP, TI, TP)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_c8toc32, libc_unicode_c8toc32, TI, 4, TP, TP, TI, TP)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_c16toc8, libc_unicode_c16toc8, TI, 3, TP, TI16, TP)

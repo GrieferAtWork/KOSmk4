@@ -309,7 +309,11 @@ INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE ATTR_IN(1) fd_t
 NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR __KOS_FIXED_CONST *__restrict dirp)
 /*[[[body:libc_dirfd]]]*/
 {
+	if unlikely(!dirp)
+		goto err_null;
 	return dirp->ds_fd;
+err_null:
+	return libc_seterrno(EINVAL);
 }
 /*[[[end:libc_dirfd]]]*/
 
@@ -326,7 +330,8 @@ NOTHROW_RPC(LIBCCALL libc_getdirentries)(fd_t fd,
 	ssize_t result;
 	if unlikely(lseek(fd, *basep, SEEK_SET) < 0)
 		goto err;
-	result = kreaddir(fd, (struct dirent *)buf, nbytes, READDIR_MULTIPLE);
+	result = kreaddir(fd, (struct dirent *)buf,
+	                  nbytes, READDIR_MULTIPLE);
 	if (result > 0)
 		*basep += result;
 	return result;
@@ -406,7 +411,7 @@ NOTHROW_RPC(LIBCCALL libc_readdirk)(DIR *__restrict dirp)
 again:
 	result = dirp->ds_next;
 
-	/* Check if there the pre-loaded next-pointer is valid. */
+	/* Check if the pre-loaded next-pointer is valid. */
 	if (READDIR_MULTIPLE_ISVALID(result, dirp->ds_buf, dirp->ds_lodsize)) {
 		if (READDIR_MULTIPLE_ISEOF(result))
 			return NULL; /* End of directory */

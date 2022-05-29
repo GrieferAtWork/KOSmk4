@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf5b8b0a */
+/* HASH CRC-32:0x1f69c543 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -560,6 +560,16 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_OUT(1),char *,__NOTHROW_NCX,unicode_writeutf
  * location. This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_writeutf8, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_OUT(1) char *__NOTHROW_NCX(__LIBCCALL unicode_writeutf8)(char *__restrict __dst, char32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf8))(__dst, __ch); })
 #endif /* !__CRT_HAVE_unicode_writeutf8 */
+#ifdef __CRT_HAVE_unicode_writeutf8_n
+/* >> unicode_writeutf8_n(3)
+ * Same as `unicode_writeutf8(3)', but don't writ emore than `dst_maxbytes' bytes. */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_OUTS(1, 3),char *,__NOTHROW_NCX,unicode_writeutf8_n,(char *__restrict __dst, char32_t __ch, __SIZE_TYPE__ __dst_maxbytes),(__dst,__ch,__dst_maxbytes))
+#else /* __CRT_HAVE_unicode_writeutf8_n */
+#include <libc/local/unicode/unicode_writeutf8_n.h>
+/* >> unicode_writeutf8_n(3)
+ * Same as `unicode_writeutf8(3)', but don't writ emore than `dst_maxbytes' bytes. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_writeutf8_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_OUTS(1, 3) char *__NOTHROW_NCX(__LIBCCALL unicode_writeutf8_n)(char *__restrict __dst, char32_t __ch, __SIZE_TYPE__ __dst_maxbytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf8_n))(__dst, __ch, __dst_maxbytes); })
+#endif /* !__CRT_HAVE_unicode_writeutf8_n */
 #ifdef __CRT_HAVE_unicode_writeutf16
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character  `ch' to `dst' and return  a pointer to its  end
@@ -810,134 +820,300 @@ __LOCAL __ATTR_RETNONNULL __ATTR_OUT(1) char32_t *
 	return __dst;
 }
 
+#ifdef __CRT_HAVE_unicode_len8to16
+/* >> unicode_len8to16(3)
+ * Return the number of utf-16 words needed to encode a given utf-8 string
+ * HINT: This is the exact number of words written by `unicode_8to16(3)' */
+__CDECLARE(__ATTR_WUNUSED __ATTR_INS(1, 2),size_t,__NOTHROW_NCX,unicode_len8to16,(char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes),(__utf8_text,__utf8_bytes))
+#else /* __CRT_HAVE_unicode_len8to16 */
+#include <libc/local/unicode/unicode_len8to16.h>
+/* >> unicode_len8to16(3)
+ * Return the number of utf-16 words needed to encode a given utf-8 string
+ * HINT: This is the exact number of words written by `unicode_8to16(3)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_len8to16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INS(1, 2) size_t __NOTHROW_NCX(__LIBCCALL unicode_len8to16)(char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_len8to16))(__utf8_text, __utf8_bytes); })
+#endif /* !__CRT_HAVE_unicode_len8to16 */
+#ifdef __CRT_HAVE_unicode_len8to32
+/* >> unicode_len8to32(3)
+ * Return the number of utf-32 character needed to encode a given utf-8 string
+ * HINT: This is the exact number of words written by `unicode_8to32(3)' */
+__CDECLARE(__ATTR_WUNUSED __ATTR_INS(1, 2),size_t,__NOTHROW_NCX,unicode_len8to32,(char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes),(__utf8_text,__utf8_bytes))
+#else /* __CRT_HAVE_unicode_len8to32 */
+#include <libc/local/unicode/unicode_len8to32.h>
+/* >> unicode_len8to32(3)
+ * Return the number of utf-32 character needed to encode a given utf-8 string
+ * HINT: This is the exact number of words written by `unicode_8to32(3)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_len8to32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INS(1, 2) size_t __NOTHROW_NCX(__LIBCCALL unicode_len8to32)(char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_len8to32))(__utf8_text, __utf8_bytes); })
+#endif /* !__CRT_HAVE_unicode_len8to32 */
 #ifdef __CRT_HAVE_unicode_8to16
 /* >> unicode_8to16(3)
  * Convert a given utf-8 string to utf-16.
- * @param: utf16_dst: A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_characters)' words, or `*2' bytes
- * @param: utf8_text: The input UTF-8 string to convert
- * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
+ * @param: utf16_dst:  A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_bytes)' words, or `*2' bytes
+ * @param: utf8_text:  The input UTF-8 string to convert
+ * @param: utf8_bytes: The amount of UTF-8 bytes found in `utf8_text'
  * @return: * : A pointer after the last written UTF-16 character */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1),char16_t *,__NOTHROW_NCX,unicode_8to16,(char16_t *__restrict __utf16_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_characters),(__utf16_dst,__utf8_text,__utf8_characters))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1),char16_t *,__NOTHROW_NCX,unicode_8to16,(char16_t *__restrict __utf16_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes),(__utf16_dst,__utf8_text,__utf8_bytes))
 #else /* __CRT_HAVE_unicode_8to16 */
 #include <libc/local/unicode/unicode_8to16.h>
 /* >> unicode_8to16(3)
  * Convert a given utf-8 string to utf-16.
- * @param: utf16_dst: A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_characters)' words, or `*2' bytes
- * @param: utf8_text: The input UTF-8 string to convert
- * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
+ * @param: utf16_dst:  A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_bytes)' words, or `*2' bytes
+ * @param: utf8_text:  The input UTF-8 string to convert
+ * @param: utf8_bytes: The amount of UTF-8 bytes found in `utf8_text'
  * @return: * : A pointer after the last written UTF-16 character */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_8to16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char16_t *__NOTHROW_NCX(__LIBCCALL unicode_8to16)(char16_t *__restrict __utf16_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_characters) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_8to16))(__utf16_dst, __utf8_text, __utf8_characters); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_8to16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char16_t *__NOTHROW_NCX(__LIBCCALL unicode_8to16)(char16_t *__restrict __utf16_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_8to16))(__utf16_dst, __utf8_text, __utf8_bytes); })
 #endif /* !__CRT_HAVE_unicode_8to16 */
+#ifdef __CRT_HAVE_unicode_8to16_n
+/* >> unicode_8to16_n(3)
+ * Same as `unicode_8to16(3)', but don't write more than `utf16_maxwords' words to `utf16_dst'
+ * @param: utf16_dst:      A buffer of at least `utf16_dst' words.
+ * @param: utf16_maxwords: Max # of words to write to `utf16_dst'
+ * @param: utf8_text:      The input UTF-8 string to convert
+ * @param: utf8_bytes:     The amount of UTF-8 bytes found in `utf8_text'
+ * @return: * : A pointer after the last written UTF-16 character */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2),char16_t *,__NOTHROW_NCX,unicode_8to16_n,(char16_t *__restrict __utf16_dst, __SIZE_TYPE__ __utf16_maxwords, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes),(__utf16_dst,__utf16_maxwords,__utf8_text,__utf8_bytes))
+#else /* __CRT_HAVE_unicode_8to16_n */
+#include <libc/local/unicode/unicode_8to16_n.h>
+/* >> unicode_8to16_n(3)
+ * Same as `unicode_8to16(3)', but don't write more than `utf16_maxwords' words to `utf16_dst'
+ * @param: utf16_dst:      A buffer of at least `utf16_dst' words.
+ * @param: utf16_maxwords: Max # of words to write to `utf16_dst'
+ * @param: utf8_text:      The input UTF-8 string to convert
+ * @param: utf8_bytes:     The amount of UTF-8 bytes found in `utf8_text'
+ * @return: * : A pointer after the last written UTF-16 character */
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_8to16_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2) char16_t *__NOTHROW_NCX(__LIBCCALL unicode_8to16_n)(char16_t *__restrict __utf16_dst, __SIZE_TYPE__ __utf16_maxwords, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_8to16_n))(__utf16_dst, __utf16_maxwords, __utf8_text, __utf8_bytes); })
+#endif /* !__CRT_HAVE_unicode_8to16_n */
 #ifdef __CRT_HAVE_unicode_8to16_chk
 /* >> unicode_8to16_chk(3)
  * Same as `unicode_8to16()', but return `NULL' if an attempt was made to write an invalid character.
- * @param: utf16_dst: A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_characters)' words, or `*2' bytes
- * @param: utf8_text: The input UTF-8 string to convert
- * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
+ * @param: utf16_dst:  A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_bytes)' words, or `*2' bytes
+ * @param: utf8_text:  The input UTF-8 string to convert
+ * @param: utf8_bytes: The amount of UTF-8 bytes found in `utf8_text'
  * @return: * : A pointer after the last written UTF-16 character.
  * @return: NULL: Attempted to write an invalid character */
-__CDECLARE(__ATTR_WUNUSED __ATTR_INS(2, 3) __ATTR_OUT(1),char16_t *,__NOTHROW_NCX,unicode_8to16_chk,(char16_t *__restrict __utf16_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_characters),(__utf16_dst,__utf8_text,__utf8_characters))
+__CDECLARE(__ATTR_WUNUSED __ATTR_INS(2, 3) __ATTR_OUT(1),char16_t *,__NOTHROW_NCX,unicode_8to16_chk,(char16_t *__restrict __utf16_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes),(__utf16_dst,__utf8_text,__utf8_bytes))
 #else /* __CRT_HAVE_unicode_8to16_chk */
 #include <libc/local/unicode/unicode_8to16_chk.h>
 /* >> unicode_8to16_chk(3)
  * Same as `unicode_8to16()', but return `NULL' if an attempt was made to write an invalid character.
- * @param: utf16_dst: A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_characters)' words, or `*2' bytes
- * @param: utf8_text: The input UTF-8 string to convert
- * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
+ * @param: utf16_dst:  A buffer of at least `UNICODE_8TO16_MAXBUF(utf8_bytes)' words, or `*2' bytes
+ * @param: utf8_text:  The input UTF-8 string to convert
+ * @param: utf8_bytes: The amount of UTF-8 bytes found in `utf8_text'
  * @return: * : A pointer after the last written UTF-16 character.
  * @return: NULL: Attempted to write an invalid character */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_8to16_chk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INS(2, 3) __ATTR_OUT(1) char16_t *__NOTHROW_NCX(__LIBCCALL unicode_8to16_chk)(char16_t *__restrict __utf16_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_characters) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_8to16_chk))(__utf16_dst, __utf8_text, __utf8_characters); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_8to16_chk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INS(2, 3) __ATTR_OUT(1) char16_t *__NOTHROW_NCX(__LIBCCALL unicode_8to16_chk)(char16_t *__restrict __utf16_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_8to16_chk))(__utf16_dst, __utf8_text, __utf8_bytes); })
 #endif /* !__CRT_HAVE_unicode_8to16_chk */
+#ifdef __CRT_HAVE_unicode_8to16_chk_n
+/* >> unicode_8to16_chk_n(3)
+ * Same as `unicode_8to16_chk(3)', but don't write more than `utf16_maxwords' words to `utf16_dst'
+ * @param: utf16_dst:      A buffer of at least `utf16_dst' words.
+ * @param: utf16_maxwords: Max # of words to write to `utf16_dst'
+ * @param: utf8_text:      The input UTF-8 string to convert
+ * @param: utf8_bytes:     The amount of UTF-8 bytes found in `utf8_text'
+ * @return: * :   A pointer after the last written UTF-16 character
+ * @return: NULL: Attempted to write an invalid character */
+__CDECLARE(__ATTR_WUNUSED __ATTR_INS(3, 4) __ATTR_OUTS(1, 2),char16_t *,__NOTHROW_NCX,unicode_8to16_chk_n,(char16_t *__restrict __utf16_dst, __SIZE_TYPE__ __utf16_maxwords, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes),(__utf16_dst,__utf16_maxwords,__utf8_text,__utf8_bytes))
+#else /* __CRT_HAVE_unicode_8to16_chk_n */
+#include <libc/local/unicode/unicode_8to16_chk_n.h>
+/* >> unicode_8to16_chk_n(3)
+ * Same as `unicode_8to16_chk(3)', but don't write more than `utf16_maxwords' words to `utf16_dst'
+ * @param: utf16_dst:      A buffer of at least `utf16_dst' words.
+ * @param: utf16_maxwords: Max # of words to write to `utf16_dst'
+ * @param: utf8_text:      The input UTF-8 string to convert
+ * @param: utf8_bytes:     The amount of UTF-8 bytes found in `utf8_text'
+ * @return: * :   A pointer after the last written UTF-16 character
+ * @return: NULL: Attempted to write an invalid character */
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_8to16_chk_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INS(3, 4) __ATTR_OUTS(1, 2) char16_t *__NOTHROW_NCX(__LIBCCALL unicode_8to16_chk_n)(char16_t *__restrict __utf16_dst, __SIZE_TYPE__ __utf16_maxwords, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_8to16_chk_n))(__utf16_dst, __utf16_maxwords, __utf8_text, __utf8_bytes); })
+#endif /* !__CRT_HAVE_unicode_8to16_chk_n */
 #ifdef __CRT_HAVE_unicode_8to32
 /* >> unicode_8to32(3)
  * Convert a given utf-8 string to utf-32.
- * @param: utf32_dst: A buffer of at least `UNICODE_8TO32_MAXBUF(utf8_characters)' dwords, or `*4' bytes
- * @param: utf8_text: The input UTF-8 string to convert
- * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
+ * @param: utf32_dst:  A buffer of at least `UNICODE_8TO32_MAXBUF(utf8_bytes)' dwords, or `*4' bytes
+ * @param: utf8_text:  The input UTF-8 string to convert
+ * @param: utf8_bytes: The amount of UTF-8 bytes found in `utf8_text'
  * @return: * : A pointer after the last written UTF-32 character. */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1),char32_t *,__NOTHROW_NCX,unicode_8to32,(char32_t *__restrict __utf32_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_characters),(__utf32_dst,__utf8_text,__utf8_characters))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1),char32_t *,__NOTHROW_NCX,unicode_8to32,(char32_t *__restrict __utf32_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes),(__utf32_dst,__utf8_text,__utf8_bytes))
 #else /* __CRT_HAVE_unicode_8to32 */
 #include <libc/local/unicode/unicode_8to32.h>
 /* >> unicode_8to32(3)
  * Convert a given utf-8 string to utf-32.
- * @param: utf32_dst: A buffer of at least `UNICODE_8TO32_MAXBUF(utf8_characters)' dwords, or `*4' bytes
- * @param: utf8_text: The input UTF-8 string to convert
- * @param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
+ * @param: utf32_dst:  A buffer of at least `UNICODE_8TO32_MAXBUF(utf8_bytes)' dwords, or `*4' bytes
+ * @param: utf8_text:  The input UTF-8 string to convert
+ * @param: utf8_bytes: The amount of UTF-8 bytes found in `utf8_text'
  * @return: * : A pointer after the last written UTF-32 character. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_8to32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char32_t *__NOTHROW_NCX(__LIBCCALL unicode_8to32)(char32_t *__restrict __utf32_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_characters) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_8to32))(__utf32_dst, __utf8_text, __utf8_characters); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_8to32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char32_t *__NOTHROW_NCX(__LIBCCALL unicode_8to32)(char32_t *__restrict __utf32_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_8to32))(__utf32_dst, __utf8_text, __utf8_bytes); })
 #endif /* !__CRT_HAVE_unicode_8to32 */
+#ifdef __CRT_HAVE_unicode_8to32_n
+/* >> unicode_8to32_n(3)
+ * Same as `unicode_8to32(3)', but don't write more than `utf32_maxwords' words to `utf32_dst'
+ * @param: utf32_dst:      A buffer of at least `utf32_maxwords' dwords
+ * @param: utf32_maxwords: Max # of words to write to `utf16_dst'
+ * @param: utf8_text:      The input UTF-8 string to convert
+ * @param: utf8_bytes:     The amount of UTF-8 bytes found in `utf8_text'
+ * @return: * : A pointer after the last written UTF-32 character. */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2),char32_t *,__NOTHROW_NCX,unicode_8to32_n,(char32_t *__restrict __utf32_dst, __SIZE_TYPE__ __utf32_maxwords, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes),(__utf32_dst,__utf32_maxwords,__utf8_text,__utf8_bytes))
+#else /* __CRT_HAVE_unicode_8to32_n */
+#include <libc/local/unicode/unicode_8to32_n.h>
+/* >> unicode_8to32_n(3)
+ * Same as `unicode_8to32(3)', but don't write more than `utf32_maxwords' words to `utf32_dst'
+ * @param: utf32_dst:      A buffer of at least `utf32_maxwords' dwords
+ * @param: utf32_maxwords: Max # of words to write to `utf16_dst'
+ * @param: utf8_text:      The input UTF-8 string to convert
+ * @param: utf8_bytes:     The amount of UTF-8 bytes found in `utf8_text'
+ * @return: * : A pointer after the last written UTF-32 character. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_8to32_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2) char32_t *__NOTHROW_NCX(__LIBCCALL unicode_8to32_n)(char32_t *__restrict __utf32_dst, __SIZE_TYPE__ __utf32_maxwords, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_8to32_n))(__utf32_dst, __utf32_maxwords, __utf8_text, __utf8_bytes); })
+#endif /* !__CRT_HAVE_unicode_8to32_n */
 #ifdef __CRT_HAVE_unicode_16to8
 /* >> unicode_16to8(3)
  * Convert a given utf-16 string to utf-8.
- * @param: utf8_dst: A buffer of at least `UNICODE_16TO8_MAXBUF(utf16_characters)' bytes
- * @param: utf16_text: The input UTF-16 string to convert
- * @param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
+ * @param: utf8_dst:    A buffer of at least `UNICODE_16TO8_MAXBUF(utf16_words)' bytes
+ * @param: utf16_text:  The input UTF-16 string to convert
+ * @param: utf16_words: The amount of UTF-16 words found in `utf16_text'
  * @return: * : A pointer after the last written UTF-8 character */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1),char *,__NOTHROW_NCX,unicode_16to8,(char *__restrict __utf8_dst, char16_t const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_characters),(__utf8_dst,__utf16_text,__utf16_characters))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1),char *,__NOTHROW_NCX,unicode_16to8,(char *__restrict __utf8_dst, char16_t const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_words),(__utf8_dst,__utf16_text,__utf16_words))
 #else /* __CRT_HAVE_unicode_16to8 */
 #include <libc/local/unicode/unicode_16to8.h>
 /* >> unicode_16to8(3)
  * Convert a given utf-16 string to utf-8.
- * @param: utf8_dst: A buffer of at least `UNICODE_16TO8_MAXBUF(utf16_characters)' bytes
- * @param: utf16_text: The input UTF-16 string to convert
- * @param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
+ * @param: utf8_dst:    A buffer of at least `UNICODE_16TO8_MAXBUF(utf16_words)' bytes
+ * @param: utf16_text:  The input UTF-16 string to convert
+ * @param: utf16_words: The amount of UTF-16 words found in `utf16_text'
  * @return: * : A pointer after the last written UTF-8 character */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_16to8, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char *__NOTHROW_NCX(__LIBCCALL unicode_16to8)(char *__restrict __utf8_dst, char16_t const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_characters) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_16to8))(__utf8_dst, __utf16_text, __utf16_characters); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_16to8, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char *__NOTHROW_NCX(__LIBCCALL unicode_16to8)(char *__restrict __utf8_dst, char16_t const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_16to8))(__utf8_dst, __utf16_text, __utf16_words); })
 #endif /* !__CRT_HAVE_unicode_16to8 */
+#ifdef __CRT_HAVE_unicode_16to8_n
+/* >> unicode_16to8_n(3)
+ * Same as `unicode_16to8(3)', but don't write more than `utf8_maxbytes' bytes to `utf8_dst'
+ * @param: utf8_dst:      A buffer of at least `utf8_maxbytes' bytes
+ * @param: utf8_maxbytes: Max # of bytes to write to `utf8_dst'
+ * @param: utf16_text:    The input UTF-16 string to convert
+ * @param: utf16_words:   The amount of UTF-16 words found in `utf16_text'
+ * @return: * : A pointer after the last written UTF-8 character */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2),char *,__NOTHROW_NCX,unicode_16to8_n,(char *__restrict __utf8_dst, __SIZE_TYPE__ __utf8_maxbytes, char16_t const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_words),(__utf8_dst,__utf8_maxbytes,__utf16_text,__utf16_words))
+#else /* __CRT_HAVE_unicode_16to8_n */
+#include <libc/local/unicode/unicode_16to8_n.h>
+/* >> unicode_16to8_n(3)
+ * Same as `unicode_16to8(3)', but don't write more than `utf8_maxbytes' bytes to `utf8_dst'
+ * @param: utf8_dst:      A buffer of at least `utf8_maxbytes' bytes
+ * @param: utf8_maxbytes: Max # of bytes to write to `utf8_dst'
+ * @param: utf16_text:    The input UTF-16 string to convert
+ * @param: utf16_words:   The amount of UTF-16 words found in `utf16_text'
+ * @return: * : A pointer after the last written UTF-8 character */
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_16to8_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2) char *__NOTHROW_NCX(__LIBCCALL unicode_16to8_n)(char *__restrict __utf8_dst, __SIZE_TYPE__ __utf8_maxbytes, char16_t const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_16to8_n))(__utf8_dst, __utf8_maxbytes, __utf16_text, __utf16_words); })
+#endif /* !__CRT_HAVE_unicode_16to8_n */
 #ifdef __CRT_HAVE_unicode_16to32
 /* >> unicode_16to32(3)
  * Convert a given utf-16 string to utf-32.
- * @param: utf32_dst: A buffer of at least `UNICODE_16TO32_MAXBUF(utf16_characters)' dwords, or *4 bytes
- * @param: utf16_text: The input UTF-16 string to convert
- * @param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
+ * @param: utf32_dst:   A buffer of at least `UNICODE_16TO32_MAXBUF(utf16_words)' dwords, or *4 bytes
+ * @param: utf16_text:  The input UTF-16 string to convert
+ * @param: utf16_words: The amount of UTF-16 words found in `utf16_text'
  * @return: * : A pointer after the last written UTF-32 character */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1),char32_t *,__NOTHROW_NCX,unicode_16to32,(char32_t *__restrict __utf32_dst, char16_t const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_characters),(__utf32_dst,__utf16_text,__utf16_characters))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1),char32_t *,__NOTHROW_NCX,unicode_16to32,(char32_t *__restrict __utf32_dst, char16_t const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_words),(__utf32_dst,__utf16_text,__utf16_words))
 #else /* __CRT_HAVE_unicode_16to32 */
 #include <libc/local/unicode/unicode_16to32.h>
 /* >> unicode_16to32(3)
  * Convert a given utf-16 string to utf-32.
- * @param: utf32_dst: A buffer of at least `UNICODE_16TO32_MAXBUF(utf16_characters)' dwords, or *4 bytes
- * @param: utf16_text: The input UTF-16 string to convert
- * @param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
+ * @param: utf32_dst:   A buffer of at least `UNICODE_16TO32_MAXBUF(utf16_words)' dwords, or *4 bytes
+ * @param: utf16_text:  The input UTF-16 string to convert
+ * @param: utf16_words: The amount of UTF-16 words found in `utf16_text'
  * @return: * : A pointer after the last written UTF-32 character */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_16to32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char32_t *__NOTHROW_NCX(__LIBCCALL unicode_16to32)(char32_t *__restrict __utf32_dst, char16_t const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_characters) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_16to32))(__utf32_dst, __utf16_text, __utf16_characters); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_16to32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char32_t *__NOTHROW_NCX(__LIBCCALL unicode_16to32)(char32_t *__restrict __utf32_dst, char16_t const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_16to32))(__utf32_dst, __utf16_text, __utf16_words); })
 #endif /* !__CRT_HAVE_unicode_16to32 */
+#ifdef __CRT_HAVE_unicode_16to32_n
+/* >> unicode_16to32_n(3)
+ * Same as `unicode_16to32(3)', but don't write more than `utf32_maxwords' words to `utf32_dst'
+ * @param: utf32_dst:      A buffer of at least `utf32_maxwords' dwords
+ * @param: utf32_maxwords: Max # of words to write to `utf16_dst'
+ * @param: utf16_text:     The input UTF-16 string to convert
+ * @param: utf16_words:    The amount of UTF-16 words found in `utf16_text'
+ * @return: * : A pointer after the last written UTF-32 character */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2),char32_t *,__NOTHROW_NCX,unicode_16to32_n,(char32_t *__restrict __utf32_dst, __SIZE_TYPE__ __utf32_maxwords, char16_t const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_words),(__utf32_dst,__utf32_maxwords,__utf16_text,__utf16_words))
+#else /* __CRT_HAVE_unicode_16to32_n */
+#include <libc/local/unicode/unicode_16to32_n.h>
+/* >> unicode_16to32_n(3)
+ * Same as `unicode_16to32(3)', but don't write more than `utf32_maxwords' words to `utf32_dst'
+ * @param: utf32_dst:      A buffer of at least `utf32_maxwords' dwords
+ * @param: utf32_maxwords: Max # of words to write to `utf16_dst'
+ * @param: utf16_text:     The input UTF-16 string to convert
+ * @param: utf16_words:    The amount of UTF-16 words found in `utf16_text'
+ * @return: * : A pointer after the last written UTF-32 character */
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_16to32_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2) char32_t *__NOTHROW_NCX(__LIBCCALL unicode_16to32_n)(char32_t *__restrict __utf32_dst, __SIZE_TYPE__ __utf32_maxwords, char16_t const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_16to32_n))(__utf32_dst, __utf32_maxwords, __utf16_text, __utf16_words); })
+#endif /* !__CRT_HAVE_unicode_16to32_n */
 #ifdef __CRT_HAVE_unicode_32to8
 /* >> unicode_32to8(3)
  * Convert a given utf-32 string to utf-8.
- * @param: utf8_dst: A buffer of at least `UNICODE_32TO8_MAXBUF(utf16_characters)' bytes
- * @param: utf32_text: The input UTF-32 string to convert
- * @param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
+ * @param: utf8_dst:     A buffer of at least `UNICODE_32TO8_MAXBUF(utf32_dwords)' bytes
+ * @param: utf32_text:   The input UTF-32 string to convert
+ * @param: utf32_dwords: The amount of UTF-32 dwords found in `utf32_text'
  * @return: * : A pointer after the last written UTF-8 character */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1),char *,__NOTHROW_NCX,unicode_32to8,(char *__restrict __utf8_dst, char32_t const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_characters),(__utf8_dst,__utf32_text,__utf32_characters))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1),char *,__NOTHROW_NCX,unicode_32to8,(char *__restrict __utf8_dst, char32_t const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_dwords),(__utf8_dst,__utf32_text,__utf32_dwords))
 #else /* __CRT_HAVE_unicode_32to8 */
 #include <libc/local/unicode/unicode_32to8.h>
 /* >> unicode_32to8(3)
  * Convert a given utf-32 string to utf-8.
- * @param: utf8_dst: A buffer of at least `UNICODE_32TO8_MAXBUF(utf16_characters)' bytes
- * @param: utf32_text: The input UTF-32 string to convert
- * @param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
+ * @param: utf8_dst:     A buffer of at least `UNICODE_32TO8_MAXBUF(utf32_dwords)' bytes
+ * @param: utf32_text:   The input UTF-32 string to convert
+ * @param: utf32_dwords: The amount of UTF-32 dwords found in `utf32_text'
  * @return: * : A pointer after the last written UTF-8 character */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_32to8, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char *__NOTHROW_NCX(__LIBCCALL unicode_32to8)(char *__restrict __utf8_dst, char32_t const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_characters) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_32to8))(__utf8_dst, __utf32_text, __utf32_characters); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_32to8, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char *__NOTHROW_NCX(__LIBCCALL unicode_32to8)(char *__restrict __utf8_dst, char32_t const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_32to8))(__utf8_dst, __utf32_text, __utf32_dwords); })
 #endif /* !__CRT_HAVE_unicode_32to8 */
+#ifdef __CRT_HAVE_unicode_32to8_n
+/* >> unicode_32to8_n(3)
+ * Same as `unicode_32to8(3)', but don't write more than `utf8_maxbytes' bytes to `utf8_dst'
+ * @param: utf8_dst:      A buffer of at least `utf8_maxbytes' bytes
+ * @param: utf8_maxbytes: Max # of words to write to `utf8_dst'
+ * @param: utf32_text:    The input UTF-32 string to convert
+ * @param: utf32_dwords:  The amount of UTF-32 dwords found in `utf32_text'
+ * @return: * : A pointer after the last written UTF-8 character */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2),char *,__NOTHROW_NCX,unicode_32to8_n,(char *__restrict __utf8_dst, __SIZE_TYPE__ __utf8_maxbytes, char32_t const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_dwords),(__utf8_dst,__utf8_maxbytes,__utf32_text,__utf32_dwords))
+#else /* __CRT_HAVE_unicode_32to8_n */
+#include <libc/local/unicode/unicode_32to8_n.h>
+/* >> unicode_32to8_n(3)
+ * Same as `unicode_32to8(3)', but don't write more than `utf8_maxbytes' bytes to `utf8_dst'
+ * @param: utf8_dst:      A buffer of at least `utf8_maxbytes' bytes
+ * @param: utf8_maxbytes: Max # of words to write to `utf8_dst'
+ * @param: utf32_text:    The input UTF-32 string to convert
+ * @param: utf32_dwords:  The amount of UTF-32 dwords found in `utf32_text'
+ * @return: * : A pointer after the last written UTF-8 character */
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_32to8_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2) char *__NOTHROW_NCX(__LIBCCALL unicode_32to8_n)(char *__restrict __utf8_dst, __SIZE_TYPE__ __utf8_maxbytes, char32_t const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_32to8_n))(__utf8_dst, __utf8_maxbytes, __utf32_text, __utf32_dwords); })
+#endif /* !__CRT_HAVE_unicode_32to8_n */
 #ifdef __CRT_HAVE_unicode_32to16
 /* >> unicode_32to16(3)
  * Convert a given utf-32 string to utf-16.
- * @param: utf16_dst: A buffer of at least `UNICODE_32TO16_MAXBUF(utf16_characters)' words, or *2 bytes
- * @param: utf32_text: The input UTF-32 string to convert
- * @param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
+ * @param: utf16_dst:    A buffer of at least `UNICODE_32TO16_MAXBUF(utf32_dwords)' words, or *2 bytes
+ * @param: utf32_text:   The input UTF-32 string to convert
+ * @param: utf32_dwords: The amount of UTF-32 dwords found in `utf32_text'
  * @return: * : A pointer after the last written UTF-16 character */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1),char16_t *,__NOTHROW_NCX,unicode_32to16,(char16_t *__restrict __utf16_dst, char32_t const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_characters),(__utf16_dst,__utf32_text,__utf32_characters))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1),char16_t *,__NOTHROW_NCX,unicode_32to16,(char16_t *__restrict __utf16_dst, char32_t const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_dwords),(__utf16_dst,__utf32_text,__utf32_dwords))
 #else /* __CRT_HAVE_unicode_32to16 */
 #include <libc/local/unicode/unicode_32to16.h>
 /* >> unicode_32to16(3)
  * Convert a given utf-32 string to utf-16.
- * @param: utf16_dst: A buffer of at least `UNICODE_32TO16_MAXBUF(utf16_characters)' words, or *2 bytes
- * @param: utf32_text: The input UTF-32 string to convert
- * @param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
+ * @param: utf16_dst:    A buffer of at least `UNICODE_32TO16_MAXBUF(utf32_dwords)' words, or *2 bytes
+ * @param: utf32_text:   The input UTF-32 string to convert
+ * @param: utf32_dwords: The amount of UTF-32 dwords found in `utf32_text'
  * @return: * : A pointer after the last written UTF-16 character */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_32to16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char16_t *__NOTHROW_NCX(__LIBCCALL unicode_32to16)(char16_t *__restrict __utf16_dst, char32_t const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_characters) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_32to16))(__utf16_dst, __utf32_text, __utf32_characters); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_32to16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) char16_t *__NOTHROW_NCX(__LIBCCALL unicode_32to16)(char16_t *__restrict __utf16_dst, char32_t const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_32to16))(__utf16_dst, __utf32_text, __utf32_dwords); })
 #endif /* !__CRT_HAVE_unicode_32to16 */
+#ifdef __CRT_HAVE_unicode_32to16_n
+/* >> unicode_32to16_n(3)
+ * Same as `unicode_32to16(3)', but don't write more than `utf16_maxwords' words to `utf16_dst'
+ * @param: utf16_dst:      A buffer of at least `utf16_dst' words.
+ * @param: utf16_maxwords: Max # of words to write to `utf16_dst'
+ * @param: utf32_text:     The input UTF-32 string to convert
+ * @param: utf32_dwords:   The amount of UTF-32 dwords found in `utf32_text'
+ * @return: * : A pointer after the last written UTF-16 character */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2),char16_t *,__NOTHROW_NCX,unicode_32to16_n,(char16_t *__restrict __utf16_dst, __SIZE_TYPE__ __utf16_maxwords, char32_t const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_dwords),(__utf16_dst,__utf16_maxwords,__utf32_text,__utf32_dwords))
+#else /* __CRT_HAVE_unicode_32to16_n */
+#include <libc/local/unicode/unicode_32to16_n.h>
+/* >> unicode_32to16_n(3)
+ * Same as `unicode_32to16(3)', but don't write more than `utf16_maxwords' words to `utf16_dst'
+ * @param: utf16_dst:      A buffer of at least `utf16_dst' words.
+ * @param: utf16_maxwords: Max # of words to write to `utf16_dst'
+ * @param: utf32_text:     The input UTF-32 string to convert
+ * @param: utf32_dwords:   The amount of UTF-32 dwords found in `utf32_text'
+ * @return: * : A pointer after the last written UTF-16 character */
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_32to16_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2) char16_t *__NOTHROW_NCX(__LIBCCALL unicode_32to16_n)(char16_t *__restrict __utf16_dst, __SIZE_TYPE__ __utf16_maxwords, char32_t const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_32to16_n))(__utf16_dst, __utf16_maxwords, __utf32_text, __utf32_dwords); })
+#endif /* !__CRT_HAVE_unicode_32to16_n */
 #ifdef __CRT_HAVE_unicode_c8toc16
 /* >> unicode_c8toc16(3)
  * @return: *:          Success (*pc16 was filled; the return value
@@ -1466,6 +1642,33 @@ __NOTHROW_NCX(unicode_asdigit)(char32_t ch, __UINT8_TYPE__ radix,
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 #endif /* !____unicode_descriptor_defined */
+
+/* Wide-character integration */
+#if __SIZEOF_WCHAR_T__ == 4
+#define UNICODE_8TOW_MAXBUF UNICODE_8TO32_MAXBUF
+#define UNICODE_WTO8_MAXBUF UNICODE_32TO8_MAXBUF
+#define unicode_len8tow     unicode_len8to32
+#define unicode_wto8(utf8_dst, wchar_text, wchar_words) \
+	unicode_32to8(utf8_dst, (char32_t const *)(wchar_text), wchar_words)
+#define unicode_wto8_n(utf8_dst, utf8_maxbytes, wchar_text, wchar_words) \
+	unicode_32to8_n(utf8_dst, utf8_maxbytes, (char32_t const *)(wchar_text), wchar_words)
+#define unicode_8tow(wide_dst, utf8_text, utf8_bytes) \
+	(wchar_t *)unicode_8to32((char32_t *)(wide_dst), utf8_text, utf8_bytes)
+#define unicode_8tow_n(wide_dst, wide_maxwords, utf8_text, utf8_bytes) \
+	(wchar_t *)unicode_8to32_n((char32_t *)(wide_dst), wide_maxwords, utf8_text, utf8_bytes)
+#else /* __SIZEOF_WCHAR_T__ == 4 */
+#define UNICODE_8TOW_MAXBUF UNICODE_8TO16_MAXBUF
+#define UNICODE_WTO8_MAXBUF UNICODE_16TO8_MAXBUF
+#define unicode_len8tow     unicode_len8to16
+#define unicode_wto8(utf8_dst, wchar_text, wchar_words) \
+	unicode_16to8(utf8_dst, (char16_t const *)(wchar_text), wchar_words)
+#define unicode_wto8_n(utf8_dst, utf8_maxbytes, wchar_text, wchar_words) \
+	unicode_16to8_n(utf8_dst, utf8_maxbytes, (char16_t const *)(wchar_text), wchar_words)
+#define unicode_8tow(wide_dst, utf8_text, utf8_bytes) \
+	(wchar_t *)unicode_8to16((char16_t *)(wide_dst), utf8_text, utf8_bytes)
+#define unicode_8tow_n(wide_dst, wide_maxwords, utf8_text, utf8_bytes) \
+	(wchar_t *)unicode_8to16_n((char16_t *)(wide_dst), wide_maxwords, utf8_text, utf8_bytes)
+#endif /* __SIZEOF_WCHAR_T__ != 4 */
 
 __SYSDECL_END
 #endif /* __CC__ */

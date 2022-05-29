@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47091066 */
+/* HASH CRC-32:0x891496c1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,32 +18,33 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_unicode_8to32_defined
-#define __local_unicode_8to32_defined
+#ifndef __local_unicode_32to16_n_defined
+#define __local_unicode_32to16_n_defined
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_unicode_readutf8_n_defined
-#define __local___localdep_unicode_readutf8_n_defined
-#ifdef __CRT_HAVE_unicode_readutf8_n
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_NONNULL((2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
-#else /* __CRT_HAVE_unicode_readutf8_n */
-__NAMESPACE_LOCAL_END
-#include <libc/local/unicode/unicode_readutf8_n.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_unicode_readutf8_n __LIBC_LOCAL_NAME(unicode_readutf8_n)
-#endif /* !__CRT_HAVE_unicode_readutf8_n */
-#endif /* !__local___localdep_unicode_readutf8_n_defined */
-__LOCAL_LIBC(unicode_8to32) __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUT(1) __CHAR32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_8to32))(__CHAR32_TYPE__ *__restrict __utf32_dst, char const *__restrict __utf8_text, __SIZE_TYPE__ __utf8_bytes) {
-	char const *__utf8_end = __utf8_text + __utf8_bytes;
-	while (__utf8_text < __utf8_end)
-		*__utf32_dst++ = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_n)((char const **)&__utf8_text, __utf8_end);
-	return __utf32_dst;
+__LOCAL_LIBC(unicode_32to16_n) __ATTR_RETNONNULL __ATTR_INS(3, 4) __ATTR_OUTS(1, 2) __CHAR16_TYPE__ *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_32to16_n))(__CHAR16_TYPE__ *__restrict __utf16_dst, __SIZE_TYPE__ __utf16_maxwords, __CHAR32_TYPE__ const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_dwords) {
+	while (__utf32_dwords-- && __utf16_maxwords) {
+		__CHAR32_TYPE__ __ch = *__utf32_text++;
+		if __likely(__ch <= 0xffff && (__ch < 0xd800 || __ch > 0xdfff)) {
+			*__utf16_dst++ = (__CHAR16_TYPE__)__ch;
+			--__utf16_maxwords;
+		} else {
+			__ch -= 0x10000;
+			*__utf16_dst++ = 0xd800 + (__CHAR16_TYPE__)(__ch >> 10);
+			--__utf16_maxwords;
+			if __unlikely(!__utf16_maxwords)
+				break;
+			*__utf16_dst++ = 0xdc00 + (__CHAR16_TYPE__)(__ch & 0x3ff);
+			--__utf16_maxwords;
+		}
+	}
+	return __utf16_dst;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_unicode_8to32_defined
-#define __local___localdep_unicode_8to32_defined
-#define __localdep_unicode_8to32 __LIBC_LOCAL_NAME(unicode_8to32)
-#endif /* !__local___localdep_unicode_8to32_defined */
-#endif /* !__local_unicode_8to32_defined */
+#ifndef __local___localdep_unicode_32to16_n_defined
+#define __local___localdep_unicode_32to16_n_defined
+#define __localdep_unicode_32to16_n __LIBC_LOCAL_NAME(unicode_32to16_n)
+#endif /* !__local___localdep_unicode_32to16_n_defined */
+#endif /* !__local_unicode_32to16_n_defined */
