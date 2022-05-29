@@ -1111,8 +1111,11 @@ ssize_t write($fd_t fd, [[in(return <= bufsize)]] void const *buf, size_t bufsiz
 @@If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
 @@the file descriptor by the amount of data that had already been loaded. - Errors
 @@during this phase are silently ignored and don't cause `errno' to change
-[[cp, guard, section(".text.crt{|.dos}.io.read"), impl_include("<libc/errno.h>")]]
-[[userimpl, requires_function(read, lseek), decl_include("<bits/types.h>")]]
+[[cp, guard, decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/stdio.h>")]]
+[[requires($has_function(read, lseek) && defined(__SEEK_CUR))]]
+[[impl_include("<libc/errno.h>")]]
+[[section(".text.crt{|.dos}.io.read")]]
 ssize_t readall($fd_t fd, [[out(bufsize)]] void *buf, size_t bufsize) {
 	ssize_t result, temp;
 	result = read(fd, buf, bufsize);
@@ -1124,10 +1127,14 @@ ssize_t readall($fd_t fd, [[out(bufsize)]] void *buf, size_t bufsize) {
 			            bufsize - (size_t)result);
 			if (temp <= 0) {
 @@pp_ifdef __libc_geterrno@@
-				int old_error = __libc_geterrno();
+				errno_t old_error = __libc_geterrno();
 @@pp_endif@@
 				/* Try to un-read data that had already been loaded. */
-				lseek(fd, -(off_t)(pos_t)result, SEEK_CUR);
+@@pp_if $has_function(lseek64) && __SIZEOF_SIZE_T__ > __SIZEOF_OFF_T__@@
+				lseek64(fd, -(off_t)(pos_t)(size_t)result, __SEEK_CUR);
+@@pp_else@@
+				lseek(fd, -(off_t)(pos_t)(size_t)result, __SEEK_CUR);
+@@pp_endif@@
 @@pp_ifdef __libc_geterrno@@
 				(void)libc_seterrno(old_error);
 @@pp_endif@@
@@ -1148,7 +1155,7 @@ ssize_t readall($fd_t fd, [[out(bufsize)]] void *buf, size_t bufsize) {
 @@written (in which case `bufsize' is returned).
 [[cp, guard, section(".text.crt{|.dos}.io.write"), impl_include("<libc/errno.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>", "<bits/crt/format-printer.h>")defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__), export_alias("write_printer")]]
-[[userimpl, requires_function(write)]]
+[[requires_function(write)]]
 [[decl_include("<bits/types.h>")]]
 ssize_t writeall($fd_t fd, [[in(bufsize)]] void const *buf, size_t bufsize) {
 	ssize_t result, temp;
@@ -1498,12 +1505,30 @@ ssize_t pwrite($fd_t fd, [[in(return <= bufsize)]] void const *buf,
 [[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("preadall")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("preadall64")]]
+[[requires_function(pread)]]
 [[impl_include("<libc/errno.h>")]]
-[[userimpl, requires_function(preadall64)]]
 [[section(".text.crt{|.dos}.io.read")]]
 ssize_t preadall($fd_t fd, [[out(bufsize)]] void *buf,
                  size_t bufsize, __PIO_OFFSET offset) {
-	return preadall64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
+	ssize_t result, temp;
+	result = pread(fd, buf, bufsize, offset);
+	if (result > 0 && (size_t)result < bufsize) {
+		/* Keep on reading */
+		for (;;) {
+			temp = pread(fd,
+			             (byte_t *)buf + (size_t)result,
+			             bufsize - (size_t)result,
+			             offset + (size_t)result);
+			if (temp <= 0) {
+				result = temp;
+				break;
+			}
+			result += temp;
+			if ((size_t)result >= bufsize)
+				break;
+		}
+	}
+	return result;
 }
 
 @@>> pwriteall(3), pwriteall64(3)
@@ -1511,12 +1536,30 @@ ssize_t preadall($fd_t fd, [[out(bufsize)]] void *buf,
 [[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("pwriteall")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("pwriteall64")]]
+[[requires_function(pwrite)]]
 [[impl_include("<libc/errno.h>")]]
-[[userimpl, requires_function(pwriteall64)]]
 [[section(".text.crt{|.dos}.io.write")]]
 ssize_t pwriteall($fd_t fd, [[in(bufsize)]] void const *buf,
                   size_t bufsize, __PIO_OFFSET offset) {
-	return pwriteall64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
+	ssize_t result, temp;
+	result = pwrite(fd, buf, bufsize, offset);
+	if (result > 0 && (size_t)result < bufsize) {
+		/* Keep on writing */
+		for (;;) {
+			temp = pwrite(fd,
+			              (byte_t const *)buf + (size_t)result,
+			              bufsize - (size_t)result,
+			              offset + (size_t)result);
+			if (temp <= 0) {
+				result = temp;
+				break;
+			}
+			result += temp;
+			if ((size_t)result >= bufsize)
+				break;
+		}
+	}
+	return result;
 }
 %#endif /* __USE_KOS */
 
@@ -1612,7 +1655,7 @@ ssize_t pwrite64($fd_t fd, [[in(return <= bufsize)]] void const *buf,
 %
 %#ifdef __USE_KOS
 [[cp, preferred_off64_variant_of(preadall), doc_alias("preadall")]]
-[[userimpl, requires_function(pread64), decl_include("<bits/types.h>")]]
+[[requires_function(pread64), decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.large.read")]]
 ssize_t preadall64($fd_t fd, [[out(bufsize)]] void *buf,
                    size_t bufsize, __PIO_OFFSET64 offset) {
@@ -1638,7 +1681,7 @@ ssize_t preadall64($fd_t fd, [[out(bufsize)]] void *buf,
 }
 
 [[cp, preferred_off64_variant_of(pwriteall), doc_alias("pwriteall")]]
-[[userimpl, requires_function(pwrite64), decl_include("<bits/types.h>")]]
+[[requires_function(pwrite64), decl_include("<bits/types.h>")]]
 [[section(".text.crt{|.dos}.io.large.write")]]
 ssize_t pwriteall64($fd_t fd, [[in(bufsize)]] void const *buf,
                     size_t bufsize, __PIO_OFFSET64 offset) {

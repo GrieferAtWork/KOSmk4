@@ -2328,6 +2328,11 @@ NOTHROW_RPC(LIBCCALL libc_lpathconf)(char const *path,
 
 
 
+/* From "../libc/compat.c": */
+INTDEF char const libc_gnu_libc_version_full[];
+INTDEF char const libc_gnu_nptl_version_full[];
+
+
 /*[[[head:libc_confstr,hash:CRC-32=0xba470477]]]*/
 /* Retrieve a system configuration string specified by `name'
  * @param: name:   One of `_CS_*' from <asm/crt/confname.h>
@@ -2347,6 +2352,9 @@ NOTHROW_NCX(LIBCCALL libc_confstr)(__STDC_INT_AS_UINT_T name,
 	size_t result;
 	DEFINE_STRING(empty_string, "");
 	char const *result_string = empty_string;
+	/* TODO: Use a packed string table + offset list to implement this function
+	 *       Additionally, place a  dedicated symbol at  `_CS_GNU_LIBC_VERSION'
+	 *       that can be used to implement `gnu_get_libc_version(3)'. */
 	switch (name) {
 
 	case _CS_PATH: {
@@ -2355,7 +2363,13 @@ NOTHROW_NCX(LIBCCALL libc_confstr)(__STDC_INT_AS_UINT_T name,
 	}	break;
 
 	case _CS_GNU_LIBC_VERSION:
+		result_string = libc_gnu_libc_version_full;
+		break;
+
 	case _CS_GNU_LIBPTHREAD_VERSION:
+		result_string = libc_gnu_nptl_version_full;
+		break;
+
 	case _CS_V6_WIDTH_RESTRICTED_ENVS:
 	case _CS_V5_WIDTH_RESTRICTED_ENVS:
 	case _CS_V7_WIDTH_RESTRICTED_ENVS:
@@ -3420,213 +3434,6 @@ for (local name: SYSCONF_VALUES_LO_INT32) {
 }
 /*[[[end:libc_sysconf]]]*/
 
-/*[[[head:libc_readall,hash:CRC-32=0xb47838cc]]]*/
-/* >> readall(3)
- * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
- * `readall()' to immediately return `0') or the entirety of the given buffer has been
- * filled (in which case `bufsize' is returned).
- * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
- * the file descriptor by the amount of data that had already been loaded. - Errors
- * during this phase are silently ignored and don't cause `errno' to change */
-INTERN ATTR_SECTION(".text.crt.io.read") ATTR_OUTS(2, 3) ssize_t
-NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd,
-                                   void *buf,
-                                   size_t bufsize)
-/*[[[body:libc_readall]]]*/
-{
-	ssize_t result, temp;
-	result = read(fd, buf, bufsize);
-	if (result > 0 && (size_t)result < bufsize) {
-		/* Keep on reading */
-		for (;;) {
-			temp = read(fd,
-			            (byte_t *)buf + (size_t)result,
-			            bufsize - (size_t)result);
-			if (temp <= 0) {
-				errno_t old_error = libc_geterrno();
-				/* Try to un-read data that had already been loaded. */
-				libc_lseek64(fd, -(off64_t)(pos64_t)result, SEEK_CUR);
-				libc_seterrno(old_error);
-				result = temp;
-				break;
-			}
-			result += temp;
-			if ((size_t)result >= bufsize)
-				break;
-		}
-	}
-	return result;
-}
-/*[[[end:libc_readall]]]*/
-
-/*[[[head:libc_writeall,hash:CRC-32=0x11eccf87]]]*/
-/* >> writeall(3)
- * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
- * `writeall()' to immediately return `0') or the entirety of the given buffer has been
- * written (in which case `bufsize' is returned). */
-INTERN ATTR_SECTION(".text.crt.io.write") ATTR_INS(2, 3) ssize_t
-NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd,
-                                    void const *buf,
-                                    size_t bufsize)
-/*[[[body:libc_writeall]]]*/
-{
-	ssize_t result, temp;
-	result = write(fd, buf, bufsize);
-	if (result > 0 && (size_t)result < bufsize) {
-		/* Keep on writing */
-		for (;;) {
-			temp = write(fd,
-			            (byte_t *)buf + (size_t)result,
-			            bufsize - (size_t)result);
-			if (temp <= 0) {
-				result = temp;
-				break;
-			}
-			result += temp;
-			if ((size_t)result >= bufsize)
-				break;
-		}
-	}
-	return result;
-}
-/*[[[end:libc_writeall]]]*/
-
-/*[[[head:libc_preadall,hash:CRC-32=0x96f6c8f1]]]*/
-/* >> preadall(3), preadall64(3)
- * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTERN ATTR_SECTION(".text.crt.io.read") ATTR_OUTS(2, 3) ssize_t
-NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd,
-                                    void *buf,
-                                    size_t bufsize,
-                                    __PIO_OFFSET offset)
-/*[[[body:libc_preadall]]]*/
-{
-	ssize_t result, temp;
-	result = pread(fd, buf, bufsize, offset);
-	if (result > 0 && (size_t)result < bufsize) {
-		/* Keep on reading */
-		for (;;) {
-			temp = pread(fd,
-			             (byte_t *)buf + (size_t)result,
-			             bufsize - (size_t)result,
-			             offset + (size_t)result);
-			if (temp <= 0) {
-				result = temp;
-				break;
-			}
-			result += temp;
-			if ((size_t)result >= bufsize)
-				break;
-		}
-	}
-	return result;
-}
-/*[[[end:libc_preadall]]]*/
-
-/*[[[head:libc_preadall64,hash:CRC-32=0x8fd068e6]]]*/
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_preadall64, libc_preadall);
-#else /* MAGIC:alias */
-/* >> preadall(3), preadall64(3)
- * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTERN ATTR_SECTION(".text.crt.io.large.read") ATTR_OUTS(2, 3) ssize_t
-NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd,
-                                      void *buf,
-                                      size_t bufsize,
-                                      __PIO_OFFSET64 offset)
-/*[[[body:libc_preadall64]]]*/
-{
-	ssize_t result, temp;
-	result = pread64(fd, buf, bufsize, offset);
-	if (result > 0 && (size_t)result < bufsize) {
-		/* Keep on reading */
-		for (;;) {
-			temp = pread64(fd,
-			               (byte_t *)buf + (size_t)result,
-			               bufsize - (size_t)result,
-			               offset + (size_t)result);
-			if (temp <= 0) {
-				result = temp;
-				break;
-			}
-			result += temp;
-			if ((size_t)result >= bufsize)
-				break;
-		}
-	}
-	return result;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_preadall64]]]*/
-
-/*[[[head:libc_pwriteall,hash:CRC-32=0x9a3b474a]]]*/
-/* >> pwriteall(3), pwriteall64(3)
- * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTERN ATTR_SECTION(".text.crt.io.write") ATTR_INS(2, 3) ssize_t
-NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd,
-                                     void const *buf,
-                                     size_t bufsize,
-                                     __PIO_OFFSET offset)
-/*[[[body:libc_pwriteall]]]*/
-{
-	ssize_t result, temp;
-	result = pwrite(fd, buf, bufsize, offset);
-	if (result > 0 && (size_t)result < bufsize) {
-		/* Keep on writing */
-		for (;;) {
-			temp = pwrite(fd,
-			              (byte_t *)buf + (size_t)result,
-			              bufsize - (size_t)result,
-			              offset + (size_t)result);
-			if (temp <= 0) {
-				result = temp;
-				break;
-			}
-			result += temp;
-			if ((size_t)result >= bufsize)
-				break;
-		}
-	}
-	return result;
-}
-/*[[[end:libc_pwriteall]]]*/
-
-/*[[[head:libc_pwriteall64,hash:CRC-32=0x5beddbd2]]]*/
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_pwriteall64, libc_pwriteall);
-#else /* MAGIC:alias */
-/* >> pwriteall(3), pwriteall64(3)
- * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTERN ATTR_SECTION(".text.crt.io.large.write") ATTR_INS(2, 3) ssize_t
-NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd,
-                                       void const *buf,
-                                       size_t bufsize,
-                                       __PIO_OFFSET64 offset)
-/*[[[body:libc_pwriteall64]]]*/
-{
-	ssize_t result, temp;
-	result = pwrite64(fd, buf, bufsize, offset);
-	if (result > 0 && (size_t)result < bufsize) {
-		/* Keep on writing */
-		for (;;) {
-			temp = pwrite64(fd,
-			                (byte_t *)buf + (size_t)result,
-			                bufsize - (size_t)result,
-			                offset + (size_t)result);
-			if (temp <= 0) {
-				result = temp;
-				break;
-			}
-			result += temp;
-			if ((size_t)result >= bufsize)
-				break;
-		}
-	}
-	return result;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_pwriteall64]]]*/
-
 /*[[[head:libc_gettid,hash:CRC-32=0x530df3fd]]]*/
 /* >> gettid(2)
  * Return the TID of the calling thread
@@ -3752,7 +3559,7 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x32eecd41]]]*/
+/*[[[start:exports,hash:CRC-32=0xaf429499]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -3851,13 +3658,6 @@ DEFINE_PUBLIC_ALIAS(_write, libc_write);
 DEFINE_PUBLIC_ALIAS(__write, libc_write);
 DEFINE_PUBLIC_ALIAS(__libc_write, libc_write);
 DEFINE_PUBLIC_ALIAS(write, libc_write);
-DEFINE_PUBLIC_ALIAS(readall, libc_readall);
-#include <hybrid/typecore.h>
-#include <bits/crt/format-printer.h>
-#if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__
-DEFINE_PUBLIC_ALIAS(write_printer, libc_writeall);
-#endif /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__ */
-DEFINE_PUBLIC_ALIAS(writeall, libc_writeall);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_lseek, libc_lseek);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -3950,14 +3750,10 @@ DEFINE_PUBLIC_ALIAS(__libc_pread, libc_pread);
 DEFINE_PUBLIC_ALIAS(pread, libc_pread);
 DEFINE_PUBLIC_ALIAS(__libc_pwrite, libc_pwrite);
 DEFINE_PUBLIC_ALIAS(pwrite, libc_pwrite);
-DEFINE_PUBLIC_ALIAS(preadall, libc_preadall);
-DEFINE_PUBLIC_ALIAS(pwriteall, libc_pwriteall);
 DEFINE_PUBLIC_ALIAS(__pread64, libc_pread64);
 DEFINE_PUBLIC_ALIAS(pread64, libc_pread64);
 DEFINE_PUBLIC_ALIAS(__pwrite64, libc_pwrite64);
 DEFINE_PUBLIC_ALIAS(pwrite64, libc_pwrite64);
-DEFINE_PUBLIC_ALIAS(preadall64, libc_preadall64);
-DEFINE_PUBLIC_ALIAS(pwriteall64, libc_pwriteall64);
 DEFINE_PUBLIC_ALIAS(DOS$dup3, libd_dup3);
 DEFINE_PUBLIC_ALIAS(dup3, libc_dup3);
 DEFINE_PUBLIC_ALIAS(pipe2, libc_pipe2);

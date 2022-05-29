@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcd2ff28 */
+/* HASH CRC-32:0x7c8a7ef6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,10 @@
 #ifndef __local_readall_defined
 #define __local_readall_defined
 #include <__crt.h>
+#include <asm/os/stdio.h>
 #include <features.h>
 #include <bits/types.h>
-#if (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek))
+#if (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && defined(__SEEK_CUR)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lseek_defined
 #define __local___localdep_lseek_defined
@@ -50,6 +51,33 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_lseek __LIBC_LOCAL_NAME(lseek)
 #endif /* !... */
 #endif /* !__local___localdep_lseek_defined */
+#ifndef __local___localdep_lseek64_defined
+#define __local___localdep_lseek64_defined
+#if defined(__CRT_HAVE_lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE__lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE___lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE___libc_lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE_lseek64)
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE__lseeki64)
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE_llseek)
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),llseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE___llseek)
+__CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),__llseek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
+__NAMESPACE_LOCAL_END
+#include <libc/local/unistd/lseek64.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_lseek64 __LIBC_LOCAL_NAME(lseek64)
+#else /* ... */
+#undef __local___localdep_lseek64_defined
+#endif /* !... */
+#endif /* !__local___localdep_lseek64_defined */
 #ifndef __local___localdep_read_defined
 #define __local___localdep_read_defined
 #ifdef __CRT_HAVE_read
@@ -79,10 +107,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readall))(__fd_t __fd, void *__buf, _
 			            __bufsize - (__SIZE_TYPE__)__result);
 			if (__temp <= 0) {
 #ifdef __libc_geterrno
-				int __old_error = __libc_geterrno();
+				__errno_t __old_error = __libc_geterrno();
 #endif /* __libc_geterrno */
 				/* Try to un-read data that had already been loaded. */
-				(__NAMESPACE_LOCAL_SYM __localdep_lseek)(__fd, -(__FS_TYPE(off))(__FS_TYPE(pos))__result, __SEEK_CUR);
+#if __SIZEOF_SIZE_T__ > __SIZEOF_OFF_T__
+				(__NAMESPACE_LOCAL_SYM __localdep_lseek64)(__fd, -(__FS_TYPE(off))(__FS_TYPE(pos))(__SIZE_TYPE__)__result, __SEEK_CUR);
+#else /* __SIZEOF_SIZE_T__ > __SIZEOF_OFF_T__ */
+				(__NAMESPACE_LOCAL_SYM __localdep_lseek)(__fd, -(__FS_TYPE(off))(__FS_TYPE(pos))(__SIZE_TYPE__)__result, __SEEK_CUR);
+#endif /* __SIZEOF_SIZE_T__ <= __SIZEOF_OFF_T__ */
 #ifdef __libc_geterrno
 				(void)__libc_seterrno(__old_error);
 #endif /* __libc_geterrno */
@@ -101,7 +133,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_readall_defined
 #define __localdep_readall __LIBC_LOCAL_NAME(readall)
 #endif /* !__local___localdep_readall_defined */
-#else /* (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_llseek || __CRT_HAVE___llseek || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) */
+#else /* (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE___libc_read) && (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_llseek || __CRT_HAVE___llseek || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) && __SEEK_CUR */
 #undef __local_readall_defined
-#endif /* (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read) || (!__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_llseek && !__CRT_HAVE___llseek && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek && !__CRT_HAVE___libc_lseek) */
+#endif /* (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read && !__CRT_HAVE___libc_read) || (!__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_llseek && !__CRT_HAVE___llseek && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek && !__CRT_HAVE___libc_lseek) || !__SEEK_CUR */
 #endif /* !__local_readall_defined */

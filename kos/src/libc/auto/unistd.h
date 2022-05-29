@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9dc2a044 */
+/* HASH CRC-32:0xd926e550 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -202,12 +202,31 @@ INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_write)(fd_t fd, void con
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_readall)(fd_t fd, void *buf, size_t bufsize);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> readall(3)
+ * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
+ * `readall()' to immediately return `0') or the entirety of the given buffer has been
+ * filled (in which case `bufsize' is returned).
+ * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
+ * the file descriptor by the amount of data that had already been loaded. - Errors
+ * during this phase are silently ignored and don't cause `errno' to change */
+INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd, void *buf, size_t bufsize);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> writeall(3)
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
 INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_writeall)(fd_t fd, void const *buf, size_t bufsize);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> writeall(3)
+ * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
+ * `writeall()' to immediately return `0') or the entirety of the given buffer has been
+ * written (in which case `bufsize' is returned). */
+INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd, void const *buf, size_t bufsize);
+#endif /* !__KERNEL__ */
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 #if !defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__)
@@ -260,9 +279,23 @@ INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite)(fd_t fd, void co
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> preadall(3), preadall64(3)
+ * Same as `readall(3)', but using `pread(2)' instead of `read()' */
+INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> pwriteall(3), pwriteall64(3)
+ * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
+INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
@@ -274,9 +307,23 @@ INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite64)(fd_t fd, void 
 /* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> preadall(3), preadall64(3)
+ * Same as `readall(3)', but using `pread(2)' instead of `read()' */
+INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> pwriteall(3), pwriteall64(3)
+ * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
+INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pipe2(2)
  * Construct a [reader,writer]-pair of pipes
  * @param: pipedes: Output for pipe fds: [0]: reader; [1]: writer

@@ -1089,8 +1089,12 @@ NOTHROW_NCX(LIBCCALL libc_getdents)(fd_t fd, struct linux_dirent *buf, size_t co
  * Note however that KOS's libc _is_ providing various functions
  * that have since been removed from gLibc, meaning that this is
  * really kind-of meaningless in terms of information... */
-PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc")
-char const libc_gnu_libc_version[] = "2.32";
+INTDEF char const libc_gnu_libc_version_full[];
+INTDEF char const libc_gnu_nptl_version_full[];
+INTERN_CONST ATTR_SECTION(".rodata.crt.compat.glibc") char const libc_gnu_libc_version_full[] = "glibc 2.32"; /* _CS_GNU_LIBC_VERSION */
+INTERN_CONST ATTR_SECTION(".rodata.crt.compat.glibc") char const libc_gnu_nptl_version_full[] = "NPTL 2.32";  /* _CS_GNU_LIBPTHREAD_VERSION */
+#define libc_gnu_libc_version (libc_gnu_libc_version_full + 6)
+
 PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc")
 char const libc_gnu_libc_release[] = "KOS";
 

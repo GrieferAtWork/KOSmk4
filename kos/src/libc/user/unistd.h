@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4fa2bdc */
+/* HASH CRC-32:0xfca63c7c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -194,19 +194,6 @@ INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd, void *bu
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd, void const *buf, size_t bufsize);
-/* >> readall(3)
- * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
- * `readall()' to immediately return `0') or the entirety of the given buffer has been
- * filled (in which case `bufsize' is returned).
- * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
- * the file descriptor by the amount of data that had already been loaded. - Errors
- * during this phase are silently ignored and don't cause `errno' to change */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd, void *buf, size_t bufsize);
-/* >> writeall(3)
- * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
- * `writeall()' to immediately return `0') or the entirety of the given buffer has been
- * written (in which case `bufsize' is returned). */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd, void const *buf, size_t bufsize);
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF off_t NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd, off_t offset, __STDC_INT_AS_UINT_T whence);
@@ -346,12 +333,6 @@ INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd, void *b
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
 INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
-/* >> preadall(3), preadall64(3)
- * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
-/* >> pwriteall(3), pwriteall64(3)
- * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
@@ -360,12 +341,6 @@ INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pread64)(fd_t fd, void 
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
 INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
-/* >> preadall(3), preadall64(3)
- * Same as `readall(3)', but using `pread(2)' instead of `read()' */
-INTDEF ATTR_OUTS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
-/* >> pwriteall(3), pwriteall64(3)
- * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
-INTDEF ATTR_INS(2, 3) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
 INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 /* >> pipe2(2)
