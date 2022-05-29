@@ -67,15 +67,15 @@ DECL_END
 #define RBTREE_T            void
 #define RBTREE_Tkey         pid_t
 #define RBTREE_GETNODE(x)   _pidtree_slotat(x, _offsetof_slot)->pts_link
-#define RBTREE_GETKEY(x)    (pid_t)(_pidtree_slotat(x, _offsetof_slot)->pts_pid & __TASKPID_SLOT_PIDMASK)
-#define RBTREE_ISRED(x)     (_pidtree_slotat(x, _offsetof_slot)->pts_pid & __TASKPID_SLOT_REDMASK)
-#define RBTREE_SETRED(x)    (_pidtree_slotat(x, _offsetof_slot)->pts_pid |= __TASKPID_SLOT_REDMASK)
-#define RBTREE_SETBLACK(x)  (_pidtree_slotat(x, _offsetof_slot)->pts_pid &= ~__TASKPID_SLOT_REDMASK)
-#define RBTREE_FLIPCOLOR(x) (_pidtree_slotat(x, _offsetof_slot)->pts_pid ^= __TASKPID_SLOT_REDMASK)
+#define RBTREE_GETKEY(x)    (pid_t)(_pidtree_slotat(x, _offsetof_slot)->pts_pid & _TASKPID_SLOT_PIDMASK)
+#define RBTREE_ISRED(x)     (_pidtree_slotat(x, _offsetof_slot)->pts_pid & _TASKPID_SLOT_REDMASK)
+#define RBTREE_SETRED(x)    (_pidtree_slotat(x, _offsetof_slot)->pts_pid |= _TASKPID_SLOT_REDMASK)
+#define RBTREE_SETBLACK(x)  (_pidtree_slotat(x, _offsetof_slot)->pts_pid &= ~_TASKPID_SLOT_REDMASK)
+#define RBTREE_FLIPCOLOR(x) (_pidtree_slotat(x, _offsetof_slot)->pts_pid ^= _TASKPID_SLOT_REDMASK)
 #define RBTREE_COPYCOLOR(dst, src)                                               \
 	(_pidtree_slotat(dst, _offsetof_slot)->pts_pid =                             \
-	 (_pidtree_slotat(dst, _offsetof_slot)->pts_pid & ~__TASKPID_SLOT_REDMASK) | \
-	 (_pidtree_slotat(src, _offsetof_slot)->pts_pid & __TASKPID_SLOT_REDMASK))
+	 (_pidtree_slotat(dst, _offsetof_slot)->pts_pid & ~_TASKPID_SLOT_REDMASK) | \
+	 (_pidtree_slotat(src, _offsetof_slot)->pts_pid & _TASKPID_SLOT_REDMASK))
 #include <hybrid/sequence/rbtree-abi.h>
 
 #define _taskpid_offsetof_slot(ind) \
@@ -361,7 +361,7 @@ for (local x: nodes) {
 	print("			.tps_link = { ", pidof(x.lhs), ", ", pidof(x.rhs), " },");
 	print("			.tps_pid  = ", x.minkey),;
 	if (x.isred)
-		print(" | __TASKPID_SLOT_REDMASK"),;
+		print(" | _TASKPID_SLOT_REDMASK"),;
 	print(",");
 	print("		}");
 	print("	}");

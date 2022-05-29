@@ -26,9 +26,8 @@
 
 #include <kos/personality.h>
 
-DECL_BEGIN
-
 #ifdef __CC__
+DECL_BEGIN
 
 /* Kernel personality bitmap */
 DATDEF byte_t kernel_personality[(KP_COUNT + 7) / 8];
@@ -41,10 +40,9 @@ DATDEF byte_t kernel_personality[(KP_COUNT + 7) / 8];
 /* Check if the calling thread has a given personality enabled.
  * @param: name: One of `KP_*' (from <kos/personality.h>) */
 #define has_personality(name) \
-	has_kernel_personality(name)
-
-#endif /* __CC__ */
+	has_kernel_personality(name) /* TODO: Make this thread-local */
 
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_PERSONALITY_H */

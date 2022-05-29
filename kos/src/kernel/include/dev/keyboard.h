@@ -177,13 +177,13 @@ struct kbddev
 #define kbddev_getops(self) \
 	((struct kbddev_ops const *)__COMPILER_REQTYPE(struct kbddev const *, self)->_kbddev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops)
 #ifdef NDEBUG
-#define ___kbddev_assert_ops_(ops) /* nothing */
+#define _kbddev_only_assert_ops_(ops) /* nothing */
 #else /* NDEBUG */
-#define ___kbddev_assert_ops_(ops)                                               \
+#define _kbddev_only_assert_ops_(ops)                                            \
 	__hybrid_assert((ops)->ko_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream), \
 	__hybrid_assert((ops)->ko_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_read == &kbddev_v_read),
 #endif /* !NDEBUG */
-#define _kbddev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->ko_cdev) ___kbddev_assert_ops_(ops)
+#define _kbddev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->ko_cdev) _kbddev_only_assert_ops_(ops)
 
 /* Helper macros */
 #define mfile_iskbd(self)   ((self)->mf_ops->mo_stream && (self)->mf_ops->mo_stream->mso_read == &kbddev_v_read)
@@ -223,11 +223,11 @@ DATDEF struct mfile_stream_ops const kbddev_v_stream_ops;
 
 
 #if !defined(CONFIG_NO_DEBUGGER) && defined(KEYBOARD_DEVICE_FLAG_DBGF12)
-#define __kbddev_init_flags(self) (self)->kd_flags = K_UNICODE | KEYBOARD_DEVICE_FLAG_DBGF12
+#define _kbddev_init_flags(self) (self)->kd_flags = K_UNICODE | KEYBOARD_DEVICE_FLAG_DBGF12
 #else /* !CONFIG_NO_DEBUGGER && KEYBOARD_DEVICE_FLAG_DBGF12 */
-#define __kbddev_init_flags(self) (self)->kd_flags = K_UNICODE | KEYBOARD_DEVICE_FLAG_NORMAL
+#define _kbddev_init_flags(self) (self)->kd_flags = K_UNICODE | KEYBOARD_DEVICE_FLAG_NORMAL
 #endif /* CONFIG_NO_DEBUGGER || !KEYBOARD_DEVICE_FLAG_DBGF12 */
-#define __kbddev_cinit_flags __kbddev_init_flags
+#define _kbddev_cinit_flags _kbddev_init_flags
 
 
 /* Initialize common+basic fields. The caller must still initialize:
@@ -243,10 +243,10 @@ DATDEF struct mfile_stream_ops const kbddev_v_stream_ops;
  * @param: struct kbddev     *self: Keyboard to initialize.
  * @param: struct kbddev_ops *ops:  Keyboard operators. */
 #define _kbddev_init(self, ops)                          \
-	(___kbddev_assert_ops_(ops)                          \
+	(_kbddev_only_assert_ops_(ops)                       \
 	 _chrdev_init(_kbddev_aschr(self), &(ops)->ko_cdev), \
 	 kbdbuf_init(&(self)->kd_buf),                       \
-	 __kbddev_init_flags(self),                          \
+	 _kbddev_init_flags(self),                           \
 	 atomic_rwlock_init(&(self)->kd_map_lock),           \
 	 keymap_init_en_US(&(self)->kd_map),                 \
 	 (self)->kd_map_extsiz = 0,                          \
@@ -256,10 +256,10 @@ DATDEF struct mfile_stream_ops const kbddev_v_stream_ops;
 	 (self)->kd_leds = 0,                                \
 	 awref_init(&(self)->kd_tty, __NULLPTR))
 #define _kbddev_cinit(self, ops)                          \
-	(___kbddev_assert_ops_(ops)                           \
+	(_kbddev_only_assert_ops_(ops)                        \
 	 _chrdev_cinit(_kbddev_aschr(self), &(ops)->ko_cdev), \
 	 kbdbuf_cinit(&(self)->kd_buf),                       \
-	 __kbddev_cinit_flags(self),                          \
+	 _kbddev_cinit_flags(self),                           \
 	 atomic_rwlock_cinit(&(self)->kd_map_lock),           \
 	 keymap_init_en_US(&(self)->kd_map),                  \
 	 __hybrid_assert((self)->kd_map_extsiz == 0),         \

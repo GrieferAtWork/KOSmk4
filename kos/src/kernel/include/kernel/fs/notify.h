@@ -365,47 +365,47 @@ EIDECLARE(BLOCKING WUNUSED NONNULL((1, 2)), REF struct fnode *, , KCALL,
 /* Post filesystem events to the notify controller of  `self'
  * Don't call this function directly -- use the macros below.
  * @param: mask: One of `(IN_ALL_EVENTS | IN_UNMOUNT | IN_IGNORED) & ~(...)' */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsevent)(struct mfile *__restrict self, uint16_t mask) ASMNAME("mfile_postfsevent");
-/* Same as `__mfile_postfsevent()', but only post to `inc_listeners' */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsfilevent)(struct mfile *__restrict self, uint16_t mask) ASMNAME("mfile_postfsfilevent");
-/* Same as `__mfile_postfsevent()', but only post to `inc_dirs' */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsdirevent)(struct mfile *__restrict self, uint16_t mask) ASMNAME("mfile_postfsdirevent");
-/* Same as `__mfile_postfsdirevent()', but has an explicit `cookie' */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsdirevent2)(struct mfile *__restrict self, uint16_t mask, uint16_t cookie) ASMNAME("mfile_postfsdirevent2");
-/* Same as `__mfile_postfsevent()', but use different masks for `inc_listeners' and `inc_dirs' */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __mfile_postfsevent_ex)(struct mfile *__restrict self, uint16_t fil_mask, uint16_t dir_mask) ASMNAME("mfile_postfsevent_ex");
-#define __mfile_canpostfsevents(self) (__hybrid_atomic_load((self)->mf_notify, __ATOMIC_ACQUIRE) != __NULLPTR)
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsevent)(struct mfile *__restrict self, uint16_t mask) ASMNAME("mfile_postfsevent");
+/* Same as `_mfile_postfsevent()', but only post to `inc_listeners' */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsfilevent)(struct mfile *__restrict self, uint16_t mask) ASMNAME("mfile_postfsfilevent");
+/* Same as `_mfile_postfsevent()', but only post to `inc_dirs' */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsdirevent)(struct mfile *__restrict self, uint16_t mask) ASMNAME("mfile_postfsdirevent");
+/* Same as `_mfile_postfsdirevent()', but has an explicit `cookie' */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsdirevent2)(struct mfile *__restrict self, uint16_t mask, uint16_t cookie) ASMNAME("mfile_postfsdirevent2");
+/* Same as `_mfile_postfsevent()', but use different masks for `inc_listeners' and `inc_dirs' */
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _mfile_postfsevent_ex)(struct mfile *__restrict self, uint16_t fil_mask, uint16_t dir_mask) ASMNAME("mfile_postfsevent_ex");
+#define _mfile_canpostfsevents(self) (__hybrid_atomic_load((self)->mf_notify, __ATOMIC_ACQUIRE) != __NULLPTR)
 #ifdef __OPTIMIZE_SIZE__
-#define __mfile_maybepostfsevent(self, expr_) expr_
+#define _mfile_maybepostfsevent(self, expr_) expr_
 #else /* __OPTIMIZE_SIZE__ */
-#define __mfile_maybepostfsevent(self, expr_) (void)(__mfile_canpostfsevents(self) && (expr_, 1))
+#define _mfile_maybepostfsevent(self, expr_) (void)(_mfile_canpostfsevents(self) && (expr_, 1))
 #endif /* !__OPTIMIZE_SIZE__ */
-#define __mfile_postfsevent(self, mask)                  __mfile_maybepostfsevent(self, (__mfile_postfsevent)(self, mask))
-#define __mfile_postfsfilevent(self, mask)               __mfile_maybepostfsevent(self, (__mfile_postfsfilevent)(self, mask))
-#define __mfile_postfsdirevent(self, mask)               __mfile_maybepostfsevent(self, (__mfile_postfsdirevent)(self, mask))
-#define __mfile_postfsdirevent2(self, mask, cookie)      __mfile_maybepostfsevent(self, (__mfile_postfsdirevent2)(self, mask, cookie))
-#define __mfile_postfsevent_ex(self, fil_mask, dir_mask) __mfile_maybepostfsevent(self, (__mfile_postfsevent_ex)(self, fil_mask, dir_mask))
+#define _mfile_postfsevent(self, mask)                  _mfile_maybepostfsevent(self, (_mfile_postfsevent)(self, mask))
+#define _mfile_postfsfilevent(self, mask)               _mfile_maybepostfsevent(self, (_mfile_postfsfilevent)(self, mask))
+#define _mfile_postfsdirevent(self, mask)               _mfile_maybepostfsevent(self, (_mfile_postfsdirevent)(self, mask))
+#define _mfile_postfsdirevent2(self, mask, cookie)      _mfile_maybepostfsevent(self, (_mfile_postfsdirevent2)(self, mask, cookie))
+#define _mfile_postfsevent_ex(self, fil_mask, dir_mask) _mfile_maybepostfsevent(self, (_mfile_postfsevent_ex)(self, fil_mask, dir_mask))
 
 /* Helper macros for generating inotify events (use these instead of the functions above) */
-#define mfile_inotify_accessed(self)         __mfile_postfsevent(self, IN_ACCESS)                    /* TODO */
-#define mfile_inotify_modified(self)         __mfile_postfsevent(self, IN_MODIFY)                    /* Implemented */
-#define mfile_inotify_attrib(self)           __mfile_postfsevent(self, IN_ATTRIB)                    /* Implemented */
-#define mfile_inotify_closewr(self)          __mfile_postfsevent(self, IN_CLOSE_WRITE)               /* TODO */
-#define mfile_inotify_closero(self)          __mfile_postfsevent(self, IN_CLOSE_NOWRITE)             /* Implemented */
-#define mfile_inotify_opened(self)           __mfile_postfsevent(self, IN_OPEN)                      /* Implemented */
-#define mfile_inotify_movefrom(self, cookie) __mfile_postfsdirevent2(self, IN_MOVED_FROM, cookie)    /* TODO */
-#define mfile_inotify_moveto(self, cookie)   __mfile_postfsdirevent2(self, IN_MOVED_TO, cookie)      /* TODO */
-#define mfile_inotify_moved(self)            __mfile_postfsfilevent(self, IN_MOVE_SELF)              /* TODO */
-#define mfile_inotify_created(self)          __mfile_postfsdirevent(self, IN_CREATE)                 /* Implemented */
-#define mfile_inotify_deleted(self)          __mfile_postfsevent_ex(self, IN_DELETE_SELF, IN_DELETE) /* Implemented */
-#define mfile_inotify_unmount(self)          __mfile_postfsfilevent(self, IN_UNMOUNT)                /* Implemented */
+#define mfile_inotify_accessed(self)         _mfile_postfsevent(self, IN_ACCESS)                    /* TODO */
+#define mfile_inotify_modified(self)         _mfile_postfsevent(self, IN_MODIFY)                    /* Implemented */
+#define mfile_inotify_attrib(self)           _mfile_postfsevent(self, IN_ATTRIB)                    /* Implemented */
+#define mfile_inotify_closewr(self)          _mfile_postfsevent(self, IN_CLOSE_WRITE)               /* TODO */
+#define mfile_inotify_closero(self)          _mfile_postfsevent(self, IN_CLOSE_NOWRITE)             /* Implemented */
+#define mfile_inotify_opened(self)           _mfile_postfsevent(self, IN_OPEN)                      /* Implemented */
+#define mfile_inotify_movefrom(self, cookie) _mfile_postfsdirevent2(self, IN_MOVED_FROM, cookie)    /* TODO */
+#define mfile_inotify_moveto(self, cookie)   _mfile_postfsdirevent2(self, IN_MOVED_TO, cookie)      /* TODO */
+#define mfile_inotify_moved(self)            _mfile_postfsfilevent(self, IN_MOVE_SELF)              /* TODO */
+#define mfile_inotify_created(self)          _mfile_postfsdirevent(self, IN_CREATE)                 /* Implemented */
+#define mfile_inotify_deleted(self)          _mfile_postfsevent_ex(self, IN_DELETE_SELF, IN_DELETE) /* Implemented */
+#define mfile_inotify_unmount(self)          _mfile_postfsfilevent(self, IN_UNMOUNT)                /* Implemented */
 /* TODO: `IN_DELETE' must remove inotify controllers from containing
  *       dir iff any of  dir's listeners have `IN_EXCL_UNLINK'  set. */
 
 /* Special function to post `IN_IGNORED', as well as delete all watch-descriptors of `self' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mfile_inotify_ignored)(struct mfile *__restrict self);
-#define mfile_inotify_ignored(self) __mfile_maybepostfsevent(self, (mfile_inotify_ignored)(self)) /* Implemented */
+#define mfile_inotify_ignored(self) _mfile_maybepostfsevent(self, (mfile_inotify_ignored)(self)) /* Implemented */
 
 
 

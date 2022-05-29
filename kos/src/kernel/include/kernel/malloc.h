@@ -65,11 +65,11 @@ FUNDEF ATTR_ERROR("Invalid slab size") void __slab_invalid_size(void);
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL slab_malloc)(size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes)) {
-#define SLAB_CHECK_SELECT(sz, _)  \
+#define _SLAB_CHECK_SELECT(sz, _) \
 		if (num_bytes <= sz)      \
 			return slab_malloc##sz(flags);
-		SLAB_FOREACH_SIZE(SLAB_CHECK_SELECT, _)
-#undef SLAB_CHECK_SELECT
+		SLAB_FOREACH_SIZE(_SLAB_CHECK_SELECT, _)
+#undef _SLAB_CHECK_SELECT
 		__slab_invalid_size();
 	}
 	return __os_slab_malloc(num_bytes, flags);
@@ -78,11 +78,11 @@ NOTHROW(KCALL slab_malloc)(size_t num_bytes, gfp_t flags) {
 FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 slab_kmalloc(size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes)) {
-#define SLAB_CHECK_SELECT(sz, _)  \
+#define _SLAB_CHECK_SELECT(sz, _) \
 		if (num_bytes <= sz)      \
 			return slab_kmalloc##sz(flags);
-		SLAB_FOREACH_SIZE(SLAB_CHECK_SELECT, _)
-#undef SLAB_CHECK_SELECT
+		SLAB_FOREACH_SIZE(_SLAB_CHECK_SELECT, _)
+#undef _SLAB_CHECK_SELECT
 		__slab_invalid_size();
 	}
 	return __os_slab_kmalloc(num_bytes, flags);
@@ -91,11 +91,11 @@ slab_kmalloc(size_t num_bytes, gfp_t flags) {
 FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes)) {
-#define SLAB_CHECK_SELECT(sz, _)  \
+#define _SLAB_CHECK_SELECT(sz, _) \
 		if (num_bytes <= sz)      \
 			return slab_kmalloc_nx##sz(flags);
-		SLAB_FOREACH_SIZE(SLAB_CHECK_SELECT, _)
-#undef SLAB_CHECK_SELECT
+		SLAB_FOREACH_SIZE(_SLAB_CHECK_SELECT, _)
+#undef _SLAB_CHECK_SELECT
 		__slab_invalid_size();
 	}
 	return __os_slab_kmalloc_nx(num_bytes, flags);

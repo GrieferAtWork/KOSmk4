@@ -141,20 +141,20 @@ nic_device_requireip(struct nicdev *__restrict self, be32 ip)
 		THROWS(E_BADALLOC);
 
 /* Initialize a given network descriptor */
-#define __network_init_common(self) \
+#define _network_init_common(self) \
 	((self)->n_ipsize = 576 /*IP_MSS*/)
 #define network_init(self)                               \
 	(incref(&net_peeraddrs_empty),                       \
 	 arref_init(&(self)->n_peers, &net_peeraddrs_empty), \
 	 sig_init(&(self)->n_addravl),                       \
 	 network_ip_datagrams_init(&(self)->n_ipgrams),      \
-	 __network_init_common(self))
+	 _network_init_common(self))
 #define network_cinit(self)                               \
 	(incref(&net_peeraddrs_empty),                        \
 	 arref_cinit(&(self)->n_peers, &net_peeraddrs_empty), \
 	 sig_cinit(&(self)->n_addravl),                       \
 	 network_ip_datagrams_cinit(&(self)->n_ipgrams),      \
-	 __network_init_common(self))
+	 _network_init_common(self))
 
 /* Finalize a given network descriptor */
 #define network_fini(self)         \

@@ -89,8 +89,8 @@ FUNDEF NOBLOCK ATTR_COLD void NOTHROW(KCALL _kernel_poison)(void);
 #endif /* !CONFIG_HAVE_DEBUGGER */
 
 /* Set kernel poison bits. */
-#define kernel_poison(what) __hybrid_atomic_or(___kernel_poisoned_wr, what, __ATOMIC_SEQ_CST)
-DATDEF __UINT8_TYPE__ ___kernel_poisoned_wr ASMNAME("_kernel_poisoned");
+#define kernel_poison(what) __hybrid_atomic_or(_kernel_private_poisoned_wr, what, __ATOMIC_SEQ_CST)
+DATDEF __UINT8_TYPE__ _kernel_private_poisoned_wr ASMNAME("_kernel_poisoned");
 
 
 /* Cause kernel panic. */

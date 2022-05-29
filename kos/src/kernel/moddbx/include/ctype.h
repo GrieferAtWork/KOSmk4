@@ -521,18 +521,18 @@ DATDEF struct ctype ctype_char32_t_const_compat_ptr;
 #error "Missing type: ctype_u64"
 #endif /* !ctype_u64 */
 
-#define __ctype_s1 ctype_s8
-#define __ctype_s2 ctype_s16
-#define __ctype_s4 ctype_s32
-#define __ctype_s8 ctype_s64
-#define __ctype_u1 ctype_u8
-#define __ctype_u2 ctype_u16
-#define __ctype_u4 ctype_u32
-#define __ctype_u8 ctype_u64
-#define __ctype_sN(sizeof) __ctype_s##sizeof
-#define __ctype_uN(sizeof) __ctype_u##sizeof
-#define ctype_sN(sizeof) __ctype_sN(sizeof)
-#define ctype_uN(sizeof) __ctype_uN(sizeof)
+#define _ctype_s1 ctype_s8
+#define _ctype_s2 ctype_s16
+#define _ctype_s4 ctype_s32
+#define _ctype_s8 ctype_s64
+#define _ctype_u1 ctype_u8
+#define _ctype_u2 ctype_u16
+#define _ctype_u4 ctype_u32
+#define _ctype_u8 ctype_u64
+#define _ctype_sN(sizeof) _ctype_s##sizeof
+#define _ctype_uN(sizeof) _ctype_u##sizeof
+#define ctype_sN(sizeof)  _ctype_sN(sizeof)
+#define ctype_uN(sizeof)  _ctype_uN(sizeof)
 
 #define ctype_size_t    ctype_uN(__SIZEOF_SIZE_T__)
 #define ctype_ssize_t   ctype_sN(__SIZEOF_SIZE_T__)

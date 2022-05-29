@@ -128,7 +128,7 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 #define MKDIR_ENT(name, type, nodeptr, hash)                       \
 	PRIVATE struct constdirent PP_CAT2(procfs_dirent_, __LINE__) = \
 	CONSTDIRENT_INIT((struct fnode *)(nodeptr), 0, type, name, hash);
-#define __MKREG_IMPL(symbol_name, perm, printer, writer)                         \
+#define _MKREG_IMPL(symbol_name, perm, printer, writer)                          \
 	INTERN struct procfs_regfile symbol_name = {                                 \
 		.prf_node = {{{                                                          \
 			.fn_file = {                                                         \
@@ -162,8 +162,8 @@ INTERN struct fregnode procfs_r_kos_leaks = {{
 		.prf_print = printer,                                                    \
 		.prf_write = writer,                                                     \
 	};
-#define MKREG_RW(symbol_name, perm, printer, writer) __MKREG_IMPL(symbol_name, perm, &printer, &writer)
-#define MKREG_RO(symbol_name, perm, printer)         __MKREG_IMPL(symbol_name, perm, &printer, NULL)
+#define MKREG_RW(symbol_name, perm, printer, writer) _MKREG_IMPL(symbol_name, perm, &printer, &writer)
+#define MKREG_RO(symbol_name, perm, printer)         _MKREG_IMPL(symbol_name, perm, &printer, NULL)
 #define MKREG_CONSTSTR(symbol_name, perm, string_ptr)                            \
 	INTERN struct procfs_txtfile symbol_name = {                                 \
 		.ptf_node  = {{{                                                         \

@@ -29,9 +29,8 @@
 #include <bits/crt/format-printer.h>
 #include <kos/except.h>
 
-DECL_BEGIN
-
 #ifdef __CC__
+DECL_BEGIN
 
 /* Exception informations for the calling thread. */
 DATDEF ATTR_PERTASK struct exception_info this_exception_info;
@@ -73,9 +72,7 @@ typedef __errno_t errno_t;
 	 ? THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG, context, input, ~(allowed) /*,0*/) \
 	 : (void)0)
 
-#endif /* __CC__ */
-
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_EXCEPT_H */

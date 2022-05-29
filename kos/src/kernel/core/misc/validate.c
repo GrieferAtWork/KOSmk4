@@ -81,14 +81,14 @@ validate_readableaddr(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT) {
 
 PUBLIC USER CHECKED void *FCALL
 validate_writableaddr(UNCHECKED USER void *addr) THROWS(E_SEGFAULT) {
-	if unlikely(!__ADDR_ISUSER(addr))
+	if unlikely(!_ADDR_ISUSER(addr))
 		except_throw_unmapped_user_wr(addr);
 	return addr;
 }
 
 PUBLIC USER CHECKED void const *FCALL
 validate_executable(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT) {
-	if unlikely(!__ADDR_ISUSER(addr))
+	if unlikely(!_ADDR_ISUSER(addr))
 		except_throw_noexec_user(addr);
 	return addr;
 }

@@ -24,9 +24,8 @@
 #include <kernel/types.h>
 #include <kos/kernel/handle.h>
 
-DECL_BEGIN
-
 #ifdef __CC__
+DECL_BEGIN
 
 #ifndef CONFIG_NO_SYSCALL_TRACING
 /* Low-level, arch-specific enable/disable system call tracing.
@@ -116,8 +115,6 @@ HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_DECLARE)
 } /* extern "C++" */
 #endif /* __cplusplus */
 
-
-
 #else /* !CONFIG_NO_SYSCALL_TRACING */
 #define arch_syscall_tracing_setenabled(enable) 0
 #define arch_syscall_tracing_getenabled()       0
@@ -126,8 +123,7 @@ HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_DECLARE)
 #define syscall_trace_stop(...)                 0
 #endif /* CONFIG_NO_SYSCALL_TRACING */
 
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_SYSCALL_TRACE_H */

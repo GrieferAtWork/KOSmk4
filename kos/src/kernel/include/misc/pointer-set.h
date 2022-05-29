@@ -75,7 +75,7 @@ struct pointer_set {
 
 
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pointer_set_init)(struct pointer_set *__restrict self) {
 	size_t i;
 	self->ps_size = 0;
@@ -84,7 +84,7 @@ NOTHROW(KCALL pointer_set_init)(struct pointer_set *__restrict self) {
 	for (i = 0; i < POINTER_SET_BUFSIZE; ++i)
 		self->ps_buf[i] = POINTER_SET_SENTINAL;
 }
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pointer_set_fini)(struct pointer_set *__restrict self) {
 	if (self->ps_list != self->ps_buf)
 		kfree(self->ps_list);
@@ -93,14 +93,14 @@ NOTHROW(KCALL pointer_set_fini)(struct pointer_set *__restrict self) {
 #endif /* !NDEBUG */
 }
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pointer_set_clear)(struct pointer_set *__restrict self) {
 	__libc_memsetc(self->ps_list, POINTER_SET_SENTINAL, self->ps_mask + 1, __SIZEOF_POINTER__);
 	self->ps_size = 0;
 }
 
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL pointer_set_rehash_with)(struct pointer_set *__restrict self,
                                        /*inherit*/ uintptr_t *__restrict new_set,
                                        uintptr_t new_mask) {
@@ -131,7 +131,7 @@ NOTHROW(KCALL pointer_set_rehash_with)(struct pointer_set *__restrict self,
 	_POINTER_SET_ASSERT_USABLE_MEMORY(self);
 }
 
-LOCAL NOBLOCK bool
+LOCAL NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL pointer_set_do_insert)(struct pointer_set *__restrict self,
                                      uintptr_t ptr) {
 	size_t i, perturb;
@@ -154,7 +154,7 @@ NOTHROW(KCALL pointer_set_do_insert)(struct pointer_set *__restrict self,
 /* Insert the given `ptr' into the set.
  * @return: true:  `ptr' has been added to the set.
  * @return: false: `ptr' was already apart of the set. */
-LOCAL NOBLOCK bool KCALL
+LOCAL NOBLOCK NONNULL((1)) bool KCALL
 pointer_set_insert(struct pointer_set *__restrict self,
                    void *ptr, gfp_t flags DFL(GFP_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
@@ -188,7 +188,7 @@ do_rehash_with:
 #define POINTER_SET_INSERT_NX_SUCCESS   1  /* `ptr' has been added to the set. */
 /* Insert the given `ptr' into the set.
  * @return: * : One of `POINTER_SET_INSERT_NX_*' */
-LOCAL NOBLOCK int
+LOCAL NOBLOCK NONNULL((1)) int
 NOTHROW(KCALL pointer_set_insert_nx)(struct pointer_set *__restrict self,
                                      void *ptr, gfp_t flags DFL(GFP_NORMAL)) {
 	if (((self->ps_size + 1) * 3) / 2 >= self->ps_mask) {
@@ -231,7 +231,7 @@ NOTHROW(KCALL pointer_set_contains)(struct pointer_set const *__restrict self,
 
 /* Set the given pointer_set  and re-hash it to  be
  * able to sustain at least `min_allocation' items. */
-LOCAL void KCALL
+LOCAL NONNULL((1)) void KCALL
 pointer_set_clear_and_rehash(struct pointer_set *__restrict self,
                              size_t min_allocation,
                              gfp_t flags DFL(GFP_NORMAL))
@@ -278,7 +278,7 @@ pointer_set_clear_and_rehash(struct pointer_set *__restrict self,
 	_POINTER_SET_ASSERT_USABLE_MEMORY(self);
 }
 
-LOCAL bool
+LOCAL NONNULL((1)) bool
 NOTHROW(KCALL pointer_set_clear_and_rehash_nx)(struct pointer_set *__restrict self,
                                                size_t min_allocation,
                                                gfp_t flags DFL(GFP_NORMAL)) {

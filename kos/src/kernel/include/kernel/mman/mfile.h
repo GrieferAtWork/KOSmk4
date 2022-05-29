@@ -469,7 +469,7 @@ mfile_dosyncio(struct mfile *__restrict self,
 /* For these 2, the caller must be holding a trunc-lock, or `MFILE_F_FIXEDFILESIZE' must be set.
  * NOTE: For the `*_nonatomic' versions, `MFILE_F_FIXEDFILESIZE' must be set unconditionally. */
 #define mfile_getsize(self)           ((pos_t)atomic64_read(&(self)->mf_filesize))
-#define mfile_getsize_nonatomic(self) ((pos_t)__atomic64_val((self)->mf_filesize))
+#define mfile_getsize_nonatomic(self) ((pos_t)_atomic64_val((self)->mf_filesize))
 #define mfile_getblockcount(self)     (mfile_getsize(self) >> (self)->mf_blockshift)
 
 
@@ -1054,19 +1054,19 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
 	                                        : PAGESHIFT)) -                     \
 	                         1)
 #ifdef CONFIG_MFILE_TRACE_LOCKPC
-#define __mfile_init_wrlockpc(self)  (self)->_mf_wrlockpc = __NULLPTR,
-#define __mfile_cinit_wrlockpc(self) __hybrid_assert((self)->_mf_wrlockpc == __NULLPTR),
+#define _mfile_init_wrlockpc_(self)  (self)->_mf_wrlockpc = __NULLPTR,
+#define _mfile_cinit_wrlockpc_(self) __hybrid_assert((self)->_mf_wrlockpc == __NULLPTR),
 #else /* CONFIG_MFILE_TRACE_LOCKPC */
-#define __mfile_init_wrlockpc(self)  /* nothing */
-#define __mfile_cinit_wrlockpc(self) /* nothing */
+#define _mfile_init_wrlockpc_(self)  /* nothing */
+#define _mfile_cinit_wrlockpc_(self) /* nothing */
 #endif /* !CONFIG_MFILE_TRACE_LOCKPC */
 
 #ifdef CONFIG_MFILE_TRACE_LOCKPC
-#define __mfile_init_notify(self)  (self)->mf_notify = __NULLPTR,
-#define __mfile_cinit_notify(self) __hybrid_assert((self)->mf_notify == __NULLPTR),
+#define _mfile_init_notify_(self)  (self)->mf_notify = __NULLPTR,
+#define _mfile_cinit_notify_(self) __hybrid_assert((self)->mf_notify == __NULLPTR),
 #else /* CONFIG_MFILE_TRACE_LOCKPC */
-#define __mfile_init_notify(self)  /* nothing */
-#define __mfile_cinit_notify(self) /* nothing */
+#define _mfile_init_notify_(self)  /* nothing */
+#define _mfile_cinit_notify_(self) /* nothing */
 #endif /* !CONFIG_MFILE_TRACE_LOCKPC */
 
 
@@ -1075,16 +1075,16 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
  *    mf_iobashift, mf_flags,  mf_filesize,  mf_atime,  mf_mtime,
  *    mf_ctime, mf_btime */
 #define _mfile_init_common(self)           \
-	(__mfile_init_wrlockpc(self)           \
-	 __mfile_init_notify(self)             \
+	(_mfile_init_wrlockpc_(self)           \
+	 _mfile_init_notify_(self)             \
 	 (self)->mf_refcnt = 1,                \
 	 atomic_rwlock_init(&(self)->mf_lock), \
 	 sig_init(&(self)->mf_initdone),       \
 	 SLIST_INIT(&(self)->mf_lockops),      \
 	 (self)->mf_trunclock = 0)
 #define _mfile_cinit_common(self)                       \
-	(__mfile_cinit_wrlockpc(self)                       \
-	 __mfile_cinit_notify(self)                         \
+	(_mfile_cinit_wrlockpc_(self)                       \
+	 _mfile_cinit_notify_(self)                         \
 	 (self)->mf_refcnt = 1,                             \
 	 atomic_rwlock_cinit(&(self)->mf_lock),             \
 	 sig_cinit(&(self)->mf_initdone),                   \
@@ -1149,19 +1149,19 @@ DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 /* Lock accessor helpers for `struct mfile' */
 #ifdef CONFIG_MFILE_TRACE_LOCKPC
 #include <asm/intrin.h>
-#define __mfile_trace_wrlock_setpc(self) (void)((self)->_mf_wrlockpc = __rdip())
-#define __mfile_trace_wrlock_clrpc(self) (void)((self)->_mf_wrlockpc = __NULLPTR)
-#define mfile_lock_write(self)      (atomic_rwlock_write(&(self)->mf_lock), __mfile_trace_wrlock_setpc(self))
-#define mfile_lock_write_nx(self)   (atomic_rwlock_write_nx(&(self)->mf_lock) ? (__mfile_trace_wrlock_setpc(self), 1) : 0)
-#define mfile_lock_trywrite(self)   (atomic_rwlock_trywrite(&(self)->mf_lock) ? (__mfile_trace_wrlock_setpc(self), 1) : 0)
-#define mfile_lock_endwrite(self)   (__mfile_trace_wrlock_clrpc(self), atomic_rwlock_endwrite(&(self)->mf_lock), mfile_lockops_reap(self))
-#define mfile_lock_endwrite_f(self) (__mfile_trace_wrlock_clrpc(self), atomic_rwlock_endwrite(&(self)->mf_lock))
-#define mfile_lock_end(self)        (void)(mfile_lock_writing(self) ? __mfile_trace_wrlock_clrpc(self) : (void)0, atomic_rwlock_end(&(self)->mf_lock) && (mfile_lockops_reap(self), 0))
-#define mfile_lock_end_f(self)      (mfile_lock_writing(self) ? __mfile_trace_wrlock_clrpc(self) : (void)0, atomic_rwlock_end(&(self)->mf_lock))
-#define mfile_lock_upgrade(self)    ({ __BOOL __ok = atomic_rwlock_upgrade(&(self)->mf_lock); __mfile_trace_wrlock_setpc(self); __ok; })
-#define mfile_lock_upgrade_nx(self) ({ unsigned int __ok = atomic_rwlock_upgrade_nx(&(self)->mf_lock); if (__ok != 0) __mfile_trace_wrlock_setpc(self); __ok; })
-#define mfile_lock_tryupgrade(self) (atomic_rwlock_tryupgrade(&(self)->mf_lock) ? (__mfile_trace_wrlock_setpc(self), 1) : 0)
-#define mfile_lock_downgrade(self)  (__mfile_trace_wrlock_clrpc(self), atomic_rwlock_downgrade(&(self)->mf_lock))
+#define _mfile_trace_wrlock_setpc(self) (void)((self)->_mf_wrlockpc = __rdip())
+#define _mfile_trace_wrlock_clrpc(self) (void)((self)->_mf_wrlockpc = __NULLPTR)
+#define mfile_lock_write(self)          (atomic_rwlock_write(&(self)->mf_lock), _mfile_trace_wrlock_setpc(self))
+#define mfile_lock_write_nx(self)       (atomic_rwlock_write_nx(&(self)->mf_lock) ? (_mfile_trace_wrlock_setpc(self), 1) : 0)
+#define mfile_lock_trywrite(self)       (atomic_rwlock_trywrite(&(self)->mf_lock) ? (_mfile_trace_wrlock_setpc(self), 1) : 0)
+#define mfile_lock_endwrite(self)       (_mfile_trace_wrlock_clrpc(self), atomic_rwlock_endwrite(&(self)->mf_lock), mfile_lockops_reap(self))
+#define mfile_lock_endwrite_f(self)     (_mfile_trace_wrlock_clrpc(self), atomic_rwlock_endwrite(&(self)->mf_lock))
+#define mfile_lock_end(self)            (void)(mfile_lock_writing(self) ? _mfile_trace_wrlock_clrpc(self) : (void)0, atomic_rwlock_end(&(self)->mf_lock) && (mfile_lockops_reap(self), 0))
+#define mfile_lock_end_f(self)          (mfile_lock_writing(self) ? _mfile_trace_wrlock_clrpc(self) : (void)0, atomic_rwlock_end(&(self)->mf_lock))
+#define mfile_lock_upgrade(self)        ({ __BOOL __ok = atomic_rwlock_upgrade(&(self)->mf_lock); _mfile_trace_wrlock_setpc(self); __ok; })
+#define mfile_lock_upgrade_nx(self)     ({ unsigned int __ok = atomic_rwlock_upgrade_nx(&(self)->mf_lock); if (__ok != 0) _mfile_trace_wrlock_setpc(self); __ok; })
+#define mfile_lock_tryupgrade(self)     (atomic_rwlock_tryupgrade(&(self)->mf_lock) ? (_mfile_trace_wrlock_setpc(self), 1) : 0)
+#define mfile_lock_downgrade(self)      (_mfile_trace_wrlock_clrpc(self), atomic_rwlock_downgrade(&(self)->mf_lock))
 #else /* CONFIG_MFILE_TRACE_LOCKPC */
 #define mfile_lock_write(self)      atomic_rwlock_write(&(self)->mf_lock)
 #define mfile_lock_write_nx(self)   atomic_rwlock_write_nx(&(self)->mf_lock)

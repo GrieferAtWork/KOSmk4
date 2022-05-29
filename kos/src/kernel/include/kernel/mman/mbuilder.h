@@ -241,11 +241,11 @@ struct mbuilder
 {
 #ifndef __cplusplus
 	struct mbuilder_norpc   _mb_base;
-#define __mbuilder_asnorpc(self) (&(self)->_mb_base)
-#define __mbuilder_base_         _mb_base.
+#define _mbuilder_asnorpc(self) (&(self)->_mb_base)
+#define _mbuilder_base_         _mb_base.
 #else /* !__cplusplus */
-#define __mbuilder_asnorpc /* nothing */
-#define __mbuilder_base_   /* nothing */
+#define _mbuilder_asnorpc /* nothing */
+#define _mbuilder_base_   /* nothing */
 #endif /* __cplusplus */
 #ifdef __INTELLISENSE__
 	struct mnode            *mb_oldmap;   /* [0..n][owned] Old mem-node tree of the target mman. */
@@ -269,11 +269,11 @@ struct mbuilder
 	 __hybrid_assert(SLIST_EMPTY(&(self)->mb_uparts)),  \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->_mb_fnodes)))
 #define mbuilder_init(self)                         \
-	(mbuilder_norpc_init(__mbuilder_asnorpc(self)), \
+	(mbuilder_norpc_init(_mbuilder_asnorpc(self)), \
 	 (self)->mb_oldmap = __NULLPTR,                 \
 	 SLIST_INIT(&(self)->mb_killrpc))
 #define mbuilder_cinit(self)                          \
-	(mbuilder_norpc_cinit(__mbuilder_asnorpc(self)),  \
+	(mbuilder_norpc_cinit(_mbuilder_asnorpc(self)),  \
 	 __hybrid_assert((self)->mb_oldmap == __NULLPTR), \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->mb_killrpc)))
 

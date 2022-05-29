@@ -137,12 +137,12 @@ struct driver_section
 };
 
 #if !defined(__cplusplus) || defined(__WANT_DRIVER_SECTION_ds_sect)
-#define __driver_section_as_module_section(self)  (&(self)->ds_sect)
-#define __driver_section_destroy(self)    module_section_destroy(&(self)->ds_sect)
-#define __driver_section_refcnt(self)     (self)->ds_sect.ms_refcnt
-DEFINE_REFCNT_FUNCTIONS_P(struct driver_section, __driver_section_refcnt, __driver_section_destroy)
+#define _driver_section_as_module_section(self) (&(self)->ds_sect)
+#define _driver_section_destroy(self)           module_section_destroy(&(self)->ds_sect)
+#define _driver_section_refcnt(self)            (self)->ds_sect.ms_refcnt
+DEFINE_REFCNT_FUNCTIONS_P(struct driver_section, _driver_section_refcnt, _driver_section_destroy)
 #else /* !__cplusplus || __WANT_DRIVER_SECTION_ds_sect */
-#define __driver_section_as_module_section /* nothing */
+#define _driver_section_as_module_section /* nothing */
 #endif /* __cplusplus && !__WANT_DRIVER_SECTION_ds_sect */
 
 
@@ -461,23 +461,23 @@ struct driver
 	(__hybrid_atomic_load((self)->d_state, __ATOMIC_ACQUIRE) >= DRIVER_STATE_FINI_DT_FINIARR)
 
 
-#undef __driver_as_module
+#undef _driver_as_module
 #if !defined(__cplusplus) || defined(__WANT_DRIVER_d_module)
-#undef __driver_destroy
-#undef __driver_free
-#undef __driver_refcnt
-#undef __driver_weakrefcnt
-#define __driver_as_module(self)  (&(self)->d_module)
-#define __driver_destroy(self)    module_destroy(&(self)->d_module)
-#define __driver_free(self)       module_free(&(self)->d_module)
-#define __driver_refcnt(self)     (self)->d_module.md_refcnt
-#define __driver_weakrefcnt(self) (self)->d_module.md_weakrefcnt
+#undef _driver_destroy
+#undef _driver_free
+#undef _driver_refcnt
+#undef _driver_weakrefcnt
+#define _driver_as_module(self)  (&(self)->d_module)
+#define _driver_destroy(self)    module_destroy(&(self)->d_module)
+#define _driver_free(self)      module_free(&(self)->d_module)
+#define _driver_refcnt(self)     (self)->d_module.md_refcnt
+#define _driver_weakrefcnt(self) (self)->d_module.md_weakrefcnt
 #ifndef __DRIVER_REFCNT_FUNCTIONS_DEFINED
-DEFINE_REFCNT_FUNCTIONS_P(struct driver, __driver_refcnt, __driver_destroy)
-DEFINE_WEAKREFCNT_FUNCTIONS_P(struct driver, __driver_weakrefcnt, __driver_free)
+DEFINE_REFCNT_FUNCTIONS_P(struct driver, _driver_refcnt, _driver_destroy)
+DEFINE_WEAKREFCNT_FUNCTIONS_P(struct driver, _driver_weakrefcnt, _driver_free)
 #endif /* !__DRIVER_REFCNT_FUNCTIONS_DEFINED */
 #else /* !__cplusplus || __WANT_DRIVER_d_module */
-#define __driver_as_module /* nothing */
+#define _driver_as_module /* nothing */
 #endif /* __cplusplus && !__WANT_DRIVER_d_module */
 
 /* The driver descriptor for the kernel core */

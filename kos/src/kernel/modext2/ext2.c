@@ -771,7 +771,7 @@ ext2_lnk_v_readlink(struct flnknode *__restrict self,
                     USER CHECKED /*utf-8*/ char *buf,
                     size_t bufsize)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
-	size_t lnksize = (size_t)__atomic64_val(self->mf_filesize);
+	size_t lnksize = (size_t)_atomic64_val(self->mf_filesize);
 	if (bufsize > lnksize)
 		bufsize = lnksize;
 	/* As per the specs, symbolic links with lengths less than 60 (yes: "<" and NOT "<=",

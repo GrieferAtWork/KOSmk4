@@ -1529,17 +1529,17 @@ DATDEF struct mpart_list mpart_all_list;
 #ifndef CONFIG_NO_MPART_ALL_SIZE
 /* [lock(mpart_all_lock)] The # of parts stored in `mpart_all_list' */
 DATDEF size_t mpart_all_size;
-#define __mpart_all_size_inc() (void)++mpart_all_size
-#define __mpart_all_size_dec() (void)--mpart_all_size
+#define _mpart_all_size_inc() (void)++mpart_all_size
+#define _mpart_all_size_dec() (void)--mpart_all_size
 #else /* !CONFIG_NO_MPART_ALL_SIZE */
-#define __mpart_all_size_inc() (void)0
-#define __mpart_all_size_dec() (void)0
+#define _mpart_all_size_inc() (void)0
+#define _mpart_all_size_dec() (void)0
 #endif /* CONFIG_NO_MPART_ALL_SIZE */
 
 /* Direct insert/remove a given part from `mpart_all_list'
  * The caller must be holding a  lock to `mpart_all_lock'! */
-#define _mpart_all_list_insert(part) (LIST_INSERT_HEAD(&mpart_all_list, part, mp_allparts), __mpart_all_size_inc())
-#define _mpart_all_list_remove(part) (__mpart_all_size_dec(), LIST_REMOVE(part, mp_allparts))
+#define _mpart_all_list_insert(part) (LIST_INSERT_HEAD(&mpart_all_list, part, mp_allparts), _mpart_all_size_inc())
+#define _mpart_all_list_remove(part) (_mpart_all_size_dec(), LIST_REMOVE(part, mp_allparts))
 
 /* Return the # of items stored in `mpart_all_list' */
 #ifdef CONFIG_NO_MPART_ALL_SIZE

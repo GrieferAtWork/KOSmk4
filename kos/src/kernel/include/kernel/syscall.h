@@ -52,8 +52,6 @@
 #include <asm/syscalls.h>
 #endif /* !__NRFEAT_DEFINED_SYSCALL_REGISTER_COUNT */
 
-DECL_BEGIN
-
 #ifndef ATTR_SECTION_SYSCALL
 #define ATTR_SECTION_SYSCALL(name_str) /* nothing */
 #endif /* !ATTR_SECTION_SYSCALL */
@@ -67,6 +65,7 @@ DECL_BEGIN
 #endif /* !__ARCH_DEFINE_SYSCALL_COMMON */
 
 #ifdef __CC__
+DECL_BEGIN
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #ifndef __PRIVATE_SYSCALL_GET_ESCAPED_TYPE
@@ -163,8 +162,8 @@ syscall_emulate(struct icpustate *__restrict state,
 FUNDEF ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2)) void
 NOTHROW(FCALL syscall_emulate_r)(struct icpustate *__restrict state,
                                  struct rpc_syscall_info const *__restrict sc_info);
-#endif /* !__CC__ */
 
 DECL_END
+#endif /* !__CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_SYSCALL_H */

@@ -283,7 +283,7 @@ syscall_emulate32(struct icpustate *__restrict state,
 	if (sysno <= __NR32_syscall0_max) {
 		/* Normal system call */
 		proto = x86_sysroute0_runc32[sysno];
-		if (__kernel_syscall_doublewide(kernel_syscall0_regcnt, sysno)) {
+		if (_kernel_private_syscall_doublewide(kernel_syscall0_regcnt, sysno)) {
 			u64 result;
 do_syscall64:
 			result = (*(syscall_run32_64_t)proto)(sc_info->rsi_regs);
@@ -298,7 +298,7 @@ do_syscall32:
 	} else if (sysno >= __NR32_syscall1_min && sysno <= __NR32_syscall1_max) {
 		/* Extended system call */
 		proto = x86_sysroute1_runc32[sysno - __NR32_syscall1_min];
-		if (__kernel_syscall_doublewide(kernel_syscall1_regcnt, sysno - __NR32_syscall1_min))
+		if (_kernel_private_syscall_doublewide(kernel_syscall1_regcnt, sysno - __NR32_syscall1_min))
 			goto do_syscall64;
 		goto do_syscall32;
 	} else {
@@ -336,7 +336,7 @@ syscall_emulate(struct icpustate *__restrict state,
 	if (sysno <= __NR32_syscall0_max) {
 		/* Normal system call */
 		proto = x86_sysroute0_c32[sysno];
-		if (__kernel_syscall_doublewide(kernel_syscall0_regcnt, sysno)) {
+		if (_kernel_private_syscall_doublewide(kernel_syscall0_regcnt, sysno)) {
 			u64 result;
 do_syscall64:
 			result = (*(syscall_proto64_t)proto)(sc_info->rsi_regs[0],
@@ -361,7 +361,7 @@ do_syscall32:
 	} else if (sysno >= __NR32_syscall1_min && sysno <= __NR32_syscall1_max) {
 		/* Extended system call */
 		proto = x86_sysroute1_c32[sysno - __NR32_syscall1_min];
-		if (__kernel_syscall_doublewide(kernel_syscall1_regcnt, sysno - __NR32_syscall1_min))
+		if (_kernel_private_syscall_doublewide(kernel_syscall1_regcnt, sysno - __NR32_syscall1_min))
 			goto do_syscall64;
 		goto do_syscall32;
 	} else {

@@ -47,20 +47,20 @@ DECL_BEGIN
 typedef struct {
 	u64 _a_val;
 } atomic64_t;
-#define __atomic64_val(self) (self)._a_val
+#define _atomic64_val(self) (self)._a_val
 #define ATOMIC64_INIT(v) { v }
 #else /* __INTELLISENSE__ */
 typedef u64 atomic64_t;
-#define __atomic64_val(self) self
+#define _atomic64_val(self) self
 #define ATOMIC64_INIT(v) v
 #endif /* !__INTELLISENSE__ */
 
-#define atomic64_init(self, v) (void)(__atomic64_val(*(self)) = (v))
+#define atomic64_init(self, v) (void)(_atomic64_val(*(self)) = (v))
 #define atomic64_cinit(self, v)                     \
-	(__hybrid_assert(__atomic64_val(*(self)) == 0), \
+	(__hybrid_assert(_atomic64_val(*(self)) == 0), \
 	 (__builtin_constant_p(v) && (v) == 0)          \
 	 ? (void)0                                      \
-	 : (void)(__atomic64_val(*(self)) = (v)))
+	 : (void)(_atomic64_val(*(self)) = (v)))
 
 
 /* Atomically read a 64-bit data word from `self' */
@@ -78,7 +78,7 @@ NOTHROW(atomic64_read)(atomic64_t const *__restrict self) {
 	        , "=&c" (__ecx)
 	        , "=&b" (__ebx)
 	        : "D" (self)
-	        , "m" (__atomic64_val(*self))
+	        , "m" (_atomic64_val(*self))
 	        : "cc");
 	return __eax_edx;
 }
@@ -97,7 +97,7 @@ NOTHROW(atomic64_write)(atomic64_t *__restrict self, u64 value) {
 	__asm__("call __i386_atomic64_write"
 	        : "=&a" (__eax)
 	        , "=&d" (__edx)
-	        , "=m" (__atomic64_val(*self))
+	        , "=m" (_atomic64_val(*self))
 	        : "D" (self)
 	        , "b" ((u32)(value))
 	        , "c" ((u32)(value >> 32))
@@ -122,7 +122,7 @@ NOTHROW(atomic64_cmpxch_val)(atomic64_t *__restrict self,
 	__register u64 __eax_edx;
 	__asm__("call __i386_atomic64_cmpxch"
 	        : "=A" (__eax_edx)
-	        , "+m" (__atomic64_val(*self))
+	        , "+m" (_atomic64_val(*self))
 	        : "D" (self)
 	        , "0" (oldval)
 	        , "b" ((u32)(newval))
@@ -159,7 +159,7 @@ NOTHROW(atomic64_cmpxch)(atomic64_t *__restrict self,
 	__asm__("call __i386_atomic64_cmpxch"
 	        : "=A" (__eax_edx)
 	        , "=@cce" (__res)
-	        , "+m" (__atomic64_val(*self))
+	        , "+m" (_atomic64_val(*self))
 	        : "D" (self)
 	        , "0" (oldval)
 	        , "b" ((u32)(newval))
@@ -186,7 +186,7 @@ NOTHROW(atomic64_xch)(atomic64_t *__restrict self,
 	 * CLOBBER: %eflags */
 	__asm__("call __i386_atomic64_xch"
 	        : "=A" (__eax_edx)
-	        , "+m" (__atomic64_val(*self))
+	        , "+m" (_atomic64_val(*self))
 	        : "D" (self)
 	        , "b" ((u32)(addend))
 	        , "c" ((u32)(addend >> 32))
@@ -212,7 +212,7 @@ NOTHROW(atomic64_fetchadd)(atomic64_t *__restrict self,
 	        : "=A" (__eax_edx)
 	        , "=&b" (__ebx)
 	        , "=&c" (__ecx)
-	        , "+m" (__atomic64_val(*self))
+	        , "+m" (_atomic64_val(*self))
 	        : "D" (self)
 	        , "1" ((u32)(addend))
 	        , "2" ((u32)(addend >> 32))
@@ -238,7 +238,7 @@ NOTHROW(atomic64_fetchand)(atomic64_t *__restrict self,
 	        : "=A" (__eax_edx)
 	        , "=&b" (__ebx)
 	        , "=&c" (__ecx)
-	        , "+m" (__atomic64_val(*self))
+	        , "+m" (_atomic64_val(*self))
 	        : "D" (self)
 	        , "1" ((u32)(addend))
 	        , "2" ((u32)(addend >> 32))
@@ -264,7 +264,7 @@ NOTHROW(atomic64_fetchor)(atomic64_t *__restrict self,
 	        : "=A" (__eax_edx)
 	        , "=&b" (__ebx)
 	        , "=&c" (__ecx)
-	        , "+m" (__atomic64_val(*self))
+	        , "+m" (_atomic64_val(*self))
 	        : "D" (self)
 	        , "1" ((u32)(addend))
 	        , "2" ((u32)(addend >> 32))
@@ -290,7 +290,7 @@ NOTHROW(atomic64_fetchxor)(atomic64_t *__restrict self,
 	        : "=A" (__eax_edx)
 	        , "=&b" (__ebx)
 	        , "=&c" (__ecx)
-	        , "+m" (__atomic64_val(*self))
+	        , "+m" (_atomic64_val(*self))
 	        : "D" (self)
 	        , "1" ((u32)(addend))
 	        , "2" ((u32)(addend >> 32))

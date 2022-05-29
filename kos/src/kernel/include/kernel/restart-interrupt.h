@@ -24,13 +24,12 @@
 
 #include <kernel/arch/restart-interrupt.h>
 
-DECL_BEGIN
-
 #ifndef KERNEL_INTERRUPT_CALLBACK_CC
 #define KERNEL_INTERRUPT_CALLBACK_CC FCALL
 #endif /* !KERNEL_INTERRUPT_CALLBACK_CC */
 
 #ifdef __CC__
+DECL_BEGIN
 
 /* Callback prototype for `kernel_restart_interrupt()' */
 #ifndef __kernel_interrupt_callback_t_defined
@@ -53,8 +52,7 @@ NOTHROW(KERNEL_INTERRUPT_CALLBACK_CC kernel_restart_interrupt)(struct icpustate 
                                                                kernel_interrupt_callback_t cb);
 #endif /* !__kernel_restart_interrupt_defined */
 
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_RESTART_INTERRUPT_H */

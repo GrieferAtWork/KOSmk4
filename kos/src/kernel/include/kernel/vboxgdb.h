@@ -38,15 +38,13 @@
 #define CONFIG_NO_VBOXGDB 1
 #endif /* !... */
 
-
-
-DECL_BEGIN
-
 /* Known VBox GDB traps. */
 #define VBOXGDB_TRAP_STARTUP "startup" /* Invoked during kernel startup (starts the GDB stub & sets initial breakpoints) */
 #define VBOXGDB_TRAP_LIBRARY "library" /* Invoked when a driver is loaded/unloaded. */
 
 #ifdef __CC__
+DECL_BEGIN
+
 #ifdef CONFIG_VBOXGDB
 
 /* Trap into the vboxgdb sub-system by sending a command "%{vboxgdb:<name>}",
@@ -60,8 +58,8 @@ NOTHROW(FCALL vboxgdb_trap)(char const *__restrict name);
 #else /* CONFIG_VBOXGDB */
 #define vboxgdb_trap(name) (void)0
 #endif /* !CONFIG_VBOXGDB */
-#endif /* __CC__ */
 
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_VBOXGDB_H */

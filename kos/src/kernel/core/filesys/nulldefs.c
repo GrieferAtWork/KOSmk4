@@ -56,9 +56,9 @@ DECL_BEGIN
 
 #ifndef __DEEMON__
 #if (S_IFCHR == 0x2000 && S_IFBLK == 0x6000) && __SIZEOF_INO_T__ == 8
-#define __SELECT_INO(ino4, ino8) ino8
+#define _SELECT_INO(ino4, ino8) ino8
 #elif (S_IFCHR == 0x2000 && S_IFBLK == 0x6000) && __SIZEOF_INO_T__ == 4
-#define __SELECT_INO(ino4, ino8) ino4
+#define _SELECT_INO(ino4, ino8) ino4
 #else /* ... */
 #error "Unsupported configuration"
 #endif /* !... */
@@ -126,7 +126,7 @@ function devfs_devnode_makeino_4(st_mode, st_rdev) -> (st_rdev << 3) | ((st_mode
 function devfs_devnode_makeino_8(st_mode, st_rdev) -> (st_rdev << 3) | ((st_mode & 0x4000) << 17) | 7;
 
 @@Possible encoding mechanisms for ino_t. The elements of this list must
-@@correspond to the arguments of `__SELECT_INO`, using the same order.
+@@correspond to the arguments of `_SELECT_INO`, using the same order.
 local MAKEINO_FUNCTIONS = {
 	("UINT32_C", devfs_devnode_makeino_4),
 	("UINT64_C", devfs_devnode_makeino_8)
@@ -152,7 +152,7 @@ print("#define __CCAST(T) (uint64_t)");
 // Assert that our generated INO numbers are correct
 for (local name, st_mode, st_rdev: DEVICES) {
 	print("STATIC_ASSERT(devfs_devnode_makeino(", STMODE_MAP[st_mode & ~07777],
-		", MKDEV(", MAJOR(st_rdev), ", ", MINOR(st_rdev), ")) == (__FS_TYPE(ino))__SELECT_INO(", ", ".join(
+		", MKDEV(", MAJOR(st_rdev), ", ", MINOR(st_rdev), ")) == (__FS_TYPE(ino))_SELECT_INO(", ", ".join(
 		for (local c, fun: MAKEINO_FUNCTIONS)
 			"{}({})".format({ c, fun(st_mode, st_rdev).hex() })),
 	"));");
@@ -167,7 +167,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("	.dd_dirent = {");
 	print("		.fd_refcnt  = 2, /" "* +1: dirent_dev_", name, ", +1: dev_", name, ".dv_dirent *" "/");
 	print("		.fd_ops     = &devdirent_ops,");
-	print("		.fd_ino     = (ino_t)__SELECT_INO(", ", ".join(
+	print("		.fd_ino     = (ino_t)_SELECT_INO(", ", ".join(
 		for (local c, fun: MAKEINO_FUNCTIONS)
 			"{}({})".format({ c, fun(st_mode, st_rdev).hex() })),
 	"),");
@@ -180,7 +180,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 }
 
 // Print static initialization symbols
-print("__SELECT_INO(", ",\n             ".join(
+print("_SELECT_INO(", ",\n             ".join(
 	for (local none, none, tree: byInoTrees)
 		"DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, {})"
 			.format({ tree.value.val.partition(".").first })
@@ -226,7 +226,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 		print("				                    ", extFlags, " |");
 	if (byNameNode.isred)
 		print("				                    _MFILE_DEVFS_BYNAME_RED |");
-	print("				                    __SELECT_INO(", ", ".join(
+	print("				                    _SELECT_INO(", ", ".join(
 		for (local c, node: inoNodes) node.isred ? "_MFILE_FN__RBRED" : "0"),
 	")),");
 	print("				MFILE_INIT_mf_trunclock,");
@@ -240,15 +240,15 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("			.fn_mode  = ", (st_mode & 07777).oct(), " | ", STMODE_MAP[st_mode & ~07777], ",");
 	print("			.fn_uid   = 0,");
 	print("			.fn_gid   = 0,");
-	print("			.fn_ino   = (ino_t)__SELECT_INO(", ", ".join(
+	print("			.fn_ino   = (ino_t)_SELECT_INO(", ", ".join(
 		for (local c, node: inoNodes)
 			"{}({})".format({ c, node.minkey.hex() })),
 	"),");
 	print("			.fn_super = &devfs.rs_sup,");
 	print("			FNODE_INIT_fn_changed,");
 	print("			.fn_supent = {");
-	print("				.rb_lhs = __SELECT_INO(", ", ".join(for (local none, node: inoNodes) node.lhs is none ? "NULL" : ("&" + node.lhs.val)), "),");
-	print("				.rb_rhs = __SELECT_INO(", ", ".join(for (local none, node: inoNodes) node.rhs is none ? "NULL" : ("&" + node.rhs.val)), "),");
+	print("				.rb_lhs = _SELECT_INO(", ", ".join(for (local none, node: inoNodes) node.lhs is none ? "NULL" : ("&" + node.lhs.val)), "),");
+	print("				.rb_rhs = _SELECT_INO(", ", ".join(for (local none, node: inoNodes) node.rhs is none ? "NULL" : ("&" + node.rhs.val)), "),");
 	print("			},");
 	print("			FNODE_INIT_fn_allnodes,");
 	print("		},");
@@ -269,16 +269,16 @@ STATIC_ASSERT(offsetof(struct ramfs_dirnode, rdn_dir.dn_node) == 0);
 STATIC_ASSERT(offsetof(struct device, dv_devnode.dn_node) == 0);
 #undef __CCAST
 #define __CCAST(T) (uint64_t)
-STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 1)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x80000f), UINT64_C(0x80000f)));
-STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 2)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x800017), UINT64_C(0x800017)));
-STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 3)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x80001f), UINT64_C(0x80001f)));
-STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 4)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x800027), UINT64_C(0x800027)));
-STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 5)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x80002f), UINT64_C(0x80002f)));
-STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 7)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x80003f), UINT64_C(0x80003f)));
-STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 8)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x800047), UINT64_C(0x800047)));
-STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 9)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x80004f), UINT64_C(0x80004f)));
-STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 11)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x80005f), UINT64_C(0x80005f)));
-STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(5, 0)) == (__FS_TYPE(ino))__SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)));
+STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 1)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x80000f), UINT64_C(0x80000f)));
+STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 2)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x800017), UINT64_C(0x800017)));
+STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 3)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x80001f), UINT64_C(0x80001f)));
+STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 4)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x800027), UINT64_C(0x800027)));
+STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 5)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x80002f), UINT64_C(0x80002f)));
+STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 7)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x80003f), UINT64_C(0x80003f)));
+STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 8)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x800047), UINT64_C(0x800047)));
+STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 9)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x80004f), UINT64_C(0x80004f)));
+STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 11)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x80005f), UINT64_C(0x80005f)));
+STATIC_ASSERT(devfs_devnode_makeino(S_IFCHR, MKDEV(5, 0)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)));
 #undef __CCAST
 #define __CCAST
 PRIVATE struct devdirent dirent_dev_mem = {
@@ -286,7 +286,7 @@ PRIVATE struct devdirent dirent_dev_mem = {
 	.dd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_mem, +1: dev_mem.dv_dirent */
 		.fd_ops     = &devdirent_ops,
-		.fd_ino     = (ino_t)__SELECT_INO(UINT32_C(0x80000f), UINT64_C(0x80000f)),
+		.fd_ino     = (ino_t)_SELECT_INO(UINT32_C(0x80000f), UINT64_C(0x80000f)),
 		.fd_hash    = 0x6d656d,
 		.fd_namelen = 3,
 		.fd_type    = IFTODT(S_IFCHR),
@@ -298,7 +298,7 @@ PRIVATE struct devdirent dirent_dev_kmem = {
 	.dd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_kmem, +1: dev_kmem.dv_dirent */
 		.fd_ops     = &devdirent_ops,
-		.fd_ino     = (ino_t)__SELECT_INO(UINT32_C(0x800017), UINT64_C(0x800017)),
+		.fd_ino     = (ino_t)_SELECT_INO(UINT32_C(0x800017), UINT64_C(0x800017)),
 		.fd_hash    = FDIRENT_HASH_INIT(0xd890d8c3, 0x6d656d6b, 0xc6d890d5, 0x6d656d6b),
 		.fd_namelen = 4,
 		.fd_type    = IFTODT(S_IFCHR),
@@ -310,7 +310,7 @@ PRIVATE struct devdirent dirent_dev_null = {
 	.dd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_null, +1: dev_null.dv_dirent */
 		.fd_ops     = &devdirent_ops,
-		.fd_ino     = (ino_t)__SELECT_INO(UINT32_C(0x80001f), UINT64_C(0x80001f)),
+		.fd_ino     = (ino_t)_SELECT_INO(UINT32_C(0x80001f), UINT64_C(0x80001f)),
 		.fd_hash    = FDIRENT_HASH_INIT(0xcfd020de, 0x6c6c756e, 0xe220cfcc, 0x6c6c756e),
 		.fd_namelen = 4,
 		.fd_type    = IFTODT(S_IFCHR),
@@ -322,7 +322,7 @@ PRIVATE struct devdirent dirent_dev_port = {
 	.dd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_port, +1: dev_port.dv_dirent */
 		.fd_ops     = &devdirent_ops,
-		.fd_ino     = (ino_t)__SELECT_INO(UINT32_C(0x800027), UINT64_C(0x800027)),
+		.fd_ino     = (ino_t)_SELECT_INO(UINT32_C(0x800027), UINT64_C(0x800027)),
 		.fd_hash    = FDIRENT_HASH_INIT(0x1805eaf0, 0x74726f70, 0xf3eb0614, 0x74726f70),
 		.fd_namelen = 4,
 		.fd_type    = IFTODT(S_IFCHR),
@@ -334,7 +334,7 @@ PRIVATE struct devdirent dirent_dev_zero = {
 	.dd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_zero, +1: dev_zero.dv_dirent */
 		.fd_ops     = &devdirent_ops,
-		.fd_ino     = (ino_t)__SELECT_INO(UINT32_C(0x80002f), UINT64_C(0x80002f)),
+		.fd_ino     = (ino_t)_SELECT_INO(UINT32_C(0x80002f), UINT64_C(0x80002f)),
 		.fd_hash    = FDIRENT_HASH_INIT(0xeb05914a, 0x6f72657a, 0x4d9105e7, 0x6f72657a),
 		.fd_namelen = 4,
 		.fd_type    = IFTODT(S_IFCHR),
@@ -346,7 +346,7 @@ PRIVATE struct devdirent dirent_dev_full = {
 	.dd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_full, +1: dev_full.dv_dirent */
 		.fd_ops     = &devdirent_ops,
-		.fd_ino     = (ino_t)__SELECT_INO(UINT32_C(0x80003f), UINT64_C(0x80003f)),
+		.fd_ino     = (ino_t)_SELECT_INO(UINT32_C(0x80003f), UINT64_C(0x80003f)),
 		.fd_hash    = FDIRENT_HASH_INIT(0xcfd02096, 0x6c6c7566, 0x9a20cfcc, 0x6c6c7566),
 		.fd_namelen = 4,
 		.fd_type    = IFTODT(S_IFCHR),
@@ -358,7 +358,7 @@ PRIVATE struct devdirent dirent_dev_random = {
 	.dd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_random, +1: dev_random.dv_dirent */
 		.fd_ops     = &devdirent_ops,
-		.fd_ino     = (ino_t)__SELECT_INO(UINT32_C(0x800047), UINT64_C(0x800047)),
+		.fd_ino     = (ino_t)_SELECT_INO(UINT32_C(0x800047), UINT64_C(0x800047)),
 		.fd_hash    = FDIRENT_HASH_INIT(0x87e1da71, 0x6d6f646e6172, 0x56d4ef3, 0x6d6f646e6172),
 		.fd_namelen = 6,
 		.fd_type    = IFTODT(S_IFCHR),
@@ -370,7 +370,7 @@ PRIVATE struct devdirent dirent_dev_urandom = {
 	.dd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_urandom, +1: dev_urandom.dv_dirent */
 		.fd_ops     = &devdirent_ops,
-		.fd_ino     = (ino_t)__SELECT_INO(UINT32_C(0x80004f), UINT64_C(0x80004f)),
+		.fd_ino     = (ino_t)_SELECT_INO(UINT32_C(0x80004f), UINT64_C(0x80004f)),
 		.fd_hash    = FDIRENT_HASH_INIT(0xe1da7581, 0x6d6f646e617275, 0x2172dc42, 0x6d6f646e617275),
 		.fd_namelen = 7,
 		.fd_type    = IFTODT(S_IFCHR),
@@ -382,7 +382,7 @@ PRIVATE struct devdirent dirent_dev_kmsg = {
 	.dd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_kmsg, +1: dev_kmsg.dv_dirent */
 		.fd_ops     = &devdirent_ops,
-		.fd_ino     = (ino_t)__SELECT_INO(UINT32_C(0x80005f), UINT64_C(0x80005f)),
+		.fd_ino     = (ino_t)_SELECT_INO(UINT32_C(0x80005f), UINT64_C(0x80005f)),
 		.fd_hash    = FDIRENT_HASH_INIT(0xa30ed8c3, 0x67736d6b, 0xc6d90e9f, 0x67736d6b),
 		.fd_namelen = 4,
 		.fd_type    = IFTODT(S_IFCHR),
@@ -394,14 +394,14 @@ PRIVATE struct devdirent dirent_dev_tty = {
 	.dd_dirent = {
 		.fd_refcnt  = 2, /* +1: dirent_dev_tty, +1: dev_tty.dv_dirent */
 		.fd_ops     = &devdirent_ops,
-		.fd_ino     = (ino_t)__SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)),
+		.fd_ino     = (ino_t)_SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)),
 		.fd_hash    = 0x797474,
 		.fd_namelen = 3,
 		.fd_type    = IFTODT(S_IFCHR),
 		.fd_name    = "tty"
 	}
 };
-__SELECT_INO(DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_port),
+_SELECT_INO(DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_port),
              DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, dev_port));
 DEFINE_INTERN_ALIAS(_devfs_byname_tree__INIT, dev_port);
 INTDEF struct chrdev_ops const dev_mem_ops;
@@ -435,7 +435,7 @@ PUBLIC struct device dev_mem = {
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
 				                    _MFILE_DEVFS_BYNAME_RED |
-				                    __SELECT_INO(0, 0)),
+				                    _SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize((uint64_t)(physaddr_t)-1),
 				MFILE_INIT_mf_atime(0, 0),
@@ -447,12 +447,12 @@ PUBLIC struct device dev_mem = {
 			.fn_mode  = 0640 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
-			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x80000f), UINT64_C(0x80000f)),
+			.fn_ino   = (ino_t)_SELECT_INO(UINT32_C(0x80000f), UINT64_C(0x80000f)),
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(NULL, NULL),
-				.rb_rhs = __SELECT_INO(NULL, NULL),
+				.rb_lhs = _SELECT_INO(NULL, NULL),
+				.rb_rhs = _SELECT_INO(NULL, NULL),
 			},
 			FNODE_INIT_fn_allnodes,
 		},
@@ -487,7 +487,7 @@ PUBLIC struct device dev_kmem = {
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
 				                    NO_USER_IO_WITHOUT_VIO |
-				                    __SELECT_INO(0, 0)),
+				                    _SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize((uint64_t)(size_t)-1),
 				MFILE_INIT_mf_atime(0, 0),
@@ -499,12 +499,12 @@ PUBLIC struct device dev_kmem = {
 			.fn_mode  = 0640 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
-			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x800017), UINT64_C(0x800017)),
+			.fn_ino   = (ino_t)_SELECT_INO(UINT32_C(0x800017), UINT64_C(0x800017)),
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(&dev_mem.dv_devnode.dn_node, &dev_mem.dv_devnode.dn_node),
-				.rb_rhs = __SELECT_INO(&dev_null.dv_devnode.dn_node, &dev_null.dv_devnode.dn_node),
+				.rb_lhs = _SELECT_INO(&dev_mem.dv_devnode.dn_node, &dev_mem.dv_devnode.dn_node),
+				.rb_rhs = _SELECT_INO(&dev_null.dv_devnode.dn_node, &dev_null.dv_devnode.dn_node),
 			},
 			FNODE_INIT_fn_allnodes,
 		},
@@ -539,7 +539,7 @@ PUBLIC struct device dev_null = {
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
-				                    __SELECT_INO(0, 0)),
+				                    _SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
@@ -551,12 +551,12 @@ PUBLIC struct device dev_null = {
 			.fn_mode  = 0666 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
-			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x80001f), UINT64_C(0x80001f)),
+			.fn_ino   = (ino_t)_SELECT_INO(UINT32_C(0x80001f), UINT64_C(0x80001f)),
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(NULL, NULL),
-				.rb_rhs = __SELECT_INO(NULL, NULL),
+				.rb_lhs = _SELECT_INO(NULL, NULL),
+				.rb_rhs = _SELECT_INO(NULL, NULL),
 			},
 			FNODE_INIT_fn_allnodes,
 		},
@@ -591,7 +591,7 @@ PUBLIC struct device dev_port = {
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
 				                    NO_USER_IO_WITHOUT_VIO |
-				                    __SELECT_INO(0, 0)),
+				                    _SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize((uint64_t)(port_t)-1),
 				MFILE_INIT_mf_atime(0, 0),
@@ -603,12 +603,12 @@ PUBLIC struct device dev_port = {
 			.fn_mode  = 0640 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
-			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x800027), UINT64_C(0x800027)),
+			.fn_ino   = (ino_t)_SELECT_INO(UINT32_C(0x800027), UINT64_C(0x800027)),
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(&dev_kmem.dv_devnode.dn_node, &dev_kmem.dv_devnode.dn_node),
-				.rb_rhs = __SELECT_INO(&dev_urandom.dv_devnode.dn_node, &dev_urandom.dv_devnode.dn_node),
+				.rb_lhs = _SELECT_INO(&dev_kmem.dv_devnode.dn_node, &dev_kmem.dv_devnode.dn_node),
+				.rb_rhs = _SELECT_INO(&dev_urandom.dv_devnode.dn_node, &dev_urandom.dv_devnode.dn_node),
 			},
 			FNODE_INIT_fn_allnodes,
 		},
@@ -642,7 +642,7 @@ PUBLIC struct device dev_zero = {
 				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
-				                    __SELECT_INO(0, 0)),
+				                    _SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
@@ -654,12 +654,12 @@ PUBLIC struct device dev_zero = {
 			.fn_mode  = 0666 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
-			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x80002f), UINT64_C(0x80002f)),
+			.fn_ino   = (ino_t)_SELECT_INO(UINT32_C(0x80002f), UINT64_C(0x80002f)),
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(NULL, NULL),
-				.rb_rhs = __SELECT_INO(NULL, NULL),
+				.rb_lhs = _SELECT_INO(NULL, NULL),
+				.rb_rhs = _SELECT_INO(NULL, NULL),
 			},
 			FNODE_INIT_fn_allnodes,
 		},
@@ -695,7 +695,7 @@ PUBLIC struct device dev_full = {
 				                    MFILE_F_FIXEDFILESIZE |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
-				                    __SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
+				                    _SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
@@ -707,12 +707,12 @@ PUBLIC struct device dev_full = {
 			.fn_mode  = 0666 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
-			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x80003f), UINT64_C(0x80003f)),
+			.fn_ino   = (ino_t)_SELECT_INO(UINT32_C(0x80003f), UINT64_C(0x80003f)),
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(&dev_zero.dv_devnode.dn_node, &dev_zero.dv_devnode.dn_node),
-				.rb_rhs = __SELECT_INO(&dev_random.dv_devnode.dn_node, &dev_random.dv_devnode.dn_node),
+				.rb_lhs = _SELECT_INO(&dev_zero.dv_devnode.dn_node, &dev_zero.dv_devnode.dn_node),
+				.rb_rhs = _SELECT_INO(&dev_random.dv_devnode.dn_node, &dev_random.dv_devnode.dn_node),
 			},
 			FNODE_INIT_fn_allnodes,
 		},
@@ -747,7 +747,7 @@ PUBLIC struct device dev_random = {
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
 				                    NO_USER_IO_WITHOUT_VIO |
-				                    __SELECT_INO(0, 0)),
+				                    _SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
@@ -759,12 +759,12 @@ PUBLIC struct device dev_random = {
 			.fn_mode  = 0666 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
-			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x800047), UINT64_C(0x800047)),
+			.fn_ino   = (ino_t)_SELECT_INO(UINT32_C(0x800047), UINT64_C(0x800047)),
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(NULL, NULL),
-				.rb_rhs = __SELECT_INO(NULL, NULL),
+				.rb_lhs = _SELECT_INO(NULL, NULL),
+				.rb_rhs = _SELECT_INO(NULL, NULL),
 			},
 			FNODE_INIT_fn_allnodes,
 		},
@@ -800,7 +800,7 @@ PUBLIC struct device dev_urandom = {
 				                    MFILE_F_FIXEDFILESIZE |
 				                    NO_USER_IO_WITHOUT_VIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
-				                    __SELECT_INO(0, 0)),
+				                    _SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize((uint64_t)-1),
 				MFILE_INIT_mf_atime(0, 0),
@@ -812,12 +812,12 @@ PUBLIC struct device dev_urandom = {
 			.fn_mode  = 0666 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
-			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x80004f), UINT64_C(0x80004f)),
+			.fn_ino   = (ino_t)_SELECT_INO(UINT32_C(0x80004f), UINT64_C(0x80004f)),
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(&dev_full.dv_devnode.dn_node, &dev_full.dv_devnode.dn_node),
-				.rb_rhs = __SELECT_INO(&dev_tty.dv_devnode.dn_node, &dev_tty.dv_devnode.dn_node),
+				.rb_lhs = _SELECT_INO(&dev_full.dv_devnode.dn_node, &dev_full.dv_devnode.dn_node),
+				.rb_rhs = _SELECT_INO(&dev_tty.dv_devnode.dn_node, &dev_tty.dv_devnode.dn_node),
 			},
 			FNODE_INIT_fn_allnodes,
 		},
@@ -853,7 +853,7 @@ PUBLIC struct device dev_kmsg = {
 				                    MFILE_F_FIXEDFILESIZE |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
-				                    __SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
+				                    _SELECT_INO(_MFILE_FN__RBRED, _MFILE_FN__RBRED)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
@@ -865,12 +865,12 @@ PUBLIC struct device dev_kmsg = {
 			.fn_mode  = 0644 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
-			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x80005f), UINT64_C(0x80005f)),
+			.fn_ino   = (ino_t)_SELECT_INO(UINT32_C(0x80005f), UINT64_C(0x80005f)),
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(NULL, NULL),
-				.rb_rhs = __SELECT_INO(NULL, NULL),
+				.rb_lhs = _SELECT_INO(NULL, NULL),
+				.rb_rhs = _SELECT_INO(NULL, NULL),
 			},
 			FNODE_INIT_fn_allnodes,
 		},
@@ -906,7 +906,7 @@ PUBLIC struct device dev_tty = {
 				                    MFILE_F_FIXEDFILESIZE |
 				                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |
 				                    _MFILE_DEVFS_BYNAME_RED |
-				                    __SELECT_INO(0, 0)),
+				                    _SELECT_INO(0, 0)),
 				MFILE_INIT_mf_trunclock,
 				MFILE_INIT_mf_filesize(0),
 				MFILE_INIT_mf_atime(0, 0),
@@ -918,12 +918,12 @@ PUBLIC struct device dev_tty = {
 			.fn_mode  = 0666 | S_IFCHR,
 			.fn_uid   = 0,
 			.fn_gid   = 0,
-			.fn_ino   = (ino_t)__SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)),
+			.fn_ino   = (ino_t)_SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)),
 			.fn_super = &devfs.rs_sup,
 			FNODE_INIT_fn_changed,
 			.fn_supent = {
-				.rb_lhs = __SELECT_INO(&dev_kmsg.dv_devnode.dn_node, &dev_kmsg.dv_devnode.dn_node),
-				.rb_rhs = __SELECT_INO(NULL, NULL),
+				.rb_lhs = _SELECT_INO(&dev_kmsg.dv_devnode.dn_node, &dev_kmsg.dv_devnode.dn_node),
+				.rb_rhs = _SELECT_INO(NULL, NULL),
 			},
 			FNODE_INIT_fn_allnodes,
 		},

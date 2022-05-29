@@ -38,35 +38,35 @@ DECL_BEGIN
  * having to define  the layout of  `struct driver' */
 #ifndef __driver_defined
 struct driver;
-#define __driver_as_module(self)  ((struct module *)(self))
-#define __driver_destroy(self)    module_destroy((struct module *)(self))
-#define __driver_free(self)       module_free((struct module *)(self))
-#define __driver_refcnt(self)     ((struct module *)(self))->md_refcnt
-#define __driver_weakrefcnt(self) ((struct module *)(self))->md_weakrefcnt
+#define _driver_as_module(self)  ((struct module *)(self))
+#define _driver_destroy(self)    module_destroy((struct module *)(self))
+#define _driver_free(self)       module_free((struct module *)(self))
+#define _driver_refcnt(self)     ((struct module *)(self))->md_refcnt
+#define _driver_weakrefcnt(self) ((struct module *)(self))->md_weakrefcnt
 #define __DRIVER_REFCNT_FUNCTIONS_DEFINED
-DEFINE_REFCNT_FUNCTIONS_P(struct driver, __driver_refcnt, __driver_destroy)
-DEFINE_WEAKREFCNT_FUNCTIONS_P(struct driver, __driver_weakrefcnt, __driver_free)
+DEFINE_REFCNT_FUNCTIONS_P(struct driver, _driver_refcnt, _driver_destroy)
+DEFINE_WEAKREFCNT_FUNCTIONS_P(struct driver, _driver_weakrefcnt, _driver_free)
 #else /* !__driver_defined */
-#ifndef __driver_destroy
-#define __driver_destroy(self)    module_destroy(__driver_as_module(self))
-#endif /* !__driver_destroy */
-#ifndef __driver_free
-#define __driver_free(self)       module_free(__driver_as_module(self))
-#endif /* !__driver_free */
-#ifndef __driver_refcnt
-#define __driver_refcnt(self)     __driver_as_module(self)->md_refcnt
-#endif /* !__driver_refcnt */
-#ifndef __driver_weakrefcnt
-#define __driver_weakrefcnt(self) __driver_as_module(self)->md_weakrefcnt
-#endif /* !__driver_weakrefcnt */
+#ifndef _driver_destroy
+#define _driver_destroy(self) module_destroy(_driver_as_module(self))
+#endif /* !_driver_destroy */
+#ifndef _driver_free
+#define _driver_free(self) module_free(_driver_as_module(self))
+#endif /* !_driver_free */
+#ifndef _driver_refcnt
+#define _driver_refcnt(self) _driver_as_module(self)->md_refcnt
+#endif /* !_driver_refcnt */
+#ifndef _driver_weakrefcnt
+#define _driver_weakrefcnt(self) _driver_as_module(self)->md_weakrefcnt
+#endif /* !_driver_weakrefcnt */
 #endif /* __driver_defined */
 
 /* The driver descriptor for the kernel core */
 #ifndef __kernel_driver_defined
 #define __kernel_driver_defined
 DATDEF struct driver kernel_driver;
-DATDEF struct module __kernel_driver ASMNAME("kernel_driver");
-#define kernel_driver (*(struct driver *)&__kernel_driver)
+DATDEF struct module _kernel_driver_as_module ASMNAME("kernel_driver");
+#define kernel_driver (*(struct driver *)&_kernel_driver_as_module)
 #endif /* !__kernel_driver_defined */
 
 
@@ -76,8 +76,8 @@ DATDEF struct module __kernel_driver ASMNAME("kernel_driver");
 #define __drv_self_defined
 /* Self-pointer to the current driver's descriptor */
 DATDEF struct driver drv_self;
-DATDEF struct module __drv_self ASMNAME("drv_self");
-#define drv_self (*(struct driver *)&__drv_self)
+DATDEF struct module _drv_self_as_module ASMNAME("drv_self");
+#define drv_self (*(struct driver *)&_drv_self_as_module)
 #endif /* !__drv_self_defined */
 
 struct mfile;
@@ -106,8 +106,8 @@ NOTHROW(KCALL drv_cc)(struct ccinfo *__restrict info);
 #ifndef __drv_self_defined
 #define __drv_self_defined
 DATDEF struct driver drv_self ASMNAME("kernel_driver");
-DATDEF struct module __drv_self ASMNAME("kernel_driver");
-#define drv_self (*(struct driver *)&__drv_self)
+DATDEF struct module _drv_self_as_module ASMNAME("kernel_driver");
+#define drv_self (*(struct driver *)&_drv_self_as_module)
 #endif /* !__drv_self_defined */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 

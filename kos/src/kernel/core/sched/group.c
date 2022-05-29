@@ -440,7 +440,7 @@ again_get_oldgrp:
 		ns_iter = newgrp->pgr_ns;
 		do {
 			size_t ind = ns_iter->pn_ind;
-#if 0 /* No need. -- The `__TASKPID_SLOT_REDMASK' flag will get cleared anyways! */
+#if 0 /* No need. -- The `_TASKPID_SLOT_REDMASK' flag will get cleared anyways! */
 			newgrp->pgr_pids[ind].pgs_pid = _taskpid_slot_getpidno(self_pid->tp_pids[ind]);
 #else
 			newgrp->pgr_pids[ind].pgs_pid = self_pid->tp_pids[ind].tps_pid;
@@ -648,7 +648,7 @@ again_get_oldgrp:
 	ns_iter = newgrp->pgr_ns;
 	do {
 		size_t ind = ns_iter->pn_ind;
-#if 0 /* No need. -- The `__TASKPID_SLOT_REDMASK' flag will get cleared anyways! */
+#if 0 /* No need. -- The `_TASKPID_SLOT_REDMASK' flag will get cleared anyways! */
 		newgrp->pgr_pids[ind].pgs_pid = _taskpid_slot_getpidno(pid->tp_pids[ind]);
 #else
 		newgrp->pgr_pids[ind].pgs_pid = pid->tp_pids[ind].tps_pid;

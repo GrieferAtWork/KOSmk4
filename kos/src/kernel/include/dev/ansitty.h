@@ -61,13 +61,13 @@ struct ansittydev
 #define ansittydev_getops(self) \
 	((struct ansittydev_ops const *)__COMPILER_REQTYPE(struct ansittydev const *, self)->_ansittydev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops)
 #ifdef NDEBUG
-#define ___ansittydev_assert_ops_(ops) /* nothing */
+#define _ansittydev_only_assert_ops_(ops) /* nothing */
 #else /* NDEBUG */
-#define ___ansittydev_assert_ops_(ops)                                            \
+#define _ansittydev_only_assert_ops_(ops)                                         \
 	__hybrid_assert((ops)->ato_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream), \
 	__hybrid_assert((ops)->ato_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_write == &ansittydev_v_write),
 #endif /* !NDEBUG */
-#define _ansittydev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->ato_cdev) ___ansittydev_assert_ops_(ops)
+#define _ansittydev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->ato_cdev) _ansittydev_only_assert_ops_(ops)
 
 /* Helper macros */
 #define mfile_isansitty(self)   ((self)->mf_ops->mo_stream && (self)->mf_ops->mo_stream->mso_write == &ansittydev_v_write)
@@ -114,7 +114,7 @@ FUNDEF NONNULL((1, 2)) __BOOL LIBANSITTY_CC __ansittydev_v_termios(struct ansitt
  * @param: struct ansitty_operators const *tty_ops: TTY operators. NOTE: `ato_output', `ato_setled' and `ato_termios' must _NOT_
  *                                                  be implemented; these operators are provided by the internal implementation! */
 #define _ansittydev_init(self, ops, tty_ops)                       \
-	(___ansittydev_assert_ops_(ops)                                \
+	(_ansittydev_only_assert_ops_(ops)                             \
 	 __hybrid_assert((tty_ops)->ato_output == __NULLPTR),          \
 	 __hybrid_assert((tty_ops)->ato_setled == __NULLPTR),          \
 	 __hybrid_assert((tty_ops)->ato_termios == __NULLPTR),         \
@@ -125,7 +125,7 @@ FUNDEF NONNULL((1, 2)) __BOOL LIBANSITTY_CC __ansittydev_v_termios(struct ansitt
 	 (self)->at_ansi.at_ops.ato_termios = &__ansittydev_v_termios, \
 	 awref_init(&(self)->at_tty, __NULLPTR))
 #define _ansittydev_cinit(self, ops, tty_ops)                      \
-	(___ansittydev_assert_ops_(ops)                                \
+	(_ansittydev_only_assert_ops_(ops)                             \
 	 __hybrid_assert((tty_ops)->ato_output == __NULLPTR),          \
 	 __hybrid_assert((tty_ops)->ato_setled == __NULLPTR),          \
 	 __hybrid_assert((tty_ops)->ato_termios == __NULLPTR),         \

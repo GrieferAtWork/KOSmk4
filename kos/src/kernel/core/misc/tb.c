@@ -81,7 +81,7 @@ nope:
 }
 
 
-PRIVATE ATTR_COLDTEXT ssize_t FCALL
+PRIVATE ATTR_COLDTEXT NONNULL((1, 3, 5, 6)) ssize_t FCALL
 do_print_traceback(pformatprinter printer, void *arg,
                    void *__restrict state, size_t state_size,
                    unwind_getreg_t reg_getter,
@@ -195,7 +195,7 @@ err:
 
 /* Dump   a  traceback  for  the  given  cpu  state.
  * Tracebacks are printed using `addr2line_printf()' */
-PUBLIC ATTR_NOINLINE ATTR_WEAK ATTR_SECTION(".text.kernel.print_traceback")
+PUBLIC ATTR_NOINLINE ATTR_WEAK ATTR_SECTION(".text.kernel.print_traceback") NONNULL((1))
 ssize_t FCALL print_traceback(pformatprinter printer, void *arg,
                               unsigned int n_skip) {
 	struct ucpustate st;
@@ -206,7 +206,7 @@ ssize_t FCALL print_traceback(pformatprinter printer, void *arg,
 	                          n_skip + 1);
 }
 
-PRIVATE ATTR_COLDTEXT ssize_t FCALL
+PRIVATE ATTR_COLDTEXT NONNULL((1, 3, 5, 6)) ssize_t FCALL
 do_print_traceback_copy(pformatprinter printer, void *arg,
                         void const *__restrict state, size_t state_size,
                         unwind_getreg_t reg_getter,
@@ -221,7 +221,7 @@ do_print_traceback_copy(pformatprinter printer, void *arg,
 	                          n_skip);
 }
 
-PUBLIC ATTR_COLDTEXT ssize_t FCALL
+PUBLIC ATTR_COLDTEXT NONNULL((1, 3)) ssize_t FCALL
 print_traceback_ucpustate(pformatprinter printer, void *arg,
                           struct ucpustate const *__restrict state,
                           unsigned int n_skip) {
@@ -231,7 +231,7 @@ print_traceback_ucpustate(pformatprinter printer, void *arg,
 	                               n_skip);
 }
 
-PUBLIC ATTR_COLDTEXT ssize_t FCALL
+PUBLIC ATTR_COLDTEXT NONNULL((1, 3)) ssize_t FCALL
 print_traceback_lcpustate(pformatprinter printer, void *arg,
                           struct lcpustate const *__restrict state,
                           unsigned int n_skip) {
@@ -240,7 +240,7 @@ print_traceback_lcpustate(pformatprinter printer, void *arg,
 	return print_traceback_kcpustate(printer, arg, &kst, n_skip);
 }
 
-PUBLIC ATTR_COLDTEXT ssize_t FCALL
+PUBLIC ATTR_COLDTEXT NONNULL((1, 3)) ssize_t FCALL
 print_traceback_kcpustate(pformatprinter printer, void *arg,
                           struct kcpustate const *__restrict state,
                           unsigned int n_skip) {
@@ -250,7 +250,7 @@ print_traceback_kcpustate(pformatprinter printer, void *arg,
 	                               n_skip);
 }
 
-PUBLIC ATTR_COLDTEXT ssize_t FCALL
+PUBLIC ATTR_COLDTEXT NONNULL((1, 3)) ssize_t FCALL
 print_traceback_icpustate(pformatprinter printer, void *arg,
                           struct icpustate const *__restrict state,
                           unsigned int n_skip) {
@@ -259,7 +259,7 @@ print_traceback_icpustate(pformatprinter printer, void *arg,
 	return print_traceback_ucpustate(printer, arg, &ust, n_skip);
 }
 
-PUBLIC ATTR_COLDTEXT ssize_t FCALL
+PUBLIC ATTR_COLDTEXT NONNULL((1, 3)) ssize_t FCALL
 print_traceback_scpustate(pformatprinter printer, void *arg,
                           struct scpustate const *__restrict state,
                           unsigned int n_skip) {
@@ -268,7 +268,7 @@ print_traceback_scpustate(pformatprinter printer, void *arg,
 	return print_traceback_ucpustate(printer, arg, &ust, n_skip);
 }
 
-PUBLIC ATTR_COLDTEXT ssize_t FCALL
+PUBLIC ATTR_COLDTEXT NONNULL((1, 3)) ssize_t FCALL
 print_traceback_fcpustate(pformatprinter printer, void *arg,
                           struct fcpustate const *__restrict state,
                           unsigned int n_skip) {

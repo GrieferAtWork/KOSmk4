@@ -256,7 +256,7 @@ mman_new(void) THROWS(E_BADALLOC) {
 	result->mm_pagedir_p  = (pagedir_phys_t)pagedir_translate(&result->mm_pagedir);
 	result->mm_refcnt     = 1;
 	result->mm_weakrefcnt = 1;
-	__mman_init_wrlockpc(result)
+	_mman_init_wrlockpc_(result)
 #ifdef CONFIG_USE_RWLOCK_FOR_MMAN
 	atomic_rwlock_init(&result->mm_lock);
 #else /* CONFIG_USE_RWLOCK_FOR_MMAN */

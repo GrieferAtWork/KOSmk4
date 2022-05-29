@@ -265,7 +265,7 @@ NOTHROW(KCALL note_module)(pformatprinter printer, void *arg,
 			goto badobj;
 		if (!ADDR_ISKERN(me->md_ops))
 			goto badobj;
-		if (me->md_ops->mo_free == &_driver_free) {
+		if (module_isdriver(me)) {
 			module_name = ((struct driver *)me)->d_name;
 			if (!ADDR_ISKERN(module_name))
 				goto badobj;
@@ -345,7 +345,7 @@ NOTHROW(KCALL note_module_section)(pformatprinter printer, void *arg,
 			ops = mod->md_ops;
 			if (!ADDR_ISKERN(ops))
 				goto badobj;
-			if (ops->mo_free == &_driver_free) {
+			if (module_ops_isdriver(ops)) {
 				struct driver *drv;
 				struct driver_section *sect;
 				ElfW(Word) section_name_offset;

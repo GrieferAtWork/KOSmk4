@@ -281,7 +281,7 @@ NOTHROW(FCALL userexcept_sysret_injected)(void);
  * to make use of this, as preemption being enabled is one  of
  * the requirements for sysret to be randomly injected. */
 #if 0
-#define __call_with_consistent_sysret(expr)                           \
+#define _call_with_consistent_sysret(expr)                            \
 	({                                                                \
 		__BOOL __cwfsr_was      = userexcept_sysret_maybe_injected(); \
 		__auto_type __cwfsr_res = expr;                               \
@@ -291,7 +291,7 @@ NOTHROW(FCALL userexcept_sysret_injected)(void);
 	})
 #else
 /* Less efficient after re-direct, but still guaranties consistency. */
-#define __call_with_consistent_sysret(expr)     \
+#define _call_with_consistent_sysret(expr)      \
 	({                                          \
 		__auto_type __cwfsr_res = expr;         \
 		if (userexcept_sysret_maybe_injected()) \
@@ -306,11 +306,11 @@ NOTHROW(FCALL userexcept_sysret_injected)(void);
  * done  on the caller  thread's stack, and even  if another thread redirects
  * the caller's IRET tail while unwinding is being performed. */
 #define unwind_cfa_apply_sysret_safe(self, fde, absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg) \
-	__call_with_consistent_sysret(unwind_cfa_apply(self, fde, absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg))
+	_call_with_consistent_sysret(unwind_cfa_apply(self, fde, absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg))
 #define unwind_cfa_sigframe_apply_sysret_safe(self, fde, absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg) \
-	__call_with_consistent_sysret(unwind_cfa_sigframe_apply(self, fde, absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg))
+	_call_with_consistent_sysret(unwind_cfa_sigframe_apply(self, fde, absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg))
 #define unwind_sysret_safe(absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg) \
-	__call_with_consistent_sysret(unwind(absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg))
+	_call_with_consistent_sysret(unwind(absolute_pc, reg_getter, reg_getter_arg, reg_setter, reg_setter_arg))
 
 
 

@@ -162,7 +162,7 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 		RETHROW();
 	}
 
-	/* Success is indicated by  */
+	/* Success is indicated by `task_setcomm_rpcfun()' */
 	return status == TASK_SETCOMM_RPC_ST_DONE;
 force_wait_for:
 	while (ATOMIC_READ(rpc->tscr_state) == TASK_SETCOMM_RPC_ST_WORKING)
@@ -182,7 +182,7 @@ NOTHROW(FCALL task_setcomm)(char const *__restrict name) {
 	memcpy(used_newname, name, namelen, sizeof(char));
 	used_newname[namelen] = '\0';
 	len = strlen(used_newname);
-	len = memlen(used_newname, 0xff, len); /* Treat 0xff the same as 0x00 */
+	len = memlen(used_newname, 0xff, len * sizeof(char)) / sizeof(char); /* Treat 0xff the same as 0x00 */
 
 	/* Force all characters after the first 0x00 or 0xff to become 0x00 */
 	bzero(used_newname + len, TASK_COMM_LEN - len, sizeof(char));

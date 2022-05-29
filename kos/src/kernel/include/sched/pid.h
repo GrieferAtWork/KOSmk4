@@ -93,15 +93,15 @@ struct taskpid_slot {
 	upid_t                 tps_pid;  /* [const] PID relevant to this slot. */
 };
 #if __SIZEOF_PID_T__ == 4
-#define __TASKPID_SLOT_PIDMASK __UINT32_C(0x7fffffff)
-#define __TASKPID_SLOT_REDMASK __UINT32_C(0x80000000)
+#define _TASKPID_SLOT_PIDMASK __UINT32_C(0x7fffffff)
+#define _TASKPID_SLOT_REDMASK __UINT32_C(0x80000000)
 #elif __SIZEOF_PID_T__ == 8
-#define __TASKPID_SLOT_PIDMASK __UINT64_C(0x7fffffffffffffff)
-#define __TASKPID_SLOT_REDMASK __UINT64_C(0x8000000000000000)
+#define _TASKPID_SLOT_PIDMASK __UINT64_C(0x7fffffffffffffff)
+#define _TASKPID_SLOT_REDMASK __UINT64_C(0x8000000000000000)
 #else /* __SIZEOF_PID_T__ == ... */
 #error "Unsupported sizeof(pid_t)"
 #endif /* __SIZEOF_PID_T__ != ... */
-#define _taskpid_slot_getpidno(self) ((pid_t)((self).tps_pid & __TASKPID_SLOT_PIDMASK))
+#define _taskpid_slot_getpidno(self) ((pid_t)((self).tps_pid & _TASKPID_SLOT_PIDMASK))
 
 
 
@@ -196,23 +196,23 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 #define taskpid_getnstid(self, ns) \
 	_taskpid_slot_getpidno((self)->tp_pids[(ns)->pn_ind])
 #else /* NDEBUG */
-#define taskpid_getnstid(self, ns)                                        \
-	({                                                                    \
-		struct taskpid const *__tpgp_self = (self);                       \
-		struct pidns const *__tpgp_ns     = (ns);                         \
-		__hybrid_assert(__tpgp_self->tp_ns->pn_ind >= __tpgp_ns->pn_ind); \
-		_taskpid_slot_getpidno(__tpgp_self->tp_pids[__tpgp_ns->pn_ind]);  \
+#define taskpid_getnstid(self, ns)                                      \
+	({                                                                  \
+		struct taskpid const *_tpgp_self = (self);                      \
+		struct pidns const *_tpgp_ns     = (ns);                        \
+		__hybrid_assert(_tpgp_self->tp_ns->pn_ind >= _tpgp_ns->pn_ind); \
+		_taskpid_slot_getpidno(_tpgp_self->tp_pids[_tpgp_ns->pn_ind]);  \
 	})
 #endif /* !NDEBUG */
 
 /* Same as `taskpid_getnstid()', but return `0' if `self' doesn't appear in `ns' */
-#define taskpid_getnstid_s(self, ns)                                         \
-	({                                                                       \
-		struct taskpid const *__tpgps_self = (self);                         \
-		struct pidns const *__tpgps_ns     = (ns);                           \
-		(likely(__tpgps_self->tp_ns->pn_ind >= __tpgps_ns->pn_ind)           \
-		 ? _taskpid_slot_getpidno(__tpgps_self->tp_pids[__tpgps_ns->pn_ind]) \
-		 : 0);                                                               \
+#define taskpid_getnstid_s(self, ns)                                       \
+	({                                                                     \
+		struct taskpid const *_tpgps_self = (self);                        \
+		struct pidns const *_tpgps_ns     = (ns);                          \
+		(likely(_tpgps_self->tp_ns->pn_ind >= _tpgps_ns->pn_ind)           \
+		 ? _taskpid_slot_getpidno(_tpgps_self->tp_pids[_tpgps_ns->pn_ind]) \
+		 : 0);                                                             \
 	})
 
 #define taskpid_gettid(self)   taskpid_getnstid(self, THIS_PIDNS)
@@ -220,10 +220,10 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 
 
 /* Return `self's TID number within its own namespace */
-#define taskpid_getselftid(self)                                                    \
-	({                                                                              \
-		struct taskpid const *__tpgsp_self = (self);                                \
-		_taskpid_slot_getpidno(__tpgsp_self->tp_pids[__tpgsp_self->tp_ns->pn_ind]); \
+#define taskpid_getselftid(self)                                                  \
+	({                                                                            \
+		struct taskpid const *_tpgsp_self = (self);                               \
+		_taskpid_slot_getpidno(_tpgsp_self->tp_pids[_tpgsp_self->tp_ns->pn_ind]); \
 	})
 
 /* Return `self's TID number within the root namespace */
@@ -233,10 +233,10 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 #define taskpid_gettidcount(self) ((self)->tp_ns->pn_ind + 1)
 
 /* Query sub-elements of `struct taskpid' */
-#define taskpid_getprocpid(self)   (self)->tp_proc
-#define taskpid_getprocctl(self)   (self)->tp_pctl
-#define taskpid_isaprocess(self)   ((self) == taskpid_getprocpid(self))
-#define _taskpid_isaprocess(self)  ({ struct taskpid const *__tpiap_self = (self); taskpid_isaprocess(__tpiap_self); })
+#define taskpid_getprocpid(self)  (self)->tp_proc
+#define taskpid_getprocctl(self)  (self)->tp_pctl
+#define taskpid_isaprocess(self)  ((self) == taskpid_getprocpid(self))
+#define _taskpid_isaprocess(self) ({ struct taskpid const *_tpiap_self = (self); taskpid_isaprocess(_tpiap_self); })
 
 /* Return `self's PID number associated with `ns' */
 #define taskpid_getnspid(self, ns)   taskpid_getnstid(taskpid_getprocpid(self), ns)

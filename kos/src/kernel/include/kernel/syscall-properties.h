@@ -36,22 +36,26 @@
 #endif /* !__NRFEAT_DEFINED_SYSCALL_REGISTER_COUNT */
 
 
-DECL_BEGIN
+/* Restart codes. */
+#define SYSCALL_RESTART_MODE_AUTO 0 /* Automatic restarting */
+#define SYSCALL_RESTART_MODE_DONT 1 /* Don't restart */
+#define SYSCALL_RESTART_MODE_MUST 2 /* Always restart */
 
 #ifdef __CC__
+DECL_BEGIN
 
 #if __NR_syscall0_min == 0
-#define __KERNEL_SYSCALL_ISTABLE0(sysno) (sysno) <= __NR_syscall0_max
+#define _kernel_private_syscall_istable0(sysno) (sysno) <= __NR_syscall0_max
 #else /* __NR_syscall0_min == 0 */
-#define __KERNEL_SYSCALL_ISTABLE0(sysno) ((sysno) >= __NR_syscall0_min && (sysno) <= __NR_syscall0_max)
+#define _kernel_private_syscall_istable0(sysno) ((sysno) >= __NR_syscall0_min && (sysno) <= __NR_syscall0_max)
 #endif /* __NR_syscall0_min != 0 */
 
 /* Invoke `callback(table_index, __VA_ARGS__)' for `sysno'
  * Note that `table_index' is a preprocessor-time literal suitable for token concat!
  * If   `sysno'  isn't  apart   of  any  defined   table,  invoke  `error'  instead. */
 #if __NRFEAT_SYSCALL_TABLE_COUNT == 3
-#define __kernel_syscall_withtable(sysno, error, callback, ...)         \
-	(__KERNEL_SYSCALL_ISTABLE0(sysno)                                   \
+#define _kernel_private_syscall_withtable(sysno, error, callback, ...)  \
+	(_kernel_private_syscall_istable0(sysno)                            \
 	 ? callback(0, __VA_ARGS__)                                         \
 	 : ((sysno) >= __NR_syscall1_min && (sysno) <= __NR_syscall1_max)   \
 	   ? callback(1, __VA_ARGS__)                                       \
@@ -59,50 +63,50 @@ DECL_BEGIN
 	     ? callback(2, __VA_ARGS__)                                     \
 	     : error)
 #elif __NRFEAT_SYSCALL_TABLE_COUNT == 2
-#define __kernel_syscall_withtable(sysno, error, callback, ...)       \
-	(__KERNEL_SYSCALL_ISTABLE0(sysno)                                 \
-	 ? callback(0, __VA_ARGS__)                                       \
-	 : ((sysno) >= __NR_syscall1_min && (sysno) <= __NR_syscall1_max) \
-	   ? callback(1, __VA_ARGS__)                                     \
+#define _kernel_private_syscall_withtable(sysno, error, callback, ...) \
+	(_kernel_private_syscall_istable0(sysno)                           \
+	 ? callback(0, __VA_ARGS__)                                        \
+	 : ((sysno) >= __NR_syscall1_min && (sysno) <= __NR_syscall1_max)  \
+	   ? callback(1, __VA_ARGS__)                                      \
 	   : error)
 #elif __NRFEAT_SYSCALL_TABLE_COUNT == 1
-#define __kernel_syscall_withtable(sysno, error, callback, ...) \
-	(__KERNEL_SYSCALL_ISTABLE0(sysno)                           \
-	 ? callback(0, __VA_ARGS__)                                 \
+#define _kernel_private_syscall_withtable(sysno, error, callback, ...) \
+	(_kernel_private_syscall_istable0(sysno)                           \
+	 ? callback(0, __VA_ARGS__)                                        \
 	 : error)
-#else
+#else /* __NRFEAT_SYSCALL_TABLE_COUNT == ... */
 #error "Unsupported number of system call tables"
-#endif
+#endif /* __NRFEAT_SYSCALL_TABLE_COUNT != ... */
 
-#define DEFINE_KERNEL_SYSCALL_TABLES_METADATA(id)                   \
+#define _DEFINE_KERNEL_SYSCALL_TABLES_METADATA(id)                  \
 	DATDEF __UINT8_TYPE__ const kernel_syscall##id##_iscp[];        \
 	DATDEF __UINT8_TYPE__ const kernel_syscall##id##_restartmode[]; \
 	DATDEF __UINT8_TYPE__ const kernel_syscall##id##_regcnt[];
-__NRFEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_TABLES_METADATA)
-#undef DEFINE_KERNEL_SYSCALL_TABLES_METADATA
+__NRFEAT_SYSCALL_TABLE_FOREACH(_DEFINE_KERNEL_SYSCALL_TABLES_METADATA)
+#undef _DEFINE_KERNEL_SYSCALL_TABLES_METADATA
 
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_CONST __BOOL
-NOTHROW(KCALL __kernel_syscall_iscp)(__UINT8_TYPE__ const *__restrict base,
-                                     __syscall_ulong_t rel_sysno) {
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_CONST NONNULL((1)) __BOOL
+NOTHROW(KCALL _kernel_private_syscall_iscp)(__UINT8_TYPE__ const *__restrict base,
+                                            __syscall_ulong_t rel_sysno) {
 	return (base[rel_sysno / 8] >> (rel_sysno % 8)) & 1;
 }
 
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_CONST __UINT8_TYPE__
-NOTHROW(KCALL __kernel_syscall_restartmode)(__UINT8_TYPE__ const *__restrict base,
-                                            __syscall_ulong_t rel_sysno) {
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_CONST NONNULL((1)) __UINT8_TYPE__
+NOTHROW(KCALL _kernel_private_syscall_restartmode)(__UINT8_TYPE__ const *__restrict base,
+                                                   __syscall_ulong_t rel_sysno) {
 	return (base[rel_sysno / 4] >> (2 * (rel_sysno % 4))) & 3;
 }
 
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_CONST __UINT8_TYPE__
-NOTHROW(KCALL __kernel_syscall_regcnt)(__UINT8_TYPE__ const *__restrict base,
-                                       __syscall_ulong_t rel_sysno) {
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_CONST NONNULL((1)) __UINT8_TYPE__
+NOTHROW(KCALL _kernel_private_syscall_regcnt)(__UINT8_TYPE__ const *__restrict base,
+                                              __syscall_ulong_t rel_sysno) {
 	return rel_sysno & 1
 	       ? (base[rel_sysno / 2] & 0x70) >> 4
 	       : (base[rel_sysno / 2] & 0x07);
 }
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_CONST __BOOL
-NOTHROW(KCALL __kernel_syscall_doublewide)(__UINT8_TYPE__ const *__restrict base,
-                                           __syscall_ulong_t rel_sysno) {
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_CONST NONNULL((1)) __BOOL
+NOTHROW(KCALL _kernel_private_syscall_doublewide)(__UINT8_TYPE__ const *__restrict base,
+                                                  __syscall_ulong_t rel_sysno) {
 	return rel_sysno & 1
 	       ? (base[rel_sysno / 2] & 0x80) != 0
 	       : (base[rel_sysno / 2] & 0x08) != 0;
@@ -111,32 +115,28 @@ NOTHROW(KCALL __kernel_syscall_doublewide)(__UINT8_TYPE__ const *__restrict base
 
 /* Check if a given `sysno' system call is a cancellation point. */
 #define _kernel_syscall_iscp(sysno) \
-	__kernel_syscall_withtable(sysno, 0, __kernel_syscall_iscp_impl, sysno)
-#define __kernel_syscall_iscp_impl(table, sysno) \
-	__kernel_syscall_iscp(kernel_syscall##table##_iscp, (sysno)-__NR_syscall##table##_min)
-
-#define SYSCALL_RESTART_MODE_AUTO 0 /* Automatic restarting */
-#define SYSCALL_RESTART_MODE_DONT 1 /* Don't restart */
-#define SYSCALL_RESTART_MODE_MUST 2 /* Always restart */
+	_kernel_private_syscall_withtable(sysno, 0, _kernel_private_syscall_iscp_impl, sysno)
+#define _kernel_private_syscall_iscp_impl(table, sysno) \
+	_kernel_private_syscall_iscp(kernel_syscall##table##_iscp, (sysno)-__NR_syscall##table##_min)
 
 /* Return the restart mode used for `sysno' (one of `SYSCALL_RESTART_MODE_*'). */
 #define _kernel_syscall_restartmode(sysno) \
-	__kernel_syscall_withtable(sysno, 0, __kernel_syscall_restartmode_impl, sysno)
+	_kernel_private_syscall_withtable(sysno, 0, __kernel_syscall_restartmode_impl, sysno)
 #define __kernel_syscall_restartmode_impl(table, sysno) \
-	__kernel_syscall_restartmode(kernel_syscall##table##_restartmode, (sysno)-__NR_syscall##table##_min)
+	_kernel_private_syscall_restartmode(kernel_syscall##table##_restartmode, (sysno)-__NR_syscall##table##_min)
 
 /* Return the number of registers table by `sysno' (<= `__NRFEAT_SYSCALL_REGISTER_MAX_COUNT') */
 #define _kernel_syscall_regcnt(sysno) \
-	__kernel_syscall_withtable(sysno, __NRFEAT_SYSCALL_REGISTER_MAX_COUNT, __kernel_syscall_regcnt_impl, sysno)
-#define __kernel_syscall_regcnt_impl(table, sysno) \
-	__kernel_syscall_regcnt(kernel_syscall##table##_regcnt, (sysno)-__NR_syscall##table##_min)
+	_kernel_private_syscall_withtable(sysno, __NRFEAT_SYSCALL_REGISTER_MAX_COUNT, _kernel_private_syscall_regcnt_impl, sysno)
+#define _kernel_private_syscall_regcnt_impl(table, sysno) \
+	_kernel_private_syscall_regcnt(kernel_syscall##table##_regcnt, (sysno)-__NR_syscall##table##_min)
 
 /* Check if a given system call `sysno' has a double-wide return
  * value (i.e.  the  return  value is  passed  in  2  registers) */
 #define _kernel_syscall_doublewide(sysno) \
-	__kernel_syscall_withtable(sysno, 0, __kernel_syscall_doublewide_impl, sysno)
-#define __kernel_syscall_doublewide_impl(table, sysno) \
-	__kernel_syscall_doublewide(kernel_syscall##table##_regcnt, (sysno)-__NR_syscall##table##_min)
+	_kernel_private_syscall_withtable(sysno, 0, _kernel_private_syscall_doublewide_impl, sysno)
+#define _kernel_private_syscall_doublewide_impl(table, sysno) \
+	_kernel_private_syscall_doublewide(kernel_syscall##table##_regcnt, (sysno)-__NR_syscall##table##_min)
 
 /* Arch may override these. */
 #ifndef kernel_syscall_iscp
@@ -146,8 +146,7 @@ NOTHROW(KCALL __kernel_syscall_doublewide)(__UINT8_TYPE__ const *__restrict base
 #define kernel_syscall_doublewide(sc_info)  _kernel_syscall_doublewide((sc_info)->rsi_sysno)
 #endif /* !kernel_syscall_iscp */
 
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_SYSCALL_PROPERTIES_H */

@@ -212,8 +212,8 @@ NOTHROW(KCALL fatdirent_v_destroy)(struct fdirent *__restrict self) {
 	me = fdirent_asfat(self);
 	_fatdirent_free(me);
 }
-#define __fatdirent_destroy(self) fatdirent_v_destroy(&(self)->fad_ent.fde_ent)
-DEFINE_REFCNT_FUNCTIONS(struct fatdirent, fad_ent.fde_ent.fd_refcnt, __fatdirent_destroy)
+#define _fatdirent_destroy(self) fatdirent_v_destroy(&(self)->fad_ent.fde_ent)
+DEFINE_REFCNT_FUNCTIONS(struct fatdirent, fad_ent.fde_ent.fd_refcnt, _fatdirent_destroy)
 PRIVATE struct fdirent_ops const fatdirent_ops = {
 	.fdo_destroy  = &fatdirent_v_destroy,
 	.fdo_opennode = &flatdirent_v_opennode,
@@ -868,7 +868,7 @@ fatlnk_v_readlink(struct flnknode *__restrict self,
 	size_t result;
 	FatLnkNode *me = flnknode_asfat(self);
 	pos_t filepos;
-	result = (size_t)__atomic64_val(me->mf_filesize);
+	result = (size_t)_atomic64_val(me->mf_filesize);
 	assert(result >= FAT_SYMLINK_FILE_MINSIZE);
 	result = FAT_SYMLINK_FILE_TEXTLEN(result);
 	if (bufsize > result)
@@ -912,7 +912,7 @@ fatlnk_v_stat(struct mfile *__restrict self,
               USER CHECKED struct stat *result)
 		THROWS(...) {
 	FatLnkNode *me  = flnknode_asfat(self);
-	result->st_size = __atomic64_val(me->mf_filesize) -
+	result->st_size = _atomic64_val(me->mf_filesize) -
 	                  (sizeof(Fat_CygwinSymlinkMagic) + 1);
 }
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */

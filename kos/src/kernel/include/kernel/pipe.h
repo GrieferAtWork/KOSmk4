@@ -26,9 +26,8 @@
 
 #include <libbuffer/ringbuffer.h>
 
-DECL_BEGIN
-
 #ifdef __CC__
+DECL_BEGIN
 
 struct pipe {
 	/* HANDLE:HANDLE_TYPE_PIPE */
@@ -55,6 +54,7 @@ struct pipe_writer {
 	WEAK refcnt_t     pw_refcnt; /* Reference counter */
 	REF struct pipe  *pw_pipe;   /* [1..1][const] The associated pipe. */
 };
+
 FUNDEF NOBLOCK void NOTHROW(KCALL pipe_reader_destroy)(struct pipe_reader *__restrict self);
 FUNDEF NOBLOCK void NOTHROW(KCALL pipe_writer_destroy)(struct pipe_writer *__restrict self);
 DEFINE_REFCNT_FUNCTIONS(struct pipe_reader, pr_refcnt, pipe_reader_destroy)
@@ -70,8 +70,7 @@ pipe_reader_create(struct pipe *__restrict self) THROWS(E_BADALLOC);
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct pipe_writer *KCALL
 pipe_writer_create(struct pipe *__restrict self) THROWS(E_BADALLOC);
 
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_PIPE_H */

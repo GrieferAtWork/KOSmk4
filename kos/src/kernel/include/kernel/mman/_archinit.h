@@ -30,15 +30,15 @@
 DECL_BEGIN
 
 #ifdef CONFIG_USE_RWLOCK_FOR_MMAN
-#define __MMAN_KERNEL_INIT_MM_LOCK ATOMIC_RWLOCK_INIT
+#define _MMAN_KERNEL_INIT_MM_LOCK ATOMIC_RWLOCK_INIT
 #else /* CONFIG_USE_RWLOCK_FOR_MMAN */
-#define __MMAN_KERNEL_INIT_MM_LOCK ATOMIC_LOCK_INIT
+#define _MMAN_KERNEL_INIT_MM_LOCK ATOMIC_LOCK_INIT
 #endif /* !CONFIG_USE_RWLOCK_FOR_MMAN */
 
 #ifndef CONFIG_NO_SMP
-#define __MMAN_KERNEL_INIT_MM_THREADSLOCK ATOMIC_LOCK_INIT,
+#define _MMAN_KERNEL_INIT_MM_THREADSLOCK .mm_threadslock = ATOMIC_LOCK_INIT,
 #else /* !CONFIG_NO_SMP */
-#define __MMAN_KERNEL_INIT_MM_THREADSLOCK /* nothing */
+#define _MMAN_KERNEL_INIT_MM_THREADSLOCK /* nothing */
 #endif /* CONFIG_NO_SMP */
 
 /* Field initializers for the  kernel mman (but excluding  `mm_pagedir')
@@ -46,13 +46,13 @@ DECL_BEGIN
 #define _MMAN_KERNEL_INIT                                                                    \
 	.mm_refcnt      = 4, /* mman_kernel, this_mman@{boottask,bootidle,asyncwork} */          \
 	.mm_weakrefcnt  = 1,                                                                     \
-	.mm_lock        = __MMAN_KERNEL_INIT_MM_LOCK,                                            \
-	__MMAN_INIT_WRLOCKPC                                                                     \
+	.mm_lock        = _MMAN_KERNEL_INIT_MM_LOCK,                                             \
+	_MMAN_INIT_WRLOCKPC_                                                                     \
 	.mm_mappings    = __NULLPTR, /* XXX: Statically initialize the initial mappings tree? */ \
 	.mm_pagedir_p   = pagedir_kernel_phys,                                                   \
 	.mm_writable    = LIST_HEAD_INITIALIZER(&mman_kernel.mm_writable),                       \
 	.mm_threads     = LIST_HEAD_INITIALIZER(&mman_kernel.mm_threads),                        \
-	.mm_threadslock = __MMAN_KERNEL_INIT_MM_THREADSLOCK
+	_MMAN_KERNEL_INIT_MM_THREADSLOCK
 
 DECL_END
 #endif /* CONFIG_BUILDING_KERNEL_CORE */

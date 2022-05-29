@@ -23,9 +23,8 @@
 #include <kernel/compiler.h>
 #include <kernel/types.h>
 
-DECL_BEGIN
-
 #ifdef __CC__
+DECL_BEGIN
 
 /* Generate and return a 32-bit, pseudo-random integer. */
 FUNDEF NOBLOCK WUNUSED ATTR_LEAF u32
@@ -63,8 +62,7 @@ FUNDEF NOBLOCK WUNUSED uintptr_t NOTHROW(KCALL krand)(void);
 /* The current kernel seed. (modified by `krand(|32|64)') */
 DATDEF WEAK u32 krand_seed;
 
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_RAND_H */

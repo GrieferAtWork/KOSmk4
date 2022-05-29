@@ -354,7 +354,7 @@ done_bss:
 
 		libdl_base = mbuilder_map(/* self:        */ &builder,
 		                          /* hint:        */ MHINT_GETADDR(KERNEL_MHINT_USER_DYNLINK),
-		                          /* num_bytes:   */ (size_t)__atomic64_val(libdl->mrf_file.mf_filesize),
+		                          /* num_bytes:   */ (size_t)_atomic64_val(libdl->mrf_file.mf_filesize),
 		                          /* prot:        */ PROT_READ | PROT_WRITE | PROT_EXEC,
 #if !defined(NDEBUG) && 1 /* XXX: Remove me */
 		                          /* flags:       */ MAP_GROWSUP | MAP_NOASLR,

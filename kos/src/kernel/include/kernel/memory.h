@@ -350,50 +350,50 @@ DATDEF struct page_usage_struct page_usage;
 #define page_usage_dec(field)    __hybrid_atomic_dec(field, __ATOMIC_SEQ_CST)
 #define page_usage_add(field, v) __hybrid_atomic_add(field, v, __ATOMIC_SEQ_CST)
 #define page_usage_sub(field, v) __hybrid_atomic_sub(field, v, __ATOMIC_SEQ_CST)
-#define page_mallocone_for(usage_field)            \
-	__XBLOCK({                                     \
-		physpage_t __pmof_page = page_mallocone(); \
-		if likely(__pmof_page != PHYSPAGE_INVALID) \
-			page_usage_inc(usage_field);           \
-		__XRETURN __pmof_page;                     \
+#define page_mallocone_for(usage_field)           \
+	__XBLOCK({                                    \
+		physpage_t _pmof_page = page_mallocone(); \
+		if likely(_pmof_page != PHYSPAGE_INVALID) \
+			page_usage_inc(usage_field);          \
+		__XRETURN _pmof_page;                     \
 	})
-#define page_malloc_for(usage_field, num_pages)           \
-	__XBLOCK({                                            \
-		physpage_t __pmf_page   = page_malloc(num_pages); \
-		if likely(__pmf_page != PHYSPAGE_INVALID)         \
-			page_usage_add(usage_field, num_pages);       \
-		__XRETURN __pmf_page;                             \
+#define page_malloc_for(usage_field, num_pages)          \
+	__XBLOCK({                                           \
+		physpage_t _pmf_page   = page_malloc(num_pages); \
+		if likely(_pmf_page != PHYSPAGE_INVALID)         \
+			page_usage_add(usage_field, num_pages);      \
+		__XRETURN _pmf_page;                             \
 	})
-#define page_malloc_part_for(usage_field, min_pages, max_pages, res_pages)          \
+#define page_malloc_part_for(usage_field, min_pages, max_pages, res_pages)         \
+	__XBLOCK({                                                                     \
+		physpage_t _pmpf_page = page_malloc_part(min_pages, max_pages, res_pages); \
+		if likely(_pmpf_page != PHYSPAGE_INVALID)                                  \
+			page_usage_add(usage_field, *(res_pages));                             \
+		__XRETURN _pmpf_page;                                                      \
+	})
+#define page_malloc_at_for(usage_field, ptr)         \
+	__XBLOCK({                                       \
+		physpage_t _pmaf_page = page_malloc_at(ptr); \
+		if likely(_pmaf_page != PHYSPAGE_INVALID)    \
+			page_usage_inc(usage_field);             \
+		__XRETURN _pmaf_page;                        \
+	})
+#define page_malloc_between_for(usage_field, min_page, max_page, num_pages)         \
 	__XBLOCK({                                                                      \
-		physpage_t __pmpf_page = page_malloc_part(min_pages, max_pages, res_pages); \
-		if likely(__pmpf_page != PHYSPAGE_INVALID)                                  \
-			page_usage_add(usage_field, *(res_pages));                              \
-		__XRETURN __pmpf_page;                                                      \
-	})
-#define page_malloc_at_for(usage_field, ptr)           \
-	__XBLOCK({                                         \
-		physpage_t __pmaf_page = page_malloc_at(ptr);  \
-		if likely(__pmaf_page != PHYSPAGE_INVALID)     \
-			page_usage_inc(usage_field);               \
-		__XRETURN __pmaf_page;                         \
-	})
-#define page_malloc_between_for(usage_field, min_page, max_page, num_pages)          \
-	__XBLOCK({                                                                       \
-		physpage_t __pmbf_page = page_malloc_between(min_page, max_page, num_pages); \
-		if likely(__pmbf_page != PHYSPAGE_INVALID)                                   \
-			page_usage_add(usage_field, num_pages);                                  \
-		__XRETURN __pmbf_page;                                                       \
+		physpage_t _pmbf_page = page_malloc_between(min_page, max_page, num_pages); \
+		if likely(_pmbf_page != PHYSPAGE_INVALID)                                   \
+			page_usage_add(usage_field, num_pages);                                 \
+		__XRETURN _pmbf_page;                                                       \
 	})
 #define page_malloc_part_between_for(usage_field, min_page, max_page,           \
                                      min_pages, max_pages, res_pages)           \
 	__XBLOCK({                                                                  \
-		physpage_t __pmbf_page = page_malloc_part_between(min_page, max_page,   \
+		physpage_t _pmbf_page = page_malloc_part_between(min_page, max_page,    \
 		                                                  min_pages, max_pages, \
 		                                                  res_pages);           \
-		if likely(__pmbf_page != PHYSPAGE_INVALID)                              \
+		if likely(_pmbf_page != PHYSPAGE_INVALID)                               \
 			page_usage_add(usage_field, (*res_pages));                          \
-		__XRETURN __pmbf_page;                                                  \
+		__XRETURN _pmbf_page;                                                   \
 	})
 #define page_freeone_for(usage_field, base)                   (page_usage_dec(usage_field), page_freeone(base))
 #define page_free_for(usage_field, base, num_pages)           (page_usage_sub(usage_field, num_pages), page_free(base, num_pages))

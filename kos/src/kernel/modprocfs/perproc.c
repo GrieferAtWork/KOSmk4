@@ -533,24 +533,24 @@ PRIVATE struct fdirent_ops const procfs_perproc_dirent_ops_nomap = {
 #include "perproc.def"
 
 /* Define directory entries. */
-#define __DEFINE_DIRENT(symbol_name, name, type, perm, fnode_ops_ptr, hash) \
-	PRIVATE struct procfs_perproc_dirent symbol_name = {                    \
-		.ppd_fops    = (struct fnode_ops *)(fnode_ops_ptr),                 \
-		.ppd_mod     = DTTOIF(type) | (perm),                               \
-		.ppd_refcnt  = 2, /* +1: symbol_name, +1: DIRECTORY_ENTRY_LIST */   \
-		.ppd_ops     = procfs_perproc_dirent_ops_for(type),                 \
-		.ppd_ino     = _INVALID_INO, /* Mustn't be used */                  \
-		.ppd_hash    = hash,                                                \
-		.ppd_namelen = COMPILER_STRLEN(name),                               \
-		.ppd_type    = type,                                                \
-		/* .ppd_name = */ name                                              \
+#define _DEFINE_DIRENT(symbol_name, name, type, perm, fnode_ops_ptr, hash) \
+	PRIVATE struct procfs_perproc_dirent symbol_name = {                   \
+		.ppd_fops    = (struct fnode_ops *)(fnode_ops_ptr),                \
+		.ppd_mod     = DTTOIF(type) | (perm),                              \
+		.ppd_refcnt  = 2, /* +1: symbol_name, +1: DIRECTORY_ENTRY_LIST */  \
+		.ppd_ops     = procfs_perproc_dirent_ops_for(type),                \
+		.ppd_ino     = _INVALID_INO, /* Mustn't be used */                 \
+		.ppd_hash    = hash,                                               \
+		.ppd_namelen = COMPILER_STRLEN(name),                              \
+		.ppd_type    = type,                                               \
+		/* .ppd_name = */ name                                             \
 	};
 #define ROOTENT(name, type, perm, fnode_ops_ptr, hash) \
-	__DEFINE_DIRENT(PP_CAT2(perproc_root_dirent_, __LINE__), name, type, perm, fnode_ops_ptr, hash)
+	_DEFINE_DIRENT(PP_CAT2(perproc_root_dirent_, __LINE__), name, type, perm, fnode_ops_ptr, hash)
 #define MKDIR_ENT(name, type, perm, fnode_ops_ptr, hash) \
-	__DEFINE_DIRENT(PP_CAT2(perproc_dirent_, __LINE__), name, type, perm, fnode_ops_ptr, hash)
+	_DEFINE_DIRENT(PP_CAT2(perproc_dirent_, __LINE__), name, type, perm, fnode_ops_ptr, hash)
 #include "perproc.def"
-#undef __DEFINE_DIRENT
+#undef _DEFINE_DIRENT
 
 
 /* Define sub-directory tables. */

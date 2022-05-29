@@ -30,8 +30,6 @@
 #include <compat/config.h>
 #include <kos/kernel/paging.h>
 
-DECL_BEGIN
-
 /* Skew a  kernel pointer  such that  it remains  unique, continues  to
  * point into kernel-space, but doesn't necessarily indicate the proper
  * address of the pointed-to kernel object.
@@ -50,27 +48,28 @@ DECL_BEGIN
 #define skew_kernel_pointer(p)   (void *)(p) /* TODO */
 #define unskew_kernel_pointer(p) (void *)(p) /* TODO */
 
-
 #ifdef __CC__
+DECL_BEGIN
+
 FUNDEF ATTR_COLD ATTR_NORETURN void FCALL
-__except_throw_unmapped_user_rd(UNCHECKED USER void const *addr)
+_except_throw_unmapped_user_rd(UNCHECKED USER void const *addr)
 		THROWS(E_SEGFAULT_UNMAPPED)
 		ASMNAME("except_throw_unmapped_user_rd");
 FUNDEF ATTR_COLD ATTR_NORETURN void FCALL
-__except_throw_unmapped_user_wr(UNCHECKED USER void const *addr)
+_except_throw_unmapped_user_wr(UNCHECKED USER void const *addr)
 		THROWS(E_SEGFAULT_UNMAPPED)
 		ASMNAME("except_throw_unmapped_user_wr");
 FUNDEF ATTR_COLD ATTR_NORETURN void FCALL
-__except_throw_noexec_user(UNCHECKED USER void const *addr)
+_except_throw_noexec_user(UNCHECKED USER void const *addr)
 		THROWS(E_SEGFAULT_NOTEXECUTABLE)
 		ASMNAME("except_throw_noexec_user");
 
 #ifdef KERNELSPACE_HIGHMEM
-#define __ADDR_ISUSER(addr) (__CCAST(__UINTPTR_TYPE__)(addr) < KERNELSPACE_BASE)
+#define _ADDR_ISUSER(addr) (__CCAST(__UINTPTR_TYPE__)(addr) < KERNELSPACE_BASE)
 #elif defined(KERNELSPACE_LOWMEM)
-#define __ADDR_ISUSER(addr) (__CCAST(__UINTPTR_TYPE__)(addr) >= KERNELSPACE_END)
+#define _ADDR_ISUSER(addr) (__CCAST(__UINTPTR_TYPE__)(addr) >= KERNELSPACE_END)
 #else /* KERNELSPACE_...MEM */
-#define __ADDR_ISUSER(addr) (__CCAST(__UINTPTR_TYPE__)(addr) < KERNELSPACE_BASE && __CCAST(__UINTPTR_TYPE__)(addr) >= KERNELSPACE_END)
+#define _ADDR_ISUSER(addr) (__CCAST(__UINTPTR_TYPE__)(addr) < KERNELSPACE_BASE && __CCAST(__UINTPTR_TYPE__)(addr) >= KERNELSPACE_END)
 #endif /* !KERNELSPACE_...MEM */
 
 
@@ -109,9 +108,9 @@ FUNDEF CHECKED USER void *FCALL validate_readwriteaddr_opt(UNCHECKED USER void *
 FUNDEF CHECKED USER void const *FCALL validate_executable(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
 FUNDEF CHECKED USER void const *FCALL validate_executable_opt(UNCHECKED USER void const *addr) THROWS(E_SEGFAULT);
 #else /* __INTELLISENSE__ */
-EIDECLARE(, USER CHECKED void const *, , FCALL, validate_readableaddr, (UNCHECKED USER void const *addr), THROWS(E_SEGFAULT) { if unlikely(!__ADDR_ISUSER(addr)) __except_throw_unmapped_user_rd(addr); return addr; })
-EIDECLARE(, USER CHECKED void *, , FCALL, validate_writableaddr, (UNCHECKED USER void *addr), THROWS(E_SEGFAULT) { if unlikely(!__ADDR_ISUSER(addr)) __except_throw_unmapped_user_wr(addr); return addr; })
-EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED USER void const *addr), THROWS(E_SEGFAULT) { if unlikely(!__ADDR_ISUSER(addr)) __except_throw_noexec_user(addr); return addr; })
+EIDECLARE(, USER CHECKED void const *, , FCALL, validate_readableaddr, (UNCHECKED USER void const *addr), THROWS(E_SEGFAULT) { if unlikely(!_ADDR_ISUSER(addr)) _except_throw_unmapped_user_rd(addr); return addr; })
+EIDECLARE(, USER CHECKED void *, , FCALL, validate_writableaddr, (UNCHECKED USER void *addr), THROWS(E_SEGFAULT) { if unlikely(!_ADDR_ISUSER(addr)) _except_throw_unmapped_user_wr(addr); return addr; })
+EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED USER void const *addr), THROWS(E_SEGFAULT) { if unlikely(!_ADDR_ISUSER(addr)) _except_throw_noexec_user(addr); return addr; })
 #define validate_user(base, num_bytes)                           validate_readableaddr(base)
 #define validate_userm(base, num_items, item_size_in_bytes)      validate_readableaddr(base)
 #define validate_useraddr(addr)                                  validate_readableaddr(addr)
@@ -189,39 +188,39 @@ EIDECLARE(, USER CHECKED void const *, , FCALL, validate_executable, (UNCHECKED 
  *       native-sized pointers mustn't use these validation macros, since obviously
  *       those pointers can't be considered compatibility-mode.
  */
-#define __compat_assert_user(base, num_bytes)                      (__hybrid_assert(__ADDR_ISUSER(base)), (base))
-#define __compat_assert_user_opt                                   __compat_assert_user
-#define __compat_assert_userm(base, num_items, item_size_in_bytes) (__hybrid_assert(__ADDR_ISUSER(base)), (base))
-#define __compat_assert_userm_opt                                  __compat_assert_userm
-#define __compat_assert_useraddr(addr)                             (__hybrid_assert(__ADDR_ISUSER(addr)), (base))
-#define __compat_assert_useraddr_opt                               __compat_assert_useraddr
+#define _compat_assert_user(base, num_bytes)                      (__hybrid_assert(_ADDR_ISUSER(base)), (base))
+#define _compat_assert_user_opt                                   _compat_assert_user
+#define _compat_assert_userm(base, num_items, item_size_in_bytes) (__hybrid_assert(_ADDR_ISUSER(base)), (base))
+#define _compat_assert_userm_opt                                  _compat_assert_userm
+#define _compat_assert_useraddr(addr)                             (__hybrid_assert(_ADDR_ISUSER(addr)), (base))
+#define _compat_assert_useraddr_opt                               _compat_assert_useraddr
 
-#define compat_validate_user(base, num_bytes)                               __compat_assert_user(base, num_bytes)
-#define compat_validate_user_opt(base, num_bytes)                           __compat_assert_user_opt(base, num_bytes)
-#define compat_validate_userm(base, num_items, item_size_in_bytes)          __compat_assert_userm(base, num_items, item_size_in_bytes)
-#define compat_validate_userm_opt(base, num_items, item_size_in_bytes)      __compat_assert_userm_opt(base, num_items, item_size_in_bytes)
-#define compat_validate_useraddr(addr)                                      __compat_assert_useraddr(addr)
-#define compat_validate_useraddr_opt(base, num_bytes)                       __compat_assert_useraddr_opt(addr)
-#define compat_validate_readable(base, num_bytes)                           __compat_assert_user(base, num_bytes)
-#define compat_validate_readable_opt(base, num_bytes)                       __compat_assert_user_opt(base, num_bytes)
-#define compat_validate_readablem(base, num_items, item_size_in_bytes)      __compat_assert_userm(base, num_items, item_size_in_bytes)
-#define compat_validate_readablem_opt(base, num_items, item_size_in_bytes)  __compat_assert_userm_opt(base, num_items, item_size_in_bytes)
-#define compat_validate_readableaddr(addr)                                  __compat_assert_useraddr(addr)
-#define compat_validate_readableaddr_opt(addr)                              __compat_assert_useraddr_opt(addr)
-#define compat_validate_writable(base, num_bytes)                           __compat_assert_user(base, num_bytes)
-#define compat_validate_writable_opt(base, num_bytes)                       __compat_assert_user_opt(base, num_bytes)
-#define compat_validate_writablem(base, num_items, item_size_in_bytes)      __compat_assert_userm(base, num_items, item_size_in_bytes)
-#define compat_validate_writablem_opt(base, num_items, item_size_in_bytes)  __compat_assert_userm_opt(base, num_items, item_size_in_bytes)
-#define compat_validate_writableaddr(addr)                                  __compat_assert_useraddr(addr)
-#define compat_validate_writableaddr_opt(addr)                              __compat_assert_useraddr_opt(addr)
-#define compat_validate_readwrite(base, num_bytes)                          __compat_assert_user(base, num_bytes)
-#define compat_validate_readwrite_opt(base, num_bytes)                      __compat_assert_user_opt(base, num_bytes)
-#define compat_validate_readwritem(base, num_items, item_size_in_bytes)     __compat_assert_userm(base, num_items, item_size_in_bytes)
-#define compat_validate_readwritem_opt(base, num_items, item_size_in_bytes) __compat_assert_userm_opt(base, num_items, item_size_in_bytes)
-#define compat_validate_readwriteaddr(addr)                                 __compat_assert_useraddr(addr)
-#define compat_validate_readwriteaddr_opt(addr)                             __compat_assert_useraddr_opt(addr)
-#define compat_validate_executable(addr)                                    __compat_assert_useraddr(addr)
-#define compat_validate_executable_opt(addr)                                __compat_assert_useraddr_opt(addr)
+#define compat_validate_user(base, num_bytes)                               _compat_assert_user(base, num_bytes)
+#define compat_validate_user_opt(base, num_bytes)                           _compat_assert_user_opt(base, num_bytes)
+#define compat_validate_userm(base, num_items, item_size_in_bytes)          _compat_assert_userm(base, num_items, item_size_in_bytes)
+#define compat_validate_userm_opt(base, num_items, item_size_in_bytes)      _compat_assert_userm_opt(base, num_items, item_size_in_bytes)
+#define compat_validate_useraddr(addr)                                      _compat_assert_useraddr(addr)
+#define compat_validate_useraddr_opt(base, num_bytes)                       _compat_assert_useraddr_opt(addr)
+#define compat_validate_readable(base, num_bytes)                           _compat_assert_user(base, num_bytes)
+#define compat_validate_readable_opt(base, num_bytes)                       _compat_assert_user_opt(base, num_bytes)
+#define compat_validate_readablem(base, num_items, item_size_in_bytes)      _compat_assert_userm(base, num_items, item_size_in_bytes)
+#define compat_validate_readablem_opt(base, num_items, item_size_in_bytes)  _compat_assert_userm_opt(base, num_items, item_size_in_bytes)
+#define compat_validate_readableaddr(addr)                                  _compat_assert_useraddr(addr)
+#define compat_validate_readableaddr_opt(addr)                              _compat_assert_useraddr_opt(addr)
+#define compat_validate_writable(base, num_bytes)                           _compat_assert_user(base, num_bytes)
+#define compat_validate_writable_opt(base, num_bytes)                       _compat_assert_user_opt(base, num_bytes)
+#define compat_validate_writablem(base, num_items, item_size_in_bytes)      _compat_assert_userm(base, num_items, item_size_in_bytes)
+#define compat_validate_writablem_opt(base, num_items, item_size_in_bytes)  _compat_assert_userm_opt(base, num_items, item_size_in_bytes)
+#define compat_validate_writableaddr(addr)                                  _compat_assert_useraddr(addr)
+#define compat_validate_writableaddr_opt(addr)                              _compat_assert_useraddr_opt(addr)
+#define compat_validate_readwrite(base, num_bytes)                          _compat_assert_user(base, num_bytes)
+#define compat_validate_readwrite_opt(base, num_bytes)                      _compat_assert_user_opt(base, num_bytes)
+#define compat_validate_readwritem(base, num_items, item_size_in_bytes)     _compat_assert_userm(base, num_items, item_size_in_bytes)
+#define compat_validate_readwritem_opt(base, num_items, item_size_in_bytes) _compat_assert_userm_opt(base, num_items, item_size_in_bytes)
+#define compat_validate_readwriteaddr(addr)                                 _compat_assert_useraddr(addr)
+#define compat_validate_readwriteaddr_opt(addr)                             _compat_assert_useraddr_opt(addr)
+#define compat_validate_executable(addr)                                    _compat_assert_useraddr(addr)
+#define compat_validate_executable_opt(addr)                                _compat_assert_useraddr_opt(addr)
 #else /* ... */
 #define compat_validate_user(base, num_bytes)                               validate_user(base, num_bytes)
 #define compat_validate_user_opt(base, num_bytes)                           validate_user_opt(base, num_bytes)
@@ -330,42 +329,42 @@ FUNDEF syscall_slong_t FCALL
 ioctl_intarg_sets64(ioctl_t cmd, USER UNCHECKED void *arg, s64 value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
-#define __IOCTL_INTARG_GETS1 (s8)ioctl_intarg_getu8
-#define __IOCTL_INTARG_GETS2 (s16)ioctl_intarg_getu16
-#define __IOCTL_INTARG_GETS4 (s32)ioctl_intarg_getu32
-#define __IOCTL_INTARG_GETS8 (s64)ioctl_intarg_getu64
-#define __IOCTL_INTARG_GETU1 ioctl_intarg_getu8
-#define __IOCTL_INTARG_GETU2 ioctl_intarg_getu16
-#define __IOCTL_INTARG_GETU4 ioctl_intarg_getu32
-#define __IOCTL_INTARG_GETU8 ioctl_intarg_getu64
-#define __IOCTL_INTARG_SETS1 ioctl_intarg_sets8
-#define __IOCTL_INTARG_SETS2 ioctl_intarg_sets16
-#define __IOCTL_INTARG_SETS4 ioctl_intarg_sets32
-#define __IOCTL_INTARG_SETS8 ioctl_intarg_sets64
-#define __IOCTL_INTARG_SETU1 ioctl_intarg_setu8
-#define __IOCTL_INTARG_SETU2 ioctl_intarg_setu16
-#define __IOCTL_INTARG_SETU4 ioctl_intarg_setu32
-#define __IOCTL_INTARG_SETU8 ioctl_intarg_setu64
+#define _IOCTL_INTARG_GETS1 (s8)ioctl_intarg_getu8
+#define _IOCTL_INTARG_GETS2 (s16)ioctl_intarg_getu16
+#define _IOCTL_INTARG_GETS4 (s32)ioctl_intarg_getu32
+#define _IOCTL_INTARG_GETS8 (s64)ioctl_intarg_getu64
+#define _IOCTL_INTARG_GETU1 ioctl_intarg_getu8
+#define _IOCTL_INTARG_GETU2 ioctl_intarg_getu16
+#define _IOCTL_INTARG_GETU4 ioctl_intarg_getu32
+#define _IOCTL_INTARG_GETU8 ioctl_intarg_getu64
+#define _IOCTL_INTARG_SETS1 ioctl_intarg_sets8
+#define _IOCTL_INTARG_SETS2 ioctl_intarg_sets16
+#define _IOCTL_INTARG_SETS4 ioctl_intarg_sets32
+#define _IOCTL_INTARG_SETS8 ioctl_intarg_sets64
+#define _IOCTL_INTARG_SETU1 ioctl_intarg_setu8
+#define _IOCTL_INTARG_SETU2 ioctl_intarg_setu16
+#define _IOCTL_INTARG_SETU4 ioctl_intarg_setu32
+#define _IOCTL_INTARG_SETU8 ioctl_intarg_setu64
 
-#define __IOCTL_INTARG_GETU_(sizeof) __IOCTL_INTARG_GETU##sizeof
-#define __IOCTL_INTARG_GETS_(sizeof) __IOCTL_INTARG_GETS##sizeof
-#define __IOCTL_INTARG_SETU_(sizeof) __IOCTL_INTARG_SETU##sizeof
-#define __IOCTL_INTARG_SETS_(sizeof) __IOCTL_INTARG_SETS##sizeof
-#define __IOCTL_INTARG_GETU(sizeof)  __IOCTL_INTARG_GETU_(sizeof)
-#define __IOCTL_INTARG_GETS(sizeof)  __IOCTL_INTARG_GETS_(sizeof)
-#define __IOCTL_INTARG_SETU(sizeof)  __IOCTL_INTARG_SETU_(sizeof)
-#define __IOCTL_INTARG_SETS(sizeof)  __IOCTL_INTARG_SETS_(sizeof)
+#define _IOCTL_INTARG_GETU_(sizeof) _IOCTL_INTARG_GETU##sizeof
+#define _IOCTL_INTARG_GETS_(sizeof) _IOCTL_INTARG_GETS##sizeof
+#define _IOCTL_INTARG_SETU_(sizeof) _IOCTL_INTARG_SETU##sizeof
+#define _IOCTL_INTARG_SETS_(sizeof) _IOCTL_INTARG_SETS##sizeof
+#define _IOCTL_INTARG_GETU(sizeof)  _IOCTL_INTARG_GETU_(sizeof)
+#define _IOCTL_INTARG_GETS(sizeof)  _IOCTL_INTARG_GETS_(sizeof)
+#define _IOCTL_INTARG_SETU(sizeof)  _IOCTL_INTARG_SETU_(sizeof)
+#define _IOCTL_INTARG_SETS(sizeof)  _IOCTL_INTARG_SETS_(sizeof)
 
-#define ioctl_intarg_getint   __IOCTL_INTARG_GETS(__SIZEOF_INT__)
-#define ioctl_intarg_setint   __IOCTL_INTARG_SETS(__SIZEOF_INT__)
-#define ioctl_intarg_getuint  __IOCTL_INTARG_GETU(__SIZEOF_INT__)
-#define ioctl_intarg_setuint  __IOCTL_INTARG_SETU(__SIZEOF_INT__)
-#define ioctl_intarg_getpid   __IOCTL_INTARG_GETS(__SIZEOF_PID_T__)
-#define ioctl_intarg_setpid   __IOCTL_INTARG_SETS(__SIZEOF_PID_T__)
-#define ioctl_intarg_getsigno __IOCTL_INTARG_GETS(__SIZEOF_SIGNO_T__)
-#define ioctl_intarg_setsigno __IOCTL_INTARG_SETS(__SIZEOF_SIGNO_T__)
-#define ioctl_intarg_getloff  __IOCTL_INTARG_GETS(__SIZEOF_LOFF_T__)
-#define ioctl_intarg_setloff  __IOCTL_INTARG_SETS(__SIZEOF_LOFF_T__)
+#define ioctl_intarg_getint   _IOCTL_INTARG_GETS(__SIZEOF_INT__)
+#define ioctl_intarg_setint   _IOCTL_INTARG_SETS(__SIZEOF_INT__)
+#define ioctl_intarg_getuint  _IOCTL_INTARG_GETU(__SIZEOF_INT__)
+#define ioctl_intarg_setuint  _IOCTL_INTARG_SETU(__SIZEOF_INT__)
+#define ioctl_intarg_getpid   _IOCTL_INTARG_GETS(__SIZEOF_PID_T__)
+#define ioctl_intarg_setpid   _IOCTL_INTARG_SETS(__SIZEOF_PID_T__)
+#define ioctl_intarg_getsigno _IOCTL_INTARG_GETS(__SIZEOF_SIGNO_T__)
+#define ioctl_intarg_setsigno _IOCTL_INTARG_SETS(__SIZEOF_SIGNO_T__)
+#define ioctl_intarg_getloff  _IOCTL_INTARG_GETS(__SIZEOF_LOFF_T__)
+#define ioctl_intarg_setloff  _IOCTL_INTARG_SETS(__SIZEOF_LOFF_T__)
 
 /* Read a size_t-value from a a variable-sized (but defaulting to sizeof(size_t)) buffer `arg'
  * - This function includes special handling for compatibility (if present and necessary)
@@ -380,10 +379,7 @@ FUNDEF syscall_slong_t FCALL
 ioctl_intarg_setsize(ioctl_t cmd, USER UNCHECKED void *arg, size_t value)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
-
-#endif /* __CC__ */
-
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_USER_H */

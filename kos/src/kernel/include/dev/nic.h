@@ -219,13 +219,13 @@ struct nicdev
 #define nicdev_getops(self) \
 	((struct nicdev_ops const *)__COMPILER_REQTYPE(struct nicdev const *, self)->_nicdev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops)
 #ifdef NDEBUG
-#define ___nicdev_assert_ops_(ops) /* nothing */
+#define _nicdev_only_assert_ops_(ops) /* nothing */
 #else /* NDEBUG */
-#define ___nicdev_assert_ops_(ops)                                               \
+#define _nicdev_only_assert_ops_(ops)                                            \
 	__hybrid_assert((ops)->nd_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream), \
 	__hybrid_assert((ops)->nd_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_write == &nicdev_v_write),
 #endif /* !NDEBUG */
-#define _nicdev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->nd_cdev) ___nicdev_assert_ops_(ops)
+#define _nicdev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->nd_cdev) _nicdev_only_assert_ops_(ops)
 
 /* Helper macros */
 #define mfile_isnic(self)   ((self)->mf_ops->mo_stream && (self)->mf_ops->mo_stream->mso_write == &nicdev_v_write)
@@ -272,7 +272,7 @@ nicdev_v_write(struct mfile *__restrict self,
  * @param: struct nicdev     *self: Character device to initialize.
  * @param: struct nicdev_ops *ops:  Character device operators. */
 #define _nicdev_init(self, ops)                                   \
-	(___nicdev_assert_ops_(ops)                                   \
+	(_nicdev_only_assert_ops_(ops)                                \
 	 _chrdev_init(_nicdev_aschr(self), &(ops)->nd_cdev),          \
 	 (self)->nd_ifflags = 0,                                      \
 	 __libc_memset(&(self)->nd_stat, 0, sizeof((self)->nd_stat)), \
@@ -280,7 +280,7 @@ nicdev_v_write(struct mfile *__restrict self,
 	 (self)->nd_addr.na_ip = htonl(INADDR_BROADCAST),             \
 	 network_init(&(self)->nd_net))
 #define _nicdev_cinit(self, ops)                          \
-	(___nicdev_assert_ops_(ops)                           \
+	(_nicdev_only_assert_ops_(ops)                        \
 	 _chrdev_cinit(_nicdev_aschr(self), &(ops)->nd_cdev), \
 	 __hybrid_assert((self)->nd_ifflags == 0),            \
 	 __hybrid_assert((self)->nd_hdgfp == GFP_NORMAL),     \

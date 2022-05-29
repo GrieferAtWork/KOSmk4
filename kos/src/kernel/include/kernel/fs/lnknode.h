@@ -187,7 +187,7 @@ struct flnknode
 	((*flnknode_getops(self)->lno_readlink)(self, buf, bufsize))
 #define flnknode_haslinkstr(self) (flnknode_getops(self)->lno_linkstr != __NULLPTR) /* Check if available */
 #define flnknode_getlinkstr(self) ((*flnknode_getops(self)->lno_linkstr)(self))     /* Return link string */
-#define flnknode_getlinklen(self) (__COMPILER_READ_BARRIER(), (size_t)__atomic64_val((self)->_flnknode_node_ _fnode_file_ mf_filesize))
+#define flnknode_getlinklen(self) (__COMPILER_READ_BARRIER(), (size_t)_atomic64_val((self)->_flnknode_node_ _fnode_file_ mf_filesize))
 
 
 

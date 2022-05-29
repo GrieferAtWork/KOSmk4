@@ -194,8 +194,8 @@ blkdev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 #define blkdev_getsectorshift(self) ((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_blockshift)
 #define blkdev_getsectorsize(self)  ((size_t)1 << blkdev_getsectorshift(self))
 #define blkdev_getsectormask(self)  (blkdev_getsectorsize(self) - 1)
-#define blkdev_getsectorcount(self) (__atomic64_val((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize) >> blkdev_getsectorshift(self))
-#define blkdev_getsize(self)        ((pos_t)__atomic64_val((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize))
+#define blkdev_getsectorcount(self) (_atomic64_val((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize) >> blkdev_getsectorshift(self))
+#define blkdev_getsize(self)        ((pos_t)_atomic64_val((self)->_blkdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_filesize))
 
 #define blkdev_part_getsectormin(self) ((uint64_t)(self)->bd_partinfo.bp_partstart >> blkdev_getsectorshift(self))
 #define blkdev_part_getsectormax(self) (blkdev_part_getsectormin(self) + blkdev_getsectorcount(self) - 1)

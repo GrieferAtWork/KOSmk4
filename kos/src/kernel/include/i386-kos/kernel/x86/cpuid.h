@@ -147,30 +147,30 @@ DATDEF ATTR_PERCPU struct cpuinfo const thiscpu_x86_cpuid;
 DATDEF u16 const bootcpu_x86_cpufeatures;
 DATDEF struct cpuinfo const bootcpu_x86_cpuid;
 
-#define __SYS86_MAKE_DWORD(a, b, c, d) \
+#define _SYS86_MAKE_DWORD(a, b, c, d) \
 	((u32)(a) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
 
 
 /* QEMU */
 #define sys86_isqemu() \
-	(bootcpu_x86_cpuid.ci_80000002a == __SYS86_MAKE_DWORD('Q', 'E', 'M', 'U'))
+	(bootcpu_x86_cpuid.ci_80000002a == _SYS86_MAKE_DWORD('Q', 'E', 'M', 'U'))
 
 /* QEMU when running with `-accel hax' */
-#define sys86_isqemu_accel()                                                     \
-	(bootcpu_x86_cpuid.ci_80000002a == __SYS86_MAKE_DWORD('V', 'i', 'r', 't') && \
-	 bootcpu_x86_cpuid.ci_80000002b == __SYS86_MAKE_DWORD('u', 'a', 'l', ' ') && \
-	 bootcpu_x86_cpuid.ci_80000002c == __SYS86_MAKE_DWORD('C', 'P', 'U', ' ') && \
-	 bootcpu_x86_cpuid.ci_80000002d == __SYS86_MAKE_DWORD('\0', '\0', '\0', '\0'))
+#define sys86_isqemu_accel()                                                    \
+	(bootcpu_x86_cpuid.ci_80000002a == _SYS86_MAKE_DWORD('V', 'i', 'r', 't') && \
+	 bootcpu_x86_cpuid.ci_80000002b == _SYS86_MAKE_DWORD('u', 'a', 'l', ' ') && \
+	 bootcpu_x86_cpuid.ci_80000002c == _SYS86_MAKE_DWORD('C', 'P', 'U', ' ') && \
+	 bootcpu_x86_cpuid.ci_80000002d == _SYS86_MAKE_DWORD('\0', '\0', '\0', '\0'))
 
 /* BOCHS */
 #define sys86_isbochs() \
-	(bootcpu_x86_cpuid.ci_80000002a == __SYS86_MAKE_DWORD('B', 'O', 'C', 'H'))
+	(bootcpu_x86_cpuid.ci_80000002a == _SYS86_MAKE_DWORD('B', 'O', 'C', 'H'))
 
 /* VirtualBox */
 #define sys86_isvbox() \
-	(bootcpu_x86_cpuid.ci_80000002a == __SYS86_MAKE_DWORD('V', 'B', 'o', 'x'))
+	(bootcpu_x86_cpuid.ci_80000002a == _SYS86_MAKE_DWORD('V', 'B', 'o', 'x'))
 #define _sys86_isvboxgdb() \
-	(bootcpu_x86_cpuid.ci_80000002b == __SYS86_MAKE_DWORD(' ', 'G', 'D', 'B'))
+	(bootcpu_x86_cpuid.ci_80000002b == _SYS86_MAKE_DWORD(' ', 'G', 'D', 'B'))
 #endif /* __CC__ */
 
 

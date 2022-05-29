@@ -102,13 +102,13 @@ struct mousedev
 #define mousedev_getops(self) \
 	((struct mousedev_ops const *)__COMPILER_REQTYPE(struct mousedev const *, self)->_mousedev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops)
 #ifdef NDEBUG
-#define ___mousedev_assert_ops_(ops) /* nothing */
+#define _mousedev_only_assert_ops_(ops) /* nothing */
 #else /* NDEBUG */
-#define ___mousedev_assert_ops_(ops)                                             \
+#define _mousedev_only_assert_ops_(ops)                                          \
 	__hybrid_assert((ops)->mo_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream), \
 	__hybrid_assert((ops)->mo_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_read == &mousedev_v_read),
 #endif /* !NDEBUG */
-#define _mousedev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->mo_cdev) ___mousedev_assert_ops_(ops)
+#define _mousedev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->mo_cdev) _mousedev_only_assert_ops_(ops)
 
 /* Helper macros */
 #define mfile_ismouse(self)   ((self)->mf_ops->mo_stream && (self)->mf_ops->mo_stream->mso_read == &mousedev_v_read)
@@ -147,14 +147,14 @@ mousedev_v_polltest(struct mfile *__restrict self,
 #define mousedev_smplock_tryacquire(self)   atomic_lock_tryacquire(&(self)->md_lock)
 #define mousedev_smplock_acquire_nopr(self) atomic_lock_acquire_nopr(&(self)->md_lock)
 #define mousedev_smplock_release_nopr(self) atomic_lock_release_nopr(&(self)->md_lock)
-#define __mousedev_init_md_lock_(self)      atomic_lock_init(&(self)->md_lock),
-#define __mousedev_cinit_md_lock_(self)     atomic_lock_cinit(&(self)->md_lock),
+#define _mousedev_init_md_lock_(self)       atomic_lock_init(&(self)->md_lock),
+#define _mousedev_cinit_md_lock_(self)      atomic_lock_cinit(&(self)->md_lock),
 #else /* !CONFIG_NO_SMP */
 #define mousedev_smplock_tryacquire(self)   1
 #define mousedev_smplock_acquire_nopr(self) (void)0
 #define mousedev_smplock_release_nopr(self) (void)0
-#define __mousedev_init_md_lock_(self)      /* nothing */
-#define __mousedev_cinit_md_lock_(self)     /* nothing */
+#define _mousedev_init_md_lock_(self)       /* nothing */
+#define _mousedev_cinit_md_lock_(self)      /* nothing */
 #endif /* CONFIG_NO_SMP */
 
 #define mousedev_smplock_acquire(self) atomic_lock_acquire_smp(&(self)->md_lock)
@@ -175,22 +175,22 @@ mousedev_v_polltest(struct mfile *__restrict self,
  * @param: struct mousedev     *self: Mouse to initialize.
  * @param: struct mousedev_ops *ops:  Mouse operators. */
 #define _mousedev_init(self, ops)                          \
-	(___mousedev_assert_ops_(ops)                          \
+	(_mousedev_only_assert_ops_(ops)                       \
 	 _chrdev_init(_mousedev_aschr(self), &(ops)->mo_cdev), \
 	 mousebuf_init(&(self)->md_buf),                       \
 	 (self)->md_state.ms_abs_x   = 0,                      \
 	 (self)->md_state.ms_abs_y   = 0,                      \
 	 (self)->md_state.ms_buttons = 0,                      \
-	 __mousedev_init_md_lock_(self)                        \
+	 _mousedev_init_md_lock_(self)                         \
 	 (self)->md_flags = MOUSE_DEVICE_FLAG_NORMAL)
 #define _mousedev_cinit(self, ops)                          \
-	(___mousedev_assert_ops_(ops)                           \
+	(_mousedev_only_assert_ops_(ops)                        \
 	 _chrdev_cinit(_mousedev_aschr(self), &(ops)->mo_cdev), \
 	 mousebuf_cinit(&(self)->md_buf),                       \
 	 __hybrid_assert((self)->md_state.ms_abs_x == 0),       \
 	 __hybrid_assert((self)->md_state.ms_abs_y == 0),       \
 	 __hybrid_assert((self)->md_state.ms_buttons == 0),     \
-	 __mousedev_cinit_md_lock_(self)                        \
+	 _mousedev_cinit_md_lock_(self)                         \
 	 __hybrid_assert((self)->md_flags == MOUSE_DEVICE_FLAG_NORMAL))
 /* Finalize a partially initialized `struct mousedev' (as initialized by `_mousedev_init()') */
 #define _mousedev_fini(self) _chrdev_fini(_mousedev_aschr(self))

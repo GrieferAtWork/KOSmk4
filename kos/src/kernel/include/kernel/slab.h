@@ -37,8 +37,6 @@
 #include "malloc-defs.h"
 #include "malloc.h"
 
-DECL_BEGIN
-
 /* Slab allocators.
  * - Used by kmalloc() for very small, but efficient allocations (< HEAP_MINSIZE)
  * - Uses the same mechanism as corebase, in that memory is allocated in pages,
@@ -66,6 +64,7 @@ DECL_BEGIN
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 #ifdef __CC__
+DECL_BEGIN
 
 struct slab {
 	union {
@@ -269,9 +268,8 @@ struct slab_descriptor {
 
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
+DECL_END
 #endif /* __CC__ */
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
-
-DECL_END
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_SLAB_H */

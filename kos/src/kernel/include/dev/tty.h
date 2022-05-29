@@ -75,14 +75,14 @@ FUNDEF NONNULL((1)) ssize_t LIBTERM_CC __ttydev_v_raise(struct terminal *__restr
 #define ttydev_getops(self) \
 	((struct ttydev_ops const *)__COMPILER_REQTYPE(struct ttydev const *, self)->_ttydev_chr_ _chrdev_dev_ _device_devnode_ _fdevnode_node_ _fnode_file_ mf_ops)
 #ifdef NDEBUG
-#define ___ttydev_assert_ops_(ops) /* nothing */
+#define _ttydev_only_assert_ops_(ops) /* nothing */
 #else /* NDEBUG */
-#define ___ttydev_assert_ops_(ops)                                                                           \
+#define _ttydev_only_assert_ops_(ops)                                                                        \
 	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream),                             \
 	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_read == &ttydev_v_read), \
 	__hybrid_assert((ops)->to_cdev.cdo_dev.do_node.dvno_node.no_file.mo_stream->mso_write == &ttydev_v_write),
 #endif /* !NDEBUG */
-#define _ttydev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->to_cdev) ___ttydev_assert_ops_(ops)
+#define _ttydev_assert_ops_(ops) _chrdev_assert_ops_(&(ops)->to_cdev) _ttydev_only_assert_ops_(ops)
 
 /* Helper macros */
 #define mfile_istty(self)   ((self)->mf_ops->mo_stream && (self)->mf_ops->mo_stream->mso_read == &ttydev_v_read)
@@ -146,7 +146,7 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
  * @param: struct ttydev_ops   *ops:      TTY operators.
  * @param: pterminal_oprinter_t oprinter: [1..1] Terminal output printer. */
 #define _ttydev_init(self, ops, oprinter)                \
-	(___ttydev_assert_ops_(ops)                          \
+	(_ttydev_only_assert_ops_(ops)                       \
 	 _chrdev_init(_ttydev_aschr(self), &(ops)->to_cdev), \
 	 terminal_init(&(self)->t_term, oprinter,            \
 	               &__ttydev_v_raise,                    \
@@ -154,7 +154,7 @@ _ttydev_tryioctl(struct mfile *__restrict self, ioctl_t cmd,
 	 awref_init(&(self)->t_cproc, __NULLPTR),            \
 	 awref_init(&(self)->t_fproc, __NULLPTR))
 #define _ttydev_cinit(self, ops)                          \
-	(___ttydev_assert_ops_(ops)                           \
+	(_ttydev_only_assert_ops_(ops)                        \
 	 _chrdev_cinit(_ttydev_aschr(self), &(ops)->to_cdev), \
 	 terminal_init(&(self)->t_term, oprinter,             \
 	               &__ttydev_v_raise,                     \

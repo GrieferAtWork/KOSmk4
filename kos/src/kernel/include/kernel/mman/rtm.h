@@ -63,10 +63,10 @@ struct mrtm_driver_hooks {
 	WEAK struct driver      *rdh_driver; /* [1..1] The driver implementing these hooks. */
 	struct mrtm_hooks_struct rdh_hooks;  /* [const] (possibly) arch-specific function pointers. */
 };
-#define __mrtm_driver_hooks_refcnt(self) __driver_refcnt((self)->rdh_driver)
-#define mrtm_driver_hooks_destroy(self)  __driver_destroy((self)->rdh_driver)
+#define _mrtm_driver_hooks_refcnt(self) _driver_refcnt((self)->rdh_driver)
+#define mrtm_driver_hooks_destroy(self) _driver_destroy((self)->rdh_driver)
 DEFINE_REFCNT_FUNCTIONS_P(struct mrtm_driver_hooks,
-                            __mrtm_driver_hooks_refcnt,
+                            _mrtm_driver_hooks_refcnt,
                             mrtm_driver_hooks_destroy)
 
 #ifndef __mrtm_driver_hooks_awref_defined

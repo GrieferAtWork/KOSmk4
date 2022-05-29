@@ -175,17 +175,17 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self);
 
 #ifdef ARCH_HAVE_RTM
-#define __mpartmeta_init_rtm(self)  , (self)->mpm_rtm_vers = 0
-#define __mpartmeta_cinit_rtm(self) , __hybrid_assert((self)->mpm_rtm_vers == 0)
+#define _mpartmeta_init_rtm_(self)  , (self)->mpm_rtm_vers = 0
+#define _mpartmeta_cinit_rtm_(self) , __hybrid_assert((self)->mpm_rtm_vers == 0)
 #else /* ARCH_HAVE_RTM */
-#define __mpartmeta_init_rtm(self)
-#define __mpartmeta_cinit_rtm(self)
+#define _mpartmeta_init_rtm_(self)
+#define _mpartmeta_cinit_rtm_(self)
 #endif /* !ARCH_HAVE_RTM */
 #define _mpartmeta_init_noftxlock(self) \
 	((self)->mpm_ftx = __NULLPTR,       \
 	 SLIST_INIT(&(self)->mpm_ftxlops),  \
 	 sig_init(&(self)->mpm_dma_done)    \
-	 __mpartmeta_init_rtm(self))
+	 _mpartmeta_init_rtm_(self))
 #define mpartmeta_init(self)                   \
 	(atomic_rwlock_init(&(self)->mpm_ftxlock), \
 	 _mpartmeta_init_noftxlock(self))
@@ -194,7 +194,7 @@ NOTHROW(FCALL mpartmeta_destroy)(struct mpartmeta *__restrict self);
 	 __hybrid_assert((self)->mpm_ftx == __NULLPTR),      \
 	 __hybrid_assert(SLIST_EMPTY(&(self)->mpm_ftxlops)), \
 	 sig_cinit(&(self)->mpm_dma_done)                    \
-	 __mpartmeta_cinit_rtm(self))
+	 _mpartmeta_cinit_rtm_(self))
 
 
 /* Lock accessor helpers for the futex tree of `struct mpartmeta' */

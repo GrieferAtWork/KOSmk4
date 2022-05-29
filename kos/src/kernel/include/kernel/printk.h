@@ -23,8 +23,6 @@
 #include <kernel/compiler.h>
 #include <kernel/types.h>
 
-DECL_BEGIN
-
 /* Level prefix strings for use with `printk()' */
 #define KERN_EMERG   "\001" "0" /* s.a. `SYSLOG_LEVEL_EMERG' */
 #define KERN_ALERT   "\001" "1" /* s.a. `SYSLOG_LEVEL_ALERT' */
@@ -39,6 +37,8 @@ DECL_BEGIN
 #define KERN_RAW     "\001" ":" /* s.a. `SYSLOG_LEVEL_RAW' */
 
 #ifdef __CC__
+DECL_BEGIN
+
 /* Print formatted system log message:
  * >> printk(KERN_DEBUG "Hello %s!\n", "World");
  * Same as:
@@ -46,9 +46,8 @@ DECL_BEGIN
  * HINT:  These   functions   can   safely  be   called   from   _any_   context! */
 FUNDEF NOBLOCK ssize_t (VCALL printk)(char const *__restrict format, ...);
 FUNDEF NOBLOCK ssize_t (KCALL vprintk)(char const *__restrict format, __builtin_va_list args);
-#endif /* __CC__ */
-
 
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_PRINTK_H */

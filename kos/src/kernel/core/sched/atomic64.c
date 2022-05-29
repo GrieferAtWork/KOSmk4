@@ -115,7 +115,7 @@ DECL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u64
 NOTHROW(FCALL FUNC(atomic64_read))(atomic64_t const *__restrict self) {
 	u64 result;
 	LOCK_RD(self);
-	result = __atomic64_val(*self);
+	result = _atomic64_val(*self);
 	UNLOCK_RD();
 	return result;
 }
@@ -124,7 +124,7 @@ DECL NOBLOCK ATTR_LEAF NONNULL((1)) void
 NOTHROW(FCALL FUNC(atomic64_write))(atomic64_t *__restrict self,
                                     u64 value) {
 	LOCK_WR(self);
-	__atomic64_val(*self) = value;
+	_atomic64_val(*self) = value;
 	UNLOCK_WR();
 }
 
@@ -133,9 +133,9 @@ NOTHROW(FCALL FUNC(atomic64_cmpxch))(atomic64_t *__restrict self,
                                      u64 oldval, u64 newval) {
 	bool result;
 	LOCK_WR(self);
-	result = __atomic64_val(*self) == oldval;
+	result = _atomic64_val(*self) == oldval;
 	if (result)
-		__atomic64_val(*self) = newval;
+		_atomic64_val(*self) = newval;
 	UNLOCK_WR();
 	return result;
 }
@@ -145,9 +145,9 @@ NOTHROW(FCALL FUNC(atomic64_cmpxch_val))(atomic64_t *__restrict self,
                                          u64 oldval, u64 newval) {
 	u64 result;
 	LOCK_WR(self);
-	result = __atomic64_val(*self);
+	result = _atomic64_val(*self);
 	if (result == oldval)
-		__atomic64_val(*self) = newval;
+		_atomic64_val(*self) = newval;
 	UNLOCK_WR();
 	return result;
 }
@@ -157,8 +157,8 @@ NOTHROW(FCALL FUNC(atomic64_xch))(atomic64_t *__restrict self,
                                   u64 value) {
 	u64 result;
 	LOCK_WR(self);
-	result        = __atomic64_val(*self);
-	__atomic64_val(*self) = value;
+	result        = _atomic64_val(*self);
+	_atomic64_val(*self) = value;
 	UNLOCK_WR();
 	return result;
 }
@@ -168,8 +168,8 @@ NOTHROW(FCALL FUNC(atomic64_fetchadd))(atomic64_t *__restrict self,
                                        u64 value) {
 	u64 result;
 	LOCK_WR(self);
-	result        = __atomic64_val(*self);
-	__atomic64_val(*self) = result + value;
+	result        = _atomic64_val(*self);
+	_atomic64_val(*self) = result + value;
 	UNLOCK_WR();
 	return result;
 }
@@ -179,8 +179,8 @@ NOTHROW(FCALL FUNC(atomic64_fetchand))(atomic64_t *__restrict self,
                                        u64 value) {
 	u64 result;
 	LOCK_WR(self);
-	result        = __atomic64_val(*self);
-	__atomic64_val(*self) = result & value;
+	result        = _atomic64_val(*self);
+	_atomic64_val(*self) = result & value;
 	UNLOCK_WR();
 	return result;
 }
@@ -190,8 +190,8 @@ NOTHROW(FCALL FUNC(atomic64_fetchor))(atomic64_t *__restrict self,
                                       u64 value) {
 	u64 result;
 	LOCK_WR(self);
-	result        = __atomic64_val(*self);
-	__atomic64_val(*self) = result | value;
+	result        = _atomic64_val(*self);
+	_atomic64_val(*self) = result | value;
 	UNLOCK_WR();
 	return result;
 }
@@ -201,8 +201,8 @@ NOTHROW(FCALL FUNC(atomic64_fetchxor))(atomic64_t *__restrict self,
                                        u64 value) {
 	u64 result;
 	LOCK_WR(self);
-	result        = __atomic64_val(*self);
-	__atomic64_val(*self) = result ^ value;
+	result        = _atomic64_val(*self);
+	_atomic64_val(*self) = result ^ value;
 	UNLOCK_WR();
 	return result;
 }

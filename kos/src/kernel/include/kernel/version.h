@@ -20,6 +20,14 @@
 #ifndef GUARD_KERNEL_INCLUDE_KERNEL_VERSION_H
 #define GUARD_KERNEL_INCLUDE_KERNEL_VERSION_H 1
 
+/* IMPORTANT: This header must not be removed or renamed!
+ *
+ * It was already there in earlier revisions of KOS,  and
+ * could thus be used to write kernel drivers that can be
+ * made portable to both KOSmk4 and KOSmk3 (and  possibly
+ * even earlier)
+ */
+
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
@@ -32,8 +40,8 @@
 #define KOS_VERSION_MINOR 0
 #define KOS_VERSION_PATCH 0
 
-#define KOS_VERSION_CODE  KERNEL_VERSION(KOS_VERSION_MAJOR, KOS_VERSION_MINOR, KOS_VERSION_PATCH)
-#define KOS_VERSION_NAME  "yakal"
+#define KOS_VERSION_CODE KERNEL_VERSION(KOS_VERSION_MAJOR, KOS_VERSION_MINOR, KOS_VERSION_PATCH)
+#define KOS_VERSION_NAME "yakal"
 
 #ifdef __CC__
 DECL_BEGIN
@@ -44,7 +52,7 @@ DECL_BEGIN
  * were compiled for and what they are actually running under. */
 DATDEF u32 const kernel_version;
 
-#define ushare_utsname   kernel_uname /* Mk3-name */
+#define ushare_utsname kernel_uname /* Mk3-name */
 
 DECL_END
 #endif /* __CC__ */

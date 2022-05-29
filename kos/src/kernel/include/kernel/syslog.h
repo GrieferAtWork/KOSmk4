@@ -27,8 +27,6 @@
 
 #include <bits/crt/format-printer.h>
 
-DECL_BEGIN
-
 #ifndef CONFIG_SYSLOG_LINEMAX
 #define CONFIG_SYSLOG_LINEMAX 498 /* Max length of a single syslog line */
 #endif /* !CONFIG_SYSLOG_LINEMAX */
@@ -69,6 +67,7 @@ DECL_BEGIN
 #define OFFSET_SYSLOG_PACKET_LEN  16
 #define OFFSET_SYSLOG_PACKET_MSG  18
 #ifdef __CC__
+DECL_BEGIN
 
 struct syslog_packet {
 	time_t sp_time;                        /* Seconds since 01.01.1970T00:00:00 */
@@ -157,10 +156,7 @@ syslog_printer(void *level,
                size_t datalen)
 		THROWS(E_SEGFAULT);
 
-
-#endif /* __CC__ */
-
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_SYSLOG_H */

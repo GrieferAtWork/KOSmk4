@@ -318,9 +318,10 @@ NOTHROW(FCALL module_locksection_index_nx)(struct module *__restrict self, unsig
  * Note  that when this is not the case, you are allowed
  * to assume  that the  module represents  some sort  of
  * user-space executable object. */
-#define module_isdriver(self) ((self)->md_ops->mo_free == &_driver_free)
-#define module_asdriver(self) ((struct driver *)(self))
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _driver_free)(struct module *__restrict self) ASMNAME("driver_free");
+#define module_ops_isdriver(self) ((self)->mo_free == &_driver_free_callback)
+#define module_isdriver(self)     ((self)->md_ops->mo_free == &_driver_free_callback)
+#define module_asdriver(self)     ((struct driver *)(self))
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _driver_free_callback)(struct module *__restrict self) ASMNAME("driver_free");
 
 
 /* Check if the given module has a path and/or name. */

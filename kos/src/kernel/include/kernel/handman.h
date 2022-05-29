@@ -74,7 +74,7 @@ struct mfutexfd;
 struct refcountable;
 
 
-/* >> int __handleidof(T *expr)
+/* >> int _handleidof(T *expr)
  * Returns the HANDLE_TYPE_* code for the kernel object type  "T".
  * Causes a compiler error if "T" doesn't have a handle type code.
  * NOTE: Sub-classes of types with codes are handled correctly. */
@@ -82,14 +82,14 @@ struct refcountable;
 extern "C++" {
 struct __PRIVATE_handleidof_tag { };
 template<class T> struct __PRIVATE_handleidof { };
-#define __FOREACH_DEFINE_HANDLEIDOF(id, T)            \
+#define _HANDLE_FOREACH_DEFINE_HANDLEIDOF(id, T)      \
 	T operator,(T const &, __PRIVATE_handleidof_tag); \
 	template<> struct __PRIVATE_handleidof<T> {       \
 		enum { value = id };                          \
 	};
-HANDLE_FOREACH_TYPE(__FOREACH_DEFINE_HANDLEIDOF)
-#undef __FOREACH_DEFINE_HANDLEIDOF
-#define __handleidof(expr) (::__PRIVATE_handleidof<decltype((*(expr), ::__PRIVATE_handleidof_tag()))>::value)
+HANDLE_FOREACH_TYPE(_HANDLE_FOREACH_DEFINE_HANDLEIDOF)
+#undef _HANDLE_FOREACH_DEFINE_HANDLEIDOF
+#define _handleidof(expr) (::__PRIVATE_handleidof<decltype((*(expr), ::__PRIVATE_handleidof_tag()))>::value)
 } /* extern "C++" */
 #endif /* __cplusplus */
 
@@ -138,10 +138,10 @@ HANDLE_FOREACH_TYPE(__FOREACH_DEFINE_HANDLEIDOF)
 #define _MANHANDLE_LOADMARKER ((uintptr_half_t)-1)
 
 #if HANDLE_TYPE_UNDEFINED == 0
-#define __handletype_ishand(h_type) ((uintptr_half_t)((h_type)-1) < (_HANDSLOT_LOP_MINTYPE - 1))
+#define _handletype_private_ishand(h_type) ((uintptr_half_t)((h_type)-1) < (_HANDSLOT_LOP_MINTYPE - 1))
 #endif /* HANDLE_TYPE_UNDEFINED == 0 */
-#define __handletype_isused(h_type) ((h_type) != HANDLE_TYPE_UNDEFINED)
-#define __handletype_isfree(h_type) ((h_type) == HANDLE_TYPE_UNDEFINED)
+#define _handletype_private_isused(h_type) ((h_type) != HANDLE_TYPE_UNDEFINED)
+#define _handletype_private_isfree(h_type) ((h_type) == HANDLE_TYPE_UNDEFINED)
 
 union handslot {
 	struct handle           mh_hand;     /* Handle data */
@@ -150,7 +150,7 @@ union handslot {
 	void                  *_mh_words[2]; /* Raw data words. */
 };
 
-#define __handslot_makeword2(h_mode, h_type)          \
+#define _handslot_private_makeword2(h_mode, h_type)   \
 	((void *)(((uintptr_t)(uintptr_half_t)(h_mode)) | \
 	          ((uintptr_t)(uintptr_half_t)(h_type) << (__SIZEOF_POINTER__ * 4))))
 
@@ -159,14 +159,14 @@ union handslot {
  *  - handslot_isused: h_type != HANDLE_TYPE_UNDEFINED
  *  - handslot_isfree: h_type == HANDLE_TYPE_UNDEFINED
  *  - handslot_forked: handslot_ishand && !IO_CLOFORK  (should the slot be retained during fork()?) */
-#ifdef __handletype_ishand
-#define handslot_ishand(self) __handletype_ishand((self)->mh_hand.h_type)
-#else /* __handletype_ishand */
+#ifdef _handletype_private_ishand
+#define handslot_ishand(self) _handletype_private_ishand((self)->mh_hand.h_type)
+#else /* _handletype_private_ishand */
 #define handslot_ishand(self) \
 	(handslot_isused(self) && _handslot_ishand((self)->mh_hand.h_type))
-#endif /* !__handletype_ishand */
-#define handslot_isused(self) __handletype_isused((self)->mh_hand.h_type)
-#define handslot_isfree(self) __handletype_isfree((self)->mh_hand.h_type)
+#endif /* !_handletype_private_ishand */
+#define handslot_isused(self) _handletype_private_isused((self)->mh_hand.h_type)
+#define handslot_isfree(self) _handletype_private_isfree((self)->mh_hand.h_type)
 #define handslot_forked(self) (handslot_ishand(self) && !((self)->mh_hand.h_mode & IO_CLOFORK))
 
 
@@ -357,36 +357,38 @@ struct handrange {
  *    if the target handle is used by a LOP handle (which we just stopped being) */
 #define _handslot_commit_inherit(man, range, self, data, mode, type)      \
 	(__hybrid_atomic_store((self)->_mh_words[0], data, __ATOMIC_RELEASE), \
-	 __handslot_commit_inherit(man, range, self, mode, type))
-#define __handslot_commit_inherit(man, range, self, mode, type)                                       \
-	(__hybrid_assert((self)->mh_hand.h_type == _MANHANDLE_LOADMARKER),                                \
-	 ((mode)&IO_CLOEXEC) ? (void)__hybrid_atomic_inc((range)->hr_cexec, __ATOMIC_RELEASE) : (void)0,  \
-	 ((mode)&IO_CLOFORK) ? (void)__hybrid_atomic_inc((range)->hr_cfork, __ATOMIC_RELEASE) : (void)0,  \
-	 __hybrid_atomic_store((self)->_mh_words[1], __handslot_makeword2(mode, type), __ATOMIC_SEQ_CST), \
-	 handrange_dec_nlops_and_maybe_rejoin(range, man, 0),                                             \
+	 _handslot_commit_inherit_with_preset_data(man, range, self, mode, type))
+#define _handslot_commit_inherit_with_preset_data(man, range, self, mode, type)                              \
+	(__hybrid_assert((self)->mh_hand.h_type == _MANHANDLE_LOADMARKER),                                       \
+	 ((mode)&IO_CLOEXEC) ? (void)__hybrid_atomic_inc((range)->hr_cexec, __ATOMIC_RELEASE) : (void)0,         \
+	 ((mode)&IO_CLOFORK) ? (void)__hybrid_atomic_inc((range)->hr_cfork, __ATOMIC_RELEASE) : (void)0,         \
+	 __hybrid_atomic_store((self)->_mh_words[1], _handslot_private_makeword2(mode, type), __ATOMIC_SEQ_CST), \
+	 handrange_dec_nlops_and_maybe_rejoin(range, man, 0),                                                    \
 	 sig_broadcast(&(man)->hm_changed))
 
 /* Similar to `_handslot_commit()', but rather than commit handles,
  * this  one is used to mark pre-allocated handles as unused. (such
  * as due to a failure  at installing/allocating the actual  handle
  * object) */
-#define _handslot_abort(man, range, self)                                                                              \
-	do {                                                                                                               \
-		unsigned int _mha_ohint, _mha_nhint;                                                                           \
-		__hybrid_assert((self)->mh_hand.h_type == _MANHANDLE_LOADMARKER);                                              \
-		/*__hybrid_atomic_store((self)->_mh_words[0], INVALID_POINTER, __ATOMIC_RELEASE);*/                            \
-		__hybrid_atomic_store((self)->_mh_words[1], __handslot_makeword2(0, HANDLE_TYPE_UNDEFINED), __ATOMIC_SEQ_CST); \
-		_mha_nhint = (unsigned int)(size_t)((self) - (range)->hr_hand);                                                \
-		/* Update `hr_nhint' to reflect our slot having become free. */                                                \
-		do {                                                                                                           \
-			_mha_ohint = __hybrid_atomic_load((range)->hr_nhint, __ATOMIC_ACQUIRE);                                    \
-			if (_mha_ohint <= _mha_nhint)                                                                              \
-				break; /* Only ever lower the hint; never raise it! */                                                 \
-		} while (!__hybrid_atomic_cmpxch_weak((range)->hr_nhint, _mha_ohint, _mha_nhint,                               \
-		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));                                    \
-		__hybrid_atomic_dec((man)->hm_handles, __ATOMIC_SEQ_CST);                                                      \
-		handrange_dec_nlops_and_maybe_rejoin(range, man, 1);                                                           \
-		sig_broadcast(&(man)->hm_changed);                                                                             \
+#define _handslot_abort(man, range, self)                                                   \
+	do {                                                                                    \
+		unsigned int _mha_ohint, _mha_nhint;                                                \
+		__hybrid_assert((self)->mh_hand.h_type == _MANHANDLE_LOADMARKER);                   \
+		/*__hybrid_atomic_store((self)->_mh_words[0], INVALID_POINTER, __ATOMIC_RELEASE);*/ \
+		__hybrid_atomic_store((self)->_mh_words[1],                                         \
+		                      _handslot_private_makeword2(0, HANDLE_TYPE_UNDEFINED),        \
+		                      __ATOMIC_SEQ_CST);                                            \
+		_mha_nhint = (unsigned int)(size_t)((self) - (range)->hr_hand);                     \
+		/* Update `hr_nhint' to reflect our slot having become free. */                     \
+		do {                                                                                \
+			_mha_ohint = __hybrid_atomic_load((range)->hr_nhint, __ATOMIC_ACQUIRE);         \
+			if (_mha_ohint <= _mha_nhint)                                                   \
+				break; /* Only ever lower the hint; never raise it! */                      \
+		} while (!__hybrid_atomic_cmpxch_weak((range)->hr_nhint, _mha_ohint, _mha_nhint,    \
+		                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));         \
+		__hybrid_atomic_dec((man)->hm_handles, __ATOMIC_SEQ_CST);                           \
+		handrange_dec_nlops_and_maybe_rejoin(range, man, 1);                                \
+		sig_broadcast(&(man)->hm_changed);                                                  \
 	}	__WHILE0
 
 /* Asynchronously try to rejoin `self' with its neighboring ranges.
@@ -883,23 +885,23 @@ HANDLE_FOREACH_TYPE(__FOREACH_HANDLES_INSTALL_COMMIT)
 #undef __FOREACH_HANDLES_INSTALL_COMMIT
 } /* extern "C++" */
 #endif /* __cplusplus */
-#else /* __INTELLISENSE__ */
-#define __PRIVATE_handman_install_commit_inherit4(self, h_data, h_mode, h_type)       \
+#else  /* __INTELLISENSE__ */
+#define _handman_private_install_commit_inherit4(self, h_data, h_mode, h_type)        \
 	(__hybrid_atomic_store((self)->hid_slot->_mh_words[0], h_data, __ATOMIC_RELEASE), \
 	 _handman_install_commit_inherit(self, h_mode, h_type))
-#define __PRIVATE_handman_install_commit4(self, h_data, h_mode, h_type) \
-	((*handle_type_db.h_incref[h_type])(h_data),                        \
-	 __PRIVATE_handman_install_commit_inherit4(self, h_data, h_mode, h_type))
-#define __PRIVATE_handman_install_commit_inherit2(self, hand) \
-	__PRIVATE_handman_install_commit_inherit4(self, (hand)->h_data, (hand)->h_mode, (hand)->h_type)
-#define __PRIVATE_handman_install_commit_inherit3(self, h_data, h_mode) \
-	__PRIVATE_handman_install_commit_inherit4(self, h_data, h_mode, __handleidof(h_data))
-#define __PRIVATE_handman_install_commit2(self, hand) \
-	__PRIVATE_handman_install_commit4(self, (hand)->h_data, (hand)->h_mode, (hand)->h_type)
-#define __PRIVATE_handman_install_commit3(self, h_data, h_mode) \
-	__PRIVATE_handman_install_commit4(self, h_data, h_mode, __handleidof(h_data))
-#define handman_install_commit_inherit(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_handman_install_commit_inherit, (__VA_ARGS__))(__VA_ARGS__)
-#define handman_install_commit(...)         __HYBRID_PP_VA_OVERLOAD(__PRIVATE_handman_install_commit, (__VA_ARGS__))(__VA_ARGS__)
+#define _handman_private_install_commit4(self, h_data, h_mode, h_type) \
+	((*handle_type_db.h_incref[h_type])(h_data),                       \
+	 _handman_private_install_commit_inherit4(self, h_data, h_mode, h_type))
+#define _handman_private_install_commit_inherit2(self, hand) \
+	_handman_private_install_commit_inherit4(self, (hand)->h_data, (hand)->h_mode, (hand)->h_type)
+#define _handman_private_install_commit_inherit3(self, h_data, h_mode) \
+	_handman_private_install_commit_inherit4(self, h_data, h_mode, _handleidof(h_data))
+#define _handman_private_install_commit2(self, hand) \
+	_handman_private_install_commit4(self, (hand)->h_data, (hand)->h_mode, (hand)->h_type)
+#define _handman_private_install_commit3(self, h_data, h_mode) \
+	_handman_private_install_commit4(self, h_data, h_mode, _handleidof(h_data))
+#define handman_install_commit_inherit(...) __HYBRID_PP_VA_OVERLOAD(_handman_private_install_commit_inherit, (__VA_ARGS__))(__VA_ARGS__)
+#define handman_install_commit(...)         __HYBRID_PP_VA_OVERLOAD(_handman_private_install_commit, (__VA_ARGS__))(__VA_ARGS__)
 #endif /* !__INTELLISENSE__ */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _handman_install_commit_inherit)(struct handle_install_data *__restrict self,

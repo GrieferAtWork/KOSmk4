@@ -29,9 +29,8 @@
 
 #include <stdbool.h>
 
-DECL_BEGIN
-
 #ifdef __CC__
+DECL_BEGIN
 
 struct driver;
 
@@ -206,8 +205,7 @@ FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister)(void *func, void *ob_pointer,
 FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister_at)(isr_vector_t vector, void *func, void *ob_pointer, uintptr_half_t ob_type);
 #endif /* !__cplusplus || __NO_ASMNAME */
 
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ISR_H */

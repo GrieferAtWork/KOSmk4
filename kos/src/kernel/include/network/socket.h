@@ -643,21 +643,21 @@ struct socket {
 	/* Socket-specific data goes here... */
 };
 
-#define __socket_init_common(self, ops, type, protocol) \
-	((self)->sk_refcnt     = 1,                         \
-	 (self)->sk_weakrefcnt = 1,                         \
-	 (self)->sk_ops        = (ops),                     \
-	 (self)->sk_type       = (type),                    \
-	 (self)->sk_prot       = (protocol),                \
-	 (self)->sk_rcvtimeo   = KTIME_INFINITE,            \
+#define _socket_init_common(self, ops, type, protocol) \
+	((self)->sk_refcnt     = 1,                        \
+	 (self)->sk_weakrefcnt = 1,                        \
+	 (self)->sk_ops        = (ops),                    \
+	 (self)->sk_type       = (type),                   \
+	 (self)->sk_prot       = (protocol),               \
+	 (self)->sk_rcvtimeo   = KTIME_INFINITE,           \
 	 (self)->sk_sndtimeo   = KTIME_INFINITE)
-#define socket_init(self, ops, type, protocol)        \
-	(__socket_init_common(self, ops, type, protocol), \
-	 axref_init(&(self)->sk_ncon),                    \
+#define socket_init(self, ops, type, protocol)       \
+	(_socket_init_common(self, ops, type, protocol), \
+	 axref_init(&(self)->sk_ncon),                   \
 	 (self)->sk_msgflags = 0)
-#define socket_cinit(self, ops, type, protocol)       \
-	(__socket_init_common(self, ops, type, protocol), \
-	 axref_cinit(&(self)->sk_ncon, __NULLPTR),        \
+#define socket_cinit(self, ops, type, protocol)      \
+	(_socket_init_common(self, ops, type, protocol), \
+	 axref_cinit(&(self)->sk_ncon, __NULLPTR),       \
 	 __hybrid_assert((self)->sk_msgflags == 0))
 
 

@@ -153,8 +153,8 @@ FUNDEF NOBLOCK NONNULL((1)) void /* == ramfs_dirent_ops.fdo_destroy */
 NOTHROW(KCALL ramfs_dirent_v_destroy)(struct fdirent *__restrict self);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct fnode * /* == ramfs_dirent_ops.fdo_opennode */
 NOTHROW(KCALL ramfs_dirent_v_opennode)(struct fdirent *__restrict self, struct fdirnode *__restrict dir);
-#define __struct_ramfs_dirent_destroy(self) ramfs_dirent_v_destroy(&(self)->rde_ent)
-DEFINE_REFCNT_FUNCTIONS(struct ramfs_dirent, rde_ent.fd_refcnt, __struct_ramfs_dirent_destroy)
+#define _struct_ramfs_dirent_destroy(self) ramfs_dirent_v_destroy(&(self)->rde_ent)
+DEFINE_REFCNT_FUNCTIONS(struct ramfs_dirent, rde_ent.fd_refcnt, _struct_ramfs_dirent_destroy)
 
 
 /* Extended directory data. */

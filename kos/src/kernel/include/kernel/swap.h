@@ -25,10 +25,9 @@
 #include <kernel/memory.h>
 #include <kernel/types.h>
 
-DECL_BEGIN
-
 #ifdef __CC__
 #ifndef CONFIG_NO_SWAP
+DECL_BEGIN
 
 typedef physpage_t swappage_t;
 typedef physaddr_t swapaddr_t;
@@ -59,9 +58,8 @@ FUNDEF void (KCALL swap_write)(swapaddr_t start, physaddr_t buffer, size_t num_b
  * @throw: E_IOERROR: The swap back-end has issued an I/O error. */
 FUNDEF void (KCALL swap_sync)(void) THROWS(E_IOERROR);
 
+DECL_END
 #endif /* !CONFIG_NO_SWAP */
 #endif /* __CC__ */
-
-DECL_END
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_SWAP_H */

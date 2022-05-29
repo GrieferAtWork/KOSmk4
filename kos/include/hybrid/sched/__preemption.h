@@ -231,21 +231,42 @@ __DECL_END
 #elif defined(__libc_sigprocmask)
 #include <asm/os/signal.h>
 #define __hybrid_preemption_flag_t struct __sigset_struct
+#define __hybrid_preemption_pop(p_flag) \
+	(void)__libc_sigprocmask(__SIG_SETMASK, p_flag, __NULLPTR)
+#define __hybrid_preemption_wason(p_flag) (!__libc_sigisemptyset(p_flag))
+#ifdef __NO_XBLOCK
+#define __hybrid_preemption_pushoff (__NAMESPACE_INT_SYM __hybrid_private_preemption_pushoff)
+#define __hybrid_preemption_ison    (__NAMESPACE_INT_SYM __hybrid_private_preemption_ison)
+__DECL_BEGIN
+__NAMESPACE_INT_BEGIN
+__LOCAL __ATTR_NONNULL((1)) void
+__NOTHROW(__hybrid_private_preemption_pushoff)(sigset_t *__restrict __p_flag) {
+	struct __sigset_struct __hpp_nss;
+	__libc_sigfillset(&__hpp_nss);
+	__libc_sigprocmask(__SIG_SETMASK, p_flag, &__hpp_nss);
+}
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __BOOL
+__NOTHROW(__hybrid_private_preemption_ison)(void) {
+	sigset_t __hpp_nss;
+	__libc_sigprocmask(SIG_SETMASK, __NULLPTR, &__hpp_nss);
+	return !__hybrid_sigisemptyset(&__hpp_nss)
+}
+__NAMESPACE_INT_END
+__DECL_END
+#else /* __NO_XBLOCK */
 #define __hybrid_preemption_pushoff(p_flag)                    \
 	__XBLOCK({                                                 \
 		struct __sigset_struct __hpp_nss;                      \
 		__libc_sigfillset(&__hpp_nss);                         \
 		__libc_sigprocmask(__SIG_SETMASK, p_flag, &__hpp_nss); \
 	})
-#define __hybrid_preemption_pop(p_flag) \
-	(void)__libc_sigprocmask(__SIG_SETMASK, p_flag, __NULLPTR)
 #define __hybrid_preemption_ison()                                \
 	__XBLOCK({                                                    \
 		struct __sigset_struct __hpp_nss;                         \
 		__libc_sigprocmask(__SIG_SETMASK, __NULLPTR, &__hpp_nss); \
 		__XRETURN !__libc_sigisemptyset(&__hpp_nss);              \
 	})
-#define __hybrid_preemption_wason(p_flag) (!__libc_sigisemptyset(p_flag))
+#endif /* !__NO_XBLOCK */
 #endif /* ... */
 #endif /* __KOS_SYSTEM_HEADERS__ */
 
@@ -308,7 +329,6 @@ __NOTHROW(__hybrid_private_preemption_pushoff)(sigset_t *__restrict __p_flag) {
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __BOOL
 __NOTHROW(__hybrid_private_preemption_ison)(void) {
 	sigset_t __hpp_nss;
-	__hybrid_sigfillset(&__hpp_nss);
 	sigprocmask(SIG_SETMASK, __NULLPTR, &__hpp_nss);
 	return !__hybrid_sigisemptyset(&__hpp_nss)
 }
@@ -391,12 +411,21 @@ __DECL_END
 #ifdef __HYBRID_PREEMPTION_NO_CONTROL
 #include "__yield.h"
 /* No preemption control -> must implement regular acquire/release semantics */
+#ifdef __NO_XBLOCK
+#define __hybrid_preemption_acquire_smp_r(_tryacquire, p_flag) \
+	do {                                                       \
+		while (!(_tryacquire)) {                               \
+			__hybrid_yield();                                  \
+		}                                                      \
+	}	__WHILE0
+#else /* __NO_XBLOCK */
 #define __hybrid_preemption_acquire_smp_r(_tryacquire, p_flag) \
 	__XBLOCK({                                                 \
 		while (!(_tryacquire)) {                               \
 			__hybrid_yield();                                  \
 		}                                                      \
 	})
+#endif /* !__NO_XBLOCK */
 #define __hybrid_preemption_release_smp_r(_release, p_flag) \
 	(_release)
 #elif defined(__HYBRID_PREEMPTION_NO_SMP)
@@ -408,6 +437,16 @@ __DECL_END
 #else /* ... */
 /* Preemption  control must interlock with lock acquisition, but still try to
  * keep preemption enabled whenever trying to yield to other waiting threads. */
+#ifdef __NO_XBLOCK
+#define __hybrid_preemption_acquire_smp_r(_tryacquire, p_flag) \
+	do {                                                       \
+		__hybrid_preemption_pushoff(p_flag);                   \
+		if (_tryacquire)                                       \
+			break;                                             \
+		__hybrid_preemption_pop(p_flag);                       \
+		__hybrid_preemption_tryyield();                        \
+	}	__WHILE1
+#else /* __NO_XBLOCK */
 #define __hybrid_preemption_acquire_smp_r(_tryacquire, p_flag) \
 	__XBLOCK({                                                 \
 		do {                                                   \
@@ -418,6 +457,7 @@ __DECL_END
 			__hybrid_preemption_tryyield();                    \
 		}	__WHILE1;                                          \
 	})
+#endif /* !__NO_XBLOCK */
 #define __hybrid_preemption_release_smp_r(_release, p_flag) \
 	(_release, __hybrid_preemption_pop(p_flag))
 #endif /* !... */

@@ -55,5 +55,4 @@ typedef u64 ktime_t;
 DECL_END
 #endif /* __CC__ */
 
-
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_TYPES_H */
