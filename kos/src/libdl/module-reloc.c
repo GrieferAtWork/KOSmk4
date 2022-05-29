@@ -475,6 +475,23 @@ STATIC_ASSERT(offsetof(Elf64_Rel, r_info) == offsetof(Elf64_Rela, r_info));
 #endif /* !ELF_ARCH_R_JMP_SLOT */
 #endif /* !ELF_ARCH_NAME_R_JMP_SLOT */
 
+#if ELF_ARCH_USESRELA
+#define IF_ELF_ARCH_USESRELA(...)     __VA_ARGS__
+#define IF_NOT_ELF_ARCH_USESRELA(...) /* nothing */
+#else /* ELF_ARCH_USESRELA */
+#define IF_ELF_ARCH_USESRELA(...)     /* nothing */
+#define IF_NOT_ELF_ARCH_USESRELA(...) __VA_ARGS__
+#endif /* !ELF_ARCH_USESRELA */
+
+#if ELF_ARCH_LAZYINDX
+#define IF_ELF_ARCH_LAZYINDX(...)     __VA_ARGS__
+#define IF_NOT_ELF_ARCH_LAZYINDX(...) /* nothing */
+#else /* ELF_ARCH_LAZYINDX */
+#define IF_ELF_ARCH_LAZYINDX(...)     /* nothing */
+#define IF_NOT_ELF_ARCH_LAZYINDX(...) __VA_ARGS__
+#endif /* !ELF_ARCH_LAZYINDX */
+
+
 INTERN WUNUSED NONNULL((1)) ElfW(Addr) FCALL
 dl_bind_lazy_relocation(DlModule *__restrict self,
 #if ELF_ARCH_LAZYINDX
@@ -496,13 +513,13 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 	if unlikely(jmp_rel_offset >= self->dm_elf.de_jmpsize)
 #endif /* !ELF_ARCH_LAZYINDX */
 	{
-#if ELF_ARCH_LAZYINDX
-		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation index %" PRIuPTR " > %" PRIuSIZ " in %q\n",
-		       jmp_rel_index, self->dm_elf.de_jmpcount, self->dm_filename);
-#else /* ELF_ARCH_LAZYINDX */
-		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation offset %" PRIuPTR " > %" PRIuSIZ " in %q\n",
-		       jmp_rel_offset, self->dm_elf.de_jmpsize, self->dm_filename);
-#endif /* !ELF_ARCH_LAZYINDX */
+		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation "
+		                  IF_ELF_ARCH_LAZYINDX("index")
+		                  IF_NOT_ELF_ARCH_LAZYINDX("offset")
+		                  " %" PRIuPTR " > %" PRIuSIZ " in %q\n",
+		       IF_ELF_ARCH_LAZYINDX(jmp_rel_index, self->dm_elf.de_jmpcount)
+		       IF_NOT_ELF_ARCH_LAZYINDX(jmp_rel_offset, self->dm_elf.de_jmpsize),
+		       self->dm_filename);
 		sys_exit_group(EXIT_FAILURE);
 	}
 #if ELF_ARCH_LAZYINDX
@@ -521,29 +538,16 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 	if unlikely(!ELF_ARCH_IS_R_JMP_SLOT(ELFW(R_TYPE)(rel->r_info))) {
 		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation at DT_JMPREL+%" PRIuSIZ " (index:%" PRIuPTR ") "
 		                  "[r_offset=%#" PRIxPTR ",r_info=%#" PRIxPTR
-#if !ELF_ARCH_USESRELA
-		                  "] isn't `" ELF_ARCH_NAME_R_JMP_SLOT "' in %q\n"
-#endif /* !ELF_ARCH_USESRELA */
-		       ,
-#if ELF_ARCH_LAZYINDX
-		       (size_t)((byte_t *)rel - (byte_t *)self->dm_elf.de_jmprel),
-		       jmp_rel_index,
-#else /* ELF_ARCH_LAZYINDX */
-		       (size_t)jmp_rel_offset,
-#if ELF_ARCH_USESRELA
-		       self->dm_flags & RTLD_JMPRELA ? (uintptr_t)((ElfW(Rela) *)rel - self->dm_elf.de_jmprela)
-		                                     : (uintptr_t)(rel - self->dm_elf.de_jmprel),
-#else /* ELF_ARCH_USESRELA */
-		       (uintptr_t)(rel - self->dm_elf.de_jmprel),
-#endif /* ELF_ARCH_USESRELA */
-#endif /* !ELF_ARCH_LAZYINDX */
+		                  IF_NOT_ELF_ARCH_USESRELA("] isn't `" ELF_ARCH_NAME_R_JMP_SLOT "' in %q\n"),
+		       IF_ELF_ARCH_LAZYINDX((size_t)((byte_t *)rel - (byte_t *)self->dm_elf.de_jmprel),
+		                            jmp_rel_index, )
+		       IF_NOT_ELF_ARCH_LAZYINDX((size_t)jmp_rel_offset,
+		                                IF_ELF_ARCH_USESRELA(self->dm_flags & RTLD_JMPRELA
+		                                                     ? (uintptr_t)((ElfW(Rela) *)rel - self->dm_elf.de_jmprela)
+		                                                     :)(uintptr_t)(rel - self->dm_elf.de_jmprel), )
 		       (uintptr_t)rel->r_offset,
 		       (uintptr_t)rel->r_info
-#if !ELF_ARCH_USESRELA
-		       ,
-		       self->dm_filename
-#endif /* !ELF_ARCH_USESRELA */
-		       );
+		       IF_NOT_ELF_ARCH_USESRELA(, self->dm_filename));
 #if ELF_ARCH_USESRELA
 		if (self->dm_flags & RTLD_JMPRELA)
 			syslog(LOG_ERROR, ",r_addend=%" PRIdPTR, (intptr_t)((ElfW(Rela) *)rel)->r_addend);

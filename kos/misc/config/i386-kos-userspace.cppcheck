@@ -13,14 +13,16 @@
 	<defines>
 		<define name="__i386__"/>
 		<define name="__KOS__"/>
+		<define name="__LCLINT__"/>
 	</defines>
 	<paths>
-		<dir name="../../src/_verify"/>
 		<dir name="../../src/apps"/>
-		<dir name="../../src/crt0"/>
 		<dir name="../../src/libansitty"/>
 		<dir name="../../src/libbuffer"/>
-		<dir name="../../src/libc"/>
+		<dir name="../../src/libc/auto"/>
+		<dir name="../../src/libc/hybrid"/>
+		<dir name="../../src/libc/libc"/>
+		<dir name="../../src/libc/user"/>
 		<dir name="../../src/libcmdline"/>
 		<dir name="../../src/libcpustate"/>
 		<dir name="../../src/libdebuginfo"/>
@@ -52,5 +54,6 @@
 		<suppression>unusedStructMember</suppression>
 		<suppression>clarifyCalculation</suppression>
 		<suppression>comparePointers</suppression>
+		<suppression>cstyleCast</suppression>
 	</suppressions>
 </project>

@@ -34,7 +34,7 @@
 
 #include <hybrid/__assert.h>
 
-#if !defined(__INSIDE_LIBTEST) && !defined(__DEEMON__)
+#if !defined(__INSIDE_LIBTEST) && !defined(__DEEMON__) && !defined(__LCLINT__)
 #error "Only include this file from within *.ctest files that are apart of /bin/system-test"
 #endif /* __INSIDE_LIBTEST */
 

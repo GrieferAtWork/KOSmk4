@@ -718,20 +718,20 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 
 						/* Erase word (while (isspace(last)) erase(); while (!isspace(last)) erase()) */
 						if (iflag & IUTF8) {
-							char32_t ch;
+							char32_t uch;
 							char const *textptr, *newptr;
 							textptr = (char *)capture.lc_base + new_size;
 							while (textptr > (char const *)capture.lc_base) {
 								newptr = textptr;
-								ch = unicode_readutf8_rev_n(&newptr, (char const *)capture.lc_base);
-								if (!unicode_isspace(ch))
+								uch = unicode_readutf8_rev_n(&newptr, (char const *)capture.lc_base);
+								if (!unicode_isspace(uch))
 									break;
 								textptr = newptr;
 							}
 							while (textptr > (char const *)capture.lc_base) {
 								newptr = textptr;
-								ch = unicode_readutf8_rev_n(&newptr, (char const *)capture.lc_base);
-								if (unicode_isspace(ch))
+								uch = unicode_readutf8_rev_n(&newptr, (char const *)capture.lc_base);
+								if (unicode_isspace(uch))
 									break;
 								textptr = newptr;
 							}

@@ -86,8 +86,13 @@ __CDECLARE_VOID(__ATTR_COLD __ATTR_NORETURN,,__assertfail,(char const *__expr, c
 __LOCAL_LIBC(__fallback_assert_fail) __ATTR_COLD __ATTR_NORETURN
 void (__LIBCCALL __fallback_assert_fail)(void) {
 	/* This is the best we can do here... */
+#ifdef __LCLINT__
+	while (1)
+		;
+#else /* __LCLINT__ */
 	for (;;) {
 	}
+#endif /* !__LCLINT__ */
 }
 #endif /* !... */
 

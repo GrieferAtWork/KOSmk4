@@ -48,12 +48,12 @@ PRIVATE int my_thread_main(void *ptr) {
 
 DEFINE_TEST(multi_threading) {
 	thrd_t thread;
-	int error, result;
+	int result;
 	did_run_my_thread_main = false;
 	COMPILER_BARRIER();
-	EQd(thrd_success, (error = thrd_create(&thread, &my_thread_main, (void *)message_pointer)));
+	EQd(thrd_success, thrd_create(&thread, &my_thread_main, (void *)message_pointer));
 	COMPILER_BARRIER();
-	EQd(thrd_success, (error = thrd_join(thread, &result)));
+	EQd(thrd_success, thrd_join(thread, &result));
 	assertf(did_run_my_thread_main, "Thread not actually executed");
 	assertf(result == 1234, "result = %d", result);
 }

@@ -54,7 +54,7 @@ NOTHROW_NCX(CC libdi_dwarf_decode_sleb128_64)(byte_t const *__restrict reader,
 			break;
 	}
 	if ((byte & 0x40) && (shift < 64))
-		*p_result |= -((int64_t)1 << shift);
+		*p_result |= -(int64_t)((uint64_t)1 << shift);
 	return reader;
 }
 

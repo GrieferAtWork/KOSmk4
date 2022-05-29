@@ -130,7 +130,7 @@ libc_LFutexExpr(lfutex_t *ulockaddr, void *base, struct lfutexexpr const *expr,
 		timeout = (struct timespec const *)&tm64;
 	}
 	return sys_Xlfutexexpr(ulockaddr, base, expr,
-	                       (struct timespec64 const *)&tm64,
+	                       (struct timespec64 const *)timeout,
 	                       timeout_flags);
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */

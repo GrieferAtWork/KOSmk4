@@ -633,12 +633,11 @@ again:
 			 * one,   but  smaller  than  the  (now)  effective  limit) */
 			if (heapptr_getsiz(new_buffer) > self->rb_size &&
 			    heapptr_getsiz(new_buffer) <= ATOMIC_READ(self->rb_limit)) {
-				size_t lo, hi;
-				byte_t *old_buffer_base;
-				size_t old_buffer_size;
 				/* Copy old buffer data. */
-				old_buffer_size = self->rb_size;
+				size_t old_buffer_size = self->rb_size;
 				if (old_buffer_size) {
+					byte_t *old_buffer_base;
+					size_t lo, hi;
 					old_buffer_base = self->rb_data;
 					hi              = old_buffer_size - self->rb_rptr;
 					if (hi >= self->rb_avail) {

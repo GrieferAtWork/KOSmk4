@@ -655,11 +655,13 @@ setflags(struct ansitty *__restrict self, uint16_t new_flags) {
 	if (self->at_ttyflag == new_flags)
 		return;
 	if ((new_flags & ANSITTY_FLAG_CONCEIL) != (self->at_ttyflag & ANSITTY_FLAG_CONCEIL)) {
-		uint8_t used_color = self->at_color;
-		if (new_flags & ANSITTY_FLAG_CONCEIL)
+		if (new_flags & ANSITTY_FLAG_CONCEIL) {
+			uint8_t used_color;
+			used_color = self->at_color;
 			used_color = ANSITTY_PALETTE_INDEX(ANSITTY_PALETTE_INDEX_BG(used_color),
 			                                   ANSITTY_PALETTE_INDEX_BG(used_color));
-		NOTIFY_SETCOLOR();
+			setcolor(self, used_color);
+		}
 	}
 	self->at_ttyflag = new_flags;
 }
@@ -2368,7 +2370,6 @@ done_insert_ansitty_flag_hedit:
 				 * PM = 3  - permanently  set
 				 * PM = 4 - permanently reset
 				 * NOTE: `PS' is the same as in `\e[<PS>h' and `\e[<PS>l' */
-				size_t len;
 				unsigned int result;
 				switch (name) {
 
@@ -2433,7 +2434,7 @@ done_insert_ansitty_flag_hedit:
 				}
 				{
 					char buf[COMPILER_LENOF(CC_SESC "[" PRIMAXu ";" PRIMAXu "$y")];
-					len = sprintf(buf, CC_SESC "[%u;%u$y", name, result);
+					size_t len = sprintf(buf, CC_SESC "[%u;%u$y", name, result);
 					DOOUTPUT(buf, len);
 				}
 			}

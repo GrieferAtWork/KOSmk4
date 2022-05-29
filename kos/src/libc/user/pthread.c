@@ -3158,10 +3158,10 @@ readlock_tls_data_dodel(struct readlock_tls_data *__restrict self,
                         pthread_rwlock_t *__restrict lck) {
 	uintptr_t hash, i, perturb;
 	struct readlock_bucket *ent;
-	pthread_rwlock_t *emon;
 	hash = pthread_rwlock_hashof(lck);
 	i = perturb = hash & self->rtd_rdlock_mask;
 	for (;; pthread_rwlock_hashnx(i, perturb)) {
+		pthread_rwlock_t *emon;
 		ent  = &self->rtd_rdlock_list[i & self->rtd_rdlock_mask];
 		emon = ent->rb_lock;
 		if (emon == READLOCK_BUCKET_SENTINEL)

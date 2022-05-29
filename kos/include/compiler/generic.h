@@ -114,12 +114,14 @@
 #define __P(x) ()
 #endif /* !__STDC__ */
 
-#if (!defined(__NO_LONG_LONG) && !defined(__DARWIN_NO_LONG_LONG) &&               \
-     ((defined(__BORLANDC__) && __BORLANDC__ >= 0x561) || defined(__SUNPRO_CC) || \
-      defined(__TINYC__) || defined(__DCC_VERSION__) ||                           \
-      defined(__CODEGEARC__) || defined(__DMC__) ||                               \
-      (defined(__HP_aCC) && __HP_aCC + 0 >= 33900) ||                             \
-      (defined(__PGIC__) && __PGIC__ + 0 >= 10)))
+#ifdef __LCLINT__
+#define __COMPILER_HAVE_LONGLONG
+#elif (!defined(__NO_LONG_LONG) && !defined(__DARWIN_NO_LONG_LONG) &&               \
+       ((defined(__BORLANDC__) && __BORLANDC__ >= 0x561) || defined(__SUNPRO_CC) || \
+        defined(__TINYC__) || defined(__DCC_VERSION__) ||                           \
+        defined(__CODEGEARC__) || defined(__DMC__) ||                               \
+        (defined(__HP_aCC) && __HP_aCC + 0 >= 33900) ||                             \
+        (defined(__PGIC__) && __PGIC__ + 0 >= 10)))
 #define __COMPILER_HAVE_LONGLONG
 #endif /* long long... */
 #define __COMPILER_HAVE_LONGDOUBLE
