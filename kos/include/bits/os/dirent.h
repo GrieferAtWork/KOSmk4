@@ -28,7 +28,12 @@
  *        ...
  *    };
  *    #ifdef __USE_LARGEFILE64
+ *    #define __dirent64 dirent64
  *    struct dirent64 {
+ *        ...
+ *    };
+ *    #else // __USE_LARGEFILE64
+ *    struct __dirent64 {
  *        ...
  *    };
  *    #endif // __USE_LARGEFILE64

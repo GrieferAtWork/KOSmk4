@@ -35,7 +35,10 @@
 
 #ifdef __USE_LARGEFILE64
 #define __dos_bstat64 stat64
-#endif /* __USE_LARGEFILE64 */
+#define __stat64      stat64
+#else /* __USE_LARGEFILE64 */
+#define __stat64      __dos_bstat64
+#endif /* !__USE_LARGEFILE64 */
 
 #endif /* __CRT_DOS_PRIMARY */
 

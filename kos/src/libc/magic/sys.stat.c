@@ -39,7 +39,7 @@
 }
 
 %[define_decl_include_implication("<bits/os/stat.h>" => ["<bits/types.h>"])]
-%[define_decl_include("<bits/os/stat.h>": ["struct stat", "struct stat64"])]
+%[define_decl_include("<bits/os/stat.h>": ["struct stat", "struct stat64", "struct __stat64"])]
 
 %[define_replacement(fd_t       = __fd_t)]
 %[define_replacement(atflag_t   = __atflag_t)]
@@ -50,6 +50,7 @@
 %[define_replacement(time_t     = "__TM_TYPE(time)")]
 %[define_replacement(time32_t   = __time32_t)]
 %[define_replacement(time64_t   = __time64_t)]
+%[define_replacement(stat64     = __stat64)]
 
 %[define_replacement(S_IFMT      = __S_IFMT)]
 %[define_replacement(S_IFDIR     = __S_IFDIR)]

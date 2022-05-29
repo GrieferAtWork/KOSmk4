@@ -45,6 +45,7 @@
 
 #define __dos_dirent dirent
 #ifdef __USE_LARGEFILE64
+#define __dirent64 dirent64
 #ifdef __USE_STRUCT64_MACRO
 #define __dos_dirent64 dirent
 #define dirent64       dirent
@@ -52,7 +53,9 @@
 #define __NEED_STRUCT___DOS_DIRENT64
 #define __dos_dirent64 dirent64
 #endif /* !__USE_STRUCT64_MACRO */
-#endif /* __USE_LARGEFILE64 */
+#else /* __USE_LARGEFILE64 */
+#define __dirent64 dirent
+#endif /* !__USE_LARGEFILE64 */
 #define _DIRENT_HAVE_D_TYPE      1
 #define _DIRENT_HAVE_D_BTIME     1
 #define _DIRENT_HAVE_D_ATIME     1

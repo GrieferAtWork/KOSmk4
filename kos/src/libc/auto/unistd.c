@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeefcbf27 */
+/* HASH CRC-32:0xe9a2bb25 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <kos/types.h>
 #include "../user/unistd.h"
 #include "../user/ctype.h"
+#include "../user/dirent.h"
 #include "../user/fcntl.h"
 #include "../user/pwd.h"
 #include "readpassphrase.h"
@@ -296,6 +297,161 @@ NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd) {
 	if likely(libc_ttyname_r(fd, buf, COMPILER_LENOF(buf)) == 0)
 		return buf;
 	return NULL;
+}
+#include <bits/types.h>
+#include <libc/errno.h>
+#include <asm/os/dirent.h>
+#include <asm/os/stat.h>
+#include <paths.h>
+#include <bits/os/dirent.h>
+#include <bits/os/stat.h>
+#include <asm/os/fcntl.h>
+/* >> ttyname_r(3)
+ * Return the name of a TTY given its file descriptor */
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUTS(2, 3) errno_t
+NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
+                                     char *buf,
+                                     size_t buflen) {
+
+	/* Ensure that it's actually a TTY */
+
+	if unlikely(!libc_isatty(fd)) {
+
+		libc_seterrno(ENOTTY);
+		return ENOTTY;
+
+
+
+
+	}
+
+
+	/* Simply try to realpath() the given `fd' */
+
+	if unlikely(!buf || !buflen) {
+
+		libc_seterrno(ERANGE);
+		return ERANGE;
+
+
+
+
+	}
+	if unlikely(libc_frealpath4(fd, buf, buflen, 0))
+		return 0; /* Found it! */
+	if (libc_geterrno() == ERANGE)
+		return ERANGE;
+
+
+	/* Fallback: Search `/dev' for the proper file */
+#ifdef _PATH_DEV
+	{
+		struct stat64 st;
+		struct dirent64 *d;
+		DIR *dirstream;
+		dev_t rdev;
+		ino64_t ino;
+
+		errno_t saved_errno;
+
+		if unlikely(buflen < COMPILER_STRLEN(_PATH_DEV) * sizeof(char)) {
+			libc_seterrno(ERANGE);
+			return ERANGE;
+		}
+		if unlikely(fstat64(fd, &st) < 0)
+			return libc_geterrno();
+		if ((dirstream = libc_opendir(_PATH_DEV)) == NULL)
+			return libc_geterrno();
+		libc_memcpy(buf, _PATH_DEV, COMPILER_STRLEN(_PATH_DEV) * sizeof(char));
+		buflen -= COMPILER_STRLEN(_PATH_DEV) * sizeof(char);
+
+		saved_errno = __libc_geterrno();
+
+		rdev = st.st_dev;
+		ino  = st.st_ino;
+		while ((d = libc_readdirk64(dirstream)) != NULL) {
+			size_t needed;
+	
+			/* We're looking for character devices. */
+			if (d->d_type != __DT_CHR)
+				continue;
+			if (d->d_ino != ino)
+				continue;
+	
+
+
+
+
+
+
+
+
+
+
+			/* Load the length of the directory entry's filename. */
+#ifdef _DIRENT_HAVE_D_NAMLEN
+			needed = d->d_namlen;
+#else /* _DIRENT_HAVE_D_NAMLEN */
+			needed = libc_strlen(d->d_name);
+#endif /* !_DIRENT_HAVE_D_NAMLEN */
+
+			/* Check that the user-supplied buffer is large enough. */
+			if (needed >= buflen) {
+
+				libc_closedir(dirstream);
+
+
+				libc_seterrno(ERANGE);
+				return ERANGE;
+
+
+
+
+			}
+			libc_memcpy(buf + COMPILER_STRLEN(_PATH_DEV),
+			       d->d_name, (needed + 1) * sizeof(char));
+
+			/* Load attributes of the file being enumerated */
+
+			if (fstatat64(libc_dirfd(dirstream), d->d_name, &st, __AT_SYMLINK_NOFOLLOW) != 0)
+				continue;
+
+
+
+
+
+			/* Verify that this is the file we're looking for. */
+			if (st.st_rdev != rdev)
+				continue;
+			if unlikely(st.st_ino != ino)
+				continue;
+			if unlikely(!__S_ISCHR(st.st_mode))
+				continue;
+	
+			/* Found it! */
+
+			libc_closedir(dirstream);
+
+
+			__libc_seterrno(saved_errno);
+
+			return 0;
+		}
+
+		libc_closedir(dirstream);
+
+
+		__libc_seterrno(saved_errno);
+
+	}
+#endif /* _PATH_DEV */
+
+	/* Fallback: indicate that this isn't a terminal... */
+
+	return ENOTTY;
+
+
+
 }
 /* >> getlogin(3)
  * Return the login name for the current user, or `NULL' on error.
@@ -1688,6 +1844,7 @@ DEFINE_PUBLIC_ALIAS(DOS$execlpe, libd_execlpe);
 DEFINE_PUBLIC_ALIAS(execlpe, libc_execlpe);
 DEFINE_PUBLIC_ALIAS(__ttyname, libc_ttyname);
 DEFINE_PUBLIC_ALIAS(ttyname, libc_ttyname);
+DEFINE_PUBLIC_ALIAS(ttyname_r, libc_ttyname_r);
 DEFINE_PUBLIC_ALIAS(getlogin, libc_getlogin);
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__)

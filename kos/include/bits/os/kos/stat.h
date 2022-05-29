@@ -115,6 +115,7 @@
  * the same name in <sys/stat.h>... */
 //#define stat64 stat
 #define __kos_stat_alias64          stat64
+#define __stat64                    stat64
 #define __OFFSET_STAT64_DEV         __OFFSET_KOS_STAT_DEV
 #define __OFFSET_STAT64_INO         __OFFSET_KOS_STAT_INO
 #define __OFFSET_STAT64_MODE        __OFFSET_KOS_STAT_MODE
@@ -158,7 +159,9 @@
 #define __OFFSET_STAT64_CTIMESPEC32 __OFFSET_KOS_STAT_CTIMESPEC
 #define __OFFSET_STAT64_BTIMESPEC32 __OFFSET_KOS_STAT_BTIMESPEC
 #endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#endif /* __USE_LARGEFILE64 */
+#else /* __USE_LARGEFILE64 */
+#define __stat64 stat
+#endif /* !__USE_LARGEFILE64 */
 #define __STAT32_MATCHES_STAT64
 #endif /* __KOS__ */
 

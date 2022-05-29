@@ -46,7 +46,10 @@
 
 #ifdef __USE_LARGEFILE64
 #define __glc_stat64 stat64
-#endif /* __USE_LARGEFILE64 */
+#define __stat64     stat64
+#else /* __USE_LARGEFILE64 */
+#define __stat64 __glc_stat64
+#endif /* !__USE_LARGEFILE64 */
 
 #endif /* __CRT_GLC_PRIMARY */
 

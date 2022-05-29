@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9365378 */
+/* HASH CRC-32:0x6f674d2e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,12 +93,12 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),__libc_free,(_
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),kfstat,(__fd,__buf))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),kfstat,(__fd,__buf))
 #elif defined(__CRT_HAVE_kfstat64) && defined(__CRT_KOS_PRIMARY)
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),kfstat64,(__fd,__buf))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),kfstat64,(__fd,__buf))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -107,32 +107,32 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),_fstat64,(__fd,__buf))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),_fstat64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),_fstat64i32,(__fd,__buf))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),_fstat64i32,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),_fstati64,(__fd,__buf))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),_fstati64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),_fstat32i64,(__fd,__buf))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),_fstat32i64,(__fd,__buf))
 #elif defined(__CRT_HAVE_fstat) && defined(__STAT32_MATCHES_STAT64)
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),fstat,(__fd,__buf))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),fstat,(__fd,__buf))
 #elif defined(__CRT_HAVE_fstat64)
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),fstat64,(__fd,__buf))
+__CREDIRECT(__ATTR_OUT(2),int,__NOTHROW_NCX,__localdep_fstat64,(__fd_t __fd, struct __stat64 *__restrict __buf),fstat64,(__fd,__buf))
 #else /* ... */
 #undef __local___localdep_fstat64_defined
 #endif /* !... */

@@ -111,6 +111,7 @@ struct dirent {
 };
 
 #ifdef __USE_LARGEFILE64
+#define __dirent64 dirent64
 #ifdef __USE_STRUCT64_MACRO
 #define dirent64 dirent
 #else /* __USE_STRUCT64_MACRO */
@@ -171,7 +172,9 @@ struct dirent64 {
 #endif /* !... */
 };
 #endif /* !__USE_STRUCT64_MACRO */
-#endif /* __USE_LARGEFILE64 */
+#else /* __USE_LARGEFILE64 */
+#define __dirent64 dirent
+#endif /* !__USE_LARGEFILE64 */
 
 __DECL_END
 #endif /* __CC__ */

@@ -48,7 +48,10 @@
 
 #ifdef __USE_LARGEFILE64
 #define __cyg_stat_alias64 stat64
-#endif /* __USE_LARGEFILE64 */
+#define __stat64           stat64
+#else /* __USE_LARGEFILE64 */
+#define __stat64 stat
+#endif /* !__USE_LARGEFILE64 */
 
 #endif /* __CRT_CYG_PRIMARY */
 

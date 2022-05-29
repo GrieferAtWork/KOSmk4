@@ -39,7 +39,10 @@
 #define __gen_stat stat
 #ifdef __USE_LARGEFILE64
 #define __gen_stat64 stat64
-#endif /* __USE_LARGEFILE64 */
+#define __stat64     stat64
+#else /* __USE_LARGEFILE64 */
+#define __stat64 __gen_stat64
+#endif /* !__USE_LARGEFILE64 */
 
 #endif /* __CRT_GENERIC */
 

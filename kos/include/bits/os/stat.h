@@ -77,7 +77,10 @@ __DECL_BEGIN
 struct stat { int __placeholder; };
 #ifdef __USE_LARGEFILE64
 struct stat64 { int __placeholder; };
-#endif /* __USE_LARGEFILE64 */
+#define __stat64 stat64
+#else /* __USE_LARGEFILE64 */
+#define __stat64 stat
+#endif /* !__USE_LARGEFILE64 */
 __DECL_END
 #endif /* __CC__ */
 #endif /* __CRT_HAVE_stat */

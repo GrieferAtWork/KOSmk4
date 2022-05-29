@@ -532,109 +532,6 @@ NOTHROW_RPC(LIBCCALL libc_pause)(void)
 }
 /*[[[end:libc_pause]]]*/
 
-PRIVATE ATTR_SECTION(".rodata.crt.io.tty") char const devpath[] = "/dev";
-
-/*[[[head:libc_ttyname_r,hash:CRC-32=0x2435f532]]]*/
-/* >> ttyname_r(3)
- * Return the name of a TTY given its file descriptor */
-INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUTS(2, 3) errno_t
-NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
-                                     char *buf,
-                                     size_t buflen)
-/*[[[body:libc_ttyname_r]]]*/
-{
-	if unlikely(!libc_isatty(fd)) {
-		libc_seterrno(ENOTTY);
-		return ENOTTY;
-	}
-	/* Simply try to realpath() the given `fd' */
-	{
-		ssize_t reqlen;
-		reqlen = sys_frealpath4(fd, buf, buflen, AT_READLINK_REQSIZE);
-		if unlikely(E_ISERR(reqlen))
-			goto fallback; /* Shouldn't happen... */
-		/* Check if the buffer was large enough */
-		if unlikely((size_t)reqlen > buflen) {
-			libc_seterrno(ERANGE);
-			return ERANGE;
-		}
-		/* Found it! */
-		return 0;
-	}
-	/* Fallback: Search `/dev' for the proper file */
-fallback:
-	{
-		struct stat64 st;
-		struct dirent *d;
-		DIR *dirstream;
-		int safe;
-		dev_t rdev;
-		ino_t ino;
-		if unlikely(buflen < (COMPILER_STRLEN(devpath) + 1) * sizeof(char)) {
-			libc_seterrno(ERANGE);
-			return ERANGE;
-		}
-		if unlikely(fstat64(fd, &st) < 0)
-			return libc_geterrno();
-		if ((dirstream = opendir(devpath)) == NULL)
-			return libc_geterrno();
-		memcpy(buf, devpath, COMPILER_STRLEN(devpath), sizeof(char));
-		buf[COMPILER_STRLEN(devpath)] = '/';
-		buflen -= (COMPILER_STRLEN(devpath) + 1) * sizeof(char);
-		safe = libc_geterrno();
-		rdev = st.st_dev;
-		ino  = st.st_ino;
-		while ((d = readdir(dirstream)) != NULL) {
-			size_t needed;
-			/* We need a character device. */
-			if (d->d_type != DT_CHR)
-				continue;
-			if (d->d_ino != ino)
-				continue;
-#if 0 /* These are symlinks (DT_LNK), so we've already skipped them ;) */
-			{
-				PRIVATE ATTR_SECTION(".rodata.crt.io.tty")  char const str_stdin[] = "stdin";
-				PRIVATE ATTR_SECTION(".rodata.crt.io.tty") char const str_stdout[] = "stdout";
-				PRIVATE ATTR_SECTION(".rodata.crt.io.tty") char const str_stderr[] = "stderr";
-				/* Ignore the /dev/std(in|out|err) aliases */
-				if (strcmp(d->d_name, str_stdin) == 0)
-					continue;
-				if (strcmp(d->d_name, str_stdout) == 0)
-					continue;
-				if (strcmp(d->d_name, str_stderr) == 0)
-					continue;
-			}
-#endif
-			needed = _D_EXACT_NAMLEN(d);
-			if (needed >= buflen) {
-				closedir(dirstream);
-				libc_seterrno(ERANGE);
-				return ERANGE;
-			}
-			memcpy(&buf[sizeof(devpath)],
-			       d->d_name,
-			       needed + 1,
-			       sizeof(char));
-			if (stat64(buf, &st) != 0)
-				continue;
-			if (st.st_rdev != rdev)
-				continue;
-			if unlikely(st.st_ino != ino)
-				continue;
-			if unlikely(!S_ISCHR(st.st_mode))
-				continue;
-			/* Found it! */
-			closedir(dirstream);
-			libc_seterrno(safe);
-			return 0;
-		}
-		closedir(dirstream);
-		libc_seterrno(safe);
-	}
-	return ENOTTY;
-}
-/*[[[end:libc_ttyname_r]]]*/
-
 /*[[[head:libc_tcgetpgrp,hash:CRC-32=0x92b5b83e]]]*/
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
@@ -3855,7 +3752,7 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2a750565]]]*/
+/*[[[start:exports,hash:CRC-32=0x32eecd41]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -3924,7 +3821,6 @@ DEFINE_PUBLIC_ALIAS(__libc_pause, libc_pause);
 DEFINE_PUBLIC_ALIAS(pause, libc_pause);
 DEFINE_PUBLIC_ALIAS(__fpathconf, libc_fpathconf);
 DEFINE_PUBLIC_ALIAS(fpathconf, libc_fpathconf);
-DEFINE_PUBLIC_ALIAS(ttyname_r, libc_ttyname_r);
 DEFINE_PUBLIC_ALIAS(tcgetpgrp, libc_tcgetpgrp);
 DEFINE_PUBLIC_ALIAS(tcsetpgrp, libc_tcsetpgrp);
 DEFINE_PUBLIC_ALIAS(DOS$__chown, libd_chown);

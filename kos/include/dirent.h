@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9b6916f */
+/* HASH CRC-32:0x40d74b98 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -366,7 +366,7 @@ __CDECLARE(__ATTR_INOUT(1),struct dirent64 *,__NOTHROW_RPC,readdir64,(DIR *__res
 /* >> readdir(3), readdir64(3)
  * Read and return the next pending directory entry of the given directory stream `dirp'
  * @except: Returns `NULL' for end-of-directory; throws an error if something else went wrong */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) struct dirent64 *__NOTHROW_RPC(__LIBCCALL readdir64)(DIR *__restrict __dirp) { return (struct dirent64 *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readdir))(__dirp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) struct dirent64 *__NOTHROW_RPC(__LIBCCALL readdir64)(DIR *__restrict __dirp) { return (struct __dirent64 *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readdir))(__dirp); }
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #ifdef __USE_POSIX

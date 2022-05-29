@@ -857,7 +857,154 @@ char *ttyname($fd_t fd) {
 @@>> ttyname_r(3)
 @@Return the name of a TTY given its file descriptor
 [[cp, decl_include("<bits/types.h>")]]
-$errno_t ttyname_r($fd_t fd, [[out(? <= buflen)]] char *buf, size_t buflen);
+[[requires_include("<paths.h>")]]
+[[requires(($has_function(frealpath4)) ||
+           ($has_function(opendir, readdir64, fstat64, lstat64) && defined(_PATH_DEV)))]]
+[[impl_include("<bits/types.h>", "<libc/errno.h>", "<asm/os/dirent.h>", "<asm/os/stat.h>")]]
+[[impl_include("<paths.h>", "<bits/os/dirent.h>", "<bits/os/stat.h>", "<asm/os/fcntl.h>")]]
+$errno_t ttyname_r($fd_t fd, [[out(? <= buflen)]] char *buf, size_t buflen) {
+
+	/* Ensure that it's actually a TTY */
+@@pp_if $has_function(isatty)@@
+	if unlikely(!isatty(fd)) {
+@@pp_ifdef ENOTTY@@
+		libc_seterrno($ENOTTY);
+		return $ENOTTY;
+@@pp_else@@
+		libc_seterrno(1);
+		return 1;
+@@pp_endif@@
+	}
+@@pp_endif@@
+
+	/* Simply try to realpath() the given `fd' */
+@@pp_if $has_function(frealpath4)@@
+	if unlikely(!buf || !buflen) {
+@@pp_ifdef ERANGE@@
+		libc_seterrno($ERANGE);
+		return $ERANGE;
+@@pp_else@@
+		libc_seterrno(1);
+		return 1;
+@@pp_endif@@
+	}
+	if unlikely(frealpath4(fd, buf, buflen, 0))
+		return 0; /* Found it! */
+	if (libc_geterrno() == ERANGE)
+		return ERANGE;
+@@pp_endif@@
+
+	/* Fallback: Search `/dev' for the proper file */
+@@pp_if $has_function(opendir, readdir64, fstat64, lstat64) && defined(_PATH_DEV)@@
+	{
+		struct stat64 st;
+		struct dirent64 *d;
+		DIR *dirstream;
+		dev_t rdev;
+		ino64_t ino;
+@@pp_ifdef __libc_geterrno@@
+		errno_t saved_errno;
+@@pp_endif@@
+		if unlikely(buflen < COMPILER_STRLEN(_PATH_DEV) * sizeof(char)) {
+			libc_seterrno(ERANGE);
+			return ERANGE;
+		}
+		if unlikely(fstat64(fd, &st) < 0)
+			return libc_geterrno();
+		if ((dirstream = opendir(_PATH_DEV)) == NULL)
+			return libc_geterrno();
+		memcpy(buf, _PATH_DEV, COMPILER_STRLEN(_PATH_DEV) * sizeof(char));
+		buflen -= COMPILER_STRLEN(_PATH_DEV) * sizeof(char);
+@@pp_ifdef __libc_geterrno@@
+		saved_errno = __libc_geterrno();
+@@pp_endif@@
+		rdev = st.@st_dev@;
+		ino  = st.@st_ino@;
+		while ((d = readdir64(dirstream)) != NULL) {
+			size_t needed;
+	
+			/* We're looking for character devices. */
+			if (d->@d_type@ != __DT_CHR)
+				continue;
+			if (d->@d_ino@ != ino)
+				continue;
+	
+@@pp_if !defined(__KOS__)@@
+			/* On KOS, these are symlinks (DT_LNK), so we've already skipped them ;) */
+			if (strcmp(d->@d_name@, "stdin") == 0)
+				continue; /* Ignore the /dev/std(in|out|err) aliases */
+			if (strcmp(d->@d_name@, "stdout") == 0)
+				continue; /* *ditto* */
+			if (strcmp(d->@d_name@, "stderr") == 0)
+				continue; /* *ditto* */
+@@pp_endif@@
+
+			/* Load the length of the directory entry's filename. */
+@@pp_ifdef _DIRENT_HAVE_D_NAMLEN@@
+			needed = d->@d_namlen@;
+@@pp_else@@
+			needed = strlen(d->@d_name@);
+@@pp_endif@@
+
+			/* Check that the user-supplied buffer is large enough. */
+			if (needed >= buflen) {
+@@pp_if $has_function(closedir)@@
+				closedir(dirstream);
+@@pp_endif@@
+@@pp_ifdef ERANGE@@
+				libc_seterrno($ERANGE);
+				return $ERANGE;
+@@pp_else@@
+				libc_seterrno(1);
+				return 1;
+@@pp_endif@@
+			}
+			memcpy(buf + COMPILER_STRLEN(_PATH_DEV),
+			       d->@d_name@, (needed + 1) * sizeof(char));
+
+			/* Load attributes of the file being enumerated */
+@@pp_if $has_function(fstatat64, dirfd) && defined(__AT_SYMLINK_NOFOLLOW)@@
+			if (fstatat64(dirfd(dirstream), d->@d_name@, &st, __AT_SYMLINK_NOFOLLOW) != 0)
+				continue;
+@@pp_else@@
+			if (lstat64(buf, &st) != 0)
+				continue;
+@@pp_endif@@
+
+			/* Verify that this is the file we're looking for. */
+			if (st.@st_rdev@ != rdev)
+				continue;
+			if unlikely(st.@st_ino@ != ino)
+				continue;
+			if unlikely(!__S_ISCHR(st.@st_mode@))
+				continue;
+	
+			/* Found it! */
+@@pp_if $has_function(closedir)@@
+			closedir(dirstream);
+@@pp_endif@@
+@@pp_ifdef __libc_geterrno@@
+			__libc_seterrno(saved_errno);
+@@pp_endif@@
+			return 0;
+		}
+@@pp_if $has_function(closedir)@@
+		closedir(dirstream);
+@@pp_endif@@
+@@pp_ifdef __libc_geterrno@@
+		__libc_seterrno(saved_errno);
+@@pp_endif@@
+	}
+@@pp_endif@@
+
+	/* Fallback: indicate that this isn't a terminal... */
+@@pp_ifdef ENOTTY@@
+	return $ENOTTY;
+@@pp_else@@
+	return 1;
+@@pp_endif@@
+}
+
 
 @@>> tcgetpgrp(2)
 @@Return the foreground process group of a given TTY file descriptor

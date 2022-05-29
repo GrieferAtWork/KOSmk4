@@ -50,9 +50,10 @@
 %[define_replacement(longptr_t  = __LONGPTR_TYPE__)]
 %[define_replacement(DIR        = "struct __dirstream")]
 %[default:section(".text.crt{|.dos}.fs.dir")]
+%[define_replacement(dirent64 = __dirent64)]
 
 %[define_decl_include_implication("<bits/os/dirent.h>" => ["<bits/types.h>"])]
-%[define_decl_include("<bits/os/dirent.h>": ["struct dirent", "struct dirent64"])]
+%[define_decl_include("<bits/os/dirent.h>": ["struct dirent", "struct dirent64", "struct __dirent64"])]
 
 
 %[insert:prefix(
