@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfe6fad0 */
+/* HASH CRC-32:0x58f6d41 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -452,6 +452,22 @@ NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
 
 
 
+}
+/* >> tcgetpgrp(2)
+ * Return the foreground process group of a given TTY file descriptor */
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED pid_t
+NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd) {
+	pid_t result;
+	if (libc_ioctl(fd, __TIOCGPGRP, &result) < 0)
+		result = -1;
+	return result;
+}
+/* >> tcsetpgrp(2)
+ * Set the foreground process group of a given TTY file descriptor */
+INTERN ATTR_SECTION(".text.crt.io.tty") int
+NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd,
+                                     pid_t pgrp_id) {
+	return libc_ioctl(fd, __TIOCSPGRP, &pgrp_id) < 0 ? -1 : 0;
 }
 /* >> getlogin(3)
  * Return the login name for the current user, or `NULL' on error.
@@ -2036,6 +2052,8 @@ DEFINE_PUBLIC_ALIAS(execlpe, libc_execlpe);
 DEFINE_PUBLIC_ALIAS(__ttyname, libc_ttyname);
 DEFINE_PUBLIC_ALIAS(ttyname, libc_ttyname);
 DEFINE_PUBLIC_ALIAS(ttyname_r, libc_ttyname_r);
+DEFINE_PUBLIC_ALIAS(tcgetpgrp, libc_tcgetpgrp);
+DEFINE_PUBLIC_ALIAS(tcsetpgrp, libc_tcsetpgrp);
 DEFINE_PUBLIC_ALIAS(getlogin, libc_getlogin);
 DEFINE_PUBLIC_ALIAS(readall, libc_readall);
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__

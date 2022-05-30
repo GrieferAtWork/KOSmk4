@@ -1026,14 +1026,25 @@ $errno_t ttyname_r($fd_t fd, [[out(? <= buflen)]] char *buf, size_t buflen) {
 @@>> tcgetpgrp(2)
 @@Return the foreground process group of a given TTY file descriptor
 [[wunused, decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/tty.h>")]]
+[[requires($has_function(ioctl) && defined(__TIOCGPGRP))]]
 [[section(".text.crt{|.dos}.io.tty")]]
-$pid_t tcgetpgrp($fd_t fd);
+$pid_t tcgetpgrp($fd_t fd) {
+	pid_t result;
+	if (ioctl(fd, __TIOCGPGRP, &result) < 0)
+		result = -1;
+	return result;
+}
 
 @@>> tcsetpgrp(2)
 @@Set the foreground process group of a given TTY file descriptor
 [[decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/tty.h>")]]
+[[requires($has_function(ioctl) && defined(__TIOCSPGRP))]]
 [[section(".text.crt{|.dos}.io.tty")]]
-int tcsetpgrp($fd_t fd, $pid_t pgrp_id);
+int tcsetpgrp($fd_t fd, $pid_t pgrp_id) {
+	return ioctl(fd, __TIOCSPGRP, &pgrp_id) < 0 ? -1 : 0;
+}
 
 @@>> getlogin(3)
 @@Return the login name for the current user, or `NULL' on error.

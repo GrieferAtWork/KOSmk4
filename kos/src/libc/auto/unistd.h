@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd926e550 */
+/* HASH CRC-32:0x6e6aa269 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -167,11 +167,21 @@ INTDEF ATTR_OUTS(2, 3) errno_t NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd, cha
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_tcgetpgrp)(fd_t fd);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> tcgetpgrp(2)
+ * Return the foreground process group of a given TTY file descriptor */
+INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> tcsetpgrp(2)
+ * Set the foreground process group of a given TTY file descriptor */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
 /* >> getlogin(3)
  * Return the login name for the current user, or `NULL' on error.
  * s.a. `getlogin_r()' and `cuserid()' */

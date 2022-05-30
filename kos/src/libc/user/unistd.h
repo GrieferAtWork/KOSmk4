@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfca63c7c */
+/* HASH CRC-32:0xa3185b79 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,12 +146,6 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_pause)(void);
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd, __STDC_INT_AS_UINT_T name);
-/* >> tcgetpgrp(2)
- * Return the foreground process group of a given TTY file descriptor */
-INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd);
-/* >> tcsetpgrp(2)
- * Set the foreground process group of a given TTY file descriptor */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
 INTDEF ATTR_IN(1) int NOTHROW_RPC(LIBDCALL libd_chown)(char const *file, uid_t owner, gid_t group);

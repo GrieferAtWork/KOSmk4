@@ -532,32 +532,6 @@ NOTHROW_RPC(LIBCCALL libc_pause)(void)
 }
 /*[[[end:libc_pause]]]*/
 
-/*[[[head:libc_tcgetpgrp,hash:CRC-32=0x92b5b83e]]]*/
-/* >> tcgetpgrp(2)
- * Return the foreground process group of a given TTY file descriptor */
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED pid_t
-NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd)
-/*[[[body:libc_tcgetpgrp]]]*/
-{
-	pid_t result;
-	if (ioctl(fd, TIOCGPGRP, &result) < 0)
-		result = -1;
-	return result;
-}
-/*[[[end:libc_tcgetpgrp]]]*/
-
-/*[[[head:libc_tcsetpgrp,hash:CRC-32=0xfc6f4045]]]*/
-/* >> tcsetpgrp(2)
- * Set the foreground process group of a given TTY file descriptor */
-INTERN ATTR_SECTION(".text.crt.io.tty") int
-NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd,
-                                     pid_t pgrp_id)
-/*[[[body:libc_tcsetpgrp]]]*/
-{
-	return ioctl(fd, TIOCSPGRP, &pgrp_id) < 0 ? -1 : 0;
-}
-/*[[[end:libc_tcsetpgrp]]]*/
-
 /*[[[head:libd_chown,hash:CRC-32=0x41fa4f3]]]*/
 /* >> chown(2)
  * Change the ownership of a given `file' to `group:owner' */
@@ -3559,7 +3533,7 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xaf429499]]]*/
+/*[[[start:exports,hash:CRC-32=0x89f7063d]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -3628,8 +3602,6 @@ DEFINE_PUBLIC_ALIAS(__libc_pause, libc_pause);
 DEFINE_PUBLIC_ALIAS(pause, libc_pause);
 DEFINE_PUBLIC_ALIAS(__fpathconf, libc_fpathconf);
 DEFINE_PUBLIC_ALIAS(fpathconf, libc_fpathconf);
-DEFINE_PUBLIC_ALIAS(tcgetpgrp, libc_tcgetpgrp);
-DEFINE_PUBLIC_ALIAS(tcsetpgrp, libc_tcsetpgrp);
 DEFINE_PUBLIC_ALIAS(DOS$__chown, libd_chown);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_chown, libd_chown);
 DEFINE_PUBLIC_ALIAS(DOS$chown, libd_chown);

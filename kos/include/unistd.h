@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5945fb7e */
+/* HASH CRC-32:0xe01eec3b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1167,12 +1167,32 @@ __CDECLARE(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_RPC,ttyname_r,(__fd_t __fd, cha
 __NAMESPACE_LOCAL_USING_OR_IMPL(ttyname_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUTS(2, 3) __errno_t __NOTHROW_RPC(__LIBCCALL ttyname_r)(__fd_t __fd, char *__buf, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ttyname_r))(__fd, __buf, __buflen); })
 #endif /* __CRT_HAVE_frealpath4 || ((__CRT_HAVE_opendir || __CRT_HAVE___libc_opendir || (__AT_FDCWD && (__CRT_HAVE_opendirat || __CRT_HAVE_fopendirat || (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)))) || (__CRT_HAVE_fdopendir && (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || __CRT_HAVE___libc_open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)))) || __USE_DOS_DIRENT) && ((__CRT_HAVE_readdirk && __CRT_KOS && _DIRENT_MATCHES_DIRENT64) || (__CRT_HAVE_readdirk64 && __CRT_KOS) || (__CRT_HAVE_readdir && !__CRT_KOS && _DIRENT_MATCHES_DIRENT64) || (__CRT_HAVE___libc_readdir && !__CRT_KOS && _DIRENT_MATCHES_DIRENT64) || (__CRT_HAVE_readdir64 && !__CRT_KOS) || (__USE_DOS_DIRENT && _DIRENT_MATCHES_DIRENT64)) && ((__CRT_HAVE_kfstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kfstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__fstat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE__fstat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE_fstat && __STAT32_MATCHES_STAT64) || __CRT_HAVE_fstat64) && ((__CRT_HAVE_klstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_klstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE_lstat && __STAT32_MATCHES_STAT64) || __CRT_HAVE_lstat64) && _PATH_DEV) */
 #endif /* !__CRT_HAVE_ttyname_r */
+#ifdef __CRT_HAVE_tcgetpgrp
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
-__CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,tcgetpgrp,(__fd_t __fd),(__fd))
+__CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,tcgetpgrp,(__fd_t __fd),(__fd))
+#else /* __CRT_HAVE_tcgetpgrp */
+#include <asm/os/tty.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCGPGRP)
+#include <libc/local/unistd/tcgetpgrp.h>
+/* >> tcgetpgrp(2)
+ * Return the foreground process group of a given TTY file descriptor */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tcgetpgrp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __pid_t __NOTHROW_NCX(__LIBCCALL tcgetpgrp)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcgetpgrp))(__fd); })
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCGPGRP */
+#endif /* !__CRT_HAVE_tcgetpgrp */
+#ifdef __CRT_HAVE_tcsetpgrp
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,tcsetpgrp,(__fd_t __fd, __pid_t __pgrp_id),(__fd,__pgrp_id))
+__CDECLARE(,int,__NOTHROW_NCX,tcsetpgrp,(__fd_t __fd, __pid_t __pgrp_id),(__fd,__pgrp_id))
+#else /* __CRT_HAVE_tcsetpgrp */
+#include <asm/os/tty.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCSPGRP)
+#include <libc/local/unistd/tcsetpgrp.h>
+/* >> tcsetpgrp(2)
+ * Set the foreground process group of a given TTY file descriptor */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tcsetpgrp, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL tcsetpgrp)(__fd_t __fd, __pid_t __pgrp_id) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcsetpgrp))(__fd, __pgrp_id); })
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCSPGRP */
+#endif /* !__CRT_HAVE_tcsetpgrp */
 #ifndef __getlogin_defined
 #define __getlogin_defined
 #ifdef __CRT_HAVE_getlogin
