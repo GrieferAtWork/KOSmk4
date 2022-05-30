@@ -30,13 +30,11 @@
 #include <kos/ioctl/file.h> /* needed for pathconf() */
 #include <kos/ioctl/tty.h>
 #include <kos/sched/shared-lock.h>
-#include <kos/syscalls.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/param.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
-#include <sys/syscall.h>
 #include <sys/sysinfo.h>
 #include <sys/time.h>
 #include <sys/utsname.h>
@@ -52,7 +50,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <syscall.h>
 #include <syslog.h>
 #include <termios.h>
 #include <unistd.h>
@@ -60,187 +57,11 @@
 #include "../libc/dl.h"
 #include "../libc/globals.h"
 #include "../libc/tls.h"
+#include "../libc/syscalls.h"
 #include "fcntl.h"
 #include "pthread.h"
 #include "stdlib.h"
 #include "unistd.h"
-
-#ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
-#undef __WANT_SYSCALL_ARGUMENT_TYPES
-#define __WANT_SYSCALL_ARGUMENT_TYPES
-#include <asm/syscalls-proto.h>
-#endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES */
-
-#define SYSCALL_ARG_TYPE_OF3(a, b)      b
-#define SYSCALL_ARG_TYPE_OF2(x)         SYSCALL_ARG_TYPE_OF3 x
-#define SYSCALL_ARG_TYPE_OF(name, argi) SYSCALL_ARG_TYPE_OF2(__NRAT##argi##_##name)
-
-#ifndef SYS_unlink
-#define sys_unlink(file) sys_unlinkat(AT_FDCWD, file, 0)
-#endif /* !SYS_unlink */
-#ifndef SYS_rmdir
-#define sys_rmdir(path) sys_unlinkat(AT_FDCWD, path, AT_REMOVEDIR)
-#endif /* !SYS_rmdir */
-
-#if __SIZEOF_UID_T__ != 4 && __SIZEOF_GID_T__ != 4
-#ifdef SYS_getuid
-#undef SYS_getuid32
-#endif /* SYS_getuid */
-#ifdef SYS_geteuid
-#undef SYS_geteuid32
-#endif /* SYS_geteuid */
-#ifdef SYS_getgid
-#undef SYS_getgid32
-#endif /* SYS_getgid */
-#ifdef SYS_getegid
-#undef SYS_getegid32
-#endif /* SYS_getegid */
-#ifdef SYS_setgroups
-#undef SYS_setgroups32
-#endif /* SYS_setgroups */
-#ifdef SYS_setuid
-#undef SYS_setuid32
-#endif /* SYS_setuid */
-#ifdef SYS_setgid
-#undef SYS_setgid32
-#endif /* SYS_setgid */
-#ifdef SYS_chown
-#undef SYS_chown32
-#endif /* SYS_chown */
-#ifdef SYS_lchown
-#undef SYS_lchown32
-#endif /* SYS_lchown */
-#ifdef SYS_getresuid
-#undef SYS_getresuid32
-#endif /* SYS_getresuid */
-#ifdef SYS_getresgid
-#undef SYS_getresgid32
-#endif /* SYS_getresgid */
-#ifdef SYS_setresuid
-#undef SYS_setresuid32
-#endif /* SYS_setresuid */
-#ifdef SYS_setresgid
-#undef SYS_setresgid32
-#endif /* SYS_setresgid */
-#ifdef SYS_fchown
-#undef SYS_fchown32
-#endif /* SYS_fchown */
-#ifdef SYS_setreuid
-#undef SYS_setreuid32
-#endif /* SYS_setreuid */
-#ifdef SYS_setregid
-#undef SYS_setregid32
-#endif /* SYS_setregid */
-#endif /* __SIZEOF_UID_T__ != 4 && __SIZEOF_GID_T__ != 4 */
-
-
-#ifdef SYS_getuid32
-#define _sys_getuid() (uid_t)sys_getuid32()
-#else /* SYS_getuid32 */
-#define _sys_getuid() (uid_t)sys_getuid()
-#endif /* SYS_getuid32 */
-#ifdef SYS_geteuid32
-#define _sys_geteuid() (uid_t)sys_geteuid32()
-#else /* SYS_geteuid32 */
-#define _sys_geteuid() (uid_t)sys_geteuid()
-#endif /* !SYS_geteuid32 */
-#ifdef SYS_getgid32
-#define _sys_getgid() (gid_t)sys_getgid32()
-#else /* SYS_getgid32 */
-#define _sys_getgid() (gid_t)sys_getgid()
-#endif /* !SYS_getgid32 */
-#ifdef SYS_getegid32
-#define _sys_getegid() (gid_t)sys_getegid32()
-#else /* SYS_getegid32 */
-#define _sys_getegid() (gid_t)sys_getegid()
-#endif /* !SYS_getegid32 */
-#ifdef SYS_setgroups32
-#define _sys_getgroups(size, list) sys_getgroups32(size, (uint32_t *)(list))
-#else /* SYS_setgroups32 */
-#define _sys_getgroups(size, list) sys_getgroups(size, (SYSCALL_ARG_TYPE_OF(getgroups, 1))(list))
-#endif /* !SYS_setgroups32 */
-#ifdef SYS_setuid32
-#define _sys_setuid(uid) sys_setuid32((uint32_t)(uid))
-#else /* SYS_setuid32 */
-#define _sys_setuid(uid) sys_setuid((SYSCALL_ARG_TYPE_OF(setuid, 0))(uid))
-#endif /* !SYS_setuid32 */
-#ifdef SYS_setgid32
-#define _sys_setgid(gid) sys_setgid32((uint32_t)(gid))
-#else /* SYS_setgid32 */
-#define _sys_setgid(gid) sys_setgid((SYSCALL_ARG_TYPE_OF(setgid, 0))(gid))
-#endif /* !SYS_setgid32 */
-#ifdef SYS_chown32
-#define _sys_chown(file, owner, group) \
-	sys_chown32(file, (uint32_t)(owner), (uint32_t)(group))
-#else /* SYS_chown32 */
-#define _sys_chown(file, owner, group) \
-	sys_chown(file, (SYSCALL_ARG_TYPE_OF(chown, 1))(owner), (SYSCALL_ARG_TYPE_OF(chown, 2))(group))
-#endif /* !SYS_chown32 */
-#ifdef SYS_lchown32
-#define _sys_lchown(file, owner, group) \
-	sys_lchown32(file, (uint32_t)(owner), (uint32_t)(group))
-#else /* SYS_lchown32 */
-#define _sys_lchown(file, owner, group) \
-	sys_lchown(file, (SYSCALL_ARG_TYPE_OF(lchown, 1))(owner), (SYSCALL_ARG_TYPE_OF(lchown, 2))(group))
-#endif /* !SYS_chown32 */
-#ifdef SYS_getresuid32
-#define _sys_getresuid(ruid, euid, suid) \
-	sys_getresuid32((uint32_t *)(ruid), (uint32_t *)(euid), (uint32_t *)(suid))
-#else /* SYS_getresuid32 */
-#define _sys_getresuid(ruid, euid, suid)                     \
-	sys_getresuid((SYSCALL_ARG_TYPE_OF(getresuid, 0))(ruid), \
-	              (SYSCALL_ARG_TYPE_OF(getresuid, 1))(euid), \
-	              (SYSCALL_ARG_TYPE_OF(getresuid, 2))(suid))
-#endif /* !SYS_getresuid32 */
-#ifdef SYS_getresgid32
-#define _sys_getresgid(rgid, egid, sgid) \
-	sys_getresgid32((uint32_t *)(rgid), (uint32_t *)(egid), (uint32_t *)(sgid))
-#else /* SYS_getresgid32 */
-#define _sys_getresgid(rgid, egid, sgid)                     \
-	sys_getresgid((SYSCALL_ARG_TYPE_OF(getresgid, 0))(rgid), \
-	              (SYSCALL_ARG_TYPE_OF(getresgid, 1))(egid), \
-	              (SYSCALL_ARG_TYPE_OF(getresgid, 2))(sgid))
-#endif /* !SYS_getresuid32 */
-#ifdef SYS_setresuid32
-#define _sys_setresuid(ruid, euid, suid) \
-	sys_setresuid32((uint32_t)(ruid), (uint32_t)(euid), (uint32_t)(suid))
-#else /* SYS_setresuid32 */
-#define _sys_setresuid(ruid, euid, suid)                     \
-	sys_setresuid((SYSCALL_ARG_TYPE_OF(setresuid, 0))(ruid), \
-	              (SYSCALL_ARG_TYPE_OF(setresuid, 1))(euid), \
-	              (SYSCALL_ARG_TYPE_OF(setresuid, 2))(suid))
-#endif /* !SYS_setresuid32 */
-#ifdef SYS_setresgid32
-#define _sys_setresgid(rgid, egid, sgid) \
-	sys_setresgid32((uint32_t)(rgid), (uint32_t)(egid), (uint32_t)(sgid))
-#else /* SYS_setresgid32 */
-#define _sys_setresgid(rgid, egid, sgid)                     \
-	sys_setresgid((SYSCALL_ARG_TYPE_OF(setresgid, 0))(rgid), \
-	              (SYSCALL_ARG_TYPE_OF(setresgid, 1))(egid), \
-	              (SYSCALL_ARG_TYPE_OF(setresgid, 2))(sgid))
-#endif /* !SYS_setresgid32 */
-#ifdef SYS_fchown32
-#define _sys_fchown(fd, owner, group) \
-	sys_fchown32(fd, (uint32_t)(owner), (uint32_t)(group))
-#else /* SYS_fchown32 */
-#define _sys_fchown(fd, owner, group) \
-	sys_fchown(fd, (SYSCALL_ARG_TYPE_OF(fchown, 1))(owner), (SYSCALL_ARG_TYPE_OF(fchown, 2))(group))
-#endif /* !SYS_fchown32 */
-#ifdef SYS_setreuid32
-#define _sys_setreuid(ruid, euid) \
-	sys_setreuid32((uint32_t)(ruid), (uint32_t)(euid))
-#else /* SYS_setreuid32 */
-#define _sys_setreuid(ruid, euid) \
-	sys_setreuid((SYSCALL_ARG_TYPE_OF(setreuid, 0))(ruid), (SYSCALL_ARG_TYPE_OF(setreuid, 1))(euid))
-#endif /* !SYS_setreuid32 */
-#ifdef SYS_setregid32
-#define _sys_setregid(rgid, egid) \
-	sys_setregid32((uint32_t)(rgid), (uint32_t)(egid))
-#else /* SYS_setregid32 */
-#define _sys_setregid(rgid, egid) \
-	sys_setregid((SYSCALL_ARG_TYPE_OF(setregid, 0))(rgid), (SYSCALL_ARG_TYPE_OF(setregid, 1))(egid))
-#endif /* !SYS_setreuid32 */
-
 
 DECL_BEGIN
 
@@ -777,8 +598,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.basic_property") ATTR_I
 NOTHROW_RPC(LIBDCALL libd_chdir)(char const *path)
 /*[[[body:libd_chdir]]]*/
 {
-	errno_t result = sys_fchdirat(AT_FDCWD, path, libd_AT_DOSPATH);
-	return libc_seterrno_syserr(result);
+	return libd_fchdirat(AT_FDCWD, path, 0);
 }
 /*[[[end:libd_chdir]]]*/
 
@@ -789,10 +609,43 @@ INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_IN(1) int
 NOTHROW_RPC(LIBCCALL libc_chdir)(char const *path)
 /*[[[body:libc_chdir]]]*/
 {
+#if defined(__OPTIMIZE_SIZE__) || !defined(SYS_chdir)
+	return libc_fchdirat(AT_FDCWD, path, 0);
+#else /* __OPTIMIZE_SIZE__ || !SYS_chdir */
 	errno_t result = sys_chdir(path);
 	return libc_seterrno_syserr(result);
+#endif /* !__OPTIMIZE_SIZE__ && SYS_chdir */
 }
 /*[[[end:libc_chdir]]]*/
+
+/*[[[head:libd_fchdirat,hash:CRC-32=0xc5eccf13]]]*/
+/* >> fchdirat(2)
+ * Change the current working directory to `dfd:path'
+ * @param: flags: Set of `0 | AT_DOSPATH' */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") ATTR_IN(2) int
+NOTHROW_RPC(LIBDCALL libd_fchdirat)(fd_t dfd,
+                                    char const *path,
+                                    atflag_t flags)
+/*[[[body:libd_fchdirat]]]*/
+{
+	return libc_fchdirat(dfd, path, flags | libd_AT_DOSPATH);
+}
+/*[[[end:libd_fchdirat]]]*/
+
+/*[[[head:libc_fchdirat,hash:CRC-32=0x92e95c55]]]*/
+/* >> fchdirat(2)
+ * Change the current working directory to `dfd:path'
+ * @param: flags: Set of `0 | AT_DOSPATH' */
+INTERN ATTR_SECTION(".text.crt.fs.property") ATTR_IN(2) int
+NOTHROW_RPC(LIBCCALL libc_fchdirat)(fd_t dfd,
+                                    char const *path,
+                                    atflag_t flags)
+/*[[[body:libc_fchdirat]]]*/
+{
+	errno_t result = sys_fchdirat(dfd, path, flags);
+	return libc_seterrno_syserr(result);
+}
+/*[[[end:libc_fchdirat]]]*/
 
 /*[[[head:libd_getcwd,hash:CRC-32=0x36e8e42]]]*/
 /* >> getcwd(2)
@@ -889,8 +742,12 @@ INTERN ATTR_SECTION(".text.crt.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file)
 /*[[[body:libc_unlink]]]*/
 {
+#if defined(__OPTIMIZE_SIZE__) || !defined(SYS_unlink)
+	return libc_unlinkat(AT_FDCWD, result, 0);
+#else /* __OPTIMIZE_SIZE__ || !SYS_unlink */
 	errno_t result = sys_unlink(file);
 	return libc_seterrno_syserr(result);
+#endif /* !__OPTIMIZE_SIZE__ && SYS_unlink */
 }
 /*[[[end:libc_unlink]]]*/
 
@@ -1014,7 +871,7 @@ NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd,
 /*[[[body:libc_fchownat]]]*/
 {
 	errno_t result;
-	result = sys_fchownat(dfd, file, (uint32_t)owner, (uint32_t)group, flags);
+	result = _sys_fchownat(dfd, file, owner, group, flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_fchownat]]]*/
@@ -1074,12 +931,12 @@ NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
                                      char const *target_path)
 /*[[[body:libc_symlinkat]]]*/
 {
-#ifdef __OPTIMIZE_SIZE__
+#if defined(__OPTIMIZE_SIZE__) || !defined(SYS_symlinkat)
 	return libc_fsymlinkat(link_text, tofd, target_path, 0);
-#else /* __OPTIMIZE_SIZE__ */
+#else /* __OPTIMIZE_SIZE__ || !SYS_symlinkat */
 	errno_t result = sys_symlinkat(link_text, tofd, target_path);
 	return libc_seterrno_syserr(result);
-#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__OPTIMIZE_SIZE__ && SYS_symlinkat */
 }
 /*[[[end:libc_symlinkat]]]*/
 
@@ -1119,12 +976,12 @@ NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd,
                                       size_t buflen)
 /*[[[body:libc_readlinkat]]]*/
 {
-#ifdef __OPTIMIZE_SIZE__
+#if defined(__OPTIMIZE_SIZE__) || !defined(SYS_readlinkat)
 	return libc_freadlinkat(dfd, path, buf, buflen, 0);
-#else /* __OPTIMIZE_SIZE__ */
+#else /* __OPTIMIZE_SIZE__ || !SYS_readlinkat */
 	errno_t result = sys_readlinkat(dfd, path, buf, buflen);
 	return libc_seterrno_syserr(result);
-#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__OPTIMIZE_SIZE__ && SYS_readlinkat */
 }
 /*[[[end:libc_readlinkat]]]*/
 
@@ -1504,13 +1361,13 @@ NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file,
                                   gid_t group)
 /*[[[body:libc_lchown]]]*/
 {
-#ifdef __OPTIMIZE_SIZE__
+#if defined(__OPTIMIZE_SIZE__) || !defined(SYS_lchown)
 	return libc_fchownat(AT_FDCWD, file, owner, group, AT_SYMLINK_NOFOLLOW);
-#else /* __OPTIMIZE_SIZE__ */
+#else /* __OPTIMIZE_SIZE__ || !SYS_lchown */
 	errno_t result;
 	result = sys_lchown(file, (uint32_t)owner, (uint32_t)group);
 	return libc_seterrno_syserr(result);
-#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__OPTIMIZE_SIZE__ && SYS_lchown */
 }
 /*[[[end:libc_lchown]]]*/
 
@@ -1540,10 +1397,7 @@ NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
                                     __PIO_OFFSET length)
 /*[[[body:libc_truncate]]]*/
 {
-#ifdef SYS_truncate
-	errno_t result = sys_truncate(file, (syscall_ulong_t)length);
-	return libc_seterrno_syserr(result);
-#else /* SYS_truncate */
+#ifndef SYS_truncate
 	int result;
 	fd_t fd = libc_open(file, O_RDWR);
 	if (fd < 0)
@@ -1551,7 +1405,10 @@ NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
 	result = libc_ftruncate(fd, length);
 	sys_close(fd);
 	return result;
-#endif /* !SYS_truncate */
+#else /* !SYS_truncate */
+	errno_t result = sys_truncate(file, (syscall_ulong_t)length);
+	return libc_seterrno_syserr(result);
+#endif /* SYS_truncate */
 }
 /*[[[end:libc_truncate]]]*/
 
@@ -1588,10 +1445,7 @@ NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
                                       __PIO_OFFSET64 length)
 /*[[[body:libc_truncate64]]]*/
 {
-#ifdef SYS_truncate64
-	errno_t result = sys_truncate64(file, (uint64_t)(__pos64_t)length);
-	return libc_seterrno_syserr(result);
-#else /* SYS_truncate64 */
+#ifndef SYS_truncate64
 	int result;
 	fd_t fd = libc_open(file, O_RDWR);
 	if (fd < 0)
@@ -1599,7 +1453,10 @@ NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
 	result = libc_ftruncate64(fd, length);
 	sys_close(fd);
 	return result;
-#endif /* !SYS_truncate64 */
+#else /* !SYS_truncate64 */
+	errno_t result = sys_truncate64(file, (uint64_t)(__pos64_t)length);
+	return libc_seterrno_syserr(result);
+#endif /* SYS_truncate64 */
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_truncate64]]]*/
@@ -1615,13 +1472,15 @@ NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t execfd,
                                    __TENVP)
 /*[[[body:libc_fexecve]]]*/
 {
+#if 0 && (defined(__OPTIMIZE_SIZE__) || !defined(SYS_fexecve)) /* TODO: Add as a kos-extension to <unistd.h> */
+	return libc_execveat(execfd, "", ___argv, ___envp, AT_EMPTY_PATH);
+#else /* __OPTIMIZE_SIZE__ || !SYS_fexecve */
 	errno_t error;
-	error = sys_execveat(execfd,
-	                     "",
-	                     (char const *const *)___argv,
-	                     (char const *const *)___envp,
-	                     AT_EMPTY_PATH);
+	error = sys_fexecve(execfd,
+	                    (char const *const *)___argv,
+	                    (char const *const *)___envp);
 	return libc_seterrno_neg(error);
+#endif /* __OPTIMIZE_SIZE__ && SYS_fexecve */
 }
 /*[[[end:libc_fexecve]]]*/
 
@@ -1805,7 +1664,8 @@ FILE *usershells_file = NULL;
 PRIVATE ATTR_SECTION(".rodata.crt.database.shell")
 char const usershells_filename[] = _PATH_SHELLS;
 PRIVATE ATTR_SECTION(".rodata.crt.database.shell")
-char const usershells_defaultdata[] = "/bin/sh\n/bin/csh";
+char const usershells_defaultdata[] = "/bin/sh\n"
+                                      "/bin/csh";
 
 
 /*[[[head:libc_setusershell,hash:CRC-32=0xdab349fb]]]*/
@@ -1882,7 +1742,7 @@ NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path)
 	fd_t fd = libd_open(path, O_RDONLY | O_DIRECTORY);
 	if (fd < 0)
 		return -1;
-	result = libd_dup2(fd, AT_FDROOT);
+	result = libd_fchroot(fd);
 	sys_close(fd);
 #if 0 /* Already done for us by `libd_dup2()' */
 	if (result == 0)
@@ -3533,7 +3393,7 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x89f7063d]]]*/
+/*[[[start:exports,hash:CRC-32=0x910084b9]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -3706,12 +3566,14 @@ DEFINE_PUBLIC_ALIAS(DOS$symlinkat, libd_symlinkat);
 DEFINE_PUBLIC_ALIAS(symlinkat, libc_symlinkat);
 DEFINE_PUBLIC_ALIAS(DOS$readlinkat, libd_readlinkat);
 DEFINE_PUBLIC_ALIAS(readlinkat, libc_readlinkat);
+DEFINE_PUBLIC_ALIAS(DOS$unlinkat, libd_unlinkat);
+DEFINE_PUBLIC_ALIAS(unlinkat, libc_unlinkat);
+DEFINE_PUBLIC_ALIAS(DOS$fchdirat, libd_fchdirat);
+DEFINE_PUBLIC_ALIAS(fchdirat, libc_fchdirat);
 DEFINE_PUBLIC_ALIAS(DOS$fsymlinkat, libd_fsymlinkat);
 DEFINE_PUBLIC_ALIAS(fsymlinkat, libc_fsymlinkat);
 DEFINE_PUBLIC_ALIAS(DOS$freadlinkat, libd_freadlinkat);
 DEFINE_PUBLIC_ALIAS(freadlinkat, libc_freadlinkat);
-DEFINE_PUBLIC_ALIAS(DOS$unlinkat, libd_unlinkat);
-DEFINE_PUBLIC_ALIAS(unlinkat, libc_unlinkat);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_lseeki64, libc_lseek64);
 #endif /* __LIBCCALL_IS_LIBDCALL */

@@ -2622,6 +2622,7 @@
 #define __CRT_HAVE_fallocate64
 #define __CRT_HAVE_fattach
 #define __CRT_HAVE_fchdir
+#define __CRT_HAVE_fchdirat
 #define __CRT_HAVE_fchmod
 #define __CRT_HAVE_fchmodat
 #define __CRT_HAVE_fchown
@@ -8409,6 +8410,7 @@
 #define __CRT_HAVE_KOS$fallocate64
 #define __CRT_HAVE_KOS$fattach
 #define __CRT_HAVE_KOS$fchdir
+#define __CRT_HAVE_KOS$fchdirat
 #define __CRT_HAVE_KOS$fchmod
 #define __CRT_HAVE_KOS$fchmodat
 #define __CRT_HAVE_KOS$fchown
@@ -12992,6 +12994,7 @@
 #define __CRT_HAVE_DOS$fallocate64
 #define __CRT_HAVE_DOS$fattach
 #define __CRT_HAVE_DOS$fchdir
+#define __CRT_HAVE_DOS$fchdirat
 #define __CRT_HAVE_DOS$fchmod
 #define __CRT_HAVE_DOS$fchmodat
 #define __CRT_HAVE_DOS$fchown

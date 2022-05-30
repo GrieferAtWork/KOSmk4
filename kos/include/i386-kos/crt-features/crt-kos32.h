@@ -2775,6 +2775,7 @@
 #define __CRT_HAVE_fallocate64
 #define __CRT_HAVE_fattach
 #define __CRT_HAVE_fchdir
+#define __CRT_HAVE_fchdirat
 #define __CRT_HAVE_fchmod
 #define __CRT_HAVE_fchmodat
 #define __CRT_HAVE_fchown
@@ -7049,8 +7050,10 @@
 #define __CRT_HAVE_KOS$execvp
 #define __CRT_HAVE_KOS$execvpe
 #define __CRT_HAVE_KOS$faccessat
+#define __CRT_HAVE_KOS$fchdirat
 #define __CRT_HAVE_KOS$fchmodat
 #define __CRT_HAVE_KOS$fchownat
+#define __CRT_HAVE_KOS$fchroot
 #define __CRT_HAVE_KOS$fgetwc
 #define __CRT_HAVE_KOS$fgetwc_unlocked
 #define __CRT_HAVE_KOS$fgetwln
@@ -8086,8 +8089,10 @@
 #define __CRT_HAVE_DOS$execvp
 #define __CRT_HAVE_DOS$execvpe
 #define __CRT_HAVE_DOS$faccessat
+#define __CRT_HAVE_DOS$fchdirat
 #define __CRT_HAVE_DOS$fchmodat
 #define __CRT_HAVE_DOS$fchownat
+#define __CRT_HAVE_DOS$fchroot
 #define __CRT_HAVE_DOS$fgetwc
 #define __CRT_HAVE_DOS$fgetwc_unlocked
 #define __CRT_HAVE_DOS$fgetwln

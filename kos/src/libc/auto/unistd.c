@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58f6d41 */
+/* HASH CRC-32:0x2cf1923 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1940,6 +1940,20 @@ NOTHROW_NCX(LIBCCALL libc_issetugid)(void) {
  * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
  * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.bsd") int
+NOTHROW_NCX(LIBDCALL libd_fchroot)(fd_t fd) {
+	fd_t result;
+	result = libd_dup2(fd, __AT_FDROOT);
+	if likely(result >= 0)
+		result = 0;
+	return result;
+}
+#include <asm/os/fcntl.h>
+/* >> fchroot(2)
+ * Change the root directory to  `fd'. If `fd' was opened  before a prior call to  `chroot()',
+ * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
+ * No special permissions  are required to  use this function,  since a malicious  application
+ * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
 INTERN ATTR_SECTION(".text.crt.bsd") int
 NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd) {
 	fd_t result;
@@ -2112,6 +2126,7 @@ DEFINE_PUBLIC_ALIAS(setrgid, libc_setrgid);
 DEFINE_PUBLIC_ALIAS(ctermid_r, libc_ctermid_r);
 DEFINE_PUBLIC_ALIAS(closefrom, libc_closefrom);
 DEFINE_PUBLIC_ALIAS(issetugid, libc_issetugid);
+DEFINE_PUBLIC_ALIAS(DOS$fchroot, libd_fchroot);
 DEFINE_PUBLIC_ALIAS(fchroot, libc_fchroot);
 DEFINE_PUBLIC_ALIAS(DOS$resolvepath, libd_resolvepath);
 DEFINE_PUBLIC_ALIAS(resolvepath, libc_resolvepath);

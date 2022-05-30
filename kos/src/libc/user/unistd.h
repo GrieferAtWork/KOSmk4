@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3185b79 */
+/* HASH CRC-32:0x34df2d9f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -292,6 +292,20 @@ INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBDCALL libd_readlinkat)(
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen);
+/* >> unlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
+INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBDCALL libd_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
+/* >> unlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
+INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
+/* >> fchdirat(2)
+ * Change the current working directory to `dfd:path'
+ * @param: flags: Set of `0 | AT_DOSPATH' */
+INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBDCALL libd_fchdirat)(fd_t dfd, char const *path, atflag_t flags);
+/* >> fchdirat(2)
+ * Change the current working directory to `dfd:path'
+ * @param: flags: Set of `0 | AT_DOSPATH' */
+INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBCCALL libc_fchdirat)(fd_t dfd, char const *path, atflag_t flags);
 /* >> fsymlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path'
@@ -310,12 +324,6 @@ INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBDCALL libd_freadlinkat)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH | AT_READLINK_REQSIZE' */
 INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) ssize_t NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd, char const *path, char *buf, size_t buflen, atflag_t flags);
-/* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
-INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBDCALL libd_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
-/* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
-INTDEF ATTR_IN(2) int NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF off64_t NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd, off64_t offset, __STDC_INT_AS_UINT_T whence);

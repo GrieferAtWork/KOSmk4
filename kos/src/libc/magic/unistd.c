@@ -1330,8 +1330,12 @@ int access([[in]] char const *file, __STDC_INT_AS_UINT_T type) {
 [[cp, guard, crt_dos_variant]]
 [[dos_export_alias("_chdir")]]
 [[export_alias("__chdir", "__libc_chdir")]]
-[[section(".text.crt{|.dos}.fs.basic_property")]]
-int chdir([[in]] char const *path);
+[[requires(defined(__AT_FDCWD) && $has_function(fchdirat))]]
+[[userimpl, section(".text.crt{|.dos}.fs.basic_property")]]
+int chdir([[in]] char const *path) {
+	return fchdirat(__AT_FDCWD, path, 0);
+}
+
 
 @@>> getcwd(2)
 @@Return the path of the current working directory, relative to the filesystem root set by `chdir(2)'
@@ -1445,7 +1449,24 @@ ssize_t readlinkat($fd_t dfd, [[in]] char const *path,
 	return freadlinkat(dfd, path, buf, buflen, 0);
 }
 
+
+@@>> unlinkat(2)
+@@Remove a file, symbolic link, device or FIFO referred to by `dfd:name'
+[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant]]
+[[section(".text.crt{|.dos}.fs.modify")]]
+int unlinkat($fd_t dfd, [[in]] char const *name, $atflag_t flags);
+
+
 %#ifdef __USE_KOS
+@@>> fchdirat(2)
+@@Change the current working directory to `dfd:path'
+@@@param: flags: Set of `0 | AT_DOSPATH'
+[[cp, decl_include("<bits/types.h>")]]
+[[crt_dos_variant]]
+[[section(".text.crt{|.dos}.fs.property")]]
+int fchdirat(fd_t dfd, [[in]] char const *path, $atflag_t flags);
+
 @@>> fsymlinkat(3)
 @@Create  a  new  symbolic  link  loaded  with  `link_text'  as link
 @@text, at the filesystem location referred to by `tofd:target_path'
@@ -1466,14 +1487,6 @@ ssize_t freadlinkat($fd_t dfd, [[in]] char const *path,
                     [[out(return <= buflen)]] char *buf, size_t buflen,
                     $atflag_t flags);
 %#endif /* __USE_KOS */
-
-
-@@>> unlinkat(2)
-@@Remove a file, symbolic link, device or FIFO referred to by `dfd:name'
-[[cp, decl_include("<bits/types.h>")]]
-[[crt_dos_variant]]
-[[section(".text.crt{|.dos}.fs.modify")]]
-int unlinkat($fd_t dfd, [[in]] char const *name, $atflag_t flags);
 %#endif /* __USE_ATFILE */
 
 %
@@ -3962,6 +3975,7 @@ int issetugid(void) {
 @@No special permissions  are required to  use this function,  since a malicious  application
 @@could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument.
 [[decl_include("<bits/types.h>")]]
+[[crt_dos_variant]]
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(dup2) && defined(__AT_FDROOT))]]
 [[impl_include("<asm/os/fcntl.h>")]]

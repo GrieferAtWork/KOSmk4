@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11a034cf */
+/* HASH CRC-32:0xb7cd3b46 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2984,7 +2984,6 @@ DFUN(".text.crt.dos.io.tty", libd_ctermid_r, libc_ctermid_r, TP, 1, TP)
 DFUN(".text.crt.dos.system.configuration", libd_sysconf, libc_sysconf, TP, 1, TD)
 DFUN(".text.crt.dos.bsd.io.access", libd_closefrom, libc_closefrom, TV, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.bsd.io.access", libd_close_range, libc_close_range, TD, 3, TD, TD, TD)
-DFUN(".text.crt.dos.bsd", libd_fchroot, libc_fchroot, TD, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.solaris", libd_tell, libc_tell, TIn(__SIZEOF_OFF32_T__), 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.solaris", libd_tell64, libc_tell64, TIn(__SIZEOF_OFF64_T__), 1, TIn(__SIZEOF_FD_T__))
 

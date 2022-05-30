@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9405f11e */
+/* HASH CRC-32:0x3d2b15dd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,7 +119,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(waccess, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 __CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,wchdir,(wchar_t const *__path),(__path))
 #elif defined(__CRT_HAVE__wchdir)
 __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,wchdir,(wchar_t const *__path),_wchdir,(__path))
-#elif (defined(__CRT_HAVE_chdir) || defined(__CRT_HAVE__chdir) || defined(__CRT_HAVE___chdir) || defined(__CRT_HAVE___libc_chdir)) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#elif (defined(__CRT_HAVE_chdir) || defined(__CRT_HAVE__chdir) || defined(__CRT_HAVE___chdir) || defined(__CRT_HAVE___libc_chdir) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_fchdirat))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/parts.wchar.unistd/wchdir.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(wchdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL wchdir)(wchar_t const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wchdir))(__path); })
 #endif /* ... */

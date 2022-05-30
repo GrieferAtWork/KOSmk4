@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x729d5de3 */
+/* HASH CRC-32:0x2257ff24 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1441,6 +1441,11 @@
 #define __CRT_HAVE_DOS$fallocate64
 #define __CRT_HAVE_DOS$fattach
 #define __CRT_HAVE_DOS$fchdir
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$fchdirat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$fchmod
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -1451,9 +1456,9 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$fchownat
+#define __CRT_HAVE_DOS$fchroot
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-#define __CRT_HAVE_DOS$fchroot
 #define __CRT_HAVE_DOS$fclose
 #define __CRT_HAVE_DOS$fcntl
 #define __CRT_HAVE_DOS$fcvt
@@ -5613,6 +5618,7 @@
 #define __CRT_HAVE_fallocate64
 #define __CRT_HAVE_fattach
 #define __CRT_HAVE_fchdir
+#define __CRT_HAVE_fchdirat
 #define __CRT_HAVE_fchmod
 #define __CRT_HAVE_fchmodat
 #define __CRT_HAVE_fchown
