@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe4dd84c */
+/* HASH CRC-32:0xb9586e6c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2598,7 +2598,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setbuffer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 /* >> setlinebuf(3)
  * Change the given `stream' to become line-buffered */
 __CDECLARE_VOID(__ATTR_INOUT(1),__NOTHROW_NCX,setlinebuf,(__FILE *__restrict __stream),(__stream))
-#elif defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
+#elif (defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)) && defined(___IOLBF)
 #include <libc/local/stdio/setlinebuf.h>
 /* >> setlinebuf(3)
  * Change the given `stream' to become line-buffered */

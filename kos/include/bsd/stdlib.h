@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a883261 */
+/* HASH CRC-32:0x493518e9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,18 +99,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__mergesort_defined */
 #if !defined(__radixsort_defined) && defined(__CRT_HAVE_radixsort)
 #define __radixsort_defined
-__CDECLARE(__ATTR_INOUTS(1, 2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
+__CDECLARE(__ATTR_INOUTS(1, 2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const __table[256], unsigned __endbyte),(__base,__item_count,__table,__endbyte))
 #endif /* !__radixsort_defined && __CRT_HAVE_radixsort */
 #if !defined(__sradixsort_defined) && defined(__CRT_HAVE_sradixsort)
 #define __sradixsort_defined
-__CDECLARE(__ATTR_INOUTS(1, 2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
+__CDECLARE(__ATTR_INOUTS(1, 2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const __table[256], unsigned __endbyte),(__base,__item_count,__table,__endbyte))
 #endif /* !__sradixsort_defined && __CRT_HAVE_sradixsort */
 #ifndef __reallocf_defined
 #define __reallocf_defined
 #ifdef __CRT_HAVE_reallocf
+/* >> reallocf(3)
+ * Same as `realloc(3)',  but `mallptr'  is always freed  when `NULL'  is
+ * returned (both error and the implementation-specific `realloc(ptr, 0)'
+ * case; s.a. __REALLOC_ZERO_IS_NONNULL) */
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,reallocf,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/stdlib/reallocf.h>
+/* >> reallocf(3)
+ * Same as `realloc(3)',  but `mallptr'  is always freed  when `NULL'  is
+ * returned (both error and the implementation-specific `realloc(ptr, 0)'
+ * case; s.a. __REALLOC_ZERO_IS_NONNULL) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL reallocf)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocf))(__mallptr, __num_bytes); })
 #else /* ... */
 #undef __reallocf_defined
@@ -133,16 +141,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(reallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #define __recallocarray_defined
 #ifdef __CRT_HAVE_recallocarray
 /* >> recallocarray(3)
- * Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
- * when `mallptr != NULL', memory pointed to by the old  `mallptr...+=old_elem_count*elem_size'
- * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
+ * Same  as  `recallocv(mallptr, new_elem_count, elem_size)', but  also ensure  that when
+ * `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory
+ * block */
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)),void *,__NOTHROW_NCX,recallocarray,(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size),(__mallptr,__old_elem_count,__new_elem_count,__elem_size))
 #elif (defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
 #include <libc/local/stdlib/recallocarray.h>
 /* >> recallocarray(3)
- * Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
- * when `mallptr != NULL', memory pointed to by the old  `mallptr...+=old_elem_count*elem_size'
- * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
+ * Same  as  `recallocv(mallptr, new_elem_count, elem_size)', but  also ensure  that when
+ * `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory
+ * block */
 __NAMESPACE_LOCAL_USING_OR_IMPL(recallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)) void *__NOTHROW_NCX(__LIBCCALL recallocarray)(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocarray))(__mallptr, __old_elem_count, __new_elem_count, __elem_size); })
 #else /* ... */
 #undef __recallocarray_defined

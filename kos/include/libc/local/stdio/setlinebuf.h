@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40ee38de */
+/* HASH CRC-32:0x105d696b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,9 @@
 #ifndef __local_setlinebuf_defined
 #define __local_setlinebuf_defined
 #include <__crt.h>
+#include <asm/crt/stdio.h>
 #include <features.h>
-#if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
+#if (defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)) && defined(___IOLBF)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_setvbuf_defined
 #define __local___localdep_setvbuf_defined
@@ -59,7 +60,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_setlinebuf_defined
 #define __localdep_setlinebuf __LIBC_LOCAL_NAME(setlinebuf)
 #endif /* !__local___localdep_setlinebuf_defined */
-#else /* __CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked */
+#else /* (__CRT_HAVE_setvbuf || __CRT_HAVE__IO_setvbuf || __CRT_HAVE_setvbuf_unlocked) && ___IOLBF */
 #undef __local_setlinebuf_defined
-#endif /* !__CRT_HAVE_setvbuf && !__CRT_HAVE__IO_setvbuf && !__CRT_HAVE_setvbuf_unlocked */
+#endif /* (!__CRT_HAVE_setvbuf && !__CRT_HAVE__IO_setvbuf && !__CRT_HAVE_setvbuf_unlocked) || !___IOLBF */
 #endif /* !__local_setlinebuf_defined */

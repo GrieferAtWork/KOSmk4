@@ -251,246 +251,264 @@
 
 
 #ifdef __KOS_SYSTEM_HEADERS__
-#undef HAVE_BCMP
-}%[insert:pp_if($has_function(bcmp))]%{
-#define HAVE_BCMP 1
-}%[insert:pp_endif]%{
+}
+/*[[[deemon
+function define_feature(macro, condition) {
+	print("%#undef ", macro);
+	print("%[insert:pp_if(", condition, ")]");
+	print("%#define ", macro, " 1");
+	print("%[insert:pp_endif]");
+}
+function define_has_function(name) {
+	define_feature("HAVE_" + name.upper(), "$has_function({})".format({ name }));
+}
 
-#undef HAVE_BCOPY
-}%[insert:pp_if($has_function(bcopy))]%{
-#define HAVE_BCOPY 1
-}%[insert:pp_endif]%{
+define_has_function("bcmp");
+define_has_function("bcopy");
+define_has_function("closedir");
+define_has_function("dup2");
+define_has_function("endgrent");
+define_has_function("endpwent");
+define_has_function("fnmatch");
+define_has_function("frexp");
+define_has_function("ftime");
+define_has_function("ftruncate");
+define_has_function("ftw");
+define_has_function("getcwd");
+define_has_function("getdtablesize");
+define_has_function("getgroups");
+define_has_function("gethostname");
+define_has_function("getmntent");
+define_has_function("getpagesize");
+define_has_function("gettimeofday");
+define_has_function("glob");
+define_has_function("isascii");
+define_has_function("memchr");
+define_has_function("memcpy");
+define_has_function("mkdir");
+define_has_function("mkfifo");
+define_has_function("mktime");
+define_has_function("pow");
+define_has_function("putenv");
+define_has_function("random");
+define_has_function("rename");
+define_has_function("rmdir");
+define_has_function("setenv");
+define_has_function("setlinebuf");
+define_has_function("setlocale");
+define_has_function("sigaction");
+define_has_function("stpcpy");
+define_has_function("strcasecmp");
+define_has_function("strchr");
+define_has_function("strrchr");
+define_has_function("strcoll");
+define_has_function("strdup");
+define_has_function("strftime");
+define_has_function("strerror");
+define_has_function("vprintf");
+define_has_function("waitpid");
+define_feature("GETPGRP_VOID", "$has_function(getpgrp)");         // 0-argument getpgrp() version
+define_feature("MOUNTED_GETMNTENT1", "$has_function(getmntent)"); // 1-argument getmntent() version
+define_feature("STAT_STATFS2_BSIZE", "$has_function(statfs)");    // Actually requires that statfs() takes 2 arguments,
+                                                                  // and that `struct statfs::f_bsize' exists!
+define_feature("HAVE_UTIME_NULL", "$has_function(utime)");        // Second argument to utime() can be NULL for current time
 
-#undef HAVE_CLOSEDIR
-}%[insert:pp_if($has_function(closedir))]%{
-#define HAVE_CLOSEDIR 1
-}%[insert:pp_endif]%{
+]]]*/
+%#undef HAVE_BCMP
+%[insert:pp_if($has_function(bcmp))]
+%#define HAVE_BCMP 1
+%[insert:pp_endif]
+%#undef HAVE_BCOPY
+%[insert:pp_if($has_function(bcopy))]
+%#define HAVE_BCOPY 1
+%[insert:pp_endif]
+%#undef HAVE_CLOSEDIR
+%[insert:pp_if($has_function(closedir))]
+%#define HAVE_CLOSEDIR 1
+%[insert:pp_endif]
+%#undef HAVE_DUP2
+%[insert:pp_if($has_function(dup2))]
+%#define HAVE_DUP2 1
+%[insert:pp_endif]
+%#undef HAVE_ENDGRENT
+%[insert:pp_if($has_function(endgrent))]
+%#define HAVE_ENDGRENT 1
+%[insert:pp_endif]
+%#undef HAVE_ENDPWENT
+%[insert:pp_if($has_function(endpwent))]
+%#define HAVE_ENDPWENT 1
+%[insert:pp_endif]
+%#undef HAVE_FNMATCH
+%[insert:pp_if($has_function(fnmatch))]
+%#define HAVE_FNMATCH 1
+%[insert:pp_endif]
+%#undef HAVE_FREXP
+%[insert:pp_if($has_function(frexp))]
+%#define HAVE_FREXP 1
+%[insert:pp_endif]
+%#undef HAVE_FTIME
+%[insert:pp_if($has_function(ftime))]
+%#define HAVE_FTIME 1
+%[insert:pp_endif]
+%#undef HAVE_FTRUNCATE
+%[insert:pp_if($has_function(ftruncate))]
+%#define HAVE_FTRUNCATE 1
+%[insert:pp_endif]
+%#undef HAVE_FTW
+%[insert:pp_if($has_function(ftw))]
+%#define HAVE_FTW 1
+%[insert:pp_endif]
+%#undef HAVE_GETCWD
+%[insert:pp_if($has_function(getcwd))]
+%#define HAVE_GETCWD 1
+%[insert:pp_endif]
+%#undef HAVE_GETDTABLESIZE
+%[insert:pp_if($has_function(getdtablesize))]
+%#define HAVE_GETDTABLESIZE 1
+%[insert:pp_endif]
+%#undef HAVE_GETGROUPS
+%[insert:pp_if($has_function(getgroups))]
+%#define HAVE_GETGROUPS 1
+%[insert:pp_endif]
+%#undef HAVE_GETHOSTNAME
+%[insert:pp_if($has_function(gethostname))]
+%#define HAVE_GETHOSTNAME 1
+%[insert:pp_endif]
+%#undef HAVE_GETMNTENT
+%[insert:pp_if($has_function(getmntent))]
+%#define HAVE_GETMNTENT 1
+%[insert:pp_endif]
+%#undef HAVE_GETPAGESIZE
+%[insert:pp_if($has_function(getpagesize))]
+%#define HAVE_GETPAGESIZE 1
+%[insert:pp_endif]
+%#undef HAVE_GETTIMEOFDAY
+%[insert:pp_if($has_function(gettimeofday))]
+%#define HAVE_GETTIMEOFDAY 1
+%[insert:pp_endif]
+%#undef HAVE_GLOB
+%[insert:pp_if($has_function(glob))]
+%#define HAVE_GLOB 1
+%[insert:pp_endif]
+%#undef HAVE_ISASCII
+%[insert:pp_if($has_function(isascii))]
+%#define HAVE_ISASCII 1
+%[insert:pp_endif]
+%#undef HAVE_MEMCHR
+%[insert:pp_if($has_function(memchr))]
+%#define HAVE_MEMCHR 1
+%[insert:pp_endif]
+%#undef HAVE_MEMCPY
+%[insert:pp_if($has_function(memcpy))]
+%#define HAVE_MEMCPY 1
+%[insert:pp_endif]
+%#undef HAVE_MKDIR
+%[insert:pp_if($has_function(mkdir))]
+%#define HAVE_MKDIR 1
+%[insert:pp_endif]
+%#undef HAVE_MKFIFO
+%[insert:pp_if($has_function(mkfifo))]
+%#define HAVE_MKFIFO 1
+%[insert:pp_endif]
+%#undef HAVE_MKTIME
+%[insert:pp_if($has_function(mktime))]
+%#define HAVE_MKTIME 1
+%[insert:pp_endif]
+%#undef HAVE_POW
+%[insert:pp_if($has_function(pow))]
+%#define HAVE_POW 1
+%[insert:pp_endif]
+%#undef HAVE_PUTENV
+%[insert:pp_if($has_function(putenv))]
+%#define HAVE_PUTENV 1
+%[insert:pp_endif]
+%#undef HAVE_RANDOM
+%[insert:pp_if($has_function(random))]
+%#define HAVE_RANDOM 1
+%[insert:pp_endif]
+%#undef HAVE_RENAME
+%[insert:pp_if($has_function(rename))]
+%#define HAVE_RENAME 1
+%[insert:pp_endif]
+%#undef HAVE_RMDIR
+%[insert:pp_if($has_function(rmdir))]
+%#define HAVE_RMDIR 1
+%[insert:pp_endif]
+%#undef HAVE_SETENV
+%[insert:pp_if($has_function(setenv))]
+%#define HAVE_SETENV 1
+%[insert:pp_endif]
+%#undef HAVE_SETLINEBUF
+%[insert:pp_if($has_function(setlinebuf))]
+%#define HAVE_SETLINEBUF 1
+%[insert:pp_endif]
+%#undef HAVE_SETLOCALE
+%[insert:pp_if($has_function(setlocale))]
+%#define HAVE_SETLOCALE 1
+%[insert:pp_endif]
+%#undef HAVE_SIGACTION
+%[insert:pp_if($has_function(sigaction))]
+%#define HAVE_SIGACTION 1
+%[insert:pp_endif]
+%#undef HAVE_STPCPY
+%[insert:pp_if($has_function(stpcpy))]
+%#define HAVE_STPCPY 1
+%[insert:pp_endif]
+%#undef HAVE_STRCASECMP
+%[insert:pp_if($has_function(strcasecmp))]
+%#define HAVE_STRCASECMP 1
+%[insert:pp_endif]
+%#undef HAVE_STRCHR
+%[insert:pp_if($has_function(strchr))]
+%#define HAVE_STRCHR 1
+%[insert:pp_endif]
+%#undef HAVE_STRRCHR
+%[insert:pp_if($has_function(strrchr))]
+%#define HAVE_STRRCHR 1
+%[insert:pp_endif]
+%#undef HAVE_STRCOLL
+%[insert:pp_if($has_function(strcoll))]
+%#define HAVE_STRCOLL 1
+%[insert:pp_endif]
+%#undef HAVE_STRDUP
+%[insert:pp_if($has_function(strdup))]
+%#define HAVE_STRDUP 1
+%[insert:pp_endif]
+%#undef HAVE_STRFTIME
+%[insert:pp_if($has_function(strftime))]
+%#define HAVE_STRFTIME 1
+%[insert:pp_endif]
+%#undef HAVE_STRERROR
+%[insert:pp_if($has_function(strerror))]
+%#define HAVE_STRERROR 1
+%[insert:pp_endif]
+%#undef HAVE_VPRINTF
+%[insert:pp_if($has_function(vprintf))]
+%#define HAVE_VPRINTF 1
+%[insert:pp_endif]
+%#undef HAVE_WAITPID
+%[insert:pp_if($has_function(waitpid))]
+%#define HAVE_WAITPID 1
+%[insert:pp_endif]
+%#undef GETPGRP_VOID
+%[insert:pp_if($has_function(getpgrp))]
+%#define GETPGRP_VOID 1
+%[insert:pp_endif]
+%#undef MOUNTED_GETMNTENT1
+%[insert:pp_if($has_function(getmntent))]
+%#define MOUNTED_GETMNTENT1 1
+%[insert:pp_endif]
+%#undef STAT_STATFS2_BSIZE
+%[insert:pp_if($has_function(statfs))]
+%#define STAT_STATFS2_BSIZE 1
+%[insert:pp_endif]
+%#undef HAVE_UTIME_NULL
+%[insert:pp_if($has_function(utime))]
+%#define HAVE_UTIME_NULL 1
+%[insert:pp_endif]
+/*[[[end]]]*/
 
-#undef HAVE_DUP2
-}%[insert:pp_if($has_function(dup2))]%{
-#define HAVE_DUP2 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_ENDGRENT
-}%[insert:pp_if($has_function(endgrent))]%{
-#define HAVE_ENDGRENT 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_ENDPWENT
-}%[insert:pp_if($has_function(endpwent))]%{
-#define HAVE_ENDPWENT 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_FNMATCH
-}%[insert:pp_if($has_function(fnmatch))]%{
-#define HAVE_FNMATCH 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_FREXP
-}%[insert:pp_if($has_function(frexp))]%{
-#define HAVE_FREXP 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_FTIME
-}%[insert:pp_if($has_function(ftime))]%{
-#define HAVE_FTIME 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_FTRUNCATE
-}%[insert:pp_if($has_function(ftruncate))]%{
-#define HAVE_FTRUNCATE 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_FTW
-}%[insert:pp_if($has_function(ftw))]%{
-#define HAVE_FTW 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_GETCWD
-}%[insert:pp_if($has_function(getcwd))]%{
-#define HAVE_GETCWD 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_GETDTABLESIZE
-}%[insert:pp_if($has_function(getdtablesize))]%{
-#define HAVE_GETDTABLESIZE 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_GETGROUPS
-}%[insert:pp_if($has_function(getgroups))]%{
-#define HAVE_GETGROUPS 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_GETHOSTNAME
-}%[insert:pp_if($has_function(gethostname))]%{
-#define HAVE_GETHOSTNAME 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_GETMNTENT
-}%[insert:pp_if($has_function(getmntent))]%{
-#define HAVE_GETMNTENT 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_GETPAGESIZE
-}%[insert:pp_if($has_function(getpagesize))]%{
-#define HAVE_GETPAGESIZE 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_GETTIMEOFDAY
-}%[insert:pp_if($has_function(gettimeofday))]%{
-#define HAVE_GETTIMEOFDAY 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_GLOB
-}%[insert:pp_if($has_function(glob))]%{
-#define HAVE_GLOB 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_ISASCII
-}%[insert:pp_if($has_function(isascii))]%{
-#define HAVE_ISASCII 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_MEMCHR
-}%[insert:pp_if($has_function(memchr))]%{
-#define HAVE_MEMCHR 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_MEMCPY
-}%[insert:pp_if($has_function(memcpy))]%{
-#define HAVE_MEMCPY 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_MKDIR
-}%[insert:pp_if($has_function(mkdir))]%{
-#define HAVE_MKDIR 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_MKFIFO
-}%[insert:pp_if($has_function(mkfifo))]%{
-#define HAVE_MKFIFO 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_MKTIME
-}%[insert:pp_if($has_function(mktime))]%{
-#define HAVE_MKTIME 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_POW
-}%[insert:pp_if($has_function(pow))]%{
-#define HAVE_POW 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_PUTENV
-}%[insert:pp_if($has_function(putenv))]%{
-#define HAVE_PUTENV 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_RANDOM
-}%[insert:pp_if($has_function(random))]%{
-#define HAVE_RANDOM 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_RENAME
-}%[insert:pp_if($has_function(rename))]%{
-#define HAVE_RENAME 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_RMDIR
-}%[insert:pp_if($has_function(rmdir))]%{
-#define HAVE_RMDIR 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_SETENV
-}%[insert:pp_if($has_function(setenv))]%{
-#define HAVE_SETENV 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_SETLINEBUF
-}%[insert:pp_if($has_function(setlinebuf))]%{
-#define HAVE_SETLINEBUF 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_SETLOCALE
-}%[insert:pp_if($has_function(setlocale))]%{
-#define HAVE_SETLOCALE 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_SIGACTION
-}%[insert:pp_if($has_function(sigaction))]%{
-#define HAVE_SIGACTION 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_STPCPY
-}%[insert:pp_if($has_function(stpcpy))]%{
-#define HAVE_STPCPY 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_STRCASECMP
-}%[insert:pp_if($has_function(strcasecmp))]%{
-#define HAVE_STRCASECMP 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_STRCHR
-}%[insert:pp_if($has_function(strchr))]%{
-#define HAVE_STRCHR 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_STRRCHR
-}%[insert:pp_if($has_function(strrchr))]%{
-#define HAVE_STRRCHR 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_STRCOLL
-}%[insert:pp_if($has_function(strcoll))]%{
-#define HAVE_STRCOLL 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_STRDUP
-}%[insert:pp_if($has_function(strdup))]%{
-#define HAVE_STRDUP 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_STRFTIME
-}%[insert:pp_if($has_function(strftime))]%{
-#define HAVE_STRFTIME 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_STRERROR
-}%[insert:pp_if($has_function(strerror))]%{
-#define HAVE_STRERROR 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_VPRINTF
-}%[insert:pp_if($has_function(vprintf))]%{
-#define HAVE_VPRINTF 1
-}%[insert:pp_endif]%{
-
-#undef HAVE_WAITPID
-}%[insert:pp_if($has_function(waitpid))]%{
-#define HAVE_WAITPID 1
-}%[insert:pp_endif]%{
-
-#undef GETPGRP_VOID
-}%[insert:pp_if($has_function(getpgrp))]%{
-#define GETPGRP_VOID 1 /* 0-argument getpgrp() version */
-}%[insert:pp_endif]%{
-
-#undef MOUNTED_GETMNTENT1
-}%[insert:pp_if($has_function(getmntent))]%{
-#define MOUNTED_GETMNTENT1 1 /* 1-argument getmntent() version */
-}%[insert:pp_endif]%{
-
-#undef STAT_STATFS2_BSIZE
-}%[insert:pp_if($has_function(statfs))]%{
-#define STAT_STATFS2_BSIZE 1 /* Actually requires that statfs() takes 2 arguments,
-                              * and    that    `struct statfs::f_bsize'    exists! */
-}%[insert:pp_endif]%{
-
-#undef HAVE_UTIME_NULL
-}%[insert:pp_if($has_function(utime))]%{
-#define HAVE_UTIME_NULL 1 /* Second argument to utime() can be NULL for current time. */
-}%[insert:pp_endif]%{
+%{
 
 
 
@@ -507,7 +525,7 @@
 
 #undef HAVE_ST_RDEV
 #ifdef _STATBUF_ST_RDEV
-#define HAVE_ST_RDEV 1
+#define HAVE_ST_RDEV 1 /* `struct stat::st_rdev' */
 #endif /* _STATBUF_ST_RDEV */
 
 #undef HAVE_STRUCT_UTIMBUF

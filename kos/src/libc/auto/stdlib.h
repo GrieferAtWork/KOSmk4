@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x112c641 */
+/* HASH CRC-32:0x16492a09 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -898,20 +898,24 @@ INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBDCALL libd_shexec)(char const *command)
  * of them are tested, this function will try to use `secure_getenv("SHELL")',  if
  * and only if that variable is defined and starts with a '/'-character. */
 INTDEF ATTR_IN_OPT(1) int NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command);
-/* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
+/* >> getexecname(3)
+ * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_getexecname)(void);
-/* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
+/* >> getexecname(3)
+ * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_getexecname)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+/* >> fdwalk(3)
+ * Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
  * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
  * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fdwalk)(int (LIBDCALL *walk)(void *arg, fd_t fd), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+/* >> fdwalk(3)
+ * Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
  * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
  * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
@@ -930,23 +934,33 @@ INTDEF ATTR_RETNONNULL WUNUSED ATTR_OUT(2) char *NOTHROW_NCX(LIBDCALL libd_ullto
 INTDEF ATTR_RETNONNULL WUNUSED ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_ulltostr)(__ULONGLONG value, char *buf);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> reallocf(3)
+ * Same as `realloc(3)',  but `mallptr'  is always freed  when `NULL'  is
+ * returned (both error and the implementation-specific `realloc(ptr, 0)'
+ * case; s.a. __REALLOC_ZERO_IS_NONNULL) */
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBDCALL libd_reallocf)(void *mallptr, size_t num_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> reallocf(3)
+ * Same as `realloc(3)',  but `mallptr'  is always freed  when `NULL'  is
+ * returned (both error and the implementation-specific `realloc(ptr, 0)'
+ * case; s.a. __REALLOC_ZERO_IS_NONNULL) */
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr, size_t num_bytes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> recallocarray(3)
- * Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
- * when `mallptr != NULL', memory pointed to by the old  `mallptr...+=old_elem_count*elem_size'
- * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
+ * Same  as  `recallocv(mallptr, new_elem_count, elem_size)', but  also ensure  that when
+ * `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory
+ * block */
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *NOTHROW_NCX(LIBDCALL libd_recallocarray)(void *mallptr, size_t old_elem_count, size_t new_elem_count, size_t elem_size);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> recallocarray(3)
- * Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
- * when `mallptr != NULL', memory pointed to by the old  `mallptr...+=old_elem_count*elem_size'
- * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
+ * Same  as  `recallocv(mallptr, new_elem_count, elem_size)', but  also ensure  that when
+ * `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory
+ * block */
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr, size_t old_elem_count, size_t new_elem_count, size_t elem_size);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -1015,8 +1029,8 @@ INTDEF ATTR_INOUT_OPT(1) NONNULL((4)) int (LIBDCALL libd_mergesort)(void *pbase,
 INTDEF ATTR_INOUT_OPT(1) NONNULL((4)) int (LIBCCALL libc_mergesort)(void *pbase, size_t item_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBDCALL libd_radixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
-INTDEF ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBDCALL libd_sradixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
+INTDEF ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBDCALL libd_radixsort)(unsigned char const **base, int item_count, unsigned char const table[256], unsigned endbyte);
+INTDEF ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBDCALL libd_sradixsort)(unsigned char const **base, int item_count, unsigned char const table[256], unsigned endbyte);
 /* >> strtonum(3)
  * Similar to `strtoi()'  with `base=10',  but return  human-
  * readable error messages in `*p_errstr' on error (alongside

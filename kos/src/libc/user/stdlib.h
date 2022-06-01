@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7016e41c */
+/* HASH CRC-32:0x36e9ddb6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -160,8 +160,8 @@ INTDEF ATTR_MALLOC WUNUSED ATTR_IN(1) char *NOTHROW_RPC(LIBDCALL libd_canonicali
  * allocated  buffer. Upon error, `NULL' is returned instead. */
 INTDEF ATTR_MALLOC WUNUSED ATTR_IN(1) char *NOTHROW_RPC(LIBCCALL libc_canonicalize_file_name)(char const *filename);
 INTDEF WUNUSED ATTR_OUT(1) ATTR_OUT(2) char *NOTHROW_NCX(LIBCCALL libc_getbsize)(int *headerlenp, __LONGPTR_TYPE__ *blocksizep);
-INTDEF ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
-INTDEF ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_sradixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
+INTDEF ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base, int item_count, unsigned char const table[256], unsigned endbyte);
+INTDEF ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_sradixsort)(unsigned char const **base, int item_count, unsigned char const table[256], unsigned endbyte);
 /* >> devname(3), devname_r(3) */
 INTDEF ATTR_OUTS(3, 4) int NOTHROW_NCX(LIBCCALL libc_devname_r)(dev_t dev, mode_t type, char *buf, size_t len);
 /* >> humanize_number(3), dehumanize_number(3)

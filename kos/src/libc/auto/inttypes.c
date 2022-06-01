@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb762c77 */
+/* HASH CRC-32:0x2189068e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -225,6 +225,8 @@ NOTHROW_NCX(LIBCCALL libc_strtoi)(char const *__restrict nptr,
 
 
 
+
+
 		} else if (result < lo) {
 
 			*rstatus = ERANGE;
@@ -279,6 +281,8 @@ NOTHROW_NCX(LIBCCALL libc_strtou)(char const *__restrict nptr,
 		if (*used_endptr != '\0') {
 
 			*rstatus = ENOTSUP;
+
+
 
 
 

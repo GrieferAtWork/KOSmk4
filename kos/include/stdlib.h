@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94e2a0f8 */
+/* HASH CRC-32:0x75074d7c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3662,18 +3662,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ttyname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #endif /* !... */
 #endif /* !__ttyname_defined */
 #ifdef __CRT_HAVE_getexecname
-/* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
+/* >> getexecname(3)
+ * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getexecname,(void),())
 #else /* __CRT_HAVE_getexecname */
 #include <libc/template/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_name
 #include <libc/local/stdlib/getexecname.h>
-/* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
+/* >> getexecname(3)
+ * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getexecname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL getexecname)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getexecname))(); })
 #endif /* __LOCAL_program_invocation_name */
 #endif /* !__CRT_HAVE_getexecname */
 #ifdef __CRT_HAVE_fdwalk
-/* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+/* >> fdwalk(3)
+ * Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
  * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
  * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
@@ -3684,7 +3687,8 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__THROWING,fdwalk,(int (__LIBCCALL *__walk)(v
 #include <bits/os/dirent.h>
 #if ((defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl) || defined(__CRT_HAVE___libc_fcntl)) && defined(__F_NEXT)) || (defined(__OS_HAVE_PROCFS_SELF_FD) && (defined(__CRT_HAVE_opendir) || defined(__CRT_HAVE___libc_opendir) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))) || defined(__USE_DOS_DIRENT)) && ((defined(__CRT_HAVE_readdirk) && defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_readdirk64) && defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_readdir) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE___libc_readdir) && !defined(__CRT_KOS) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_readdir64) && !defined(__CRT_KOS) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || defined(__USE_DOS_DIRENT)))
 #include <libc/local/stdlib/fdwalk.h>
-/* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+/* >> fdwalk(3)
+ * Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
  * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
  * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
@@ -3725,9 +3729,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ulltostr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #ifndef __reallocf_defined
 #define __reallocf_defined
 #ifdef __CRT_HAVE_reallocf
+/* >> reallocf(3)
+ * Same as `realloc(3)',  but `mallptr'  is always freed  when `NULL'  is
+ * returned (both error and the implementation-specific `realloc(ptr, 0)'
+ * case; s.a. __REALLOC_ZERO_IS_NONNULL) */
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,reallocf,(void *__mallptr, __SIZE_TYPE__ __num_bytes),(__mallptr,__num_bytes))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/stdlib/reallocf.h>
+/* >> reallocf(3)
+ * Same as `realloc(3)',  but `mallptr'  is always freed  when `NULL'  is
+ * returned (both error and the implementation-specific `realloc(ptr, 0)'
+ * case; s.a. __REALLOC_ZERO_IS_NONNULL) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL reallocf)(void *__mallptr, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocf))(__mallptr, __num_bytes); })
 #else /* ... */
 #undef __reallocf_defined
@@ -3737,16 +3749,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(reallocf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #define __recallocarray_defined
 #ifdef __CRT_HAVE_recallocarray
 /* >> recallocarray(3)
- * Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
- * when `mallptr != NULL', memory pointed to by the old  `mallptr...+=old_elem_count*elem_size'
- * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
+ * Same  as  `recallocv(mallptr, new_elem_count, elem_size)', but  also ensure  that when
+ * `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory
+ * block */
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)),void *,__NOTHROW_NCX,recallocarray,(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size),(__mallptr,__old_elem_count,__new_elem_count,__elem_size))
 #elif (defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
 #include <libc/local/stdlib/recallocarray.h>
 /* >> recallocarray(3)
- * Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
- * when `mallptr != NULL', memory pointed to by the old  `mallptr...+=old_elem_count*elem_size'
- * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
+ * Same  as  `recallocv(mallptr, new_elem_count, elem_size)', but  also ensure  that when
+ * `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory
+ * block */
 __NAMESPACE_LOCAL_USING_OR_IMPL(recallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)) void *__NOTHROW_NCX(__LIBCCALL recallocarray)(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recallocarray))(__mallptr, __old_elem_count, __new_elem_count, __elem_size); })
 #else /* ... */
 #undef __recallocarray_defined
@@ -3876,11 +3890,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__mergesort_defined */
 #if !defined(__radixsort_defined) && defined(__CRT_HAVE_radixsort)
 #define __radixsort_defined
-__CDECLARE(__ATTR_INOUTS(1, 2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
+__CDECLARE(__ATTR_INOUTS(1, 2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,radixsort,(unsigned char const **__base, int __item_count, unsigned char const __table[256], unsigned __endbyte),(__base,__item_count,__table,__endbyte))
 #endif /* !__radixsort_defined && __CRT_HAVE_radixsort */
 #if !defined(__sradixsort_defined) && defined(__CRT_HAVE_sradixsort)
 #define __sradixsort_defined
-__CDECLARE(__ATTR_INOUTS(1, 2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const *__table, unsigned __endbyte),(__base,__item_count,__table,__endbyte))
+__CDECLARE(__ATTR_INOUTS(1, 2) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,sradixsort,(unsigned char const **__base, int __item_count, unsigned char const __table[256], unsigned __endbyte),(__base,__item_count,__table,__endbyte))
 #endif /* !__sradixsort_defined && __CRT_HAVE_sradixsort */
 
 #ifdef __LONGLONG

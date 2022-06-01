@@ -1081,6 +1081,8 @@ $intmax_t strtoi([[in]] char const *__restrict nptr,
 		if (*used_endptr != '\0') {
 @@pp_ifdef ENOTSUP@@
 			*rstatus = ENOTSUP;
+@@pp_elif defined(EOPNOTSUPP)@@
+			*rstatus = EOPNOTSUPP;
 @@pp_elif defined(EINVAL)@@
 			*rstatus = EINVAL;
 @@pp_else@@
@@ -1131,6 +1133,8 @@ $uintmax_t strtou([[in]] char const *__restrict nptr,
 		if (*used_endptr != '\0') {
 @@pp_ifdef ENOTSUP@@
 			*rstatus = ENOTSUP;
+@@pp_elif defined(EOPNOTSUPP)@@
+			*rstatus = EOPNOTSUPP;
 @@pp_elif defined(EINVAL)@@
 			*rstatus = EINVAL;
 @@pp_else@@

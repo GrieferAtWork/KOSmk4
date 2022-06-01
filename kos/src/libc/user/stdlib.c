@@ -2966,11 +2966,11 @@ NOTHROW_RPC(LIBKCALL libc__wsearchenv_s)(char32_t const *file,
 
 
 
-/*[[[head:libc_radixsort,hash:CRC-32=0xa07725d3]]]*/
+/*[[[head:libc_radixsort,hash:CRC-32=0x70f7f2c3]]]*/
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base,
                                      int item_count,
-                                     unsigned char const *table,
+                                     unsigned char const table[256],
                                      unsigned endbyte)
 /*[[[body:libc_radixsort]]]*/
 /*AUTO*/{
@@ -2983,11 +2983,11 @@ NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base,
 }
 /*[[[end:libc_radixsort]]]*/
 
-/*[[[head:libc_sradixsort,hash:CRC-32=0x572a5a6f]]]*/
+/*[[[head:libc_sradixsort,hash:CRC-32=0x81ae9281]]]*/
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_INOUTS(1, 2) ATTR_IN_OPT(3) int
 NOTHROW_NCX(LIBCCALL libc_sradixsort)(unsigned char const **base,
                                       int item_count,
-                                      unsigned char const *table,
+                                      unsigned char const table[256],
                                       unsigned endbyte)
 /*[[[body:libc_sradixsort]]]*/
 /*AUTO*/{

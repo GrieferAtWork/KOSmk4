@@ -3459,6 +3459,7 @@ int shexec([[in_opt]] char const *command) {
 %[insert:extern(memalign)]
 %[insert:extern(ttyname)]
 
+@@>> getexecname(3)
 @@Returns the absolute filename of the main executable (s.a. `program_invocation_name')
 [[crt_dos_variant, const, wunused]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
@@ -3468,6 +3469,7 @@ char const *getexecname() {
 	return __LOCAL_program_invocation_name;
 }
 
+@@>> fdwalk(3)
 @@Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
 @@If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
 @@and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
@@ -3562,6 +3564,10 @@ char *ulltostr(__ULONGLONG value, [[out]] char *buf) {
 
 %
 %#ifdef __USE_BSD
+@@>> reallocf(3)
+@@Same as `realloc(3)',  but `mallptr'  is always freed  when `NULL'  is
+@@returned (both error and the implementation-specific `realloc(ptr, 0)'
+@@case; s.a. __REALLOC_ZERO_IS_NONNULL)
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 [[guard, decl_include("<hybrid/typecore.h>")]]
 [[requires_function(realloc)]]
@@ -3593,9 +3599,10 @@ void *reallocf(void *mallptr, $size_t num_bytes) {
 }
 
 @@>> recallocarray(3)
-@@Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
-@@when `mallptr != NULL', memory pointed to by the old  `mallptr...+=old_elem_count*elem_size'
-@@is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block
+@@Same  as  `recallocv(mallptr, new_elem_count, elem_size)', but  also ensure  that when
+@@`mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+@@is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory
+@@block
 [[guard, decl_include("<hybrid/typecore.h>")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((3, 4))]]
 [[requires_function(recallocv, calloc, malloc_usable_size)]]
@@ -3778,12 +3785,12 @@ int mergesort([[inout(item_count * item_size)]] void *pbase, $size_t item_count,
 
 [[guard]]
 int radixsort([[inout(item_count)]] unsigned char const **base, int item_count,
-              [[in_opt]] unsigned char const *table, unsigned endbyte);
+              [[in_opt]] unsigned char const table[256], unsigned endbyte);
 /* TODO: `radixsort()' can be implemented via magic! */
 
 [[guard]]
 int sradixsort([[inout(item_count)]] unsigned char const **base, int item_count,
-               [[in_opt]] unsigned char const *table, unsigned endbyte);
+               [[in_opt]] unsigned char const table[256], unsigned endbyte);
 /* TODO: `sradixsort()' can be implemented via magic! */
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xced89fbe */
+/* HASH CRC-32:0xa7f6d102 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -717,7 +717,7 @@ NOTHROW_NCX(LIBCCALL libc_setbuffer)(FILE *__restrict stream,
  * Change the given `stream' to become line-buffered */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc_setlinebuf)(FILE *__restrict stream) {
-	libc_setvbuf(stream, NULL, _IOLBF, 0);
+	libc_setvbuf(stream, NULL, ___IOLBF, 0);
 }
 #include <libc/errno.h>
 #include <asm/os/stdio.h>

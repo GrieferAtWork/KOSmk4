@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b15e85c */
+/* HASH CRC-32:0x30f04126 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,6 +64,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou))(char const *__restrict __npt
 		if (*__used_endptr != '\0') {
 #ifdef __ENOTSUP
 			*__rstatus = __ENOTSUP;
+#elif defined(__EOPNOTSUPP)
+			*__rstatus = __EOPNOTSUPP;
 #elif defined(__EINVAL)
 			*__rstatus = __EINVAL;
 #else /* ... */

@@ -1757,17 +1757,19 @@ void setbuffer([[inout]] $FILE *__restrict stream,
 
 @@>> setlinebuf(3)
 @@Change the given `stream' to become line-buffered
+[[requires_include("<asm/crt/stdio.h>")]]
+[[requires($has_function(setvbuf) && defined(___IOLBF))]]
+[[impl_include("<asm/crt/stdio.h>")]]
 [[section(".text.crt{|.dos}.FILE.locked.read.utility")]]
-[[requires_function(setvbuf)]]
 void setlinebuf([[inout]] $FILE *__restrict stream) {
-	setvbuf(stream, NULL, _IOLBF, 0);
+	setvbuf(stream, NULL, ___IOLBF, 0);
 }
 
 @@>> fflush_unlocked(3)
 @@Same as `fflush()', but performs I/O without acquiring a lock to `stream'
-[[section(".text.crt{|.dos}.FILE.unlocked.write.utility")]]
 [[dos_only_export_alias("_fflush_nolock")]]
-[[cp_stdio, userimpl, alias(CNL_fflush...)]]
+[[cp_stdio, alias(CNL_fflush...)]]
+[[userimpl, section(".text.crt{|.dos}.FILE.unlocked.write.utility")]]
 int fflush_unlocked([[nullable]] $FILE *stream) {
 	/* NO-OP  (When  not  implemented  by  the  CRT,  assume  no
 	 * buffering being done, meaning this function isn't needed) */
@@ -1784,8 +1786,8 @@ int fflush_unlocked([[nullable]] $FILE *stream) {
 [[cp_stdio, wunused, decl_include("<hybrid/typecore.h>")]]
 [[no_crt_self_import, no_crt_self_export]]
 [[export_alias(CNL_fread_unlocked...), alias(CNL_fread...)]]
-[[userimpl, requires_function(fgetc_unlocked)]]
-[[section(".text.crt{|.dos}.FILE.unlocked.read.read")]]
+[[requires_function(fgetc_unlocked)]]
+[[userimpl, section(".text.crt{|.dos}.FILE.unlocked.read.read")]]
 $size_t fread_unlocked([[out(return * elemsize <= elemcount * elemsize)]] void *__restrict buf,
                        $size_t elemsize, $size_t elemcount, [[inout]] $FILE *__restrict stream) {
 	$size_t i, result = 0;
@@ -1808,8 +1810,8 @@ done:
 [[cp_stdio, wunused, decl_include("<hybrid/typecore.h>")]]
 [[no_crt_self_import, no_crt_self_export]]
 [[export_alias(CNL_fwrite_unlocked...), alias(CNL_fwrite...)]]
-[[userimpl, requires_function(fgetc_unlocked)]]
-[[section(".text.crt{|.dos}.FILE.unlocked.write.write")]]
+[[requires_function(fgetc_unlocked)]]
+[[userimpl, section(".text.crt{|.dos}.FILE.unlocked.write.write")]]
 $size_t fwrite_unlocked([[in(return * elemsize <= elemcount * elemsize)]] void const *__restrict buf,
                         $size_t elemsize, $size_t elemcount, [[inout]] $FILE *__restrict stream) {
 	$size_t i, result = 0;
@@ -3265,8 +3267,8 @@ int putw_unlocked(int w, [[inout]] $FILE *__restrict stream) {
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[no_crt_self_import, no_crt_self_export]]
 [[export_alias(CNL_setvbuf_unlocked...), alias(CNL_setvbuf...)]]
-[[userimpl, requires_function(setvbuf)]]
-[[section(".text.crt{|.dos}.FILE.unlocked.read.utility")]]
+[[requires_function(setvbuf)]]
+[[userimpl, section(".text.crt{|.dos}.FILE.unlocked.read.utility")]]
 int setvbuf_unlocked([[inout]] $FILE *__restrict stream,
                      char *__restrict buf, __STDC_INT_AS_UINT_T modes,
                      $size_t bufsize) {

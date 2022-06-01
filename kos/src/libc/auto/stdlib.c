@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x320ba0e9 */
+/* HASH CRC-32:0x27b359c8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2363,13 +2363,15 @@ NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
 	return -1;
 }
 #include <libc/template/program_invocation_name.h>
-/* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
+/* >> getexecname(3)
+ * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") ATTR_CONST WUNUSED char const *
 NOTHROW_NCX(LIBDCALL libd_getexecname)(void) {
 	return __LOCAL_program_invocation_name;
 }
 #include <libc/template/program_invocation_name.h>
-/* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
+/* >> getexecname(3)
+ * Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 INTERN ATTR_SECTION(".text.crt.solaris") ATTR_CONST WUNUSED char const *
 NOTHROW_NCX(LIBCCALL libc_getexecname)(void) {
 	return __LOCAL_program_invocation_name;
@@ -2388,7 +2390,8 @@ PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") int
 	return (*c->walk)(c->arg, fd);
 }
 #endif /* !__dwrap_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1_defined */
-/* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+/* >> fdwalk(3)
+ * Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
  * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
  * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
@@ -2404,7 +2407,8 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1)) int
 #ifndef __KERNEL__
 #include <asm/os/fcntl.h>
 #include <bits/os/dirent.h>
-/* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+/* >> fdwalk(3)
+ * Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
  * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
  * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
@@ -2481,6 +2485,10 @@ NOTHROW_NCX(LIBCCALL libc_ulltostr)(__ULONGLONG value,
 	return buf;
 }
 #include <asm/crt/malloc.h>
+/* >> reallocf(3)
+ * Same as `realloc(3)',  but `mallptr'  is always freed  when `NULL'  is
+ * returned (both error and the implementation-specific `realloc(ptr, 0)'
+ * case; s.a. __REALLOC_ZERO_IS_NONNULL) */
 INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *
 NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
                                     size_t num_bytes) {
@@ -2508,9 +2516,10 @@ NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
 	return result;
 }
 /* >> recallocarray(3)
- * Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
- * when `mallptr != NULL', memory pointed to by the old  `mallptr...+=old_elem_count*elem_size'
- * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
+ * Same  as  `recallocv(mallptr, new_elem_count, elem_size)', but  also ensure  that when
+ * `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory
+ * block */
 INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *
 NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr,
                                          size_t old_elem_count,
