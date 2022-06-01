@@ -43,7 +43,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <assert.h>
 #include <inttypes.h>

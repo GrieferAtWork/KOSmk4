@@ -32,7 +32,7 @@
 #include <sys/io.h>
 
 #ifndef CONFIG_NO_SMP
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 #endif /* !CONFIG_NO_SMP */
 
 #ifdef __CC__

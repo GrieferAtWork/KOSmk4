@@ -29,7 +29,7 @@
 
 #include <hybrid/__asm.h>
 #include <hybrid/align.h>
-#include <hybrid/sync/atomic-owner-rwlock.h>
+#include <hybrid/sched/atomic-owner-rwlock.h>
 
 #include <asm/asmword.h>
 #include <kos/debugtrap.h>

@@ -66,7 +66,7 @@
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <kos/aref.h>
 #include <kos/kernel/cpu-state-helpers.h>

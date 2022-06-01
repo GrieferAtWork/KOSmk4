@@ -29,8 +29,8 @@
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sync/atomic-lock.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <asm/os/statvfs.h>
 #include <kos/lockop.h>

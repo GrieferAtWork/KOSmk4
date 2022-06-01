@@ -34,8 +34,8 @@
 #include <hybrid/overflow.h>
 #include <hybrid/sched/preemption.h>
 #include <hybrid/sequence/list.h>
-#include <hybrid/sync/atomic-lock.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>

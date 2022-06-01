@@ -35,7 +35,7 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/unaligned.h>
 
 #include <asm/cpu-flags.h>

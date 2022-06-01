@@ -25,7 +25,7 @@
 #include <dev/keyboard.h>
 #include <kernel/types.h>
 
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <kos/sched/shared-lock.h>
 

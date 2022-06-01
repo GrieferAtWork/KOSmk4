@@ -26,8 +26,8 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
-#include <hybrid/sync/atomic-once.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-once.h>
+#include <hybrid/sched/atomic-rwlock.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/exec/idata.h>

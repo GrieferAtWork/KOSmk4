@@ -32,7 +32,7 @@
 #include <hybrid/typecore.h>
 
 #ifndef CONFIG_NO_SMP
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 #endif /* !CONFIG_NO_SMP */
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)

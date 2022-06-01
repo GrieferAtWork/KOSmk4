@@ -28,7 +28,7 @@
 #include <hybrid/__assert.h>
 #include <hybrid/sequence/list.h>   /* LIST_HEAD, SLIST_HEAD, ... */
 #include <hybrid/sequence/rbtree.h> /* RBTREE_ROOT */
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <kos/lockop.h>
 
@@ -48,7 +48,7 @@
 #endif /* !... */
 
 #ifdef CONFIG_USE_RWLOCK_FOR_MMAN
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 #endif /* CONFIG_USE_RWLOCK_FOR_MMAN */
 
 /* Trace program counters of write-locks to mfile objects. */

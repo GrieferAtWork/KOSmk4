@@ -26,7 +26,7 @@
 #include <sched/atomic64.h>
 #include <sched/pertask.h>
 
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #ifdef __CC__
 DECL_BEGIN

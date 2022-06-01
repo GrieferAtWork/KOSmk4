@@ -33,7 +33,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include "../api.h"
 /**/
 
-#include <hybrid/sync/atomic-once.h>
+#include <hybrid/sched/atomic-once.h>
 
 #include <kos/exec/elf.h>
 #include <kos/exec/idata.h>

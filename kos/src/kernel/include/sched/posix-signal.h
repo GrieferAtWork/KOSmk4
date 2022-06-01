@@ -25,7 +25,7 @@
 #include <kernel/types.h>
 #include <sched/pid.h>
 
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <bits/os/siginfo.h>
 

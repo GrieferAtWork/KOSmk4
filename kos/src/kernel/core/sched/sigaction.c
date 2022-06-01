@@ -37,7 +37,7 @@
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <bits/os/sigaction.h>
 #include <compat/config.h>

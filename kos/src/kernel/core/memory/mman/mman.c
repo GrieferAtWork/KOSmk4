@@ -42,8 +42,8 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/sched/preemption.h>
-#include <hybrid/sync/atomic-lock.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <kos/except.h>
 #include <kos/kernel/paging.h>

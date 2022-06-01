@@ -28,7 +28,7 @@
 
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <bits/crt/format-printer.h>
 #include <kos/aref.h>

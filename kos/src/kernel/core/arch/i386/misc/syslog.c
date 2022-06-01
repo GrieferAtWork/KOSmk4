@@ -32,7 +32,7 @@
 
 #include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <sys/io.h>
 

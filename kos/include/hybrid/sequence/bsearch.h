@@ -36,9 +36,9 @@
 			; /* Found it! (element is in `vector[index]') */          \
 		else
 
-/* >> BSEARCH(size_t &index, T vector[], size_t count,
- * >>         UNARY_SUFFIX_EXPR field,
- * >>         typeof(vector[index] field) key) {
+/* >> BSEARCH (size_t &index, T vector[], size_t count,
+ * >>          UNARY_SUFFIX_EXPR field,
+ * >>          typeof(vector[index] field) key) {
  * >>     <SUCC>
  * >> }
  * >> <FAIL>
@@ -47,7 +47,7 @@
  * >> struct number { int value; };
  * >> ssize_t find_number(struct number num[], size_t count, int v) {
  * >>     size_t i;
- * >>     BSEARCH(i, num, count, .value, v) {
+ * >>     BSEARCH (i, num, count, .value, v) {
  * >>         return i; // Found it!
  * >>     }
  * >>     return -1; // Not found

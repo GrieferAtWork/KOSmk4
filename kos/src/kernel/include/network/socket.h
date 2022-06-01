@@ -26,7 +26,7 @@
 #include <kernel/iovec.h>
 #include <kernel/types.h>
 
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <bits/os/cmsghdr.h>
 #include <compat/config.h>

@@ -72,7 +72,7 @@
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/typecore.h>
 
 #include <kos/except.h>

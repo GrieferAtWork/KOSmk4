@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <hw/timer/pit.h>
 #include <asm/intrin.h> /* __pause */

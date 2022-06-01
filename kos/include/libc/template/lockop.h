@@ -22,7 +22,7 @@
 #include <kos/lockop.h>
 #endif /* !_KOS_LOCKOP_H */
 #include <hybrid/__atomic.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #undef __LOCAL_obj
 #define __LOCAL_trylock() atomic_lock_tryacquire(__lock)

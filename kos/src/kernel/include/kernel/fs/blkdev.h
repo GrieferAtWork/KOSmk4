@@ -25,7 +25,7 @@
 #include <kernel/fs/devfs.h>
 
 #include <hybrid/__unaligned.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <kos/guid.h>
 #include <kos/lockop.h>

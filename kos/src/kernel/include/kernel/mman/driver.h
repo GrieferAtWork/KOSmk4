@@ -33,7 +33,7 @@
 #include <kos/exec/elf.h>
 
 #ifdef __WANT_DRIVER__d_internals
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <kos/lockop.h>
 #endif /* __WANT_DRIVER__d_internals */

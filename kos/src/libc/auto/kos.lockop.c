@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d285fda */
+/* HASH CRC-32:0x28b5ba62 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ NOTHROW(__LOCKOP_CC libc_oblockop_reap_ex)(struct oblockop_slist *__restrict sel
 #if defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)
 DEFINE_INTERN_ALIAS(libc_lockop_reap_atomic_lock, libc_oblockop_reap_atomic_lock);
 #else /* __OPTIMIZE_SIZE__ && __x86_64__ */
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void
 NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_lock)(struct lockop_slist *__restrict self,
                                                   struct atomic_lock *__restrict lock) {
@@ -85,7 +85,7 @@ NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_lock)(struct lockop_slist *__restric
 #endif /* !__INTELLISENSE__ */
 }
 #endif /* !__OPTIMIZE_SIZE__ || !__x86_64__ */
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)) void
 NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock)(struct oblockop_slist *__restrict self,
                                                     struct atomic_lock *__restrict lock,
@@ -101,7 +101,7 @@ NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_lock)(struct oblockop_slist *__res
 #if defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)
 DEFINE_INTERN_ALIAS(libc_lockop_reap_atomic_rwlock, libc_oblockop_reap_atomic_rwlock);
 #else /* __OPTIMIZE_SIZE__ && __x86_64__ */
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) void
 NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_rwlock)(struct lockop_slist *__restrict self,
                                                     struct atomic_rwlock *__restrict lock) {
@@ -114,7 +114,7 @@ NOTHROW(__LOCKOP_CC libc_lockop_reap_atomic_rwlock)(struct lockop_slist *__restr
 #endif /* !__INTELLISENSE__ */
 }
 #endif /* !__OPTIMIZE_SIZE__ || !__x86_64__ */
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) ATTR_INOUT(2) NONNULL((3)) void
 NOTHROW(__LOCKOP_CC libc_oblockop_reap_atomic_rwlock)(struct oblockop_slist *__restrict self,
                                                       struct atomic_rwlock *__restrict lock,

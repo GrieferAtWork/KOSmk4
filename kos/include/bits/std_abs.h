@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd277e405 */
+/* HASH CRC-32:0x1729f6ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,31 +74,6 @@ extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED long __NOTHROW(__LIBCCALL abs)(long __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(labs))(__x); }
 #endif /* !... */
 #endif /* !... */
-#ifdef __CRT_HAVE_ldiv
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),ldiv,(__numer,__denom))
-#else /* __CRT_HAVE_ldiv */
-} /* extern "C++" */
-__NAMESPACE_STD_END
-#include <hybrid/typecore.h>
-__NAMESPACE_STD_BEGIN
-extern "C++" {
-#if defined(__CRT_HAVE_div) && __SIZEOF_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),div,(__numer,__denom))
-#elif defined(__CRT_HAVE_lldiv) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),lldiv,(__numer,__denom))
-#elif defined(__CRT_HAVE_qdiv) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),qdiv,(__numer,__denom))
-#elif defined(__CRT_HAVE_imaxdiv) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __ldiv_struct,__NOTHROW_NCX,div,(long __numer, long __denom),imaxdiv,(__numer,__denom))
-#else /* ... */
-} /* extern "C++" */
-__NAMESPACE_STD_END
-#include <libc/local/stdlib/ldiv.h>
-__NAMESPACE_STD_BEGIN
-extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __ldiv_struct __NOTHROW_NCX(__LIBCCALL div)(long __numer, long __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldiv))(__numer, __denom); }
-#endif /* !... */
-#endif /* !__CRT_HAVE_ldiv */
 } /* extern "C++" */
 #endif /* !__CORRECT_ISO_CPP_STDLIB_H_PROTO */
 #if (!defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO) || !defined(__USE_ISOC99)) && defined(__COMPILER_HAVE_LONGLONG)
@@ -130,31 +105,6 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL abs)(__LONGLONG __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llabs))(__x); }
-#endif /* !... */
-#endif /* !... */
-#ifdef __CRT_HAVE_lldiv
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),lldiv,(__numer,__denom))
-#elif defined(__CRT_HAVE_qdiv)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),qdiv,(__numer,__denom))
-#else /* ... */
-} /* extern "C++" */
-__NAMESPACE_STD_END
-#include <hybrid/typecore.h>
-__NAMESPACE_STD_BEGIN
-extern "C++" {
-#if defined(__CRT_HAVE_div) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),div,(__numer,__denom))
-#elif defined(__CRT_HAVE_ldiv) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),ldiv,(__numer,__denom))
-#elif defined(__CRT_HAVE_imaxdiv) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __lldiv_struct,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),imaxdiv,(__numer,__denom))
-#else /* ... */
-} /* extern "C++" */
-__NAMESPACE_STD_END
-#include <libc/local/stdlib/lldiv.h>
-__NAMESPACE_STD_BEGIN
-extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct __NOTHROW_NCX(__LIBCCALL div)(__LONGLONG __numer, __LONGLONG __denom) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lldiv))(__numer, __denom); }
 #endif /* !... */
 #endif /* !... */
 } /* extern "C++" */

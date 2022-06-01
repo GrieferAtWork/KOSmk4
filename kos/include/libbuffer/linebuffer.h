@@ -23,7 +23,7 @@
 #include "api.h"
 
 #include <hybrid/__atomic.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <bits/types.h>
 #include <kos/anno.h>

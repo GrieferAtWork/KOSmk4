@@ -44,7 +44,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/sequence/bsearch.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <compat/config.h>
 #include <sys/stat.h>

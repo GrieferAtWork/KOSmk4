@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa161e536 */
+/* HASH CRC-32:0x8cfcf247 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ struct atomic_rwlock;
 #include <kos/lockop.h>
 #endif /* !_KOS_LOCKOP_H */
 #include <hybrid/__atomic.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_oblockop_reap_atomic_rwlock) __NOBLOCK __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_NONNULL((3)) void
 __NOTHROW(__LOCKOP_CC __LIBC_LOCAL_NAME(_oblockop_reap_atomic_rwlock))(struct oblockop_slist *__restrict __self, struct atomic_rwlock *__restrict __lock, void *__restrict __obj) {

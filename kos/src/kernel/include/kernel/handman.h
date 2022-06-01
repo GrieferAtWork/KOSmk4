@@ -27,7 +27,7 @@
 #include <sched/sig.h>
 
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <kos/kernel/paging.h>
 #include <kos/lockop.h>

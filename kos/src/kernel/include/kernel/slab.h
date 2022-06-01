@@ -31,7 +31,7 @@
 #include <kos/kernel/paging.h> /* KERNEL_MHINT_SLAB */
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #include "malloc-defs.h"

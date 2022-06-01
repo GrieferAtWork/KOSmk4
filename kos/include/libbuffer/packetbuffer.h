@@ -25,7 +25,7 @@
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 #include <hybrid/__overflow.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <bits/types.h>
 #include <kos/anno.h>

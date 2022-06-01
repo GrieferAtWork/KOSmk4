@@ -97,7 +97,7 @@
 #include <sched/sig.h>
 
 #include <hybrid/byteorder.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <kos/except.h>
 

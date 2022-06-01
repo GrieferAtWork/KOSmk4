@@ -25,7 +25,7 @@
 
 #include <hybrid/atomic.h>
 #include <hybrid/sequence/list.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <kos/anno.h>
 #include <kos/futex.h>

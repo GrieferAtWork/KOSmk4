@@ -29,7 +29,7 @@
 #include <sched/cpu.h>
 #include <sched/task.h>
 
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <stdbool.h>
 

@@ -24,7 +24,7 @@
 
 #include <kernel/types.h>
 
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <asm/os/signal.h>
 #include <bits/os/sigaction.h> /* `struct kernel_sigaction' */

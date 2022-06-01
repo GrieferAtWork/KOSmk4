@@ -362,6 +362,7 @@ incdir("");
 #include <bits/pthreadtypes.h>
 #include <bits/sigset.h>
 #include <bits/sockaddr.h>
+#include <bits/std_abs.h>
 #include <bits/syscalls.h>
 #include <bits/timex.h>
 #include <bits/types/FILE.h>
@@ -611,6 +612,10 @@ incdir("");
 #include <hybrid/sched/__gettid.h>
 #include <hybrid/sched/__preemption.h>
 #include <hybrid/sched/__yield.h>
+#include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sched/atomic-once.h>
+#include <hybrid/sched/atomic-owner-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 #include <hybrid/sched/preemption.h>
 #include <hybrid/sched/yield.h>
 #include <hybrid/sequence/bitset.h>
@@ -812,6 +817,7 @@ incdir("");
 #include <libdl/asm/dlfcn.h>
 #include <libdl/bits/dlfcn.h>
 #include <libdl/extension.h>
+#include <libdl/tls.h>
 #include <libemu86/api.h>
 #include <libemu86/eflags.h>
 #include <libemu86/emu/push-pop-util.h>

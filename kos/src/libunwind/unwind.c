@@ -39,7 +39,7 @@
 #ifndef __KERNEL__
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <kos/anno.h>
 

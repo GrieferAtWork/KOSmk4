@@ -36,7 +36,7 @@
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <kos/aref.h>
 #include <kos/except.h>

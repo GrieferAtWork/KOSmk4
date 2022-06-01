@@ -27,7 +27,7 @@
 #include <sched/sig.h>
 
 #include <hybrid/__assert.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <kos/aref.h>
 #include <linux/if_ether.h>

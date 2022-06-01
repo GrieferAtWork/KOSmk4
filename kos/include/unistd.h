@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4890011 */
+/* HASH CRC-32:0x6747b941 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1867,7 +1867,7 @@ __CDECLARE_OPT(__ATTR_IN(2),int,__NOTHROW_RPC,unlinkat,(__fd_t __dfd, char const
 /* >> fchdirat(2)
  * Change the current working directory to `dfd:path'
  * @param: flags: Set of `0 | AT_DOSPATH' */
-__CDECLARE_OPT(__ATTR_IN(2),int,__NOTHROW_RPC,fchdirat,(fd_t __dfd, char const *__path, __atflag_t __flags),(__dfd,__path,__flags))
+__CDECLARE_OPT(__ATTR_IN(2),int,__NOTHROW_RPC,fchdirat,(__fd_t __dfd, char const *__path, __atflag_t __flags),(__dfd,__path,__flags))
 /* >> fsymlinkat(3)
  * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path'

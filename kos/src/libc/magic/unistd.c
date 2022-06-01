@@ -1465,7 +1465,7 @@ int unlinkat($fd_t dfd, [[in]] char const *name, $atflag_t flags);
 [[cp, decl_include("<bits/types.h>")]]
 [[crt_dos_variant]]
 [[section(".text.crt{|.dos}.fs.property")]]
-int fchdirat(fd_t dfd, [[in]] char const *path, $atflag_t flags);
+int fchdirat($fd_t dfd, [[in]] char const *path, $atflag_t flags);
 
 @@>> fsymlinkat(3)
 @@Create  a  new  symbolic  link  loaded  with  `link_text'  as link

@@ -25,7 +25,7 @@
 #include <kernel/types.h>
 
 #include <hybrid/sequence/list.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <kos/lockop.h>
 

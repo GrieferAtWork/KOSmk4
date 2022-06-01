@@ -44,11 +44,9 @@ __SYSDECL_BEGIN
 %(std)#ifdef __cplusplus
 %(std)#ifndef __CORRECT_ISO_CPP_STDLIB_H_PROTO
 %[insert:std_function_nousing(abs = labs, externLinkageOverride: "C++")]
-%[insert:std_function_nousing(div = ldiv, externLinkageOverride: "C++")]
 %(std)#endif /* !__CORRECT_ISO_CPP_STDLIB_H_PROTO */
 %(std)#if (!defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO) || !defined(__USE_ISOC99)) && defined(__COMPILER_HAVE_LONGLONG)
 %[insert:std_function_nousing(abs = llabs, externLinkageOverride: "C++")]
-%[insert:std_function_nousing(div = lldiv, externLinkageOverride: "C++")]
 %(std)#endif /* (!__CORRECT_ISO_CPP_STDLIB_H_PROTO || !__USE_ISOC99) && __COMPILER_HAVE_LONGLONG */
 %(std)#if !defined(__CORRECT_ISO_CPP_MATH_H_PROTO) && !defined(__NO_FPU)
 %[insert:std_function_nousing(abs = fabsf, externLinkageOverride: "C++")]

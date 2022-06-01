@@ -27,7 +27,7 @@
 #include "api.h"
 
 #include <hybrid/atomic.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <kos/futex.h>
 #include <kos/ioctl/fd.h>

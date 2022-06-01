@@ -434,7 +434,7 @@ void _oblockop_reap_ex([[inout]] struct oblockop_slist *__restrict self,
 [[kernel, no_crt_dos_wrapper, cc(__LOCKOP_CC)]]
 [[if(defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)), crt_intern_kos_alias("libc_oblockop_reap_atomic_lock")]]
 [[impl_prefix(MAYBE_INCLUDE_KOS_LOCKOP_H)]]
-[[impl_include("<hybrid/__atomic.h>", "<hybrid/sync/atomic-lock.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<hybrid/sched/atomic-lock.h>")]]
 void _lockop_reap_atomic_lock([[inout]] struct lockop_slist *__restrict self,
                               [[inout]] struct atomic_lock *__restrict lock) {
 #ifndef __INTELLISENSE__
@@ -452,7 +452,7 @@ void _lockop_reap_atomic_lock([[inout]] struct lockop_slist *__restrict self,
 [[decl_prefix(struct oblockop_slist;), decl_prefix(struct atomic_lock;)]]
 [[kernel, no_crt_dos_wrapper, cc(__LOCKOP_CC)]]
 [[impl_prefix(MAYBE_INCLUDE_KOS_LOCKOP_H)]]
-[[impl_include("<hybrid/__atomic.h>", "<hybrid/sync/atomic-lock.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<hybrid/sched/atomic-lock.h>")]]
 void _oblockop_reap_atomic_lock([[inout]] struct oblockop_slist *__restrict self,
                                 [[inout]] struct atomic_lock *__restrict lock,
                                 [[nonnull]] void *__restrict obj) {
@@ -472,7 +472,7 @@ void _oblockop_reap_atomic_lock([[inout]] struct oblockop_slist *__restrict self
 [[kernel, no_crt_dos_wrapper, cc(__LOCKOP_CC)]]
 [[if(defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)), crt_intern_kos_alias("libc_oblockop_reap_atomic_rwlock")]]
 [[impl_prefix(MAYBE_INCLUDE_KOS_LOCKOP_H)]]
-[[impl_include("<hybrid/__atomic.h>", "<hybrid/sync/atomic-rwlock.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<hybrid/sched/atomic-rwlock.h>")]]
 void _lockop_reap_atomic_rwlock([[inout]] struct lockop_slist *__restrict self,
                                 [[inout]] struct atomic_rwlock *__restrict lock) {
 #ifndef __INTELLISENSE__
@@ -490,7 +490,7 @@ void _lockop_reap_atomic_rwlock([[inout]] struct lockop_slist *__restrict self,
 [[decl_prefix(struct oblockop_slist;), decl_prefix(struct atomic_rwlock;)]]
 [[kernel, no_crt_dos_wrapper, cc(__LOCKOP_CC)]]
 [[impl_prefix(MAYBE_INCLUDE_KOS_LOCKOP_H)]]
-[[impl_include("<hybrid/__atomic.h>", "<hybrid/sync/atomic-rwlock.h>")]]
+[[impl_include("<hybrid/__atomic.h>", "<hybrid/sched/atomic-rwlock.h>")]]
 void _oblockop_reap_atomic_rwlock([[inout]] struct oblockop_slist *__restrict self,
                                   [[inout]] struct atomic_rwlock *__restrict lock,
                                   [[nonnull]] void *__restrict obj) {

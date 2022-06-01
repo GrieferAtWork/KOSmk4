@@ -26,7 +26,7 @@
 #include <kernel/types.h>
 #include <sched/sig.h>
 
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sched/atomic-rwlock.h>
 
 #include <kos/ioctl/mouse.h>
 

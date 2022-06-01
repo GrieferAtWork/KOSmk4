@@ -33,7 +33,7 @@
 #include <hybrid/sched/preemption.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sched/atomic-lock.h>
 
 #include <asm/pagesize.h>
 #include <kos/except.h>
