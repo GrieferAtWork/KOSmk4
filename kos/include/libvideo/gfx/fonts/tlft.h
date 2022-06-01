@@ -117,8 +117,9 @@ tlft_lookup(TLFT_Hdr const *__restrict self, __uint32_t ch) {
 		return ascii + ((ch - 0x0020) << self->h_log2chsize);
 	chars = ascii + (95 << self->h_log2chsize);
 	/* bsearch-style lookup */
-	BSEARCHR(i, groups, self->h_ngroups,
-	         /*item*/ .ug_minuni, /*item*/ .ug_maxuni, ch) {
+	BSEARCH_RANGE(i, groups, self->h_ngroups,
+	               /*item*/ .ug_minuni,
+	               /*item*/ .ug_maxuni, ch) {
 		/* Found it! */
 		return chars + (groups[i].ug_offset << self->h_log2chsize);
 	}

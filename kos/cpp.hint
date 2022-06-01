@@ -1454,8 +1454,8 @@
 
 #define BSEARCH(...) for(;;)
 #define BSEARCH_EX(...) for(;;)
-#define BSEARCHR(...) for(;;)
-#define BSEARCHR_EX(...) for(;;)
+#define BSEARCH_RANGE(...) for(;;)
+#define BSEARCH_RANGE_EX(...) for(;;)
 #define BITSET(num_bits) struct{unsigned int _bs_bits[42];}
 #define ATOMIC_ONCE_RUN(self, ...) __VA_ARGS__
 

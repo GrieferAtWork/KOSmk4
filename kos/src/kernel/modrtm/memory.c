@@ -735,8 +735,10 @@ rtm_memory_readwrite(struct rtm_memory *__restrict self, USER void *addr,
 		return; /* Nothing to do here! */
 again:
 	i = 0;
-	BSEARCHR(i, self->rm_regionv, self->rm_regionc,
-	         ->mr_addrlo, ->mr_addrhi, addr) {
+	BSEARCH_RANGE (i, self->rm_regionv, self->rm_regionc,
+	                                    ->mr_addrlo,
+	                                    ->mr_addrhi,
+	               addr) {
 		struct rtm_memory_region *region;
 		size_t avail_bytes;
 		byte_t *rdat;
@@ -957,10 +959,10 @@ again_lock_effective_mman:
 			access_bytes = num_bytes;
 		/* Check for some additional region with which the  given
 		 * address range may overlap at some later point in time.
-		 * HINT: `i' is still left initialized by the `BSEARCHR()'  above,
-		 *       and currently points at where the region for `addr' would
-		 *       have been (if it existed),  or at the region before  that
-		 *       index. */
+		 * HINT: `i'  is  still left  initialized by  the `BSEARCH_RANGE()'
+		 *       above, and currently points at where the region for `addr'
+		 *       would have been (if it  existed), or at the region  before
+		 *       that index. */
 		if (i >= self->rm_regionc) {
 			assertf(i == 0,
 			        "i                = %" PRIuSIZ "\n"

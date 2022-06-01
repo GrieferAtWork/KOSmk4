@@ -409,8 +409,10 @@ rpc_mem_readwrite(struct rpc_mem *__restrict self,
 	validate_readwrite(addr, num_bytes);
 again:
 	i = 0;
-	BSEARCHR(i, self->rm_bankv, self->rm_bankc,
-	         ->rmb_addrlo, ->rmb_addrhi, addr) {
+	BSEARCH_RANGE (i, self->rm_bankv, self->rm_bankc,
+	                                  ->rmb_addrlo,
+	                                  ->rmb_addrhi,
+	               addr) {
 		/* Found it! */
 		bank = self->rm_bankv[i];
 		goto rw_bank;

@@ -62,9 +62,10 @@ libvideo_tlft_lookup(struct tlft_font const *__restrict self,
 	uint8_t i;
 	if (ord >= 0x0020 && ord <= 0x007e)
 		return self->tf_ascii + ((ord - 0x0020) << self->tf_hdr->h_log2chsize);
-	BSEARCHR(i, self->tf_grps, self->tf_hdr->h_ngroups,
-	         /*item*/ .ug_minuni, /*item*/ .ug_maxuni,
-	         (uint16_t)ord) {
+	BSEARCH_RANGE (i, self->tf_grps, self->tf_hdr->h_ngroups,
+	               /*item*/ .ug_minuni,
+	               /*item*/ .ug_maxuni,
+	               (uint16_t)ord) {
 		/* Found it! */
 		return self->tf_chars + ((self->tf_grps[i].ug_offset +
 		                          ((uint16_t)ord - self->tf_grps[i].ug_minuni))

@@ -816,10 +816,10 @@ NOTHROW(FCALL driver_fromaddr)(void const *addr) {
 	 * drivers. */
 	ll = get_driver_loadlist();
 	assert_assume(ll->dll_count >= 1);
-	BSEARCHR (i, ll->dll_drivers, ll->dll_count,
-	          ->d_module.md_loadmin,
-	          ->d_module.md_loadmax,
-	          (byte_t const *)addr) {
+	BSEARCH_RANGE (i, ll->dll_drivers, ll->dll_count,
+	                                   ->d_module.md_loadmin,
+	                                   ->d_module.md_loadmax,
+	               (byte_t const *)addr) {
 		uint16_t phdr;
 		uintptr_t driver_reladdr;
 		result = ll->dll_drivers[i];
