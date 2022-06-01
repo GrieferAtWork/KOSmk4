@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xe4ee3c9e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,18 +17,56 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_imaxabs_defined
-#define __local_imaxabs_defined
+#ifndef _BITS_CRT_DIV_H
+#define _BITS_CRT_DIV_H 1
+
 #include <__crt.h>
+#include <__stdinc.h>
+
 #include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(imaxabs) __ATTR_CONST __INTMAX_TYPE__
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(imaxabs))(__INTMAX_TYPE__ __x) {
-	return __x < 0 ? -__x : __x;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_imaxabs_defined
-#define __local___localdep_imaxabs_defined
-#define __localdep_imaxabs __LIBC_LOCAL_NAME(imaxabs)
-#endif /* !__local___localdep_imaxabs_defined */
-#endif /* !__local_imaxabs_defined */
+
+#define __OFFSET_DIV_QUOT     0
+#define __OFFSET_DIV_REM      __SIZEOF_INT__
+#define __SIZEOF_DIV_STRUCT   (2 * __SIZEOF_INT__)
+#define __OFFSET_LDIV_QUOT    0
+#define __OFFSET_LDIV_REM     __SIZEOF_LONG__
+#define __SIZEOF_LDIV_STRUCT  (2 * __SIZEOF_LONG__)
+#ifdef __LONGLONG
+#define __OFFSET_LLDIV_QUOT   0
+#define __OFFSET_LLDIV_REM    __SIZEOF_LONG_LONG__
+#define __SIZEOF_LLDIV_STRUCT (2 * __SIZEOF_LONG_LONG__)
+#endif /* __LONGLONG */
+
+#ifdef __CC__
+__DECL_BEGIN
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("quot")
+#pragma push_macro("rem")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef quot
+#undef rem
+struct __div_struct {
+	int quot;
+	int rem;
+};
+struct __ldiv_struct {
+	long quot;
+	long rem;
+};
+#ifdef __LONGLONG
+struct __lldiv_struct {
+	__LONGLONG quot;
+	__LONGLONG rem;
+};
+#endif /* __LONGLONG */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("rem")
+#pragma pop_macro("quot")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_BITS_CRT_DIV_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdc8f988 */
+/* HASH CRC-32:0xf39deaf2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -508,14 +508,21 @@ DEFINE_PUBLIC_ALIAS(DOS$getifaddrs, libd_getifaddrs);
 DEFINE_PUBLIC_ALIAS(DOS$freeifaddrs, libd_freeifaddrs);
 
 /* inttypes */
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8
 DEFINE_PUBLIC_ALIAS(DOS$imaxabs, libd_imaxabs);
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8 */
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__
 DEFINE_PUBLIC_ALIAS(DOS$imaxdiv, libd_imaxdiv);
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ */
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 DEFINE_PUBLIC_ALIAS(DOS$strtoimax, libd_strtoimax);
 DEFINE_PUBLIC_ALIAS(DOS$strtoumax, libd_strtoumax);
 DEFINE_PUBLIC_ALIAS(DOS$_strtoimax_l, libd_strtoimax_l);
 DEFINE_PUBLIC_ALIAS(DOS$strtoimax_l, libd_strtoimax_l);
 DEFINE_PUBLIC_ALIAS(DOS$_strtoumax_l, libd_strtoumax_l);
 DEFINE_PUBLIC_ALIAS(DOS$strtoumax_l, libd_strtoumax_l);
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 DEFINE_PUBLIC_ALIAS(DOS$strtoi, libd_strtoi);
 DEFINE_PUBLIC_ALIAS(DOS$strtou, libd_strtou);
 DEFINE_PUBLIC_ALIAS(DOS$strtoi_l, libd_strtoi_l);
@@ -2345,14 +2352,32 @@ DEFINE_PUBLIC_ALIAS(DOS$__fsetlocking, libd___fsetlocking);
 DEFINE_PUBLIC_ALIAS(DOS$__fseterr, libd___fseterr);
 
 /* stdlib */
+#if __SIZEOF_INTMAX_T__ == __SIZEOF_INT__
+DEFINE_PUBLIC_ALIAS(DOS$imaxabs, libd_abs);
+#endif /* __SIZEOF_INTMAX_T__ == __SIZEOF_INT__ */
+DEFINE_PUBLIC_ALIAS(DOS$abs, libd_abs);
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$imaxabs, libd_labs);
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(DOS$labs, libd_labs);
+#if __SIZEOF_INTMAX_T__ == __SIZEOF_INT__
+DEFINE_PUBLIC_ALIAS(DOS$imaxdiv, libd_div);
+#endif /* __SIZEOF_INTMAX_T__ == __SIZEOF_INT__ */
+DEFINE_PUBLIC_ALIAS(DOS$div, libd_div);
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$imaxdiv, libd_ldiv);
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
+DEFINE_PUBLIC_ALIAS(DOS$ldiv, libd_ldiv);
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$imaxabs, libd_llabs);
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(DOS$llabs, libd_llabs);
 DEFINE_PUBLIC_ALIAS(DOS$qabs, libd_llabs);
-DEFINE_PUBLIC_ALIAS(DOS$ldiv, libd_ldiv);
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$imaxdiv, libd_lldiv);
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(DOS$lldiv, libd_lldiv);
 DEFINE_PUBLIC_ALIAS(DOS$qdiv, libd_lldiv);
-DEFINE_PUBLIC_ALIAS(DOS$abs, libd_abs);
-DEFINE_PUBLIC_ALIAS(DOS$div, libd_div);
 DEFINE_PUBLIC_ALIAS(DOS$mblen, libd_mblen);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_system, libd_system);
 DEFINE_PUBLIC_ALIAS(DOS$system, libd_system);
@@ -2378,15 +2403,27 @@ DEFINE_PUBLIC_ALIAS(DOS$free, libd_free);
 DEFINE_PUBLIC_ALIAS(DOS$srand, libd_srand);
 DEFINE_PUBLIC_ALIAS(DOS$atoi, libd_atoi);
 DEFINE_PUBLIC_ALIAS(DOS$atol, libd_atol);
-DEFINE_PUBLIC_ALIAS(DOS$atoll, libd_atoll);
-DEFINE_PUBLIC_ALIAS(DOS$strtoul, libd_strtoul);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$strtoimax, libd_strtol);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(DOS$strtol, libd_strtol);
-DEFINE_PUBLIC_ALIAS(DOS$strtoull, libd_strtoull);
-DEFINE_PUBLIC_ALIAS(DOS$strtouq, libd_strtoull);
-DEFINE_PUBLIC_ALIAS(DOS$__strtouq, libd_strtoull);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$strtoumax, libd_strtoul);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
+DEFINE_PUBLIC_ALIAS(DOS$strtoul, libd_strtoul);
+DEFINE_PUBLIC_ALIAS(DOS$atoll, libd_atoll);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$strtoimax, libd_strtoll);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(DOS$strtoll, libd_strtoll);
 DEFINE_PUBLIC_ALIAS(DOS$strtoq, libd_strtoll);
 DEFINE_PUBLIC_ALIAS(DOS$__strtoq, libd_strtoll);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$strtoumax, libd_strtoull);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
+DEFINE_PUBLIC_ALIAS(DOS$strtoull, libd_strtoull);
+DEFINE_PUBLIC_ALIAS(DOS$strtouq, libd_strtoull);
+DEFINE_PUBLIC_ALIAS(DOS$__strtouq, libd_strtoull);
 DEFINE_PUBLIC_ALIAS(DOS$atof, libd_atof);
 DEFINE_PUBLIC_ALIAS(DOS$strtod, libd_strtod);
 DEFINE_PUBLIC_ALIAS(DOS$__strtof, libd_strtof);
@@ -2400,16 +2437,44 @@ DEFINE_PUBLIC_ALIAS(DOS$strtou32_r, libd_strtou32_r);
 DEFINE_PUBLIC_ALIAS(DOS$strto32_r, libd_strto32_r);
 DEFINE_PUBLIC_ALIAS(DOS$strtou64_r, libd_strtou64_r);
 DEFINE_PUBLIC_ALIAS(DOS$strto64_r, libd_strto64_r);
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(DOS$strtoumax, libd_strtou32);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(DOS$strtou32, libd_strtou32);
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(DOS$strtoimax, libd_strto32);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(DOS$strto32, libd_strto32);
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(DOS$strtoumax, libd_strtou64);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
 DEFINE_PUBLIC_ALIAS(DOS$_strtoui64, libd_strtou64);
 DEFINE_PUBLIC_ALIAS(DOS$strtou64, libd_strtou64);
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(DOS$strtoimax, libd_strto64);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
 DEFINE_PUBLIC_ALIAS(DOS$_strtoi64, libd_strto64);
 DEFINE_PUBLIC_ALIAS(DOS$strto64, libd_strto64);
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(DOS$strtoumax_l, libd_strtou32_l);
+DEFINE_PUBLIC_ALIAS(DOS$_strtoumax_l, libd_strtou32_l);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(DOS$strtou32_l, libd_strtou32_l);
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(DOS$strtoimax_l, libd_strto32_l);
+DEFINE_PUBLIC_ALIAS(DOS$_strtoimax_l, libd_strto32_l);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(DOS$strto32_l, libd_strto32_l);
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(DOS$strtoumax_l, libd_strtou64_l);
+DEFINE_PUBLIC_ALIAS(DOS$_strtoumax_l, libd_strtou64_l);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
 DEFINE_PUBLIC_ALIAS(DOS$_strtoui64_l, libd_strtou64_l);
 DEFINE_PUBLIC_ALIAS(DOS$strtou64_l, libd_strtou64_l);
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(DOS$strtoimax_l, libd_strto64_l);
+DEFINE_PUBLIC_ALIAS(DOS$_strtoimax_l, libd_strto64_l);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
 DEFINE_PUBLIC_ALIAS(DOS$_strtoi64_l, libd_strto64_l);
 DEFINE_PUBLIC_ALIAS(DOS$strto64_l, libd_strto64_l);
 DEFINE_PUBLIC_ALIAS(DOS$_gcvt, libd_gcvt);
@@ -2467,15 +2532,31 @@ DEFINE_PUBLIC_ALIAS(DOS$mkdtemp, libd_mkdtemp);
 DEFINE_PUBLIC_ALIAS(DOS$grantpt, libd_grantpt);
 DEFINE_PUBLIC_ALIAS(DOS$unlockpt, libd_unlockpt);
 DEFINE_PUBLIC_ALIAS(DOS$posix_openpt, libd_posix_openpt);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG___
+DEFINE_PUBLIC_ALIAS(DOS$strtoimax_l, libd_strtol_l);
+DEFINE_PUBLIC_ALIAS(DOS$_strtoimax_l, libd_strtol_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG___ */
 DEFINE_PUBLIC_ALIAS(DOS$_strtol_l, libd_strtol_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strtol_l, libd_strtol_l);
 DEFINE_PUBLIC_ALIAS(DOS$strtol_l, libd_strtol_l);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG___
+DEFINE_PUBLIC_ALIAS(DOS$strtoumax_l, libd_strtoul_l);
+DEFINE_PUBLIC_ALIAS(DOS$_strtoumax_l, libd_strtoul_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG___ */
 DEFINE_PUBLIC_ALIAS(DOS$_strtoul_l, libd_strtoul_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strtoul_l, libd_strtoul_l);
 DEFINE_PUBLIC_ALIAS(DOS$strtoul_l, libd_strtoul_l);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG___ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG___
+DEFINE_PUBLIC_ALIAS(DOS$strtoimax_l, libd_strtoll_l);
+DEFINE_PUBLIC_ALIAS(DOS$_strtoimax_l, libd_strtoll_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG___ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG___ */
 DEFINE_PUBLIC_ALIAS(DOS$_strtoll_l, libd_strtoll_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strtoll_l, libd_strtoll_l);
 DEFINE_PUBLIC_ALIAS(DOS$strtoll_l, libd_strtoll_l);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG___ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG___
+DEFINE_PUBLIC_ALIAS(DOS$strtoumax_l, libd_strtoull_l);
+DEFINE_PUBLIC_ALIAS(DOS$_strtoumax_l, libd_strtoull_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG___ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG___ */
 DEFINE_PUBLIC_ALIAS(DOS$_strtoull_l, libd_strtoull_l);
 DEFINE_PUBLIC_ALIAS(DOS$__strtoull_l, libd_strtoull_l);
 DEFINE_PUBLIC_ALIAS(DOS$strtoull_l, libd_strtoull_l);
@@ -2520,6 +2601,9 @@ DEFINE_PUBLIC_ALIAS(DOS$_get_pgmptr, libd__get_pgmptr);
 DEFINE_PUBLIC_ALIAS(DOS$_set_fmode, libd__set_fmode);
 DEFINE_PUBLIC_ALIAS(DOS$_get_fmode, libd__get_fmode);
 DEFINE_PUBLIC_ALIAS(DOS$_set_abort_behavior, libd__set_abort_behavior);
+#if __SIZEOF_INT__ != 8 && __SIZEOF_LONG__ != 8 && __SIZEOF_LONG_LONG__ != 8 && __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(DOS$imaxabs, libd__abs64);
+#endif /* __SIZEOF_INT__ != 8 && __SIZEOF_LONG__ != 8 && __SIZEOF_LONG_LONG__ != 8 && __SIZEOF_INTMAX_T__ == 8 */
 DEFINE_PUBLIC_ALIAS(DOS$_abs64, libd__abs64);
 DEFINE_PUBLIC_ALIAS(DOS$_atof_l, libd__atof_l);
 DEFINE_PUBLIC_ALIAS(DOS$_atoi_l, libd__atoi_l);
@@ -2702,7 +2786,6 @@ DEFINE_PUBLIC_ALIAS(DOS$wmempset, libd_mempsetw);
 DEFINE_PUBLIC_ALIAS(DOS$mempsetw, libd_mempsetw);
 DEFINE_PUBLIC_ALIAS(DOS$memsetl, libd_memsetl);
 DEFINE_PUBLIC_ALIAS(DOS$mempsetl, libd_mempsetl);
-#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ <= 2
 DEFINE_PUBLIC_ALIAS(DOS$wmemcmp, libd_memcmpw);
 #endif /* __SIZEOF_INT__ <= 2 */

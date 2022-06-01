@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb583a335 */
+/* HASH CRC-32:0x97ac6ad8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -160,10 +160,12 @@ __NAMESPACE_STD_USING(ungetwc)
 #define __wcsftime_defined
 __NAMESPACE_STD_USING(wcsftime)
 #endif /* !__wcsftime_defined && __std_wcsftime_defined */
+#if !defined(__USE_DOS) || defined(__USE_ISOC95)
 #if !defined(__wcstok_defined) && defined(__std_wcstok_defined)
 #define __wcstok_defined
 __NAMESPACE_STD_USING(wcstok)
 #endif /* !__wcstok_defined && __std_wcstok_defined */
+#endif /* !__USE_DOS || __USE_ISOC95 */
 #if !defined(__wcslen_defined) && defined(__std_wcslen_defined)
 #define __wcslen_defined
 __NAMESPACE_STD_USING(wcslen)
@@ -193,10 +195,13 @@ __NAMESPACE_STD_USING(wcspbrk)
 __NAMESPACE_STD_USING(wcsstr)
 #endif /* !__wcsstr_defined && __std_wcsstr_defined */
 __NAMESPACE_STD_USING(wmemchr)
+#if defined(__USE_ISOC95) || defined(__USE_UNIX98)
 #if !defined(__fwide_defined) && defined(__std_fwide_defined)
 #define __fwide_defined
 __NAMESPACE_STD_USING(fwide)
 #endif /* !__fwide_defined && __std_fwide_defined */
+#endif /* __USE_ISOC95 || __USE_UNIX98 */
+#if defined(__USE_ISOC95) || defined(__USE_UNIX98) || defined(__USE_DOS)
 #if !defined(__fwprintf_defined) && defined(__std_fwprintf_defined)
 #define __fwprintf_defined
 __NAMESPACE_STD_USING(fwprintf)
@@ -233,21 +238,25 @@ __NAMESPACE_STD_USING(vswprintf)
 #define __swprintf_defined
 __NAMESPACE_STD_USING(swprintf)
 #endif /* !__swprintf_defined && __std_swprintf_defined */
+#endif /* __USE_ISOC95 || __USE_UNIX98 || __USE_DOS */
 #ifndef __NO_FPU
 #if !defined(__wcstod_defined) && defined(__std_wcstod_defined)
 #define __wcstod_defined
 __NAMESPACE_STD_USING(wcstod)
 #endif /* !__wcstod_defined && __std_wcstod_defined */
 #endif /* !__NO_FPU */
+#ifdef __USE_ISOC99
 #ifndef __NO_FPU
 #if !defined(__wcstof_defined) && defined(__std_wcstof_defined)
 #define __wcstof_defined
 __NAMESPACE_STD_USING(wcstof)
 #endif /* !__wcstof_defined && __std_wcstof_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__wcstold_defined) && defined(__std_wcstold_defined)
 #define __wcstold_defined
 __NAMESPACE_STD_USING(wcstold)
 #endif /* !__wcstold_defined && __std_wcstold_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 #if !defined(__wcstoll_defined) && defined(__std_wcstoll_defined)
 #define __wcstoll_defined
@@ -269,6 +278,7 @@ __NAMESPACE_STD_USING(vwscanf)
 #define __vswscanf_defined
 __NAMESPACE_STD_USING(vswscanf)
 #endif /* !__vswscanf_defined && __std_vswscanf_defined */
+#endif /* __USE_ISOC99 */
 #if !defined(__wcstok_defined) && defined(__std_wcstok_defined)
 #define __wcstok_defined
 __NAMESPACE_STD_USING(wcstok)
@@ -1753,8 +1763,8 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstold, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL wcstold)(wchar_t const *__restrict __nptr, wchar_t **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstold))(__nptr, __endptr); })
 #endif /* !... */
 #endif /* !__std_wcstold_defined */
-#endif /* !__NO_FPU */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__NO_FPU */
 #ifndef __std_wcstoll_defined
 #define __std_wcstoll_defined
 #ifdef __wcstoll_defined
@@ -2062,10 +2072,16 @@ __NAMESPACE_STD_USING(ungetwc)
 #define __wcsftime_defined
 __NAMESPACE_STD_USING(wcsftime)
 #endif /* !__wcsftime_defined && __std_wcsftime_defined */
+#endif /* !__CXX_SYSTEM_HEADER */
+#if !defined(__USE_DOS) || defined(__USE_ISOC95)
+#ifndef __CXX_SYSTEM_HEADER
 #if !defined(__wcstok_defined) && defined(__std_wcstok_defined)
 #define __wcstok_defined
 __NAMESPACE_STD_USING(wcstok)
 #endif /* !__wcstok_defined && __std_wcstok_defined */
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* !__USE_DOS || __USE_ISOC95 */
+#ifndef __CXX_SYSTEM_HEADER
 #if !defined(__wcslen_defined) && defined(__std_wcslen_defined)
 #define __wcslen_defined
 __NAMESPACE_STD_USING(wcslen)
@@ -2095,10 +2111,17 @@ __NAMESPACE_STD_USING(wcspbrk)
 __NAMESPACE_STD_USING(wcsstr)
 #endif /* !__wcsstr_defined && __std_wcsstr_defined */
 __NAMESPACE_STD_USING(wmemchr)
+#endif /* !__CXX_SYSTEM_HEADER */
+#if defined(__USE_ISOC95) || defined(__USE_UNIX98)
+#ifndef __CXX_SYSTEM_HEADER
 #if !defined(__fwide_defined) && defined(__std_fwide_defined)
 #define __fwide_defined
 __NAMESPACE_STD_USING(fwide)
 #endif /* !__fwide_defined && __std_fwide_defined */
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __USE_ISOC95 || __USE_UNIX98 */
+#if defined(__USE_ISOC95) || defined(__USE_UNIX98) || defined(__USE_DOS)
+#ifndef __CXX_SYSTEM_HEADER
 #if !defined(__fwprintf_defined) && defined(__std_fwprintf_defined)
 #define __fwprintf_defined
 #ifdef fwprintf
@@ -2160,6 +2183,7 @@ __NAMESPACE_STD_USING(swprintf)
 #endif /* !swprintf */
 #endif /* !__swprintf_defined && __std_swprintf_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __USE_ISOC95 || __USE_UNIX98 || __USE_DOS */
 #ifndef __NO_FPU
 #ifndef __CXX_SYSTEM_HEADER
 #if !defined(__wcstod_defined) && defined(__std_wcstod_defined)
@@ -2168,17 +2192,22 @@ __NAMESPACE_STD_USING(wcstod)
 #endif /* !__wcstod_defined && __std_wcstod_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 #endif /* !__NO_FPU */
+#ifdef __USE_ISOC99
 #ifndef __NO_FPU
 #ifndef __CXX_SYSTEM_HEADER
 #if !defined(__wcstof_defined) && defined(__std_wcstof_defined)
 #define __wcstof_defined
 __NAMESPACE_STD_USING(wcstof)
 #endif /* !__wcstof_defined && __std_wcstof_defined */
+#endif /* !__CXX_SYSTEM_HEADER */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#ifndef __CXX_SYSTEM_HEADER
 #if !defined(__wcstold_defined) && defined(__std_wcstold_defined)
 #define __wcstold_defined
 __NAMESPACE_STD_USING(wcstold)
 #endif /* !__wcstold_defined && __std_wcstold_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 #ifndef __CXX_SYSTEM_HEADER
 #if !defined(__wcstoll_defined) && defined(__std_wcstoll_defined)
@@ -2201,6 +2230,9 @@ __NAMESPACE_STD_USING(vwscanf)
 #define __vswscanf_defined
 __NAMESPACE_STD_USING(vswscanf)
 #endif /* !__vswscanf_defined && __std_vswscanf_defined */
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __USE_ISOC99 */
+#ifndef __CXX_SYSTEM_HEADER
 #if !defined(__wcstok_defined) && defined(__std_wcstok_defined)
 #define __wcstok_defined
 __NAMESPACE_STD_USING(wcstok)
@@ -2579,6 +2611,8 @@ __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__ULONGLONG,__NOTHROW_NCX
 /* >> wcstoull(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ULONGLONG __NOTHROW_NCX(__LIBCCALL wcstouq)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoull))(__nptr, __endptr, __base); }
 #endif /* !... */
+
+#ifdef __LONGLONG
 #ifdef __CRT_HAVE_wcstoll_l
 /* >> wcstoll_l(3) */
 __CDECLARE(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGLONG,__NOTHROW_NCX,wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
@@ -2609,9 +2643,6 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGLONG,__NOTHROW_NCX,wcstoll_l,(w
 #elif defined(__CRT_HAVE__wcstoimax_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
 /* >> wcstoll_l(3) */
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGLONG,__NOTHROW_NCX,wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE___wcstoimax_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
-/* >> wcstoll_l(3) */
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGLONG,__NOTHROW_NCX,wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcstoll_l.h>
 /* >> wcstoll_l(3) */
@@ -2647,14 +2678,12 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__ULONGLONG,__NOTHROW_NCX,wcstoull_l,
 #elif defined(__CRT_HAVE__wcstoumax_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
 /* >> wcstoull_l(3) */
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__ULONGLONG,__NOTHROW_NCX,wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE___wcstoumax_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
-/* >> wcstoull_l(3) */
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__ULONGLONG,__NOTHROW_NCX,wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcstoull_l.h>
 /* >> wcstoull_l(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstoull_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT_OPT(2) __ULONGLONG __NOTHROW_NCX(__LIBCCALL wcstoull_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoull_l))(__nptr, __endptr, __base, __locale); })
 #endif /* !... */
+#endif /* __LONGLONG */
 #ifndef __NO_FPU
 #ifdef __CRT_HAVE_wcstof_l
 /* >> wcstof_l(3) */
@@ -3174,29 +3203,6 @@ __CDECLARE(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4),__UINT64
 /* >> wcstou64_r(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstou64_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL wcstou64_r)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64_r))(__nptr, __endptr, __base, __error); })
 #endif /* !__CRT_HAVE_wcstou64_r */
-#if defined(__CRT_HAVE_wcstoul) && __SIZEOF_LONG__ == 8
-/* >> wcstou64(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoul,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_wcstoull) && __SIZEOF_LONG_LONG__ == 8
-/* >> wcstou64(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoull,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_wcstouq) && __SIZEOF_LONG_LONG__ == 8
-/* >> wcstou64(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstouq,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_wcstou64)
-/* >> wcstou64(3) */
-__CDECLARE(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE__wcstoui64)
-/* >> wcstou64(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),_wcstoui64,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_wcstoumax) && __SIZEOF_INTMAX_T__ == 8
-/* >> wcstou64(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoumax,(__nptr,__endptr,__base))
-#else /* ... */
-#include <libc/local/wchar/wcstou64.h>
-/* >> wcstou64(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcstou64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL wcstou64)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64))(__nptr, __endptr, __base); })
-#endif /* !... */
 #if defined(__CRT_HAVE_wcstol) && __SIZEOF_LONG__ == 8
 /* >> wcsto64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__INT64_TYPE__,__NOTHROW_NCX,wcsto64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstol,(__nptr,__endptr,__base))
@@ -3219,6 +3225,29 @@ __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__INT64_TYPE__,__NOTHROW_
 #include <libc/local/wchar/wcsto64.h>
 /* >> wcsto64(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcsto64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL wcsto64)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64))(__nptr, __endptr, __base); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wcstoul) && __SIZEOF_LONG__ == 8
+/* >> wcstou64(3) */
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoul,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_wcstoull) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstou64(3) */
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoull,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_wcstouq) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstou64(3) */
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstouq,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_wcstou64)
+/* >> wcstou64(3) */
+__CDECLARE(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE__wcstoui64)
+/* >> wcstou64(3) */
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),_wcstoui64,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_wcstoumax) && __SIZEOF_INTMAX_T__ == 8
+/* >> wcstou64(3) */
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoumax,(__nptr,__endptr,__base))
+#else /* ... */
+#include <libc/local/wchar/wcstou64.h>
+/* >> wcstou64(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcstou64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL wcstou64)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* __UINT64_TYPE__ */
 #if defined(__CRT_HAVE_wcsto32_r) && __SIZEOF_LONG__ == 4
@@ -3328,9 +3357,6 @@ __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__INT32_TYPE__,__NOTHROW_
 #elif defined(__CRT_HAVE__wcstoimax_l) && __SIZEOF_INTMAX_T__ == 4
 /* >> wcsto32_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__INT32_TYPE__,__NOTHROW_NCX,wcsto32_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE___wcstoimax_l) && __SIZEOF_INTMAX_T__ == 4
-/* >> wcsto32_l(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__INT32_TYPE__,__NOTHROW_NCX,wcsto32_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcsto32_l.h>
 /* >> wcsto32_l(3) */
@@ -3363,9 +3389,6 @@ __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT32_TYPE__,__NOTHROW
 #elif defined(__CRT_HAVE__wcstoumax_l) && __SIZEOF_INTMAX_T__ == 4
 /* >> wcstou32_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT32_TYPE__,__NOTHROW_NCX,wcstou32_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE___wcstoumax_l) && __SIZEOF_INTMAX_T__ == 4
-/* >> wcstou32_l(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT32_TYPE__,__NOTHROW_NCX,wcstou32_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcstou32_l.h>
 /* >> wcstou32_l(3) */
@@ -3403,9 +3426,6 @@ __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__INT64_TYPE__,__NOTHROW_
 #elif defined(__CRT_HAVE__wcstoimax_l) && __SIZEOF_INTMAX_T__ == 8
 /* >> wcsto64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__INT64_TYPE__,__NOTHROW_NCX,wcsto64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE___wcstoimax_l) && __SIZEOF_INTMAX_T__ == 8
-/* >> wcsto64_l(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__INT64_TYPE__,__NOTHROW_NCX,wcsto64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcsto64_l.h>
 /* >> wcsto64_l(3) */
@@ -3441,9 +3461,6 @@ __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW
 #elif defined(__CRT_HAVE__wcstoumax_l) && __SIZEOF_INTMAX_T__ == 8
 /* >> wcstou64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
-#elif defined(__CRT_HAVE___wcstoumax_l) && __SIZEOF_INTMAX_T__ == 8
-/* >> wcstou64_l(3) */
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__UINT64_TYPE__,__NOTHROW_NCX,wcstou64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcstou64_l.h>
 /* >> wcstou64_l(3) */

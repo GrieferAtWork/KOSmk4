@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa46b1aed */
+/* HASH CRC-32:0x320ba0e9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -200,6 +200,10 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED ATTR_IN(1) ATTR_IN_OPT(2
 	                         (void *)compar);
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
+INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST WUNUSED int
+NOTHROW(LIBCCALL libc_abs)(int x) {
+	return x < 0 ? -x : x;
+}
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_labs, libc_abs);
@@ -209,17 +213,14 @@ NOTHROW(LIBCCALL libc_labs)(long x) {
 	return x < 0 ? -x : x;
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
-#include <hybrid/typecore.h>
-#if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-DEFINE_INTERN_ALIAS(libc_llabs, libc_abs);
-#elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libc_llabs, libc_labs);
-#else /* ... */
-INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST WUNUSED __LONGLONG
-NOTHROW(LIBCCALL libc_llabs)(__LONGLONG x) {
-	return x < 0 ? -x : x;
+INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST WUNUSED struct __div_struct
+NOTHROW_NCX(LIBCCALL libc_div)(int numer,
+                               int denom) {
+	div_t result;
+	result.quot = numer / denom;
+	result.rem  = numer % denom;
+	return result;
 }
-#endif /* !... */
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_ldiv, libc_div);
@@ -235,6 +236,17 @@ NOTHROW_NCX(LIBCCALL libc_ldiv)(long numer,
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+DEFINE_INTERN_ALIAS(libc_llabs, libc_abs);
+#elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libc_llabs, libc_labs);
+#else /* ... */
+INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST WUNUSED __LONGLONG
+NOTHROW(LIBCCALL libc_llabs)(__LONGLONG x) {
+	return x < 0 ? -x : x;
+}
+#endif /* !... */
+#include <hybrid/typecore.h>
+#if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
 DEFINE_INTERN_ALIAS(libc_lldiv, libc_div);
 #elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_lldiv, libc_ldiv);
@@ -248,18 +260,6 @@ NOTHROW_NCX(LIBCCALL libc_lldiv)(__LONGLONG numer,
 	return result;
 }
 #endif /* !... */
-INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_abs)(int x) {
-	return x < 0 ? -x : x;
-}
-INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST WUNUSED struct __div_struct
-NOTHROW_NCX(LIBCCALL libc_div)(int numer,
-                               int denom) {
-	div_t result;
-	result.quot = numer / denom;
-	result.rem  = numer % denom;
-	return result;
-}
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_IN_OPT(1) int
 NOTHROW_NCX(LIBCCALL libc_mblen)(char const *str,
                                  size_t maxlen) {
@@ -386,18 +386,20 @@ NOTHROW_NCX(LIBCCALL libc_atol)(char const *__restrict nptr) {
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
 #include <hybrid/typecore.h>
-#if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-DEFINE_INTERN_ALIAS(libc_atoll, libc_atoi);
-#elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-DEFINE_INTERN_ALIAS(libc_atoll, libc_atol);
+#if __SIZEOF_LONG__ == 4
+DEFINE_INTERN_ALIAS(libc_strtol, libc_strto32);
+#elif __SIZEOF_LONG__ == 8
+DEFINE_INTERN_ALIAS(libc_strtol, libc_strto64);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_PURE WUNUSED ATTR_IN(1) __LONGLONG
-NOTHROW_NCX(LIBCCALL libc_atoll)(char const *__restrict nptr) {
-#if __SIZEOF_LONG_LONG__ <= 4
-	return (__LONGLONG)libc_strto32(nptr, NULL, 10);
-#else /* __SIZEOF_LONG_LONG__ <= 4 */
-	return (__LONGLONG)libc_strto64(nptr, NULL, 10);
-#endif /* __SIZEOF_LONG_LONG__ > 4 */
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) long
+NOTHROW_NCX(LIBCCALL libc_strtol)(char const *__restrict nptr,
+                                  char **endptr,
+                                  __STDC_INT_AS_UINT_T base) {
+#if __SIZEOF_LONG__ <= 4
+	return (long)libc_strto32(nptr, endptr, base);
+#else /* __SIZEOF_LONG__ <= 4 */
+	return (long)libc_strto64(nptr, endptr, base);
+#endif /* __SIZEOF_LONG__ > 4 */
 }
 #endif /* !... */
 #if __SIZEOF_LONG__ == 4
@@ -418,36 +420,17 @@ NOTHROW_NCX(LIBCCALL libc_strtoul)(char const *__restrict nptr,
 }
 #endif /* !... */
 #include <hybrid/typecore.h>
-#if __SIZEOF_LONG__ == 4
-DEFINE_INTERN_ALIAS(libc_strtol, libc_strto32);
-#elif __SIZEOF_LONG__ == 8
-DEFINE_INTERN_ALIAS(libc_strtol, libc_strto64);
+#if __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+DEFINE_INTERN_ALIAS(libc_atoll, libc_atoi);
+#elif __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+DEFINE_INTERN_ALIAS(libc_atoll, libc_atol);
 #else /* ... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) long
-NOTHROW_NCX(LIBCCALL libc_strtol)(char const *__restrict nptr,
-                                  char **endptr,
-                                  __STDC_INT_AS_UINT_T base) {
-#if __SIZEOF_LONG__ <= 4
-	return (long)libc_strto32(nptr, endptr, base);
-#else /* __SIZEOF_LONG__ <= 4 */
-	return (long)libc_strto64(nptr, endptr, base);
-#endif /* __SIZEOF_LONG__ > 4 */
-}
-#endif /* !... */
-#include <hybrid/typecore.h>
-#if __SIZEOF_LONG_LONG__ == 8
-DEFINE_INTERN_ALIAS(libc_strtoull, libc_strtou64);
-#elif __SIZEOF_LONG_LONG__ == 4
-DEFINE_INTERN_ALIAS(libc_strtoull, libc_strtou32);
-#else /* ... */
-INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) __ULONGLONG
-NOTHROW_NCX(LIBCCALL libc_strtoull)(char const *__restrict nptr,
-                                    char **endptr,
-                                    __STDC_INT_AS_UINT_T base) {
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_PURE WUNUSED ATTR_IN(1) __LONGLONG
+NOTHROW_NCX(LIBCCALL libc_atoll)(char const *__restrict nptr) {
 #if __SIZEOF_LONG_LONG__ <= 4
-	return (__ULONGLONG)libc_strtou32(nptr, endptr, base);
+	return (__LONGLONG)libc_strto32(nptr, NULL, 10);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
-	return (__ULONGLONG)libc_strtou64(nptr, endptr, base);
+	return (__LONGLONG)libc_strto64(nptr, NULL, 10);
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 #endif /* !... */
@@ -465,6 +448,23 @@ NOTHROW_NCX(LIBCCALL libc_strtoll)(char const *__restrict nptr,
 	return (__LONGLONG)libc_strto32(nptr, endptr, base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
 	return (__LONGLONG)libc_strto64(nptr, endptr, base);
+#endif /* __SIZEOF_LONG_LONG__ > 4 */
+}
+#endif /* !... */
+#include <hybrid/typecore.h>
+#if __SIZEOF_LONG_LONG__ == 8
+DEFINE_INTERN_ALIAS(libc_strtoull, libc_strtou64);
+#elif __SIZEOF_LONG_LONG__ == 4
+DEFINE_INTERN_ALIAS(libc_strtoull, libc_strtou32);
+#else /* ... */
+INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) __ULONGLONG
+NOTHROW_NCX(LIBCCALL libc_strtoull)(char const *__restrict nptr,
+                                    char **endptr,
+                                    __STDC_INT_AS_UINT_T base) {
+#if __SIZEOF_LONG_LONG__ <= 4
+	return (__ULONGLONG)libc_strtou32(nptr, endptr, base);
+#else /* __SIZEOF_LONG_LONG__ <= 4 */
+	return (__ULONGLONG)libc_strtou64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 #endif /* !... */
@@ -4389,14 +4389,32 @@ DEFINE_PUBLIC_ALIAS(DOS$bsearch, libd_bsearch);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(bsearch, libc_bsearch);
+#if __SIZEOF_INTMAX_T__ == __SIZEOF_INT__
+DEFINE_PUBLIC_ALIAS(imaxabs, libc_abs);
+#endif /* __SIZEOF_INTMAX_T__ == __SIZEOF_INT__ */
+DEFINE_PUBLIC_ALIAS(abs, libc_abs);
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(imaxabs, libc_labs);
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(labs, libc_labs);
+#if __SIZEOF_INTMAX_T__ == __SIZEOF_INT__
+DEFINE_PUBLIC_ALIAS(imaxdiv, libc_div);
+#endif /* __SIZEOF_INTMAX_T__ == __SIZEOF_INT__ */
+DEFINE_PUBLIC_ALIAS(div, libc_div);
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(imaxdiv, libc_ldiv);
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
+DEFINE_PUBLIC_ALIAS(ldiv, libc_ldiv);
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(imaxabs, libc_llabs);
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(llabs, libc_llabs);
 DEFINE_PUBLIC_ALIAS(qabs, libc_llabs);
-DEFINE_PUBLIC_ALIAS(ldiv, libc_ldiv);
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(imaxdiv, libc_lldiv);
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(lldiv, libc_lldiv);
 DEFINE_PUBLIC_ALIAS(qdiv, libc_lldiv);
-DEFINE_PUBLIC_ALIAS(abs, libc_abs);
-DEFINE_PUBLIC_ALIAS(div, libc_div);
 DEFINE_PUBLIC_ALIAS(mblen, libc_mblen);
 DEFINE_PUBLIC_ALIAS(DOS$mbtowc, libd_mbtowc);
 DEFINE_PUBLIC_ALIAS(mbtowc, libc_mbtowc);
@@ -4419,15 +4437,27 @@ DEFINE_PUBLIC_ALIAS(abort, libc_abort);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(atoi, libc_atoi);
 DEFINE_PUBLIC_ALIAS(atol, libc_atol);
-DEFINE_PUBLIC_ALIAS(atoll, libc_atoll);
-DEFINE_PUBLIC_ALIAS(strtoul, libc_strtoul);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(strtoimax, libc_strtol);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(strtol, libc_strtol);
-DEFINE_PUBLIC_ALIAS(strtoull, libc_strtoull);
-DEFINE_PUBLIC_ALIAS(strtouq, libc_strtoull);
-DEFINE_PUBLIC_ALIAS(__strtouq, libc_strtoull);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(strtoumax, libc_strtoul);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
+DEFINE_PUBLIC_ALIAS(strtoul, libc_strtoul);
+DEFINE_PUBLIC_ALIAS(atoll, libc_atoll);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(strtoimax, libc_strtoll);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(strtoll, libc_strtoll);
 DEFINE_PUBLIC_ALIAS(strtoq, libc_strtoll);
 DEFINE_PUBLIC_ALIAS(__strtoq, libc_strtoll);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(strtoumax, libc_strtoull);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
+DEFINE_PUBLIC_ALIAS(strtoull, libc_strtoull);
+DEFINE_PUBLIC_ALIAS(strtouq, libc_strtoull);
+DEFINE_PUBLIC_ALIAS(__strtouq, libc_strtoull);
 DEFINE_PUBLIC_ALIAS(atof, libc_atof);
 DEFINE_PUBLIC_ALIAS(strtod, libc_strtod);
 DEFINE_PUBLIC_ALIAS(__strtof, libc_strtof);
@@ -4439,23 +4469,59 @@ DEFINE_PUBLIC_ALIAS(strtou32_r, libc_strtou32_r);
 DEFINE_PUBLIC_ALIAS(strto32_r, libc_strto32_r);
 DEFINE_PUBLIC_ALIAS(strtou64_r, libc_strtou64_r);
 DEFINE_PUBLIC_ALIAS(strto64_r, libc_strto64_r);
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(strtoumax, libc_strtou32);
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(strtou32, libc_strtou32);
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(strtoimax, libc_strto32);
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(strto32, libc_strto32);
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(strtoumax, libc_strtou64);
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ == 8 */
 #if defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(_strtoui64, libc_strtou64);
 #endif /* __LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strtou64, libc_strtou64);
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(strtoimax, libc_strto64);
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ == 8 */
 #if defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 DEFINE_PUBLIC_ALIAS(_strtoi64, libc_strto64);
 #endif /* __LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(strto64, libc_strto64);
 #ifndef __KERNEL__
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(strtoumax_l, libc_strtou32_l);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
+#if defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(_strtoumax_l, libc_strtou32_l);
+#endif /* __LIBCCALL_IS_LIBDCALL && __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(strtou32_l, libc_strtou32_l);
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(strtoimax_l, libc_strto32_l);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
+#if defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(_strtoimax_l, libc_strto32_l);
+#endif /* __LIBCCALL_IS_LIBDCALL && __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(strto32_l, libc_strto32_l);
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(strtoumax_l, libc_strtou64_l);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
+#if defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(_strtoumax_l, libc_strtou64_l);
+#endif /* __LIBCCALL_IS_LIBDCALL && __SIZEOF_INTMAX_T__ == 8 */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoui64_l, libc_strtou64_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(strtou64_l, libc_strtou64_l);
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(strtoimax_l, libc_strto64_l);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
+#if defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(_strtoimax_l, libc_strto64_l);
+#endif /* __LIBCCALL_IS_LIBDCALL && __SIZEOF_INTMAX_T__ == 8 */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoi64_l, libc_strto64_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -4500,21 +4566,45 @@ DEFINE_PUBLIC_ALIAS(mkdtemp, libc_mkdtemp);
 DEFINE_PUBLIC_ALIAS(unlockpt, libc_unlockpt);
 DEFINE_PUBLIC_ALIAS(DOS$ptsname, libd_ptsname);
 DEFINE_PUBLIC_ALIAS(ptsname, libc_ptsname);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG___
+DEFINE_PUBLIC_ALIAS(strtoimax_l, libc_strtol_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG___ */
+#if defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG___
+DEFINE_PUBLIC_ALIAS(_strtoimax_l, libc_strtol_l);
+#endif /* __LIBCCALL_IS_LIBDCALL && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG___ */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtol_l, libc_strtol_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strtol_l, libc_strtol_l);
 DEFINE_PUBLIC_ALIAS(strtol_l, libc_strtol_l);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG___
+DEFINE_PUBLIC_ALIAS(strtoumax_l, libc_strtoul_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG___ */
+#if defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG___
+DEFINE_PUBLIC_ALIAS(_strtoumax_l, libc_strtoul_l);
+#endif /* __LIBCCALL_IS_LIBDCALL && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG___ */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoul_l, libc_strtoul_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strtoul_l, libc_strtoul_l);
 DEFINE_PUBLIC_ALIAS(strtoul_l, libc_strtoul_l);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG___ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG___
+DEFINE_PUBLIC_ALIAS(strtoimax_l, libc_strtoll_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG___ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG___ */
+#if defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG___ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG___
+DEFINE_PUBLIC_ALIAS(_strtoimax_l, libc_strtoll_l);
+#endif /* __LIBCCALL_IS_LIBDCALL && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG___ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG___ */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoll_l, libc_strtoll_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__strtoll_l, libc_strtoll_l);
 DEFINE_PUBLIC_ALIAS(strtoll_l, libc_strtoll_l);
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG___ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG___
+DEFINE_PUBLIC_ALIAS(strtoumax_l, libc_strtoull_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG___ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG___ */
+#if defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG___ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG___
+DEFINE_PUBLIC_ALIAS(_strtoumax_l, libc_strtoull_l);
+#endif /* __LIBCCALL_IS_LIBDCALL && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG___ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG___ */
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoull_l, libc_strtoull_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -4590,6 +4680,9 @@ DEFINE_PUBLIC_ALIAS(__p__pgmptr, libc___p__pgmptr);
 DEFINE_PUBLIC_ALIAS(_get_pgmptr, libc__get_pgmptr);
 DEFINE_PUBLIC_ALIAS(DOS$_get_wpgmptr, libd__get_wpgmptr);
 DEFINE_PUBLIC_ALIAS(_get_wpgmptr, libc__get_wpgmptr);
+#if __SIZEOF_INT__ != 8 && __SIZEOF_LONG__ != 8 && __SIZEOF_LONG_LONG__ != 8 && __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(imaxabs, libc__abs64);
+#endif /* __SIZEOF_INT__ != 8 && __SIZEOF_LONG__ != 8 && __SIZEOF_LONG_LONG__ != 8 && __SIZEOF_INTMAX_T__ == 8 */
 DEFINE_PUBLIC_ALIAS(_abs64, libc__abs64);
 DEFINE_PUBLIC_ALIAS(_atof_l, libc__atof_l);
 DEFINE_PUBLIC_ALIAS(_atoi_l, libc__atoi_l);

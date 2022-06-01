@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2257ff24 */
+/* HASH CRC-32:0xd5ef6f38 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1980,8 +1980,15 @@
 #define __CRT_HAVE_DOS$ilogb
 #define __CRT_HAVE_DOS$ilogbf
 #define __CRT_HAVE_DOS$ilogbl
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#include <hybrid/typecore.h>
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8
 #define __CRT_HAVE_DOS$imaxabs
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__
 #define __CRT_HAVE_DOS$imaxdiv
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$inet6_opt_append
 #define __CRT_HAVE_DOS$inet6_opt_find
 #define __CRT_HAVE_DOS$inet6_opt_finish
@@ -3362,8 +3369,12 @@
 #define __CRT_HAVE_DOS$strtof_l
 #define __CRT_HAVE_DOS$strtoi
 #define __CRT_HAVE_DOS$strtoi_l
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 #define __CRT_HAVE_DOS$strtoimax
 #define __CRT_HAVE_DOS$strtoimax_l
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$strtok
 #define __CRT_HAVE_DOS$strtok_r
 #define __CRT_HAVE_DOS$strtol
@@ -3386,8 +3397,12 @@
 #define __CRT_HAVE_DOS$strtoul_l
 #define __CRT_HAVE_DOS$strtoull
 #define __CRT_HAVE_DOS$strtoull_l
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 #define __CRT_HAVE_DOS$strtoumax
 #define __CRT_HAVE_DOS$strtoumax_l
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$strtrns
 #define __CRT_HAVE_DOS$strupr
 #define __CRT_HAVE_DOS$strupr_l
@@ -3810,8 +3825,12 @@
 #define __CRT_HAVE_DOS$wcstod_l
 #define __CRT_HAVE_DOS$wcstof
 #define __CRT_HAVE_DOS$wcstof_l
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 #define __CRT_HAVE_DOS$wcstoimax
 #define __CRT_HAVE_DOS$wcstoimax_l
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$wcstok
 #define __CRT_HAVE_DOS$wcstol
 #define __CRT_HAVE_DOS$wcstol_l
@@ -3831,8 +3850,12 @@
 #define __CRT_HAVE_DOS$wcstoul_l
 #define __CRT_HAVE_DOS$wcstoull
 #define __CRT_HAVE_DOS$wcstoull_l
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 #define __CRT_HAVE_DOS$wcstoumax
 #define __CRT_HAVE_DOS$wcstoumax_l
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$wcsupr
 #define __CRT_HAVE_DOS$wcsupr_l
 #define __CRT_HAVE_DOS$wcsverscmp
@@ -6190,8 +6213,14 @@
 #define __CRT_HAVE_ilogb
 #define __CRT_HAVE_ilogbf
 #define __CRT_HAVE_ilogbl
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8
 #define __CRT_HAVE_imaxabs
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__
 #define __CRT_HAVE_imaxdiv
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_inet6_opt_append
 #define __CRT_HAVE_inet6_opt_find
 #define __CRT_HAVE_inet6_opt_finish
@@ -7711,8 +7740,12 @@
 #define __CRT_HAVE_strtof_l
 #define __CRT_HAVE_strtoi
 #define __CRT_HAVE_strtoi_l
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 #define __CRT_HAVE_strtoimax
 #define __CRT_HAVE_strtoimax_l
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#ifndef __KERNEL__
 #define __CRT_HAVE_strtok
 #define __CRT_HAVE_strtok_r
 #define __CRT_HAVE_strtol
@@ -7741,8 +7774,12 @@
 #define __CRT_HAVE_strtoul_l
 #define __CRT_HAVE_strtoull
 #define __CRT_HAVE_strtoull_l
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 #define __CRT_HAVE_strtoumax
 #define __CRT_HAVE_strtoumax_l
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#ifndef __KERNEL__
 #define __CRT_HAVE_strtrns
 #define __CRT_HAVE_strupr
 #define __CRT_HAVE_strupr_l
@@ -8140,8 +8177,12 @@
 #define __CRT_HAVE_wcstod_l
 #define __CRT_HAVE_wcstof
 #define __CRT_HAVE_wcstof_l
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 #define __CRT_HAVE_wcstoimax
 #define __CRT_HAVE_wcstoimax_l
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#ifndef __KERNEL__
 #define __CRT_HAVE_wcstok
 #define __CRT_HAVE_wcstol
 #define __CRT_HAVE_wcstol_l
@@ -8161,8 +8202,12 @@
 #define __CRT_HAVE_wcstoul_l
 #define __CRT_HAVE_wcstoull
 #define __CRT_HAVE_wcstoull_l
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 #define __CRT_HAVE_wcstoumax
 #define __CRT_HAVE_wcstoumax_l
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#ifndef __KERNEL__
 #define __CRT_HAVE_wcsupr
 #define __CRT_HAVE_wcsupr_l
 #define __CRT_HAVE_wcsverscmp
@@ -8245,7 +8290,6 @@
 #define __CRT_HAVE_wrenameat2
 #define __CRT_HAVE_write
 #endif /* !__KERNEL__ */
-#include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 #if !defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__)
 #define __CRT_HAVE_write_printer

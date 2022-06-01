@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f7704d4 */
+/* HASH CRC-32:0x5625c29a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4107,40 +4107,6 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 	return result;
 }
 #include <libc/errno.h>
-/* >> wcstou64(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uint64_t
-NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
-                                    char16_t **endptr,
-                                    __STDC_INT_AS_UINT_T base) {
-
-	uint64_t result;
-	errno_t error;
-	result = libd_wcstou64_r(nptr, endptr, base, &error);
-	if (error == ERANGE)
-		(void)libc_seterrno(ERANGE);
-	return result;
-
-
-
-}
-#include <libc/errno.h>
-/* >> wcstou64(3) */
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uint64_t
-NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
-                                    char32_t **endptr,
-                                    __STDC_INT_AS_UINT_T base) {
-
-	uint64_t result;
-	errno_t error;
-	result = libc_wcstou64_r(nptr, endptr, base, &error);
-	if (error == ERANGE)
-		(void)libc_seterrno(ERANGE);
-	return result;
-
-
-
-}
-#include <libc/errno.h>
 /* >> wcsto64(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) int64_t
 NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
@@ -4167,6 +4133,40 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64)(char32_t const *__restrict nptr,
 	int64_t result;
 	errno_t error;
 	result = libc_wcsto64_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
+		(void)libc_seterrno(ERANGE);
+	return result;
+
+
+
+}
+#include <libc/errno.h>
+/* >> wcstou64(3) */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uint64_t
+NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
+                                    char16_t **endptr,
+                                    __STDC_INT_AS_UINT_T base) {
+
+	uint64_t result;
+	errno_t error;
+	result = libd_wcstou64_r(nptr, endptr, base, &error);
+	if (error == ERANGE)
+		(void)libc_seterrno(ERANGE);
+	return result;
+
+
+
+}
+#include <libc/errno.h>
+/* >> wcstou64(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uint64_t
+NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
+                                    char32_t **endptr,
+                                    __STDC_INT_AS_UINT_T base) {
+
+	uint64_t result;
+	errno_t error;
+	result = libc_wcstou64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
 		(void)libc_seterrno(ERANGE);
 	return result;
@@ -5744,9 +5744,25 @@ DEFINE_PUBLIC_ALIAS(mbsrtowcs, libc_mbsrtowcs);
 DEFINE_PUBLIC_ALIAS(DOS$wcsrtombs, libd_wcsrtombs);
 DEFINE_PUBLIC_ALIAS(wcsrtombs, libc_wcsrtombs);
 DEFINE_PUBLIC_ALIAS(DOS$wcstol, libd_wcstol);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$wcstoimax, libd_wcstol);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(wcstol, libc_wcstol);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(wcstoimax, libc_wcstol);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(DOS$wcstoul, libd_wcstoul);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$wcstoumax, libd_wcstoul);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(wcstoul, libc_wcstoul);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(wcstoumax, libc_wcstoul);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(mbsinit, libc_mbsinit);
 #endif /* !__KERNEL__ */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2
@@ -5847,12 +5863,28 @@ DEFINE_PUBLIC_ALIAS(DOS$wcstold, libd_wcstold);
 DEFINE_PUBLIC_ALIAS(wcstold, libc_wcstold);
 DEFINE_PUBLIC_ALIAS(DOS$wcstoll, libd_wcstoll);
 DEFINE_PUBLIC_ALIAS(DOS$wcstoq, libd_wcstoll);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$wcstoimax, libd_wcstoll);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(wcstoll, libc_wcstoll);
 DEFINE_PUBLIC_ALIAS(wcstoq, libc_wcstoll);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(wcstoimax, libc_wcstoll);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(DOS$wcstoull, libd_wcstoull);
 DEFINE_PUBLIC_ALIAS(DOS$wcstouq, libd_wcstoull);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$wcstoumax, libd_wcstoull);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(wcstoull, libc_wcstoull);
 DEFINE_PUBLIC_ALIAS(wcstouq, libc_wcstoull);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(wcstoumax, libc_wcstoull);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(DOS$vfwscanf, libd_vfwscanf);
 DEFINE_PUBLIC_ALIAS(vfwscanf, libc_vfwscanf);
 DEFINE_PUBLIC_ALIAS(DOS$vwscanf, libd_vwscanf);
@@ -5913,23 +5945,59 @@ DEFINE_PUBLIC_ALIAS(DOS$wcschrnul, libd_wcschrnul);
 DEFINE_PUBLIC_ALIAS(wcschrnul, libc_wcschrnul);
 DEFINE_PUBLIC_ALIAS(DOS$_wcstol_l, libd_wcstol_l);
 DEFINE_PUBLIC_ALIAS(DOS$__wcstol_l, libd_wcstol_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$wcstoimax_l, libd_wcstol_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wcstoimax_l, libd_wcstol_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(DOS$wcstol_l, libd_wcstol_l);
 DEFINE_PUBLIC_ALIAS(__wcstol_l, libc_wcstol_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(wcstoimax_l, libc_wcstol_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(wcstol_l, libc_wcstol_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wcstoul_l, libd_wcstoul_l);
 DEFINE_PUBLIC_ALIAS(DOS$__wcstoul_l, libd_wcstoul_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$wcstoumax_l, libd_wcstoul_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wcstoumax_l, libd_wcstoul_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(DOS$wcstoul_l, libd_wcstoul_l);
 DEFINE_PUBLIC_ALIAS(__wcstoul_l, libc_wcstoul_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
+DEFINE_PUBLIC_ALIAS(wcstoumax_l, libc_wcstoul_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(wcstoul_l, libc_wcstoul_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wcstoll_l, libd_wcstoll_l);
 DEFINE_PUBLIC_ALIAS(DOS$__wcstoll_l, libd_wcstoll_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$wcstoimax_l, libd_wcstoll_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wcstoimax_l, libd_wcstoll_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(DOS$wcstoll_l, libd_wcstoll_l);
 DEFINE_PUBLIC_ALIAS(__wcstoll_l, libc_wcstoll_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(wcstoimax_l, libc_wcstoll_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(wcstoll_l, libc_wcstoll_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wcstoull_l, libd_wcstoull_l);
 DEFINE_PUBLIC_ALIAS(DOS$__wcstoull_l, libd_wcstoull_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(DOS$wcstoumax_l, libd_wcstoull_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wcstoumax_l, libd_wcstoull_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(DOS$wcstoull_l, libd_wcstoull_l);
 DEFINE_PUBLIC_ALIAS(__wcstoull_l, libc_wcstoull_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
+DEFINE_PUBLIC_ALIAS(wcstoumax_l, libc_wcstoull_l);
+#endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__ */
 DEFINE_PUBLIC_ALIAS(wcstoull_l, libc_wcstoull_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wcstof_l, libd_wcstof_l);
 DEFINE_PUBLIC_ALIAS(DOS$__wcstof_l, libd_wcstof_l);
@@ -5995,29 +6063,97 @@ DEFINE_PUBLIC_ALIAS(DOS$wcsto32_r, libd_wcsto32_r);
 DEFINE_PUBLIC_ALIAS(wcsto32_r, libc_wcsto32_r);
 DEFINE_PUBLIC_ALIAS(DOS$wcstou32_r, libd_wcstou32_r);
 DEFINE_PUBLIC_ALIAS(wcstou32_r, libc_wcstou32_r);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(DOS$wcstoimax, libd_wcsto32);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(DOS$wcsto32, libd_wcsto32);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(wcstoimax, libc_wcsto32);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(wcsto32, libc_wcsto32);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(DOS$wcstoumax, libd_wcstou32);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(DOS$wcstou32, libd_wcstou32);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(wcstoumax, libc_wcstou32);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(wcstou32, libc_wcstou32);
 DEFINE_PUBLIC_ALIAS(DOS$wcsto64_r, libd_wcsto64_r);
 DEFINE_PUBLIC_ALIAS(wcsto64_r, libc_wcsto64_r);
 DEFINE_PUBLIC_ALIAS(DOS$wcstou64_r, libd_wcstou64_r);
 DEFINE_PUBLIC_ALIAS(wcstou64_r, libc_wcstou64_r);
-DEFINE_PUBLIC_ALIAS(DOS$_wcstoui64, libd_wcstou64);
-DEFINE_PUBLIC_ALIAS(DOS$wcstou64, libd_wcstou64);
-DEFINE_PUBLIC_ALIAS(wcstou64, libc_wcstou64);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(DOS$wcstoimax, libd_wcsto64);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
 DEFINE_PUBLIC_ALIAS(DOS$_wcstoi64, libd_wcsto64);
 DEFINE_PUBLIC_ALIAS(DOS$wcsto64, libd_wcsto64);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(wcstoimax, libc_wcsto64);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
 DEFINE_PUBLIC_ALIAS(wcsto64, libc_wcsto64);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(DOS$wcstoumax, libd_wcstou64);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
+DEFINE_PUBLIC_ALIAS(DOS$_wcstoui64, libd_wcstou64);
+DEFINE_PUBLIC_ALIAS(DOS$wcstou64, libd_wcstou64);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(wcstoumax, libc_wcstou64);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
+DEFINE_PUBLIC_ALIAS(wcstou64, libc_wcstou64);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(DOS$wcstoimax_l, libd_wcsto32_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wcstoimax_l, libd_wcsto32_l);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(DOS$wcsto32_l, libd_wcsto32_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(wcstoimax_l, libc_wcsto32_l);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(wcsto32_l, libc_wcsto32_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(DOS$wcstoumax_l, libd_wcstou32_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wcstoumax_l, libd_wcstou32_l);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(DOS$wcstou32_l, libd_wcstou32_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 4
+DEFINE_PUBLIC_ALIAS(wcstoumax_l, libc_wcstou32_l);
+#endif /* __SIZEOF_INTMAX_T__ == 4 */
 DEFINE_PUBLIC_ALIAS(wcstou32_l, libc_wcstou32_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wcstoi64_l, libd_wcsto64_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(DOS$wcstoimax_l, libd_wcsto64_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wcstoimax_l, libd_wcsto64_l);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
 DEFINE_PUBLIC_ALIAS(DOS$wcsto64_l, libd_wcsto64_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(wcstoimax_l, libc_wcsto64_l);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
 DEFINE_PUBLIC_ALIAS(wcsto64_l, libc_wcsto64_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wcstoui64_l, libd_wcstou64_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(DOS$wcstoumax_l, libd_wcstou64_l);
+DEFINE_PUBLIC_ALIAS(DOS$_wcstoumax_l, libd_wcstou64_l);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
 DEFINE_PUBLIC_ALIAS(DOS$wcstou64_l, libd_wcstou64_l);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ == 8
+DEFINE_PUBLIC_ALIAS(wcstoumax_l, libc_wcstou64_l);
+#endif /* __SIZEOF_INTMAX_T__ == 8 */
 DEFINE_PUBLIC_ALIAS(wcstou64_l, libc_wcstou64_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wcsncoll, libd_wcsncoll);
 DEFINE_PUBLIC_ALIAS(DOS$wcsncoll, libd_wcsncoll);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7cd3b46 */
+/* HASH CRC-32:0x8ea6c983 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -546,12 +546,19 @@ DFUN(".text.crt.dos.unsorted", libd_getifaddrs, libc_getifaddrs, TD, 1, TP)
 DFUN(".text.crt.dos.unsorted", libd_freeifaddrs, libc_freeifaddrs, TV, 1, TP)
 
 /* inttypes */
+#include <hybrid/typecore.h>
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8
 DFUN(".text.crt.dos.math.utility", libd_imaxabs, libc_imaxabs, TIn(__SIZEOF_INTMAX_T__), 1, TIn(__SIZEOF_INTMAX_T__))
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8 */
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__
 DFUN(".text.crt.dos.math.utility", libd_imaxdiv, libc_imaxdiv, TS(__SIZEOF_IMAXDIV_STRUCT), 2, TIn(__SIZEOF_INTMAX_T__), TIn(__SIZEOF_INTMAX_T__))
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ */
+#if __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtoimax, libc_strtoimax, TIn(__SIZEOF_INTMAX_T__), 3, TP, TP, TD)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtoumax, libc_strtoumax, TIn(__SIZEOF_INTMAX_T__), 3, TP, TP, TD)
 DFUN(".text.crt.dos.unicode.locale.convert", libd_strtoimax_l, libc_strtoimax_l, TIn(__SIZEOF_INTMAX_T__), 4, TP, TP, TD, TP)
 DFUN(".text.crt.dos.unicode.locale.convert", libd_strtoumax_l, libc_strtoumax_l, TIn(__SIZEOF_INTMAX_T__), 4, TP, TP, TD, TP)
+#endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtoi, libc_strtoi, TIn(__SIZEOF_INTMAX_T__), 6, TP, TP, TD, TIn(__SIZEOF_INTMAX_T__), TIn(__SIZEOF_INTMAX_T__), TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtou, libc_strtou, TIn(__SIZEOF_INTMAX_T__), 6, TP, TP, TD, TIn(__SIZEOF_INTMAX_T__), TIn(__SIZEOF_INTMAX_T__), TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtoi_l, libc_strtoi_l, TIn(__SIZEOF_INTMAX_T__), 7, TP, TP, TD, TIn(__SIZEOF_INTMAX_T__), TIn(__SIZEOF_INTMAX_T__), TP, TP)
@@ -919,7 +926,6 @@ DFUN(".text.crt.dos.math.math", libd_nextdownf, libc_nextdownf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_nextupf, libc_nextupf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_nextdownl, libc_nextdownl, TFL, 1, TFL)
 DFUN(".text.crt.dos.math.math", libd_nextupl, libc_nextupl, TFL, 1, TFL)
-#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libd_llogb, libd_ilogb);
 #else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
@@ -1927,12 +1933,12 @@ DFUN(".text.crt.dos.FILE.utility.ext", libd___fsetlocking, libc___fsetlocking, T
 DFUN(".text.crt.dos.FILE.utility.ext", libd___fseterr, libc___fseterr, TV, 1, TP)
 
 /* stdlib */
-DFUN(".text.crt.dos.math.utility", libd_labs, libc_labs, TL, 1, TL)
-DFUN(".text.crt.dos.math.utility", libd_llabs, libc_llabs, TLL, 1, TLL)
-DFUN(".text.crt.dos.math.utility", libd_ldiv, libc_ldiv, TS(__SIZEOF_LDIV_STRUCT), 2, TL, TL)
-DFUN(".text.crt.dos.math.utility", libd_lldiv, libc_lldiv, TS(__SIZEOF_LLDIV_STRUCT), 2, TLL, TLL)
 DFUN(".text.crt.dos.math.utility", libd_abs, libc_abs, TD, 1, TD)
+DFUN(".text.crt.dos.math.utility", libd_labs, libc_labs, TL, 1, TL)
 DFUN(".text.crt.dos.math.utility", libd_div, libc_div, TS(__SIZEOF_DIV_STRUCT), 2, TD, TD)
+DFUN(".text.crt.dos.math.utility", libd_ldiv, libc_ldiv, TS(__SIZEOF_LDIV_STRUCT), 2, TL, TL)
+DFUN(".text.crt.dos.math.utility", libd_llabs, libc_llabs, TLL, 1, TLL)
+DFUN(".text.crt.dos.math.utility", libd_lldiv, libc_lldiv, TS(__SIZEOF_LLDIV_STRUCT), 2, TLL, TLL)
 DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd_mblen, libc_mblen, TD, 2, TP, TI)
 DFUN(".text.crt.dos.fs.exec.system", libd_system, libc_system, TD, 1, TP)
 DFUN(".text.crt.dos.application.exit", libd_exit, libc_exit, TV, 1, TD)
@@ -1947,11 +1953,11 @@ DFUN(".text.crt.dos.heap.malloc", libd_free, libc_free, TV, 1, TP)
 DFUN(".text.crt.dos.random", libd_srand, libc_srand, TV, 1, TL)
 DFUN(".text.crt.dos.unicode.static.convert", libd_atoi, libc_atoi, TD, 1, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_atol, libc_atol, TL, 1, TP)
-DFUN(".text.crt.dos.unicode.static.convert", libd_atoll, libc_atoll, TLL, 1, TP)
-DFUN(".text.crt.dos.unicode.static.convert", libd_strtoul, libc_strtoul, TL, 3, TP, TP, TD)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtol, libc_strtol, TL, 3, TP, TP, TD)
-DFUN(".text.crt.dos.unicode.static.convert", libd_strtoull, libc_strtoull, TLL, 3, TP, TP, TD)
+DFUN(".text.crt.dos.unicode.static.convert", libd_strtoul, libc_strtoul, TL, 3, TP, TP, TD)
+DFUN(".text.crt.dos.unicode.static.convert", libd_atoll, libc_atoll, TLL, 1, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtoll, libc_strtoll, TLL, 3, TP, TP, TD)
+DFUN(".text.crt.dos.unicode.static.convert", libd_strtoull, libc_strtoull, TLL, 3, TP, TP, TD)
 DFUN(".text.crt.dos.unicode.static.convert", libd_atof, libc_atof, TFD, 1, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtod, libc_strtod, TFD, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtof, libc_strtof, TF, 2, TP, TP)

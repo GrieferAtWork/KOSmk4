@@ -34,7 +34,6 @@ struct dyn_string {
 	char                *s;         /* [1..length][owned] Associated string (never `NULL') */
 };
 
-
 __DECL_END
 #endif /* __CC__ */
 

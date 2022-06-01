@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c7f41c4 */
+/* HASH CRC-32:0xf77d0e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_lldiv_defined
 #define __local_lldiv_defined
 #include <__crt.h>
+#include <bits/crt/div.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(lldiv) __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lldiv))(__LONGLONG __numer, __LONGLONG __denom) {

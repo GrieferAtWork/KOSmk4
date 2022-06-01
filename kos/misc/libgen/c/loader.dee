@@ -6193,7 +6193,8 @@ with_primaryImplementation:
 							local n = #existingBindings;
 							for (local i = 0; i < n;) {
 								local existingBinding: FunctionBinding = existingBindings[i];
-								if (type(existingBinding.binding) !in [string, UserString]) {
+								if ((existingBinding !is FunctionBinding) ||
+								    (type(existingBinding.binding) !in [string, UserString])) {
 									++i;
 									continue;
 								}

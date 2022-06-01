@@ -226,8 +226,8 @@ __NAMESPACE_STD_USING(wint_t)
 %[define_crt_name_list(CNL_wcstou32_l  = ["wcstou32_l"])]
 %[define_crt_name_list(CNL_wcsto64_l   = ["wcsto64_l", "_wcstoi64_l"])]
 %[define_crt_name_list(CNL_wcstou64_l  = ["wcstou64_l", "_wcstoui64_l"])]
-%[define_crt_name_list(CNL_wcstoimax_l = ["wcstoimax_l", "_wcstoimax_l", "__wcstoimax_l"])]
-%[define_crt_name_list(CNL_wcstoumax_l = ["wcstoumax_l", "_wcstoumax_l", "__wcstoumax_l"])]
+%[define_crt_name_list(CNL_wcstoimax_l = ["wcstoimax_l", "_wcstoimax_l"])]
+%[define_crt_name_list(CNL_wcstoumax_l = ["wcstoumax_l", "_wcstoumax_l"])]
 
 
 
@@ -449,9 +449,12 @@ size_t wcsrtombs([[out_opt/*(dstlen)*/]] char *dst,
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),                    alias(CNL_wcsto32...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),                    alias(CNL_wcsto64...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__),  alias(CNL_wcstoimax...)]]
-[[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), crt_intern_alias("wcsto32")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), crt_intern_alias("wcsto64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")
+     __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 &&
+     __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), export_as("wcstoimax")]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcstol(*) %{generate(str2wcs("strtol"))}
 
 @@>> wcstoul(3)
@@ -461,9 +464,12 @@ wcstol(*) %{generate(str2wcs("strtol"))}
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),                    alias(CNL_wcstou32...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),                    alias(CNL_wcstou64...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__),  alias(CNL_wcstoumax...)]]
-[[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), crt_intern_alias("wcstou32")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), crt_intern_alias("wcstou64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")
+     __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 &&
+     __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__), export_as("wcstoumax")]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcstoul(*) %{generate(str2wcs("strtoul"))}
 
 @@>> mbsinit(3)
@@ -750,7 +756,7 @@ size_t wcsftime([[out(return <= buflen)]] wchar_t *__restrict buf, size_t buflen
 
 %[default:section(".text.crt{|.dos}.wchar.string.memory")]
 %(std)
-%(std)#if !defined(__USE_DOS) || defined(__USE_ISOC95)
+%(std,c,ccompat)#if !defined(__USE_DOS) || defined(__USE_ISOC95)
 
 @@>> wcstok(3)
 [[decl_include("<hybrid/typecore.h>")]]
@@ -763,7 +769,7 @@ wchar_t *wcstok([[inout_opt]] wchar_t *str,
                 [[inout]] wchar_t **__restrict save_ptr)
 	%{generate(str2wcs("strtok_r"))}
 
-%(std)#endif /* !__USE_DOS || __USE_ISOC95 */
+%(std,c,ccompat)#endif /* !__USE_DOS || __USE_ISOC95 */
 
 @@>> wcslen(3)
 [[std, guard, wchar]]
@@ -833,7 +839,7 @@ wcscspn(*) %{generate(str2wcs("strcspn"))}
 @@pp_endif@@
 }
 
-%(std)#if defined(__USE_ISOC95) || defined(__USE_UNIX98)
+%(std,c,ccompat)#if defined(__USE_ISOC95) || defined(__USE_UNIX98)
 
 @@>> fwide(3)
 [[std, guard]]
@@ -845,10 +851,10 @@ int fwide([[inout]] FILE *fp, int mode) {
 	return 0;
 }
 
-%(std)#endif /* __USE_ISOC95 || __USE_UNIX98 */
+%(std,c,ccompat)#endif /* __USE_ISOC95 || __USE_UNIX98 */
 
 %(std)
-%(std)#if defined(__USE_ISOC95) || defined(__USE_UNIX98) || defined(__USE_DOS)
+%(std,c,ccompat)#if defined(__USE_ISOC95) || defined(__USE_UNIX98) || defined(__USE_DOS)
 
 @@>> fwprintf(3), vfwprintf(3), fwprintf_unlocked(3), vfwprintf_unlocked(3)
 [[cp_stdio, std, guard, wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]]
@@ -956,7 +962,7 @@ __STDC_INT_AS_SIZE_T swprintf([[out(? <= buflen)]] wchar_t *__restrict buf, size
                               [[in, format]] wchar_t const *__restrict format, ...)
 	%{printf("vswprintf")}
 
-%(std)#endif /* __USE_ISOC95 || __USE_UNIX98 || __USE_DOS */
+%(std,c,ccompat)#endif /* __USE_ISOC95 || __USE_UNIX98 || __USE_DOS */
 
 %[default:section(".text.crt{|.dos}.wchar.unicode.static.convert")]
 %(std)
@@ -970,7 +976,7 @@ wcstod(*) %{generate(str2wcs("strtod"))}
 
 %(std,c,ccompat)#endif /* !__NO_FPU */
 
-%(std)#ifdef __USE_ISOC99
+%(std,c,ccompat)#ifdef __USE_ISOC99
 %(std,c,ccompat)#ifndef __NO_FPU
 
 @@>> wcstof(3)
@@ -978,15 +984,15 @@ wcstod(*) %{generate(str2wcs("strtod"))}
 [[dependency(unicode_readutf16, unicode_readutf16_rev)]]
 wcstof(*) %{generate(str2wcs("strtof"))}
 
-%(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std,c,ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 
 @@>> wcstold(3)
 [[std, guard, wchar]]
 [[dependency(unicode_readutf16, unicode_readutf16_rev)]]
 wcstold(*) %{generate(str2wcs("strtold"))}
 
+%(std,c,ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std,c,ccompat)#endif /* !__NO_FPU */
-%(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 @@>> wcstoll(3)
 [[std, guard, wchar]]
@@ -998,6 +1004,10 @@ wcstold(*) %{generate(str2wcs("strtold"))}
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(CNL_wcstoimax...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), crt_intern_alias("wcsto64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), crt_intern_alias("wcsto32")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")
+     __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 &&
+     __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ &&
+     __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), export_as("wcstoimax")]]
 wcstoll(*) %{generate(str2wcs("strtoll"))}
 
 @@>> wcstoull(3)
@@ -1010,6 +1020,10 @@ wcstoll(*) %{generate(str2wcs("strtoll"))}
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(CNL_wcstoumax...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), crt_intern_alias("wcstou64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), crt_intern_alias("wcstou32")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")
+     __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 &&
+     __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ &&
+     __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__), export_as("wcstoumax")]]
 wcstoull(*) %{generate(str2wcs("strtoull"))}
 
 %[default:section(".text.crt{|.dos}.wchar.FILE.locked.read.scanf")]
@@ -1194,7 +1208,7 @@ __STDC_INT_AS_SIZE_T vswscanf([[in]] wchar_t const *__restrict input,
 	                      (void *)&input, format, args);
 }
 
-%(std)#endif /* __USE_ISOC99 */
+%(std,c,ccompat)#endif /* __USE_ISOC99 */
 
 
 
@@ -1475,22 +1489,38 @@ __STDC_INT32_AS_SSIZE_T wcswidth([[in(wcsnlen(str, num_chars))]] wchar_t const *
 
 @@>> wcstol_l(3)
 [[wchar, dos_export_alias("_wcstol_l"), export_alias("__wcstol_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")
+     __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 &&
+     __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),
+  export_as("wcstoimax_l"), dos_export_as("DOS$_wcstoimax_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstol_l(*) %{generate(str2wcs("strtol_l"))}
 
 @@>> wcstoul_l(3)
 [[wchar, dos_export_alias("_wcstoul_l"), export_alias("__wcstoul_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")
+     __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 &&
+     __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__),
+  export_as("wcstoumax_l"), dos_export_as("DOS$_wcstoumax_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstoul_l(*) %{generate(str2wcs("strtoul_l"))}
 
 %[insert:function(wcstoq = wcstoll)]
 %[insert:function(wcstouq = wcstoull)]
 
+%
+%#ifdef __LONGLONG
+
 @@>> wcstoll_l(3)
 [[wchar, dos_export_alias("_wcstoll_l"), export_alias("__wcstoll_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__),     alias(CNL_wcstol_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8),                   alias(CNL_wcsto64_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(CNL_wcstoimax_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")
+     __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 &&
+     __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ &&
+     __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),
+  export_as("wcstoimax_l"), dos_export_as("DOS$_wcstoimax_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstoll_l(*) %{generate(str2wcs("strtoll_l"))}
 
@@ -1499,8 +1529,14 @@ wcstoll_l(*) %{generate(str2wcs("strtoll_l"))}
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__),     alias(CNL_wcstoul_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8),                   alias(CNL_wcstou64_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(CNL_wcstoumax_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")
+     __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 &&
+     __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ &&
+     __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__),
+  export_as("wcstoumax_l"), dos_export_as("DOS$_wcstoumax_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstoull_l(*) %{generate(str2wcs("strtoull_l"))}
+%#endif /* __LONGLONG */
 
 %#ifndef __NO_FPU
 @@>> wcstof_l(3)
@@ -1893,6 +1929,7 @@ wcstou32_r(*) %{generate(str2wcs("strtou32_r"))}
 
 
 @@>> wcsto32(3)
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), export_as("wcstoimax")]]
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      preferred_alias(CNL_wcstol...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), preferred_alias(CNL_wcstoll...)]]
@@ -1900,6 +1937,7 @@ wcstou32_r(*) %{generate(str2wcs("strtou32_r"))}
 wcsto32(*) %{generate(str2wcs("strto32"))}
 
 @@>> wcstou32(3)
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4), export_as("wcstoumax")]]
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      preferred_alias(CNL_wcstoul...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), preferred_alias(CNL_wcstoull...)]]
@@ -1917,21 +1955,23 @@ wcsto64_r(*) %{generate(str2wcs("strto64_r"))}
 wcstou64_r(*) %{generate(str2wcs("strtou64_r"))}
 
 
-@@>> wcstou64(3)
-[[wchar, dos_export_alias("_wcstoui64")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      preferred_alias(CNL_wcstoul...)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), preferred_alias(CNL_wcstoull...)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_wcstoumax...)]]
-[[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
-wcstou64(*) %{generate(str2wcs("strtou64"))}
-
 @@>> wcsto64(3)
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), export_as("wcstoimax")]]
 [[wchar, dos_export_alias("_wcstoi64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      preferred_alias(CNL_wcstol...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), preferred_alias(CNL_wcstoll...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_wcstoimax...)]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcsto64(*) %{generate(str2wcs("strto64"))}
+
+@@>> wcstou64(3)
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8), export_as("wcstoumax")]]
+[[wchar, dos_export_alias("_wcstoui64")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      preferred_alias(CNL_wcstoul...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), preferred_alias(CNL_wcstoull...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_wcstoumax...)]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
+wcstou64(*) %{generate(str2wcs("strtou64"))}
 %#endif /* __UINT64_TYPE__ */
 
 /************************************************************************/
@@ -1976,17 +2016,21 @@ wcstoull_r(*) %{generate(str2wcs("strtoull_r"))}
 %
 %#ifdef __USE_XOPEN2K8
 @@>> wcsto32_l(3)
-[[wchar, section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
+[[wchar]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      preferred_alias(CNL_wcstol_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), preferred_alias(CNL_wcstoll_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_wcstoimax_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  export_as("wcstoimax_l"), dos_export_as("DOS$_wcstoimax_l")]]
+[[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcsto32_l(*) %{generate(str2wcs("strto32_l"))}
 
 @@>> wcstou32_l(3)
-[[wchar, section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
+[[wchar]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      preferred_alias(CNL_wcstoul_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), preferred_alias(CNL_wcstoull_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_wcstoumax_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  export_as("wcstoumax_l"), dos_export_as("DOS$_wcstoumax_l")]]
+[[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstou32_l(*) %{generate(str2wcs("strtou32_l"))}
 
 %
@@ -1996,6 +2040,7 @@ wcstou32_l(*) %{generate(str2wcs("strtou32_l"))}
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      preferred_alias(CNL_wcstol_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), preferred_alias(CNL_wcstoll_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_wcstoimax_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  export_as("wcstoimax_l"), dos_export_as("DOS$_wcstoimax_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcsto64_l(*) %{generate(str2wcs("strto64_l"))}
 
@@ -2004,6 +2049,7 @@ wcsto64_l(*) %{generate(str2wcs("strto64_l"))}
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      preferred_alias(CNL_wcstoul_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), preferred_alias(CNL_wcstoull_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  alias(CNL_wcstoumax_l...)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 8),  export_as("wcstoumax_l"), dos_export_as("DOS$_wcstoumax_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstou64_l(*) %{generate(str2wcs("strtou64_l"))}
 %#endif /* __UINT64_TYPE__ */

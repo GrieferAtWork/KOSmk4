@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88f9d3da */
+/* HASH CRC-32:0xc108bb3e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -447,14 +447,14 @@ INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int64_t NOTHROW_NCX(
 INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint64_t NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 /* >> wcstou64_r(3) */
 INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint64_t NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
-/* >> wcstou64(3) */
-INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uint64_t NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base);
-/* >> wcstou64(3) */
-INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uint64_t NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base);
 /* >> wcsto64(3) */
 INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) int64_t NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base);
 /* >> wcsto64(3) */
 INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) int64_t NOTHROW_NCX(LIBKCALL libc_wcsto64)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base);
+/* >> wcstou64(3) */
+INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uint64_t NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base);
+/* >> wcstou64(3) */
+INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uint64_t NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base);
 /* >> wcsto32_l(3) */
 INTDEF ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) int32_t NOTHROW_NCX(LIBDCALL libd_wcsto32_l)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base, locale_t locale);
 /* >> wcsto32_l(3) */

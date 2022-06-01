@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28822bad */
+/* HASH CRC-32:0xfb762c77 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,11 +30,14 @@
 
 DECL_BEGIN
 
-#ifndef __KERNEL__
+#include <hybrid/typecore.h>
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8
 INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST intmax_t
 NOTHROW(LIBCCALL libc_imaxabs)(intmax_t x) {
 	return x < 0 ? -x : x;
 }
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__
 INTERN ATTR_SECTION(".text.crt.math.utility") ATTR_CONST imaxdiv_t
 NOTHROW(LIBCCALL libc_imaxdiv)(intmax_t numer,
                                intmax_t denom) {
@@ -43,6 +46,8 @@ NOTHROW(LIBCCALL libc_imaxdiv)(intmax_t numer,
 	result.rem  = numer % denom;
 	return result;
 }
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) intmax_t
 NOTHROW_NCX(LIBCCALL libc_strtoimax)(char const *__restrict nptr,
                                      char **endptr,
@@ -63,6 +68,8 @@ NOTHROW_NCX(LIBCCALL libc_strtoumax)(char const *__restrict nptr,
 	return (uintmax_t)libc_strtou64(nptr, endptr, base);
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) intmax_t
 NOTHROW_NCX(LIBDCALL libd_wcstoimax)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
@@ -73,6 +80,8 @@ NOTHROW_NCX(LIBDCALL libd_wcstoimax)(char16_t const *__restrict nptr,
 	return (intmax_t)libd_wcsto64(nptr, endptr, base);
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) intmax_t
 NOTHROW_NCX(LIBKCALL libc_wcstoimax)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
@@ -83,6 +92,8 @@ NOTHROW_NCX(LIBKCALL libc_wcstoimax)(char32_t const *__restrict nptr,
 	return (intmax_t)libc_wcsto64(nptr, endptr, base);
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uintmax_t
 NOTHROW_NCX(LIBDCALL libd_wcstoumax)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
@@ -93,6 +104,8 @@ NOTHROW_NCX(LIBDCALL libd_wcstoumax)(char16_t const *__restrict nptr,
 	return (uintmax_t)libd_wcstou64(nptr, endptr, base);
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uintmax_t
 NOTHROW_NCX(LIBKCALL libc_wcstoumax)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
@@ -108,49 +121,77 @@ NOTHROW_NCX(LIBCCALL libc_strtoimax_l)(char const *__restrict nptr,
                                        char **endptr,
                                        __STDC_INT_AS_UINT_T base,
                                        locale_t locale) {
-	(void)locale;
-	return libc_strtoimax(nptr, endptr, base);
+#if __SIZEOF_INTMAX_T__ <= 4
+	return (intmax_t)libc_strto32_l(nptr, endptr, base, locale);
+#else /* __SIZEOF_INTMAX_T__ <= 4 */
+	return (intmax_t)libc_strto64_l(nptr, endptr, base, locale);
+#endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uintmax_t
 NOTHROW_NCX(LIBCCALL libc_strtoumax_l)(char const *__restrict nptr,
                                        char **endptr,
                                        __STDC_INT_AS_UINT_T base,
                                        locale_t locale) {
-	(void)locale;
-	return libc_strtoumax(nptr, endptr, base);
+#if __SIZEOF_INTMAX_T__ <= 4
+	return (uintmax_t)libc_strtou32_l(nptr, endptr, base, locale);
+#else /* __SIZEOF_INTMAX_T__ <= 4 */
+	return (uintmax_t)libc_strtou64_l(nptr, endptr, base, locale);
+#endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) intmax_t
 NOTHROW_NCX(LIBDCALL libd_wcstoimax_l)(char16_t const *__restrict nptr,
                                        char16_t **endptr,
                                        __STDC_INT_AS_UINT_T base,
                                        locale_t locale) {
-	(void)locale;
-	return libd_wcstoimax(nptr, endptr, base);
+#if __SIZEOF_INTMAX_T__ <= 4
+	return (intmax_t)libd_wcsto32_l(nptr, endptr, base, locale);
+#else /* __SIZEOF_INTMAX_T__ <= 4 */
+	return (intmax_t)libd_wcsto64_l(nptr, endptr, base, locale);
+#endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) intmax_t
 NOTHROW_NCX(LIBKCALL libc_wcstoimax_l)(char32_t const *__restrict nptr,
                                        char32_t **endptr,
                                        __STDC_INT_AS_UINT_T base,
                                        locale_t locale) {
-	(void)locale;
-	return libc_wcstoimax(nptr, endptr, base);
+#if __SIZEOF_INTMAX_T__ <= 4
+	return (intmax_t)libc_wcsto32_l(nptr, endptr, base, locale);
+#else /* __SIZEOF_INTMAX_T__ <= 4 */
+	return (intmax_t)libc_wcsto64_l(nptr, endptr, base, locale);
+#endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uintmax_t
 NOTHROW_NCX(LIBDCALL libd_wcstoumax_l)(char16_t const *__restrict nptr,
                                        char16_t **endptr,
                                        __STDC_INT_AS_UINT_T base,
                                        locale_t locale) {
-	(void)locale;
-	return libd_wcstoumax(nptr, endptr, base);
+#if __SIZEOF_INTMAX_T__ <= 4
+	return (uintmax_t)libd_wcstou32_l(nptr, endptr, base, locale);
+#else /* __SIZEOF_INTMAX_T__ <= 4 */
+	return (uintmax_t)libd_wcstou64_l(nptr, endptr, base, locale);
+#endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) uintmax_t
 NOTHROW_NCX(LIBKCALL libc_wcstoumax_l)(char32_t const *__restrict nptr,
                                        char32_t **endptr,
                                        __STDC_INT_AS_UINT_T base,
                                        locale_t locale) {
-	(void)locale;
-	return libc_wcstoumax(nptr, endptr, base);
+#if __SIZEOF_INTMAX_T__ <= 4
+	return (uintmax_t)libc_wcstou32_l(nptr, endptr, base, locale);
+#else /* __SIZEOF_INTMAX_T__ <= 4 */
+	return (uintmax_t)libc_wcstou64_l(nptr, endptr, base, locale);
+#endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#ifndef __KERNEL__
 #include <libc/errno.h>
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
  * Safely convert `nptr'  to an integer  which is then  returned.
@@ -319,14 +360,26 @@ NOTHROW_NCX(LIBCCALL libc_strtou_l)(char const *__restrict nptr,
 
 DECL_END
 
-#ifndef __KERNEL__
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8
 DEFINE_PUBLIC_ALIAS(imaxabs, libc_imaxabs);
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__
 DEFINE_PUBLIC_ALIAS(imaxdiv, libc_imaxdiv);
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 DEFINE_PUBLIC_ALIAS(strtoimax, libc_strtoimax);
 DEFINE_PUBLIC_ALIAS(strtoumax, libc_strtoumax);
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 DEFINE_PUBLIC_ALIAS(DOS$wcstoimax, libd_wcstoimax);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 DEFINE_PUBLIC_ALIAS(wcstoimax, libc_wcstoimax);
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 DEFINE_PUBLIC_ALIAS(DOS$wcstoumax, libd_wcstoumax);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 DEFINE_PUBLIC_ALIAS(wcstoumax, libc_wcstoumax);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strtoimax_l, libc_strtoimax_l);
@@ -336,12 +389,22 @@ DEFINE_PUBLIC_ALIAS(strtoimax_l, libc_strtoimax_l);
 DEFINE_PUBLIC_ALIAS(_strtoumax_l, libc_strtoumax_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(strtoumax_l, libc_strtoumax_l);
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 DEFINE_PUBLIC_ALIAS(DOS$_wcstoimax_l, libd_wcstoimax_l);
 DEFINE_PUBLIC_ALIAS(DOS$wcstoimax_l, libd_wcstoimax_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 DEFINE_PUBLIC_ALIAS(wcstoimax_l, libc_wcstoimax_l);
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 DEFINE_PUBLIC_ALIAS(DOS$_wcstoumax_l, libd_wcstoumax_l);
 DEFINE_PUBLIC_ALIAS(DOS$wcstoumax_l, libd_wcstoumax_l);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#if !defined(__KERNEL__) && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8
 DEFINE_PUBLIC_ALIAS(wcstoumax_l, libc_wcstoumax_l);
+#endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(strtoi, libc_strtoi);
 DEFINE_PUBLIC_ALIAS(strtou, libc_strtou);
 DEFINE_PUBLIC_ALIAS(strtoi_l, libc_strtoi_l);
