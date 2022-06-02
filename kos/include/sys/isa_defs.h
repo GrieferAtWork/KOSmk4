@@ -34,6 +34,11 @@
  * the source's copyright allows that... */
 
 #if defined(_MACHINE__ENDIAN_H) || defined(_SYS_ENDIAN_H)
+/*[[[warning(warn_or_error("
+	Both [<machine/endian.h>, <machine/_endian.h>, <sys/endian.h>] and [<sys/isa_defs.h>]
+	define the macros `_LITTLE_ENDIAN' and `_BIG_ENDIAN', however assign entirely different
+	meanings (and values). - Please change your code to only include one of either
+"))]]]*/
 #ifndef __NO_WARNINGS
 #ifdef __PREPROCESSOR_HAVE_WARNING
 #warning "\
@@ -52,6 +57,7 @@ define the macros `_LITTLE_ENDIAN' and `_BIG_ENDIAN', however assign entirely di
 meanings (and values). - Please change your code to only include one of either"
 #endif /* !... */
 #endif /* !__NO_WARNINGS */
+/*[[[end]]]*/
 #endif /* _MACHINE__ENDIAN_H || _SYS_ENDIAN_H */
 
 #undef _LITTLE_ENDIAN

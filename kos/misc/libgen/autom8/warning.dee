@@ -67,20 +67,54 @@ function operator_pop(fp: File, arg: string) {
 		<< optimizeForEndif(expr);
 }
 
-global final OPERATORS: {string: Callable} = {
-	"push_ignored" : operator_push_ignored,
-	"pop"          : operator_pop,
-};
+function operator_warn(fp: File, body: string, error: bool = false) {
+	if (!body.startswith("\"") || !body.endswith("\""))
+		throw Error("`warning warn` expects a string, but was given " + repr body);
+	body = body[1:-1].decode("c-escape").unifylines().strip("\n").splitlines(false);
+	local common = none;
+	for (local line: body)
+		common = common is none ? line : line[:line.common(common)];
+	common = #common - #common.lstrip();
+	body = "\n".join(for (local line: body) line[common:].rstrip());
+	body = body.replace(r'"', r'\"').replace("\n", " \\\n");
+	if ("\n" in body)
+		body = "\\\n" + body;
+	body = '"{}"'.format({ body });
+	fp << "#ifndef __NO_WARNINGS\n";
+	fp << "#ifdef __PREPROCESSOR_HAVE_WARNING\n";
+	fp << "#warning " << body << "\n";
+	fp << "#elif defined(__PREPROCESSOR_HAVE_PRAGMA_WARNING)\n";
+	fp << "#pragma warning(" << body << ")\n";
+	if (error) {
+		fp << "#else /* ... */\n";
+		fp << "#error " << body << "\n";
+		fp << "#endif /* !... */\n";
+	} else {
+		fp << "#endif /* ... */\n";
+	}
+	fp << "#endif /* !__NO_WARNINGS */\n";
+}
 
+function operator_warn_or_error(fp: File, body: string) {
+	return operator_warn(fp, body, true);
+}
+
+global final OPERATORS: {string: Callable} = {
+	"push_ignored"  : operator_push_ignored,
+	"pop"           : operator_pop,
+	"warn"          : operator_warn,
+	"warn_or_error" : operator_warn_or_error,
+};
 
 function main(parser: Autom8Parser, body: string) {
 	body = stringParen(body);
+	local command;
 	if (!body || !body.issymstrt(0))
 		throw Error("Invalid warning directive: " + repr body);
 	local commandEnd = 1;
 	while (commandEnd < #body && body.issymcont(commandEnd))
 		++commandEnd;
-	local command = body[:commandEnd];
+	command = body[:commandEnd];
 	body = stringParen(body[commandEnd:]);
 
 	local autoEnd = parser.text.find("/*[[[end]]]*/", parser.commentEnd);

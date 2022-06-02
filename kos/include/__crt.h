@@ -1212,9 +1212,15 @@ __DECL_END
 #ifdef __SSP_FORTIFY_LEVEL
 #if (__SSP_FORTIFY_LEVEL + 0) > 0
 #if !__has_builtin(__builtin_object_size)
+/*[[[warning(warn("__SSP_FORTIFY_LEVEL enabled, but `__builtin_object_size()' not supported"))]]]*/
+#ifndef __NO_WARNINGS
 #ifdef __PREPROCESSOR_HAVE_WARNING
 #warning "__SSP_FORTIFY_LEVEL enabled, but `__builtin_object_size()' not supported"
-#endif /* __PREPROCESSOR_HAVE_WARNING */
+#elif defined(__PREPROCESSOR_HAVE_PRAGMA_WARNING)
+#pragma warning("__SSP_FORTIFY_LEVEL enabled, but `__builtin_object_size()' not supported")
+#endif /* ... */
+#endif /* !__NO_WARNINGS */
+/*[[[end]]]*/
 #undef __SSP_FORTIFY_LEVEL
 #endif /* !__has_builtin(__builtin_object_size) */
 #else /* __SSP_FORTIFY_LEVEL > 0 */
