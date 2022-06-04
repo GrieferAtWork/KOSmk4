@@ -561,29 +561,29 @@ define_feature("HAVE_UTIME_NULL", "$has_function(utime)");        // Second argu
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 /* Sizes of built-in types and pointers known to the compiler.  */
-#define SIZEOF_CHAR          __SIZEOF_CHAR__
-#define SIZEOF_CHAR_P        __SIZEOF_POINTER__
-#define SIZEOF_SHORT         __SIZEOF_SHORT__
-#define SIZEOF_SHORT_P       __SIZEOF_POINTER__
-#define SIZEOF_INT           __SIZEOF_INT__
-#define SIZEOF_INT_P         __SIZEOF_POINTER__
-#define SIZEOF_LONG          __SIZEOF_LONG__
-#define SIZEOF_LONG_P        __SIZEOF_POINTER__
+#define SIZEOF_CHAR    __SIZEOF_CHAR__    /* `sizeof(char)' */
+#define SIZEOF_CHAR_P  __SIZEOF_POINTER__ /* `sizeof(char *)' */
+#define SIZEOF_SHORT   __SIZEOF_SHORT__   /* `sizeof(short)' */
+#define SIZEOF_SHORT_P __SIZEOF_POINTER__ /* `sizeof(short *)' */
+#define SIZEOF_INT     __SIZEOF_INT__     /* `sizeof(int)' */
+#define SIZEOF_INT_P   __SIZEOF_POINTER__ /* `sizeof(int *)' */
+#define SIZEOF_LONG    __SIZEOF_LONG__    /* `sizeof(long)' */
+#define SIZEOF_LONG_P  __SIZEOF_POINTER__ /* `sizeof(long *)' */
 #ifdef __SIZEOF_LONG_LONG__
-#define SIZEOF_LONG_LONG     __SIZEOF_LONG_LONG__
-#define SIZEOF_LONG_LONG_P   __SIZEOF_POINTER__
+#define SIZEOF_LONG_LONG   __SIZEOF_LONG_LONG__ /* `sizeof(long long)' */
+#define SIZEOF_LONG_LONG_P __SIZEOF_POINTER__   /* `sizeof(long long *)' */
 #endif /* __SIZEOF_LONG_LONG__ */
 #ifndef __NO_FPU
-#define SIZEOF_FLOAT         __SIZEOF_FLOAT__
-#define SIZEOF_FLOAT_P       __SIZEOF_POINTER__
-#define SIZEOF_DOUBLE        __SIZEOF_DOUBLE__
-#define SIZEOF_DOUBLE_P      __SIZEOF_POINTER__
+#define SIZEOF_FLOAT    __SIZEOF_FLOAT__   /* `sizeof(float)' */
+#define SIZEOF_FLOAT_P  __SIZEOF_POINTER__ /* `sizeof(float *)' */
+#define SIZEOF_DOUBLE   __SIZEOF_DOUBLE__  /* `sizeof(double)' */
+#define SIZEOF_DOUBLE_P __SIZEOF_POINTER__ /* `sizeof(double *)' */
 #ifdef __SIZEOF_LONG_DOUBLE__
-#define SIZEOF_LONG_DOUBLE   __SIZEOF_LONG_DOUBLE__
-#define SIZEOF_LONG_DOUBLE_P __SIZEOF_POINTER__
+#define SIZEOF_LONG_DOUBLE   __SIZEOF_LONG_DOUBLE__ /* `sizeof(long double)' */
+#define SIZEOF_LONG_DOUBLE_P __SIZEOF_POINTER__     /* `sizeof(long double *)' */
 #endif /* __SIZEOF_LONG_DOUBLE__ */
 #endif /* !__NO_FPU */
-#define SIZEOF_VOID_P        __SIZEOF_POINTER__
+#define SIZEOF_VOID_P __SIZEOF_POINTER__ /* `sizeof(void *)' */
 
 
 #undef STACK_DIRECTION

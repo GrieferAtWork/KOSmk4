@@ -136,17 +136,17 @@ meanings (and values). - Please change your code to only include one of either"
 #define _LONG_ALIGNMENT __ALIGNOF_LONG__
 #endif /* !_LONG_ALIGNMENT */
 
-#ifndef _LONG_LONG_ALIGNMENT
+#if !defined(_LONG_LONG_ALIGNMENT) && defined(__ALIGNOF_LONG_LONG__)
 #define _LONG_LONG_ALIGNMENT __ALIGNOF_LONG_LONG__
-#endif /* !_LONG_LONG_ALIGNMENT */
+#endif /* !_LONG_LONG_ALIGNMENT && __ALIGNOF_LONG_LONG__ */
 
-#ifndef _DOUBLE_ALIGNMENT
+#if !defined(_DOUBLE_ALIGNMENT) && defined(__ALIGNOF_DOUBLE__)
 #define _DOUBLE_ALIGNMENT __ALIGNOF_DOUBLE__
-#endif /* !_DOUBLE_ALIGNMENT */
+#endif /* !_DOUBLE_ALIGNMENT && __ALIGNOF_DOUBLE__ */
 
-#ifndef _LONG_DOUBLE_ALIGNMENT
+#if !defined(_LONG_DOUBLE_ALIGNMENT) && defined(__ALIGNOF_LONG_DOUBLE__)
 #define _LONG_DOUBLE_ALIGNMENT __ALIGNOF_LONG_DOUBLE__
-#endif /* !_LONG_DOUBLE_ALIGNMENT */
+#endif /* !_LONG_DOUBLE_ALIGNMENT && __ALIGNOF_LONG_DOUBLE__ */
 
 #ifndef _POINTER_ALIGNMENT
 #define _POINTER_ALIGNMENT __ALIGNOF_POINTER__
