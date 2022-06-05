@@ -290,12 +290,12 @@ int wmknodat($fd_t dirfd, [[in]] wchar_t const *nodename,
 [[cp, ignore, doc_alias("wutimensat"), nocrt, alias("wutimensat")]]
 [[wchar, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
 int crt_wutimensat32($fd_t dirfd, [[in]] wchar_t const *filename,
-                     [[in_opt]] struct timespec const times[2 /*or:3*/],
+                     [[in_opt]] struct $timespec32 const times[2 /*or:3*/],
                      $atflag_t flags);
 [[cp, ignore, doc_alias("wutimensat"), nocrt, alias("wutimensat64")]]
 [[wchar, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
 int crt_wutimensat64($fd_t dirfd, [[in]] wchar_t const *filename,
-                     [[in_opt]] struct timespec64 const times[2 /*or:3*/],
+                     [[in_opt]] struct $timespec64 const times[2 /*or:3*/],
                      $atflag_t flags);
 
 [[ignore]] crt_c16utimensat32(*) %{uchar16("crt_wutimensat32")}
@@ -321,23 +321,23 @@ int wutimensat($fd_t dirfd, [[in]] wchar_t const *filename,
 	struct timespec32 tms[3];
 	if (!times)
 		return crt_wutimensat32(dirfd, filename, NULL, flags);
-	tms[0].tv_sec  = (time32_t)times[0].tv_sec;
-	tms[0].tv_nsec = times[0].tv_nsec;
-	tms[1].tv_sec  = (time32_t)times[1].tv_sec;
-	tms[1].tv_nsec = times[1].tv_nsec;
+	tms[0].@tv_sec@  = (time32_t)times[0].@tv_sec@;
+	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
+	tms[1].@tv_sec@  = (time32_t)times[1].@tv_sec@;
+	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
 	if (flags & __AT_CHANGE_BTIME) {
-		tms[2].tv_sec  = (time32_t)times[2].tv_sec;
-		tms[2].tv_nsec = times[2].tv_nsec;
+		tms[2].@tv_sec@  = (time32_t)times[2].@tv_sec@;
+		tms[2].@tv_nsec@ = times[2].@tv_nsec@;
 	}
 	return crt_wutimensat32(dirfd, filename, tms, flags);
 @@pp_else@@
 	struct timespec32 tms[2];
 	if (!times)
 		return crt_wutimensat32(dirfd, filename, NULL, flags);
-	tms[0].tv_sec  = (time32_t)times[0].tv_sec;
-	tms[0].tv_nsec = times[0].tv_nsec;
-	tms[1].tv_sec  = (time32_t)times[1].tv_sec;
-	tms[1].tv_nsec = times[1].tv_nsec;
+	tms[0].@tv_sec@  = (time32_t)times[0].@tv_sec@;
+	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
+	tms[1].@tv_sec@  = (time32_t)times[1].@tv_sec@;
+	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
 	return crt_wutimensat32(dirfd, filename, tms, flags);
 @@pp_endif@@
 @@pp_elif $has_function(crt_wutimensat64) && (!defined(__BUILDING_LIBC) || __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__)@@
@@ -345,23 +345,23 @@ int wutimensat($fd_t dirfd, [[in]] wchar_t const *filename,
 	struct timespec64 tms[3];
 	if (!times)
 		return wutimensat64(dirfd, filename, NULL, flags);
-	tms[0].tv_sec  = (time64_t)times[0].tv_sec;
-	tms[0].tv_nsec = times[0].tv_nsec;
-	tms[1].tv_sec  = (time64_t)times[1].tv_sec;
-	tms[1].tv_nsec = times[1].tv_nsec;
+	tms[0].@tv_sec@  = (time64_t)times[0].@tv_sec@;
+	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
+	tms[1].@tv_sec@  = (time64_t)times[1].@tv_sec@;
+	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
 	if (flags & __AT_CHANGE_BTIME) {
-		tms[2].tv_sec  = (time64_t)times[2].tv_sec;
-		tms[2].tv_nsec = times[2].tv_nsec;
+		tms[2].@tv_sec@  = (time64_t)times[2].@tv_sec@;
+		tms[2].@tv_nsec@ = times[2].@tv_nsec@;
 	}
 	return wutimensat64(dirfd, filename, tms, flags);
 @@pp_else@@
 	struct timespec64 tms[2];
 	if (!times)
 		return wutimensat64(dirfd, filename, NULL, flags);
-	tms[0].tv_sec  = (time64_t)times[0].tv_sec;
-	tms[0].tv_nsec = times[0].tv_nsec;
-	tms[1].tv_sec  = (time64_t)times[1].tv_sec;
-	tms[1].tv_nsec = times[1].tv_nsec;
+	tms[0].@tv_sec@  = (time64_t)times[0].@tv_sec@;
+	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
+	tms[1].@tv_sec@  = (time64_t)times[1].@tv_sec@;
+	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
 	return wutimensat64(dirfd, filename, tms, flags);
 @@pp_endif@@
 @@pp_else@@
@@ -403,23 +403,23 @@ int wutimensat64($fd_t dirfd, [[in]] wchar_t const *filename,
 	struct timespec32 tms[3];
 	if (!times)
 		return crt_wutimensat32(dirfd, filename, NULL, flags);
-	tms[0].tv_sec  = (time32_t)times[0].tv_sec;
-	tms[0].tv_nsec = times[0].tv_nsec;
-	tms[1].tv_sec  = (time32_t)times[1].tv_sec;
-	tms[1].tv_nsec = times[1].tv_nsec;
+	tms[0].@tv_sec@  = (time32_t)times[0].@tv_sec@;
+	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
+	tms[1].@tv_sec@  = (time32_t)times[1].@tv_sec@;
+	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
 	if (flags & __AT_CHANGE_BTIME) {
-		tms[2].tv_sec  = (time32_t)times[2].tv_sec;
-		tms[2].tv_nsec = times[2].tv_nsec;
+		tms[2].@tv_sec@  = (time32_t)times[2].@tv_sec@;
+		tms[2].@tv_nsec@ = times[2].@tv_nsec@;
 	}
 	return crt_wutimensat32(dirfd, filename, tms, flags);
 @@pp_else@@
 	struct timespec32 tms[2];
 	if (!times)
 		return crt_wutimensat32(dirfd, filename, NULL, flags);
-	tms[0].tv_sec  = (time32_t)times[0].tv_sec;
-	tms[0].tv_nsec = times[0].tv_nsec;
-	tms[1].tv_sec  = (time32_t)times[1].tv_sec;
-	tms[1].tv_nsec = times[1].tv_nsec;
+	tms[0].@tv_sec@  = (time32_t)times[0].@tv_sec@;
+	tms[0].@tv_nsec@ = times[0].@tv_nsec@;
+	tms[1].@tv_sec@  = (time32_t)times[1].@tv_sec@;
+	tms[1].@tv_nsec@ = times[1].@tv_nsec@;
 	return crt_wutimensat32(dirfd, filename, tms, flags);
 @@pp_endif@@
 @@pp_endif@@

@@ -94,38 +94,53 @@ function joinClangTidyAndTeeOutputIntoCtoFile(
 						continue;
 					} catch (...) {
 					}
+				} else if (strippedLine.startswith("note:")) {
+					goto normal_line;
 				}
-				local col = l.find(":");
-				if (col >= 0 && !l.isanyspace(0, col)) {
+				local col = strippedLine.find(":");
+				if (col == 1 && strippedLine.isalpha(0))
+					col = strippedLine.find(":", 2); /* Absolute path on windows */
+				if (col >= 0 && !strippedLine.isanyspace(0, col)) {
 again_handle_col:
-					local filename = l[:col];
+					local filename = strippedLine[:col];
 					local line, column = none;
-					local col2 = l.find(":", col + 1);
-					if (col2 >= 0) {
-						line = l[col + 1:col2];
-						if (line.isdigit()) {
-							local col3 = l.find(":", col2 + 1);
-							if (col3 >= 0) {
-								column = l[col2 + 1:col3];
-								if (column.isdigit()) {
-									col2 = col3;
-								} else {
-									column = none;
-								}
-							}
-						} else if (
-								(line.startswith("/") ||
-								line.startswith("\\"))&&
-								!l.isanyspace(0, col2)) {
-							col = col2;
-							goto again_handle_col;
-						} else {
-							col2 = col;
-							line = none;
+					local col2;
+					if ("(" in filename && filename.endswith(")")) {
+						local lparen = filename.index("(");
+						line = filename[lparen:];
+						filename = filename[:lparen];
+						if ("," in line) {
+							line, none, column = line.partition(",")...;
 						}
-					} else {
-						line = none;
 						col2 = col;
+					} else {
+						col2 = strippedLine.find(":", col + 1);
+						if (col2 >= 0) {
+							line = strippedLine[col + 1:col2];
+							if (line.isdigit()) {
+								local col3 = strippedLine.find(":", col2 + 1);
+								if (col3 >= 0) {
+									column = strippedLine[col2 + 1:col3];
+									if (column.isdigit()) {
+										col2 = col3;
+									} else {
+										column = none;
+									}
+								}
+							} else if (
+									(line.startswith("/") ||
+									line.startswith("\\"))&&
+									!strippedLine.isanyspace(0, col2)) {
+								col = col2;
+								goto again_handle_col;
+							} else {
+								col2 = col;
+								line = none;
+							}
+						} else {
+							line = none;
+							col2 = col;
+						}
 					}
 					print normalizeFilenameForLog(filename.decode("utf-8")),;
 					if (line !is none) {
@@ -137,7 +152,50 @@ again_handle_col:
 						}
 						print ")",;
 					}
-					print l[col2:].rstrip();
+					strippedLine = strippedLine[col2:].rstrip();
+					if (strippedLine.endswith("]")) {
+						local tagStart = strippedLine.rfind("[");
+						if (tagStart >= 0) {
+							local tag = strippedLine[tagStart:];
+							local lastcol = 0;
+							local categoryEnd = 0;
+							for (;;) {
+								while (lastcol < #strippedLine && strippedLine.isspace(lastcol))
+									++lastcol;
+								if (!strippedLine.startswith(":", lastcol))
+									break;
+								++lastcol;
+								while (lastcol < #strippedLine && strippedLine.isspace(lastcol))
+									++lastcol;
+								if (strippedLine.casestartswith("error", lastcol)) {
+									lastcol += 5;
+								} else if (strippedLine.casestartswith("warning", lastcol)) {
+									lastcol += 7;
+								} else {
+									break;
+								}
+								while (lastcol < #strippedLine && strippedLine.isspace(lastcol))
+									++lastcol;
+								categoryEnd = lastcol;
+								while (lastcol < #strippedLine && strippedLine.isalnum(lastcol))
+									++lastcol;
+							}
+							if (categoryEnd > 0) {
+								print strippedLine[:categoryEnd].rstrip(),;
+								print " ",;
+								print tag.lstrip("[").rstrip("]"),;
+								print " ",;
+								print strippedLine[categoryEnd:lastcol].lstrip(),;
+							} else {
+								print strippedLine[:lastcol],;
+								print tag,;
+								print " ",;
+							}
+							print strippedLine[lastcol:tagStart].rstrip();
+							continue;
+						}
+					}
+					print strippedLine;
 					continue;
 				}
 normal_line:
@@ -211,10 +269,13 @@ function createClangTidyProcess(
 		 */
 		"-undef",
 		"-m32",
-		"-D__clang_tidy__",
+		"-mno-ms-bitfields",
 		"-D__clang__",
+		"-D__clang_tidy__",
+		"-D__SIZEOF_WCHAR_T__=2",
 		"-D__SIZEOF_LONG__=4",
-		"-D__SIZEOF_LONG_DOUBLE__=16",
+		"-D__SIZEOF_LONG_DOUBLE__=8",
+		"-D__ALIGNOF_INT64__=8",
 		"-D__GNUC__=9",
 		"-D__GNUC_MINOR__=1",
 	});

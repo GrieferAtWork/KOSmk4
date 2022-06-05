@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd5defae */
+/* HASH CRC-32:0xa641d85c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,14 +49,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexpf))(float __x, int *__pexponent)
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 
 
-	
-#ifdef __IEEE754_DOUBLE_TYPE_IS_FLOAT__
-	return (float)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)__x, __pexponent);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
-	return (float)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)__x, __pexponent);
-#else /* ... */
-	return (float)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __pexponent);
-#endif /* !... */
+	return __LIBM_MATHFUN2IF(frexp, __x, __pexponent);
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 	return (float)(__NAMESPACE_LOCAL_SYM __localdep_frexp)((double)__x, __pexponent);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */

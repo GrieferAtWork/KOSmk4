@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2edfcc1f */
+/* HASH CRC-32:0x4274cb46 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,14 +130,14 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32getdomainname))(__CHAR32_TYPE__ *_
 	if __likely(__result == 0) {
 		struct __LOCAL_format_wsnprintf_data __printer_data;
 		struct __LOCAL_format_8tow_data __convert_data;
-		__SIZE_TYPE__ __len = (__NAMESPACE_LOCAL_SYM __localdep_strnlen)(__uts.domainname, __COMPILER_LENOF(__uts.domainname));
+		__SIZE_TYPE__ __len = (__NAMESPACE_LOCAL_SYM __localdep_strnlen)(__uts.__PRIVATE_UTSNAME_DOMAINNAME, __COMPILER_LENOF(__uts.__PRIVATE_UTSNAME_DOMAINNAME));
 		__SSIZE_TYPE__ __width;
 		__printer_data.__sd_buffer  = __name;
 		__printer_data.__sd_bufsiz  = __buflen;
 		__convert_data.__fd_arg     = &__printer_data;
 		__convert_data.__fd_printer = &(__NAMESPACE_LOCAL_SYM __localdep_format_c32snprintf_printer);
 		__mbstate_init(&__convert_data.__fd_incomplete);
-		__width = (__NAMESPACE_LOCAL_SYM __localdep_format_8to32)(&__convert_data, __uts.domainname, __len);
+		__width = (__NAMESPACE_LOCAL_SYM __localdep_format_8to32)(&__convert_data, __uts.__PRIVATE_UTSNAME_DOMAINNAME, __len);
 		if __unlikely(__width < 0)
 			return -1;
 		if ((__SIZE_TYPE__)__width >= __buflen) {

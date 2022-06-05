@@ -33,8 +33,8 @@
 
 __CXXDECL_BEGIN
 __NAMESPACE_INT_BEGIN
-#if defined(__COMPILER_HAVE_CXX_DECLTYPE) && \
-defined(__COMPILER_HAVE_CXX11_NOEXCEPT)
+#if (defined(__COMPILER_HAVE_CXX_DECLTYPE) && \
+     defined(__COMPILER_HAVE_CXX11_NOEXCEPT))
 template<class __T> struct __is_swappable;
 template<class __T> struct __is_nothrow_swappable;
 #else
@@ -46,12 +46,16 @@ __NAMESPACE_STD_BEGIN
 template<class __T> inline
 typename enable_if<__NAMESPACE_INT_SYM __and_<is_move_constructible<__T>,
                                               is_move_assignable<__T> >::value>::type
-swap(__T &__lhs, __T &__rhs) __CXX_NOEXCEPT_IF((__NAMESPACE_INT_SYM __and_<
-                                                is_nothrow_move_constructible<__T>,
-                                                is_nothrow_move_assignable<__T> >::value));
+swap(__T &__lhs, __T &__rhs)
+	__CXX_NOEXCEPT_IF((__NAMESPACE_INT_SYM __and_<
+	                   is_nothrow_move_constructible<__T>,
+	                   is_nothrow_move_assignable<__T> >::value));
+#ifndef __clang_tidy__ /* FIXME */
 template<class __T, __SIZE_TYPE__ __Count> inline
 typename enable_if<__NAMESPACE_INT_SYM __is_swappable<__T>::value>::type
-swap(__T (&__lhs)[__Count], __T (&__rhs)[__Count]) __CXX_NOEXCEPT_IF(__NAMESPACE_INT_SYM __is_nothrow_swappable<__T>::value);
+swap(__T (&__lhs)[__Count], __T (&__rhs)[__Count])
+	__CXX_NOEXCEPT_IF(__NAMESPACE_INT_SYM __is_nothrow_swappable<__T>::value);
+#endif /* !__clang_tidy__ */
 __NAMESPACE_STD_END
 
 #if defined(__COMPILER_HAVE_CXX_DECLTYPE) && defined(__COMPILER_HAVE_CXX11_NOEXCEPT)
@@ -72,7 +76,7 @@ struct __do_is_nothrow_swappable_impl {
 	__test(int);
 	template<class __T> static __NAMESPACE_STD_SYM false_type __test(...);
 };
-}
+} /* namespace __swappable_details */
 template<class __T> struct __is_swappable_impl
     : public __swappable_details::__do_is_swappable_impl {
 	typedef decltype(__test<__T>(0)) type;

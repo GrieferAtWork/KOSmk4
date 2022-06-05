@@ -32,6 +32,7 @@
 #ifdef LIBPCIACCESS_SUPPORTED
 #include <features.h>
 
+#include <hybrid/__bitfield.h>
 #include <hybrid/byteorder.h>
 
 #include <asm/os/mman.h>
@@ -290,12 +291,12 @@ struct pci_mem_region {
 	                                       * You  should  use  `pci_device_map_range()'  to  map  this  if  it's  a  memory   location! */
 	__size_t     pmr_size;                /* [const] BAR size (in bytes) */
 #ifndef __KERNEL__
-	pciaddr_t    _pmr_bus_addr;           /* Unused / never initialized */
+	pciaddr_t   _pmr_bus_addr;            /* Unused / never initialized */
 	void        *pmr_memory;              /* [0..1][lock(WRITE_ONCE)] Mapped address (s.a. `pci_device_map_region()') */
 #endif /* !__KERNEL__ */
-	unsigned int pmr_is_IO : 1;           /* [const] Set to 1 if this is I/O memory. */
-	unsigned int pmr_is_prefetchable : 1; /* [const] Can memory be prefetched? */
-	unsigned int pmr_is_64 : 1;           /* [const] Set to 1 if it's a 64-bit address. */
+	__HYBRID_BITFIELD8_T pmr_is_IO : 1;           /* [const] Set to 1 if this is I/O memory. */
+	__HYBRID_BITFIELD8_T pmr_is_prefetchable : 1; /* [const] Can memory be prefetched? */
+	__HYBRID_BITFIELD8_T pmr_is_64 : 1;           /* [const] Set to 1 if it's a 64-bit address. */
 #else /* __USE_KOS_ALTERATIONS */
 	union {
 		__physaddr_t pmr_addr;            /* [const] BAR base address. (either a physical memory- or an I/O location; s.a. `pmr_is_IO')
@@ -319,14 +320,14 @@ struct pci_mem_region {
 #endif /* !__KERNEL__ */
 	union {
 		struct {
-			unsigned int pmr_is_IO : 1;           /* [const] Set to 1 if this is I/O memory. */
-			unsigned int pmr_is_prefetchable : 1; /* [const] Can memory be prefetched? */
-			unsigned int pmr_is_64 : 1;           /* [const] Set to 1 if it's a 64-bit address. */
+			__HYBRID_BITFIELD8_T pmr_is_IO : 1;           /* [const] Set to 1 if this is I/O memory. */
+			__HYBRID_BITFIELD8_T pmr_is_prefetchable : 1; /* [const] Can memory be prefetched? */
+			__HYBRID_BITFIELD8_T pmr_is_64 : 1;           /* [const] Set to 1 if it's a 64-bit address. */
 		};
 		struct {
-			unsigned int is_IO : 1;           /* [const] Set to 1 if this is I/O memory. */
-			unsigned int is_prefetchable : 1; /* [const] Can memory be prefetched? */
-			unsigned int is_64 : 1;           /* [const] Set to 1 if it's a 64-bit address. */
+			__HYBRID_BITFIELD8_T is_IO : 1;           /* [const] Set to 1 if this is I/O memory. */
+			__HYBRID_BITFIELD8_T is_prefetchable : 1; /* [const] Can memory be prefetched? */
+			__HYBRID_BITFIELD8_T is_64 : 1;           /* [const] Set to 1 if it's a 64-bit address. */
 		};
 	};
 #endif /* !__USE_KOS_ALTERATIONS */
@@ -338,9 +339,9 @@ struct pci_mem_region {
 	pciaddr_t    bus_addr;            /* Unused / never initialized */
 	void        *memory;              /* [0..1][lock(WRITE_ONCE)] Mapped address (s.a. `pci_device_map_region()') */
 #endif /* !__KERNEL__ */
-	unsigned int is_IO : 1;           /* [const] Set to 1 if this is I/O memory. */
-	unsigned int is_prefetchable : 1; /* [const] Can memory be prefetched? */
-	unsigned int is_64 : 1;           /* [const] Set to 1 if it's a 64-bit address. */
+	__HYBRID_BITFIELD8_T is_IO : 1;           /* [const] Set to 1 if this is I/O memory. */
+	__HYBRID_BITFIELD8_T is_prefetchable : 1; /* [const] Can memory be prefetched? */
+	__HYBRID_BITFIELD8_T is_64 : 1;           /* [const] Set to 1 if it's a 64-bit address. */
 #endif /* !__USE_KOS */
 };
 
@@ -352,31 +353,31 @@ struct pci_device {
 	union {
 		pciaddr_t        pd_addr;        /* [const] PCI Device address. (to-be or'd with `PCI_ADDR_REGMASK') */
 		struct {
-			__uint8_t    __pd_zero1;     /* [const] 0b00000000 (s.a. `PCI_ADDR_REGMASK') */
-			unsigned int pd_func: 3;     /* [const] s.a. `PCI_ADDR_FUNMASK' */
-			unsigned int pd_dev: 5;      /* [const] s.a. `PCI_ADDR_DEVMASK' */
-			__uint8_t    pd_bus;         /* [const] s.a. `PCI_ADDR_BUSMASK' */
-			unsigned int __pd_zero2 : 7; /* [const] 0b0000000 */
-			unsigned int __pd_one3 : 1;  /* [const] 0b1 (s.a. `PCI_ADDR_FENABLED') */
+			__uint8_t            __pd_zero1;     /* [const] 0b00000000 (s.a. `PCI_ADDR_REGMASK') */
+			__HYBRID_BITFIELD8_T   pd_func: 3;   /* [const] s.a. `PCI_ADDR_FUNMASK' */
+			__HYBRID_BITFIELD8_T   pd_dev: 5;    /* [const] s.a. `PCI_ADDR_DEVMASK' */
+			__uint8_t              pd_bus;       /* [const] s.a. `PCI_ADDR_BUSMASK' */
+			__HYBRID_BITFIELD8_T __pd_zero2 : 7; /* [const] 0b0000000 */
+			__HYBRID_BITFIELD8_T __pd_one3 : 1;  /* [const] 0b1 (s.a. `PCI_ADDR_FENABLED') */
 		};
 #ifndef __USE_KOS_ALTERATIONS
 		struct {
-			__uint8_t    ___pd_zero1;    /* [const] 0b00000000 (s.a. `PCI_ADDR_REGMASK') */
-			unsigned int func: 3;        /* [const] s.a. `PCI_ADDR_FUNMASK' */
-			unsigned int dev: 5;         /* [const] s.a. `PCI_ADDR_DEVMASK' */
-			__uint8_t    bus;            /* [const] s.a. `PCI_ADDR_BUSMASK' */
-			unsigned int ___zero2 : 7;   /* [const] 0b0000000 */
-			unsigned int ___one3 : 1;    /* [const] 0b1 (s.a. `PCI_ADDR_FENABLED') */
+			__uint8_t            ___pd_zero1;     /* [const] 0b00000000 (s.a. `PCI_ADDR_REGMASK') */
+			__HYBRID_BITFIELD8_T    func: 3;      /* [const] s.a. `PCI_ADDR_FUNMASK' */
+			__HYBRID_BITFIELD8_T    dev: 5;       /* [const] s.a. `PCI_ADDR_DEVMASK' */
+			__uint8_t               bus;          /* [const] s.a. `PCI_ADDR_BUSMASK' */
+			__HYBRID_BITFIELD8_T ___pd_zero2 : 7; /* [const] 0b0000000 */
+			__HYBRID_BITFIELD8_T ___pd_one3 : 1;  /* [const] 0b1 (s.a. `PCI_ADDR_FENABLED') */
 		};
 #endif /* !__USE_KOS_ALTERATIONS */
 	};
 #else /* __USE_KOS */
-	__uint8_t    __pd_zero1;     /* [const] 0b00000000 (s.a. `PCI_ADDR_REGMASK') */
-	unsigned int func: 3;        /* [const] s.a. `PCI_ADDR_FUNMASK' */
-	unsigned int dev: 5;         /* [const] s.a. `PCI_ADDR_DEVMASK' */
-	__uint8_t    bus;            /* [const] s.a. `PCI_ADDR_BUSMASK' */
-	unsigned int __pd_zero2 : 7; /* [const] 0b0000000 */
-	unsigned int __pd_one3 : 1;  /* [const] 0b1 (s.a. `PCI_ADDR_FENABLED') */
+	__uint8_t            __pd_zero1;     /* [const] 0b00000000 (s.a. `PCI_ADDR_REGMASK') */
+	__HYBRID_BITFIELD8_T   func: 3;      /* [const] s.a. `PCI_ADDR_FUNMASK' */
+	__HYBRID_BITFIELD8_T   dev: 5;       /* [const] s.a. `PCI_ADDR_DEVMASK' */
+	__uint8_t              bus;          /* [const] s.a. `PCI_ADDR_BUSMASK' */
+	__HYBRID_BITFIELD8_T __pd_zero2 : 7; /* [const] 0b0000000 */
+	__HYBRID_BITFIELD8_T __pd_one3 : 1;  /* [const] 0b1 (s.a. `PCI_ADDR_FENABLED') */
 #endif /* !__USE_KOS */
 
 	/* PCI Device vendor-id / device-id */
@@ -447,11 +448,11 @@ struct pci_device {
 		__uint32_t pd_dev8; /* [const] s.a. `PCI_DEV8' */
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			unsigned int __pd_revision : 8;    /* [const] s.a. `PCI_DEV8_REVIDMASK' */
-			unsigned int pd_device_class : 24; /* [const] s.a. `pciclass_t'. */
+			__HYBRID_BITFIELD32_T __pd_revision : 8;      /* [const] s.a. `PCI_DEV8_REVIDMASK' */
+			__HYBRID_BITFIELD32_T   pd_device_class : 24; /* [const] s.a. `pciclass_t'. */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			unsigned int pd_device_class : 24; /* [const] s.a. `pciclass_t'. */
-			unsigned int __pd_revision : 8;    /* [const] s.a. `PCI_DEV8_REVIDMASK' */
+			__HYBRID_BITFIELD32_T   pd_device_class : 24; /* [const] s.a. `pciclass_t'. */
+			__HYBRID_BITFIELD32_T __pd_revision : 8;      /* [const] s.a. `PCI_DEV8_REVIDMASK' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 		struct {
@@ -470,22 +471,22 @@ struct pci_device {
 #ifndef __USE_KOS_ALTERATIONS
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			unsigned int revision : 8;      /* [const] s.a. `PCI_DEV8_REVIDMASK' */
-			unsigned int device_class : 24; /* [const] s.a. `pciclass_t'. */
+			__HYBRID_BITFIELD32_T revision : 8;      /* [const] s.a. `PCI_DEV8_REVIDMASK' */
+			__HYBRID_BITFIELD32_T device_class : 24; /* [const] s.a. `pciclass_t'. */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			unsigned int device_class : 24; /* [const] s.a. `pciclass_t'. */
-			unsigned int revision : 8;      /* [const] s.a. `PCI_DEV8_REVIDMASK' */
+			__HYBRID_BITFIELD32_T device_class : 24; /* [const] s.a. `pciclass_t'. */
+			__HYBRID_BITFIELD32_T revision : 8;      /* [const] s.a. `PCI_DEV8_REVIDMASK' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 #endif /* !__USE_KOS_ALTERATIONS */
 	};
 #else /* __USE_KOS */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int revision : 8;      /* [const] s.a. `PCI_DEV8_REVIDMASK' */
-	unsigned int device_class : 24; /* [const] s.a. `pciclass_t'. */
+	__HYBRID_BITFIELD32_T revision : 8;      /* [const] s.a. `PCI_DEV8_REVIDMASK' */
+	__HYBRID_BITFIELD32_T device_class : 24; /* [const] s.a. `pciclass_t'. */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-	unsigned int device_class : 24; /* [const] s.a. `pciclass_t'. */
-	unsigned int revision : 8;      /* [const] s.a. `PCI_DEV8_REVIDMASK' */
+	__HYBRID_BITFIELD32_T device_class : 24; /* [const] s.a. `pciclass_t'. */
+	__HYBRID_BITFIELD32_T revision : 8;      /* [const] s.a. `PCI_DEV8_REVIDMASK' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 #endif /* !__USE_KOS */
 
@@ -788,21 +789,21 @@ struct pci_agp_info {
 		__uint8_t        pai_cfg2;          /* == `pci_device_cfg_readb(config_offset + 2)' */
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			unsigned int pai_minor_version : 4; /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
-			unsigned int pai_major_version : 4; /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
+			__HYBRID_BITFIELD8_T pai_minor_version : 4; /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
+			__HYBRID_BITFIELD8_T pai_major_version : 4; /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			unsigned int pai_major_version : 4; /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
-			unsigned int pai_minor_version : 4; /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
+			__HYBRID_BITFIELD8_T pai_major_version : 4; /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
+			__HYBRID_BITFIELD8_T pai_minor_version : 4; /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 #ifndef __USE_KOS_ALTERATIONS
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			unsigned int minor_version : 4; /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
-			unsigned int major_version : 4; /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
+			__HYBRID_BITFIELD8_T minor_version : 4; /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
+			__HYBRID_BITFIELD8_T major_version : 4; /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			unsigned int major_version : 4; /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
-			unsigned int minor_version : 4; /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
+			__HYBRID_BITFIELD8_T major_version : 4; /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
+			__HYBRID_BITFIELD8_T minor_version : 4; /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 #endif /* !__USE_KOS_ALTERATIONS */
@@ -811,49 +812,49 @@ struct pci_agp_info {
 		__uint32_t   _pai_cfg4_mod;         /* Slightly modified `pci_device_cfg_readl(config_offset + 4)' */
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			unsigned int pai_rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
-			unsigned int pai_fast_writes : 1;   /* Support for fast-writes. */
-			unsigned int pai_addr64 : 1;        /* ... */
-			unsigned int pai_htrans : 1;        /* ... */
-			unsigned int pai_gart64 : 1;        /* ... */
-			unsigned int pai_coherent : 1;      /* ... */
-			unsigned int pai_sideband : 1;      /* Support for side-band addressing. */
-			unsigned int __pai_pad : 6;         /* ... */
-			unsigned int pai_isochronus : 1;    /* ... */
+			__HYBRID_BITFIELD8_T pai_rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+			__HYBRID_BITFIELD8_T pai_fast_writes : 1;   /* Support for fast-writes. */
+			__HYBRID_BITFIELD8_T pai_addr64 : 1;        /* ... */
+			__HYBRID_BITFIELD8_T pai_htrans : 1;        /* ... */
+			__HYBRID_BITFIELD8_T pai_gart64 : 1;        /* ... */
+			__HYBRID_BITFIELD8_T pai_coherent : 1;      /* ... */
+			__HYBRID_BITFIELD8_T pai_sideband : 1;      /* Support for side-band addressing. */
+			__HYBRID_BITFIELD8_T __pai_pad : 6;         /* ... */
+			__HYBRID_BITFIELD8_T pai_isochronus : 1;    /* ... */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			unsigned int pai_isochronus : 1;    /* ... */
-			unsigned int __pai_pad : 6;         /* ... */
-			unsigned int pai_sideband : 1;      /* Support for side-band addressing. */
-			unsigned int pai_coherent : 1;      /* ... */
-			unsigned int pai_gart64 : 1;        /* ... */
-			unsigned int pai_htrans : 1;        /* ... */
-			unsigned int pai_addr64 : 1;        /* ... */
-			unsigned int pai_fast_writes : 1;   /* Support for fast-writes. */
-			unsigned int pai_rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+			__HYBRID_BITFIELD8_T pai_isochronus : 1;    /* ... */
+			__HYBRID_BITFIELD8_T __pai_pad : 6;         /* ... */
+			__HYBRID_BITFIELD8_T pai_sideband : 1;      /* Support for side-band addressing. */
+			__HYBRID_BITFIELD8_T pai_coherent : 1;      /* ... */
+			__HYBRID_BITFIELD8_T pai_gart64 : 1;        /* ... */
+			__HYBRID_BITFIELD8_T pai_htrans : 1;        /* ... */
+			__HYBRID_BITFIELD8_T pai_addr64 : 1;        /* ... */
+			__HYBRID_BITFIELD8_T pai_fast_writes : 1;   /* Support for fast-writes. */
+			__HYBRID_BITFIELD8_T pai_rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 #ifndef __USE_KOS_ALTERATIONS
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			unsigned int rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
-			unsigned int fast_writes : 1;   /* Support for fast-writes. */
-			unsigned int addr64 : 1;        /* ... */
-			unsigned int htrans : 1;        /* ... */
-			unsigned int gart64 : 1;        /* ... */
-			unsigned int coherent : 1;      /* ... */
-			unsigned int sideband : 1;      /* Support for side-band addressing. */
-			unsigned int __pad : 6;         /* ... */
-			unsigned int isochronus : 1;    /* ... */
+			__HYBRID_BITFIELD8_T rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+			__HYBRID_BITFIELD8_T fast_writes : 1;   /* Support for fast-writes. */
+			__HYBRID_BITFIELD8_T addr64 : 1;        /* ... */
+			__HYBRID_BITFIELD8_T htrans : 1;        /* ... */
+			__HYBRID_BITFIELD8_T gart64 : 1;        /* ... */
+			__HYBRID_BITFIELD8_T coherent : 1;      /* ... */
+			__HYBRID_BITFIELD8_T sideband : 1;      /* Support for side-band addressing. */
+			__HYBRID_BITFIELD8_T __pad : 6;         /* ... */
+			__HYBRID_BITFIELD8_T isochronus : 1;    /* ... */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			unsigned int isochronus : 1;    /* ... */
-			unsigned int __pad : 6;         /* ... */
-			unsigned int sideband : 1;      /* Support for side-band addressing. */
-			unsigned int coherent : 1;      /* ... */
-			unsigned int gart64 : 1;        /* ... */
-			unsigned int htrans : 1;        /* ... */
-			unsigned int addr64 : 1;        /* ... */
-			unsigned int fast_writes : 1;   /* Support for fast-writes. */
-			unsigned int rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+			__HYBRID_BITFIELD8_T isochronus : 1;    /* ... */
+			__HYBRID_BITFIELD8_T __pad : 6;         /* ... */
+			__HYBRID_BITFIELD8_T sideband : 1;      /* Support for side-band addressing. */
+			__HYBRID_BITFIELD8_T coherent : 1;      /* ... */
+			__HYBRID_BITFIELD8_T gart64 : 1;        /* ... */
+			__HYBRID_BITFIELD8_T htrans : 1;        /* ... */
+			__HYBRID_BITFIELD8_T addr64 : 1;        /* ... */
+			__HYBRID_BITFIELD8_T fast_writes : 1;   /* Support for fast-writes. */
+			__HYBRID_BITFIELD8_T rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 #endif /* !__USE_KOS_ALTERATIONS */
@@ -877,38 +878,38 @@ struct pci_agp_info {
 	};
 #endif /* !__USE_KOS_ALTERATIONS */
 #else /* __USE_KOS */
-	__uint8_t    config_offset;            /* PCI_ADDR_REGMASK-style offset for the capability matrix.  */
+	__uint8_t            config_offset;            /* PCI_ADDR_REGMASK-style offset for the capability matrix.  */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int minor_version : 4;        /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
-	unsigned int major_version : 4;        /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
+	__HYBRID_BITFIELD8_T minor_version : 4;        /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
+	__HYBRID_BITFIELD8_T major_version : 4;        /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-	unsigned int major_version : 4;        /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
-	unsigned int minor_version : 4;        /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
+	__HYBRID_BITFIELD8_T major_version : 4;        /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
+	__HYBRID_BITFIELD8_T minor_version : 4;        /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int rates : 4;                /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
-	unsigned int fast_writes : 1;          /* Support for fast-writes. */
-	unsigned int addr64 : 1;               /* ... */
-	unsigned int htrans : 1;               /* ... */
-	unsigned int gart64 : 1;               /* ... */
-	unsigned int coherent : 1;             /* ... */
-	unsigned int sideband : 1;             /* Support for side-band addressing. */
-	unsigned int __pad : 6;                /* ... */
-	unsigned int isochronus : 1;           /* ... */
+	__HYBRID_BITFIELD8_T rates : 4;                /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+	__HYBRID_BITFIELD8_T fast_writes : 1;          /* Support for fast-writes. */
+	__HYBRID_BITFIELD8_T addr64 : 1;               /* ... */
+	__HYBRID_BITFIELD8_T htrans : 1;               /* ... */
+	__HYBRID_BITFIELD8_T gart64 : 1;               /* ... */
+	__HYBRID_BITFIELD8_T coherent : 1;             /* ... */
+	__HYBRID_BITFIELD8_T sideband : 1;             /* Support for side-band addressing. */
+	__HYBRID_BITFIELD8_T __pad : 6;                /* ... */
+	__HYBRID_BITFIELD8_T isochronus : 1;           /* ... */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-	unsigned int isochronus : 1;           /* ... */
-	unsigned int __pad : 6;                /* ... */
-	unsigned int sideband : 1;             /* Support for side-band addressing. */
-	unsigned int coherent : 1;             /* ... */
-	unsigned int gart64 : 1;               /* ... */
-	unsigned int htrans : 1;               /* ... */
-	unsigned int addr64 : 1;               /* ... */
-	unsigned int fast_writes : 1;          /* Support for fast-writes. */
-	unsigned int rates : 4;                /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+	__HYBRID_BITFIELD8_T isochronus : 1;           /* ... */
+	__HYBRID_BITFIELD8_T __pad : 6;                /* ... */
+	__HYBRID_BITFIELD8_T sideband : 1;             /* Support for side-band addressing. */
+	__HYBRID_BITFIELD8_T coherent : 1;             /* ... */
+	__HYBRID_BITFIELD8_T gart64 : 1;               /* ... */
+	__HYBRID_BITFIELD8_T htrans : 1;               /* ... */
+	__HYBRID_BITFIELD8_T addr64 : 1;               /* ... */
+	__HYBRID_BITFIELD8_T fast_writes : 1;          /* Support for fast-writes. */
+	__HYBRID_BITFIELD8_T rates : 4;                /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
-	__uint8_t    async_req_size;           /* ... */
-	__uint8_t    calibration_cycle_timing; /* ... */
-	__uint8_t    max_requests;             /* ... */
+	__uint8_t            async_req_size;           /* ... */
+	__uint8_t            calibration_cycle_timing; /* ... */
+	__uint8_t            max_requests;             /* ... */
 #endif /* !__USE_KOS */
 };
 
@@ -921,18 +922,18 @@ struct pci_bridge_info {
 	__uint8_t  pbi_subordinate_bus;         /* == `pci_device_cfg_readb(0x1a)' */
 	__uint8_t  pbi_secondary_latency_timer; /* == `pci_device_cfg_readb(0x1b)' */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int pbi_io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
-	unsigned int pbi_mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+	__HYBRID_BITFIELD8_T pbi_io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
+	__HYBRID_BITFIELD8_T pbi_mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-	unsigned int pbi_mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
-	unsigned int pbi_io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
+	__HYBRID_BITFIELD8_T pbi_mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+	__HYBRID_BITFIELD8_T pbi_io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
-	unsigned int __pbi_pad : 4;             /* ... */
+	__HYBRID_BITFIELD8_T pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+	__HYBRID_BITFIELD8_T __pbi_pad : 4;             /* ... */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-	unsigned int __pbi_pad : 4;             /* ... */
-	unsigned int pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+	__HYBRID_BITFIELD8_T __pbi_pad : 4;             /* ... */
+	__HYBRID_BITFIELD8_T pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 	__uint16_t pbi_secondary_status;        /* == `pci_device_cfg_readw(0x1e)' */
 	__uint16_t pbi_bridge_control;          /* == `pci_device_cfg_readw(0x3e)' */
@@ -963,40 +964,40 @@ struct pci_bridge_info {
 	union {
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			unsigned int pbi_io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
-			unsigned int pbi_mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+			__HYBRID_BITFIELD8_T pbi_io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
+			__HYBRID_BITFIELD8_T pbi_mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			unsigned int pbi_mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
-			unsigned int pbi_io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
+			__HYBRID_BITFIELD8_T pbi_mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+			__HYBRID_BITFIELD8_T pbi_io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			unsigned int io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
-			unsigned int mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+			__HYBRID_BITFIELD8_T io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
+			__HYBRID_BITFIELD8_T mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			unsigned int mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
-			unsigned int io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
+			__HYBRID_BITFIELD8_T mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+			__HYBRID_BITFIELD8_T io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 	};
 	union {
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			unsigned int pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
-			unsigned int __pbi_pad : 4;             /* ... */
+			__HYBRID_BITFIELD8_T pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+			__HYBRID_BITFIELD8_T __pbi_pad : 4;             /* ... */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			unsigned int __pbi_pad : 4;             /* ... */
-			unsigned int pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+			__HYBRID_BITFIELD8_T __pbi_pad : 4;             /* ... */
+			__HYBRID_BITFIELD8_T pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			unsigned int prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
-			unsigned int __pad : 4;             /* ... */
+			__HYBRID_BITFIELD8_T prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+			__HYBRID_BITFIELD8_T __pad : 4;             /* ... */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			unsigned int __pad : 4;             /* ... */
-			unsigned int prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+			__HYBRID_BITFIELD8_T __pad : 4;             /* ... */
+			__HYBRID_BITFIELD8_T prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 	};
@@ -1040,18 +1041,18 @@ struct pci_bridge_info {
 	__uint8_t  subordinate_bus;         /* == `pci_device_cfg_readb(0x1a)' */
 	__uint8_t  secondary_latency_timer; /* == `pci_device_cfg_readb(0x1b)' */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
-	unsigned int mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+	__HYBRID_BITFIELD8_T io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
+	__HYBRID_BITFIELD8_T mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-	unsigned int mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
-	unsigned int io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
+	__HYBRID_BITFIELD8_T mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+	__HYBRID_BITFIELD8_T io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
-	unsigned int __pad : 4;             /* ... */
+	__HYBRID_BITFIELD8_T prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+	__HYBRID_BITFIELD8_T __pad : 4;             /* ... */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-	unsigned int __pad : 4;             /* ... */
-	unsigned int prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+	__HYBRID_BITFIELD8_T __pad : 4;             /* ... */
+	__HYBRID_BITFIELD8_T prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 	__uint16_t secondary_status;        /* == `pci_device_cfg_readw(0x1e)' */
 	__uint16_t bridge_control;          /* == `pci_device_cfg_readw(0x3e)' */

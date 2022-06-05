@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80146b47 */
+/* HASH CRC-32:0x19929a83 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_convert_wcstombs_defined */
 #if !defined(__local___localdep_crt_wutimensat32_defined) && defined(__CRT_HAVE_wutimensat)
 #define __local___localdep_crt_wutimensat32_defined
-__CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_crt_wutimensat32,(__fd_t __dirfd, __WCHAR_TYPE__ const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
+__CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_crt_wutimensat32,(__fd_t __dirfd, __WCHAR_TYPE__ const *__filename, struct __timespec32 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
 #endif /* !__local___localdep_crt_wutimensat32_defined && __CRT_HAVE_wutimensat */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined

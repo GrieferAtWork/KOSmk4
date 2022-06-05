@@ -176,9 +176,9 @@ static void *mover_threadmain(void *closure) {
 }
 
 static int process_input(void) {
-#define handle(str)                            \
-	((!memcmp(iter, str, COMPILER_STRLEN(str)) \
-	  ? (iter += COMPILER_STRLEN(str), 1)      \
+#define handle(str)                                \
+	((memcmp(iter, str, COMPILER_STRLEN(str)) == 0 \
+	  ? (iter += COMPILER_STRLEN(str), 1)          \
 	  : 0))
 	char buf[16];
 	ssize_t s;

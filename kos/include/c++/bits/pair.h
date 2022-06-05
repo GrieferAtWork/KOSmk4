@@ -47,7 +47,11 @@ template<__CXX_VARARGS_TEMPLATE_ARGS_DEF(class, __Types, void)> class tuple;
 #endif /* !__std_tuple_fwd_defined */
 
 #ifdef __USE_ISOCXX11
+#ifdef __COMPILER_HAVE_CXX_DEFAULT_FUNCTIONS
 struct piecewise_construct_t { explicit __CXX_DEFAULT_CTOR(piecewise_construct_t); };
+#else /* __COMPILER_HAVE_CXX_DEFAULT_FUNCTIONS */
+struct piecewise_construct_t { };
+#endif /* !__COMPILER_HAVE_CXX_DEFAULT_FUNCTIONS */
 static __CXX11_CONSTEXPR piecewise_construct_t piecewise_construct = piecewise_construct_t();
 __NAMESPACE_STD_END
 __NAMESPACE_INT_BEGIN

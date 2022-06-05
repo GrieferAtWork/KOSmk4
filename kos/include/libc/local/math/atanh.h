@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29d732c9 */
+/* HASH CRC-32:0x9cd5966d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,8 +35,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atanh))(double __x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2(isgreaterequal, __LIBM_MATHFUN(fabs, __x), 1.0))
 		return __kernel_standard(__x, __x, __HUGE_VAL,
-		                         __ieee754_fabsf(__x) > 1.0 ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
-		                                                  : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
+		                         __LIBM_MATHFUN(fabs, __x) > 1.0 ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
+		                                                         : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
 	return __LIBM_MATHFUN(atanh, __x);
 }
 __NAMESPACE_LOCAL_END

@@ -38,6 +38,7 @@ template<class __T> struct default_delete {
 	__CXX_NOEXCEPT_IFNX(delete (__ptr)) { delete __ptr; }
 };
 
+#ifndef __clang_tidy__ /* FIXME */
 template<class __T> struct default_delete<__T[]> {
 public:
 	__CXX11_CONSTEXPR __CXX_DEFAULT_CTOR_NOEXCEPT(default_delete);
@@ -47,6 +48,7 @@ public:
 	__CXX_CLASSMEMBER __LIBCCALL operator()(__U *__ptr) const
 	__CXX_NOEXCEPT_IFNX(delete[](__ptr)) { delete[] __ptr; }
 };
+#endif /* !__clang_tidy__ */
 
 #if 0
 #ifndef __COMPILER_HAVE_CXX_DECLTYPE

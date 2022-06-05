@@ -153,21 +153,26 @@
      (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180020827) || \
      (__GCC_VERSION_NUM >= 40400 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)))
 #define __CXX_HAVE_DELETE_FUNCTIONS
-#define __CXX_DELETE_CTOR(T)        T() = delete
-#define __CXX_DELETE_DTOR(T)        ~T() = delete
-#define __CXX_DELETE_COPY(T)        T(T const&) = delete
-#define __CXX_DELETE_COPY_ASSIGN(T) T &operator = (T const&) = delete
+#define __CXX_DELETE_CTOR(T)          T() = delete
+#define __CXX_DELETE_DTOR(T)          ~T() = delete
+#define __CXX_DELETE_COPY(T)          T(T const&) = delete
+#define __CXX_DELETE_COPY_ASSIGN(T)   T &operator = (T const&) = delete
+#define __CXX_DELETE_COPY_ASSIGN_X(T) T &operator = (T const&) = delete
 #ifdef _MSC_VER
-#define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) /* Nothing */
+#define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T)   /* Nothing */
+#define __CXX_DELETE_VOLATILE_COPY_ASSIGN_X(T) /* Nothing */
 #else /* _MSC_VER */
-#define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) T &operator = (T const&) volatile = delete
+#define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T)   T &operator = (T const&) volatile = delete
+#define __CXX_DELETE_VOLATILE_COPY_ASSIGN_X(T) T &operator = (T const&) volatile = delete
 #endif /* !_MSC_VER */
 #else /* ... */
-#define __CXX_DELETE_CTOR(T)                 private: T()
-#define __CXX_DELETE_DTOR(T)                 private: ~T()
-#define __CXX_DELETE_COPY(T)                 private: T(T const&)
-#define __CXX_DELETE_COPY_ASSIGN(T)          private: T &operator = (T const&)
-#define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) private: T &operator = (T const&) volatile
+#define __CXX_DELETE_CTOR(T)                   private: T()
+#define __CXX_DELETE_DTOR(T)                   private: ~T()
+#define __CXX_DELETE_COPY(T)                   private: T(T const&)
+#define __CXX_DELETE_COPY_ASSIGN(T)            private: T &operator = (T const&)
+#define __CXX_DELETE_COPY_ASSIGN_X(T)          /* nothing */
+#define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T)   private: T &operator = (T const&) volatile
+#define __CXX_DELETE_VOLATILE_COPY_ASSIGN_X(T) /* nothing */
 #endif /* !... */
 
 #ifdef _MSC_VER

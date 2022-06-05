@@ -30,9 +30,9 @@ __NAMESPACE_STD_BEGIN
 
 class bad_alloc: public exception {
 public:
-	__CXX_CLASSMEMBER __LIBCCALL bad_alloc() __CXX_NOEXCEPT {}
-	virtual __LIBCCALL ~bad_alloc() __CXX_NOEXCEPT;
-	virtual char const *__LIBCCALL what() const __CXX_NOEXCEPT;
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __LIBCCALL bad_alloc() __CXX_NOEXCEPT {}
+	__LIBCCALL ~bad_alloc() __CXX_NOEXCEPT override;
+	char const *__LIBCCALL what() const __CXX_NOEXCEPT override;
 };
 
 __NAMESPACE_STD_END

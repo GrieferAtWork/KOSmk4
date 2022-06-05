@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc322c4c7 */
+/* HASH CRC-32:0xae46144b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2397,11 +2397,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mbsnrtowcs, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !__CRT_HAVE_mbsnrtowcs */
 #ifdef __CRT_HAVE_wcsnrtombs
 /* >> wcsnrtombs(3) */
-__CDECLARE(__ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,wcsnrtombs,(char *__dst, wchar_t const **__restrict __psrc, __SIZE_TYPE__ __nwc, size_t __dstlen, mbstate_t *__mbs),(__dst,__psrc,__nwc,__dstlen,__mbs))
+__CDECLARE(__ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__NOTHROW_NCX,wcsnrtombs,(char *__dst, wchar_t const **__restrict __psrc, __SIZE_TYPE__ __nwc, size_t __dstlen, struct __mbstate *__mbs),(__dst,__psrc,__nwc,__dstlen,__mbs))
 #else /* __CRT_HAVE_wcsnrtombs */
 #include <libc/local/wchar/wcsnrtombs.h>
 /* >> wcsnrtombs(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcsnrtombs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __ATTR_OUT_OPT(1) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL wcsnrtombs)(char *__dst, wchar_t const **__restrict __psrc, __SIZE_TYPE__ __nwc, size_t __dstlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnrtombs))(__dst, __psrc, __nwc, __dstlen, __mbs); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcsnrtombs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __ATTR_OUT_OPT(1) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL wcsnrtombs)(char *__dst, wchar_t const **__restrict __psrc, __SIZE_TYPE__ __nwc, size_t __dstlen, struct __mbstate *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnrtombs))(__dst, __psrc, __nwc, __dstlen, __mbs); })
 #endif /* !__CRT_HAVE_wcsnrtombs */
 /* >> open_wmemstream(3) */
 __CDECLARE_OPT(,__FILE *,__NOTHROW_NCX,open_wmemstream,(wchar_t **__bufloc, __SIZE_TYPE__ *__sizeloc),(__bufloc,__sizeloc))

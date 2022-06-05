@@ -31,6 +31,7 @@
 #include <nt/processenv.h>
 
 #include <errno.h>
+#include <fcntl.h>
 #include <format-printer.h>
 #include <malloc.h>
 #include <stddef.h>
@@ -148,7 +149,7 @@ libk32_SetStdHandleEx(DWORD nStdHandle, HANDLE hHandle, PHANDLE phPrevValue) {
 	}
 	if (phPrevValue) {
 		int result;
-		fd_t d = dup(fd);
+		fd_t d = fcntl(fd, F_DUPFD_CLOEXEC);
 		if (d == -1)
 			return FALSE;
 		result = dup2(NTHANDLE_ASFD(hHandle), fd);

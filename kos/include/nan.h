@@ -24,6 +24,7 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/__bitfield.h>
 #include <hybrid/byteorder.h>
 
 #include <sys/isa_defs.h>
@@ -63,45 +64,45 @@ __DECL_BEGIN
 typedef union __ATTR_ALIGNED(8) __ATTR_PACKED {
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int sign : 1;          /* s.a. `union ieee754_double::ieee::negative' */
-		unsigned int exponent : 11;     /* s.a. `union ieee754_double::ieee::exponent' */
-		unsigned int bits : 20;         /* s.a. `union ieee754_double::ieee::mantissa0' */
-		unsigned int fraction_low : 32; /* s.a. `union ieee754_double::ieee::mantissa1' */
+		__HYBRID_BITFIELD32_T sign : 1;      /* s.a. `union ieee754_double::ieee::negative' */
+		__HYBRID_BITFIELD32_T exponent : 11; /* s.a. `union ieee754_double::ieee::exponent' */
+		__HYBRID_BITFIELD32_T bits : 20;     /* s.a. `union ieee754_double::ieee::mantissa0' */
+		__UINT32_TYPE__       fraction_low;  /* s.a. `union ieee754_double::ieee::mantissa1' */
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int bits : 20;         /* s.a. `union ieee754_double::ieee::mantissa0' */
-		unsigned int exponent : 11;     /* s.a. `union ieee754_double::ieee::exponent' */
-		unsigned int sign : 1;          /* s.a. `union ieee754_double::ieee::negative' */
-		unsigned int fraction_low : 32; /* s.a. `union ieee754_double::ieee::mantissa1' */
+		__HYBRID_BITFIELD32_T bits : 20;     /* s.a. `union ieee754_double::ieee::mantissa0' */
+		__HYBRID_BITFIELD32_T exponent : 11; /* s.a. `union ieee754_double::ieee::exponent' */
+		__HYBRID_BITFIELD32_T sign : 1;      /* s.a. `union ieee754_double::ieee::negative' */
+		__UINT32_TYPE__       fraction_low;  /* s.a. `union ieee754_double::ieee::mantissa1' */
 #else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
-		unsigned int fraction_low : 32; /* s.a. `union ieee754_double::ieee::mantissa1' */
-		unsigned int bits : 20;         /* s.a. `union ieee754_double::ieee::mantissa0' */
-		unsigned int exponent : 11;     /* s.a. `union ieee754_double::ieee::exponent' */
-		unsigned int sign : 1;          /* s.a. `union ieee754_double::ieee::negative' */
+		__UINT32_TYPE__       fraction_low;  /* s.a. `union ieee754_double::ieee::mantissa1' */
+		__HYBRID_BITFIELD32_T bits : 20;     /* s.a. `union ieee754_double::ieee::mantissa0' */
+		__HYBRID_BITFIELD32_T exponent : 11; /* s.a. `union ieee754_double::ieee::exponent' */
+		__HYBRID_BITFIELD32_T sign : 1;      /* s.a. `union ieee754_double::ieee::negative' */
 #endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif /* ... */
 	} inf_parts;
 
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int sign : 1;          /* s.a. `union ieee754_double::ieee_nan::negative' */
-		unsigned int exponent : 11;     /* s.a. `union ieee754_double::ieee_nan::exponent' */
-		unsigned int qnan_bit : 1;      /* s.a. `union ieee754_double::ieee_nan::quiet_nan' */
-		unsigned int bits : 19;         /* s.a. `union ieee754_double::ieee_nan::mantissa0' */
-		unsigned int fraction_low : 32; /* s.a. `union ieee754_double::ieee_nan::mantissa1' */
+		__HYBRID_BITFIELD32_T sign : 1;      /* s.a. `union ieee754_double::ieee_nan::negative' */
+		__HYBRID_BITFIELD32_T exponent : 11; /* s.a. `union ieee754_double::ieee_nan::exponent' */
+		__HYBRID_BITFIELD32_T qnan_bit : 1;  /* s.a. `union ieee754_double::ieee_nan::quiet_nan' */
+		__HYBRID_BITFIELD32_T bits : 19;     /* s.a. `union ieee754_double::ieee_nan::mantissa0' */
+		__UINT32_TYPE__       fraction_low;  /* s.a. `union ieee754_double::ieee_nan::mantissa1' */
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int bits : 19;         /* s.a. `union ieee754_double::ieee_nan::mantissa0' */
-		unsigned int qnan_bit : 1;      /* s.a. `union ieee754_double::ieee_nan::quiet_nan' */
-		unsigned int exponent : 11;     /* s.a. `union ieee754_double::ieee_nan::exponent' */
-		unsigned int sign : 1;          /* s.a. `union ieee754_double::ieee_nan::negative' */
-		unsigned int fraction_low : 32; /* s.a. `union ieee754_double::ieee_nan::mantissa1' */
+		__HYBRID_BITFIELD32_T bits : 19;     /* s.a. `union ieee754_double::ieee_nan::mantissa0' */
+		__HYBRID_BITFIELD32_T qnan_bit : 1;  /* s.a. `union ieee754_double::ieee_nan::quiet_nan' */
+		__HYBRID_BITFIELD32_T exponent : 11; /* s.a. `union ieee754_double::ieee_nan::exponent' */
+		__HYBRID_BITFIELD32_T sign : 1;      /* s.a. `union ieee754_double::ieee_nan::negative' */
+		__UINT32_TYPE__       fraction_low;  /* s.a. `union ieee754_double::ieee_nan::mantissa1' */
 #else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
-		unsigned int fraction_low : 32; /* s.a. `union ieee754_double::ieee_nan::mantissa1' */
-		unsigned int bits : 19;         /* s.a. `union ieee754_double::ieee_nan::mantissa0' */
-		unsigned int qnan_bit : 1;      /* s.a. `union ieee754_double::ieee_nan::quiet_nan' */
-		unsigned int exponent : 11;     /* s.a. `union ieee754_double::ieee_nan::exponent' */
-		unsigned int sign : 1;          /* s.a. `union ieee754_double::ieee_nan::negative' */
+		__UINT32_TYPE__       fraction_low;  /* s.a. `union ieee754_double::ieee_nan::mantissa1' */
+		__HYBRID_BITFIELD32_T bits : 19;     /* s.a. `union ieee754_double::ieee_nan::mantissa0' */
+		__HYBRID_BITFIELD32_T qnan_bit : 1;  /* s.a. `union ieee754_double::ieee_nan::quiet_nan' */
+		__HYBRID_BITFIELD32_T exponent : 11; /* s.a. `union ieee754_double::ieee_nan::exponent' */
+		__HYBRID_BITFIELD32_T sign : 1;      /* s.a. `union ieee754_double::ieee_nan::negative' */
 #endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif /* ... */
 	} nan_parts;

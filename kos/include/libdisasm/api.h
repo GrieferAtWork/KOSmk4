@@ -28,6 +28,7 @@
 #else /* ... */
 #define LIBDISASM_CC /* nothing */
 #endif /* !... */
+#define LIBDISASM_VCC /* nothing */
 
 #if (!defined(LIBDISASM_WANT_PROTOTYPES) && \
      defined(__KOS__) && defined(__KERNEL__))

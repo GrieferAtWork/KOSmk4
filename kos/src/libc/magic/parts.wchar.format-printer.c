@@ -308,18 +308,22 @@ $ssize_t format_wwidth(void *arg, [[in(datalen)]] wchar_t const *__restrict data
 $ssize_t format_wlength(void *arg, wchar_t const *__restrict data, $size_t datalen) = format_length;
 
 
-
-%{
-
-#ifndef __format_waprintf_data_defined
+%[define(DEFINE_FORMAT_WAPRINTF_DATA =
+@@pp_ifndef __format_waprintf_data_defined@@
 #define __format_waprintf_data_defined
 struct format_waprintf_data {
-	wchar_t      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+	wchar_t      *@ap_base@;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ @ap_avail@; /* Unused buffer size */
+	__SIZE_TYPE__ @ap_used@;  /* Used buffer size */
 };
-#endif /* !__format_waprintf_data_defined */
+@@pp_endif@@
+)]
 
+
+
+%
+%[insert:prefix(DEFINE_FORMAT_WAPRINTF_DATA)]
+%{
 #define FORMAT_WAPRINTF_DATA_INIT \
 	{ __NULLPTR, 0, 0 }
 #define format_waprintf_data_init(self) \
@@ -348,18 +352,6 @@ struct format_waprintf_data {
 #endif /* !... */
 
 }
-
-
-%[define(DEFINE_FORMAT_WAPRINTF_DATA =
-#ifndef __format_waprintf_data_defined
-#define __format_waprintf_data_defined
-struct format_waprintf_data {
-	wchar_t      *@ap_base@;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ @ap_avail@; /* Unused buffer size */
-	__SIZE_TYPE__ @ap_used@;  /* Used buffer size */
-};
-#endif /* !__format_waprintf_data_defined */
-)]
 
 
 @@Pack  and  finalize  a  given  aprintf  format printer

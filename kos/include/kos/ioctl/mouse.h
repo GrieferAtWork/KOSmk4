@@ -23,11 +23,11 @@
 /* KOS-specific mouse-device system interface. */
 
 #include <__stdinc.h>
+
+#include <hybrid/__bitfield.h>
+
 #include <asm/ioctl.h>
 #include <bits/types.h>
-
-__DECL_BEGIN
-
 
 #define MOUSE_BUTTON_LEFT    0x01 /* Left mouse button */
 #define MOUSE_BUTTON_MIDDLE  0x02 /* Middle mouse button */
@@ -48,6 +48,8 @@ __DECL_BEGIN
                                 * Calculated as: X  = 6 FOR  X in 12*X  >= 64 &&  6*X >=  32 */
 
 #ifdef __CC__
+__DECL_BEGIN
+
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("mp_word")
 #pragma push_macro("mp_type")
@@ -89,14 +91,14 @@ typedef union __ATTR_ALIGNED(2) __ATTR_PACKED {
 		/* Mouse packet. - This is the structure that is returned when `read(2)'-ing from a mouse device.
 		 * Prior to being usable, this structure should be processed using `mouse_packet_sequence()',  in
 		 * order to safely handle packet sequences. */
-		unsigned int mp_type   : 4; /* Mouse packet type. */
-		unsigned int mp_seqnum : 4; /* Packet sequence number.
-		                             * 0: The last packet of a sequence
-		                             * N: This packet is followed by N-1 more packets
-		                             * NOTE: The current implementation never produces more than `MOUSE_PACKET_SEQMAX'
-		                             *       packets within the same sequence, however KOS reserves the right to later
-		                             *       define additional meaning for sequence numbers that are greater.
-		                             * Example: { 3, 2, 1, 0 } (4-packet sequence) */
+		__HYBRID_BITFIELD8_T mp_type   : 4; /* Mouse packet type. */
+		__HYBRID_BITFIELD8_T mp_seqnum : 4; /* Packet sequence number.
+		                                     * 0: The last packet of a sequence
+		                                     * N: This packet is followed by N-1 more packets
+		                                     * NOTE: The current implementation never produces more than `MOUSE_PACKET_SEQMAX'
+		                                     *       packets within the same sequence, however KOS reserves the right to later
+		                                     *       define additional meaning for sequence numbers that are greater.
+		                                     * Example: { 3, 2, 1, 0 } (4-packet sequence) */
 		union __ATTR_PACKED {
 
 			/* NOTE: Sign-extension is done based on the most significant  bit
@@ -244,6 +246,8 @@ struct mouse_fake_button {
 #pragma pop_macro("mm_relx")
 #pragma pop_macro("mp_seqnum")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+__DECL_END
 #endif /* __CC__ */
 
 /* Mouse device I/O functions. */
@@ -262,9 +266,5 @@ struct mouse_fake_button {
 #define MOUSEIO_PUTVWHEEL       _IOW_KOS('M', 0x05, __int32_t) /* Inject vertical wheel inputs. (errno=EAGAIN: Buffer was full) */
 #define MOUSEIO_PUTHWHEEL       _IOW_KOS('M', 0x06, __int32_t) /* Inject horizontal wheel inputs. (errno=EAGAIN: Buffer was full) */
 #define MOUSEIO_FLUSHPENDING     _IO_KOS('M', 0x07) /* Clear the buffer of pending mouse packets */
-
-
-
-__DECL_END
 
 #endif /* !_KOS_IOCTL_MOUSE_H */

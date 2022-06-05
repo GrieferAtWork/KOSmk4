@@ -89,7 +89,7 @@ again:
 got_result:
 		task_connection_disconnect_all(self, false);
 		COMPILER_BARRIER();
-		assert(result = self->tcs_dlvr);
+		assert(result == self->tcs_dlvr);
 		self->tcs_dlvr = NULL;
 	} else {
 		if unlikely_untraced(!preemption_ison()) {

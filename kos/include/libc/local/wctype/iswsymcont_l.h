@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd215259f */
+/* HASH CRC-32:0xddefc23 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,12 +51,23 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_iswalnum_l __LIBC_LOCAL_NAME(iswalnum_l)
 #endif /* !... */
 #endif /* !__local___localdep_iswalnum_l_defined */
+#ifndef __local___localdep_iswsymcont_defined
+#define __local___localdep_iswsymcont_defined
+#ifdef __CRT_HAVE___iswcsym
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswsymcont,(__WINT_TYPE__ __wc),__iswcsym,(__wc))
+#else /* __CRT_HAVE___iswcsym */
+__NAMESPACE_LOCAL_END
+#include <libc/local/wctype/iswsymcont.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_iswsymcont __LIBC_LOCAL_NAME(iswsymcont)
+#endif /* !__CRT_HAVE___iswcsym */
+#endif /* !__local___localdep_iswsymcont_defined */
 __LOCAL_LIBC(iswsymcont_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswsymcont_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 	__COMPILER_IMPURE();
 	(void)__locale;
-	return __iswcsym(__wc);
+	return (__NAMESPACE_LOCAL_SYM __localdep_iswsymcont)(__wc);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return (__NAMESPACE_LOCAL_SYM __localdep_iswalnum_l)(__wc, __locale) || __wc == '_' || __wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */

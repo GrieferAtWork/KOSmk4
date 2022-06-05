@@ -1246,14 +1246,14 @@ again:
 		} else if (cpuset_size != pthread_default_attr.pa_cpusetsize) {
 			cpuset_size = pthread_default_attr.pa_cpusetsize;
 			pthread_default_attr_endread();
-			cpuset = (cpu_set_t *)realloc(cpuset, cpuset_size);
+			cpuset = (cpu_set_t *)reallocf(cpuset, cpuset_size);
 			if unlikely(!cpuset)
 				return ENOMEM;
 			goto again;
 		}
 		attr->pa_cpuset     = cpuset;
 		attr->pa_cpusetsize = cpuset_size;
-		cpuset            = NULL; /* Don't free() below */
+		cpuset              = NULL; /* Don't free() below */
 	}
 	pthread_default_attr_endread();
 	if (attr->pa_stacksize == 0)
@@ -1440,11 +1440,9 @@ done_stack:
 			cpu_set_t *buf = NULL, *newbuf;
 			size_t bufsize = sizeof(attr->pa_cpusetsize) * 2;
 			do {
-				newbuf = (cpu_set_t *)realloc(buf, bufsize);
-				if unlikely(!newbuf) {
-					free(buf);
+				newbuf = (cpu_set_t *)reallocf(buf, bufsize);
+				if unlikely(!newbuf)
 					return ENOMEM;
-				}
 				buf = newbuf;
 				error = pthread_getaffinity_np(pthread, bufsize, buf);
 				if (error == EOK) {
@@ -1724,11 +1722,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setaffinity_np)(pthread_t pthread,
 		cpu_set_t *buf = NULL, *newbuf;
 		size_t bufsize = sizeof(old_cpusetsize) * 2;
 		for (;;) {
-			newbuf = (cpu_set_t *)realloc(buf, bufsize);
-			if unlikely(!newbuf) {
-				free(buf);
+			newbuf = (cpu_set_t *)reallocf(buf, bufsize);
+			if unlikely(!newbuf)
 				return ENOMEM;
-			}
 			buf = newbuf;
 			error = sys_sched_getaffinity(tid, bufsize, buf);
 			if (E_ISOK(error)) {

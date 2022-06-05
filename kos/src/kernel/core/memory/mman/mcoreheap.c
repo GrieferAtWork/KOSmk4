@@ -61,16 +61,16 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 
 /* Assert that constants are correct. */
-STATIC_ASSERT(alignof(struct mpart) == __ALIGNOF_MPART);
-STATIC_ASSERT(alignof(struct mnode) == __ALIGNOF_MNODE);
-STATIC_ASSERT(alignof(union mcorepart) == __ALIGNOF_MCOREPART);
-STATIC_ASSERT(sizeof(struct mpart) == __SIZEOF_MPART);
-STATIC_ASSERT(sizeof(struct mnode) == __SIZEOF_MNODE);
-STATIC_ASSERT(sizeof(union mcorepart) == __SIZEOF_MCOREPART);
-STATIC_ASSERT(offsetof(struct mcorepage, mcp_part) == _MCOREPAGE_HEADER_SIZE);
+static_assert(alignof(struct mpart) == __ALIGNOF_MPART);
+static_assert(alignof(struct mnode) == __ALIGNOF_MNODE);
+static_assert(alignof(union mcorepart) == __ALIGNOF_MCOREPART);
+static_assert(sizeof(struct mpart) == __SIZEOF_MPART);
+static_assert(sizeof(struct mnode) == __SIZEOF_MNODE);
+static_assert(sizeof(union mcorepart) == __SIZEOF_MCOREPART);
+static_assert(offsetof(struct mcorepage, mcp_part) == _MCOREPAGE_HEADER_SIZE);
 
 /* Also make sure that `struct mcorepage' really fits into a single page! */
-STATIC_ASSERT(sizeof(struct mcorepage) <= PAGESIZE);
+static_assert(sizeof(struct mcorepage) <= PAGESIZE);
 
 #ifndef SIZEOF_POINTER
 #define SIZEOF_POINTER __SIZEOF_POINTER__

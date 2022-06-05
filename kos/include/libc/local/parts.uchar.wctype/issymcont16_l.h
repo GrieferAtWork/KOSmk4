@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad70ff2e */
+/* HASH CRC-32:0x415266cd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,12 +62,30 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_isalnum16_l __LIBC_LOCAL_NAME(isalnum16_l)
 #endif /* !... */
 #endif /* !__local___localdep_isalnum16_l_defined */
+#ifndef __local___localdep_issymcont16_defined
+#define __local___localdep_issymcont16_defined
+#if defined(__CRT_HAVE___iswcsym) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_issymcont16,(__WINT16_TYPE__ __wc),__iswcsym,(__wc))
+#elif defined(__CRT_HAVE_DOS$__iswcsym)
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_issymcont16,(__WINT16_TYPE__ __wc),__iswcsym,(__wc))
+#elif __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <libc/local/wctype/iswsymcont.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_issymcont16 __NAMESPACE_LOCAL_TYPEHAX(int(__LIBDCALL*)(__WINT16_TYPE__),int(__LIBDCALL&)(__WINT16_TYPE__),iswsymcont)
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.uchar.wctype/issymcont16.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_issymcont16 __LIBC_LOCAL_NAME(issymcont16)
+#endif /* !... */
+#endif /* !__local___localdep_issymcont16_defined */
 __LOCAL_LIBC(issymcont16_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(issymcont16_l))(__WINT16_TYPE__ __wc, __locale_t __locale) {
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 	__COMPILER_IMPURE();
 	(void)__locale;
-	return __iswcsym(__wc);
+	return (__NAMESPACE_LOCAL_SYM __localdep_issymcont16)(__wc);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return (__NAMESPACE_LOCAL_SYM __localdep_isalnum16_l)(__wc, __locale) || __wc == '_' || __wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */

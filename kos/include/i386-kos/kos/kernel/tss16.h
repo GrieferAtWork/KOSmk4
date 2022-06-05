@@ -23,9 +23,6 @@
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
 
-__DECL_BEGIN
-
-
 #define OFFSET_TSS16_LINK  0
 #define OFFSET_TSS16_SP0   2
 #define OFFSET_TSS16_SS0   4
@@ -52,6 +49,8 @@ __DECL_BEGIN
 #define ALIGNOF_TSS16      2
 
 #ifdef __CC__
+__DECL_BEGIN
+
 struct __ATTR_ALIGNED(ALIGNOF_TSS16) __ATTR_PACKED tss16 /*[PREFIX(t_)]*/ {
 	__UINT16_TYPE__   t_link;
 	__UINT16_TYPE__   t_sp0;
@@ -76,8 +75,8 @@ struct __ATTR_ALIGNED(ALIGNOF_TSS16) __ATTR_PACKED tss16 /*[PREFIX(t_)]*/ {
 	__UINT16_TYPE__   t_ds;
 	__UINT16_TYPE__   t_ldtr;
 };
-#endif /* __CC__ */
 
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_I386_KOS_KOS_KERNEL_TSS16_H */

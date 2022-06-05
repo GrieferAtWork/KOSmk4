@@ -32,159 +32,308 @@
 
 #include <bits/typesizes.h>
 
-__DECL_BEGIN
-
+/* Default sizes */
 #ifndef __SIZEOF_FD_T__
-#define __SIZEOF_FD_T__             __SIZEOF_INT__
+#define __SIZEOF_FD_T__ __SIZEOF_INT__
 #endif /* !__SIZEOF_FD_T__ */
 #ifndef __SIZEOF_ERRNO_T__
-#define __SIZEOF_ERRNO_T__          __SIZEOF_INT__
+#define __SIZEOF_ERRNO_T__ __SIZEOF_INT__
 #endif /* !__SIZEOF_ERRNO_T__ */
 #ifndef __SIZEOF_SIGNO_T__
-#define __SIZEOF_SIGNO_T__          __SIZEOF_INT__
+#define __SIZEOF_SIGNO_T__ __SIZEOF_INT__
 #endif /* !__SIZEOF_SIGNO_T__ */
 #ifndef __SIZEOF_OFLAG_T__
-#define __SIZEOF_OFLAG_T__          __SIZEOF_INT__
+#define __SIZEOF_OFLAG_T__ __SIZEOF_INT__
 #endif /* !__SIZEOF_OFLAG_T__ */
 #ifndef __SIZEOF_SYSCALL_LONG_T__
-#define __SIZEOF_SYSCALL_LONG_T__   __SIZEOF_REGISTER__
+#define __SIZEOF_SYSCALL_LONG_T__ __SIZEOF_REGISTER__
 #endif /* !__SIZEOF_SYSCALL_LONG_T__ */
 #ifndef __SIZEOF_MODE_T__
-#define __SIZEOF_MODE_T__           4
+#define __SIZEOF_MODE_T__ 4
 #endif /* !__SIZEOF_MODE_T__ */
 #ifndef __SIZEOF_ATFLAG_T__
-#define __SIZEOF_ATFLAG_T__         __SIZEOF_INT__
+#define __SIZEOF_ATFLAG_T__ __SIZEOF_INT__
 #endif /* !__SIZEOF_ATFLAG_T__ */
 #ifndef __SIZEOF_IOMODE_T__
 #if __SIZEOF_POINTER__ >= 8
-#define __SIZEOF_IOMODE_T__         4
+#define __SIZEOF_IOMODE_T__ 4
 #else /* __SIZEOF_POINTER__ >= 8 */
-#define __SIZEOF_IOMODE_T__         2
+#define __SIZEOF_IOMODE_T__ 2
 #endif /* __SIZEOF_POINTER__ < 8 */
 #endif /* !__SIZEOF_IOMODE_T__ */
 #ifndef __SIZEOF_MAJOR_T__
-#define __SIZEOF_MAJOR_T__          4
+#define __SIZEOF_MAJOR_T__ 4
 #endif /* !__SIZEOF_MAJOR_T__ */
 #ifndef __SIZEOF_MINOR_T__
-#define __SIZEOF_MINOR_T__          4
+#define __SIZEOF_MINOR_T__ 4
 #endif /* !__SIZEOF_MINOR_T__ */
 #ifndef __SIZEOF_DEV_T__
-#define __SIZEOF_DEV_T__            8
+#define __SIZEOF_DEV_T__ 8
 #endif /* !__SIZEOF_DEV_T__ */
 #ifndef __SIZEOF_ID_T__
-#define __SIZEOF_ID_T__             4
+#define __SIZEOF_ID_T__ 4
 #endif /* !__SIZEOF_ID_T__ */
 #ifndef __SIZEOF_PID_T__
-#define __SIZEOF_PID_T__            4
+#define __SIZEOF_PID_T__ 4
 #endif /* !__SIZEOF_PID_T__ */
 #ifndef __SIZEOF_KEY_T__
-#define __SIZEOF_KEY_T__            4
+#define __SIZEOF_KEY_T__ 4
 #endif /* !__SIZEOF_KEY_T__ */
 #ifndef __SIZEOF_DADDR_T__
-#define __SIZEOF_DADDR_T__          4
+#define __SIZEOF_DADDR_T__ 4
 #endif /* !__SIZEOF_DADDR_T__ */
 #ifndef __SIZEOF_CADDR_T__
-#define __SIZEOF_CADDR_T__          __SIZEOF_POINTER__
+#define __SIZEOF_CADDR_T__ __SIZEOF_POINTER__
 #endif /* !__SIZEOF_CADDR_T__ */
 #ifndef __SIZEOF_FSID_T__
-#define __SIZEOF_FSID_T__           8
+#define __SIZEOF_FSID_T__ 8
 #endif /* !__SIZEOF_FSID_T__ */
 #ifndef __SIZEOF_BLKSIZE_T__
-#define __SIZEOF_BLKSIZE_T__        __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_BLKSIZE_T__ __SIZEOF_SYSCALL_LONG_T__
 #endif /* !__SIZEOF_BLKSIZE_T__ */
 #ifndef __SIZEOF_NLINK_T__
-#define __SIZEOF_NLINK_T__          4
+#define __SIZEOF_NLINK_T__ 4
 #endif /* !__SIZEOF_NLINK_T__ */
 #ifndef __SIZEOF_OFF32_T__
-#define __SIZEOF_OFF32_T__          4
+#define __SIZEOF_OFF32_T__ 4
 #endif /* !__SIZEOF_OFF32_T__ */
 #ifndef __SIZEOF_OFF64_T__
-#define __SIZEOF_OFF64_T__          8
+#define __SIZEOF_OFF64_T__ 8
 #endif /* !__SIZEOF_OFF64_T__ */
 #ifndef __SIZEOF_LOFF_T__
-#define __SIZEOF_LOFF_T__           8
+#define __SIZEOF_LOFF_T__ 8
 #endif /* !__SIZEOF_LOFF_T__ */
 #ifndef __SIZEOF_BLKCNT32_T__
-#define __SIZEOF_BLKCNT32_T__       4
+#define __SIZEOF_BLKCNT32_T__ 4
 #endif /* !__SIZEOF_BLKCNT32_T__ */
 #ifndef __SIZEOF_BLKCNT64_T__
-#define __SIZEOF_BLKCNT64_T__       8
+#define __SIZEOF_BLKCNT64_T__ 8
 #endif /* !__SIZEOF_BLKCNT64_T__ */
 #ifndef __SIZEOF_FSBLKCNT32_T__
-#define __SIZEOF_FSBLKCNT32_T__     4
+#define __SIZEOF_FSBLKCNT32_T__ 4
 #endif /* !__SIZEOF_FSBLKCNT32_T__ */
 #ifndef __SIZEOF_FSBLKCNT64_T__
-#define __SIZEOF_FSBLKCNT64_T__     8
+#define __SIZEOF_FSBLKCNT64_T__ 8
 #endif /* !__SIZEOF_FSBLKCNT64_T__ */
 #ifndef __SIZEOF_FSFILCNT32_T__
-#define __SIZEOF_FSFILCNT32_T__     4
+#define __SIZEOF_FSFILCNT32_T__ 4
 #endif /* !__SIZEOF_FSFILCNT32_T__ */
 #ifndef __SIZEOF_FSFILCNT64_T__
-#define __SIZEOF_FSFILCNT64_T__     8
+#define __SIZEOF_FSFILCNT64_T__ 8
 #endif /* !__SIZEOF_FSFILCNT64_T__ */
 #ifndef __SIZEOF_INO32_T__
-#define __SIZEOF_INO32_T__          4
+#define __SIZEOF_INO32_T__ 4
 #endif /* !__SIZEOF_INO32_T__ */
 #ifndef __SIZEOF_INO64_T__
-#define __SIZEOF_INO64_T__          8
+#define __SIZEOF_INO64_T__ 8
 #endif /* !__SIZEOF_INO64_T__ */
 #ifndef __SIZEOF_RLIM32_T__
-#define __SIZEOF_RLIM32_T__         4
+#define __SIZEOF_RLIM32_T__ 4
 #endif /* !__SIZEOF_RLIM32_T__ */
 #ifndef __SIZEOF_RLIM64_T__
-#define __SIZEOF_RLIM64_T__         8
+#define __SIZEOF_RLIM64_T__ 8
 #endif /* !__SIZEOF_RLIM64_T__ */
 #ifndef __SIZEOF_TIME32_T__
-#define __SIZEOF_TIME32_T__         4
+#define __SIZEOF_TIME32_T__ 4
 #endif /* !__SIZEOF_TIME32_T__ */
 #ifndef __SIZEOF_TIME64_T__
-#define __SIZEOF_TIME64_T__         8
+#define __SIZEOF_TIME64_T__ 8
 #endif /* !__SIZEOF_TIME64_T__ */
 #ifndef __SIZEOF_SOCKLEN_T__
-#define __SIZEOF_SOCKLEN_T__        __SIZEOF_SIZE_T__
+#define __SIZEOF_SOCKLEN_T__ __SIZEOF_SIZE_T__
 #endif /* !__SIZEOF_SOCKLEN_T__ */
 #ifndef __SIZEOF_QUANTUM_DIFF_T__
-#define __SIZEOF_QUANTUM_DIFF_T__   4
+#define __SIZEOF_QUANTUM_DIFF_T__ 4
 #endif /* !__SIZEOF_QUANTUM_DIFF_T__ */
 #ifndef __SIZEOF_CLOCK_T__
-#define __SIZEOF_CLOCK_T__          __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_CLOCK_T__ __SIZEOF_SYSCALL_LONG_T__
 #endif /* !__SIZEOF_CLOCK_T__ */
 #ifndef __SIZEOF_USECONDS_T__
-#define __SIZEOF_USECONDS_T__       4
+#define __SIZEOF_USECONDS_T__ 4
 #endif /* !__SIZEOF_USECONDS_T__ */
 #ifndef __SIZEOF_SUSECONDS_T__
-#define __SIZEOF_SUSECONDS_T__      __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_SUSECONDS_T__ __SIZEOF_SYSCALL_LONG_T__
 #endif /* !__SIZEOF_SUSECONDS_T__ */
 #ifndef __SIZEOF_CLOCKID_T__
-#define __SIZEOF_CLOCKID_T__        4
+#define __SIZEOF_CLOCKID_T__ 4
 #endif /* !__SIZEOF_CLOCKID_T__ */
 #ifndef __SIZEOF_GID_T__
-#define __SIZEOF_GID_T__            4
+#define __SIZEOF_GID_T__ 4
 #endif /* !__SIZEOF_GID_T__ */
 #ifndef __SIZEOF_UID_T__
-#define __SIZEOF_UID_T__            4
+#define __SIZEOF_UID_T__ 4
 #endif /* !__SIZEOF_UID_T__ */
 #ifndef __SIZEOF_TIMER_T__
-#define __SIZEOF_TIMER_T__          __SIZEOF_POINTER__
+#define __SIZEOF_TIMER_T__ __SIZEOF_POINTER__
 #endif /* !__SIZEOF_TIMER_T__ */
 #ifndef __SIZEOF_FSWORD_T__
-#define __SIZEOF_FSWORD_T__         __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_FSWORD_T__ __SIZEOF_SYSCALL_LONG_T__
 #endif /* !__SIZEOF_FSWORD_T__ */
 #ifndef __SIZEOF_PHYSADDR_T__
-#define __SIZEOF_PHYSADDR_T__       __SIZEOF_POINTER__
+#define __SIZEOF_PHYSADDR_T__ __SIZEOF_POINTER__
 #endif /* !__SIZEOF_PHYSADDR_T__ */
 #ifndef __SIZEOF_PHYSPAGE_T__
-#define __SIZEOF_PHYSPAGE_T__       __SIZEOF_POINTER__
+#define __SIZEOF_PHYSPAGE_T__ __SIZEOF_POINTER__
 #endif /* !__SIZEOF_PHYSPAGE_T__ */
 #ifndef __SIZEOF_SA_FAMILY_T__
-#define __SIZEOF_SA_FAMILY_T__      2
+#define __SIZEOF_SA_FAMILY_T__ 2
 #endif /* !__SIZEOF_SA_FAMILY_T__ */
 #ifndef __SIZEOF_IOCTL_T__
-#define __SIZEOF_IOCTL_T__          __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_IOCTL_T__ __SIZEOF_SYSCALL_LONG_T__
 #endif /* !__SIZEOF_IOCTL_T__ */
 #ifndef __SIZEOF_FCNTL_T__
-#define __SIZEOF_FCNTL_T__          __SIZEOF_INT__
+#define __SIZEOF_FCNTL_T__ __SIZEOF_INT__
 #endif /* !__SIZEOF_FCNTL_T__ */
+
+
+/* Default alignments */
+#ifndef __ALIGNOF_FD_T__
+#define __ALIGNOF_FD_T__ __ALIGNOF(__SIZEOF_FD_T__)
+#endif /* !__ALIGNOF_FD_T__ */
+#ifndef __ALIGNOF_ERRNO_T__
+#define __ALIGNOF_ERRNO_T__ __ALIGNOF(__SIZEOF_ERRNO_T__)
+#endif /* !__ALIGNOF_ERRNO_T__ */
+#ifndef __ALIGNOF_SIGNO_T__
+#define __ALIGNOF_SIGNO_T__ __ALIGNOF(__SIZEOF_SIGNO_T__)
+#endif /* !__ALIGNOF_SIGNO_T__ */
+#ifndef __ALIGNOF_OFLAG_T__
+#define __ALIGNOF_OFLAG_T__ __ALIGNOF(__SIZEOF_OFLAG_T__)
+#endif /* !__ALIGNOF_OFLAG_T__ */
+#ifndef __ALIGNOF_SYSCALL_LONG_T__
+#define __ALIGNOF_SYSCALL_LONG_T__ __ALIGNOF(__SIZEOF_SYSCALL_LONG_T__)
+#endif /* !__ALIGNOF_SYSCALL_LONG_T__ */
+#ifndef __ALIGNOF_MODE_T__
+#define __ALIGNOF_MODE_T__ __ALIGNOF(__SIZEOF_MODE_T__)
+#endif /* !__ALIGNOF_MODE_T__ */
+#ifndef __ALIGNOF_ATFLAG_T__
+#define __ALIGNOF_ATFLAG_T__ __ALIGNOF(__SIZEOF_ATFLAG_T__)
+#endif /* !__ALIGNOF_ATFLAG_T__ */
+#ifndef __ALIGNOF_IOMODE_T__
+#define __ALIGNOF_IOMODE_T__ __ALIGNOF(__SIZEOF_IOMODE_T__)
+#endif /* !__ALIGNOF_IOMODE_T__ */
+#ifndef __ALIGNOF_MAJOR_T__
+#define __ALIGNOF_MAJOR_T__ __ALIGNOF(__SIZEOF_MAJOR_T__)
+#endif /* !__ALIGNOF_MAJOR_T__ */
+#ifndef __ALIGNOF_MINOR_T__
+#define __ALIGNOF_MINOR_T__ __ALIGNOF(__SIZEOF_MINOR_T__)
+#endif /* !__ALIGNOF_MINOR_T__ */
+#ifndef __ALIGNOF_DEV_T__
+#define __ALIGNOF_DEV_T__ __ALIGNOF(__SIZEOF_DEV_T__)
+#endif /* !__ALIGNOF_DEV_T__ */
+#ifndef __ALIGNOF_ID_T__
+#define __ALIGNOF_ID_T__ __ALIGNOF(__SIZEOF_ID_T__)
+#endif /* !__ALIGNOF_ID_T__ */
+#ifndef __ALIGNOF_PID_T__
+#define __ALIGNOF_PID_T__ __ALIGNOF(__SIZEOF_PID_T__)
+#endif /* !__ALIGNOF_PID_T__ */
+#ifndef __ALIGNOF_KEY_T__
+#define __ALIGNOF_KEY_T__ __ALIGNOF(__SIZEOF_KEY_T__)
+#endif /* !__ALIGNOF_KEY_T__ */
+#ifndef __ALIGNOF_DADDR_T__
+#define __ALIGNOF_DADDR_T__ __ALIGNOF(__SIZEOF_DADDR_T__)
+#endif /* !__ALIGNOF_DADDR_T__ */
+#ifndef __ALIGNOF_CADDR_T__
+#define __ALIGNOF_CADDR_T__ __ALIGNOF(__SIZEOF_CADDR_T__)
+#endif /* !__ALIGNOF_CADDR_T__ */
+#ifndef __ALIGNOF_FSID_T__
+#define __ALIGNOF_FSID_T__ __ALIGNOF(__SIZEOF_FSID_T__)
+#endif /* !__ALIGNOF_FSID_T__ */
+#ifndef __ALIGNOF_BLKSIZE_T__
+#define __ALIGNOF_BLKSIZE_T__ __ALIGNOF(__SIZEOF_BLKSIZE_T__)
+#endif /* !__ALIGNOF_BLKSIZE_T__ */
+#ifndef __ALIGNOF_NLINK_T__
+#define __ALIGNOF_NLINK_T__ __ALIGNOF(__SIZEOF_NLINK_T__)
+#endif /* !__ALIGNOF_NLINK_T__ */
+#ifndef __ALIGNOF_OFF32_T__
+#define __ALIGNOF_OFF32_T__ __ALIGNOF(__SIZEOF_OFF32_T__)
+#endif /* !__ALIGNOF_OFF32_T__ */
+#ifndef __ALIGNOF_OFF64_T__
+#define __ALIGNOF_OFF64_T__ __ALIGNOF(__SIZEOF_OFF64_T__)
+#endif /* !__ALIGNOF_OFF64_T__ */
+#ifndef __ALIGNOF_LOFF_T__
+#define __ALIGNOF_LOFF_T__ __ALIGNOF(__SIZEOF_LOFF_T__)
+#endif /* !__ALIGNOF_LOFF_T__ */
+#ifndef __ALIGNOF_BLKCNT32_T__
+#define __ALIGNOF_BLKCNT32_T__ __ALIGNOF(__SIZEOF_BLKCNT32_T__)
+#endif /* !__ALIGNOF_BLKCNT32_T__ */
+#ifndef __ALIGNOF_BLKCNT64_T__
+#define __ALIGNOF_BLKCNT64_T__ __ALIGNOF(__SIZEOF_BLKCNT64_T__)
+#endif /* !__ALIGNOF_BLKCNT64_T__ */
+#ifndef __ALIGNOF_FSBLKCNT32_T__
+#define __ALIGNOF_FSBLKCNT32_T__ __ALIGNOF(__SIZEOF_FSBLKCNT32_T__)
+#endif /* !__ALIGNOF_FSBLKCNT32_T__ */
+#ifndef __ALIGNOF_FSBLKCNT64_T__
+#define __ALIGNOF_FSBLKCNT64_T__ __ALIGNOF(__SIZEOF_FSBLKCNT64_T__)
+#endif /* !__ALIGNOF_FSBLKCNT64_T__ */
+#ifndef __ALIGNOF_FSFILCNT32_T__
+#define __ALIGNOF_FSFILCNT32_T__ __ALIGNOF(__SIZEOF_FSFILCNT32_T__)
+#endif /* !__ALIGNOF_FSFILCNT32_T__ */
+#ifndef __ALIGNOF_FSFILCNT64_T__
+#define __ALIGNOF_FSFILCNT64_T__ __ALIGNOF(__SIZEOF_FSFILCNT64_T__)
+#endif /* !__ALIGNOF_FSFILCNT64_T__ */
+#ifndef __ALIGNOF_INO32_T__
+#define __ALIGNOF_INO32_T__ __ALIGNOF(__SIZEOF_INO32_T__)
+#endif /* !__ALIGNOF_INO32_T__ */
+#ifndef __ALIGNOF_INO64_T__
+#define __ALIGNOF_INO64_T__ __ALIGNOF(__SIZEOF_INO64_T__)
+#endif /* !__ALIGNOF_INO64_T__ */
+#ifndef __ALIGNOF_RLIM32_T__
+#define __ALIGNOF_RLIM32_T__ __ALIGNOF(__SIZEOF_RLIM32_T__)
+#endif /* !__ALIGNOF_RLIM32_T__ */
+#ifndef __ALIGNOF_RLIM64_T__
+#define __ALIGNOF_RLIM64_T__ __ALIGNOF(__SIZEOF_RLIM64_T__)
+#endif /* !__ALIGNOF_RLIM64_T__ */
+#ifndef __ALIGNOF_TIME32_T__
+#define __ALIGNOF_TIME32_T__ __ALIGNOF(__SIZEOF_TIME32_T__)
+#endif /* !__ALIGNOF_TIME32_T__ */
+#ifndef __ALIGNOF_TIME64_T__
+#define __ALIGNOF_TIME64_T__ __ALIGNOF(__SIZEOF_TIME64_T__)
+#endif /* !__ALIGNOF_TIME64_T__ */
+#ifndef __ALIGNOF_SOCKLEN_T__
+#define __ALIGNOF_SOCKLEN_T__ __ALIGNOF(__SIZEOF_SOCKLEN_T__)
+#endif /* !__ALIGNOF_SOCKLEN_T__ */
+#ifndef __ALIGNOF_QUANTUM_DIFF_T__
+#define __ALIGNOF_QUANTUM_DIFF_T__ __ALIGNOF(__SIZEOF_QUANTUM_DIFF_T__)
+#endif /* !__ALIGNOF_QUANTUM_DIFF_T__ */
+#ifndef __ALIGNOF_CLOCK_T__
+#define __ALIGNOF_CLOCK_T__ __ALIGNOF(__SIZEOF_CLOCK_T__)
+#endif /* !__ALIGNOF_CLOCK_T__ */
+#ifndef __ALIGNOF_USECONDS_T__
+#define __ALIGNOF_USECONDS_T__ __ALIGNOF(__SIZEOF_USECONDS_T__)
+#endif /* !__ALIGNOF_USECONDS_T__ */
+#ifndef __ALIGNOF_SUSECONDS_T__
+#define __ALIGNOF_SUSECONDS_T__ __ALIGNOF(__SIZEOF_SUSECONDS_T__)
+#endif /* !__ALIGNOF_SUSECONDS_T__ */
+#ifndef __ALIGNOF_CLOCKID_T__
+#define __ALIGNOF_CLOCKID_T__ __ALIGNOF(__SIZEOF_CLOCKID_T__)
+#endif /* !__ALIGNOF_CLOCKID_T__ */
+#ifndef __ALIGNOF_GID_T__
+#define __ALIGNOF_GID_T__ __ALIGNOF(__SIZEOF_GID_T__)
+#endif /* !__ALIGNOF_GID_T__ */
+#ifndef __ALIGNOF_UID_T__
+#define __ALIGNOF_UID_T__ __ALIGNOF(__SIZEOF_UID_T__)
+#endif /* !__ALIGNOF_UID_T__ */
+#ifndef __ALIGNOF_TIMER_T__
+#define __ALIGNOF_TIMER_T__ __ALIGNOF(__SIZEOF_TIMER_T__)
+#endif /* !__ALIGNOF_TIMER_T__ */
+#ifndef __ALIGNOF_FSWORD_T__
+#define __ALIGNOF_FSWORD_T__ __ALIGNOF(__SIZEOF_FSWORD_T__)
+#endif /* !__ALIGNOF_FSWORD_T__ */
+#ifndef __ALIGNOF_PHYSADDR_T__
+#define __ALIGNOF_PHYSADDR_T__ __ALIGNOF(__SIZEOF_PHYSADDR_T__)
+#endif /* !__ALIGNOF_PHYSADDR_T__ */
+#ifndef __ALIGNOF_PHYSPAGE_T__
+#define __ALIGNOF_PHYSPAGE_T__ __ALIGNOF(__SIZEOF_PHYSPAGE_T__)
+#endif /* !__ALIGNOF_PHYSPAGE_T__ */
+#ifndef __ALIGNOF_SA_FAMILY_T__
+#define __ALIGNOF_SA_FAMILY_T__ __ALIGNOF(__SIZEOF_SA_FAMILY_T__)
+#endif /* !__ALIGNOF_SA_FAMILY_T__ */
+#ifndef __ALIGNOF_IOCTL_T__
+#define __ALIGNOF_IOCTL_T__ __ALIGNOF(__SIZEOF_IOCTL_T__)
+#endif /* !__ALIGNOF_IOCTL_T__ */
+#ifndef __ALIGNOF_FCNTL_T__
+#define __ALIGNOF_FCNTL_T__ __ALIGNOF(__SIZEOF_FCNTL_T__)
+#endif /* !__ALIGNOF_FCNTL_T__ */
 
 
 #ifdef __CC__
@@ -229,6 +378,8 @@ typedef struct { __UINT32_TYPE__ __lo,__hi; } __uint64_t;
 #define __CRT_PRIVATE_UINT(sizeof)  __CRT_PRIVATE_UINT2(sizeof)
 #define __CRT_PRIVATE_SLNG(sizeof)  __CRT_PRIVATE_SLNG2(sizeof)
 #define __CRT_PRIVATE_ULNG(sizeof)  __CRT_PRIVATE_ULNG2(sizeof)
+
+__DECL_BEGIN
 
 #ifndef ____s8_defined
 #define ____s8_defined
@@ -462,11 +613,17 @@ typedef struct { __INT8_TYPE__  __val[__SIZEOF_FSID_T__]; } __fsid_t;
 #endif /* __SIZEOF_TIMER_T__ != __SIZEOF_POINTER__ */
 #endif /* __CC__ */
 
+__DECL_END
 
-#define __SIZEOF_INO_T__  __FS_SIZEOF(INO)  /* == sizeof(ino_t) */
-#define __SIZEOF_OFF_T__  __FS_SIZEOF(OFF)  /* == sizeof(off_t) */
-#define __SIZEOF_POS_T__  __FS_SIZEOF(OFF)  /* == sizeof(pos_t) */
-#define __SIZEOF_TIME_T__ __TM_SIZEOF(TIME) /* == sizeof(time_t) */
+
+#define __SIZEOF_INO_T__   __FS_SIZEOF(INO)   /* == sizeof(ino_t) */
+#define __SIZEOF_OFF_T__   __FS_SIZEOF(OFF)   /* == sizeof(off_t) */
+#define __SIZEOF_POS_T__   __FS_SIZEOF(OFF)   /* == sizeof(pos_t) */
+#define __SIZEOF_TIME_T__  __TM_SIZEOF(TIME)  /* == sizeof(time_t) */
+#define __ALIGNOF_INO_T__  __FS_ALIGNOF(INO)  /* == alignof(ino_t) */
+#define __ALIGNOF_OFF_T__  __FS_ALIGNOF(OFF)  /* == alignof(off_t) */
+#define __ALIGNOF_POS_T__  __FS_ALIGNOF(OFF)  /* == alignof(pos_t) */
+#define __ALIGNOF_TIME_T__ __TM_ALIGNOF(TIME) /* == alignof(time_t) */
 
 
 
@@ -509,7 +666,5 @@ typedef struct { __INT8_TYPE__  __val[__SIZEOF_FSID_T__]; } __fsid_t;
 #define __SIZEOF_POS64_T__ 4
 #define __SIZEOF_CLOCK_T__ 4
 #endif /* __CRT_DOS_PRIMARY */
-
-__DECL_END
 
 #endif /* !_BITS_TYPES_H */

@@ -24,6 +24,7 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/__bitfield.h>
 #include <hybrid/typecore.h>
 
 #include <asm/ioctl.h>
@@ -157,25 +158,25 @@ enum reset_mode {
 };
 
 struct floppy_fdc_state {
-	__INT32_TYPE__    spec1; /* spec1 value last used */
-	__INT32_TYPE__    spec2; /* spec2 value last used */
-	__INT32_TYPE__    dtr;
-	__UINT8_TYPE__    version; /* FDC version code */
-	__UINT8_TYPE__    dor;
-	__ULONGPTR_TYPE__ address; /* io address */
-	unsigned int      rawcmd : 2;
-	unsigned int      reset : 1;
-	unsigned int      need_configure : 1;
-	unsigned int      perp_mode : 2;
-	unsigned int      has_fifo : 1;
-	__UINT32_TYPE__   driver_version; /* version code for floppy driver */
+	__INT32_TYPE__       spec1; /* spec1 value last used */
+	__INT32_TYPE__       spec2; /* spec2 value last used */
+	__INT32_TYPE__       dtr;
+	__UINT8_TYPE__       version; /* FDC version code */
+	__UINT8_TYPE__       dor;
+	__ULONGPTR_TYPE__    address; /* io address */
+	__HYBRID_BITFIELD8_T rawcmd : 2;
+	__HYBRID_BITFIELD8_T reset : 1;
+	__HYBRID_BITFIELD8_T need_configure : 1;
+	__HYBRID_BITFIELD8_T perp_mode : 2;
+	__HYBRID_BITFIELD8_T has_fifo : 1;
+	__UINT32_TYPE__      driver_version; /* version code for floppy driver */
 #define FD_DRIVER_VERSION 0x100
 	/* user programs using the floppy  API should use floppy_fdc_state  to
 	 * get the version number of the  floppy driver that they are  running
 	 * on. If this version number is bigger than the one compiled into the
 	 * user program (the FD_DRIVER_VERSION define), it should be  prepared
 	 * to bigger structures */
-	unsigned char     track[4];
+	unsigned char        track[4];
 	/* Position of the heads of the 4 units attached to this  FDC,
 	 * as stored on the FDC. In the future, the position as stored
 	 * on  the  FDC  might  not  agree  with  the  actual physical

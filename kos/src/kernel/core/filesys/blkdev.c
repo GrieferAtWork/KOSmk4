@@ -391,6 +391,7 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 	uint32_t efi_entcnt;
 	uint32_t efi_entsize;
 	pos_t efi_entbase;
+	STATIC_ASSERT(sizeof(struct mbr_sector) == 512);
 	STATIC_ASSERT(PAGESIZE >= sizeof(struct mbr_sector));
 	STATIC_ASSERT(sizeof(struct efi_descriptor) <= sizeof(struct mbr_sector));
 	STATIC_ASSERT(sizeof(struct efi_partition) <= sizeof(struct mbr_sector));

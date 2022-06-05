@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5cfac51 */
+/* HASH CRC-32:0xf454b02c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,6 +43,7 @@ DECL_BEGIN
 
 #include "../libc/globals.h"
 #ifndef __KERNEL__
+#include <asm/crt/stdio.h>
 /* >> btowc(3)
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
@@ -53,6 +54,7 @@ NOTHROW_NCX(LIBDCALL libd_btowc)(int ch) {
 		return (wint16_t)ch;
 	return __WEOF16;
 }
+#include <asm/crt/stdio.h>
 /* >> btowc(3)
  * Convert a single-byte into a wide character. If the given
  * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
@@ -1945,7 +1947,7 @@ NOTHROW_NCX(LIBKCALL libc_vswscanf)(char32_t const *__restrict input,
                                     char32_t const *__restrict format,
                                     va_list args) {
 	return libc_format_vwscanf(&__NAMESPACE_LOCAL_SYM vsc32scanf_getc,
-	                      &__NAMESPACE_LOCAL_SYM vsc16scanf_ungetc,
+	                      &__NAMESPACE_LOCAL_SYM vsc32scanf_ungetc,
 	                      (void *)&input, format, args);
 }
 /* >> wcscasecmp(3) */

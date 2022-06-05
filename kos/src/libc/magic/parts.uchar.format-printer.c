@@ -163,27 +163,34 @@ $ssize_t format_c32length(void *arg, [[in(datalen)]] char32_t const *__restrict 
 %[define_wchar_replacement(format_waprintf_data_init = format_c16aprintf_data_init, format_c32aprintf_data_init)]
 %[define_wchar_replacement(format_waprintf_data_cinit = format_c16aprintf_data_cinit, format_c32aprintf_data_cinit)]
 %[define_wchar_replacement(format_waprintf_data_fini = format_c16aprintf_data_fini, format_c32aprintf_data_fini)]
+%[define_wchar_replacement(DEFINE_FORMAT_WAPRINTF_DATA = DEFINE_FORMAT_C16APRINTF_DATA, DEFINE_FORMAT_C32APRINTF_DATA)]
 
-%{
-
-#ifndef __format_c16aprintf_data_defined
+%[define(DEFINE_FORMAT_C16APRINTF_DATA =
+@@pp_ifndef __format_c16aprintf_data_defined@@
 #define __format_c16aprintf_data_defined
 struct format_c16aprintf_data {
-	char16_t     *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+	char16_t     *@ap_base@;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ @ap_avail@; /* Unused buffer size */
+	__SIZE_TYPE__ @ap_used@;  /* Used buffer size */
 };
-#endif /* !__format_c32aprintf_data_defined */
+@@pp_endif@@
+)]
 
-#ifndef __format_c32aprintf_data_defined
+%[define(DEFINE_FORMAT_C32APRINTF_DATA =
+@@pp_ifndef __format_c32aprintf_data_defined@@
 #define __format_c32aprintf_data_defined
 struct format_c32aprintf_data {
-	char32_t     *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+	char32_t     *@ap_base@;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ @ap_avail@; /* Unused buffer size */
+	__SIZE_TYPE__ @ap_used@;  /* Used buffer size */
 };
-#endif /* !__format_c32aprintf_data_defined */
+@@pp_endif@@
+)]
 
+%
+%[insert:prefix(DEFINE_FORMAT_C16APRINTF_DATA)]
+%[insert:prefix(DEFINE_FORMAT_C32APRINTF_DATA)]
+%{
 #define FORMAT_C16APRINTF_DATA_INIT \
 	{ (char16_t *)__NULLPTR, 0, 0 }
 #define FORMAT_C32APRINTF_DATA_INIT \

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xd434cae3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,21 +17,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_btoc16_defined
-#define __local_btoc16_defined
-#include <__crt.h>
-#include <hybrid/typecore.h>
-#include <asm/crt/stdio.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(btoc16) __ATTR_CONST __ATTR_WUNUSED __WINT16_TYPE__
-__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(btoc16))(int __ch) {
-	if (__ch >= 0 && __ch <= 0x7f)
-		return (__WINT16_TYPE__)__ch;
-	return __WEOF16;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_btoc16_defined
-#define __local___localdep_btoc16_defined
-#define __localdep_btoc16 __LIBC_LOCAL_NAME(btoc16)
-#endif /* !__local___localdep_btoc16_defined */
-#endif /* !__local_btoc16_defined */
+#ifndef __GUARD_HYBRID___BITFIELD_H
+#define __GUARD_HYBRID___BITFIELD_H 1
+
+#include "../__stdinc.h"
+
+
+/* Helpers for portably declarations of bitfields */
+#ifdef __clang__
+#include "typecore.h"
+#define __HYBRID_BITFIELD8_T  __UINT8_TYPE__
+#define __HYBRID_BITFIELD16_T __UINT16_TYPE__
+#define __HYBRID_BITFIELD32_T __UINT32_TYPE__
+#define __HYBRID_BITFIELD64_T __UINT64_TYPE__
+#else /* __clang__ */
+#define __HYBRID_BITFIELD8_T  unsigned int
+#define __HYBRID_BITFIELD16_T unsigned int
+#define __HYBRID_BITFIELD32_T unsigned int
+#define __HYBRID_BITFIELD64_T unsigned int
+#endif /* !__clang__ */
+
+#endif /* !__GUARD_HYBRID___BITFIELD_H */

@@ -21,6 +21,9 @@
 #define _LIBZLIB_INFLATE_H 1
 
 #include "api.h"
+
+#include <hybrid/__bitfield.h>
+
 #include <bits/types.h>
 
 /* Specs for how to inflate zlib-compressed data blobs can be found here:
@@ -50,8 +53,8 @@ struct zlib_treeent {
 	__uint8_t    te_len;      /* Entry length. */
 	__uint8_t    te_pad;      /* ... */
 #else
-	unsigned int te_len : 4;  /* Entry length. */
-	unsigned int te_pad : 12; /* ... */
+	__HYBRID_BITFIELD16_T te_len : 4;  /* Entry length. */
+	__HYBRID_BITFIELD16_T te_pad : 12; /* ... */
 #endif
 	__uint16_t   te_code;     /* Compressed bit sequence (with a length of `te_len' bits). */
 };

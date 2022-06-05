@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc8a0d8 */
+/* HASH CRC-32:0x9f355bd4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,14 +23,14 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <hybrid/typecore.h>
-#ifndef __format_waprintf_data_defined
-#define __format_waprintf_data_defined
-struct format_waprintf_data {
-	__WCHAR_TYPE__      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+#ifndef __format_c16aprintf_data_defined
+#define __format_c16aprintf_data_defined
+struct format_c16aprintf_data {
+	__CHAR16_TYPE__     *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
-#endif /* !__format_waprintf_data_defined */
+#endif /* !__format_c16aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined

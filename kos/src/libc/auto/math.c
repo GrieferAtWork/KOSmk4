@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5f25120 */
+/* HASH CRC-32:0xb9973cd0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -600,8 +600,8 @@ NOTHROW(LIBCCALL libc_atanh)(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2(isgreaterequal, __LIBM_MATHFUN(fabs, x), 1.0))
 		return __kernel_standard(x, x, __HUGE_VAL,
-		                         __ieee754_fabsf(x) > 1.0 ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
-		                                                  : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
+		                         __LIBM_MATHFUN(fabs, x) > 1.0 ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
+		                                                         : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
 	return __LIBM_MATHFUN(atanh, x);
 }
 #include <libm/fcomp.h>
@@ -652,8 +652,8 @@ NOTHROW(LIBCCALL libc_atanhf)(float x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2F(isgreaterequal, __LIBM_MATHFUNF(fabs, x), 1.0f))
 		return __kernel_standard_f(x, x, __HUGE_VALF,
-		                         __ieee754_fabsf(x) > 1.0f ? __LIBM_KMATHERRF_ATANH_PLUSONE /* atanh(|x|>1) */
-		                                                  : __LIBM_KMATHERRF_ATANH_ONE);   /* atanh(|x|==1) */
+		                         __LIBM_MATHFUNF(fabs, x) > 1.0f ? __LIBM_KMATHERRF_ATANH_PLUSONE /* atanh(|x|>1) */
+		                                                         : __LIBM_KMATHERRF_ATANH_ONE);   /* atanh(|x|==1) */
 	return __LIBM_MATHFUNF(atanh, x);
 
 
@@ -707,8 +707,8 @@ NOTHROW(LIBCCALL libc_atanhl)(__LONGDOUBLE x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2L(isgreaterequal, __LIBM_MATHFUNL(fabs, x), 1.0L))
 		return __kernel_standard_l(x, x, __HUGE_VALL,
-		                         __ieee754_fabsf(x) > 1.0L ? __LIBM_KMATHERRL_ATANH_PLUSONE /* atanh(|x|>1) */
-		                                                  : __LIBM_KMATHERRL_ATANH_ONE);   /* atanh(|x|==1) */
+		                         __LIBM_MATHFUNL(fabs, x) > 1.0L ? __LIBM_KMATHERRL_ATANH_PLUSONE /* atanh(|x|>1) */
+		                                                         : __LIBM_KMATHERRL_ATANH_ONE);   /* atanh(|x|==1) */
 	return __LIBM_MATHFUNL(atanh, x);
 
 
@@ -740,13 +740,7 @@ NOTHROW(LIBCCALL libc_exp)(double x) {
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_OUT(2) double
 NOTHROW_NCX(LIBCCALL libc_frexp)(double x,
                                  int *pexponent) {
-
-	return (double)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)x, pexponent);
-
-
-
-
-
+	return __LIBM_MATHFUN2I(frexp, x, pexponent);
 }
 #include <libc/errno.h>
 #include <libm/finite.h>
@@ -757,13 +751,7 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_ldexp)(double x,
                              int exponent) {
 	double result;
-
-	result = (double)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
-
-
-
-
-
+	result = __LIBM_MATHFUN2I(ldexp, x, exponent);
 
 	if unlikely(!__LIBM_MATHFUNI(finite, result) || result == 0.0)
 		(void)libc_seterrno(ERANGE);
@@ -818,13 +806,7 @@ NOTHROW(LIBCCALL libc_log10)(double x) {
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED ATTR_OUT(2) double
 NOTHROW_NCX(LIBCCALL libc_modf)(double x,
                                 double *iptr) {
-
-	return (double)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
-
-
-
-
-
+	return __LIBM_MATHFUN2I(modf, x, (__LIBM_MATHFUN_T *)iptr);
 }
 #include <libm/signbit.h>
 #include <libm/finite.h>
@@ -861,13 +843,7 @@ NOTHROW_NCX(LIBCCALL libc_frexpf)(float x,
 
 
 
-	
-
-
-	return (float)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)x, pexponent);
-
-
-
+	return __LIBM_MATHFUN2IF(frexp, x, pexponent);
 
 
 
@@ -884,13 +860,7 @@ NOTHROW(LIBCCALL libc_ldexpf)(float x,
 
 
 	float result;
-
-
-
-	result = (float)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
-
-
-
+	result = __LIBM_MATHFUN2IF(ldexp, x, exponent);
 
 	if unlikely(!__LIBM_MATHFUNIF(finite, result) || result == 0.0f)
 		(void)libc_seterrno(ERANGE);
@@ -965,13 +935,7 @@ NOTHROW_NCX(LIBCCALL libc_modff)(float x,
 
 
 
-	
-
-
-	return (float)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
-
-
-
+	return __LIBM_MATHFUN2IF(modf, x, (__LIBM_MATHFUNF_T *)iptr);
 
 
 
@@ -1011,13 +975,7 @@ NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x,
 
 
 
-	
-
-
-
-
-	return (__LONGDOUBLE)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
-
+	return __LIBM_MATHFUN2IL(frexp, x, pexponent);
 
 
 
@@ -1034,13 +992,7 @@ NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
 
 
 	__LONGDOUBLE result;
-
-
-
-
-
-	result = (__LONGDOUBLE)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
-
+	result = __LIBM_MATHFUN2IL(ldexp, x, exponent);
 
 	if unlikely(!__LIBM_MATHFUNIL(finite, result) || result == 0.0L)
 		(void)libc_seterrno(ERANGE);
@@ -1115,13 +1067,7 @@ NOTHROW_NCX(LIBCCALL libc_modfl)(__LONGDOUBLE x,
 
 
 
-	
-
-
-
-
-	return (__LONGDOUBLE)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
-
+	return __LIBM_MATHFUN2IL(modf, x, (__LIBM_MATHFUNL_T *)iptr);
 
 
 
@@ -2392,13 +2338,7 @@ NOTHROW(LIBCCALL libc_nexttoward)(double x,
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_scalbn)(double x,
                               int n) {
-
-	return (double)__ieee754_scalbn((__IEEE754_DOUBLE_TYPE__)x, n);
-
-
-
-
-
+	return __LIBM_MATHFUN2I(scalbn, x, n);
 }
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_scalbln, libc_scalbn);
@@ -2409,13 +2349,7 @@ DEFINE_INTERN_ALIAS(libc_scalbln, libc_scalbn);
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_scalbln)(double x,
                                long int n) {
-
-	return (double)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)x, n);
-
-
-
-
-
+	return __LIBM_MATHFUN2I(scalbln, x, n);
 }
 #endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
 #include <hybrid/typecore.h>
@@ -2600,13 +2534,7 @@ NOTHROW(LIBCCALL libc_scalbnf)(float x,
 
 
 
-	
-
-
-	return (float)__ieee754_scalbnf((__IEEE754_FLOAT_TYPE__)x, n);
-
-
-
+	return __LIBM_MATHFUN2IF(scalbn, x, n);
 
 
 
@@ -2623,13 +2551,7 @@ NOTHROW(LIBCCALL libc_scalblnf)(float x,
 
 
 
-	
-
-
-	return (float)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)x, n);
-
-
-
+	return __LIBM_MATHFUN2IF(scalbln, x, n);
 
 
 
@@ -2808,13 +2730,7 @@ NOTHROW(LIBCCALL libc_scalbnl)(__LONGDOUBLE x,
 
 
 
-	
-
-
-
-
-	return (__LONGDOUBLE)__ieee854_scalbnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
-
+	return __LIBM_MATHFUN2IL(scalbn, x, n);
 
 
 
@@ -2831,13 +2747,7 @@ NOTHROW(LIBCCALL libc_scalblnl)(__LONGDOUBLE x,
 
 
 
-	
-
-
-
-
-	return (__LONGDOUBLE)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
-
+	return __LIBM_MATHFUN2IL(scalbln, x, n);
 
 
 
@@ -3015,7 +2925,7 @@ NOTHROW(LIBCCALL libc_sincos)(double x,
                               double *psinx,
                               double *pcosx) {
 
-	__LIBM_MATHFUNX(sincos)(x, psinx, pcosx);
+	__LIBM_MATHFUNX(sincos)(x, (__LIBM_MATHFUN_T *)psinx, (__LIBM_MATHFUN_T *)pcosx);
 
 
 
@@ -3056,7 +2966,7 @@ NOTHROW(LIBCCALL libc_sincosf)(float x,
                                float *psinx,
                                float *pcosx) {
 
-	__LIBM_MATHFUNXF(sincos)(x, psinx, pcosx);
+	__LIBM_MATHFUNXF(sincos)(x, (__LIBM_MATHFUNF_T *)psinx, (__LIBM_MATHFUNF_T *)pcosx);
 
 
 
@@ -3102,7 +3012,7 @@ NOTHROW(LIBCCALL libc_sincosl)(__LONGDOUBLE x,
                                __LONGDOUBLE *psinx,
                                __LONGDOUBLE *pcosx) {
 
-	__LIBM_MATHFUNXL(sincos)(x, psinx, pcosx);
+	__LIBM_MATHFUNXL(sincos)(x, (__LIBM_MATHFUNL_T *)psinx, (__LIBM_MATHFUNL_T *)pcosx);
 
 
 
@@ -3951,11 +3861,7 @@ NOTHROW(LIBCCALL libc___fpclassify)(double x) {
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___signbit)(double x) {
 
-	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
-
-
-
-
+	return __LIBM_MATHFUNI(signbit, x);
 
 
 
@@ -3980,11 +3886,7 @@ NOTHROW(LIBCCALL libc___fpclassifyf)(float x) {
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___signbitf)(float x) {
 
-
-
-	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
-
-
+	return __LIBM_MATHFUNIF(signbit, x);
 
 
 
@@ -4009,11 +3911,7 @@ NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x) {
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc___signbitl)(__LONGDOUBLE x) {
 
-
-
-
-
-	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+	return __LIBM_MATHFUNIL(signbit, x);
 
 
 

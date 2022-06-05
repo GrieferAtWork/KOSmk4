@@ -25,6 +25,8 @@
 #include <kernel/types.h>
 #include <sched/pertask.h>
 
+#include <hybrid/__bitfield.h>
+
 #include <asm/cpu-cpuid.h>
 
 DECL_BEGIN
@@ -82,16 +84,16 @@ struct cpuinfo {
 	union ATTR_PACKED {
 		u32           ci_1a;           /* [const][== cpuid(1).EAX] Processor info... */
 		struct ATTR_PACKED {
-			unsigned int ci_version : 12;
+			__HYBRID_BITFIELD32_T ci_version : 12;
 		};
 		struct ATTR_PACKED {
-			unsigned int ci_stepping : 4;
-			unsigned int ci_model : 4;
-			unsigned int ci_family : 4;
-			unsigned int ci_processor_type : 4;
-			unsigned int ci_extended_model : 4;
-			unsigned int ci_extended_family : 8;
-			unsigned int __ci_pad0 : 4;
+			__HYBRID_BITFIELD32_T ci_stepping : 4;
+			__HYBRID_BITFIELD32_T ci_model : 4;
+			__HYBRID_BITFIELD32_T ci_family : 4;
+			__HYBRID_BITFIELD32_T ci_processor_type : 4;
+			__HYBRID_BITFIELD32_T ci_extended_model : 4;
+			__HYBRID_BITFIELD32_T ci_extended_family : 8;
+			__HYBRID_BITFIELD32_T __ci_pad0 : 4;
 		};
 	};
 	u32               ci_1b;           /* [const][== cpuid(1).EBX] Processor info... */

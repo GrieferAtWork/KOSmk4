@@ -28,6 +28,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
+#include <hybrid/__bitfield.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
@@ -165,13 +166,13 @@ union __ATTR_ALIGNED(4) __ATTR_PACKED ieee754_float {
 	/* IEEE 754 single-precision. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int negative : 1;
-		unsigned int exponent : 8;
-		unsigned int mantissa : 23;
+		__HYBRID_BITFIELD32_T negative : 1;
+		__HYBRID_BITFIELD32_T exponent : 8;
+		__HYBRID_BITFIELD32_T mantissa : 23;
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		unsigned int mantissa : 23;
-		unsigned int exponent : 8;
-		unsigned int negative : 1;
+		__HYBRID_BITFIELD32_T mantissa : 23;
+		__HYBRID_BITFIELD32_T exponent : 8;
+		__HYBRID_BITFIELD32_T negative : 1;
 #endif
 	} ieee;
 
@@ -179,24 +180,24 @@ union __ATTR_ALIGNED(4) __ATTR_PACKED ieee754_float {
 	 * tell non-signaling-  and signaling  NaN. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int negative : 1;
-		unsigned int exponent : 8;
-		unsigned int quiet_nan : 1;
-		unsigned int mantissa : 22;
+		__HYBRID_BITFIELD32_T negative : 1;
+		__HYBRID_BITFIELD32_T exponent : 8;
+		__HYBRID_BITFIELD32_T quiet_nan : 1;
+		__HYBRID_BITFIELD32_T mantissa : 22;
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		unsigned int mantissa : 22;
-		unsigned int quiet_nan : 1;
-		unsigned int exponent : 8;
-		unsigned int negative : 1;
+		__HYBRID_BITFIELD32_T mantissa : 22;
+		__HYBRID_BITFIELD32_T quiet_nan : 1;
+		__HYBRID_BITFIELD32_T exponent : 8;
+		__HYBRID_BITFIELD32_T negative : 1;
 #endif
 	} ieee_nan;
 
 #if defined(__i386__) || defined(__x86_64__)
 	/* i387 single-precision. */
 	struct {
-		unsigned int mantissa : 23;
-		unsigned int exponent : 8;
-		unsigned int negative : 1;
+		__HYBRID_BITFIELD32_T mantissa : 23;
+		__HYBRID_BITFIELD32_T exponent : 8;
+		__HYBRID_BITFIELD32_T negative : 1;
 	} i387;
 #endif /* __i387__ || __x86_64__ */
 };
@@ -210,23 +211,23 @@ union __ATTR_ALIGNED(8) __ATTR_PACKED ieee754_double {
 	/* IEEE 754 double-precision. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int negative : 1;
-		unsigned int exponent : 11;
+		__HYBRID_BITFIELD32_T negative : 1;
+		__HYBRID_BITFIELD32_T exponent : 11;
 		/* Together these comprise the mantissa. */
-		unsigned int mantissa0 : 20;
-		unsigned int mantissa1 : 32;
+		__HYBRID_BITFIELD32_T mantissa0 : 20;
+		__UINT32_TYPE__       mantissa1;
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int mantissa0 : 20;
-		unsigned int exponent : 11;
-		unsigned int negative : 1;
-		unsigned int mantissa1 : 32;
+		__HYBRID_BITFIELD32_T mantissa0 : 20;
+		__HYBRID_BITFIELD32_T exponent : 11;
+		__HYBRID_BITFIELD32_T negative : 1;
+		__UINT32_TYPE__       mantissa1;
 #else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
 		/* Together these comprise the mantissa. */
-		unsigned int mantissa1 : 32;
-		unsigned int mantissa0 : 20;
-		unsigned int exponent : 11;
-		unsigned int negative : 1;
+		__UINT32_TYPE__       mantissa1;
+		__HYBRID_BITFIELD32_T mantissa0 : 20;
+		__HYBRID_BITFIELD32_T exponent : 11;
+		__HYBRID_BITFIELD32_T negative : 1;
 #endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif /* ... */
 	} ieee;
@@ -235,26 +236,26 @@ union __ATTR_ALIGNED(8) __ATTR_PACKED ieee754_double {
 	 * tell non-signaling-  and signaling  NaN. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int negative : 1;
-		unsigned int exponent : 11;
-		unsigned int quiet_nan : 1;
+		__HYBRID_BITFIELD32_T negative : 1;
+		__HYBRID_BITFIELD32_T exponent : 11;
+		__HYBRID_BITFIELD32_T quiet_nan : 1;
 		/* Together these comprise the mantissa. */
-		unsigned int mantissa0 : 19;
-		unsigned int mantissa1 : 32;
+		__HYBRID_BITFIELD32_T mantissa0 : 19;
+		__UINT32_TYPE__       mantissa1;
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int mantissa0 : 19;
-		unsigned int quiet_nan : 1;
-		unsigned int exponent : 11;
-		unsigned int negative : 1;
-		unsigned int mantissa1 : 32;
+		__HYBRID_BITFIELD32_T mantissa0 : 19;
+		__HYBRID_BITFIELD32_T quiet_nan : 1;
+		__HYBRID_BITFIELD32_T exponent : 11;
+		__HYBRID_BITFIELD32_T negative : 1;
+		__UINT32_TYPE__       mantissa1;
 #else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
 		/* Together these comprise the mantissa. */
-		unsigned int mantissa1 : 32;
-		unsigned int mantissa0 : 19;
-		unsigned int quiet_nan : 1;
-		unsigned int exponent : 11;
-		unsigned int negative : 1;
+		__UINT32_TYPE__       mantissa1;
+		__HYBRID_BITFIELD32_T mantissa0 : 19;
+		__HYBRID_BITFIELD32_T quiet_nan : 1;
+		__HYBRID_BITFIELD32_T exponent : 11;
+		__HYBRID_BITFIELD32_T negative : 1;
 #endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif /* ... */
 	} ieee_nan;
@@ -273,24 +274,24 @@ union __ATTR_ALIGNED(16) __ATTR_PACKED ieee854_long_double {
 	/* IEEE 854 double-extended-precision. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int negative : 1;
-		unsigned int exponent : 15;
-		unsigned int empty : 16;
-		unsigned int mantissa0 : 32;
-		unsigned int mantissa1 : 32;
+		__HYBRID_BITFIELD16_T negative : 1;
+		__HYBRID_BITFIELD16_T exponent : 15;
+		__UINT16_TYPE__       empty;
+		__UINT32_TYPE__       mantissa0;
+		__UINT32_TYPE__       mantissa1;
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int exponent : 15;
-		unsigned int negative : 1;
-		unsigned int empty : 16;
-		unsigned int mantissa0 : 32;
-		unsigned int mantissa1 : 32;
+		__HYBRID_BITFIELD16_T exponent : 15;
+		__HYBRID_BITFIELD16_T negative : 1;
+		__UINT16_TYPE__       empty;
+		__UINT32_TYPE__       mantissa0;
+		__UINT32_TYPE__       mantissa1;
 #else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
-		unsigned int mantissa1 : 32;
-		unsigned int mantissa0 : 32;
-		unsigned int exponent : 15;
-		unsigned int negative : 1;
-		unsigned int empty : 16;
+		__UINT32_TYPE__       mantissa1;
+		__UINT32_TYPE__       mantissa0;
+		__HYBRID_BITFIELD16_T exponent : 15;
+		__HYBRID_BITFIELD16_T negative : 1;
+		__UINT16_TYPE__       empty;
 #endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif
 	} ieee;
@@ -299,30 +300,30 @@ union __ATTR_ALIGNED(16) __ATTR_PACKED ieee854_long_double {
 	 * tell non-signaling-  and signaling  NaN. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int negative : 1;
-		unsigned int exponent : 15;
-		unsigned int empty : 16;
-		unsigned int one : 1;
-		unsigned int quiet_nan : 1;
-		unsigned int mantissa0 : 30;
-		unsigned int mantissa1 : 32;
+		__HYBRID_BITFIELD16_T negative : 1;
+		__HYBRID_BITFIELD16_T exponent : 15;
+		__UINT16_TYPE__       empty;
+		__HYBRID_BITFIELD32_T one : 1;
+		__HYBRID_BITFIELD32_T quiet_nan : 1;
+		__HYBRID_BITFIELD32_T mantissa0 : 30;
+		__UINT32_TYPE__       mantissa1;
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int exponent : 15;
-		unsigned int negative : 1;
-		unsigned int empty : 16;
-		unsigned int mantissa0 : 30;
-		unsigned int quiet_nan : 1;
-		unsigned int one : 1;
-		unsigned int mantissa1 : 32;
+		__HYBRID_BITFIELD16_T exponent : 15;
+		__HYBRID_BITFIELD16_T negative : 1;
+		__UINT16_TYPE__       empty;
+		__HYBRID_BITFIELD32_T mantissa0 : 30;
+		__HYBRID_BITFIELD32_T quiet_nan : 1;
+		__HYBRID_BITFIELD32_T one : 1;
+		__UINT32_TYPE__       mantissa1;
 #else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
-		unsigned int mantissa1 : 32;
-		unsigned int mantissa0 : 30;
-		unsigned int quiet_nan : 1; /* Called the M-bit in the Intel manual */
-		unsigned int one : 1;       /* Called the Integer bit, or J-bit in the Intel manual */
-		unsigned int exponent : 15;
-		unsigned int negative : 1;
-		unsigned int empty : 16;
+		__UINT32_TYPE__       mantissa1;
+		__HYBRID_BITFIELD32_T mantissa0 : 30;
+		__HYBRID_BITFIELD32_T quiet_nan : 1; /* Called the M-bit in the Intel manual */
+		__HYBRID_BITFIELD32_T one : 1;       /* Called the Integer bit, or J-bit in the Intel manual */
+		__HYBRID_BITFIELD16_T exponent : 15;
+		__HYBRID_BITFIELD16_T negative : 1;
+		__UINT16_TYPE__       empty;
 #endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif
 	} ieee_nan;
@@ -336,21 +337,21 @@ union __ATTR_PACKED ieee854_float80 {
 	/* IEEE 854 double-extended-precision */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int negative : 1;
-		unsigned int exponent : 15;
-		unsigned int mantissa0 : 32;
-		unsigned int mantissa1 : 32;
+		__HYBRID_BITFIELD16_T negative : 1;
+		__HYBRID_BITFIELD16_T exponent : 15;
+		__UINT32_TYPE__       mantissa0;
+		__UINT32_TYPE__       mantissa1;
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int exponent : 15;
-		unsigned int negative : 1;
-		unsigned int mantissa0 : 32;
-		unsigned int mantissa1 : 32;
+		__HYBRID_BITFIELD16_T exponent : 15;
+		__HYBRID_BITFIELD16_T negative : 1;
+		__UINT32_TYPE__       mantissa0;
+		__UINT32_TYPE__       mantissa1;
 #else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
-		unsigned int mantissa1 : 32;
-		unsigned int mantissa0 : 32;
-		unsigned int exponent : 15;
-		unsigned int negative : 1;
+		__UINT32_TYPE__       mantissa1;
+		__UINT32_TYPE__       mantissa0;
+		__HYBRID_BITFIELD16_T exponent : 15;
+		__HYBRID_BITFIELD16_T negative : 1;
 #endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif
 	} ieee;
@@ -359,27 +360,27 @@ union __ATTR_PACKED ieee854_float80 {
 	 * tell non-signaling-  and signaling  NaN. */
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int negative : 1;
-		unsigned int exponent : 15;
-		unsigned int one : 1;
-		unsigned int quiet_nan : 1;
-		unsigned int mantissa0 : 30;
-		unsigned int mantissa1 : 32;
+		__HYBRID_BITFIELD16_T negative : 1;
+		__HYBRID_BITFIELD16_T exponent : 15;
+		__HYBRID_BITFIELD32_T one : 1;
+		__HYBRID_BITFIELD32_T quiet_nan : 1;
+		__HYBRID_BITFIELD32_T mantissa0 : 30;
+		__UINT32_TYPE__       mantissa1;
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int exponent : 15;
-		unsigned int negative : 1;
-		unsigned int mantissa0 : 30;
-		unsigned int quiet_nan : 1;
-		unsigned int one : 1;
-		unsigned int mantissa1 : 32;
+		__HYBRID_BITFIELD16_T exponent : 15;
+		__HYBRID_BITFIELD16_T negative : 1;
+		__HYBRID_BITFIELD32_T mantissa0 : 30;
+		__HYBRID_BITFIELD32_T quiet_nan : 1;
+		__HYBRID_BITFIELD32_T one : 1;
+		__UINT32_TYPE__       mantissa1;
 #else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
-		unsigned int mantissa1 : 32;
-		unsigned int mantissa0 : 30;
-		unsigned int quiet_nan : 1;
-		unsigned int one : 1;
-		unsigned int exponent : 15;
-		unsigned int negative : 1;
+		__UINT32_TYPE__       mantissa1;
+		__HYBRID_BITFIELD32_T mantissa0 : 30;
+		__HYBRID_BITFIELD32_T quiet_nan : 1;
+		__HYBRID_BITFIELD32_T one : 1;
+		__HYBRID_BITFIELD16_T exponent : 15;
+		__HYBRID_BITFIELD16_T negative : 1;
 #endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif
 	} ieee_nan;

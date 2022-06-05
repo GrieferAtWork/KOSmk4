@@ -135,7 +135,7 @@ done:
 }
 
 [[decl_include("<features.h>", "<hybrid/typecore.h>"), decl_prefix(DEFINE_TARGV)]]
-[[cp, guard, wchar, argument_names(path, ___argv), dos_export_alias("_wexecvp")]]
+[[cp, guard, wchar, argument_names(file, ___argv), dos_export_alias("_wexecvp")]]
 [[requires_function(execvp, convert_wcstombs, convert_wcstombsv)]]
 int wexecvp([[in]] wchar_t const *__restrict file, [[in]] __TWARGV) {
 	int result = -1;
@@ -159,7 +159,7 @@ done:
 }
 
 [[decl_include("<features.h>", "<hybrid/typecore.h>"), decl_prefix(DEFINE_TARGV)]]
-[[cp, guard, wchar, argument_names(path, ___argv, ___envp), dos_export_alias("_wexecvpe")]]
+[[cp, guard, wchar, argument_names(file, ___argv, ___envp), dos_export_alias("_wexecvpe")]]
 [[requires_function(execvpe, convert_wcstombs, convert_wcstombsv)]]
 int wexecvpe([[in]] wchar_t const *__restrict file, [[in]] __TWARGV, [[in]] __TWENVP) {
 	int result = -1;

@@ -52,6 +52,9 @@ struct flatdirent {
 	TAILQ_ENTRY(REF flatdirent) fde_bypos; /* [0..1][lock(:fdn_data.fdd_lock)] By-`fde_pos'-sorted list of dir entries.
 	                                        * This  field becomes [const] once it is  marked as UNBOUND, at which point
 	                                        * this directory entry may be considered as having been deleted. */
+#if __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__
+	byte_t __fde_pad[__ALIGNOF_POS_T__ - __ALIGNOF_POINTER__];
+#endif /* __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__ */
 	struct fdirent              fde_ent;   /* Underlying directory entry. */
 };
 

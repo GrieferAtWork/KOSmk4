@@ -22,6 +22,8 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/__bitfield.h>
+
 #include <bits/types.h>
 
 __DECL_BEGIN
@@ -53,16 +55,16 @@ struct __ATTR_PACKED mbr_partition_common {
 
 struct __ATTR_PACKED mbr_partition_32 {
 	/* HDD Partition */
-	__u8         pt_bootable;       /* Boot indicator bit flag: 0 = no, 0x80 = bootable (or "active") */
-	__u8         pt_headstart;      /* Starting Head */
-	unsigned int pt_sectstart : 6;  /* Starting Sector */
-	unsigned int pt_cylistart : 10; /* Starting Cylinder */
-	__u8         pt_sysid;          /* System ID (s.a.: `MBR_SYSID_*') */
-	__u8         pt_headend;        /* Ending Head */
-	unsigned int pt_sectend : 6;    /* Ending Sector */
-	unsigned int pt_cyliend : 10;   /* Ending Cylinder */
-	__le32       pt_lbastart;       /* Relative Sector (to start of partition -- also equals the partition's starting LBA value) */
-	__le32       pt_lbasize;        /* Total Sectors in partition */
+	__u8                  pt_bootable;       /* Boot indicator bit flag: 0 = no, 0x80 = bootable (or "active") */
+	__u8                  pt_headstart;      /* Starting Head */
+	__HYBRID_BITFIELD16_T pt_sectstart : 6;  /* Starting Sector */
+	__HYBRID_BITFIELD16_T pt_cylistart : 10; /* Starting Cylinder */
+	__u8                  pt_sysid;          /* System ID (s.a.: `MBR_SYSID_*') */
+	__u8                  pt_headend;        /* Ending Head */
+	__HYBRID_BITFIELD16_T pt_sectend : 6;    /* Ending Sector */
+	__HYBRID_BITFIELD16_T pt_cyliend : 10;   /* Ending Cylinder */
+	__le32                pt_lbastart;       /* Relative Sector (to start of partition -- also equals the partition's starting LBA value) */
+	__le32                pt_lbasize;        /* Total Sectors in partition */
 };
 #endif /* __CC__ */
 

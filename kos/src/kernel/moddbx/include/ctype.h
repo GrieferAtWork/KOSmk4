@@ -299,11 +299,30 @@ NOTHROW(FCALL ctype_enumname)(struct ctype const *__restrict self,
 
 
 
+#define SIZEOF_CTYPE_IEEE754_FLOAT  4
+#define SIZEOF_CTYPE_IEEE754_DOUBLE 8
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+#define SIZEOF_CTYPE_IEEE854_LONG_DOUBLE __SIZEOF_LONG_DOUBLE__
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#define SIZEOF_CTYPE_IEEE854_LONG_DOUBLE __SIZEOF_DOUBLE__
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+#define SIZEOF_CTYPE_IEEE854_LONG_DOUBLE __SIZEOF_FLOAT__
+#endif /* ... */
+
+#ifdef SIZEOF_CTYPE_IEEE854_LONG_DOUBLE
+#define CTYPE_KIND_IEEE854_LONG_DOUBLE \
+	((CTYPE_KIND_IEEE854_LONG_DOUBLE_12 & ~CTYPE_KIND_SIZEMASK) | SIZEOF_CTYPE_IEEE854_LONG_DOUBLE)
+#endif /* SIZEOF_CTYPE_IEEE854_LONG_DOUBLE */
+
+
+
 /* Builtin types. */
 DATDEF struct ctype ctype_bool;
 DATDEF struct ctype ctype_ieee754_float;
 DATDEF struct ctype ctype_ieee754_double;
+#ifdef CTYPE_KIND_IEEE854_LONG_DOUBLE
 DATDEF struct ctype ctype_ieee854_long_double;
+#endif /* CTYPE_KIND_IEEE854_LONG_DOUBLE */
 DATDEF struct ctype ctype_void;
 DATDEF struct ctype ctype_void_ptr;
 DATDEF struct ctype ctype_void_const_ptr;
@@ -381,21 +400,6 @@ DATDEF struct ctype ctype_char16_t_const_compat_ptr;
 DATDEF struct ctype ctype_char32_t_compat_ptr;
 DATDEF struct ctype ctype_char32_t_const_compat_ptr;
 #endif /* __ARCH_HAVE_COMPAT */
-
-
-
-#define SIZEOF_CTYPE_IEEE754_FLOAT  4
-#define SIZEOF_CTYPE_IEEE754_DOUBLE 8
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-#define SIZEOF_CTYPE_IEEE854_LONG_DOUBLE __SIZEOF_LONG_DOUBLE__
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#define SIZEOF_CTYPE_IEEE854_LONG_DOUBLE __SIZEOF_DOUBLE__
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-#define SIZEOF_CTYPE_IEEE854_LONG_DOUBLE __SIZEOF_FLOAT__
-#endif /* ... */
-
-#define CTYPE_KIND_IEEE854_LONG_DOUBLE \
-	((CTYPE_KIND_IEEE854_LONG_DOUBLE_12 & ~CTYPE_KIND_SIZEMASK) | SIZEOF_CTYPE_IEEE854_LONG_DOUBLE)
 
 
 #if __SIZEOF_CHAR__ == 1

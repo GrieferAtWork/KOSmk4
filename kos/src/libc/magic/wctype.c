@@ -874,7 +874,7 @@ int iswsymstrt_l($wint_t wc, $locale_t locale) {
 @@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
 	COMPILER_IMPURE();
 	(void)locale;
-	return __iswcsymf(wc);
+	return iswsymstrt(wc);
 @@pp_else@@
 	return iswalpha_l(wc, locale) || wc == '_' || wc == '$';
 @@pp_endif@@
@@ -888,7 +888,7 @@ int iswsymcont_l($wint_t wc, $locale_t locale) {
 @@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
 	COMPILER_IMPURE();
 	(void)locale;
-	return __iswcsym(wc);
+	return iswsymcont(wc);
 @@pp_else@@
 	return iswalnum_l(wc, locale) || wc == '_' || wc == '$';
 @@pp_endif@@

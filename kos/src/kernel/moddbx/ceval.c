@@ -713,11 +713,13 @@ doparen_expr:
 			ch = unicode_readutf8_n(&endp, self->c_tokend);
 			if unlikely(endp != self->c_tokend)
 				goto syn;
-			if (ch == 'f' || ch == 'F')
+			if (ch == 'f' || ch == 'F') {
 				used_type = &ctype_ieee754_float;
-			else if (ch == 'l' || ch == 'L')
+#ifdef CTYPE_KIND_IEEE854_LONG_DOUBLE
+			} else if (ch == 'l' || ch == 'L') {
 				used_type = &ctype_ieee854_long_double;
-			else {
+#endif /* CTYPE_KIND_IEEE854_LONG_DOUBLE */
+			} else {
 				goto syn;
 			}
 		}
@@ -2512,11 +2514,17 @@ yield_and_scan_keyword:
 		integer_type_flags |= BASETYPE_FLAG_CHAR;
 		goto yield_and_scan_keyword;
 	} else if (KWD_CHECK(kwd_str, kwd_len, "double")) {
+#ifdef CTYPE_KIND_IEEE854_LONG_DOUBLE
 		if unlikely(integer_type_flags != 0 &&
 		            integer_type_flags != BASETYPE_FLAG_LONG)
 			goto syn;
+#else /* CTYPE_KIND_IEEE854_LONG_DOUBLE */
+		if unlikely(integer_type_flags != 0)
+			goto syn;
+#endif /* !CTYPE_KIND_IEEE854_LONG_DOUBLE */
 		yield();
 		presult->ct_typ = &ctype_ieee754_double;
+#ifdef CTYPE_KIND_IEEE854_LONG_DOUBLE
 		if (self->c_tok == CTOKEN_TOK_KEYWORD) {
 			if unlikely(integer_type_flags != 0)
 				goto syn;
@@ -2529,6 +2537,7 @@ yield_and_scan_keyword:
 		} else if (integer_type_flags == BASETYPE_FLAG_LONG) {
 			presult->ct_typ = &ctype_ieee854_long_double;
 		}
+#endif /* CTYPE_KIND_IEEE854_LONG_DOUBLE */
 		incref(presult->ct_typ);
 	} else {
 		/* Check for builtin types. */

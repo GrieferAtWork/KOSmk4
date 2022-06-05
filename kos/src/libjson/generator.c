@@ -80,6 +80,7 @@ libjson_output_message(struct json_writer *__restrict writer,
 	va_end(args);
 	return 0;
 err_printer:
+	va_end(args);
 	writer->jw_result = temp;
 	return -1;
 }

@@ -24,6 +24,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/__bitfield.h>
 #include <hybrid/typecore.h>
 
 #include <kos/types.h>
@@ -55,11 +56,11 @@ extern int errno;
 #define CONFTYPE_SYSCONF  3 /* Use `sysconf()' to determine value */
 
 struct conf {
-	char const  *c_name;      /* [1..1] Config name */
-	unsigned int c_id : 30;   /* Configuration ID */
-	unsigned int c_type : 2;  /* Configuration type */
+	char const           *c_name;      /* [1..1] Config name */
+	__HYBRID_BITFIELD32_T c_id : 30;   /* Configuration ID */
+	__HYBRID_BITFIELD32_T c_type : 2;  /* Configuration type */
 #if __SIZEOF_POINTER__ > 4
-	uint32_t    _c_pad; /* ... */
+	uint32_t             _c_pad; /* ... */
 #endif /* __SIZEOF_POINTER__ > 4 */
 };
 

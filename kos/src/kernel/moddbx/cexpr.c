@@ -115,6 +115,13 @@ DECL_BEGIN
 #define GETFLOAT_IEEE854_LONG_DOUBLE_NOFAULT(addr, Tresult, result) _GETFLOAT_NOFAULT(__IEEE854_LONG_DOUBLE_TYPE__, addr, Tresult, result)
 #define SETFLOAT_IEEE854_LONG_DOUBLE_NOFAULT(addr, value)           _SETFLOAT_NOFAULT(__IEEE854_LONG_DOUBLE_TYPE__, addr, value)
 
+#ifdef CTYPE_KIND_IEEE854_LONG_DOUBLE
+#define IF_HAVE_CTYPE_KIND_IEEE854_LONG_DOUBLE(...) __VA_ARGS__
+#else /* CTYPE_KIND_IEEE854_LONG_DOUBLE */
+#define IF_HAVE_CTYPE_KIND_IEEE854_LONG_DOUBLE(...) /* nothing */
+#endif /* !CTYPE_KIND_IEEE854_LONG_DOUBLE */
+
+
 #define GETFLOAT_BYKIND(kind, addr, Tresult, result, handle_bad_kind, handle_fault) \
 	do {                                                                            \
 		switch (kind) {                                                             \
@@ -124,9 +131,10 @@ DECL_BEGIN
 		case CTYPE_KIND_IEEE754_DOUBLE:                                             \
 			GETFLOAT_IEEE754_DOUBLE(addr, Tresult, result, handle_fault);           \
 			break;                                                                  \
+		IF_HAVE_CTYPE_KIND_IEEE854_LONG_DOUBLE(                                     \
 		case CTYPE_KIND_IEEE854_LONG_DOUBLE:                                        \
 			GETFLOAT_IEEE854_LONG_DOUBLE(addr, Tresult, result, handle_fault);      \
-			break;                                                                  \
+			break);                                                                 \
 		default: handle_bad_kind;                                                   \
 		}                                                                           \
 	}	__WHILE0
@@ -140,9 +148,10 @@ DECL_BEGIN
 		case CTYPE_KIND_IEEE754_DOUBLE:                                   \
 			SETFLOAT_IEEE754_DOUBLE(addr, value, handle_fault);           \
 			break;                                                        \
+		IF_HAVE_CTYPE_KIND_IEEE854_LONG_DOUBLE(                           \
 		case CTYPE_KIND_IEEE854_LONG_DOUBLE:                              \
 			SETFLOAT_IEEE854_LONG_DOUBLE(addr, value, handle_fault);      \
-			break;                                                        \
+			break);                                                       \
 		default: handle_bad_kind;                                         \
 		}                                                                 \
 	}	__WHILE0
@@ -156,9 +165,10 @@ DECL_BEGIN
 		case CTYPE_KIND_IEEE754_DOUBLE:                                       \
 			GETFLOAT_IEEE754_DOUBLE_NOFAULT(addr, Tresult, result);           \
 			break;                                                            \
+		IF_HAVE_CTYPE_KIND_IEEE854_LONG_DOUBLE(                               \
 		case CTYPE_KIND_IEEE854_LONG_DOUBLE:                                  \
 			GETFLOAT_IEEE854_LONG_DOUBLE_NOFAULT(addr, Tresult, result);      \
-			break;                                                            \
+			break);                                                           \
 		default: handle_bad_kind;                                             \
 		}                                                                     \
 	}	__WHILE0
@@ -172,9 +182,10 @@ DECL_BEGIN
 		case CTYPE_KIND_IEEE754_DOUBLE:                             \
 			SETFLOAT_IEEE754_DOUBLE_NOFAULT(addr, value);           \
 			break;                                                  \
+		IF_HAVE_CTYPE_KIND_IEEE854_LONG_DOUBLE(                     \
 		case CTYPE_KIND_IEEE854_LONG_DOUBLE:                        \
 			SETFLOAT_IEEE854_LONG_DOUBLE_NOFAULT(addr, value);      \
-			break;                                                  \
+			break);                                                 \
 		default: handle_bad_kind;                                   \
 		}                                                           \
 	}	__WHILE0
@@ -1724,6 +1735,7 @@ do_check_for_non_zero_byte:
 				return 1;
 		}	break;
 
+#ifdef CTYPE_KIND_IEEE854_LONG_DOUBLE
 		case CTYPE_KIND_IEEE854_LONG_DOUBLE: {
 			__LONGDOUBLE ld;
 			if (dbg_readmemory(data, &ld, sizeof(ld)) != 0)
@@ -1731,6 +1743,7 @@ do_check_for_non_zero_byte:
 			if (ld != 0.0l)
 				return 1;
 		}	break;
+#endif /* CTYPE_KIND_IEEE854_LONG_DOUBLE */
 
 		default:
 			goto do_check_for_non_zero_byte;

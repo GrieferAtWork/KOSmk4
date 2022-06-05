@@ -116,9 +116,9 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(struct mpart) this_kernel_stackpart_ = {
 	MPART_INIT_mp_share({ &this_kernel_stacknode_ }),
 	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(this_kernel_stackpart_.mp_lockops)),
 	MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),
+	MPART_INIT_mp_changed({}),
 	MPART_INIT_mp_minaddr(0),
 	MPART_INIT_mp_maxaddr(KERNEL_STACKSIZE - 1),
-	MPART_INIT_mp_changed({}),
 	MPART_INIT_mp_filent({ {} }),
 	MPART_INIT_mp_blkst_ptr({ NULL }),
 	MPART_INIT_mp_mem(0 /* Filled later */, CEILDIV(KERNEL_STACKSIZE, PAGESIZE)),
@@ -217,7 +217,7 @@ NOTHROW(KCALL kernel_initialize_scheduler_after_smp)(void) {
 	struct task *task_template;
 	task_template = (struct task *)__kernel_pertask_start;
 	assert(task_template->t_mman == &mman_kernel);
-	assert(FORTASK(task_template, this_kernel_stackpart_).mp_state = MPART_ST_MEM);
+	assert(FORTASK(task_template, this_kernel_stackpart_).mp_state == MPART_ST_MEM);
 	assert(FORTASK(task_template, this_fs) == &fs_kernel);
 	assert(FORTASK(task_template, this_handman) == &handman_kernel);
 

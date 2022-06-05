@@ -120,7 +120,7 @@ __LOCAL int(InlineIsEqualGUID)(REFGUID rguid1, REFGUID rguid2) {
 	        ((__UINT32_TYPE__ *)&rguid1)[3] == ((__UINT32_TYPE__ *)&rguid2)[3]);
 }
 __LOCAL int(IsEqualGUID)(REFGUID rguid1, REFGUID rguid2) {
-	return !__libc_memcmp(&rguid1, &rguid2, sizeof(GUID));
+	return __libc_memcmp(&rguid1, &rguid2, sizeof(GUID)) == 0;
 }
 #else /* __cplusplus */
 #define InlineIsEqualGUID(rguid1, rguid2)                                    \

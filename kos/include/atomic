@@ -253,8 +253,8 @@ public:
 	__CXX_DEFAULT_CTOR_NOEXCEPT(__atomic_int);
 	__CXX_DEFAULT_DTOR_NOEXCEPT(__atomic_int);
 	__CXX_DELETE_COPY(__atomic_int);
-	__CXX_DELETE_COPY_ASSIGN(__atomic_int);
-	__CXX_DELETE_VOLATILE_COPY_ASSIGN(__atomic_int);
+	__CXX_DELETE_COPY_ASSIGN_X(__atomic_int);
+	__CXX_DELETE_VOLATILE_COPY_ASSIGN_X(__atomic_int);
 
 public:
 	__CXX_CLASSMEMBER __CXX11_CONSTEXPR __atomic_int(__T __val) __CXX_NOEXCEPT
@@ -537,8 +537,8 @@ public:
 	__CXX_DEFAULT_CTOR_NOEXCEPT(atomic);
 	__CXX_DEFAULT_DTOR_NOEXCEPT(atomic);
 	__CXX_DELETE_COPY(atomic);
-	__CXX_DELETE_COPY_ASSIGN(atomic);
-	__CXX_DELETE_VOLATILE_COPY_ASSIGN(atomic);
+	__CXX_DELETE_COPY_ASSIGN_X(atomic);
+	__CXX_DELETE_VOLATILE_COPY_ASSIGN_X(atomic);
 
 public:
 	__CXX_CLASSMEMBER __CXX11_CONSTEXPR atomic(__T __val) __CXX_NOEXCEPT
@@ -617,8 +617,8 @@ public:
 	__CXX_DEFAULT_CTOR_NOEXCEPT(atomic);
 	__CXX_DEFAULT_DTOR_NOEXCEPT(atomic);
 	__CXX_DELETE_COPY(atomic);
-	__CXX_DELETE_COPY_ASSIGN(atomic);
-	__CXX_DELETE_VOLATILE_COPY_ASSIGN(atomic);
+	__CXX_DELETE_COPY_ASSIGN_X(atomic);
+	__CXX_DELETE_VOLATILE_COPY_ASSIGN_X(atomic);
 
 public:
 	__CXX_CLASSMEMBER __CXX11_CONSTEXPR atomic(__pointer_type __val) __CXX_NOEXCEPT

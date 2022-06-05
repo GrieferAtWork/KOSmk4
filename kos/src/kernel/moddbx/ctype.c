@@ -418,10 +418,12 @@ struct _pointer_ctype {
 	DEFINE_CTYPE(struct _pointer_ctype, ctype_##name##_const_ptr) = _POINTER_CTYPE_INIT(NULL, NULL, &ctype_##name, CTYPEREF_FLAG_CONST);
 #endif /* !__ARCH_HAVE_COMPAT */
 
-DEFINE_CTYPE(struct _basic_ctype, ctype_bool)                = _BASIC_CTYPE_INIT(CTYPE_KIND_BOOL, NULL);
-DEFINE_CTYPE(struct _basic_ctype, ctype_ieee754_float)       = _BASIC_CTYPE_INIT(CTYPE_KIND_IEEE754_FLOAT, NULL);
-DEFINE_CTYPE(struct _basic_ctype, ctype_ieee754_double)      = _BASIC_CTYPE_INIT(CTYPE_KIND_IEEE754_DOUBLE, NULL);
+DEFINE_CTYPE(struct _basic_ctype, ctype_bool)           = _BASIC_CTYPE_INIT(CTYPE_KIND_BOOL, NULL);
+DEFINE_CTYPE(struct _basic_ctype, ctype_ieee754_float)  = _BASIC_CTYPE_INIT(CTYPE_KIND_IEEE754_FLOAT, NULL);
+DEFINE_CTYPE(struct _basic_ctype, ctype_ieee754_double) = _BASIC_CTYPE_INIT(CTYPE_KIND_IEEE754_DOUBLE, NULL);
+#ifdef CTYPE_KIND_IEEE854_LONG_DOUBLE
 DEFINE_CTYPE(struct _basic_ctype, ctype_ieee854_long_double) = _BASIC_CTYPE_INIT(CTYPE_KIND_IEEE854_LONG_DOUBLE, NULL);
+#endif /* CTYPE_KIND_IEEE854_LONG_DOUBLE */
 DEFINE_CTYPE_TRIPLE(CTYPE_KIND_VOID, void)
 #ifdef __CHAR_UNSIGNED__
 DEFINE_CTYPE_TRIPLE(CTYPE_KIND_Un(__SIZEOF_CHAR__), char)
@@ -447,7 +449,9 @@ PRIVATE struct ctype *const standalong_ctypes[] = {
 	&ctype_bool,
 	&ctype_ieee754_float,
 	&ctype_ieee754_double,
+#ifdef CTYPE_KIND_IEEE854_LONG_DOUBLE
 	&ctype_ieee854_long_double,
+#endif /* CTYPE_KIND_IEEE854_LONG_DOUBLE */
 };
 
 struct ctype_triple {
@@ -553,8 +557,10 @@ try_pointer_register:
 			return incref(&ctype_ieee754_float);
 		} else if (buflen == SIZEOF_CTYPE_IEEE754_DOUBLE) {
 			return incref(&ctype_ieee754_double);
+#ifdef CTYPE_KIND_IEEE854_LONG_DOUBLE
 		} else if (buflen == SIZEOF_CTYPE_IEEE854_LONG_DOUBLE) {
 			return incref(&ctype_ieee854_long_double);
+#endif /* CTYPE_KIND_IEEE854_LONG_DOUBLE */
 		}
 		break;
 
@@ -1087,9 +1093,12 @@ again:
 			break;
 
 		case DW_ATE_float:
+#ifdef CTYPE_KIND_IEEE854_LONG_DOUBLE
 			if (typinfo.t_sizeof == SIZEOF_CTYPE_IEEE854_LONG_DOUBLE) {
 				presult->ct_typ = incref(&ctype_ieee854_long_double);
-			} else if (typinfo.t_sizeof == SIZEOF_CTYPE_IEEE754_DOUBLE) {
+			} else
+#endif /* CTYPE_KIND_IEEE854_LONG_DOUBLE */
+			if (typinfo.t_sizeof == SIZEOF_CTYPE_IEEE754_DOUBLE) {
 				presult->ct_typ = incref(&ctype_ieee754_double);
 			} else if (typinfo.t_sizeof == SIZEOF_CTYPE_IEEE754_FLOAT) {
 				presult->ct_typ = incref(&ctype_ieee754_float);

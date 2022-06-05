@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe27680dd */
+/* HASH CRC-32:0xf370499c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(modf) __ATTR_WUNUSED __ATTR_OUT(2) double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modf))(double __x, double *__iptr) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__ *)__iptr);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_modff((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__ *)__iptr);
-#else /* ... */
-	return (double)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__ *)__iptr);
-#endif /* !... */
+	return __LIBM_MATHFUN2I(modf, __x, (__LIBM_MATHFUN_T *)__iptr);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_modf_defined

@@ -23,7 +23,9 @@
 #include <__stdinc.h>
 #include <features.h>
 
+#include <hybrid/__bitfield.h>
 #include <hybrid/byteorder.h>
+#include <hybrid/typecore.h>
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -49,26 +51,26 @@ union wait {
 #ifdef __COMPILER_HAVE_TRANSPARENT_STRUCT
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		unsigned int w_termsig  : 7; /* Terminating signal. */
-		unsigned int w_coredump : 1; /* Set if dumped core. */
-		unsigned int w_retcode  : 8; /* Return code if exited normally. */
-		unsigned int __w_pad0   : 16;
+		__HYBRID_BITFIELD8_T w_termsig  : 7; /* Terminating signal. */
+		__HYBRID_BITFIELD8_T w_coredump : 1; /* Set if dumped core. */
+		__UINT8_TYPE__       w_retcode;      /* Return code if exited normally. */
+		__UINT16_TYPE__    __w_pad0;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int __w_pad0   : 16;
-		unsigned int w_retcode  : 8; /* Return code if exited normally. */
-		unsigned int w_coredump : 1; /* Set if dumped core. */
-		unsigned int w_termsig  : 7; /* Terminating signal. */
+		__UINT16_TYPE__    __w_pad0;
+		__UINT8_TYPE__       w_retcode;      /* Return code if exited normally. */
+		__HYBRID_BITFIELD8_T w_coredump : 1; /* Set if dumped core. */
+		__HYBRID_BITFIELD8_T w_termsig  : 7; /* Terminating signal. */
 #endif /* Endian... */
 	};
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		unsigned int w_stopval : 8; /* W_STOPPED if stopped. */
-		unsigned int w_stopsig : 8; /* Stopping signal. */
-		unsigned int __w_pad1  : 16;
+		__UINT8_TYPE__       w_stopval; /* W_STOPPED if stopped. */
+		__UINT8_TYPE__       w_stopsig; /* Stopping signal. */
+		__UINT16_TYPE__    __w_pad1;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int __w_pad1  : 16;
-		unsigned int w_stopsig : 8; /* Stopping signal. */
-		unsigned int w_stopval : 8; /* W_STOPPED if stopped. */
+		__UINT16_TYPE__    __w_pad1;
+		__UINT8_TYPE__       w_stopsig; /* Stopping signal. */
+		__UINT8_TYPE__       w_stopval; /* W_STOPPED if stopped. */
 #endif /* Endian... */
 	};
 #endif /* __COMPILER_HAVE_TRANSPARENT_STRUCT */
@@ -76,26 +78,26 @@ union wait {
      !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT))
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		unsigned int __w_termsig  : 7; /* Terminating signal. */
-		unsigned int __w_coredump : 1; /* Set if dumped core. */
-		unsigned int __w_retcode  : 8; /* Return code if exited normally. */
-		unsigned int __w_pad0     : 16;
+		__HYBRID_BITFIELD8_T __w_termsig  : 7; /* Terminating signal. */
+		__HYBRID_BITFIELD8_T __w_coredump : 1; /* Set if dumped core. */
+		__UINT8_TYPE__       __w_retcode;      /* Return code if exited normally. */
+		__UINT16_TYPE__      __w_pad0;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int __w_pad0     : 16;
-		unsigned int __w_retcode  : 8; /* Return code if exited normally. */
-		unsigned int __w_coredump : 1; /* Set if dumped core. */
-		unsigned int __w_termsig  : 7; /* Terminating signal. */
+		__UINT16_TYPE__      __w_pad0;
+		__UINT8_TYPE__       __w_retcode;      /* Return code if exited normally. */
+		__HYBRID_BITFIELD8_T __w_coredump : 1; /* Set if dumped core. */
+		__HYBRID_BITFIELD8_T __w_termsig  : 7; /* Terminating signal. */
 #endif /* Endian... */
 	} __wait_terminated;
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		unsigned int __w_stopval : 8; /* W_STOPPED if stopped. */
-		unsigned int __w_stopsig : 8; /* Stopping signal. */
-		unsigned int __w_pad1    : 16;
+		__UINT8_TYPE__      __w_stopval; /* W_STOPPED if stopped. */
+		__UINT8_TYPE__      __w_stopsig; /* Stopping signal. */
+		__UINT16_TYPE__     __w_pad1;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-		unsigned int __w_pad1    : 16;
-		unsigned int __w_stopsig : 8; /* Stopping signal. */
-		unsigned int __w_stopval : 8; /* W_STOPPED if stopped. */
+		__UINT16_TYPE__     __w_pad1;
+		__UINT8_TYPE__      __w_stopsig; /* Stopping signal. */
+		__UINT8_TYPE__      __w_stopval; /* W_STOPPED if stopped. */
 #endif /* Endian... */
 	} __wait_stopped;
 #ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT

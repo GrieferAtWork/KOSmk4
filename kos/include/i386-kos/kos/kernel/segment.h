@@ -21,6 +21,8 @@
 #define _I386_KOS_KOS_KERNEL_SEGMENT_H 1
 
 #include <__stdinc.h>
+
+#include <hybrid/__bitfield.h>
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
@@ -385,27 +387,27 @@ struct __ATTR_PACKED segment {
 			union __ATTR_PACKED {
 				__UINT8_TYPE__ d_type_s_dpl_p; /* Segment TYPE, S, DPL and P bits. */
 				struct __ATTR_PACKED {
-					unsigned int dtb_accessed : 1; /* A-bit: Accessed */
-					unsigned int dtb_wr : 1;       /* W/R-bit: Writable(dtb_code=0) / Readable(dtb_code=1) */
-					unsigned int dtb_ec : 1;       /* E/C-bit: Expand-down(dtb_code=0) / Conforming(dtb_code=1) */
-					unsigned int dtb_code : 1;     /* When set: is a code segment. */
+					__HYBRID_BITFIELD8_T dtb_accessed : 1;  /* A-bit: Accessed */
+					__HYBRID_BITFIELD8_T dtb_wr : 1;        /* W/R-bit: Writable(dtb_code=0) / Readable(dtb_code=1) */
+					__HYBRID_BITFIELD8_T dtb_ec : 1;        /* E/C-bit: Expand-down(dtb_code=0) / Conforming(dtb_code=1) */
+					__HYBRID_BITFIELD8_T dtb_code : 1;      /* When set: is a code segment. */
 				} d_type_bits;
 				struct __ATTR_PACKED {
-					unsigned int d_type: 4;           /* Segment TYPE (One of `SEGMENT_DESCRIPTOR_TYPE_*') */
-					unsigned int d_code_or_data: 1;   /* S-bit: 1=code-or-data; 0=system-descriptor */
-					unsigned int d_dpl: 2;            /* Descriptor Privilege Level (0-3) */
-					unsigned int d_present: 1;        /* P-bit: Segment is present. */
+					__HYBRID_BITFIELD8_T d_type: 4;         /* Segment TYPE (One of `SEGMENT_DESCRIPTOR_TYPE_*') */
+					__HYBRID_BITFIELD8_T d_code_or_data: 1; /* S-bit: 1=code-or-data; 0=system-descriptor */
+					__HYBRID_BITFIELD8_T d_dpl: 2;          /* Descriptor Privilege Level (0-3) */
+					__HYBRID_BITFIELD8_T d_present: 1;      /* P-bit: Segment is present. */
 				};
 			};
 			union __ATTR_PACKED {
-				__UINT8_TYPE__ d_limit1_avl_l_db_g;   /* [valid_if(d_present == 1)] Segment limit 16-19, AVL, L, D/B and G bits. */
+				__UINT8_TYPE__ d_limit1_avl_l_db_g; /* [valid_if(d_present == 1)] Segment limit 16-19, AVL, L, D/B and G bits. */
 				struct __ATTR_PACKED {
-					unsigned int d_limit1: 4;         /* [valid_if(d_present == 1)] Segment limit 16-19 */
-					unsigned int d_avl: 1;            /* [valid_if(d_present == 1)] Unused bit (available for use by system software; unused in KOS) */
-					unsigned int d_long: 1;           /* [valid_if(d_present == 1)] L-bit: Set to 1 if this is a 64-bit code segment (for x86_64). */
-					unsigned int d_defop: 1;          /* [valid_if(d_present == 1)] D/B-bit: Default operand size (0=16, 1=32) (this affects the 66h-prefix).
-					                                   * NOTE: When `d_long' is set, then this bit _must_ be cleared! */
-					unsigned int d_granularity: 1;    /* [valid_if(d_present == 1)] G-bit: When set, `REAL_LIMIT = (LIMIT * 0x1000) + 0xfff'. */
+					__HYBRID_BITFIELD8_T d_limit1: 4;       /* [valid_if(d_present == 1)] Segment limit 16-19 */
+					__HYBRID_BITFIELD8_T d_avl: 1;          /* [valid_if(d_present == 1)] Unused bit (available for use by system software; unused in KOS) */
+					__HYBRID_BITFIELD8_T d_long: 1;         /* [valid_if(d_present == 1)] L-bit: Set to 1 if this is a 64-bit code segment (for x86_64). */
+					__HYBRID_BITFIELD8_T d_defop: 1;        /* [valid_if(d_present == 1)] D/B-bit: Default operand size (0=16, 1=32) (this affects the 66h-prefix).
+					                                         * NOTE: When `d_long' is set, then this bit _must_ be cleared! */
+					__HYBRID_BITFIELD8_T d_granularity: 1;  /* [valid_if(d_present == 1)] G-bit: When set, `REAL_LIMIT = (LIMIT * 0x1000) + 0xfff'. */
 				};
 			};
 			__UINT8_TYPE__  d_base2;  /* [valid_if(d_present == 1)] Bit 24-31 of the segment base. */
@@ -420,30 +422,30 @@ struct __ATTR_PACKED segment {
 			union __ATTR_PACKED {
 				__UINT8_TYPE__ t_busy_dpl_p; /* TSS BUSY, DPL and P bits. */
 				struct __ATTR_PACKED {
-					unsigned int __dtb_accessed : 1; /* A-bit: Always 1 */
-					unsigned int ttb_busy: 1;        /* TSS BUSY bit. */
-					unsigned int __ttb_ec : 1;       /* E/C-bit: Always 0 */
+					__HYBRID_BITFIELD8_T __dtb_accessed : 1; /* A-bit: Always 1 */
+					__HYBRID_BITFIELD8_T ttb_busy: 1;        /* TSS BUSY bit. */
+					__HYBRID_BITFIELD8_T __ttb_ec : 1;       /* E/C-bit: Always 0 */
 #ifdef __x86_64__
-					unsigned int __ttb_code : 1;     /* Always 1 */
+					__HYBRID_BITFIELD8_T __ttb_code : 1;     /* Always 1 */
 #else /* __x86_64__ */
-					unsigned int ttb_is32 : 1;       /* code-bit: 1=32-bit tss; 0=16-bit tss */
+					__HYBRID_BITFIELD8_T ttb_is32 : 1;       /* code-bit: 1=32-bit tss; 0=16-bit tss */
 #endif /* !__x86_64__ */
 				} t_type_bits;
 				struct __ATTR_PACKED {
-					unsigned int t_type: 4;           /* Segment TYPE (One of `SEGMENT_DESCRIPTOR_TYPE_TSS_*') */
-					unsigned int __t_code_or_data: 1; /* S-bit: Always 0 */
-					unsigned int t_dpl: 2;            /* Max CPL for which access to this TSS is allowed (0-3) */
-					unsigned int t_present: 1;        /* P-bit: Segment is present. */
+					__HYBRID_BITFIELD8_T t_type: 4;           /* Segment TYPE (One of `SEGMENT_DESCRIPTOR_TYPE_TSS_*') */
+					__HYBRID_BITFIELD8_T __t_code_or_data: 1; /* S-bit: Always 0 */
+					__HYBRID_BITFIELD8_T t_dpl: 2;            /* Max CPL for which access to this TSS is allowed (0-3) */
+					__HYBRID_BITFIELD8_T t_present: 1;        /* P-bit: Segment is present. */
 				};
 			};
 			union __ATTR_PACKED {
 				__UINT8_TYPE__ t_limit1_avl_g;   /* Segment limit 16-19, AVL and G bits. */
 				struct __ATTR_PACKED {
-					unsigned int t_limit1: 4;         /* Segment limit 16-19 */
-					unsigned int t_avl: 1;            /* Unused bit (available for use by system software; unused in KOS) */
-					unsigned int __t_long: 1;         /* L-bit: Always 0. */
-					unsigned int __t_defop: 1;        /* D/B-bit: Always 0. */
-					unsigned int t_granularity: 1;    /* G-bit: When set, `REAL_LIMIT = (LIMIT * 0x1000) + 0xfff'. */
+					__HYBRID_BITFIELD8_T t_limit1: 4;         /* Segment limit 16-19 */
+					__HYBRID_BITFIELD8_T t_avl: 1;            /* Unused bit (available for use by system software; unused in KOS) */
+					__HYBRID_BITFIELD8_T __t_long: 1;         /* L-bit: Always 0. */
+					__HYBRID_BITFIELD8_T __t_defop: 1;        /* D/B-bit: Always 0. */
+					__HYBRID_BITFIELD8_T t_granularity: 1;    /* G-bit: When set, `REAL_LIMIT = (LIMIT * 0x1000) + 0xfff'. */
 				};
 			};
 			__UINT8_TYPE__  t_base2;  /* Bit 24-31 of the segment base. */
@@ -460,28 +462,28 @@ struct __ATTR_PACKED segment {
 			union __ATTR_PACKED {
 				__UINT8_TYPE__ cg_argc_zero; /* Argument count and 0 bits. */
 				struct __ATTR_PACKED {
-					unsigned int cg_argc: 5;   /* Argument count (number of data-words, where word-size depends on gate type (16/32)) */
-					unsigned int __cg_zero: 3; /* Always 0 */
+					__HYBRID_BITFIELD8_T   cg_argc: 5; /* Argument count (number of data-words, where word-size depends on gate type (16/32)) */
+					__HYBRID_BITFIELD8_T __cg_zero: 3; /* Always 0 */
 				};
 			};
 #endif /* !__x86_64__ */
 			union __ATTR_PACKED {
 				__UINT8_TYPE__ cg_type_dpl_p; /* Call gate TYPE, DPL and P bits. */
 				struct __ATTR_PACKED {
-					unsigned int __cgtb_accessed : 1; /* A-bit: Always 0 */
-					unsigned int __cgtb_wr : 1;       /* W/R-bit: Always 0 */
-					unsigned int __cgtb_ec : 1;       /* E/C-bit: Always 1 */
+					__HYBRID_BITFIELD8_T __cgtb_accessed : 1; /* A-bit: Always 0 */
+					__HYBRID_BITFIELD8_T __cgtb_wr : 1;       /* W/R-bit: Always 0 */
+					__HYBRID_BITFIELD8_T __cgtb_ec : 1;       /* E/C-bit: Always 1 */
 #ifdef __x86_64__
-					unsigned int __cgtb_code : 1;     /* Always 1 */
+					__HYBRID_BITFIELD8_T __cgtb_code : 1;     /* Always 1 */
 #else /* __x86_64__ */
-					unsigned int cgtb_is32 : 1;       /* code-bit: 1=32-bit gate; 0=16-bit gate */
+					__HYBRID_BITFIELD8_T cgtb_is32 : 1;       /* code-bit: 1=32-bit gate; 0=16-bit gate */
 #endif /* !__x86_64__ */
 				} cg_type_bits;
 				struct __ATTR_PACKED {
-					unsigned int cg_type: 4;           /* Segment TYPE (One of `SEGMENT_DESCRIPTOR_TYPE_CALLGATE_*') */
-					unsigned int __cg_code_or_data: 1; /* S-bit: Always 0 */
-					unsigned int cg_dpl: 2;            /* Max CPL for which access to this Call Gate is allowed (0-3) */
-					unsigned int cg_present: 1;        /* P-bit: Segment is present. */
+					__HYBRID_BITFIELD8_T cg_type: 4;           /* Segment TYPE (One of `SEGMENT_DESCRIPTOR_TYPE_CALLGATE_*') */
+					__HYBRID_BITFIELD8_T __cg_code_or_data: 1; /* S-bit: Always 0 */
+					__HYBRID_BITFIELD8_T cg_dpl: 2;            /* Max CPL for which access to this Call Gate is allowed (0-3) */
+					__HYBRID_BITFIELD8_T cg_present: 1;        /* P-bit: Segment is present. */
 				};
 			};
 			__UINT16_TYPE__ cg_offset1; /* Bit 16-31 of the offset within the target segment. */
@@ -496,8 +498,8 @@ struct __ATTR_PACKED segment {
 			union __ATTR_PACKED {
 				__UINT8_TYPE__ ig_ist_zero;     /* IST and ZERO bits */
 				struct __ATTR_PACKED {
-					unsigned int ig_ist : 3;    /* Interrupt stack table index+1 (or 0 if the stack isn't changed) */
-					unsigned int __ig_zero : 5; /* Always 0 */
+					__HYBRID_BITFIELD8_T   ig_ist : 3;  /* Interrupt stack table index+1 (or 0 if the stack isn't changed) */
+					__HYBRID_BITFIELD8_T __ig_zero : 5; /* Always 0 */
 				};
 			};
 #else /* __x86_64__ */
@@ -506,20 +508,20 @@ struct __ATTR_PACKED segment {
 			union __ATTR_PACKED {
 				__UINT8_TYPE__ ig_type_dpl_p; /* Interrupt/Trap gate TYPE, DPL and P bits. */
 				struct __ATTR_PACKED {
-					unsigned int igtb_istrap : 1; /* A-bit: 0=interrupt gate, 1=trap gate */
-					unsigned int __igtb_wr : 1;   /* W/R-bit: Always 1 */
-					unsigned int __igtb_ec : 1;   /* E/C-bit: Always 1 */
+					__HYBRID_BITFIELD8_T igtb_istrap : 1; /* A-bit: 0=interrupt gate, 1=trap gate */
+					__HYBRID_BITFIELD8_T __igtb_wr : 1;   /* W/R-bit: Always 1 */
+					__HYBRID_BITFIELD8_T __igtb_ec : 1;   /* E/C-bit: Always 1 */
 #ifdef __x86_64__
-					unsigned int __igtb_code : 1; /* Always 1 */
+					__HYBRID_BITFIELD8_T __igtb_code : 1; /* Always 1 */
 #else /* __x86_64__ */
-					unsigned int igtb_is32 : 1;   /* code-bit: 1=32-bit gate; 0=16-bit gate */
+					__HYBRID_BITFIELD8_T igtb_is32 : 1;   /* code-bit: 1=32-bit gate; 0=16-bit gate */
 #endif /* !__x86_64__ */
 				} ig_type_bits;
 				struct __ATTR_PACKED {
-					unsigned int ig_type: 4;           /* Segment TYPE (One of `SEGMENT_DESCRIPTOR_TYPE_INTRGATE_*') */
-					unsigned int __cg_code_or_data: 1; /* S-bit: Always 0 */
-					unsigned int ig_dpl: 2;            /* Max CPL for which access to this Interrupt/Trap Gate is allowed (0-3) */
-					unsigned int ig_present: 1;        /* P-bit: Segment is present. */
+					__HYBRID_BITFIELD8_T ig_type: 4;           /* Segment TYPE (One of `SEGMENT_DESCRIPTOR_TYPE_INTRGATE_*') */
+					__HYBRID_BITFIELD8_T __cg_code_or_data: 1; /* S-bit: Always 0 */
+					__HYBRID_BITFIELD8_T ig_dpl: 2;            /* Max CPL for which access to this Interrupt/Trap Gate is allowed (0-3) */
+					__HYBRID_BITFIELD8_T ig_present: 1;        /* P-bit: Segment is present. */
 				};
 			};
 			__UINT16_TYPE__ ig_offset1; /* Bit 16-31 of the offset within the target segment. */
@@ -536,16 +538,16 @@ struct __ATTR_PACKED segment {
 			union __ATTR_PACKED {
 				__UINT8_TYPE__ tg_type_dpl_p; /* Task gate TYPE, DPL and P bits. */
 				struct __ATTR_PACKED {
-					unsigned int __igtb_accessed : 1; /* A-bit: Always 1 */
-					unsigned int __igtb_wr : 1;       /* W/R-bit: Always 0 */
-					unsigned int __igtb_ec : 1;       /* E/C-bit: Always 1 */
-					unsigned int __igtb_code : 1;     /* Code-bit: Always 0 */
+					__HYBRID_BITFIELD8_T __igtb_accessed : 1; /* A-bit: Always 1 */
+					__HYBRID_BITFIELD8_T __igtb_wr : 1;       /* W/R-bit: Always 0 */
+					__HYBRID_BITFIELD8_T __igtb_ec : 1;       /* E/C-bit: Always 1 */
+					__HYBRID_BITFIELD8_T __igtb_code : 1;     /* Code-bit: Always 0 */
 				} tg_type_bits;
 				struct __ATTR_PACKED {
-					unsigned int tg_type: 4;           /* Segment TYPE (One of `SEGMENT_DESCRIPTOR_TYPE_TRAPGATE_*') */
-					unsigned int __cg_code_or_data: 1; /* S-bit: Always 0 */
-					unsigned int tg_dpl: 2;            /* Max CPL for which access to this Task Gate is allowed (0-3) */
-					unsigned int tg_present: 1;        /* P-bit: Segment is present. */
+					__HYBRID_BITFIELD8_T tg_type: 4;           /* Segment TYPE (One of `SEGMENT_DESCRIPTOR_TYPE_TRAPGATE_*') */
+					__HYBRID_BITFIELD8_T __cg_code_or_data: 1; /* S-bit: Always 0 */
+					__HYBRID_BITFIELD8_T tg_dpl: 2;            /* Max CPL for which access to this Task Gate is allowed (0-3) */
+					__HYBRID_BITFIELD8_T tg_present: 1;        /* P-bit: Segment is present. */
 				};
 			};
 			__UINT16_TYPE__ __tg_offset1; /* Always 0 */
@@ -557,35 +559,35 @@ struct __ATTR_PACKED segment {
 		 * These  are  the  data  formats   for  the  second  entry   respectively. */
 #ifdef __x86_64__
 		struct __ATTR_PACKED {
-			__UINT32_TYPE__ th_base3;        /* Bit 32-63 of the segment base. */
-			__UINT8_TYPE__  th_reserved0;    /* Reserved (initialize to 0). */
-			unsigned int    th_zero: 4;      /* Always 0 */
-			unsigned int    th_reserved1: 4; /* Reserved (initialize to 0). */
-			__UINT16_TYPE__ th_reserved2;    /* Reserved (initialize to 0). */
+			__UINT32_TYPE__      th_base3;        /* Bit 32-63 of the segment base. */
+			__UINT8_TYPE__       th_reserved0;    /* Reserved (initialize to 0). */
+			__HYBRID_BITFIELD8_T th_zero: 4;      /* Always 0 */
+			__HYBRID_BITFIELD8_T th_reserved1: 4; /* Reserved (initialize to 0). */
+			__UINT16_TYPE__      th_reserved2;    /* Reserved (initialize to 0). */
 		} s_tss_hi; /* TSS descriptor (high part) */
 
 		struct __ATTR_PACKED {
-			__UINT32_TYPE__ cgh_offset3;      /* Bit 32-63 of the offset. */
-			__UINT8_TYPE__  cgh_reserved0;    /* Reserved (initialize to 0). */
-			unsigned int    cgh_zero: 4;      /* Always 0 */
-			unsigned int    cgh_reserved1: 4; /* Reserved (initialize to 0). */
-			__UINT16_TYPE__ cgh_reserved2;    /* Reserved (initialize to 0). */
+			__UINT32_TYPE__      cgh_offset3;      /* Bit 32-63 of the offset. */
+			__UINT8_TYPE__       cgh_reserved0;    /* Reserved (initialize to 0). */
+			__HYBRID_BITFIELD8_T cgh_zero: 4;      /* Always 0 */
+			__HYBRID_BITFIELD8_T cgh_reserved1: 4; /* Reserved (initialize to 0). */
+			__UINT16_TYPE__      cgh_reserved2;    /* Reserved (initialize to 0). */
 		} s_callgate_hi; /* Call gate descriptor (high part) */
 
 		struct __ATTR_PACKED {
-			__UINT32_TYPE__ igh_offset3;      /* Bit 32-63 of the offset. */
-			__UINT8_TYPE__  igh_reserved0;    /* Reserved (initialize to 0). */
-			unsigned int    igh_zero: 4;      /* Always 0 */
-			unsigned int    igh_reserved1: 4; /* Reserved (initialize to 0). */
-			__UINT16_TYPE__ igh_reserved2;    /* Reserved (initialize to 0). */
+			__UINT32_TYPE__      igh_offset3;      /* Bit 32-63 of the offset. */
+			__UINT8_TYPE__       igh_reserved0;    /* Reserved (initialize to 0). */
+			__HYBRID_BITFIELD8_T igh_zero: 4;      /* Always 0 */
+			__HYBRID_BITFIELD8_T igh_reserved1: 4; /* Reserved (initialize to 0). */
+			__UINT16_TYPE__      igh_reserved2;    /* Reserved (initialize to 0). */
 		} s_intrgate_hi; /* Interrupt/Trap gate descriptor (high part) */
 
 		struct __ATTR_PACKED {
-			__UINT32_TYPE__ lh_base3;        /* Bit 32-63 of the LDT address. */
-			__UINT8_TYPE__  lh_reserved0;    /* Reserved (initialize to 0). */
-			unsigned int    lh_zero: 4;      /* Always 0 */
-			unsigned int    lh_reserved1: 4; /* Reserved (initialize to 0). */
-			__UINT16_TYPE__ lh_reserved2;    /* Reserved (initialize to 0). */
+			__UINT32_TYPE__      lh_base3;        /* Bit 32-63 of the LDT address. */
+			__UINT8_TYPE__       lh_reserved0;    /* Reserved (initialize to 0). */
+			__HYBRID_BITFIELD8_T lh_zero: 4;      /* Always 0 */
+			__HYBRID_BITFIELD8_T lh_reserved1: 4; /* Reserved (initialize to 0). */
+			__UINT16_TYPE__      lh_reserved2;    /* Reserved (initialize to 0). */
 		} s_ldt_hi; /* LDT descriptor (high part) */
 #endif /* __x86_64__ */
 	};

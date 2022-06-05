@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2740b48a */
+/* HASH CRC-32:0x41207ed4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -410,7 +410,6 @@ struct format_waprintf_data {
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
 #endif /* !__format_waprintf_data_defined */
-
 #define FORMAT_WAPRINTF_DATA_INIT \
 	{ __NULLPTR, 0, 0 }
 #define format_waprintf_data_init(self) \

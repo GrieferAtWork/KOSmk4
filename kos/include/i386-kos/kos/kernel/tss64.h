@@ -24,8 +24,6 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-__DECL_BEGIN
-
 #ifdef __x86_64__
 #define OFFSET_TSS_RSP0  OFFSET_TSS64_RSP0
 #define OFFSET_TSS_RSP1  OFFSET_TSS64_RSP1
@@ -44,7 +42,6 @@ __DECL_BEGIN
 #define tss64            tss
 #endif /* __x86_64__ */
 
-
 #define OFFSET_TSS64_RSP0    4
 #define OFFSET_TSS64_RSP1    12
 #define OFFSET_TSS64_RSP2    20
@@ -58,14 +55,15 @@ __DECL_BEGIN
 #define OFFSET_TSS64_IST(n) (36 + ((n) - 1) * 8)
 #define OFFSET_TSS64_IOMAP   102
 #define SIZEOF_TSS64         104
-#define ALIGNOF_TSS64        4
+#define ALIGNOF_TSS64        __ALIGNOF_INT64__
 
 
 /* NOTE: Documentation is taken/derived from:
  *   `Volume 3 (3A, 3B, 3C & 3D): System Programming Guide'
  *   `Figure 7-11.  64-Bit TSS Format' */
-
 #ifdef __CC__
+__DECL_BEGIN
+
 struct __ATTR_ALIGNED(ALIGNOF_TSS64) __ATTR_PACKED tss64 /*[PREFIX(t_)]*/ {
 	__UINT32_TYPE__ __t_zero0; /* ... */
 	/* The full 64-bit canonical forms of the stack pointers (RSP) for privilege levels 0-2. */
@@ -93,8 +91,8 @@ struct __ATTR_ALIGNED(ALIGNOF_TSS64) __ATTR_PACKED tss64 /*[PREFIX(t_)]*/ {
 	__UINT16_TYPE__ __t_zero5; /* ... */
 	__UINT16_TYPE__   t_iomap; /* The 16-bit offset to the I/O permission bit map from the 64-bit TSS base. */
 };
-#endif /* __CC__ */
 
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_I386_KOS_KOS_KERNEL_TSS64_H */

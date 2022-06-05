@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca9ca2b4 */
+/* HASH CRC-32:0x11b02ffe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,8 +57,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atanhl))(__LONGDOUBLE __x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2L(isgreaterequal, __LIBM_MATHFUNL(fabs, __x), 1.0L))
 		return __kernel_standard_l(__x, __x, __HUGE_VALL,
-		                         __ieee754_fabsf(__x) > 1.0L ? __LIBM_KMATHERRL_ATANH_PLUSONE /* atanh(|x|>1) */
-		                                                  : __LIBM_KMATHERRL_ATANH_ONE);   /* atanh(|x|==1) */
+		                         __LIBM_MATHFUNL(fabs, __x) > 1.0L ? __LIBM_KMATHERRL_ATANH_PLUSONE /* atanh(|x|>1) */
+		                                                         : __LIBM_KMATHERRL_ATANH_ONE);   /* atanh(|x|==1) */
 	return __LIBM_MATHFUNL(atanh, __x);
 #else /* __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ */
 	return (__LONGDOUBLE)(__NAMESPACE_LOCAL_SYM __localdep_atanh)((double)__x);

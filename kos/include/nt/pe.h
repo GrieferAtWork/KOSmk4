@@ -27,6 +27,7 @@
 #include "types.h"
 
 /**/
+#include <hybrid/__bitfield.h>
 #include <hybrid/typecore.h>
 
 
@@ -1515,10 +1516,10 @@ typedef struct _NON_PAGED_DEBUG_INFO {
 #define IMAGE_SEPARATE_DEBUG_MISMATCH   0x8000
 
 typedef struct _ImageArchitectureHeader {
-	unsigned int AmaskValue : 1;
-	int Adummy1 : 7;
-	unsigned int AmaskShift : 8;
-	int Adummy2 : 16;
+	__HYBRID_BITFIELD8_T AmaskValue : 1;
+	__HYBRID_BITFIELD8_T Adummy1 : 7;
+	__UINT8_TYPE__ AmaskShift;
+	__UINT16_TYPE__ Adummy2;
 	DWORD FirstEntryRVA;
 } IMAGE_ARCHITECTURE_HEADER, *PIMAGE_ARCHITECTURE_HEADER;
 

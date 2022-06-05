@@ -22,6 +22,9 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/__bitfield.h>
+#include <hybrid/typecore.h>
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -36,15 +39,15 @@ __DECL_BEGIN
 #undef useable
 
 struct linux_user_desc {
-	unsigned int  entry_number;
-	unsigned long base_addr;
-	unsigned int  limit;
-	unsigned int  seg_32bit:1;
-	unsigned int  contents:2;
-	unsigned int  read_exec_only:1;
-	unsigned int  limit_in_pages:1;
-	unsigned int  seg_not_present:1;
-	unsigned int  useable:1;
+	__UINT32_TYPE__      entry_number;
+	__ULONGPTR_TYPE__    base_addr;
+	__UINT32_TYPE__      limit;
+	__HYBRID_BITFIELD8_T seg_32bit : 1;
+	__HYBRID_BITFIELD8_T contents : 2;
+	__HYBRID_BITFIELD8_T read_exec_only : 1;
+	__HYBRID_BITFIELD8_T limit_in_pages : 1;
+	__HYBRID_BITFIELD8_T seg_not_present : 1;
+	__HYBRID_BITFIELD8_T useable : 1;
 };
 
 __DECL_END

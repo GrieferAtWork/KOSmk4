@@ -2335,7 +2335,7 @@ int ftrylockfile([[inout]] $FILE *__restrict stream);
 
 @@>> __uflow(3)
 @@This is essentially gLibc's version of `_filbuf(3)' (but sadly not binary compatible)
-[[wunused]] int __uflow([[inout]] FILE *stream) = _filbuf;
+[[wunused]] int __uflow([[inout]] $FILE *stream) = _filbuf;
 
 @@>> __overflow(3)
 @@This is essentially gLibc's version of `_flsbuf(3)' (but sadly not binary compatible)

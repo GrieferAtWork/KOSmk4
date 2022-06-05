@@ -23,41 +23,41 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/__bitfield.h>
 #include <hybrid/byteorder.h>
 
 #define __BIND 19950621 /* ??? */
 
 typedef struct {
-	unsigned int id : 16; /* ??? */
+	__UINT16_TYPE__      id;         /* ??? */
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-
-	unsigned int qr : 1;     /* ??? */
-	unsigned int opcode : 4; /* ??? */
-	unsigned int aa : 1;     /* ??? */
-	unsigned int tc : 1;     /* ??? */
-	unsigned int rd : 1;     /* ??? */
-	unsigned int ra : 1;     /* ??? */
-	unsigned int unused : 1; /* ??? */
-	unsigned int ad : 1;     /* ??? */
-	unsigned int cd : 1;     /* ??? */
-	unsigned int rcode : 4;  /* ??? */
+	__HYBRID_BITFIELD8_T qr : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T opcode : 4; /* ??? */
+	__HYBRID_BITFIELD8_T aa : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T tc : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T rd : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T ra : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T unused : 1; /* ??? */
+	__HYBRID_BITFIELD8_T ad : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T cd : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T rcode : 4;  /* ??? */
 #else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
-	unsigned int rd : 1;     /* ??? */
-	unsigned int tc : 1;     /* ??? */
-	unsigned int aa : 1;     /* ??? */
-	unsigned int opcode : 4; /* ??? */
-	unsigned int qr : 1;     /* ??? */
-	unsigned int rcode : 4;  /* ??? */
-	unsigned int cd : 1;     /* ??? */
-	unsigned int ad : 1;     /* ??? */
-	unsigned int unused : 1; /* ??? */
-	unsigned int ra : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T rd : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T tc : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T aa : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T opcode : 4; /* ??? */
+	__HYBRID_BITFIELD8_T qr : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T rcode : 4;  /* ??? */
+	__HYBRID_BITFIELD8_T cd : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T ad : 1;     /* ??? */
+	__HYBRID_BITFIELD8_T unused : 1; /* ??? */
+	__HYBRID_BITFIELD8_T ra : 1;     /* ??? */
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 	/* remaining bytes */
-	unsigned int qdcount : 16; /* ??? */
-	unsigned int ancount : 16; /* ??? */
-	unsigned int nscount : 16; /* ??? */
-	unsigned int arcount : 16; /* ??? */
+	__UINT16_TYPE__      qdcount;    /* ??? */
+	__UINT16_TYPE__      ancount;    /* ??? */
+	__UINT16_TYPE__      nscount;    /* ??? */
+	__UINT16_TYPE__      arcount;    /* ??? */
 } HEADER;
 
 #define PACKETSZ        NS_PACKETSZ

@@ -24,9 +24,9 @@
 #include "api.h"
 /**/
 
-#include "codecs.h"
-
 #include <hybrid/compiler.h>
+
+#include <hybrid/__bitfield.h>
 
 #include <kos/kernel/types.h>
 #include <kos/types.h>
@@ -38,6 +38,7 @@
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/palette.h>
 
+#include "codecs.h"
 #include "palette.h"
 
 DECL_BEGIN
@@ -1126,113 +1127,113 @@ linefill4_msb(byte_t *__restrict dst_line, uintptr_t dst_x,
 
 
 DEFINE_FORMAT_CONVERTER_RGBA(rgba4444, u16, {
-	unsigned int r : 4;
-	unsigned int g : 4;
-	unsigned int b : 4;
-	unsigned int a : 4;
+	__HYBRID_BITFIELD16_T r : 4;
+	__HYBRID_BITFIELD16_T g : 4;
+	__HYBRID_BITFIELD16_T b : 4;
+	__HYBRID_BITFIELD16_T a : 4;
 });
 DEFINE_FORMAT_CONVERTER_RGBX(rgbx4444, u16, {
-	unsigned int r : 4;
-	unsigned int g : 4;
-	unsigned int b : 4;
-	unsigned int x : 4;
+	__HYBRID_BITFIELD16_T r : 4;
+	__HYBRID_BITFIELD16_T g : 4;
+	__HYBRID_BITFIELD16_T b : 4;
+	__HYBRID_BITFIELD16_T x : 4;
 });
 DEFINE_FORMAT_CONVERTER_RGBA(argb4444, u16, {
-	unsigned int a : 4;
-	unsigned int r : 4;
-	unsigned int g : 4;
-	unsigned int b : 4;
+	__HYBRID_BITFIELD16_T a : 4;
+	__HYBRID_BITFIELD16_T r : 4;
+	__HYBRID_BITFIELD16_T g : 4;
+	__HYBRID_BITFIELD16_T b : 4;
 });
 DEFINE_FORMAT_CONVERTER_RGBX(xrgb4444, u16, {
-	unsigned int x : 4;
-	unsigned int r : 4;
-	unsigned int g : 4;
-	unsigned int b : 4;
+	__HYBRID_BITFIELD16_T x : 4;
+	__HYBRID_BITFIELD16_T r : 4;
+	__HYBRID_BITFIELD16_T g : 4;
+	__HYBRID_BITFIELD16_T b : 4;
 });
 DEFINE_FORMAT_CONVERTER_RGBA(abgr4444, u16, {
-	unsigned int a : 4;
-	unsigned int b : 4;
-	unsigned int g : 4;
-	unsigned int r : 4;
+	__HYBRID_BITFIELD16_T a : 4;
+	__HYBRID_BITFIELD16_T b : 4;
+	__HYBRID_BITFIELD16_T g : 4;
+	__HYBRID_BITFIELD16_T r : 4;
 });
 DEFINE_FORMAT_CONVERTER_RGBX(xbgr4444, u16, {
-	unsigned int x : 4;
-	unsigned int b : 4;
-	unsigned int g : 4;
-	unsigned int r : 4;
+	__HYBRID_BITFIELD16_T x : 4;
+	__HYBRID_BITFIELD16_T b : 4;
+	__HYBRID_BITFIELD16_T g : 4;
+	__HYBRID_BITFIELD16_T r : 4;
 });
 DEFINE_FORMAT_CONVERTER_RGBA(bgra4444, u16, {
-	unsigned int b : 4;
-	unsigned int g : 4;
-	unsigned int r : 4;
-	unsigned int a : 4;
+	__HYBRID_BITFIELD16_T b : 4;
+	__HYBRID_BITFIELD16_T g : 4;
+	__HYBRID_BITFIELD16_T r : 4;
+	__HYBRID_BITFIELD16_T a : 4;
 });
 DEFINE_FORMAT_CONVERTER_RGBX(bgrx4444, u16, {
-	unsigned int b : 4;
-	unsigned int g : 4;
-	unsigned int r : 4;
-	unsigned int x : 4;
+	__HYBRID_BITFIELD16_T b : 4;
+	__HYBRID_BITFIELD16_T g : 4;
+	__HYBRID_BITFIELD16_T r : 4;
+	__HYBRID_BITFIELD16_T x : 4;
 });
 
 
 DEFINE_FORMAT_CONVERTER_RGBA(rgba5551, u16, {
-	unsigned int r : 5;
-	unsigned int g : 5;
-	unsigned int b : 5;
-	unsigned int a : 1;
+	__HYBRID_BITFIELD16_T r : 5;
+	__HYBRID_BITFIELD16_T g : 5;
+	__HYBRID_BITFIELD16_T b : 5;
+	__HYBRID_BITFIELD16_T a : 1;
 });
 DEFINE_FORMAT_CONVERTER_RGBX(rgbx5551, u16, {
-	unsigned int r : 5;
-	unsigned int g : 5;
-	unsigned int b : 5;
-	unsigned int x : 1;
+	__HYBRID_BITFIELD16_T r : 5;
+	__HYBRID_BITFIELD16_T g : 5;
+	__HYBRID_BITFIELD16_T b : 5;
+	__HYBRID_BITFIELD16_T x : 1;
 });
 DEFINE_FORMAT_CONVERTER_RGBA(argb1555, u16, {
-	unsigned int a : 1;
-	unsigned int r : 5;
-	unsigned int g : 5;
-	unsigned int b : 5;
+	__HYBRID_BITFIELD16_T a : 1;
+	__HYBRID_BITFIELD16_T r : 5;
+	__HYBRID_BITFIELD16_T g : 5;
+	__HYBRID_BITFIELD16_T b : 5;
 });
 DEFINE_FORMAT_CONVERTER_RGBX(xrgb1555, u16, {
-	unsigned int x : 1;
-	unsigned int r : 5;
-	unsigned int g : 5;
-	unsigned int b : 5;
+	__HYBRID_BITFIELD16_T x : 1;
+	__HYBRID_BITFIELD16_T r : 5;
+	__HYBRID_BITFIELD16_T g : 5;
+	__HYBRID_BITFIELD16_T b : 5;
 });
 DEFINE_FORMAT_CONVERTER_RGBA(abgr1555, u16, {
-	unsigned int a : 1;
-	unsigned int b : 5;
-	unsigned int g : 5;
-	unsigned int r : 5;
+	__HYBRID_BITFIELD16_T a : 1;
+	__HYBRID_BITFIELD16_T b : 5;
+	__HYBRID_BITFIELD16_T g : 5;
+	__HYBRID_BITFIELD16_T r : 5;
 });
 DEFINE_FORMAT_CONVERTER_RGBX(xbgr1555, u16, {
-	unsigned int x : 1;
-	unsigned int b : 5;
-	unsigned int g : 5;
-	unsigned int r : 5;
+	__HYBRID_BITFIELD16_T x : 1;
+	__HYBRID_BITFIELD16_T b : 5;
+	__HYBRID_BITFIELD16_T g : 5;
+	__HYBRID_BITFIELD16_T r : 5;
 });
 DEFINE_FORMAT_CONVERTER_RGBA(bgra5551, u16, {
-	unsigned int b : 5;
-	unsigned int g : 5;
-	unsigned int r : 5;
-	unsigned int a : 1;
+	__HYBRID_BITFIELD16_T b : 5;
+	__HYBRID_BITFIELD16_T g : 5;
+	__HYBRID_BITFIELD16_T r : 5;
+	__HYBRID_BITFIELD16_T a : 1;
 });
 DEFINE_FORMAT_CONVERTER_RGBX(bgrx5551, u16, {
-	unsigned int b : 5;
-	unsigned int g : 5;
-	unsigned int r : 5;
-	unsigned int x : 1;
+	__HYBRID_BITFIELD16_T b : 5;
+	__HYBRID_BITFIELD16_T g : 5;
+	__HYBRID_BITFIELD16_T r : 5;
+	__HYBRID_BITFIELD16_T x : 1;
 });
 
 DEFINE_FORMAT_CONVERTER_RGB(rgb565, u16, {
-	unsigned int r : 5;
-	unsigned int g : 6;
-	unsigned int b : 5;
+	__HYBRID_BITFIELD16_T r : 5;
+	__HYBRID_BITFIELD16_T g : 6;
+	__HYBRID_BITFIELD16_T b : 5;
 });
 DEFINE_FORMAT_CONVERTER_RGB(bgr565, u16, {
-	unsigned int b : 5;
-	unsigned int g : 6;
-	unsigned int r : 5;
+	__HYBRID_BITFIELD16_T b : 5;
+	__HYBRID_BITFIELD16_T g : 6;
+	__HYBRID_BITFIELD16_T r : 5;
 });
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88f34cfb */
+/* HASH CRC-32:0x355ad3d3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,15 +25,11 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__signbitl) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitl))(__LONGDOUBLE __x) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)__x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)__x);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
-#else /* ... */
+#ifdef __LIBM_MATHFUNIL
+	return __LIBM_MATHFUNIL(signbit, __x);
+#else /* __LIBM_MATHFUNIL */
 	return __x < 0.0L;
-#endif /* !... */
+#endif /* !__LIBM_MATHFUNIL */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___signbitl_defined

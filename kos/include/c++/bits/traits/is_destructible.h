@@ -33,7 +33,8 @@
 #include "is_reference.h"
 #include "is_scalar.h"
 #include "is_void.h"
-#endif
+#include "remove_all_extents.h"
+#endif /* ... */
 
 __CXXDECL_BEGIN
 

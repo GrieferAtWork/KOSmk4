@@ -228,7 +228,7 @@ typedef unsigned int femode_t;
 %[define_replacement(femode_t = "unsigned int")]
 
 int fesetexcept(int excepts);
-int fetestexceptflag(fexcept_t const *flagp, int excepts);
+int fetestexceptflag($fexcept_t const *flagp, int excepts);
 int fegetmode(femode_t *modep);
 int fesetmode(femode_t const *modep);
 

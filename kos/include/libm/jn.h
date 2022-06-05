@@ -321,11 +321,11 @@ __LIBM_LOCAL_FUNC(jn) __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
 			/* x is tiny, return the first Taylor expansion of J(n,x)
 			 * J(n,x) = 1/n!*(x/2)^n - ... */
 			if (__n > 33) { /* underflow */
-				__b = __LIBM_LOCAL_VALUE(zerol);
+				__b = __LIBM_LOCAL_VALUE(zero);
 			} else {
 				__temp = __x * __IEEE754_DOUBLE_C(0.5);
 				__b    = __temp;
-				for (__a = __LIBM_LOCAL_VALUE(onel), __i = 2; __i <= __n; ++__i) {
+				for (__a = __LIBM_LOCAL_VALUE(one), __i = 2; __i <= __n; ++__i) {
 					__a *= (__IEEE754_DOUBLE_TYPE__)__i; /* a = n! */
 					__b *= __temp;                       /* b = (x/2)^n */
 				}

@@ -23,6 +23,7 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/__bitfield.h>
 #include <hybrid/typecore.h>
 
 #include <asm/ioctl.h>
@@ -623,23 +624,23 @@ typedef __ULONGPTR_TYPE__ sata_ioreg_t;
 typedef union ide_reg_valid_s {
 	__UINT16_TYPE__ all;
 	struct {
-		unsigned int data : 1;
-		unsigned int error_feature : 1;
-		unsigned int sector : 1;
-		unsigned int nsector : 1;
-		unsigned int lcyl : 1;
-		unsigned int hcyl : 1;
-		unsigned int select : 1;
-		unsigned int status_command : 1;
+		__HYBRID_BITFIELD8_T data : 1;
+		__HYBRID_BITFIELD8_T error_feature : 1;
+		__HYBRID_BITFIELD8_T sector : 1;
+		__HYBRID_BITFIELD8_T nsector : 1;
+		__HYBRID_BITFIELD8_T lcyl : 1;
+		__HYBRID_BITFIELD8_T hcyl : 1;
+		__HYBRID_BITFIELD8_T select : 1;
+		__HYBRID_BITFIELD8_T status_command : 1;
 
-		unsigned int data_hob : 1;
-		unsigned int error_feature_hob : 1;
-		unsigned int sector_hob : 1;
-		unsigned int nsector_hob : 1;
-		unsigned int lcyl_hob : 1;
-		unsigned int hcyl_hob : 1;
-		unsigned int select_hob : 1;
-		unsigned int control_hob : 1;
+		__HYBRID_BITFIELD8_T data_hob : 1;
+		__HYBRID_BITFIELD8_T error_feature_hob : 1;
+		__HYBRID_BITFIELD8_T sector_hob : 1;
+		__HYBRID_BITFIELD8_T nsector_hob : 1;
+		__HYBRID_BITFIELD8_T lcyl_hob : 1;
+		__HYBRID_BITFIELD8_T hcyl_hob : 1;
+		__HYBRID_BITFIELD8_T select_hob : 1;
+		__HYBRID_BITFIELD8_T control_hob : 1;
 	} b;
 } ide_reg_valid_t;
 

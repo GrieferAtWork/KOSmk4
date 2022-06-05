@@ -146,13 +146,13 @@ public:
 	/* Lock the video buffer into memory.
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
-	__CXX_CLASSMEMBER __ATTR_NONNULL((1))
+	__CXX_CLASSMEMBER __ATTR_NONNULL_CXX((1))
 	int LIBVIDEO_GFX_CC lock(struct video_lock &__lock) {
 		return (*vb_ops->vi_lock)(this, &__lock);
 	}
 
 	/* Unlock a video buffer that has previously been mapped into memory. */
-	__CXX_CLASSMEMBER __ATTR_NONNULL((1))
+	__CXX_CLASSMEMBER __ATTR_NONNULL_CXX((1))
 	void LIBVIDEO_GFX_CC unlock(struct video_lock const &__lock) {
 		(*vb_ops->vi_unlock)(this, &__lock);
 	}

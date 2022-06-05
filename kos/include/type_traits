@@ -297,11 +297,11 @@ __CXX_ENUM_CLASS_BEGIN(endian) {
 	native = __BYTE_ORDER__
 } __CXX_ENUM_CLASS_END(endian);
 
-template<typename __T> struct remove_cvref { typedef typename remove_cv<typename remove_reference<_Tp>::type>::type type; };
+template<typename __T> struct remove_cvref { typedef typename remove_cv<typename remove_reference<__T>::type>::type type; };
 template<typename __T> struct type_identity { typedef __T type; };
 template<typename __T> struct unwrap_reference { typedef __T type; };
 template<typename __T> struct unwrap_reference<reference_wrapper<__T> > { typedef __T &type; };
-template<typename __T> struct unwrap_ref_decay { typedef typename unwrap_reference_t<typename decay<__T>::type>::type type; };
+template<typename __T> struct unwrap_ref_decay { typedef typename unwrap_reference<typename decay<__T>::type>::type type; };
 #ifdef __COMPILER_HAVE_CXX_TEMPLATE_USING
 template<typename __T> using remove_cvref_t     = typename remove_cvref<__T>::type;
 template<typename __T> using type_identity_t    = typename type_identity<__T>::type;
@@ -311,7 +311,7 @@ template<typename __T> using unwrap_ref_decay_t = typename unwrap_ref_decay<__T>
 
 #define __cpp_lib_bounded_array_traits 201902L
 template<typename __T> struct is_bounded_array: public integral_constant<bool, (extent<__T>::value > 0)> {};
-template<typename __T> struct is_unbounded_array: public __NAMESPACE_INT_SYM __and_<is_array<_Tp>, __NAMESPACE_INT_SYM __not_<extent<_Tp> > > {};
+template<typename __T> struct is_unbounded_array: public __NAMESPACE_INT_SYM __and_<is_array<__T>, __NAMESPACE_INT_SYM __not_<extent<__T> > > {};
 #ifdef __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR
 template<typename __T> inline constexpr bool is_bounded_array_v   = is_bounded_array<__T>::value;
 template<typename __T> inline constexpr bool is_unbounded_array_v = is_unbounded_array<__T>::value;

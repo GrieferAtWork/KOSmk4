@@ -796,27 +796,35 @@
 
 
 #ifdef __USE_FILE_OFFSET64
-#define __FS_TYPE(x)      __##x##64_t
-#define __FS_SIZEOF(x)    __SIZEOF_##x##64_T__
-#define __FS_ALTTYPE(x)   __##x##32_t
-#define __FS_ALTSIZEOF(x) __SIZEOF_##x##32_T__
+#define __FS_TYPE(x)       __##x##64_t
+#define __FS_SIZEOF(x)     __SIZEOF_##x##64_T__
+#define __FS_ALIGNOF(x)    __ALIGNOF_##x##64_T__
+#define __FS_ALTTYPE(x)    __##x##32_t
+#define __FS_ALTSIZEOF(x)  __SIZEOF_##x##32_T__
+#define __FS_ALTALIGNOF(x) __ALIGNOF_##x##32_T__
 #else /* __USE_FILE_OFFSET64 */
-#define __FS_TYPE(x)      __##x##32_t
-#define __FS_SIZEOF(x)    __SIZEOF_##x##32_T__
-#define __FS_ALTTYPE(x)   __##x##64_t
-#define __FS_ALTSIZEOF(x) __SIZEOF_##x##64_T__
+#define __FS_TYPE(x)       __##x##32_t
+#define __FS_SIZEOF(x)     __SIZEOF_##x##32_T__
+#define __FS_ALIGNOF(x)    __ALIGNOF_##x##32_T__
+#define __FS_ALTTYPE(x)    __##x##64_t
+#define __FS_ALTSIZEOF(x)  __SIZEOF_##x##64_T__
+#define __FS_ALTALIGNOF(x) __ALIGNOF_##x##64_T__
 #endif /* !__USE_FILE_OFFSET64 */
 
 #ifdef __USE_TIME_BITS64
-#define __TM_TYPE(x)      __##x##64_t
-#define __TM_SIZEOF(x)    __SIZEOF_##x##64_T__
-#define __TM_ALTTYPE(x)   __##x##32_t
-#define __TM_ALTSIZEOF(x) __SIZEOF_##x##32_T__
+#define __TM_TYPE(x)       __##x##64_t
+#define __TM_SIZEOF(x)     __SIZEOF_##x##64_T__
+#define __TM_ALIGNOF(x)    __ALIGNOF_##x##64_T__
+#define __TM_ALTTYPE(x)    __##x##32_t
+#define __TM_ALTSIZEOF(x)  __SIZEOF_##x##32_T__
+#define __TM_ALTALIGNOF(x) __ALIGNOF_##x##32_T__
 #else /* __USE_TIME_BITS64 */
-#define __TM_TYPE(x)      __##x##32_t
-#define __TM_SIZEOF(x)    __SIZEOF_##x##32_T__
-#define __TM_ALTTYPE(x)   __##x##64_t
-#define __TM_ALTSIZEOF(x) __SIZEOF_##x##64_T__
+#define __TM_TYPE(x)       __##x##32_t
+#define __TM_SIZEOF(x)     __SIZEOF_##x##32_T__
+#define __TM_ALIGNOF(x)    __ALIGNOF_##x##32_T__
+#define __TM_ALTTYPE(x)    __##x##64_t
+#define __TM_ALTSIZEOF(x)  __SIZEOF_##x##64_T__
+#define __TM_ALTALIGNOF(x) __ALIGNOF_##x##64_T__
 #endif /* !__USE_TIME_BITS64 */
 
 

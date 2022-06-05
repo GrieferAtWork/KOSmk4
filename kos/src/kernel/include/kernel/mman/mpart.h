@@ -192,7 +192,11 @@ struct mchunkvec {
 
 #define __ALIGNOF_MPART __ALIGNOF_INT64__
 #if __SIZEOF_POINTER__ == 4
+#if __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__
+#define __SIZEOF_MPART 88
+#else /* __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__ */
 #define __SIZEOF_MPART 84
+#endif /* __ALIGNOF_POS_T__ <= __ALIGNOF_POINTER__ */
 #elif __SIZEOF_POINTER__ == 8
 #define __SIZEOF_MPART 152
 #else /* __SIZEOF_POINTER__ == ... */
@@ -209,9 +213,9 @@ struct mchunkvec {
 //	MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(FILLME.mp_share)),
 //	MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(FILLME.mp_lockops)),
 //	MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),
+//	MPART_INIT_mp_changed({}),
 //	MPART_INIT_mp_minaddr(0),
 //	MPART_INIT_mp_maxaddr(FILLME - 1),
-//	MPART_INIT_mp_changed({}),
 //	MPART_INIT_mp_filent({}),
 //	MPART_INIT_mp_blkst_ptr(NULL),
 //	MPART_INIT_mp_mem(FILLME, CEILDIV(FILLME, PAGESIZE)),
@@ -252,6 +256,8 @@ struct mchunkvec {
  *        space is a tightly packed sequence of modified bytes,
  *        rather than pages containing modified bytes!
  */
+
+
 
 
 struct mpart {
@@ -333,6 +339,34 @@ struct mpart {
 	LIST_ENTRY(mpart)             mp_allparts;  /* [0..1][lock(:mpart_all_lock)]
 	                                             * Chain of all mem-parts in existence. (may be unbound for certain parts) */
 #endif /* !__WANT_MPART__mp_lopall */
+#ifdef __WANT_MPART__mp_dead
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_changed(...) { __VA_ARGS__ }
+#endif /* __WANT_MPART_INIT */
+	union {
+		SLIST_ENTRY(REF mpart)    mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
+		                                         *                         !mpart_isanon(self) && MPART_F_CHANGED)]
+		                                         * Per-file chain of mem-parts that have changed.
+		                                         * When  the  associated  file  supports  the  `mo_saveblocks', then
+		                                         * whenever the `MPART_F_CHANGED' flag is set, this part is inserted
+		                                         * into its file's `mf_changed' list.
+		                                         * Also note that  changed mem-parts  are kept alive  by the  associated
+		                                         * file, since this list contains references, rather than weak pointers. */
+		SLIST_ENTRY(mpart)       _mp_dead;      /* [lock(ATOMIC)] Chain of dead parts. */
+	};
+#else /* __WANT_MPART__mp_dead */
+#ifdef __WANT_MPART_INIT
+#define MPART_INIT_mp_changed(...) __VA_ARGS__
+#endif /* __WANT_MPART_INIT */
+	SLIST_ENTRY(REF mpart)        mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
+	                                             *                         !mpart_isanon(self) && MPART_F_CHANGED)]
+	                                             * Per-file chain of mem-parts that have changed.
+	                                             * When  the  associated  file  supports  the  `mo_saveblocks', then
+	                                             * whenever the `MPART_F_CHANGED' flag is set, this part is inserted
+	                                             * into its file's `mf_changed' list.
+	                                             * Also note that  changed mem-parts  are kept alive  by the  associated
+	                                             * file, since this list contains references, rather than weak pointers. */
+#endif /* !__WANT_MPART__mp_dead */
 #if defined(__WANT_MPART_INIT) && __SIZEOF_POS_T__ > __SIZEOF_POINTER__
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define _MPART_INIT_ADDR(val) { { (uintptr_t)(val), 0 } }
@@ -383,34 +417,6 @@ struct mpart {
 	                                             * NOTE: The  difference between this and `mp_minaddr' must
 	                                             *       not be greater than `SIZE_MAX' (aka. `(size_t)-1') */
 #endif /* !__WANT_MPART_INIT || __SIZEOF_POS_T__ <= __SIZEOF_POINTER__ */
-#ifdef __WANT_MPART__mp_dead
-#ifdef __WANT_MPART_INIT
-#define MPART_INIT_mp_changed(...) { __VA_ARGS__ }
-#endif /* __WANT_MPART_INIT */
-	union {
-		SLIST_ENTRY(REF mpart)    mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
-		                                         *                         !mpart_isanon(self) && MPART_F_CHANGED)]
-		                                         * Per-file chain of mem-parts that have changed.
-		                                         * When  the  associated  file  supports  the  `mo_saveblocks', then
-		                                         * whenever the `MPART_F_CHANGED' flag is set, this part is inserted
-		                                         * into its file's `mf_changed' list.
-		                                         * Also note that  changed mem-parts  are kept alive  by the  associated
-		                                         * file, since this list contains references, rather than weak pointers. */
-		SLIST_ENTRY(mpart)       _mp_dead;      /* [lock(ATOMIC)] Chain of dead parts. */
-	};
-#else /* __WANT_MPART__mp_dead */
-#ifdef __WANT_MPART_INIT
-#define MPART_INIT_mp_changed(...) __VA_ARGS__
-#endif /* __WANT_MPART_INIT */
-	SLIST_ENTRY(REF mpart)        mp_changed;   /* [lock(ATOMIC)][valid_if(mp_file->mf_ops->mo_saveblocks &&
-	                                             *                         !mpart_isanon(self) && MPART_F_CHANGED)]
-	                                             * Per-file chain of mem-parts that have changed.
-	                                             * When  the  associated  file  supports  the  `mo_saveblocks', then
-	                                             * whenever the `MPART_F_CHANGED' flag is set, this part is inserted
-	                                             * into its file's `mf_changed' list.
-	                                             * Also note that  changed mem-parts  are kept alive  by the  associated
-	                                             * file, since this list contains references, rather than weak pointers. */
-#endif /* !__WANT_MPART__mp_dead */
 #ifdef __WANT_MPART_INIT
 #ifdef __WANT_MPART__mp_trmlop
 #define MPART_INIT_mp_filent(...) { __VA_ARGS__ }
@@ -472,8 +478,8 @@ struct mpart {
 		 *       that  a whole blocks  are always contained within  a single chunk, even
 		 *       when the size of a  block is larger than the  size of a page (in  which
 		 *       case multiple physical pages are required to represent a single block)! */
-		struct mchunk             mp_mem;       /* [valid_if(MPART_ST_MEM)] Physically allocated memory */
-		struct mchunkvec          mp_mem_sc;    /* [valid_if(MPART_ST_MEM_SC)] Scattered memory */
+		struct mchunk             mp_mem;    /* [valid_if(MPART_ST_MEM)] Physically allocated memory */
+		struct mchunkvec          mp_mem_sc; /* [valid_if(MPART_ST_MEM_SC)] Scattered memory */
 		/* NOTE: Unlike  mem-data, swap data  only contains blocks that  have their state set
 		 *       to `MPART_BLOCK_ST_CHNG', meaning that the total number of swap pages equals
 		 *       the ceil-aligned number of pages needed to represent as many blocks as there
@@ -496,14 +502,17 @@ struct mpart {
 		 * memory, doing so might actually cause problems (since `MPART_F_NOFREE' is set  by
 		 * special files such as `mfile_phys')
 		 */
-		struct mchunk             mp_swp;       /* [valid_if(MPART_ST_SWP)] Physically allocated swap */
-		struct mchunkvec          mp_swp_sc;    /* [valid_if(MPART_ST_SWP_SC)] Scattered swap */
+		struct mchunk             mp_swp;    /* [valid_if(MPART_ST_SWP)] Physically allocated swap */
+		struct mchunkvec          mp_swp_sc; /* [valid_if(MPART_ST_SWP_SC)] Scattered swap */
 	};
 #ifdef __WANT_MPART_INIT
 #define MPART_INIT_mp_meta(mp_meta) mp_meta
 #endif /* __WANT_MPART_INIT */
 	struct mpartmeta             *mp_meta;      /* [0..1][owned][lock(READ(ATOMIC), WRITE(ONCE && MPART_F_LOCKBIT))]
 	                                             * Runtime meta-data for futex and RTM support. */
+#if __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__
+	byte_t __mp_pad[__ALIGNOF_POS_T__ - __ALIGNOF_POINTER__];
+#endif /* __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__ */
 };
 
 
@@ -520,9 +529,9 @@ struct mpart {
 		MPART_INIT_mp_share(LIST_HEAD_INITIALIZER(~)),             \
 		MPART_INIT_mp_lockops(SLIST_HEAD_INITIALIZER(~)),          \
 		MPART_INIT_mp_allparts(LIST_ENTRY_UNBOUND_INITIALIZER),    \
+		MPART_INIT_mp_changed({}),                                 \
 		MPART_INIT_mp_minaddr(0),                                  \
 		MPART_INIT_mp_maxaddr((num_bytes)-1),                      \
-		MPART_INIT_mp_changed({}),                                 \
 		MPART_INIT_mp_filent_asanon(),                             \
 		MPART_INIT_mp_blkst_ptr(__NULLPTR),                        \
 		MPART_INIT_mp_mem(first_page, page_count),                 \

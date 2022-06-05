@@ -900,7 +900,7 @@ err:
 @@   a second argument is passed that indicates the absolute length in characters.
 @@@return: >= 0: The sum of all values returned by `printer'
 @@@return: < 0:  The first negative value ever returned by `printer' (if any)
-[[kernel, throws]]
+[[kernel, libc, throws]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<parts/printf-config.h>", "<bits/types.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
@@ -949,7 +949,7 @@ $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
 #endif /* !__INTELLISENSE__ */
 }
 
-[[kernel, throws]]
+[[kernel, libc, throws]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>"), doc_alias("format_vprintf")]]
 $ssize_t format_printf([[nonnull]] pformatprinter printer, void *arg,
                        [[in, format]] char const *__restrict format, ...) {

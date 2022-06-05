@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa35b4b4f */
+/* HASH CRC-32:0x1defc9b6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc32scanf) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __ATTR_LIBC_C32SCANF(2, 0) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(vsc32scanf))(__CHAR32_TYPE__ const *__restrict __input, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_format_vc32scanf)(&__NAMESPACE_LOCAL_SYM __vsc32scanf_getc,
-	                      &__NAMESPACE_LOCAL_SYM __vsc16scanf_ungetc,
+	                      &__NAMESPACE_LOCAL_SYM __vsc32scanf_ungetc,
 	                      (void *)&__input, __format, __args);
 }
 __NAMESPACE_LOCAL_END

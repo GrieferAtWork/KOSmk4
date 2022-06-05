@@ -173,8 +173,8 @@ struct __siginfox64_struct /*[NAME(siginfox64)][PREFIX(si_)]*/ {
 				__INT32_TYPE__    __cld_si_pid;    /* Which child. */
 				__UINT32_TYPE__   __cld_si_uid;    /* Real user ID of sending process. */
 				__INT32_TYPE__      si_status;     /* Exit value or signal. */
-				__siginfo64_clock_t si_utime;
-				__siginfo64_clock_t si_stime;
+				__siginfo64_clock_t si_utime __ATTR_PACKED;
+				__siginfo64_clock_t si_stime __ATTR_PACKED;
 			};
 			struct { /* SIGILL, SIGFPE, SIGSEGV, SIGBUS. */
 				__HYBRID_PTR64(void) si_addr;     /* Faulting insn/memory ref. */
@@ -214,8 +214,8 @@ struct __siginfox64_struct /*[NAME(siginfox64)][PREFIX(si_)]*/ {
 				__INT32_TYPE__      _si_pid;    /* Which child. */
 				__UINT32_TYPE__     _si_uid;    /* Real user ID of sending process. */
 				__INT32_TYPE__      _si_status; /* Exit value or signal. */
-				__siginfo64_clock_t _si_utime;
-				__siginfo64_clock_t _si_stime;
+				__siginfo64_clock_t _si_utime __ATTR_PACKED;
+				__siginfo64_clock_t _si_stime __ATTR_PACKED;
 			} _sigchld;
 			struct { /* SIGILL, SIGFPE, SIGSEGV, SIGBUS. */
 				__HYBRID_PTR64(void) _si_addr;     /* Faulting insn/memory ref. */

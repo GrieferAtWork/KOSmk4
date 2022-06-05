@@ -21,10 +21,10 @@
 #define _I386_KOS_KOS_KERNEL_TSS32_H 1
 
 #include <__stdinc.h>
+
+#include <hybrid/__bitfield.h>
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
-
-__DECL_BEGIN
 
 #ifndef __x86_64__
 #define OFFSET_TSS_LINK   OFFSET_TSS32_LINK
@@ -93,8 +93,9 @@ __DECL_BEGIN
 /* NOTE: Documentation is taken/derived from:
  *   `Volume 3 (3A, 3B, 3C & 3D): System Programming Guide'
  *   `Figure 7-2.  32-Bit Task-State Segment (TSS)' */
-
 #ifdef __CC__
+__DECL_BEGIN
+
 struct __ATTR_ALIGNED(ALIGNOF_TSS32) __ATTR_PACKED tss32 /*[PREFIX(t_)]*/ {
 	__UINT16_TYPE__   t_link;  /* Contains the segment selector for the TSS of the previous task  (updated
 	                            * on a task switch that was initiated by a call, interrupt, or exception).
@@ -149,9 +150,9 @@ struct __ATTR_ALIGNED(ALIGNOF_TSS32) __ATTR_PACKED tss32 /*[PREFIX(t_)]*/ {
 	union __ATTR_PACKED {
 		__UINT16_TYPE__ t_flags; /* TSS flags (bit 1 is the `T' (debug trap) bit) */
 		struct __ATTR_PACKED {
-			unsigned int   t_trap : 1; /* When set, the T flag  causes the processor to raise  a
-			                            * debug exception when a task switch to this task occurs */
-			unsigned int __t_zerob : 15; /* ... */
+			__HYBRID_BITFIELD16_T   t_trap : 1;   /* When set, the T flag  causes the processor to raise  a
+			                                       * debug exception when a task switch to this task occurs */
+			__HYBRID_BITFIELD16_T __t_zerob : 15; /* ... */
 		};
 	};
 	__UINT16_TYPE__   t_iomap;  /* Contains a 16-bit offset from the base of the TSS to the I/O permission
@@ -160,8 +161,8 @@ struct __ATTR_ALIGNED(ALIGNOF_TSS32) __ATTR_PACKED tss32 /*[PREFIX(t_)]*/ {
 	                             * to the beginning  of the  I/O permission  bit map  and the  end of  the
 	                             * interrupt redirection bit map */
 };
-#endif /* __CC__ */
 
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_I386_KOS_KOS_KERNEL_TSS32_H */

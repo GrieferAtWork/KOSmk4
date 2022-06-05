@@ -41,6 +41,12 @@ DECL_BEGIN
 struct fdirent_ops;
 struct constdirent {
 	REF struct fnode                       *cd_node;     /* [1..1][const] File pointed-to by this directory entry. */
+#if __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__
+	byte_t __cd_pad[__ALIGNOF_POS_T__ - __ALIGNOF_POINTER__];
+#define CONSTDIRENT_PRIVATE_INIT_PAD_ {},
+#else /* __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__ */
+#define CONSTDIRENT_PRIVATE_INIT_PAD_ /* nothing */
+#endif /* __ALIGNOF_POS_T__ <= __ALIGNOF_POINTER__ */
 	/* Below fields are  binary-compatible with  `struct fdirent'
 	 * I wish I could simply put a field `struct fdirent cd_ent',
 	 * but g++ programmers got lazy and decided to disallow brace
@@ -66,7 +72,9 @@ struct constdirent {
 /* Static initializer for `struct constdirent'
  * NOTE: `fd_hash' can be auto-generated via `libgen.fdirent_hash' */
 #define CONSTDIRENT_INIT(node, fd_ino, fd_type, fd_name, fd_hash) \
-	{ node, 1, &constdirent_ops, fd_ino, fd_hash, (sizeof(fd_name) / sizeof(char)) - 1, fd_type, fd_name }
+	{ node, CONSTDIRENT_PRIVATE_INIT_PAD_ 1, &constdirent_ops,    \
+	  fd_ino, fd_hash, (sizeof(fd_name) / sizeof(char)) - 1,      \
+	  fd_type, fd_name }
 
 /* Operators used to facilitate `struct constdirent' */
 DATDEF struct fdirent_ops const constdirent_ops;

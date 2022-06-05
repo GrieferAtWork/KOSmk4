@@ -80,7 +80,7 @@ libk32_DuplicateHandle(HANDLE hSourceProcessHandle, HANDLE hSourceHandle,
 		return FALSE;
 	}
 	newfd = bInheritHandle
-	        ? dup(NTHANDLE_ASFD(hSourceHandle))
+	        ? dup(NTHANDLE_ASFD(hSourceHandle)) /* NOLINT */
 	        : fcntl(NTHANDLE_ASFD(hSourceHandle), F_DUPFD_CLOEXEC);
 	if (newfd == -1)
 		return FALSE;

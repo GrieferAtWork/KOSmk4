@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2f7f6c2 */
+/* HASH CRC-32:0xb24f4509 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sincos) __DECL_SIMD_sincos __ATTR_OUT(2) __ATTR_OUT(3) void
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sincos))(double __x, double *__psinx, double *__pcosx) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-	__LIBM_MATHFUNX(sincos)(__x, __psinx, __pcosx);
+	__LIBM_MATHFUNX(sincos)(__x, (__LIBM_MATHFUN_T *)__psinx, (__LIBM_MATHFUN_T *)__pcosx);
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 	*__psinx = (__NAMESPACE_LOCAL_SYM __localdep_sin)(__x);
 	*__pcosx = (__NAMESPACE_LOCAL_SYM __localdep_cos)(__x);

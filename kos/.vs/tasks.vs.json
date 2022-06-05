@@ -85,6 +85,23 @@
 		},
 
 		{
+			"taskName": "clang-tidy-all",
+			"appliesTo": "*",
+			"type": "launch",
+			"contextType": "custom",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${workspaceRoot}\\..",
+			"command": "${workspaceRoot}\\..\\binutils\\deemon\\deemon.exe",
+			"args": [
+				"magic.dee",
+				"--target=${env.TARGET}",
+				"--config=${env.CONFIG}",
+				"--clang-tidy=D:\\LLVM\\bin\\clang-tidy.exe",
+				"--format-error-messages"
+			]
+		},
+
+		{
 			"taskName": "lint",
 			"appliesTo": "*",
 			"type": "launch",

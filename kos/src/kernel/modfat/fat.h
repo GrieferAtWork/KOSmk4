@@ -36,6 +36,7 @@ DECL_END
 #include <kernel/fs/super.h>
 #include <kernel/types.h>
 
+#include <hybrid/__bitfield.h>
 #include <hybrid/minmax.h>
 
 #include <kos/sched/shared-rwlock.h>
@@ -80,9 +81,9 @@ typedef struct fatsuper FatSuperblock;
 struct ATTR_PACKED fat_filetime {
 	union ATTR_PACKED {
 		struct ATTR_PACKED {
-			unsigned int ft_sec : 5;
-			unsigned int ft_min : 6;
-			unsigned int ft_hour : 5;
+			__HYBRID_BITFIELD16_T ft_sec : 5;
+			__HYBRID_BITFIELD16_T ft_min : 6;
+			__HYBRID_BITFIELD16_T ft_hour : 5;
 		};
 		u16 ft_sum;
 	};
@@ -92,9 +93,9 @@ struct ATTR_PACKED fat_filedate {
 	union ATTR_PACKED {
 		u16 fd_sum;
 		struct ATTR_PACKED {
-			unsigned int fd_day : 5;
-			unsigned int fd_month : 4;
-			unsigned int fd_year : 7;
+			__HYBRID_BITFIELD16_T fd_day : 5;
+			__HYBRID_BITFIELD16_T fd_month : 4;
+			__HYBRID_BITFIELD16_T fd_year : 7;
 		};
 	};
 };

@@ -52,6 +52,7 @@
 %[define_double_replacement(__LIBM_MATHFUNIM = __LIBM_MATHFUNIMF, __LIBM_MATHFUNIML)]
 %[define_double_replacement(__LIBM_MATHFUN0 = __LIBM_MATHFUN0F, __LIBM_MATHFUN0L)]
 %[define_double_replacement(__LIBM_MATHFUNX = __LIBM_MATHFUNXF, __LIBM_MATHFUNXL)]
+%[define_double_replacement(__LIBM_MATHFUN_T = __LIBM_MATHFUNF_T, __LIBM_MATHFUNL_T)]
 %[define_double_replacement(__kernel_standard = __kernel_standard_f, __kernel_standard_l)]
 %[define_double2float_replacement(__IEEE754_FLOAT_TYPE_IS_DOUBLE__ = __IEEE754_FLOAT_TYPE_IS_FLOAT__)]
 %[define_double2float_replacement(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ = __IEEE754_DOUBLE_TYPE_IS_FLOAT__)]
@@ -587,8 +588,8 @@ double atanh(double x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&
 	    __LIBM_MATHFUNI2(@isgreaterequal@, __LIBM_MATHFUN(@fabs@, x), 1.0))
 		return __kernel_standard(x, x, __HUGE_VAL,
-		                         __ieee754_fabsf(x) > 1.0 ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
-		                                                  : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
+		                         __LIBM_MATHFUN(@fabs@, x) > 1.0 ? __LIBM_KMATHERR_ATANH_PLUSONE /* atanh(|x|>1) */
+		                                                         : __LIBM_KMATHERR_ATANH_ONE);   /* atanh(|x|==1) */
 	return __LIBM_MATHFUN(@atanh@, x);
 }
 
@@ -638,13 +639,7 @@ double exp(double x) {
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double frexp(double x, [[out]] int *pexponent) {
-@@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
-	return (double)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)x, pexponent);
-@@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
-	return (double)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)x, pexponent);
-@@pp_else@@
-	return (double)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
-@@pp_endif@@
+	return __LIBM_MATHFUN2I(@frexp@, x, pexponent);
 }
 
 @@>> ldexpf(3), ldexp(3), ldexpl(3)
@@ -657,13 +652,7 @@ double frexp(double x, [[out]] int *pexponent) {
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double ldexp(double x, int exponent) {
 	double result;
-@@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
-	result = (double)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
-@@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
-	result = (double)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
-@@pp_else@@
-	result = (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
-@@pp_endif@@
+	result = __LIBM_MATHFUN2I(@ldexp@, x, exponent);
 @@pp_ifdef ERANGE@@
 	if unlikely(!__LIBM_MATHFUNI(@finite@, result) || result == 0.0)
 		(void)libc_seterrno(ERANGE);
@@ -728,13 +717,7 @@ double log10(double x) {
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double modf(double x, [[out]] double *iptr) {
-@@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
-	return (double)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
-@@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
-	return (double)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
-@@pp_else@@
-	return (double)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
-@@pp_endif@@
+	return __LIBM_MATHFUN2I(@modf@, x, (__LIBM_MATHFUN_T *)iptr);
 }
 
 
@@ -1359,7 +1342,7 @@ int ilogbl(__LONGDOUBLE x) %{generate(double2ldouble("ilogb"))}
             defined(__IEEE854_LONG_DOUBLE_TYPE__)) ||
             $has_function(nextafterl))]]
 double nexttoward(double x, __LONGDOUBLE y) {
-@@pp_ifdef      __IEEE854_LONG_DOUBLE_TYPE__@@
+@@pp_ifdef __IEEE854_LONG_DOUBLE_TYPE__@@
 @@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
 	return (double)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 @@pp_else@@
@@ -1379,13 +1362,7 @@ double nexttoward(double x, __LONGDOUBLE y) {
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double scalbn(double x, int n) {
-@@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
-	return (double)__ieee754_scalbn((__IEEE754_DOUBLE_TYPE__)x, n);
-@@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
-	return (double)__ieee754_scalbnf((__IEEE754_FLOAT_TYPE__)x, n);
-@@pp_else@@
-	return (double)__ieee854_scalbnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
-@@pp_endif@@
+	return __LIBM_MATHFUN2I(@scalbn@, x, n);
 }
 
 [[doc_alias("scalbn")]]
@@ -1397,13 +1374,7 @@ double scalbn(double x, int n) {
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 double scalbln(double x, long int n) {
-@@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
-	return (double)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)x, n);
-@@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
-	return (double)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)x, n);
-@@pp_else@@
-	return (double)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
-@@pp_endif@@
+	return __LIBM_MATHFUN2I(@scalbln@, x, n);
 }
 
 @@>> nearbyintf(3), nearbyint(3), nearbyintl(3)
@@ -1580,7 +1551,7 @@ __LONGLONG llround(double x) {
             defined(__IEEE854_LONG_DOUBLE_TYPE__)) ||
             $has_function(nextafterl))]]
 float nexttowardf(float x, __LONGDOUBLE y) {
-@@pp_ifdef    __IEEE854_LONG_DOUBLE_TYPE__@@
+@@pp_ifdef __IEEE854_LONG_DOUBLE_TYPE__@@
 @@pp_ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__@@
 	return (float)__ieee754_nexttowardf((__IEEE754_FLOAT_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 @@pp_else@@
@@ -1856,7 +1827,7 @@ __LONGLONG llroundl(__LONGDOUBLE x) %{generate(double2ldouble("llround"))}
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
 void sincos(double x, [[out]] double *psinx, [[out]] double *pcosx) {
 @@pp_if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)@@
-	__LIBM_MATHFUNX(@sincos@)(x, psinx, pcosx);
+	__LIBM_MATHFUNX(@sincos@)(x, (__LIBM_MATHFUN_T *)psinx, (__LIBM_MATHFUN_T *)pcosx);
 @@pp_else@@
 	*psinx = sin(x);
 	*pcosx = cos(x);
@@ -1902,7 +1873,7 @@ double pow10(double x) {
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__))]]
 void sincosf(float x, [[out]] float *psinx, [[out]] float *pcosx) {
 @@pp_if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)@@
-	__LIBM_MATHFUNXF(@sincos@)(x, psinx, pcosx);
+	__LIBM_MATHFUNXF(@sincos@)(x, (__LIBM_MATHFUNF_T *)psinx, (__LIBM_MATHFUNF_T *)pcosx);
 @@pp_elif $has_function(sincos)@@
 	double sinx, cosx;
 	sincos((double)x, &sinx, &cosx);
@@ -1944,7 +1915,7 @@ float exp10f(float x) {
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__))]]
 void sincosl(__LONGDOUBLE x, [[out]] __LONGDOUBLE *psinx, [[out]] __LONGDOUBLE *pcosx) {
 @@pp_if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)@@
-	__LIBM_MATHFUNXL(@sincos@)(x, psinx, pcosx);
+	__LIBM_MATHFUNXL(@sincos@)(x, (__LIBM_MATHFUNL_T *)psinx, (__LIBM_MATHFUNL_T *)pcosx);
 @@pp_elif $has_function(sincos)@@
 	double sinx, cosx;
 	sincos((double)x, &sinx, &cosx);
@@ -2716,12 +2687,8 @@ int __fpclassify(double x) {
 [[const, wunused, nothrow, dos_only_export_alias("_dsign")]]
 [[impl_include("<libm/signbit.h>")]]
 int __signbit(double x) {
-@@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
-	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
-@@pp_elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)@@
-	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
-@@pp_elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)@@
-	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+@@pp_ifdef __LIBM_MATHFUNI@@
+	return __LIBM_MATHFUNI(@signbit@, x);
 @@pp_else@@
 	return x < 0.0;
 @@pp_endif@@

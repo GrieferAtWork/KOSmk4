@@ -1114,6 +1114,10 @@ skip_expression:
 			}
 		}
 	}
+#ifndef __KERNEL__
+	landing1_backup_freechain(state_backup_free);
+	landing1_backup_freechain(state_backup_list);
+#endif /* !__KERNEL__ */
 #ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
 	if unlikely(capsule_recursion != 0) {
 		/* Scan capsules for rules. */

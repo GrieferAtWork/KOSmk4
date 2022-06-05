@@ -53,6 +53,8 @@ static_assert(alignof(union ieee754_double) == 8);
 static_assert(sizeof(union ieee854_long_double) == 16);
 static_assert(alignof(union ieee854_long_double) == 16);
 static_assert(sizeof(union ieee854_float80) == 10);
+static_assert(sizeof(((union ieee854_float80 *)0)->ieee) == 10);
+static_assert(sizeof(((union ieee854_float80 *)0)->ieee_nan) == 10);
 
 /*[[[deemon
 import * from .....misc.libgen.assert_offsetof;

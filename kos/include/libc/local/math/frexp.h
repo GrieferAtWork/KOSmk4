@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfea3f3a7 */
+/* HASH CRC-32:0x3430f222 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(frexp) __ATTR_OUT(2) double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexp))(double __x, int *__pexponent) {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	return (double)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)__x, __pexponent);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	return (double)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)__x, __pexponent);
-#else /* ... */
-	return (double)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __pexponent);
-#endif /* !... */
+	return __LIBM_MATHFUN2I(frexp, __x, __pexponent);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_frexp_defined

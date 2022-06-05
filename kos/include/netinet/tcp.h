@@ -68,6 +68,8 @@
 #include <__stdinc.h>
 #include <features.h>
 
+#include <hybrid/__bitfield.h>
+
 /* User-settable options (used with setsockopt). */
 #define TCP_NODELAY              1  /* Don't delay send to coalesce packets.  */
 #define TCP_MAXSEG               2  /* Set maximum segment size.  */
@@ -131,11 +133,11 @@ struct tcphdr {
 	tcp_seq      th_seq;     /* sequence number. */
 	tcp_seq      th_ack;     /* acknowledgement number. */
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-	unsigned int th_x2 : 4;  /* (unused) */
-	unsigned int th_off : 4; /* data offset */
+	__HYBRID_BITFIELD8_T th_x2 : 4;  /* (unused) */
+	__HYBRID_BITFIELD8_T th_off : 4; /* data offset */
 #elif __BYTE_ORDER == __BIG_ENDIAN
-	unsigned int th_off : 4; /* data offset */
-	unsigned int th_x2 : 4;  /* (unused) */
+	__HYBRID_BITFIELD8_T th_off : 4; /* data offset */
+	__HYBRID_BITFIELD8_T th_x2 : 4;  /* (unused) */
 #endif
 	__uint8_t    th_flags;   /* Set of `TH_*' */
 	__u_net16_t  th_win;     /* window */
@@ -150,11 +152,11 @@ struct tcphdr {
 			tcp_seq      th_seq;     /* sequence number. */
 			tcp_seq      th_ack;     /* acknowledgement number. */
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-			unsigned int th_x2 : 4;  /* (unused) */
-			unsigned int th_off : 4; /* data offset */
+			__HYBRID_BITFIELD8_T th_x2 : 4;  /* (unused) */
+			__HYBRID_BITFIELD8_T th_off : 4; /* data offset */
 #elif __BYTE_ORDER == __BIG_ENDIAN
-			unsigned int th_off : 4; /* data offset */
-			unsigned int th_x2 : 4;  /* (unused) */
+			__HYBRID_BITFIELD8_T th_off : 4; /* data offset */
+			__HYBRID_BITFIELD8_T th_x2 : 4;  /* (unused) */
 #endif
 			__uint8_t    th_flags;   /* Set of `TH_*' */
 			__u_net16_t  th_win;     /* window */
@@ -167,25 +169,25 @@ struct tcphdr {
 			tcp_seq     seq;     /* sequence number. */
 			tcp_seq     ack_seq; /* acknowledgement number. */
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-			unsigned int res1 : 4; /* (unused) */
-			unsigned int doff : 4; /* data offset */
-			unsigned int fin : 1;
-			unsigned int syn : 1;
-			unsigned int rst : 1;
-			unsigned int psh : 1;
-			unsigned int ack : 1;
-			unsigned int urg : 1;
-			unsigned int res2 : 2; /* (unused) */
+			__HYBRID_BITFIELD8_T res1 : 4; /* (unused) */
+			__HYBRID_BITFIELD8_T doff : 4; /* data offset */
+			__HYBRID_BITFIELD8_T fin : 1;
+			__HYBRID_BITFIELD8_T syn : 1;
+			__HYBRID_BITFIELD8_T rst : 1;
+			__HYBRID_BITFIELD8_T psh : 1;
+			__HYBRID_BITFIELD8_T ack : 1;
+			__HYBRID_BITFIELD8_T urg : 1;
+			__HYBRID_BITFIELD8_T res2 : 2; /* (unused) */
 #elif __BYTE_ORDER == __BIG_ENDIAN
-			unsigned int doff : 4; /* data offset */
-			unsigned int res1 : 4; /* (unused) */
-			unsigned int res2 : 2; /* (unused) */
-			unsigned int urg : 1;
-			unsigned int ack : 1;
-			unsigned int psh : 1;
-			unsigned int rst : 1;
-			unsigned int syn : 1;
-			unsigned int fin : 1;
+			__HYBRID_BITFIELD8_T doff : 4; /* data offset */
+			__HYBRID_BITFIELD8_T res1 : 4; /* (unused) */
+			__HYBRID_BITFIELD8_T res2 : 2; /* (unused) */
+			__HYBRID_BITFIELD8_T urg : 1;
+			__HYBRID_BITFIELD8_T ack : 1;
+			__HYBRID_BITFIELD8_T psh : 1;
+			__HYBRID_BITFIELD8_T rst : 1;
+			__HYBRID_BITFIELD8_T syn : 1;
+			__HYBRID_BITFIELD8_T fin : 1;
 #endif
 			__u_net16_t window;  /* window */
 			__u_net16_t check;   /* checksum */
@@ -221,11 +223,11 @@ struct tcphdr {
 #define th_ack       ack_seq     /* acknowledgement number. */
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-	unsigned int res1 : 4; /* (unused) */
-	unsigned int doff : 4; /* data offset */
+	__HYBRID_BITFIELD8_T res1 : 4; /* (unused) */
+	__HYBRID_BITFIELD8_T doff : 4; /* data offset */
 #elif __BYTE_ORDER == __BIG_ENDIAN
-	unsigned int doff : 4; /* data offset */
-	unsigned int res1 : 4; /* (unused) */
+	__HYBRID_BITFIELD8_T doff : 4; /* data offset */
+	__HYBRID_BITFIELD8_T res1 : 4; /* (unused) */
 #endif
 #define th_x2  res1 /* (unused) */
 #define th_off doff /* data offset */
@@ -233,21 +235,21 @@ struct tcphdr {
 		__uint8_t    th_flags;   /* Set of `TH_*' */
 		struct {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-			unsigned int fin : 1;
-			unsigned int syn : 1;
-			unsigned int rst : 1;
-			unsigned int psh : 1;
-			unsigned int ack : 1;
-			unsigned int urg : 1;
-			unsigned int res2 : 2;
+			__HYBRID_BITFIELD8_T fin : 1;
+			__HYBRID_BITFIELD8_T syn : 1;
+			__HYBRID_BITFIELD8_T rst : 1;
+			__HYBRID_BITFIELD8_T psh : 1;
+			__HYBRID_BITFIELD8_T ack : 1;
+			__HYBRID_BITFIELD8_T urg : 1;
+			__HYBRID_BITFIELD8_T res2 : 2;
 #elif __BYTE_ORDER == __BIG_ENDIAN
-			unsigned int res2 : 2;
-			unsigned int urg : 1;
-			unsigned int ack : 1;
-			unsigned int psh : 1;
-			unsigned int rst : 1;
-			unsigned int syn : 1;
-			unsigned int fin : 1;
+			__HYBRID_BITFIELD8_T res2 : 2;
+			__HYBRID_BITFIELD8_T urg : 1;
+			__HYBRID_BITFIELD8_T ack : 1;
+			__HYBRID_BITFIELD8_T psh : 1;
+			__HYBRID_BITFIELD8_T rst : 1;
+			__HYBRID_BITFIELD8_T syn : 1;
+			__HYBRID_BITFIELD8_T fin : 1;
 #endif
 		}
 #ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT

@@ -23,6 +23,8 @@
 #include <__crt.h>
 #include <__stdinc.h>
 
+#include <hybrid/__bitfield.h>
+
 #include <asm/crt/resolv.h>
 #include <bits/types.h>
 #include <netinet/bits/in.h>
@@ -115,38 +117,38 @@ typedef res_sendhookact
 #undef nsinit
 #undef nsaddrs
 typedef struct __res_state {
-	int                retrans;                 /* ??? */
-	int                retry;                   /* ??? */
-	__u_long           options;                 /* ??? */
-	int                nscount;                 /* ??? */
-	struct sockaddr_in nsaddr_list[__MAXNS];    /* ??? */
-#define nsaddr         nsaddr_list[0]           /* ??? */
-	__u_short          id;                      /* ??? */
-	__byte_t         __rs_pad1[2];              /* ... */
-	char              *dnsrch[__MAXDNSRCH + 1]; /* ??? */
-	char               defdname[256];           /* ??? */
-	__u_long           pfcode;                  /* ??? */
-	unsigned int       ndots : 4;               /* ??? */
-	unsigned int       nsort : 4;               /* ??? */
-	unsigned int       ipv6_unavail : 1;        /* ??? */
-	unsigned int       unused : 23;             /* ??? */
+	int                   retrans;                 /* ??? */
+	int                   retry;                   /* ??? */
+	__u_long              options;                 /* ??? */
+	int                   nscount;                 /* ??? */
+	struct sockaddr_in    nsaddr_list[__MAXNS];    /* ??? */
+#define nsaddr            nsaddr_list[0]           /* ??? */
+	__u_short             id;                      /* ??? */
+	__byte_t            __rs_pad1[2];              /* ... */
+	char                 *dnsrch[__MAXDNSRCH + 1]; /* ??? */
+	char                  defdname[256];           /* ??? */
+	__u_long              pfcode;                  /* ??? */
+	__HYBRID_BITFIELD32_T ndots : 4;               /* ??? */
+	__HYBRID_BITFIELD32_T nsort : 4;               /* ??? */
+	__HYBRID_BITFIELD32_T ipv6_unavail : 1;        /* ??? */
+	__HYBRID_BITFIELD32_T unused : 23;             /* ??? */
 	struct {
-		struct in_addr addr;                    /* ??? */
-		__uint32_t     mask;                    /* ??? */
+		struct in_addr    addr;                    /* ??? */
+		__uint32_t        mask;                    /* ??? */
 	} sort_list[__MAXRESOLVSORT];               /* ??? */
 #if __SIZEOF_POINTER__ >= 8
-	__byte_t         __rs_pad2[4];              /* ... */
+	__byte_t            __rs_pad2[4];              /* ... */
 #endif /* __SIZEOF_POINTER__ >= 8 */
-	res_send_qhook     qhook;                   /* ??? */
-	res_send_rhook     rhook;                   /* ??? */
-	int                res_h_errno;             /* ??? */
-	int               _vcsock;                  /* ??? */
-	__u_int           _flags;                   /* ??? */
+	res_send_qhook        qhook;                   /* ??? */
+	res_send_rhook        rhook;                   /* ??? */
+	int                   res_h_errno;             /* ??? */
+	int                  _vcsock;                  /* ??? */
+	__u_int              _flags;                   /* ??? */
 #if __SIZEOF_POINTER__ >= 8
-	__byte_t         __rs_pad3[4];              /* ... */
+	__byte_t            __rs_pad3[4];              /* ... */
 #endif /* __SIZEOF_POINTER__ >= 8 */
 	union {
-		char           pad[52]; /* ... */
+		char              pad[52]; /* ... */
 		struct {
 			__uint16_t           nscount;        /* ??? */
 			__uint16_t           nsmap[__MAXNS];   /* ??? */

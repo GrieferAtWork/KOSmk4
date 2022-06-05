@@ -1975,6 +1975,9 @@ struct struct_flatdirnode_deleted_dirent {
 	pos_t                                   fde_pos;
 	size_t                                  fde_size;
 	TAILQ_ENTRY(REF flatdirent)             fde_bypos;
+#if __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__
+	byte_t __fde_pad[__ALIGNOF_POS_T__ > __ALIGNOF_POINTER__];
+#endif /* __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__ */
 	WEAK refcnt_t                           _fd_refcnt;
 	struct fdirent_ops const               *_fd_ops;
 	ino_t                                   _fd_ino;
@@ -1995,9 +1998,12 @@ static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, _fd_type) == of
 static_assert(offsetof(struct struct_flatdirnode_deleted_dirent, _fd_name) == offsetof(struct flatdirent, fde_ent.fd_name));
 DATDEF struct struct_flatdirnode_deleted_dirent __flatdirnode_deleted_dirent ASMNAME("flatdirnode_deleted_dirent");
 PUBLIC struct struct_flatdirnode_deleted_dirent __flatdirnode_deleted_dirent = {
-	.fde_pos    = 0,
-	.fde_size   = 0,
-	.fde_bypos  = TAILQ_ENTRY_UNBOUND_INITIALIZER,
+	.fde_pos     = 0,
+	.fde_size    = 0,
+	.fde_bypos   = TAILQ_ENTRY_UNBOUND_INITIALIZER,
+#if __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__
+	.__fde_pad   = {},
+#endif /* __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__ */
 	._fd_refcnt  = 1,
 	._fd_ops     = &fdirent_empty_ops,
 	._fd_ino     = 0,

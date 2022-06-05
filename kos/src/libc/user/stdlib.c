@@ -442,6 +442,7 @@ again_searchenv:
 			struct environ_heapstr *existing_heapline;
 			if (memcmp(existing_line, line->ehs_text, (namelen + 1) * sizeof(char)) != 0)
 				continue;
+			free(new_envp);
 			if (!replace) {
 				/* Even though we've already checked this above, another thread
 				 * may have added  the environment variable  in the mean  time. */
@@ -642,6 +643,7 @@ again_searchenv:
 			environ_endwrite();
 			/* Free the old line if it was heap-allocated. */
 			free(existing_heapline);
+			free(new_envp);
 			return 0;
 		}
 	}

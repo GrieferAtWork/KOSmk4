@@ -146,7 +146,9 @@ PRIVATE struct builtin_type_name const builtin_type_names[] = {
 //	{ "bool", &ctype_bool }, /* Special handling... */
 	{ "float", &ctype_ieee754_float },
 	{ "double", &ctype_ieee754_double },
+#ifdef CTYPE_KIND_IEEE854_LONG_DOUBLE
 	{ "long double", &ctype_ieee854_long_double },
+#endif /* CTYPE_KIND_IEEE854_LONG_DOUBLE */
 //	{ "void", &ctype_void }, /* Special handling... */
 	{ "char", &ctype_char },
 	{ "signed char", &ctype_signed_char },

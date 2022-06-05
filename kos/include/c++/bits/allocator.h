@@ -52,14 +52,14 @@ public:
 	typedef true_type propagate_on_container_move_assignment;
 	typedef true_type is_always_equal;
 #endif /* __USE_ISOCXX11 */
-	__CXX_CLASSMEMBER __allocator_base() __CXX_NOEXCEPT {}
-	__CXX_CLASSMEMBER __allocator_base(__allocator_base const &) __CXX_NOEXCEPT {}
-	template<class __T2> __CXX_CLASSMEMBER __allocator_base(__allocator_base<__T2> const &) __CXX_NOEXCEPT {}
-	__CXX_CLASSMEMBER ~__allocator_base() __CXX_NOEXCEPT {}
-	__CXX_CLASSMEMBER pointer address(reference __x) const __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __allocator_base() __CXX_NOEXCEPT {}
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __allocator_base(__allocator_base const &) __CXX_NOEXCEPT {}
+	template<class __T2> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __allocator_base(__allocator_base<__T2> const &) __CXX_NOEXCEPT {}
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL ~__allocator_base() __CXX_NOEXCEPT {}
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL pointer address(reference __x) const __CXX_NOEXCEPT {
 		return __NAMESPACE_INT_SYM __addressof(__x);
 	}
-	__CXX_CLASSMEMBER const_pointer address(const_reference __x) const __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL const_pointer address(const_reference __x) const __CXX_NOEXCEPT {
 		return __NAMESPACE_INT_SYM __addressof(__x);
 	}
 	__CXX_CLASSMEMBER pointer allocate(size_type __count, void const * = 0) {
@@ -67,40 +67,40 @@ public:
 			__CXX_THROW_BAD_ALLOC();
 		return (__T *)(::operator new(__count * sizeof(__T)));
 	}
-	__CXX_CLASSMEMBER __ATTR_NONNULL((1)) void deallocate(pointer __p, size_type __UNUSED(__count)) {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL_CXX((1)) void deallocate(pointer __p, size_type __UNUSED(__count)) {
 		::operator delete(__p);
 	}
-	__CXX_CLASSMEMBER size_type max_size() const __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL size_type max_size() const __CXX_NOEXCEPT {
 		return size_type(-1) / sizeof(__T);
 	}
 #if defined(__USE_ISOCXX11) && \
 	defined(__COMPILER_HAVE_CXX_RVALUE_REFERENCE) && \
 	defined(__COMPILER_HAVE_CXX_VARIABLE_TEMPLATES)
-	template<class __Tp, class... __Args> __CXX_CLASSMEMBER __ATTR_NONNULL((1))
-	void construct(__Tp *__p, __Args &&... __args) {
+	template<class __Tp, class... __Args> __CXX_CLASSMEMBER __ATTR_NONNULL_CXX((1))
+	__ATTR_ARTIFICIAL void construct(__Tp *__p, __Args &&... __args) {
 		::new ((void *)__p) __Tp(std::forward<__Args>(__args)...);
 	}
-	template<class __Tp> __CXX_CLASSMEMBER __ATTR_NONNULL((1)) void destroy(__Tp *__p) {
+	template<class __Tp> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL_CXX((1)) void destroy(__Tp *__p) {
 		__p->~__Tp();
 	}
 #else
-	__CXX_CLASSMEMBER __ATTR_NONNULL((1)) void construct(pointer __p, __T const &__val) {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL_CXX((1)) void construct(pointer __p, __T const &__val) {
 		::new ((void *)__p) __T(__val);
 	}
-	__CXX_CLASSMEMBER __ATTR_NONNULL((1)) void destroy(pointer __p) {
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __ATTR_NONNULL_CXX((1)) void destroy(pointer __p) {
 		__p->~__T();
 	}
 #endif
-	__CXX_CLASSMEMBER bool operator==(__allocator_base<__T> const &) const __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_CONST __ATTR_ARTIFICIAL bool operator==(__allocator_base<__T> const &) const __CXX_NOEXCEPT {
 		return true;
 	}
-	__CXX_CLASSMEMBER bool operator!=(__allocator_base<__T> const &) const __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER __ATTR_CONST __ATTR_ARTIFICIAL bool operator!=(__allocator_base<__T> const &) const __CXX_NOEXCEPT {
 		return false;
 	}
-	template<class __T2> __CXX_CLASSMEMBER bool operator==(__allocator_base<__T2> const &) const __CXX_NOEXCEPT {
+	template<class __T2> __CXX_CLASSMEMBER __ATTR_CONST __ATTR_ARTIFICIAL bool operator==(__allocator_base<__T2> const &) const __CXX_NOEXCEPT {
 		return true;
 	}
-	template<class __T2> __CXX_CLASSMEMBER bool operator!=(__allocator_base<__T2> const &) const __CXX_NOEXCEPT {
+	template<class __T2> __CXX_CLASSMEMBER __ATTR_CONST __ATTR_ARTIFICIAL bool operator!=(__allocator_base<__T2> const &) const __CXX_NOEXCEPT {
 		return false;
 	}
 };
@@ -113,10 +113,10 @@ class allocator
 public:
 	template<typename __T2>
 	struct rebind { typedef allocator<__T2> other; };
-	__CXX_CLASSMEMBER allocator() __CXX_NOEXCEPT: __intern::__allocator_base<__T>() {}
-	__CXX_CLASSMEMBER allocator(allocator const &__other) __CXX_NOEXCEPT: __intern::__allocator_base<__T>(__other) {}
-	template<typename __T2> __CXX_CLASSMEMBER allocator(allocator<__T2> const &__other) __CXX_NOEXCEPT: __intern::__allocator_base<__T>(__other) {}
-	__CXX_CLASSMEMBER ~allocator() __CXX_NOEXCEPT {}
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL allocator() __CXX_NOEXCEPT: __intern::__allocator_base<__T>() {}
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL allocator(allocator const &__other) __CXX_NOEXCEPT: __intern::__allocator_base<__T>(__other) {}
+	template<typename __T2> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL allocator(allocator<__T2> const &__other) __CXX_NOEXCEPT: __intern::__allocator_base<__T>(__other) {}
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL ~allocator() __CXX_NOEXCEPT {}
 };
 
 template<>
@@ -137,28 +137,29 @@ public:
 	defined(__COMPILER_HAVE_CXX_RVALUE_REFERENCE) && \
 	defined(__COMPILER_HAVE_CXX_VARIABLE_TEMPLATES)
 	template<typename __Tp, typename... __Args> __CXX_CLASSMEMBER
-	void construct(__Tp *__p, __Args &&... __args) {
+	__ATTR_ARTIFICIAL void construct(__Tp *__p, __Args &&... __args) {
 		::new ((void *)__p) __Tp(std::forward<__Args>(__args)...);
 	}
-	template<typename __Tp> __CXX_CLASSMEMBER void destroy(__Tp *__p) {
+	template<typename __Tp> __CXX_CLASSMEMBER
+	__ATTR_ARTIFICIAL void destroy(__Tp *__p) {
 		__p->~__Tp();
 	}
 #endif
 };
 
-template<class __T> __CXX_CLASSMEMBER bool
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL bool
 operator==(allocator<__T> const &, allocator<__T> const &) __CXX_NOEXCEPT {
 	return true;
 }
-template<class __T> __CXX_CLASSMEMBER bool
+template<class __T> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL bool
 operator!=(allocator<__T> const &, allocator<__T> const &) __CXX_NOEXCEPT {
 	return false;
 }
-template<class __T1, class __T2> __CXX_CLASSMEMBER bool
+template<class __T1, class __T2> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL bool
 operator==(allocator<__T1> const &, allocator<__T2> const &) __CXX_NOEXCEPT {
 	return true;
 }
-template<class __T1, class __T2> __CXX_CLASSMEMBER bool
+template<class __T1, class __T2> __CXX_CLASSMEMBER __ATTR_ARTIFICIAL bool
 operator!=(allocator<__T1> const &, allocator<__T2> const &) __CXX_NOEXCEPT {
 	return false;
 }

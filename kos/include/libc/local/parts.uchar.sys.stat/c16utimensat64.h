@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x100f3632 */
+/* HASH CRC-32:0x6d8aceaf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,9 +54,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_c16utimensat32_defined
 #define __local___localdep_crt_c16utimensat32_defined
 #if defined(__CRT_HAVE_wutimensat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_crt_c16utimensat32,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
+__CREDIRECT(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_crt_c16utimensat32,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct __timespec32 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_DOS$wutimensat)
-__CREDIRECT_DOS(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_crt_c16utimensat32,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
+__CREDIRECT_DOS(__ATTR_IN(2) __ATTR_IN_OPT(3),int,__NOTHROW_RPC,__localdep_crt_c16utimensat32,(__fd_t __dirfd, __CHAR16_TYPE__ const *__filename, struct __timespec32 const __times[2 /*or:3*/], __atflag_t __flags),wutimensat,(__dirfd,__filename,__times,__flags))
 #else /* ... */
 #undef __local___localdep_crt_c16utimensat32_defined
 #endif /* !... */

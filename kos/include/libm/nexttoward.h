@@ -185,7 +185,11 @@ __LIBM_LOCAL_FUNC(nexttoward) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE_
 
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
-#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
+#elif defined(__clang_tidy__)
+/* Prevent compiler errors when clang-tidy doesn't have `long double' */
+#define __ieee754_nexttowardf(x, y) (x)
+#define __ieee754_nexttoward(x, y)  (x)
+#endif /* ... */
 
 __DECL_END
 #endif /* __CC__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cc14ad0 */
+/* HASH CRC-32:0x1e6a566b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3117,15 +3117,15 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,ftrylockfile,(__FIL
 #ifdef __CRT_HAVE__filbuf
 /* >> __uflow(3)
  * This is essentially gLibc's version of `_filbuf(3)' (but sadly not binary compatible) */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,__uflow,(FILE *__stream),_filbuf,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,__uflow,(__FILE *__stream),_filbuf,(__stream))
 #elif defined(__CRT_HAVE___uflow)
 /* >> __uflow(3)
  * This is essentially gLibc's version of `_filbuf(3)' (but sadly not binary compatible) */
-__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,__uflow,(FILE *__stream),(__stream))
+__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,__uflow,(__FILE *__stream),(__stream))
 #elif defined(__CRT_HAVE___underflow)
 /* >> __uflow(3)
  * This is essentially gLibc's version of `_filbuf(3)' (but sadly not binary compatible) */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,__uflow,(FILE *__stream),__underflow,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,__uflow,(__FILE *__stream),__underflow,(__stream))
 #endif /* ... */
 #ifdef __CRT_HAVE___overflow
 /* >> __overflow(3)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e4b6b5d */
+/* HASH CRC-32:0xa914091d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -403,7 +403,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fegetexcept, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 typedef unsigned int femode_t;
 #define FE_DFL_MODE ((femode_t const *)-1)
 __CDECLARE_OPT(,int,__NOTHROW_NCX,fesetexcept,(int __excepts),(__excepts))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,fetestexceptflag,(fexcept_t const *__flagp, int __excepts),(__flagp,__excepts))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,fetestexceptflag,(__fexcept_t const *__flagp, int __excepts),(__flagp,__excepts))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,fegetmode,(femode_t *__modep),(__modep))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,fesetmode,(femode_t const *__modep),(__modep))
 #if defined(FE_INVALID) && defined(__SUPPORT_SNAN__)

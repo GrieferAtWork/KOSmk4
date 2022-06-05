@@ -63,7 +63,7 @@ format_vscanf(__pformatgetc __FORMAT_PGETC,
 #if __CHAR_SIZE == __SIZEOF_CHAR__
 #define __PRIVATE_FORMAT_SCANF_READUNI(p_iter, end) __libc_unicode_readutf8_n((char const **)(p_iter), end)
 #elif __CHAR_SIZE == 2
-#define __PRIVATE_FORMAT_SCANF_READUNI(p_iter, end) __libc_unicode_readutf16_n((__CHAR16_TYPE__ const **)(p_iter), end)
+#define __PRIVATE_FORMAT_SCANF_READUNI(p_iter, end) __libc_unicode_readutf16_n((__CHAR16_TYPE__ const **)(p_iter), (__CHAR16_TYPE__ const *)(end))
 #else /* __CHAR_SIZE == ... */
 #define __PRIVATE_FORMAT_SCANF_READUNI(p_iter, end) (*(p_iter) >= (end) ? 0 : *((*(p_iter))++))
 #endif /* __CHAR_SIZE != ... */

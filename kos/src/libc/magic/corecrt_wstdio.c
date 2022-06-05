@@ -483,19 +483,19 @@ __STDC_INT_AS_SSIZE_T _vfwprintf_p_l([[inout]] FILE *stream, [[in, format]] wcha
 	return __stdio_common_vfwprintf_p(_CRT_INTERNAL_LOCAL_PRINTF_OPTIONS, stream, format, locale, args);
 }
 %[default:section(".text.crt.dos.wchar.FILE.locked.read.scanf")];
-[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<corecrt_stdio_config.h>"), wunused, requires_function(__stdio_common_vfscanf)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<corecrt_stdio_config.h>"), wunused, requires_function(__stdio_common_vfwscanf)]]
 __STDC_INT_AS_SSIZE_T _vfwscanf_l([[inout]] FILE *stream,[[in, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return __stdio_common_vfwscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS, stream, format, locale, args);
 }
-[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<corecrt_stdio_config.h>"),  wunused, requires_function(__stdio_common_vfscanf)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<corecrt_stdio_config.h>"),  wunused, requires_function(__stdio_common_vfwscanf)]]
 __STDC_INT_AS_SSIZE_T _vfwscanf_s_l([[inout]] FILE *stream, [[in, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return __stdio_common_vfwscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS | _CRT_INTERNAL_SCANF_SECURECRT, stream, format, locale, args);
 }
-[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<corecrt_stdio_config.h>"), ignore, wunused, requires_function(__stdio_common_vsscanf)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<corecrt_stdio_config.h>"), ignore, wunused, requires_function(__stdio_common_vswscanf)]]
 __STDC_INT_AS_SSIZE_T _vsnwscanf_l([[in(bufsize)]] wchar_t const *buf, size_t bufsize, [[in, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return __stdio_common_vswscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS, buf, bufsize, format, locale, args);
 }
-[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<corecrt_stdio_config.h>"), ignore, wunused, requires_function(__stdio_common_vsscanf)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), impl_include("<corecrt_stdio_config.h>"), ignore, wunused, requires_function(__stdio_common_vswscanf)]]
 __STDC_INT_AS_SSIZE_T _vsnwscanf_s_l([[in(bufsize)]] wchar_t const *buf, size_t bufsize, [[in, format]] wchar_t const *format, $locale_t locale, $va_list args) {
 	return __stdio_common_vswscanf(_CRT_INTERNAL_LOCAL_SCANF_OPTIONS | _CRT_INTERNAL_SCANF_SECURECRT, buf, bufsize, format, locale, args);
 }

@@ -239,6 +239,7 @@ __NAMESPACE_STD_USING(wint_t)
 @@returned instead.
 [[wchar, std, const, wunused]]
 [[decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<asm/crt/stdio.h>")]]
 wint_t btowc(int ch) {
 	if (ch >= 0 && ch <= 0x7f)
 		return (wint_t)ch;
@@ -1126,7 +1127,7 @@ __STDC_INT_AS_SIZE_T vwscanf([[in, format]] wchar_t const *__restrict format, $v
 %[default:section(".text.crt{|.dos}.wchar.unicode.static.format.scanf")]
 
 %[define_wchar_replacement(vswscanf_getc = vsc16scanf_getc, vsc32scanf_getc)]
-%[define_wchar_replacement(vswscanf_ungetc = vsc16scanf_ungetc, vsc16scanf_ungetc)]
+%[define_wchar_replacement(vswscanf_ungetc = vsc16scanf_ungetc, vsc32scanf_ungetc)]
 %[define_wchar_replacement(____vswscanf_getc_defined = ____vsc16scanf_getc_defined, ____vsc32scanf_getc_defined)]
 %[define_wchar_replacement(DEFINE_VSWSCANF_HELPERS = DEFINE_VSC16SCANF_HELPERS, DEFINE_VSC32SCANF_HELPERS)]
 
@@ -1332,7 +1333,7 @@ $size_t mbsnrtowcs([[out_opt/*(dstlen)*/]] wchar_t *__restrict dst,
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/mbstate.h>")]]
 $size_t wcsnrtombs([[out_opt/*(dstlen)*/]] char *dst,
                    [[inout]] wchar_t const **__restrict psrc, $size_t nwc, size_t dstlen,
-                   [[inout_opt]] mbstate_t *mbs) {
+                   [[inout_opt]] $mbstate_t *mbs) {
 	size_t result = 0;
 	wchar_t const *src = *psrc;
 	while (dstlen) {

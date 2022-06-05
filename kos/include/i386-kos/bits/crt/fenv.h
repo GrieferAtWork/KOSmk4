@@ -22,6 +22,7 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/__bitfield.h>
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
@@ -92,19 +93,19 @@ typedef __UINT16_TYPE__ __fexcept_t;
  * of the MXCSR register as written by the `stmxcsr' instruction.
  * HINT: Under KOS, this structure also exists as `struct sfpuenv' */
 struct __fenv_struct {
-	__UINT16_TYPE__ __control_word;        /* struct sfpuenv::fe_fcw (Set of `FCW_*') */
-	__UINT16_TYPE__ __glibc_reserved1;     /* ... */
-	__UINT16_TYPE__ __status_word;         /* struct sfpuenv::fe_fsw (Set of `FSW_*') */
-	__UINT16_TYPE__ __glibc_reserved2;     /* ... */
-	__UINT16_TYPE__ __tags;                /* struct sfpuenv::fe_ftw (Set of `FTW_*') */
-	__UINT16_TYPE__ __glibc_reserved3;     /* ... */
-	__UINT32_TYPE__ __eip;                 /* struct sfpuenv::fe_fip */
-	__UINT16_TYPE__ __cs_selector;         /* struct sfpuenv::fe_fcs */
-	unsigned int    __opcode : 11;         /* struct sfpuenv::fe_fop */
-	unsigned int    __glibc_reserved4 : 5; /* ... */
-	__UINT32_TYPE__ __data_offset;         /* struct sfpuenv::fe_fdp */
-	__UINT16_TYPE__ __data_selector;       /* struct sfpuenv::fe_fds */
-	__UINT16_TYPE__ __glibc_reserved5;     /* ... */
+	__UINT16_TYPE__       __control_word;        /* struct sfpuenv::fe_fcw (Set of `FCW_*') */
+	__UINT16_TYPE__       __glibc_reserved1;     /* ... */
+	__UINT16_TYPE__       __status_word;         /* struct sfpuenv::fe_fsw (Set of `FSW_*') */
+	__UINT16_TYPE__       __glibc_reserved2;     /* ... */
+	__UINT16_TYPE__       __tags;                /* struct sfpuenv::fe_ftw (Set of `FTW_*') */
+	__UINT16_TYPE__       __glibc_reserved3;     /* ... */
+	__UINT32_TYPE__       __eip;                 /* struct sfpuenv::fe_fip */
+	__UINT16_TYPE__       __cs_selector;         /* struct sfpuenv::fe_fcs */
+	__HYBRID_BITFIELD16_T __opcode : 11;         /* struct sfpuenv::fe_fop */
+	__HYBRID_BITFIELD16_T __glibc_reserved4 : 5; /* ... */
+	__UINT32_TYPE__       __data_offset;         /* struct sfpuenv::fe_fdp */
+	__UINT16_TYPE__       __data_selector;       /* struct sfpuenv::fe_fds */
+	__UINT16_TYPE__       __glibc_reserved5;     /* ... */
 #ifdef __x86_64__
 	__UINT32_TYPE__ __mxcsr; /* Not actually found in `struct sfpuenv' */
 #endif /* __x86_64__ */

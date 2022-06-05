@@ -173,7 +173,7 @@ __LOCAL __ATTR_NONNULL((1, 2)) void LIBDISASM_CC
 disasm_vprintf(struct disassembler *__restrict self,
                char const *__restrict format,
                __builtin_va_list args);
-__LOCAL __ATTR_NONNULL((1, 2)) void LIBDISASM_CC
+__LOCAL __ATTR_NONNULL((1, 2)) void LIBDISASM_VCC
 disasm_printf(struct disassembler *__restrict self,
               char const *__restrict format, ...) {
 	__builtin_va_list args;
@@ -318,8 +318,12 @@ __LOCAL_LIBC(format_vprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3, 4)) 
                                                char const *__restrict __format,
                                                __builtin_va_list __args);
 __NAMESPACE_LOCAL_END
+#define DISASM_PRIVATE_FORMAT_VPRINTF __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vprintf)
+#elif defined(_FORMAT_PRINTER_H)
+#define DISASM_PRIVATE_FORMAT_VPRINTF format_vprintf
 #else /* __local_format_vprintf_defined */
-#include <format-printer.h>
+#include <libc/format-printer.h>
+#define DISASM_PRIVATE_FORMAT_VPRINTF __libc_format_vprintf
 #endif /* !__local_format_vprintf_defined */
 
 __LOCAL __ATTR_NONNULL((1, 2)) void LIBDISASM_CC
@@ -328,17 +332,7 @@ disasm_vprintf(struct disassembler *__restrict self,
                __builtin_va_list args) {
 	if (self->d_result >= 0) {
 		__ssize_t temp;
-#ifdef __local_format_vprintf_defined
-		temp = __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vprintf)(self->d_printer,
-		                                                               self->d_arg,
-		                                                               format,
-		                                                               args);
-#else /* __local_format_vprintf_defined */
-		temp = format_vprintf(self->d_printer,
-		                      self->d_arg,
-		                      format,
-		                      args);
-#endif /* !__local_format_vprintf_defined */
+		temp = DISASM_PRIVATE_FORMAT_VPRINTF(self->d_printer, self->d_arg, format, args);
 		if __unlikely(temp < 0)
 			self->d_result = temp;
 		else {

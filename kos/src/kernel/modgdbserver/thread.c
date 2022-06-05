@@ -155,7 +155,7 @@ NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
 			next = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
 			stop_event.e.tse_next = next;
 		} while (!ATOMIC_CMPXCH_WEAK(GDBThread_AsyncNotifStopEvents,
-		                             stop_event.e.tse_next, &stop_event));
+		                             stop_event.e.tse_next, &stop_event.e));
 		if (!next)
 			sig_broadcast(&GDBThread_AsyncNotifStopEventsAdded);
 	} else {
@@ -164,7 +164,8 @@ NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
 		 *       is actually expecting us to access this field ourself. */
 		do {
 			stop_event.e.tse_next = ATOMIC_READ(GDBThread_Stopped);
-		} while (!ATOMIC_CMPXCH_WEAK(GDBThread_Stopped, stop_event.e.tse_next, &stop_event));
+		} while (!ATOMIC_CMPXCH_WEAK(GDBThread_Stopped, stop_event.e.tse_next,
+		                             &stop_event.e));
 	}
 	COMPILER_BARRIER();
 

@@ -298,7 +298,8 @@ vga_v_setlogicalwidth(struct svga_chipset *__restrict self, uint32_t offset) {
  * The base registers  are already saved  by the  caller! */
 PRIVATE NONNULL((1)) void CC
 vga_v_getregs(struct svga_chipset *__restrict UNUSED(self),
-              byte_t UNUSED(regbuf)[]) {
+              byte_t regbuf[]) {
+	(void)regbuf;
 }
 #define vga_v_setregs (*(void(CC *)(struct svga_chipset *__restrict, __byte_t const[]))&vga_v_getregs)
 

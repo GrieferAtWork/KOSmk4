@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae80671a */
+/* HASH CRC-32:0xc073b855 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ldexp) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexp))(double __x, int __exponent) {
 	double __result;
-#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
-	__result = (double)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)__x, __exponent);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-	__result = (double)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)__x, __exponent);
-#else /* ... */
-	__result = (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __exponent);
-#endif /* !... */
+	__result = __LIBM_MATHFUN2I(ldexp, __x, __exponent);
 #ifdef __ERANGE
 	if __unlikely(!__LIBM_MATHFUNI(finite, __result) || __result == 0.0)
 		(void)__libc_seterrno(__ERANGE);

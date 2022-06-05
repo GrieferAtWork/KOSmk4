@@ -919,14 +919,14 @@ int wgetdomainname([[out(? <= buflen)]] wchar_t *name, size_t buflen) {
 	if likely(result == 0) {
 		struct __LOCAL_format_wsnprintf_data printer_data;
 		struct __LOCAL_format_8tow_data convert_data;
-		size_t len = strnlen(uts.@domainname@, COMPILER_LENOF(uts.@domainname@));
+		size_t len = strnlen(uts.__PRIVATE_UTSNAME_DOMAINNAME, COMPILER_LENOF(uts.__PRIVATE_UTSNAME_DOMAINNAME));
 		ssize_t width;
 		printer_data.sd_buffer  = name;
 		printer_data.sd_bufsiz  = buflen;
 		convert_data.fd_arg     = &printer_data;
 		convert_data.fd_printer = &format_wsnprintf_printer;
 		__mbstate_init(&convert_data.fd_incomplete);
-		width = format_8tow(&convert_data, uts.@domainname@, len);
+		width = format_8tow(&convert_data, uts.__PRIVATE_UTSNAME_DOMAINNAME, len);
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {

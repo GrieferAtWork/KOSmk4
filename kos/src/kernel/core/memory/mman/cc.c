@@ -1074,15 +1074,15 @@ again:
 	 *       `LIST_*' to `TAILQ_*' (which has a O(1) *_LAST operation). */
 	LIST_FOREACH_SAFE (iter, &fallnodes_list, fn_allnodes) {
 		if ((iter->mf_flags & (MFILE_FN_GLOBAL_REF | MFILE_F_PERSISTENT)) != MFILE_FN_GLOBAL_REF)
-			continue; /* Can't be unloaded via decref */
+			goto nextnode; /* Can't be unloaded via decref */
 		if (ATOMIC_READ(iter->mf_refcnt) != 1)
-			continue; /* External references exist, or already destroyed. */
+			goto nextnode; /* External references exist, or already destroyed. */
 
 		/* Try to unload this file. */
 		if (!mfile_lock_trywrite(iter)) {
 			bool waitfor_ok;
 			if (!tryincref(iter))
-				continue;
+				goto nextnode;
 			mpart_all_release();
 			waitfor_ok = mfile_lock_waitwrite_nx(iter);
 			if (ATOMIC_DECFETCH(iter->mf_refcnt) == 0) {
@@ -1099,18 +1099,18 @@ again:
 		if (!(ATOMIC_FETCHAND(iter->mf_flags, ~MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)) { /* inherit reference */
 			mfile_tslock_release_br(iter);
 			mfile_lock_endwrite(iter);
-			continue;
+			goto nextnode;
 		}
 		if (!ATOMIC_CMPXCH(iter->mf_refcnt, 1, 0)) {
 			if (!(ATOMIC_FETCHOR(iter->mf_flags, MFILE_FN_GLOBAL_REF) & MFILE_FN_GLOBAL_REF)) { /* inherit reference */
 				mfile_tslock_release_br(iter);
 				mfile_lock_endwrite(iter);
-				continue;
+				goto nextnode;
 			}
 			if (ATOMIC_DECFETCH(iter->mf_refcnt) != 0) {
 				mfile_tslock_release_br(iter);
 				mfile_lock_endwrite(iter);
-				continue;
+				goto nextnode;
 			}
 		}
 
@@ -1120,6 +1120,8 @@ again:
 		ccinfo_account(info, sizeof(struct mfile));
 		if (ccinfo_isdone(info))
 			break;
+nextnode:
+		;
 	}
 	fallnodes_release();
 

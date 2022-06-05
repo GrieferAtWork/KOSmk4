@@ -28,7 +28,7 @@ __NAMESPACE_STD_BEGIN
 
 class exception {
 public:
-	__CXX_CLASSMEMBER __LIBCCALL exception() __CXX_NOEXCEPT {}
+	__CXX_CLASSMEMBER __ATTR_ARTIFICIAL __LIBCCALL exception() __CXX_NOEXCEPT {}
 	virtual __LIBCCALL ~exception() __CXX_NOEXCEPT;
 	virtual char const *__LIBCCALL what() const __CXX_NOEXCEPT;
 };

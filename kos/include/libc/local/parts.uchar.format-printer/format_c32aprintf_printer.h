@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad2c9f05 */
+/* HASH CRC-32:0xb1a2348a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,30 +29,38 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_c32aprintf_alloc_defined
 #if defined(__CRT_HAVE_format_waprintf_alloc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
-#ifndef __format_waprintf_data_defined
-#define __format_waprintf_data_defined
-struct format_waprintf_data {
-	__WCHAR_TYPE__      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+#ifndef __format_c32aprintf_data_defined
+#define __format_c32aprintf_data_defined
+struct format_c32aprintf_data {
+	__CHAR32_TYPE__     *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
-#endif /* !__format_waprintf_data_defined */
+#endif /* !__format_c32aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_INOUT(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_format_c32aprintf_alloc,(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
 #elif defined(__CRT_HAVE_KOS$format_waprintf_alloc)
 __NAMESPACE_LOCAL_END
-#ifndef __format_waprintf_data_defined
-#define __format_waprintf_data_defined
-struct format_waprintf_data {
-	__WCHAR_TYPE__      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+#ifndef __format_c32aprintf_data_defined
+#define __format_c32aprintf_data_defined
+struct format_c32aprintf_data {
+	__CHAR32_TYPE__     *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
-#endif /* !__format_waprintf_data_defined */
+#endif /* !__format_c32aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_KOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_INOUT(1),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_format_c32aprintf_alloc,(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars),format_waprintf_alloc,(__self,__num_wchars))
 #elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
+#ifndef __format_c32aprintf_data_defined
+#define __format_c32aprintf_data_defined
+struct format_c32aprintf_data {
+	__CHAR32_TYPE__     *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+};
+#endif /* !__format_c32aprintf_data_defined */
 #include <libc/local/parts.wchar.format-printer/format_waprintf_alloc.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_c32aprintf_alloc __NAMESPACE_LOCAL_TYPEHAX(__CHAR32_TYPE__ *(__LIBKCALL*)(struct format_c32aprintf_data *__restrict,__SIZE_TYPE__),__CHAR32_TYPE__ *(__LIBKCALL&)(struct format_c32aprintf_data *__restrict,__SIZE_TYPE__),format_waprintf_alloc)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf89441d2 */
+/* HASH CRC-32:0x4d5f5c91 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,79 +131,79 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3) int __NOTH
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32execve, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3) int __NOTHROW_RPC(__LIBKCALL c32execve)(char32_t const *__restrict __path, __T32ARGV, __T32ENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32execve))(__path, ___argv, ___envp); })
 #endif /* ... */
 #if defined(__CRT_HAVE_wexecvp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c16execvp,(char16_t const *__restrict __file, __T16ARGV),wexecvp,(__path,___argv))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c16execvp,(char16_t const *__restrict __file, __T16ARGV),wexecvp,(__file,___argv))
 #elif defined(__CRT_HAVE_DOS$wexecvp)
-__CREDIRECT_DOS(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c16execvp,(char16_t const *__restrict __file, __T16ARGV),wexecvp,(__path,___argv))
+__CREDIRECT_DOS(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c16execvp,(char16_t const *__restrict __file, __T16ARGV),wexecvp,(__file,___argv))
 #elif defined(__CRT_HAVE__wexecvp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c16execvp,(char16_t const *__restrict __file, __T16ARGV),_wexecvp,(__path,___argv))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c16execvp,(char16_t const *__restrict __file, __T16ARGV),_wexecvp,(__file,___argv))
 #elif defined(__CRT_HAVE_DOS$_wexecvp)
-__CREDIRECT_DOS(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c16execvp,(char16_t const *__restrict __file, __T16ARGV),_wexecvp,(__path,___argv))
+__CREDIRECT_DOS(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c16execvp,(char16_t const *__restrict __file, __T16ARGV),_wexecvp,(__file,___argv))
 #else /* ... */
 #include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
 #if (defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp) || ((defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_convert_wcstombsv) || defined(__CRT_HAVE_convert_wcstombsvn) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/parts.wchar.process/wexecvp.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBDCALL c16execvp)(char16_t const *__restrict __file, __T16ARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecvp))((__WCHAR_TYPE__ const *)__path, (__TWARGV)___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBDCALL c16execvp)(char16_t const *__restrict __file, __T16ARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecvp))((__WCHAR_TYPE__ const *)__file, (__TWARGV)___argv); }
 #elif (defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp) || ((defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ))) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && ((defined(__CRT_HAVE_convert_wcstombsv) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombsv) || (defined(__CRT_HAVE_convert_wcstombsvn) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$convert_wcstombsvn) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign))
 #include <libc/local/parts.uchar.process/c16execvp.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBDCALL c16execvp)(char16_t const *__restrict __file, __T16ARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16execvp))(__path, ___argv); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBDCALL c16execvp)(char16_t const *__restrict __file, __T16ARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16execvp))(__file, ___argv); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_wexecvp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c32execvp,(char32_t const *__restrict __file, __T32ARGV),wexecvp,(__path,___argv))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c32execvp,(char32_t const *__restrict __file, __T32ARGV),wexecvp,(__file,___argv))
 #elif defined(__CRT_HAVE_KOS$wexecvp)
-__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c32execvp,(char32_t const *__restrict __file, __T32ARGV),wexecvp,(__path,___argv))
+__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c32execvp,(char32_t const *__restrict __file, __T32ARGV),wexecvp,(__file,___argv))
 #elif defined(__CRT_HAVE__wexecvp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c32execvp,(char32_t const *__restrict __file, __T32ARGV),_wexecvp,(__path,___argv))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c32execvp,(char32_t const *__restrict __file, __T32ARGV),_wexecvp,(__file,___argv))
 #elif defined(__CRT_HAVE_KOS$_wexecvp)
-__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c32execvp,(char32_t const *__restrict __file, __T32ARGV),_wexecvp,(__path,___argv))
+__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_RPC,c32execvp,(char32_t const *__restrict __file, __T32ARGV),_wexecvp,(__file,___argv))
 #else /* ... */
 #include <libc/template/environ.h>
 #include <hybrid/__alloca.h>
 #if (defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp) || ((defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_convert_wcstombsv) || defined(__CRT_HAVE_convert_wcstombsvn) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/parts.wchar.process/wexecvp.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBKCALL c32execvp)(char32_t const *__restrict __file, __T32ARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecvp))((__WCHAR_TYPE__ const *)__path, (__TWARGV)___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBKCALL c32execvp)(char32_t const *__restrict __file, __T32ARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecvp))((__WCHAR_TYPE__ const *)__file, (__TWARGV)___argv); }
 #elif (defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp) || ((defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ))) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && ((defined(__CRT_HAVE_convert_wcstombsv) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombsv) || (defined(__CRT_HAVE_convert_wcstombsvn) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$convert_wcstombsvn) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign))
 #include <libc/local/parts.uchar.process/c32execvp.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBKCALL c32execvp)(char32_t const *__restrict __file, __T32ARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32execvp))(__path, ___argv); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_RPC(__LIBKCALL c32execvp)(char32_t const *__restrict __file, __T32ARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32execvp))(__file, ___argv); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_wexecvpe) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c16execvpe,(char16_t const *__restrict __file, __T16ARGV, __T16ENVP),wexecvpe,(__path,___argv,___envp))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c16execvpe,(char16_t const *__restrict __file, __T16ARGV, __T16ENVP),wexecvpe,(__file,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$wexecvpe)
-__CREDIRECT_DOS(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c16execvpe,(char16_t const *__restrict __file, __T16ARGV, __T16ENVP),wexecvpe,(__path,___argv,___envp))
+__CREDIRECT_DOS(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c16execvpe,(char16_t const *__restrict __file, __T16ARGV, __T16ENVP),wexecvpe,(__file,___argv,___envp))
 #elif defined(__CRT_HAVE__wexecvpe) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c16execvpe,(char16_t const *__restrict __file, __T16ARGV, __T16ENVP),_wexecvpe,(__path,___argv,___envp))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c16execvpe,(char16_t const *__restrict __file, __T16ARGV, __T16ENVP),_wexecvpe,(__file,___argv,___envp))
 #elif defined(__CRT_HAVE_DOS$_wexecvpe)
-__CREDIRECT_DOS(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c16execvpe,(char16_t const *__restrict __file, __T16ARGV, __T16ENVP),_wexecvpe,(__path,___argv,___envp))
+__CREDIRECT_DOS(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c16execvpe,(char16_t const *__restrict __file, __T16ARGV, __T16ENVP),_wexecvpe,(__file,___argv,___envp))
 #else /* ... */
 #include <hybrid/__alloca.h>
 #include <libc/template/environ.h>
 #if (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__hybrid_alloca))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_convert_wcstombsv) || defined(__CRT_HAVE_convert_wcstombsvn) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/parts.wchar.process/wexecvpe.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3) int __NOTHROW_RPC(__LIBDCALL c16execvpe)(char16_t const *__restrict __file, __T16ARGV, __T16ENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecvpe))((__WCHAR_TYPE__ const *)__path, (__TWARGV)___argv, (__TWENVP)___envp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3) int __NOTHROW_RPC(__LIBDCALL c16execvpe)(char16_t const *__restrict __file, __T16ARGV, __T16ENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecvpe))((__WCHAR_TYPE__ const *)__file, (__TWARGV)___argv, (__TWENVP)___envp); }
 #elif (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__hybrid_alloca))) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && ((defined(__CRT_HAVE_convert_wcstombsv) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$convert_wcstombsv) || (defined(__CRT_HAVE_convert_wcstombsvn) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$convert_wcstombsvn) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign))
 #include <libc/local/parts.uchar.process/c16execvpe.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3) int __NOTHROW_RPC(__LIBDCALL c16execvpe)(char16_t const *__restrict __file, __T16ARGV, __T16ENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16execvpe))(__path, ___argv, ___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3) int __NOTHROW_RPC(__LIBDCALL c16execvpe)(char16_t const *__restrict __file, __T16ARGV, __T16ENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16execvpe))(__file, ___argv, ___envp); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_wexecvpe) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c32execvpe,(char32_t const *__restrict __file, __T32ARGV, __T32ENVP),wexecvpe,(__path,___argv,___envp))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c32execvpe,(char32_t const *__restrict __file, __T32ARGV, __T32ENVP),wexecvpe,(__file,___argv,___envp))
 #elif defined(__CRT_HAVE_KOS$wexecvpe)
-__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c32execvpe,(char32_t const *__restrict __file, __T32ARGV, __T32ENVP),wexecvpe,(__path,___argv,___envp))
+__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c32execvpe,(char32_t const *__restrict __file, __T32ARGV, __T32ENVP),wexecvpe,(__file,___argv,___envp))
 #elif defined(__CRT_HAVE__wexecvpe) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c32execvpe,(char32_t const *__restrict __file, __T32ARGV, __T32ENVP),_wexecvpe,(__path,___argv,___envp))
+__CREDIRECT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c32execvpe,(char32_t const *__restrict __file, __T32ARGV, __T32ENVP),_wexecvpe,(__file,___argv,___envp))
 #elif defined(__CRT_HAVE_KOS$_wexecvpe)
-__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c32execvpe,(char32_t const *__restrict __file, __T32ARGV, __T32ENVP),_wexecvpe,(__path,___argv,___envp))
+__CREDIRECT_KOS(__ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3),int,__NOTHROW_RPC,c32execvpe,(char32_t const *__restrict __file, __T32ARGV, __T32ENVP),_wexecvpe,(__file,___argv,___envp))
 #else /* ... */
 #include <hybrid/__alloca.h>
 #include <libc/template/environ.h>
 #if (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__hybrid_alloca))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_convert_wcstombsv) || defined(__CRT_HAVE_convert_wcstombsvn) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/parts.wchar.process/wexecvpe.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3) int __NOTHROW_RPC(__LIBKCALL c32execvpe)(char32_t const *__restrict __file, __T32ARGV, __T32ENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecvpe))((__WCHAR_TYPE__ const *)__path, (__TWARGV)___argv, (__TWENVP)___envp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3) int __NOTHROW_RPC(__LIBKCALL c32execvpe)(char32_t const *__restrict __file, __T32ARGV, __T32ENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecvpe))((__WCHAR_TYPE__ const *)__file, (__TWARGV)___argv, (__TWENVP)___envp); }
 #elif (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve) || defined(__CRT_HAVE___execve) || defined(__CRT_HAVE___libc_execve)) && defined(__hybrid_alloca))) && ((defined(__CRT_HAVE_convert_wcstombs) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombs) || (defined(__CRT_HAVE_convert_wcstombsn) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && ((defined(__CRT_HAVE_convert_wcstombsv) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$convert_wcstombsv) || (defined(__CRT_HAVE_convert_wcstombsvn) && __SIZEOF_WCHAR_T__ == 4) || defined(__CRT_HAVE_KOS$convert_wcstombsvn) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign))
 #include <libc/local/parts.uchar.process/c32execvpe.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3) int __NOTHROW_RPC(__LIBKCALL c32execvpe)(char32_t const *__restrict __file, __T32ARGV, __T32ENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32execvpe))(__path, ___argv, ___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_IN(3) int __NOTHROW_RPC(__LIBKCALL c32execvpe)(char32_t const *__restrict __file, __T32ARGV, __T32ENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32execvpe))(__file, ___argv, ___envp); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_wexecl) && __SIZEOF_WCHAR_T__ == 2 && defined(__VLIBCCALL_IS_VLIBDCALL)

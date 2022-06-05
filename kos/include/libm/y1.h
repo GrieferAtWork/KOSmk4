@@ -225,11 +225,11 @@ __LIBM_LOCAL_FUNC(y1) __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
 		 *              sin(x) +- cos(x) = -cos(2x)/(sin(x) -+ cos(x))
 		 * to compute the worse one. */
 		if (__ix > __INT32_C(0x48000000)) {
-			__z = (__LIBM_LOCAL_VALUE(invsqrtpil) * __ss) / __ieee754_sqrt(__x);
+			__z = (__LIBM_LOCAL_VALUE(invsqrtpi) * __ss) / __ieee754_sqrt(__x);
 		} else {
 			__u = __ieee754_j1_y1_pone(__x);
 			__v = __ieee754_j1_y1_qone(__x);
-			__z = __LIBM_LOCAL_VALUE(invsqrtpil) * (__u * __ss + __v * __cc) / __ieee754_sqrt(__x);
+			__z = __LIBM_LOCAL_VALUE(invsqrtpi) * (__u * __ss + __v * __cc) / __ieee754_sqrt(__x);
 		}
 		return __z;
 	}

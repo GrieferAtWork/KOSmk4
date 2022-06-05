@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9eaff1ce */
+/* HASH CRC-32:0xb6b46fdc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -871,7 +871,7 @@ NOTHROW_NCX(LIBDCALL libd__iswcsymf_l)(wint16_t wc,
 
 	COMPILER_IMPURE();
 	(void)locale;
-	return __iswcsymf(wc);
+	return libd___iswcsymf(wc);
 
 
 
@@ -888,7 +888,7 @@ NOTHROW_NCX(LIBKCALL libc__iswcsymf_l)(wint32_t wc,
 
 	COMPILER_IMPURE();
 	(void)locale;
-	return __iswcsymf(wc);
+	return libc___iswcsymf(wc);
 
 
 
@@ -905,7 +905,7 @@ NOTHROW_NCX(LIBDCALL libd__iswcsym_l)(wint16_t wc,
 
 	COMPILER_IMPURE();
 	(void)locale;
-	return __iswcsym(wc);
+	return libd___iswcsym(wc);
 
 
 
@@ -922,7 +922,7 @@ NOTHROW_NCX(LIBKCALL libc__iswcsym_l)(wint32_t wc,
 
 	COMPILER_IMPURE();
 	(void)locale;
-	return __iswcsym(wc);
+	return libc___iswcsym(wc);
 
 
 

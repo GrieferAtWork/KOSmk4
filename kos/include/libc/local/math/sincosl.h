@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1a5788d */
+/* HASH CRC-32:0x1f1484a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sincosl) __DECL_SIMD_sincosl __ATTR_OUT(2) __ATTR_OUT(3) void
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sincosl))(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
-	__LIBM_MATHFUNXL(sincos)(__x, __psinx, __pcosx);
+	__LIBM_MATHFUNXL(sincos)(__x, (__LIBM_MATHFUNL_T *)__psinx, (__LIBM_MATHFUNL_T *)__pcosx);
 #elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos) || ((defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 	double __sinx, __cosx;
 	(__NAMESPACE_LOCAL_SYM __localdep_sincos)((double)__x, &__sinx, &__cosx);

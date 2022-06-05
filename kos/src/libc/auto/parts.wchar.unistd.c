@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x365eb769 */
+/* HASH CRC-32:0x5ef7cbf1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1535,14 +1535,14 @@ NOTHROW_NCX(LIBDCALL libd_wgetdomainname)(char16_t *name,
 	if likely(result == 0) {
 		struct __LOCAL_format_wsnprintf_data printer_data;
 		struct __LOCAL_format_8tow_data convert_data;
-		size_t len = libc_strnlen(uts.domainname, COMPILER_LENOF(uts.domainname));
+		size_t len = libc_strnlen(uts.__PRIVATE_UTSNAME_DOMAINNAME, COMPILER_LENOF(uts.__PRIVATE_UTSNAME_DOMAINNAME));
 		ssize_t width;
 		printer_data.sd_buffer  = name;
 		printer_data.sd_bufsiz  = buflen;
 		convert_data.fd_arg     = &printer_data;
 		convert_data.fd_printer = &libd_format_wsnprintf_printer;
 		__mbstate_init(&convert_data.fd_incomplete);
-		width = libd_format_8tow(&convert_data, uts.domainname, len);
+		width = libd_format_8tow(&convert_data, uts.__PRIVATE_UTSNAME_DOMAINNAME, len);
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {
@@ -1576,14 +1576,14 @@ NOTHROW_NCX(LIBKCALL libc_wgetdomainname)(char32_t *name,
 	if likely(result == 0) {
 		struct __LOCAL_format_wsnprintf_data printer_data;
 		struct __LOCAL_format_8tow_data convert_data;
-		size_t len = libc_strnlen(uts.domainname, COMPILER_LENOF(uts.domainname));
+		size_t len = libc_strnlen(uts.__PRIVATE_UTSNAME_DOMAINNAME, COMPILER_LENOF(uts.__PRIVATE_UTSNAME_DOMAINNAME));
 		ssize_t width;
 		printer_data.sd_buffer  = name;
 		printer_data.sd_bufsiz  = buflen;
 		convert_data.fd_arg     = &printer_data;
 		convert_data.fd_printer = &libc_format_wsnprintf_printer;
 		__mbstate_init(&convert_data.fd_incomplete);
-		width = libc_format_8tow(&convert_data, uts.domainname, len);
+		width = libc_format_8tow(&convert_data, uts.__PRIVATE_UTSNAME_DOMAINNAME, len);
 		if unlikely(width < 0)
 			return -1;
 		if ((size_t)width >= buflen) {

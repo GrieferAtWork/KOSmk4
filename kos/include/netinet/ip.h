@@ -52,6 +52,7 @@
 
 #include <features.h>
 
+#include <hybrid/__bitfield.h>
 #include <hybrid/byteorder.h>
 
 #include <bits/types.h>
@@ -71,11 +72,11 @@ struct __ATTR_PACKED __ATTR_ALIGNED(2) timestamp {
 	__uint8_t    len;
 	__uint8_t    ptr;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int flags : 4;
-	unsigned int overflow : 4;
+	__HYBRID_BITFIELD8_T flags : 4;
+	__HYBRID_BITFIELD8_T overflow : 4;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	unsigned int overflow : 4;
-	unsigned int flags : 4;
+	__HYBRID_BITFIELD8_T overflow : 4;
+	__HYBRID_BITFIELD8_T flags : 4;
 #endif
 	__uint32_t   data[9];
 };
@@ -98,77 +99,77 @@ struct __ATTR_PACKED __ATTR_ALIGNED(2) timestamp {
 struct __ATTR_PACKED __ATTR_ALIGNED(2) iphdr /*[PREFIX(ip_)]*/ {
 #ifdef __USE_KOS_PURE
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int   ip_hl : 4; /* header length */
-	unsigned int   ip_v : 4;  /* version */
+	__HYBRID_BITFIELD8_T ip_hl : 4; /* header length */
+	__HYBRID_BITFIELD8_T ip_v : 4;  /* version */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	unsigned int   ip_v : 4;  /* version */
-	unsigned int   ip_hl : 4; /* header length */
-#endif
-	__uint8_t      ip_tos;    /* type of service (s.a. `IPTOS_*') */
-	__u_net16_t    ip_len;    /* total length (of _this_ fragment) */
-	__u_net16_t    ip_id;     /* identification */
-	__u_net16_t    ip_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
-	__uint8_t      ip_ttl;    /* time to live */
-	__uint8_t      ip_p;      /* protocol */
-	__u_net16_t    ip_sum;    /* checksum */
-	struct in_addr ip_src;    /* source address */
-	struct in_addr ip_dst;    /* dest address */
+	__HYBRID_BITFIELD8_T ip_v : 4;  /* version */
+	__HYBRID_BITFIELD8_T ip_hl : 4; /* header length */
+#endif /* __BYTE_ORDER__ == ... */
+	__uint8_t            ip_tos;    /* type of service (s.a. `IPTOS_*') */
+	__u_net16_t          ip_len;    /* total length (of _this_ fragment) */
+	__u_net16_t          ip_id;     /* identification */
+	__u_net16_t          ip_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
+	__uint8_t            ip_ttl;    /* time to live */
+	__uint8_t            ip_p;      /* protocol */
+	__u_net16_t          ip_sum;    /* checksum */
+	struct in_addr       ip_src;    /* source address */
+	struct in_addr       ip_dst;    /* dest address */
 #elif (defined(__USE_KOS) &&                          \
        defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
        defined(__COMPILER_HAVE_TRANSPARENT_UNION))
 	union {
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			unsigned int   ip_hl : 4; /* header length */
-			unsigned int   ip_v : 4;  /* version */
+			__HYBRID_BITFIELD8_T ip_hl : 4; /* header length */
+			__HYBRID_BITFIELD8_T ip_v : 4;  /* version */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-			unsigned int   ip_v : 4;  /* version */
-			unsigned int   ip_hl : 4; /* header length */
-#endif
-			__uint8_t      ip_tos;    /* type of service (s.a. `IPTOS_*') */
-			__u_net16_t    ip_len;    /* total length (of _this_ fragment) */
-			__u_net16_t    ip_id;     /* identification */
-			__u_net16_t    ip_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
-			__uint8_t      ip_ttl;    /* time to live */
-			__uint8_t      ip_p;      /* protocol */
-			__u_net16_t    ip_sum;    /* checksum */
-			struct in_addr ip_src;    /* source address */
-			struct in_addr ip_dst;    /* dest address */
+			__HYBRID_BITFIELD8_T ip_v : 4;  /* version */
+			__HYBRID_BITFIELD8_T ip_hl : 4; /* header length */
+#endif /* __BYTE_ORDER__ == ... */
+			__uint8_t            ip_tos;    /* type of service (s.a. `IPTOS_*') */
+			__u_net16_t          ip_len;    /* total length (of _this_ fragment) */
+			__u_net16_t          ip_id;     /* identification */
+			__u_net16_t          ip_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
+			__uint8_t            ip_ttl;    /* time to live */
+			__uint8_t            ip_p;      /* protocol */
+			__u_net16_t          ip_sum;    /* checksum */
+			struct in_addr       ip_src;    /* source address */
+			struct in_addr       ip_dst;    /* dest address */
 		};
 		struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			unsigned int ihl : 4;     /* header length */
-			unsigned int version : 4; /* version */
+			__HYBRID_BITFIELD8_T ihl : 4;     /* header length */
+			__HYBRID_BITFIELD8_T version : 4; /* version */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-			unsigned int version : 4; /* version */
-			unsigned int ihl : 4;     /* header length */
-#endif
-			__uint8_t    tos;         /* type of service (s.a. `IPTOS_*') */
-			__u_net16_t  tot_len;     /* total length (of _this_ fragment) */
-			__u_net16_t  id;          /* identification */
-			__u_net16_t  frag_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
-			__uint8_t    ttl;         /* time to live */
-			__uint8_t    protocol;    /* protocol */
-			__u_net16_t  check;       /* checksum */
-			__u_net32_t  saddr;       /* source address */
-			__u_net32_t  daddr;       /* dest address */
+			__HYBRID_BITFIELD8_T version : 4; /* version */
+			__HYBRID_BITFIELD8_T ihl : 4;     /* header length */
+#endif /* __BYTE_ORDER__ == ... */
+			__uint8_t            tos;         /* type of service (s.a. `IPTOS_*') */
+			__u_net16_t          tot_len;     /* total length (of _this_ fragment) */
+			__u_net16_t          id;          /* identification */
+			__u_net16_t          frag_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
+			__uint8_t            ttl;         /* time to live */
+			__uint8_t            protocol;    /* protocol */
+			__u_net16_t          check;       /* checksum */
+			__u_net32_t          saddr;       /* source address */
+			__u_net32_t          daddr;       /* dest address */
 		};
 	};
 #else /* ... */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int ihl : 4;     /* header length */
-	unsigned int version : 4; /* version */
+	__HYBRID_BITFIELD8_T ihl : 4;     /* header length */
+	__HYBRID_BITFIELD8_T version : 4; /* version */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	unsigned int version : 4; /* version */
-	unsigned int ihl : 4;     /* header length */
-#endif
-	__uint8_t    tos;         /* type of service (s.a. `IPTOS_*') */
-	__u_net16_t  tot_len;     /* total length (of _this_ fragment) */
-	__u_net16_t  id;          /* identification */
-	__u_net16_t  frag_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
-	__uint8_t    ttl;         /* time to live */
-	__uint8_t    protocol;    /* protocol */
-	__u_net16_t  check;       /* checksum */
+	__HYBRID_BITFIELD8_T version : 4; /* version */
+	__HYBRID_BITFIELD8_T ihl : 4;     /* header length */
+#endif /* __BYTE_ORDER__ == ... */
+	__uint8_t            tos;         /* type of service (s.a. `IPTOS_*') */
+	__u_net16_t          tot_len;     /* total length (of _this_ fragment) */
+	__u_net16_t          id;          /* identification */
+	__u_net16_t          frag_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
+	__uint8_t            ttl;         /* time to live */
+	__uint8_t            protocol;    /* protocol */
+	__u_net16_t          check;       /* checksum */
 #ifdef __USE_KOS
 #ifdef __COMPILER_HAVE_TRANSPARENT_UNION
 	union {
@@ -251,21 +252,21 @@ struct __ATTR_PACKED __ATTR_ALIGNED(2) iphdr /*[PREFIX(ip_)]*/ {
 #ifndef __USE_KOS_PURE /* The same structure as `struct iphdr' */
 struct __ATTR_PACKED __ATTR_ALIGNED(2) ip {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int   ip_hl : 4; /* header length */
-	unsigned int   ip_v : 4;  /* version */
+	__HYBRID_BITFIELD8_T ip_hl : 4; /* header length */
+	__HYBRID_BITFIELD8_T ip_v : 4;  /* version */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	unsigned int   ip_v : 4;  /* version */
-	unsigned int   ip_hl : 4; /* header length */
-#endif
-	__uint8_t      ip_tos;    /* type of service (s.a. `IPTOS_*') */
-	__u_net16_t    ip_len;    /* total length (of _this_ fragment) */
-	__u_net16_t    ip_id;     /* identification */
-	__u_net16_t    ip_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
-	__uint8_t      ip_ttl;    /* time to live */
-	__uint8_t      ip_p;      /* protocol */
-	__u_net16_t    ip_sum;    /* checksum */
-	struct in_addr ip_src;    /* source address */
-	struct in_addr ip_dst;    /* dest address */
+	__HYBRID_BITFIELD8_T ip_v : 4;  /* version */
+	__HYBRID_BITFIELD8_T ip_hl : 4; /* header length */
+#endif /* __BYTE_ORDER__ == ... */
+	__uint8_t            ip_tos;    /* type of service (s.a. `IPTOS_*') */
+	__u_net16_t          ip_len;    /* total length (of _this_ fragment) */
+	__u_net16_t          ip_id;     /* identification */
+	__u_net16_t          ip_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
+	__uint8_t            ip_ttl;    /* time to live */
+	__uint8_t            ip_p;      /* protocol */
+	__u_net16_t          ip_sum;    /* checksum */
+	struct in_addr       ip_src;    /* source address */
+	struct in_addr       ip_dst;    /* dest address */
 };
 #endif /* __CC__ */
 #endif /* !__USE_KOS_PURE */
@@ -273,25 +274,25 @@ struct __ATTR_PACKED __ATTR_ALIGNED(2) ip {
 /* Time stamp option structure. */
 #ifdef __CC__
 struct __ATTR_PACKED __ATTR_ALIGNED(2) ip_timestamp {
-	__uint8_t    ipt_code;     /* IPOPT_TS */
-	__uint8_t    ipt_len;      /* size of structure (variable) */
-	__uint8_t    ipt_ptr;      /* index of current entry */
+	__uint8_t            ipt_code;     /* IPOPT_TS */
+	__uint8_t            ipt_len;      /* size of structure (variable) */
+	__uint8_t            ipt_ptr;      /* index of current entry */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int ipt_flg : 4;  /* flags, see below */
-	unsigned int ipt_oflw : 4; /* overflow counter */
+	__HYBRID_BITFIELD8_T ipt_flg : 4;  /* flags, see below */
+	__HYBRID_BITFIELD8_T ipt_oflw : 4; /* overflow counter */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	unsigned int ipt_oflw : 4; /* overflow counter */
-	unsigned int ipt_flg : 4;  /* flags, see below */
-#endif
+	__HYBRID_BITFIELD8_T ipt_oflw : 4; /* overflow counter */
+	__HYBRID_BITFIELD8_T ipt_flg : 4;  /* flags, see below */
+#endif /* __BYTE_ORDER__ == ... */
 #ifdef __USE_KOS_PURE
-	__u_net32_t  ipt_data[9];
+	__u_net32_t          ipt_data[9];
 #elif (defined(__USE_KOS) && defined(__COMPILER_HAVE_TRANSPARENT_UNION))
 	union {
-		__u_net32_t ipt_data[9];
-		__u_net32_t data[9];
+		__u_net32_t      ipt_data[9];
+		__u_net32_t      data[9];
 	};
 #else /* ... */
-	__u_net32_t  data[9];
+	__u_net32_t          data[9];
 #endif /* !... */
 };
 #endif /* __CC__ */
