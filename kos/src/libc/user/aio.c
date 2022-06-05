@@ -108,7 +108,7 @@ NOTHROW_NCX(LIBCCALL sigevent_notify)(struct sigevent const *__restrict self) {
 		break;
 
 	case SIGEV_THREAD: {
-		STATIC_ASSERT(sizeof(sigval_t) == sizeof(void *));
+		STATIC_ASSERT((sizeof(sigval_t) == sizeof(void *)));
 		pthread_t p;
 		pthread_attr_t _attr;
 		pthread_attr_t *attr;

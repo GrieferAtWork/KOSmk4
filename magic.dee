@@ -413,6 +413,12 @@ function main(argv: {string...}) {
 					CONFIG_EMULATOR_USED = none;
 					break;
 
+				case "--environ": {
+					local name;
+					name, none, value = value.partition("=")...;
+					fs.environ[name] = value;
+				}	break;
+
 				default:
 					goto _err_unknown_argument;
 				}

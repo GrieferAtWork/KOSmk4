@@ -180,12 +180,13 @@
      (defined(__cplusplus) &&                                                                      \
       ((defined(__BORLANDC__) && defined(__CODEGEAR_0X_SUPPORT__) && __BORLANDC__ + 0 >= 0x610) || \
        (defined(__CODEGEARC__) && __CODEGEARC__ + 0 > 0x620))))
-#define __STATIC_ASSERT_IS_static_assert
 #if defined(__cpp_static_assert) && __cpp_static_assert + 0 >= 201411
+#define __STATIC_ASSERT_IS_static_assert
 #define __STATIC_ASSERT static_assert
 #else /* __cpp_static_assert >= 201411 */
 #define __STATIC_ASSERT(expr) static_assert(expr, #expr)
 #endif /* __cpp_static_assert < 201411 */
+#define __STATIC_ASSERT_MSG_IS_static_assert
 #define __STATIC_ASSERT_MSG static_assert
 #elif (defined(_Static_assert) || __has_feature(c_static_assert) || \
        (!defined(__cplusplus) && ((defined(__STDC_VERSION__) && __STDC_VERSION__ + 0 >= 201112L))))

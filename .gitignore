@@ -21,6 +21,7 @@ __ice__
 *.dec
 *.latest
 *.stackdump
+*.tmp
 
 # These headers are installed by `make_utility.sh ... ncurses`
 /kos/include/bsd/curses.h

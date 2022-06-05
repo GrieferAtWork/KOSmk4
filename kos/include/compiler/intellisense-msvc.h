@@ -528,7 +528,7 @@ enum {
 //#define asm(...)           /* Nothing (Used for register variables) */
 #define asm                __asm__
 #define __asm              __asm__
-#define __asm__(...)       ;enum{}
+#define __asm__(...)       /* Nothing */
 #define goto(...)          /* Nothing */
 #define __attribute        __attribute__
 #define __extension__      /* Nothing */
@@ -660,6 +660,10 @@ typedef bool _Bool;
 #define ____INTELLISENSE_attribute___warning__                ____INTELLISENSE_ATTR_FUNC_STR
 #define ____INTELLISENSE_attribute_weak                       ____INTELLISENSE_ATTR_FUNCORVAR
 #define ____INTELLISENSE_attribute___weak__                   ____INTELLISENSE_ATTR_FUNCORVAR
+#define ____INTELLISENSE_attribute_artificial                 ____INTELLISENSE_ATTR_FUNC
+#define ____INTELLISENSE_attribute___artificial__             ____INTELLISENSE_ATTR_FUNC
+#define ____INTELLISENSE_attribute_access(...)                ____INTELLISENSE_ATTR_FUNC
+#define ____INTELLISENSE_attribute___access__                 ____INTELLISENSE_attribute_access
 #define ____INTELLISENSE_ATTR_FORMAT_asm_fprintf              ____INTELLISENSE_ATTR_FUNC
 #define ____INTELLISENSE_ATTR_FORMAT___asm_fprintf__          ____INTELLISENSE_ATTR_FUNC
 #define ____INTELLISENSE_ATTR_FORMAT_gcc_cdiag                ____INTELLISENSE_ATTR_FUNC
@@ -732,6 +736,7 @@ enum { /* Highlight attributes in a different color */
 	__warn_unused_result__, /* __attribute__((warn_unused_result)); */
 	__warning__,            /* __attribute__((warning)); */
 	__weak__,               /* __attribute__((weak)); */
+	__access__,             /* __attribute__((access(...,1,2))); */
 #ifdef __x86_64__
 	__ms_abi__,             /* __attribute__((ms_abi)); */
 	__sysv_abi__,           /* __attribute__((sysv_abi)); */
@@ -752,6 +757,11 @@ enum { /* Highlight attributes in a different color */
 	__gcc_diag__,           /* __attribute__((format(gcc_diag,1,2))); */
 	__gcc_cdiag__,          /* __attribute__((format(gcc_cdiag,1,2))); */
 	__gcc_cxxdiag__,        /* __attribute__((format(gcc_cxxdiag,1,2))); */
+	__artificial__,         /* __attribute__((artificial)); */
+	__none__,               /* __attribute__((access(none,1))); */
+	__read_only__,          /* __attribute__((access(read_only,1))); */
+	__write_only__,         /* __attribute__((access(write_only,1))); */
+	__read_write__,         /* __attribute__((access(read_write,1))); */
 };
 #endif
 
@@ -1021,22 +1031,22 @@ void __builtin_va_end(__builtin_va_list &ap);
 void __builtin_va_copy(__builtin_va_list &dst_ap, __builtin_va_list &src_ap);
 #define __builtin_va_arg(ap, __T) (::__intern::____INTELLISENSE_va_arg_heper<__T>(ap))
 
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_fetch_and_add(__T volatile *ptr, __S value, ...);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_fetch_and_sub(__T volatile *ptr, __S value, ...);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_fetch_and_or(__T volatile *ptr, __S value, ...);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_fetch_and_and(__T volatile *ptr, __S value, ...);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_fetch_and_xor(__T volatile *ptr, __S value, ...);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_fetch_and_nand(__T volatile *ptr, __S value, ...);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_add_and_fetch(__T volatile *ptr, __S value, ...);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_sub_and_fetch(__T volatile *ptr, __S value, ...);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_or_and_fetch(__T volatile *ptr, __S value, ...);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_and_and_fetch(__T volatile *ptr, __S value, ...);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_xor_and_fetch(__T volatile *ptr, __S value, ...);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_nand_and_fetch(__T volatile *ptr, __S value, ...);
-template<class __T, class __S, class __N> typename ::__intern::____INTELLISENSE_enableif_arith<__T, bool>::__type __sync_bool_compare_and_swap(__T volatile *ptr, __S oldval, __N newval, ...);
-template<class __T, class __S, class __N> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_val_compare_and_swap(__T volatile *ptr, __S oldval, __N newval, ...);
-template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T, __T>::__type __sync_lock_test_and_set(__T *ptr, __S value, ...);
-template<class __T> typename ::__intern::____INTELLISENSE_enableif_arith<__T, void>::__type __sync_lock_release(__T *ptr, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_fetch_and_add(__T volatile *ptr, __S value, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_fetch_and_sub(__T volatile *ptr, __S value, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_fetch_and_or(__T volatile *ptr, __S value, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_fetch_and_and(__T volatile *ptr, __S value, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_fetch_and_xor(__T volatile *ptr, __S value, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_fetch_and_nand(__T volatile *ptr, __S value, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_add_and_fetch(__T volatile *ptr, __S value, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_sub_and_fetch(__T volatile *ptr, __S value, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_or_and_fetch(__T volatile *ptr, __S value, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_and_and_fetch(__T volatile *ptr, __S value, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_xor_and_fetch(__T volatile *ptr, __S value, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_nand_and_fetch(__T volatile *ptr, __S value, ...);
+template<class __T, class __S, class __N> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, bool>::__type __sync_bool_compare_and_swap(__T volatile *ptr, __S oldval, __N newval, ...);
+template<class __T, class __S, class __N> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_val_compare_and_swap(__T volatile *ptr, __S oldval, __N newval, ...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, __T>::__type __sync_lock_test_and_set(__T *ptr, __S value, ...);
+template<class __T> typename ::__intern::____INTELLISENSE_enableif< ::__intern::____INTELLISENSE_isarith<__T>::__value, void>::__type __sync_lock_release(__T *ptr, ...);
 void __sync_synchronize(...);
 
 

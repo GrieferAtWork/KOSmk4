@@ -427,7 +427,7 @@ function processKosDebugOutput(
 	local stored_data = Cell();
 	function writeData(data: Bytes) {
 		data = data.replace("\030", "");
-		if (stored_data.value is bound) {
+		if (stored_data) {
 			data = stored_data.value + data;
 			del stored_data.value;
 		}
@@ -637,7 +637,7 @@ do_flush_text:
 		writeData(text[flushStart:]);
 	}
 done_join:
-	if (stored_data.value is bound)
+	if (stored_data)
 		writeStdout(FINAL_FORMAT_RAW_DATA(stored_data.value));
 	for (local none, x: running_addr2line)
 		x.close();

@@ -25,13 +25,28 @@
 /* Define `static_assert()', optionally with  no-message
  * overload when KOS or isoc++17 extensions are enabled. */
 #if !defined(static_assert) && (defined(__USE_ISOC11) || defined(__USE_ISOCXX11) || defined(__USE_KOS))
-#if defined(__cpp_static_assert) && __cpp_static_assert + 0 >= 201411
+#if (defined(__STATIC_ASSERT_IS_static_assert) || \
+     (defined(__cpp_static_assert) && __cpp_static_assert + 0 >= 201411))
 /* the message argument is already optional! */
 #elif defined(__USE_KOS) || defined(__USE_ISOCXX17)
 /* Emulate `static_assert()' such that the message becomes optional. */
 #include <hybrid/pp/__va_nargs.h>
 #ifdef __HYBRID_PP_VA_OVERLOAD
+#ifdef __STATIC_ASSERT_IS_static_assert
+#define __PRIVATE_static_assert_1(a) static_assert(a)
+#else /* __STATIC_ASSERT_IS_static_assert */
 #define __PRIVATE_static_assert_1(a) __STATIC_ASSERT(a)
+#endif /* !__STATIC_ASSERT_IS_static_assert */
+#ifdef __STATIC_ASSERT_MSG_IS_static_assert
+#define __PRIVATE_static_assert_2(a, msg) static_assert(a, msg)
+#define __PRIVATE_static_assert_3(a, b, msg) static_assert((a, b), msg)
+#define __PRIVATE_static_assert_4(a, b, c, msg) static_assert((a, b, c), msg)
+#define __PRIVATE_static_assert_5(a, b, c, d, msg) static_assert((a, b, c, d), msg)
+#define __PRIVATE_static_assert_6(a, b, c, d, e, msg) static_assert((a, b, c, d, e), msg)
+#define __PRIVATE_static_assert_7(a, b, c, d, e, f, msg) static_assert((a, b, c, d, e, f), msg)
+#define __PRIVATE_static_assert_8(a, b, c, d, e, f, g, msg) static_assert((a, b, c, d, e, f, g), msg)
+#define __PRIVATE_static_assert_9(a, b, c, d, e, f, g, h, msg) static_assert((a, b, c, d, e, f, g, h), msg)
+#else /* __STATIC_ASSERT_MSG_IS_static_assert */
 #define __PRIVATE_static_assert_2(a, msg) __STATIC_ASSERT_MSG(a, msg)
 #define __PRIVATE_static_assert_3(a, b, msg) __STATIC_ASSERT_MSG((a, b), msg)
 #define __PRIVATE_static_assert_4(a, b, c, msg) __STATIC_ASSERT_MSG((a, b, c), msg)
@@ -40,6 +55,7 @@
 #define __PRIVATE_static_assert_7(a, b, c, d, e, f, msg) __STATIC_ASSERT_MSG((a, b, c, d, e, f), msg)
 #define __PRIVATE_static_assert_8(a, b, c, d, e, f, g, msg) __STATIC_ASSERT_MSG((a, b, c, d, e, f, g), msg)
 #define __PRIVATE_static_assert_9(a, b, c, d, e, f, g, h, msg) __STATIC_ASSERT_MSG((a, b, c, d, e, f, g, h), msg)
+#endif /* !__STATIC_ASSERT_MSG_IS_static_assert */
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define static_assert(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_static_assert_, (__VA_ARGS__))(__VA_ARGS__)
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)

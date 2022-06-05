@@ -114,6 +114,13 @@ function createVsFile(filename: string, cb: Callable) {
 	with (fp) cb(fp);
 }
 
+function injectPath(): string {
+	/* For some reason, Visual Studio unsetenv's $PATH when calling our build script.
+	 * Work around this issue by saving $PATH at the time the project files were build,
+	 * so it can be injected into magic.dee, which will then restore it! */
+	return "\"--environ=PATH={}\"".format({ fs.environ["PATH"] });
+}
+
 createVsFile("kos.sln", [](fp) {
 	fp <<
 "
@@ -201,9 +208,21 @@ createVsFile("kos.vcxproj", [](fp) {
 	for (local name: SORTED_FILE_NAMES) {
 		local typ = FILES[name];
 		if (typ == FILE_KIND_SRC) {
-			fp <<
-"		<ClCompile Include=\"" << projRelPath(name) << "\" />
+			name = projRelPath(name);
+			if (name.startswith(r"..\kos\src\kernel")) {
+				fp <<
+"		<ClCompile Include=\"" << name << "\">
+			<AdditionalOptions>$(AdditionalOptions) /D__KERNEL__";
+				if (name.startswith(r"..\kos\src\kernel\core"))
+					fp << " /DCONFIG_BUILDING_KERNEL_CORE";
+				fp << "</AdditionalOptions>
+		</ClCompile>
 ";
+			} else {
+				fp <<
+"		<ClCompile Include=\"" << name << "\" />
+";
+			}
 		}
 	}
 	fp <<
@@ -267,18 +286,20 @@ createVsFile("kos.vcxproj", [](fp) {
 		<LibraryWPath />
 		<SourcePath />
 		<ExcludePath />
-		<NMakeBuildCommandLine>cmd /C \"" << ROOTDIR << "\\binutils\\deemon\\deemon.exe"
+		<NMakeBuildCommandLine>C:\\Windows\\system32\\cmd.exe /C \"" << ROOTDIR << "\\binutils\\deemon\\deemon.exe"
 			" " << ROOTDIR << "\\magic.dee"
 			" --build-only"     /* Force rebuild */
 			" --target=" << PORJ_TARGETS_MAGIC_NAME(target) <<
 			" --config=" << configShortHand <<
+			" " << injectPath() <<
 			"\"</NMakeBuildCommandLine>
-		<NMakeReBuildCommandLine>cmd /C \"" << ROOTDIR << "\\binutils\\deemon\\deemon.exe"
+		<NMakeReBuildCommandLine>C:\\Windows\\system32\\cmd.exe /C \"" << ROOTDIR << "\\binutils\\deemon\\deemon.exe"
 			" " << ROOTDIR << "\\magic.dee"
 			" -f"               /* Force rebuild */
 			" --build-only"     /* Only build */
 			" --target=" << PORJ_TARGETS_MAGIC_NAME(target) <<
 			" --config=" << configShortHand <<
+			" " << injectPath() <<
 			"\"</NMakeReBuildCommandLine>
 		<NMakeCleanCommandLine>CMD_NEW"  /* ??? */
 			"</NMakeCleanCommandLine>
@@ -430,9 +451,12 @@ createVsFile("kos.vcxproj.user", [](fp) {
 			fp <<
 "	<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='" << config << "|" << target_int << "'\">
 		<LocalDebuggerCommand>" << ROOTDIR << "\\binutils\\deemon\\deemon.exe</LocalDebuggerCommand>
-		<LocalDebuggerCommandArguments>--run-only"
+		<LocalDebuggerCommandArguments>"
+			<< ROOTDIR << "\\magic.dee"
+			" --run-only"
 			" --target=" << PORJ_TARGETS_MAGIC_NAME(target) <<
 			" --config=" << configShortHand <<
+			" " << injectPath() <<
 			"</LocalDebuggerCommandArguments>
 		<LocalDebuggerWorkingDirectory>" << ROOTDIR << "</LocalDebuggerWorkingDirectory>
 		<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
