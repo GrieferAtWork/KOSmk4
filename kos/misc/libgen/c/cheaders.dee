@@ -1639,14 +1639,15 @@ class LoaderFunctionImplementation {
 }
 
 
-@@Mapping of symbol names to sets of namespaces that use the cast-to-return-type trick
-@@When these appear in using declarations, code must be generated to check for macro
-@@definitions, which in turn must cause the return type to be imported, rather than
-@@the function itself.
-global usingImportReturnTypeTrickUsed: {string: HashSet with Namespace} = Dict();
+@@Name of the return-type used by the using-import-return-type trick.
 function usingImportReturnTypeNameOf(exposedName: string): string {
 	return "__PRIVATE_{}_rt".format({ exposedName });
 }
+
+@@Set of functions that are imported from the global namespace. Functions
+@@in this set may need to be able to support the cast-to-return-type trick
+@@if they are ever defined as macros.
+global everImportedFromGlobalNamespace: HashSet with string = HashSet();
 
 
 class LocalFunction {
@@ -1654,7 +1655,7 @@ class LocalFunction {
 
 	public operator == (other: Function): bool -> this === other;
 	public operator != (other: Function): bool -> this !== other;
-	public operator hash (): int -> Object.id(this);
+	public operator hash(): int -> Object.id(this);
 
 	@@Name of this local function (e.g. "strlen")
 	public member name: string | UserString;
@@ -1833,21 +1834,18 @@ class LocalFunction {
 						callToEscapeMode: callToEscapeMode);
 				});
 			}
-			if (fp.namespace != GLOBAL_NAMESPACE) {
+			if (fp.namespace != GLOBAL_NAMESPACE || exposedName in everImportedFromGlobalNamespace) {
 				if (exposedName == name) {
 					fp.ppElif("defined(__cplusplus)");
 				} else {
 					fp.ppIf("defined(__cplusplus)");
 				}
 				/* Use the cast-to-return-type-for-namespace-prefix trick. */
-				local set = usingImportReturnTypeTrickUsed.get(exposedName);
-				if (set is none)
-					set = usingImportReturnTypeTrickUsed.setdefault(exposedName, HashSet());
-				set.insert(fp.namespace);
 				fp << "typedef ";
 				usedPrototype.returnType.cprint(fp, escapeMode);
 				local rtName = usingImportReturnTypeNameOf(exposedName);
 				fp	<< " " << rtName << ";\n"
+					<< "#define " << rtName << " " << rtName << "\n"
 					<< "#define " << exposedName << "(...) "
 					<< rtName << "(" << callToLocalName << "(__VA_ARGS__))\n";
 				fp.ppElse();
@@ -2137,10 +2135,12 @@ class NamespaceBinding {
 			 * imported in that case) */
 			if (namespace === STD_NAMESPACE) {
 				/* We can always simply use keyUsing() in this case! */
-				local rtTricks: HashSet with Namespace = usingImportReturnTypeTrickUsed.get(exposedName);
-				if (rtTricks !is none && namespace in rtTricks) {
-					fp.ppIfdef(exposedName);
-					namespace.keyUsing(fp, usingImportReturnTypeNameOf(exposedName));
+				if ((for (local none, protos: conditionalPrototypes)
+						protos.each.hasEllipsis || ...
+					) || ...) {
+					local tn = usingImportReturnTypeNameOf(exposedName);
+					fp.ppIfdef(tn);
+					namespace.keyUsing(fp, tn);
 					fp.ppElse();
 					namespace.keyUsing(fp, exposedName);
 					fp.ppEndif();
@@ -2157,15 +2157,21 @@ class NamespaceBinding {
 			if (#conditionalPrototypes == 1 && conditionalPrototypes.first[0] == "1") {
 				local prototypes = conditionalPrototypes.first[1];
 				local doUsingPpCond = "1";
-				local usedCallToPrototype = none;
+				local isFirst = true;
 				if (#prototypes == 1) {
-					usedCallToPrototype = prototypes.first;
+					local usedCallToPrototype = prototypes.first;
 					if (prototype is bound)
 						usedCallToPrototype = functionPrototype;
-					if (usedCallToPrototype.hasEllipsis)
+					if (usedCallToPrototype.hasEllipsis) {
+						/* Deal with the using-import-return-type trick */
+						local tn = usingImportReturnTypeNameOf(exposedName);
+						fp.ppIfdef(tn);
+						isFirst = false;
+						namespace.keyUsing(fp, tn);
 						doUsingPpCond = "__has_builtin(__builtin_va_arg_pack)";
+					}
 				}
-				fp.ppIf(doUsingPpCond);
+				(isFirst ? fp.ppIf : fp.ppElif)(doUsingPpCond);
 				namespace.keyUsingOrImpl(fp, exposedName, []{
 					if (#prototypes == 1) {
 						local callToPrototype = prototypes.first;
@@ -2193,10 +2199,11 @@ class NamespaceBinding {
 					}
 				});
 				if (doUsingPpCond != "1") {
-					fp.ppElse();
 					if (fp.namespace === GLOBAL_NAMESPACE) {
+						fp.ppElse();
 						fp << "#define " << exposedName << "(...) " << cSymbolName << "(__VA_ARGS__)\n";
 					} else {
+						fp.ppElse();
 						namespace.keyUsing(fp, exposedName);
 					}
 				}

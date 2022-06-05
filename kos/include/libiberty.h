@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98a056af */
+/* HASH CRC-32:0x6818d6e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -158,7 +158,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vasprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
  * Print  a formatted string to a given in-member string buffer `buf'
  * Always return the REQUIRED buffer size (excluding a trailing  NUL-
  * character), and never write more than `buflen' characters to `buf' */
+#ifdef __PRIVATE_snprintf_rt
+__NAMESPACE_STD_USING(__PRIVATE_snprintf_rt)
+#else /* __PRIVATE_snprintf_rt */
 __NAMESPACE_STD_USING(snprintf)
+#endif /* !__PRIVATE_snprintf_rt */
 #elif __has_builtin(__builtin_snprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_snprintf) && __has_builtin(__builtin_va_arg_pack)
 /* >> snprintf(3), vsnprintf(3)
  * Print  a formatted string to a given in-member string buffer `buf'
@@ -185,9 +189,13 @@ __LIBC __ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_OUTS(1, 2) __STDC_INT_AS_SIZ
  * character), and never write more than `buflen' characters to `buf' */
 #if defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_USING_OR_IMPL(snprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_OUTS(1, 2) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL snprintf)(char *__restrict __buf, size_t __buflen, char const *__restrict __format, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(snprintf))(__buf, __buflen, __format, __builtin_va_arg_pack()); })
-#else /* __cplusplus && __has_builtin(__builtin_va_arg_pack) */
+#elif defined(__cplusplus)
+typedef __STDC_INT_AS_SIZE_T __PRIVATE_snprintf_rt;
+#define __PRIVATE_snprintf_rt __PRIVATE_snprintf_rt
+#define snprintf(...) __PRIVATE_snprintf_rt((__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(snprintf))(__VA_ARGS__))
+#else /* ... */
 #define snprintf(...) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(snprintf))(__VA_ARGS__)
-#endif /* !__cplusplus || !__has_builtin(__builtin_va_arg_pack) */
+#endif /* !... */
 #endif /* !... */
 #endif /* !__snprintf_defined */
 #ifndef __vsnprintf_defined

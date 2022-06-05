@@ -6837,6 +6837,8 @@ done_function:
 					nsGuard = ns.keyDefaultGuard(exposedName);
 				if (ns === dflNamespace)
 					dflGuard = nsGuard;
+				if (currentFeatures.std && ns === GLOBAL_NAMESPACE)
+					everImportedFromGlobalNamespace.insert(exposedName);
 				moreBindings.append(FunctionBinding(
 					ppCond:     "defined({})".format({ nsGuard }),
 					prototypes: currentPrototypes,

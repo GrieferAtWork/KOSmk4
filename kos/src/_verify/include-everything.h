@@ -253,6 +253,7 @@ incdir("");
 #include <bits/crt/db/ttyent.h>
 #include <bits/crt/db/utmp.h>
 #include <bits/crt/db/utmpx.h>
+#include <bits/crt/div.h>
 #include <bits/crt/dyn-string.h>
 #include <bits/crt/environments.h>
 #include <bits/crt/fenv-inline.h>
