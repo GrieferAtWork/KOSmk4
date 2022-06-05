@@ -2767,6 +2767,7 @@ libdl_dlauxctrl(USER DlModule *self, unsigned int cmd, ...)
 		goto err;
 
 	case DLAUXCTRL_GET_MAIN_TLSSEG:
+		va_end(args);
 		return libdl_dlmainsegment();
 
 	default:

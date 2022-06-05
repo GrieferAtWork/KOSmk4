@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e298377 */
+/* HASH CRC-32:0xc3d2f060 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -467,6 +467,8 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid,
 	pid_t result = -1;
 
 	fd = libc_open(path, O_RDONLY | O_CLOEXEC);
+
+
 
 
 

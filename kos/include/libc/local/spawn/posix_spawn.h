@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd142c25c */
+/* HASH CRC-32:0xf6639581 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,6 +98,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn))(__pid_t *__restrict __p
 	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __O_RDONLY | __O_CLOEXEC);
 #elif defined(__O_RDONLY)
 	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __O_RDONLY);
+#elif defined(__O_CLOEXEC)
+	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __O_CLOEXEC);
 #else /* ... */
 	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, 0);
 #endif /* !... */

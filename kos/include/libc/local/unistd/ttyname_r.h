@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fea8103 */
+/* HASH CRC-32:0xb21feea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -306,13 +306,13 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ttyname_r))(__fd_t __fd, char *__buf,
 		__ino  = __st.st_ino;
 		while ((__d = (__NAMESPACE_LOCAL_SYM __localdep_readdir64)(__dirstream)) != __NULLPTR) {
 			__SIZE_TYPE__ __needed;
-	
+
 			/* We're looking for character devices. */
 			if (__d->d_type != __DT_CHR)
 				continue;
 			if (__d->d_ino != __ino)
 				continue;
-	
+
 #ifndef __KOS__
 			/* On KOS, these are symlinks (DT_LNK), so we've already skipped them ;) */
 			if ((__NAMESPACE_LOCAL_SYM __localdep_strcmp)(__d->d_name, "stdin") == 0)
@@ -362,7 +362,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ttyname_r))(__fd_t __fd, char *__buf,
 				continue;
 			if __unlikely(!__S_ISCHR(__st.st_mode))
 				continue;
-	
+
 			/* Found it! */
 #if defined(__CRT_HAVE_closedir) || defined(__CRT_HAVE___libc_closedir) || defined(__USE_DOS_DIRENT)
 			(__NAMESPACE_LOCAL_SYM __localdep_closedir)(__dirstream);

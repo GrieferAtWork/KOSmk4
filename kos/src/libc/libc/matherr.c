@@ -279,36 +279,10 @@ libc_handle_matherr(void const *return_pc_in_math_function,
 	case __LIBM_KMATHERRF_HYPOT:
 	case __LIBM_KMATHERRL_HYPOT:
 		/* hypot(finite,finite) overflow */
-		exc.type = OVERFLOW;
-		if (version == _SVID_) {
-			exc.retval = HUGE;
-		} else {
-			exc.retval = HUGE_VAL;
-		}
-		if (version == _POSIX_) {
-			exc.err = ERANGE;
-		} else if (matherr(&exc) == 0) {
-			exc.err = ERANGE;
-		}
-		break;
-
 	case __LIBM_KMATHERR_COSH:
 	case __LIBM_KMATHERRF_COSH:
 	case __LIBM_KMATHERRL_COSH:
 		/* cosh(finite) overflow */
-		exc.type = OVERFLOW;
-		if (version == _SVID_) {
-			exc.retval = HUGE;
-		} else {
-			exc.retval = HUGE_VAL;
-		}
-		if (version == _POSIX_) {
-			exc.err = ERANGE;
-		} else if (matherr(&exc) == 0) {
-			exc.err = ERANGE;
-		}
-		break;
-
 	case __LIBM_KMATHERR_EXP_OVERFLOW:
 	case __LIBM_KMATHERRF_EXP_OVERFLOW:
 	case __LIBM_KMATHERRL_EXP_OVERFLOW:
@@ -366,21 +340,7 @@ libc_handle_matherr(void const *return_pc_in_math_function,
 	case __LIBM_KMATHERRF_Y0_ZERO:
 	case __LIBM_KMATHERRL_Y0_ZERO:
 		/* y0(0) = -inf */
-		exc.type = DOMAIN; /* should be SING for IEEE */
-		if (version == _SVID_) {
-			exc.retval = -HUGE;
-		} else {
-			exc.retval = -HUGE_VAL;
-		}
-		if (version == _POSIX_) {
-			exc.err = EDOM;
-		} else if (matherr(&exc) == 0) {
-			if (version == _SVID_)
-				WRITE_ERROR("y0: DOMAIN error\n");
-			exc.err = EDOM;
-		}
-		break;
-
+		/*exc.type = DOMAIN;*/ /* should be SING for IEEE */
 	case __LIBM_KMATHERR_Y0_MINUS:
 	case __LIBM_KMATHERRF_Y0_MINUS:
 	case __LIBM_KMATHERRL_Y0_MINUS:
@@ -404,21 +364,7 @@ libc_handle_matherr(void const *return_pc_in_math_function,
 	case __LIBM_KMATHERRF_Y1_ZERO:
 	case __LIBM_KMATHERRL_Y1_ZERO:
 		/* y1(0) = -inf */
-		exc.type = DOMAIN; /* should be SING for IEEE */
-		if (version == _SVID_) {
-			exc.retval = -HUGE;
-		} else {
-			exc.retval = -HUGE_VAL;
-		}
-		if (version == _POSIX_) {
-			exc.err = EDOM;
-		} else if (matherr(&exc) == 0) {
-			if (version == _SVID_)
-				WRITE_ERROR("y1: DOMAIN error\n");
-			exc.err = EDOM;
-		}
-		break;
-
+		/*exc.type = DOMAIN;*/ /* should be SING for IEEE */
 	case __LIBM_KMATHERR_Y1_MINUS:
 	case __LIBM_KMATHERRF_Y1_MINUS:
 	case __LIBM_KMATHERRL_Y1_MINUS:
@@ -442,21 +388,7 @@ libc_handle_matherr(void const *return_pc_in_math_function,
 	case __LIBM_KMATHERRF_YN_ZERO:
 	case __LIBM_KMATHERRL_YN_ZERO:
 		/* yn(n,0) = -inf */
-		exc.type = DOMAIN; /* should be SING for IEEE */
-		if (version == _SVID_) {
-			exc.retval = -HUGE;
-		} else {
-			exc.retval = -HUGE_VAL;
-		}
-		if (version == _POSIX_) {
-			exc.err = EDOM;
-		} else if (matherr(&exc) == 0) {
-			if (version == _SVID_)
-				WRITE_ERROR("yn: DOMAIN error\n");
-			exc.err = EDOM;
-		}
-		break;
-
+		/*exc.type = DOMAIN;*/ /* should be SING for IEEE */
 	case __LIBM_KMATHERR_YN_MINUS:
 	case __LIBM_KMATHERRF_YN_MINUS:
 	case __LIBM_KMATHERRL_YN_MINUS:
@@ -1101,41 +1033,14 @@ libc_handle_matherr(void const *return_pc_in_math_function,
 	case __LIBM_KMATHERRF_COS_INF:
 	case __LIBM_KMATHERRL_COS_INF:
 		/* cos(inf) */
-		exc.type   = DOMAIN;
-		exc.retval = nan("");
-		if (version == _POSIX_) {
-			exc.err = EDOM;
-		} else if (matherr(&exc) == 0) {
-			exc.err = EDOM;
-		}
-		break;
-
 	case __LIBM_KMATHERR_SIN_INF:
 	case __LIBM_KMATHERRF_SIN_INF:
 	case __LIBM_KMATHERRL_SIN_INF:
 		/* sin(inf) */
-		exc.type   = DOMAIN;
-		exc.retval = nan("");
-		if (version == _POSIX_) {
-			exc.err = EDOM;
-		} else if (matherr(&exc) == 0) {
-			exc.err = EDOM;
-		}
-		break;
-
 	case __LIBM_KMATHERR_TAN_INF:
 	case __LIBM_KMATHERRF_TAN_INF:
 	case __LIBM_KMATHERRL_TAN_INF:
 		/* tan(inf) */
-		exc.type   = DOMAIN;
-		exc.retval = nan("");
-		if (version == _POSIX_) {
-			exc.err = EDOM;
-		} else if (matherr(&exc) == 0) {
-			exc.err = EDOM;
-		}
-		break;
-
 	case __LIBM_KMATHERR_SCALB_INVALID:
 	case __LIBM_KMATHERRF_SCALB_INVALID:
 	case __LIBM_KMATHERRL_SCALB_INVALID:

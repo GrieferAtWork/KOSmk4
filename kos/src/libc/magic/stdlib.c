@@ -1373,7 +1373,7 @@ handle_overflow:
 		}
 	}
 	if (sign == '-') {
-		if (__hybrid_overflow_sneg_p2n(result, &result))
+		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
@@ -1653,7 +1653,7 @@ handle_overflow:
 		}
 	}
 	if (sign == '-') {
-		if (__hybrid_overflow_sneg_p2n(result, &result))
+		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
@@ -2650,13 +2650,13 @@ long a64l([[in]] char const *s) {
 		if ((unsigned char)ch <= '\0') {
 			break;
 		} else if ((unsigned char)ch <= '/') {
-			digit = (unsigned long)(ch - '.' + 0);
+			digit = (unsigned long)(unsigned int)(ch - '.' + 0);
 		} else if ((unsigned char)ch <= '9') {
-			digit = (unsigned long)(ch - '0' + 2);
+			digit = (unsigned long)(unsigned int)(ch - '0' + 2);
 		} else if ((unsigned char)ch <= 'Z') {
-			digit = (unsigned long)(ch - 'A' + 12);
+			digit = (unsigned long)(unsigned int)(ch - 'A' + 12);
 		} else {
-			digit = (unsigned long)(ch - 'a' + 38);
+			digit = (unsigned long)(unsigned int)(ch - 'a' + 38);
 		}
 		digit <<= shift;
 		result |= digit;
@@ -5432,6 +5432,7 @@ int _atoldbl_l([[out]] __LONGDOUBLE *__restrict result,
 %#endif /* !__NO_FPU */
 
 
+%#if !__has_builtin(_rotl)
 [[const, nothrow, section(".text.crt.dos.math.utility")]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_lrotl")]]
@@ -5440,7 +5441,9 @@ int _atoldbl_l([[out]] __LONGDOUBLE *__restrict result,
 unsigned int _rotl(unsigned int val, int shift) {
 	return __hybrid_rol(val, (shift_t)(unsigned int)shift);
 }
+%#endif /* !__has_builtin(_rotl) */
 
+%#if !__has_builtin(_rotr)
 [[const, nothrow, section(".text.crt.dos.math.utility")]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_lrotr")]]
@@ -5449,7 +5452,9 @@ unsigned int _rotl(unsigned int val, int shift) {
 unsigned int _rotr(unsigned int val, int shift) {
 	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }
+%#endif /* !__has_builtin(_rotr) */
 
+%#if !__has_builtin(_lrotl)
 [[const, nothrow, section(".text.crt.dos.math.utility")]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_rotl")]]
@@ -5459,7 +5464,9 @@ unsigned int _rotr(unsigned int val, int shift) {
 unsigned long _lrotl(unsigned long val, int shift) {
 	return __hybrid_rol(val, (shift_t)(unsigned int)shift);
 }
+%#endif /* !__has_builtin(_lrotl) */
 
+%#if !__has_builtin(_lrotr)
 [[const, nothrow, section(".text.crt.dos.math.utility")]]
 [[impl_include("<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_rotr")]]
@@ -5469,8 +5476,10 @@ unsigned long _lrotl(unsigned long val, int shift) {
 unsigned long _lrotr(unsigned long val, int shift) {
 	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }
+%#endif /* !__has_builtin(_lrotr) */
 
 %#ifdef __UINT64_TYPE__
+%#if !__has_builtin(_rotl64)
 [[const, nothrow, section(".text.crt.dos.math.utility")]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>", "<hybrid/__rotate.h>")]]
@@ -5479,7 +5488,9 @@ unsigned long _lrotr(unsigned long val, int shift) {
 $u64 _rotl64($u64 val, int shift) {
 	return __hybrid_rol64(val, (shift_t)(unsigned int)shift);
 }
+%#endif /* !__has_builtin(_rotl64) */
 
+%#if !__has_builtin(_rotr64)
 [[const, nothrow, section(".text.crt.dos.math.utility")]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>", "<hybrid/__rotate.h>")]]
@@ -5488,6 +5499,7 @@ $u64 _rotl64($u64 val, int shift) {
 $u64 _rotr64($u64 val, int shift) {
 	return __hybrid_ror64(val, (shift_t)(unsigned int)shift);
 }
+%#endif /* !__has_builtin(_rotr64) */
 %#endif /* __UINT64_TYPE__ */
 
 %

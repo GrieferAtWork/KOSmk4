@@ -71,7 +71,7 @@ __LIBM_LOCAL_FUNC(isnan) __ATTR_WUNUSED __ATTR_CONST int
 	__int32_t __hx, __lx;
 	__LIBM_EXTRACT_WORDS(__hx, __lx, __x);
 	__hx &= 0x7fffffff;
-	__hx |= (__uint32_t)(__lx | (-__lx)) >> 31;
+	__hx |= (__int32_t)((__uint32_t)(__lx | (-__lx)) >> 31);
 	__hx = 0x7ff00000 - __hx;
 	return (int)(((__uint32_t)(__hx)) >> 31);
 }
@@ -86,8 +86,8 @@ __LIBM_LOCAL_FUNC(isnanl) __ATTR_WUNUSED __ATTR_CONST int
 	__int32_t __se, __hx, __lx;
 	__LIBM_GET_LDOUBLE_WORDS(__se, __hx, __lx, __x);
 	__se = (__se & 0x7fff) << 1;
-	__lx |= __hx & __UINT32_C(0x7fffffff);
-	__se |= (__uint32_t)(__lx | (-__lx)) >> 31;
+	__lx |= __hx & __INT32_C(0x7fffffff);
+	__se |= (__int32_t)((__uint32_t)(__lx | (-__lx)) >> 31);
 	__se = 0xfffe - __se;
 	return (int)(((__uint32_t)(__se)) >> 31);
 }

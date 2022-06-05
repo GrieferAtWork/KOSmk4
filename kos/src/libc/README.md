@@ -58,21 +58,17 @@ Other architectures display the same set of `10` relocations with slight deviati
 In the following, each of these relocations will be rationalized:
 
 - The first `6` relocations (`R_386_RELATIVE`):
-	- These are the result of the initialization of the `stdin`, `stdout` and `stderr` global variables, as available in `<stdio.h>`. No lazy/indirect initialization is performed for these symbols due to the fact that a majority of programs actually make use of these variables (though it may be argued that this only applies to `stdout` and `stderr`, but not necessarily `stdin`). As such, it stands to reason that using the `STT_KOS_IDATA`-trick for initializing these could actually degrade performance, rather than aid it. For reference, see the following snippet from `/kos/src/libc/user/stdio.c`:
+	- These are the result of the initialization of the `stdin`, `stdout` and `stderr` global variables, as available in `<stdio.h>`. No lazy/indirect initialization is performed for these symbols due to the fact that a majority of programs actually make use of these variables (though it may be argued that this only applies to `stdout` and `stderr`, but not necessarily `stdin`). As such, it stands to reason that using the `STT_KOS_IDATA`-trick for initializing these could actually degrade performance, rather than aid it. For reference, see the following snippet from `/kos/src/libc/libc/compat.c`:
 
 	```c
-	#define DEFINE_DEFAULT_STD_FILE(name, io_flags, fd)                            \
-		PRIVATE ATTR_SECTION(".data.crt.FILE.std_files")                           \
-		struct iofile_data_novtab default_##name##_io = IOFILE_DATA_NOVTAB_INIT(); \
-		INTERN ATTR_SECTION(".data.crt.FILE.std_files") FILE default_##name =      \
-		__IO_FILE_INIT(NULL, 0, NULL, io_flags, fd, { 0 }, 0, (struct iofile_data *)&default_##name##_io)
-	DEFINE_DEFAULT_STD_FILE(stdin, IO_LNBUF, STDIN_FILENO);             /* !Relocation: &default_stdin_io */
-	DEFINE_DEFAULT_STD_FILE(stdout, IO_RW | IO_LNIFTYY, STDOUT_FILENO); /* !Relocation: &default_stdout_io */
-	DEFINE_DEFAULT_STD_FILE(stderr, IO_RW | IO_LNIFTYY, STDERR_FILENO); /* !Relocation: &default_stderr_io */
-	#undef DEFINE_DEFAULT_STD_FILE
-	PUBLIC FILE *g_stdin  = &default_stdin;  /* !Relocation: &default_stdin */
-	PUBLIC FILE *g_stdout = &default_stdout; /* !Relocation: &default_stdout */
-	PUBLIC FILE *g_stderr = &default_stderr; /* !Relocation: &default_stderr */
+	INTERN FILE libc_iob[3] = {
+		[0] = __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdin_data),             /* !Relocation: &default_stdin_io */
+		[1] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, (struct iofile_data *)&default_stdout_data), /* !Relocation: &default_stdout_io */
+		[2] = __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDERR_FILENO, { 0 }, 0, (struct iofile_data *)&default_stderr_data), /* !Relocation: &default_stderr_io */
+	};
+	INTERN FILE *libc_stdin  = &libc_iob[0]; /* !Relocation: &libc_iob[0] */
+	INTERN FILE *libc_stdout = &libc_iob[1]; /* !Relocation: &libc_iob[1] */
+	INTERN FILE *libc_stderr = &libc_iob[2]; /* !Relocation: &libc_iob[2] */
 	```
 
 	Every line marked with `!Relocation` is responsible for one of these `6` relocations.

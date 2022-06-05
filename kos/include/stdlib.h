@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75074d7c */
+/* HASH CRC-32:0x82aaf5d7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5686,6 +5686,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_atoldbl_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
+#if !__has_builtin(_rotl)
 #ifdef __CRT_HAVE__rotl
 __CDECLARE(__ATTR_CONST,unsigned int,__NOTHROW,_rotl,(unsigned int __val, int __shift),(__val,__shift))
 #elif defined(__CRT_HAVE__lrotl) && __SIZEOF_INT__ == __SIZEOF_LONG__
@@ -5696,6 +5697,8 @@ __CREDIRECT(__ATTR_CONST,unsigned int,__NOTHROW,_rotl,(unsigned int __val, int _
 #include <libc/local/stdlib/_rotl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_rotl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST unsigned int __NOTHROW(__LIBCCALL _rotl)(unsigned int __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_rotl))(__val, __shift); })
 #endif /* !... */
+#endif /* !__has_builtin(_rotl) */
+#if !__has_builtin(_rotr)
 #ifdef __CRT_HAVE__rotr
 __CDECLARE(__ATTR_CONST,unsigned int,__NOTHROW,_rotr,(unsigned int __val, int __shift),(__val,__shift))
 #elif defined(__CRT_HAVE__lrotr) && __SIZEOF_INT__ == __SIZEOF_LONG__
@@ -5706,6 +5709,8 @@ __CREDIRECT(__ATTR_CONST,unsigned int,__NOTHROW,_rotr,(unsigned int __val, int _
 #include <libc/local/stdlib/_rotr.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_rotr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST unsigned int __NOTHROW(__LIBCCALL _rotr)(unsigned int __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_rotr))(__val, __shift); })
 #endif /* !... */
+#endif /* !__has_builtin(_rotr) */
+#if !__has_builtin(_lrotl)
 #ifdef __CRT_HAVE__lrotl
 __CDECLARE(__ATTR_CONST,unsigned long,__NOTHROW,_lrotl,(unsigned long __val, int __shift),(__val,__shift))
 #elif defined(__CRT_HAVE__rotl) && __SIZEOF_LONG__ == __SIZEOF_INT__
@@ -5716,6 +5721,8 @@ __CREDIRECT(__ATTR_CONST,unsigned long,__NOTHROW,_lrotl,(unsigned long __val, in
 #include <libc/local/stdlib/_lrotl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_lrotl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST unsigned long __NOTHROW(__LIBCCALL _lrotl)(unsigned long __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lrotl))(__val, __shift); })
 #endif /* !... */
+#endif /* !__has_builtin(_lrotl) */
+#if !__has_builtin(_lrotr)
 #ifdef __CRT_HAVE__lrotr
 __CDECLARE(__ATTR_CONST,unsigned long,__NOTHROW,_lrotr,(unsigned long __val, int __shift),(__val,__shift))
 #elif defined(__CRT_HAVE__rotr) && __SIZEOF_LONG__ == __SIZEOF_INT__
@@ -5726,7 +5733,9 @@ __CREDIRECT(__ATTR_CONST,unsigned long,__NOTHROW,_lrotr,(unsigned long __val, in
 #include <libc/local/stdlib/_lrotr.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_lrotr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST unsigned long __NOTHROW(__LIBCCALL _lrotr)(unsigned long __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lrotr))(__val, __shift); })
 #endif /* !... */
+#endif /* !__has_builtin(_lrotr) */
 #ifdef __UINT64_TYPE__
+#if !__has_builtin(_rotl64)
 #ifdef __CRT_HAVE__rotl64
 __CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW,_rotl64,(__UINT64_TYPE__ __val, int __shift),(__val,__shift))
 #elif defined(__CRT_HAVE__lrotl) && __SIZEOF_LONG__ == 8
@@ -5737,6 +5746,8 @@ __CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW,_rotl64,(__UINT64_TYPE__ __va
 #include <libc/local/stdlib/_rotl64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_rotl64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW(__LIBCCALL _rotl64)(__UINT64_TYPE__ __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_rotl64))(__val, __shift); })
 #endif /* !... */
+#endif /* !__has_builtin(_rotl64) */
+#if !__has_builtin(_rotr64)
 #ifdef __CRT_HAVE__rotr64
 __CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW,_rotr64,(__UINT64_TYPE__ __val, int __shift),(__val,__shift))
 #elif defined(__CRT_HAVE__lrotr) && __SIZEOF_LONG__ == 8
@@ -5747,6 +5758,7 @@ __CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW,_rotr64,(__UINT64_TYPE__ __va
 #include <libc/local/stdlib/_rotr64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_rotr64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW(__LIBCCALL _rotr64)(__UINT64_TYPE__ __val, int __shift) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_rotr64))(__val, __shift); })
 #endif /* !... */
+#endif /* !__has_builtin(_rotr64) */
 #endif /* __UINT64_TYPE__ */
 
 #ifndef _CRT_PERROR_DEFINED

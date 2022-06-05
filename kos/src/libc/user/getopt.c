@@ -361,7 +361,7 @@ _getopt_internal_r(int argc, char **argv, char const *optstring,
 		if (temp == NULL || c == ':' || c == ';') {
 			if (print_errors)
 				fprintf(stderr, message_invalid_option, argv[0], c);
-			optopt = c;
+			optopt = (unsigned char)c;
 			return '?';
 		}
 		if (temp[0] == 'W' && temp[1] == ';' && longopts != NULL) {
@@ -370,7 +370,7 @@ _getopt_internal_r(int argc, char **argv, char const *optstring,
 			} else if (optind == argc) {
 				if (print_errors)
 					fprintf(stderr, message_requires_argument2, argv[0], c);
-				optopt = c;
+				optopt = (unsigned char)c;
 				c      = optstring[0] == ':' ? ':' : '?';
 				return c;
 			} else {
@@ -403,7 +403,7 @@ _getopt_internal_r(int argc, char **argv, char const *optstring,
 				} else if (optind == argc) {
 					if (print_errors)
 						fprintf(stderr, message_requires_argument2, argv[0], c);
-					optopt = c;
+					optopt = (unsigned char)c;
 					c      = optstring[0] == ':' ? ':' : '?';
 				} else {
 					optarg = argv[optind++];

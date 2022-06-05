@@ -49,4 +49,17 @@
 #define __O_LARGEFILE 0 /* Assume native supported (if necessary CRT functions are available) */
 #endif /* !__O_LARGEFILE */
 
+
+#ifdef __O_CLOEXEC
+#define __PRIVATE_O_CLOEXEC __O_CLOEXEC
+#else /* __O_CLOEXEC */
+#define __PRIVATE_O_CLOEXEC 0
+#endif /* !__O_CLOEXEC */
+
+#ifdef __O_CLOFORK
+#define __PRIVATE_O_CLOFORK __O_CLOFORK
+#else /* __O_CLOFORK */
+#define __PRIVATE_O_CLOFORK 0
+#endif /* !__O_CLOFORK */
+
 #endif /* !_ASM_OS_OFLAGS_H */

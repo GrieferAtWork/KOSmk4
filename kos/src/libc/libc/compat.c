@@ -103,9 +103,9 @@ INTERN ATTR_SECTION(".data.crt.FILE.std_files") FILE libc_iob[3] = {
 #undef stdin
 #undef stdout
 #undef stderr
-INTERN ATTR_SECTION(".data.crt.FILE.locked.read.read") FILE *libc_stdin    = &libc_iob[0]; /* !Relocation: &default_stdin */
-INTERN ATTR_SECTION(".data.crt.FILE.locked.write.write") FILE *libc_stdout = &libc_iob[1]; /* !Relocation: &default_stdout */
-INTERN ATTR_SECTION(".data.crt.FILE.locked.write.write") FILE *libc_stderr = &libc_iob[2]; /* !Relocation: &default_stderr */
+INTERN ATTR_SECTION(".data.crt.FILE.locked.read.read") FILE *libc_stdin    = &libc_iob[0]; /* !Relocation: &libc_iob[0] */
+INTERN ATTR_SECTION(".data.crt.FILE.locked.write.write") FILE *libc_stdout = &libc_iob[1]; /* !Relocation: &libc_iob[1] */
+INTERN ATTR_SECTION(".data.crt.FILE.locked.write.write") FILE *libc_stderr = &libc_iob[2]; /* !Relocation: &libc_iob[2] */
 DEFINE_PUBLIC_ALIAS(stdin, libc_stdin);
 DEFINE_PUBLIC_ALIAS(stdout, libc_stdout);
 DEFINE_PUBLIC_ALIAS(stderr, libc_stderr);
@@ -157,8 +157,8 @@ NOTHROW(LIBCCALL libc_stdtty_initialize)(void) {
 	 * a controlling terminal will fail with EBADF at use  time. */
 
 #ifndef AT_FDCTTY
-	/* Lazily open /dev/tty on first access. Note that have
-	 * to set `O_CLOEXEC' to ensure that the file handle is
+	/* Lazily open /dev/tty on first access. Note that we
+	 * set `O_CLOEXEC' to ensure that the file handle  is
 	 * not inherited by child processes! */
 	fd_t ttyfd = sys_open(_PATH_TTY, O_RDWR | O_CLOEXEC, 0);
 	if likely(E_ISOK(ttyfd))
@@ -905,15 +905,14 @@ INTERN ATTR_SECTION(".bss.crt.compat.linux.init")
 uintptr_t libc_compat = COMPAT_FLAG_NORMAL;
 
 
-DECL_END
 
 
 /************************************************************************/
 /* <fpu_control.h>                                                      */
 /************************************************************************/
 #ifndef __NO_FPU
+DECL_END
 #include <fpu_control.h>
-
 DECL_BEGIN
 
 #ifdef _FPU_GETCW
@@ -975,9 +974,8 @@ uint32_t const libc___huge_val[2] = {
 	UINT32_C(0x00000000)
 };
 
-DECL_END
 #endif /* !__NO_FPU */
-DECL_BEGIN
+
 
 
 

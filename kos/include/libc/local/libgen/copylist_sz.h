@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91eb5abf */
+/* HASH CRC-32:0x84bc6eb9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,7 +104,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(copylist_sz) __ATTR_IN(1) __ATTR_OUT(2) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(copylist_sz))(char const *__filename, __SIZE_TYPE__ *__p_filesize) {
 	char *__result;
-	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__filename, __O_RDONLY);
+#ifdef __O_RDONLY
+	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__filename, __O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
+#else /* __O_RDONLY */
+	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__filename, __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
+#endif /* !__O_RDONLY */
 	if __unlikely(__fd < 0)
 		return __NULLPTR;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_fcopylist_sz)(__fd, __p_filesize);

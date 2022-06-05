@@ -1,16 +1,22 @@
 ---
-Checks:          '-*,bugprone-argument-comment,bugprone-bool-pointer-implicit-conversion,bugprone-copy-constructor-init,bugprone-dynamic-static-initializers,bugprone-infinite-loop,bugprone-integer-division,bugprone-lambda-function-name,bugprone-macro-repeated-side-effects,bugprone-misplaced-operator-in-strlen-in-alloc,bugprone-exception-escape,bugprone-misplaced-pointer-arithmetic-in-alloc,bugprone-misplaced-widening-cast,bugprone-move-forwarding-reference,bugprone-multiple-statement-macro,bugprone-posix-return,bugprone-suspicious-missing-comma,bugprone-suspicious-string-compare,bugprone-swapped-arguments,bugprone-terminating-continue,bugprone-too-small-loop-variable,clang-analyzer-core.uninitialized.CapturedBlockVariable,clang-analyzer-cplusplus.InnerPointer,clang-analyzer-nullability.NullableReturnedFromNonnull,readability-avoid-const-params-in-decls,readability-const-return-type,readability-misleading-indentation,readability-named-parameter,clang-analyzer-core-*'
+Checks:          '-*,bugprone-argument-comment,bugprone-assert-side-effect,bugprone-bool-pointer-implicit-conversion,bugprone-branch-clone,bugprone-copy-constructor-init,bugprone-dynamic-static-initializers,bugprone-infinite-loop,bugprone-integer-division,bugprone-lambda-function-name,bugprone-macro-repeated-side-effects,bugprone-misplaced-operator-in-strlen-in-alloc,bugprone-exception-escape,bugprone-misplaced-pointer-arithmetic-in-alloc,bugprone-misplaced-widening-cast,bugprone-move-forwarding-reference,bugprone-multiple-statement-macro,bugprone-posix-return,bugprone-suspicious-missing-comma,bugprone-suspicious-string-compare,bugprone-swapped-arguments,bugprone-terminating-continue,bugprone-too-small-loop-variable,bugprone-implicit-widening-of-multiplication-result,clang-analyzer-cplusplus.InnerPointer,clang-analyzer-nullability.NullableReturnedFromNonnull,readability-avoid-const-params-in-decls,readability-const-return-type,readability-misleading-indentation,*-cloexec-*,bugprone-posix-return,bugprone-redundant-branch-condition,bugprone-suspicious-memset-usage,bugprone-suspicious-semicolon,clang-analyzer-valist.*,modernize-use-override,performance-no-int-to-ptr,readability-inconsistent-declaration-parameter-name,readability-misplaced-array-index'
 WarningsAsErrors: ''
 AnalyzeTemporaryDtors: false
 FormatStyle:     file
 CheckOptions:
   - key:             bugprone-argument-comment.IgnoreSingleArgument
     value:           false
+  - key:             bugprone-assert-side-effect.AssertMacros
+    value:           assert,assert_assume,__assert_assume,assert_noreturn,__assert_noreturn,-__hybrid_assert
   - key:             bugprone-misplaced-widening-cast.CheckImplicitCasts
     value:           1
   - key:             bugprone-suspicious-string-compare.WarnOnLogicalNotComparison
     value:           1
-# - key:             readability-braces-around-statements.ShortStatementLines
-#   value:           2
+  - key:             bugprone-implicit-widening-of-multiplication-result.UseCXXStaticCastsInCppSources
+    value:           false
+  - key:             bugprone-implicit-widening-of-multiplication-result.UseCXXHeadersInCppSources
+    value:           false
+  - key:             readability-inconsistent-declaration-parameter-name.Strict
+    value:           true
 ...
 

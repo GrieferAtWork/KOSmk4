@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x985920f */
+/* HASH CRC-32:0xa721c6ef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,33 +41,33 @@ __SYSDECL_BEGIN
 
 #if defined(__CRT_HAVE_wcsftime) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> wcsftime(3) */
-__CREDIRECT(__ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C16FTIME(3, 0) __ATTR_OUTS(1, 2),size_t,__NOTHROW_NCX,c16ftime,(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, struct tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
+__CREDIRECT(__ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C16FTIME(3, 0) __ATTR_OUTS(1, 2),size_t,__NOTHROW_NCX,c16ftime,(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
 #elif defined(__CRT_HAVE_DOS$wcsftime)
 /* >> wcsftime(3) */
-__CREDIRECT_DOS(__ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C16FTIME(3, 0) __ATTR_OUTS(1, 2),size_t,__NOTHROW_NCX,c16ftime,(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, struct tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
+__CREDIRECT_DOS(__ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C16FTIME(3, 0) __ATTR_OUTS(1, 2),size_t,__NOTHROW_NCX,c16ftime,(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcsftime.h>
 /* >> wcsftime(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C16FTIME(3, 0) __ATTR_OUTS(1, 2) size_t __NOTHROW_NCX(__LIBDCALL c16ftime)(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, struct tm const *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime))((__WCHAR_TYPE__ *)__buf, __buflen, (__WCHAR_TYPE__ const *)__format, __tp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C16FTIME(3, 0) __ATTR_OUTS(1, 2) size_t __NOTHROW_NCX(__LIBDCALL c16ftime)(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime))((__WCHAR_TYPE__ *)__buf, __buflen, (__WCHAR_TYPE__ const *)__format, __tp); }
 #else /* ... */
 #include <libc/local/parts.uchar.time/c16ftime.h>
 /* >> wcsftime(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16ftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C16FTIME(3, 0) __ATTR_OUTS(1, 2) size_t __NOTHROW_NCX(__LIBDCALL c16ftime)(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, struct tm const *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16ftime))(__buf, __buflen, __format, __tp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16ftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C16FTIME(3, 0) __ATTR_OUTS(1, 2) size_t __NOTHROW_NCX(__LIBDCALL c16ftime)(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16ftime))(__buf, __buflen, __format, __tp); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsftime) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> wcsftime(3) */
-__CREDIRECT(__ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C32FTIME(3, 0) __ATTR_OUTS(1, 2),size_t,__NOTHROW_NCX,c32ftime,(char32_t *__restrict __buf, size_t __buflen, char32_t const *__restrict __format, struct tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
+__CREDIRECT(__ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C32FTIME(3, 0) __ATTR_OUTS(1, 2),size_t,__NOTHROW_NCX,c32ftime,(char32_t *__restrict __buf, size_t __buflen, char32_t const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
 #elif defined(__CRT_HAVE_KOS$wcsftime)
 /* >> wcsftime(3) */
-__CREDIRECT_KOS(__ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C32FTIME(3, 0) __ATTR_OUTS(1, 2),size_t,__NOTHROW_NCX,c32ftime,(char32_t *__restrict __buf, size_t __buflen, char32_t const *__restrict __format, struct tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
+__CREDIRECT_KOS(__ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C32FTIME(3, 0) __ATTR_OUTS(1, 2),size_t,__NOTHROW_NCX,c32ftime,(char32_t *__restrict __buf, size_t __buflen, char32_t const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcsftime.h>
 /* >> wcsftime(3) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C32FTIME(3, 0) __ATTR_OUTS(1, 2) size_t __NOTHROW_NCX(__LIBKCALL c32ftime)(char32_t *__restrict __buf, size_t __buflen, char32_t const *__restrict __format, struct tm const *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime))((__WCHAR_TYPE__ *)__buf, __buflen, (__WCHAR_TYPE__ const *)__format, __tp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C32FTIME(3, 0) __ATTR_OUTS(1, 2) size_t __NOTHROW_NCX(__LIBKCALL c32ftime)(char32_t *__restrict __buf, size_t __buflen, char32_t const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime))((__WCHAR_TYPE__ *)__buf, __buflen, (__WCHAR_TYPE__ const *)__format, __tp); }
 #else /* ... */
 #include <libc/local/parts.uchar.time/c32ftime.h>
 /* >> wcsftime(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32ftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C32FTIME(3, 0) __ATTR_OUTS(1, 2) size_t __NOTHROW_NCX(__LIBKCALL c32ftime)(char32_t *__restrict __buf, size_t __buflen, char32_t const *__restrict __format, struct tm const *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32ftime))(__buf, __buflen, __format, __tp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32ftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_C32FTIME(3, 0) __ATTR_OUTS(1, 2) size_t __NOTHROW_NCX(__LIBKCALL c32ftime)(char32_t *__restrict __buf, size_t __buflen, char32_t const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32ftime))(__buf, __buflen, __format, __tp); })
 #endif /* !... */
 
 #ifdef __USE_GNU

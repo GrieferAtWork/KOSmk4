@@ -845,7 +845,7 @@ char *vconcat([[in_opt]] char const *first, va_list args) {
 		totlen += strlen(ptr);
 	va_end(copy);
 	ptr = result = (char *)xmalloc((totlen + 1) * sizeof(char));
-	for (; first; first = va_arg(copy, char *))
+	for (; first; first = va_arg(args, char *))
 		ptr = (char *)mempcpyc(ptr, first, strlen(first), sizeof(char));
 	*ptr = '\0';
 	return result;

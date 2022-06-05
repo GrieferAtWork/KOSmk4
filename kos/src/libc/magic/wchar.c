@@ -745,7 +745,7 @@ wint_t ungetwc(wint_t wc, [[inout]] FILE *stream);
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.strftime")]]
 size_t wcsftime([[out(return <= buflen)]] wchar_t *__restrict buf, size_t buflen,
                 [[in, format("wcsftime")]] wchar_t const *__restrict format,
-                [[in]] struct tm const *__restrict tp) {
+                [[in]] struct $tm const *__restrict tp) {
 	if (buflen)
 		*buf = 0;
 	/* TODO */

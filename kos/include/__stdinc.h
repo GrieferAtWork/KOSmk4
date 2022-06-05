@@ -217,7 +217,8 @@
  * >> typedef void NOTHROW_T(KCALL TFUN)(void);
  * >> void NOTHROW_T(KCALL *funptr)(void);
  * >> void NOTHROW(KCALL fun)(void); */
-#if defined(__cplusplus)
+#if (defined(__cplusplus) && \
+     ((defined(__GNUC__) && __GNUC__ >= 12))) /* TODO: Other compilers? */
 #define __NOTHROW_T           __NOTHROW
 #define __NOTHROW_NCX_T       __NOTHROW_NCX
 #define __NOTHROW_RPC_T       __NOTHROW_RPC

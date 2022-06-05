@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf5f00b3 */
+/* HASH CRC-32:0x195411cc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,12 +87,13 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(get_avphys_pages))(void) {
 		__info.mem_unit >>= 1;
 		__ps >>= 1;
 	}
-	__result = __info.freeram * __info.mem_unit;
+	__result = (__UINTPTR_TYPE__)__info.freeram *
+	         (__UINTPTR_TYPE__)__info.mem_unit;
 	while (__ps > 1) {
 		__result >>= 1;
 		__ps >>= 1;
 	}
-	return __result;
+	return (__INTPTR_TYPE__)__result;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_get_avphys_pages_defined

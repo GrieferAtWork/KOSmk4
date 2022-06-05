@@ -101,7 +101,7 @@ NOTHROW_RPC(LIBCCALL libc_opendir)(char const *name)
 /*[[[body:libc_opendir]]]*/
 {
 	DIR *result;
-	fd_t fd = open(name, O_RDONLY | O_DIRECTORY);
+	fd_t fd = open(name, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
 	if unlikely(fd < 0)
 		goto err;
 	result = fdopendir(fd);
@@ -540,7 +540,7 @@ NOTHROW_RPC(LIBCCALL libc_scandiratk)(fd_t dirfd,
 	*namelist = NULL;
 
 	/* Open the named directory. */
-	stream.ds_fd = openat(dirfd, dir, O_RDONLY | O_DIRECTORY);
+	stream.ds_fd = openat(dirfd, dir, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
 	if unlikely(stream.ds_fd < 0)
 		goto done_nostream;
 
@@ -762,7 +762,7 @@ NOTHROW_RPC(LIBCCALL libc_scandirat)(fd_t dirfd,
 	*namelist = NULL;
 
 	/* Open the named directory. */
-	stream.ds_fd = openat(dirfd, dir, O_RDONLY | O_DIRECTORY);
+	stream.ds_fd = openat(dirfd, dir, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
 	if unlikely(stream.ds_fd < 0)
 		goto done_nostream;
 
@@ -962,7 +962,7 @@ NOTHROW_RPC(LIBCCALL libc_scandirat64)(fd_t dirfd,
 	*namelist = NULL;
 
 	/* Open the named directory. */
-	stream.ds_fd = openat(dirfd, dir, O_RDONLY | O_DIRECTORY);
+	stream.ds_fd = openat(dirfd, dir, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
 	if unlikely(stream.ds_fd < 0)
 		goto done_nostream;
 

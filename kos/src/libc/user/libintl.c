@@ -959,7 +959,7 @@ again_load_from_tree:
 		fd_t fd;
 		struct stat st;
 		struct mo_file_header *base;
-		fd = open(filename, O_RDONLY);
+		fd = open(filename, O_RDONLY | O_CLOEXEC);
 		if unlikely(fd < 0)
 			goto err_r;
 		if unlikely(fstat(fd, &st) != 0) {

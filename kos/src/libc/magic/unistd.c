@@ -939,13 +939,13 @@ $errno_t ttyname_r($fd_t fd, [[out(? <= buflen)]] char *buf, size_t buflen) {
 		ino  = st.@st_ino@;
 		while ((d = readdir64(dirstream)) != NULL) {
 			size_t needed;
-	
+
 			/* We're looking for character devices. */
 			if (d->@d_type@ != __DT_CHR)
 				continue;
 			if (d->@d_ino@ != ino)
 				continue;
-	
+
 @@pp_if !defined(__KOS__)@@
 			/* On KOS, these are symlinks (DT_LNK), so we've already skipped them ;) */
 			if (strcmp(d->@d_name@, "stdin") == 0)
@@ -995,7 +995,7 @@ $errno_t ttyname_r($fd_t fd, [[out(? <= buflen)]] char *buf, size_t buflen) {
 				continue;
 			if unlikely(!__S_ISCHR(st.@st_mode@))
 				continue;
-	
+
 			/* Found it! */
 @@pp_if $has_function(closedir)@@
 			closedir(dirstream);
@@ -1088,7 +1088,7 @@ int chown([[in]] char const *file, $uid_t owner, $gid_t group) {
 $longptr_t pathconf([[in]] char const *path, __STDC_INT_AS_UINT_T name) {
 	fd_t fd;
 	longptr_t result;
-	fd = open(path, O_RDONLY);
+	fd = open(path, O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 	if unlikely(fd < 0)
 		return -1;
 	result = fpathconf(fd, name);
@@ -2170,8 +2170,9 @@ int crt_truncate32([[in]] char const *file, $pos32_t length);
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("truncate", "__truncate", "__libc_truncate")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("truncate64")]]
 [[export_as("__truncate", "__libc_truncate")]]
+[[requires_include("<asm/os/oflags.h>")]]
 [[requires($has_function(truncate64) || $has_function(crt_truncate32) ||
-           $has_function(open, ftruncate))]]
+           ($has_function(open, ftruncate) && defined(__O_WRONLY)))]]
 [[userimpl, section(".text.crt{|.dos}.fs.modify")]]
 int truncate([[in]] char const *file, __PIO_OFFSET length) {
 @@pp_if $has_function(crt_truncate32)@@
@@ -2181,7 +2182,7 @@ int truncate([[in]] char const *file, __PIO_OFFSET length) {
 @@pp_else@@
 	int result;
 	fd_t fd;
-	fd = open(file, 1); /* O_WRONLY */
+	fd = open(file, O_WRONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 	if __unlikely(fd < 0)
 		return -1;
 	result = ftruncate(fd, length);
@@ -2366,9 +2367,9 @@ int setregid($gid_t rgid, $gid_t egid) {
 [[section(".text.crt{|.dos}.system.configuration")]]
 $longptr_t gethostid() {
 @@pp_ifdef O_RDONLY@@
-	fd_t fd = open(_PATH_HOSTID, O_RDONLY);
+	fd_t fd = open(_PATH_HOSTID, O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 @@pp_else@@
-	fd_t fd = open(_PATH_HOSTID, 0);
+	fd_t fd = open(_PATH_HOSTID, __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 @@pp_endif@@
 	if (fd >= 0) {
 		uint32_t id32;
@@ -2643,7 +2644,7 @@ int sethostid($longptr_t id) {
 @@pp_endif@@
 
 	/* Try to open the hostid file for writing */
-	fd = open(_PATH_HOSTID, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	fd = open(_PATH_HOSTID, O_WRONLY | O_CREAT | O_TRUNC | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK, 0644);
 	if (fd < 0) {
 		/* Try to lazily create the containing directory if it's missing. */
 @@pp_if $has_function(mkdir) && defined(libc_geterrno_or) && defined(ENOTDIR)@@
@@ -2656,7 +2657,7 @@ int sethostid($longptr_t id) {
 			    libc_geterrno() == EEXIST)
 @@pp_endif@@
 			{
-				fd = open(_PATH_HOSTID, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+				fd = open(_PATH_HOSTID, O_WRONLY | O_CREAT | O_TRUNC | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK, 0644);
 				if (fd >= 0)
 					goto got_fd;
 #define WANT_got_fd
@@ -2803,7 +2804,7 @@ int daemon(int nochdir, int noclose) {
 		if (!nochdir)
 			(void)chdir("/");
 		if (!noclose) {
-			fd_t i, nul = open(_PATH_DEVNULL, O_RDWR);
+			fd_t i, nul = open(_PATH_DEVNULL, O_RDWR | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 			if unlikely(nul < 0)
 				return nul;
 			/* NOTE: Glibc does an additional check to ensure that `nul'  really
@@ -3219,16 +3220,6 @@ char *getpassfd([[in_opt]] char const *prompt,
 	if (!fds) {
 		fds = default_fds;
 @@pp_if $has_function(open)@@
-@@pp_ifdef      __O_CLOEXEC@@
-#define __PRIVATE_GETPASSFD_O_CLOEXEC __O_CLOEXEC
-@@pp_else@@
-#define __PRIVATE_GETPASSFD_O_CLOEXEC 0
-@@pp_endif@@
-@@pp_ifdef __O_CLOFORK@@
-#define __PRIVATE_GETPASSFD_O_CLOFORK __O_CLOFORK
-@@pp_else@@
-#define __PRIVATE_GETPASSFD_O_CLOFORK 0
-@@pp_endif@@
 @@pp_ifdef __O_RDWR@@
 #define __PRIVATE_GETPASSFD_O_RDWR __O_RDWR
 @@pp_else@@
@@ -3248,15 +3239,13 @@ char *getpassfd([[in_opt]] char const *prompt,
 @@pp_endif@@
 #if __PRIVATE_GETPASSFD_O_NONBLOCK != 0
 		default_fds[2] = open(__PRIVATE_GETPASSFD_PATH_TTY,
-		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
-		                      __PRIVATE_GETPASSFD_O_CLOFORK |
 		                      __PRIVATE_GETPASSFD_O_RDWR |
+		                      __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK |
 		                      (timeout_in_seconds != 0 ? __PRIVATE_GETPASSFD_O_NONBLOCK : 0));
 #else /* __PRIVATE_GETPASSFD_O_NONBLOCK != 0 */
 		default_fds[2] = open(__PRIVATE_GETPASSFD_PATH_TTY,
-		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
-		                      __PRIVATE_GETPASSFD_O_CLOFORK |
-		                      __PRIVATE_GETPASSFD_O_RDWR);
+		                      __PRIVATE_GETPASSFD_O_RDWR |
+		                      __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 #endif /* __PRIVATE_GETPASSFD_O_NONBLOCK == 0 */
 		if (default_fds[2] != -1) {
 			default_fds[0] = default_fds[2];
@@ -3789,7 +3778,7 @@ int getpeereid($fd_t sockfd,
 $longptr_t lpathconf([[in]] char const *path, __STDC_INT_AS_UINT_T name) {
 	fd_t fd;
 	longptr_t result;
-	fd = open(path, O_RDONLY | O_PATH | O_NOFOLLOW);
+	fd = open(path, O_RDONLY | O_PATH | O_NOFOLLOW | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 	if unlikely(fd < 0)
 		return -1;
 	result = fpathconf(fd, name);

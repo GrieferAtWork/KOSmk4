@@ -210,9 +210,11 @@ function createClangTidyProcess(
 		 * that was built for anything else...
 		 */
 		"-undef",
+		"-m32",
 		"-D__clang_tidy__",
 		"-D__clang__",
 		"-D__SIZEOF_LONG__=4",
+		"-D__SIZEOF_LONG_DOUBLE__=16",
 		"-D__GNUC__=9",
 		"-D__GNUC_MINOR__=1",
 	});

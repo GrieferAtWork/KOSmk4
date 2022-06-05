@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8669a95c */
+/* HASH CRC-32:0xab9bb4a7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -156,7 +156,7 @@ __handle_overflow:
 		}
 	}
 	if (__sign == '-') {
-		if (__hybrid_overflow_sneg_p2n(__result, &__result))
+		if (__hybrid_overflow_sneg_p2n(__result, &__result)) /* NOLINT */
 			goto __handle_overflow; /* Overflow... */
 	}
 	if __unlikely(__num_iter == __num_start) {

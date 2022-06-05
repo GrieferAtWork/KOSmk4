@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84023cb6 */
+/* HASH CRC-32:0x4de182ee */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,13 +92,11 @@ __LOCAL_LIBC(spawnve) __ATTR_IN(2) __ATTR_IN(3) __ATTR_IN(4) __pid_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(spawnve))(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, __TARGV, __TENVP) {
 	__fd_t __fd;
 	__pid_t __result = -1;
-#if defined(__O_RDONLY) && defined(__O_CLOEXEC)
-	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __O_RDONLY | __O_CLOEXEC);
-#elif defined(__O_RDONLY)
-	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __O_RDONLY);
-#else /* ... */
-	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, 0);
-#endif /* !... */
+#ifdef __O_RDONLY
+	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
+#else /* __O_RDONLY */
+	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
+#endif /* !__O_RDONLY */
 	if __likely(__fd >= 0) {
 		__result = (__NAMESPACE_LOCAL_SYM __localdep_fspawnve)(__mode, __fd, ___argv, ___envp);
 #if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) || defined(__CRT_HAVE___libc_close)

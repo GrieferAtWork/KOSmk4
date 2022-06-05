@@ -433,12 +433,10 @@ $pid_t spawnve(__STDC_INT_AS_UINT_T mode,
                [[in]] __TARGV, [[in]] __TENVP) {
 	fd_t fd;
 	pid_t result = -1;
-@@pp_if defined(O_RDONLY) && defined(O_CLOEXEC)@@
-	fd = open(path, O_RDONLY | O_CLOEXEC);
-@@pp_elif defined(O_RDONLY)@@
-	fd = open(path, O_RDONLY);
+@@pp_ifdef O_RDONLY@@
+	fd = open(path, O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 @@pp_else@@
-	fd = open(path, 0);
+	fd = open(path, __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 @@pp_endif@@
 	if likely(fd >= 0) {
 		result = fspawnve(mode, fd, ___argv, ___envp);

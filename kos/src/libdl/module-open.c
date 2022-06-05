@@ -377,7 +377,7 @@ NOTHROW_RPC(CC preadall)(fd_t fd, void *buf, size_t bufsize, ElfW(Off) offset) {
 			temp = sys_pread64(fd,
 			                   (byte_t *)buf + (size_t)result,
 			                   bufsize - (size_t)result,
-			                   offset + (size_t)result);
+			                   (pos64_t)offset + (size_t)result);
 			if unlikely(E_ISERR(result))
 				goto err;
 			if unlikely(!temp)

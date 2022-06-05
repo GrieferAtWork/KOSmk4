@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff284110 */
+/* HASH CRC-32:0xb38d9f02 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1067,7 +1067,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_c8toc16)(char16_t *__restrict pc16,
 			if (ch <= 0x7f) {
 				*pc16 = ch;
 				goto done;
-			} else if (ch <= 0xbf) {
+			} else if (ch <= 0xbf) { /* NOLINT */
 				goto error_ilseq;
 			} else if (ch <= 0xdf) {
 				mbs->__mb_word = __MBSTATE_TYPE_UTF8_2_2 | (ch & 0x1f);
@@ -1199,7 +1199,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32,
 			if (ch <= 0x7f) {
 				*pc32 = ch;
 				goto done;
-			} else if (ch <= 0xbf) {
+			} else if (ch <= 0xbf) { /* NOLINT */
 				goto error_ilseq;
 			} else if (ch <= 0xdf) {
 				mbs->__mb_word = __MBSTATE_TYPE_UTF8_2_2 | (ch & 0x1f);

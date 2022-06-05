@@ -432,12 +432,18 @@ err:
 	return NULL;
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[static, requires_function(open, fcopylist_sz), crt_dos_variant]]
+[[static, decl_include("<hybrid/typecore.h>")]]
+[[crt_dos_variant]]
+[[requires_function(open, fcopylist_sz)]]
+[[impl_include("<asm/os/oflags.h>")]]
 char *copylist_sz([[in]] char const *filename,
                   [[out]] size_t *p_filesize) {
 	char *result;
-	fd_t fd = open(filename, O_RDONLY);
+@@pp_ifdef O_RDONLY@@
+	fd_t fd = open(filename, O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
+@@pp_else@@
+	fd_t fd = open(filename, __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
+@@pp_endif@@
 	if unlikely(fd < 0)
 		return NULL;
 	result = fcopylist_sz(fd, p_filesize);

@@ -263,6 +263,9 @@ DIR *opendir([[in]] char const *name) {
 @@pp_ifdef __O_DIRECTORY@@
 	oflags |= __O_DIRECTORY;
 @@pp_endif@@
+@@pp_ifdef __O_CLOEXEC@@
+	oflags |= __O_CLOEXEC;
+@@pp_endif@@
 	fd = open(name, oflags);
 	if unlikely(fd < 0)
 		return NULL;

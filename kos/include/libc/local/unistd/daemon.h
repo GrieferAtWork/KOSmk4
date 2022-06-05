@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f87d120 */
+/* HASH CRC-32:0xabbc1f8a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,7 +155,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(daemon))(int __nochdir, int __noclose
 		if (!__nochdir)
 			(void)(__NAMESPACE_LOCAL_SYM __localdep_chdir)("/");
 		if (!__noclose) {
-			__fd_t __i, __nul = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_DEVNULL, __O_RDWR);
+			__fd_t __i, __nul = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_DEVNULL, __O_RDWR | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 			if __unlikely(__nul < 0)
 				return __nul;
 			/* NOTE: Glibc does an additional check to ensure that `nul'  really

@@ -1735,7 +1735,7 @@ __do_special_float:
 		/* Special case: no fraction wanted. - Round the whole-part. */
 		if (__max_prec == 0) {
 			__diff = __val - (__USED_FLOAT_TYPE)__whole;
-			if (__diff > 0.5) {
+			if (__diff > 0.5) { /* NOLINT */
 				++__whole;
 			} else if (__diff == 0.5 && (__whole & 1)) {
 				++__whole;
@@ -2264,7 +2264,7 @@ __after_posscan2_infmt:
 							switch (__type_code) {
 
 #if (!defined(__NO_PRINTF_FLOATING_POINT) && !defined(__NO_FPU))
-							case 8:
+							case 8: /* NOLINT */
 								__p_args[__posi].__p_unsigned = __builtin_va_arg(__FORMAT_ARGS, double);
 								break;
 #ifdef __COMPILER_HAVE_LONGDOUBLE

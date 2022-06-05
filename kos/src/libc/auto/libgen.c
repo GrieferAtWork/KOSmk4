@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x361f169e */
+/* HASH CRC-32:0x42a3cf47 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -351,11 +351,16 @@ err_r:
 err:
 	return NULL;
 }
+#include <asm/os/oflags.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.solaris") ATTR_IN(1) ATTR_OUT(2) char *
 NOTHROW_NCX(LIBDCALL libd_copylist_sz)(char const *filename,
                                        size_t *p_filesize) {
 	char *result;
-	fd_t fd = libd_open(filename, O_RDONLY);
+
+	fd_t fd = libd_open(filename, O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
+
+
+
 	if unlikely(fd < 0)
 		return NULL;
 	result = libc_fcopylist_sz(fd, p_filesize);
@@ -364,11 +369,16 @@ NOTHROW_NCX(LIBDCALL libd_copylist_sz)(char const *filename,
 
 	return result;
 }
+#include <asm/os/oflags.h>
 INTERN ATTR_SECTION(".text.crt.solaris") ATTR_IN(1) ATTR_OUT(2) char *
 NOTHROW_NCX(LIBCCALL libc_copylist_sz)(char const *filename,
                                        size_t *p_filesize) {
 	char *result;
-	fd_t fd = libc_open(filename, O_RDONLY);
+
+	fd_t fd = libc_open(filename, O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
+
+
+
 	if unlikely(fd < 0)
 		return NULL;
 	result = libc_fcopylist_sz(fd, p_filesize);

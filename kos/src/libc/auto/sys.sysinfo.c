@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16d9d19e */
+/* HASH CRC-32:0xf66c60d6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,12 +45,13 @@ NOTHROW(LIBCCALL libc_get_phys_pages)(void) {
 		info.mem_unit >>= 1;
 		ps >>= 1;
 	}
-	result = info.totalram * info.mem_unit;
+	result = (uintptr_t)info.totalram *
+	         (uintptr_t)info.mem_unit;
 	while (ps > 1) {
 		result >>= 1;
 		ps >>= 1;
 	}
-	return result;
+	return (intptr_t)result;
 }
 #include <linux/sysinfo.h>
 /* >> get_avphys_pages(3)
@@ -67,12 +68,13 @@ NOTHROW(LIBCCALL libc_get_avphys_pages)(void) {
 		info.mem_unit >>= 1;
 		ps >>= 1;
 	}
-	result = info.freeram * info.mem_unit;
+	result = (uintptr_t)info.freeram *
+	         (uintptr_t)info.mem_unit;
 	while (ps > 1) {
 		result >>= 1;
 		ps >>= 1;
 	}
-	return result;
+	return (intptr_t)result;
 }
 #endif /* !__KERNEL__ */
 

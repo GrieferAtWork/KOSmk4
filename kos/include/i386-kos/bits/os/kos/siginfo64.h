@@ -152,8 +152,8 @@ struct __siginfox64_struct /*[NAME(siginfox64)][PREFIX(si_)]*/ {
 		union {
 			__INT64_TYPE__ _si_data[(__SIX64_MAX_SIZE - 16) / 8];
 			struct { /* kill(). */
-				__UINT32_TYPE__  si_pid; /* Sending process ID. */
-				__UINT32_TYPE__  si_uid; /* Real user ID of sending process. */
+				__INT32_TYPE__  si_pid; /* Sending process ID. */
+				__UINT32_TYPE__ si_uid; /* Real user ID of sending process. */
 			};
 			struct { /* POSIX.1b timers. */
 				__INT32_TYPE__ si_timerid; /* Timer ID. */

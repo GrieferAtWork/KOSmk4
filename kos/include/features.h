@@ -406,7 +406,7 @@
 #define __USE_ISOCXX11 1
 #endif /* _ISOCXX11_SOURCE || __USE_ISOCXX14 || __cplusplus >= 201103L || __GXX_EXPERIMENTAL_CXX0X__ */
 
-#if defined(__cplusplus) && (!defined(__GNUC__) || __GCC_VERSION_NUM >= 40400)
+#if defined(__cplusplus) && (!defined(__GCC_VERSION_NUM) || __GCC_VERSION_NUM >= 40400)
 /* Enable proper C++ prototype declarations. */
 #define __CORRECT_ISO_CPP_STRING_H_PROTO    1
 #define __CORRECT_ISO_CPP_STRINGS_H_PROTO   1

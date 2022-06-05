@@ -153,8 +153,8 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digitd)(uint8_t digit_idx)
 	digit = &unicode_digits[digit_idx];
 	if likely(unidigit_iswhole(digit))
 		return (double)unidigit_getwhole(digit);
-	return (double)(unidigit_getfrac_numerator(digit) /
-	                unidigit_getfrac_denominator(digit));
+	return (double)unidigit_getfrac_numerator(digit) /
+	       (double)unidigit_getfrac_denominator(digit);
 }
 /*[[[end:libc___unicode_descriptor_digitd]]]*/
 
@@ -173,8 +173,8 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digitld)(uint8_t digit_idx)
 	digit = &unicode_digits[digit_idx];
 	if likely(unidigit_iswhole(digit))
 		return (__LONGDOUBLE)unidigit_getwhole(digit);
-	return (__LONGDOUBLE)(unidigit_getfrac_numerator(digit) /
-	                      unidigit_getfrac_denominator(digit));
+	return (__LONGDOUBLE)unidigit_getfrac_numerator(digit) /
+	       (__LONGDOUBLE)unidigit_getfrac_denominator(digit);
 }
 /*[[[end:libc___unicode_descriptor_digitld]]]*/
 

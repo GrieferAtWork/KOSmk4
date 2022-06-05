@@ -811,30 +811,15 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 /* clang-tidy causes problems with extern-inline, so just disable it for now... */
 #undef __NO_EXTERN_INLINE
 #define __NO_EXTERN_INLINE
-namespace __intern {
+/*namespace __intern {
 template<class __T> struct ____clang_tidy_remlval { typedef __T __type; };
 template<class __T> struct ____clang_tidy_remlval<__T &> { typedef __T __type; };
-struct ____clang_tidy_void_helper { };
-template<class __T> __T operator , (__T &&,____clang_tidy_void_helper);
-template<class __T> __T const operator , (__T const &&,____clang_tidy_void_helper);
-template<class __T, unsigned long __N> __T (&operator , (__T(&&)[__N],____clang_tidy_void_helper))[__N];
-template<class __T, unsigned long __N> __T const (&operator , (__T const (&&)[__N],____clang_tidy_void_helper))[__N];
-void ____clang_tidy_typeof_helper(____clang_tidy_void_helper &&);
-template<class __T> typename ____clang_tidy_remlval<__T>::__type ____clang_tidy_typeof_helper(__T &&);
-template<class __T> typename ____clang_tidy_remlval<__T>::__type const ____clang_tidy_typeof_helper(__T const &&);
-template<class __T, unsigned long __N> typename ____clang_tidy_remlval<__T[__N]>::__type &____clang_tidy_typeof_helper(__T(&)[__N]);
-template<class __T, unsigned long __N> typename ____clang_tidy_remlval<__T[__N]>::__type const &____clang_tidy_typeof_helper(__T const (&)[__N]);
-template<class __T, class ...Args> __T(__attribute__((__cdecl__)) && ____clang_tidy_typeof_helper(__T(__attribute__((__cdecl__)) &)(Args...)))(Args...);
-template<class __T, class ...Args> __T(__attribute__((__cdecl__)) && ____clang_tidy_typeof_helper(__T(__attribute__((__cdecl__)) &)(Args..., ...)))(Args..., ...);
-template<class __T, class ...Args> __T(__attribute__((__fastcall__)) && ____clang_tidy_typeof_helper(__T(__attribute__((__fastcall__)) &)(Args...)))(Args...);
-template<class __T, class ...Args> __T(__attribute__((__fastcall__)) && ____clang_tidy_typeof_helper(__T(__attribute__((__fastcall__)) &)(Args..., ...)))(Args..., ...);
-template<class __T, class ...Args> __T(__attribute__((__stdcall__)) && ____clang_tidy_typeof_helper(__T(__attribute__((__stdcall__)) &)(Args...)))(Args...);
-template<class __T, class... Args> __T(__attribute__((__stdcall__)) && ____clang_tidy_typeof_helper(__T(__attribute__((__stdcall__)) &)(Args..., ...)))(Args..., ...);
-#define typeof(...)     decltype(::__intern::____clang_tidy_typeof_helper(((__VA_ARGS__), ::__intern::____clang_tidy_void_helper())))
-#define __typeof(...)   decltype(::__intern::____clang_tidy_typeof_helper(((__VA_ARGS__), ::__intern::____clang_tidy_void_helper())))
-#define __typeof__(...) decltype(::__intern::____clang_tidy_typeof_helper(((__VA_ARGS__), ::__intern::____clang_tidy_void_helper())))
-#define __auto_type     auto
-}
+template<class __T> using ____clang_tidy_remlval_t = typename ____clang_tidy_remlval<__T>::__type;
+#define __typeof__(...) ::__intern::____clang_tidy_remlval_t<decltype(__VA_ARGS__)>
+}*/
+#define typeof __typeof__
+#define __typeof __typeof__
+#define __auto_type auto
 #endif /* __clang_tidy__ */
 
 #define __STATIC_IF(x)   if(x)

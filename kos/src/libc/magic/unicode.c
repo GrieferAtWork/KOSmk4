@@ -1523,7 +1523,7 @@ $size_t unicode_c8toc16([[out]] char16_t *__restrict pc16,
 			if (ch <= 0x7f) {
 				*pc16 = ch;
 				goto done;
-			} else if (ch <= 0xbf) {
+			} else if (ch <= 0xbf) { /* NOLINT */
 				goto error_ilseq;
 			} else if (ch <= 0xdf) {
 				mbs->@__mb_word@ = __MBSTATE_TYPE_UTF8_2_2 | (ch & 0x1f);
@@ -1657,7 +1657,7 @@ $size_t unicode_c8toc32([[out]] char32_t *__restrict pc32,
 			if (ch <= 0x7f) {
 				*pc32 = ch;
 				goto done;
-			} else if (ch <= 0xbf) {
+			} else if (ch <= 0xbf) { /* NOLINT */
 				goto error_ilseq;
 			} else if (ch <= 0xdf) {
 				mbs->@__mb_word@ = __MBSTATE_TYPE_UTF8_2_2 | (ch & 0x1f);

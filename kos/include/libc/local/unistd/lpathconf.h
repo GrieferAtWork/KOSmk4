@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd58c411 */
+/* HASH CRC-32:0x16ec823e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,7 +114,7 @@ __LOCAL_LIBC(lpathconf) __ATTR_IN(1) __LONGPTR_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lpathconf))(char const *__path, __STDC_INT_AS_UINT_T __name) {
 	__fd_t __fd;
 	__LONGPTR_TYPE__ __result;
-	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __O_RDONLY | __O_PATH | __O_NOFOLLOW);
+	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __O_RDONLY | __O_PATH | __O_NOFOLLOW | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 	if __unlikely(__fd < 0)
 		return -1;
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_fpathconf)(__fd, __name);

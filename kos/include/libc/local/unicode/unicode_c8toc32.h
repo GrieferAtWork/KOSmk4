@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62ac2b00 */
+/* HASH CRC-32:0xf7cfd081 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c8toc32))(__CHAR32_TYPE__ *__
 			if (__ch <= 0x7f) {
 				*__pc32 = __ch;
 				goto __done;
-			} else if (__ch <= 0xbf) {
+			} else if (__ch <= 0xbf) { /* NOLINT */
 				goto __error_ilseq;
 			} else if (__ch <= 0xdf) {
 				__mbs->__mb_word = __MBSTATE_TYPE_UTF8_2_2 | (__ch & 0x1f);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x777d212c */
+/* HASH CRC-32:0x1a3960ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -138,6 +138,9 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(opendir))(char const *__name) {
 #ifdef __O_DIRECTORY
 	__oflags |= __O_DIRECTORY;
 #endif /* __O_DIRECTORY */
+#ifdef __O_CLOEXEC
+	__oflags |= __O_CLOEXEC;
+#endif /* __O_CLOEXEC */
 	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__name, __oflags);
 	if __unlikely(__fd < 0)
 		return __NULLPTR;

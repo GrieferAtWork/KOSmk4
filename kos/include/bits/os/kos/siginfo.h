@@ -91,8 +91,8 @@ struct __siginfo_struct /*[NAME(siginfo)][PREFIX(si_)]*/ {
 	union {
 		__INT32_TYPE__ _pad[__SI_PAD_SIZE];
 		struct { /* kill(). */
-			__pid_t  si_pid; /* Sending process ID. */
-			__uid_t  si_uid; /* Real user ID of sending process. */
+			__pid_t si_pid; /* Sending process ID. */
+			__uid_t si_uid; /* Real user ID of sending process. */
 		};
 		struct { /* POSIX.1b timers. */
 			__INT32_TYPE__ si_timerid; /* Timer ID. */

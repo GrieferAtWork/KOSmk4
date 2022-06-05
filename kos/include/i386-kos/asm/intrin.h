@@ -40,11 +40,42 @@ __DECL_BEGIN
 #undef __ud2
 #define __ud2 __x86_ud2
 #endif /* __has_builtin(__ud2) */
-
 #if __has_builtin(__rdtsc)
 #undef __rdtsc
 #define __rdtsc __x86_rdtsc
 #endif /* __has_builtin(__rdtsc) */
+#if __has_builtin(__movsb)
+#undef __movsb
+#define __movsb __x86_movsb
+#endif /* __has_builtin(__movsb) */
+#if __has_builtin(__movsw)
+#undef __movsw
+#define __movsw __x86_movsw
+#endif /* __has_builtin(__movsw) */
+#if __has_builtin(__movsl)
+#undef __movsl
+#define __movsl __x86_movsl
+#endif /* __has_builtin(__movsl) */
+#if __has_builtin(__stosb)
+#undef __stosb
+#define __stosb __x86_stosb
+#endif /* __has_builtin(__stosb) */
+#if __has_builtin(__stosw)
+#undef __stosw
+#define __stosw __x86_stosw
+#endif /* __has_builtin(__stosw) */
+#if __has_builtin(__stosl)
+#undef __stosl
+#define __stosl __x86_stosl
+#endif /* __has_builtin(__stosl) */
+#if __has_builtin(__movsq)
+#undef __movsq
+#define __movsq __x86_movsq
+#endif /* __has_builtin(__movsq) */
+#if __has_builtin(__stosq)
+#undef __stosq
+#define __stosq __x86_stosq
+#endif /* __has_builtin(__stosq) */
 
 
 
@@ -728,8 +759,13 @@ __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__
 	                     , "=d" (__res.__l[1])
 	                     : "b" ((__UINT32_TYPE__)(__newval))
 	                     , "c" ((__UINT32_TYPE__)(__newval >> 32))
+#ifdef __clang__
+	                     , "a" ((__UINT32_TYPE__)(__oldval))
+	                     , "d" ((__UINT32_TYPE__)(__oldval >> 32))
+#else /* __clang__ */
 	                     , "1" ((__UINT32_TYPE__)(__oldval))
 	                     , "2" ((__UINT32_TYPE__)(__oldval >> 32))
+#endif /* !__clang__ */
 	                     : "cc");
 	return __res.__q;
 #else /* __x86_64__ */
@@ -739,7 +775,11 @@ __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__
 	                     , "+A" (__res)
 	                     : "b" ((__UINT32_TYPE__)(__newval))
 	                     , "c" ((__UINT32_TYPE__)(__newval >> 32))
+#ifdef __clang__
+	                     , "A" (__oldval)
+#else /* __clang__ */
 	                     , "1" (__oldval)
+#endif /* !__clang__ */
 	                     : "cc");
 	return __res;
 #endif /* !__x86_64__ */

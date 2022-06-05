@@ -87,16 +87,7 @@
 #endif /* ... */
 #define __THROWING        /* Use in place of __NOTHROW() for the same effect as `__THROWS(...)' */
 
-#if defined(__clang_tidy__) && defined(__cplusplus)
-/* This  forces  warnings  in  clang-tidy,  if  a THROWS-annotated
- * function is called from another function annotated as NOTHROW()
- * s.a. `bugprone-exception-escape' */
-#undef __THROWS
-#define __THROWS(...)         throw(int)
-#undef __THROWING
-#define __THROWING(...) (__VA_ARGS__) __PRIVATE_THROWING
-#define __PRIVATE_THROWING(...) (__VA_ARGS__) throw(int)
-#elif defined(__INTELLISENSE__) && defined(__cplusplus)
+#if defined(__INTELLISENSE__) && defined(__cplusplus)
 /* Highlight invalid use of this annotation in intellisense! */
 #undef __THROWS
 #define __THROWS(...) noexcept(false)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f218d56 */
+/* HASH CRC-32:0x47256c33 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -438,15 +438,7 @@ NOTHROW_NCX(LIBCCALL libc_fmapfileat)(struct mapfile *__restrict mapping,
                                       atflag_t atflags) {
 	fd_t fd;
 	int result;
-
-	oflag_t oflags = __O_RDONLY | __O_CLOEXEC | __O_CLOFORK;
-
-
-
-
-
-
-
+	oflag_t oflags = __O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK;
 
 	if (atflags & __AT_DOSPATH) {
 		oflags |= __O_DOSPATH;
@@ -486,14 +478,6 @@ NOTHROW_NCX(LIBCCALL libc_mapfile)(struct mapfile *__restrict mapping,
                                    size_t num_trailing_nulbytes) {
 
 	return libc_fmapfileat(mapping, __AT_FDCWD, filename, offset, max_bytes, num_trailing_nulbytes, 0);
-
-
-
-
-
-
-
-
 
 
 

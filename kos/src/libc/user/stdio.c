@@ -340,7 +340,7 @@ file_buffer_realloc_dynscale(FILE *__restrict self,
 
 /* Change the operations mode of a given buffer. */
 PRIVATE WUNUSED ATTR_SECTION(".text.crt.FILE.core.utility") NONNULL((1)) int LIBCCALL
-file_setmode(FILE *__restrict self, void *buf, int mode, size_t size) {
+file_setmode(FILE *__restrict self, void *buf, unsigned int mode, size_t size) {
 	/* Convert DOS names. */
 	if unlikely(mode == 0x0040)
 		mode = _IOLBF;

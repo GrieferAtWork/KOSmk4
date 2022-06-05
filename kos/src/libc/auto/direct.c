@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc938f5c */
+/* HASH CRC-32:0x382299c4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive,
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.property") int
 NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive) {
-	drive = libc_toupper((unsigned char)drive);
+	drive = (unsigned char)libc_toupper((unsigned char)drive);
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
 
 		return libc_seterrno(EINVAL);

@@ -159,7 +159,7 @@ PRIVATE ATTR_SECTION(".bss.crt.system.auxv") pthread_once_t random_didinit = PTH
 PRIVATE ATTR_SECTION(".text.crt.system.auxv") void LIBCCALL random_init(void) {
 	fd_t fd;
 	ssize_t read_status;
-	fd = open("/dev/random", O_RDONLY);
+	fd = open("/dev/random", O_RDONLY | O_CLOEXEC);
 	if (fd < 0) {
 fallback:
 		unsigned int i;

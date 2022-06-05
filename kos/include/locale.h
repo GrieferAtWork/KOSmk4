@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70e5700a */
+/* HASH CRC-32:0xb56303c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,6 +67,7 @@ __NAMESPACE_STD_USING(localeconv)
 #include <features.h>
 #include <asm/crt/locale.h>
 #include <bits/crt/lconv.h>
+#include <bits/crt/tm.h>
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
@@ -335,8 +336,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_W_Getmonths, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* ... */
 __CDECLARE_OPT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,_Gettnames,(void),())
 __CDECLARE_OPT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,_W_Gettnames,(void),())
-__CDECLARE_OPT(__ATTR_IN(3) __ATTR_IN(4) __ATTR_OUTS(1, 2),__SIZE_TYPE__,__NOTHROW_NCX,_Strftime,(char *__buf, __SIZE_TYPE__ __bufsize, char const *__format, struct tm const *__tms, void *__lc_time_arg),(__buf,__bufsize,__format,__tms,__lc_time_arg))
-__CDECLARE_OPT(__ATTR_IN(3) __ATTR_IN(4) __ATTR_OUTS(1, 2),__SIZE_TYPE__,__NOTHROW_NCX,_Wcsftime,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, struct tm const *__tms, void *__lc_time_arg),(__buf,__bufsize,__format,__tms,__lc_time_arg))
+__CDECLARE_OPT(__ATTR_IN(3) __ATTR_IN(4) __ATTR_OUTS(1, 2),__SIZE_TYPE__,__NOTHROW_NCX,_Strftime,(char *__buf, __SIZE_TYPE__ __bufsize, char const *__format, struct __NAMESPACE_STD_SYM tm const *__tms, void *__lc_time_arg),(__buf,__bufsize,__format,__tms,__lc_time_arg))
+__CDECLARE_OPT(__ATTR_IN(3) __ATTR_IN(4) __ATTR_OUTS(1, 2),__SIZE_TYPE__,__NOTHROW_NCX,_Wcsftime,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, struct __NAMESPACE_STD_SYM tm const *__tms, void *__lc_time_arg),(__buf,__bufsize,__format,__tms,__lc_time_arg))
 #endif /* __USE_DOS */
 
 __SYSDECL_END

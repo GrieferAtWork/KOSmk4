@@ -141,7 +141,7 @@ NOTHROW_RPC(LIBCCALL libc_sleep)(unsigned int seconds)
 /*[[[body:libc_sleep]]]*/
 {
 	struct timespec req, rem;
-	req.tv_sec  = seconds;
+	req.tv_sec  = (time_t)seconds;
 	req.tv_nsec = 0;
 	rem.tv_sec  = 0;
 	sys_nanosleep(&req, &rem);
@@ -1926,7 +1926,7 @@ err_perm:
 /*[[[end:libc_sbrk]]]*/
 
 
-#define PATHCONF_VARYING_LIMIT INTPTR_MIN
+#define PATHCONF_VARYING_LIMIT ((longptr_t)INTPTR_MIN)
 PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] = {
 	[_PC_LINK_MAX]           = PATHCONF_VARYING_LIMIT,
 	[_PC_MAX_CANON]          = PATHCONF_VARYING_LIMIT,

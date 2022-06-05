@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97ac6ad8 */
+/* HASH CRC-32:0x13a28741 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1059,16 +1059,16 @@ __CREDIRECT(__ATTR_INOUT(2),wint_t,__NOTHROW_NCX,ungetwc,(wint_t __wc, FILE *__s
 #define __std_wcsftime_defined
 #ifdef __wcsftime_defined
 /* >> wcsftime(3) */
-__NAMESPACE_GLB_USING_OR_IMPL(wcsftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_WCSFTIME(3, 0) __ATTR_OUTS(1, 2) size_t __NOTHROW_NCX(__LIBCCALL wcsftime)(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, struct tm const *__restrict __tp) { return :: wcsftime(__buf, __buflen, __format, __tp); })
+__NAMESPACE_GLB_USING_OR_IMPL(wcsftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_WCSFTIME(3, 0) __ATTR_OUTS(1, 2) size_t __NOTHROW_NCX(__LIBCCALL wcsftime)(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) { return :: wcsftime(__buf, __buflen, __format, __tp); })
 #elif defined(__CRT_HAVE_wcsftime)
 /* >> wcsftime(3) */
-__CDECLARE(__ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_WCSFTIME(3, 0) __ATTR_OUTS(1, 2),size_t,__NOTHROW_NCX,wcsftime,(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, struct tm const *__restrict __tp),(__buf,__buflen,__format,__tp))
+__CDECLARE(__ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_WCSFTIME(3, 0) __ATTR_OUTS(1, 2),size_t,__NOTHROW_NCX,wcsftime,(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),(__buf,__buflen,__format,__tp))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/wchar/wcsftime.h>
 __NAMESPACE_STD_BEGIN
 /* >> wcsftime(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcsftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_WCSFTIME(3, 0) __ATTR_OUTS(1, 2) size_t __NOTHROW_NCX(__LIBCCALL wcsftime)(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, struct tm const *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime))(__buf, __buflen, __format, __tp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcsftime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_IN(4) __ATTR_LIBC_WCSFTIME(3, 0) __ATTR_OUTS(1, 2) size_t __NOTHROW_NCX(__LIBCCALL wcsftime)(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime))(__buf, __buflen, __format, __tp); })
 #endif /* !... */
 #endif /* !__std_wcsftime_defined */
 

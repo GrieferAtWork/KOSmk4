@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cf1923 */
+/* HASH CRC-32:0x7d2432bb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -371,13 +371,13 @@ NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
 		ino  = st.st_ino;
 		while ((d = libc_readdirk64(dirstream)) != NULL) {
 			size_t needed;
-	
+
 			/* We're looking for character devices. */
 			if (d->d_type != __DT_CHR)
 				continue;
 			if (d->d_ino != ino)
 				continue;
-	
+
 
 
 
@@ -427,7 +427,7 @@ NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
 				continue;
 			if unlikely(!__S_ISCHR(st.st_mode))
 				continue;
-	
+
 			/* Found it! */
 
 			libc_closedir(dirstream);
@@ -871,7 +871,7 @@ NOTHROW_NCX(LIBCCALL libc_setpgrp)(void) {
 INTERN ATTR_SECTION(".text.crt.system.configuration") WUNUSED longptr_t
 NOTHROW_NCX(LIBCCALL libc_gethostid)(void) {
 
-	fd_t fd = libc_open(_PATH_HOSTID, O_RDONLY);
+	fd_t fd = libc_open(_PATH_HOSTID, O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 
 
 
@@ -1041,7 +1041,7 @@ NOTHROW_NCX(LIBCCALL libc_sethostid)(longptr_t id) {
 #endif /* __SIZEOF_POINTER__ > 4 */
 
 	/* Try to open the hostid file for writing */
-	fd = libc_open(_PATH_HOSTID, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	fd = libc_open(_PATH_HOSTID, O_WRONLY | O_CREAT | O_TRUNC | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK, 0644);
 	if (fd < 0) {
 		/* Try to lazily create the containing directory if it's missing. */
 
@@ -1054,7 +1054,7 @@ NOTHROW_NCX(LIBCCALL libc_sethostid)(longptr_t id) {
 			    libc_geterrno() == EEXIST)
 
 			{
-				fd = libc_open(_PATH_HOSTID, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+				fd = libc_open(_PATH_HOSTID, O_WRONLY | O_CREAT | O_TRUNC | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK, 0644);
 				if (fd >= 0)
 					goto got_fd;
 #define WANT_got_fd
@@ -1161,7 +1161,7 @@ NOTHROW_RPC(LIBCCALL libc_daemon)(int nochdir,
 		if (!nochdir)
 			(void)libc_chdir("/");
 		if (!noclose) {
-			fd_t i, nul = libc_open(_PATH_DEVNULL, O_RDWR);
+			fd_t i, nul = libc_open(_PATH_DEVNULL, O_RDWR | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 			if unlikely(nul < 0)
 				return nul;
 			/* NOTE: Glibc does an additional check to ensure that `nul'  really
@@ -1356,16 +1356,6 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 		fds = default_fds;
 
 
-#define __PRIVATE_GETPASSFD_O_CLOEXEC __O_CLOEXEC
-
-
-
-
-#define __PRIVATE_GETPASSFD_O_CLOFORK __O_CLOFORK
-
-
-
-
 #define __PRIVATE_GETPASSFD_O_RDWR __O_RDWR
 
 
@@ -1384,15 +1374,13 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 #endif /* !_PATH_TTY */
 #if __PRIVATE_GETPASSFD_O_NONBLOCK != 0
 		default_fds[2] = libc_open(__PRIVATE_GETPASSFD_PATH_TTY,
-		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
-		                      __PRIVATE_GETPASSFD_O_CLOFORK |
 		                      __PRIVATE_GETPASSFD_O_RDWR |
+		                      __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK |
 		                      (timeout_in_seconds != 0 ? __PRIVATE_GETPASSFD_O_NONBLOCK : 0));
 #else /* __PRIVATE_GETPASSFD_O_NONBLOCK != 0 */
 		default_fds[2] = libc_open(__PRIVATE_GETPASSFD_PATH_TTY,
-		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
-		                      __PRIVATE_GETPASSFD_O_CLOFORK |
-		                      __PRIVATE_GETPASSFD_O_RDWR);
+		                      __PRIVATE_GETPASSFD_O_RDWR |
+		                      __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 #endif /* __PRIVATE_GETPASSFD_O_NONBLOCK == 0 */
 		if (default_fds[2] != -1) {
 			default_fds[0] = default_fds[2];

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc69ab5c */
+/* HASH CRC-32:0x669669e6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vconcat))(char const *__first, __buil
 		__totlen += (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__ptr);
 	__builtin_va_end(__copy);
 	__ptr = __result = (char *)(__NAMESPACE_LOCAL_SYM __localdep_xmalloc)((__totlen + 1) * sizeof(char));
-	for (; __first; __first = __builtin_va_arg(__copy, char *))
+	for (; __first; __first = __builtin_va_arg(__args, char *))
 		__ptr = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyc)(__ptr, __first, (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__first), sizeof(char));
 	*__ptr = '\0';
 	return __result;

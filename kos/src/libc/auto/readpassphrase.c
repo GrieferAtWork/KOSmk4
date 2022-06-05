@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5dbc51a1 */
+/* HASH CRC-32:0xe86a07f2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,13 +133,13 @@ again:
 
 #ifdef _PATH_TTY
 
-		infd = libc_open(_PATH_TTY, __O_RDWR);
+		infd = libc_open(_PATH_TTY, O_RDWR | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 
 
 
 #else /* _PATH_TTY */
 
-		infd = libc_open("/dev/tty", __O_RDWR);
+		infd = libc_open("/dev/tty", O_RDWR | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 
 
 

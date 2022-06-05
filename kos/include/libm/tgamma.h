@@ -408,7 +408,7 @@ __LIBM_LOCAL_FUNC(gamma_positive) __IEEE754_DOUBLE_TYPE__
 		__IEEE754_DOUBLE_TYPE__ __n, __x_adj, __eps, __prod;
 		__n         = __ieee754_ceil(__x - __IEEE754_DOUBLE_C(1.5));
 		__x_adj     = __x - __n;
-		__prod      = __ieee754_gamma_product(__x_adj, 0, __n, &__eps);
+		__prod      = __ieee754_gamma_product(__x_adj, 0.0, (int)__n, &__eps);
 		*__exp2_adj = 0;
 		return __ieee754_exp(__ieee754_lgamma(__x_adj, &__local_signgam)) *
 		       __prod * (1.0 + __eps);

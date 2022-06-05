@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90857309 */
+/* HASH CRC-32:0x69798cf5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -432,16 +432,6 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 	if (!__fds) {
 		__fds = __default_fds;
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
-#ifdef __O_CLOEXEC
-#define __PRIVATE_GETPASSFD_O_CLOEXEC __O_CLOEXEC
-#else /* __O_CLOEXEC */
-#define __PRIVATE_GETPASSFD_O_CLOEXEC 0
-#endif /* !__O_CLOEXEC */
-#ifdef __O_CLOFORK
-#define __PRIVATE_GETPASSFD_O_CLOFORK __O_CLOFORK
-#else /* __O_CLOFORK */
-#define __PRIVATE_GETPASSFD_O_CLOFORK 0
-#endif /* !__O_CLOFORK */
 #ifdef __O_RDWR
 #define __PRIVATE_GETPASSFD_O_RDWR __O_RDWR
 #else /* __O_RDWR */
@@ -461,15 +451,13 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 #endif /* !... */
 #if __PRIVATE_GETPASSFD_O_NONBLOCK != 0
 		__default_fds[2] = (__NAMESPACE_LOCAL_SYM __localdep_open)(__PRIVATE_GETPASSFD_PATH_TTY,
-		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
-		                      __PRIVATE_GETPASSFD_O_CLOFORK |
 		                      __PRIVATE_GETPASSFD_O_RDWR |
+		                      __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK |
 		                      (__timeout_in_seconds != 0 ? __PRIVATE_GETPASSFD_O_NONBLOCK : 0));
 #else /* __PRIVATE_GETPASSFD_O_NONBLOCK != 0 */
 		__default_fds[2] = (__NAMESPACE_LOCAL_SYM __localdep_open)(__PRIVATE_GETPASSFD_PATH_TTY,
-		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
-		                      __PRIVATE_GETPASSFD_O_CLOFORK |
-		                      __PRIVATE_GETPASSFD_O_RDWR);
+		                      __PRIVATE_GETPASSFD_O_RDWR |
+		                      __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 #endif /* __PRIVATE_GETPASSFD_O_NONBLOCK == 0 */
 		if (__default_fds[2] != -1) {
 			__default_fds[0] = __default_fds[2];

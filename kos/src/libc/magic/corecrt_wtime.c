@@ -25,6 +25,10 @@
 
 %[default:section(".text.crt.dos.wchar.time")]
 
+%(auto_header){
+#include <time.h>
+}
+
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(

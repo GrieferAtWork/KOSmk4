@@ -68,6 +68,8 @@
 #include <asm/crt/locale.h>
 )]%[insert:prefix(
 #include <bits/crt/lconv.h>
+)]%[insert:prefix(
+#include <bits/crt/tm.h>
 )]%{
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
@@ -437,11 +439,11 @@ $wchar_t *_W_Getmonths(void) {
 [[decl_include("<bits/crt/tm.h>", "<hybrid/typecore.h>")]]
 $size_t _Strftime([[out(? <= bufsize)]] char *buf, $size_t bufsize,
                   [[in]] char const *format,
-                  [[in]] struct tm const *tms, void *lc_time_arg);
+                  [[in]] struct $tm const *tms, void *lc_time_arg);
 [[wchar, decl_include("<bits/crt/tm.h>", "<hybrid/typecore.h>")]]
 $size_t _Wcsftime([[out(? <= bufsize)]] $wchar_t *buf, $size_t bufsize,
                   [[in]] $wchar_t const *format,
-                  [[in]] struct tm const *tms, void *lc_time_arg);
+                  [[in]] struct $tm const *tms, void *lc_time_arg);
 
 %#endif /* __USE_DOS */
 

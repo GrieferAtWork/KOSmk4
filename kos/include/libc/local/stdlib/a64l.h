@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ebb155f */
+/* HASH CRC-32:0xfcbd8267 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,13 +32,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(a64l))(char const *__s) {
 		if ((unsigned char)__ch <= '\0') {
 			break;
 		} else if ((unsigned char)__ch <= '/') {
-			__digit = (unsigned long)(__ch - '.' + 0);
+			__digit = (unsigned long)(unsigned int)(__ch - '.' + 0);
 		} else if ((unsigned char)__ch <= '9') {
-			__digit = (unsigned long)(__ch - '0' + 2);
+			__digit = (unsigned long)(unsigned int)(__ch - '0' + 2);
 		} else if ((unsigned char)__ch <= 'Z') {
-			__digit = (unsigned long)(__ch - 'A' + 12);
+			__digit = (unsigned long)(unsigned int)(__ch - 'A' + 12);
 		} else {
-			__digit = (unsigned long)(__ch - 'a' + 38);
+			__digit = (unsigned long)(unsigned int)(__ch - 'a' + 38);
 		}
 		__digit <<= __shift;
 		__result |= __digit;

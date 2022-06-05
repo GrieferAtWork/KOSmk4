@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x747ce0e0 */
+/* HASH CRC-32:0x37a36353 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -461,15 +461,15 @@ __again:
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #ifdef _PATH_TTY
 #ifdef __O_RDWR
-		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_TTY, __O_RDWR);
+		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_TTY, __O_RDWR | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 #else /* __O_RDWR */
-		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_TTY, 0);
+		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_TTY, __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 #endif /* !__O_RDWR */
 #else /* _PATH_TTY */
 #ifdef __O_RDWR
-		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)("/dev/tty", __O_RDWR);
+		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)("/dev/tty", __O_RDWR | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 #else /* __O_RDWR */
-		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)("/dev/tty", 0);
+		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)("/dev/tty", __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 #endif /* !__O_RDWR */
 #endif /* !_PATH_TTY */
 		if __unlikely(__infd == -1) {

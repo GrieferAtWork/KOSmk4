@@ -163,16 +163,16 @@ again:
 	if (!(flags & __RPP_STDIN)) {
 @@pp_if $has_function(open)@@
 @@pp_ifdef _PATH_TTY@@
-@@pp_ifdef __O_RDWR@@
-		infd = open(_PATH_TTY, __O_RDWR);
+@@pp_ifdef O_RDWR@@
+		infd = open(_PATH_TTY, O_RDWR | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 @@pp_else@@
-		infd = open(_PATH_TTY, 0);
+		infd = open(_PATH_TTY, __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 @@pp_endif@@
 @@pp_else@@
-@@pp_ifdef __O_RDWR@@
-		infd = open("/dev/tty", __O_RDWR);
+@@pp_ifdef O_RDWR@@
+		infd = open("/dev/tty", O_RDWR | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 @@pp_else@@
-		infd = open("/dev/tty", 0);
+		infd = open("/dev/tty", __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 @@pp_endif@@
 @@pp_endif@@
 		if unlikely(infd == -1) {

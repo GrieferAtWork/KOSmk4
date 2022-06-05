@@ -100,7 +100,7 @@ struct callback_list<ReturnType KCALL(ArgumenTypes...)> {
 	}
 };
 
-#if !defined(__x86_64__) && defined(__i386__)
+#if !defined(__x86_64__) && defined(__i386__) && !defined(__clang_tidy__)
 template<class ReturnType, class ...ArgumenTypes>
 struct callback_list<ReturnType FCALL(ArgumenTypes...)> {
 	__callback_list_t __m_list;

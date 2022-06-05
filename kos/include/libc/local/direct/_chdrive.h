@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e63260 */
+/* HASH CRC-32:0x46040ba7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_chdrive) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_chdrive))(int __drive) {
-	__drive = (__NAMESPACE_LOCAL_SYM __localdep_toupper)((unsigned char)__drive);
+	__drive = (unsigned char)(__NAMESPACE_LOCAL_SYM __localdep_toupper)((unsigned char)__drive);
 	if __unlikely(__drive < __AT_DOS_DRIVEMIN || __drive > __AT_DOS_DRIVEMAX) {
 #ifdef __EINVAL
 		return __libc_seterrno(__EINVAL);

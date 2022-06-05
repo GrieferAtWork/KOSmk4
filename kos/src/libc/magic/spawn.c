@@ -615,6 +615,8 @@ $errno_t posix_spawn([[out]] pid_t *__restrict pid,
 	fd = open(path, O_RDONLY | O_CLOEXEC);
 @@pp_elif defined(O_RDONLY)@@
 	fd = open(path, O_RDONLY);
+@@pp_elif defined(O_CLOEXEC)@@
+	fd = open(path, O_CLOEXEC);
 @@pp_else@@
 	fd = open(path, 0);
 @@pp_endif@@

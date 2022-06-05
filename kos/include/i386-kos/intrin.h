@@ -145,51 +145,75 @@ __BYTE_TYPE__ _interlockedbittestandreset64(__LONG64_TYPE__ volatile *__base, __
 #endif /* !_bittest64 */
 #ifndef _bittestandcomplement
 #define _bittestandcomplement _bittestandcomplement
+#if !__has_builtin(_bittestandcomplement)
 __LOCAL __BYTE_TYPE__ (_bittestandcomplement)(__LONG32_TYPE__ *__base, __LONG32_TYPE__ __offset) { return !(((*__base ^= (__LONG32_TYPE__)1 << __offset) >> __offset) & 1); }
+#endif /* !__has_builtin(_bittestandcomplement) */
 #endif /* !_bittestandcomplement */
 #ifndef _bittestandcomplement64
 #define _bittestandcomplement64 _bittestandcomplement64
+#if !__has_builtin(_bittestandcomplement64)
 __LOCAL __BYTE_TYPE__ (_bittestandcomplement64)(__LONG64_TYPE__ *__base, __LONG64_TYPE__ __offset) { return !(((*__base ^= (__LONG64_TYPE__)1 << __offset) >> __offset) & 1); }
+#endif /* !__has_builtin(_bittestandcomplement64) */
 #endif /* !_bittestandcomplement64 */
 #ifndef _bittestandset
 #define _bittestandset _bittestandset
+#if !__has_builtin(_bittestandset)
 __LOCAL __BYTE_TYPE__ (_bittestandset)(__LONG32_TYPE__ *__base, __LONG32_TYPE__ __offset) { __LONG32_TYPE__ __mask = (__LONG32_TYPE__)1 << __offset; __BYTE_TYPE__ __result = (*__base & __mask) != 0; *__base |= __mask; return __result; }
+#endif /* !__has_builtin(_bittestandset) */
 #endif /* !_bittestandset */
 #ifndef _bittestandset64
 #define _bittestandset64 _bittestandset64
+#if !__has_builtin(_bittestandset64)
 __LOCAL __BYTE_TYPE__ (_bittestandset64)(__LONG64_TYPE__ *__base, __LONG64_TYPE__ __offset) { __LONG64_TYPE__ __mask = (__LONG64_TYPE__)1 << __offset; __BYTE_TYPE__ __result = (*__base & __mask) != 0; *__base |= __mask; return __result; }
+#endif /* !__has_builtin(_bittestandset64) */
 #endif /* !_bittestandset64 */
 #ifndef _bittestandreset
 #define _bittestandreset _bittestandreset
+#if !__has_builtin(_bittestandreset)
 __LOCAL __BYTE_TYPE__ (_bittestandreset)(__LONG32_TYPE__ *__base, __LONG32_TYPE__ __offset) { __LONG32_TYPE__ __mask = (__LONG32_TYPE__)1 << __offset; __BYTE_TYPE__ __result = (*__base & __mask) != 0; *__base &= ~__mask; return __result; }
+#endif /* !__has_builtin(_bittestandreset) */
 #endif /* !_bittestandreset */
 #ifndef _bittestandreset64
 #define _bittestandreset64 _bittestandreset64
+#if !__has_builtin(_bittestandreset64)
 __LOCAL __BYTE_TYPE__ (_bittestandreset64)(__LONG64_TYPE__ *__base, __LONG64_TYPE__ __offset) { __LONG64_TYPE__ __mask = (__LONG64_TYPE__)1 << __offset; __BYTE_TYPE__ __result = (*__base & __mask) != 0; *__base &= ~__mask; return __result; }
+#endif /* !__has_builtin(_bittestandreset64) */
 #endif /* !_bittestandreset64 */
 #ifndef _interlockedbittestandcomplement
 #define _interlockedbittestandcomplement _interlockedbittestandcomplement
+#if !__has_builtin(_interlockedbittestandcomplement)
 __LOCAL __BYTE_TYPE__ (_interlockedbittestandcomplement)(__LONG32_TYPE__ *__base, __LONG32_TYPE__ __offset) { return !((__hybrid_atomic_fetchxor(*__base, (__LONG32_TYPE__)1 << __offset, __ATOMIC_SEQ_CST) >> __offset) & 1); }
+#endif /* !__has_builtin(_interlockedbittestandcomplement) */
 #endif /* !_interlockedbittestandcomplement */
 #ifndef _interlockedbittestandcomplement64
 #define _interlockedbittestandcomplement64 _interlockedbittestandcomplement64
+#if !__has_builtin(_interlockedbittestandcomplement64)
 __LOCAL __BYTE_TYPE__ (_interlockedbittestandcomplement64)(__LONG64_TYPE__ *__base, __LONG64_TYPE__ __offset) { return !((__hybrid_atomic_fetchxor(*__base, (__LONG64_TYPE__)1 << __offset, __ATOMIC_SEQ_CST) >> __offset) & 1); }
+#endif /* !__has_builtin(_interlockedbittestandcomplement64) */
 #endif /* !_interlockedbittestandcomplement64 */
 #ifndef _interlockedbittestandset
 #define _interlockedbittestandset _interlockedbittestandset
+#if !__has_builtin(_interlockedbittestandset)
 __LOCAL __BYTE_TYPE__ (_interlockedbittestandset)(__LONG32_TYPE__ *__base, __LONG32_TYPE__ __offset) { __LONG32_TYPE__ __mask = (__LONG32_TYPE__)1 << __offset; return (__hybrid_atomic_fetchor(*__base, __mask, __ATOMIC_SEQ_CST) & __mask) != 0; }
+#endif /* !__has_builtin(_interlockedbittestandset) */
 #endif /* !_interlockedbittestandset */
 #ifndef _interlockedbittestandset64
 #define _interlockedbittestandset64 _interlockedbittestandset64
+#if !__has_builtin(_interlockedbittestandset64)
 __LOCAL __BYTE_TYPE__ (_interlockedbittestandset64)(__LONG64_TYPE__ *__base, __LONG64_TYPE__ __offset) { __LONG64_TYPE__ __mask = (__LONG64_TYPE__)1 << __offset; return (__hybrid_atomic_fetchor(*__base, __mask, __ATOMIC_SEQ_CST) & __mask) != 0; }
+#endif /* !__has_builtin(_interlockedbittestandset64) */
 #endif /* !_interlockedbittestandset64 */
 #ifndef _interlockedbittestandreset
 #define _interlockedbittestandreset _interlockedbittestandreset
+#if !__has_builtin(_interlockedbittestandreset)
 __LOCAL __BYTE_TYPE__ (_interlockedbittestandreset)(__LONG32_TYPE__ *__base, __LONG32_TYPE__ __offset) { __LONG32_TYPE__ __mask = (__LONG32_TYPE__)1 << __offset; return (__hybrid_atomic_fetchand(*__base, ~__mask, __ATOMIC_SEQ_CST) & __mask) != 0; }
+#endif /* !__has_builtin(_interlockedbittestandreset) */
 #endif /* !_interlockedbittestandreset */
 #ifndef _interlockedbittestandreset64
 #define _interlockedbittestandreset64 _interlockedbittestandreset64
+#if !__has_builtin(_interlockedbittestandreset64)
 __LOCAL __BYTE_TYPE__ (_interlockedbittestandreset64)(__LONG64_TYPE__ *__base, __LONG64_TYPE__ __offset) { __LONG64_TYPE__ __mask = (__LONG64_TYPE__)1 << __offset; return (__hybrid_atomic_fetchand(*__base, ~__mask, __ATOMIC_SEQ_CST) & __mask) != 0; }
+#endif /* !__has_builtin(_interlockedbittestandreset64) */
 #endif /* !_interlockedbittestandreset64 */
 
 
@@ -770,6 +794,7 @@ __FORCELOCAL void(__writedr)(unsigned int __n, __REGISTER_TYPE__ __val) {
 #define __incfsword(off)       __incfsw(off)
 #ifndef __readfsqword
 #define __readfsqword __readfsqword
+#if !__has_builtin(__readfsqword)
 __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__(__readfsqword)(__ULONGPTR_TYPE__ __off) {
 	union {
 		__UINT64_TYPE__ __v64;
@@ -779,9 +804,11 @@ __FORCELOCAL __ATTR_WUNUSED __UINT64_TYPE__(__readfsqword)(__ULONGPTR_TYPE__ __o
 	__res.__v32[1] = __rdfsl(__off + 4);
 	return __res.__v64;
 }
+#endif /* !__has_builtin(__readfsqword) */
 #endif /* !__readfsqword */
 #ifndef __writefsqword
 #define __writefsqword __writefsqword
+#if !__has_builtin(__writefsqword)
 __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __off, __UINT64_TYPE__ __val) {
 	union {
 		__UINT64_TYPE__ __v64;
@@ -791,6 +818,7 @@ __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __off, __UINT64_TYPE__ __va
 	__wrfsl(__off + 0, __data.__v32[0]);
 	__wrfsl(__off + 4, __data.__v32[1]);
 }
+#endif /* !__has_builtin(__writefsqword) */
 #endif /* !__writefsqword */
 /* __MACHINEX86: void _m_empty(void) */
 /* __MACHINEX86: void _m_femms(void) */

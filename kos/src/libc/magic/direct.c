@@ -81,7 +81,7 @@ char *_getdcwd(int drive, [[out(? <= bufsize)]] char *buf, size_t bufsize) {
 [[requires($has_function(fchdir) && defined(__AT_FDDRIVE_ROOT))]]
 [[impl_include("<libc/errno.h>")]]
 int _chdrive(int drive) {
-	drive = toupper((unsigned char)drive);
+	drive = (unsigned char)toupper((unsigned char)drive);
 	if unlikely(drive < __AT_DOS_DRIVEMIN || drive > __AT_DOS_DRIVEMAX) {
 @@pp_ifdef EINVAL@@
 		return libc_seterrno(EINVAL);

@@ -31,6 +31,15 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#ifdef __USE_KOS_ALTERATIONS
+#define __PRIVATE_RUAGE_USEC32_T __ULONG32_TYPE__
+#define __PRIVATE_RUAGE_USEC64_T __ULONG64_TYPE__
+#else /* __USE_KOS_ALTERATIONS */
+#define __PRIVATE_RUAGE_USEC32_T __LONG32_TYPE__
+#define __PRIVATE_RUAGE_USEC64_T __LONG64_TYPE__
+#endif /* !__USE_KOS_ALTERATIONS */
+
+
 __LOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(rusagex32_to_rusagex32_64)(struct __rusagex32 const *__restrict __self,
                                          struct __rusagex32_64 *__restrict __result) {
@@ -81,9 +90,9 @@ __LOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(rusagex32_to_rusagex64)(struct __rusagex32 const *__restrict __self,
                                       struct __rusagex64 *__restrict __result) {
 	__result->ru_utime.tv_sec  = (__INT64_TYPE__)__self->ru_utime.tv_sec;
-	__result->ru_utime.tv_usec = (__UINT64_TYPE__)__self->ru_utime.tv_usec;
+	__result->ru_utime.tv_usec = (__PRIVATE_RUAGE_USEC64_T)__self->ru_utime.tv_usec;
 	__result->ru_stime.tv_sec  = (__INT64_TYPE__)__self->ru_stime.tv_sec;
-	__result->ru_stime.tv_usec = (__UINT64_TYPE__)__self->ru_stime.tv_usec;
+	__result->ru_stime.tv_usec = (__PRIVATE_RUAGE_USEC64_T)__self->ru_stime.tv_usec;
 	__result->ru_maxrss        = (__LONG64_TYPE__)__self->ru_maxrss;
 	__result->ru_ixrss         = (__LONG64_TYPE__)__self->ru_ixrss;
 	__result->ru_idrss         = (__LONG64_TYPE__)__self->ru_idrss;
@@ -104,9 +113,9 @@ __LOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(rusagex32_64_to_rusagex64)(struct __rusagex32_64 const *__restrict __self,
                                          struct __rusagex64 *__restrict __result) {
 	__result->ru_utime.tv_sec  = __self->ru_utime.tv_sec;
-	__result->ru_utime.tv_usec = (__UINT64_TYPE__)__self->ru_utime.tv_usec;
+	__result->ru_utime.tv_usec = (__PRIVATE_RUAGE_USEC64_T)__self->ru_utime.tv_usec;
 	__result->ru_stime.tv_sec  = __self->ru_stime.tv_sec;
-	__result->ru_stime.tv_usec = (__UINT64_TYPE__)__self->ru_stime.tv_usec;
+	__result->ru_stime.tv_usec = (__PRIVATE_RUAGE_USEC64_T)__self->ru_stime.tv_usec;
 	__result->ru_maxrss        = (__LONG64_TYPE__)__self->ru_maxrss;
 	__result->ru_ixrss         = (__LONG64_TYPE__)__self->ru_ixrss;
 	__result->ru_idrss         = (__LONG64_TYPE__)__self->ru_idrss;
@@ -127,9 +136,9 @@ __LOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(rusagex64_to_rusagex32)(struct __rusagex64 const *__restrict __self,
                                       struct __rusagex32 *__restrict __result) {
 	__result->ru_utime.tv_sec  = (__INT32_TYPE__)__self->ru_utime.tv_sec;
-	__result->ru_utime.tv_usec = (__UINT32_TYPE__)__self->ru_utime.tv_usec;
+	__result->ru_utime.tv_usec = (__PRIVATE_RUAGE_USEC32_T)__self->ru_utime.tv_usec;
 	__result->ru_stime.tv_sec  = (__INT32_TYPE__)__self->ru_stime.tv_sec;
-	__result->ru_stime.tv_usec = (__UINT32_TYPE__)__self->ru_stime.tv_usec;
+	__result->ru_stime.tv_usec = (__PRIVATE_RUAGE_USEC32_T)__self->ru_stime.tv_usec;
 	__result->ru_maxrss        = (__LONG32_TYPE__)__self->ru_maxrss;
 	__result->ru_ixrss         = (__LONG32_TYPE__)__self->ru_ixrss;
 	__result->ru_idrss         = (__LONG32_TYPE__)__self->ru_idrss;
@@ -150,9 +159,9 @@ __LOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(rusagex64_to_rusagex32_64)(struct __rusagex64 const *__restrict __self,
                                          struct __rusagex32_64 *__restrict __result) {
 	__result->ru_utime.tv_sec  = __self->ru_utime.tv_sec;
-	__result->ru_utime.tv_usec = (__UINT32_TYPE__)__self->ru_utime.tv_usec;
+	__result->ru_utime.tv_usec = (__PRIVATE_RUAGE_USEC32_T)__self->ru_utime.tv_usec;
 	__result->ru_stime.tv_sec  = __self->ru_stime.tv_sec;
-	__result->ru_stime.tv_usec = (__UINT32_TYPE__)__self->ru_stime.tv_usec;
+	__result->ru_stime.tv_usec = (__PRIVATE_RUAGE_USEC32_T)__self->ru_stime.tv_usec;
 	__result->ru_maxrss        = (__LONG32_TYPE__)__self->ru_maxrss;
 	__result->ru_ixrss         = (__LONG32_TYPE__)__self->ru_ixrss;
 	__result->ru_idrss         = (__LONG32_TYPE__)__self->ru_idrss;
@@ -169,6 +178,8 @@ __NOTHROW_NCX(rusagex64_to_rusagex32_64)(struct __rusagex64 const *__restrict __
 	__result->ru_nivcsw        = (__LONG32_TYPE__)__self->ru_nivcsw;
 }
 
+#undef __PRIVATE_RUAGE_USEC32_T
+#undef __PRIVATE_RUAGE_USEC64_T
 
 #ifdef __x86_64__
 #define rusagex32_to_rusage                 rusagex32_to_rusagex64

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5625c29a */
+/* HASH CRC-32:0xd5cfac51 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3022,7 +3022,7 @@ handle_overflow:
 		}
 	}
 	if (sign == '-') {
-		if (__hybrid_overflow_sneg_p2n(result, &result))
+		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
@@ -3167,7 +3167,7 @@ handle_overflow:
 		}
 	}
 	if (sign == '-') {
-		if (__hybrid_overflow_sneg_p2n(result, &result))
+		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
@@ -3644,7 +3644,7 @@ handle_overflow:
 		}
 	}
 	if (sign == '-') {
-		if (__hybrid_overflow_sneg_p2n(result, &result))
+		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
@@ -3789,7 +3789,7 @@ handle_overflow:
 		}
 	}
 	if (sign == '-') {
-		if (__hybrid_overflow_sneg_p2n(result, &result))
+		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {

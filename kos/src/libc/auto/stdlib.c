@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27b359c8 */
+/* HASH CRC-32:0x26fa3b32 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1005,7 +1005,7 @@ handle_overflow:
 		}
 	}
 	if (sign == '-') {
-		if (__hybrid_overflow_sneg_p2n(result, &result))
+		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
@@ -1307,7 +1307,7 @@ handle_overflow:
 		}
 	}
 	if (sign == '-') {
-		if (__hybrid_overflow_sneg_p2n(result, &result))
+		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
 	if unlikely(num_iter == num_start) {
@@ -1779,13 +1779,13 @@ NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s) {
 		if ((unsigned char)ch <= '\0') {
 			break;
 		} else if ((unsigned char)ch <= '/') {
-			digit = (unsigned long)(ch - '.' + 0);
+			digit = (unsigned long)(unsigned int)(ch - '.' + 0);
 		} else if ((unsigned char)ch <= '9') {
-			digit = (unsigned long)(ch - '0' + 2);
+			digit = (unsigned long)(unsigned int)(ch - '0' + 2);
 		} else if ((unsigned char)ch <= 'Z') {
-			digit = (unsigned long)(ch - 'A' + 12);
+			digit = (unsigned long)(unsigned int)(ch - 'A' + 12);
 		} else {
-			digit = (unsigned long)(ch - 'a' + 38);
+			digit = (unsigned long)(unsigned int)(ch - 'a' + 38);
 		}
 		digit <<= shift;
 		result |= digit;

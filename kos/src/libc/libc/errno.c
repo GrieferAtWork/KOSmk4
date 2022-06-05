@@ -45,9 +45,9 @@ INTERN NOBLOCK ATTR_CONST ATTR_SECTION(".text.crt.errno_access.core") errno_t *
 NOTHROW(LIBCCALL libc_errno_p)(void) {
 	struct pthread *me = &current;
 	if unlikely(me->pt_errno_kind != LIBC_ERRNO_KIND_KOS) {
-		if (me->pt_errno_kind == LIBC_ERRNO_KIND_DOS)
+		if (me->pt_errno_kind == LIBC_ERRNO_KIND_DOS) {
 			me->pt_errno_value = libd_errno_dos2kos(me->pt_errno_value);
-		else if (me->pt_errno_kind == LIBC_ERRNO_KIND_NT) {
+		} else if (me->pt_errno_kind == LIBC_ERRNO_KIND_NT) {
 			me->pt_errno_value = libd_errno_nt2kos(me->pt_errno_value);
 		} else {
 			me->pt_errno_value = libd_errno_cyg2kos(me->pt_errno_value);
@@ -109,11 +109,11 @@ INTERN NOBLOCK ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access") /*dos*/ err
 NOTHROW(LIBDCALL libd_errno_p)(void) {
 	struct pthread *me = &current;
 	if (me->pt_errno_kind != LIBC_ERRNO_KIND_DOS) {
-		if (me->pt_errno_kind == LIBC_ERRNO_KIND_KOS)
+		if (me->pt_errno_kind == LIBC_ERRNO_KIND_KOS) {
 			me->pt_errno_value = libd_errno_kos2dos(me->pt_errno_value);
-		else if (me->pt_errno_kind == LIBC_ERRNO_KIND_NT)
+		} else if (me->pt_errno_kind == LIBC_ERRNO_KIND_NT) {
 			me->pt_errno_value = libd_errno_nt2dos(me->pt_errno_value);
-		else {
+		} else {
 			me->pt_errno_value = libd_errno_cyg2dos(me->pt_errno_value);
 		}
 		me->pt_errno_kind = LIBC_ERRNO_KIND_DOS;
@@ -147,11 +147,11 @@ INTERN NOBLOCK ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access") /*nt*/ errn
 NOTHROW(LIBDCALL libd_nterrno_p)(void) {
 	struct pthread *me = &current;
 	if (me->pt_errno_kind != LIBC_ERRNO_KIND_NT) {
-		if (me->pt_errno_kind == LIBC_ERRNO_KIND_KOS)
+		if (me->pt_errno_kind == LIBC_ERRNO_KIND_KOS) {
 			me->pt_errno_value = libd_errno_kos2nt(me->pt_errno_value);
-		else if (me->pt_errno_kind == LIBC_ERRNO_KIND_DOS)
+		} else if (me->pt_errno_kind == LIBC_ERRNO_KIND_DOS) {
 			me->pt_errno_value = libd_errno_dos2nt(me->pt_errno_value);
-		else {
+		} else {
 			me->pt_errno_value = libd_errno_cyg2nt(me->pt_errno_value);
 		}
 		me->pt_errno_kind = LIBC_ERRNO_KIND_NT;
@@ -189,11 +189,11 @@ INTERN NOBLOCK ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access") /*cyg*/ err
 NOTHROW(LIBDCALL libd_cygerrno_p)(void) {
 	struct pthread *me = &current;
 	if (me->pt_errno_kind != LIBC_ERRNO_KIND_CYG) {
-		if (me->pt_errno_kind == LIBC_ERRNO_KIND_KOS)
+		if (me->pt_errno_kind == LIBC_ERRNO_KIND_KOS) {
 			me->pt_errno_value = libd_errno_kos2cyg(me->pt_errno_value);
-		else if (me->pt_errno_kind == LIBC_ERRNO_KIND_DOS)
+		} else if (me->pt_errno_kind == LIBC_ERRNO_KIND_DOS) {
 			me->pt_errno_value = libd_errno_dos2cyg(me->pt_errno_value);
-		else {
+		} else {
 			me->pt_errno_value = libd_errno_nt2cyg(me->pt_errno_value);
 		}
 		me->pt_errno_kind = LIBC_ERRNO_KIND_CYG;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xecc6f708 */
+/* HASH CRC-32:0xca98257e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -165,7 +165,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sethostid))(__LONGPTR_TYPE__ __id) {
 #endif /* __SIZEOF_POINTER__ > 4 */
 
 	/* Try to open the hostid file for writing */
-	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_HOSTID, __O_WRONLY | __O_CREAT | __O_TRUNC, 0644);
+	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_HOSTID, __O_WRONLY | __O_CREAT | __O_TRUNC | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK, 0644);
 	if (__fd < 0) {
 		/* Try to lazily create the containing directory if it's missing. */
 #if (defined(__CRT_HAVE_mkdir) || defined(__CRT_HAVE___mkdir) || defined(__CRT_HAVE___libc_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_mkdirat) || defined(__CRT_HAVE_fmkdirat)))) && defined(__libc_geterrno_or) && defined(__ENOTDIR)
@@ -178,7 +178,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sethostid))(__LONGPTR_TYPE__ __id) {
 			    __libc_geterrno() == __EEXIST)
 #endif /* __EEXIST */
 			{
-				__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_HOSTID, __O_WRONLY | __O_CREAT | __O_TRUNC, 0644);
+				__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_HOSTID, __O_WRONLY | __O_CREAT | __O_TRUNC | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK, 0644);
 				if (__fd >= 0)
 					goto __got_fd;
 #define __WANT_got_fd

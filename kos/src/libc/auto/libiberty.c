@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ff0b940 */
+/* HASH CRC-32:0xc9d00589 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -601,7 +601,7 @@ NOTHROW_NCX(LIBCCALL libc_vconcat)(char const *first,
 		totlen += libc_strlen(ptr);
 	va_end(copy);
 	ptr = result = (char *)libc_xmalloc((totlen + 1) * sizeof(char));
-	for (; first; first = va_arg(copy, char *))
+	for (; first; first = va_arg(args, char *))
 		ptr = (char *)libc_mempcpyc(ptr, first, libc_strlen(first), sizeof(char));
 	*ptr = '\0';
 	return result;

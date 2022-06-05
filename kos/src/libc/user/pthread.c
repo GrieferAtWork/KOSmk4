@@ -333,7 +333,7 @@ NOTHROW(LIBC_PTHREAD_MAIN_CC libc_pthread_main)(LIBC_PTHREAD_MAIN_ARGS) {
 			 * in  case  we  have   to  unmap  our  own   stack. */
 			RETHROW();
 		}
-		exitcode = except_data()->e_args.e_exit_thread.et_exit_code;
+		exitcode = (int)except_data()->e_args.e_exit_thread.et_exit_code;
 		me->pt_retval = PTHREAD_CANCELED;
 	}
 	/* Perform cleanup & terminate the current thread. */

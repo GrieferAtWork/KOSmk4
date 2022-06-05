@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2dc58287 */
+/* HASH CRC-32:0xdf6fed37 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 
 DECL_BEGIN
 
+#include <time.h>
 #ifndef __KERNEL__
 INTDEF WUNUSED ATTR_IN(1) char16_t *NOTHROW_NCX(LIBDCALL libd__wasctime)(struct tm const *tp);
 INTDEF WUNUSED ATTR_IN(1) char32_t *NOTHROW_NCX(LIBKCALL libc__wasctime)(struct tm const *tp);

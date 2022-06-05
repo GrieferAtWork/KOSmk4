@@ -142,10 +142,10 @@ NOTHROW_NCX(LIBCCALL libc_ftime64)(struct timeb64 *timebuf)
 	int result;
 	result = gettimeofday64(&tv, &tz);
 	if likely(result == 0) {
-		timebuf->dstflag  = tz.tz_dsttime;
-		timebuf->timezone = tz.tz_minuteswest;
-		timebuf->millitm  = tv.tv_usec / 1000;
-		timebuf->time     = tv.tv_sec;
+		timebuf->dstflag  = (typeof(timebuf->dstflag))(tz.tz_dsttime);
+		timebuf->timezone = (typeof(timebuf->timezone))(tz.tz_minuteswest);
+		timebuf->millitm  = (typeof(timebuf->millitm))(tv.tv_usec / 1000);
+		timebuf->time     = (typeof(timebuf->time))(tv.tv_sec);
 	}
 	return result;
 }

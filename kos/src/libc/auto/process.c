@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae4c09f0 */
+/* HASH CRC-32:0x3b3ab50f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,9 +114,7 @@ NOTHROW_RPC(LIBDCALL libd_spawnve)(__STDC_INT_AS_UINT_T mode,
 	fd_t fd;
 	pid_t result = -1;
 
-	fd = libd_open(path, O_RDONLY | O_CLOEXEC);
-
-
+	fd = libd_open(path, O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 
 
 
@@ -137,9 +135,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnve)(__STDC_INT_AS_UINT_T mode,
 	fd_t fd;
 	pid_t result = -1;
 
-	fd = libc_open(path, O_RDONLY | O_CLOEXEC);
-
-
+	fd = libc_open(path, O_RDONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
 
 
 

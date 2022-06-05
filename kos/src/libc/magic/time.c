@@ -475,7 +475,7 @@ struct sigevent;
 [[ignore, nocrt, doc_alias("asctime_s"), alias("asctime_s")]]
 [[decl_include("<bits/types.h>", "<bits/crt/tm.h>")]]
 $errno_t crt_asctime_s([[out(? <= buflen)]] char *__restrict buf, size_t buflen,
-                       [[in]] struct tm const *__restrict tp);
+                       [[in]] struct $tm const *__restrict tp);
 
 
 %[define(DEFINE_TIME_MONTH_NUMDAYS =
@@ -688,7 +688,7 @@ double difftime(time_t time1, time_t time0) {
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mktime64", "_mktime64", "timelocal64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mktime", "_mktime32", "timelocal")]]
 [[requires_function(timegm)]]
-time_t mktime([[inout]] struct tm *tp) {
+time_t mktime([[inout]] struct $tm *tp) {
 	/* TODO: Support for localtime? */
 	return timegm(tp);
 }
@@ -739,7 +739,7 @@ __LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
 DEFINE_GMTIME_BUFFER
 @@pp_endif@@
 )]]
-[[nonnull]] struct tm *gmtime([[in]] time_t const *timer) {
+[[nonnull]] struct $tm *gmtime([[in]] time_t const *timer) {
 @@pp_if $has_function(gmtime64) && !defined(__BUILDING_LIBC)@@
 	time64_t tm64 = (time64_t)*timer;
 	return gmtime64(&tm64);
@@ -762,7 +762,7 @@ DEFINE_GMTIME_BUFFER
 DEFINE_GMTIME_BUFFER
 @@pp_endif@@
 )]]
-[[nonnull]] struct tm *localtime([[in]] time_t const *timer) {
+[[nonnull]] struct $tm *localtime([[in]] time_t const *timer) {
 @@pp_if $has_function(localtime64) && !defined(__BUILDING_LIBC)@@
 	time64_t tm64 = (time64_t)*timer;
 	return localtime64(&tm64);
@@ -790,7 +790,7 @@ $size_t crt_strftime_l([[out(return <= bufsize)]] char *__restrict buf, $size_t 
 [[std, decl_include("<bits/crt/tm.h>", "<hybrid/typecore.h>"), crtbuiltin, alias("_Strftime")]]
 size_t strftime([[out(? <= bufsize)]] char *__restrict buf, size_t bufsize,
                 [[in, format("strftime")]] char const *__restrict format,
-                [[in]] struct tm const *__restrict tp) {
+                [[in]] struct $tm const *__restrict tp) {
 @@pp_if $has_function(crt_strftime_l) && !defined(__BUILDING_LIBC)@@
 	return crt_strftime_l(buf, bufsize, format, tp, NULL);
 @@pp_else@@
@@ -817,7 +817,7 @@ __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 @@Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
 @@that is  the  representation  of  `tp'  in  this  format
 [[std, wunused, impl_prefix(DEFINE_CTIME_BUFFER)]]
-[[nonnull]] char *asctime([[in]] struct tm const *tp) {
+[[nonnull]] char *asctime([[in]] struct $tm const *tp) {
 	return asctime_r(tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
 }
 
@@ -826,7 +826,7 @@ __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 [[std, guard, impl_include("<libc/errno.h>")]]
 [[decl_include("<bits/crt/tm.h>", "<bits/types.h>")]]
 $errno_t asctime_s([[out(? <= buflen)]] char *__restrict buf, size_t buflen,
-                   [[in]] struct tm const *__restrict tp) {
+                   [[in]] struct $tm const *__restrict tp) {
 	if (buflen < 26)
 		return __ERANGE;
 	asctime_r(tp, buf);
@@ -1751,7 +1751,7 @@ DEFINE_PUBLIC_ALIAS(getdate_err, libc_getdate_err);
 [[requires($has_function(getdate_r) && defined(__LOCAL_getdate_err))]]
 [[impl_include("<bits/crt/tm.h>")]]
 struct $tm *getdate([[in]] const char *string) {
-	static @struct tm@ result;
+	static struct tm result;
 	int error = getdate_r(string, &result);
 	if (error == 0)
 		return &result;
