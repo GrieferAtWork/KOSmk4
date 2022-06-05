@@ -60,11 +60,11 @@ DEFINE_TEST(fifo) {
 	 * NOTE: This only happens when `O_NONBLOCK' is given. Without the later
 	 *       flag,  this operation would block until a reader would open the
 	 *       fifo */
-	EQd(-1, (wr = open(FIFO_NAME, O_WRONLY | O_NONBLOCK)));
+	EQd(-1, (wr = open(FIFO_NAME, O_WRONLY | O_NONBLOCK))); /* NOLINT */
 	EQd(errno, ENXIO);
 
-	NEd(-1, (rd = open(FIFO_NAME, O_RDONLY | O_NONBLOCK)));
-	NEd(-1, (wr = open(FIFO_NAME, O_WRONLY | O_NONBLOCK)));
+	NEd(-1, (rd = open(FIFO_NAME, O_RDONLY | O_NONBLOCK))); /* NOLINT */
+	NEd(-1, (wr = open(FIFO_NAME, O_WRONLY | O_NONBLOCK))); /* NOLINT */
 	EQss(6, write(wr, "foobar", 6));
 
 	EQss(3, read(rd, buf, 3));
@@ -88,7 +88,7 @@ DEFINE_TEST(fifo) {
 	/* Open the fifo for writing once again.
 	 * NOTE: Don't pass O_NONBLOCK this time around, since the presence
 	 *       of our  reader (rd)  should  prevent this  from  blocking! */
-	NEd(-1, (wr = open(FIFO_NAME, O_WRONLY)));
+	NEd(-1, (wr = open(FIFO_NAME, O_WRONLY))); /* NOLINT */
 
 	/* Trying to read from the FIFO should once again indicate
 	 * EWOULDBLOCK,   since  there's  a  writer  (once  again) */

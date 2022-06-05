@@ -263,7 +263,7 @@ DlModule_OpenService(USER char const *filename, unsigned int mode) THROWS(E_SEGF
 	if unlikely(!mod->dm_filename) {
 		service_close(result->dsm_service);
 		libservice_close();
-		goto err_nomem;
+		goto err_nomem_r;
 	}
 	mod->dm_dynhdr     = NULL;
 	mod->dm_tlsoff     = 0;
@@ -302,6 +302,8 @@ DlModule_OpenService(USER char const *filename, unsigned int mode) THROWS(E_SEGF
 	dlglobals_all_add(&dl_globals, mod);
 	dlglobals_all_endwrite(&dl_globals);
 	return mod;
+err_nomem_r:
+	free(result);
 err_nomem:
 	dl_seterror_nomem();
 	return NULL;

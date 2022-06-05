@@ -297,7 +297,7 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 	if (dwStackSize != 0) {
 		error = pthread_attr_setstacksize(&attr, dwStackSize);
 		if (error != EOK)
-			goto seterr_attr;
+			goto seterr_attr_cookie;
 	}
 
 	/* Actually create the new thread. */
@@ -323,7 +323,8 @@ libk32_CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes, SIZE_T dwStackSize
 
 	/* Return a OS-level handle for the thread. */
 	return result;
-seterr_attr:
+seterr_attr_cookie:
+	free(cookie);
 	pthread_attr_destroy(&attr);
 seterr:
 	errno = error;

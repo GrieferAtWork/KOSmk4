@@ -58,7 +58,7 @@ DECL_BEGIN
 
 PRIVATE char const *init_envp[] = {
 	"HOME=/",
-	"PATH=" _PATH_STDPATH,
+	"PATH=" _PATH_STDPATH, /* NOLINT */
 	"PWD=/",
 	"TERM=xterm",
 	NULL
@@ -212,7 +212,7 @@ done_tmpfs:
 
 	/* Setup dos drives. */
 	{
-		fd_t rfd = open("/", O_RDONLY | O_DIRECTORY);
+		fd_t rfd = open("/", O_RDONLY | O_DIRECTORY); /* NOLINT */
 		if (rfd >= 0) {
 			dup2(rfd, AT_FDDRIVE_ROOT('C'));
 			close(rfd);

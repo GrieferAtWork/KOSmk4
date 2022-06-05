@@ -81,7 +81,7 @@ DEFINE_TEST(inotify) {
 	assert_inotify_empty(notify_fd);
 
 	/* Test: `IN_OPEN' */
-	LEd(0, (fd = open("/tmp", O_RDONLY)));
+	LEd(0, (fd = open("/tmp", O_RDONLY))); /* NOLINT */
 	assert_inotify_event(notify_fd, wfd, IN_OPEN | IN_ISDIR, NULL);
 	assert_inotify_empty(notify_fd);
 
@@ -91,7 +91,7 @@ DEFINE_TEST(inotify) {
 	assert_inotify_empty(notify_fd);
 
 	/* Test: `IN_CREATE' */
-	LEd(0, (fd = open("/tmp/testfile", O_RDWR | O_CREAT, 0644)));
+	LEd(0, (fd = open("/tmp/testfile", O_RDWR | O_CREAT, 0644))); /* NOLINT */
 	assert_inotify_event(notify_fd, wfd, IN_CREATE, "testfile");
 	assert_inotify_empty(notify_fd);
 
@@ -121,7 +121,7 @@ DEFINE_TEST(inotify) {
 	EQd(0, inotify_rm_watch(notify_fd, wfd));
 	assert_inotify_event(notify_fd, wfd, IN_IGNORED | IN_ISDIR, NULL); /* Triggered by `inotify_rm_watch(2)' */
 	assert_inotify_empty(notify_fd);
-	LEd(0, (fd = open("/tmp", O_RDONLY)));
+	LEd(0, (fd = open("/tmp", O_RDONLY))); /* NOLINT */
 	assert_inotify_empty(notify_fd);
 	EQd(0, close(fd));
 	assert_inotify_empty(notify_fd);
@@ -131,7 +131,8 @@ DEFINE_TEST(inotify) {
 	LEd(0, (notify_fd = inotify_init1(IN_CLOEXEC | IN_NONBLOCK)));
 	assert_inotify_empty(notify_fd);
 	LEd(0, (wfd = inotify_add_watch(notify_fd, "/tmp", IN_ALL_EVENTS | IN_ONLYDIR)));
-	LEd(0, (fd = open("/tmp", O_RDONLY))); /* This generates `IN_OPEN', but we won't consume that event! */
+	/* This generates `IN_OPEN', but we won't consume that event! */
+	LEd(0, (fd = open("/tmp", O_RDONLY))); /* NOLINT */
 	EQd(0, close(fd));
 	EQd(0, close(notify_fd));
 }
@@ -151,7 +152,7 @@ DEFINE_TEST(dnotify) {
 	ohand = signal(SIGUSR1, &sigio_handler);
 
 	/* Setup SIGIO-based notification for events on /tmp */
-	LEd(0, (dirfd = open("/tmp", O_RDONLY)));
+	LEd(0, (dirfd = open("/tmp", O_RDONLY))); /* NOLINT */
 	EQd(0, fcntl(dirfd, F_NOTIFY,
 	             DN_ACCESS | DN_MODIFY | DN_CREATE |
 	             DN_DELETE | DN_RENAME | DN_ATTRIB |
@@ -164,7 +165,7 @@ DEFINE_TEST(dnotify) {
 	EQu(0, sigio);
 
 	/* Trigger some events and assert that each of them raises SIGUSR1 */
-	LEd(0, (fd = open("/tmp/foo", O_WRONLY | O_CREAT, 0644)));
+	LEd(0, (fd = open("/tmp/foo", O_WRONLY | O_CREAT, 0644))); /* NOLINT */
 	EQu(1, sigio); /* DN_CREATE */
 
 	EQss(5, write(fd, "Hello", 5));

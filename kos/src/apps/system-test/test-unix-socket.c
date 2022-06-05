@@ -50,7 +50,7 @@ DEFINE_TEST(unix_socket) {
 	struct stat st;
 
 	/* Server */
-	server_sock = socket(AF_UNIX, SOCK_STREAM, PF_UNIX);
+	server_sock = socket(AF_UNIX, SOCK_STREAM, PF_UNIX); /* NOLINT */
 	if (server_sock < 0)
 		err(1, "socket() failed");
 	sa.sun_family = AF_UNIX;
@@ -64,14 +64,14 @@ DEFINE_TEST(unix_socket) {
 		err(1, "stat() failed");
 
 	/* Client (NOTE: `SOCK_NONBLOCK' means async connect) */
-	client_sock = socket(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, PF_UNIX);
+	client_sock = socket(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, PF_UNIX); /* NOLINT */
 	if (client_sock < 0)
 		err(1, "socket() failed");
 	if (connect(client_sock, (struct sockaddr *)&sa, sizeof(sa)) < 0)
 		err(1, "connect() failed");
 
 	/* Accept the client */
-	accept_sock = accept(server_sock, NULL, NULL);
+	accept_sock = accept(server_sock, NULL, NULL); /* NOLINT */
 	if (accept_sock < 0)
 		err(1, "accept() failed");
 

@@ -51,7 +51,7 @@ assertFileText_impl(fd_t dfd, char const *name,
 	fd_t fd;
 	int error;
 	size_t len = strlen(text);
-	fd = openat(dfd, name, O_RDONLY);
+	fd = openat(dfd, name, O_RDONLY); /* NOLINT */
 	assertf(fd != -1,
 	        "%m\n"
 	        "line:%d",
@@ -143,12 +143,12 @@ PRIVATE void testPath(char const *path) {
 	checkTestFiles(path, false);
 
 	/* Create a previous non-existent file. */
-	NEd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644)));
+	NEd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644))); /* NOLINT */
 	EQss(3, write(fd, "F1\n", 3));
 	EQd(0, close(fd));
 
 	/* At this point, the file should already exist */
-	EQd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644)));
+	EQd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644))); /* NOLINT */
 	EQd(errno, EEXIST);
 
 	/* At this point, the file should already exist */
@@ -158,14 +158,14 @@ PRIVATE void testPath(char const *path) {
 	EQd(0, renameat2(dfd, "test", dfd, "test2", AT_RENAME_NOREPLACE));
 
 	/* The open should now fail. */
-	EQd(-1, (fd = openat(dfd, "test", O_RDONLY)));
+	EQd(-1, (fd = openat(dfd, "test", O_RDONLY))); /* NOLINT */
 	EQd(errno, ENOENT);
 
 	/* But an open with the new filename shouldn't */
 	assertFileText(dfd, "test2", "F1\n");
 
 	/* Now try to create a second file. */
-	NEd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644)));
+	NEd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644))); /* NOLINT */
 	EQd(3, write(fd, "F2\n", 3));
 	EQd(0, close(fd));
 
@@ -186,7 +186,7 @@ PRIVATE void testPath(char const *path) {
 	assertFileText(dfd, "test", "F2\n");
 
 	/* But the test2 file should no longer exist. */
-	EQd(-1, (fd = openat(dfd, "test2", O_RDONLY)));
+	EQd(-1, (fd = openat(dfd, "test2", O_RDONLY))); /* NOLINT */
 	EQd(errno, ENOENT);
 
 	/* Now try the rename once again */
@@ -199,7 +199,7 @@ PRIVATE void testPath(char const *path) {
 	 * Finally,  try to create  a new `test' file.
 	 * The important part here  is that a file  of
 	 * the same name already existed at one point! */
-	NEd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644)));
+	NEd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644))); /* NOLINT */
 	EQss(3, write(fd, "F3\n", 3));
 	EQd(0, close(fd));
 
@@ -221,7 +221,7 @@ PRIVATE void testPath(char const *path) {
 		struct stat st1, st2;
 		char modestr[12];
 
-		NEd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644)));
+		NEd(-1, (fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644))); /* NOLINT */
 		EQss(3, write(fd, "HL1", 3));
 		EQd(0, close(fd));
 

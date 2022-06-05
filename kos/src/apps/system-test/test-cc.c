@@ -50,10 +50,10 @@ DEFINE_TEST(cc) {
 
 	fd_t fd;
 	unlink("/var/testfile.txt");
-	fd = open("/var/testfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644);
+	fd = open("/var/testfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644); /* NOLINT */
 	if (fd < 0) {
 		mkdir("/var/", 755);
-		LEd(0, (fd = open("/var/testfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644)));
+		LEd(0, (fd = open("/var/testfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644))); /* NOLINT */
 	}
 	EQss(DATSZ, pwrite(fd, dat, DATSZ, 512));
 	EQd(0, close(fd));
@@ -75,13 +75,13 @@ DEFINE_TEST(cc) {
 	 *
 	 * This test ensures that this no longer happens, and that file data is preserved
 	 * across sync+cc, even  if the first  access thereafter happens  to be a  write. */
-	LEd(0, (fd = open("/var/testfile.txt", O_WRONLY | O_APPEND)));
+	LEd(0, (fd = open("/var/testfile.txt", O_WRONLY | O_APPEND))); /* NOLINT */
 	EQss(4, write(fd, "tail", 4));
 	EQd(0, close(fd));
 	sync();
 	ksysctl(KSYSCTL_SYSTEM_CLEARCACHES);
 
-	LEd(0, (fd = open("/var/testfile.txt", O_RDONLY)));
+	LEd(0, (fd = open("/var/testfile.txt", O_RDONLY))); /* NOLINT */
 	EQss(DATSZ, pread(fd, buf, DATSZ, 512));
 	assertf(memcmp(buf, dat, DATSZ) == 0,
 	        "buf = %$q\n"

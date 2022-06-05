@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 		case 'd':
 			if (kbdev >= 0)
 				close(kbdev);
-			kbdev = open(optarg, O_RDWR);
+			kbdev = open(optarg, O_RDWR); /* NOLINT */
 			if (kbdev < 0) {
 				fprintf(stderr, "%s: Failed to open device %s: %m\n",
 				        argv[0], optarg);
@@ -73,9 +73,9 @@ int main(int argc, char *argv[]) {
 	}
 	if (kbdev < 0) {
 		/* TODO: if (isatty(STDIN_FILENO)) open_keyboard_of(STDIN_FILENO) */
-		kbdev = open("/dev/ps2kbd1", O_RDONLY);
+		kbdev = open("/dev/ps2kbd1", O_RDONLY); /* NOLINT */
 		if (kbdev < 0)
-			kbdev = open("/dev/ps2kbd2", O_RDONLY);
+			kbdev = open("/dev/ps2kbd2", O_RDONLY); /* NOLINT */
 		if (kbdev < 0) {
 			fprintf(stderr, "%s: Failed to find keyboard device\n",
 			        argv[0]);
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	map_filename = argv[optind];
-	keymap_fd = open(map_filename, O_RDONLY);
+	keymap_fd = open(map_filename, O_RDONLY); /* NOLINT */
 	if (keymap_fd < 0) {
 		fprintf(stderr, "%s: Failed to open keymap file %s: %m\n",
 		        argv[0], map_filename);

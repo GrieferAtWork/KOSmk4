@@ -42,7 +42,7 @@ static char *readfile(char const *filename) {
 	size_t bufsize = 4096, ok = 0;
 	char *buf = (char *)malloc(bufsize);
 	ssize_t rsize;
-	fd_t fd = open(filename, O_RDONLY);
+	fd_t fd = open(filename, O_RDONLY); /* NOLINT */
 	NEp(NULL, buf);
 	LOd(-1, fd);
 	while ((rsize = read(fd, buf + ok, bufsize - ok)) > 0) {
@@ -71,7 +71,7 @@ DEFINE_TEST(mapfile) {
 	/* Test mapfile() on ramfs files.
 	 * case: [mmap:yes,pread:yes,read:yes] */
 	unlink("/tmp/test-mapfile");
-	file = open("/tmp/test-mapfile", O_CREAT | O_EXCL | O_WRONLY, 0644);
+	file = open("/tmp/test-mapfile", O_CREAT | O_EXCL | O_WRONLY, 0644); /* NOLINT */
 	LEd(0, file);
 	EQss(7, write(file, "Content", 7));
 	EQd(0, close(file));
@@ -102,7 +102,7 @@ DEFINE_TEST(mapfile) {
 
 	/* Test mapfile() on pipes.
 	 * case: [mmap:no,pread:no,read:yes] */
-	EQd(0, pipe(pipes));
+	EQd(0, pipe(pipes)); /* NOLINT */
 	EQss(7, write(pipes[1], "Content", 7));
 	EQd(0, close(pipes[1]));
 	EQd(0, fmapfile(&mf, pipes[0], 0, (size_t)-1, 1));
@@ -111,7 +111,7 @@ DEFINE_TEST(mapfile) {
 	EQs(7, mf.mf_size);
 	assert(!mapfile_usesmmap(&mf)); /* Should have used malloc! */
 	EQd(0, unmapfile(&mf));
-	EQd(0, pipe(pipes));
+	EQd(0, pipe(pipes)); /* NOLINT */
 	EQss(7, write(pipes[1], "Content", 7));
 	EQd(0, close(pipes[1]));
 	EQd(0, fmapfile(&mf, pipes[0], 1, (size_t)-1, 1));

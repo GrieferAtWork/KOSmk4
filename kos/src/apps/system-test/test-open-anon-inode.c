@@ -83,7 +83,7 @@ DEFINE_TEST(open_anon_inode) {
 	/* Pipes exist as anonymous objects in kernel-space.
 	 * -> Reading their symlink will yield something
 	 *    along  the  lines  of   `anon_inode:[...]' */
-	error = pipe(rw);
+	error = pipe(rw); /* NOLINT */
 	ASSERT_ERROR_OK(error == 0);
 	error = close(rw[1]);
 	ASSERT_ERROR_OK(error == 0);
@@ -101,7 +101,7 @@ DEFINE_TEST(open_anon_inode) {
 	 * as  a path,  which must  obviously result  in a file-not-found
 	 * exception. */
 	sprintf(pathbuf, "/proc/self/fd/%d/", rw[0]);
-	dupres = open(pathbuf, O_RDONLY);
+	dupres = open(pathbuf, O_RDONLY); /* NOLINT */
 	/* ENOENT is the result of `E_FSERROR_NOT_A_DIRECTORY' */
 	ASSERT_ERROR_NOT_OK(dupres != -1, ENOENT);
 
@@ -110,7 +110,7 @@ DEFINE_TEST(open_anon_inode) {
 	 * which point  we'd once  again be  trying to  open a  symlink
 	 * directly. */
 	sprintf(pathbuf, "/proc/self/fd/%d", rw[0]);
-	dupres = open(pathbuf, O_RDONLY | O_NOFOLLOW);
+	dupres = open(pathbuf, O_RDONLY | O_NOFOLLOW); /* NOLINT */
 	/* ELOOP is the result of `E_FSERROR_IS_A_SYMBOLIC_LINK' */
 	ASSERT_ERROR_NOT_OK(dupres != -1, ELOOP);
 
@@ -119,7 +119,7 @@ DEFINE_TEST(open_anon_inode) {
 	 * for procfs fd files.
 	 * This is the case where open() must behave as dup() */
 	sprintf(pathbuf, "/proc/self/fd/%d", rw[0]);
-	dupres = open(pathbuf, O_RDONLY);
+	dupres = open(pathbuf, O_RDONLY); /* NOLINT */
 	ASSERT_ERROR_OK(dupres != -1);
 
 	/* Compare kernel object pointers to ensure that `dupres'
@@ -149,7 +149,7 @@ DEFINE_TEST(open_anon_inode) {
 		 * Use files from `/proc/self/fd/[...]/' to implement the
 		 * equivalent  of an `openat()' system call, whilst still
 		 * using the regular `open()'. */
-		dfd = open("/proc/self", O_RDONLY | O_DIRECTORY);
+		dfd = open("/proc/self", O_RDONLY | O_DIRECTORY); /* NOLINT */
 		ASSERT_ERROR_OK(dfd != -1);
 
 		sprintf(pathbuf, "/proc/self/fd/%d/exe", dfd);

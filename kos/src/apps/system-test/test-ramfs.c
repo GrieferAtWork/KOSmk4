@@ -56,7 +56,7 @@ DEFINE_TEST(ramfs) {
 	EQd(-1, rmdir("/tmp/submount"));
 	EQd(errno, EBUSY);
 
-	LEd(0, (fd = open("/tmp/submount/myfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644)));
+	LEd(0, (fd = open("/tmp/submount/myfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644))); /* NOLINT */
 	{
 		static char const s[] = "File contents...\n";
 		EQss(sizeof(s) - sizeof(char),
@@ -68,7 +68,7 @@ DEFINE_TEST(ramfs) {
 	 * `fsuper_delete()'  has to recursive  in order to delete
 	 * everything). */
 	EQd(0, mkdir("/tmp/submount/subdir", 0755));
-	LEd(0, (fd = open("/tmp/submount/subdir/foo.bar", O_CREAT | O_EXCL | O_WRONLY, 0644)));
+	LEd(0, (fd = open("/tmp/submount/subdir/foo.bar", O_CREAT | O_EXCL | O_WRONLY, 0644))); /* NOLINT */
 	{
 		static char const s[] = "foo.bar file contents...\n";
 		EQss(sizeof(s) - sizeof(char),

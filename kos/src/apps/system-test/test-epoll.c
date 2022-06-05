@@ -46,18 +46,18 @@ DEFINE_TEST(epoll) {
 	struct epoll_event ee;
 	struct epoll_event events[8];
 
-	NEd(-1, (epfd = epoll_create1(0)));
+	NEd(-1, (epfd = epoll_create1(0))); /* NOLINT */
 	EQd(0, close(epfd));
 	NEd(-1, (epfd = epoll_create1(EPOLL_CLOEXEC)));
 	EQd(0, close(epfd));
-	NEd(-1, (epfd = epoll_create1(EPOLL_CLOFORK)));
+	NEd(-1, (epfd = epoll_create1(EPOLL_CLOFORK))); /* NOLINT */
 	EQd(0, close(epfd));
 	NEd(-1, (epfd = epoll_create1(EPOLL_CLOEXEC | EPOLL_CLOFORK)));
 	EQd(0, close(epfd));
 
-	NEd(-1, (epfd = epoll_create(42)));
+	NEd(-1, (epfd = epoll_create(42))); /* NOLINT */
 
-	EQd(0, pipe(pipes));
+	EQd(0, pipe(pipes)); /* NOLINT */
 
 	ee.events   = EPOLLIN;
 	ee.data.u64 = 1234;
@@ -141,8 +141,8 @@ DEFINE_TEST(epoll_et) {
 	struct epoll_event events[8];
 	char buf[64];
 
-	NEd(-1, (epfd = epoll_create1(0)));
-	EQd(0, pipe(pipes));
+	NEd(-1, (epfd = epoll_create1(0))); /* NOLINT */
+	EQd(0, pipe(pipes)); /* NOLINT */
 	/* Make the reader pipe non-blocking. */
 	EQd(0, fcntl(pipes[0], F_SETFL, fcntl(pipes[0], F_GETFL) | O_NONBLOCK));
 

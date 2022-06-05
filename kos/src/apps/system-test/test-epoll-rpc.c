@@ -58,7 +58,7 @@ DEFINE_TEST(epoll_rpc) {
 	myrpc_called = 0;
 
 	NEd(-1, (epfd = epoll_create1(EPOLL_CLOEXEC | EPOLL_CLOFORK)));
-	EQd(0, pipe(pipes));
+	EQd(0, pipe(pipes)); /* NOLINT */
 
 	/* Setup a monitor that gets triggered as soon
 	 * as  reading from the pipe becomes possible. */

@@ -268,7 +268,7 @@ int main_fork(int argc, char *argv[], char *envp[]) {
 			 * This wouldn't actually  be necessary,  but we  want to  ensure that  a
 			 * single signal is enough to reach everyone, even if some of our sibling
 			 * threads are currently in the process of being created. */
-			lock = open(lockfile, O_WRONLY | O_CREAT | O_EXCL, 0644);
+			lock = open(lockfile, O_WRONLY | O_CREAT | O_EXCL, 0644); /* NOLINT */
 			if (lock >= 0) {
 				kill(-mygroup, SIGKILL);
 #ifdef __breakpoint
@@ -499,7 +499,7 @@ int main_sock(int argc, char *argv[], char *envp[]) {
 	ssize_t resplen;
 	(void)argc, (void)argv, (void)envp;
 	ksysctl_insmod("ne2k", NULL);
-	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); /* NOLINT */
 	if (sock < 0)
 		err(EXIT_FAILURE, "socket() failed");
 	in.sin_family      = AF_INET;
@@ -965,7 +965,7 @@ int main_fatls(int argc, char *argv[], char *envp[]) {
 		argc = 1;
 	}
 	for (; argc; --argc, ++argv) {
-		fd_t dirfd = open(*argv, O_DIRECTORY | O_RDONLY);
+		fd_t dirfd = open(*argv, O_DIRECTORY | O_RDONLY); /* NOLINT */
 		if (dirfd < 0)
 			err(1, "fatls: failed to open %q", *argv);
 		printf("%s:\n", *argv);

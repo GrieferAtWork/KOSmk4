@@ -81,11 +81,10 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct dltls_segment *seg) THROWS(E_S
 		if (preadall(fd, init, self->dm_tlsfsize, self->dm_tlsoff) <= 0) {
 			dl_seterrorf("Failed to read %" PRIuSIZ " bytes of TLS template data from %" PRIuN(__SIZEOF_ELFW(OFF__)),
 			             self->dm_tlsfsize, self->dm_tlsoff);
+			free(init);
 			goto err;
 		}
-		new_init = (byte_t *)ATOMIC_CMPXCH_VAL(self->dm_tlsinit,
-		                                       NULL,
-		                                       init);
+		new_init = (byte_t *)ATOMIC_CMPXCH_VAL(self->dm_tlsinit, NULL, init);
 		if unlikely(new_init != NULL)
 			free(init);
 	}

@@ -29,6 +29,7 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 
 /* DeBug eXtensions. */
 
+#ifndef __clang_tidy__ /* clang-tidy takes forever to parse this file, so let's just hide it ;) */
 #include <__crt.h>
 
 #ifndef __CRT_HAVE_strtold
@@ -69,6 +70,17 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 #include "include/cparser.h"
 #include "include/ctype.h"
 #include "include/malloc.h"
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+#define strto854l strtold
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#define strto854l strtod
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+#define strto854l strtof
+#else /* ... */
+#define strto854l (__IEEE854_LONG_DOUBLE_TYPE__)strtold
+#endif /* !... */
+
 
 DECL_BEGIN
 
@@ -684,27 +696,7 @@ doparen_expr:
 		struct ctype *used_type;
 		char *endp;
 		__IEEE854_LONG_DOUBLE_TYPE__ value;
-		/* FIXME: Because of how libc/local functions are linked (using c++ `inline'),
-		 *        our  attempt at using a custom version of format_scanf() doesn't end
-		 *        up working, since the c++ standard requires that functions  declared
-		 *        as  inline   share   the   same  address   throughout   a   program.
-		 *        As  such, relocations are  generated that will  end up bypassing our
-		 *        custom format_scanf() in favor of  the one exported from the  kernel
-		 *        core, which doesn't include floating-point support....
-		 * I feel like there's no  point in trying to make  this work. - That would  end
-		 * up  being _way_ too hacky, so I feel  like the best solution would be to just
-		 * copy the  relevant code  from the  implementation of  format_scanf() that  is
-		 * used for parsing floating-point numbers, paste it here, and call it directly.
-		 */
-#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-		value = strtold(self->c_tokstart, &endp);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-		value = strtod(self->c_tokstart, &endp);
-#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-		value = strtof(self->c_tokstart, &endp);
-#else /* ... */
-		value = (__IEEE854_LONG_DOUBLE_TYPE__)strtold(self->c_tokstart, &endp);
-#endif /* !... */
+		value     = strto854l(self->c_tokstart, &endp);
 		used_type = &ctype_ieee754_double;
 		if (endp != self->c_tokend) {
 			char32_t ch;
@@ -2996,5 +2988,6 @@ NOTHROW(FCALL ctype_eval)(struct cparser *__restrict self,
 
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* !__clang_tidy__ */
 
 #endif /* !GUARD_MODDBX_CEVAL_C */

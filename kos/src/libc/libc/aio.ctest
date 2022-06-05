@@ -44,7 +44,7 @@ DEFINE_TEST(aio) {
 	fd_t pipefds[2];
 	struct aiocb aio;
 	struct aiocb *aio_list[] = { &aio };
-	EQd(pipe(pipefds), 0);
+	EQd(pipe(pipefds), 0); /* NOLINT */
 
 	/* Start reading from the pipe. */
 	bzero(&aio, sizeof(aio));

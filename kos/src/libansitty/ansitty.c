@@ -555,7 +555,7 @@ PRIVATE NOBLOCK ATTR_CONST WUNUSED uint8_t
 NOTHROW(CC colorindex)(uint8_t r, uint8_t g, uint8_t b) {
 	uint8_t i, winner_index = 0;
 	uint16_t winner_distance = (uint16_t)-1;
-	for (i = 0; i < COMPILER_LENOF(ansipal); ++i) {
+	for (i = 0; i < (uint8_t)COMPILER_LENOF(ansipal); ++i) {
 		uint16_t distance;
 		distance = color_distance(r, g, b,
 		                          ansipal[i][0],

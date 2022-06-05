@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 	command = *argv++;
 	--argc;
 
-	svga = open("/dev/svga", O_RDONLY);
+	svga = open("/dev/svga", O_RDONLY); /* NOLINT */
 	if (svga < 0)
 		err(1, "Failed to open '/dev/svga'");
 

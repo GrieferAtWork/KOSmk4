@@ -55,11 +55,11 @@ do_o_direct_test(char const *filename) {
 	struct stat st;
 
 	unlink(filename);
-	fd = open(filename, O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644);
+	fd = open(filename, O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644); /* NOLINT */
 	if (fd < 0) {
 		if (memcmp(filename, "/var/", 5 * sizeof(char)) == 0)
 			mkdir("/var/", 755);
-		LEd(0, (fd = open(filename, O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644)));
+		LEd(0, (fd = open(filename, O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644))); /* NOLINT */
 	}
 
 	/* Query alignment requirements. */

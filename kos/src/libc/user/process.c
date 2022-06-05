@@ -129,7 +129,7 @@ NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec,
 	               (void *)-1, /* TODO: CLONE_CHILDSTACK_AUTO isn't supported by KOSmk4! */
 	               CLONE_VM | CLONE_FS | CLONE_FILES |
 	               CLONE_SIGHAND | CLONE_THREAD,
-	               arg);
+	               data);
 	if unlikely(result == -1) {
 		free(data);
 		result = 0;

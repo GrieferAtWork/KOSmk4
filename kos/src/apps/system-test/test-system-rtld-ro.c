@@ -62,9 +62,10 @@ DEFINE_TEST(system_rtld_ro) {
 	{
 		fd_t tempfd;
 		char name[sizeof("/proc/self/fd/" PRIMAXd)];
-		NEd(-1, (tempfd = dup(AT_FDSYSRTLD))); /* Make the FD appear in procfs */
+		/* Make the FD appear in procfs */
+		NEd(-1, (tempfd = dup(AT_FDSYSRTLD))); /* NOLINT */
 		sprintf(name, "/proc/self/fd/%d", tempfd);
-		NEd(-1, (sysrtld = open(name, O_RDWR)));
+		NEd(-1, (sysrtld = open(name, O_RDWR))); /* NOLINT */
 		/* And with that, we should have a writable file descriptor! */
 		EQd(0, close(tempfd));
 	}

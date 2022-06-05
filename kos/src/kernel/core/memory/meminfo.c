@@ -857,7 +857,7 @@ kernel_handle_ram_cmdline(char *__restrict arg) {
 		else {
 			/* Translate the bank type. */
 			for (bank_type = 0;
-			     bank_type < COMPILER_LENOF(pmembank_type_names); ++bank_type) {
+			     bank_type < (u16)COMPILER_LENOF(pmembank_type_names); ++bank_type) {
 				if (strcmp(ramdef.rd_type, pmembank_type_names[bank_type]) == 0)
 					goto got_bank_type;
 			}
