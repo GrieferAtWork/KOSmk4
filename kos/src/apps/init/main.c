@@ -286,8 +286,21 @@ done_tmpfs:
 			signal(SIGINT, SIG_DFL);
 			signal(SIGTTIN, SIG_DFL);
 			signal(SIGTTOU, SIG_DFL);
+
+			/* Try stuff from `/etc/shells' */
+			{
+				char *shell;
+				setusershell();
+				while ((shell = getusershell()) != NULL) {
+					execle(shell, strrchrnul(shell, '/') + 1,
+					       (char *)NULL, init_envp);
+				}
+			}
+
+			/* Try some fallback paths. */
 			execle("/bin/busybox", "bash", (char *)NULL, init_envp);
 			execle("/bin/sh", "sh", (char *)NULL, init_envp);
+			execle("/bin/csh", "csh", (char *)NULL, init_envp);
 			execle("/bin/bash", "bash", (char *)NULL, init_envp);
 			dprintf(STDOUT_FILENO, "Failed to launch shell: %m\n");
 			for (;;) {
