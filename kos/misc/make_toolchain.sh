@@ -18,8 +18,6 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-
-
 # NOTE: Create patches using:
 # $ diff -Naur gcc-9.1.0-orig gcc-9.1.0 > patches/gcc-9.1.0.patch
 # NOTE: Apply patches using:
@@ -28,7 +26,6 @@
 ##################
 # diff -Naur binutils-2.32-orig binutils-2.32 > ..\..\kos\misc\patches\binutils-2.32.patch
 ##################
-
 
 # TODO: Option to install bochs?
 # TODO: Option to install qemu?
@@ -286,6 +283,7 @@ if [[ "$1" == i?86-kos ]]; then
 	INCLUDE_NAME="i386-kos"
 	TARGET_GDB="i686-elf"
 	BINLIBDIRNAME="lib"
+	SYSHEADER_BUILD_CONFIG_SUFFIX="32"
 	export TARGET="i686-kos"
 elif [[ "$1" == x86_64-kos ]]; then
 	if ! [ -f "${KOS_MISC}/../../binutils/i386-kos/bin/i686-kos-gcc" ] && \
@@ -301,6 +299,7 @@ elif [[ "$1" == x86_64-kos ]]; then
 	BINLIBDIRNAME="lib64"
 	CONFIGURE_OPTIONS_BINUTILS+=("--enable-64-bit-bfd")
 	CONFIGURE_OPTIONS_GCC+=("--enable-64-bit-bfd")
+	SYSHEADER_BUILD_CONFIG_SUFFIX="64"
 	export TARGET="x86_64-kos"
 else
 	echo "Unknown target: '$1'"
@@ -905,6 +904,38 @@ cmd cd "$KOS_ROOT/kos/include/libiconv"
 for name in *.h; do
 	libiconv_mirror_include "$name"
 done
+
+BUILD_CONFIG_HEADER="$KOS_ROOT/kos/include/$INCLUDE_NAME/kos/_build-config${SYSHEADER_BUILD_CONFIG_SUFFIX}.h"
+echo "Updating build configuration: $BUILD_CONFIG_HEADER"
+DI=($(date -u +"%-s %0Y %0m %0d %0H %0M %0S %0N"))
+lstrip() { echo -n "${1#"${1%%[1-9]*}"}"; }
+IFS="."
+PARTS_VERSION_BINUTILS=($BINUTILS_VERSION_NUMBER)
+PARTS_VERSION_GCC=($GCC_VERSION_NUMBER)
+unset IFS
+
+cat > "$BUILD_CONFIG_HEADER" <<EOF
+#ifndef KOS_BUILD_CONFIG_TOOLCHAIN_HOST
+#define KOS_BUILD_CONFIG_TOOLCHAIN_BINUTILS_URL     "$BINUTILS_VERSION_URL"
+#define KOS_BUILD_CONFIG_TOOLCHAIN_BINUTILS_VERSION "$BINUTILS_VERSION_NUMBER"
+$(i=0; for part in "${PARTS_VERSION_BINUTILS[@]}"; do
+	echo "#define KOS_BUILD_CONFIG_TOOLCHAIN_BINUTILS_VERSION_$i $part"
+	: $((i += 1))
+done)
+#define KOS_BUILD_CONFIG_TOOLCHAIN_GCC_URL     "$GCC_VERSION_URL"
+#define KOS_BUILD_CONFIG_TOOLCHAIN_GCC_VERSION "$GCC_VERSION_NUMBER"
+$(i=0; for part in "${PARTS_VERSION_GCC[@]}"; do
+	echo "#define KOS_BUILD_CONFIG_TOOLCHAIN_GCC_VERSION_$i $part"
+	: $((i += 1))
+done)
+#define KOS_BUILD_CONFIG_TOOLCHAIN_HOST       "$(gcc -dumpmachine)"
+#define KOS_BUILD_CONFIG_TOOLCHAIN_HOST_ROOT  "$KOS_ROOT"
+#define KOS_BUILD_CONFIG_TOOLCHAIN_BUILD      "$TARGET_NAME-kos"
+#define KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_ARCH "$TARGET_NAME"
+#define KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_CPU  "${TARGET%%-*}"
+#define KOS_BUILD_CONFIG_TOOLCHAIN_DATE_INFO  ($(lstrip ${DI[0]}),($(lstrip ${DI[1]},$(lstrip ${DI[2]},$(lstrip ${DI[3]},$(lstrip ${DI[4]},$(lstrip ${DI[5]},$(lstrip ${DI[6]},$(lstrip ${DI[7]})))))))),(${DI[1]},${DI[2]},${DI[3]},${DI[4]},${DI[5]},${DI[6]},${DI[7]}))
+#endif /* !KOS_BUILD_CONFIG_TOOLCHAIN_HOST */
+EOF
 
 
 

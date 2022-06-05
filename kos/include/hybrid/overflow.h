@@ -23,12 +23,12 @@
 #include <__stdinc.h>
 #include "__overflow.h"
 
-/* @return: true:  Overflow occurred (unlikely; `*res' remains unmodified)
- *                 Overflow  here  means  that  the  finite  result stored
- *                 in  `*res'  doesn't  match  a  value  that  would  have
- *                 been produced  when infinite  precision was  available.
- *                 e.g.: `UINT_MAX + 42u' and `11u - 19u' overflow,
- *                       but   `32u + 42u'   or   `11 - 19'   don't
+/* @return: true:  Overflow  occurred (unlikely; `*res' contains the truncated result)
+ *                 Overflow here means that the finite result stored in `*res' doesn't
+ *                 match a value that would have been produced when infinite precision
+ *                 was available.
+ *                 e.g.: `UINT_MAX + 42u' and `11u - 19u' overflow, but `32u + 42u'
+ *                       or `11 - 19' don't
  * @return: false: `*res' contains the correct result. */
 #define OVERFLOW_UADD __hybrid_overflow_uadd
 #define OVERFLOW_SADD __hybrid_overflow_sadd
@@ -46,6 +46,5 @@
 #define OVERFLOW_SENG     __hybrid_overflow_sneg
 #define OVERFLOW_SENG_P2N __hybrid_overflow_sneg_p2n
 #define OVERFLOW_SENG_N2P __hybrid_overflow_sneg_n2p
-
 
 #endif /* !__GUARD_HYBRID_OVERFLOW_H */

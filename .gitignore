@@ -23,6 +23,10 @@ __ice__
 *.stackdump
 *.tmp
 
+# These headers are installed by `make_toolchain.sh`
+/kos/include/i386-kos/kos/_build-config32.h
+/kos/include/i386-kos/kos/_build-config64.h
+
 # These headers are installed by `make_utility.sh ... ncurses`
 /kos/include/bsd/curses.h
 /kos/include/curses.h
