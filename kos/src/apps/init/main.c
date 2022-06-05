@@ -25,6 +25,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/build-config.h>
 #include <kos/fcntl.h> /* Open() */
 #include <kos/io.h>
 #include <kos/ioctl/svga.h>
@@ -302,7 +303,14 @@ done_tmpfs:
 			execle("/bin/sh", "sh", (char *)NULL, init_envp);
 			execle("/bin/csh", "csh", (char *)NULL, init_envp);
 			execle("/bin/bash", "bash", (char *)NULL, init_envp);
+
+			/* Display an error if we were unable to launch a shell. */
 			dprintf(STDOUT_FILENO, "Failed to launch shell: %m\n");
+			if (errno == ENOENT) {
+				dprintf(STDOUT_FILENO,
+				        "Did you remember to install:\n"
+				        "\t" AC_WHITE("bash kos/misc/make_utility.sh " KOS_BUILD_CONFIG_TOOLCHAIN_BUILD " busybox") "\n");
+			}
 			for (;;) {
 				char buf[1];
 				read(STDIN_FILENO, buf, sizeof(buf));
