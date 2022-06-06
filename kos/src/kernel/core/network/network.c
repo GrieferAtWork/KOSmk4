@@ -121,8 +121,6 @@ again:
 	if unlikely(!arref_cmpxch_inherit_new(&self->nd_net.n_peers, old_peers, new_peers)) {
 		assert(!wasdestroyed(new_peers));
 		assert(!isshared(new_peers));
-		assert(!wasdestroyed(new_peers));
-		assert(isshared(new_peers));
 		destroy(new_peers);
 		assert(!wasdestroyed(result));
 		assert(!isshared(result));

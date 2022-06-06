@@ -882,6 +882,7 @@ devfs_super_v_rename(struct fdirnode *__restrict self,
 		if unlikely(devfile->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED || /* Deleted */
 		            old_dirent != fdirent_asdevfs(info->frn_oldent)) {         /* Renamed */
 			devfs_byname_endwrite();
+			kfree(new_dirent);
 			return FDIRNODE_RENAME_DELETED;
 		}
 
@@ -1022,6 +1023,7 @@ again_acquire_locks:
 				ramfs_dirnode_endwrite(&devfs_rootdir);
 				info->frn_repfile = NULL;
 				info->frn_dent    = NULL;
+				kfree(new_dirent);
 				return FDIRNODE_RENAME_EXISTS;
 			}
 		}

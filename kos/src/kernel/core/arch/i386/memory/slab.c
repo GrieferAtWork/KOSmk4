@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_SLAB_C
 #define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_SLAB_C 1
+#define NO_INSTRUMENT_KMALLOC
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>

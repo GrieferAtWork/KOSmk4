@@ -608,9 +608,9 @@ FUNDEF WUNUSED NONNULL((1)) char const *
 NOTHROW(FCALL ctype_struct_getname)(struct ctype const *__restrict self);
 
 
-/* Load   a   C-type   from   a   given   `type_debug_info'   which   should  be
- * loaded  with  the   help  of   an  internal  copy   made  from   `cu_parser'.
- * The given `type_debug_info' is a pointer like `di_debuginfo_member_t::m_type'
+/* Load a C-type from a given `type_debug_info' which should be loaded
+ * with the help of an internal copy made from `cu_parser'. The  given
+ * `type_debug_info' is a pointer like `di_debuginfo_member_t::m_type'
  * @param: ptyperef_flags: When non-NULL, store type-reference flags here (`CTYPEREF_FLAG_*')
  * @return: DBX_EOK:     A reference to the associated type.
  * @return: DBX_ENOMEM:  Out of memory.

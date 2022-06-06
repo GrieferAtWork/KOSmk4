@@ -1159,7 +1159,8 @@ NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self,
 		                                             me->ts_filec * sizeof(REF struct tarfile *),
 		                                             GFP_NORMAL);
 		if likely(newlist) {
-			size_t new_usable = kmalloc_usable_size(me->ts_filev);
+			size_t new_usable;
+			new_usable   = kmalloc_usable_size(newlist);
 			me->ts_filev = newlist;
 			assert(old_usable >= new_usable);
 			ccinfo_account(info, old_usable - new_usable);

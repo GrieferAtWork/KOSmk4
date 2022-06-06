@@ -1721,11 +1721,14 @@ pae_doenum(struct pae_enumdat *__restrict data,
 		size_t indent;
 		dbg_printf(DBGSTR(": " AC_WHITE("%p") "+" AC_FG_WHITE),
 		           word & PAE_PAGE_FADDR_4KIB);
+#if __SIZEOF_SIZE_T__ >= 8
 		if ((num_bytes >= ((u64)1024 * 1024 * 1024 * 1024)) &&
 		    (num_bytes % ((u64)1024 * 1024 * 1024 * 1024)) == 0) {
 			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "TiB"),
 			                    (size_t)(num_bytes / ((u64)1024 * 1024 * 1024 * 1024)));
-		} else if ((num_bytes >= ((u64)1024 * 1024 * 1024)) &&
+		} else
+#endif /* __SIZEOF_SIZE_T__ >= 8 */
+		if ((num_bytes >= ((u64)1024 * 1024 * 1024)) &&
 		    (num_bytes % ((u64)1024 * 1024 * 1024)) == 0) {
 			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "GiB"),
 			                    (size_t)(num_bytes / ((u64)1024 * 1024 * 1024)));

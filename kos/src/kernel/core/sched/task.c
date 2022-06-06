@@ -120,7 +120,7 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(struct mpart) this_kernel_stackpart_ = {
 	MPART_INIT_mp_minaddr(0),
 	MPART_INIT_mp_maxaddr(KERNEL_STACKSIZE - 1),
 	MPART_INIT_mp_filent({ {} }),
-	MPART_INIT_mp_blkst_ptr({ NULL }),
+	MPART_INIT_mp_blkst_ptr(NULL),
 	MPART_INIT_mp_mem(0 /* Filled later */, CEILDIV(KERNEL_STACKSIZE, PAGESIZE)),
 	MPART_INIT_mp_meta(NULL)
 };

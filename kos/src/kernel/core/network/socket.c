@@ -1501,7 +1501,7 @@ again_read_ncon:
 						intval = EOK;
 					}
 					/* Consume the completion status. */
-					xch_ok = axref_cmpxch_inherit_new(&self->sk_ncon, ah, NULL);
+					xch_ok = axref_cmpxch_inherit_new_nokill(&self->sk_ncon, ah, NULL);
 					decref_unlikely(ah);
 					if (!xch_ok)
 						goto again_read_ncon;

@@ -604,8 +604,8 @@ ProcFS_PrintUserSpaceStringArray(struct mman *__restrict mm, pformatprinter prin
 	while (strc) {
 		USER UNCHECKED char const *strings[32];
 		size_t count = strc;
-		if (count > COMPILER_STRLEN(strings))
-			count = COMPILER_STRLEN(strings);
+		if (count > COMPILER_LENOF(strings))
+			count = COMPILER_LENOF(strings);
 		mman_read(mm, strv, strings, count * sizeof(USER UNCHECKED char const *));
 		for (i = 0; i < count; ++i) {
 			USER UNCHECKED char const *str = strings[i];
@@ -635,8 +635,8 @@ ProcFS_PrintCompatUserSpaceStringArray(struct mman *__restrict mm, pformatprinte
 	while (strc) {
 		USER UNCHECKED compat_uintptr_t strings[32];
 		size_t count = strc;
-		if (count > COMPILER_STRLEN(strings))
-			count = COMPILER_STRLEN(strings);
+		if (count > COMPILER_LENOF(strings))
+			count = COMPILER_LENOF(strings);
 		mman_read(mm, strv, strings, count * sizeof(USER UNCHECKED compat_uintptr_t));
 		for (i = 0; i < count; ++i) {
 			USER UNCHECKED compat_uintptr_t str = strings[i];

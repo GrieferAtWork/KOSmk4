@@ -775,12 +775,10 @@ NOTHROW(FCALL system_cc_pertask)(struct task *__restrict self,
 
 PRIVATE NOBLOCK NONNULL((1, 2)) ssize_t
 NOTHROW(TASK_ENUM_CC system_cc_pertask_cb)(void *arg, struct task *__restrict thread) {
-	if (thread) {
-		struct ccinfo *info = (struct ccinfo *)arg;
-		system_cc_pertask(thread, info);
-		if (ccinfo_isdone(info))
-			return -1; /* Stop enumeration */
-	}
+	struct ccinfo *info = (struct ccinfo *)arg;
+	system_cc_pertask(thread, info);
+	if (ccinfo_isdone(info))
+		return -1; /* Stop enumeration */
 	return 0;
 }
 

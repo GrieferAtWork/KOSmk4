@@ -32,6 +32,93 @@
 #ifdef __CC__
 DECL_BEGIN
 
+#if defined(__clang_tidy__) && !defined(NO_INSTRUMENT_KMALLOC)
+#ifndef ____os_free_defined
+#define ____os_free_defined
+extern void free(void *ptr);
+#define __os_free free
+#endif /* !____os_free_defined */
+#define kcalloc(n_bytes, flags)                          kmalloc(n_bytes, (flags) | GFP_CALLOC)
+#define krecalign(ptr, min_alignment, n_bytes, flags)    krealign(ptr, min_alignment, n_bytes, (flags) | GFP_CALLOC)
+#define krecalloc(ptr, n_bytes, flags)                   krealloc(ptr, n_bytes, (flags) | GFP_CALLOC)
+#define krecalloc_in_place(ptr, n_bytes, flags)          krealloc_in_place(ptr, n_bytes, (flags) | GFP_CALLOC)
+#define kcalloc_nx(n_bytes, flags)                       kmalloc_nx(n_bytes, (flags) | GFP_CALLOC)
+#define krecalign_nx(ptr, min_alignment, n_bytes, flags) krealign_nx(ptr, min_alignment, n_bytes, (flags) | GFP_CALLOC)
+#define krecalloc_nx(ptr, n_bytes, flags)                krealloc_nx(ptr, n_bytes, (flags) | GFP_CALLOC)
+#define krecalloc_in_place_nx(ptr, n_bytes, flags)       krealloc_in_place_nx(ptr, n_bytes, (flags) | GFP_CALLOC)
+#define kfree_unlikely(ptr)                              kfree(ptr)
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#define slab_free            kfree
+#define slab_ffree           kffree
+#define __os_slab_malloc     kmalloc
+#define __os_slab_kmalloc_nx kmalloc_nx
+#define slab_malloc          kmalloc
+#define slab_kmalloc         kmalloc
+#define slab_kmalloc_nx      kmalloc_nx
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#define __os_malloc              kmalloc
+#define __os_malloc_noslab       kmalloc
+#define __os_memalign            kmemalign
+#define __os_memalign_offset     kmemalign_offset
+#define __os_realloc             krealloc
+#define __os_realign             krealign
+#define __os_realign_offset      krealign_offset
+#define __os_realloc_in_place    krealloc_in_place
+#define __os_malloc_usable_size  kmalloc_usable_size
+#define __os_ffree               kffree
+#define __os_malloc_nx           kmalloc_nx
+#define __os_malloc_noslab_nx    kmalloc_nx
+#define __os_memalign_nx         kmemalign_nx
+#define __os_memalign_offset_nx  kmemalign_offset_nx
+#define __os_realloc_nx          krealloc_nx
+#define __os_realign_nx          krealign_nx
+#define __os_realign_offset_nx   krealign_offset_nx
+#define __os_realloc_in_place_nx krealloc_in_place_nx
+
+extern void *malloc(size_t num_bytes);
+extern void *realloc(void *ptr, size_t num_bytes);
+extern void *calloc(size_t elem_count, size_t elem_size);
+extern size_t malloc_usage_size(void *ptr);
+extern void *realloc_in_place(void *ptr, size_t n_bytes);
+
+#define kmalloc(n_bytes, flags) \
+	((flags) & GFP_CALLOC ? calloc(n_bytes, 1) : malloc(n_bytes))
+#define krealloc(ptr, n_bytes, flags) \
+	((void)(flags), realloc(ptr, n_bytes))
+#define krealloc_in_place(ptr, n_bytes, flags) \
+	((void)(flags), realloc_in_place(ptr, n_bytes))
+#define kfree(ptr) \
+	free(ptr)
+#define kmalloc_usable_size(ptr) \
+	malloc_usage_size(ptr)
+
+#define kmemalign(min_alignment, n_bytes, flags) \
+	((void)(min_alignment), kmalloc(n_bytes, flags))
+#define kmemalign_offset(min_alignment, offset, n_bytes, flags) \
+	((void)(min_alignment), (void)(offset), kmalloc(n_bytes, flags))
+#define krealign(ptr, min_alignment, n_bytes, flags) \
+	((void)(min_alignment), krealloc(ptr, n_bytes, flags))
+#define krealign_offset(ptr, min_alignment, offset, n_bytes, flags) \
+	((void)(min_alignment), (void)(offset), krealloc(ptr, n_bytes, flags))
+#define kffree(ptr, flags) \
+	((void)(flags), kfree(ptr))
+#define kmalloc_nx(n_bytes, flags) \
+	kmalloc(n_bytes, flags)
+#define kmemalign_nx(min_alignment, n_bytes, flags) \
+	kmemalign(min_alignment, n_bytes, flags)
+#define kmemalign_offset_nx(min_alignment, offset, n_bytes, flags) \
+	kmemalign_offset(min_alignment, offset, n_bytes, flags)
+#define krealloc_nx(ptr, n_bytes, flags) \
+	krealloc(ptr, n_bytes, flags)
+#define krealign_nx(ptr, min_alignment, n_bytes, flags) \
+	krealign(ptr, min_alignment, n_bytes, flags)
+#define krealign_offset_nx(ptr, min_alignment, offset, n_bytes, flags) \
+	krealign_offset(ptr, min_alignment, offset, n_bytes, flags)
+#define krealloc_in_place_nx(ptr, n_bytes, flags) \
+	krealloc_in_place(ptr, n_bytes, flags)
+
+#else /* __clang_tidy__ && !NO_INSTRUMENT_KMALLOC */
+
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 
 /* Free (non-null) slab pointers. */
@@ -342,6 +429,7 @@ NOTHROW(KCALL krealloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags)
 	return __os_realloc_in_place_nx(ptr, n_bytes, flags);
 }
 #endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
+#endif /* !__clang_tidy__ || NO_INSTRUMENT_KMALLOC */
 
 DECL_END
 #endif /* __CC__ */

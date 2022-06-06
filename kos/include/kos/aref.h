@@ -77,141 +77,149 @@
  * get, set, exchange, compare-exchange, etc... the pointed-to field,  such
  * that all transactions are performed atomically.
  *
- * >> T     *arref_ptr                     (ARREF(T) const *self);
- * >> REF T *arref_get                     (ARREF(T) *self);
- * >> REF T *arref_get_nopr                (ARREF(T) *self);
- * >> void   arref_get                     (ARREF(T) *self, REF T **p_result);
- * >> void   arref_get_nopr                (ARREF(T) *self, REF T **p_result);
- * >> void   arref_get                     (ARREF(T) *self, REF T **p_result, void incref(T *));
- * >> void   arref_get_nopr                (ARREF(T) *self, REF T **p_result, void incref(T *));
- * >> REF T *arref_xch_inherit             (ARREF(T) *self, REF T *newobj);
- * >> REF T *arref_xch_inherit_nopr        (ARREF(T) *self, REF T *newobj);
- * >> void   arref_xch_inherit             (ARREF(T) *self, REF T *newobj, REF T **p_oldobj);
- * >> void   arref_xch_inherit_nopr        (ARREF(T) *self, REF T *newobj, REF T **p_oldobj);
- * >> REF T *arref_xch                     (ARREF(T) *self, T *newobj);
- * >> REF T *arref_xch_nopr                (ARREF(T) *self, T *newobj);
- * >> void   arref_xch                     (ARREF(T) *self, T *newobj, REF T **p_oldobj);
- * >> void   arref_xch_nopr                (ARREF(T) *self, T *newobj, REF T **p_oldobj);
- * >> void   arref_xch                     (ARREF(T) *self, T *newobj, REF T **p_oldobj, void incref(T *));
- * >> void   arref_xch_nopr                (ARREF(T) *self, T *newobj, REF T **p_oldobj, void incref(T *));
- * >> void   arref_set_inherit             (ARREF(T) *self, REF T *newobj);
- * >> void   arref_set_inherit_nopr        (ARREF(T) *self, REF T *newobj);
- * >> void   arref_set_inherit             (ARREF(T) *self, REF T *newobj, typename T);
- * >> void   arref_set_inherit_nopr        (ARREF(T) *self, REF T *newobj, typename T);
- * >> void   arref_set_inherit             (ARREF(T) *self, REF T *newobj, typename T, void decref(T *));
- * >> void   arref_set_inherit_nopr        (ARREF(T) *self, REF T *newobj, typename T, void decref(T *));
- * >> void   arref_set                     (ARREF(T) *self, REF T *newobj);
- * >> void   arref_set_nopr                (ARREF(T) *self, REF T *newobj);
- * >> void   arref_set                     (ARREF(T) *self, REF T *newobj, typename T);
- * >> void   arref_set_nopr                (ARREF(T) *self, REF T *newobj, typename T);
- * >> void   arref_set                     (ARREF(T) *self, REF T *newobj, typename T, void incref(T *), void decref(T *));
- * >> void   arref_set_nopr                (ARREF(T) *self, REF T *newobj, typename T, void incref(T *), void decref(T *));
- * >> bool   arref_cmpxch_inherit          (ARREF(T) *self, REF T *oldobj, REF T *newobj);
- * >> bool   arref_cmpxch_inherit_nopr     (ARREF(T) *self, REF T *oldobj, REF T *newobj);
- * >> void   arref_cmpxch_inherit          (ARREF(T) *self, REF T *oldobj, REF T *newobj, bool *p_ok);
- * >> void   arref_cmpxch_inherit_nopr     (ARREF(T) *self, REF T *oldobj, REF T *newobj, bool *p_ok);
- * >> bool   arref_cmpxch_inherit_new      (ARREF(T) *self, T *oldobj, REF T *newobj);
- * >> bool   arref_cmpxch_inherit_new_nopr (ARREF(T) *self, T *oldobj, REF T *newobj);
- * >> void   arref_cmpxch_inherit_new      (ARREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok);
- * >> void   arref_cmpxch_inherit_new_nopr (ARREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok);
- * >> void   arref_cmpxch_inherit_new      (ARREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok, void decref(T *));
- * >> void   arref_cmpxch_inherit_new_nopr (ARREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok, void decref(T *));
- * >> bool   arref_cmpxch                  (ARREF(T) *self, T *oldobj, T *newobj);
- * >> bool   arref_cmpxch_nopr             (ARREF(T) *self, T *oldobj, T *newobj);
- * >> void   arref_cmpxch                  (ARREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
- * >> void   arref_cmpxch_nopr             (ARREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
- * >> void   arref_cmpxch                  (ARREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *));
- * >> void   arref_cmpxch_nopr             (ARREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *));
- * >> void   arref_cmpxch                  (ARREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *), void decref_nokill(T *));
- * >> void   arref_cmpxch_nopr             (ARREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *), void decref_nokill(T *));
+ * >> T     *arref_ptr                            (ARREF(T) const *self);
+ * >> REF T *arref_get                            (ARREF(T) *self);
+ * >> REF T *arref_get_nopr                       (ARREF(T) *self);
+ * >> void   arref_get                            (ARREF(T) *self, REF T **p_result);
+ * >> void   arref_get_nopr                       (ARREF(T) *self, REF T **p_result);
+ * >> void   arref_get                            (ARREF(T) *self, REF T **p_result, void incref(T *));
+ * >> void   arref_get_nopr                       (ARREF(T) *self, REF T **p_result, void incref(T *));
+ * >> REF T *arref_xch_inherit                    (ARREF(T) *self, REF T *newobj);
+ * >> REF T *arref_xch_inherit_nopr               (ARREF(T) *self, REF T *newobj);
+ * >> void   arref_xch_inherit                    (ARREF(T) *self, REF T *newobj, REF T **p_oldobj);
+ * >> void   arref_xch_inherit_nopr               (ARREF(T) *self, REF T *newobj, REF T **p_oldobj);
+ * >> REF T *arref_xch                            (ARREF(T) *self, T *newobj);
+ * >> REF T *arref_xch_nopr                       (ARREF(T) *self, T *newobj);
+ * >> void   arref_xch                            (ARREF(T) *self, T *newobj, REF T **p_oldobj);
+ * >> void   arref_xch_nopr                       (ARREF(T) *self, T *newobj, REF T **p_oldobj);
+ * >> void   arref_xch                            (ARREF(T) *self, T *newobj, REF T **p_oldobj, void incref(T *));
+ * >> void   arref_xch_nopr                       (ARREF(T) *self, T *newobj, REF T **p_oldobj, void incref(T *));
+ * >> void   arref_set_inherit                    (ARREF(T) *self, REF T *newobj);
+ * >> void   arref_set_inherit_nopr               (ARREF(T) *self, REF T *newobj);
+ * >> void   arref_set_inherit                    (ARREF(T) *self, REF T *newobj, typename T);
+ * >> void   arref_set_inherit_nopr               (ARREF(T) *self, REF T *newobj, typename T);
+ * >> void   arref_set_inherit                    (ARREF(T) *self, REF T *newobj, typename T, void decref(T *));
+ * >> void   arref_set_inherit_nopr               (ARREF(T) *self, REF T *newobj, typename T, void decref(T *));
+ * >> void   arref_set                            (ARREF(T) *self, REF T *newobj);
+ * >> void   arref_set_nopr                       (ARREF(T) *self, REF T *newobj);
+ * >> void   arref_set                            (ARREF(T) *self, REF T *newobj, typename T);
+ * >> void   arref_set_nopr                       (ARREF(T) *self, REF T *newobj, typename T);
+ * >> void   arref_set                            (ARREF(T) *self, REF T *newobj, typename T, void incref(T *), void decref(T *));
+ * >> void   arref_set_nopr                       (ARREF(T) *self, REF T *newobj, typename T, void incref(T *), void decref(T *));
+ * >> bool   arref_cmpxch_inherit                 (ARREF(T) *self, REF T *oldobj, REF T *newobj);
+ * >> bool   arref_cmpxch_inherit_nopr            (ARREF(T) *self, REF T *oldobj, REF T *newobj);
+ * >> void   arref_cmpxch_inherit                 (ARREF(T) *self, REF T *oldobj, REF T *newobj, bool *p_ok);
+ * >> void   arref_cmpxch_inherit_nopr            (ARREF(T) *self, REF T *oldobj, REF T *newobj, bool *p_ok);
+ * >> bool   arref_cmpxch_inherit_new             (ARREF(T) *self, T *oldobj, REF T *newobj);
+ * >> bool   arref_cmpxch_inherit_new_nopr        (ARREF(T) *self, T *oldobj, REF T *newobj);
+ * >> bool   arref_cmpxch_inherit_new_nokill      (ARREF(T) *self, T *oldobj, REF T *newobj);
+ * >> bool   arref_cmpxch_inherit_new_nokill_nopr (ARREF(T) *self, T *oldobj, REF T *newobj);
+ * >> void   arref_cmpxch_inherit_new             (ARREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok);
+ * >> void   arref_cmpxch_inherit_new_nopr        (ARREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok);
+ * >> void   arref_cmpxch_inherit_new_nokill      (ARREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok);
+ * >> void   arref_cmpxch_inherit_new_nokill_nopr (ARREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok);
+ * >> void   arref_cmpxch_inherit_new             (ARREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok, void decref(T *));
+ * >> void   arref_cmpxch_inherit_new_nopr        (ARREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok, void decref(T *));
+ * >> bool   arref_cmpxch                         (ARREF(T) *self, T *oldobj, T *newobj);
+ * >> bool   arref_cmpxch_nopr                    (ARREF(T) *self, T *oldobj, T *newobj);
+ * >> void   arref_cmpxch                         (ARREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
+ * >> void   arref_cmpxch_nopr                    (ARREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
+ * >> void   arref_cmpxch                         (ARREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *));
+ * >> void   arref_cmpxch_nopr                    (ARREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *));
+ * >> void   arref_cmpxch                         (ARREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *), void decref_nokill(T *));
+ * >> void   arref_cmpxch_nopr                    (ARREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *), void decref_nokill(T *));
  *
- * >> T     *axref_ptr                     (AXREF(T) const *self);
- * >> REF T *axref_get                     (AXREF(T) *self);
- * >> REF T *axref_get_nopr                (AXREF(T) *self);
- * >> void   axref_get                     (AXREF(T) *self, REF T **p_result);
- * >> void   axref_get_nopr                (AXREF(T) *self, REF T **p_result);
- * >> void   axref_get                     (AXREF(T) *self, REF T **p_result, void incref(T *));
- * >> void   axref_get_nopr                (AXREF(T) *self, REF T **p_result, void incref(T *));
- * >> REF T *axref_xch_inherit             (AXREF(T) *self, REF T *newobj);
- * >> REF T *axref_xch_inherit_nopr        (AXREF(T) *self, REF T *newobj);
- * >> void   axref_xch_inherit             (AXREF(T) *self, REF T *newobj, REF T **p_oldobj);
- * >> void   axref_xch_inherit_nopr        (AXREF(T) *self, REF T *newobj, REF T **p_oldobj);
- * >> REF T *axref_xch                     (AXREF(T) *self, T *newobj);
- * >> REF T *axref_xch_nopr                (AXREF(T) *self, T *newobj);
- * >> void   axref_xch                     (AXREF(T) *self, T *newobj, REF T **p_oldobj);
- * >> void   axref_xch_nopr                (AXREF(T) *self, T *newobj, REF T **p_oldobj);
- * >> void   axref_xch                     (AXREF(T) *self, T *newobj, REF T **p_oldobj, void incref(T *));
- * >> void   axref_xch_nopr                (AXREF(T) *self, T *newobj, REF T **p_oldobj, void incref(T *));
- * >> REF T *axref_steal                   (AXREF(T) *self);
- * >> REF T *axref_steal_nopr              (AXREF(T) *self);
- * >> void   axref_steal                   (AXREF(T) *self, REF T **p_oldobj);
- * >> void   axref_steal_nopr              (AXREF(T) *self, REF T **p_oldobj);
- * >> void   axref_set_inherit             (AXREF(T) *self, REF T *newobj);
- * >> void   axref_set_inherit_nopr        (AXREF(T) *self, REF T *newobj);
- * >> void   axref_set_inherit             (AXREF(T) *self, REF T *newobj, typename T);
- * >> void   axref_set_inherit_nopr        (AXREF(T) *self, REF T *newobj, typename T);
- * >> void   axref_set_inherit             (AXREF(T) *self, REF T *newobj, typename T, void decref(T *));
- * >> void   axref_set_inherit_nopr        (AXREF(T) *self, REF T *newobj, typename T, void decref(T *));
- * >> void   axref_set                     (AXREF(T) *self, REF T *newobj);
- * >> void   axref_set_nopr                (AXREF(T) *self, REF T *newobj);
- * >> void   axref_set                     (AXREF(T) *self, REF T *newobj, typename T);
- * >> void   axref_set_nopr                (AXREF(T) *self, REF T *newobj, typename T);
- * >> void   axref_set                     (AXREF(T) *self, REF T *newobj, typename T, void incref(T *), void decref(T *));
- * >> void   axref_set_nopr                (AXREF(T) *self, REF T *newobj, typename T, void incref(T *), void decref(T *));
- * >> void   axref_clear                   (AXREF(T) *self);
- * >> void   axref_clear_nopr              (AXREF(T) *self);
- * >> void   axref_clear                   (AXREF(T) *self, typename T);
- * >> void   axref_clear_nopr              (AXREF(T) *self, typename T);
- * >> void   axref_clear                   (AXREF(T) *self, typename T, void decref(T *));
- * >> void   axref_clear_nopr              (AXREF(T) *self, typename T, void decref(T *));
- * >> bool   axref_cmpxch_inherit          (AXREF(T) *self, REF T *oldobj, REF T *newobj);
- * >> bool   axref_cmpxch_inherit_nopr     (AXREF(T) *self, REF T *oldobj, REF T *newobj);
- * >> void   axref_cmpxch_inherit          (AXREF(T) *self, REF T *oldobj, REF T *newobj, bool *p_ok);
- * >> void   axref_cmpxch_inherit_nopr     (AXREF(T) *self, REF T *oldobj, REF T *newobj, bool *p_ok);
- * >> bool   axref_cmpxch_inherit_new      (AXREF(T) *self, T *oldobj, REF T *newobj);
- * >> bool   axref_cmpxch_inherit_new_nopr (AXREF(T) *self, T *oldobj, REF T *newobj);
- * >> void   axref_cmpxch_inherit_new      (AXREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok);
- * >> void   axref_cmpxch_inherit_new_nopr (AXREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok);
- * >> void   axref_cmpxch_inherit_new      (AXREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok, void decref(T *));
- * >> void   axref_cmpxch_inherit_new_nopr (AXREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok, void decref(T *));
- * >> bool   axref_cmpxch                  (AXREF(T) *self, T *oldobj, T *newobj);
- * >> bool   axref_cmpxch_nopr             (AXREF(T) *self, T *oldobj, T *newobj);
- * >> void   axref_cmpxch                  (AXREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
- * >> void   axref_cmpxch_nopr             (AXREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
- * >> void   axref_cmpxch                  (AXREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *));
- * >> void   axref_cmpxch_nopr             (AXREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *));
- * >> void   axref_cmpxch                  (AXREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *), void decref_nokill(T *));
- * >> void   axref_cmpxch_nopr             (AXREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *), void decref_nokill(T *));
+ * >> T     *axref_ptr                            (AXREF(T) const *self);
+ * >> REF T *axref_get                            (AXREF(T) *self);
+ * >> REF T *axref_get_nopr                       (AXREF(T) *self);
+ * >> void   axref_get                            (AXREF(T) *self, REF T **p_result);
+ * >> void   axref_get_nopr                       (AXREF(T) *self, REF T **p_result);
+ * >> void   axref_get                            (AXREF(T) *self, REF T **p_result, void incref(T *));
+ * >> void   axref_get_nopr                       (AXREF(T) *self, REF T **p_result, void incref(T *));
+ * >> REF T *axref_xch_inherit                    (AXREF(T) *self, REF T *newobj);
+ * >> REF T *axref_xch_inherit_nopr               (AXREF(T) *self, REF T *newobj);
+ * >> void   axref_xch_inherit                    (AXREF(T) *self, REF T *newobj, REF T **p_oldobj);
+ * >> void   axref_xch_inherit_nopr               (AXREF(T) *self, REF T *newobj, REF T **p_oldobj);
+ * >> REF T *axref_xch                            (AXREF(T) *self, T *newobj);
+ * >> REF T *axref_xch_nopr                       (AXREF(T) *self, T *newobj);
+ * >> void   axref_xch                            (AXREF(T) *self, T *newobj, REF T **p_oldobj);
+ * >> void   axref_xch_nopr                       (AXREF(T) *self, T *newobj, REF T **p_oldobj);
+ * >> void   axref_xch                            (AXREF(T) *self, T *newobj, REF T **p_oldobj, void incref(T *));
+ * >> void   axref_xch_nopr                       (AXREF(T) *self, T *newobj, REF T **p_oldobj, void incref(T *));
+ * >> REF T *axref_steal                          (AXREF(T) *self);
+ * >> REF T *axref_steal_nopr                     (AXREF(T) *self);
+ * >> void   axref_steal                          (AXREF(T) *self, REF T **p_oldobj);
+ * >> void   axref_steal_nopr                     (AXREF(T) *self, REF T **p_oldobj);
+ * >> void   axref_set_inherit                    (AXREF(T) *self, REF T *newobj);
+ * >> void   axref_set_inherit_nopr               (AXREF(T) *self, REF T *newobj);
+ * >> void   axref_set_inherit                    (AXREF(T) *self, REF T *newobj, typename T);
+ * >> void   axref_set_inherit_nopr               (AXREF(T) *self, REF T *newobj, typename T);
+ * >> void   axref_set_inherit                    (AXREF(T) *self, REF T *newobj, typename T, void decref(T *));
+ * >> void   axref_set_inherit_nopr               (AXREF(T) *self, REF T *newobj, typename T, void decref(T *));
+ * >> void   axref_set                            (AXREF(T) *self, REF T *newobj);
+ * >> void   axref_set_nopr                       (AXREF(T) *self, REF T *newobj);
+ * >> void   axref_set                            (AXREF(T) *self, REF T *newobj, typename T);
+ * >> void   axref_set_nopr                       (AXREF(T) *self, REF T *newobj, typename T);
+ * >> void   axref_set                            (AXREF(T) *self, REF T *newobj, typename T, void incref(T *), void decref(T *));
+ * >> void   axref_set_nopr                       (AXREF(T) *self, REF T *newobj, typename T, void incref(T *), void decref(T *));
+ * >> void   axref_clear                          (AXREF(T) *self);
+ * >> void   axref_clear_nopr                     (AXREF(T) *self);
+ * >> void   axref_clear                          (AXREF(T) *self, typename T);
+ * >> void   axref_clear_nopr                     (AXREF(T) *self, typename T);
+ * >> void   axref_clear                          (AXREF(T) *self, typename T, void decref(T *));
+ * >> void   axref_clear_nopr                     (AXREF(T) *self, typename T, void decref(T *));
+ * >> bool   axref_cmpxch_inherit                 (AXREF(T) *self, REF T *oldobj, REF T *newobj);
+ * >> bool   axref_cmpxch_inherit_nopr            (AXREF(T) *self, REF T *oldobj, REF T *newobj);
+ * >> void   axref_cmpxch_inherit                 (AXREF(T) *self, REF T *oldobj, REF T *newobj, bool *p_ok);
+ * >> void   axref_cmpxch_inherit_nopr            (AXREF(T) *self, REF T *oldobj, REF T *newobj, bool *p_ok);
+ * >> bool   axref_cmpxch_inherit_new             (AXREF(T) *self, T *oldobj, REF T *newobj);
+ * >> bool   axref_cmpxch_inherit_new_nopr        (AXREF(T) *self, T *oldobj, REF T *newobj);
+ * >> bool   axref_cmpxch_inherit_new_nokill      (AXREF(T) *self, T *oldobj, REF T *newobj);
+ * >> bool   axref_cmpxch_inherit_new_nokill_nopr (AXREF(T) *self, T *oldobj, REF T *newobj);
+ * >> void   axref_cmpxch_inherit_new             (AXREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok);
+ * >> void   axref_cmpxch_inherit_new_nopr        (AXREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok);
+ * >> void   axref_cmpxch_inherit_new_nokill      (AXREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok);
+ * >> void   axref_cmpxch_inherit_new_nokill_nopr (AXREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok);
+ * >> void   axref_cmpxch_inherit_new             (AXREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok, void decref(T *));
+ * >> void   axref_cmpxch_inherit_new_nopr        (AXREF(T) *self, T *oldobj, REF T *newobj, bool *p_ok, void decref(T *));
+ * >> bool   axref_cmpxch                         (AXREF(T) *self, T *oldobj, T *newobj);
+ * >> bool   axref_cmpxch_nopr                    (AXREF(T) *self, T *oldobj, T *newobj);
+ * >> void   axref_cmpxch                         (AXREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
+ * >> void   axref_cmpxch_nopr                    (AXREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
+ * >> void   axref_cmpxch                         (AXREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *));
+ * >> void   axref_cmpxch_nopr                    (AXREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *));
+ * >> void   axref_cmpxch                         (AXREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *), void decref_nokill(T *));
+ * >> void   axref_cmpxch_nopr                    (AXREF(T) *self, T *oldobj, T *newobj, bool *p_ok, void incref(T *), void decref(T *), void decref_nokill(T *));
  *
- * >> T     *awref_ptr                     (AWREF(T) const *self);
- * >> REF T *awref_get                     (AWREF(T) *self);
- * >> REF T *awref_get_nopr                (AWREF(T) *self);
- * >> void   awref_get                     (AWREF(T) *self, REF T **p_result);
- * >> void   awref_get_nopr                (AWREF(T) *self, REF T **p_result);
- * >> void   awref_get                     (AWREF(T) *self, REF T **p_result, bool tryincref(T *));
- * >> void   awref_get_nopr                (AWREF(T) *self, REF T **p_result, bool tryincref(T *));
- * >> void   awref_set                     (AWREF(T) *self, T *newobj);
- * >> void   awref_set_nopr                (AWREF(T) *self, T *newobj);
- * >> REF T *awref_xch                     (AWREF(T) *self, T *newobj);
- * >> REF T *awref_xch_nopr                (AWREF(T) *self, T *newobj);
- * >> void   awref_xch                     (AWREF(T) *self, T *newobj, REF T **p_oldobj);
- * >> void   awref_xch_nopr                (AWREF(T) *self, T *newobj, REF T **p_oldobj);
- * >> void   awref_xch                     (AWREF(T) *self, T *newobj, REF T **p_oldobj, bool tryincref(T *));
- * >> void   awref_xch_nopr                (AWREF(T) *self, T *newobj, REF T **p_oldobj, bool tryincref(T *));
- * >> void   awref_clear                   (AWREF(T) *self);
- * >> void   awref_clear_nopr              (AWREF(T) *self);
- * >> bool   awref_cmpxch                  (AWREF(T) *self, T *oldobj, T *newobj);
- * >> bool   awref_cmpxch_nopr             (AWREF(T) *self, T *oldobj, T *newobj);
- * >> void   awref_cmpxch                  (AWREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
- * >> void   awref_cmpxch_nopr             (AWREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
- * >> bool   awref_replacedead             (AWREF(T) *self, T *newobj); // Replace an already-destroyed object
- * >> bool   awref_replacedead_nopr        (AWREF(T) *self, T *newobj);
- * >> void   awref_replacedead             (AWREF(T) *self, T *newobj, bool *p_ok);
- * >> void   awref_replacedead_nopr        (AWREF(T) *self, T *newobj, bool *p_ok);
- * >> void   awref_replacedead             (AWREF(T) *self, T *newobj, bool *p_ok, typename T);
- * >> void   awref_replacedead_nopr        (AWREF(T) *self, T *newobj, bool *p_ok, typename T);
- * >> void   awref_replacedead             (AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *));
- * >> void   awref_replacedead_nopr        (AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *));
+ * >> T     *awref_ptr                            (AWREF(T) const *self);
+ * >> REF T *awref_get                            (AWREF(T) *self);
+ * >> REF T *awref_get_nopr                       (AWREF(T) *self);
+ * >> void   awref_get                            (AWREF(T) *self, REF T **p_result);
+ * >> void   awref_get_nopr                       (AWREF(T) *self, REF T **p_result);
+ * >> void   awref_get                            (AWREF(T) *self, REF T **p_result, bool tryincref(T *));
+ * >> void   awref_get_nopr                       (AWREF(T) *self, REF T **p_result, bool tryincref(T *));
+ * >> void   awref_set                            (AWREF(T) *self, T *newobj);
+ * >> void   awref_set_nopr                       (AWREF(T) *self, T *newobj);
+ * >> REF T *awref_xch                            (AWREF(T) *self, T *newobj);
+ * >> REF T *awref_xch_nopr                       (AWREF(T) *self, T *newobj);
+ * >> void   awref_xch                            (AWREF(T) *self, T *newobj, REF T **p_oldobj);
+ * >> void   awref_xch_nopr                       (AWREF(T) *self, T *newobj, REF T **p_oldobj);
+ * >> void   awref_xch                            (AWREF(T) *self, T *newobj, REF T **p_oldobj, bool tryincref(T *));
+ * >> void   awref_xch_nopr                       (AWREF(T) *self, T *newobj, REF T **p_oldobj, bool tryincref(T *));
+ * >> void   awref_clear                          (AWREF(T) *self);
+ * >> void   awref_clear_nopr                     (AWREF(T) *self);
+ * >> bool   awref_cmpxch                         (AWREF(T) *self, T *oldobj, T *newobj);
+ * >> bool   awref_cmpxch_nopr                    (AWREF(T) *self, T *oldobj, T *newobj);
+ * >> void   awref_cmpxch                         (AWREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
+ * >> void   awref_cmpxch_nopr                    (AWREF(T) *self, T *oldobj, T *newobj, bool *p_ok);
+ * >> bool   awref_replacedead                    (AWREF(T) *self, T *newobj); // Replace an already-destroyed object
+ * >> bool   awref_replacedead_nopr               (AWREF(T) *self, T *newobj);
+ * >> void   awref_replacedead                    (AWREF(T) *self, T *newobj, bool *p_ok);
+ * >> void   awref_replacedead_nopr               (AWREF(T) *self, T *newobj, bool *p_ok);
+ * >> void   awref_replacedead                    (AWREF(T) *self, T *newobj, bool *p_ok, typename T);
+ * >> void   awref_replacedead_nopr               (AWREF(T) *self, T *newobj, bool *p_ok, typename T);
+ * >> void   awref_replacedead                    (AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *));
+ * >> void   awref_replacedead_nopr               (AWREF(T) *self, T *newobj, bool *p_ok, typename T, bool wasdestroyed(T *));
  *
  * If not given, refcnt operators default to those which may be defined by `<kos/refcnt.h>'
  */
@@ -771,16 +779,20 @@
 	if ((*(p_ok) = __hybrid_atomic_cmpxch((self)->arr_obj, oldobj, newobj,             \
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) != 0) { \
 		__PRIVATE_arref_waitfor(self)                                                  \
-		__PRIVATE_AR_INTR_BREAK();                                                     \
+		__PRIVATE_AR_INTR_BREAK_NOPR();                                                \
 		decref(oldobj);                                                                \
 	} else {                                                                           \
-		__PRIVATE_AR_INTR_BREAK();                                                     \
+		__PRIVATE_AR_INTR_BREAK_NOPR();                                                \
 	}                                                                                  \
 	__PRIVATE_AR_INTR_END_NOPR()
 #define __PRIVATE_arref_cmpxch_inherit_new_4(self, oldobj, newobj, p_ok) \
 	__PRIVATE_arref_cmpxch_inherit_new_5(self, oldobj, newobj, p_ok, decref)
 #define __PRIVATE_arref_cmpxch_inherit_new_nopr_4(self, oldobj, newobj, p_ok) \
 	__PRIVATE_arref_cmpxch_inherit_new_nopr_5(self, oldobj, newobj, p_ok, decref)
+#define __PRIVATE_arref_cmpxch_inherit_new_nokill_4(self, oldobj, newobj, p_ok) \
+	__PRIVATE_arref_cmpxch_inherit_new_5(self, oldobj, newobj, p_ok, decref_nokill)
+#define __PRIVATE_arref_cmpxch_inherit_new_nokill_nopr_4(self, oldobj, newobj, p_ok) \
+	__PRIVATE_arref_cmpxch_inherit_new_nopr_5(self, oldobj, newobj, p_ok, decref_nokill)
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define __PRIVATE_arref_cmpxch_inherit_new_3(self, oldobj, newobj)                \
 	__XBLOCK({                                                                    \
@@ -794,6 +806,18 @@
 		__PRIVATE_arref_cmpxch_inherit_new_nopr_4(self, oldobj, newobj, &__arcxin_ok); \
 		__XRETURN __arcxin_ok;                                                         \
 	})
+#define __PRIVATE_arref_cmpxch_inherit_new_nokill_3(self, oldobj, newobj)                \
+	__XBLOCK({                                                                           \
+		__BOOL __arcxin_ok;                                                              \
+		__PRIVATE_arref_cmpxch_inherit_new_nokill_4(self, oldobj, newobj, &__arcxin_ok); \
+		__XRETURN __arcxin_ok;                                                           \
+	})
+#define __PRIVATE_arref_cmpxch_inherit_new_nokill_nopr_3(self, oldobj, newobj)                \
+	__XBLOCK({                                                                                \
+		__BOOL __arcxin_ok;                                                                   \
+		__PRIVATE_arref_cmpxch_inherit_new_nokill_nopr_4(self, oldobj, newobj, &__arcxin_ok); \
+		__XRETURN __arcxin_ok;                                                                \
+	})
 #ifdef __HYBRID_PP_VA_OVERLOAD
 /* >> bool arref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj);
  * >> void arref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
@@ -803,25 +827,47 @@
  * >> void arref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
  * >> void arref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define arref_cmpxch_inherit_new_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_cmpxch_inherit_new_nopr_, (__VA_ARGS__))(__VA_ARGS__)
+/* >> bool arref_cmpxch_inherit_new_nokill(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj);
+ * >> void arref_cmpxch_inherit_new_nokill(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * Same as `arref_cmpxch_inherit_new()', but assume that the caller is holding a reference to `oldobj' */
+#define arref_cmpxch_inherit_new_nokill(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_cmpxch_inherit_new_nokill_, (__VA_ARGS__))(__VA_ARGS__)
+/* >> bool arref_cmpxch_inherit_new_nokill_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj);
+ * >> void arref_cmpxch_inherit_new_nokill_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * Same as `arref_cmpxch_inherit_new_nopr()', but assume that the caller is holding a reference to `oldobj' */
+#define arref_cmpxch_inherit_new_nokill_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_cmpxch_inherit_new_nokill_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* __HYBRID_PP_VA_OVERLOAD */
 /* >> void arref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define arref_cmpxch_inherit_new __PRIVATE_arref_cmpxch_inherit_new_5
+/* >> void arref_cmpxch_inherit_new_nokill(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * Same as `arref_cmpxch_inherit_new()', but assume that the caller is holding a reference to `oldobj' */
+#define arref_cmpxch_inherit_new_nokill __PRIVATE_arref_cmpxch_inherit_new_nokill_4
 /* >> void arref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define arref_cmpxch_inherit_new_nopr __PRIVATE_arref_cmpxch_inherit_new_nopr_5
+/* >> void arref_cmpxch_inherit_new_nokill_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * Same as `arref_cmpxch_inherit_new_nopr()', but assume that the caller is holding a reference to `oldobj' */
+#define arref_cmpxch_inherit_new_nokill_nopr __PRIVATE_arref_cmpxch_inherit_new_nokill_nopr_4
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
-#elif defined(__HYBRID_PP_VA_OVERLOAD)
+#else /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+#ifdef __HYBRID_PP_VA_OVERLOAD
 /* >> void arref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
  * >> void arref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define arref_cmpxch_inherit_new(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_cmpxch_inherit_new_, (__VA_ARGS__))(__VA_ARGS__)
 /* >> void arref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
  * >> void arref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define arref_cmpxch_inherit_new_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_cmpxch_inherit_new_nopr_, (__VA_ARGS__))(__VA_ARGS__)
-#else /* ... */
+#else /* __HYBRID_PP_VA_OVERLOAD */
 /* >> void arref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define arref_cmpxch_inherit_new __PRIVATE_arref_cmpxch_inherit_new_5
 /* >> void arref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define arref_cmpxch_inherit_new_nopr __PRIVATE_arref_cmpxch_inherit_new_nopr_5
-#endif /* !... */
+#endif /* !__HYBRID_PP_VA_OVERLOAD */
+/* >> void arref_cmpxch_inherit_new_nokill(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * Same as `arref_cmpxch_inherit_new()', but assume that the caller is holding a reference to `oldobj' */
+#define arref_cmpxch_inherit_new_nokill __PRIVATE_arref_cmpxch_inherit_new_nokill_4
+/* >> void arref_cmpxch_inherit_new_nokill_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * Same as `arref_cmpxch_inherit_new_nopr()', but assume that the caller is holding a reference to `oldobj' */
+#define arref_cmpxch_inherit_new_nokill_nopr __PRIVATE_arref_cmpxch_inherit_new_nokill_nopr_4
+#endif /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
 
 /* ========== arref_cmpxch ========== */
 #define __PRIVATE_arref_cmpxch_7(self, oldobj, newobj, p_ok, incref, decref, decref_nokill) \
@@ -1397,6 +1443,10 @@
 	__PRIVATE_axref_cmpxch_inherit_new_5(self, oldobj, newobj, p_ok, decref)
 #define __PRIVATE_axref_cmpxch_inherit_new_nopr_4(self, oldobj, newobj, p_ok) \
 	__PRIVATE_axref_cmpxch_inherit_new_nopr_5(self, oldobj, newobj, p_ok, decref)
+#define __PRIVATE_axref_cmpxch_inherit_new_nokill_4(self, oldobj, newobj, p_ok) \
+	__PRIVATE_axref_cmpxch_inherit_new_5(self, oldobj, newobj, p_ok, decref_nokill)
+#define __PRIVATE_axref_cmpxch_inherit_new_nokill_nopr_4(self, oldobj, newobj, p_ok) \
+	__PRIVATE_axref_cmpxch_inherit_new_nopr_5(self, oldobj, newobj, p_ok, decref_nokill)
 #if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_TYPEOF)
 #define __PRIVATE_axref_cmpxch_inherit_new_3(self, oldobj, newobj)                \
 	__XBLOCK({                                                                    \
@@ -1410,34 +1460,68 @@
 		__PRIVATE_axref_cmpxch_inherit_new_nopr_4(self, oldobj, newobj, &__arcxin_ok); \
 		__XRETURN __arcxin_ok;                                                         \
 	})
+#define __PRIVATE_axref_cmpxch_inherit_new_nokill_3(self, oldobj, newobj)                \
+	__XBLOCK({                                                                           \
+		__BOOL __arcxin_ok;                                                              \
+		__PRIVATE_axref_cmpxch_inherit_new_nokill_4(self, oldobj, newobj, &__arcxin_ok); \
+		__XRETURN __arcxin_ok;                                                           \
+	})
+#define __PRIVATE_axref_cmpxch_inherit_new_nokill_nopr_3(self, oldobj, newobj)                \
+	__XBLOCK({                                                                                \
+		__BOOL __arcxin_ok;                                                                   \
+		__PRIVATE_axref_cmpxch_inherit_new_nokill_nopr_4(self, oldobj, newobj, &__arcxin_ok); \
+		__XRETURN __arcxin_ok;                                                                \
+	})
 #ifdef __HYBRID_PP_VA_OVERLOAD
-/* >> bool axref_cmpxch_inherit_new(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj);
- * >> void axref_cmpxch_inherit_new(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
- * >> void axref_cmpxch_inherit_new(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
+/* >> bool axref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj);
+ * >> void axref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * >> void axref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define axref_cmpxch_inherit_new(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_cmpxch_inherit_new_, (__VA_ARGS__))(__VA_ARGS__)
-/* >> bool axref_cmpxch_inherit_new_nopr(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj);
- * >> void axref_cmpxch_inherit_new_nopr(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
- * >> void axref_cmpxch_inherit_new_nopr(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
+/* >> bool axref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj);
+ * >> void axref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * >> void axref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
+#define axref_cmpxch_inherit_new_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_cmpxch_inherit_new_nopr_, (__VA_ARGS__))(__VA_ARGS__)
+/* >> bool axref_cmpxch_inherit_new_nokill(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj);
+ * >> void axref_cmpxch_inherit_new_nokill(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * Same as `axref_cmpxch_inherit_new()', but assume that the caller is holding a reference to `oldobj' (if non-NULL) */
+#define axref_cmpxch_inherit_new_nokill(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_cmpxch_inherit_new_nokill_, (__VA_ARGS__))(__VA_ARGS__)
+/* >> bool axref_cmpxch_inherit_new_nokill_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj);
+ * >> void axref_cmpxch_inherit_new_nokill_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * Same as `axref_cmpxch_inherit_new_nopr()', but assume that the caller is holding a reference to `oldobj' (if non-NULL) */
+#define axref_cmpxch_inherit_new_nokill_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_cmpxch_inherit_new_nokill_nopr_, (__VA_ARGS__))(__VA_ARGS__)
+#else /* __HYBRID_PP_VA_OVERLOAD */
+/* >> void axref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
+#define axref_cmpxch_inherit_new __PRIVATE_axref_cmpxch_inherit_new_5
+/* >> void axref_cmpxch_inherit_new_nokill(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * Same as `axref_cmpxch_inherit_new()', but assume that the caller is holding a reference to `oldobj' (if non-NULL) */
+#define axref_cmpxch_inherit_new_nokill __PRIVATE_axref_cmpxch_inherit_new_nokill_4
+/* >> void axref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
+#define axref_cmpxch_inherit_new_nopr __PRIVATE_axref_cmpxch_inherit_new_nopr_5
+/* >> void axref_cmpxch_inherit_new_nokill_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * Same as `axref_cmpxch_inherit_new_nopr()', but assume that the caller is holding a reference to `oldobj' (if non-NULL) */
+#define axref_cmpxch_inherit_new_nokill_nopr __PRIVATE_axref_cmpxch_inherit_new_nokill_nopr_4
+#endif /* !__HYBRID_PP_VA_OVERLOAD */
+#else /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+#ifdef __HYBRID_PP_VA_OVERLOAD
+/* >> void axref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * >> void axref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
+#define axref_cmpxch_inherit_new(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_cmpxch_inherit_new_, (__VA_ARGS__))(__VA_ARGS__)
+/* >> void axref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * >> void axref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define axref_cmpxch_inherit_new_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_cmpxch_inherit_new_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* __HYBRID_PP_VA_OVERLOAD */
-/* >> void axref_cmpxch_inherit_new(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
+/* >> void axref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define axref_cmpxch_inherit_new __PRIVATE_axref_cmpxch_inherit_new_5
-/* >> void axref_cmpxch_inherit_new_nopr(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
+/* >> void axref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define axref_cmpxch_inherit_new_nopr __PRIVATE_axref_cmpxch_inherit_new_nopr_5
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
-#elif defined(__HYBRID_PP_VA_OVERLOAD)
-/* >> void axref_cmpxch_inherit_new(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
- * >> void axref_cmpxch_inherit_new(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
-#define axref_cmpxch_inherit_new(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_cmpxch_inherit_new_, (__VA_ARGS__))(__VA_ARGS__)
-/* >> void axref_cmpxch_inherit_new_nopr(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
- * >> void axref_cmpxch_inherit_new_nopr(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
-#define axref_cmpxch_inherit_new_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_axref_cmpxch_inherit_new_nopr_, (__VA_ARGS__))(__VA_ARGS__)
-#else /* ... */
-/* >> void axref_cmpxch_inherit_new(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
-#define axref_cmpxch_inherit_new __PRIVATE_axref_cmpxch_inherit_new_5
-/* >> void axref_cmpxch_inherit_new_nopr(AXREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
-#define axref_cmpxch_inherit_new_nopr __PRIVATE_axref_cmpxch_inherit_new_nopr_5
-#endif /* !... */
+/* >> void axref_cmpxch_inherit_new_nokill(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * Same as `axref_cmpxch_inherit_new()', but assume that the caller is holding a reference to `oldobj' (if non-NULL) */
+#define axref_cmpxch_inherit_new_nokill __PRIVATE_axref_cmpxch_inherit_new_nokill_4
+/* >> void axref_cmpxch_inherit_new_nokill_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
+ * Same as `axref_cmpxch_inherit_new_nopr()', but assume that the caller is holding a reference to `oldobj' (if non-NULL) */
+#define axref_cmpxch_inherit_new_nokill_nopr __PRIVATE_axref_cmpxch_inherit_new_nokill_nopr_4
+#endif /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
 
 /* ========== axref_cmpxch ========== */
 #define __PRIVATE_axref_cmpxch_7(self, oldobj, newobj, p_ok, incref, decref, decref_nokill) \

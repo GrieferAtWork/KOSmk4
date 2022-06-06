@@ -128,7 +128,7 @@ again:
 				incref(new_state->cl_list[j - 1].cn_orig);
 			}
 		}
-		success = arref_cmpxch_inherit_new(self, state, new_state);
+		success = arref_cmpxch_inherit_new_nokill(self, state, new_state);
 		if likely(state != &__callback_list_empty)
 			decref_likely(state);
 		if likely(success)

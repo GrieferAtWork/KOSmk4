@@ -565,7 +565,7 @@ NOTHROW(FCALL rtm_memory_try_merge_regions)(struct rtm_memory *__restrict self,
 			return false;
 		}
 		self->rm_regionv[region_lo_index] = downsized;
-		merged_avl = kmalloc_usable_size(region_lo);
+		merged_avl = kmalloc_usable_size(downsized);
 		self->rm_mem_avl += region_lo_oldavl;
 		if unlikely(OVERFLOW_USUB(self->rm_mem_avl, merged_avl, &self->rm_mem_avl))
 			self->rm_mem_avl = 0; /* Prevent underflow... */

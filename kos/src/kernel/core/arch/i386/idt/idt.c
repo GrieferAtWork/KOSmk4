@@ -250,8 +250,10 @@ PUBLIC ATTR_COLDTEXT bool FCALL x86_idt_modify_begin(bool nx)
 		                                     GFP_LOCKED | GFP_PREFLT);
 	}
 	if (!shared_lock_tryacquire(&x86_idt_modify_lock)) {
-		if (nx)
+		if (nx) {
+			kfree(copy);
 			return false;
+		}
 		TRY {
 			shared_lock_acquire(&x86_idt_modify_lock);
 		} EXCEPT {

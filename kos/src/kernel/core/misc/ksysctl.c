@@ -514,10 +514,12 @@ again_get_oldpath:
 				return -EPERM;
 			}
 			/* Compare-exchange the old path for the new one. */
-			if (!arref_cmpxch_inherit_new(&driver_libpath,
-			                              oldpath_string,
-			                              newpath_string))
+			if (!arref_cmpxch_inherit_new_nokill(&driver_libpath,
+			                                     oldpath_string,
+			                                     newpath_string)) {
+				decref_likely(oldpath_string);
 				goto again_get_oldpath;
+			}
 			decref_likely(oldpath_string);
 		} else {
 			/* Simply set the new library path without comparing it to the old. */

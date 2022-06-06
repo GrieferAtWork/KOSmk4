@@ -305,7 +305,7 @@ function createClangTidyProcess(
 	}
 	if (language == "c++") {
 		ccargs.extend({
-			"-D__cplusplus=201406L",
+//			"-D__cplusplus=201406L",
 			"-D__GXX_EXPERIMENTAL_CXX0X__",
 			"-D__cpp_unicode_characters=200704",
 		});

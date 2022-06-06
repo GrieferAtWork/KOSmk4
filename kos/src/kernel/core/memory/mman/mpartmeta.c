@@ -205,12 +205,12 @@ again:
 		awref_clear(&root->mfu_part);
 		decref_unlikely(root);
 	}
-
-	/* Drop the weak reference held by the futex-tree */
-	weakdecref_unlikely(root);
 	lhs = root->mfu_mtaent.rb_lhs;
 	rhs = root->mfu_mtaent.rb_rhs;
 	DBG_memset(&root->mfu_mtaent, 0xcc, sizeof(root->mfu_mtaent));
+
+	/* Drop the weak reference held by the futex-tree */
+	weakdecref_unlikely(root);
 	if (lhs) {
 		if (rhs)
 			mfutex_tree_clear_all_parts(rhs);

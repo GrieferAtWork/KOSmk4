@@ -393,12 +393,11 @@ PRIVATE struct epoll_handle_monitor deleted_monitor = {
 	/* .ehm_ctrl    = */ NULL,
 	/* .ehm_rnext   = */ NULL
 	}},
-	/* .ehm_raised  = */ { 0 },
 #else /* CONFIG_HAVE_EPOLL_RPC */
 	/* .ehm_ctrl    = */ NULL,
 	/* .ehm_rnext   = */ NULL,
-	/* .ehm_raised  = */ 0,
 #endif /* !CONFIG_HAVE_EPOLL_RPC */
+	/* .ehm_raised  = */ 0,
 	/* .ehm_handtyp = */ HANDLE_TYPE_UNDEFINED,
 	/* .ehm_handptr = */ NULL,
 	/* .ehm_fdkey   = */ (unsigned int)-1,
@@ -912,13 +911,13 @@ again_acquire:
 				if unlikely(status != EPOLL_CONTROLLER_INTERN_ADD_SUCCESS) {
 					/* Cannot add: An identical monitor had already been added in the past... */
 					epoll_controller_lock_release(self);
-					(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
-					sig_multicompletion_fini(&newmon->ehm_comp);
-					kfree(newmon);
 #ifdef CONFIG_HAVE_EPOLL_RPC
 					if (status == EPOLL_CONTROLLER_INTERN_ADD_MUSTREAP)
 						goto again_acquire;
 #endif /* CONFIG_HAVE_EPOLL_RPC */
+					(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
+					sig_multicompletion_fini(&newmon->ehm_comp);
+					kfree(newmon);
 					return false;
 				}
 
@@ -1065,9 +1064,7 @@ NOTHROW(FCALL epoll_rpc_completion)(struct sig_completion *__restrict self,
 	 *  - `epoll_controller_destroy()' */
 	monitor = container_of(sig_multicompletion_controller(self),
 	                       struct epoll_handle_monitor, ehm_comp);
-#ifdef CONFIG_HAVE_EPOLL_RPC
 	assert(epoll_handle_monitor_isrpc(monitor));
-#endif /* CONFIG_HAVE_EPOLL_RPC */
 
 	if (ATOMIC_READ(monitor->ehm_rpc) != NULL && bufsize < 2 * sizeof(void *))
 		return 2 * sizeof(void *);
@@ -1158,12 +1155,12 @@ again_acquire:
 				if unlikely(status != EPOLL_CONTROLLER_INTERN_ADD_SUCCESS) {
 					/* Cannot add: An identical monitor had already been added in the past... */
 					epoll_controller_lock_release(self);
+					if (status == EPOLL_CONTROLLER_INTERN_ADD_MUSTREAP)
+						goto again_acquire;
 					(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
 					sig_multicompletion_fini(&newmon->ehm_comp);
 					kfree(newmon);
 					epoll_monitor_rpc_destroy(rpc);
-					if (status == EPOLL_CONTROLLER_INTERN_ADD_MUSTREAP)
-						goto again_acquire;
 					return false;
 				}
 			} EXCEPT {

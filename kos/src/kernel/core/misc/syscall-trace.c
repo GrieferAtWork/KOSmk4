@@ -309,7 +309,7 @@ again:
 		new_table->tt_count = new_count;
 	}
 set_new_table:
-	if (!arref_cmpxch_inherit_new(&sct_table, old_table, new_table)) {
+	if (!arref_cmpxch_inherit_new_nokill(&sct_table, old_table, new_table)) {
 		/* The table has changed in the meantime.
 		 * -> Try again! */
 		if (has_old_table_ref)

@@ -259,7 +259,18 @@ FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
 
 
 
-#if defined(__cplusplus) && defined(__CC__)
+#ifdef __CC__
+#ifdef __clang_tidy__
+DECL_BEGIN
+#ifndef ____os_free_defined
+#define ____os_free_defined
+extern void free(void *ptr);
+#define __os_free free
+#endif /* !____os_free_defined */
+DECL_END
+#endif /* __clang_tidy__ */
+
+#ifdef __cplusplus
 #include <__stdcxx.h>
 
 
@@ -401,6 +412,7 @@ __NAMESPACE_INT_END
 #define FINALLY_XDECREF_LIKELY(ptr)   __NAMESPACE_INT_SYM _finally_xdecref_likely<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fxdecref_l)(ptr)
 #define FINALLY_XDECREF_UNLIKELY(ptr) __NAMESPACE_INT_SYM _finally_xdecref_unlikely<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fxdecref_u)(ptr)
 #endif /* __cplusplus */
+#endif /* __CC__ */
 
 #define DEFINE_REFCNT_FUNCTIONS       __DEFINE_REFCNT_FUNCTIONS
 #define DEFINE_REFCNT_FUNCTIONS_P     __DEFINE_REFCNT_FUNCTIONS_P

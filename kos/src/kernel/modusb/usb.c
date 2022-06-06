@@ -351,7 +351,7 @@ found_index:
 	for (i = 0; i < nvec->upv_count; ++i)
 		incref(nvec->upv_elem[i].c_driver);
 	func_driver = ovec->upv_elem[del_index].c_driver; /* Inherit reference */
-	if (!arref_cmpxch_inherit_new(self, ovec, nvec)) {
+	if (!arref_cmpxch_inherit_new_nokill(self, ovec, nvec)) {
 		destroy(nvec);
 		decref_unlikely(ovec);
 		goto again;

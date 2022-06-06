@@ -502,7 +502,7 @@ NOTHROW(FCALL mnode_domerge_without_part)(struct mnode *__restrict lonode,
  * Return a pointer to the newly merged node.
  * @return: * : The merged node.
  * @return: MNODE_MERGE_CANNOT_MERGE: ... */
-PRIVATE NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct mnode *
+PRIVATE NOBLOCK NONNULL((1, 2)) struct mnode *
 NOTHROW(FCALL mnode_domerge_samepart_locked)(struct mnode *__restrict lonode,
                                              struct mnode *__restrict hinode) {
 	assert(lonode->mn_part != NULL);

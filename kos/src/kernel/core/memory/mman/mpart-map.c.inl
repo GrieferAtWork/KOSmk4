@@ -306,7 +306,6 @@ NOTHROW(FCALL mpart_mmap)(struct mpart const *__restrict self,
 	bitset = self->mp_blkst_ptr;
 	if (self->mp_flags & MPART_F_BLKST_INL)
 		bitset = &self->mp_blkst_inl;
-	__builtin_assume(&self->mp_blkst_inl != NULL);
 	switch (__builtin_expect(self->mp_state, MPART_ST_MEM)) {
 
 	case MPART_ST_MEM: {

@@ -4133,7 +4133,6 @@ NOTHROW(FCALL driver_nonodes)(struct driver *__restrict self) {
 		 * We don't do this inline to reduce the time spent holding onto
 		 * the kernel mman mappings lock (which our caller is  currently
 		 * holding) */
-		driver_free_(self);
 		self->_d_mm_lop.olo_func = &driver_nonodes_cleanup_lop;
 		SLIST_ATOMIC_INSERT(&mman_kernel_lockops,
 		                    &self->_d_mm_lop, olo_link);

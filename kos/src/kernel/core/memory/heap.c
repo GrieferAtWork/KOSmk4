@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MEMORY_HEAP_C
 #define GUARD_KERNEL_SRC_MEMORY_HEAP_C 1
-#define __OMIT_HEAP_CONSTANT_P_WRAPPERS 1
+#define __OMIT_HEAP_CONSTANT_P_WRAPPERS
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
