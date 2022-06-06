@@ -21,6 +21,7 @@
 #define GUARD_LIBC_USER_WORDEXP_C 1
 #define _KOS_SOURCE 1
 
+#ifndef __clang_tidy__ /* Takes too long :( */
 #include "../api.h"
 /**/
 
@@ -3053,5 +3054,6 @@ DEFINE_PUBLIC_ALIAS(wordexp, libc_wordexp);
 /*[[[end:exports]]]*/
 
 DECL_END
+#endif /* !__clang_tidy__ */
 
 #endif /* !GUARD_LIBC_USER_WORDEXP_C */
