@@ -30,28 +30,28 @@
 #ifndef __KERNEL__
 DECL_BEGIN
 
-#define GET_NOREL_GLOBAL(name) (*(__pdyn_##name ? __pdyn_##name : __##name##_impl()))
+#define GET_NOREL_GLOBAL(name) (*(libc_pdyn_##name ? libc_pdyn_##name : libc_bind_##name()))
 #define DECLARE_NOREL_GLOBAL_META(T, name) \
-	INTDEF T *__pdyn_##name;               \
-	INTDEF ATTR_CONST T *(LIBCCALL __##name##_impl)(void)
+	INTDEF T *libc_pdyn_##name;            \
+	INTDEF ATTR_CONST T *(LIBCCALL libc_bind_##name)(void)
 #ifdef __INTELLISENSE__
-#define DEFINE_NOREL_GLOBAL_META(T, name, section)                                  \
-	INTERN ATTR_SECTION(".bss" section) T *__pdyn_##name               = __NULLPTR; \
-	PRIVATE ATTR_SECTION(".rodata" section) char const __name_##name[] = #name;     \
-	INTERN ATTR_CONST ATTR_SECTION(".text" section) T *(LIBCCALL __##name##_impl)(void)
+#define DEFINE_NOREL_GLOBAL_META(T, name, section)                                     \
+	INTERN ATTR_SECTION(".bss" section) T *libc_pdyn_##name               = __NULLPTR; \
+	PRIVATE ATTR_SECTION(".rodata" section) char const libc_name_##name[] = #name;     \
+	INTERN ATTR_CONST ATTR_SECTION(".text" section) T *(LIBCCALL libc_bind_##name)(void)
 #else /* __INTELLISENSE__ */
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 
 #include <dlfcn.h>
-#define DEFINE_NOREL_GLOBAL_META(T, name, section)                                        \
-	INTERN ATTR_SECTION(".bss" section) T *__pdyn_##name               = __NULLPTR;       \
-	PRIVATE ATTR_SECTION(".rodata" section) char const __name_##name[] = #name;           \
-	INTERN ATTR_CONST ATTR_SECTION(".text" section) T *(LIBCCALL __##name##_impl)(void) { \
-		T *ptr = (T *)dlsym(RTLD_DEFAULT, __name_##name);                                 \
-		__hybrid_assert(ptr);                                                             \
-		__hybrid_atomic_store(__pdyn_##name, ptr, __ATOMIC_RELEASE);                      \
-		return ptr;                                                                       \
+#define DEFINE_NOREL_GLOBAL_META(T, name, section)                                         \
+	INTERN ATTR_SECTION(".bss" section) T *libc_pdyn_##name               = __NULLPTR;     \
+	PRIVATE ATTR_SECTION(".rodata" section) char const libc_name_##name[] = #name;         \
+	INTERN ATTR_CONST ATTR_SECTION(".text" section) T *(LIBCCALL libc_bind_##name)(void) { \
+		T *ptr = (T *)dlsym(RTLD_DEFAULT, libc_name_##name);                               \
+		__hybrid_assert(ptr);                                                              \
+		__hybrid_atomic_store(libc_pdyn_##name, ptr, __ATOMIC_RELEASE);                    \
+		return ptr;                                                                        \
 	}
 #endif /* !__INTELLISENSE__ */
 

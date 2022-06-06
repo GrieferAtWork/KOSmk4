@@ -30,6 +30,7 @@
 #include <kos/exec/rtld.h> /* RTLD_PLATFORM */
 #include <kos/syscalls.h>
 #include <linux/prctl.h> /* PR_KOS_GET_AT_SECURE */
+#include <sys/random.h>
 
 #include <fcntl.h>
 #include <pthread.h>
@@ -157,21 +158,12 @@ PRIVATE bool LIBCCALL libc_has_kernel64(void) {
 PRIVATE ATTR_SECTION(".bss.crt.system.auxv") byte_t random_bytes[16];
 PRIVATE ATTR_SECTION(".bss.crt.system.auxv") pthread_once_t random_didinit = PTHREAD_ONCE_INIT;
 PRIVATE ATTR_SECTION(".text.crt.system.auxv") void LIBCCALL random_init(void) {
-	fd_t fd;
-	ssize_t read_status;
-	fd = open("/dev/random", O_RDONLY | O_CLOEXEC);
-	if (fd < 0) {
-fallback:
+	if (getrandom(random_bytes, 16, GRND_RANDOM) != 16) {
 		unsigned int i;
 		srand(time(NULL));
 		for (i = 0; i < 16; ++i)
 			random_bytes[i] = rand() & 0xff;
-		return;
 	}
-	read_status = readall(fd, random_bytes, 16);
-	close(fd);
-	if (read_status != 16)
-		goto fallback;
 }
 
 
