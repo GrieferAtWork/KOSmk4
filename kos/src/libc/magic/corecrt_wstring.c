@@ -162,7 +162,7 @@ $errno_t _wcserror_s([[out(? <= buflen)]] wchar_t *buf,
 		return 1;
 @@pp_endif@@
 	}
-	wmemcpy(buf, msg, msglen);
+	(void)wmemcpy(buf, msg, msglen);
 	return 0;
 }
 
@@ -226,7 +226,7 @@ $errno_t __wcserror_s([[out(? <= buflen)]] wchar_t *buf, $size_t buflen,
 		return 1;
 @@pp_endif@@
 	}
-	wmemcpy(buf, msg, msglen);
+	(void)wmemcpy(buf, msg, msglen);
 	return 0;
 }
 

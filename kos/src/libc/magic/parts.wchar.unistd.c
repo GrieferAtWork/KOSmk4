@@ -255,7 +255,7 @@ wchar_t *wgetcwd([[out(? <= bufsize)]] wchar_t *buf, size_t bufsize) {
 		buf = NULL;
 		goto done;
 	}
-	wmemcpy(buf, result, result_len);
+	buf = wmemcpy(buf, result, result_len);
 done:
 @@pp_if $has_function(free)@@
 	free(result);

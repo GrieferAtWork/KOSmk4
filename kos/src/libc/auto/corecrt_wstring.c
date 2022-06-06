@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb5b0f10 */
+/* HASH CRC-32:0x23164047 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,7 +100,7 @@ NOTHROW_NCX(LIBDCALL libd__wcserror_s)(char16_t *buf,
 
 
 	}
-	(char16_t *)libc_memcpyw(buf, msg, msglen);
+	(void)(char16_t *)libc_memcpyw(buf, msg, msglen);
 	return 0;
 }
 #include <libc/errno.h>
@@ -117,7 +117,7 @@ NOTHROW_NCX(LIBKCALL libc__wcserror_s)(char32_t *buf,
 
 
 	}
-	(char32_t *)libc_memcpyl(buf, msg, msglen);
+	(void)(char32_t *)libc_memcpyl(buf, msg, msglen);
 	return 0;
 }
 #include <libc/errno.h>
@@ -216,7 +216,7 @@ NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,
 
 
 	}
-	(char16_t *)libc_memcpyw(buf, msg, msglen);
+	(void)(char16_t *)libc_memcpyw(buf, msg, msglen);
 	return 0;
 }
 #include <libc/errno.h>
@@ -241,7 +241,7 @@ NOTHROW_NCX(LIBKCALL libc___wcserror_s)(char32_t *buf,
 
 
 	}
-	(char32_t *)libc_memcpyl(buf, msg, msglen);
+	(void)(char32_t *)libc_memcpyl(buf, msg, msglen);
 	return 0;
 }
 #include <libc/errno.h>

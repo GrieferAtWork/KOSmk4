@@ -30,6 +30,7 @@
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/node.h>
 #include <kernel/fs/path.h>
+#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/exec.h>
 #include <kernel/mman/mfile.h>

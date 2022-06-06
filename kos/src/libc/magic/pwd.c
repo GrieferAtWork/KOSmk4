@@ -583,8 +583,10 @@ nextline:
 @@pp_endif@@
 	if unlikely(fgetpos64(stream, &curpos))
 		goto err_nodbline;
-	if (curpos >= maxpos)
+	if (curpos >= maxpos) {
+		dbline = NULL;
 		goto eof;
+	}
 	goto again_parseln;
 }
 

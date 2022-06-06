@@ -45,6 +45,7 @@
 #include <kernel/fs/vfs.h>
 #include <kernel/handle.h>
 #include <kernel/handman.h>
+#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/event.h>
 #include <kernel/mman/exec.h>

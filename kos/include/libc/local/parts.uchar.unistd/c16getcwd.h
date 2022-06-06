@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe071ceb5 */
+/* HASH CRC-32:0xc57c27c5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -162,7 +162,7 @@ __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16getcwd))(__CHAR16_TYPE__ *__buf, _
 		__buf = __NULLPTR;
 		goto __done;
 	}
-	(__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memcpyw)(__buf, __result, __result_len);
+	__buf = (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memcpyw)(__buf, __result, __result_len);
 __done:
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 	(__NAMESPACE_LOCAL_SYM __localdep_free)(__result);

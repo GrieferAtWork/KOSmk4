@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed03dc69 */
+/* HASH CRC-32:0xf3d20ffe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,31 +36,31 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcsnlen __LIBC_LOCAL_NAME(wcsnlen)
 #endif /* !... */
 #endif /* !__local___localdep_wcsnlen_defined */
-#ifndef __local___localdep_wmemcpy_defined
-#define __local___localdep_wmemcpy_defined
-#ifdef __CRT_HAVE_wmemcpy
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_memcpyw) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyw,(__dst,__src,__num_chars))
-#elif defined(__CRT_HAVE_memcpyl) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
+#ifndef __local___localdep_wmempcpy_defined
+#define __local___localdep_wmempcpy_defined
+#ifdef __CRT_HAVE_wmempcpy
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmempcpy,(__dst,__src,__num_chars))
+#elif defined(__CRT_HAVE_mempcpyw) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),mempcpyw,(__dst,__src,__num_chars))
+#elif defined(__CRT_HAVE_mempcpyl) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmempcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),mempcpyl,(__dst,__src,__num_chars))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/memcpyw.h>
+#include <libc/local/string/mempcpyw.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_wmemcpy __NAMESPACE_LOCAL_TYPEHAX(__WCHAR_TYPE__ *(__LIBCCALL*)(__WCHAR_TYPE__ *__restrict,__WCHAR_TYPE__ const *__restrict,__SIZE_TYPE__),__WCHAR_TYPE__ *(__LIBCCALL&)(__WCHAR_TYPE__ *__restrict,__WCHAR_TYPE__ const *__restrict,__SIZE_TYPE__),memcpyw)
+#define __localdep_wmempcpy __NAMESPACE_LOCAL_TYPEHAX(__WCHAR_TYPE__ *(__LIBCCALL*)(__WCHAR_TYPE__ *__restrict,__WCHAR_TYPE__ const *__restrict,__SIZE_TYPE__),__WCHAR_TYPE__ *(__LIBCCALL&)(__WCHAR_TYPE__ *__restrict,__WCHAR_TYPE__ const *__restrict,__SIZE_TYPE__),mempcpyw)
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/memcpyl.h>
+#include <libc/local/string/mempcpyl.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_wmemcpy __NAMESPACE_LOCAL_TYPEHAX(__WCHAR_TYPE__ *(__LIBCCALL*)(__WCHAR_TYPE__ *__restrict,__WCHAR_TYPE__ const *__restrict,__SIZE_TYPE__),__WCHAR_TYPE__ *(__LIBCCALL&)(__WCHAR_TYPE__ *__restrict,__WCHAR_TYPE__ const *__restrict,__SIZE_TYPE__),memcpyl)
+#define __localdep_wmempcpy __NAMESPACE_LOCAL_TYPEHAX(__WCHAR_TYPE__ *(__LIBCCALL*)(__WCHAR_TYPE__ *__restrict,__WCHAR_TYPE__ const *__restrict,__SIZE_TYPE__),__WCHAR_TYPE__ *(__LIBCCALL&)(__WCHAR_TYPE__ *__restrict,__WCHAR_TYPE__ const *__restrict,__SIZE_TYPE__),mempcpyl)
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/wchar/wmemcpy.h>
+#include <libc/local/wchar/wmempcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_wmemcpy __LIBC_LOCAL_NAME(wmemcpy)
+#define __localdep_wmempcpy __LIBC_LOCAL_NAME(wmempcpy)
 #endif /* !... */
-#endif /* !__local___localdep_wmemcpy_defined */
+#endif /* !__local___localdep_wmempcpy_defined */
 #ifndef __local___localdep_wmempset_defined
 #define __local___localdep_wmempset_defined
 #ifdef __CRT_HAVE_wmempset
@@ -89,8 +89,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcspncpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcspncpy))(__WCHAR_TYPE__ *__restrict __buf, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __buflen) {
 	__SIZE_TYPE__ __srclen = (__NAMESPACE_LOCAL_SYM __localdep_wcsnlen)(__src, __buflen);
-	(__NAMESPACE_LOCAL_SYM __localdep_wmemcpy)(__buf, __src, __srclen);
-	return (__NAMESPACE_LOCAL_SYM __localdep_wmempset)(__buf + __srclen, (__WCHAR_TYPE__)'\0', __buflen - __srclen);
+	__buf = (__NAMESPACE_LOCAL_SYM __localdep_wmempcpy)(__buf, __src, __srclen);
+	__buf = (__NAMESPACE_LOCAL_SYM __localdep_wmempset)(__buf, (__WCHAR_TYPE__)'\0', __buflen - __srclen);
+	return __buf;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcspncpy_defined

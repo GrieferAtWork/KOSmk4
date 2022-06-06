@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94270af0 */
+/* HASH CRC-32:0xfd34f634 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -597,8 +597,10 @@ INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_INOUT_OPT(2) ATTR_IN_OPT(1)
 		rootp = cmp < 0 ? &p->left_node
 		                : &p->right_node;
 		root = *rootp;
-		if (root == NULL)
+		if (root == NULL) {
+			__freea(nodestack);
 			return NULL;
+		}
 	}
 	retval = p;
 	root = *rootp;

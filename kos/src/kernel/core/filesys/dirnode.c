@@ -30,6 +30,7 @@
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/node.h>
 #include <kernel/handle.h>
+#include <kernel/malloc.h>
 #include <sched/task.h>
 
 #include <kos/except.h>

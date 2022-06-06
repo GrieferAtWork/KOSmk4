@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36e9ddb6 */
+/* HASH CRC-32:0x4191c9ea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -218,6 +218,12 @@ INTDEF errno_t NOTHROW_NCX(LIBKCALL libc__wputenv_s)(char32_t const *varname, ch
 INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC(LIBDCALL libd__wsearchenv_s)(char16_t const *file, char16_t const *envvar, char16_t *__restrict resultpath, size_t resultpath_len);
 INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_OUTS(3, 4) errno_t NOTHROW_RPC(LIBKCALL libc__wsearchenv_s)(char32_t const *file, char32_t const *envvar, char32_t *__restrict resultpath, size_t resultpath_len);
 #endif /* !__KERNEL__ */
+#ifdef __clang_tidy__
+#define libc_malloc(num_bytes)           __builtin_malloc(num_bytes)
+#define libc_calloc(count, num_bytes)    __builtin_calloc(count, num_bytes)
+#define libc_realloc(mallptr, num_bytes) __builtin_realloc(mallptr, num_bytes)
+#define libc_free(mallptr)               __builtin_free(mallptr)
+#endif /* __clang_tidy__ */
 
 DECL_END
 

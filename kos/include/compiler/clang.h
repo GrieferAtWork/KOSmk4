@@ -806,21 +806,59 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #define __UNUSED(x) x __attribute__((__unused__))
 /* Disable  this, so clang-tidy doesn't think that function like memcpy() cannot
  * be made to be noexcept. - We only want warnings when calling functions marked
- * as THROWS() being called by those marked as NOTHROW(). */
+ * as THROWS() are called by those marked as NOTHROW(). */
 #undef __NO_NON_CALL_EXCEPTIONS
 #define __NO_NON_CALL_EXCEPTIONS
 /* clang-tidy causes problems with extern-inline, so just disable it for now... */
 #undef __NO_EXTERN_INLINE
 #define __NO_EXTERN_INLINE
-/*namespace __intern {
-template<class __T> struct ____clang_tidy_remlval { typedef __T __type; };
-template<class __T> struct ____clang_tidy_remlval<__T &> { typedef __T __type; };
-template<class __T> using ____clang_tidy_remlval_t = typename ____clang_tidy_remlval<__T>::__type;
-#define __typeof__(...) ::__intern::____clang_tidy_remlval_t<decltype(__VA_ARGS__)>
-}*/
 #define typeof __typeof__
 #define __typeof __typeof__
 #define __auto_type auto
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+#ifndef __SIZE_TYPE__
+#ifdef __x86_64__
+#if defined(__SIZEOF_LONG__) && __SIZEOF_LONG__ == 8
+#define __SIZE_TYPE__ unsigned long
+#else /* __SIZEOF_LONG__ == 8 */
+#define __SIZE_TYPE__ unsigned long long
+#endif /* __SIZEOF_LONG__ != 8 */
+#else /* __x86_64__ */
+#define __SIZE_TYPE__ unsigned int
+#endif /* !__x86_64__ */
+#endif /* !__SIZE_TYPE__ */
+
+/* Builtin heap functions for static analysis (use these for static detection of leaks and bad usage) */
+#define __builtin_malloc(num_bytes)                        malloc(num_bytes)
+#define __builtin_pvalloc(num_bytes)                       malloc(num_bytes)
+#define __builtin_valloc(num_bytes)                        malloc(num_bytes)
+#define __builtin_memalign(alignment, num_bytes)           ((void)(alignment), malloc(num_bytes))
+#define __builtin_free(ptr)                                free(ptr)
+#define __builtin_calloc(item_size, item_count)            calloc(item_size, item_count)
+#define __builtin_realloc(ptr, num_bytes)                  realloc(ptr, num_bytes)
+#define __builtin_recalloc(ptr, num_bytes)                 realloc(ptr, num_bytes)
+#define __builtin_recallocv(ptr, item_size, item_count)    realloc(ptr, (item_size) * (item_count))
+#define __builtin_malloc_usable_size(ptr)                  malloc_usable_size(ptr)
+#define __builtin_realloc_in_place(ptr, num_bytes)         realloc_in_place(ptr, num_bytes)
+#define __builtin_memdup(ptr, num_bytes)                   __builtin_memcpy(malloc(num_bytes), ptr, num_bytes)
+#define __builtin_reallocarray(ptr, item_size, item_count) realloc(ptr, (item_size) * (item_count))
+#define __malloc_defined
+#define __free_defined
+#define __calloc_defined
+#define __realloc_defined
+#define __malloc_usable_size_defined
+#define __realloc_in_place_defined
+extern void free(void *);
+extern void *malloc(__SIZE_TYPE__);
+extern void *calloc(__SIZE_TYPE__, __SIZE_TYPE__);
+extern void *realloc(void *, __SIZE_TYPE__);
+extern __SIZE_TYPE__ malloc_usable_size(void *);
+extern void *realloc_in_place(void *, __SIZE_TYPE__);
+#ifdef __cplusplus
+} /* extern "C" */
+#endif /* __cplusplus */
 #endif /* __clang_tidy__ */
 
 #define __STATIC_IF(x)   if(x)
@@ -908,16 +946,16 @@ template<class __T> using ____clang_tidy_remlval_t = typename ____clang_tidy_rem
 /* Emulate: __builtin_types_compatible_p() */
 #ifdef __cplusplus
 namespace __intern {
-template<class __T> struct ____INTELLISENSE_remcv { typedef __T __type; };
-template<class __T> struct ____INTELLISENSE_remcv<__T const> { typedef __T __type; };
-template<class __T> struct ____INTELLISENSE_remcv<__T volatile> { typedef __T __type; };
-template<class __T> struct ____INTELLISENSE_remcv<__T const volatile> { typedef __T __type; };
-template<class T1, class T2> struct ____INTELLISENSE_sametype_impl { enum { __val = false }; };
-template<class T1> struct ____INTELLISENSE_sametype_impl<T1, T1> { enum { __val = true }; };
-template<class T1, class T2> struct ____INTELLISENSE_sametype:
-	____INTELLISENSE_sametype_impl<typename ____INTELLISENSE_remcv<T1>::__type,
-	typename ____INTELLISENSE_remcv<T2>::__type> { };
-#define __builtin_types_compatible_p(...) (::__intern::____INTELLISENSE_sametype< __VA_ARGS__ >::__val)
+template<class __T> struct __clang_remcv { typedef __T __type; };
+template<class __T> struct __clang_remcv<__T const> { typedef __T __type; };
+template<class __T> struct __clang_remcv<__T volatile> { typedef __T __type; };
+template<class __T> struct __clang_remcv<__T const volatile> { typedef __T __type; };
+template<class T1, class T2> struct __clang_sametype_impl { enum { __val = false }; };
+template<class T1> struct __clang_sametype_impl<T1, T1> { enum { __val = true }; };
+template<class T1, class T2> struct __clang_sametype:
+	__clang_sametype_impl<typename __clang_remcv<T1>::__type,
+	typename __clang_remcv<T2>::__type> { };
+#define __builtin_types_compatible_p(...) (::__intern::__clang_sametype< __VA_ARGS__ >::__val)
 }
 #else /* __cplusplus */
 #define __NO_builtin_types_compatible_p

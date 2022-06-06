@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bcca2f7 */
+/* HASH CRC-32:0x77d6b691 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -382,8 +382,10 @@ nextline:
 
 	if unlikely(libc_fgetpos64(stream, &curpos))
 		goto err_nodbline;
-	if (curpos >= maxpos)
+	if (curpos >= maxpos) {
+		dbline = NULL;
 		goto eof;
+	}
 	goto again_parseln;
 }
 #include <bits/crt/db/group.h>

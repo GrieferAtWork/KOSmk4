@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d773b07 */
+/* HASH CRC-32:0x254f273c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,11 +31,12 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
- *           possible due to the requested  memory above `MALLPTR' already  being
- *           in use. However, an `E_BADALLOC' exception is thrown if insufficient
- *           memory (for internal  control structures) is  available to  complete
- *           the operation */
+/* >> realloc_in_place(3)
+ * `realloc_in_place(3)' will return `NULL' if the reallocation isn't
+ * possible due to the requested memory above `mallptr' already being
+ * in use. However, NULL is also returned (and `errno=ENOMEM' is set)
+ * if  insufficient  memory  (for  internal  control  structures)  is
+ * available to complete the operation. */
 INTDEF ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_realloc_in_place)(void *__restrict mallptr, size_t n_bytes);
 INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_memalign)(size_t alignment, size_t n_bytes);
 INTDEF ATTR_MALLOC ATTR_MALL_PAGEALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_pvalloc)(size_t n_bytes);
@@ -50,6 +51,18 @@ INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_N
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_recalloc)(void *mallptr, size_t num_bytes);
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc_recallocv)(void *mallptr, size_t elem_count, size_t elem_size);
 #endif /* !__KERNEL__ */
+#ifdef __clang_tidy__
+#define libc_realloc_in_place(mallptr, n_bytes)        __builtin_realloc_in_place(mallptr, n_bytes)
+#define libc_memalign(alignment, n_bytes)              __builtin_memalign(alignment, n_bytes)
+#define libc_pvalloc(n_bytes)                          __builtin_pvalloc(n_bytes)
+#define libc_valloc(n_bytes)                           __builtin_valloc(n_bytes)
+#define libc_posix_memalign(pp, alignment, n_bytes)    ((*(pp) = __builtin_memalign(alignment, n_bytes)) != 0 ? 0 : ENOMEM)
+#define libc_malloc_usable_size(ptr)                   __builtin_malloc_usable_size(ptr)
+#define libc_memdup(ptr, n_bytes)                      __builtin_memdup(ptr, n_bytes)
+#define libc_reallocarray(ptr, elem_count, elem_size)  __builtin_reallocarray(ptr, elem_count, elem_size)
+#define libc_recalloc(mallptr, num_bytes)              __builtin_recalloc(mallptr, num_bytes)
+#define libc_recallocv(mallptr, elem_count, elem_size) __builtin_recallocv(mallptr, elem_count, elem_size)
+#endif /* __clang_tidy__ */
 
 DECL_END
 

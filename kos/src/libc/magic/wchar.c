@@ -580,7 +580,7 @@ wchar_t *wmemmove([[out(num_chars)]] wchar_t *dst,
 [[std, guard, wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcscat([[inout]] wchar_t *__restrict buf,
                             [[in]] wchar_t const *__restrict src) {
-	wmemcpy(wcsend(buf), src, wcslen(src) + 1);
+	(void)wmemcpy(wcsend(buf), src, wcslen(src) + 1);
 	return buf;
 }
 
@@ -592,8 +592,7 @@ wchar_t *wmemmove([[out(num_chars)]] wchar_t *dst,
                              $size_t buflen) {
 	size_t srclen = wcsnlen(src, buflen);
 	wchar_t *dst = wcsend(buf);
-	wmemcpy(dst, src, srclen);
-	dst[srclen] = (wchar_t)'\0';
+	*wmempcpy(dst, src, srclen) = (wchar_t)'\0';
 	return buf;
 }
 
@@ -603,9 +602,10 @@ wchar_t *wmemmove([[out(num_chars)]] wchar_t *dst,
 [[nonnull]] wchar_t *wcsncpy([[out(buflen)]] wchar_t *__restrict buf,
                              [[in(wcsnlen(src, buflen))]] wchar_t const *__restrict src,
                              $size_t buflen) {
+	wchar_t *ptr;
 	size_t srclen = wcsnlen(src, buflen);
-	wmemcpy(buf, src, srclen);
-	wmemset(buf + srclen, (wchar_t)'\0', buflen - srclen);
+	ptr = wmempcpy(buf, src, srclen);
+	(void)wmemset(ptr, (wchar_t)'\0', buflen - srclen);
 	return buf;
 }
 
@@ -1276,9 +1276,9 @@ wcsxfrm_l(*) %{generate(str2wcs("strxfrm_l"))}
                              [[in(wcsnlen(., buflen))]] wchar_t const *__restrict src,
                              $size_t buflen) {
 	$size_t srclen = wcsnlen(src, buflen);
-	wmemcpy(buf, src, srclen);
-	wmemset(buf + srclen, (wchar_t)'\0', ($size_t)(buflen - srclen));
-	return buf + srclen;
+	buf = wmempcpy(buf, src, srclen);
+	buf = wmemset(buf, (wchar_t)'\0', ($size_t)(buflen - srclen));
+	return buf;
 }
 
 @@>> mbsnrtowcs(3)
@@ -2122,8 +2122,9 @@ wcsnupr(*) %{generate(str2wcs("strnupr"))}
 [[nonnull]] wchar_t *wcspncpy([[out(buflen)]] wchar_t *__restrict buf,
                               [[in(wcsnlen(src, buflen))]] wchar_t const *__restrict src, $size_t buflen) {
 	$size_t srclen = wcsnlen(src, buflen);
-	wmemcpy(buf, src, srclen);
-	return wmempset(buf + srclen, (wchar_t)'\0', buflen - srclen);
+	buf = wmempcpy(buf, src, srclen);
+	buf = wmempset(buf, (wchar_t)'\0', buflen - srclen);
+	return buf;
 }
 
 %[define_wchar_replacement(wmempset = "(char16_t *)mempsetw", "(char32_t *)mempsetl")]

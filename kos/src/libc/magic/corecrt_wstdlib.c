@@ -255,7 +255,7 @@ wchar_t *_wfullpath([[out(? <= buflen)]] wchar_t *buf,
 @@pp_endif@@
 		return NULL;
 	}
-	wmemcpy(buf, wcs_realpath, reqlen);
+	buf = wmemcpy(buf, wcs_realpath, reqlen);
 @@pp_if $has_function(free)@@
 	free(wcs_realpath);
 @@pp_endif@@

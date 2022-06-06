@@ -25,6 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/malloc.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/selftest.h> /* DEFINE_TEST */

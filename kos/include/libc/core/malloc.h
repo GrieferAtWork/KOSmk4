@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43b9fae */
+/* HASH CRC-32:0xee035ea1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,19 +33,21 @@ __SYSDECL_BEGIN
 #define ____libc_core_realloc_in_place_defined
 #ifdef __CRT_HAVE_realloc_in_place
 #include <hybrid/typecore.h>
-/* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
- *           possible due to the requested  memory above `MALLPTR' already  being
- *           in use. However, an `E_BADALLOC' exception is thrown if insufficient
- *           memory (for internal  control structures) is  available to  complete
- *           the operation */
+/* >> realloc_in_place(3)
+ * `realloc_in_place(3)' will return `NULL' if the reallocation isn't
+ * possible due to the requested memory above `mallptr' already being
+ * in use. However, NULL is also returned (and `errno=ENOMEM' is set)
+ * if  insufficient  memory  (for  internal  control  structures)  is
+ * available to complete the operation. */
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__libc_core_realloc_in_place,(void *__restrict __mallptr, __SIZE_TYPE__ __n_bytes),realloc_in_place,(__mallptr,__n_bytes))
 #elif defined(__CRT_HAVE__expand)
 #include <hybrid/typecore.h>
-/* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
- *           possible due to the requested  memory above `MALLPTR' already  being
- *           in use. However, an `E_BADALLOC' exception is thrown if insufficient
- *           memory (for internal  control structures) is  available to  complete
- *           the operation */
+/* >> realloc_in_place(3)
+ * `realloc_in_place(3)' will return `NULL' if the reallocation isn't
+ * possible due to the requested memory above `mallptr' already being
+ * in use. However, NULL is also returned (and `errno=ENOMEM' is set)
+ * if  insufficient  memory  (for  internal  control  structures)  is
+ * available to complete the operation. */
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__libc_core_realloc_in_place,(void *__restrict __mallptr, __SIZE_TYPE__ __n_bytes),_expand,(__mallptr,__n_bytes))
 #else /* ... */
 #undef ____libc_core_realloc_in_place_defined

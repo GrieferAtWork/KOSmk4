@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2a04897 */
+/* HASH CRC-32:0x8475d806 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,8 +95,10 @@ __LOCAL_LIBC(tdelete_r) __ATTR_INOUT_OPT(2) __ATTR_IN_OPT(1) __ATTR_NONNULL((3))
 		__rootp = __cmp < 0 ? &__p->__left_node
 		                : &__p->__right_node;
 		__root = *__rootp;
-		if (__root == __NULLPTR)
+		if (__root == __NULLPTR) {
+			__freea(__nodestack);
 			return __NULLPTR;
+		}
 	}
 	__retval = __p;
 	__root = *__rootp;

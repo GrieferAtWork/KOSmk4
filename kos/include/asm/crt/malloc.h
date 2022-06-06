@@ -25,8 +25,10 @@
 
 #if defined(__CRT_KOS) || defined(__CRT_GLC)
 /* malloc behavior attributes. */
+#ifndef __clang_tidy__
 #define __MALLOC_ZERO_IS_NONNULL  1
 #define __REALLOC_ZERO_IS_NONNULL 1
+#endif /* !__clang_tidy__ */
 
 #define __M_TRIM_THRESHOLD     (-1)
 #define __M_GRANULARITY        (-2)

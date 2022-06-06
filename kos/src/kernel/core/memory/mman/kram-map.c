@@ -25,6 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/heap.h>
+#include <kernel/malloc.h>
 #include <kernel/mman/cache.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/mfile.h>

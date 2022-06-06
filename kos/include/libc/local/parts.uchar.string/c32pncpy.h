@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63c6fdd5 */
+/* HASH CRC-32:0xde8f2181 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,21 +45,21 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32nlen __LIBC_LOCAL_NAME(c32nlen)
 #endif /* !... */
 #endif /* !__local___localdep_c32nlen_defined */
-#ifndef __local___localdep_memcpyl_defined
-#define __local___localdep_memcpyl_defined
-#ifdef __CRT_HAVE_memcpyl
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),memcpyl,(__dst,__src,__n_dwords))
-#elif defined(__CRT_HAVE_wmemcpy) && __SIZEOF_WCHAR_T__ == 4
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),wmemcpy,(__dst,__src,__n_dwords))
-#elif defined(__CRT_HAVE_KOS$wmemcpy) && defined(__LIBCCALL_IS_LIBKCALL)
-__COMPILER_CREDIRECT(__LIBC,__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),KOS$wmemcpy,(__dst,__src,__n_dwords))
+#ifndef __local___localdep_mempcpyl_defined
+#define __local___localdep_mempcpyl_defined
+#ifdef __CRT_HAVE_mempcpyl
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),mempcpyl,(__dst,__src,__n_dwords))
+#elif defined(__CRT_HAVE_wmempcpy) && __SIZEOF_WCHAR_T__ == 4
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),wmempcpy,(__dst,__src,__n_dwords))
+#elif defined(__CRT_HAVE_KOS$wmempcpy) && defined(__LIBCCALL_IS_LIBKCALL)
+__COMPILER_CREDIRECT(__LIBC,__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),KOS$wmempcpy,(__dst,__src,__n_dwords))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/memcpyl.h>
+#include <libc/local/string/mempcpyl.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_memcpyl __LIBC_LOCAL_NAME(memcpyl)
+#define __localdep_mempcpyl __LIBC_LOCAL_NAME(mempcpyl)
 #endif /* !... */
-#endif /* !__local___localdep_memcpyl_defined */
+#endif /* !__local___localdep_mempcpyl_defined */
 #ifndef __local___localdep_mempsetl_defined
 #define __local___localdep_mempsetl_defined
 #ifdef __CRT_HAVE_mempsetl
@@ -78,8 +78,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32pncpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32pncpy))(__CHAR32_TYPE__ *__restrict __buf, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __buflen) {
 	__SIZE_TYPE__ __srclen = (__NAMESPACE_LOCAL_SYM __localdep_c32nlen)(__src, __buflen);
-	(__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memcpyl)(__buf, __src, __srclen);
-	return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mempsetl)(__buf + __srclen, (__CHAR32_TYPE__)'\0', __buflen - __srclen);
+	__buf = (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyl)(__buf, __src, __srclen);
+	__buf = (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mempsetl)(__buf, (__CHAR32_TYPE__)'\0', __buflen - __srclen);
+	return __buf;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32pncpy_defined

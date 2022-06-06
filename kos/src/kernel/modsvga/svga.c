@@ -24,8 +24,9 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/driver.h>
 #include <kernel/driver-param.h>
+#include <kernel/driver.h>
+#include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/printk.h>
 

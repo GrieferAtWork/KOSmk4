@@ -30,6 +30,7 @@
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
+#include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <sched/sig.h>
 #include <sched/task.h>

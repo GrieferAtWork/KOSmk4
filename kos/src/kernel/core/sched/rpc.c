@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/malloc.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <kernel/types.h>

@@ -28,6 +28,7 @@
 
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
+#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
@@ -518,8 +519,8 @@ NOTHROW(FCALL mnode_domerge_samepart_locked)(struct mnode *__restrict lonode,
 		/* If  the 2 ranges  overlap with each other  in any way, then
 		 * at least some part of the physical backing memory is mapped
 		 * more than once, in which case merging isn't possible, since
-		 * we  must maintain the expected invariant of the part of the
-		 * mapping being a duplicate of another part. */
+		 * we must maintain the expected invariant of some part of the
+		 * mapping shadowing another part. */
 		if (RANGES_OVERLAP(mnode_getpartminaddr(lonode),
 		                   mnode_getpartmaxaddr(lonode),
 		                   mnode_getpartminaddr(hinode),
@@ -1436,7 +1437,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		        mchunkvec_getsize(hivec, hicnt), hisize);
 #endif /* !NDEBUG */
 		if ((lovec[locnt - 1].mc_start + lovec[locnt - 1].mc_size) != hivec[0].mc_start) {
-			/* TODO: Try to re-map the mappings of the 2 parts  */
+			/* TODO: Try to re-map the chunks of the 2 parts so they become continuous */
 		}
 
 		/* Deal with the simple case: merge 2 in-line vectors. */
@@ -1823,7 +1824,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks_noftx)(/*inherit(on_success)*/ REF st
 		}
 	}
 
-	/* With all of the now held, check one more time if merging is possible. */
+	/* With all of the locks now held, check one more time if merging is possible. */
 	if unlikely(!mpart_canmerge(lopart, hipart)) {
 		result = MPART_MERGE_CANNOT_MERGE;
 	} else {

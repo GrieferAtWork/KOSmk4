@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8d8a1c5 */
+/* HASH CRC-32:0x4d054387 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,7 +111,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(bgets) __ATTR_RETNONNULL __ATTR_INOUT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1) char *
+__LOCAL_LIBC(bgets) __ATTR_INOUT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bgets))(char *__buf, __SIZE_TYPE__ __buflen_minus_one, __FILE *__fp, char __KOS_FIXED_CONST *__stop_chars) {
 	char *__iter = __buf;
 	if (__stop_chars == __NULLPTR)

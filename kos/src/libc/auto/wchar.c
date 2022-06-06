@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf454b02c */
+/* HASH CRC-32:0x51df9a1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -479,14 +479,14 @@ NOTHROW_NCX(LIBKCALL libc_wcscpy)(char32_t *__restrict buf,
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL ATTR_IN(2) ATTR_INOUT(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscat)(char16_t *__restrict buf,
                                   char16_t const *__restrict src) {
-	(char16_t *)libc_memcpyw(libd_wcsend(buf), src, libd_wcslen(src) + 1);
+	(void)(char16_t *)libc_memcpyw(libd_wcsend(buf), src, libd_wcslen(src) + 1);
 	return buf;
 }
 /* >> wcscat(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL ATTR_IN(2) ATTR_INOUT(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcscat)(char32_t *__restrict buf,
                                   char32_t const *__restrict src) {
-	(char32_t *)libc_memcpyl(libc_wcsend(buf), src, libc_wcslen(src) + 1);
+	(void)(char32_t *)libc_memcpyl(libc_wcsend(buf), src, libc_wcslen(src) + 1);
 	return buf;
 }
 /* >> wcsncat(3) */
@@ -496,8 +496,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncat)(char16_t *__restrict buf,
                                    size_t buflen) {
 	size_t srclen = libd_wcsnlen(src, buflen);
 	char16_t *dst = libd_wcsend(buf);
-	(char16_t *)libc_memcpyw(dst, src, srclen);
-	dst[srclen] = (char16_t)'\0';
+	*(char16_t *)libc_mempcpyw(dst, src, srclen) = (char16_t)'\0';
 	return buf;
 }
 /* >> wcsncat(3) */
@@ -507,8 +506,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncat)(char32_t *__restrict buf,
                                    size_t buflen) {
 	size_t srclen = libc_wcsnlen(src, buflen);
 	char32_t *dst = libc_wcsend(buf);
-	(char32_t *)libc_memcpyl(dst, src, srclen);
-	dst[srclen] = (char32_t)'\0';
+	*(char32_t *)libc_mempcpyl(dst, src, srclen) = (char32_t)'\0';
 	return buf;
 }
 /* >> wcsncpy(3) */
@@ -516,9 +514,10 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR
 NOTHROW_NCX(LIBDCALL libd_wcsncpy)(char16_t *__restrict buf,
                                    char16_t const *__restrict src,
                                    size_t buflen) {
+	char16_t *ptr;
 	size_t srclen = libd_wcsnlen(src, buflen);
-	(char16_t *)libc_memcpyw(buf, src, srclen);
-	(char16_t *)libc_memsetw(buf + srclen, (char16_t)'\0', buflen - srclen);
+	ptr = (char16_t *)libc_mempcpyw(buf, src, srclen);
+	(void)(char16_t *)libc_memsetw(ptr, (char16_t)'\0', buflen - srclen);
 	return buf;
 }
 /* >> wcsncpy(3) */
@@ -526,9 +525,10 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL ATTR_INS(2,
 NOTHROW_NCX(LIBKCALL libc_wcsncpy)(char32_t *__restrict buf,
                                    char32_t const *__restrict src,
                                    size_t buflen) {
+	char32_t *ptr;
 	size_t srclen = libc_wcsnlen(src, buflen);
-	(char32_t *)libc_memcpyl(buf, src, srclen);
-	(char32_t *)libc_memsetl(buf + srclen, (char32_t)'\0', buflen - srclen);
+	ptr = (char32_t *)libc_mempcpyl(buf, src, srclen);
+	(void)(char32_t *)libc_memsetl(ptr, (char32_t)'\0', buflen - srclen);
 	return buf;
 }
 /* >> wcscmp(3) */
@@ -2112,9 +2112,9 @@ NOTHROW_NCX(LIBDCALL libd_wcpncpy)(char16_t *__restrict buf,
                                    char16_t const *__restrict src,
                                    size_t buflen) {
 	size_t srclen = libd_wcsnlen(src, buflen);
-	(char16_t *)libc_memcpyw(buf, src, srclen);
-	(char16_t *)libc_memsetw(buf + srclen, (char16_t)'\0', (size_t)(buflen - srclen));
-	return buf + srclen;
+	buf = (char16_t *)libc_mempcpyw(buf, src, srclen);
+	buf = (char16_t *)libc_memsetw(buf, (char16_t)'\0', (size_t)(buflen - srclen));
+	return buf;
 }
 /* >> wcpncpy(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUTS(1, 3) char32_t *
@@ -2122,9 +2122,9 @@ NOTHROW_NCX(LIBKCALL libc_wcpncpy)(char32_t *__restrict buf,
                                    char32_t const *__restrict src,
                                    size_t buflen) {
 	size_t srclen = libc_wcsnlen(src, buflen);
-	(char32_t *)libc_memcpyl(buf, src, srclen);
-	(char32_t *)libc_memsetl(buf + srclen, (char32_t)'\0', (size_t)(buflen - srclen));
-	return buf + srclen;
+	buf = (char32_t *)libc_mempcpyl(buf, src, srclen);
+	buf = (char32_t *)libc_memsetl(buf, (char32_t)'\0', (size_t)(buflen - srclen));
+	return buf;
 }
 /* >> mbsnrtowcs(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_INOUT(2) ATTR_INOUT_OPT(5) ATTR_OUT_OPT(1) size_t
@@ -4395,8 +4395,9 @@ NOTHROW_NCX(LIBDCALL libd_wcspncpy)(char16_t *__restrict buf,
                                     char16_t const *__restrict src,
                                     size_t buflen) {
 	size_t srclen = libd_wcsnlen(src, buflen);
-	(char16_t *)libc_memcpyw(buf, src, srclen);
-	return (char16_t *)libc_mempsetw(buf + srclen, (char16_t)'\0', buflen - srclen);
+	buf = (char16_t *)libc_mempcpyw(buf, src, srclen);
+	buf = (char16_t *)libc_mempsetw(buf, (char16_t)'\0', buflen - srclen);
+	return buf;
 }
 /* >> wcspncpy(3)
  * Same as wcsncpy, but return a pointer after the last written character */
@@ -4405,8 +4406,9 @@ NOTHROW_NCX(LIBKCALL libc_wcspncpy)(char32_t *__restrict buf,
                                     char32_t const *__restrict src,
                                     size_t buflen) {
 	size_t srclen = libc_wcsnlen(src, buflen);
-	(char32_t *)libc_memcpyl(buf, src, srclen);
-	return (char32_t *)libc_mempsetl(buf + srclen, (char32_t)'\0', buflen - srclen);
+	buf = (char32_t *)libc_mempcpyl(buf, src, srclen);
+	buf = (char32_t *)libc_mempsetl(buf, (char32_t)'\0', buflen - srclen);
+	return buf;
 }
 /* >> wcsnchr(3)
  * Same as `wcschr', but don't exceed `max_chars' characters. */

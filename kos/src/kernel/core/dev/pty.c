@@ -29,6 +29,7 @@
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/handman.h>
+#include <kernel/malloc.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>

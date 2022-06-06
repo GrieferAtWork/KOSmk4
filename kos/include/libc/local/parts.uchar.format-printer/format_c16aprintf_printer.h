@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90ba539e */
+/* HASH CRC-32:0x26d6aeb9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,7 +94,7 @@ __NOTHROW_NCX(__C16FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_c16aprintf_printer)
 	__buf = (__NAMESPACE_LOCAL_SYM __localdep_format_c16aprintf_alloc)((struct format_c16aprintf_data *)__arg, __datalen);
 	if __unlikely(!__buf)
 		goto __err;
-	(__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memcpyw)(__buf, __data, __datalen);
+	(void)(__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memcpyw)(__buf, __data, __datalen);
 	return (__SSIZE_TYPE__)__datalen;
 __err:
 	return -1;

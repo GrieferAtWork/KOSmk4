@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7f7d87b */
+/* HASH CRC-32:0xf5985d96 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -163,22 +163,28 @@ __NAMESPACE_STD_USING(realloc)
 __NAMESPACE_STD_USING(free)
 #endif /* !__free_defined && __std_free_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
+#ifndef __realloc_in_place_defined
+#define __realloc_in_place_defined
 #ifdef __CRT_HAVE_realloc_in_place
-/* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
- *           possible due to the requested  memory above `MALLPTR' already  being
- *           in use. However, an `E_BADALLOC' exception is thrown if insufficient
- *           memory (for internal  control structures) is  available to  complete
- *           the operation */
+/* >> realloc_in_place(3)
+ * `realloc_in_place(3)' will return `NULL' if the reallocation isn't
+ * possible due to the requested memory above `mallptr' already being
+ * in use. However, NULL is also returned (and `errno=ENOMEM' is set)
+ * if  insufficient  memory  (for  internal  control  structures)  is
+ * available to complete the operation. */
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,realloc_in_place,(void *__restrict __mallptr, size_t __n_bytes),(__mallptr,__n_bytes))
 #elif defined(__CRT_HAVE__expand)
-/* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
- *           possible due to the requested  memory above `MALLPTR' already  being
- *           in use. However, an `E_BADALLOC' exception is thrown if insufficient
- *           memory (for internal  control structures) is  available to  complete
- *           the operation */
+/* >> realloc_in_place(3)
+ * `realloc_in_place(3)' will return `NULL' if the reallocation isn't
+ * possible due to the requested memory above `mallptr' already being
+ * in use. However, NULL is also returned (and `errno=ENOMEM' is set)
+ * if  insufficient  memory  (for  internal  control  structures)  is
+ * available to complete the operation. */
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,realloc_in_place,(void *__restrict __mallptr, size_t __n_bytes),_expand,(__mallptr,__n_bytes))
-#endif /* ... */
-
+#else /* ... */
+#undef __realloc_in_place_defined
+#endif /* !... */
+#endif /* !__realloc_in_place_defined */
 #ifndef __memalign_defined
 #define __memalign_defined
 #if __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)
@@ -196,7 +202,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(memalign, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #undef __memalign_defined
 #endif /* !... */
 #endif /* !__memalign_defined */
-
 __CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_PAGEALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,pvalloc,(size_t __n_bytes),(__n_bytes))
 #ifndef __valloc_defined
 #define __valloc_defined
@@ -238,19 +243,22 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,cfree,(void *__mallptr),__libc_free,(__mallptr))
 #undef __cfree_defined
 #endif /* !... */
 #endif /* !__cfree_defined */
-
 #ifdef __CRT_HAVE_malloc_trim
 __CDECLARE(,int,__NOTHROW_NCX,malloc_trim,(size_t __pad),(__pad))
 #else /* __CRT_HAVE_malloc_trim */
 #include <libc/local/malloc/malloc_trim.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(malloc_trim, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL malloc_trim)(size_t __pad) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc_trim))(__pad); })
 #endif /* !__CRT_HAVE_malloc_trim */
-
+#ifndef __malloc_usable_size_defined
+#define __malloc_usable_size_defined
 #ifdef __CRT_HAVE_malloc_usable_size
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,size_t,__NOTHROW_NCX,malloc_usable_size,(void *__restrict __mallptr),(__mallptr))
 #elif defined(__CRT_HAVE__msize)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,size_t,__NOTHROW_NCX,malloc_usable_size,(void *__restrict __mallptr),_msize,(__mallptr))
-#endif /* ... */
+#else /* ... */
+#undef __malloc_usable_size_defined
+#endif /* !... */
+#endif /* !__malloc_usable_size_defined */
 #ifdef __CRT_HAVE_mallopt
 __CDECLARE(,int,__NOTHROW_NCX,mallopt,(int __parameter_number, int __parameter_value),(__parameter_number,__parameter_value))
 #else /* __CRT_HAVE_mallopt */
@@ -341,7 +349,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recallocv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #undef __recallocv_defined
 #endif /* !... */
 #endif /* !__recallocv_defined */
-
 
 #ifdef __USE_STRING_OVERLOADS
 #ifndef __MALLOC_OVERLOADS_DEFINED
@@ -435,6 +442,39 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR
 #endif /* !__MALLOC_OVERLOADS_DEFINED */
 #endif /* __USE_STRING_OVERLOADS */
 #endif /* __USE_KOS */
+#ifdef __clang_tidy__
+#ifdef __memalign_defined
+#undef memalign
+#define memalign(alignment, n_bytes) __builtin_memalign(alignment, n_bytes)
+#endif /* __memalign_defined */
+#ifdef __pvalloc_defined
+#undef pvalloc
+#define pvalloc(n_bytes) __builtin_pvalloc(n_bytes)
+#endif /* __pvalloc_defined */
+#ifdef __valloc_defined
+#undef valloc
+#define valloc(n_bytes) __builtin_valloc(n_bytes)
+#endif /* __valloc_defined */
+#ifdef __posix_memalign_defined
+#include <asm/os/errno.h>
+#undef posix_memalign
+#define posix_memalign(pp, alignment, n_bytes) ((*(pp) = __builtin_memalign(alignment, n_bytes)) != 0 ? 0 : __ENOMEM)
+#endif /* __posix_memalign_defined */
+#if defined(__CRT_HAVE_memdup) || defined(__CRT_HAVE___memdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)
+#undef memdup
+#define memdup(ptr, n_bytes) __builtin_memdup(ptr, n_bytes)
+#endif /* __CRT_HAVE_memdup || __CRT_HAVE___memdup || __CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign */
+#ifdef __reallocarray_defined
+#undef reallocarray
+#define reallocarray(ptr, elem_count, elem_size) __builtin_reallocarray(ptr, elem_count, elem_size)
+#undef recallocv
+#define recallocv reallocarray
+#endif /* __reallocarray_defined */
+#ifdef __realloc_defined
+#undef recalloc
+#define recalloc realloc
+#endif /* __realloc_defined */
+#endif /* __clang_tidy__ */
 
 __SYSDECL_END
 #endif /* __CC__ */

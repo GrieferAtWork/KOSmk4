@@ -244,7 +244,7 @@ typedef __FILE FILE;
 @@@return: * :   Returns a pointer to the trailing NUL written to `buf'
 @@               There is no true error  case; read errors are  treated
 @@               the same way as end-of-file.
-[[nonnull, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[requires_function(fgetc), impl_include("<asm/crt/stdio.h>")]]
 char *bgets([[out/*(? <= buflen_minus_one+1)*/]] char *buf, size_t buflen_minus_one,
             [[inout]] FILE *fp,

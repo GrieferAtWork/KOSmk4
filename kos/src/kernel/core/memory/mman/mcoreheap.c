@@ -25,6 +25,7 @@
 
 #include <kernel/heap.h>
 #include <kernel/malloc-defs.h>
+#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/mcoreheap.h>

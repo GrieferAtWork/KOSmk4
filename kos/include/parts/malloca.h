@@ -37,9 +37,33 @@ __SYSDECL_BEGIN
  * NOTE: In all cases, 'freea()' should be used to clean up a
  *       pointer previously allocated  using 'malloca()'  and
  *       friends. */
-#if (((defined(____libc_malloc_defined) && defined(____libc_free_defined)) || \
-      (defined(__KOS__) && defined(__KERNEL__))) &&                           \
-     defined(__hybrid_alloca))
+#ifdef __clang_tidy__
+#define __malloca_mayfail          1
+#define __malloca(num_bytes)       __builtin_malloc(num_bytes)
+#define __calloca(num_bytes)       __builtin_calloc(num_bytes, 1)
+#define __freea(ptr)               __builtin_free(ptr)
+#define __malloca_heap(num_bytes)  __builtin_malloc(num_bytes)
+#define __calloca_heap(num_bytes)  __builtin_calloc(num_bytes, 1)
+#define __malloca_stack(num_bytes) __builtin_malloc(num_bytes)
+#define __calloca_stack(num_bytes) __builtin_calloc(num_bytes, 1)
+#define __malloca_tryhard_mayfail  1
+#define __malloca_tryhard(result, num_bytes) (void)(*(void **)&(result) = __builtin_malloc(num_bytes))
+#define __calloca_tryhard(result, num_bytes) (void)(*(void **)&(result) = __builtin_calloc(num_bytes, 1))
+#elif defined(__INTELLISENSE__)
+#define __malloca_mayfail          1
+#define __malloca(num_bytes)       ((void)(num_bytes), (void *)1234)
+#define __calloca(num_bytes)       ((void)(num_bytes), (void *)1234)
+#define __freea(ptr)               (void)(ptr)
+#define __malloca_heap(num_bytes)  ((void)(num_bytes), (void *)1234)
+#define __calloca_heap(num_bytes)  ((void)(num_bytes), (void *)1234)
+#define __malloca_stack(num_bytes) ((void)(num_bytes), (void *)1234)
+#define __calloca_stack(num_bytes) ((void)(num_bytes), (void *)1234)
+#define __malloca_tryhard_mayfail  1
+#define __malloca_tryhard(result, num_bytes) (void)((void)(num_bytes), *(void **)&(result) = (void *)1234)
+#define __calloca_tryhard(result, num_bytes) (void)((void)(num_bytes), *(void **)&(result) = (void *)1234)
+#elif (((defined(____libc_malloc_defined) && defined(____libc_free_defined)) || \
+        (defined(__KOS__) && defined(__KERNEL__))) &&                           \
+       defined(__hybrid_alloca))
 /* Best case: Both heap & stack allocation is possible. */
 #ifndef __MALLOCA_ALIGN
 #define __MALLOCA_ALIGN __SIZEOF_POINTER__
@@ -96,17 +120,7 @@ __SYSDECL_BEGIN
 	})
 #if defined(__KOS__) && defined(__KERNEL__)
 #include <kernel/malloc.h>
-#if defined(__clang_tidy__) && !defined(NO_INSTRUMENT_KMALLOC)
-#undef __malloca_stack
-#undef __calloca_stack
-#define __malloca_heap(s)  malloc(s)
-#define __calloca_heap(s)  calloc(s, 1)
-#define __malloca_stack(s) malloc(s)
-#define __calloca_stack(s) calloc(s, 1)
-#define __malloca(s)       malloc(s)
-#define __calloca(s)       calloc(s, 1)
-#define __freea(p)         free(p)
-#elif defined(__OMIT_KMALLOC_CONSTANT_P_WRAPPERS)
+#ifdef __OMIT_KMALLOC_CONSTANT_P_WRAPPERS
 #define __malloca_heap(s)                                                                       \
 	__XBLOCK({                                                                                  \
 		__BYTE_TYPE__ *__mah_res = (__BYTE_TYPE__ *)kmalloc((s) + __MALLOCA_ALIGN, GFP_NORMAL); \
@@ -372,10 +386,7 @@ __NAMESPACE_INT_END
 #define __freea(p) (__NAMESPACE_INT_SYM __local_freea(p))
 #endif /* __NO_XBLOCK */
 #if defined(__KOS__) && defined(__KERNEL__)
-#if defined(__clang_tidy__) && !defined(NO_INSTRUMENT_KMALLOC)
-#define __malloca_tryhard(result, s) (*(void **)&(result) = malloc(s))
-#define __calloca_tryhard(result, s) (*(void **)&(result) = calloc(s, 1))
-#elif defined(__OMIT_KMALLOC_CONSTANT_P_WRAPPERS)
+#ifdef __OMIT_KMALLOC_CONSTANT_P_WRAPPERS
 #define __malloca_tryhard(result, s)                                                                                         \
 	do {                                                                                                                     \
 		__SIZE_TYPE__ const __math_s = (s) + __MALLOCA_ALIGN;                                                                \

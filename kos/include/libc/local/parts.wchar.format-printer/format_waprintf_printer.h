@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce885627 */
+/* HASH CRC-32:0xea864614 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,7 +79,7 @@ __NOTHROW_NCX(__WFORMATPRINTER_CC __LIBC_LOCAL_NAME(format_waprintf_printer))(vo
 	__buf = (__NAMESPACE_LOCAL_SYM __localdep_format_waprintf_alloc)((struct format_waprintf_data *)__arg, __datalen);
 	if __unlikely(!__buf)
 		goto __err;
-	(__NAMESPACE_LOCAL_SYM __localdep_wmemcpy)(__buf, __data, __datalen);
+	(void)(__NAMESPACE_LOCAL_SYM __localdep_wmemcpy)(__buf, __data, __datalen);
 	return (__SSIZE_TYPE__)__datalen;
 __err:
 	return -1;

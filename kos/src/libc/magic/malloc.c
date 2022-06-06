@@ -89,12 +89,14 @@ typedef __SIZE_TYPE__ size_t;
 
 
 
-@@@EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
-@@          possible due to the requested  memory above `MALLPTR' already  being
-@@          in use. However, an `E_BADALLOC' exception is thrown if insufficient
-@@          memory (for internal  control structures) is  available to  complete
-@@          the operation
-[[libc, dos_only_export_alias("_expand")]]
+
+@@>> realloc_in_place(3)
+@@`realloc_in_place(3)' will return `NULL' if the reallocation isn't
+@@possible due to the requested memory above `mallptr' already being
+@@in use. However, NULL is also returned (and `errno=ENOMEM' is set)
+@@if  insufficient  memory  (for  internal  control  structures)  is
+@@available to complete the operation.
+[[libc, guard, dos_only_export_alias("_expand")]]
 [[ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
 [[section(".text.crt{|.dos}.heap.helpers"), decl_include("<hybrid/typecore.h>")]]
 void *realloc_in_place(void *__restrict mallptr, size_t n_bytes);
@@ -102,8 +104,6 @@ void *realloc_in_place(void *__restrict mallptr, size_t n_bytes);
 [[ignore, nocrt, alias("posix_memalign"), decl_include("<hybrid/typecore.h>")]]
 int crt_posix_memalign([[out]] void **__restrict pp,
                        size_t alignment, size_t n_bytes);
-
-%
 
 [[guard, wunused, ATTR_ALLOC_ALIGN(1), ATTR_ALLOC_SIZE((2))]]
 [[ATTR_MALLOC, export_alias("aligned_alloc", "__libc_memalign"), decl_include("<hybrid/typecore.h>")]]
@@ -118,7 +118,6 @@ void *memalign(size_t alignment, size_t n_bytes) {
 }
 
 
-%
 [[wunused, ATTR_MALL_PAGEALIGNED, ATTR_ALLOC_SIZE((1)), ATTR_MALLOC]]
 [[section(".text.crt{|.dos}.heap.rare_helpers"), decl_include("<hybrid/typecore.h>")]]
 void *pvalloc(size_t n_bytes);
@@ -161,7 +160,6 @@ $errno_t posix_memalign([[out]] void **__restrict pp,
 cfree(*) = free;
 
 
-%
 [[ignore, nocrt, alias("_heapmin")]]
 int _heapmin();
 
@@ -185,9 +183,8 @@ int malloc_trim(size_t pad) {
 @@pp_endif@@
 }
 
-%
 [[libc, pure, wunused, decl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_msize")]]
+[[guard, dos_only_export_alias("_msize")]]
 /* NOTE: `_msize_debug()' only appears in `msvcrt.dll', but disassembly shows it
  *       just calls forward to the regular `_msize()'. I'm guessing the idea was
  *       to set a breakpoint on `_msize_debug()'s entry, and only code that uses
@@ -288,7 +285,6 @@ recallocv(void *mallptr, $size_t elem_count, $size_t elem_size)
 
 
 %
-%
 %#ifdef __USE_STRING_OVERLOADS
 %#ifndef __MALLOC_OVERLOADS_DEFINED
 %#define __MALLOC_OVERLOADS_DEFINED 1
@@ -367,6 +363,57 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(size_t __num_bytes) { return (calloc)(1, 
 %#endif /* !__MALLOC_OVERLOADS_DEFINED */
 %#endif /* __USE_STRING_OVERLOADS */
 %#endif /* __USE_KOS */
+
+
+%(user){
+#ifdef __clang_tidy__
+#define libc_realloc_in_place(mallptr, n_bytes)        __builtin_realloc_in_place(mallptr, n_bytes)
+#define libc_memalign(alignment, n_bytes)              __builtin_memalign(alignment, n_bytes)
+#define libc_pvalloc(n_bytes)                          __builtin_pvalloc(n_bytes)
+#define libc_valloc(n_bytes)                           __builtin_valloc(n_bytes)
+#define libc_posix_memalign(pp, alignment, n_bytes)    ((*(pp) = __builtin_memalign(alignment, n_bytes)) != 0 ? 0 : ENOMEM)
+#define libc_malloc_usable_size(ptr)                   __builtin_malloc_usable_size(ptr)
+#define libc_memdup(ptr, n_bytes)                      __builtin_memdup(ptr, n_bytes)
+#define libc_reallocarray(ptr, elem_count, elem_size)  __builtin_reallocarray(ptr, elem_count, elem_size)
+#define libc_recalloc(mallptr, num_bytes)              __builtin_recalloc(mallptr, num_bytes)
+#define libc_recallocv(mallptr, elem_count, elem_size) __builtin_recallocv(mallptr, elem_count, elem_size)
+#endif /* __clang_tidy__ */
+}
+%{
+#ifdef __clang_tidy__
+#ifdef __memalign_defined
+#undef memalign
+#define memalign(alignment, n_bytes) __builtin_memalign(alignment, n_bytes)
+#endif /* __memalign_defined */
+#ifdef __pvalloc_defined
+#undef pvalloc
+#define pvalloc(n_bytes) __builtin_pvalloc(n_bytes)
+#endif /* __pvalloc_defined */
+#ifdef __valloc_defined
+#undef valloc
+#define valloc(n_bytes) __builtin_valloc(n_bytes)
+#endif /* __valloc_defined */
+#ifdef __posix_memalign_defined
+#include <asm/os/errno.h>
+#undef posix_memalign
+#define posix_memalign(pp, alignment, n_bytes) ((*(pp) = __builtin_memalign(alignment, n_bytes)) != 0 ? 0 : __ENOMEM)
+#endif /* __posix_memalign_defined */
+}%[insert:pp_if($has_function(memdup))]%{
+#undef memdup
+#define memdup(ptr, n_bytes) __builtin_memdup(ptr, n_bytes)
+}%[insert:pp_endif]%{
+#ifdef __reallocarray_defined
+#undef reallocarray
+#define reallocarray(ptr, elem_count, elem_size) __builtin_reallocarray(ptr, elem_count, elem_size)
+#undef recallocv
+#define recallocv reallocarray
+#endif /* __reallocarray_defined */
+#ifdef __realloc_defined
+#undef recalloc
+#define recalloc realloc
+#endif /* __realloc_defined */
+#endif /* __clang_tidy__ */
+}
 
 
 %{

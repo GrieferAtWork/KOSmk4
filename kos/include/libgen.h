@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4382ec3 */
+/* HASH CRC-32:0xe59591bc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -222,7 +222,7 @@ typedef __FILE FILE;
  * @return: * :   Returns a pointer to the trailing NUL written to `buf'
  *                There is no true error  case; read errors are  treated
  *                the same way as end-of-file. */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_INOUT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1),char *,__NOTHROW_NCX,bgets,(char *__buf, size_t __buflen_minus_one, FILE *__fp, char __KOS_FIXED_CONST *__stop_chars),(__buf,__buflen_minus_one,__fp,__stop_chars))
+__CDECLARE(__ATTR_INOUT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1),char *,__NOTHROW_NCX,bgets,(char *__buf, size_t __buflen_minus_one, FILE *__fp, char __KOS_FIXED_CONST *__stop_chars),(__buf,__buflen_minus_one,__fp,__stop_chars))
 #elif defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 #include <libc/local/libgen/bgets.h>
 /* >> bgets(3)
@@ -241,7 +241,7 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_INOUT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1),char
  * @return: * :   Returns a pointer to the trailing NUL written to `buf'
  *                There is no true error  case; read errors are  treated
  *                the same way as end-of-file. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(bgets, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_INOUT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1) char *__NOTHROW_NCX(__LIBCCALL bgets)(char *__buf, size_t __buflen_minus_one, FILE *__fp, char __KOS_FIXED_CONST *__stop_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bgets))(__buf, __buflen_minus_one, __fp, __stop_chars); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(bgets, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1) char *__NOTHROW_NCX(__LIBCCALL bgets)(char *__buf, size_t __buflen_minus_one, FILE *__fp, char __KOS_FIXED_CONST *__stop_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bgets))(__buf, __buflen_minus_one, __fp, __stop_chars); })
 #endif /* ... */
 #ifdef __CRT_HAVE_bufsplit
 /* >> bufsplit(3)

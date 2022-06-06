@@ -401,7 +401,7 @@ NOTHROW(FCALL get_language_name)(int category) {
 			result = unknown_language_name;
 		}
 		env_lang = ATOMIC_CMPXCH_VAL(language_names[(unsigned int)category],
-		                             NULL, result);
+		                             NULL, (char *)result);
 		if unlikely(env_lang != NULL) {
 			if (result != unknown_language_name)
 				free((char *)result);

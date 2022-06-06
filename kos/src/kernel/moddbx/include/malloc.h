@@ -40,6 +40,12 @@
 
 DECL_BEGIN
 
+#if defined(__clang_tidy__) && !defined(NO_INSTRUMENT_KMALLOC)
+#define dbx_malloc(num_bytes)       __builtin_malloc(num_bytes)
+#define dbx_realloc(ptr, num_bytes) __builtin_realloc(ptr, num_bytes)
+#define dbx_malloc_usable_size(ptr) __builtin_malloc_usable_size(ptr)
+#define dbx_free(ptr)               __builtin_free(ptr)
+#else /* __clang_tidy__ && !NO_INSTRUMENT_KMALLOC */
 /* High-level malloc functions. */
 FUNDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) ATTR_ASSUME_ALIGNED(__SIZEOF_POINTER__) void *
 NOTHROW(FCALL dbx_malloc)(size_t num_bytes);
@@ -47,6 +53,7 @@ FUNDEF WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ASSUME_ALIGNED(__SIZEOF_POINTER__) void
 NOTHROW(FCALL dbx_realloc)(void *ptr, size_t num_bytes);
 FUNDEF ATTR_PURE WUNUSED size_t NOTHROW(FCALL dbx_malloc_usable_size)(void *ptr);
 FUNDEF void NOTHROW(FCALL dbx_free)(void *ptr);
+#endif /* !__clang_tidy__ || NO_INSTRUMENT_KMALLOC */
 
 /* Low-level heap alloc/free functions. */
 FUNDEF WUNUSED heapptr_t NOTHROW(FCALL dbx_heap_alloc)(size_t num_bytes);

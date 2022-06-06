@@ -29,6 +29,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/compat.h>
+#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/kram.h>
 #include <kernel/mman/map.h>

@@ -36,6 +36,7 @@
 #include <kernel/fs/node.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
+#include <kernel/malloc.h>
 #include <kernel/paging.h>
 #include <kernel/user.h>
 #include <sched/task.h>

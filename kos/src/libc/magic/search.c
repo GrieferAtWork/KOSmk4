@@ -655,8 +655,10 @@ void *tdelete_r([[in_opt]] void const *__restrict key, [[inout_opt]] void **__re
 		rootp = cmp < 0 ? &p->left_node
 		                : &p->right_node;
 		root = *rootp;
-		if (root == NULL)
+		if (root == NULL) {
+			__freea(nodestack);
 			return NULL;
+		}
 	}
 	retval = p;
 	root = *rootp;

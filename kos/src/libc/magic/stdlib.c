@@ -5936,6 +5936,15 @@ errno_t _get_wenviron([[out]] wchar_t ***p_wenviron) {
 /************************************************************************/
 /************************************************************************/
 
+%(user){
+#ifdef __clang_tidy__
+#define libc_malloc(num_bytes)           __builtin_malloc(num_bytes)
+#define libc_calloc(count, num_bytes)    __builtin_calloc(count, num_bytes)
+#define libc_realloc(mallptr, num_bytes) __builtin_realloc(mallptr, num_bytes)
+#define libc_free(mallptr)               __builtin_free(mallptr)
+#endif /* __clang_tidy__ */
+}
+
 
 %{
 

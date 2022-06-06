@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42a3cf47 */
+/* HASH CRC-32:0x6563c251 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -165,7 +165,7 @@ fallback:
  * @return: * :   Returns a pointer to the trailing NUL written to `buf'
  *                There is no true error  case; read errors are  treated
  *                the same way as end-of-file. */
-INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL ATTR_INOUT(3) ATTR_IN_OPT(4) ATTR_OUT(1) char *
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_INOUT(3) ATTR_IN_OPT(4) ATTR_OUT(1) char *
 NOTHROW_NCX(LIBCCALL libc_bgets)(char *buf,
                                  size_t buflen_minus_one,
                                  FILE *fp,

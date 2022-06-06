@@ -35,8 +35,7 @@ DECL_BEGIN
 #if defined(__clang_tidy__) && !defined(NO_INSTRUMENT_KMALLOC)
 #ifndef ____os_free_defined
 #define ____os_free_defined
-extern void free(void *ptr);
-#define __os_free free
+#define __os_free __builtin_free
 #endif /* !____os_free_defined */
 #define kcalloc(n_bytes, flags)                          kmalloc(n_bytes, (flags) | GFP_CALLOC)
 #define krecalign(ptr, min_alignment, n_bytes, flags)    krealign(ptr, min_alignment, n_bytes, (flags) | GFP_CALLOC)
@@ -74,23 +73,16 @@ extern void free(void *ptr);
 #define __os_realign_nx          krealign_nx
 #define __os_realign_offset_nx   krealign_offset_nx
 #define __os_realloc_in_place_nx krealloc_in_place_nx
-
-extern void *malloc(size_t num_bytes);
-extern void *realloc(void *ptr, size_t num_bytes);
-extern void *calloc(size_t elem_count, size_t elem_size);
-extern size_t malloc_usage_size(void *ptr);
-extern void *realloc_in_place(void *ptr, size_t n_bytes);
-
 #define kmalloc(n_bytes, flags) \
-	((flags) & GFP_CALLOC ? calloc(n_bytes, 1) : malloc(n_bytes))
+	((flags) & GFP_CALLOC ? __builtin_calloc(n_bytes, 1) : __builtin_malloc(n_bytes))
 #define krealloc(ptr, n_bytes, flags) \
-	((void)(flags), realloc(ptr, n_bytes))
+	((void)(flags), __builtin_realloc(ptr, n_bytes))
 #define krealloc_in_place(ptr, n_bytes, flags) \
-	((void)(flags), realloc_in_place(ptr, n_bytes))
+	((void)(flags), __builtin_realloc_in_place(ptr, n_bytes))
 #define kfree(ptr) \
-	free(ptr)
+	__builtin_free(ptr)
 #define kmalloc_usable_size(ptr) \
-	malloc_usage_size(ptr)
+	__builtin_malloc_usable_size(ptr)
 
 #define kmemalign(min_alignment, n_bytes, flags) \
 	((void)(min_alignment), kmalloc(n_bytes, flags))

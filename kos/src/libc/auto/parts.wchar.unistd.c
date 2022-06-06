@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ef7cbf1 */
+/* HASH CRC-32:0x4e70ae63 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -386,7 +386,7 @@ NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
 		buf = NULL;
 		goto done;
 	}
-	(char16_t *)libc_memcpyw(buf, result, result_len);
+	buf = (char16_t *)libc_memcpyw(buf, result, result_len);
 done:
 
 	libc_free(result);
@@ -442,7 +442,7 @@ NOTHROW_RPC(LIBKCALL libc_wgetcwd)(char32_t *buf,
 		buf = NULL;
 		goto done;
 	}
-	(char32_t *)libc_memcpyl(buf, result, result_len);
+	buf = (char32_t *)libc_memcpyl(buf, result, result_len);
 done:
 
 	libc_free(result);

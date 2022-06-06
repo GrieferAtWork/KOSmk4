@@ -116,7 +116,7 @@ wchar_t *wrealpath([[in]] wchar_t const *filename, [[out_opt]] wchar_t *resolved
 @@pp_endif@@
 		return NULL;
 	}
-	wmemcpy(resolved, wcs_resolved, resolved_length);
+	resolved = wmemcpy(resolved, wcs_resolved, resolved_length);
 @@pp_if $has_function(free)@@
 	free(wcs_resolved);
 @@pp_endif@@
@@ -163,7 +163,7 @@ wchar_t *wfrealpath($fd_t fd, [[out(? <= buflen)]] wchar_t *resolved, $size_t bu
 @@pp_endif@@
 		return NULL;
 	}
-	wmemcpy(resolved, wcs_resolved, resolved_length);
+	resolved = wmemcpy(resolved, wcs_resolved, resolved_length);
 @@pp_if $has_function(free)@@
 	free(wcs_resolved);
 @@pp_endif@@
@@ -206,7 +206,7 @@ wchar_t *wfrealpath4($fd_t fd, [[out(? <= buflen)]] wchar_t *resolved,
 @@pp_endif@@
 		return NULL;
 	}
-	wmemcpy(resolved, wcs_resolved, resolved_length);
+	resolved = wmemcpy(resolved, wcs_resolved, resolved_length);
 @@pp_if $has_function(free)@@
 	free(wcs_resolved);
 @@pp_endif@@
@@ -252,7 +252,7 @@ wchar_t *wfrealpathat($fd_t dirfd, [[in]] wchar_t const *filename,
 @@pp_endif@@
 		return NULL;
 	}
-	wmemcpy(resolved, wcs_resolved, resolved_length);
+	resolved = wmemcpy(resolved, wcs_resolved, resolved_length);
 @@pp_if $has_function(free)@@
 	free(wcs_resolved);
 @@pp_endif@@

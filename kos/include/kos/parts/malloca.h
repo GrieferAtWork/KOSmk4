@@ -24,7 +24,17 @@
 
 #include <parts/malloca.h>
 
-#if defined(__KOS__) && defined(__KERNEL__)
+#ifdef __clang_tidy__
+#define __MallocaHeap __malloca_heap
+#define __CallocaHeap __calloca_heap
+#define __Malloca     __malloca
+#define __Calloca     __calloca
+#elif defined(__INTELLISENSE__)
+#define __MallocaHeap __malloca_heap
+#define __CallocaHeap __calloca_heap
+#define __Malloca     __malloca
+#define __Calloca     __calloca
+#elif defined(__KOS__) && defined(__KERNEL__)
 /* In this case, the regular malloca() is already exception-enabled! */
 #ifdef __malloca_heap
 #define __MallocaHeap __malloca_heap

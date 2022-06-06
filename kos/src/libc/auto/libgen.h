@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x122b9840 */
+/* HASH CRC-32:0x3709c3dc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,7 +148,7 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT_OPT(1) char *NOTHROW_NCX(LIBCCALL libc___xpg_b
  * @return: * :   Returns a pointer to the trailing NUL written to `buf'
  *                There is no true error  case; read errors are  treated
  *                the same way as end-of-file. */
-INTDEF ATTR_RETNONNULL ATTR_INOUT(3) ATTR_IN_OPT(4) ATTR_OUT(1) char *NOTHROW_NCX(LIBDCALL libd_bgets)(char *buf, size_t buflen_minus_one, FILE *fp, char __KOS_FIXED_CONST *stop_chars);
+INTDEF ATTR_INOUT(3) ATTR_IN_OPT(4) ATTR_OUT(1) char *NOTHROW_NCX(LIBDCALL libd_bgets)(char *buf, size_t buflen_minus_one, FILE *fp, char __KOS_FIXED_CONST *stop_chars);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> bgets(3)
@@ -167,7 +167,7 @@ INTDEF ATTR_RETNONNULL ATTR_INOUT(3) ATTR_IN_OPT(4) ATTR_OUT(1) char *NOTHROW_NC
  * @return: * :   Returns a pointer to the trailing NUL written to `buf'
  *                There is no true error  case; read errors are  treated
  *                the same way as end-of-file. */
-INTDEF ATTR_RETNONNULL ATTR_INOUT(3) ATTR_IN_OPT(4) ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc_bgets)(char *buf, size_t buflen_minus_one, FILE *fp, char __KOS_FIXED_CONST *stop_chars);
+INTDEF ATTR_INOUT(3) ATTR_IN_OPT(4) ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc_bgets)(char *buf, size_t buflen_minus_one, FILE *fp, char __KOS_FIXED_CONST *stop_chars);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> bufsplit(3)

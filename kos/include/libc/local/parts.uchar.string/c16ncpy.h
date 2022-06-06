@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38b7ad57 */
+/* HASH CRC-32:0x6b919768 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,21 +45,21 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16nlen __LIBC_LOCAL_NAME(c16nlen)
 #endif /* !... */
 #endif /* !__local___localdep_c16nlen_defined */
-#ifndef __local___localdep_memcpyw_defined
-#define __local___localdep_memcpyw_defined
-#ifdef __CRT_HAVE_memcpyw
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),memcpyw,(__dst,__src,__n_words))
-#elif defined(__CRT_HAVE_wmemcpy) && __SIZEOF_WCHAR_T__ == 2
-__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),wmemcpy,(__dst,__src,__n_words))
-#elif defined(__CRT_HAVE_DOS$wmemcpy) && defined(__LIBCCALL_IS_LIBDCALL)
-__COMPILER_CREDIRECT(__LIBC,__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),DOS$wmemcpy,(__dst,__src,__n_words))
+#ifndef __local___localdep_mempcpyw_defined
+#define __local___localdep_mempcpyw_defined
+#ifdef __CRT_HAVE_mempcpyw
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),mempcpyw,(__dst,__src,__n_words))
+#elif defined(__CRT_HAVE_wmempcpy) && __SIZEOF_WCHAR_T__ == 2
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),wmempcpy,(__dst,__src,__n_words))
+#elif defined(__CRT_HAVE_DOS$wmempcpy) && defined(__LIBCCALL_IS_LIBDCALL)
+__COMPILER_CREDIRECT(__LIBC,__ATTR_LEAF __ATTR_IN(2) __ATTR_OUT(1),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),DOS$wmempcpy,(__dst,__src,__n_words))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/memcpyw.h>
+#include <libc/local/string/mempcpyw.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_memcpyw __LIBC_LOCAL_NAME(memcpyw)
+#define __localdep_mempcpyw __LIBC_LOCAL_NAME(mempcpyw)
 #endif /* !... */
-#endif /* !__local___localdep_memcpyw_defined */
+#endif /* !__local___localdep_mempcpyw_defined */
 #ifndef __local___localdep_memsetw_defined
 #define __local___localdep_memsetw_defined
 #ifdef __CRT_HAVE_memsetw
@@ -77,9 +77,10 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memsetw_defined */
 __LOCAL_LIBC(c16ncpy) __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16ncpy))(__CHAR16_TYPE__ *__restrict __buf, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __buflen) {
+	__CHAR16_TYPE__ *__ptr;
 	__SIZE_TYPE__ __srclen = (__NAMESPACE_LOCAL_SYM __localdep_c16nlen)(__src, __buflen);
-	(__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memcpyw)(__buf, __src, __srclen);
-	(__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memsetw)(__buf + __srclen, (__CHAR16_TYPE__)'\0', __buflen - __srclen);
+	__ptr = (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyw)(__buf, __src, __srclen);
+	(void)(__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memsetw)(__ptr, (__CHAR16_TYPE__)'\0', __buflen - __srclen);
 	return __buf;
 }
 __NAMESPACE_LOCAL_END

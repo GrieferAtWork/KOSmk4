@@ -30,6 +30,7 @@
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/handman.h>
+#include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>

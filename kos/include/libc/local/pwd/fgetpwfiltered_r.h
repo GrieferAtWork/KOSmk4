@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55fb19b7 */
+/* HASH CRC-32:0x1d46be7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -482,8 +482,10 @@ __nextline:
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_fgetpos64)(__stream, &__curpos))
 		goto __err_nodbline;
-	if (__curpos >= __maxpos)
+	if (__curpos >= __maxpos) {
+		__dbline = __NULLPTR;
 		goto __eof;
+	}
 	goto __again_parseln;
 }
 __NAMESPACE_LOCAL_END

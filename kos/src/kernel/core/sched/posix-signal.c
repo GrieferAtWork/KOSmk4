@@ -26,6 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
+#include <kernel/malloc.h>
 #include <kernel/rt/except-handler.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>

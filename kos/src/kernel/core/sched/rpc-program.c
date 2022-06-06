@@ -26,6 +26,7 @@
 
 #include <kernel/except.h>
 #include <kernel/fpu.h>
+#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/fault.h>
 #include <kernel/mman/mpartmeta.h>

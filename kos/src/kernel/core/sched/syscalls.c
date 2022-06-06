@@ -28,6 +28,7 @@
 #include <kernel/except.h>
 #include <kernel/fs/fs.h>
 #include <kernel/handman.h>
+#include <kernel/malloc.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/syscall.h>

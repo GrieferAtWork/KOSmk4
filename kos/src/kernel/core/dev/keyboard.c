@@ -29,6 +29,7 @@
 #include <dev/keyboard.h>
 #include <kernel/compat.h>
 #include <kernel/except.h>
+#include <kernel/malloc.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/user.h>

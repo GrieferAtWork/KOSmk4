@@ -476,7 +476,7 @@ $ssize_t format_waprintf_printer([[nonnull]] /*struct format_waprintf_data **/ v
 	buf = format_waprintf_alloc((struct $format_waprintf_data *)arg, datalen);
 	if unlikely(!buf)
 		goto err;
-	wmemcpy(buf, data, datalen);
+	(void)wmemcpy(buf, data, datalen);
 	return (ssize_t)datalen;
 err:
 	return -1;

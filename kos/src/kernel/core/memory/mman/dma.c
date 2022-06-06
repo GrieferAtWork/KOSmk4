@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/iovec.h>
+#include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/mman/dma.h>
 #include <kernel/mman/fault.h>

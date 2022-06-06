@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74226b00 */
+/* HASH CRC-32:0x2b35bbfa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -186,18 +186,20 @@ __CDECLARE_VOID(,__NOTHROW_NCX,_aligned_free,(void *__aligned_mallptr),(__aligne
 __NAMESPACE_LOCAL_USING_OR_IMPL(_aligned_free, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL _aligned_free)(void *__aligned_mallptr) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_free))(__aligned_mallptr); })
 #endif /* ... */
 #ifdef __CRT_HAVE_realloc_in_place
-/* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
- *           possible due to the requested  memory above `MALLPTR' already  being
- *           in use. However, an `E_BADALLOC' exception is thrown if insufficient
- *           memory (for internal  control structures) is  available to  complete
- *           the operation */
+/* >> realloc_in_place(3)
+ * `realloc_in_place(3)' will return `NULL' if the reallocation isn't
+ * possible due to the requested memory above `mallptr' already being
+ * in use. However, NULL is also returned (and `errno=ENOMEM' is set)
+ * if  insufficient  memory  (for  internal  control  structures)  is
+ * available to complete the operation. */
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,_expand,(void *__restrict __mallptr, size_t __n_bytes),realloc_in_place,(__mallptr,__n_bytes))
 #elif defined(__CRT_HAVE__expand)
-/* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
- *           possible due to the requested  memory above `MALLPTR' already  being
- *           in use. However, an `E_BADALLOC' exception is thrown if insufficient
- *           memory (for internal  control structures) is  available to  complete
- *           the operation */
+/* >> realloc_in_place(3)
+ * `realloc_in_place(3)' will return `NULL' if the reallocation isn't
+ * possible due to the requested memory above `mallptr' already being
+ * in use. However, NULL is also returned (and `errno=ENOMEM' is set)
+ * if  insufficient  memory  (for  internal  control  structures)  is
+ * available to complete the operation. */
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,_expand,(void *__restrict __mallptr, size_t __n_bytes),(__mallptr,__n_bytes))
 #endif /* ... */
 #ifdef __CRT_HAVE_malloc_usable_size

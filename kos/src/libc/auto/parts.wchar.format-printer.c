@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb56829bb */
+/* HASH CRC-32:0x492ba92f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1748,7 +1748,7 @@ NOTHROW_NCX(__C16FORMATPRINTER_CC libd_format_waprintf_printer)(void *arg,
 	buf = libd_format_waprintf_alloc((struct format_c16aprintf_data *)arg, datalen);
 	if unlikely(!buf)
 		goto err;
-	(char16_t *)libc_memcpyw(buf, data, datalen);
+	(void)(char16_t *)libc_memcpyw(buf, data, datalen);
 	return (ssize_t)datalen;
 err:
 	return -1;
@@ -1766,7 +1766,7 @@ NOTHROW_NCX(__C32FORMATPRINTER_CC libc_format_waprintf_printer)(void *arg,
 	buf = libc_format_waprintf_alloc((struct format_c32aprintf_data *)arg, datalen);
 	if unlikely(!buf)
 		goto err;
-	(char32_t *)libc_memcpyl(buf, data, datalen);
+	(void)(char32_t *)libc_memcpyl(buf, data, datalen);
 	return (ssize_t)datalen;
 err:
 	return -1;

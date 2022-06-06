@@ -62,7 +62,7 @@ DEFINE_INTERN_ALIAS(libc_kfstatat64, libc_kos_fstatat);
 
 /* KOS Native stat() */
 INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBCCALL libc_kos_fstat)(fd_t fd,
+NOTHROW_NCX(LIBCCALL libc_kos_fstat)(fd_t fd,
                                      struct __kos_stat *__restrict buf) {
 	errno_t error;
 	error = sys_kfstat(fd,
@@ -71,7 +71,7 @@ NOTHROW_RPC(LIBCCALL libc_kos_fstat)(fd_t fd,
 }
 
 INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBCCALL libc_kos_fstatat)(fd_t dirfd,
+NOTHROW_NCX(LIBCCALL libc_kos_fstatat)(fd_t dirfd,
                                        char const *__restrict filename,
                                        struct __kos_stat *__restrict buf,
                                        atflag_t flags) {
@@ -81,7 +81,7 @@ NOTHROW_RPC(LIBCCALL libc_kos_fstatat)(fd_t dirfd,
 }
 
 INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBCCALL libc_kos_stat)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libc_kos_stat)(char const *__restrict filename,
                                     struct __kos_stat *__restrict buf) {
 	errno_t error;
 	error = sys_kfstatat(AT_FDCWD,
@@ -92,7 +92,7 @@ NOTHROW_RPC(LIBCCALL libc_kos_stat)(char const *__restrict filename,
 }
 
 INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBCCALL libc_kos_lstat)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libc_kos_lstat)(char const *__restrict filename,
                                      struct __kos_stat *__restrict buf) {
 	errno_t error;
 	error = sys_kfstatat(AT_FDCWD,
@@ -118,7 +118,7 @@ DEFINE_INTERN_ALIAS(libd_kfstatat, libd_kos_fstatat);
 DEFINE_INTERN_ALIAS(libd_kfstatat64, libd_kos_fstatat);
 
 INTERN ATTR_SECTION(".text.crt.dos.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBDCALL libd_kos_fstatat)(fd_t dirfd,
+NOTHROW_NCX(LIBDCALL libd_kos_fstatat)(fd_t dirfd,
                                        char const *__restrict filename,
                                        struct __kos_stat *__restrict buf,
                                        atflag_t flags) {
@@ -128,13 +128,13 @@ NOTHROW_RPC(LIBDCALL libd_kos_fstatat)(fd_t dirfd,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBDCALL libd_kos_stat)(char const *__restrict filename,
+NOTHROW_NCX(LIBDCALL libd_kos_stat)(char const *__restrict filename,
                                     struct __kos_stat *__restrict buf) {
 	return libd_kos_fstatat(AT_FDCWD, filename, buf, 0);
 }
 
 INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBDCALL libd_kos_lstat)(char const *__restrict filename,
+NOTHROW_NCX(LIBDCALL libd_kos_lstat)(char const *__restrict filename,
                                      struct __kos_stat *__restrict buf) {
 	return libd_kos_fstatat(AT_FDCWD, filename, buf, AT_SYMLINK_NOFOLLOW);
 }
@@ -174,7 +174,7 @@ convstat_kos2cyg(struct __cyg_stat *__restrict dst,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.cyg.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBCCALL libc_cyg_fstat)(fd_t fd,
+NOTHROW_NCX(LIBCCALL libc_cyg_fstat)(fd_t fd,
                                      struct __cyg_stat *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_fstat(fd, &st);
@@ -184,7 +184,7 @@ NOTHROW_RPC(LIBCCALL libc_cyg_fstat)(fd_t fd,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.cyg.fs.stat") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_cyg_stat)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libc_cyg_stat)(char const *__restrict filename,
                                     struct __cyg_stat *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_stat(filename, &st);
@@ -194,7 +194,7 @@ NOTHROW_RPC(LIBCCALL libc_cyg_stat)(char const *__restrict filename,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.cyg.fs.stat") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_cyg_lstat)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libc_cyg_lstat)(char const *__restrict filename,
                                      struct __cyg_stat *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_lstat(filename, &st);
@@ -204,7 +204,7 @@ NOTHROW_RPC(LIBCCALL libc_cyg_lstat)(char const *__restrict filename,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.cyg.fs.stat") NONNULL((2, 3)) int
-NOTHROW_RPC(LIBCCALL libc_cyg_fstatat)(fd_t dirfd,
+NOTHROW_NCX(LIBCCALL libc_cyg_fstatat)(fd_t dirfd,
                                        char const *__restrict filename,
                                        struct __cyg_stat *__restrict buf,
                                        atflag_t flags) {
@@ -288,7 +288,7 @@ convstat_kos2glc64(struct __glc_stat64 *__restrict dst,
 }
 
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBCCALL libc_glc_fstat)(fd_t fd,
+NOTHROW_NCX(LIBCCALL libc_glc_fstat)(fd_t fd,
                                      struct __glc_stat *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_fstat(fd, &st);
@@ -298,7 +298,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_fstat)(fd_t fd,
 }
 
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBCCALL libc_glc_fstat64)(fd_t fd,
+NOTHROW_NCX(LIBCCALL libc_glc_fstat64)(fd_t fd,
                                        struct __glc_stat64 *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_fstat(fd, &st);
@@ -308,7 +308,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_fstat64)(fd_t fd,
 }
 
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_glc_stat)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libc_glc_stat)(char const *__restrict filename,
                                     struct __glc_stat *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_stat(filename, &st);
@@ -318,7 +318,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_stat)(char const *__restrict filename,
 }
 
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_glc_stat64)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libc_glc_stat64)(char const *__restrict filename,
                                       struct __glc_stat64 *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_stat(filename, &st);
@@ -328,7 +328,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_stat64)(char const *__restrict filename,
 }
 
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_glc_lstat)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libc_glc_lstat)(char const *__restrict filename,
                                      struct __glc_stat *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_lstat(filename, &st);
@@ -338,7 +338,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_lstat)(char const *__restrict filename,
 }
 
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_glc_lstat64)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libc_glc_lstat64)(char const *__restrict filename,
                                        struct __glc_stat64 *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_lstat(filename, &st);
@@ -348,7 +348,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_lstat64)(char const *__restrict filename,
 }
 
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
-NOTHROW_RPC(LIBCCALL libc_glc_fstatat)(fd_t dirfd,
+NOTHROW_NCX(LIBCCALL libc_glc_fstatat)(fd_t dirfd,
                                        char const *__restrict filename,
                                        struct __glc_stat *__restrict buf,
                                        atflag_t flags) {
@@ -363,7 +363,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_fstatat)(fd_t dirfd,
 }
 
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
-NOTHROW_RPC(LIBCCALL libc_glc_fstatat64)(fd_t dirfd,
+NOTHROW_NCX(LIBCCALL libc_glc_fstatat64)(fd_t dirfd,
                                          char const *__restrict filename,
                                          struct __glc_stat64 *__restrict buf,
                                          atflag_t flags) {
@@ -577,7 +577,7 @@ NOTHROW(LIBCCALL stat_conv)(int vers, struct stat const *__restrict st, void *__
 DEFINE_PUBLIC_ALIAS(__fxstat, libc___fxstat);
 DEFINE_PUBLIC_ALIAS(_fxstat, libc___fxstat);
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((3)) int
-NOTHROW_RPC(LIBCCALL libc___fxstat)(int vers, fd_t fd, void *__restrict buf) {
+NOTHROW_NCX(LIBCCALL libc___fxstat)(int vers, fd_t fd, void *__restrict buf) {
 	struct stat info;
 	errno_t error = sys_kfstat(fd, &info);
 	if (error == -EOK)
@@ -588,7 +588,7 @@ NOTHROW_RPC(LIBCCALL libc___fxstat)(int vers, fd_t fd, void *__restrict buf) {
 DEFINE_PUBLIC_ALIAS(__fxstat64, libc___fxstat64);
 DEFINE_PUBLIC_ALIAS(_fxstat64, libc___fxstat64);
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((3)) int
-NOTHROW_RPC(LIBCCALL libc___fxstat64)(int vers, fd_t fd, void *__restrict buf) {
+NOTHROW_NCX(LIBCCALL libc___fxstat64)(int vers, fd_t fd, void *__restrict buf) {
 	struct stat info;
 	errno_t error = sys_kfstat(fd, &info);
 	if (error == -EOK)
@@ -599,7 +599,7 @@ NOTHROW_RPC(LIBCCALL libc___fxstat64)(int vers, fd_t fd, void *__restrict buf) {
 DEFINE_PUBLIC_ALIAS(__xstat, libc___xstat);
 DEFINE_PUBLIC_ALIAS(_xstat, libc___xstat);
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
-NOTHROW_RPC(LIBCCALL libc___xstat)(int vers, char const *filename, void *__restrict buf) {
+NOTHROW_NCX(LIBCCALL libc___xstat)(int vers, char const *filename, void *__restrict buf) {
 	struct stat info;
 	errno_t error = sys_kstat(filename, &info);
 	if (error == -EOK)
@@ -610,7 +610,7 @@ NOTHROW_RPC(LIBCCALL libc___xstat)(int vers, char const *filename, void *__restr
 DEFINE_PUBLIC_ALIAS(__xstat64, libc___xstat64);
 DEFINE_PUBLIC_ALIAS(_xstat64, libc___xstat64);
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
-NOTHROW_RPC(LIBCCALL libc___xstat64)(int vers, char const *filename, void *__restrict buf) {
+NOTHROW_NCX(LIBCCALL libc___xstat64)(int vers, char const *filename, void *__restrict buf) {
 	struct stat info;
 	errno_t error = sys_kstat(filename, &info);
 	if (error == -EOK)
@@ -620,7 +620,7 @@ NOTHROW_RPC(LIBCCALL libc___xstat64)(int vers, char const *filename, void *__res
 
 DEFINE_PUBLIC_ALIAS(__fxstatat, libc___fxstatat);
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((3, 4)) int
-NOTHROW_RPC(LIBCCALL libc___fxstatat)(int vers, fd_t dfd,
+NOTHROW_NCX(LIBCCALL libc___fxstatat)(int vers, fd_t dfd,
                                       char const *filename,
                                       void *__restrict buf,
                                       atflag_t flags) {
@@ -633,7 +633,7 @@ NOTHROW_RPC(LIBCCALL libc___fxstatat)(int vers, fd_t dfd,
 
 DEFINE_PUBLIC_ALIAS(__fxstatat64, libc___fxstatat64);
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((3, 4)) int
-NOTHROW_RPC(LIBCCALL libc___fxstatat64)(int vers, fd_t dfd,
+NOTHROW_NCX(LIBCCALL libc___fxstatat64)(int vers, fd_t dfd,
                                         char const *filename,
                                         void *__restrict buf,
                                         atflag_t flags) {
@@ -647,7 +647,7 @@ NOTHROW_RPC(LIBCCALL libc___fxstatat64)(int vers, fd_t dfd,
 DEFINE_PUBLIC_ALIAS(__lxstat, libc___lxstat);
 DEFINE_PUBLIC_ALIAS(_lxstat, libc___lxstat);
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
-NOTHROW_RPC(LIBCCALL libc___lxstat)(int vers, char const *filename, void *__restrict buf) {
+NOTHROW_NCX(LIBCCALL libc___lxstat)(int vers, char const *filename, void *__restrict buf) {
 	struct stat info;
 	errno_t error = sys_klstat(filename, &info);
 	if (error == -EOK)
@@ -658,7 +658,7 @@ NOTHROW_RPC(LIBCCALL libc___lxstat)(int vers, char const *filename, void *__rest
 DEFINE_PUBLIC_ALIAS(__lxstat64, libc___lxstat64);
 DEFINE_PUBLIC_ALIAS(_lxstat64, libc___lxstat64);
 INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
-NOTHROW_RPC(LIBCCALL libc___lxstat64)(int vers, char const *filename, void *__restrict buf) {
+NOTHROW_NCX(LIBCCALL libc___lxstat64)(int vers, char const *filename, void *__restrict buf) {
 	struct stat info;
 	errno_t error = sys_klstat(filename, &info);
 	if (error == -EOK)
@@ -769,7 +769,7 @@ convstat_kos2dos64(struct __dos_stat64 *__restrict dst,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBCCALL libc_dos_fstat32)(fd_t fd,
+NOTHROW_NCX(LIBCCALL libc_dos_fstat32)(fd_t fd,
                                        struct __dos_stat32 *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_fstat(fd, &st);
@@ -779,7 +779,7 @@ NOTHROW_RPC(LIBCCALL libc_dos_fstat32)(fd_t fd,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBCCALL libc_dos_fstat32i64)(fd_t fd,
+NOTHROW_NCX(LIBCCALL libc_dos_fstat32i64)(fd_t fd,
                                           struct __dos_stat32i64 *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_fstat(fd, &st);
@@ -789,7 +789,7 @@ NOTHROW_RPC(LIBCCALL libc_dos_fstat32i64)(fd_t fd,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((2)) int
-NOTHROW_RPC(LIBCCALL libc_dos_fstat64)(fd_t fd,
+NOTHROW_NCX(LIBCCALL libc_dos_fstat64)(fd_t fd,
                                        struct __dos_stat64 *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_fstat(fd, &st);
@@ -799,7 +799,7 @@ NOTHROW_RPC(LIBCCALL libc_dos_fstat64)(fd_t fd,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_dos_stat32)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libc_dos_stat32)(char const *__restrict filename,
                                       struct __dos_stat32 *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_stat(filename, &st);
@@ -809,7 +809,7 @@ NOTHROW_RPC(LIBCCALL libc_dos_stat32)(char const *__restrict filename,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_dos_stat32i64)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libc_dos_stat32i64)(char const *__restrict filename,
                                          struct __dos_stat32i64 *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_stat(filename, &st);
@@ -819,7 +819,7 @@ NOTHROW_RPC(LIBCCALL libc_dos_stat32i64)(char const *__restrict filename,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libc_dos_stat64)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libc_dos_stat64)(char const *__restrict filename,
                                       struct __dos_stat64 *__restrict buf) {
 	struct __kos_stat st;
 	int result = libc_kos_stat(filename, &st);
@@ -843,7 +843,7 @@ DEFINE_INTERN_ALIAS(libd__stat64, libd_dos_stat64);
 DEFINE_INTERN_ALIAS(libd__stat64i32, libd_dos_stat64);
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libd_dos_stat32)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libd_dos_stat32)(char const *__restrict filename,
                                       struct __dos_stat32 *__restrict buf) {
 	struct __kos_stat st;
 	int result = libd_kos_stat(filename, &st);
@@ -853,7 +853,7 @@ NOTHROW_RPC(LIBCCALL libd_dos_stat32)(char const *__restrict filename,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libd_dos_stat32i64)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libd_dos_stat32i64)(char const *__restrict filename,
                                          struct __dos_stat32i64 *__restrict buf) {
 	struct __kos_stat st;
 	int result = libd_kos_stat(filename, &st);
@@ -863,7 +863,7 @@ NOTHROW_RPC(LIBCCALL libd_dos_stat32i64)(char const *__restrict filename,
 }
 
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) int
-NOTHROW_RPC(LIBCCALL libd_dos_stat64)(char const *__restrict filename,
+NOTHROW_NCX(LIBCCALL libd_dos_stat64)(char const *__restrict filename,
                                       struct __dos_stat64 *__restrict buf) {
 	struct __kos_stat st;
 	int result = libd_kos_stat(filename, &st);

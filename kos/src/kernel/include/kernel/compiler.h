@@ -260,15 +260,12 @@ FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
 
 
 #ifdef __CC__
-#ifdef __clang_tidy__
-DECL_BEGIN
+#if defined(__clang_tidy__) && !defined(NO_INSTRUMENT_KMALLOC)
 #ifndef ____os_free_defined
 #define ____os_free_defined
-extern void free(void *ptr);
-#define __os_free free
+#define __os_free __builtin_free
 #endif /* !____os_free_defined */
-DECL_END
-#endif /* __clang_tidy__ */
+#endif /* __clang_tidy__ && !NO_INSTRUMENT_KMALLOC */
 
 #ifdef __cplusplus
 #include <__stdcxx.h>

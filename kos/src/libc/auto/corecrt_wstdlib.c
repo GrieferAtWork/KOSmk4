@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4f39c50 */
+/* HASH CRC-32:0x6ec09bd8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -627,7 +627,7 @@ NOTHROW_NCX(LIBDCALL libd__wfullpath)(char16_t *buf,
 
 		return NULL;
 	}
-	(char16_t *)libc_memcpyw(buf, wcs_realpath, reqlen);
+	buf = (char16_t *)libc_memcpyw(buf, wcs_realpath, reqlen);
 
 	libc_free(wcs_realpath);
 
@@ -671,7 +671,7 @@ NOTHROW_NCX(LIBKCALL libc__wfullpath)(char32_t *buf,
 
 		return NULL;
 	}
-	(char32_t *)libc_memcpyl(buf, wcs_realpath, reqlen);
+	buf = (char32_t *)libc_memcpyl(buf, wcs_realpath, reqlen);
 
 	libc_free(wcs_realpath);
 

@@ -136,8 +136,8 @@ INTDEF LPMATHERR libc_pdyn_matherr; /* From "libc/matherr.c" */
 
 
 DEFINE_PUBLIC_ALIAS(__setusermatherr, libc___setusermatherr);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBKCALL
-libc___setusermatherr(int (LIBKCALL *fptr)(struct _exception *)) {
+INTERN ATTR_SECTION(".text.crt.dos.application.init") void
+NOTHROW_NCX(LIBKCALL libc___setusermatherr)(int (LIBKCALL *fptr)(struct _exception *)) {
 	/* We've already asserted  that DOS's `struct _exception'  and
 	 * our `STRUCT_EXCEPTION'  are  binary  compatible  (s.a.  the
 	 * static asserts above), so  if the calling conventions  also

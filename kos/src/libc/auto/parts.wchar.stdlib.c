@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x175d549b */
+/* HASH CRC-32:0xdd01d1f5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -292,7 +292,7 @@ NOTHROW_RPC(LIBDCALL libd_wfrealpath4)(fd_t fd,
 
 		return NULL;
 	}
-	(char16_t *)libc_memcpyw(resolved, wcs_resolved, resolved_length);
+	resolved = (char16_t *)libc_memcpyw(resolved, wcs_resolved, resolved_length);
 
 	libc_free(wcs_resolved);
 
@@ -329,7 +329,7 @@ NOTHROW_RPC(LIBKCALL libc_wfrealpath4)(fd_t fd,
 
 		return NULL;
 	}
-	(char32_t *)libc_memcpyl(resolved, wcs_resolved, resolved_length);
+	resolved = (char32_t *)libc_memcpyl(resolved, wcs_resolved, resolved_length);
 
 	libc_free(wcs_resolved);
 
@@ -373,7 +373,7 @@ NOTHROW_RPC(LIBDCALL libd_wfrealpathat)(fd_t dirfd,
 
 		return NULL;
 	}
-	(char16_t *)libc_memcpyw(resolved, wcs_resolved, resolved_length);
+	resolved = (char16_t *)libc_memcpyw(resolved, wcs_resolved, resolved_length);
 
 	libc_free(wcs_resolved);
 
@@ -417,7 +417,7 @@ NOTHROW_RPC(LIBKCALL libc_wfrealpathat)(fd_t dirfd,
 
 		return NULL;
 	}
-	(char32_t *)libc_memcpyl(resolved, wcs_resolved, resolved_length);
+	resolved = (char32_t *)libc_memcpyl(resolved, wcs_resolved, resolved_length);
 
 	libc_free(wcs_resolved);
 
