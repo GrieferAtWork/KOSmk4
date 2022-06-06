@@ -41,6 +41,10 @@
 #define __BYTE_ORDER__ __BYTEORDER
 #elif defined(__ENDIAN__)
 #define __BYTE_ORDER__ __ENDIAN__
+#elif defined(__LITTLE_ENDIAN__) && !defined(__BIG_ENDIAN__)
+#define __BYTE_ORDER__ 1234
+#elif defined(__BIG_ENDIAN__) && !defined(__LITTLE_ENDIAN__)
+#define __BYTE_ORDER__ 4321
 #elif (defined(__BIG_ENDIAN__) || defined(__big_endian__) ||          \
        defined(__ARM_BIG_ENDIAN) || defined(__ARMEB__) ||             \
        defined(__MIPSEB__) || defined(_BIG_ENDIAN) ||                 \

@@ -2558,13 +2558,13 @@ __NAMESPACE_INT_END
 #define __INTMAX_WIDTH__ __PRIVATE_WIDTH(__SIZEOF_INTMAX_T__)
 #endif /* !__INTMAX_WIDTH__ */
 
-
-#define __PRIVATE_ALIGNOF1        __ALIGNOF_INT8__
-#define __PRIVATE_ALIGNOF2        __ALIGNOF_INT16__
-#define __PRIVATE_ALIGNOF4        __ALIGNOF_INT32__
-#define __PRIVATE_ALIGNOF8        __ALIGNOF_INT64__
-#define __PRIVATE_ALIGNOF(sizeof) __PRIVATE_ALIGNOF##sizeof
-#define __ALIGNOF(sizeof)         __PRIVATE_ALIGNOF(sizeof)
+/* Helpers to query the alignment of an integer type, given its size */
+#define __HYBRID_PRIVATE_ALIGNOF1        __ALIGNOF_INT8__
+#define __HYBRID_PRIVATE_ALIGNOF2        __ALIGNOF_INT16__
+#define __HYBRID_PRIVATE_ALIGNOF4        __ALIGNOF_INT32__
+#define __HYBRID_PRIVATE_ALIGNOF8        __ALIGNOF_INT64__
+#define __HYBRID_PRIVATE_ALIGNOF(sizeof) __HYBRID_PRIVATE_ALIGNOF##sizeof
+#define __HYBRID_ALIGNOF(sizeof)         __HYBRID_PRIVATE_ALIGNOF(sizeof)
 
 #endif /* !__DEEMON__ */
 

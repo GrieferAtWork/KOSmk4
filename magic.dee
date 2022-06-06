@@ -297,11 +297,6 @@ function main(argv: {string...}) {
 				case "--echo":
 					print "ECHO:", repr(value);
 					break;
-				case "--feature-test":
-					import(".kos.misc.libmagic.featuretest")
-						.generateCompilerSpecs(toolchain, value, COPYRIGHT);
-					AppExit.exit(0);
-					break;
 				case "-n":
 					CONFIG_MAX_COMPILERS = int(value);
 					break;
@@ -377,20 +372,6 @@ function main(argv: {string...}) {
 				case "--clang-tidy":
 					options.setdefault(OPT_COMPILE_SECONDARY, [])
 						.append("clang-tidy=" + value);
-					/* Configure clang-tidy macros and options. */
-					{
-						local mac = options.setdefault(OPT_COMPILE_MACROS, Dict());
-						mac["__KOS__"] = "1";
-						mac["__ELF__"] = "1";
-						if (TARGET_ARCH !is bound)
-							loadMissingSettings();
-						mac["__" + TARGET_ARCH + "__"] = "1";
-					}
-					options.setdefault(OPT_COMPILE_CLANG_TIDY_CC_ARGS, []).extend({
-						"-nostdinc",
-						"-isystem", "kos/include/i386-kos", /* FIXME: Don't hardcode here! */
-						"-isystem", "kos/include",
-					});
 					CONFIG_EMULATOR_USED = none;
 					break;
 

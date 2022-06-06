@@ -77,10 +77,11 @@ libdl_dltlsaddr2(USER DlModule *self, USER struct dltls_segment *seg) THROWS(E_S
 			goto err_nomem;
 		fd = DlModule_GetFd(self);
 		if unlikely(fd < 0)
-			goto err;
+			goto err_init;
 		if (preadall(fd, init, self->dm_tlsfsize, self->dm_tlsoff) <= 0) {
 			dl_seterrorf("Failed to read %" PRIuSIZ " bytes of TLS template data from %" PRIuN(__SIZEOF_ELFW(OFF__)),
 			             self->dm_tlsfsize, self->dm_tlsoff);
+err_init:
 			free(init);
 			goto err;
 		}

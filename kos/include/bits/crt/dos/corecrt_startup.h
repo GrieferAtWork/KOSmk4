@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_CRT_DOS__CRTMEMSTATE_H
-#define _BITS_CRT_DOS__CRTMEMSTATE_H 1
+#ifndef _BITS_CRT_DOS_CORECRT_STARTUP_H
+#define _BITS_CRT_DOS_CORECRT_STARTUP_H 1
 
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
@@ -57,4 +57,4 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_BITS_CRT_DOS__CRTMEMSTATE_H */
+#endif /* !_BITS_CRT_DOS_CORECRT_STARTUP_H */

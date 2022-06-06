@@ -236,7 +236,7 @@ function createClangTidyProcess(
 		language:     string,           /* "c" */
 		incPath:      string,           /* { "kos/src/kernel/include/i386-kos", "Ikos/src/kernel/include" } */
 		macros:       {string: string}, /* { "__KOS__" : "1" } */
-		clangTidyExe: string        /* /path/to/clang-tidy.exe */
+		clangTidyExe: string            /* /path/to/clang-tidy.exe */
 		): Waitable {
 	if (language is none)
 		language = getLanguageFromExtension(fs.extof(srcFile));
@@ -260,6 +260,11 @@ function createClangTidyProcess(
 		ccargs.append(flag);
 	}
 	ccargs.extend({ "-MMD", "-MF", depFile });
+	local TARGET = toolchain.config.CROSS_PREFIX
+		.lsstrip("binutils/")
+		.partition("/")
+		.first
+		.rsstrip("-kos");
 	ccargs.extend({
 		/* XXX: These  are work-arounds  caused by  the fact  that I'm not
 		 *      using  a cross-compiled version of clang-tidy, but instead
@@ -268,17 +273,36 @@ function createClangTidyProcess(
 		 * that was built for anything else...
 		 */
 		"-undef",
-		"-m32",
+		"-nostdinc",
 		"-mno-ms-bitfields",
+		"-isystem", "kos/include/{}-kos".format({
+			{ "x86_64" : "i386" }.get(TARGET, TARGET)
+		}),
+		"-isystem", "kos/include",
+		"-D__KOS__",
+		"-D__ELF__",
+		"-D__{}__".format({ TARGET }),
 		"-D__clang__",
 		"-D__clang_tidy__",
+#ifdef __WINDOWS__ /* Assume the use of clang-tidy build for windows (so re-inject some stuff we can't override) */
 		"-D__SIZEOF_WCHAR_T__=2",
 		"-D__SIZEOF_LONG__=4",
 		"-D__SIZEOF_LONG_DOUBLE__=8",
 		"-D__ALIGNOF_INT64__=8",
+#endif /* __WINDOWS__ */
 		"-D__GNUC__=9",
 		"-D__GNUC_MINOR__=1",
 	});
+	switch (TARGET) {
+	case "i386":
+		ccargs.extend({ "-m32", });
+		break;
+	case "x86_64":
+		ccargs.extend({ "-m64", "-D__SIZEOF_INT128__=16", });
+		break;
+	default:
+		break;
+	}
 	if (language == "c++") {
 		ccargs.extend({
 			"-D__cplusplus=201406L",
